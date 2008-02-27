@@ -1,0 +1,49 @@
+! This is a script for Ferret.
+
+! This script compares "coefoz_v2_3.nc" and "coefoz_LMDZ.nc", at a
+! given horizontal position of the LMDZ grid and at a given month. Run
+! this script from the directory containing "coefoz_LMDZ.nc".
+
+! Reset everything:
+cancel data_set/all
+cancel axis/all
+cancel viewport
+CANCEL EXPRESSION
+CANCEL GRID
+CANCEL LIST/ALL
+CANCEL MEMORY/all
+CANCEL SYMBOL/ALL
+CANCEL REGION/all
+CANCEL VARIABLE/ALL
+pplus/reset
+cancel window/all
+
+use/title="48" coefoz_LMDZ
+use "$HOME/Documents/Utilisation_LMDZ/Input_etat0_lim/Ozone/coefoz_v2_3.nc"
+!!use "$HOME/Documents/Utilisation_LMDZ/Results_etat0_lim/45/coefoz_LMDZ.nc"
+
+set region/i=25/j=2/l=9 ! choose horizontal position and month
+pplus axlsze .15
+! First plot coefoz_LMDZ to have longitude in the labels
+
+! Mole fraction:
+set window/new
+plot/symbol/line/vs/d=1/vlog/vlimits=1e4:.001/size=.2/hlog/hlim=1e-8:1e-4/set_up r, pls
+pplus ylab "pressure (hPa)"
+go unlabel 6
+pplus plot
+
+plot/line/symbol/overlay/title="Mobidic regridded in latitude" \
+   r[d=2, gy=r[d=1]@ave]
+!!plot/symbol/line/vs/d=3/title="45"/overlay r, pls
+
+! Production:
+set window/new
+plot/symbol/line/vs/d=1/vlog/vlimits=1e4:.001/size=.2/set_up p_net, pls
+pplus ylab "pressure (hPa)"
+go unlabel 6
+pplus plot
+
+plot/line/symbol/overlay/title="Mobidic regridded in latitude" \
+   p_net[d=2, gy=p_net[d=1]@ave]
+!!plot/symbol/line/vs/d=3/title="45"/overlay p_net, pls

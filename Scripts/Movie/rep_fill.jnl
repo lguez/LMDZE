@@ -1,0 +1,42 @@
+! This is a script for Ferret.
+
+! Description: repeat fill
+
+! This script creates a set of GIF files for a 3D (longitude,
+! latitude, time) variable.
+! It does not average on longitude.
+! There is one GIF image for each time value.
+! The script takes 5 input arguments:
+! - variable name,
+! - directory of data file,
+! - minimun level of color palette,
+! - maximum level of color palette,
+! - interval between levels.
+
+!!set mode verify
+!!set mode journal
+
+! Preserve Ferret state:
+define region/default save
+set data/save
+set grid/save
+
+say Variable name: $1
+say Directory: $2
+
+use histday.nc
+use/title="Run $2, beginning at day `int(t_ave_00086400[l=1]/86400)`" histday.nc
+
+say minimum = `$1[x=@min, y=@min, t=@min]`
+say maximum = `$1[x=@max, y=@max, t=@max]`
+
+repeat/l=1:90 \
+(\
+   fill/levels=($3,$4,$5) $1; go land;\
+   frame/file=`l`.gif;\
+)
+
+! Restore Ferret state:
+set region save
+set data/restore
+set grid/restore

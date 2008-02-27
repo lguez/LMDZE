@@ -1,0 +1,29 @@
+! This is a script for Ferret.
+
+! This script compares a Mobidic field with the field regridded in
+! latitude. The field regridded in latitude is read from a text
+! file. The text file is exported from TotalView.
+
+! Reset everything:
+cancel data_set/all
+cancel axis/all
+cancel viewport
+CANCEL EXPRESSION
+CANCEL GRID
+CANCEL LIST/ALL
+CANCEL MEMORY/all
+CANCEL SYMBOL/ALL
+CANCEL REGION/all
+CANCEL VARIABLE/ALL
+pplus/reset
+
+use "Input_etat0_lim/Ozone/coefoz_v2_3.nc"
+use "Results_etat0_lim/40/coefoz_LMDZ.nc"
+define grid/z=r[d=1]/y=r[d=2] mob_regr_lat
+
+file/variables="-,r_regr_lat"/grid=mob_regr_lat/skip=44/format=delimited/delimiters=" " "Results_etat0_lim/40/v_regr_lat.txt"
+
+set region/j=1/l=1
+pplus axlsze 0.15
+plot/vlog/vlimits=.01:1000/symbol/line r[d=1]
+plot/overlay/symbol/line r_regr_lat

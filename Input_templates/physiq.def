@@ -1,0 +1,83 @@
+#
+# $Header: /home/cvsroot/LMDZ4/physiq.def,v 1.2 2004/06/22 11:45:18 lmdzadmin Exp $
+#
+
+OCEAN=force 
+VEGET=y
+OK_journe=n
+OK_mensuel=y
+OK_instan=n
+if_ebil=0
+#
+# parametres KE
+#
+epmax = .99
+ok_adj_ema = n
+iflag_clw = 1
+# 
+# parametres nuages
+#
+cld_lc_lsc = 0.00026
+cld_lc_con = 0.00026
+cld_tau_lsc = 3600.
+cld_tau_con = 3600.
+ffallv_lsc = 1.
+ffallv_con = 1.
+coef_eva = 0.00002
+reevap_ice = y
+iflag_cldcon = 3
+iflag_pdf = 1
+fact_cldcon = 1.
+#facttemps = 1.e-4
+facttemps = 0.0001
+ok_newmicro = y
+ratqsbas = 0.005
+ratqshaut = 0.33
+rad_froid = 35
+rad_chau1=12
+rad_chau2=11
+#ksta_ter=1.e-7
+ksta_ter=0.0000001
+#
+# parametres outputs
+#
+#niveau de sortie "hf" lev_histhf avec
+# - lev_histhf=3 => defaut
+# - lev_histhf=4 => histhf3d.nc champs 3d niveaux modele
+lev_histhf=3
+#niveau de sortie "day" lev_histday
+# - lev_histday=2 => defaut
+# - lev_histday=3 => + champs 3D => F. Lott
+# - lev_histday=4 => + champs sous-surfaces
+lev_histday=2
+#niveau de sortie "mth" lev_histmth avec
+# - lev_histmth=2 => defaut
+# - lev_histmth=3 => albedo, rugosite sous-surfaces
+# - lev_histmth=4 => champs tendances 3d
+lev_histmth=2
+#
+# parametres climatique
+#
+R_ecc = 0.016715
+R_peri = 102.7
+R_incl = 23.441
+solaire = 1365.
+co2_ppm = 348.
+CH4_ppb = 1650.
+N2O_ppb = 306.
+CFC11_ppt = 280.
+CFC12_ppt = 484.
+#
+# parametres simulateur ISCCP
+#
+top_height = 3
+#overlap = 1, 2 ou 3
+overlap = 3
+#cdmmax
+#cdmmax = 2.5E-3
+cdmmax = 0.0025
+#cdhmax
+#cdhmax = 2.0E-3
+cdhmax = 0.002
+iflag_pbl = 1
+iflag_thermals = 0
