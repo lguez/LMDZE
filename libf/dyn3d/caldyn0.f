@@ -1,9 +1,8 @@
-!
-! $Header: /home/cvsroot/LMDZ4/libf/dyn3d/caldyn0.F,v 1.1.1.1 2004/05/19 12:53:07 lmdzadmin Exp $
-!
       SUBROUTINE caldyn0
      $ (itau,ucov,vcov,teta,ps,masse,pk,phis ,
      $  phi,w,pbaru,pbarv,time )
+
+!     From dyn3d/caldyn0.F,v 1.1.1.1 2004/05/19 12:53:07
 
       use dimens_m
       use paramet_m

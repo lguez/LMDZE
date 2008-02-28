@@ -15,7 +15,7 @@ libf_dir = .
 VPATH = ${libf_dir}:${libf_dir}/dyn3d:${libf_dir}/filtrez:${libf_dir}/phylmd:${libf_dir}/bibio
 
 # Compiler-dependent part:
-include compiler.mk
+-include compiler.mk
 
 # Source files:
 sources_etat0_lim = abort_gcm.f90 acc.f dimens_m.f90 comvert.f90 comconst.f90 paramet_m.f90 bernoui.f caldyn0.f coefpoly.f comdissnew.f90 conf_dat2d.f90 conf_dat3d.f90 conf_gcm.f90 convflu.f convmas.f covcont.f cray.f90 dimphy.f90 diverg.f diverg_gam.f divergf.f divgrad.f divgrad2.f dynredem0.f90 dynredem1.f90 eigen_sort.f enercin.f indicesol.f90 etat0_lim.f90 etat0.f90 exner_hyb.f90 extrapol.f filtreg.f flumass.f fxhyp.f fxy.f fxyhyper.f90 fxysinus.f fyhyp.f geopot.f90 grid_change.f90 grad.f gradiv.f gradiv2.f grid_atob.f90 heavyside.f iniconst.f90 inidissip.f inifgn.f inifilr.f inigeom.f inter_barxy.f90 jacobi.f laplacien.f laplacien_gam.f laplacien_rot.f laplacien_rotgam.f limit.f90 massbar.f massbarxy.f massdair.f minmax.f90 nxgrad.f nxgrad_gam.f nxgraro2.f nxgrarot.f phyredem.f pression.f90 psextbar.f q_sat.f90 ran1.f rotat.f rotat_nfil.f rotatf.f sortvarc0.f tourpot.f vitvert.f logic.f90 comgeom.f90 serre.f90 dimsoil.f90 temps.f90 clesphys.f90 iniprint.f90 ener.f90 advtrac_m.f90 netcdf95.f90 startdyn.f90 regr1_step_av_m.f90 regr_coefoz.f90 pressure_m.f90 regr1_lint_m.f90 start_init_phys_m.f90 start_init_orog_m.f90 grid_noro_m.f90 gr_int_dyn_m.f90

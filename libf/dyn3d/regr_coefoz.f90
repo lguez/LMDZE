@@ -1,6 +1,7 @@
 module regr_coefoz_m
 
   ! This module is clean: no C preprocessor directive, no include line.
+  ! Author: Lionel GUEZ
 
   implicit none
 
@@ -33,7 +34,7 @@ contains
 
     ! We assume that in the input file the latitude is in degrees
     ! and the pressure level is in hPa, and that both are strictly
-    ! monotonic.
+    ! monotonic (as all NetCDF coordinate variables should be).
 
     use dimens_m, only: iim, jjm, llm
     use comgeom, only: rlatv
@@ -85,18 +86,21 @@ contains
     integer, parameter:: n_o3_param = 8 ! number of ozone parameters
 
     character(len=11) name_in(n_o3_param)
+    ! (name of NetCDF variable in the input file)
+
     character(len=9) name_out(n_o3_param)
+    ! (name of NetCDF variable in the output file)
 
     logical:: stepav_choice(n_o3_param) = .true.
-    ! (vertical regridding by step avergage, otherwise linear interpolation)
+    ! (vertical regridding by step average, otherwise linear interpolation)
 
     real top_value(n_o3_param) 
     ! (value at 0 pressure, only used for linear interpolation)
 
     integer varid_in(n_o3_param), varid_out(n_o3_param), ncerr ! for NetCDF
 
-    real, allocatable:: v_regr_lat(:, :, :)
-    ! (mean of "v" over a latitude interval)
+    real, allocatable:: v_regr_lat(:, :, :) ! (jjm + 1, 0:n_plev, 12)
+    ! (mean of a variable "v" over a latitude interval)
     ! First dimension is latitude interval.
     ! The latitude interval for "v_regr_lat(j,:, :)" contains "rlatu(j)".
     ! If "j" is between 2 and "jjm" then the interval is:
@@ -159,12 +163,12 @@ contains
 
     latitude => coordin(ncid_in, "latitude")
     ! Convert from degrees to rad, because "rlatv" is in rad:
-    latitude(:) = latitude(:) / 180. * pi
+    latitude = latitude / 180. * pi
     n_lat = size(latitude)
     ! We need to supply the latitudes to "stepav" in
     ! increasing order, so invert order if necessary:
     decr_lat = latitude(1) > latitude(n_lat)
-    if (decr_lat) latitude(:) = latitude(n_lat:1:-1)
+    if (decr_lat) latitude = latitude(n_lat:1:-1)
 
     ! Compute edges of latitude intervals:
     allocate(lat_in_edg(n_lat + 1))
@@ -174,13 +178,13 @@ contains
     deallocate(latitude) ! pointer
 
     plev => coordin(ncid_in, "plev")
-    ! Convert from hPa to Pa because "p3d" is in Pa:
-    plev(:) = plev(:) * 100.
+    ! Convert from hPa to Pa because "p3d" and "pls" are in Pa:
+    plev = plev * 100.
     n_plev = size(plev)
     ! We need to supply the pressure levels to "stepav" in
     ! increasing order, so invert order if necessary:
     decr_plev = plev(1) > plev(n_plev)
-    if (decr_plev) plev(:) = plev(n_plev:1:-1)
+    if (decr_plev) plev = plev(n_plev:1:-1)
 
     ! Compute edges of pressure intervals:
     allocate(press_in_edg(n_plev + 1))
@@ -213,7 +217,8 @@ contains
        ! equivalent to weighting by cosine of latitude:
        v_regr_lat(jjm+1:1:-1, 1:, :) = regr1_step_av(o3_par_in, &
             xs=sin(lat_in_edg), xt=sin((/- pi / 2, rlatv(jjm:1:-1), pi / 2/)))
-       ! (invert order of indices because "rlatu" is decreasing)
+       ! (invert order of indices in "v_regr_lat" because "rlatu" is
+       ! decreasing)
 
        ! Regrid in pressure at each horizontal position:
 
@@ -293,7 +298,7 @@ contains
   subroutine prepare_out(ncid_in, varid_in, name_out, ncid_out, varid_out)
 
     ! This subroutine creates the NetCDF output file, defines
-    ! dimensions and variables, writes coordinate variables and "pls".
+    ! dimensions and variables, and writes coordinate variables and "pls".
 
     use dimens_m, only: iim, jjm, llm
     use comgeom, only: rlatu, rlonv
@@ -392,7 +397,7 @@ contains
     ! (convert from rad to degrees and sort in increasing order)
     call handle_err("nf90_put_var", ncerr, ncid_out)
 
-    ncerr = nf90_put_var(ncid_out, varid_rlonv, rlonv(:) / pi * 180.)
+    ncerr = nf90_put_var(ncid_out, varid_rlonv, rlonv / pi * 180.)
     ! (convert from rad to degrees)
     call handle_err("nf90_put_var", ncerr, ncid_out)
 
