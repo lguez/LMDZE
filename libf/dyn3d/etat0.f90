@@ -95,7 +95,6 @@ contains
     REAL flic_tmp(iim + 1, jjm + 1) !fraction land ice temporary
 
     INTEGER l, ji
-    INTEGER nq
 
     REAL pk(iim + 1, jjm + 1, llm) ! fonction d'Exner aux milieux des couches 
     real pks(iim + 1, jjm + 1)
@@ -186,28 +185,30 @@ contains
 
     q3d(:, :, :, 2:4) = 0. ! liquid water, radon and lead
 
-    ! Ozone:
+    if (nqmx >= 5) then
+       ! Ozone:
 
-    ! Compute ozone parameters on the LMDZ grid:
-    call regr_coefoz
+       ! Compute ozone parameters on the LMDZ grid:
+       call regr_coefoz
 
-    ! Find the month containing the day number "dayref":
-    month = (dayref - 1) / 30 + 1
-    print *, "month = ", month
+       ! Find the month containing the day number "dayref":
+       month = (dayref - 1) / 30 + 1
+       print *, "month = ", month
 
-    call nf95_open("coefoz_LMDZ.nc", nf90_nowrite, ncid)
+       call nf95_open("coefoz_LMDZ.nc", nf90_nowrite, ncid)
 
-    ! Get data at the right month from the input file:
-    call nf95_inq_varid(ncid, "r_Mob", varid)
-    ncerr = nf90_get_var(ncid, varid, q3d(:, :, :, 5), &
-         start=(/1, 1, 1, month/))
-    call handle_err("nf90_get_var r_Mob", ncerr)
+       ! Get data at the right month from the input file:
+       call nf95_inq_varid(ncid, "r_Mob", varid)
+       ncerr = nf90_get_var(ncid, varid, q3d(:, :, :, 5), &
+            start=(/1, 1, 1, month/))
+       call handle_err("nf90_get_var r_Mob", ncerr)
 
-    call nf95_close(ncid)
-    ! Latitudes are in increasing order in the input file while
-    ! "rlatu" is in decreasing order so we need to invert order. Also, we
-    ! compute mass fraction from mole fraction:
-    q3d(:, :, :, 5) = q3d(:, jjm+1:1:-1, :, 5)  * 48. / 29.
+       call nf95_close(ncid)
+       ! Latitudes are in increasing order in the input file while
+       ! "rlatu" is in decreasing order so we need to invert order. Also, we
+       ! compute mass fraction from mole fraction:
+       q3d(:, :, :, 5) = q3d(:, jjm+1:1:-1, :, 5)  * 48. / 29.
+    end if
 
     tsol(:) = pack(tsol_2d, dyn_phy)
     qsol(:) = pack(qsol_2d, dyn_phy)
@@ -305,7 +306,7 @@ contains
     END forall
 
     ! Initialisation pour traceurs:
-    call iniadvtrac(nq)
+    call iniadvtrac
     ! Ecriture:
     CALL inidissip(lstardis, nitergdiv, nitergrot, niterh, tetagdiv, &
          tetagrot, tetatemp)
@@ -317,8 +318,8 @@ contains
     CALL geopot(ip1jmp1, tpot, pk , pks,  phis  , phi)
     CALL caldyn0(0, uvent, vvent, tpot, psol, masse, pk, phis, phi, w, &
          pbaru, pbarv, 0)
-    CALL dynredem0("start.nc", dayref, phis, nqmx)
-    CALL dynredem1("start.nc", 0., vvent, uvent, tpot, q3d, nqmx, masse, psol)
+    CALL dynredem0("start.nc", dayref, phis)
+    CALL dynredem1("start.nc", 0., vvent, uvent, tpot, q3d, masse, psol)
 
     ! Ecriture état initial physique:
     print *, 'dtvr = ', dtvr

@@ -6,6 +6,7 @@
 
       use dimens_m
       use paramet_m
+             use parafilt
       IMPLICIT NONE
 c=======================================================================
 c
@@ -45,7 +46,6 @@ c                ifiltre = 2     filtre directe
 c                ifiltre =-2     filtre inverse
 c
 c
-      include "parafilt.h"
       include "coefils.h"
 c
       INTEGER nlat,nbniv,ifiltre,iter

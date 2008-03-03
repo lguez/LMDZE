@@ -204,7 +204,7 @@ PROGRAM gcm
   print *, "day_ini = ", day_ini
   print *, "day_end = ", day_end
 
-  CALL dynredem0("restart.nc", day_end, phis, nqmx)
+  CALL dynredem0("restart.nc", day_end, phis)
   CALL inithist(day_ref, annee_ref, zdtvr, nqmx, histid, histvid, &
        infile="dyn_hist.nc", t_ops = iecri * daysec, t_wrt = iecri * daysec)
   CALL initdynav(day_ref, annee_ref, zdtvr, nqmx, histaveid, &

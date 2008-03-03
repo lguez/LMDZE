@@ -27,7 +27,7 @@ contains
     ! Modification M.-A. Filiberti 02/02 lecture de "traceur.def"
     ! Modification de l'intégration de "q" (26/04/94)
 
-    integer, intent(out):: nq
+    integer, intent(out), optional:: nq
 
     ! Variables local to the procedure:
 
@@ -36,7 +36,7 @@ contains
     character(len=2) txtp(9)
     character(len=13) str1, str2
 
-    integer iq, iiq, iiiq, ierr, ii
+    integer iq, iiq, iiiq, ierr, ii, nq_local
 
     data txtp/'x', 'y', 'z', 'xx', 'xy', 'xz', 'yy', 'yz', 'zz'/
 
@@ -101,26 +101,26 @@ contains
          iostat=ierr)
     if (ierr == 0) then
        print *, 'Ouverture de "traceur.def" ok'
-       read(unit=90, fmt=*) nq
-       print *, 'nombre de traceurs ', nq
-       if (nq > nqmx) then
+       read(unit=90, fmt=*) nq_local
+       print *, 'nombre de traceurs ', nq_local
+       if (nq_local > nqmx) then
           print *, 'nombre de traceurs trop important'
           print *, 'verifier traceur.def'
           stop
        endif
 
-       do iq=1, nq
+       do iq=1, nq_local
           read(90, 999) hadv(iq), vadv(iq), tnom(iq)
        end do
        close(90)  
        PRINT *, 'lecture de traceur.def :'   
-       do iq=1, nq
+       do iq=1, nq_local
           write(*, *) hadv(iq), vadv(iq), tnom(iq)
        end do
     else
-       print *, 'problème ouverture traceur.def'
-       print *, 'ATTENTION on prend des valeurs par défaut'
-       nq = 4
+       print *, 'Problème à l''ouverture de "traceur.def"'
+       print *, 'Attention : on prend des valeurs par défaut.'
+       nq_local = 4
        hadv(1) = 14
        vadv(1) = 14
        tnom(1) = 'H2Ov'
@@ -135,7 +135,7 @@ contains
        tnom(4) = 'PB'
     ENDIF
     PRINT *, 'Valeur de traceur.def :'
-    do iq=1, nq
+    do iq=1, nq_local
        write(*, *) hadv(iq), vadv(iq), tnom(iq)
     end do
 
@@ -143,7 +143,7 @@ contains
     ! détemine le nom long :
     iiq=0
     ii=0
-    do iq=1, nq 
+    do iq=1, nq_local
        iiq=iiq+1
        if (hadv(iq) /= vadv(iq)) then
           if (hadv(iq) == 10.and.vadv(iq) == 16) then
@@ -209,6 +209,7 @@ contains
           niadv(iiq)=iq
        endif
     end do
+    if (present(nq)) nq = nq_local
 
 999 format (i2, 1x, i2, 1x, a8)
 

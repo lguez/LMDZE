@@ -10,13 +10,13 @@ c
       use logic
       use comgeom
       use serre
+             use parafilt
       IMPLICIT NONE
 c
 c     version 3 .....
 
 c     Correction  le 28/10/97    P. Le Van .
 c  -------------------------------------------------------------------
-      include "parafilt.h"
 c  -------------------------------------------------------------------
       include "coefils.h"
 

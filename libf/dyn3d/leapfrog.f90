@@ -332,8 +332,7 @@ contains
           ENDIF
 
           IF (itau == itaufin) THEN
-             CALL dynredem1("restart.nc", 0.0, &
-                  vcov, ucov, teta, q, nqmx, masse, ps)
+             CALL dynredem1("restart.nc", 0., vcov, ucov, teta, q, masse, ps)
              CLOSE(99)
           ENDIF
 

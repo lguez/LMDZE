@@ -1,125 +1,117 @@
-SUBROUTINE dynredem1(fichnom,time, vcov,ucov,teta,q,nq,masse,ps)
+SUBROUTINE dynredem1(fichnom, time, vcov, ucov, teta, q, masse, ps)
 
-  ! From dyn3d/dynredem.F,v 1.2 2004/06/22 11:45:30
+  ! From dyn3d/dynredem.F, v 1.2 2004/06/22 11:45:30
 
-  !  Ecriture du fichier de redémarrage au format NetCDF
+  ! Ecriture du fichier de redémarrage au format NetCDF
 
-  use dimens_m
-  use paramet_m
-  use comgeom
-  use temps
-  use abort_gcm_m, only: abort_gcm
-  use advtrac_m, only: tname
+  USE dimens_m, ONLY : llm, nqmx
+  USE paramet_m, ONLY : ip1jm, ip1jmp1
+  USE temps, ONLY : itaufin, itau_dyn
+  USE abort_gcm_m, ONLY : abort_gcm
+  USE advtrac_m, ONLY : tname
 
   IMPLICIT NONE
-  include "netcdf.inc"
 
-  INTEGER nq
-  REAL, intent(in):: vcov(ip1jm,llm),ucov(ip1jmp1,llm) 
-  REAL teta(ip1jmp1,llm)                   
-  REAL, intent(in):: ps(ip1jmp1)
-  real masse(ip1jmp1,llm)                   
-  REAL, intent(in):: q(ip1jmp1,llm,nq)
-  CHARACTER(len=*) fichnom
+  REAL, INTENT (IN) :: vcov(ip1jm, llm), ucov(ip1jmp1, llm), teta(ip1jmp1, llm)
+  REAL, INTENT (IN) :: ps(ip1jmp1), masse(ip1jmp1, llm)
+  REAL, INTENT (IN) :: q(ip1jmp1, llm, nqmx)
+  CHARACTER(len=*), INTENT (IN) :: fichnom
 
-  REAL time
-  INTEGER nid, nvarid
-  INTEGER ierr
-  INTEGER iq
-  INTEGER length
-  PARAMETER (length = 100)
-  REAL tab_cntrl(length) ! tableau des parametres du run
-  character(len=20) modname
-  character(len=80) abort_message
+  INCLUDE 'netcdf.inc'
 
-  INTEGER nb
-  SAVE nb
-  DATA nb / 0 /
+  REAL :: time
+  INTEGER :: nid, nvarid
+  INTEGER :: ierr
+  INTEGER :: iq
+  INTEGER :: length
+  PARAMETER (length=100)
+  REAL :: tab_cntrl(length) ! tableau des parametres du run
+  CHARACTER (len=20) :: modname
+  CHARACTER (len=80) :: abort_message
+  INTEGER :: nb = 0
 
   !---------------------------------------------------------
 
-  print *, "Call sequence information: dynredem1"
+  PRINT *, 'Call sequence information: dynredem1'
 
   modname = 'dynredem1'
-  ierr = NF_OPEN(fichnom, NF_WRITE, nid)
-  IF (ierr .NE. NF_NOERR) THEN
-     PRINT*, "Pb. d ouverture "//fichnom
-     stop 1
-  ENDIF
+  ierr = nf_open(fichnom, nf_write, nid)
+  IF (ierr/=nf_noerr) THEN
+     PRINT *, 'Pb. d ouverture ' // fichnom
+     STOP 1
+  END IF
 
   !  Ecriture/extension de la coordonnee temps
 
   nb = nb + 1
-  ierr = NF_INQ_VARID(nid, "temps", nvarid)
-  IF (ierr .NE. NF_NOERR) THEN
-     print *, NF_STRERROR(ierr)
-     abort_message='Variable temps n est pas definie'
-     CALL abort_gcm(modname,abort_message,ierr)
-  ENDIF
-  ierr = NF_PUT_VAR1_REAL (nid,nvarid,nb,time)
-  PRINT*, "Enregistrement pour ", nb, time
+  ierr = nf_inq_varid(nid, 'temps', nvarid)
+  IF (ierr/=nf_noerr) THEN
+     PRINT *, nf_strerror(ierr)
+     abort_message = 'Variable temps n est pas definie'
+     CALL abort_gcm(modname, abort_message, ierr)
+  END IF
+  ierr = nf_put_var1_real(nid, nvarid, nb, time)
+  PRINT *, 'Enregistrement pour ', nb, time
 
-  !
+
   !  Re-ecriture du tableau de controle, itaufin n'est plus defini quand
   !  on passe dans dynredem0
-  ierr = NF_INQ_VARID (nid, "controle", nvarid)
-  IF (ierr .NE. NF_NOERR) THEN
-     abort_message="dynredem1: Le champ <controle> est absent"
+  ierr = nf_inq_varid(nid, 'controle', nvarid)
+  IF (ierr/=nf_noerr) THEN
+     abort_message = 'dynredem1: Le champ <controle> est absent'
      ierr = 1
-     CALL abort_gcm(modname,abort_message,ierr)
-  ENDIF
-  ierr = NF_GET_VAR_REAL(nid, nvarid, tab_cntrl)
-  tab_cntrl(31) = REAL(itau_dyn + itaufin)
-  ierr = NF_PUT_VAR_REAL (nid,nvarid,tab_cntrl)
+     CALL abort_gcm(modname, abort_message, ierr)
+  END IF
+  ierr = nf_get_var_real(nid, nvarid, tab_cntrl)
+  tab_cntrl(31) = real(itau_dyn+itaufin)
+  ierr = nf_put_var_real(nid, nvarid, tab_cntrl)
 
   !  Ecriture des champs
-  !
-  ierr = NF_INQ_VARID(nid, "ucov", nvarid)
-  IF (ierr .NE. NF_NOERR) THEN
-     PRINT*, "Variable ucov n est pas definie"
-     stop 1
-  ENDIF
-  ierr = NF_PUT_VAR_REAL (nid,nvarid,ucov)
 
-  ierr = NF_INQ_VARID(nid, "vcov", nvarid)
-  IF (ierr .NE. NF_NOERR) THEN
-     PRINT*, "Variable vcov n est pas definie"
-     stop 1
-  ENDIF
-  ierr = NF_PUT_VAR_REAL (nid,nvarid,vcov)
+  ierr = nf_inq_varid(nid, 'ucov', nvarid)
+  IF (ierr/=nf_noerr) THEN
+     PRINT *, 'Variable ucov n est pas definie'
+     STOP 1
+  END IF
+  ierr = nf_put_var_real(nid, nvarid, ucov)
 
-  ierr = NF_INQ_VARID(nid, "teta", nvarid)
-  IF (ierr .NE. NF_NOERR) THEN
-     PRINT*, "Variable teta n est pas definie"
-     stop 1
-  ENDIF
-  ierr = NF_PUT_VAR_REAL (nid,nvarid,teta)
+  ierr = nf_inq_varid(nid, 'vcov', nvarid)
+  IF (ierr/=nf_noerr) THEN
+     PRINT *, 'Variable vcov n est pas definie'
+     STOP 1
+  END IF
+  ierr = nf_put_var_real(nid, nvarid, vcov)
 
-  IF(nq.GE.1) THEN
-     do iq=1,nq   
-        ierr = NF_INQ_VARID(nid, tname(iq), nvarid)
-        IF (ierr .NE. NF_NOERR) THEN
-           PRINT*, "Variable  ", tname(iq), "n'est pas définie"
-           stop 1
-        ENDIF
-        ierr = NF_PUT_VAR_REAL (nid,nvarid,q(1,1,iq))
-     ENDDO
-  ENDIF
-  !
-  ierr = NF_INQ_VARID(nid, "masse", nvarid)
-  IF (ierr .NE. NF_NOERR) THEN
-     PRINT*, "Variable masse n est pas definie"
-     stop 1
-  ENDIF
-  ierr = NF_PUT_VAR_REAL (nid,nvarid,masse)
-  !
-  ierr = NF_INQ_VARID(nid, "ps", nvarid)
-  IF (ierr .NE. NF_NOERR) THEN
-     PRINT*, "Variable ps n est pas definie"
-     stop 1
-  ENDIF
-  ierr = NF_PUT_VAR_REAL (nid,nvarid,ps)
+  ierr = nf_inq_varid(nid, 'teta', nvarid)
+  IF (ierr/=nf_noerr) THEN
+     PRINT *, 'Variable teta n est pas definie'
+     STOP 1
+  END IF
+  ierr = nf_put_var_real(nid, nvarid, teta)
 
-  ierr = NF_CLOSE(nid)
+  DO iq = 1, nqmx
+     ierr = nf_inq_varid(nid, tname(iq), nvarid)
+     IF (ierr/=nf_noerr) THEN
+        PRINT *, 'Variable  ', tname(iq), 'n''est pas définie'
+        STOP 1
+     END IF
+     ierr = nf_put_var_real(nid, nvarid, q(1, 1, iq))
+  END DO
+
+  ierr = nf_inq_varid(nid, 'masse', nvarid)
+  IF (ierr/=nf_noerr) THEN
+     PRINT *, 'Variable masse n est pas definie'
+     STOP 1
+  END IF
+  ierr = nf_put_var_real(nid, nvarid, masse)
+
+  ierr = nf_inq_varid(nid, 'ps', nvarid)
+  IF (ierr/=nf_noerr) THEN
+     PRINT *, 'Variable ps n est pas definie'
+     STOP 1
+  END IF
+  ierr = nf_put_var_real(nid, nvarid, ps)
+
+  ierr = nf_close(nid)
 
 END SUBROUTINE dynredem1

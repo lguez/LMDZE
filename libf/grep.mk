@@ -5,8 +5,9 @@ etat0_lim_mod.txt: ${sources_etat0_lim}
 	grep --extended-regexp --ignore-case --no-filename "^ *module" $^ >$@
 
 grep_out.txt: ${sources_etat0_lim}
-	@grep --extended-regexp --files-with-matches \# $^ >$@
-## --ignore-case
+	@echo grep
+	@grep --ignore-case --files-with-matches nqmx $^ >$@
+## --extended-regexp --ignore-case
 
 .PHONY: clean_grep
 clean_grep: clean
