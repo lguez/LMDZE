@@ -243,8 +243,10 @@ contains
           clsol(it) = .FALSE.  ! Par defaut couche limite avec flux prescrit
        ENDDO
 
-       ! Get the parameters for ozone chemistry:
-       call read_coefoz
+       if (nqmax >= 3) then
+          ! Get the parameters for ozone chemistry:
+          call read_coefoz
+       end if
     ENDIF
 
     ! Initialisation du traceur dans le sol (couche limite radonique)
@@ -401,8 +403,10 @@ contains
        ENDDO
     endif ! rnpb decroissance  radioactive
 
-    ! Ozone as a tracer:
-    call o3_chem(julien, gmtime, t_seri, zmasse, pdtphys, tr_seri(:, :, 3))
+    if (nqmax >= 3) then
+       ! Ozone as a tracer:
+       call o3_chem(julien, gmtime, t_seri, zmasse, pdtphys, tr_seri(:, :, 3))
+    end if
 
     ! Calcul de l'effet de la precipitation
 

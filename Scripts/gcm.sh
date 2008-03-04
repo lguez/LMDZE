@@ -57,7 +57,7 @@ if [[ $my_host = vierne ]]
 fi
 
 test -f $REL_dir/$numb_cr/limit.nc
-test -f $REL_dir/$numb_cr/coefoz_LMDZ.nc
+##test -f $REL_dir/$numb_cr/coefoz_LMDZ.nc
 ln -f -s $REL_dir/$numb_cr/limit.nc $REL_dir/$numb_cr/coefoz_LMDZ.nc .
 
 if [[ $restart != y ]]

@@ -2752,9 +2752,12 @@ contains
       CALL histwrite(nid_hf3d, "vitv", itau_w, zx_tmp_3d, &
            iim*(jjm + 1)*llm, ndex3d)
 
-      CALL gr_fi_ecrit(llm, klon, iim, (jjm + 1), tr_seri(1, 1, 3), &
-           zx_tmp_3d)
-      CALL histwrite(nid_hf3d, "O3", itau_w, zx_tmp_3d, iim*(jjm + 1)*llm, ndex3d)
+      if (nbtr >= 3) then
+         CALL gr_fi_ecrit(llm, klon, iim, (jjm + 1), tr_seri(1, 1, 3), &
+              zx_tmp_3d)
+         CALL histwrite(nid_hf3d, "O3", itau_w, zx_tmp_3d, iim*(jjm + 1)*llm, &
+              ndex3d)
+      end if
 
       if (ok_sync) then
          call histsync(nid_hf3d)

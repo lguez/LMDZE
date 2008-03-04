@@ -58,7 +58,7 @@ contains
     ! sorties hf 3d
 
     use dimens_m, only: iim, jjm, llm
-    use dimphy, only: klon
+    use dimphy, only: klon, nbtr
     use temps, only: itau_phy, day_ref, annee_ref
     use clesphys, only: ecrit_hf
     use phyetat0_m, only: rlon, rlat
@@ -113,9 +113,11 @@ contains
          iim, (jjm + 1), nhori, llm, 1, llm, nvert, 32, &
          "ave(X)", zstohf, zout)
 
-    CALL histdef(nid_hf3d, "O3", "Ozone mass fraction", "?", iim, &
-         (jjm + 1), nhori, llm, 1, llm, nvert, 32, "ave(X)", zstohf, &
-         zout)
+    if (nbtr >= 3) then
+       CALL histdef(nid_hf3d, "O3", "Ozone mass fraction", "?", iim, &
+            (jjm + 1), nhori, llm, 1, llm, nvert, 32, "ave(X)", zstohf, &
+            zout)
+    end if
 
     CALL histend(nid_hf3d)
 
