@@ -27,7 +27,7 @@ define axis/x=1:`iim`:1 long_index
 define axis/y=1:`jjm-1`:1 lat_index
 let dyn_grid= x[gx=long_index] + y[gy=lat_index]
 use startphy
-shade reshape(sst[i=2:`klon-1`, d=1], dyn_grid), \
-   reshape(longitude[i=2:`klon-1`], dyn_grid), \
-   reshape(latitude[i=2:`klon-1`], dyn_grid)
+set region/l=1/i=2:`klon-1`
+shade reshape(sst[d=1], dyn_grid), reshape(longitude, dyn_grid), \
+   reshape(latitude, dyn_grid)
 go land

@@ -26,7 +26,7 @@ c tr0------input-R- traceurs a la surface ou dans l'ocean (non active)
 c d_tr-----output-R- le changement de tr
 c flux_tr--output-R- flux de tr
 c======================================================================
-      REAL dtime
+      REAL, intent(in):: dtime
       REAL coef(klon,klev)
       REAL, intent(in):: t(klon,klev) ! temperature (K)
       real tr(klon,klev)

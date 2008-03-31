@@ -25,7 +25,7 @@ c=====================================================================
 c
       include "YOECUMF.h" 
 c
-      REAL pdtime
+      REAL, intent(in):: pdtime
 c--les flux sont definis au 1/2 niveaux
 c--pmfu(klev+1) et pmfd(klev+1) sont implicitement nuls
       REAL pmfu(klon,klev)  ! flux de masse dans le panache montant 

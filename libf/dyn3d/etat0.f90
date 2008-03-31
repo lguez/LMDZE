@@ -41,11 +41,11 @@ contains
     use grid_change, only: init_dyn_phy, dyn_phy
     use q_sat_m, only: q_sat
     use exner_hyb_m, only: exner_hyb
-    use regr_coefoz_m, only: regr_coefoz
     use advtrac_m, only: iniadvtrac
-    use netcdf95, only: nf95_open, nf95_close, nf95_inq_varid, nf90_nowrite, &
-         nf90_get_var, handle_err
     use pressure_m, only: pls, p3d
+    use dynredem0_m, only: dynredem0
+    use regr_lat_time_coefoz_m, only: regr_lat_time_coefoz
+    use regr_pr_o3_m, only: regr_pr_o3
 
     ! Variables local to the procedure:
 
@@ -105,7 +105,6 @@ contains
     REAL w(ip1jmp1, llm)
     REAL phystep
     INTEGER radpas
-    integer ncid, varid, ncerr, month
 
     !---------------------------------
 
@@ -187,27 +186,10 @@ contains
 
     if (nqmx >= 5) then
        ! Ozone:
-
-       ! Compute ozone parameters on the LMDZ grid:
-       call regr_coefoz
-
-       ! Find the month containing the day number "dayref":
-       month = (dayref - 1) / 30 + 1
-       print *, "month = ", month
-
-       call nf95_open("coefoz_LMDZ.nc", nf90_nowrite, ncid)
-
-       ! Get data at the right month from the input file:
-       call nf95_inq_varid(ncid, "r_Mob", varid)
-       ncerr = nf90_get_var(ncid, varid, q3d(:, :, :, 5), &
-            start=(/1, 1, 1, month/))
-       call handle_err("nf90_get_var r_Mob", ncerr)
-
-       call nf95_close(ncid)
-       ! Latitudes are in increasing order in the input file while
-       ! "rlatu" is in decreasing order so we need to invert order. Also, we
-       ! compute mass fraction from mole fraction:
-       q3d(:, :, :, 5) = q3d(:, jjm+1:1:-1, :, 5)  * 48. / 29.
+       call regr_lat_time_coefoz
+       call regr_pr_o3(q3d(:, :, :, 5))
+       ! Convert from mole fraction to mass fraction:
+       q3d(:, :, :, 5) = q3d(:, :, :, 5)  * 48. / 29.
     end if
 
     tsol(:) = pack(tsol_2d, dyn_phy)

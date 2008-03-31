@@ -1,4 +1,4 @@
-module read_coefoz_m
+module regr_pr_comb_coefoz_m
 
   ! This module is clean: no C preprocessor directive, no include line.
 
@@ -7,72 +7,92 @@ module read_coefoz_m
 
   implicit none
 
-  real, save:: c_Mob(klon, llm, 12)
+  real, save:: c_Mob(klon, llm)
   ! (sum of Mobidic terms in the net mass production rate of ozone
   ! by chemistry, per unit mass of air, in s-1)
   ! (On the "physics" grid.
-  ! Third dimension is the number of the month in the year.
-  ! "c_Mob(i, k, month)" is at longitude "rlon(i)", latitude "rlat(i)",
+  ! "c_Mob(i, k)" is at longitude "rlon(i)", latitude "rlat(i)",
   ! middle of layer "k".)
 
-  real, save:: a2(klon, llm, 12)
+  real, save:: a2(klon, llm)
   ! (derivative of mass production rate of ozone per unit mass of
   ! air with respect to ozone mass fraction, in s-1)
   ! (On the "physics" grid.
-  ! Third dimension is the number of the month in the year.
-  ! "a2(i, k, month)" is at longitude "rlon(i)", latitude "rlat(i)",
+  ! "a2(i, k)" is at longitude "rlon(i)", latitude "rlat(i)",
   ! middle of layer "k".)
 
-  real, save:: a4_mass(klon, llm, 12)
+  real, save:: a4_mass(klon, llm)
   ! (derivative of mass production rate of ozone per unit mass of
   ! air with respect to temperature, in s-1 K-1)
   ! (On the "physics" grid.
-  ! Third dimension is the number of the month in the year.
-  ! "a4_mass(i, k, month)" is at longitude "rlon(i)", latitude "rlat(i)",
+  ! "a4_mass(i, k)" is at longitude "rlon(i)", latitude "rlat(i)",
   ! middle of layer "k".)
 
-  real, save:: a6_mass(klon, llm, 12)
+  real, save:: a6_mass(klon, llm)
   ! (derivative of mass production rate of ozone per unit mass of
   ! air with respect to mass column-density of ozone above, in m2 s-1 kg-1)
   ! (On the "physics" grid.
-  ! Third dimension is the number of the month in the year.
-  ! "a6_mass(i, k, month)" is at longitude "rlon(i)", latitude "rlat(i)",
+  ! "a6_mass(i, k)" is at longitude "rlon(i)", latitude "rlat(i)",
   ! middle of layer "k".)
 
-  real, save:: r_het_interm(klon, llm, 12)
+  real, save:: r_het_interm(klon, llm)
   ! (net mass production rate by heterogeneous chemistry, per unit
   ! mass of ozone, corrected for chlorine content and latitude, but
   ! not for temperature and sun direction, in s-1)
   ! (On the "physics" grid.
-  ! Third dimension is the number of the month in the year.
-  ! "r_het_interm(i, k, month)" is at longitude "rlon(i)", latitude "rlat(i)",
+  ! "r_het_interm(i, k)" is at longitude "rlon(i)", latitude "rlat(i)",
   ! middle of layer "k".)
 
   private klon, llm
 
 contains
 
-  subroutine read_coefoz
+  subroutine regr_pr_comb_coefoz(julien)
 
-    ! This subroutine reads from a file all eight parameters for ozone
-    ! chemistry, at all months.
-    ! The parameters are packed to the "physics" grid.
-    ! Finally, the eight parameters are combined to define the five
-    ! module variables.
+    ! "regr_pr_comb_coefoz" stands for "regrid pressure combine
+    ! coefficients ozone".
 
-    use netcdf95, only: nf95_open, nf95_close, nf90_nowrite
-    use o3_Mob_ph_m, only: o3_Mob_ph
+    ! This subroutine :
+    ! -- reads from a file all eight parameters for ozone chemistry,
+    !    at the current day ;
+    ! -- regrids the parameters in pressure to the LMDZ vertical grid ;
+    ! -- packs the parameters to the "physics" horizontal grid ;
+    ! -- combines the eight parameters to define the five module variables.
+
+    ! We assume that, in "coefoz_LMDZ.nc", the pressure levels are in hPa
+    ! and strictly increasing.
+
+    use netcdf95, only: nf95_open, nf95_close, nf95_get_coord
+    use netcdf, only: nf90_nowrite
+    use regr_pr_coefoz, only: regr_pr_av_coefoz, regr_pr_int_coefoz
     use phyetat0_m, only: rlat
+
+    integer, intent(in):: julien ! jour julien, 1 <= julien <= 360
 
     ! Variables local to the procedure:
     integer ncid ! for NetCDF
 
-    real a6(klon, llm, 12)
-    ! (derivative of P_net_Mob with respect to column-density of ozone
+    real, pointer:: plev(:)
+    ! (pressure level of input data, converted to Pa, in strictly
+    ! increasing order)
+
+    integer n_plev ! number of pressure levels in the input data
+
+    real, allocatable:: press_in_edg(:)
+    ! (edges of pressure intervals for input data, in Pa, in strictly
+    ! increasing order)
+
+    real coefoz(klon, llm)
+    ! (temporary storage for an ozone coefficient)
+    ! (On the "physics" grid.
+    ! "coefoz(i, k)" is at longitude "rlon(i)", latitude "rlat(i)",
+    ! middle of layer "k".)
+
+    real a6(klon, llm)
+    ! (derivative of "P_net_Mob" with respect to column-density of ozone
     ! above, in cm2 s-1)
     ! (On the "physics" grid.
-    ! Third dimension is the number of the month in the year.
-    ! "a6(i, k, month)" is at longitude "rlon(i)", latitude "rlat(i)",
+    ! "a6(i, k)" is at longitude "rlon(i)", latitude "rlat(i)",
     ! middle of layer "k".)
 
     real, parameter:: amu = 1.6605402e-27 ! atomic mass unit, in kg
@@ -80,7 +100,7 @@ contains
     real, parameter:: Clx = 3.8e-9
     ! (total chlorine content in the upper stratosphere)
 
-    integer k, month
+    integer k
 
     !------------------------------------
 
@@ -88,27 +108,58 @@ contains
 
     call nf95_open("coefoz_LMDZ.nc", nf90_nowrite, ncid)
 
-    a2 = o3_Mob_ph(ncid, "a2")
-    a4_mass = o3_Mob_ph(ncid, "a4") * 48. / 29.
-    a6 = o3_Mob_ph(ncid, "a6")
+    call nf95_get_coord(ncid, "plev", plev)
+    ! Convert from hPa to Pa because "regr_pr_av" and "regr_pr_int" require so:
+    plev = plev * 100.
+    n_plev = size(plev)
+
+    ! Compute edges of pressure intervals:
+    allocate(press_in_edg(n_plev + 1))
+    press_in_edg(1) = 0.
+    ! We choose edges halfway in logarithm:
+    forall (k = 2:n_plev) press_in_edg(k) = sqrt(plev(k - 1) * plev(k))
+    press_in_edg(n_plev + 1) = huge(0.)
+    ! (infinity, but any value guaranteed to be greater than the
+    ! surface pressure would do)
+
+    call regr_pr_av_coefoz(ncid, "a2", julien, press_in_edg, a2)
+
+    call regr_pr_av_coefoz(ncid, "a4", julien, press_in_edg, a4_mass)
+    a4_mass = a4_mass * 48. / 29.
+
+    call regr_pr_av_coefoz(ncid, "a6", julien, press_in_edg, a6)
 
     ! Compute "a6_mass" avoiding underflow, do not divide by 1e4
     ! before dividing by molecular mass:
     a6_mass = a6 / (1e4 * 29. * amu)
     ! (factor 1e4: conversion from cm2 to m2)
 
-    c_Mob = 48. / 29. * (o3_Mob_ph(ncid, "P_net_Mob") &
-         - a2 * o3_Mob_ph(ncid, "r_Mob") - a6 * o3_Mob_ph(ncid, "Sigma_Mob")) &
-         - a4_mass * o3_Mob_ph(ncid, "temp_Mob") 
+    ! Combine coefficients to get "c_Mob":
+    ! (We use as few local variables as possible, in order to spare
+    ! main memory.)
 
-    r_het_interm = o3_Mob_ph(ncid, "R_Het") * (Clx / 3.8e-9)**2
+    call regr_pr_av_coefoz(ncid, "P_net_Mob", julien, press_in_edg, c_Mob)
+
+    call regr_pr_av_coefoz(ncid, "r_Mob", julien, press_in_edg, coefoz)
+    c_mob = c_mob - a2 * coeofoz
+
+    call regr_pr_int_coefoz(ncid, "Sigma_Mob", julien, plev, top_value=0., &
+         coefoz)
+    c_mob = (c_mob - a6 * coefoz) * 48. / 29.
+
+    call regr_pr_av_coefoz(ncid, "temp_Mob", julien, press_in_edg, coefoz)
+    c_mob = c_mob - a4_mass * coefoz
+
+    call regr_pr_av_coefoz(ncid, "R_Het", julien, press_in_edg, r_het_interm)
     ! Heterogeneous chemistry is only at high latitudes:
-    forall (k = 1: llm, month = 1: 12)
-       where (abs(rlat) <= 45.) r_het_interm(:, k, month) = 0.
+    forall (k = 1: llm)
+       where (abs(rlat) <= 45.) r_het_interm(:, k) = 0.
     end forall
+    where (r_het_interm  /= 0.) r_het_interm = r_het_interm * (Clx / 3.8e-9)**2
 
+    deallocate(plev) ! pointer
     call nf95_close(ncid)
 
-  end subroutine read_coefoz
+  end subroutine regr_pr_comb_coefoz
 
-end module read_coefoz_m
+end module regr_pr_comb_coefoz_m

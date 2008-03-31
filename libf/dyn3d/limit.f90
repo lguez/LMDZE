@@ -27,12 +27,12 @@ contains
     use interpolation, only: spline, splint
     use grid_change, only: dyn_phy
 
-    use netcdf95, only: handle_err, coordin, &
-         NF90_CLOBBER, NF95_CLOSE, NF95_DEF_DIM, nf90_def_var, nf95_enddef, &
-         NF90_FLOAT, NF90_GET_VAR, NF90_GLOBAL, NF90_NOWRITE, NF90_PUT_ATT, &
-         NF90_PUT_VAR, NF90_UNLIMITED, &
-         NF95_CREATE, nf95_inq_dimid, nf95_inquire_dimension, nf95_inq_varid, &
-         nf95_open
+    use netcdf95, only: handle_err, nf95_get_coord, NF95_CLOSE, NF95_DEF_DIM, &
+         nf95_enddef, NF95_CREATE, nf95_inq_dimid, nf95_inquire_dimension, &
+         nf95_inq_varid, NF95_OPEN
+    use netcdf, only: NF90_CLOBBER, nf90_def_var, NF90_FLOAT, NF90_GET_VAR, &
+         NF90_GLOBAL, NF90_NOWRITE, NF90_PUT_ATT, NF90_PUT_VAR, &
+         NF90_UNLIMITED
 
     ! Variables local to the procedure:
 
@@ -95,13 +95,13 @@ contains
     PRINT *, 'Processing rugosity...'
     call NF95_OPEN('Rugos.nc', NF90_NOWRITE, ncid)
 
-    dlon_ini => coordin(ncid, "longitude")
+    call nf95_get_coord(ncid, "longitude", dlon_ini)
     imdep = size(dlon_ini)
 
-    dlat_ini => coordin(ncid, "latitude")
+    call nf95_get_coord(ncid, "latitude", dlat_ini)
     jmdep = size(dlat_ini)
 
-    timeyear => coordin(ncid, "temps")
+    call nf95_get_coord(ncid, "temps", timeyear)
     lmdep = size(timeyear)
 
     ALLOCATE(champ(imdep, jmdep), champtime(iim, jjm + 1, lmdep))
@@ -144,10 +144,10 @@ contains
     PRINT *, 'Processing sea ice...'
     call NF95_OPEN('amipbc_sic_1x1.nc', NF90_NOWRITE, ncid)
 
-    dlon_ini => coordin(ncid, "longitude")
+    call nf95_get_coord(ncid, "longitude", dlon_ini)
     imdep = size(dlon_ini)
 
-    dlat_ini => coordin(ncid, "latitude")
+    call nf95_get_coord(ncid, "latitude", dlat_ini)
     jmdep = size(dlat_ini)
 
     call nf95_inq_dimid(ncid, "time", dimid)
@@ -241,10 +241,10 @@ contains
     PRINT *, 'Traitement de la sst'
     call NF95_OPEN('amipbc_sst_1x1.nc', NF90_NOWRITE, ncid)
 
-    dlon_ini => coordin(ncid, "longitude")
+    call nf95_get_coord(ncid, "longitude", dlon_ini)
     imdep = size(dlon_ini)
 
-    dlat_ini => coordin(ncid, "latitude")
+    call nf95_get_coord(ncid, "latitude", dlat_ini)
     jmdep = size(dlat_ini)
 
     call nf95_inq_dimid(ncid, "time", dimid)
@@ -310,13 +310,13 @@ contains
     PRINT *, 'Traitement de l albedo'
     call NF95_OPEN('Albedo.nc', NF90_NOWRITE, ncid)
 
-    dlon_ini => coordin(ncid, "longitude")
+    call nf95_get_coord(ncid, "longitude", dlon_ini)
     imdep = size(dlon_ini)
 
-    dlat_ini => coordin(ncid, "latitude")
+    call nf95_get_coord(ncid, "latitude", dlat_ini)
     jmdep = size(dlat_ini)
 
-    timeyear => coordin(ncid, "temps")
+    call nf95_get_coord(ncid, "temps", timeyear)
     lmdep = size(timeyear)
 
     ALLOCATE ( champ(imdep, jmdep), champtime(iim, jjm + 1, lmdep))

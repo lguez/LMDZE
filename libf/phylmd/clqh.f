@@ -131,7 +131,7 @@ c contre-gradient pour la chaleur sensible: Kelvin/metre
 c======================================================================
 c======================================================================
 c Rajout pour l'interface
-      integer itime
+      integer, intent(in):: itime
       integer nisurf
       logical, intent(in):: debut
       logical, intent(in):: lafin

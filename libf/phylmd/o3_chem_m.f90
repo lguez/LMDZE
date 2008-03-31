@@ -38,7 +38,7 @@ contains
     ! layer "k".)
 
     ! Variables local to the procedure:
-    integer month, k
+    integer k
 
     real c(klon, llm)
     ! (constant term during a time step in the net mass production
@@ -73,14 +73,13 @@ contains
     call assert(llm == (/size(q, 2), size(t_seri, 2), size(zmasse, 2)/), &
          "o3_chem llm")
 
-    month = (julien - 1) / 30 + 1 ! compute the month from the day number
-    c = c_Mob(:, :, month) + a4_mass(:, :, month) * t_seri
+    c = c_Mob + a4_mass * t_seri
 
     ! Compute coefficient "b":
 
     ! Heterogeneous chemistry is only at low temperature:
     where (t_seri < 195.)
-       b = r_het_interm(:, :, month)
+       b = r_het_interm
     elsewhere
        b = 0.
     end where
@@ -92,14 +91,14 @@ contains
        where (pmu0 <= cos(87. / 180. * pi)) b(:, k) = 0.
     end forall
 
-    b = b + a2(:, :, month)
+    b = b + a2
 
     ! Midpoint method:
 
     ! Trial step to the midpoint:
-    dq_o3_chem = o3_prod(q, month, zmasse, c, b) * pdtphys  / 2
+    dq_o3_chem = o3_prod(q, zmasse, c, b) * pdtphys  / 2
     ! "Real" step across the whole interval:
-    dq_o3_chem = o3_prod(q + dq_o3_chem, month, zmasse, c, b) * pdtphys
+    dq_o3_chem = o3_prod(q + dq_o3_chem, zmasse, c, b) * pdtphys
     q = q + dq_o3_chem
 
     ! Confine the mass fraction:
@@ -109,7 +108,7 @@ contains
 
   !*************************************************
 
-  function o3_prod(q, month, zmasse, c, b)
+  function o3_prod(q, zmasse, c, b)
 
     ! This function computes the production rate of ozone by chemistry.
 
@@ -122,8 +121,6 @@ contains
     ! (On the "physics" grid.
     ! "q(i, k)" is at longitude "rlon(i)", latitude "rlat(i)", middle of
     ! layer "k".)
-
-    integer, intent(in):: month
 
     real, intent(in):: zmasse(:, :)
     ! (column-density of mass of air in a layer, in kg m-2)
@@ -177,7 +174,7 @@ contains
        sigma_mass(:, k) = sigma_mass(:, k+1) + zmasse(:, k) * q(:, k)
     end do
 
-    o3_prod = c + b * q + a6_mass(:, :, month) * sigma_mass
+    o3_prod = c + b * q + a6_mass * sigma_mass
 
   end function o3_prod
 

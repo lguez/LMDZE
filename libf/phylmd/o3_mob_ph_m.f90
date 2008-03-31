@@ -1,50 +1,141 @@
-module o3_Mob_ph_m
+module regr_pr_coefoz
 
   implicit none
 
 contains
 
-  function o3_Mob_ph(ncid, name)
+  subroutine regr_pr_av_coefoz(ncid, name, julien, press_in_edg, v3)
 
-    ! This function reads a single Mobidic ozone parameter from a file and
-    ! packs it on the "physics" grid.
+    ! "regr_pr_av_coefoz" stands for "regrid pressure averaging
+    ! coefficients ozone".
+    ! This procedure reads a single Mobidic ozone coefficient from
+    !"coefoz_LMDZ.nc", at the current day, regrids this parameter in
+    ! pressure to the LMDZ vertical grid and packs it to the LMDZ
+    ! horizontal "physics" grid.
+    ! Regridding is by averaging a step function.
 
     use dimens_m, only: iim, jjm, llm
     use dimphy, only: klon
-    use netcdf95, only: nf95_inq_varid, nf90_get_var, handle_err
+    use netcdf95, only: nf95_inq_varid, handle_err
+    use netcdf, only: nf90_get_var
     use grid_change, only: dyn_phy
+    use regr_pr, only: regr_pr_av
+    use nrutil, only: assert
 
     integer, intent(in):: ncid ! NetCDF ID of the file
     character(len=*), intent(in):: name ! of the NetCDF variable
+    integer, intent(in):: julien ! jour julien, 1 <= julien <= 360
 
-    real o3_Mob_ph(klon, llm, 12)
-    ! (ozone parameter from Mobidic on the "physics" grid)
-    ! (Third dimension is the number of the month in the year.
-    ! "o3_Mob_ph(i, k, month)" is at longitude "xlon(i)", latitude
+    real, intent(in):: press_in_edg(:)
+    ! (edges of pressure intervals for Mobidic data, in Pa, in
+    ! strictly increasing order)
+
+    real, intent(out):: v3(:, :) ! (klon, llm)
+    ! (ozone coefficient from Mobidic on the "physics" grid)
+    ! ("v3(i, k)" is at longitude "xlon(i)", latitude
     ! "xlat(i)", middle of layer "k".)
 
     ! Variables local to the procedure:
     integer varid, ncerr
-    integer k, month
+    integer k
 
-    real o3_Mob_dyn(iim + 1, jjm + 1, llm, 12)
+    real  v1(jjm + 1, size(press_in_edg) - 1)
+    ! (ozone coefficient from "coefoz_LMDZ.nc" at day "julien")
+    ! ("v1(j, k)" is at latitude "rlatu(j)" and for
+    ! pressure interval "[press_in_edg(k), press_in_edg(k+1)]".)
+
+    real v2(iim + 1, jjm + 1, llm)
     ! (ozone parameter from Mobidic on the "dynamics" grid)
-    ! Fourth dimension is the number of the month in the year.
-    ! "o3_Mob_dyn(i, j, k, month)" is at longitude "rlonv(i)", latitude
+    ! "v2(i, j, k)" is at longitude "rlonv(i)", latitude
     ! "rlatu(j)", middle of layer "k".)
 
     !--------------------------------------------
 
+    call assert(shape(v3) == (/klon, llm/), "regr_pr_av_coefoz")
+
     call nf95_inq_varid(ncid, name, varid)
-    ncerr = nf90_get_var(ncid, varid, o3_Mob_dyn)
-    call handle_err("o3_Mob_ph nf90_get_var " // name, ncerr, ncid)
 
+    ! Get data at the right day from the input file:
+    ncerr = nf90_get_var(ncid, varid, v1, start=(/1, 1, julien/))
+    call handle_err("regr_pr_av_coefoz nf90_get_var " // name, ncerr, ncid)
     ! Latitudes are in increasing order in the input file while
-    ! "rlatu" is in decreasing order, so invert:
-    o3_Mob_dyn = o3_Mob_dyn(:, jjm+1:1:-1, :, :)
-    forall (k = 1:llm, month = 1:12) &
-         o3_Mob_ph(:, k, month) = pack(o3_Mob_dyn(:, :, k, month), dyn_phy)
+    ! "rlatu" is in decreasing order so we need to invert order:
+    v1 = v1(jjm+1:1:-1, :)
 
-  end function o3_Mob_ph
+    ! Regrid in pressure at each horizontal position:
+    v2 = regr_pr_av(v1, press_in_edg)
 
-end module o3_Mob_ph_m
+    forall (k = 1:llm) v3(:, k) = pack(v2(:, :, k), dyn_phy)
+
+  end subroutine regr_pr_av_coefoz
+
+  !***************************************************************
+
+  subroutine regr_pr_int_coefoz(ncid, name, julien, plev, top_value, v3)
+
+    ! This procedure reads a single Mobidic ozone coefficient from
+    !"coefoz_LMDZ.nc", at the current day, regrids this parameter in
+    ! pressure to the LMDZ vertical grid and packs it to the LMDZ
+    ! horizontal "physics" grid.
+    ! Regridding is by linear interpolation.
+
+    use dimens_m, only: iim, jjm, llm
+    use dimphy, only: klon
+    use netcdf95, only: nf95_inq_varid, handle_err
+    use netcdf, only: nf90_get_var
+    use grid_change, only: dyn_phy
+    use regr_pr, only: regr_pr_int
+    use nrutil, only: assert
+
+    integer, intent(in):: ncid ! NetCDF ID of the file
+    character(len=*), intent(in):: name ! of the NetCDF variable
+    integer, intent(in):: julien ! jour julien, 1 <= julien <= 360
+
+    real, intent(in):: plev(:)
+    ! (pressure levels of Mobidic data, in Pa, in strictly increasing order)
+
+    real, intent(in):: top_value
+    ! (extra value of ozone coefficient at 0 pressure)
+
+    real, intent(out):: v3(:, :) ! (klon, llm)
+    ! (ozone parameter from Mobidic on the "physics" grid)
+    ! ("v3(i, k)" is at longitude "xlon(i)", latitude
+    ! "xlat(i)", middle of layer "k".)
+
+    ! Variables local to the procedure:
+    integer varid, ncerr
+    integer k
+
+    real  v1(jjm + 1, 0:size(plev))
+    ! (ozone coefficient from "coefoz_LMDZ.nc" at day "julien")
+    ! ("v1(j, k >=1)" is at latitude "rlatu(j)" and pressure "plev(k)".)
+
+    real v2(iim + 1, jjm + 1, llm)
+    ! (ozone parameter from Mobidic on the "dynamics" grid)
+    ! "v2(i, j, k)" is at longitude "rlonv(i)", latitude
+    ! "rlatu(j)", middle of layer "k".)
+
+    !--------------------------------------------
+
+    call assert(shape(v3) == (/klon, llm/), "regr_pr_int_coefoz")
+
+    call nf95_inq_varid(ncid, name, varid)
+
+    ! Get data at the right day from the input file:
+    ncerr = nf90_get_var(ncid, varid, v1(:, 1:), start=(/1, 1, julien/))
+    call handle_err("regr_pr_int_coefoz nf90_get_var " // name, ncerr, ncid)
+    ! Latitudes are in increasing order in the input file while
+    ! "rlatu" is in decreasing order so we need to invert order:
+    v1(:, 1:) = v1(jjm+1:1:-1, 1:)
+
+    ! Complete "v1" with the value at 0 pressure:
+    v1(:, 0) = top_value
+
+    ! Regrid in pressure at each horizontal position:
+    v2 = regr_pr_int(v1, (/0., plev/))
+
+    forall (k = 1:llm) v3(:, k) = pack(v2(:, :, k), dyn_phy)
+
+  end subroutine regr_pr_int_coefoz
+
+end module regr_pr_coefoz

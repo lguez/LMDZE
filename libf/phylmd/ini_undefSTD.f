@@ -31,7 +31,8 @@ c
       parameter (jjmp1=jjm+1-1/jjm)
 c variables Input/Output
       INTEGER, intent(in):: nlevSTD
-      integer klevSTD, itap
+      integer klevSTD
+      integer, intent(in):: itap
       PARAMETER(klevSTD=17)
       INTEGER ecrit_day,ecrit_mth
 c

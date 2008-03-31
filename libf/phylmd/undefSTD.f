@@ -27,7 +27,8 @@ c
       integer jjmp1
       parameter (jjmp1=jjm+1-1/jjm)
 c variables Input
-      INTEGER nlevSTD, klevSTD, itap
+      INTEGER nlevSTD, klevSTD
+      integer, intent(in):: itap
       PARAMETER(klevSTD=17)
       INTEGER, intent(in):: ecrit_hf
 c

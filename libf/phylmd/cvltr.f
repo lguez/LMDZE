@@ -13,7 +13,7 @@ c=====================================================================
 c
       include "YOECUMF.h" 
 c
-      REAL pdtime
+      REAL, intent(in):: pdtime
       REAL, intent(in):: paprs(klon,klev+1) ! pression aux 1/2 couches (bas en haut)
       REAL pplay(klon,klev)  ! pression pour le milieu de chaque couche
       REAL x(klon,klev)        ! q de traceur (bas en haut) 

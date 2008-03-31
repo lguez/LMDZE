@@ -1,7 +1,7 @@
 !
 ! $Header: /home/cvsroot/LMDZ4/libf/phylmd/readsulfate.F,v 1.2 2005/05/19 08:27:15 fairhead Exp $
 !
-      SUBROUTINE readsulfate (r_day, first, sulfate)
+      SUBROUTINE readsulfate(r_day, first, sulfate)
       
       use dimens_m      
       use dimphy      
@@ -38,7 +38,7 @@ c --------------
 c 
 c Input:
 c ------
-      REAL*8  r_day                   ! Day of integration
+      REAL*8, intent(in):: r_day                   ! Day of integration
       LOGICAL, intent(in):: first                 ! First timestep 
                                     ! (and therefore initialization necessary)
 c      
@@ -309,7 +309,7 @@ c --------------
 c 
 c Input:
 c ------
-      REAL*8  r_day                   ! Day of integration
+      REAL*8, intent(in)::  r_day                   ! Day of integration
       LOGICAL, intent(in):: first                 ! First timestep 
                                     ! (and therefore initialization necessary)
 c      

@@ -133,7 +133,7 @@ contains
     REAL SSUM
 
     LOGICAL:: firstcal = .true.
-    REAL rdayvrai
+    REAL, intent(in):: rdayvrai
 
     !-----------------------------------------------------------------------
 

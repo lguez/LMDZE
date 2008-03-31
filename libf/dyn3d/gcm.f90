@@ -39,6 +39,7 @@ PROGRAM gcm
   use grid_change, only: dyn_phy, init_dyn_phy
   use advtrac_m, only: iniadvtrac
   use leapfrog_m, only: leapfrog
+  use dynredem0_m, only: dynredem0
 
   IMPLICIT NONE
 
@@ -52,7 +53,7 @@ PROGRAM gcm
   REAL ps(ip1jmp1) ! pression au sol (Pa)
 
   REAL masse(ip1jmp1, llm) ! masse d'air
-  REAL phis(ip1jmp1) ! géopotentiel au sol
+  REAL phis(iim + 1, jjm + 1) ! géopotentiel au sol
 
   ! Variables pour le fichier histoire :
   REAL time_0

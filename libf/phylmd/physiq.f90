@@ -9,7 +9,7 @@ module physiq_m
 
 contains
 
-  SUBROUTINE physiq (nq, debut, lafin, rjourvrai, gmtime, pdtphys, paprs, &
+  SUBROUTINE physiq (nq, firstcal, lafin, rdayvrai, gmtime, pdtphys, paprs, &
        pplay, pphi, pphis, presnivs, clesphy0, u, v, t, qx, omega, d_u, d_v, &
        d_t, d_qx, d_ps, dudyn, PVteta)
 
@@ -58,10 +58,10 @@ contains
     ! Variables argument:
 
     INTEGER nq ! input nombre de traceurs (y compris vapeur d'eau)
-    REAL rjourvrai ! input numero du jour de l'experience
+    REAL, intent(in):: rdayvrai ! input numero du jour de l'experience
     REAL, intent(in):: gmtime ! heure de la journée en fraction de jour
     REAL pdtphys ! input pas d'integration pour la physique (seconde)
-    LOGICAL, intent(in):: debut ! premier passage
+    LOGICAL, intent(in):: firstcal ! first call to "calfis"
     logical, intent(in):: lafin ! dernier passage
 
     REAL, intent(in):: paprs(klon, llm+1)
@@ -319,11 +319,6 @@ contains
     PARAMETER    ( longcles = 20 )
     REAL clesphy0( longcles      )
 
-    ! Variables quasi-arguments
-
-    REAL xjour
-    SAVE xjour
-
     ! Variables propres a la physique
 
     REAL, SAVE:: dtime ! pas temporel de la physique (s)
@@ -335,7 +330,7 @@ contains
     REAL radsol(klon)
     SAVE radsol               ! bilan radiatif au sol calcule par code radiatif
 
-    INTEGER, SAVE:: itap ! compteur pour la physique
+    INTEGER, SAVE:: itap ! number of calls to "physiq"
     REAL co2_ppm_etat0
     REAL solaire_etat0
 
@@ -472,7 +467,7 @@ contains
 
     INTEGER julien
 
-    INTEGER, SAVE:: lmt_pas ! fréquence de mise à jour
+    INTEGER, SAVE:: lmt_pas ! number of time steps of "physics" per day
     REAL pctsrf(klon, nbsrf)
     !IM
     REAL pctsrf_new(klon, nbsrf) !pourcentage surfaces issus d'ORCHIDEE
@@ -500,7 +495,9 @@ contains
     EXTERNAL transp    ! transport total de l'eau et de l'energie
 
     EXTERNAL ini_undefSTD  !initialise a 0 une variable a 1 niveau de pression
-    EXTERNAL undefSTD !somme les valeurs definies d'1 var a 1 niveau de pression
+
+    EXTERNAL undefSTD
+    ! (somme les valeurs definies d'1 var a 1 niveau de pression)
 
     ! Variables locales
 
@@ -802,14 +799,12 @@ contains
        END DO
     END IF
     ok_sync=.TRUE.
-    IF (nq .LT. 2) THEN
+    IF (nq  <  2) THEN
        abort_message = 'eaux vapeur et liquide sont indispensables'
        CALL abort_gcm (modname, abort_message, 1)
     ENDIF
 
-    xjour = rjourvrai
-
-    test_debut: IF (debut) THEN
+    test_firstcal: IF (firstcal) THEN
        !  initialiser
        u10m(:, :)=0.
        v10m(:, :)=0.
@@ -932,7 +927,7 @@ contains
        ENDIF
 
        lmt_pas = NINT(86400. / dtime)  ! tous les jours
-       print *, 'La frequence de lecture surface est de ', lmt_pas
+       print *, 'Number of time steps of "physics" per day: ', lmt_pas
 
        ecrit_ins = NINT(ecrit_ins/dtime)
        ecrit_hf = NINT(ecrit_hf/dtime)
@@ -964,7 +959,7 @@ contains
        CALL ymds2ju(annee_ref, 1, int(day_ref), 0., date0)
        !XXXPB Positionner date0 pour initialisation de ORCHIDEE
        WRITE(*, *) 'physiq date0 : ', date0
-    ENDIF test_debut
+    ENDIF test_firstcal
 
     ! Mettre a zero des variables de sortie (pour securite)
 
@@ -1065,8 +1060,8 @@ contains
 
     ! Incrementer le compteur de la physique
 
-    itap   = itap + 1
-    julien = MOD(NINT(xjour), 360)
+    itap = itap + 1
+    julien = MOD(NINT(rdayvrai), 360)
     if (julien == 0) julien = 360
 
     ! Mettre en action les conditions aux limites (albedo, sst, etc.).
@@ -1164,7 +1159,7 @@ contains
          fluxlat, rain_fall, snow_fall, &
          fsolsw, fsollw, sollwdown, fder, &
          rlon, rlat, cuphy, cvphy, frugs, &
-         debut, lafin, agesno, rugoro, &
+         firstcal, lafin, agesno, rugoro, &
          d_t_vdf, d_q_vdf, d_u_vdf, d_v_vdf, d_ts, &
          fluxt, fluxq, fluxu, fluxv, cdragh, cdragm, &
          q2, dsens, devap, &
@@ -1282,25 +1277,25 @@ contains
 
     DO nsrf = 1, nbsrf
        DO i = 1, klon
-          IF (pctsrf(i, nsrf) .LT. epsfra) ftsol(i, nsrf) = zxtsol(i)
+          IF (pctsrf(i, nsrf)  <  epsfra) ftsol(i, nsrf) = zxtsol(i)
 
-          IF (pctsrf(i, nsrf) .LT. epsfra) t2m(i, nsrf) = zt2m(i)
-          IF (pctsrf(i, nsrf) .LT. epsfra) q2m(i, nsrf) = zq2m(i)
-          IF (pctsrf(i, nsrf) .LT. epsfra) u10m(i, nsrf) = zu10m(i)
-          IF (pctsrf(i, nsrf) .LT. epsfra) v10m(i, nsrf) = zv10m(i)
-          IF (pctsrf(i, nsrf) .LT. epsfra) ffonte(i, nsrf) = zxffonte(i)
-          IF (pctsrf(i, nsrf) .LT. epsfra)  &
+          IF (pctsrf(i, nsrf)  <  epsfra) t2m(i, nsrf) = zt2m(i)
+          IF (pctsrf(i, nsrf)  <  epsfra) q2m(i, nsrf) = zq2m(i)
+          IF (pctsrf(i, nsrf)  <  epsfra) u10m(i, nsrf) = zu10m(i)
+          IF (pctsrf(i, nsrf)  <  epsfra) v10m(i, nsrf) = zv10m(i)
+          IF (pctsrf(i, nsrf)  <  epsfra) ffonte(i, nsrf) = zxffonte(i)
+          IF (pctsrf(i, nsrf)  <  epsfra)  &
                fqcalving(i, nsrf) = zxfqcalving(i)
-          IF (pctsrf(i, nsrf) .LT. epsfra) pblh(i, nsrf)=s_pblh(i)
-          IF (pctsrf(i, nsrf) .LT. epsfra) plcl(i, nsrf)=s_lcl(i)
-          IF (pctsrf(i, nsrf) .LT. epsfra) capCL(i, nsrf)=s_capCL(i)
-          IF (pctsrf(i, nsrf) .LT. epsfra) oliqCL(i, nsrf)=s_oliqCL(i)
-          IF (pctsrf(i, nsrf) .LT. epsfra) cteiCL(i, nsrf)=s_cteiCL(i)
-          IF (pctsrf(i, nsrf) .LT. epsfra) pblT(i, nsrf)=s_pblT(i)
-          IF (pctsrf(i, nsrf) .LT. epsfra) therm(i, nsrf)=s_therm(i)
-          IF (pctsrf(i, nsrf) .LT. epsfra) trmb1(i, nsrf)=s_trmb1(i)
-          IF (pctsrf(i, nsrf) .LT. epsfra) trmb2(i, nsrf)=s_trmb2(i)
-          IF (pctsrf(i, nsrf) .LT. epsfra) trmb3(i, nsrf)=s_trmb3(i)
+          IF (pctsrf(i, nsrf)  <  epsfra) pblh(i, nsrf)=s_pblh(i)
+          IF (pctsrf(i, nsrf)  <  epsfra) plcl(i, nsrf)=s_lcl(i)
+          IF (pctsrf(i, nsrf)  <  epsfra) capCL(i, nsrf)=s_capCL(i)
+          IF (pctsrf(i, nsrf)  <  epsfra) oliqCL(i, nsrf)=s_oliqCL(i)
+          IF (pctsrf(i, nsrf)  <  epsfra) cteiCL(i, nsrf)=s_cteiCL(i)
+          IF (pctsrf(i, nsrf)  <  epsfra) pblT(i, nsrf)=s_pblT(i)
+          IF (pctsrf(i, nsrf)  <  epsfra) therm(i, nsrf)=s_therm(i)
+          IF (pctsrf(i, nsrf)  <  epsfra) trmb1(i, nsrf)=s_trmb1(i)
+          IF (pctsrf(i, nsrf)  <  epsfra) trmb2(i, nsrf)=s_trmb2(i)
+          IF (pctsrf(i, nsrf)  <  epsfra) trmb3(i, nsrf)=s_trmb3(i)
        ENDDO
     ENDDO
 
@@ -1411,7 +1406,7 @@ contains
                 zcor   = 1./(1.-retv*zx_qs)
                 zx_qs  = zx_qs*zcor
              ELSE
-                IF (zx_t.LT.t_coup) THEN
+                IF (zx_t < t_coup) THEN
                    zx_qs = qsats(zx_t)/pplay(i, k)
                 ELSE
                    zx_qs = qsatl(zx_t)/pplay(i, k)
@@ -1481,7 +1476,7 @@ contains
        DO k = 1, llm
           DO i = 1, klon
              IF (z_factor(i).GT.(1.0+1.0E-08) .OR. &
-                  z_factor(i).LT.(1.0-1.0E-08)) THEN
+                  z_factor(i) < (1.0-1.0E-08)) THEN
                 q_seri(i, k) = q_seri(i, k) * z_factor(i)
              ENDIF
           ENDDO
@@ -1501,7 +1496,7 @@ contains
     IF(prt_level>9)WRITE(lunout, *) &
          'AVANT LA CONVECTION SECHE, iflag_thermals=' &
          , iflag_thermals, '   nsplit_thermals=', nsplit_thermals
-    if(iflag_thermals.lt.0) then
+    if(iflag_thermals < 0) then
        !  Rien
        IF(prt_level>9)WRITE(lunout, *)'pas de convection'
     else if(iflag_thermals == 0) then
@@ -1626,7 +1621,7 @@ contains
           rain_tiedtke=0.
           do k=1, llm
              do i=1, klon
-                if (d_q_con(i, k).lt.0.) then
+                if (d_q_con(i, k) < 0.) then
                    rain_tiedtke(i)=rain_tiedtke(i)-d_q_con(i, k)/pdtphys &
                         *(paprs(i, k)-paprs(i, k+1))/rg
                 endif
@@ -1648,9 +1643,9 @@ contains
        ENDDO
 
     ELSE IF (iflag_cldcon == 3) THEN
-       !  On prend pour les nuages convectifs le max du calcul de la
-       !  convection et du calcul du pas de temps précédent diminué d'un facteur
-       !  facttemps
+       ! On prend pour les nuages convectifs le max du calcul de la
+       ! convection et du calcul du pas de temps précédent diminué d'un facteur
+       ! facttemps
        facteur = pdtphys *facttemps
        do k=1, llm
           do i=1, klon
@@ -1709,7 +1704,7 @@ contains
              zcor   = 1./(1.-retv*zx_qs)
              zx_qs  = zx_qs*zcor
           ELSE
-             IF (zx_t.LT.t_coup) THEN
+             IF (zx_t < t_coup) THEN
                 zx_qs = qsats(zx_t)/pplay(i, k)
              ELSE
                 zx_qs = qsatl(zx_t)/pplay(i, k)
@@ -1723,8 +1718,8 @@ contains
     !jq - Johannes Quaas, 27/11/2003 (quaas@lmd.jussieu.fr)
     IF (ok_ade.OR.ok_aie) THEN
        ! Get sulfate aerosol distribution
-       CALL readsulfate(rjourvrai, debut, sulfate)
-       CALL readsulfate_preind(rjourvrai, debut, sulfate_pi)
+       CALL readsulfate(rdayvrai, firstcal, sulfate)
+       CALL readsulfate_preind(rdayvrai, firstcal, sulfate_pi)
 
        ! Calculate aerosol optical properties (Olivier Boucher)
        CALL aeropt(pplay, paprs, t_seri, sulfate, rhcl, &
@@ -1914,7 +1909,7 @@ contains
 
     !IM calcul composantes axiales du moment angulaire et couple des montagnes
 
-    CALL aaam_bud (27, klon, llm, rjourvrai, gmtime, &
+    CALL aaam_bud (27, klon, llm, gmtime, &
          ra, rg, romega, &
          rlat, rlon, pphis, &
          zustrdr, zustrli, zustrph, &
@@ -1933,7 +1928,7 @@ contains
 
     !   Calcul  des tendances traceurs
 
-    call phytrac(rnpb, itap,  julien,  gmtime, debut, lafin, nq-2, &
+    call phytrac(rnpb, itap, lmt_pas, julien,  gmtime, firstcal, lafin, nq-2, &
          dtime, u, v, t, paprs, pplay, &
          pmfu,  pmfd,  pen_u,  pde_u,  pen_d,  pde_d, &
          ycoefh, fm_therm, entr_therm, yu1, yv1, ftsol, &
@@ -2227,8 +2222,8 @@ contains
 
       ENDDO !k=1, nlevSTD
 
-      !IM on somme les valeurs definies a chaque pas de temps de la physique ou 
-      !IM toutes les 6 heures
+      !IM on somme les valeurs definies a chaque pas de temps de la
+      ! physique ou toutes les 6 heures
 
       oknondef(1:klon, 1:nlevSTD, 1:nout)=.TRUE.
       CALL undefSTD(nlevSTD, itap, tlevSTD, &

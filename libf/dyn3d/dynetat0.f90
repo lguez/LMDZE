@@ -29,7 +29,7 @@ contains
     !   Arguments:
     REAL, intent(out):: vcov(: , :), ucov(:, :), teta(:, :)
     REAL, intent(out):: q(:, :, :), masse(:, :)
-    REAL, intent(out):: ps(:), phis(:)
+    REAL, intent(out):: ps(:), phis(:, :)
     REAL, intent(out):: time
 
     !   Variables 
@@ -44,8 +44,8 @@ contains
 
     call assert(size(vcov, 1) == (iim + 1) * jjm, "dynetat0 vcov 1")
     call assert((/size(ucov, 1), size(teta, 1), size(q, 1), size(masse, 1), &
-         size(ps), size(phis)/) == (iim + 1) * (jjm + 1), &
-         "dynetat0 (iim + 1) * (jjm + 1)")
+         size(ps)/) == (iim + 1) * (jjm + 1), "dynetat0 (iim + 1) * (jjm + 1)")
+    call assert(shape(phis) == (/iim + 1, jjm + 1/), "dynetat0 phis")
     call assert((/size(vcov, 2), size(ucov, 2), size(teta, 2), size(q, 2), &
          size(masse, 2)/) == llm, "dynetat0 llm")
     call assert(size(q, 3) == nqmx, "dynetat0 q 3")
@@ -132,7 +132,7 @@ contains
     call handle_err("dynetat0, aire", ierr, nid)
 
     call NF95_INQ_VARID (nid, "phisinit", nvarid)
-    ierr = NF90_GET_VAR(nid, nvarid, phis, count=(/iim + 1, jjm + 1/))
+    ierr = NF90_GET_VAR(nid, nvarid, phis)
     call handle_err("dynetat0, phisinit", ierr, nid)
 
     call NF95_INQ_VARID (nid, "temps", nvarid)

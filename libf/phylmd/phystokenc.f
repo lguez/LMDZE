@@ -38,7 +38,8 @@ c   -------
 c
       real pdtphys ! pas d'integration pour la physique (seconde)
 c
-      integer physid, itap
+      integer physid
+      integer, intent(in):: itap
       save physid
       integer ndex2d(iim*(jjm+1)),ndex3d(iim*(jjm+1)*klev)
 

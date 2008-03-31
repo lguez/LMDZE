@@ -118,7 +118,7 @@ c$$$ PB ajout pour soil
 c
       REAL dtime
       real date0
-      integer itap
+      integer, intent(in):: itap
       REAL t(klon,klev), q(klon,klev)
       REAL u(klon,klev), v(klon,klev)
 cIM 230604 BAD  REAL radsol(klon) ??? 

@@ -1,4 +1,4 @@
-      subroutine aaam_bud (iam,nlon,nlev,rjour,rsec,
+      subroutine aaam_bud (iam,nlon,nlev,rsec,
      i                   rea,rg,ome,      
      i                   plat,plon,phis,
      i                   dragu,liftu,phyu,
@@ -36,7 +36,6 @@ c                 It is a formatted file that has been opened
 c                 in physiq.F
 c nlon----input-I-Total number of horizontal points that get into physics
 c nlev----input-I-Number of vertical levels
-c rjour---input-R-Jour compte depuis le debut de la simu (run.def)
 c rsec----input-R-Seconde de la journee
 c rea-----input-R-Earth radius
 c rg------input-R-gravity constant
@@ -89,7 +88,6 @@ c
 c ARGUMENTS
 c
       INTEGER iam,nlon,nlev
-      REAL rjour
       real, intent(in):: rsec
       real rea
       real, intent(in):: rg

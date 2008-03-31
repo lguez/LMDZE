@@ -46,7 +46,7 @@ SUBROUTINE cltracrn( itr, dtime,u1lay, v1lay, &
   ! d_trs----output-R- le changement de "trs"
   !======================================================================
   !======================================================================
-  REAL dtime
+  REAL, intent(in):: dtime
   REAL u1lay(klon), v1lay(klon)
   REAL coef(klon,klev)
   REAL, intent(in):: t(klon,klev) ! temperature (K)

@@ -3,7 +3,7 @@ program test_disvert
   use dimens_m, only: llm
   use comvert, only: pa, disvert, ap, bp, preff
   use comconst, only: initialize
-  use in_out, only: new_unit
+  use new_unit_m, only: new_unit
 
   implicit none
 

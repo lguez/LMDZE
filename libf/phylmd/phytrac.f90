@@ -9,8 +9,8 @@ module phytrac_m
 
 contains
 
-  SUBROUTINE phytrac(rnpb, nstep, julien, gmtime, debutphy, lafin, nqmax, &
-       pdtphys, u, v, t_seri, paprs, pplay, pmfu, pmfd, pen_u, &
+  SUBROUTINE phytrac(rnpb, itap, lmt_pas, julien, gmtime, firstcal, lafin, &
+       nqmax, pdtphys, u, v, t_seri, paprs, pplay, pmfu, pmfd, pen_u, &
        pde_u, pen_d, pde_d, coefh, fm_therm, entr_therm, yu1, yv1, ftsol, &
        pctsrf, frac_impa, frac_nucl, presnivs, pphis, &
        pphi, albsol, sh, rh, cldfra, rneb, diafra, cldliq, itop_con, &
@@ -37,7 +37,7 @@ contains
     use abort_gcm_m, only: abort_gcm
     use YOMCST, only: rg
     use ctherm, only: iflag_thermals
-    use read_coefoz_m, only: read_coefoz
+    use regr_pr_comb_coefoz_m, only: regr_pr_comb_coefoz
     use phyetat0_m, only: rlat
     use o3_chem_m, only: o3_chem
 
@@ -52,12 +52,13 @@ contains
     integer, intent(in):: nqmax
     ! (nombre de traceurs auxquels on applique la physique)
 
-    integer, intent(in):: nstep  ! appel physique
+    integer, intent(in):: itap  ! number of calls to "physiq"
+    integer, intent(in):: lmt_pas ! number of time steps of "physics" per day
     integer, intent(in):: julien !jour julien, 1 <= julien <= 360
     integer itop_con(klon)
     integer ibas_con(klon)
     real, intent(in):: gmtime ! heure de la journée en fraction de jour
-    real pdtphys  ! pas d'integration pour la physique (s)
+    real, intent(in):: pdtphys  ! pas d'integration pour la physique (s)
     real, intent(in):: t_seri(klon, llm) ! temperature, in K
 
     real tr_seri(klon, llm, nbtr)
@@ -83,7 +84,7 @@ contains
     real pphi(klon, llm) ! geopotentiel
     real pphis(klon)
     REAL, intent(in):: presnivs(llm)
-    logical, intent(in):: debutphy ! le flag de l'initialisation de la physique
+    logical, intent(in):: firstcal ! first call to "calfis"
     logical, intent(in):: lafin ! fin de la physique
 
     integer nsplit
@@ -208,7 +209,7 @@ contains
 
     modname='phytrac'
 
-    if (debutphy) then
+    if (firstcal) then
        print *, 'phytrac: pdtphys = ', pdtphys
        PRINT *, 'Fréquence de sortie des traceurs : ecrit_tra = ', ecrit_tra
        if (nbtr < nqmax) then
@@ -242,11 +243,6 @@ contains
           radio(it) = .FALSE. ! par défaut pas de passage par "radiornpb"
           clsol(it) = .FALSE.  ! Par defaut couche limite avec flux prescrit
        ENDDO
-
-       if (nqmax >= 3) then
-          ! Get the parameters for ozone chemistry:
-          call read_coefoz
-       end if
     ENDIF
 
     ! Initialisation du traceur dans le sol (couche limite radonique)
@@ -405,6 +401,10 @@ contains
 
     if (nqmax >= 3) then
        ! Ozone as a tracer:
+       if (mod(itap - 1, lmt_pas) == 0) then
+          ! Once per day, update the coefficients for ozone chemistry:
+          call regr_pr_comb_coefoz(julien)
+       end if
        call o3_chem(julien, gmtime, t_seri, zmasse, pdtphys, tr_seri(:, :, 3))
     end if
 
@@ -460,7 +460,7 @@ contains
     ENDIF
 
     !   Ecriture des sorties
-    call write_histrac(lessivage, nqmax, nstep, nid_tra)
+    call write_histrac(lessivage, nqmax, itap, nid_tra)
 
     if (lafin) then
        print *, "C'est la fin de la physique."
@@ -474,7 +474,7 @@ contains
 
   contains
 
-    subroutine write_histrac(lessivage, nqmax, nstep, nid_tra)
+    subroutine write_histrac(lessivage, nqmax, itap, nid_tra)
 
       ! From phylmd/write_histrac.h, version 1.9 2006/02/21 08:08:30
 
@@ -490,7 +490,7 @@ contains
       integer, intent(in):: nqmax
       ! (nombre de traceurs auxquels on applique la physique)
 
-      integer, intent(in):: nstep  ! appel physique
+      integer, intent(in):: itap  ! number of calls to "physiq"
       integer, intent(in):: nid_tra
 
       ! Variables local to the procedure:
@@ -504,7 +504,7 @@ contains
 
       ndex2d = 0
       ndex3d = 0
-      itau_w = itau_phy + nstep
+      itau_w = itau_phy + itap
 
       CALL gr_fi_ecrit(1, klon, iim, jjm+1, pphis, zx_tmp_2d)
       CALL histwrite(nid_tra, "phis", itau_w, zx_tmp_2d, iim*(jjm+1), ndex2d)
