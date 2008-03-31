@@ -141,10 +141,10 @@ contains
     call regr_pr_av_coefoz(ncid, "P_net_Mob", julien, press_in_edg, c_Mob)
 
     call regr_pr_av_coefoz(ncid, "r_Mob", julien, press_in_edg, coefoz)
-    c_mob = c_mob - a2 * coeofoz
+    c_mob = c_mob - a2 * coefoz
 
     call regr_pr_int_coefoz(ncid, "Sigma_Mob", julien, plev, top_value=0., &
-         coefoz)
+         v3=coefoz)
     c_mob = (c_mob - a6 * coefoz) * 48. / 29.
 
     call regr_pr_av_coefoz(ncid, "temp_Mob", julien, press_in_edg, coefoz)

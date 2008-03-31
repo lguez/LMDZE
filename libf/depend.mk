@@ -77,7 +77,7 @@ dynredem0.o : advtrac_m.o ener.o temps.o serre.o comgeom.o logic.o comvert.o com
 dynredem1.o : advtrac_m.o abort_gcm.o temps.o paramet_m.o dimens_m.o 
 ener.o : dimens_m.o 
 enercin.o : comgeom.o paramet_m.o dimens_m.o 
-etat0.o : rrpo.o rrltwc.o dynredem0.o pressure_m.o advtrac_m.o exner_hyb.o q_sat.o grid_change.o grid_atob.o clesphys.o temps.o dimsoil.o serre.o comgeom.o conf_gcm.o comvert.o comdissnew.o comconst.o paramet_m.o dimens_m.o startdyn.o start_init_phys_m.o start_init_orog_m.o dimphy.o indicesol.o 
+etat0.o : regr_pr_o3.o regr_lat_time_coefoz.o dynredem0.o pressure_m.o advtrac_m.o exner_hyb.o q_sat.o grid_change.o grid_atob.o clesphys.o temps.o dimsoil.o serre.o comgeom.o conf_gcm.o comvert.o comdissnew.o comconst.o paramet_m.o dimens_m.o startdyn.o start_init_phys_m.o start_init_orog_m.o dimphy.o indicesol.o 
 etat0_lim.o : limit.o etat0.o conf_gcm.o comconst.o 
 exner_hyb.o : comgeom.o comvert.o comconst.o dimens_m.o 
 filtreg.o : coefils.h parafilt.o paramet_m.o dimens_m.o 
@@ -142,8 +142,7 @@ nxgrad.o : comgeom.o paramet_m.o dimens_m.o
 nxgrad_gam.o : comgeom.o paramet_m.o dimens_m.o 
 nxgraro2.o : comdissipn.h paramet_m.o dimens_m.o 
 nxgrarot.o : comdissipn.h logic.o paramet_m.o dimens_m.o 
-o3_chem_m.o : orbite.o read_coefoz_m.o dimens_m.o dimphy.o 
-o3_mob_ph_m.o : grid_change.o dimphy.o dimens_m.o 
+o3_chem.o : orbite.o regr_pr_comb_coefoz.o dimens_m.o dimphy.o 
 orbite.o : comconst.o phyetat0.o dimphy.o YOMCST.o 
 orografi.o : YOEGWD.h YOMCST.o dimphy.o dimens_m.o 
 ozonecm.o : YOMCST.o clesphys.o dimphy.o dimens_m.o 
@@ -153,7 +152,7 @@ phyetat0.o : clesphys.o temps.o dimsoil.o indicesol.o dimens_m.o dimphy.o
 phyredem.o : clesphys.o temps.o dimsoil.o conf_gcm.o dimphy.o indicesol.o dimens_m.o 
 physiq.o : FCTTRE.o conf_phys.o hgardfou.o phyetat0.o orbite.o ini_hist.o YOETHF.o radopt.o radepsi.o oasis_m.o phytrac.o ctherm.o comgeomphy.o YOMCST.o abort_gcm.o iniprint.o clesphys.o temps.o dimsoil.o conf_gcm.o dimphy.o indicesol.o dimens_m.o 
 phystokenc.o : tracstoke.o conf_gcm.o dimphy.o indicesol.o dimens_m.o 
-phytrac.o : grid_change.o comgeomphy.o advtrac_m.o temps.o o3_chem_m.o phyetat0.o read_coefoz_m.o ctherm.o YOMCST.o abort_gcm.o clesphys.o dimphy.o indicesol.o dimens_m.o 
+phytrac.o : grid_change.o comgeomphy.o advtrac_m.o temps.o o3_chem.o phyetat0.o regr_pr_comb_coefoz.o ctherm.o YOMCST.o abort_gcm.o clesphys.o dimphy.o indicesol.o dimens_m.o 
 plevel.o : dimphy.o dimens_m.o 
 prather.o : comgeom.o comvert.o comconst.o paramet_m.o dimens_m.o 
 pression.o : dimens_m.o 
@@ -163,15 +162,16 @@ psextbar.o : comgeom.o paramet_m.o dimens_m.o
 qminimum.o : comvert.o paramet_m.o dimens_m.o 
 raddim.o : dimens_m.o 
 radlwsw.o : raddimlw.h radopt.o radepsi.o dimens_m.o YOETHF.o raddim.o YOMCST.o clesphys.o dimphy.o 
-read_coefoz_m.o : phyetat0.o o3_mob_ph_m.o dimphy.o dimens_m.o regr_pr.o 
 read_reanalyse.o : q_sat.o pression.o exner_hyb.o comconst.o guide.o comgeom.o comvert.o paramet_m.o dimens_m.o 
 readsulfate.o : chem.h YOMCST.o temps.o dimphy.o dimens_m.o 
+regr_lat_time_coefoz.o : regr3_lint.o regr1_step_av.o comconst.o comgeom.o dimens_m.o 
 regr_pr.o : regr1_lint.o pressure_m.o regr1_step_av.o dimens_m.o 
+regr_pr_coefoz.o : regr_pr.o grid_change.o dimphy.o dimens_m.o 
+regr_pr_comb_coefoz.o : phyetat0.o regr_pr_coefoz.o dimphy.o dimens_m.o 
+regr_pr_o3.o : regr_pr.o dimens_m.o conf_gcm.o 
 rotat.o : comgeom.o paramet_m.o dimens_m.o 
 rotat_nfil.o : comgeom.o paramet_m.o dimens_m.o 
 rotatf.o : comgeom.o paramet_m.o dimens_m.o 
-rrltwc.o : regr3_lint.o regr1_step_av.o comconst.o comgeom.o dimens_m.o 
-rrpo.o : regr_pr.o dimens_m.o conf_gcm.o 
 screenc.o : YOMCST.o 
 soil.o : YOMCST.o dimsoil.o dimphy.o indicesol.o dimens_m.o 
 sortvarc.o : ener.o temps.o comgeom.o logic.o comvert.o comconst.o paramet_m.o dimens_m.o 
@@ -181,7 +181,7 @@ start_init_phys_m.o : dimens_m.o comgeom.o gr_int_dyn_m.o inter_barxy.o conf_dat
 startdyn.o : conf_dat3d.o start_init_phys_m.o start_init_orog_m.o gr_int_dyn_m.o dimens_m.o comconst.o inter_barxy.o conf_dat2d.o comgeom.o 
 stdlevvar.o : YOETHF.o YOMCST.o 
 suphec.o : YOETHF.o YOMCST.o 
-test_disvert.o : in_out.o comconst.o comvert.o dimens_m.o 
+test_disvert.o : new_unit.o comconst.o comvert.o dimens_m.o 
 test_inter_barxy.o : comvert.o conf_gcm.o dimens_m.o comgeom.o comconst.o inter_barxy.o 
 tetalevel.o : dimphy.o paramet_m.o dimens_m.o 
 thermcell.o : YOMCST.o dimphy.o dimens_m.o 

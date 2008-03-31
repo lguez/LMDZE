@@ -11,8 +11,6 @@ c
      I                   frac_impa,frac_nucl,
      I                   pphis,paire,dtime,itap)
       USE ioipsl
-      USE histcom
-
       use dimens_m
       use indicesol
       use dimphy

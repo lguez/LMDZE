@@ -5,8 +5,15 @@
 
 FC = g95
 
+netcdf_inc_dir = /home/guez/include/NetCDF_g95
+netcdf_lib_dir = /home/guez/lib /home/guez/lib/NetCDF_g95
+
+numer_rec_dir = /home/guez/lib/Numer_Rec_Lionel/a
+netcdf95_dir = /home/guez/lib/NetCDF95/g95
+IOIPSL_dir = /home/guez/lib/IOIPSL_Lionel/ac
+
 # Include flags:
-inc_flags =-I${libf_dir} -I${libf_dir}/dyn3d -I${libf_dir}/phylmd -I${libf_dir}/filtrez -I/home/guez/include/NetCDF_g95 -I/home/guez/lib/IOIPSL_Lionel/ac -I/home/guez/lib/Numer_Rec_Lionel/a -I/home/guez/lib/NetCDF95_g95
+inc_flags =-I${libf_dir} -I${libf_dir}/dyn3d -I${libf_dir}/phylmd -I${libf_dir}/filtrez -I${netcdf_inc_dir} -I${numer_rec_dir} -I${netcdf95_dir} -I${IOIPSL_dir}
 
 # Other flags which do not affect run time performance:
 lang_flags = -ffree-form -pedantic -std=f95 -Wall -Wextra -Wno=136,163,165
@@ -20,4 +27,4 @@ perf_flags = -fbounds-check -freal=nan -ftrace=full -g -O0
 FFLAGS = ${inc_flags} ${perf_flags}
 F90FLAGS = ${inc_flags} ${lang_flags} ${perf_flags}
 
-LDLIBS = -L/home/guez/lib/IOIPSL_Lionel/ac -L/home/guez/lib -L/home/guez/lib/NetCDF_g95 -L/home/guez/lib/Numer_Rec_Lionel/a -L/home/guez/lib/NetCDF95_g95 -lioipsl -lnetcdf95 -lnetcdff -lnetcdf -lnumer_rec
+LDLIBS = $(addprefix -L, ${netcdf_lib_dir} ${numer_rec_dir} ${netcdf95_dir} ${IOIPSL_dir}) -lioipsl -lnetcdf95 -lnetcdff -lnetcdf -lnumer_rec

@@ -6,7 +6,7 @@ module regr_lat_time_coefoz_m
   implicit none
 
   private
-  public read_regr_lat_time_write_coefoz
+  public regr_lat_time_coefoz
 
 contains
 

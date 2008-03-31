@@ -6,8 +6,6 @@
      .                    fileid,filevid,filedid)
 
        USE IOIPSL
-       USE histcom
-
 
 C
 C   Routine d'initialisation des ecritures des fichiers histoires LMDZ

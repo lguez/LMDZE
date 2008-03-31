@@ -16,7 +16,7 @@ contains
     use nrutil, only: assert
     use dimphy, only: klon
     use dimens_m, only: llm
-    use read_coefoz_m, only: c_Mob, a4_mass, a2, r_het_interm
+    use regr_pr_comb_coefoz_m, only: c_Mob, a4_mass, a2, r_het_interm
     use orbite_m, only: orbite, zenang
     use nrtype, only: pi
 
@@ -112,7 +112,7 @@ contains
 
     ! This function computes the production rate of ozone by chemistry.
 
-    use read_coefoz_m, only: a6_mass
+    use regr_pr_comb_coefoz_m, only: a6_mass
     use nrutil, only: assert
     use dimens_m, only: llm
     use dimphy, only: klon
