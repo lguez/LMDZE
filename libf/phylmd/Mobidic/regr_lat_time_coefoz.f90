@@ -113,7 +113,7 @@ contains
 
     !---------------------------------
 
-    print *, "Call sequence information: regr_coefoz"
+    print *, "Call sequence information: regr_lat_time_coefoz"
 
     ! Names of ozone parameters:
     i_v = 0

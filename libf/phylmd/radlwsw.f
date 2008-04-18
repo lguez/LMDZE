@@ -79,7 +79,7 @@ cIM   real co2_ppm
 cIM   real solaire
 c
       real, intent(in):: paprs(klon,klev+1)
-      real pplay(klon,klev)
+      real, intent(in):: pplay(klon,klev)
       real albedo(klon), alblw(klon), tsol(klon)
       real t(klon,klev), q(klon,klev)
       real, intent(in):: wo(klon,klev)
@@ -2794,8 +2794,8 @@ cIM ctes ds clesphys.h   SUBROUTINE LW(RCO2,RCH4,RN2O,RCFC11,RCFC12,
       use clesphys
       use YOMCST
       use raddim
+            use raddimlw
       IMPLICIT none
-      include "raddimlw.h"
 C
 C-----------------------------------------------------------------------
 C     METHOD.
@@ -2957,8 +2957,8 @@ cIM ctes ds clesphys.h   SUBROUTINE LWU(RCO2, RCH4, RN2O, RCFC11, RCFC12,
       use raddim
       use radepsi
       use radopt
+            use raddimlw
       IMPLICIT none
-      include "raddimlw.h"
 C
 C     PURPOSE.
 C     --------
@@ -3347,8 +3347,8 @@ C
       use dimphy
       use YOMCST
       use raddim
+            use raddimlw
       IMPLICIT none
-      include "raddimlw.h"
 C
 C     PURPOSE.
 C     --------
@@ -3842,8 +3842,8 @@ C
       use dimens_m
       use dimphy
       use raddim
+            use raddimlw
       IMPLICIT none
-      include "raddimlw.h"
 C
 C-----------------------------------------------------------------------
 C     PURPOSE.
@@ -5254,8 +5254,8 @@ C
       use dimphy
       use YOMCST
       use raddim
+            use raddimlw
       IMPLICIT none
-      include "raddimlw.h"
 C
 C-----------------------------------------------------------------------
 C     PURPOSE.
@@ -5367,8 +5367,8 @@ C
       use dimphy
       use raddim
       use radopt
+            use raddimlw
       IMPLICIT none
-      include "raddimlw.h"
 C
 C-----------------------------------------------------------------------
 C     PURPOSE.
@@ -5698,8 +5698,8 @@ C
       use dimens_m
       use dimphy
       use raddim
+            use raddimlw
       IMPLICIT none
-      include "raddimlw.h"
 C
 C-----------------------------------------------------------------------
 C     PURPOSE.
@@ -5950,8 +5950,8 @@ C
       use dimens_m
       use dimphy
       use raddim
+            use raddimlw
       IMPLICIT none
-      include "raddimlw.h"
 C
 C-----------------------------------------------------------------------
 C     PURPOSE.
@@ -6157,8 +6157,8 @@ C
       use dimens_m
       use dimphy
       use raddim
+            use raddimlw
       IMPLICIT none
-      include "raddimlw.h"
 C
 C-----------------------------------------------------------------------
 C     PURPOSE.
@@ -6332,8 +6332,8 @@ C
       use dimens_m
       use dimphy
       use raddim
+            use raddimlw
       IMPLICIT none
-      include "raddimlw.h"
 C
 C     ------------------------------------------------------------------
 C     PURPOSE.

@@ -45,6 +45,7 @@ contains
 
     !------------------------------------------------------------
 
+    print *, "Call sequence information: regr_pr_o3"
     call assert(shape(o3_mob_regr) == (/iim + 1, jjm + 1, llm/), "regr_pr_o3")
 
     call nf95_open("coefoz_LMDZ.nc", nf90_nowrite, ncid)

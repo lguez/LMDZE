@@ -68,8 +68,8 @@ c     Input variables
       REAL dtime
       REAL vcov(ip1jm,llm),ucov(ip1jmp1,llm) ! vents covariants
       REAL ps(ip1jmp1)                       ! pression  au sol
-      REAL p (ip1jmp1,llmp1  )  ! pression aux interfac.des couches
-      REAL pk (ip1jmp1,llm  )  ! = (p/Pref)**kappa
+      REAL, intent(in):: p(ip1jmp1, llmp1)  ! pression aux interfac.des couches
+      REAL, intent(in):: pk (ip1jmp1,llm  )  ! = (p/Pref)**kappa
       REAL teta(ip1jmp1,llm)                 ! temperature potentielle 
       REAL q(ip1jmp1,llm)               ! champs eau vapeur
       REAL ql(ip1jmp1,llm)               ! champs eau liquide

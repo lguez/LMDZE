@@ -1,0 +1,12 @@
+module yoegwd
+
+  ! From phylmd/YOEGWD.h,v 1.1.1.1 2004/05/19 12:53:08
+  ! PARAMETERS FOR GRAVITY WAVE DRAG CALCULATIONS
+
+  implicit none
+
+  integer NKTOPG,NSTRA
+  real GFRCRIT,GKWAKE,GRCRIT,GVCRIT,GKDRAG,GKLIFT
+  real GHMAX,GRAHILO,GSIGCR,GSSEC,GTSEC,GVSEC
+
+end module yoegwd

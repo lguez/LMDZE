@@ -42,7 +42,7 @@ c======================================================================
 C
 c
       REAL, intent(in):: paprs(klon,klev+1)
-      real pplay(klon,klev)
+      real, intent(in):: pplay(klon,klev)
       REAL t(klon,klev)
 c
       REAL pclc(klon,klev)

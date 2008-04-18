@@ -80,10 +80,10 @@ C INPUT:
 C =============
 C
 C Q(IMR,JNP,NLAY,NC): mixing ratios at current time (t)
-C NC: total # of constituents
-C IMR: first dimension (E-W); # of Grid intervals in E-W is IMR
-C JNP: 2nd dimension (N-S); # of Grid intervals in N-S is JNP-1
-C NLAY: 3rd dimension (# of layers); vertical index increases from 1 at
+C NC: total number of constituents
+C IMR: first dimension (E-W); number of Grid intervals in E-W is IMR
+C JNP: 2nd dimension (N-S); number of Grid intervals in N-S is JNP-1
+C NLAY: 3rd dimension (number of layers); vertical index increases from 1 at
 C       the model top to NLAY near the surface (see fig. below).
 C       It is assumed that 6 <= NLAY <= JNP (for dynamic memory allocation)
 C
@@ -240,7 +240,7 @@ C A larger polar cap is used if j1=3 (recommended for C-Grid winds or when
 C winds are noisy near poles).
 C
 C Flux-Form Semi-Lagrangian transport in the East-West direction is used
-C when and where Courant # is greater than one.
+C when and where Courant number is greater than one.
 C
 C The user needs to change the parameter Jmax or Kmax if the resolution
 C is greater than 0.5 deg in N-S or 150 layers in the vertical direction.
@@ -441,10 +441,10 @@ C
       do 1500 k=1,NLAY
 C
       if(IGD.eq.0) then
-C Convert winds on A-Grid to Courant # on C-Grid.
+C Convert winds on A-Grid to Courant number on C-Grid.
       call A2C(U(1,1,k),V(1,1,k),IMR,JMR,j1,j2,CRX,CRY,dtdx5,DTDY5)
       else
-C Convert winds on C-grid to Courant #
+C Convert winds on C-grid to Courant number
       do 45 j=j1,j2
       do 45 i=2,IMR
 45    CRX(i,J) = dtdx(j)*U(i-1,j,k)

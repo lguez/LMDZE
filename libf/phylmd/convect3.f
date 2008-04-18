@@ -14,9 +14,9 @@ cccc     *     DTVPDT1,DTVPDQ1,DPLCLDT,DPLCLDR)
 C
 C    ***  THE PARAMETER NA SHOULD IN GENERAL EQUAL ND   ***
 C
-c#################################################################
+
 cFleur       Introduction des traceurs dans convect3 le 6 juin 200
-c#################################################################
+
       use dimens_m
       use dimphy
       use YOMCST
@@ -608,15 +608,7 @@ C          The interval on which CAPE is computed starts at PBASE :
          CAPE=CAPE+RD*BUOY(I-1)*DELTAP/P(I-1)
          DCAPE=RD*BUOY(I-1)*DELTAP/P(I-1)
          DLNP=DELTAP/P(I-1)
-Cjyg2
-c sb3d         print *,'buoy,dlnp,dcape,cape',buoy(i-1),dlnp,dcape,cape
-c test sb:
-c@       write(*,*) '############################################'
-c@         write(*,*) 'cape,rrd,buoy,deltap,p,pbase,ph:'
-c@     :     ,cape,rd,buoy(i-1),deltap,p(i-1),pbase,ph(i)
-c@       write(*,*) '############################################'
 
-c fin test sb
          CAPE=AMAX1(0.0,CAPE)
 C
          SIGOLD=SIG(I)
@@ -638,14 +630,6 @@ C
          W=(1.-BETA)*FAC*SQRT(CAPE)+BETA*W0(I)
          AMU=0.5*(SIG(I)+SIGOLD)*W
          M(I)=AMU*0.007*P(I)*(PH(I)-PH(I+1))/TV(I)
-
-c --------- test sb:
-c       write(*,*) '############################################'
-c       write(*,*) 'k,amu,buoy(k-1),deltap,w,beta,fac,cape,w0(k)'
-c       write(*,*) i,amu,buoy(i-1),deltap
-c     :           ,w,beta,fac,cape,w0(i)
-c       write(*,*) '############################################'
-c ---------
 
          W0(I)=W
    98 CONTINUE

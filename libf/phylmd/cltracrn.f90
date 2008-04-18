@@ -6,7 +6,6 @@ SUBROUTINE cltracrn( itr, dtime,u1lay, v1lay, &
      d_tr,d_trs )
 
   ! This procedure is clean: no C preprocessor directive, no include line.
-
   ! From phylmd/cltracrn.F,v 1.2 2005/05/25 13:10:09
 
   use indicesol, only: nbsrf
@@ -53,7 +52,8 @@ SUBROUTINE cltracrn( itr, dtime,u1lay, v1lay, &
   real ftsol(klon,nbsrf), pctsrf(klon,nbsrf) 
   REAL tr(klon,klev), trs(klon)
   REAL, intent(in):: paprs(klon,klev+1)
-  real pplay(klon,klev), delp(klon,klev)
+  real, intent(in):: pplay(klon,klev)
+  real delp(klon,klev)
   REAL masktr(klon) 
   REAL fshtr(klon) 
   REAL hsoltr
@@ -112,7 +112,6 @@ SUBROUTINE cltracrn( itr, dtime,u1lay, v1lay, &
   !AA   Il doit y avoir coherence (dc la meme chose ici)
 
   DO i = 1, klon
-     !AA         zx_alpha1(i) = (paprs(i,1)-pplay(i,2))/(pplay(i,1)-pplay(i,2))
      zx_alpha1(i) = 1.0
      zx_alpha2(i) = 1.0 - zx_alpha1(i)
   ENDDO

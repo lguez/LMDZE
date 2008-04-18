@@ -67,7 +67,7 @@ contains
     REAL, intent(in):: paprs(klon, llm+1)
     ! (pression pour chaque inter-couche, en Pa)
     
-    REAL pplay(klon, llm)
+    REAL, intent(in):: pplay(klon, llm)
     ! (input pression pour le mileu de chaque couche (en Pa))
 
     REAL pphi(klon, llm)  
@@ -1014,7 +1014,7 @@ contains
     IF (if_ebil >= 1) THEN 
        ztit='after dynamic'
        CALL diagetpq(airephy, ztit, ip_ebil, 1, 1, dtime &
-            , t_seri, q_seri, ql_seri, qs_seri, u_seri, v_seri, paprs, pplay &
+            , t_seri, q_seri, ql_seri, qs_seri, u_seri, v_seri, paprs &
             , d_h_vcol, d_qt, d_qw, d_ql, d_qs, d_ec)
        !     Comme les tendances de la physique sont ajoute dans la dynamique, 
        !     on devrait avoir que la variation d'entalpie par la dynamique
@@ -1090,7 +1090,7 @@ contains
     IF (if_ebil >= 2) THEN 
        ztit='after reevap'
        CALL diagetpq(airephy, ztit, ip_ebil, 2, 1, dtime &
-            , t_seri, q_seri, ql_seri, qs_seri, u_seri, v_seri, paprs, pplay &
+            , t_seri, q_seri, ql_seri, qs_seri, u_seri, v_seri, paprs &
             , d_h_vcol, d_qt, d_qw, d_ql, d_qs, d_ec)
        call diagphy(airephy, ztit, ip_ebil &
             , zero_v, zero_v, zero_v, zero_v, zero_v &
@@ -1207,7 +1207,7 @@ contains
     IF (if_ebil >= 2) THEN 
        ztit='after clmain'
        CALL diagetpq(airephy, ztit, ip_ebil, 2, 2, dtime &
-            , t_seri, q_seri, ql_seri, qs_seri, u_seri, v_seri, paprs, pplay &
+            , t_seri, q_seri, ql_seri, qs_seri, u_seri, v_seri, paprs &
             , d_h_vcol, d_qt, d_qw, d_ql, d_qs, d_ec)
        call diagphy(airephy, ztit, ip_ebil &
             , zero_v, zero_v, zero_v, zero_v, sens &
@@ -1437,7 +1437,7 @@ contains
     IF (if_ebil >= 2) THEN 
        ztit='after convect'
        CALL diagetpq(airephy, ztit, ip_ebil, 2, 2, dtime &
-            , t_seri, q_seri, ql_seri, qs_seri, u_seri, v_seri, paprs, pplay &
+            , t_seri, q_seri, ql_seri, qs_seri, u_seri, v_seri, paprs &
             , d_h_vcol, d_qt, d_qw, d_ql, d_qs, d_ec)
        call diagphy(airephy, ztit, ip_ebil &
             , zero_v, zero_v, zero_v, zero_v, zero_v &
@@ -1519,7 +1519,7 @@ contains
     IF (if_ebil >= 2) THEN 
        ztit='after dry_adjust'
        CALL diagetpq(airephy, ztit, ip_ebil, 2, 2, dtime &
-            , t_seri, q_seri, ql_seri, qs_seri, u_seri, v_seri, paprs, pplay &
+            , t_seri, q_seri, ql_seri, qs_seri, u_seri, v_seri, paprs &
             , d_h_vcol, d_qt, d_qw, d_ql, d_qs, d_ec)
     END IF
 
@@ -1600,7 +1600,7 @@ contains
     IF (if_ebil >= 2) THEN 
        ztit='after fisrt'
        CALL diagetpq(airephy, ztit, ip_ebil, 2, 2, dtime &
-            , t_seri, q_seri, ql_seri, qs_seri, u_seri, v_seri, paprs, pplay &
+            , t_seri, q_seri, ql_seri, qs_seri, u_seri, v_seri, paprs &
             , d_h_vcol, d_qt, d_qw, d_ql, d_qs, d_ec)
        call diagphy(airephy, ztit, ip_ebil &
             , zero_v, zero_v, zero_v, zero_v, zero_v &
@@ -1688,7 +1688,7 @@ contains
     IF (if_ebil >= 2) THEN 
        ztit="after diagcld"
        CALL diagetpq(airephy, ztit, ip_ebil, 2, 2, dtime &
-            , t_seri, q_seri, ql_seri, qs_seri, u_seri, v_seri, paprs, pplay &
+            , t_seri, q_seri, ql_seri, qs_seri, u_seri, v_seri, paprs &
             , d_h_vcol, d_qt, d_qw, d_ql, d_qs, d_ec)
     END IF
 
@@ -1798,7 +1798,7 @@ contains
     IF (if_ebil >= 2) THEN 
        ztit='after rad'
        CALL diagetpq(airephy, ztit, ip_ebil, 2, 2, dtime &
-            , t_seri, q_seri, ql_seri, qs_seri, u_seri, v_seri, paprs, pplay &
+            , t_seri, q_seri, ql_seri, qs_seri, u_seri, v_seri, paprs &
             , d_h_vcol, d_qt, d_qw, d_ql, d_qs, d_ec)
        call diagphy(airephy, ztit, ip_ebil &
             , topsw, toplw, solsw, sollw, zero_v &
@@ -1920,7 +1920,7 @@ contains
     IF (if_ebil >= 2) THEN 
        ztit='after orography'
        CALL diagetpq(airephy, ztit, ip_ebil, 2, 2, dtime &
-            , t_seri, q_seri, ql_seri, qs_seri, u_seri, v_seri, paprs, pplay &
+            , t_seri, q_seri, ql_seri, qs_seri, u_seri, v_seri, paprs &
             , d_h_vcol, d_qt, d_qw, d_ql, d_qs, d_ec)
     END IF
 
@@ -1979,7 +1979,7 @@ contains
     IF (if_ebil >= 1) THEN 
        ztit='after physic'
        CALL diagetpq(airephy, ztit, ip_ebil, 1, 1, dtime &
-            , t_seri, q_seri, ql_seri, qs_seri, u_seri, v_seri, paprs, pplay &
+            , t_seri, q_seri, ql_seri, qs_seri, u_seri, v_seri, paprs &
             , d_h_vcol, d_qt, d_qw, d_ql, d_qs, d_ec)
        !     Comme les tendances de la physique sont ajoute dans la dynamique, 
        !     on devrait avoir que la variation d'entalpie par la dynamique

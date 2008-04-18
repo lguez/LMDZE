@@ -1,21 +1,20 @@
 c
 c $Header: /home/cvsroot/LMDZ4/libf/phylmd/cvltr.F,v 1.1 2005/04/15 12:36:17 lmdzadmin Exp $
 c
-      SUBROUTINE cvltr(pdtime,da, phi, mp,paprs,pplay,x,upd,dnd,dx)
+      SUBROUTINE cvltr(pdtime,da, phi, mp,paprs,x,upd,dnd,dx)
       use dimens_m
       use dimphy
       use YOMCST
+            use yoecumf 
       IMPLICIT NONE 
 c=====================================================================
 c Objet : convection des traceurs / KE
 c Auteurs: M-A Filiberti and J-Y Grandpeix
 c=====================================================================
 c
-      include "YOECUMF.h" 
 c
       REAL, intent(in):: pdtime
       REAL, intent(in):: paprs(klon,klev+1) ! pression aux 1/2 couches (bas en haut)
-      REAL pplay(klon,klev)  ! pression pour le milieu de chaque couche
       REAL x(klon,klev)        ! q de traceur (bas en haut) 
       REAL dx(klon,klev)     ! tendance de traceur  (bas en haut)
       real da(klon,klev),phi(klon,klev,klev),mp(klon,klev)

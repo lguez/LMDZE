@@ -80,7 +80,9 @@ contains
     real, intent(in):: paprs(klon, llm+1)
     ! (pression pour chaque inter-couche, en Pa)
 
-    real pplay(klon, llm)  ! pression pour le mileu de chaque couche (en Pa)
+    real, intent(in):: pplay(klon, llm)
+    ! (pression pour le mileu de chaque couche, en Pa)
+
     real pphi(klon, llm) ! geopotentiel
     real pphis(klon)
     REAL, intent(in):: presnivs(llm)
@@ -279,10 +281,10 @@ contains
           if (iflag_con.eq.2) then
              ! tiedke
              CALL nflxtr(pdtphys, pmfu, pmfd, pen_u, pde_u, pen_d, pde_d, &
-                  pplay, paprs, tr_seri(1, 1, it), d_tr_cv(1, 1, it))
+                  paprs, tr_seri(1, 1, it), d_tr_cv(1, 1, it))
           else if (iflag_con.eq.3) then
              ! KE
-             call cvltr(pdtphys, da, phi, mp, paprs, pplay, &
+             call cvltr(pdtphys, da, phi, mp, paprs, &
                   tr_seri(1, 1, it), upwd, dnwd, d_tr_cv(1, 1, it))
           endif
 

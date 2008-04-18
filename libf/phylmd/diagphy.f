@@ -147,7 +147,7 @@ C
 
 C======================================================================
       SUBROUTINE diagetpq(airephy,tit,iprt,idiag,idiag2,dtime
-     e  ,t,q,ql,qs,u,v,paprs,pplay
+     e  ,t,q,ql,qs,u,v,paprs
      s  , d_h_vcol, d_qt, d_qw, d_ql, d_qs, d_ec)
 C======================================================================
 C
@@ -185,7 +185,6 @@ c qs-------input-R- solid watter (kg/kg)
 c u--------input-R- vitesse u
 c v--------input-R- vitesse v
 c paprs----input-R- pression a intercouche (Pa)
-c pplay----input-R- pression au milieu de couche (Pa)
 c
 C the following total value are computed by UNIT of earth surface
 C
@@ -220,7 +219,6 @@ c     Input variables
       REAL t(klon,klev), q(klon,klev), ql(klon,klev), qs(klon,klev)
       REAL u(klon,klev), v(klon,klev)
       REAL, intent(in):: paprs(klon,klev+1)
-      real pplay(klon,klev)
 c     Output variables
       REAL d_h_vcol, d_qt, d_qw, d_ql, d_qs, d_ec
 C

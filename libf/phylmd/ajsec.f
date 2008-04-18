@@ -16,7 +16,7 @@ c
 c d_t-----output-R-Incrementation de la temperature
 c======================================================================
       REAL, intent(in):: paprs(klon,klev+1)
-      real pplay(klon,klev)
+      real, intent(in):: pplay(klon,klev)
       REAL t(klon,klev), q(klon,klev)
       REAL d_t(klon,klev), d_q(klon,klev)
 c

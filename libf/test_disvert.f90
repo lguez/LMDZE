@@ -20,7 +20,7 @@ program test_disvert
   sigma = ap / pa + bp
   p = ap + bp * preff
 
-  unit = new_unit()
+  call new_unit(unit)
   open(unit, file="test_disvert.csv", status="replace", action="write")
   write(unit, fmt=*) '"ap (Pa)" "bp" "sigma" "p (Pa)"' ! title line
   do l = 1, llm

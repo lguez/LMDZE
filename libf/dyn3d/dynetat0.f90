@@ -29,7 +29,8 @@ contains
     !   Arguments:
     REAL, intent(out):: vcov(: , :), ucov(:, :), teta(:, :)
     REAL, intent(out):: q(:, :, :), masse(:, :)
-    REAL, intent(out):: ps(:), phis(:, :)
+    REAL, intent(out):: ps(:) ! in Pa
+    REAL, intent(out):: phis(:, :)
     REAL, intent(out):: time
 
     !   Variables 

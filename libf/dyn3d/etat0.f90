@@ -42,7 +42,7 @@ contains
     use q_sat_m, only: q_sat
     use exner_hyb_m, only: exner_hyb
     use advtrac_m, only: iniadvtrac
-    use pressure_m, only: pls, p3d
+    use pressure_var, only: pls, p3d
     use dynredem0_m, only: dynredem0
     use regr_lat_time_coefoz_m, only: regr_lat_time_coefoz
     use regr_pr_o3_m, only: regr_pr_o3

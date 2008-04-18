@@ -9,20 +9,20 @@ contains
     ! "regr_pr_av" stands for "regrid pressure averaging".
     ! This function regrids a 2D latitude -- pressure variable to the
     ! LMDZ 3D grid.
+    ! The target horizontal LMDZ grid is the "scalar" grid: "rlonv", "rlatu".
+    ! The target vertical LMDZ grid is the grid of layer boundaries.
     ! We assume that the variable is already on the LMDZ "rlatu" latitude grid.
     ! There only remains to regrid in pressure at each horizontal
     ! position.
     ! The input variable does not depend on longitude, but the pressure
-    ! at LMDZ mid-layers does.
+    ! at LMDZ layers does.
     ! Therefore, the values on the LMDZ grid do depend on longitude.
-    ! The target horizontal LMDZ grid is the "scalar" grid: "rlonv", "rlatu".
-    ! The target vertical LMDZ grid is the grid of mid-layers.
     ! The variable is regridded by averaging.
 
     use dimens_m, only: iim, jjm, llm
     use nrutil, only: assert
     use regr1_step_av_m, only: regr1_step_av
-    use pressure_m, only: p3d
+    use pressure_var, only: p3d
 
     real, intent(in):: v(:, :)
     ! ("v(j, l)" is at latitude "rlatu(j)" and for pressure interval
@@ -35,7 +35,7 @@ contains
     real regr_pr_av(iim + 1, jjm + 1, llm)
     ! (variable adapted to the LMDZ grid
     ! "regr_pr_av(i, j, l)" is at longitude "rlonv(i)", latitude
-    ! "rlatu(j)" and pressure level "pls(i, j, l)")
+    ! "rlatu(j)" and in pressure interval "[p3d(i, j, l+1), p3d(i, j, l)]")
 
     ! Variables local to the procedure:
     integer i, j
@@ -82,20 +82,20 @@ contains
     ! "regr_pr_int" stands for "regrid pressure interpolation".
     ! This function regrids a 2D latitude -- pressure variable to the
     ! LMDZ 3D grid.
+    ! The target horizontal LMDZ grid is the "scalar" grid: "rlonv", "rlatu".
+    ! The target vertical LMDZ grid is the grid of mid-layers.
     ! We assume that the variable is already on the LMDZ latitude grid.
     ! There only remains to regrid in pressure at each horizontal
     ! position.
     ! The input variable does not depend on longitude, but the pressure
     ! at LMDZ mid-layers does.
     ! Therefore, the values on the LMDZ grid do depend on longitude.
-    ! The target horizontal LMDZ grid is the "scalar" grid: "rlonv", "rlatu".
-    ! The target vertical LMDZ grid is the grid of mid-layers.
     ! The variable is regridded by interpolation.
 
     use dimens_m, only: iim, jjm, llm
     use nrutil, only: assert
     use regr1_lint_m, only: regr1_lint
-    use pressure_m, only: pls
+    use pressure_var, only: pls
 
     real, intent(in):: v(:, :)
     ! ("v(j, l)" is at latitude "rlatu(j)" and pressure level "press_in(l)".)

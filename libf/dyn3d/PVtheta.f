@@ -56,7 +56,7 @@ c
       REAL pucov(iip1,jjp1,ilev)
       REAL pteta(iip1,jjp1,ilev)
       REAL ztfi(ilon,ilev)
-      REAL zplay(ilon,ilev), zplev(ilon,ilev+1)
+      REAL, intent(in):: zplay(ilon,ilev), zplev(ilon,ilev+1)
       INTEGER nbteta
       REAL theta(nbteta)
 c

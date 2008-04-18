@@ -1,4 +1,4 @@
-module pressure_m
+module pressure_var
 
   use dimens_m, only: iim, jjm, llm
 
@@ -15,4 +15,4 @@ module pressure_m
 
   private iim, jjm, llm
 
-end module pressure_m
+end module pressure_var

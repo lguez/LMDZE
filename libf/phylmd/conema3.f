@@ -70,7 +70,7 @@ c
       REAL em_d_u2(klev), em_d_v2(klev)     ! sbl   
 c 
       REAL, intent(in):: paprs(klon,klev+1)
-      real pplay(klon,klev)
+      real, intent(in):: pplay(klon,klev)
       REAL t(klon,klev), q(klon,klev), d_t(klon,klev), d_q(klon,klev)
       REAL u(klon,klev), v(klon,klev), tra(klon,klev,ntra)
       REAL d_u(klon,klev), d_v(klon,klev), d_tra(klon,klev,ntra)
@@ -356,7 +356,6 @@ c  precip.
             if (ktop(i)-kbas(i).gt.0.and.
      s         l.ge.kbas(i).and.l.le.ktop(i)) then
                qcond_incld(i,l)=rain(i)*8.e4
-c    s         *(pplay(i,l      )-paprs(i,ktop(i)+1))
      s         /(pplay(i,kbas(i))-pplay(i,ktop(i)))
 c    s         **2
             else

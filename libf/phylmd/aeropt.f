@@ -15,7 +15,7 @@ c
 c Arguments:
 c
       REAL, intent(in):: paprs(klon,klev+1)
-      REAL pplay(klon,klev), t_seri(klon,klev)
+      REAL, intent(in):: pplay(klon,klev), t_seri(klon,klev)
       REAL msulfate(klon,klev) ! masse sulfate ug SO4/m3  [ug/m^3]
       REAL RHcl(klon,klev)     ! humidite relative ciel clair
       REAL tau_ae(klon,klev,2) ! epaisseur optique aerosol

@@ -35,7 +35,7 @@ c   Arguments:
 c   ----------
 
       REAL vcov(ip1jm,llm),ucov(ip1jmp1,llm),teta(ip1jmp1,llm)
-      REAL  p( ip1jmp1,llmp1 )
+      REAL, intent(in):: p( ip1jmp1,llmp1 )
       REAL dv(ip1jm,llm),du(ip1jmp1,llm),dh(ip1jmp1,llm)
 
 c   Local:

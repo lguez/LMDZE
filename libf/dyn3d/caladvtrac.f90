@@ -14,7 +14,8 @@ SUBROUTINE caladvtrac(q, pbaru, pbarv, p, masse, dq, teta, pk)
   IMPLICIT NONE
 
   REAL pbaru(ip1jmp1, llm), pbarv((iim + 1) * jjm, llm), masse(ip1jmp1, llm)
-  REAL p(ip1jmp1, llm + 1), q(ip1jmp1, llm, nqmx)
+  REAL, intent(in):: p(ip1jmp1, llm + 1)
+  real q(ip1jmp1, llm, nqmx)
 
   real, intent(out):: dq(ip1jmp1, llm, 2)
   ! (n'est utilisé et dimensionné que pour l'eau vapeur et liquide)

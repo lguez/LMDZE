@@ -40,7 +40,7 @@ c======================================================================
 C
 c
       REAL, intent(in):: paprs(klon,klev+1)
-      real pplay(klon,klev)
+      real, intent(in):: pplay(klon,klev)
       REAL t(klon,klev)
 c
       REAL pclc(klon,klev)
@@ -244,7 +244,7 @@ c
 c
 c Arguments d'entree:
       REAL, intent(in):: paprs(klon,klev+1) ! pression (Pa) a inter-couche
-      REAL pplay(klon,klev) ! pression (Pa) au milieu de couche
+      REAL, intent(in):: pplay(klon,klev) ! pression (Pa) au milieu de couche
       REAL t(klon,klev) ! temperature (K)
       REAL q(klon,klev) ! humidite specifique (Kg/Kg)
       REAL rain(klon) ! pluie convective (kg/m2/s)
@@ -324,7 +324,7 @@ c
 c
 c Arguments d'entree:
       REAL, intent(in):: paprs(klon,klev+1) ! pression (Pa) a inter-couche
-      REAL pplay(klon,klev) ! pression (Pa) au milieu de couche
+      REAL, intent(in):: pplay(klon,klev) ! pression (Pa) au milieu de couche
       REAL t(klon,klev) ! temperature (K)
       REAL q(klon,klev) ! humidite specifique (Kg/Kg)
 c

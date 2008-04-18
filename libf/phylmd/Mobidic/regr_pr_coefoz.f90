@@ -7,12 +7,12 @@ contains
   subroutine regr_pr_av_coefoz(ncid, name, julien, press_in_edg, v3)
 
     ! "regr_pr_av_coefoz" stands for "regrid pressure averaging
-    ! coefficients ozone".
+    ! coefficient ozone".
     ! This procedure reads a single Mobidic ozone coefficient from
     !"coefoz_LMDZ.nc", at the current day, regrids this parameter in
     ! pressure to the LMDZ vertical grid and packs it to the LMDZ
     ! horizontal "physics" grid.
-    ! Regridding is by averaging a step function.
+    ! Regridding in pressure is done by averaging a step function.
 
     use dimens_m, only: iim, jjm, llm
     use dimphy, only: klon

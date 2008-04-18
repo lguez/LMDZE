@@ -22,15 +22,14 @@ contains
     ! et possibilite d'appeler une fonction f(y) a derivee tangente
     ! hyperbolique a la place de la fonction a derivee sinusoidale.
 
-    ! ... Possibilite de choisir le shema pour l'advection de
+    ! ... Possibilité de choisir le schéma pour l'advection de
     ! q, en modifiant iadv dans "traceur.def" (10/02) .
 
     ! Pour Van-Leer + Vapeur d'eau saturee, iadv(1)=4. (F.Codron, 10/99)
     ! Pour Van-Leer iadv=10 
 
-    use dimens_m, only: iim, llm, nqmx
-    use paramet_m, only: ip1jmp1, ip1jm, llmp1, ijmllm, ijp1llm, jjp1, iip1, &
-         iip2
+    use dimens_m, only: iim, jjm, llm, nqmx
+    use paramet_m, only: ip1jmp1, ip1jm, ijmllm, ijp1llm, jjp1, iip1, iip2
     use comconst, only: dtvr, daysec, dtphys
     use comvert, only: ap, bp
     use conf_gcm_m, only: day_step, iconser, idissip, iphysiq, iperiod, nday, &
@@ -42,30 +41,33 @@ contains
     use temps, only: itaufin, day_ini, dt
     use iniprint, only: prt_level
     use com_io_dyn
-    use abort_gcm_m, only: abort_gcm
     use ener
     use calfis_m, only: calfis
     use exner_hyb_m, only: exner_hyb
     use guide_m, only: guide
     use pression_m, only: pression
+    use pressure_var, only: p3d
 
     integer nq
+    REAL clesphy0(:)
 
-    INTEGER longcles
-    PARAMETER (longcles = 20)
-    REAL clesphy0(longcles)
-
-    ! variables dynamiques
+    ! Variables dynamiques:
     REAL vcov(ip1jm, llm), ucov(ip1jmp1, llm) ! vents covariants
     REAL teta(ip1jmp1, llm) ! temperature potentielle 
     REAL q(ip1jmp1, llm, nqmx) ! mass fractions of advected fields
-    REAL ps(ip1jmp1) ! pression au sol
-    REAL p(ip1jmp1, llmp1) ! pression aux interfac.des couches
+    REAL ps(ip1jmp1) ! pression au sol, en Pa
+    REAL masse(ip1jmp1, llm) ! masse d'air
+    REAL phis(ip1jmp1) ! geopotentiel au sol
+
+    REAL time_0
+
+    ! Variables local to the procedure:
+
+    ! Variables dynamiques:
+
     REAL pks(ip1jmp1) ! exner au sol
     REAL pk(ip1jmp1, llm) ! exner au milieu des couches
     REAL pkf(ip1jmp1, llm) ! exner filt.au milieu des couches
-    REAL masse(ip1jmp1, llm) ! masse d'air
-    REAL phis(ip1jmp1) ! geopotentiel au sol
     REAL phi(ip1jmp1, llm) ! geopotential
     REAL w(ip1jmp1, llm) ! vitesse verticale
 
@@ -98,15 +100,13 @@ contains
     REAL time ! Heure de la journee en fraction d'1 jour
 
     REAL SSUM
-    REAL time_0, finvmaold(ip1jmp1, llm)
+    real finvmaold(ip1jmp1, llm)
 
     LOGICAL :: lafin=.false.
     INTEGER ij, l
 
     REAL rdayvrai, rdaym_ini
-    LOGICAL callinigrads
-
-    data callinigrads/.true./
+    LOGICAL:: callinigrads = .true.
 
     !+jld variables test conservation energie
     REAL ecin(ip1jmp1, llm), ecin0(ip1jmp1, llm)
@@ -116,20 +116,10 @@ contains
     REAL dtetaecdt(ip1jmp1, llm)
     REAL vcont(ip1jm, llm), ucont(ip1jmp1, llm)
     CHARACTER*15 ztit
-    INTEGER ip_ebil_dyn ! PRINT level for energy conserv. diag.
-    SAVE ip_ebil_dyn
-    DATA ip_ebil_dyn /0/
+    INTEGER:: ip_ebil_dyn = 0 ! PRINT level for energy conserv. diag.
 
-    character(len=*), parameter:: modname = "leapfrog"
-    character*80 abort_message
-
-    logical dissip_conservative
-    save dissip_conservative
-    data dissip_conservative /.true./
-
-    LOGICAL prem
-    save prem
-    DATA prem /.true./
+    logical:: dissip_conservative = .true.
+    LOGICAL:: prem = .true.
 
     !---------------------------------------------------
 
@@ -148,11 +138,11 @@ contains
 
     ! On initialise la pression et la fonction d'Exner :
     dq=0.
-    CALL pression(ip1jmp1, ap, bp, ps, p)
-    CALL exner_hyb(ps, p, pks, pk, pkf)
+    CALL pression(ip1jmp1, ap, bp, ps, p3d)
+    CALL exner_hyb(ps, p3d, pks, pk, pkf)
 
     ! Debut de l'integration temporelle:
-    do
+    outer_loop:do
        if (ok_guide.and.(itaufin - itau - 1) * dtvr > 21600) then
           call guide(itau, ucov, vcov, teta, q, masse, ps)
        else
@@ -196,7 +186,7 @@ contains
           ! calcul des tendances advection des traceurs (dont l'humidite)
 
           IF (forward .OR. leapf) THEN
-             CALL caladvtrac(q, pbaru, pbarv, p, masse, dq, teta, pk)
+             CALL caladvtrac(q, pbaru, pbarv, p3d, masse, dq, teta, pk)
              IF (offline) THEN
                 !maf stokage du flux de masse pour traceurs OFF-LINE
                 CALL fluxstokenc(pbaru, pbarv, masse, teta, phi, phis, dtvr, &
@@ -213,8 +203,8 @@ contains
           IF (apphys) THEN
              IF (itau + 1 == itaufin) lafin = .TRUE.
 
-             CALL pression(ip1jmp1, ap, bp, ps, p)
-             CALL exner_hyb(ps, p, pks, pk, pkf)
+             CALL pression(ip1jmp1, ap, bp, ps, p3d)
+             CALL exner_hyb(ps, p3d, pks, pk, pkf)
 
              rdaym_ini = itau * dtvr / daysec
              rdayvrai = rdaym_ini + day_ini
@@ -224,12 +214,12 @@ contains
              ! Diagnostique de conservation de l'énergie : initialisation
              IF (ip_ebil_dyn >= 1) THEN 
                 ztit='bil dyn'
-                CALL diagedyn(ztit, 2, 1, 1, dtphys &
-                     , ucov, vcov, ps, p, pk, teta, q(:, :, 1), q(:, :, 2))
+                CALL diagedyn(ztit, 2, 1, 1, dtphys, ucov, vcov, ps, p3d, pk, &
+                     teta, q(:, :, 1), q(:, :, 2))
              ENDIF
 
              CALL calfis(nq, lafin, rdayvrai, time, ucov, vcov, teta, q, &
-                  masse, ps, p, pk, phis, phi, du, dv, dteta, dq, w, &
+                  masse, ps, pk, phis, phi, du, dv, dteta, dq, w, &
                   clesphy0, dufi, dvfi, dtetafi, dqfi, dpfi)
 
              ! ajout des tendances physiques:
@@ -240,13 +230,13 @@ contains
              ! Diagnostique de conservation de l'énergie : difference
              IF (ip_ebil_dyn >= 1) THEN 
                 ztit = 'bil phys'
-                CALL diagedyn(ztit, 2, 1, 1, dtphys, ucov, vcov, ps, p, pk, &
+                CALL diagedyn(ztit, 2, 1, 1, dtphys, ucov, vcov, ps, p3d, pk, &
                      teta, q(:, :, 1), q(:, :, 2))
              ENDIF
           ENDIF
 
-          CALL pression(ip1jmp1, ap, bp, ps, p)
-          CALL exner_hyb(ps, p, pks, pk, pkf)
+          CALL pression(ip1jmp1, ap, bp, ps, p3d)
+          CALL exner_hyb(ps, p3d, pks, pk, pkf)
 
           ! dissipation horizontale et verticale des petites echelles:
 
@@ -256,7 +246,7 @@ contains
              call enercin(vcov, ucov, vcont, ucont, ecin0)
 
              ! dissipation
-             CALL dissip(vcov, ucov, teta, p, dvdis, dudis, dtetadis)
+             CALL dissip(vcov, ucov, teta, p3d, dvdis, dudis, dtetadis)
              ucov=ucov + dudis
              vcov=vcov + dvdis
 
@@ -315,10 +305,7 @@ contains
              ENDIF
           ENDIF
 
-          IF (itau == itaufinp1) then 
-             abort_message = 'Simulation finished'
-             call abort_gcm(modname, abort_message, 0)
-          ENDIF
+          IF (itau == itaufinp1) exit outer_loop
 
           ! ecriture du fichier histoire moyenne:
 
@@ -355,7 +342,7 @@ contains
              dt = 2. * dtvr
           END IF
        end do
-    end do
+    end do outer_loop
 
   END SUBROUTINE leapfrog
 

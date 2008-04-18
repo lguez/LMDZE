@@ -34,7 +34,7 @@ c
       INTEGER nlon,nlev
       REAL dtime
       REAL, intent(in):: paprs(klon,klev+1)
-      REAL pplay(klon,klev)
+      REAL, intent(in):: pplay(klon,klev)
       REAL pmea(nlon),pstd(nlon),psig(nlon),pgam(nlon),pthe(nlon)
       REAL ppic(nlon),pval(nlon)
       REAL pulow(nlon),pvlow(nlon),pustr(nlon),pvstr(nlon)
@@ -134,6 +134,7 @@ c outputs
       use dimens_m
       use dimphy
       use YOMCST
+            use yoegwd
       implicit none
 
 c
@@ -183,7 +184,6 @@ c     f.lott + m. miller    e.c.m.w.f.     22/11/94
 c-----------------------------------------------------------------------
 c
 c
-      include "YOEGWD.h"
 c-----------------------------------------------------------------------
 c
 c*       0.1   arguments
@@ -468,10 +468,10 @@ c-----------------------------------------------------------------------
       use dimens_m
       use dimphy
       use YOMCST
+            use yoegwd
       implicit none
 c
 
-      include "YOEGWD.h"
 
 c-----------------------------------------------------------------------
 c
@@ -936,8 +936,8 @@ c-----------------------------------------------------------------------
       use dimens_m
       use dimphy
       use YOMCST
+            use yoegwd
       implicit none
-      include "YOEGWD.h"
 
 c-----------------------------------------------------------------------
 c
@@ -1070,12 +1070,12 @@ C-----------------------------------------------------------------------
       use dimens_m
       use dimphy
       use YOMCST
+            use yoegwd
       implicit none
 C
 
 C
 
-      include "YOEGWD.h"
 
 C-----------------------------------------------------------------------
 C
@@ -1324,7 +1324,7 @@ c
       INTEGER nlon,nlev
       REAL dtime
       REAL, intent(in):: paprs(klon,klev+1)
-      REAL pplay(klon,klev)
+      REAL, intent(in):: pplay(klon,klev)
       REAL, intent(in):: plat(nlon)
       real pmea(nlon)
       REAL pstd(nlon)
@@ -1442,10 +1442,10 @@ C
       use dimens_m
       use dimphy
       use YOMCST
+            use yoegwd
       implicit none
 C
 C
-      include "YOEGWD.h"
 C-----------------------------------------------------------------------
 C
 C*       0.1   ARGUMENTS
@@ -1742,15 +1742,15 @@ C     MODIFICATIONS.
 C     --------------
 C        ORIGINAL : 90-01-01
 C     ------------------------------------------------------------------
+            use yoegwd
       implicit none
 C
 C     -----------------------------------------------------------------
-      include "YOEGWD.h"
 C      ----------------------------------------------------------------
 C
       integer nlon,nlev, jk
       REAL, intent(in):: paprs(nlon,nlev+1)
-      REAL pplay(nlon,nlev)
+      REAL, intent(in):: pplay(nlon,nlev)
       real zpr,zstra,zsigt,zpm1r
 C
 C*       1.    SET THE VALUES OF THE PARAMETERS

@@ -7,7 +7,7 @@ module calfis_m
 contains
 
   SUBROUTINE calfis(nq, lafin, rdayvrai, heure, pucov, pvcov, pteta, pq, &
-       pmasse, pps, pp, ppk, pphis, pphi, pducov, pdvcov, pdteta, pdq, pw, &
+       pmasse, pps, ppk, pphis, pphi, pducov, pdvcov, pdteta, pdq, pw, &
        clesphy0, pdufi, pdvfi, pdhfi, pdqfi, pdpsfi)
 
     ! From dyn3d/calfis.F,v 1.3 2005/05/25 13:10:09
@@ -60,6 +60,7 @@ contains
     use advtrac_m, only: niadv
     use grid_change, only: dyn_phy, gr_fi_dyn
     use physiq_m, only: physiq
+    use pressure_var, only: p3d, pls
 
     !    0.  Declarations :
 
@@ -89,8 +90,7 @@ contains
     REAL pw(iim + 1,jjm + 1,llm)
 
     REAL pps(iim + 1,jjm + 1)
-    REAL pp(iim + 1,jjm + 1,llm + 1)
-    REAL ppk(iim + 1,jjm + 1,llm)
+    REAL, intent(in):: ppk(iim + 1,jjm + 1,llm)
 
     REAL pdvfi(iim + 1,jjm,llm)
     REAL pdufi(iim + 1,jjm + 1,llm)
@@ -123,7 +123,7 @@ contains
 
     REAL zsin(iim),zcos(iim),z1(iim)
     REAL zsinbis(iim),zcosbis(iim),z1bis(iim)
-    REAL unskap, pksurcp
+    REAL pksurcp(iim + 1,jjm + 1)
 
     ! I. Musat: diagnostic PVteta, Amip2
     INTEGER, PARAMETER:: ntetaSTD=3
@@ -162,45 +162,15 @@ contains
 
     !    ...    Exner = cp * (p(l) / preff) ** kappa     ....
 
-    unskap   = 1./ kappa
-
-    DO l = 1, llm + 1
-       zplev(1,l) = pp(1,1,l)
-       ig0 = 2
-       DO j = 2, jjm
-          DO i =1, iim
-             zplev(ig0,l) = pp(i,j,l)
-             ig0 = ig0 +1
-          ENDDO
-       ENDDO
-       zplev(klon,l) = pp(1,jjm + 1,l)
-    ENDDO
+    forall (l = 1: llm+1) zplev(:, l) = pack(p3d(:, :, l), dyn_phy)
 
     !   43. temperature naturelle (en K) et pressions milieux couches .
-
     DO l=1,llm
-
-       pksurcp     =  ppk(1,1,l) / cpp
-       zplay(1,l)  =  preff * pksurcp ** unskap
-       ztfi(1,l)   =  pteta(1,1,l) *  pksurcp
-       pcvgt(1,l)  =  pdteta(1,1,l) * pksurcp / pmasse(1,1,l)
-       ig0         = 2
-
-       DO j = 2, jjm
-          DO i = 1, iim
-             pksurcp        = ppk(i,j,l) / cpp
-             zplay(ig0,l)   = preff * pksurcp ** unskap
-             ztfi(ig0,l)    = pteta(i,j,l)  * pksurcp
-             pcvgt(ig0,l)   = pdteta(i,j,l) * pksurcp / pmasse(i,j,l)
-             ig0            = ig0 + 1
-          ENDDO
-       ENDDO
-
-       pksurcp       = ppk(1,jjm + 1,l) / cpp
-       zplay(ig0,l)  = preff * pksurcp ** unskap
-       ztfi (ig0,l)  = pteta(1,jjm + 1,l)  * pksurcp
-       pcvgt(ig0,l)  = pdteta(1,jjm + 1,l) * pksurcp/ pmasse(1,jjm + 1,l)
-
+       pksurcp     =  ppk(:, :, l) / cpp
+       pls(:, :, l) = preff * pksurcp**(1./ kappa)
+       zplay(:, l) = pack(pls(:, :, l), dyn_phy)
+       ztfi(:, l) = pack(pteta(:, :, l) * pksurcp, dyn_phy)
+       pcvgt(:, l) = pack(pdteta(:, :, l) * pksurcp / pmasse(:, :, l), dyn_phy)
     ENDDO
 
     !   43.bis traceurs

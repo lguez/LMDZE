@@ -24,7 +24,7 @@ c======================================================================
 c Entree:
       REAL dtime            ! pas d'integration (s)
       REAL, intent(in):: pres_h(klon,klev+1) ! pression half-level (Pa)
-      REAL pres_f(klon,klev)! pression full-level (Pa)
+      REAL, intent(in):: pres_f(klon,klev)! pression full-level (Pa)
       REAL t(klon,klev)     ! temperature (K)
       REAL q(klon,klev)     ! humidite specifique (g/g)
       REAL w(klon,klev)     ! vitesse verticale (Pa/s)
@@ -217,9 +217,9 @@ c     *                   ldcum, ktype,
       use dimphy
       use YOMCST
       use yoethf
+            use yoecumf
       IMPLICIT none
 C     ------------------------------------------------------------------
-      include "YOECUMF.h"
 C     ----------------------------------------------------------------
       REAL pten(klon,klev), pqen(klon,klev), pqsen(klon,klev)
       REAL ptte(klon,klev)
@@ -717,12 +717,12 @@ c
       use dimphy
       use YOMCST
       use yoethf
+            use yoecumf
       IMPLICIT none
 C----------------------------------------------------------------------
 C THIS ROUTINE DOES THE CALCULATIONS FOR CLOUD ASCENTS
 C FOR CUMULUS PARAMETERIZATION
 C----------------------------------------------------------------------
-      include "YOECUMF.h"
 C
       REAL pdtime
       REAL pten(klon,klev), ptenh(klon,klev)
@@ -1022,12 +1022,12 @@ C
       use YOMCST
       use yoethf
       use fcttre
+            use yoecumf
       IMPLICIT none
 C----------------------------------------------------------------------
 C THIS ROUTINE DOES THE FINAL CALCULATION OF CONVECTIVE
 C FLUXES IN THE CLOUD LAYER AND IN THE SUBCLOUD LAYER
 C----------------------------------------------------------------------
-      include "YOECUMF.h"
 C
       REAL cevapcu(klev)
 C     -----------------------------------------------------------------
@@ -1265,11 +1265,11 @@ c
       use dimphy
       use YOMCST
       use yoethf
+            use yoecumf
       IMPLICIT none
 c----------------------------------------------------------------------
 c calculer les tendances T et Q
 c----------------------------------------------------------------------
-      include "YOECUMF.h"
 C     -----------------------------------------------------------------
       LOGICAL  llo1
 C
@@ -1336,6 +1336,7 @@ C
       use dimphy
       use YOMCST
       use yoethf
+            use yoecumf
       IMPLICIT none
 C
 C----------------------------------------------------------------------
@@ -1353,7 +1354,6 @@ C
 C CHECK FOR NEGATIVE BUOYANCY OF AIR OF EQUAL PARTS OF
 C MOIST ENVIRONMENTAL AIR AND CLOUD AIR.
 C----------------------------------------------------------------------
-      include "YOECUMF.h"
 C
       REAL ptenh(klon,klev)
       REAL pqenh(klon,klev)
@@ -1447,6 +1447,7 @@ C
       use dimphy
       use YOMCST
       use yoethf
+            use yoecumf
       IMPLICIT none
 C
 C----------------------------------------------------------------------
@@ -1464,7 +1465,6 @@ C          A) MOVING AIR DRY-ADIABATICALLY TO NEXT LEVEL BELOW AND
 C          B) CORRECTING FOR EVAPORATION TO OBTAIN SATURATED STATE.
 C
 C----------------------------------------------------------------------
-      include "YOECUMF.h"
 C
       REAL ptenh(klon,klev), pqenh(klon,klev)
       REAL pgeoh(klon,klev), paph(klon,klev+1)
@@ -1636,11 +1636,11 @@ C
       RETURN
       END
       SUBROUTINE flxsetup
+            use yoecumf
       IMPLICIT none
 C
 C     THIS ROUTINE DEFINES DISPOSABLE PARAMETERS FOR MASSFLUX SCHEME
 C
-      include "YOECUMF.h"
 C
       ENTRPEN=1.0E-4  ! ENTRAINMENT RATE FOR PENETRATIVE CONVECTION
       ENTRSCV=3.0E-4  ! ENTRAINMENT RATE FOR SHALLOW CONVECTION

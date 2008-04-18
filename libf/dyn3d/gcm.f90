@@ -15,7 +15,7 @@ PROGRAM gcm
   ! Pour Van-Leer plus vapeur d'eau saturée : iadv(1)=4
   ! Pour Van-Leer : iadv=10
 
-  USE IOIPSL, only: ioconf_calendar
+  USE IOIPSL, only: ioconf_calendar, histclo
   use dimens_m, only: iim, jjm, llm, nqmx
   use dimphy, only: klon
   use paramet_m, only: ip1jm, ip1jmp1
@@ -100,20 +100,6 @@ PROGRAM gcm
 
   ! Lecture du fichier "start.nc" :
   CALL dynetat0(vcov, ucov, teta, q, masse, ps, phis, time_0)
-  ! Begin special experiment
-!!$     print *, "This is a special experiment."
-!!$     print *, "We are setting:"
-!!$     print *, "ucov = vcov = 0, q = 0, ps = 101325"
-!!$     print *, "We are averaging 'teta' horizontally."
-!!$     ucov = 0.
-!!$     vcov = 0.
-!!$     q = 0.
-!!$     ps = 101325.
-  ! Average teta over all longitudes and latitudes:
-!!$     forall(i = 1:llm) teta(:,i) = sum(teta(:,i)) / ip1jmp1
-  ! (it would be better to weight each element with an associated
-  ! surface area)
-  ! End special experiment
 
   ! Lecture des paramètres de contrôle pour la simulation :
   ! on recalcule éventuellement le pas de temps
@@ -218,5 +204,9 @@ PROGRAM gcm
 
   ! Intégration temporelle du modèle :
   CALL leapfrog(ucov, vcov, teta, ps, masse, phis, nq, q, clesphy0, time_0)
+
+  call histclo
+  print *, 'Simulation finished'
+  print *, 'Everything is cool'
 
 END PROGRAM gcm

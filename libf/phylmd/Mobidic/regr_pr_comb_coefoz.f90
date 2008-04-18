@@ -7,41 +7,30 @@ module regr_pr_comb_coefoz_m
 
   implicit none
 
+  ! The five module variables declared here are on the "physics" grid.
+  ! The value of each variable for index "(i, k)" is at longitude
+  ! "rlon(i)", latitude "rlat(i)" and middle of layer "k".
+
   real, save:: c_Mob(klon, llm)
   ! (sum of Mobidic terms in the net mass production rate of ozone
   ! by chemistry, per unit mass of air, in s-1)
-  ! (On the "physics" grid.
-  ! "c_Mob(i, k)" is at longitude "rlon(i)", latitude "rlat(i)",
-  ! middle of layer "k".)
 
   real, save:: a2(klon, llm)
   ! (derivative of mass production rate of ozone per unit mass of
   ! air with respect to ozone mass fraction, in s-1)
-  ! (On the "physics" grid.
-  ! "a2(i, k)" is at longitude "rlon(i)", latitude "rlat(i)",
-  ! middle of layer "k".)
 
   real, save:: a4_mass(klon, llm)
   ! (derivative of mass production rate of ozone per unit mass of
   ! air with respect to temperature, in s-1 K-1)
-  ! (On the "physics" grid.
-  ! "a4_mass(i, k)" is at longitude "rlon(i)", latitude "rlat(i)",
-  ! middle of layer "k".)
 
   real, save:: a6_mass(klon, llm)
   ! (derivative of mass production rate of ozone per unit mass of
   ! air with respect to mass column-density of ozone above, in m2 s-1 kg-1)
-  ! (On the "physics" grid.
-  ! "a6_mass(i, k)" is at longitude "rlon(i)", latitude "rlat(i)",
-  ! middle of layer "k".)
 
   real, save:: r_het_interm(klon, llm)
   ! (net mass production rate by heterogeneous chemistry, per unit
   ! mass of ozone, corrected for chlorine content and latitude, but
   ! not for temperature and sun direction, in s-1)
-  ! (On the "physics" grid.
-  ! "r_het_interm(i, k)" is at longitude "rlon(i)", latitude "rlat(i)",
-  ! middle of layer "k".)
 
   private klon, llm
 
@@ -53,11 +42,11 @@ contains
     ! coefficients ozone".
 
     ! This subroutine :
-    ! -- reads from a file all eight parameters for ozone chemistry,
+    ! -- reads from a file all eight coefficients for ozone chemistry,
     !    at the current day ;
-    ! -- regrids the parameters in pressure to the LMDZ vertical grid ;
-    ! -- packs the parameters to the "physics" horizontal grid ;
-    ! -- combines the eight parameters to define the five module variables.
+    ! -- regrids the coefficients in pressure to the LMDZ vertical grid ;
+    ! -- packs the coefficients to the "physics" horizontal grid ;
+    ! -- combines the eight coefficients to define the five module variables.
 
     ! We assume that, in "coefoz_LMDZ.nc", the pressure levels are in hPa
     ! and strictly increasing.
@@ -104,7 +93,7 @@ contains
 
     !------------------------------------
 
-    print *, "Call sequence information: read_coefoz"
+    print *, "Call sequence information: regr_pr_comb_coefoz"
 
     call nf95_open("coefoz_LMDZ.nc", nf90_nowrite, ncid)
 

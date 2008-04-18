@@ -12,7 +12,7 @@ contains
 
     USE IOIPSL, only: ymds2ju, ju2ymds
     use dimens_m, only: iim, jjm, llm, nqmx
-    use paramet_m, only: ip1jmp1, iip1, jjp1, llmp1
+    use paramet_m, only: iip1, jjp1, llmp1
     use comconst, only: rad, cpp, daysec, dtvr, kappa, g, omeg
     use comvert, only: pa, bp, ap, nivsigs, preff, presnivs, nivsig
     use logic

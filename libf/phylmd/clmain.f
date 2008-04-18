@@ -123,7 +123,7 @@ c
       REAL u(klon,klev), v(klon,klev)
 cIM 230604 BAD  REAL radsol(klon) ??? 
       REAL, intent(in):: paprs(klon,klev+1)
-      real pplay(klon,klev)
+      real, intent(in):: pplay(klon,klev)
       REAL, intent(in):: rlon(klon), rlat(klon)
       real cufi(klon), cvfi(klon)
       REAL d_t(klon, klev), d_q(klon, klev)
@@ -356,7 +356,6 @@ CC        call flush(6)
       ENDDO
       ENDDO
       DO i = 1, klon  ! vent de la premiere couche
-ccc         zx_alf1 = (paprs(i,1)-pplay(i,2))/(pplay(i,1)-pplay(i,2))
          zx_alf1 = 1.0
          zx_alf2 = 1.0 - zx_alf1
          u1lay(i) = u(i,1)*zx_alf1 + u(i,2)*zx_alf2

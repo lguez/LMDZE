@@ -45,7 +45,7 @@ c   ----------
       REAL pu(ngrid,nlay),pduadj(ngrid,nlay)
       REAL pv(ngrid,nlay),pdvadj(ngrid,nlay)
       REAL po(ngrid,nlay),pdoadj(ngrid,nlay)
-      REAL pplay(ngrid,nlay)
+      REAL, intent(in):: pplay(ngrid,nlay)
       real, intent(in):: pplev(ngrid,nlay+1)
       real pphi(ngrid,nlay)
 
@@ -722,14 +722,6 @@ c    s         ,'   FM=',fm(ig,l)
             endif
             if(.not.masse(ig,l).ge.1.e-10
      s         .or..not.masse(ig,l).le.1.e4) then
-c     print*,'WARN!!! masse exagere ig=',ig,'   l=',l
-c    s         ,'   M=',masse(ig,l)
-c     print*,'rho(ig,l),pplay(ig,l),zpspsk(ig,l),RD,zh(ig,l)',
-c    s                 rho(ig,l),pplay(ig,l),zpspsk(ig,l),RD,zh(ig,l)
-c     print*,'zlev(ig,l+1),zlev(ig,l)'
-c    s                ,zlev(ig,l+1),zlev(ig,l)
-c     print*,'pphi(ig,l-1),pphi(ig,l),pphi(ig,l+1)'
-c    s                ,pphi(ig,l-1),pphi(ig,l),pphi(ig,l+1)
             endif
             if(.not.entr(ig,l).ge.0..or..not.entr(ig,l).le.10.) then
 c     print*,'WARN!!! entr exagere ig=',ig,'   l=',l

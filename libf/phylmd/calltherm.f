@@ -17,7 +17,7 @@
       REAL u_seri(klon,klev),v_seri(klon,klev)
       REAL t_seri(klon,klev),q_seri(klon,klev)
       REAL, intent(in):: paprs(klon,klev+1)
-      REAL pplay(klon,klev)
+      REAL, intent(in):: pplay(klon,klev)
       REAL pphi(klon,klev)
 
 CFH Update Thermiques
@@ -60,14 +60,6 @@ c   tests sur les valeurs negatives de l'eau
 
          zdt=dtime/float(nsplit_thermals)
          do isplit=1,nsplit_thermals
-
-cym            CALL thermcell(klon,klev,zdt
-cym     s      ,pplay,paprs,pphi
-cym     s      ,u_seri,v_seri,t_seri,q_seri
-cym     s      ,d_u_the,d_v_the,d_t_the,d_q_the
-cym     s      ,zfm_therm,zentr_therm
-cym     s      ,r_aspect_thermals,l_mix_thermals,w2di_thermals
-cym     s      ,tho_thermals,3)
 
             CALL thermcell(klon,klev,zdt
      s      ,pplay,paprs,pphi

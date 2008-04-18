@@ -29,13 +29,8 @@ contains
     call histclo
     write(lunout,*) 'Stopping in ', modname
     write(lunout,*) 'Reason = ', trim(message)
-    if (ierr == 0) then
-       write(lunout,*) 'Everything is cool'
-       STOP
-    else
-       write(lunout,*) 'Houston, we have a problem ', ierr
-       STOP 1
-    endif
+    write(lunout,*) 'Houston, we have a problem ', ierr
+    STOP 1
 
   END SUBROUTINE abort_gcm
 

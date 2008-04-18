@@ -29,7 +29,7 @@ c Arguments:
 c
       REAL dtime ! intervalle du temps (s)
       REAL, intent(in):: paprs(klon,klev+1) ! pression a inter-couche
-      REAL pplay(klon,klev) ! pression au milieu de couche
+      REAL, intent(in):: pplay(klon,klev) ! pression au milieu de couche
       REAL t(klon,klev) ! temperature (K)
       REAL q(klon,klev) ! humidite specifique (kg/kg)
       REAL d_t(klon,klev) ! incrementation de la temperature (K)
@@ -96,7 +96,7 @@ c---------------------------------------------------------------
 c
 cAA Variables traceurs:
 cAA  Provisoire !!! Parametres alpha du lessivage
-cAA  A priori on a 4 scavenging # possibles
+cAA  A priori on a 4 scavenging numbers possibles
 c
       REAL a_tr_sca(4)
       save a_tr_sca

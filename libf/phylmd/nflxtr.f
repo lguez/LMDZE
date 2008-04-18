@@ -2,10 +2,11 @@
 ! $Header: /home/cvsroot/LMDZ4/libf/phylmd/nflxtr.F,v 1.1.1.1 2004/05/19 12:53:08 lmdzadmin Exp $
 !
       SUBROUTINE nflxtr(pdtime,pmfu,pmfd,pen_u,pde_u,pen_d,pde_d,
-     .                 pplay,paprs,x,dx) 
+     .                 paprs,x,dx) 
       use dimens_m
       use dimphy
       use YOMCST
+            use yoecumf 
       IMPLICIT NONE 
 c=====================================================================
 c Objet : Melange convectif de traceurs a partir des flux de masse 
@@ -17,13 +18,12 @@ c             elle a herite de certaines notations et conventions du
 c             schema de Tiedtke (1993). 
 c --En particulier, les couches sont numerotees de haut en bas !!!
 c   Ceci est valable pour les flux
-c   mais pas pour les entrees x, pplay, paprs !!!!
+c   mais pas pour les entrees x, paprs !!!!
 c --pmfu est positif, pmfd est negatif 
 c --Tous les flux d'entrainements et de detrainements sont positifs 
 c   contrairement au schema de Tiedtke d'ou les changements de signe!!!! 
 c=====================================================================
 c
-      include "YOECUMF.h" 
 c
       REAL, intent(in):: pdtime
 c--les flux sont definis au 1/2 niveaux
@@ -35,7 +35,6 @@ c--pmfu(klev+1) et pmfd(klev+1) sont implicitement nuls
       REAL pen_d(klon,klev) ! flux entraine dans le panache descendant
       REAL pde_d(klon,klev) ! flux detraine dans le panache descendant
 
-      REAL pplay(klon,klev)    ! pression aux couches (bas en haut)
       REAL, intent(in):: paprs(klon,klev+1) ! pression aux 1/2 couches (bas en haut)
       REAL, intent(in):: x(klon,klev)        ! q de traceur (bas en haut) 
       REAL dx(klon,klev)     ! tendance de traceur  (bas en haut)

@@ -36,7 +36,8 @@ c   ----------
       REAL pbaru( ip1jmp1,llm ),pbarv( ip1jm,llm)
       REAL q(ip1jmp1,llm)
       REAL w(ip1jmp1,llm),pdt
-      REAL p(ip1jmp1,llmp1),teta(ip1jmp1,llm),pk(ip1jmp1,llm)
+      REAL, intent(in):: p(ip1jmp1,llmp1)
+      real teta(ip1jmp1,llm),pk(ip1jmp1,llm)
 c
 c      Local 
 c   ---------

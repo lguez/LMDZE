@@ -10,9 +10,12 @@ contains
 
     ! Authors : P. Le Van, F. Hourdin
 
-    ! Calcule la pression p(l) aux différents niveaux l = 1 (niveau du
-    ! sol) à l = llm +1, ces niveaux correspondant aux interfaces des (llm) 
-    ! couches, avec  p(ij, llm +1) = 0 et p(ij, 1) = ps(ij).
+    ! Calcule la pression "p(l)" aux différents niveaux, de l = 1 (niveau du
+    ! sol) à l = llm +1.
+    ! Ces niveaux correspondent aux interfaces des "llm" couches, avec :
+    ! p(:, llm +1) = 0
+    ! et :
+    ! p(:, 1) = ps
 
     use dimens_m, only: llm
 

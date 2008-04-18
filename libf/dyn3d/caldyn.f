@@ -60,7 +60,6 @@ c   ------
       REAL bern(ip1jmp1,llm)
       REAL massebxy(ip1jm,llm)
     
-
       INTEGER   ij,l
 
 c-----------------------------------------------------------------------
