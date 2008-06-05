@@ -3,21 +3,25 @@
 
 # Compiled modules created by NAG are needed.
 
-.PHONY: objects
-objects: ${objects}
-# (useful for NAG module builder)
+.PHONY: all_nag objects
 
-# Call graph:
+all_nag: objects CG_etat0_lim CG_gcm CR_etat0_lim CR_gcm
+objects: ${objects}
+
+# Call graphs:
 CG_etat0_lim: ${sources_etat0_lim}
-	@nag_fcalls95 ${nag_fcalls_options} -listing $@ $^
+	nag_fcalls95 ${nag_fcalls_options} -listing $@ $^
 
 CG_gcm: ${sources_gcm}
-	@nag_fcalls95 ${nag_fcalls_options} -listing $@ $^
+	nag_fcalls95 ${nag_fcalls_options} -listing $@ $^
 
 # Cross references:
 CR_etat0_lim: ${sources_etat0_lim}
-	@nag_xref95 ${nag_cross_options} -listing $@ $^
+	nag_xref95 ${nag_cross_options} -listing $@ $^
+
+CR_gcm: ${sources_gcm}
+	nag_xref95 ${nag_cross_options} -listing $@ $^
 
 .PHONY: clean_nag
 clean_nag:
-	rm -f CG_etat0_lim CG_gcm CR_etat0_lim
+	rm -f CG_etat0_lim CG_gcm CR_etat0_lim CR_gcm

@@ -1,0 +1,27 @@
+! This is a script for Ferret.
+
+! This script computes the pressure field.
+
+! Reset everything:
+cancel data_set/all
+CANCEL GRID
+cancel viewport
+CANCEL EXPRESSION
+CANCEL LIST/ALL
+CANCEL MEMORY/all
+CANCEL SYMBOL/ALL
+CANCEL REGION/all
+CANCEL VARIABLE/ALL
+cancel axis/all
+pplus/reset
+cancel window/all
+set window/new
+
+use start
+let eta = z[gz=1:10:1] ! 1: llm + 1: 1
+let/title="pressure"/units="hPa" \
+   pressure = (reshape(ap, eta) + reshape(bp, eta) * ps) / 100.
+
+! Now we can see or plot what we want. For example:
+list pressure[x=0, y=0]
+stat pressure[k=7]

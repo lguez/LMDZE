@@ -82,5 +82,5 @@ set +x
 read -p "Previous run number for comparison [none] ? "
 if [[ -n $REPLY ]]
     then
-    selective_diff.sh $res_dir/$REPLY .
+    selective_diff.sh $res_dir/${REPLY# } .
 fi

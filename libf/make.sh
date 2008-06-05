@@ -39,7 +39,7 @@ else
     # Find the current compiler, if any:
     if [[ -L compiler.mk ]]
 	then
-	target=`basename $(ls -l compiler.mk |cut -d " " -f 11) .mk`
+	target=`basename $(readlink compiler.mk) .mk`
     fi
 fi
 

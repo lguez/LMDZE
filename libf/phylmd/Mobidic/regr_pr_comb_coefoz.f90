@@ -144,7 +144,7 @@ contains
     forall (k = 1: llm)
        where (abs(rlat) <= 45.) r_het_interm(:, k) = 0.
     end forall
-    where (r_het_interm  /= 0.) r_het_interm = r_het_interm * (Clx / 3.8e-9)**2
+    r_het_interm = r_het_interm * (Clx / 3.8e-9)**2
 
     deallocate(plev) ! pointer
     call nf95_close(ncid)

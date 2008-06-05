@@ -13,5 +13,5 @@ COMPILE.f90 = nag_modules95.sh $@ ${nag_gl_options}
 COMPILE.f = ${COMPILE.f90}
 OUTPUT_OPTION =
 
-nag_fcalls_options = -calledby -locate -class ${nag_gl_options}
+nag_fcalls_options = -calledby -lines -locate -class ${nag_gl_options}
 nag_cross_options = -key ${nag_gl_options}

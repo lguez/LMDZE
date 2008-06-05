@@ -1,0 +1,1955 @@
+\documentclass[a4paper]{article}
+
+                                % Packages
+
+\usepackage[latin1]{inputenc}
+\usepackage{ifpdf}
+
+\ifpdf
+   \usepackage{aeguill}
+   \usepackage[pdftex]{color,graphicx}
+\else
+   \usepackage[T1]{fontenc}
+   \usepackage[dvips]{color,graphicx}
+   \usepackage[active]{srcltx}
+\fi
+
+\usepackage[frenchb]{babel}
+\usepackage{mathrsfs}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{mathabx}
+\usepackage{algorithmic}
+\usepackage[all]{xy}
+
+
+% Load last:
+\ifpdf
+   \usepackage{hyperref}
+   \hypersetup{pdftex, pdftitle={Manuel pour LMDZE}, pdfauthor={Lionel
+       Guez}, pdfstartview=FitBH}
+\else
+   \usepackage[hypertex]{hyperref}
+\fi
+
+                                %---------------
+
+\newcommand{\ud}{\mathrm{d}}
+\DeclareMathOperator{\diverg}{div}
+\DeclareMathOperator{\tgh}{th}
+
+\newcommand{\Eng}[1]{\textit{\foreignlanguage{english}{#1}}}
+% (English language)
+
+\newcommand{\pseudov}[1]{\overset{\curvearrowbotright}{#1}}
+
+\renewcommand{\algorithmicdo}{\textbf{faire}}
+\renewcommand{\algorithmicend}{\textbf{fin}}
+\renewcommand{\algorithmicfor}{\textbf{pour}}
+
+\author{Lionel GUEZ}
+\title{Manuel pour LMDZE}
+
+                                %---------------
+
+\begin{document}
+
+\maketitle
+\ifpdf
+\else
+   \tableofcontents
+\fi
+\listoffigures
+   \newpage
+
+\part{Installation}
+
+LMDZE utilise quatre bibliothèques. Cf. figure (\ref{fig:libraries}).
+\begin{figure}[htbp]
+  \centering
+  \includegraphics{Graphiques/libraries}
+  \caption{Bibliothèques utilisées par LMDZE.}
+  \label{fig:libraries}
+\end{figure}
+
+Pour télécharger le programme :
+\begin{verbatim}
+svn checkout \
+   svn+ssh://forge.ipsl.jussieu.fr/ipsl/forge/projets/lmdze/svn/trunk \
+   LMDZE_program
+\end{verbatim}
+
+Pour compiler \verb+gcm+ :
+\begin{enumerate}
+\item Choisir la résolution spatiale dans \verb+dimens_m.f+.  Choisir
+  la valeur de \verb+kdlon+ dans \verb+phylmd/raddim.f+. Pour cela,
+  consulter le tableau (\ref{tab:kdlon}), les
+  \href{http://www.lmd.jussieu.fr/~lmdz/LMDZ4/choisir_une_resolution.html}{conseils}
+  et le programme
+  \href{file:///user/guez/Documents/Informatique_fonctionnement/Tests/choixdim.f}{\texttt{choixdim}}.
+  (Il faudra adapter les pas de temps à l'exécution.)
+\item Vérifier la cible du lien \verb+compiler.mk+. Vérifier dans
+  \verb+make.sh+ la valeur de \verb+dest_dir+.
+\item \verb+make.sh+.  (Si on a modifié les dimensions alors il faudra
+  créer un nouvel état initial adapté à ces dimensions. Il faut donc
+  recompiler \verb+etat0_lim+.)
+\end{enumerate}
+\begin{table}[htbp]
+  \centering
+  \begin{tabular}{lll}
+    \texttt{iim} & \texttt{jjm} & \texttt{kdlon} \\
+    \hline
+    32 & 24 & 41 \\
+    48 & 32 & 149 \\
+    72 & 46 & 1621 \\
+    96 & 72 & 487 \\
+    160 & 98 & 78 \\
+    192 & 43 & 10
+  \end{tabular}
+  \caption{Choix de \texttt{kdlon} dans \texttt{phylmd/raddim.f}.}
+  \label{tab:kdlon}
+\end{table}
+
+La compilation de \verb+clmain.F+ avec le compilateur IBM XL Fortran
+Enterprise Edition V9.1 Version: 09.01.0000.0005 et les options
+\verb+-O5 -qnostrict -qessl+ n'est pas finie en 10 h. Avec les options
+\verb+-O4 -qnostrict -qessl+, elle n'est pas finie en 1 h.
+
+\part{Utilisation comme boîte noire}
+
+Cf. liste des fichiers d'entrée nécessaires sur le
+\href{file:///user/guez/Documents/Informatique_fonctionnement/Programs/Documentation
+  IOIPSL LMDZ/inout LMDZE.odg}{schéma des entrées-sorties}. Les
+fichiers \verb+ECDYN.nc+ et \verb+ECPHY.nc+ contiennent des données du
+centre européen, pour un jour particulier, avec une résolution de 1°.
+
+Le fichier \verb+amipbc_sic_1x1.nc+ donne la fraction de 
+la surface de la mer couverte par de la glace. (Cette définition 
+suppose que la fraction en question est indépendante de l'échelle 
+spatiale considérée.)
+
+Cf. la
+\href{file:///user/guez/Documents/Informatique_fonctionnement/Programs/Documentation
+  IOIPSL LMDZ/namelists.ods}{liste des paramètres d'entrée}. Avant de
+lancer l'exécution de \verb+gcm+, il faut en particulier choisir
+\verb+nday+ (par exemple 1 ou 30). Je peux aussi modifier
+\verb+iecri+, qui contrôle la fréquence d'écriture dans le fichier
+\verb+histday.nc+, et \verb+periodav+, qui contrôle la fréquence
+d'écriture dans le fichier \verb+histmth.nc+ (?).
+
+Pour ne pas utiliser Orchidée, choisir \verb+VEGET = n+ 
+dans \verb+physiq.def+. Si on intègre sur 1 jour, choisir 
+\verb+OK_journe = y+, \verb+OK_mensuel = n+.
+
+Si on a changé la résolution spatiale, il peut être nécessaire de
+modifier les variables \verb+nfilun+, \verb+nfilus+, \verb+nfilvn+ et
+\verb+nfilvs+, définies dans \verb+filtrez/parafilt.h+.
+\verb+etat0_lim+ se plante et indique alors les bonnes valeurs.
+
+\verb+idissip+ dans \verb+gcm.def+ n'est pas pris en compte. Il est
+automatiquement calculé par le programme. Phu L. V. conseille de
+diminuer à 3600 les valeurs de \verb+tetagdiv+ et \verb+tetagrot+.
+
+\verb+grossismx+ et \verb+grossismy+ doivent être inférieurs à 4 pour
+que le modèle converge.
+
+Phu L. V. me conseille de choisir \verb+ysinus=n+ dans \verb+gcm.def+.
+
+\section{Paramètres liés au pas de temps}
+
+Les paramètres à choisir au moment de l'exécution et liés au pas de
+temps sont \verb+day_step+, \verb+iphysiq+, \verb+iperiod+ et
+\verb+iconser+. Il faut en particulier penser à ajuster ces paramètres
+lorsque l'on a changé la résolution spatiale. Le principe de base est
+que le pas de temps doit être suffisamment petit pour que le modèle
+soit stable. Il doit être d'autant plus petit que la résolution
+spatiale horizontale est fine. Si les milieux de couches ne montent
+pas trop haut dans la stratosphère alors la résolution verticale n'a
+pas à être prise en compte. La référence est un pas de temps maximal
+de 6 mn environ pour une grille de 64 longitudes par 50 latitudes.
+Lorsqu'on multiplie par un même facteur le nombre de longitudes et de
+latitudes, on divise par ce facteur le pas de temps maximal. Pour des
+milieux de couches haut dans la stratosphère, cf.
+\href{file:///user/guez/Documents/Utilisation_LMDZ/Utilisation_LMDZ.texfol/Utilisation-LMDZ.dvi}{notes
+  sur l'utilisation de LMDZ}.
+
+\verb+day_step+ est le nombre de pas de temps par jour. \verb+iphys+
+est le nombre de pas de temps entre deux appels de la physique.
+\verb+iperiod+ est le nombre de pas de temps entre deux pas Matsuno.
+\verb+iconser+ est le nombre de pas de temps entre deux écritures des
+variables de contrôle. Ces quatre paramètres doivent recevoir des
+valeurs entières. Apparemment, on laisse toujours \verb+iperiod+ à 5
+(quelle que soit la résolution).
+
+On a en outre la contrainte que \verb+day_step+ soit un multiple de
+\verb+iperiod+ (cf. l'unité de programme principale \verb+gcm+), c'est-à-dire
+normalement un multiple de 5.
+
+Enfin, on a la contrainte suivante sur \verb+iphysiq+. Dans le fichier
+\verb+fisrtilp.F+, ligne 133, on trouve :
+\begin{verbatim}
+IF (ABS(dtime/FLOAT(ninter)-360.0).GT.0.001) THEN
+   PRINT*, 'fisrtilp: Ce n est pas prevu, voir Z.X.Li', dtime
+   PRINT*, 'Je prefere un sous-intervalle de 6 minutes'
+ENDIF
+\end{verbatim}
+Donc, comme \verb+ninter+ vaut 5, il faut que \verb+dtime+, le pas de
+temps de la physique, vaille 1800 s à 5.10$^{-3}$ s près. Notons $d$
+le pas de temps de la dynamique, en mn. Il faut donc que
+$\mathtt{iphysiq} \times d = 30$.
+
+En résumé, en notant $d_M$ le pas de temps maximal imposé par la
+résolution, nous avons le système de contraintes suivant :
+\begin{displaymath}
+  \left\{
+    \begin{array}{l}
+      \mathtt{iphysiq} \times d = 30 \\
+      d \le d_M \\
+      \mathtt{day\_step} \times d = 1440 \\
+      \mathtt{day\_step} \equiv 0[5]
+    \end{array}
+  \right.
+\end{displaymath}
+D'où :
+\begin{displaymath}
+  \left\{
+    \begin{array}{l}
+      \mathtt{iphysiq} \ge = 30 / d_M \\
+      48 \times \mathtt{iphysiq} \equiv 0[5]
+    \end{array}
+  \right.
+\end{displaymath}
+C'est-à-dire :
+\begin{displaymath}
+  \left\{
+    \begin{array}{l}
+      \mathtt{iphysiq} \ge = 30 / d_M \\
+      \mathtt{iphysiq} \equiv 0[5]
+    \end{array}
+  \right.
+\end{displaymath}
+On peut donc adopter l'algorithme suivant :
+\begin{verbatim}
+entrer(iim, jjm)
+n := ceiling(max(iim / 64., jjm / 50.))
+iphysiq := 5 * n
+day_step := 240 * n
+\end{verbatim}
+
+\section{Ressources nécessaires}
+
+Espace disque par utilisateur :
+\begin{itemize}
+\item fichiers sources LMDZ (sans IOIPSL ni NetCDF) 3 Moctets ;
+\item fichiers objets, exécutables (sans IOIPSL ni NetCDF) (résolution
+  $32 \times 24 \times 9$) 4 Moctets ;
+\item fichiers sortie \verb+etat0_lim+ 9 Moctets ;
+\item fichiers sortie \verb+gcm+ (principalement \verb+histday.nc+) 26
+  Moctets.
+\end{itemize}
+Par ailleurs, on peut centraliser :
+\begin{itemize}
+\item fichiers NetCDF entrée \verb+etat0_lim+ 40 Moctets ;
+\item bibliothèque IOIPSL 600 koctets ;
+\item ensemble NetCDF (bibliothèque, utilitaires, manuels, modules,
+  etc.) 3 Moctets.
+\end{itemize}
+
+Mémoire principale (résolution $32 \times 24 \times 9$) : 30 Moctets.
+
+Durées. Temps de compilation avec \verb+g95 -O3+ : 5 mn. Temps
+d'exécution de \verb+gcm+ avec \verb+g95 -O3+ (résolution $32 \times
+24 \times 9$) : environ 10 mn par mois simulé.
+
+\part{Fonctionnement : derrière les coulisses}
+
+\begin{verbatim}
+wc -l `find . -name "*.[fh]" -o -name "*.f90"`
+\end{verbatim}
+donne environ $7 \cdot 10^{4}$ lignes.
+
+\section{Intérêt de placer un makefile dans chaque répertoire}
+
+J'admets l'intérêt de séparer les fichiers sources dans les
+répertoires \verb+dyn3d+, \verb+bibio+ etc. Avec un aussi grand nombre
+de fichiers, ce classement apporte de la clarté. À partir de là se
+pose la question de l'intérêt de placer un \verb+makefile+ dans chaque
+répertoire. Cette organisation suppose déjà l'absence de dépendance
+circulaire entre les répertoires pour la compilation.  Admettons qu'il
+n'y en ait pas. Il y aurait logiquement un \verb+makefile+ au dessus
+de ces répertoires pour les éditions de liens. Je suis arrivé à la
+conclusion qu'en bon style de \verb+makefile+ des archives
+n'apparaissent que dans les options d'édition de liens et ne sont pas
+connues directement du \verb+makefile+ du programme utilisateur.
+L'utilisation des archives ne permettrait donc pas la mise à jour des
+deux programmes, \verb+gcm+ et \verb+etat0_lim+, lorsqu'un fichier
+d'un répertoire est modifié. J'écarte donc la création d'une archive
+pour chaque répertoire.  Par ailleurs, chacun des deux programmes
+utilise des fichiers répartis dans les différents répertoires. Pour
+chacun des deux programmes, la liste des objets pertinents doit donc
+apparaître en prérequis. On ne pourrait mettre simplement en prérequis
+des répertoires. Mais alors comment le \verb+makefile+ supérieur
+sait-il mettre à jour ces objets ? En conclusion, je crois qu'il ne
+faut pas placer un \verb+makefile+ dans chaque répertoire.  Un unique
+\verb+makefile+ au dessus des répertoires est la bonne solution.
+
+\section{Description des programmes}
+
+Sur le suffixe des fichiers. Pour pouvoir utiliser les outils NAG,
+tant que le programme est formé d'un mélange de fichiers aux formats
+fixe et libre, je suis obligé d'associer le format libre au suffixe
+\verb+f90+ ou \verb+f95+. \verb+sxf90+ m'impose le suffixe \verb+f90+.
+Pour le format fixe, \verb+sxf90+ m'impose \verb+f+. Cf.
+\hyperref{file:///user/guez/Documents/Informatique_fonctionnement/Informatique,
+  fonctionnement.texfol/fonctionnement.dvi}{text}{suffixes}{contraintes
+  sur les suffixes de fichiers de Fortran}.
+
+Deux unités de programme principales en Fortran, dans les fichiers 
+\verb+etat0_lim.f+ et \verb+gcm.f+.
+
+Au plus haut niveau, parties du programme \verb+gcm+ : 
+calcul des tendances (\verb+caldyn+), intégration (\verb+integr+), 
+physique, dissipation (\verb+dissip+), advection. Variables 
+principales : \verb+ucov+, \verb+vcov+, température, 
+pression. \verb+w+ se déduit par quelque chose comme une 
+relation de fermeture. Dans la physique, il n'y a pas d'échange 
+horizontal entre les mailles. Un problème fondamental est l'utilisation 
+d'une grille rectangulaire en latitudes et longitudes pour couvrir 
+la sphère. Les mailles de la grille n'ont pas la même surface. 
+La solution choisie pour résoudre ce problème est le filtrage. 
+Principe du filtrage : décomposition d'un champ en harmoniques 
+sphériques et conservation d'une partie seulement du spectre. 
+Le filtre est très coûteux : il faut connaître le champ 
+en entier pour le calculer en un point particulier. Par ailleurs, 
+le programme calcule à de nombreuses occasions des valeurs moyennes 
+aux pôles, à partir des mailles pôlaires (à chaque pôle, autant 
+de mailles pôlaires que de longitudes dans la grille)
+
+\verb+etat0_lim+ crée l'état initial. \verb+etat0_lim+ appelle
+\verb+etat0+ et \verb+limit+. \verb+etat0+ crée les fichiers
+\verb+start.nc+ et \verb+startphy.nc+. \verb+limit+ crée
+\verb+limit.nc+.
+
+Le répertoire \verb+phylmd+ contient ce qui concerne la 
+physique. Le répertoire \verb+dyn3d+ contient ce qui concerne 
+la dynamique.
+
+\verb+histday.nc+ contient des moyennes journalières.
+\verb+ini_histday+ et \verb+write_histday+ sont responsables de
+l'écriture de \verb+histday.nc+. \verb+ini_histday+ initialise le
+fichier \verb+histday.nc+, puis \verb+write_histday+ écrit les
+contenus des variables dans ce fichier. Rôles analogues pour
+\verb+ini_histmth+ et \verb+write_histmth+ avec le fichier
+\verb+histmth.nc+.  L'initialisation d'un fichier inclut
+l'initialisation de variables avec le sous-programme \verb+histdef+.
+L'écriture du contenu d'une variable se fait avec le sous-programme
+\verb+histwrite+.
+
+La lecture des fichiers d'entrée \verb+*.def+ se fait entre autres par
+l'intermédiaire du sous-programme \verb+getin+ de IOIPSL. \verb+getin+
+n'est appelé que dans les fichiers \verb+phylmd/conf_phys.f+,
+\verb+dyn3d/conf_gcm.F+ et \verb+dyn3d/getparam.f+.
+
+La résolution des fichiers de conditions initiales et de conditions
+aux limites étant a priori différente de celle de LMDZ, LMDZ re-maille
+ces données par interpolation ou moyenne.
+
+Dans le module \verb+start_init_orog_m+, la variable \verb+phis+ est
+allouée et modifiée par \verb+start_init_orog+. Dans
+\verb+start_init_orog+, \verb+phis+ est passée en argument à
+\verb+grid_noro+ et remplie par \verb+grid_noro+.
+
+Dans \verb+grid_noro+, \verb+mask+ est rempli avec \verb+num_lan+
+\verb+/+ \verb+num_tot+. On peut voir les valeurs obtenues en
+regardant la variable \verb+masque+ dans \verb+startphy.nc+. Le nom de
+masque devrait être réservé à des variables logiques. \verb+mask+
+calculé par \verb+grid_noro+ n'est pas une variable logique et ne
+contient pas que les valeurs 0 ou 1. Ce doit être la fraction de terre
+dans la maille considérée.  \verb+zdata+ sert à calculer \verb+zusn+.
+
+La variable \verb+iperiod+, qui est importante pour la structure de la
+procédure \verb+leapfrog+, n'est pas modifiée au cours de l'exécution
+de cette procédure. Cf. figure (\ref{fig:leapfrog}).
+\begin{figure}[htbp]
+  \centering
+  \includegraphics{Graphiques/leapfrog}
+  \caption[Principe de l'intégration temporelle selon le schéma
+  ``Matsuno-leapfrog'']{Principe de l'intégration temporelle selon le
+    schéma ``Matsuno-leapfrog'', dans \texttt{leapfrog}. Cas où
+    \texttt{iphysiq} = 10. ``FM'' : \Eng{forward} Matsuno, ``BM'' :
+    \Eng{backward} Matsuno. Les flèches courbent représentent des pas
+    ``leapfrog''.  Les numéros sur les flèches indiquent l'ordre des
+    intégrations.  Six intégrations sont nécessaires pour avancer de
+    cinq pas de temps.}
+  \label{fig:leapfrog}
+\end{figure}
+
+\subsection{Maillage horizontal}
+
+Trois grilles à trois dimensions. Une grille de base pour, entre 
+autres, la température et l'humidité relative. François L. l'appelle 
+la grille physique. Une grille décalée en longitude par rapport 
+à la grille de base, d'un demi-pas de longitude, pour la vitesse 
+zonale \textit{u}. Une grille décalée en latitude par rapport à la 
+grille de base, d'un demi-pas de latitude, pour la vitesse \textit{v}. 
+François L. appelle ces deux dernières grilles les grilles dynamiques. 
+Les points de la grille de base de dernier indice de longitude 
+et ceux de premier indice de longitude ont la même longitude. 
+De même, les points de la grille de base de dernier indice de 
+latitude et ceux de premier indice de latitude ont la même latitude. 
+On peut dire que la grille de base est « repliée sur elle 
+même » en longitude et latitude. Les deux grilles décalées 
+ont autant de points que la grille de base. Elles sont aussi 
+repliées sur elles-mêmes en longitude et latitude. \textit{Cf}. :
+\begin{itemize}
+\item Arakawa et Lamb [1977 \#737] ;
+\item description du modèle par Phu L. V. (juin 1989) ;
+\item
+  \href{file:///user/guez/Documents/Informatique_fonctionnement/Programs/Documentation
+    IOIPSL LMDZ/Manuel_LMDZE.texfol/Discrétisation équations
+    LMDZ.ps}{Discrétisation des équations de la dynamique dans LMDZ}
+  (16 novembre 1995) ;
+\item manuel de LMDZ pour Mars (5 avril 2004) ;
+\item commentaires dans la procédure \verb+inigeom +;
+\item
+  \href{file:///user/guez/Documents/Informatique_fonctionnement/Programs/Documentation
+    IOIPSL LMDZ/Grilles horizontales LMDZ.odg}{schéma des grilles
+    horizontales}.
+\end{itemize}
+\verb+iim+ est le nombre de longitudes distinctes dans la 
+grille de base (scalaire). Les valeurs de ces longitudes sont 
+dans le tableau \verb+rlonv+. La taille de rlonv est \verb-iim+1- 
+et \verb-rlonv(iim+1)=rlonv(1)-. \verb+jjm+ est le 
+nombre d'intervalles de latitude dans la grille de base. Les 
+valeurs de ces longitudes sont dans le tableau \verb+rlatu+. 
+La taille de rlatu est \verb-jjm+1-. Pour la partie physique 
+du modèle, les points distincts de la grille scalaire sont classés 
+par ordre de latitude décroissante et, pour une même latitude, 
+par ordre de longitude croissante (cf. figure 2.2 du manuel de 
+LMDZ pour Mars). Chacun des points distincts de la grille scalaire 
+peut donc être identifié par un indice dans ce classement : 
+un seul indice au lieu de 2 indices faisant référence à la latitude 
+et à la longitude. Les tableaux \verb+latfi+ et \verb+lonfi+ 
+contiennent les coordonnées associées à cet indice simple.
+
+Pour le remplissage des tableaux \verb+latfi+, \verb+lonfi+,
+\verb+zcufi+ et \verb+zcvfi+ dans \verb+gcm+, cf.
+\href{file:///user/guez/Documents/Informatique_fonctionnement/Programs/Documentation
+  IOIPSL LMDZ/Grilles horizontales LMDZ.odg}{schéma des grilles
+  horizontales}. Dans cette figure, dans le tableau \verb+mask_v+, le
+point d'indice \verb-(1, jjm + 1)- est marqué
+{\textquotedbl}T(2){\textquotedbl} pour rappeler qu'il est recopié
+dans deux éléments de \verb+zcvfi+. zcufi et zcvfi sont les valeurs de
+cu et cv affectées aux points de la grille « physique ».  Par exemple,
+regardons le
+\href{file:///user/guez/Documents/Informatique_fonctionnement/Programs/Documentation
+  IOIPSL LMDZ/Grilles horizontales LMDZ.odg}{schéma} et considérons le
+cas de \verb+cv+ et \verb+zcvfi+. \verb+cv+ est bien défini sur les
+points rouges. Il s'agit de donner des valeurs de \verb+cv+ aux points
+(noirs) de la grille physique.  Pour tous les points de la grille
+physique sauf le pôle sud, on choisit la valeur au point rouge juste
+en dessous. Pour le pôle sud, on prend le point rouge juste au dessus.
+On pourrait imaginer d'interpoler les valeurs en plusieurs points
+rouges pour chaque point de la grille physique. Et on pourrait de même
+imaginer des interpolations pour les valeurs de \verb+zcufi+.  Cela
+aurait plus de sens. Mais Phu L. V. semble dire que la faible
+importance des tableaux \verb+zcufi+ et \verb+zcvfi+ ne justifie pas
+de compliquer ainsi. Cf. son message du 27/10/6.
+
+Dans la version que j'ai téléchargée, la résolution (modifiable) est
+de 96 longitudes \ensuremath{\times} 71 latitudes \ensuremath{\times}
+19 niveaux.  François L. préfère 72 latitudes pour avoir une grille
+sur des valeurs rondes. Laurent Li utilise LMDZ avec la résolution 72
+longitudes \ensuremath{\times} 45 latitudes \ensuremath{\times} 19
+niveaux. Soit une résolution de 5° en longitude et 4° en latitude.
+LMDZ ne converge plus lorsque la résolution devient trop fine.
+\textit{Cf.} aussi la
+\href{http://www.lmd.jussieu.fr/~lmdz/LMDZ4/choisir_une_resolution.html}{documentation
+  officielle de LMDZ4}.
+
+\subsection{Maillage vertical}
+
+L'indice de niveau vertical est croissant de la surface au sommet de
+l'atmosphère.  Cf.
+\href{http://www.lmd.jussieu.fr/~lmdz/manuelGCM/main.ps}{manuel de
+  LMDZ pour Mars}, figure 2.4.
+
+D'après François L., le temps passé dans les calculs de transfert
+radiatif est proportionnel au cube du nombre de niveaux verticaux.
+
+Dans \verb+disvert+, $s$ peut être calculé de quatre façons
+selon la valeur de \verb+s_sampling+. D'après Phu L.  V., le cas
+\verb+param+ n'est plus utilisé (il n'est pas utilisé non plus par
+François L. pour son extension à la haute atmosphère). Les quatre
+échantillonnages de $s$ sont comparés pour quelques valeurs
+de \verb+llm+ dans les figures (\ref{fig:compare_sampl_9}),
+(\ref{fig:compare_sampl_19}), (\ref{fig:compare_sampl_30}) et
+(\ref{fig:compare_sampl_41}).
+\begin{figure}[htbp]
+  \centering
+  \input{Graphiques/compare_sampl_9.tex}
+  \caption[Maillage vertical, échantillonnages de $s$ pour :
+  \texttt{llm} = 9]{Maillage vertical.  Comparaison des quatre
+    échantillonnages de $s$ pour : \texttt{llm} = 9 ; \texttt{h} = 7 ;
+    \texttt{deltaz} = \nombre{0,04} ; \texttt{beta} = \nombre{1,3} ;
+    \texttt{k0} = 20 ; \texttt{k1} = \nombre{1,2}. La pression à la
+    surface choisie est de 101325 Pa.}
+  \label{fig:compare_sampl_9}
+\end{figure}
+\begin{figure}[htbp]
+  \centering
+  \input{Graphiques/compare_sampl_19.tex}
+  \caption[Maillage vertical, échantillonnages de $s$ pour :
+  \texttt{llm} = 19]{Maillage vertical.  Comparaison des quatre
+    échantillonnages de $s$ pour : \texttt{llm} = 19 ; \texttt{h} = 7
+    ; \texttt{deltaz} = \nombre{0,04} ; \texttt{beta} = \nombre{1,3} ;
+    \texttt{k0} = 20 ; \texttt{k1} = \nombre{1,2}. La pression à la
+    surface choisie est de 101325 Pa.}
+  \label{fig:compare_sampl_19}
+\end{figure}
+\begin{figure}[htbp]
+  \centering
+  \input{Graphiques/compare_sampl_30.tex}
+  \caption[Maillage vertical, échantillonnages de $s$ pour :
+  \texttt{llm} = 30]{Maillage vertical.  Comparaison des quatre
+    échantillonnages de $s$ pour : \texttt{llm} = 30 ; \texttt{h} = 7
+    ; \texttt{deltaz} = \nombre{0,04} ; \texttt{beta} = \nombre{1,3} ;
+    \texttt{k0} = 20 ; \texttt{k1} = \nombre{1,2}. La pression à la
+    surface choisie est de 101325 Pa.}
+  \label{fig:compare_sampl_30}
+\end{figure}
+\begin{figure}[htbp]
+  \centering
+  \input{Graphiques/compare_sampl_41.tex}
+  \caption[Maillage vertical, échantillonnages de $s$ pour :
+  \texttt{llm} = 41]{Maillage vertical.  Comparaison des quatre
+    échantillonnages de $s$ pour : \texttt{llm} = 41 ; \texttt{h} = 7
+    ; \texttt{deltaz} = \nombre{0,04} ; \texttt{beta} = \nombre{1,3} ;
+    \texttt{k0} = 20 ; \texttt{k1} = \nombre{1,2}. La pression à la
+    surface choisie est de 101325 Pa.}
+  \label{fig:compare_sampl_41}
+\end{figure}
+
+On pose :
+\begin{align*}
+  & b(0) = 0 \\
+  & b(s) = \exp(1 - 1 / s^2)
+  \qquad \mathrm{pour}\ s \in \mathbb{R}^*
+\end{align*}
+$b$ est $\mathscr{C}^\infty$ sur $\mathbb{R}$, paire, strictement croissante
+sur $\mathbb{R}^+$. On a :
+\begin{align*}
+  & \exists \lim_{s \to +\infty} b(s) = e \\
+  & b'(0) = 0 \\
+  & b'(1) = 2
+\end{align*}
+et $b$ admet un point d'inflexion en $\sqrt{6} / 3$ ($\approx
+\nombre{0,8}$). Cf. figure (\ref{fig:disvert}).
+\begin{figure}[htbp]
+  \centering
+  \input{Graphiques/disvert.tex}
+  \caption[Maillage vertical : $a$ et $b$]{Maillage vertical. Pour
+    $p_a = 5 \cdot 10^4$ Pa et $p_s = \nombre{101325}$ Pa.}
+  \label{fig:disvert}
+\end{figure}
+Puis, étant donné $p_a \in \mathbb{R}^{+*}$, on pose, pour tout
+$s$ :
+\begin{displaymath}
+  a(s) = p_a (s - b(s))
+\end{displaymath}
+Pour $s > 0$ :
+\begin{displaymath}
+  a'(s) \ge 0 \Leftrightarrow b(s) \le s^3 / 2
+\end{displaymath}
+L'équation $b(s) = s^3 / 2$ admet deux solutions strictement
+positives. Notons-les $s_1$ et $s_2$, $s_1 < 1 <
+s_2$. $a$ est strictement croissante sur $[0, s_1]$,
+strictement décroissante sur $[s_1, s_2]$, strictement
+croissante sur $[s_2, + \infty[$. Cf. figure (\ref{fig:disvert}).
+Enfin, étant donné $p_s \in \mathbb{R}^{+*}$, on pose, pour tout
+$s$ :
+\begin{align*}
+  p(s) & = a(s) + b(s) p_s \\
+  & = p_a s + b(s) (p_s - p_a)
+\end{align*}
+Cf. figure (\ref{fig:disvert}). On a :
+\begin{displaymath}
+  s \le \nombre{0,3} \Rightarrow b(s) \ll s
+\end{displaymath}
+Cf. figure (\ref{fig:b_s}).
+\begin{figure}[htbp]
+  \centering
+  \input{Graphiques/b_s.tex}
+  \caption[Maillage vertical : $b(s) / s$]{Maillage vertical. Les
+    niveaux de $s$ sont des niveaux de pression lorsque $b(s) / s$ est
+    très petit.}
+  \label{fig:b_s}
+\end{figure}
+En supposant que $p_s - p_a$ soit de l'ordre de $p_a$, on a donc, aux
+plus hauts niveaux de l'atmosphère, tels que $s(l) \le
+\nombre{0,3}$ :
+\begin{displaymath}
+  p(s(l)) \approx a(s(l))
+  \approx p_a s(l)
+\end{displaymath}
+En haut de l'atmosphère, les niveaux de $s$ sont des niveaux de
+pression. Ces niveaux de pression sont les valeurs de \verb+ap+.
+(Après une exécution de \verb+etat0_lim+, \verb+ap+ est dans le
+fichier \verb+start.nc+.)
+
+\subsubsection{Cas \texttt{LMD5}}
+
+Pour $l \in \{1, \dots,
+\mathtt{llm}\}$, posons :
+\begin{displaymath}
+  x_l = \frac{\pi (l - 1/2)}{\mathtt{llm} + 1}
+\end{displaymath}
+Pour $x \in \mathbb{R}$, posons :
+\begin{displaymath}
+  f(x) = 1 + 7 \sin^2 x
+\end{displaymath}
+$f$ est périodique de période $\pi$. Cf. figure (\ref{fig:f_x}).
+\begin{figure}[htbp]
+  \centering
+  \input{Graphiques/f_x.tex}
+  \caption{Maillage vertical, fonction utilisée dans le cas
+    \texttt{LMD5}.}
+  \label{fig:f_x}
+\end{figure}
+$(x_l)$ est un échantillonnage de $[0, \pi]$ d'autant plus fin que
+\verb+llm+ est grand :
+\begin{align*}
+  & \forall l \in \{1, \dots, \mathtt{llm}\}, x_l \in ]0, \pi[ \\
+  & \exists \lim_{\mathtt{llm} \to +\infty} x_1 = 0 \\
+  & \exists \lim_{\mathtt{llm} \to +\infty} x_\mathtt{llm} = \pi \\
+  & x_{l+1} - x_l = \frac{\pi}{\mathtt{llm} + 1}
+  \underset{\mathtt{llm} \to + \infty}{\longrightarrow} 0
+\end{align*}
+Le programme calcule :
+\begin{displaymath}
+  \mathtt{ds(l)} = \frac{f(x_l)}{\sum_{l'=1}^\mathtt{llm} f(x_{l'})}
+\end{displaymath}
+Or :
+\begin{displaymath}
+  \sum_{l=1}^\mathtt{llm} f(x_{l}) \frac{\pi}{\mathtt{llm} + 1}
+  \underset{\mathtt{llm} \to + \infty}{\longrightarrow} \int_0 ^\pi f
+\end{displaymath}
+Notons :
+\begin{displaymath}
+  I := \int_0 ^\pi f = 9 \pi / 2
+\end{displaymath}
+On a donc :
+\begin{displaymath}
+  \sum_{l=1}^\mathtt{llm} f(x_{l})
+  \underset{\mathtt{llm} \to +\infty}{\sim} \frac{I}{\pi} \mathtt{llm}
+\end{displaymath}
+(L'erreur est de 2 \% environ pour \verb+llm+ = 41.) Le niveau
+$s$ le plus petit est 0, le deuxième plus petit est :
+\begin{displaymath}
+  s(\mathtt{llm}) = \mathtt{ds(llm)}
+  \underset{\mathtt{llm} \to +\infty}{\sim} \frac{\pi f(\pi)}{I\ \mathtt{llm}}
+\end{displaymath}
+
+Donc :
+\begin{displaymath}
+  p(s(\mathtt{llm}))
+  \underset{\mathtt{llm} \to +\infty}{\sim}
+  \frac{\pi f(\pi) p_a}{I\ \mathtt{llm}}
+  = \frac{2 p_a}{9\ \mathtt{llm}}
+\end{displaymath}
+On a :
+\begin{align*}
+  & \mathtt{llm} = 9 \Rightarrow \mathtt{ap(llm)}
+  \approx 3 \cdot 10\ \mathrm{hPa} \\
+  & \mathtt{llm} = 19 \Rightarrow \mathtt{ap(llm)} \approx 8\ \mathrm{hPa} \\
+  & \mathtt{llm} = 50 \Rightarrow \mathtt{ap(llm)} \approx 2\ \mathrm{hPa}
+\end{align*}
+Il faudrait prendre \verb+llm+ de l'ordre de $10^3$ pour résoudre la
+région décrite par la paramétrisation de la chimie de l'ozone.
+
+\subsubsection{Cas \texttt{strato1}}
+
+On pose, pour $(x, y) \in
+\mathbb{R}^2$ :
+\begin{displaymath}
+  f(x, y) = \tgh x + \frac{1}{2} \tgh \frac{x - y}{2}
+\end{displaymath}
+Relevons quelques propriétés de $f$, considérée comme une fonction de
+$x$, à $y$ fixé. $f$ est une fonction strictement croissante sur
+$\mathbb{R}$, de $- 3/2$ à $3/2$. Par rapport à la fonction $\tgh$, le
+second terme de $f$ est 2 fois plus large, translaté de $y$ et 2 fois
+moins haut. Puisque $\tgh 3$ est déjà très proche de 1, les domaines
+de variation des deux termes de $f$ sont clairement séparés dès que $y
+\ge 9$. Cf. figure (\ref{fig:strato1}).
+\begin{figure}[htbp]
+  \centering
+  \input{Graphiques/strato1.tex}
+  \caption[Maillage vertical, cas \texttt{strato1}]{Maillage vertical,
+    cas \texttt{strato1}. Fonction utilisée pour \texttt{llm} = 70.}
+  \label{fig:strato1}
+\end{figure}
+
+Le programme calcule :
+\begin{displaymath}
+  \mathtt{dz(l)}
+  = \nombre{1,56}
+  + f\left(\frac{\mathtt{l} - 12}{5}, \frac{\mathtt{llm} - 12}{5}\right)
+\end{displaymath}
+D'après l'étude de $f$, $\mathtt{dz(l)} \in ]\nombre{0,06} ;
+\nombre{3,06}[$, \verb+dz(l)+ croît avec $l$. Pour \verb+llm+
+suffisamment grand :
+\begin{align*}
+  & \mathtt{dz(1)} \approx \nombre{1,06} - \tgh\nombre{2,2}
+  \approx \nombre{8,43} \cdot 10^{-2} \\
+  & \mathtt{dz(llm)} \approx \nombre{2,56}
+\end{align*}
+(l'erreur relative sur \verb+dz(1)+ devient inférieure à 1 \% si
+\verb+llm+ $\ge 37$ ; l'erreur relative sur \verb+dz(llm)+ devient
+inférieure à 1 \% si \verb+llm+ $\ge 23$). Les domaines de variation
+des deux termes $\tgh$ de \verb+dz+ sont clairement séparés dès que
+\verb+llm+ $\ge 57$.
+
+Posons, pour $z \in \mathbb{R}$ :
+\begin{displaymath}
+  s(z)
+  = \frac{\exp(- z / h) - \exp(- \mathtt{zz(llm + 1)} / h)}
+  {1 - \exp(- \mathtt{zz(llm + 1)} / h)}
+\end{displaymath}
+Le programme calcule $s(\mathtt{zz})$. On a, pour $h = 7$ km :
+\begin{align*}
+  & \mathtt{llm} = 40
+  \Rightarrow \mathtt{ap(llm)} \approx \nombre{2,70}\ \mathrm{Pa} \\
+  & \mathtt{llm} = 41
+  \Rightarrow \mathtt{ap(llm)} \approx \nombre{2,01}\ \mathrm{Pa} \\
+  & \mathtt{llm} = 50
+  \Rightarrow \mathtt{ap(llm)} \approx \nombre{0,14}\ \mathrm{Pa}
+\end{align*}
+
+Si $\exp[- \mathtt{zz(llm + 1)} / h] \ll 1$, pour des valeurs de $z$
+telles que :
+\begin{equation}
+  \label{eq:z_interm}
+  \left\{
+    \begin{array}{l}
+      \exp(- z / h) \gg \exp[- \mathtt{zz(llm + 1)} / h] \\
+      \exp(- z / h) \le \nombre{0,3}
+    \end{array}
+  \right.
+\end{equation}
+on a :
+\begin{align*}
+  & s(z) \approx \exp(- z / h) \\
+  & b[s(z)] \ll s(z)
+\end{align*}
+Donc, en supposant que $p_s - p_a$ soit de l'ordre de $p_a$ :
+\begin{displaymath}
+  p[s(z)] \approx a[s(z)] \approx p_a \exp(- z / h)
+\end{displaymath}
+Si $h$ est proche de la hauteur d'échelle réelle dans la région
+considérée alors les variations d'altitude entre deux niveaux
+$s$ sont proches de \verb+dz+. Par exemple, pour \verb+llm+ =
+70, \verb=zz(llm + 1)= $\approx 125$ km. Si $h = 7$ km, la condition
+(\ref{eq:z_interm}) devient $z \in [9\ \mathrm{km}, 92\ \mathrm{km}]$,
+qui correspond aux niveaux 17 à 56.
+
+\subsubsection{Cas \texttt{strato2}}
+
+C'est le cas conseillé par François L. pour un domaine incluant la
+stratosphère. Ce cas est analogue au cas \verb+LMD5+. Seule la
+fonction $f$ utilisée change. Pour $x \in \mathbb{R}$, posons :
+\begin{displaymath}
+  g(x)
+  = \frac{1}{2} \left[1 - \tgh\left(\frac{x - \pi / 2}{\pi / 2}\right)\right]
+\end{displaymath}
+Par rapport à la fonction $\tgh$, $g$ est translatée de $\pi / 2$ vers
+la droite, dilatée horizontalement d'un facteur $\pi / 2$, inversée
+verticalement, translatée verticalement de 1 et contractée
+verticalement d'un facteur 2. Elle décroît donc de 1 à $-1$. La
+fonction $f$ utilisée est maintenant :
+\begin{displaymath}
+  f(x) = (1 + 7 \sin^2 x) g(x)^2
+\end{displaymath}
+\begin{figure}[htbp]
+  \centering
+  \input{Graphiques/strato2.tex}
+  \caption[Maillage vertical, cas \texttt{strato2}]{Maillage vertical,
+    cas \texttt{strato2}. $f(\pi) \approx \nombre{0,014}$.}
+  \label{fig:strato2}
+\end{figure}
+On a :
+\begin{displaymath}
+  I := \int_0 ^\pi f \approx \nombre{4,02}
+\end{displaymath}
+donc :
+\begin{displaymath}
+  p(s(\mathtt{llm}))
+  \underset{\mathtt{llm} \to +\infty}{\sim}
+  \frac{\pi f(\pi) p_a}{I\ \mathtt{llm}}
+  = \frac{\nombre{0,011} p_a}{\mathtt{llm}}
+\end{displaymath}
+
+\subsection{Module \texttt{inter\_barxy\_m}}
+
+Cf.
+\href{file:///user/guez/Documents/Informatique_fonctionnement/Programs/Documentation
+  IOIPSL LMDZ/Mouvement de données/inter_barxy.odg}{graphique de
+  transmission de données}.
+
+Le seul cas où \verb+size(champint, 2)+ vaut \verb+jjm+ dans
+\verb+inter_barxy+ se produit suite à l'appel :
+\begin{verbatim}
+vvent = start_inter_3d("V", ...)
+\end{verbatim}
+C'est aussi le seul cas où \verb+rlatimod+ reçoit \verb+rlatu(:jjm)+.
+Dans tous les autres cas, \verb+rlatimod+ dans \verb+inter_barxy+
+reçoit \verb+rlatv+.
+
+Dans le cas le plus fréquent, dans \verb+inter_barxy+ :
+\begin{verbatim}
+size(champint, 2) == jjm + 1
+\end{verbatim}
+et \verb+rlatimod+ reçoit \verb+rlatv+. On veut interpoler sur les
+\verb+jjm+ + 1 latitudes \verb+rlatu+ mais on reçoit \verb+rlatv+.
+Bizarre.
+
+Je crois que \verb+inter_bary+ réalise une moyenne et non une
+interpolation. (Par exemple, pour l'initialisation de l'abondance de
+vapeur d'eau, on veut calculer \verb+q3d+ aux points \verb+rlatu+.)
+Cf.
+\href{file:///user/guez/Documents/Utilisation_LMDZ/Utilisation_LMDZ.texfol/Utilisation-LMDZ.pdf}{analyse}.
+Je crois que le calcul suppose une fonction en escalier, dont les
+marches sont limitées par \verb+yjdat+. Pour $i \ge 2$, \verb+fdat(i)+
+est interprété comme la hauteur de la marche $[\mathtt{yjdat(i-1)},
+\mathtt{yjdat(i)}]$. Pour $i \ge 2$, \verb+inter_bary(i)+ est la
+moyenne sur l'intervalle $[\mathtt{yjmod(i-1)}, \mathtt{yjmod(i)}]$.
+
+Cf. le remaillage \verb+@ave+ dans Ferret. On pourrait imaginer une
+procédure qui reçoit les tableaux \verb+x1edge+, \verb+x2edge+ et
+\verb+y1+, qui retourne un tableau \verb+y2+, où \verb+x1edge+ et
+\verb+x2edge+ sont deux listes de frontières d'intervalles, \verb+y1+
+et \verb+y2+ ont un élément de moins que \verb+x1edge+ et
+\verb+x2edge+, \verb+y1+ donne les valeurs d'une fonction en escalier
+dont les marches sont limitées par \verb+x1edge+, et \verb+y2+ est la
+moyenne de cette fonction sur les intervalles limités par
+\verb+x2edge+.
+
+\subsection{Les traceurs en général}
+
+Procédures qui concernent les traceurs dans le programme
+\verb+etat0_lim+ : \verb+iniadvtrac+, \verb+etat0+. Procédures qui
+concernent les traceurs dans le programme \verb+gcm+ :
+\verb+iniadvtrac+, \verb+dynetat0+, \verb+caladvtrac+, \verb+advtrac+,
+\verb+physiq+, \verb+phytrac+. Laurent L. connaît peut-être bien le
+traitement des traceurs. Il a écrit une grande partie de la
+``physique'' du modèle.
+
+Dans le fichier \verb+traceur.def+, le premier nombre est le nombre de
+traceurs. Chaque ligne suivante correspond à un traceur. Pour chaque
+traceur, on indique le numéro du schéma
+d'advection à utiliser. Les numéros sont définis dans
+\verb+iniadvtrac+.
+
+\verb+traceur.def+ est lu uniquement dans le sous-programme
+\verb+iniadvtrac+. \verb+nq+ est lu dans \verb+traceur.def+.
+\verb+iniadvtrac+ impose \verb+nqmx+ $\ge$ \verb+nq+. \verb+nq+ est
+passé à \verb+calfis+ et à \verb+physiq+. \verb+physiq+ impose
+\verb+nq+ $\ge 2$. Donc \verb+nqmx+ doit être supérieur à 2.
+\verb+nbtr+ (variable de \verb+dimphy+) vaut 1 pour \verb+nqmx+
+\verb+=+ \verb+2+ et \verb+nqmx+ -- \verb+2+ pour \verb+nqmx+ $\ge 3$.
+\verb+nq-2+ est passé à \verb+phytrac+ et devient \verb+nqmax+ dans
+\verb+phytrac+. À cause de l'appel de \verb+dynredem1+ par
+\verb+etat0+, \verb+nq+ doit être égal à \verb+nqmx+. \verb+initrrnpb+
+impose \verb+nbtr+ $\ge 2$, mais il n'est appelé que si \verb+rnpb+
+est vrai. Cf. aussi message de Ionela M. du 29/11/6.
+
+\verb+phytrac+ peut effectuer un traitement spécial pour les traceurs
+plomb et radon (décroissance radioactive etc.).  \verb+phytrac+
+suppose que ce sont les traceurs numérotés 3 et 4. Donc si on veut
+laisser les traceurs plomb et radon, avec le traitement spécial qui
+leur est réservé, alors il faut les laisser en troisième et quatrième
+position dans \verb+traceur.def+ et laisser \verb+rnpb+ à
+\verb+.true.+ dans \verb+physiq+. Cette variable est définie dans
+\verb+physiq+ et \verb+phytrac+ uniquement. Cf. le message de
+Frédéric H. du 26/1/7.
+
+Dans le programme \verb+etat0_lim+, la variable qui contient la
+distribution initiale des traceurs est \verb+q3d+. Cette variable est
+définie dans \verb+etat0+. Pour la vapeur d'eau (traceur numéro 1), la
+distribution initiale est calculée à partir de la variable \verb+R+ du
+fichier \verb+ECDYN.nc+. La distribution initiale des traceurs est
+écrite dans \verb+start.nc+.
+
+Dans le programme \verb+gcm+, la procédure \verb+iniadvtrac+ lit les
+noms des traceurs. La procédure \verb+dynetat0+ lit les distributions
+initiales à partir du fichier \verb+start.nc+ vers la variable
+\verb+q+. Cette variable se retrouve intacte dans \verb+leapfrog+. Par
+ailleurs, la concentration de radon dans le sol est lue dans
+\verb+starttrac+ par \verb+phytrac+. Dans \verb+phytrac+, on calcule
+la fraction massique à $t + \ud t$ :
+\begin{displaymath}
+  q(\vec r, t + \ud t) = q(\vec r, t) + (\partial_t q)(\vec r, t)\ud t
+\end{displaymath}
+Cf.
+\href{file:///user/guez/Documents/Informatique_fonctionnement/Programs/Guide_IPSL_climate_models/Traceurs.odg}{graphique
+  de flux de données}. Les distributions de traceurs calculées sont
+écrites dans \verb+dyn_hist_ave.nc+ et \verb+histrac.nc+. Les
+distributions finales sont écrites dans \verb+restart.nc+ par
+\verb+dynredem1+. Par ailleurs, la concentration de radon dans le sol
+est écrite dans \verb+restarttrac+ par \verb+phytrac+.
+
+\subsection{L'ozone en tant que traceur}
+
+Résumé. On part d'une certaine paramétrisation de la chimie
+stratosphérique de l'ozone, préparée par Daniel Cariolle et Hubert
+Teyssedre. La paramétrisation calcule en chaque point une production
+chimique d'ozone. On suit l'ozone ainsi produit comme un traceur
+passif, c'est-à-dire qu'il n'a aucun effet sur le reste du modèle.
+Les paramètres chimiques sont remaillés pour LMDZ, en latitude et en
+temps, dans \verb+etat0_lim+. Le remaillage vertical est fait une fois
+par jour dans \verb+gcm+. On néglige donc l'effet sur le remaillage de
+la variation temporelle de pression à la surface pendant une journée.
+Le champ initial d'ozone spécifié dans \verb+etat0_lim+ est le champ
+de référence de D. Cariolle (un des paramètres). Pour les passages de
+fraction molaire d'ozone à fraction massique, on néglige la présence
+de vapeur d'eau dans l'air.  L'évolution de la fraction massique
+d'ozone pendant un pas de temps de la physique est calculée dans
+\verb+phytrac+ : les contributions du transport et de la chimie sont
+intégrées séparément. La température, la masse volumique de l'air et
+la direction du Soleil sont considérées comme constantes pendant un
+pas de temps de la physique. Un des paramètres de D. Cariolle est la
+densité-colonne d'ozone au dessus d'un point donné. Cette
+densité-colonne est calculée dans l'approximation ``plans
+parallèles''. La production chimique est intégrée pendant un pas de
+temps de la physique par la méthode du point milieu. Une fois par jour
+de simulation, dans \verb+gcm+, une procédure lit dans un fichier tous
+les paramètres chimiques au bon jour, remaillés en latitude pour LMDZ.
+
+Cf. Cariolle (1986 \#761),
+\href{file:/user/guez/Documents/Commentaires_lectures/Autres_publications/-1991/Cariolle_1986_761.texfol/Cariolle_1986_761.dvi}{commentaires
+  sur Cariolle (1986 \# 761)}, texte des courriels (François L.,
+29/11/6 ; D. Cariolle, 29/11/6 ; François L., 12/1/7), fichiers
+\verb+O3_readme.txt+ de D. Cariolle et \verb+coefoz_v2_3.nc+.
+Attention : les symboles ne désignent apparemment pas les mêmes
+grandeurs dans Cariolle (1986, \#761) et dans la paramétrisation de
+2005. $r$ passe d'une concentration massique à une fraction molaire.
+$P$ et $L$ passent de la dimension masse$^{-1}$ temps$^{-1}$ à la
+dimension temps$^{-1}$.
+
+Phu L. V. conseille d'utiliser le schéma de transport numéro 10 (choix
+dans \verb+traceur.def+).
+
+Nous notons avec un indice ``Mob'' les valeurs des paramètres tirés de
+Mobidic.
+
+\subsubsection{La paramétrisation de la chimie}
+
+Le taux de production photochimique par unité de volume (ou de masse
+d'air) est le nombre de molécules créées par unité de volume (ou de
+masse d'air) et par unité de temps. On peut aussi définir un taux de
+destruction chimique d'une espèce, de dimension temps$^{-1}$, sachant
+que le nombre de molécules de cette espèce détruites par unité de
+volume et par unité de temps est proportionnel à la densité de
+l'espèce. Comment $P$ est-il donc défini dans la paramétrisation de
+2005 ?  En divisant par $N$, la densité totale de la phase gazeuse ?
+Quelle définition pour $L$ ? Par ailleurs, quelle grandeur la
+paramétrisation de 2005 permet-elle de calculer ? Certainement pas la
+dérivée partielle comme noté dans l'équation (5) de Cariolle (1986
+\#761), car la dérivée partielle doit dépendre du mouvement de
+l'atmosphère. Cf.
+\href{file:/user/guez/Documents/Commentaires_lectures/Autres_publications/-1991/Cariolle_1986_761.texfol/Cariolle_1986_761.dvi}{commentaires
+  sur Cariolle (1986 \# 761)}. La paramétrisation donne-t-elle la
+dérivée lagrangienne de la fraction molaire, comme noté dans le
+fichier \verb+O3_readme.txt+ ?  Notons :
+\begin{description}
+\item[$r$] : fraction molaire d'ozone
+\item[$q$] : fraction massique d'ozone
+\item[$s_{O_3}$] : masse nette d'ozone créée par la chimie par unité de
+  volume et par unité de temps
+\item[$S$] : nombre net de molécules d'ozone créées par la chimie par
+  unité de volume et par unité de temps
+\item[$N$] : densité totale de la phase gazeuse
+\item[$\rho$] : masse volumique totale de la phase gazeuse
+\end{description}
+On a :
+\begin{equation}
+  \label{eq:o3}
+  \left\{
+    \begin{array}{l}
+      \partial_t \rho_{\mathrm{O}_3} + \diverg(\rho_{\mathrm{O}_3} \vec v)
+      = s_{O_3} \\
+      \partial_t \rho + \diverg(\rho \vec v) = 0
+    \end{array}
+  \right.
+\end{equation}
+Remarquer que l'équation bilan sur le nombre total de molécules en
+phase gazeuse est plus compliquée que celle sur la masse totale : le
+second membre n'est a priori pas nul. D'après (\ref{eq:o3}) :
+\begin{equation}
+  \label{eq:dqdt}
+  \frac{\ud q}{\ud t} = s_{O_3} / \rho
+\end{equation}
+D'où :
+\begin{displaymath}
+  \frac{\ud r}{\ud t}
+  =
+  \frac{1}{\mu_\mathrm{moy}} \frac{\ud \mu_\mathrm{moy}}{\ud t} r + S / N
+\end{displaymath}
+Donc il serait bizarre que la paramétrisation donne $\ud r/\ud t$. Je
+vais supposer qu'elle donne $S/N$. $P$ et $L$ sont alors les taux de
+production et de destruction chimique par unité de volume divisés par
+$N$. Je note : $P_\mathrm{net} := S / N$, taux de production chimique
+d'ozone, par molécule d'air.
+
+Désignons par $R_\mathrm{het}$ le taux de production chimique
+hétérogène par molécule d'ozone, interpolé journalièrement, remaillé
+horizontalement et verticalement pour LMDZ. Notons $\phi$ la latitude
+et $\lambda$ la longitude. Notons $d(t)$ le jour contenant une date
+$t$, $s$ la coordonnée verticale hybride et $\alpha$ l'angle entre la
+direction du Soleil et la verticale (\Eng{solar zenith angle?}). Nous
+pouvons définir un taux de destruction par chimie hétérogène corrigé :
+\begin{multline*}
+  R_\mathrm{het,corr}(\lambda, \phi, s, t)
+  =
+  R_\mathrm{het}(\lambda, \phi, s, d(t))
+  1_{T(\lambda, \phi, s, t) > 195\ \mathrm{K}}
+  1_{\phi \notin [- 45°, 45°]} \\
+  \times 1_{\alpha(\lambda, \phi, t) < 87°}
+  \left(\frac{\mathrm{Clx}}{\nombre{3,8} \cdot 10^{-9}}\right)^2
+\end{multline*}
+(La définition de Clx n'est pas claire pour moi.) Clx est supposé être
+une constante. On calcule alors :
+\begin{multline*}
+  P_\mathrm{net}(\lambda, \phi, s, t)
+  =
+  P_\mathrm{net,Mob}(\lambda, \phi, s, d(t)) \\
+  + \frac{\partial P_\mathrm{net}}{\partial r}(\lambda, \phi, s, d(t))
+  [r(\lambda, \phi, s, t) - r_\mathrm{Mob}(\lambda, \phi, s, d(t))] \\
+  + \frac{\partial P_\mathrm{net}}{\partial T}(\lambda, \phi, s, d(t))
+  [T(\lambda, \phi, s, t) - T_\mathrm{Mob}(\lambda, \phi, s, d(t))] \\
+  + \frac{\partial P_\mathrm{net}}{\partial \Sigma}
+  (\lambda, \phi, s, d(t))
+  [\Sigma(\lambda, \phi, s, t) - \Sigma_\mathrm{Mob}
+  (\lambda, \phi, s, d(t))] \\
+  + R_\mathrm{het,corr}(\lambda, \phi, s, t) r(\lambda, \phi, s, t)
+\end{multline*}
+Ou encore :
+\begin{displaymath}
+  S = P_\mathrm{net,Mob} N + \ldots
+  + R_\mathrm{het,corr} n_{\mathrm{O}_3}
+\end{displaymath}
+Donc $R_\mathrm{het,corr}$ est le taux de production (algébrique) par
+chimie hétérogène par unité de volume et par molécule d'ozone.
+
+Soit une position dans l'atmosphère. Soit $\pseudov{\ud^2 S} = \ud^2 S
+\vec u_r$ une surface élémentaire à cette position. Notons $\ud^2
+\tau$ le volume compris dans l'angle solide de sommet le centre de la
+Terre, limitant $\ud^2 S$, et aux rayons $r'$ supérieurs au rayon $r$
+de la position considérée.  J'interprète $\Sigma$ et
+$\Sigma_\mathrm{Mob}$ comme les nombres de molécules d'ozone dans
+$\ud^2 \tau$, divisés par $\ud^2 S$. D'où :
+\begin{displaymath}
+  \mu_{\mathrm{O}_3} \Sigma
+  = \frac{1}{r^2} \int_r ^{+ \infty} q \rho r'^2 \ud r'
+\end{displaymath}
+Avec l'équilibre hydrostatique vertical :
+\begin{displaymath}
+  \mu_{\mathrm{O}_3} \Sigma
+  = \frac{1}{r^2} \int_0 ^p q r'^2 \frac{\ud p'}{g}
+\end{displaymath}
+
+$a_2$, $a_4$ et $a_6$ sont constants sur les quatre niveaux de
+pression les plus proches de la surface, sur toutes les latitudes et
+tous les mois : $a_2 \approx - 2 \cdot 10^{-6}$, $a_4 \equiv 0$, $a_6
+\equiv 0$. L'intervalle de pression correspond à une couche de 400 ou
+500 m au dessus de la surface. Pour $a_2$, il y a une discontinuité
+entre la valeur dans cette couche proche de la surface et les valeurs
+au-dessus. Cf.
+\href{file:///user/guez/Documents/Utilisation_LMDZ/Input_etat0_lim/Ozone/a2.ps}{exemple
+  de variation de $a_2$}.
+
+Ordres de grandeur dans \verb+coefoz_v2_3.nc+ :
+\begin{displaymath}
+  \begin{array}{rcl}
+  - 10^{-11} \lesssim & P_\mathrm{net,Mob} & \lesssim 10^{-12} \\
+  - 10^{-5} \lesssim & a_2 & \lesssim 10^{-11} \\
+  10^{-8} \lesssim & r_\mathrm{Mob} & \lesssim 10^{-5} \\
+  - 10^{-12} \lesssim & a_4 & \lesssim 10^{-13} \\
+  184 \le & T_\mathrm{Mob} & \le 320 \\
+  - 10^{-27} \lesssim & a_6 & \lesssim 10^{-28} \\
+  10^{12} \lesssim & \Sigma_\mathrm{Mob} & \lesssim 10^{19} \\
+  10^{-13} \lesssim & - R_\mathrm{het} & \lesssim 10^{-5}    
+  \end{array}
+\end{displaymath}
+Deux valeurs de $|a_6|$ sont non nulles inférieures à $1,2 \cdot
+10^{-38}$ : environ $7 \cdot 10^{-39}$ et $2 \cdot 10^{-39}$. $1,2
+\cdot 10^{-38}$ est le plus petit nombre strictement positif normalisé
+dans l'ensemble IEEE des réels simple précision. Les deux petites
+valeurs de $|a_6|$ sont donc dénormalisées dans le fichier NetCDF. La
+perte de précision n'est pas importante. Ce problème ne se produit pas
+pour les autres coefficients.
+
+\subsubsection{Passage de la fraction molaire à la fraction massique d'ozone}
+
+Nous avons besoin de la masse moléculaire moyenne de l'air. Nous
+pourrions considérer l'air comme un mélange de trois espèces : une
+espèce fictive ``air sec'', l'eau (vapeur) et l'ozone. Nous supposons
+connue la fraction massique d'eau (elle est calculée par
+\verb+etat0+). Notons ici $q_i$ la fraction massique de l'espèce $i$
+et $x_i$ sa fraction molaire. Nous avons donc le système de quatre
+équations :
+\begin{displaymath}
+  \left\{
+    \begin{array}{ll}
+      q_{\mathrm{H}_2\mathrm{O}}
+      & = \frac{\mu_{\mathrm{H}_2\mathrm{O}}}{\mu_\mathrm{moy}}
+      x_{\mathrm{H}_2\mathrm{O}} \\
+      \mu_\mathrm{moy}
+      & = \mu_{\mathrm{H}_2\mathrm{O}} x_{\mathrm{H}_2\mathrm{O}}
+      + \mu_{\mathrm{O}_3} x_{\mathrm{O}_3}
+      + \mu_\textrm{air sec} x_\textrm{air sec} \\
+      1 & = x_{\mathrm{H}_2\mathrm{O}} + x_{\mathrm{O}_3}
+      + x_\textrm{air sec} \\
+      q_{\mathrm{O}_3} & = \frac{\mu_{\mathrm{O}_3}}{\mu_\mathrm{moy}}
+      x_{\mathrm{O}_3}
+    \end{array}
+  \right.
+\end{displaymath}
+pour les quatre inconnues : $\mu_\mathrm{moy}$,
+$x_{\mathrm{H}_2\mathrm{O}}$, $x_\textrm{air sec}$, $q_{\mathrm{O}_3}$. La
+solution de ce système est :
+\begin{equation}
+  \label{eq:qO3}
+  \left\{
+    \begin{array}{ll}
+      \mu_\mathrm{moy}
+      & =
+      \frac{[(\mu_{\mathrm{O}_3} - \mu_\textrm{air sec}) x_{\mathrm{O}_3}
+        + \mu_\textrm{air sec}] \mu_{\mathrm{H}_2\mathrm{O}}}
+      {\mu_{\mathrm{H}_2\mathrm{O}}
+        + (\mu_\textrm{air sec} - \mu_{\mathrm{H}_2\mathrm{O}})
+        q_{\mathrm{H}_2\mathrm{O}}} \\
+      q_{\mathrm{O}_3}
+      & =
+      \frac{\mu_{\mathrm{O}_3}
+        [(\mu_\textrm{air sec} - \mu_{\mathrm{H}_2\mathrm{O}})
+        q_{\mathrm{H}_2\mathrm{O}}
+        + \mu_{\mathrm{H}_2\mathrm{O}}]}
+      {\mu_{\mathrm{H}_2\mathrm{O}}
+        \left[
+          \mu_{\mathrm{O}_3}
+          + \mu_\textrm{air sec}
+          \left(
+            \frac{1}{x_{\mathrm{O}_3}} - 1
+          \right)
+        \right]}
+    \end{array}
+  \right.
+\end{equation}
+Les valeurs typiques semblent être :
+\begin{align*}
+  \max q_{\mathrm{H}_2\mathrm{O}} \# 10^{-2} \\
+  \max x_{\mathrm{O}_3} \# 10^{-5}
+\end{align*}
+L'écart entre $\mu_\mathrm{moy}$ et $\mu_\textrm{air sec}$ est alors
+$\lesssim 10^{-2}$, et essentiellement dû à la présence de l'eau. Une
+approximation intermédiaire entre :
+\begin{displaymath}
+  \left\{
+    \begin{array}{ll}
+      \mu_\mathrm{moy} & = \mu_\textrm{air sec} \\
+      q_{\mathrm{O}_3} & = \frac{\mu_{\mathrm{O}_3}}{\mu_\textrm{air sec}}
+      x_{\mathrm{O}_3}
+    \end{array}
+  \right.
+\end{displaymath}
+et le système (\ref{eq:qO3}) serait de calculer $\mu_\mathrm{moy}$ en
+ne tenant compte que de la présence de l'eau :
+\begin{displaymath}
+  \mu_\mathrm{moy}
+  =
+  \frac{\mu_\textrm{air sec}}
+  {1 +
+    \left(
+      \frac{\mu_\textrm{air sec}}{\mu_{\mathrm{H}_2\mathrm{O}}} - 1
+    \right)
+    q_{\mathrm{H}_2\mathrm{O}}}   
+\end{displaymath}
+
+\subsubsection{Choix du type de remaillage}
+
+Copiant ce qui était déjà fait pour la vapeur d'eau, j'ai d'abord
+choisi de remailler verticalement les paramètres de Cariolle en
+interpolant une spline cubique de la pression. (Noter que ce n'est pas
+une interpolation en logarithme de pression.) Si on interpole
+simplement les données de Cariolle et que la pression à laquelle on
+interpole est à l'extérieur du tableau de pressions de Cariolle alors
+la formule d'interpolation devient sans crier gare une formule
+d'extrapolation. C'est la formule pour l'intervalle extrême qui est
+utilisée. Pour mieux contrôler cette extrapolation, j'ai ajouté aux
+données de Cariolle un point correspondant à une pression nulle. Le
+but était d'avoir approximativement une fraction molaire constante
+au-dessus du point le plus haut de Cariolle et une production qui tend
+vers 0.
+
+Mais l'interpolation avec une spline cubique produit de fortes
+oscillations. (Elle donne d'ailleurs souvent des fractions molaires
+négatives.) Cf. exécutions
+\href{file:/user/guez/Documents/Utilisation_LMDZ/Utilisation_LMDZ.texfol/Utilisation-LMDZ.dvi}{28}
+et
+\href{file:///user/guez/Documents/Utilisation_LMDZ/Results_etat0_lim/check_coefoz_38.ps}{38}
+de \verb+etat0_lim+. Le remaillage vertical est donc maintenant fait
+par moyenne pour la plupart des paramètres chimiques, comme le
+remaillage horizontal.
+
+Considérons le remaillage de la fraction molaire $r_\mathrm{Mob}$ (le
+raisonnement est le même pour $P_\mathrm{net,Mob}$). Nous avons choisi
+un remaillage par moyenne donc nous voulons associer à une cellule de
+la grille tri-dimensionnelle de LMDZ une moyenne de $r_\mathrm{Mob}$
+sur cette cellule. Plus généralement, considérons un volume quelconque
+de l'espace réel humain. Le plus sensé est d'associer à ce volume une
+moyenne de $r_\mathrm{Mob}$ pondérée par la densité de l'air :
+\begin{align*}
+  \langle r_\mathrm{Mob} \rangle
+  & = \frac{\iiint r_\mathrm{Mob} N \ud^3 \tau}{\iiint N \ud^3 \tau} \\
+  & = \frac{\iiint (a + z)^2 r_\mathrm{Mob} N \cos\phi\,\ud z\, \ud \phi\, \ud \lambda}
+  {\iiint (a + z)^2 N \cos\phi\, \ud z\, \ud \phi\, \ud \lambda}
+\end{align*}
+Opérons le changement de variable $(z, \phi, \lambda) \to (p, \phi,
+\lambda)$, avec l'hypothèse d'équilibre hydrostatique vertical. Notons
+$\ud(z, \phi, \lambda) / \ud(p, \phi, \lambda)$ le jacobien de ce
+changement de variable :
+\begin{align*}
+  \ud z\, \ud \phi\, \ud \lambda
+  & = | \frac{\ud(z, \phi, \lambda)}{\ud(p, \phi, \lambda)} |
+  \ud p\, \ud \phi\, \ud \lambda \\
+  & = | \partial_p z | \ud p\, \ud \phi\, \ud \lambda \\
+  & = \frac{\ud p}{\rho g} \ud \phi\, \ud \lambda
+\end{align*}
+D'où :
+\begin{displaymath}
+  \langle r_\mathrm{Mob} \rangle = \frac
+  {
+    \iiint (a + z)^2 r_\mathrm{Mob} \cos\phi \frac{\ud p}{\mu_\mathrm{moy} g}
+    \ud \phi\, \ud \lambda
+  }
+  {
+    \iiint (a + z)^2 \cos\phi \frac{\ud p}{\mu_\mathrm{moy} g}
+    \ud \phi\, \ud \lambda
+  }
+\end{displaymath}
+Si $z \ll a$ et $\mu_\mathrm{moy}$ et $g$ sont approximativement
+constants sur le domaine considéré alors :
+\begin{displaymath}
+  \langle r_\mathrm{Mob} \rangle \approx \frac
+  {\iiint r_\mathrm{Mob} \cos\phi\, \ud p\, \ud \phi\, \ud \lambda}
+  {\iiint \cos\phi \, \ud p\, \ud \phi\, \ud \lambda}
+\end{displaymath}
+(Attention : même si $r_\mathrm{Mob}$ ne dépend pas de $\lambda$, l'intégrale sur
+$\lambda$ ne se simplifie que si le domaine en $(p, \phi)$ est
+indépendant de $\lambda$.) Considérons maintenant le cas particulier
+où le domaine est une cellule de LMDZ. Nous considérons cette cellule
+comme un parallélépipède rectangle dans l'espace $(p, \phi, \lambda)$,
+d'où :
+\begin{displaymath}
+  \langle r_\mathrm{Mob} \rangle = \frac{1}{\Delta p \Delta(\sin\phi)}
+  \iint r_\mathrm{Mob} \cos\phi\, \ud p\, \ud \phi
+\end{displaymath}
+Cf. figure (\ref{fig:cell}).
+\begin{figure}[htbp]
+  \centering
+  \includegraphics{Graphiques/Cellule}
+  \caption[Remaillage de la paramétrisation de la chimie de
+  l'ozone]{En noir, cellule sur laquelle on moyenne les données
+    concernant l'ozone. En rouge, cellules de Mobidic.}
+  \label{fig:cell}
+\end{figure}
+Nous n'avons pas a priori $r_\mathrm{Mob}$ en tout point $(p, \phi)$,
+nous avons un nombre fini de valeurs de $r_\mathrm{Mob}$. Il nous
+reste donc à supposer une forme de variation de $r_\mathrm{Mob}$ en
+fonction de $(p, \phi)$. Le plus simple est de supposer que
+$r_\mathrm{Mob}$ est constant sur des cellules rectangulaires du plan
+$(p, \phi)$. Nous devons choisir les limites de ces cellules. En
+latitude, nous prenons les milieux des valeurs de Mobidic. En
+pression, nous prenons les moyennes géométriques des valeurs de
+Mobidic (si bien que les limites de cellule en pression sont à
+mi-chemin des valeurs de Mobidic sur un axe logarithmique).
+
+Pour les coefficients $a_2$ et $R_\mathrm{het}$, la démarche est moins évidente. Supposons
+connu $a_2$ en tout point de ``l'espace humain'', quelle valeur
+moyenne de $a_2$, $\overline{a_2}$, associer à un volume $\tau$ ?
+Considérons la paramétrisation simplifiée :
+\begin{displaymath}
+  P_\mathrm{net} = P_\mathrm{net,Mob} + a_2 (r - r_\mathrm{Mob})
+\end{displaymath}
+Nous voudrions que :
+\begin{displaymath}
+  \overline{P_\mathrm{net}}
+  = \overline{P_\mathrm{net,Mob}}
+  + \overline{a_2} (\bar r - \overline{r_\mathrm{Mob}})
+\end{displaymath}
+Ce qui donne :
+\begin{displaymath}
+  \overline{a_2}
+  = \frac{\iiint a_2 (r - r_\mathrm{Mob}) N \ud^3 \tau}
+  {\iiint (r - r_\mathrm{Mob})N \ud^3 \tau}
+\end{displaymath}
+On peut adopter :
+\begin{displaymath}
+  \overline{a_2} = \frac{\iiint a_2 N \ud^3 \tau}{\iiint N \ud^3 \tau}
+\end{displaymath}
+et garder ainsi une certaine compatibilité avec l'hypothèse selon
+laquelle $r_\mathrm{Mob}$ est constant sur une cellule de
+Mobidic. Idem pour $R_\mathrm{het}$.
+
+Pour $a_4$ et $T_\mathrm{Mob}$, nous calculons aussi la moyenne
+pondérée par $N$.
+
+Pour $\Sigma_\mathrm{Mob}$, verticalement, une moyenne ne me
+semblerait pas avoir de sens. Je choisis de faire une interpolation au
+milieu de couche de LMDZ (pression \verb+pls+). Quelle interpolation ?
+On a :
+\begin{equation}
+  \label{eq:sigma}
+  \frac{\partial \Sigma_\mathrm{Mob}}{\partial z} = - r_\mathrm{Mob} N \approx - \frac{r_\mathrm{Mob} p}{k_B T}
+\end{equation}
+En remaillant $r_\mathrm{Mob}$ et $T$, nous avons supposé qu'ils
+étaient constants sur des intervalles de pression centrés sur les
+niveaux de pression de Mobidic. Considérons donc un tel intervalle,
+centré sur la pression $p_1$, correspondant à une altitude $z_1$.
+Supposons aussi $\mu_\mathrm{moy}$ et $g$ constants. Sur l'intervalle,
+l'échelle $H$ de gradient de pression est constante :
+\begin{displaymath}
+  p(z) = p(z_1) \exp\left(- \frac{z - z_1}{H}\right)
+\end{displaymath}
+Donc, en intégrant (\ref{eq:sigma}) sur $z$ :
+\begin{displaymath}
+  \Sigma_\mathrm{Mob}(p) - \Sigma_\mathrm{Mob}(p_1) = \frac{r_\mathrm{Mob}}{\mu_\mathrm{moy} g} (p - p_1)
+\end{displaymath}
+$\Sigma_\mathrm{Mob}$ varie linéairement avec la pression. Nous connaissons les
+valeurs de $\Sigma_\mathrm{Mob}$ aux niveaux de Mobidic, que nous supposons être
+les centres des intervalles de fraction molaire constante, et non les
+limites des intervalles. Nous pourrions commencer par calculer
+$\Sigma_\mathrm{Mob}$ aux limites des intervalles. Notons $p_1$ et $p_2$ deux
+niveaux de pression successifs de Mobidic, $r_{\mathrm{Mob},1}$ et $r_{\mathrm{Mob},2}$ les
+fractions molaires correspondantes, $p_l = \sqrt{p_1 p_2}$ la
+limite entre les deux intervalles de centres $p_1$ et $p_2$. Posons :
+\begin{displaymath}
+  \alpha = \frac{r_{\mathrm{Mob},1}}{r_{\mathrm{Mob},2}} \frac{p_l - p_1}{p_2 - p_l}
+\end{displaymath}
+On a :
+\begin{align*}
+  & \Sigma_\mathrm{Mob}(p_l) - \Sigma_{\mathrm{Mob},1}
+  = \frac{r_{\mathrm{Mob},1}}{\mu_\mathrm{moy} g} (p_l - p_1) \\
+  & \Sigma_{\mathrm{Mob},2} - \Sigma_\mathrm{Mob}(p_l)
+  = \frac{r_{\mathrm{Mob},2}}{\mu_\mathrm{moy} g} (p_2 - p_l)
+\end{align*}
+donc :
+\begin{displaymath}
+  \Sigma_\mathrm{Mob}(p_l) = \frac{\Sigma_{\mathrm{Mob},1} + \alpha \Sigma_{\mathrm{Mob},2}}{1 + \alpha}
+\end{displaymath}
+Plus simplement, je choisis d'interpoler linéairement en pression
+entre les valeurs de Mobidic.
+
+Pour $\Sigma_\mathrm{Mob}$ horizontalement, nous moyennons simplement pour
+conserver le nombre de molécules d'ozone au-dessus d'une surface :
+\begin{align*}
+  \bar \Sigma_\mathrm{Mob} & = \frac{\iint \Sigma_\mathrm{Mob} \ud^2 S}{S} \\
+  & =
+  \frac{\iint \Sigma_\mathrm{Mob} (a + z^2) \cos\phi \ud \phi \ud \lambda}
+  {\iint (a + z^2) \cos\phi \ud \phi \ud \lambda} \\
+  & \approx \frac{\iint \Sigma_\mathrm{Mob} \cos\phi \ud \phi \ud \lambda}
+  {\iint \cos\phi \ud \phi \ud \lambda}
+\end{align*}
+
+Pour $a_6$, une moyenne pondérée par $N$ semble censée. $a_6(p) (\Sigma(p) -
+\Sigma_\mathrm{Mob}(p))$ est une contribution à
+$P_\mathrm{net}(p)$. LMDZ calcule la moyenne
+$\overline{P_\mathrm{net}}$ pondérée par $N$ sur une cellule. Une
+contribution à cette moyenne est :
+\begin{displaymath}
+  \frac{\int a_6 N (\Sigma - \Sigma_\mathrm{Mob}) \ud \tau}{\int N \ud \tau}
+\end{displaymath}
+$\overline{a_6} (\Sigma - \Sigma_\mathrm{Mob})$, avec $\Sigma$ la
+valeur en milieu de couche dans LMDZ et $\Sigma_\mathrm{Mob}$ la
+valeur interpolée, se rapproche de cette contribution.
+
+Cf. figures (\ref{fig:regr_latit}), (\ref{fig:regr_p_stepav}) et
+(\ref{fig:regr_p_lint}).
+\begin{figure}[htbp]
+  \centering
+  \includegraphics{Graphiques/regr_latit}
+  \caption[Remaillage en latitude de la paramétrisation de la chimie
+  de l'ozone]{Remaillage en latitude. En bleu, les valeurs d'origine,
+    en rouge les valeurs utilisées.}
+  \label{fig:regr_latit}
+\end{figure}
+\begin{figure}[htbp]
+  \centering
+  \includegraphics{Graphiques/regr_p_stepav}  
+  \caption[Remaillage de la paramétrisation de la chimie de l'ozone,
+  en pression par moyenne de fonction en escalier] {Remaillage en
+    pression par moyenne de fonction en escalier.  En bleu, les
+    valeurs d'origine, en rouge les valeurs utilisées. La position de
+    \texttt{p3d(i, j, 1)} par rapport à \texttt{plev(n\_plev)} est
+    quelconque.}
+  \label{fig:regr_p_stepav}
+\end{figure}
+\begin{figure}[htbp]
+  \centering
+  \includegraphics{Graphiques/regr_p_lint}  
+  \caption[Remaillage de la paramétrisation de la chimie de l'ozone,
+  en pression par interpolation linéaire]{Remaillage en pression par
+    interpolation linéaire. Les calculs aux valeurs élevées de
+    \texttt{pls} (premiers indices de niveau vertical) peuvent être
+    des extrapolations. La valeur supplémentaire à pression nulle du
+    maillage source contrôle l'extrapolation aux basses pressions.}
+  \label{fig:regr_p_lint}
+\end{figure}
+
+\subsubsection{Remaillage : dans quel programme, à quel moment ?  Quelles
+  entrées-sorties ?}
+
+Les paramètres chimiques doivent être remaillés en latitude pour LMDZ.
+Ce remaillage en latitude peut être fait une fois pour toutes, dans
+\verb+etat0_lim+. Par ailleurs, au cours d'une simulation, la pression
+à une longitude, une latitude et un niveau vertical donnés change
+parce que la pression à la surface change. Donc il faut en principe
+faire le remaillage en pression des données de Cariolle à chaque pas
+de temps physique. Enfin, nous voulons lisser les variations
+temporelles des paramètres chimiques en les interpolant
+journalièrement. Ce remaillage temporel peut être fait une fois pour
+toutes, dans \verb+etat0_lim+.
+
+En pratique, le remaillage en pression à chaque pas de temps n'est pas
+indispensable parce que l'essentiel de la chimie de l'ozone, avec
+notre paramétrisation, se déroule à haute altitude, où les niveaux
+verticaux de LMDZ sont pratiquement des niveaux de pression fixés.
+Nous pouvons donc nous demander si, pour simplifier le programme, nous
+pouvons faire les trois remaillages (latitude, pression, temps) dans
+\verb+etat0_lim+. Nous négligerions alors pour le remaillage vertical
+l'évolution des pressions aux interfaces des couches. Mais la
+\href{file:///user/guez/Documents/Informatique_fonctionnement/Programs/Guide_IPSL_climate_models/taille.ods}{taille
+  du fichier contenant les paramètres remaillés} serait alors trop
+grande.\footnote{Le remaillage en pression dans \texttt{etat0\_lim}
+  serait une bonne solution si nous utilisions les paramètres mensuels
+  sans interpolation journalière.}
+
+Nous devons donc faire un des trois remaillages dans \verb+gcm+.
+Lequel ? On ne peut faire le remaillage vertical sans avoir fait le
+remaillage en latitude. Le choix dans \verb+gcm+ se restreint donc aux
+remaillages vertical et temporel. Pour le calcul de la production
+chimique d'ozone, nous avons besoin à chaque pas de temps de cinq
+coefficients tri-dimensionnels (taille totale : $(\mathtt{iim} + 1)
+\times (\mathtt{jjm} + 1) \times \mathtt{llm} \times 5$). Si nous
+partons des coefficients remaillés en pression dans \verb+etat0_lim+,
+nous devons calculer ces cinq coefficients par interpolation
+temporelle pour chaque jour. Si nous partons des coefficients
+interpolés journalièrement dans \verb+etat0_lim+, nous pouvons aussi
+nous contenter de calculer ces cinq coefficients par remaillage
+vertical pour chaque jour. Les deux transformations :
+\begin{displaymath}
+  \xymatrix{
+    (\mathtt{jjm} + 1) \times 45 \ar[d]_{\textrm{remaillage vertical}}
+    & (\mathtt{iim} + 1) \times (\mathtt{jjm} + 1) \times \mathtt{llm}
+    \times 12 \ar[ld]^{\textrm{remaillage temporel}} \\
+    (\mathtt{iim} + 1) \times (\mathtt{jjm} + 1) \times \mathtt{llm}
+  }
+\end{displaymath}
+demandent des nombres d'opérations du même ordre de grandeur :
+$(\mathtt{iim} + 1) \times (\mathtt{jjm} + 1) \times \mathtt{llm}$. Le
+plus sensé est donc de faire le remaillage en pression dans
+\verb+gcm+. Pour que l'arrêt et le redémarrage du programme \verb+gcm+
+soient sans conséquence, nous ne pouvons faire le remaillage en
+pression moins d'une fois par jour. (En particulier, nous ne pouvons
+le faire une fois par exéuction de \verb+gcm+, au début de \verb+gcm+,
+à partir de la valeur courante du champ de pression.) Nous faisons
+donc le remaillage vertical pour chaque jour, négligeant l'évolution
+des pressions aux interfaces des couches pendant un jour.
+
+Nous devons encore nous demander s'il vaut mieux lire tout le contenu
+de \verb+coefoz_LMDZ.nc+ au début de l'exécution de \verb+gcm+ ou lire
+dans le fichier une fois par jour les paramètres au bon jour. Si nous
+lisons tout en une seule fois, nous gagnons en temps d'exécution (nous
+limitons les accès au disque) mais nous augmentons la
+\href{file:///user/guez/Documents/Informatique_fonctionnement/Programs/Guide_IPSL_climate_models/taille.ods}{mémoire
+  principale consommée}. La lecture une fois par jour simulé est-elle
+trop fréquente ? On peut se référer à une durée de 40 s de temps
+écoulé par jour simulé en résolution $96 \times 72 \times 50$, sur
+deux processus MPI. Pour le moment, la programmation de la lecture une
+fois par jour me paraît plus simple.
+
+\verb+etat0_lim+ fait le remaillage en latitude et en temps des huit
+coefficients et le remaillage vertical du coefficient $r$ seulement,
+au jour initial seulement, pour servir d'état initial de l'abondance
+d'ozone. Nous ne pouvons donc pas faire le remaillage en latitude et
+temps après \verb+etat0+.
+
+Dans quel fichier \verb+etat0_lim+ doit-il écrire les coefficients
+remaillés ? Le fichier \verb+limit.nc+ n'est pas très adapté car les
+coefficients ne sont pas sur la grille de la ``physique''. De plus,
+les paramètres chimiques ne sont pas des conditions à la limite. Par
+ailleurs, les paramètres chimiques sont les mêmes dans plusieurs
+exécutions successives de \verb+gcm+, donc ils ne peuvent pas être
+dans \verb+start+ ou \verb+startphy+. Nous créons donc un nouveau
+fichier \verb+coefoz_LMDZ.nc+. Cf.
+\href{file:///user/guez/Documents/Informatique_fonctionnement/Programs/Guide_IPSL_climate_models/inout
+  LMDZE.odg}{schéma des entrées-sorties de \texttt{etat0\_lim} et
+  \texttt{gcm}}. \verb+coefoz_LMDZ.nc+ contient donc les données de
+Cariolle remaillées en latitude pour LMDZ et interpolées
+journalièrement.
+
+Principe de la procédure \verb+regr_lat_time_coefoz+ :
+\begin{algorithmic}
+  \FOR{chaque coefficient à remailler}
+  \STATE remaillage en latitude
+  \STATE remaillage en temps
+  \ENDFOR
+\end{algorithmic}
+Cf. figure (\ref{fig:regr_lat_time_coefoz}).
+\begin{figure}[htbp]
+  \centering
+  \includegraphics{Graphiques/regr_lat_time_coefoz}
+  \caption{Schéma des entrées-sorties de
+    \texttt{regr\_lat\_time\_coefoz}.}
+  \label{fig:regr_lat_time_coefoz}
+\end{figure}
+
+\subsubsection{Calcul de l'évolution de la distribution d'ozone dans \texttt{phytrac}}
+
+D'après l'équation (\ref{eq:dqdt}) :
+\begin{displaymath}
+  \partial_t q
+  = - \vec U \cdot \vec\nabla q
+  + P_\mathrm{net} \frac{\mu_{\mathrm{O}_3}}{\mu_\mathrm{moy}}
+\end{displaymath}
+Notons $\vec r$ le vecteur position. \verb+phytrac+ calcule :
+\begin{displaymath}
+  q(\vec r, t + \mathtt{pdtphys}) = q(\vec r, t) + \textrm{termes de transport}
+  + \int_t ^{t + \mathtt{pdtphys}} P_\mathrm{net}(\vec r, t')
+  \frac{\mu_{\mathrm{O}_3}}{\mu_\mathrm{moy}} \ud t'
+\end{displaymath}
+Le dernier terme est la contribution de la chime de l'ozone. Nous
+avons besoin de $P_\mathrm{net}$ à chaque point de la grille
+horizontale de LMDZ et à chaque niveau vertical de LMDZ. Le fichier
+\verb+coefoz_LMDZ.nc+ contenant les grandeurs $P_\mathrm{net,Mob}$,
+$a_2$, $r_\mathrm{Mob}$, $a_4$, $T _\mathrm{Mob}$, $a_6$,
+$\Sigma_\mathrm{Mob}$ et $R_\mathrm{het}$, \verb+phytrac+ doit
+intégrer :
+\begin{multline*}
+  P_\mathrm{net} \frac{\mu_{\mathrm{O}_3}}{\mu_\mathrm{moy}}
+  = P_\mathrm{net,Mob} \frac{\mu_{\mathrm{O}_3}}{\mu_\mathrm{moy}}
+  + a_2 \left(q - r_\mathrm{Mob} \frac{\mu_{\mathrm{O}_3}}{\mu_\mathrm{moy}}\right)
+  + a_4 \frac{\mu_{\mathrm{O}_3}}{\mu_\mathrm{moy}}
+  (T - T_\mathrm{Mob}) \\
+  + \frac{a_6}{\mu_\mathrm{moy}}
+  \left(
+    \frac{1}{r^2} \int_r ^{+ \infty} q \rho r'^2 \ud r'
+    - \mu_{\mathrm{O}_3} \Sigma_\mathrm{Mob}
+  \right)
+  + R_\mathrm{het,corr} q
+\end{multline*}
+
+Dans \verb+phytrac+, nous n'avons accès qu'à la température et à la
+masse volumique à l'instant courant, et à aucun autre instant.
+Calculons donc l'intégrale comme si $T$ et $\rho$ étaient des
+constantes pendant \verb+pdtphys+. La direction du Soleil, qui
+intervient dans le terme de chimie hétérogène, pourrait être
+considérée comme une fonction du temps. Je choisis pour simplifier de
+considérer aussi la direction du Soleil comme une constante pendant un
+pas de temps de la physique. Récrivons alors $P_\mathrm{net}
+\mu_{\mathrm{O}_3} / \mu_\mathrm{moy}$ en mettant en évidence les
+constantes. Posons :
+\begin{align*}
+  & c := [P_\mathrm{net,Mob} - a_2 r_\mathrm{Mob}
+  + a_4 (T - T_\mathrm{Mob}) - a_6 \Sigma_\mathrm{Mob}]
+  \frac{\mu_{\mathrm{O}_3}}{\mu_\mathrm{moy}} \\
+  & b := a_2 + R_\mathrm{het,corr} \\
+  & a_{6m} := \frac{a_6}{\mu_\mathrm{moy}}
+\end{align*}
+$c$, $b$ et $a_{6m}$ sont des champs constants connus pendant
+\verb+pdtphys+. On a :
+\begin{equation}
+  \label{eq:dq_dt}
+  P_\mathrm{net} \frac{\mu_{\mathrm{O}_3}}{\mu_\mathrm{moy}}
+  = c + b q + a_{6m} \frac{1}{r^2} \int_r ^{+ \infty} q \rho r'^2 \ud r'
+\end{equation}
+Si on calcule l'évolution de $q$ en ne tenant compte
+que de la chimie (c'est-à-dire sans tenir compte des termes de
+transport) alors on obtient :
+\begin{displaymath}
+  \partial_t q = P_\mathrm{net} \frac{\mu_{\mathrm{O}_3}}{\mu_\mathrm{moy}}
+\end{displaymath}
+
+Limitons-nous d'abord aux deux premiers termes dans le membre de
+droite de (\ref{eq:dq_dt}) :
+\begin{equation}
+  \label{eq:dq_dt_c_a2}
+  \partial_t q = c + b q
+\end{equation}
+La solution exacte de cette équation différentielle sur $q$ donne :
+\begin{equation}
+  \label{eq:delta_q_exact}
+  \begin{array}{|ll}
+    \delta q = (c + b q) \frac{e^{b \delta t} - 1}{b}
+    & \textrm{si } b \ne 0 \\
+    \delta q = c \delta t & \textrm{si } b = 0
+  \end{array}
+\end{equation}
+pour un intervalle de temps $\delta t$ quelconque. \`A l'ordre 2 en
+$b \delta t$, nous avons donc, que $b$ soit nul ou non :
+\begin{equation}
+  \label{eq:delta_q}
+  \delta q = (c + b q) (1 + b \delta t / 2) \delta t
+\end{equation}
+(Ce qui revient à avoir intégré l'équation différentielle par la
+méthode du point milieu. Cf. Press et al. [1992 \# 318, équation
+(16.1.2)].) Pour $\delta t = 1800$ s, on a :
+\begin{displaymath}
+  4 \cdot 10^{-11} \le |a_2| \delta t \le \nombre{0,02}
+\end{displaymath}
+Entre la valeur calculée de $e^x -1$ et la valeur calculée de $x + x^2
+/ 2$, laquelle est la plus proche de la valeur exacte de $e^x -1$ ?
+Pour $x \ge 10^{-2}$, c'est la valeur calculée de $e^x -1$. Pour $0
+\le x \le 10^{-3}$, c'est la valeur calculée de $x + x^2 / 2$. En
+conséquence, l'utilisation de (\ref{eq:delta_q}) à la place de
+(\ref{eq:delta_q_exact}) est un bon choix.
+
+Si on tient maintenant compte du terme de densité-colonne dans
+(\ref{eq:dq_dt}), nous avons une équation intégro-différentielle aux
+dérivées partielles. Nous commençons par une discrétisation spatiale
+verticale, à une position horizontale fixée. Nous avons \verb+llm+
+couches d'atmosphère et nous supposons que $q$ est uniforme dans
+chaque couche. La fonction inconnue $q(\vec r, t)$ devient alors un
+vecteur de fonctions du temps : $[q_1(t), \dots, q_\mathtt{llm}(t)]$.
+La fonction connue $c(\vec r)$ devient un vecteur de constantes
+connues : $[c_1, \dots, c_\mathtt{llm}]$, idem pour $b$ et $a_{6m}$.
+Notons $r_k$ la position de la limite entre les couches $k-1$
+et $k$. Pour chaque couche $k$, nous avons :
+\begin{displaymath}
+  \frac{\ud q_k}{\ud t}
+  = c_k + b_k q_k
+  + a_{6m,k} \frac{1}{r_k^2}
+  \sum_{k'=k} ^{\mathtt{llm}} q_{k'} \int_{r_{k'}} ^{r_{k'+1}} \rho r^2 \ud r
+\end{displaymath}
+Supposons que la différence entre $r_\mathtt{llm}$  et
+le rayon de la Terre soit négligeable. Alors pour $k \le k' \le \mathtt{llm}
+- 1$ :
+\begin{equation}
+  \label{eq:approx_column}
+  \frac{1}{r_k^2} \int_{r_{k'}} ^{r_{k'+1}}\rho r'^2 \ud r'
+  \approx \int_{z_{k'}} ^{z_{k'+1}} \rho \ud z
+\end{equation}
+Mais le cas de la couche supérieure est plus problématique :
+$r_{\mathtt{llm}+1} = + \infty$. Nous pouvons faire l'approximation
+(\ref{eq:approx_column}) pour $k' = \mathtt{llm}$ si $\rho$ décroît
+suffisamment rapidement au dessus de $r_\mathtt{llm}$. C'est
+l'approximation qui est faite dans \verb+phytrac+ pour le calcul de
+\verb+zmasse+, et que je garde. Alors :
+\begin{equation}
+  \label{eq:dqk_dt}
+  \frac{\ud q_k}{\ud t}
+  = c_k + b_k q_k
+  + a_{6m,k} \sum_{k'=k} ^{\mathtt{llm}} q_{k'} \mathtt{zmasse}_{k'}
+\end{equation}
+Nous nous sommes ramenés à un système d'équations différentielles du
+premier ordre.
+
+La somme partielle dans (\ref{eq:dqk_dt}) est la densité-colonne
+d'ozone au dessus de la base de la couche $k$. Nous pourrions raffiner
+en calculant à partir de là des densités-colonnes au dessus des
+milieux de couches (par interpolation linéaire en pression). Je reste
+pour l'instant à l'équation (\ref{eq:dqk_dt}).
+
+Les équations différentielles du premier ordre du système
+(\ref{eq:dqk_dt}) sont linéaires à coefficients constants. Nous
+pourrions chercher une solution exacte. Considérant l'étude que j'ai
+faite de l'équation (\ref{eq:dq_dt_c_a2}), je choisis d'appliquer
+simplement la méthode du point milieu.
+
+$c$ et $b$ doivent être recalculés à chaque pas de temps de la
+physique mais, parmi les termes composant $c$, les termes provenant de
+Mobidic ne varient que pour le remaillage en pression: leur
+combinaison peut être calculée une fois par jour. Distinguons donc :
+\begin{displaymath}
+  c_\mathrm{Mob}
+  :=
+  (P_\mathrm{net,Mob} - a_2 r_\mathrm{Mob}
+  - a_6 \Sigma_\mathrm{Mob} - a_4 T_\mathrm{Mob})
+  \frac{\mu_{\mathrm{O}_3}}{\mu_\mathrm{moy}}
+\end{displaymath}
+$c_\mathrm{Mob}$ regroupe les quatre paramètres ``climatologiques''.
+On a :
+\begin{displaymath}
+  c = c_\mathrm{Mob} + a_4 \frac{\mu_{\mathrm{O}_3}}{\mu_\mathrm{moy}} T
+\end{displaymath}
+De même, pour le calcul de $b$, le filtrage de la chimie hétérogène
+selon la latitude et la prise en compte du coefficient Clx peuvent
+être faits une fois par jour. En résumé, nous avons distingué :
+\begin{itemize}
+\item la variable $q$ à intégrer pendant un pas de temps de la
+  physique, qui est donc considérée comme dépendant du temps pendant
+  \verb+pdtphys+ ;
+\item les variables considérées comme constantes pendant
+  \verb+pdtphys+ mais qui changent d'un pas de temps de la physique à
+  l'autre ;
+\item les variables qui ne changent qu'une fois par jour.
+\end{itemize}
+
+\subsubsection{Les procédures \texttt{regr\_pr\_comb\_coefoz} et
+  \texttt{regr\_pr\_(av|int)\_coefoz}}
+
+Les procédures du module \verb+regr_pr+ (cf. figure
+(\ref{fig:regridding_proced})) fournissent des variables ayant un
+double indice horizontal alors que \verb+tr_seri+ dans \verb+phytrac+
+a un indice horizontal simple.
+\begin{figure}[htbp]
+  \centering
+  \includegraphics{Graphiques/regridding_proced}
+  \caption{Arbre des appels des procédures de remaillage. Les cadres
+    verts symbolisent des modules. Les procédures du plus bas niveau
+    sont celles qui effectuent réellement le remaillage. Elles sont
+    les plus générales et ne font pas référence aux notions de
+    pression, latitude ou temps.}
+  \label{fig:regridding_proced}
+\end{figure}
+Il faut lire dans le fichier \verb+coefoz_LMDZ.nc+, remailler en
+pression et faire la transformation d'indiçage une seule fois par jour
+de simulation. De même, $c_\mathrm{Mob}$, $a_4 \mu_{\mathrm{O}_3} /
+\mu_\mathrm{moy}$ et $a_{6m}$ doivent être calculés une seule fois par
+jour. Toutes ces opérations sont faites dans la procédure
+\verb+regr_pr_comb_coefoz+.  Quand pouvons-nous appeler
+\verb+regr_pr_comb_coefoz+ ? \verb+calfis+ appelle forcément une seule
+fois \verb+physiq+, qui appelle forcément une seule fois
+\verb+phytrac+. Nous pourrions donc faire l'appel dans n'importe
+laquelle de ces trois procédures. Nous choisissons \verb+phytrac+ pour
+une plus grande modularité.
+
+La procédure \verb+regr_pr_comb_coefoz+ lit en entier les huit
+coefficients chimiques au jour courant et met à jour les cinq
+variables de module : \verb+a2+, \verb+a4_mass+, \verb+c_mob+,
+\verb+a6_mass+, \verb+r_het_interm+.  Nous regroupons ici les
+définitions des quatre dernières :
+\begin{align*}
+  & a_{4m} := a_4 \frac{\mu_{\mathrm{O}_3}}{\mu_\mathrm{moy}} \\
+  & c_\mathrm{Mob}
+  := (P_\mathrm{net,Mob} - a_2 r_\mathrm{Mob} - a_6 \Sigma_\mathrm{Mob})
+  \frac{\mu_{\mathrm{O}_3}}{\mu_\mathrm{moy}} - a_{4m} T_\mathrm{Mob} \\
+  & a_{6m} := \frac{a_6}{\mu_\mathrm{moy}} \\
+  & R_\mathrm{het,interm} = R_\mathrm{het} 1_{\phi \notin [- 45°, 45°]} 
+  \left(\frac{\mathrm{Clx}}{\nombre{3,8} \cdot 10^{-9}}\right)^2
+\end{align*}
+Chacune des cinq variables de module est de profil \verb+(klon, llm)+.
+
+La procédure \verb+regr_pr_(av|int)_coefoz+ est appelée une fois par
+jour, pour chaque coefficient chimimque. Cf. figure (\ref{fig:regr_pr_coefoz}).
+\begin{figure}[htbp]
+  \centering
+  \includegraphics{Graphiques/regr_pr_coefoz}
+  \caption{Entrées-sorties de la procédure
+    \texttt{regr\_pr\_(av|int)\_coefoz}. En rouge : les données, en
+    noir : les traitements.}
+    \label{fig:regr_pr_coefoz}
+\end{figure}
+
+
+\subsubsection{Vue d'ensemble informatique}
+
+Cf. figure (\ref{fig:ozone}).
+\begin{figure}[htbp]
+  \centering
+  \includegraphics{Graphiques/ozone}
+  \caption{Vue d'ensemble de ce qui concerne le traceur ozone.}
+  \label{fig:ozone}
+\end{figure}
+Les résultats du programme \texttt{gcm} pour l'ozone apparaissent dans
+cinq fichiers (cf. figure (\ref{fig:ozone})). Dans \verb+histrac.nc+,
+ce sont les variables :
+\begin{itemize}
+\item \verb+float O3(time_counter, presnivs, lat, lon)+
+\item \verb+flO3+ flux
+\item \verb+d_tr_th_O3+ tendance thermique
+\item \verb+d_tr_cv_O3+ tendance convection
+\item \verb+d_tr_cl_O3+ tendance couche limite
+\end{itemize}
+La différence entre \verb+O3+ dans \verb+histrac.nc+ et :
+\begin{verbatim}
+float O3VL1(time_counter, sigss, lat, lon)
+\end{verbatim}
+dans \verb+dyn_hist_ave.nc+ n'est pas claire pour moi. Une longitude
+en plus, 180°, dans \verb+dyn_hist_ave.nc+. Les latitudes sont les
+mêmes. Cf.
+\hyperref{file:/user/guez/Documents/Utilisation_LMDZ/Utilisation_LMDZ.texfol/Utilisation-LMDZ.dvi}{section}{ozone}{résultats}.
+Faire varier les paramètres dans \verb+physiq.def+ :
+\begin{verbatim}
+OK_mensuel=y
+OK_instan=y
+lev_histhf=4
+lev_histmth=2
+\end{verbatim}
+n'apporte aucune sortie supplémentaire sur l'ozone. Cf. exécutions 58
+à 63 de \verb+gcm+.
+
+Diverses procédures s'occupent de remaillage. Elles sont de
+généralités différentes. Cf. figure (\ref{fig:regridding_proced}).
+\begin{description}
+\item[\texttt{regr\_pr\_comb\_coefoz}] : lecture, remaillage en pression,
+  empaquetage, combinaison
+\item[\texttt{regr\_pr\_coefoz}] : lecture, remaillage en pression, empaquetage
+\item[\texttt{regr\_lat\_time\_coefoz}] : lecture, remaillage en temps et
+  latitude, écriture
+\item[\texttt{regr\_pr\_o3}] : lecture, remaillage en pression
+\item[\texttt{regr\_pr}] : remaillage en pression
+\item[\texttt{regr1\_lint}, \texttt{regr1\_step\_av},
+  \texttt{regr3\_lint}] : remaillage
+\end{description}
+
+
+\section{Versions de \texttt{etat0\_lim}}
+
+Problème de l'appel à \verb+startget_dyn+ pour \verb+vvent+.  Cf.
+Flyspray, tâche numéro 29. Dans mon rapport, j'aurais dû ajouter que
+le même problème que pour \verb+pls+ se posait pour \verb+workvar+. Si
+on corrige en sélectionnant les indices de latitude de 1 à \verb+jjm+
+dans les arguments effectifs \verb+pls+ et \verb+workvar+ alors on
+obtient des modifications dans la sortie standard et dans le fichier
+\verb+start.nc+ uniquement. Dans la sortie standard, des petites
+différences seulement, entre autres dans les valeurs de \verb+V+
+\verb+min+ \verb+max+ affichées après l'appel incriminé de
+\verb+startget_dyn+. Dans le fichier \verb+start.nc+, les seules
+variables différentes sont \verb+controle+ et \verb+vcov+.
+
+Modifications provisoires :
+\begin{description}
+\item[M1] Mise en commentaire de l'appel à \verb+startget+ pour
+  \verb+phis+ dans \verb+etat0+.
+\item[M2] \verb+q3d(:, :, :, 5) = 3.+ dans \verb+etat0+.
+\end{description}
+
+Modifications cumulatives :
+\begin{description}
+\item[L1] Passage à \verb+netcdf95+ dans \verb+limit.f+. Correction
+  lecture \verb+Rugos+. Correction dans \verb+etat0+, appel à
+  \verb+startget_dyn+ pour \verb+vvent+. Version 2.10a de
+  \verb+spline+ et \verb+splint+.
+\item[L2] Initialisation d'un traceur ozone (sans rétroaction sur
+  l'atmosphère) à partir des données de Mobidic. Modification de
+  \verb+nqmx+, 5 au lieu de 4 dans \verb+dimens_m.f+.
+\item[L3] Correction dans \verb+etat0+ : \verb+q3d+ doit contenir des
+  fractions massiques et non molaires.
+\item[L4] Correction : attribut \verb+save+ dans les modules
+  \verb+comvert+, \verb+serre+, \verb+clesphys+, \verb+iniprint+,
+  \verb+ener+, \verb+comdissnew+, \verb+dimphy+, \verb+logic+, \verb+comgeom+.
+\item[L5] \'Ecriture du fichier \verb+coefoz_LMDZ.nc+ (ajout de la
+  procédure \verb+aver_interp_coefoz+), lecture de la distribution
+  initiale d'ozone dans ce fichier (suppression de la procédure
+  \verb+initial_o3+).
+\item[L6] Pour l'écriture de \verb+coefoz_LMDZ.nc+, modification de
+  l'extrapolation aux basses pressions. Nouveau cas \verb+strato1+ dans
+  \verb+disvert+.
+\item[L7] Création des modules \verb+regr_coefoz_m+, \verb+pressure_m+
+  et \verb+regrid+. Clarification de \verb+inter_barxy+. Modification
+  du remaillage en latitude des coefficients pour l'ozone : en
+  supposant une fonction en escalier et non une fonction linéaire par
+  morceaux.
+\item[L8] Modification du remaillage en latitude des coefficients pour
+  l'ozone : pondération avec le cosinus de la latitude.
+\item[L9] Modification du remaillage en pression des coefficients pour
+  l'ozone : moyenne au lieu d'une interpolation par spline cubique.
+\item[L10] Nouveau cas \verb+strato2+ dans \verb+disvert+.
+  Correction de bogue dans \verb+inter_bary+ : \verb+y0+ initialisé à
+  $-90$ au lieu de 0.
+\item[L11] Remaillage de la variable \verb+a2+ dans \verb+regr_coefoz+.
+\item[L12] Changement de nom : \verb+sigma+ en \verb+s+ dans
+  \verb+disvert+. Changement de noms : \verb+r+ et \verb+P_net+ en
+  \verb+r_Mob+ et \verb+P_net_Mob+ dans \verb+coefoz_LMDZ.nc+.
+\item[L13] Remaillage de \verb+a4+ et \verb+temperature+ dans
+  \verb+regr_coefoz+.
+\item[L14] Remaillage de \verb+a6+ et \verb+Sigma+ dans
+  \verb+regr_coefoz+.
+\item[L15] Remaillage de \verb+R_Het+ dans \verb+regr_coefoz+.
+  Suppression de la variable \verb+newlmt+ dans \verb+limit+.
+\end{description}
+
+\section{Versions de \texttt{gcm}}
+
+Modifications provisoires :
+\begin{description}
+\item[M1] Modifications de François L. dans \verb+ini_histday.h+,
+\verb+physiq.F+, \verb+phytrac.F+, \verb+write_histday+\verb+.h+.
+Avec ces modifications, les fichiers \verb+ini_histhf.h+,
+\verb+write_histhf.h+, \verb+ini_histmth.h+, \verb+write_histmth.h+,
+\verb+ini_histmthNMC.h+ et \verb+write_histmthNMC.h+ ne sont plus
+utilisés. Les variables \verb+lev_histhf+, \verb+lev_histmth+ et
+\verb+ok_mensuel+ ne sont donc pas utilisées.
+\item[M2] Dans \verb+gcm+, après l'appel à \verb+dynetat0+ : 
+\verb+teta+ moyenné horizontalement, \verb+ucov=vcov=0+, 
+\verb+q=0+.
+\item[M3] Dans \verb+gcm+, après l'appel à \verb+dynetat0+ : 
+\verb+ps+ = 101325.
+\item[M4] Dans \verb+leapfrog.F+, mise en commentaire des appels 
+à \verb+writedynav+ et \verb+bilan_dyn+ (deux appels 
+de chaque sous-programme). Pour que le fichier \verb+dyn_hist_ave.nc+ 
+soit presque vide et que le fichier \verb+dynzon.nc+ ne 
+soit pas créé.
+\end{description}
+
+Modifications cumulatives :
+\begin{description}
+\item[L1] Sur la base de la version téléchargée le 2/3/6, corrections 
+de Phu L. V. dans \verb+physiq.F+ et \verb+write_histmthNMC.h+, \textit{cf.} 
+messages des 13/3/6 et 14/3/6.
+\item[L2] Décroissance radioactive de l'ozone (modification dans
+  \verb+phytrac+).
+\item[L3] Correction : attribut \verb+save+ dans les modules
+  \verb+comvert+, \verb+conema3_m+, \verb+serre+, \verb+clesphys+,
+  \verb+iniprint+, \verb+ener+, \verb+comgeomphy+, \verb+yoethf+,
+  \verb+comdissnew+, \verb+dimphy+, \verb+logic+, \verb+comgeom+.
+\item[L4] \'Evolution du traceur ozone selon la paramétrisation de
+  Cariolle, à l'ordre 0 (terme $P_\mathrm{net}$ uniquement) et sans la
+  chimie hétérogène.
+\item[L5] Correction dans \verb+phytrac+, pour empêcher la fraction
+  massique d'ozone de devenir négative. Nouveaux cas \verb+strato1+ et
+  \verb+strato2+ dans \verb+disvert+.
+\item[L6] Augmentation de \verb+lmx+ de 20 à 100 dans \verb+gradsdef+.
+\item[L7] Ajout du terme en $a_2$ dans le calcul de la production
+  chimique d'ozone, dans \verb+phytrac+.
+\item[L8] Ajout du terme en $a_4$ dans le calcul de la production
+  chimique d'ozone, dans \verb+phytrac+.
+\item[L9] Ajout du terme en $a_6$ dans le calcul de la production
+  chimique d'ozone, dans \verb+phytrac+.
+\item[L10] Ajout du terme de chimie hétérogène dans le calcul de la
+  production chimique d'ozone, dans \verb+o3_chem_m+.
+\item[L11] Correction d'un bogue dans \verb+o3_chem+ : le filtrage
+  selon la direction du Soleil doit affecter $b$ et non \verb+r_het+.
+\end{description}
+
+\section{Utilisation de module à la place de l'inclusion de fichier}
+
+Pour remplacer les \verb+include+ de fichiers particuliers, 
+par exemple \verb+temp.h+ et \verb+temps.inc+, par 
+des \verb+use temps+ dans tous les fichiers, dans chacun 
+des répertoires \verb+bibio+, \verb+dyn3d+, \verb+filtrez+ 
+et \verb+phylmd+ :
+\begin{verbatim}
+%M
+.+\.f\(90\)?$
+Q
+include +\(['"]\)temps\.\(h\|inc\)\1
+      use temps
+\end{verbatim}
+Pour chaque fichier, taper ensuite ``!''. Enregistrer tous 
+les fichiers modifiés avec la commande \verb+Ctrl-x s !+. 
+Tous les fichiers modifiés étant encore ouverts, dans chacun 
+d'entre eux, déplacer la ligne \verb+use+ au bon endroit, 
+enregistrer et fermer le \Eng{buffer}.
+
+Effacer le fichier \verb+.h+.  Ajouter le fichier \verb+.f+ dans la
+liste des objets pour l'un ou l'autre exécutable (selon qu'ils
+l'utilisent ou non).
+\begin{verbatim}
+make depend
+make.sh
+\end{verbatim}
+Corriger les mauvaises positions restantes des instructions \verb+use+.
+
+\end{document}

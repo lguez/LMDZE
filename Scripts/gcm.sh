@@ -14,7 +14,7 @@ REL_dir=/home/guez/In_transit/LMDZE_work/Results_etat0_lim
 IGCM_dir=~/Documents/Utilisation_LMDZ/Input_gcm
 ##IGCM_dir=~
 
-executable_dir=/home/guez/In_transit/LMDZE_work/Compil_prod
+executable_dir=/home/guez/In_transit/LMDZE_work/Compil_prod_g95
 ##executable_dir=$workdir/LMDZE/Compil_prod
 
 RGCM_dir=/home/guez/In_transit/LMDZE_work/Results_gcm
@@ -57,8 +57,12 @@ if [[ $my_host = vierne ]]
 fi
 
 test -f $REL_dir/$numb_cr/limit.nc
-##test -f $REL_dir/$numb_cr/coefoz_LMDZ.nc
-ln -f -s $REL_dir/$numb_cr/limit.nc $REL_dir/$numb_cr/coefoz_LMDZ.nc .
+ln -f -s $REL_dir/$numb_cr/limit.nc .
+
+if [[ -f $REL_dir/$numb_cr/coefoz_LMDZ.nc ]]
+    then
+    ln -f -s $REL_dir/$numb_cr/coefoz_LMDZ.nc .
+fi
 
 if [[ $restart != y ]]
     then
