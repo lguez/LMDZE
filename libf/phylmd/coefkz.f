@@ -125,11 +125,11 @@ c
 c
       IF (appel1er) THEN
         if (prt_level > 9) THEN
-          WRITE(lunout,*)'coefkz, opt_ec:', opt_ec
-          WRITE(lunout,*)'coefkz, richum:', richum
-          IF (richum) WRITE(lunout,*)'coefkz, ratqs:', ratqs
-          WRITE(lunout,*)'coefkz, isommet:', isommet
-          WRITE(lunout,*)'coefkz, tvirtu:', tvirtu
+          print *,'coefkz, opt_ec:', opt_ec
+          print *,'coefkz, richum:', richum
+          IF (richum) print *,'coefkz, ratqs:', ratqs
+          print *,'coefkz, isommet:', isommet
+          print *,'coefkz, tvirtu:', tvirtu
           appel1er = .FALSE.
         endif
       ENDIF

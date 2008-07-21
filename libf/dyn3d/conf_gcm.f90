@@ -41,7 +41,9 @@ module conf_gcm_m
   REAL:: periodav= 1.
   ! periode de stockage fichier histmoy (en jour) 
 
-  logical, save:: offline
+  logical:: offline = .FALSE.
+  ! Nouvelle eau liquide
+  ! Permet de mettre en route la nouvelle parametrisation de l'eau liquide
 
 contains
 
@@ -53,52 +55,41 @@ contains
     ! Nouveaux paramètres nitergdiv, nitergrot, niterh, tetagdiv, tetagrot, 
     ! tetatemp ajoutés pour la dissipation.
 
-    ! Autre paramètre ajouté en fin de liste de tapedef : fxyhypb
-    ! Si fxyhypb = .TRUE., choix de la fonction à dérivée tangente
-    ! hyperbolique
-    ! Sinon, choix de fxynew, à dérivée sinusoïdale
-
     ! On ne compare pas les valeurs des paramètres du zoom, grossismx, 
     ! grossismy, clon, clat, fxyhypb lues sur le fichier start avec
     ! celles passées par run.def, au début du gcm. 
     ! Ces paramètres définissent entre autres la grille et doivent être
     ! cohérents, sinon il y aura divergence du gcm.
 
-    use IOIPSL, only: getin
-    use dimens_m
-    use paramet_m
     use comdissnew, only: read_comdissnew
-    use logic, only: iflag_phys, fxyhypb, ysinus, purmats, ok_guide
+    use logic, only: read_logic
     use serre, only: clon, clat, grossismx, grossismy, alphax, alphay, &
          dzoomx, dzoomy, taux, tauy
-    use clesphys, only: ok_limitvrai, ok_orolf, iflag_con, nbapp_rad, &
+    use clesphys2, only: ok_limitvrai, ok_orolf, iflag_con, nbapp_rad, &
          ok_orodr, cycle_diurne, new_oliq, soil_model
-    use iniprint, only: lunout, read_iniprint
+    use iniprint, only: read_iniprint
 
     INTEGER, PARAMETER:: longcles = 20
 
     REAL, intent(out), optional:: clesphy0(longcles)
 
     namelist /conf_gcm_nml/dayref, anneeref, raz_date, nday, day_step, &
-         iperiod, iapp_tracvl, iconser, iecri, periodav, idissip, purmats, &
-         ok_guide, iflag_phys, iphysiq, cycle_diurne, soil_model, new_oliq, &
+         iperiod, iapp_tracvl, iconser, iecri, periodav, idissip, &
+         iphysiq, cycle_diurne, soil_model, new_oliq, &
          ok_orodr, ok_orolf, ok_limitvrai, nbapp_rad, iflag_con, clon, clat, &
-         grossismx, grossismy, dzoomx, dzoomy, taux, tauy
+         grossismx, grossismy, dzoomx, dzoomy, taux, tauy, offline
 
     !------------------------------------
 
     print *, "Call sequence information: conf_gcm"
+
     call read_iniprint
+    call read_logic
+    call read_comdissnew
 
     print *, "Enter namelist 'conf_gcm_nml'."
     read(unit=*, nml=conf_gcm_nml)
     write(unit=*, nml=conf_gcm_nml)
-
-    call read_comdissnew
-
-    IF (lunout /= 5 .and. lunout /= 6) THEN
-       OPEN(lunout, FILE='lmdz.out')
-    ENDIF
 
     if (present(clesphy0)) then
        clesphy0(:) = 0.
@@ -127,32 +118,6 @@ contains
     ENDIF
     PRINT *, 'alphax = ', alphax
     PRINT *, 'alphay = ', alphay
-
-    ! Key = fxyhypb
-    ! Desc = Fonction hyperbolique
-    ! Def = y
-    ! Help = Fonction f(y) hyperbolique si = .true. 
-    ! sinon sinusoidale
-    fxyhypb = .TRUE.
-    CALL getin('fxyhypb', fxyhypb)
-
-    ! Key = ysinus
-    ! IF = !fxyhypb
-    ! Desc = Fonction en Sinus
-    ! Def = y
-    ! Help = Fonction f(y) avec y = Sin(latit.) si = .true. 
-    ! sinon y = latit.
-    ysinus = .TRUE.
-    CALL getin('ysinus', ysinus)
-
-    ! Key = offline
-    ! Desc = Nouvelle eau liquide
-    ! Def = n
-    ! Help = Permet de mettre en route la
-    ! nouvelle parametrisation de l'eau liquide
-    offline = .FALSE.
-    CALL getin('offline', offline)
-    write(lunout, *)' offline = ', offline
 
   END SUBROUTINE conf_gcm
 

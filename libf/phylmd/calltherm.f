@@ -12,7 +12,7 @@
       use ctherm
       implicit none
 
-      REAL dtime
+      REAL, intent(in):: dtime
 
       REAL u_seri(klon,klev),v_seri(klon,klev)
       REAL t_seri(klon,klev),q_seri(klon,klev)

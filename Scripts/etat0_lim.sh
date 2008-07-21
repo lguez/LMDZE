@@ -10,10 +10,10 @@
 in_dir=~/Documents/Utilisation_LMDZ/Input_etat0_lim
 ##in_dir=$workdir/LMDZE/Input_etat0_lim
 
-executable_dir=/home/guez/In_transit/LMDZE_work/Compil_prod_g95
+executable_dir=/usr/local/guez/LMDZE_work/Compil_prod_g95
 ##executable_dir=$workdir/LMDZE/Compil_prod
 
-res_dir=/home/guez/In_transit/LMDZE_work/Results_etat0_lim
+res_dir=/usr/local/guez/LMDZE_work/Results_etat0_lim
 # (only for comparison with a previous run)
 
 read -p \

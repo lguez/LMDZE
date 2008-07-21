@@ -38,7 +38,7 @@ c======================================================================
 
 c Arguments:
       INTEGER knon
-      REAL dtime              ! intervalle du temps (s)
+      REAL, intent(in):: dtime              ! intervalle du temps (s)
       real date0
       REAL u1lay(klon)        ! vitesse u de la 1ere couche (m/s)
       REAL v1lay(klon)        ! vitesse v de la 1ere couche (m/s)
@@ -71,7 +71,7 @@ c                               indique la valeur de Cdrag (sans unite)
       real cufi(klon), cvfi(klon)
       logical ok_veget 
       REAL co2_ppm            ! taux CO2 atmosphere
-      character*6 ocean
+      character(len=*), intent(in):: ocean
       integer npas, nexca
 c -- LOOP
        REAL yu10mx(klon)
@@ -144,7 +144,7 @@ c Rajout pour l'interface
       real sollw(klon), sollwdown(klon), swnet(klon), swdown(klon)
       real p1lay(klon)
 c$$$C PB ajout pour soil
-      LOGICAL soil_model
+      LOGICAL, intent(in):: soil_model
       REAL tsoil(klon, nsoilmx)
       REAL qsol(klon)
 

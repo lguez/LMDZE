@@ -32,7 +32,7 @@ c
 c ARGUMENTS
 c
       INTEGER nlon,nlev
-      REAL dtime
+      REAL, intent(in):: dtime
       REAL, intent(in):: paprs(klon,klev+1)
       REAL, intent(in):: pplay(klon,klev)
       REAL pmea(nlon),pstd(nlon),psig(nlon),pgam(nlon),pthe(nlon)
@@ -240,7 +240,8 @@ c
      *       zd1(klon),
      *       zd2(klon),
      *       zdmod(klon)
-      real ztmst, ptsphy, zrtmst 
+      real ztmst, zrtmst 
+      real, intent(in):: ptsphy
 c
 c------------------------------------------------------------------
 c
@@ -1322,7 +1323,7 @@ c
 c ARGUMENTS
 c
       INTEGER nlon,nlev
-      REAL dtime
+      REAL, intent(in):: dtime
       REAL, intent(in):: paprs(klon,klev+1)
       REAL, intent(in):: pplay(klon,klev)
       REAL, intent(in):: plat(nlon)
@@ -1469,7 +1470,7 @@ C
      *      PAPHM1(NLON,NLEV+1)
 C
       INTEGER  KTEST(NLON)
-      real ptsphy
+      real, intent(in):: ptsphy
 C-----------------------------------------------------------------------
 C
 C*       0.2   LOCAL ARRAYS

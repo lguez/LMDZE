@@ -1329,7 +1329,7 @@ c inputs
       integer ncum, nd, nloc
       integer nk(nloc), icb(nloc), inb(nloc)
       integer nent(nloc,nd)
-      real delt
+      real, intent(in):: delt
       real t(nloc,nd), q(nloc,nd), u(nloc,nd), v(nloc,nd)
       real gz(nloc,nd)
       real p(nloc,nd), ph(nloc,nd+1), h(nloc,nd)
@@ -1386,9 +1386,6 @@ c   ***  Calculate surface precipitation in mm/day     ***
 c
         do 1190 i=1,ncum
           if(iflag(i).le.1)then
-cc            precip(i)=precip(i)+wt(i,1)*sigd*water(i,1)*3600.*24000.
-cc     &                /(rowl*g)
-cc            precip(i)=precip(i)*delt/86400.
             precip(i) = wt(i,1)*sigd*water(i,1)*86400/g
           endif
  1190   continue

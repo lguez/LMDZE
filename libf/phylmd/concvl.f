@@ -53,9 +53,9 @@ c
       integer NTRAC
       PARAMETER (NTRAC=nqmx-2)
 c
-       INTEGER iflag_con
+       INTEGER, intent(in):: iflag_con
 c
-       REAL dtime
+       REAL, intent(in):: dtime
        real, intent(in):: paprs(klon,klev+1)
        real, intent(in):: pplay(klon,klev)
        REAL t(klon,klev),q(klon,klev),u(klon,klev),v(klon,klev)

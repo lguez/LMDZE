@@ -1,0 +1,33 @@
+! This is a script for Ferret.
+
+! This script compares column-density from "coefoz_LMDZ.c" and
+! "histrac.nc", then it compares ozone mole fraction.
+
+! Reset everything:
+cancel data_set/all
+CANCEL GRID
+cancel viewport
+CANCEL EXPRESSION
+CANCEL LIST/ALL
+CANCEL MEMORY/all
+CANCEL SYMBOL/ALL
+CANCEL REGION/all
+CANCEL VARIABLE/ALL
+cancel axis/all
+pplus/reset
+cancel window/all
+set window/new
+
+use coefoz_LMDZ.nc
+use "/usr/local/guez/histrac.nc"
+
+contour sigma_mob[d=1, k=45, l=1:90] / 2.69e16
+let sigma_o3 = o3 * zmasse
+contour/over sigma_o3[x=@ave,z=@sum] / 2.14e-5
+
+set window/new
+define axis/depth/z log_plev= log(z[d=1, g=r_mob])
+define axis/depth/z log_PRESNIVS=log(z[g=o3]) - 2.
+set region/l=2
+contour r_mob[d=1, gz=log_plev@asn] * 1e6
+contour/over o3[x=@ave, gz=log_presnivs@asn] * 29 / 48 * 1e6

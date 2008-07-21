@@ -53,7 +53,8 @@ C   Declarations
 C   Arguments
       character*(*) infile
       integer*4 nhoriid, i
-      real tstep, t_ops, t_wrt
+      real, intent(in):: tstep
+      real t_ops, t_wrt
       integer fileid, filevid
       integer nq,l
       real nivsigs(llm)

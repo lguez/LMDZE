@@ -44,7 +44,7 @@ else
 fi
 
 ##dest_dir=$workdir/LMDZE/Compil_prod
-dest_dir=/home/guez/In_transit/LMDZE_work/Compil_prod${target:+_$target}
+dest_dir=/usr/local/guez/LMDZE_work/Compil_prod${target:+_$target}
 # (Do not just use the name of the compiler as a directory name, it
 # confuses some compilers.)
 

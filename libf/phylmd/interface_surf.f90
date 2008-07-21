@@ -104,7 +104,7 @@ CONTAINS
     !   p1lay        pression 1er niveau (milieu de couche)
     !   ps           pression au sol
     !   radsol       rayonnement net aus sol (LW + SW)
-    !   ocean        type d'ocean utilise (force, slab, couple)
+    !   ocean        type d'ocean utilise ("force" ou "slab" mais pas "couple")
     !   fder         derivee des flux (pour le couplage)
     !   taux, tauy   tension de vents
     !   windsp       module du vent a 10m
@@ -165,11 +165,11 @@ CONTAINS
     real, dimension(klon), intent(IN) :: zmasq
     real, dimension(klon), intent(IN) :: taux, tauy, rugos, rugoro
     real, dimension(klon), intent(IN) :: windsp
-    character (len = 6)  :: ocean
+    character(len=*), intent(IN):: ocean
     integer              :: npas, nexca ! nombre et pas de temps couplage
     real, dimension(klon), intent(INOUT) :: evap, snow, qsurf
     !! PB ajout pour soil
-    logical          :: soil_model
+    logical, intent(in):: soil_model
     integer          :: nsoilmx
     REAL, DIMENSION(klon, nsoilmx) :: tsoil
     REAL, dimension(klon), intent(INOUT) :: qsol
@@ -236,7 +236,7 @@ CONTAINS
           abort_message='voir ci-dessus'
           call abort_gcm(modname,abort_message,1)
        endif
-       if (ocean /= 'slab' .and. ocean /= 'force' .and. ocean /= 'couple') then
+       if (ocean /= 'slab' .and. ocean /= 'force') then
           write(*,*)' *** Warning ***'
           write(*,*)'Option couplage pour l''ocean = ', ocean
           abort_message='option pour l''ocean non valable'
@@ -440,44 +440,9 @@ CONTAINS
        pctsrf_new(:,nisurf) = pctsrf(:,nisurf)
 
     else if (nisurf == is_oce) then
-
-       if (check) write(*,*)'ocean, nisurf = ',nisurf 
-
-       !
        ! Surface "ocean" appel a l'interface avec l'ocean
        !
-       if (ocean == 'couple') then
-          if (nexca == 0) then
-             abort_message='nexca = 0 dans interfoce_cpl'
-             call abort_gcm(modname,abort_message,1)
-          endif
-
-          cumul = .false.
-
-          iloc = maxloc(fder(1:klon))
-          if (check) then
-             if (fder(iloc(1))> 0.) then
-                WRITE(*,*)'**** Debug fder ****'
-                WRITE(*,*)'max fder(',iloc(1),') = ',fder(iloc(1))
-             endif
-          endif
-!!$
-!!$      where(fder.gt.0.) 
-!!$        fder = 0.
-!!$      endwhere
-
-          call interfoce_cpl(itime, dtime, cumul, &
-               & klon, iim, jjm, nisurf, pctsrf, knon, knindex, rlon, rlat, &
-               & ocean, npas, nexca, debut, lafin, &
-               & swdown, sollw, precip_rain, precip_snow, evap, tsurf, &
-               & fluxlat, fluxsens, fder, albedo, taux, tauy, &
-               & windsp, &
-               & zmasq, &
-               & tsurf_new, alb_new, &
-               & pctsrf_new)
-
-          !IM: "slab" ocean
-       else if (ocean == 'slab  ') then
+       if (ocean == 'slab  ') then
           tsurf_new = tsurf
           pctsrf_new = tmp_pctsrf_slab
           !
@@ -530,22 +495,7 @@ CONTAINS
        ! 2eme appel a interfoce pour le cumul des champs (en particulier
        ! fluxsens et fluxlat calcules dans calcul_fluxs)
        !
-       if (ocean == 'couple') then
-
-          cumul = .true.
-
-          call interfoce_cpl(itime, dtime, cumul, &
-               & klon, iim, jjm, nisurf, pctsrf, knon, knindex, rlon, rlat, &
-               & ocean, npas, nexca, debut, lafin, &
-               & swdown, sollw, precip_rain, precip_snow, evap, tsurf, &
-               & fluxlat, fluxsens, fder, albedo, taux, tauy, &
-               & windsp, &
-               & zmasq, &
-               & tsurf_new, alb_new, &
-               & pctsrf_new)
-
-          !IM: "slab" ocean 
-       else if (ocean == 'slab  ') then
+       if (ocean == 'slab  ') then
           !
           seaice=tmp_seaice
           cumul = .true.
@@ -585,37 +535,7 @@ CONTAINS
        ! Surface "glace de mer" appel a l'interface avec l'ocean
        !
        !
-       if (ocean == 'couple') then
-
-          cumul =.false.
-
-          iloc = maxloc(fder(1:klon))
-          if (check.and.fder(iloc(1))> 0.) then
-             WRITE(*,*)'**** Debug fder ****'
-             WRITE(*,*)'max fder(',iloc(1),') = ',fder(iloc(1))
-          endif
-!!$
-!!$      where(fder.gt.0.) 
-!!$        fder = 0.
-!!$      endwhere
-
-          call interfoce_cpl(itime, dtime, cumul, &
-               & klon, iim, jjm, nisurf, pctsrf, knon, knindex, rlon, rlat, &
-               & ocean, npas, nexca, debut, lafin, &
-               & swdown, sollw, precip_rain, precip_snow, evap, tsurf, &
-               & fluxlat, fluxsens, fder, albedo, taux, tauy, &
-               & windsp, &
-               & zmasq, &
-               & tsurf_new, alb_new, &
-               & pctsrf_new)
-
-          tsurf_temp = tsurf_new
-          cal = 0.
-          dif_grnd = 0.
-          beta = 1.0
-
-          !IM: "slab" ocean
-       else if (ocean == 'slab  ') then
+       if (ocean == 'slab  ') then
           pctsrf_new=tmp_pctsrf_slab
           !
           DO ii = 1, knon
@@ -708,24 +628,21 @@ CONTAINS
           tmp_radsol(knindex(i))=radsol(i)
        ENDDO
 
-       IF (ocean /= 'couple') THEN
-          CALL fonte_neige( klon, knon, nisurf, dtime, &
-               &   tsurf_temp, p1lay, cal, beta, tq_cdrag, ps, &
-               &   precip_rain, precip_snow, snow, qsol,  &
-               &   radsol, dif_grnd, temp_air, spechum, u1_lay, v1_lay, &
-               &   petAcoef, peqAcoef, petBcoef, peqBcoef, &
-               &   tsurf_new, evap, fluxlat, fluxsens, dflux_s, dflux_l, &
-               &   fqcalving,ffonte, run_off_lic_0)
+       CALL fonte_neige( klon, knon, nisurf, dtime, &
+            &   tsurf_temp, p1lay, cal, beta, tq_cdrag, ps, &
+            &   precip_rain, precip_snow, snow, qsol,  &
+            &   radsol, dif_grnd, temp_air, spechum, u1_lay, v1_lay, &
+            &   petAcoef, peqAcoef, petBcoef, peqBcoef, &
+            &   tsurf_new, evap, fluxlat, fluxsens, dflux_s, dflux_l, &
+            &   fqcalving,ffonte, run_off_lic_0)
 
-          !     calcul albedo
+       !     calcul albedo
 
-          CALL albsno(klon,knon,dtime,agesno(:),alb_neig(:), precip_snow(:))  
-          WHERE (snow(1 : knon) .LT. 0.0001) agesno(1 : knon) = 0.
-          zfra(1:knon) = MAX(0.0,MIN(1.0,snow(1:knon)/(snow(1:knon)+10.0)))
-          alb_new(1 : knon) = alb_neig(1 : knon) *zfra(1:knon) + & 
-               &                    0.6 * (1.0-zfra(1:knon))
-          !!      alb_new(1 : knon) = 0.6
-       ENDIF
+       CALL albsno(klon,knon,dtime,agesno(:),alb_neig(:), precip_snow(:))  
+       WHERE (snow(1 : knon) .LT. 0.0001) agesno(1 : knon) = 0.
+       zfra(1:knon) = MAX(0.0,MIN(1.0,snow(1:knon)/(snow(1:knon)+10.0)))
+       alb_new(1 : knon) = alb_neig(1 : knon) *zfra(1:knon) + & 
+            0.6 * (1.0-zfra(1:knon))
 
        fder_prev = fder    
        fder = fder_prev + dflux_s + dflux_l
@@ -737,28 +654,10 @@ CONTAINS
           WRITE(*,*)'fder_prev, dflux_s, dflux_l',fder_prev(iloc(1)), &
                &                        dflux_s(iloc(1)), dflux_l(iloc(1))
        endif
-!!$      where(fder.gt.0.) 
-!!$        fder = 0.
-!!$      endwhere
 
        !
        ! 2eme appel a interfoce pour le cumul et le passage des flux a l'ocean
        !
-       if (ocean == 'couple') then
-
-          cumul =.true.
-
-          call interfoce_cpl(itime, dtime, cumul, &
-               & klon, iim, jjm, nisurf, pctsrf, knon, knindex, rlon, rlat, &
-               & ocean, npas, nexca, debut, lafin, &
-               & swdown, sollw, precip_rain, precip_snow, evap, tsurf, &
-               & fluxlat, fluxsens, fder, albedo, taux, tauy, &
-               & windsp, &
-               & zmasq, &
-               & tsurf_new, alb_new, &
-               & pctsrf_new)
-       endif
-
        z0_new = 0.002
        z0_new = SQRT(z0_new**2+rugoro**2)
        alblw(1:knon) = alb_new(1:knon)
@@ -842,587 +741,6 @@ CONTAINS
     endif
 
   END SUBROUTINE interfsurf_hq
-
-  !************************
-
-  SUBROUTINE interfoce_cpl(itime, dtime, cumul, &
-       & klon, iim, jjm, nisurf, pctsrf, knon, knindex, rlon, rlat, &
-       & ocean, npas, nexca, debut, lafin, &
-       & swdown, lwdown, precip_rain, precip_snow, evap, tsurf, &
-       & fluxlat, fluxsens, fder, albsol, taux, tauy, &
-       & windsp, &
-       & zmasq, &
-       & tsurf_new, alb_new, &
-       & pctsrf_new)
-
-    ! Cette routine sert d'interface entre le modele atmospherique et un 
-    ! coupleur avec un modele d'ocean 'complet' derriere
-    !
-    ! Le modele de glace qu'il est prevu d'utiliser etant couple directement a 
-    ! l'ocean presentement, on va passer deux fois dans cette routine par pas de 
-    ! temps physique, une fois avec les points oceans et l'autre avec les points
-    ! glace. A chaque pas de temps de couplage, la lecture des champs provenant
-    ! du coupleur se fera "dans" l'ocean et l'ecriture des champs a envoyer
-    ! au coupleur "dans" la glace. Il faut donc des tableaux de travail "tampons"
-    ! dimensionnes sur toute la grille qui remplissent les champs sur les
-    ! domaines ocean/glace quand il le faut. Il est aussi necessaire que l'index
-    ! ocean soit traiter avant l'index glace (sinon tout intervertir)
-    !
-    !
-    ! L. Fairhead 02/2000
-    !
-    ! input:
-    !   itime        numero du pas de temps
-    !   iim, jjm     nbres de pts de grille
-    !   dtime        pas de temps de la physique
-    !   klon         nombre total de points de grille
-    !   nisurf       index de la surface a traiter (1 = sol continental)
-    !   pctsrf       tableau des fractions de surface de chaque maille
-    !   knon         nombre de points de la surface a traiter
-    !   knindex      index des points de la surface a traiter
-    !   rlon         longitudes
-    !   rlat         latitudes
-    !   debut        logical: 1er appel a la physique
-    !   lafin        logical: dernier appel a la physique
-    !   ocean        type d'ocean
-    !   nexca        frequence de couplage
-    !   swdown       flux solaire entrant a la surface
-    !   lwdown       flux IR net a la surface
-    !   precip_rain  precipitation liquide
-    !   precip_snow  precipitation solide
-    !   evap         evaporation
-    !   tsurf        temperature de surface
-    !   fder         derivee dF/dT
-    !   albsol       albedo du sol (coherent avec swdown)
-    !   taux         tension de vent en x
-    !   tauy         tension de vent en y
-    !    windsp       module du vent a 10m
-    !   nexca        frequence de couplage
-    !   zmasq        masque terre/ocean
-    !
-    !
-    ! output:
-    !   tsurf_new    temperature au sol
-    !   alb_new      albedo
-    !   pctsrf_new   nouvelle repartition des surfaces
-    !   alb_ice      albedo de la glace
-    !
-    use temps
-    use iniprint
-    use abort_gcm_m, only: abort_gcm
-    use gath_cpl, only: gath2cpl, cpl2gath
-    use ioipsl
-    use indicesol
-    use YOMCST
-
-    ! Parametres d'entree
-    integer, intent(IN) :: itime
-    integer, intent(IN) :: iim, jjm
-    real, intent(IN) :: dtime
-    integer, intent(IN) :: klon
-    integer, intent(IN) :: nisurf
-    integer, intent(IN) :: knon
-    real, dimension(klon,nbsrf), intent(IN) :: pctsrf
-    integer, dimension(klon), intent(in) :: knindex
-    logical, intent(IN) :: debut, lafin
-    real, dimension(klon), intent(IN) :: rlon, rlat
-    character (len = 6)  :: ocean
-    real, dimension(klon), intent(IN) :: lwdown, swdown
-    real, dimension(klon), intent(IN) :: precip_rain, precip_snow
-    real, dimension(klon), intent(IN) :: tsurf, fder, albsol, taux, tauy
-    real, dimension(klon), intent(IN) :: windsp
-    INTEGER              :: nexca, npas
-    real, dimension(klon), intent(IN) :: zmasq
-    real, dimension(klon), intent(IN) :: fluxlat, fluxsens
-    logical, intent(IN)               :: cumul
-    real, dimension(klon), intent(INOUT) :: evap
-
-    ! Parametres de sortie
-    real, dimension(klon), intent(OUT):: tsurf_new, alb_new
-    real, dimension(klon,nbsrf), intent(OUT) :: pctsrf_new
-
-    ! Variables locales
-    integer                    :: j, error, sum_error, ig, cpl_index,i
-    INTEGER :: nsrf
-    character (len = 20) :: modname = 'interfoce_cpl'
-    character (len = 80) :: abort_message
-    logical,save              :: check = .FALSE.
-    ! variables pour moyenner les variables de couplage
-    real, allocatable, dimension(:,:),save :: cpl_sols, cpl_nsol, cpl_rain
-    real, allocatable, dimension(:,:),save :: cpl_snow, cpl_evap, cpl_tsol
-    real, allocatable, dimension(:,:),save :: cpl_fder, cpl_albe, cpl_taux
-    real, allocatable, dimension(:,:),save :: cpl_windsp
-    real, allocatable, dimension(:,:),save :: cpl_tauy
-    REAL, ALLOCATABLE, DIMENSION(:,:),SAVE :: cpl_rriv, cpl_rcoa, cpl_rlic
-!!$
-    ! variables tampons avant le passage au coupleur
-    real, allocatable, dimension(:,:,:),save :: tmp_sols, tmp_nsol, tmp_rain
-    real, allocatable, dimension(:,:,:),save :: tmp_snow, tmp_evap, tmp_tsol
-    real, allocatable, dimension(:,:,:),save :: tmp_fder, tmp_albe, tmp_taux
-    real, allocatable, dimension(:,:,:),save :: tmp_windsp
-    REAL, ALLOCATABLE, DIMENSION(:,:,:),SAVE :: tmp_tauy
-    ! variables a passer au coupleur
-    real, dimension(iim, jjm+1) :: wri_sol_ice, wri_sol_sea, wri_nsol_ice 
-    real, dimension(iim, jjm+1) :: wri_nsol_sea, wri_fder_ice, wri_evap_ice
-    REAL, DIMENSION(iim, jjm+1) :: wri_evap_sea, wri_rcoa, wri_rriv
-    REAL, DIMENSION(iim, jjm+1) :: wri_rain, wri_snow, wri_taux, wri_tauy
-    REAL, DIMENSION(iim, jjm+1) :: wri_windsp
-    REAL, DIMENSION(iim, jjm+1) :: wri_calv
-    REAL, DIMENSION(iim, jjm+1) :: wri_tauxx, wri_tauyy, wri_tauzz
-    REAL, DIMENSION(iim, jjm+1) :: tmp_lon, tmp_lat
-    ! variables relues par le coupleur
-    ! read_sic = fraction de glace
-    ! read_sit = temperature de glace
-    real, allocatable, dimension(:,:),save :: read_sst, read_sic, read_sit
-    real, allocatable, dimension(:,:),save :: read_alb_sic
-    ! variable tampon
-    real, dimension(klon)       :: tamp_sic
-    ! sauvegarde des fractions de surface d'un pas de temps a l'autre apres 
-    ! l'avoir lu
-    real, allocatable,dimension(:,:),save :: pctsrf_sav
-    real, dimension(iim, jjm+1, 2) :: tamp_srf
-    integer, allocatable, dimension(:), save :: tamp_ind
-    real, allocatable, dimension(:,:),save :: tamp_zmasq
-    real, dimension(iim, jjm+1) :: deno
-    integer                     :: idtime
-    integer, allocatable,dimension(:),save :: unity
-    ! 
-    logical, save    :: first_appel = .true.
-    logical,save          :: print
-    !maf
-    ! variables pour avoir une sortie IOIPSL des champs echanges
-    CHARACTER(len=80),SAVE :: clintocplnam, clfromcplnam
-    INTEGER, SAVE :: jf,nhoridct,nidct
-    INTEGER, SAVE :: nhoridcs,nidcs
-    INTEGER :: ndexct(iim*(jjm+1)),ndexcs(iim*(jjm+1))
-    REAL :: zx_lon(iim,jjm+1), zx_lat(iim,jjm+1), zjulian
-    INTEGER,save :: idayref
-    !med  integer :: itau_w
-    integer,save :: itau_w
-    integer :: nb_interf_cpl
-    include "param_cou.h"
-    include "inc_cpl.h"
-    !
-    ! Initialisation
-    !
-    if (check) write(*,*)'Entree ',modname,'nisurf = ',nisurf
-
-    if (first_appel) then
-       error = 0
-       allocate(unity(klon), stat = error)
-       if ( error  /=0) then
-          abort_message='Pb allocation variable unity'
-          call abort_gcm(modname,abort_message,1)
-       endif
-       allocate(pctsrf_sav(klon,nbsrf), stat = error)
-       if ( error  /=0) then
-          abort_message='Pb allocation variable pctsrf_sav'
-          call abort_gcm(modname,abort_message,1)
-       endif
-       pctsrf_sav = 0.
-
-       do ig = 1, klon
-          unity(ig) = ig
-       enddo
-       sum_error = 0
-       allocate(cpl_sols(klon,2), stat = error); sum_error = sum_error + error
-       allocate(cpl_nsol(klon,2), stat = error); sum_error = sum_error + error
-       allocate(cpl_rain(klon,2), stat = error); sum_error = sum_error + error
-       allocate(cpl_snow(klon,2), stat = error); sum_error = sum_error + error
-       allocate(cpl_evap(klon,2), stat = error); sum_error = sum_error + error
-       allocate(cpl_tsol(klon,2), stat = error); sum_error = sum_error + error
-       allocate(cpl_fder(klon,2), stat = error); sum_error = sum_error + error
-       allocate(cpl_albe(klon,2), stat = error); sum_error = sum_error + error
-       allocate(cpl_taux(klon,2), stat = error); sum_error = sum_error + error
-       allocate(cpl_windsp(klon,2), stat = error); sum_error = sum_error + error
-       allocate(cpl_tauy(klon,2), stat = error); sum_error = sum_error + error
-       ALLOCATE(cpl_rriv(iim,jjm+1), stat=error); sum_error = sum_error + error
-       ALLOCATE(cpl_rcoa(iim,jjm+1), stat=error); sum_error = sum_error + error
-       ALLOCATE(cpl_rlic(iim,jjm+1), stat=error); sum_error = sum_error + error
-       !!
-       allocate(read_sst(iim, jjm+1), stat = error); sum_error = sum_error + error
-       allocate(read_sic(iim, jjm+1), stat = error); sum_error = sum_error + error
-       allocate(read_sit(iim, jjm+1), stat = error); sum_error = sum_error + error
-       allocate(read_alb_sic(iim, jjm+1), stat = error); sum_error = sum_error + error
-
-       if (sum_error /= 0) then
-          abort_message='Pb allocation variables couplees'
-          call abort_gcm(modname,abort_message,1)
-       endif
-       cpl_sols = 0.; cpl_nsol = 0.; cpl_rain = 0.; cpl_snow = 0.
-       cpl_evap = 0.; cpl_tsol = 0.; cpl_fder = 0.; cpl_albe = 0.
-       cpl_taux = 0.; cpl_tauy = 0.; cpl_rriv = 0.; cpl_rcoa = 0.; cpl_rlic = 0.
-       cpl_windsp = 0.
-
-       sum_error = 0
-       allocate(tamp_ind(klon), stat = error); sum_error = sum_error + error
-       allocate(tamp_zmasq(iim, jjm+1), stat = error); sum_error = sum_error + error    
-       do ig = 1, klon
-          tamp_ind(ig) = ig
-       enddo
-       call gath2cpl(zmasq, tamp_zmasq, klon, klon, iim, jjm, tamp_ind)
-       !
-       ! initialisation couplage
-       !
-       idtime = int(dtime)
-       !
-       ! initialisation sorties netcdf
-       !
-       idayref = day_ini
-       CALL ymds2ju(annee_ref, 1, idayref, 0.0, zjulian)
-       CALL gr_fi_ecrit(1,klon,iim,jjm+1,rlon,zx_lon)
-       DO i = 1, iim
-          zx_lon(i,1) = rlon(i+1)
-          zx_lon(i,jjm+1) = rlon(i+1)
-       ENDDO
-       CALL gr_fi_ecrit(1,klon,iim,jjm+1,rlat,zx_lat)
-       clintocplnam="cpl_atm_tauflx"
-       CALL histbeg_totreg(clintocplnam, iim,zx_lon(:,1),jjm+1,zx_lat(1,:),1,iim,1,jjm+1, &
-            & itau_phy,zjulian,dtime,nhoridct,nidct) 
-       ! no vertical axis
-       CALL histdef(nidct, 'tauxe','tauxe', &
-            & "-",iim, jjm+1, nhoridct, 1, 1, 1, -99, 32, "inst", dtime,dtime)
-       CALL histdef(nidct, 'tauyn','tauyn', &
-            & "-",iim, jjm+1, nhoridct, 1, 1, 1, -99, 32, "inst", dtime,dtime)
-       CALL histdef(nidct, 'tmp_lon','tmp_lon', &
-            & "-",iim, jjm+1, nhoridct, 1, 1, 1, -99, 32, "inst", dtime,dtime)
-       CALL histdef(nidct, 'tmp_lat','tmp_lat', &
-            & "-",iim, jjm+1, nhoridct, 1, 1, 1, -99, 32, "inst", dtime,dtime)
-       DO jf=1,jpflda2o1 + jpflda2o2
-          CALL histdef(nidct, cl_writ(jf),cl_writ(jf), &
-               & "-",iim, jjm+1, nhoridct, 1, 1, 1, -99, 32, "inst", dtime,dtime)
-       END DO
-       CALL histend(nidct)
-       CALL histsync(nidct)
-
-       clfromcplnam="cpl_atm_sst"
-       CALL histbeg_totreg(clfromcplnam, iim,zx_lon(:,1),jjm+1,zx_lat(1,:),1,iim,1,jjm+1, &
-            & 0,zjulian,dtime,nhoridcs,nidcs) 
-       ! no vertical axis
-       DO jf=1,jpfldo2a
-          CALL histdef(nidcs, cl_read(jf),cl_read(jf), &
-               & "-",iim, jjm+1, nhoridcs, 1, 1, 1, -99, 32, "inst", dtime,dtime)
-       END DO
-       CALL histend(nidcs)
-       CALL histsync(nidcs)
-
-       ! pour simuler la fonte des glaciers antarctiques
-       ! 
-       surf_maille = (4. * rpi * ra**2) / (iim * (jjm +1))
-       ALLOCATE(coeff_iceberg(iim,jjm+1), stat=error)
-       if (error /= 0) then
-          abort_message='Pb allocation variable coeff_iceberg'
-          call abort_gcm(modname,abort_message,1)
-       endif
-       open (12,file='flux_iceberg',form='formatted',status='old')
-       read (12,*) coeff_iceberg
-       close (12)
-       num_antarctic = max(1, count(coeff_iceberg > 0))
-
-       first_appel = .false.
-    endif ! fin if (first_appel)
-
-    ! Initialisations
-
-    ! calcul des fluxs a passer
-    nb_interf_cpl = nb_interf_cpl + 1  
-    if (check) write(lunout,*)'passage dans interface_surf.F90 :  ',nb_interf_cpl 
-    cpl_index = 1
-    if (nisurf == is_sic) cpl_index = 2
-    if (cumul) then
-       if (check) write(lunout,*)'passage dans cumul '
-       if (check) write(lunout,*)'valeur de cpl_index ', cpl_index 
-       ! -- LOOP  
-       if (check) write(*,*) modname, 'cumul des champs'
-       do ig = 1, knon
-          cpl_sols(ig,cpl_index) = cpl_sols(ig,cpl_index) &
-               &                          + swdown(ig)      / FLOAT(nexca)
-          cpl_nsol(ig,cpl_index) = cpl_nsol(ig,cpl_index) &
-               &                          + (lwdown(ig) + fluxlat(ig) +fluxsens(ig))&
-               &                                / FLOAT(nexca)
-          cpl_rain(ig,cpl_index) = cpl_rain(ig,cpl_index) &
-               &                          + precip_rain(ig) / FLOAT(nexca)
-          cpl_snow(ig,cpl_index) = cpl_snow(ig,cpl_index) &
-               &                          + precip_snow(ig) / FLOAT(nexca)
-          cpl_evap(ig,cpl_index) = cpl_evap(ig,cpl_index) &
-               &                          + evap(ig)        / FLOAT(nexca)
-          cpl_tsol(ig,cpl_index) = cpl_tsol(ig,cpl_index) &
-               &                          + tsurf(ig)       / FLOAT(nexca)
-          cpl_fder(ig,cpl_index) = cpl_fder(ig,cpl_index) &
-               &                          + fder(ig)        / FLOAT(nexca)
-          cpl_albe(ig,cpl_index) = cpl_albe(ig,cpl_index) &
-               &                          + albsol(ig)      / FLOAT(nexca)
-          cpl_taux(ig,cpl_index) = cpl_taux(ig,cpl_index) &
-               &                          + taux(ig)        / FLOAT(nexca)
-          cpl_tauy(ig,cpl_index) = cpl_tauy(ig,cpl_index) &
-               &                          + tauy(ig)        / FLOAT(nexca)
-          IF (cpl_index .EQ. 1) THEN
-             cpl_windsp(ig,cpl_index) = cpl_windsp(ig,cpl_index) &
-                  &                          + windsp(ig)      / FLOAT(nexca) 
-          ENDIF
-       enddo
-       IF (cpl_index .EQ. 1) THEN 
-          cpl_rriv(:,:) = cpl_rriv(:,:) + tmp_rriv(:,:) / FLOAT(nexca)
-          cpl_rcoa(:,:) = cpl_rcoa(:,:) + tmp_rcoa(:,:) / FLOAT(nexca)
-          cpl_rlic(:,:) = cpl_rlic(:,:) + tmp_rlic(:,:) / FLOAT(nexca)
-       ENDIF
-    endif
-
-    if (mod(itime, nexca) == 1) then
-       !
-       ! Demande des champs au coupleur
-       !
-       ! Si le domaine considere est l'ocean, on lit les champs venant du coupleur
-       !
-       if (nisurf == is_oce .and. .not. cumul) then
-          if (check) write(*,*)'rentree fromcpl, itime-1 = ',itime-1
-          !
-          ! sorties NETCDF des champs recus
-          !
-          ndexcs(:)=0
-          itau_w = itau_phy + itime
-          CALL histwrite(nidcs,cl_read(1),itau_w,read_sst,iim*(jjm+1),ndexcs)
-          CALL histwrite(nidcs,cl_read(2),itau_w,read_sic,iim*(jjm+1),ndexcs)
-          CALL histwrite(nidcs,cl_read(3),itau_w,read_alb_sic,iim*(jjm+1),ndexcs)
-          CALL histwrite(nidcs,cl_read(4),itau_w,read_sit,iim*(jjm+1),ndexcs)
-          CALL histsync(nidcs)
-          ! pas utile      IF (npas-itime.LT.nexca )CALL histclo(nidcs)
-
-          do j = 1, jjm + 1
-             do ig = 1, iim
-                if (abs(1. - read_sic(ig,j)) < 0.00001) then
-                   read_sst(ig,j) = RTT - 1.8
-                   read_sit(ig,j) = read_sit(ig,j) / read_sic(ig,j)
-                   read_alb_sic(ig,j) = read_alb_sic(ig,j) / read_sic(ig,j)
-                else if (abs(read_sic(ig,j)) < 0.00001) then
-                   read_sst(ig,j) = read_sst(ig,j) / (1. - read_sic(ig,j))
-                   read_sit(ig,j) = read_sst(ig,j)
-                   read_alb_sic(ig,j) =  0.6
-                else
-                   read_sst(ig,j) = read_sst(ig,j) / (1. - read_sic(ig,j))
-                   read_sit(ig,j) = read_sit(ig,j) / read_sic(ig,j)
-                   read_alb_sic(ig,j) = read_alb_sic(ig,j) / read_sic(ig,j)
-                endif
-             enddo
-          enddo
-          !
-          ! transformer read_sic en pctsrf_sav
-          !
-          call cpl2gath(read_sic, tamp_sic , klon, klon,iim,jjm, unity)
-          do ig = 1, klon
-             IF (pctsrf(ig,is_oce) > epsfra .OR.            &
-                  &             pctsrf(ig,is_sic) > epsfra) THEN
-                pctsrf_sav(ig,is_sic) = (pctsrf(ig,is_oce) + pctsrf(ig,is_sic)) &
-                     &                               * tamp_sic(ig)
-                pctsrf_sav(ig,is_oce) = (pctsrf(ig,is_oce) + pctsrf(ig,is_sic)) &
-                     &                        - pctsrf_sav(ig,is_sic)
-             endif
-          enddo
-          !
-          ! Pour rattraper des erreurs d'arrondis
-          !
-          where (abs(pctsrf_sav(:,is_sic)) .le. 2.*epsilon(pctsrf_sav(1,is_sic)))
-             pctsrf_sav(:,is_sic) = 0.
-             pctsrf_sav(:,is_oce) = pctsrf(:,is_oce) + pctsrf(:,is_sic)
-          endwhere
-          where (abs(pctsrf_sav(:,is_oce)) .le. 2.*epsilon(pctsrf_sav(1,is_oce)))
-             pctsrf_sav(:,is_sic) = pctsrf(:,is_oce) + pctsrf(:,is_sic)
-             pctsrf_sav(:,is_oce) = 0.
-          endwhere
-          if (minval(pctsrf_sav(:,is_oce)) < 0.) then
-             write(*,*)'Pb fraction ocean inferieure a 0'
-             write(*,*)'au point ',minloc(pctsrf_sav(:,is_oce))
-             write(*,*)'valeur = ',minval(pctsrf_sav(:,is_oce)) 
-             abort_message = 'voir ci-dessus'
-             call abort_gcm(modname,abort_message,1)
-          endif
-          if (minval(pctsrf_sav(:,is_sic)) < 0.) then
-             write(*,*)'Pb fraction glace inferieure a 0'
-             write(*,*)'au point ',minloc(pctsrf_sav(:,is_sic))
-             write(*,*)'valeur = ',minval(pctsrf_sav(:,is_sic)) 
-             abort_message = 'voir ci-dessus'
-             call abort_gcm(modname,abort_message,1)
-          endif
-       endif
-    endif                         ! fin mod(itime, nexca) == 1
-
-    if (mod(itime, nexca) == 0) then
-       !
-       ! allocation memoire
-       if (nisurf == is_oce .and. (.not. cumul) ) then
-          sum_error = 0
-          allocate(tmp_sols(iim,jjm+1,2), stat=error); sum_error = sum_error + error
-          allocate(tmp_nsol(iim,jjm+1,2), stat=error); sum_error = sum_error + error
-          allocate(tmp_rain(iim,jjm+1,2), stat=error); sum_error = sum_error + error
-          allocate(tmp_snow(iim,jjm+1,2), stat=error); sum_error = sum_error + error
-          allocate(tmp_evap(iim,jjm+1,2), stat=error); sum_error = sum_error + error
-          allocate(tmp_tsol(iim,jjm+1,2), stat=error); sum_error = sum_error + error
-          allocate(tmp_fder(iim,jjm+1,2), stat=error); sum_error = sum_error + error
-          allocate(tmp_albe(iim,jjm+1,2), stat=error); sum_error = sum_error + error
-          allocate(tmp_taux(iim,jjm+1,2), stat=error); sum_error = sum_error + error
-          allocate(tmp_tauy(iim,jjm+1,2), stat=error); sum_error = sum_error + error
-          allocate(tmp_windsp(iim,jjm+1,2), stat=error); sum_error = sum_error + error
-!!$      allocate(tmp_rriv(iim,jjm+1,2), stat=error); sum_error = sum_error + error
-!!$      allocate(tmp_rcoa(iim,jjm+1,2), stat=error); sum_error = sum_error + error
-          if (sum_error /= 0) then
-             abort_message='Pb allocation variables couplees pour l''ecriture'
-             call abort_gcm(modname,abort_message,1)
-          endif
-       endif
-
-       !
-       ! Mise sur la bonne grille des champs a passer au coupleur
-       !
-       cpl_index = 1
-       if (nisurf == is_sic) cpl_index = 2
-       call gath2cpl(cpl_sols(1,cpl_index), tmp_sols(1,1,cpl_index), klon, knon,iim,jjm,                  knindex)
-       call gath2cpl(cpl_nsol(1,cpl_index), tmp_nsol(1,1,cpl_index), klon, knon,iim,jjm,                  knindex)
-       call gath2cpl(cpl_rain(1,cpl_index), tmp_rain(1,1,cpl_index), klon, knon,iim,jjm,                  knindex)
-       call gath2cpl(cpl_snow(1,cpl_index), tmp_snow(1,1,cpl_index), klon, knon,iim,jjm,                  knindex)
-       call gath2cpl(cpl_evap(1,cpl_index), tmp_evap(1,1,cpl_index), klon, knon,iim,jjm,                  knindex)
-       call gath2cpl(cpl_tsol(1,cpl_index), tmp_tsol(1,1,cpl_index), klon, knon,iim,jjm,                  knindex)
-       call gath2cpl(cpl_fder(1,cpl_index), tmp_fder(1,1,cpl_index), klon, knon,iim,jjm,                  knindex)
-       call gath2cpl(cpl_albe(1,cpl_index), tmp_albe(1,1,cpl_index), klon, knon,iim,jjm,                  knindex)
-       call gath2cpl(cpl_taux(1,cpl_index), tmp_taux(1,1,cpl_index), klon, knon,iim,jjm,                  knindex)
-       call gath2cpl(cpl_windsp(1,cpl_index), tmp_windsp(1,1,cpl_index), klon, knon,iim,jjm,             knindex)
-       call gath2cpl(cpl_tauy(1,cpl_index), tmp_tauy(1,1,cpl_index), klon, knon,iim,jjm,                  knindex)
-
-       !
-       ! Si le domaine considere est la banquise, on envoie les champs au coupleur
-       !
-       if (nisurf == is_sic .and. cumul) then
-          wri_rain = 0.; wri_snow = 0.; wri_rcoa = 0.; wri_rriv = 0. 
-          wri_taux = 0.; wri_tauy = 0.
-          wri_windsp = 0.
-          ! -- LOOP      
-          call gath2cpl(pctsrf(1,is_oce), tamp_srf(1,1,1), klon, klon, iim, jjm, tamp_ind)
-          call gath2cpl(pctsrf(1,is_sic), tamp_srf(1,1,2), klon, klon, iim, jjm, tamp_ind)
-
-          wri_sol_ice = tmp_sols(:,:,2)
-          wri_sol_sea = tmp_sols(:,:,1)
-          wri_nsol_ice = tmp_nsol(:,:,2)
-          wri_nsol_sea = tmp_nsol(:,:,1)
-          wri_fder_ice = tmp_fder(:,:,2)
-          wri_evap_ice = tmp_evap(:,:,2)
-          wri_evap_sea = tmp_evap(:,:,1)
-          wri_windsp = tmp_windsp(:,:,1)
-
-!!$PB
-          wri_rriv = cpl_rriv(:,:)
-          wri_rcoa = cpl_rcoa(:,:)
-          DO j = 1, jjm + 1
-             wri_calv(:,j) = sum(cpl_rlic(:,j)) / iim
-          enddo
-
-          where (tamp_zmasq /= 1.)
-             deno =  tamp_srf(:,:,1) + tamp_srf(:,:,2)
-             wri_rain = tmp_rain(:,:,1) * tamp_srf(:,:,1) / deno +    &
-                  &            tmp_rain(:,:,2) * tamp_srf(:,:,2) / deno
-             wri_snow = tmp_snow(:,:,1) * tamp_srf(:,:,1) / deno +    &
-                  &            tmp_snow(:,:,2) * tamp_srf(:,:,2) / deno
-             wri_taux = tmp_taux(:,:,1) * tamp_srf(:,:,1) / deno +    &
-                  &            tmp_taux(:,:,2) * tamp_srf(:,:,2) / deno
-             wri_tauy = tmp_tauy(:,:,1) * tamp_srf(:,:,1) / deno +    &
-                  &            tmp_tauy(:,:,2) * tamp_srf(:,:,2) / deno
-          endwhere
-          !
-          ! pour simuler la fonte des glaciers antarctiques
-          !
-          !$$$        wri_rain = wri_rain      &
-          !$$$      &     + coeff_iceberg * cte_flux_iceberg / (num_antarctic * surf_maille)
-          !      wri_calv = coeff_iceberg * cte_flux_iceberg / (num_antarctic * surf_maille)
-          !
-          ! on passe les coordonnées de la grille
-          !
-
-          CALL gr_fi_ecrit(1,klon,iim,jjm+1,rlon,tmp_lon)
-          CALL gr_fi_ecrit(1,klon,iim,jjm+1,rlat,tmp_lat)
-
-          DO i = 1, iim
-             tmp_lon(i,1) = rlon(i+1)
-             tmp_lon(i,jjm + 1) = rlon(i+1)
-          ENDDO
-          !
-          ! sortie netcdf des champs pour le changement de repere
-          !
-          ndexct(:)=0
-          CALL histwrite(nidct,'tauxe',itau_w,wri_taux,iim*(jjm+1),ndexct)
-          CALL histwrite(nidct,'tauyn',itau_w,wri_tauy,iim*(jjm+1),ndexct)
-          CALL histwrite(nidct,'tmp_lon',itau_w,tmp_lon,iim*(jjm+1),ndexct)
-          CALL histwrite(nidct,'tmp_lat',itau_w,tmp_lat,iim*(jjm+1),ndexct)
-
-          !
-          ! calcul 3 coordonnées du vent
-          !
-          CALL atm2geo (iim , jjm + 1, wri_taux, wri_tauy, tmp_lon, tmp_lat, &
-               & wri_tauxx, wri_tauyy, wri_tauzz )
-          !
-          ! sortie netcdf des champs apres changement de repere et juste avant
-          ! envoi au coupleur
-          !
-          CALL histwrite(nidct,cl_writ(8),itau_w,wri_sol_ice,iim*(jjm+1),ndexct)
-          CALL histwrite(nidct,cl_writ(9),itau_w,wri_sol_sea,iim*(jjm+1),ndexct)
-          CALL histwrite(nidct,cl_writ(10),itau_w,wri_nsol_ice,iim*(jjm+1),ndexct)
-          CALL histwrite(nidct,cl_writ(11),itau_w,wri_nsol_sea,iim*(jjm+1),ndexct)
-          CALL histwrite(nidct,cl_writ(12),itau_w,wri_fder_ice,iim*(jjm+1),ndexct)
-          CALL histwrite(nidct,cl_writ(13),itau_w,wri_evap_ice,iim*(jjm+1),ndexct)
-          CALL histwrite(nidct,cl_writ(14),itau_w,wri_evap_sea,iim*(jjm+1),ndexct)
-          CALL histwrite(nidct,cl_writ(15),itau_w,wri_rain,iim*(jjm+1),ndexct)
-          CALL histwrite(nidct,cl_writ(16),itau_w,wri_snow,iim*(jjm+1),ndexct)
-          CALL histwrite(nidct,cl_writ(17),itau_w,wri_rcoa,iim*(jjm+1),ndexct)
-          CALL histwrite(nidct,cl_writ(18),itau_w,wri_rriv,iim*(jjm+1),ndexct)
-          CALL histwrite(nidct,cl_writ(19),itau_w,wri_calv,iim*(jjm+1),ndexct)
-          CALL histwrite(nidct,cl_writ(1),itau_w,wri_tauxx,iim*(jjm+1),ndexct)
-          CALL histwrite(nidct,cl_writ(2),itau_w,wri_tauyy,iim*(jjm+1),ndexct)
-          CALL histwrite(nidct,cl_writ(3),itau_w,wri_tauzz,iim*(jjm+1),ndexct)
-          CALL histwrite(nidct,cl_writ(4),itau_w,wri_tauxx,iim*(jjm+1),ndexct)
-          CALL histwrite(nidct,cl_writ(5),itau_w,wri_tauyy,iim*(jjm+1),ndexct)
-          CALL histwrite(nidct,cl_writ(6),itau_w,wri_tauzz,iim*(jjm+1),ndexct)
-          CALL histwrite(nidct,cl_writ(7),itau_w,wri_windsp,iim*(jjm+1),ndexct)
-          CALL histsync(nidct)
-          ! pas utile      IF (lafin) CALL histclo(nidct)
-          ! 
-          cpl_sols = 0.; cpl_nsol = 0.; cpl_rain = 0.; cpl_snow = 0.
-          cpl_evap = 0.; cpl_tsol = 0.; cpl_fder = 0.; cpl_albe = 0.
-          cpl_taux = 0.; cpl_tauy = 0.; cpl_rriv = 0.; cpl_rcoa = 0.; cpl_rlic = 0.
-          cpl_windsp = 0.
-          !
-          ! deallocation memoire variables temporaires
-          !
-          sum_error = 0
-          deallocate(tmp_sols, stat=error); sum_error = sum_error + error
-          deallocate(tmp_nsol, stat=error); sum_error = sum_error + error
-          deallocate(tmp_rain, stat=error); sum_error = sum_error + error
-          deallocate(tmp_snow, stat=error); sum_error = sum_error + error
-          deallocate(tmp_evap, stat=error); sum_error = sum_error + error
-          deallocate(tmp_fder, stat=error); sum_error = sum_error + error
-          deallocate(tmp_tsol, stat=error); sum_error = sum_error + error
-          deallocate(tmp_albe, stat=error); sum_error = sum_error + error
-          deallocate(tmp_taux, stat=error); sum_error = sum_error + error
-          deallocate(tmp_tauy, stat=error); sum_error = sum_error + error
-          deallocate(tmp_windsp, stat=error); sum_error = sum_error + error
-          if (sum_error /= 0) then
-             abort_message='Pb deallocation variables couplees'
-             call abort_gcm(modname,abort_message,1)
-          endif
-
-       endif
-
-    endif            ! fin (mod(itime, nexca) == 0)
-    !
-    ! on range les variables lues/sauvegardees dans les bonnes variables de sortie
-    !
-    if (nisurf == is_oce) then
-       call cpl2gath(read_sst, tsurf_new, klon, knon,iim,jjm, knindex)
-    else if (nisurf == is_sic) then
-       call cpl2gath(read_sit, tsurf_new, klon, knon,iim,jjm, knindex)
-       call cpl2gath(read_alb_sic, alb_new, klon, knon,iim,jjm, knindex)
-    endif
-    pctsrf_new(:,nisurf) = pctsrf_sav(:,nisurf)
-
-    !  if (lafin) call quitcpl
-
-  END SUBROUTINE interfoce_cpl
 
   !************************
 

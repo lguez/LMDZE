@@ -16,7 +16,6 @@ contains
     !         ierr    = severity of situation ( = 0 normal )
 
     USE IOIPSL, only: histclo
-    use iniprint, only: lunout
 
     character(len=*), intent(in):: modname
     integer, intent(in):: ierr
@@ -27,9 +26,9 @@ contains
     print *, 'abort_gcm'
 
     call histclo
-    write(lunout,*) 'Stopping in ', modname
-    write(lunout,*) 'Reason = ', trim(message)
-    write(lunout,*) 'Houston, we have a problem ', ierr
+    print *, 'Stopping in ', modname
+    print *, 'Reason = ', trim(message)
+    print *, 'Houston, we have a problem ', ierr
     STOP 1
 
   END SUBROUTINE abort_gcm

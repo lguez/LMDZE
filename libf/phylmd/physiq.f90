@@ -9,7 +9,7 @@ module physiq_m
 
 contains
 
-  SUBROUTINE physiq (nq, firstcal, lafin, rdayvrai, gmtime, pdtphys, paprs, &
+  SUBROUTINE physiq(nq, firstcal, lafin, rdayvrai, gmtime, pdtphys, paprs, &
        pplay, pphi, pphis, presnivs, clesphy0, u, v, t, qx, omega, d_u, d_v, &
        d_t, d_qx, d_ps, dudyn, PVteta)
 
@@ -32,11 +32,13 @@ contains
     use dimsoil, only: nsoilmx
     use temps, only: itau_phy, day_ref, annee_ref, itaufin
     use clesphys, only: ecrit_hf, ecrit_hf2mth, &
-         ecrit_ins, iflag_con, ok_orolf, ok_orodr, ecrit_mth, ecrit_day, &
-         nbapp_rad, cycle_diurne, cdmmax, cdhmax, &
-         co2_ppm, ecrit_reg, ecrit_tra, ksta, ksta_ter, new_oliq, &
-         ok_kzmin, soil_model
-    use iniprint, only: lunout, prt_level
+         ecrit_ins, ecrit_mth, ecrit_day, &
+         cdmmax, cdhmax, &
+         co2_ppm, ecrit_reg, ecrit_tra, ksta, ksta_ter, &
+         ok_kzmin
+    use clesphys2, only: iflag_con, ok_orolf, ok_orodr, nbapp_rad, &
+         cycle_diurne, new_oliq, soil_model
+    use iniprint, only: prt_level
     use abort_gcm_m, only: abort_gcm
     use YOMCST, only: rcpd, rtt, rlvtt, rg, ra, rsigma, retv, romega
     use comgeomphy
@@ -60,7 +62,7 @@ contains
     INTEGER nq ! input nombre de traceurs (y compris vapeur d'eau)
     REAL, intent(in):: rdayvrai ! input numero du jour de l'experience
     REAL, intent(in):: gmtime ! heure de la journée en fraction de jour
-    REAL pdtphys ! input pas d'integration pour la physique (seconde)
+    REAL, intent(in):: pdtphys ! pas d'integration pour la physique (seconde)
     LOGICAL, intent(in):: firstcal ! first call to "calfis"
     logical, intent(in):: lafin ! dernier passage
 
@@ -82,8 +84,8 @@ contains
     REAL v(klon, llm)  ! input vitesse Y (de S a N) en m/s
     REAL t(klon, llm)  ! input temperature (K)
 
-    REAL qx(klon, llm, nq)
-    ! (input humidite specifique (kg/kg) et d'autres traceurs)
+    REAL, intent(in):: qx(klon, llm, nq)
+    ! (humidite specifique (kg/kg) et fractions massiques des autres traceurs)
 
     REAL omega(klon, llm)  ! input vitesse verticale en Pa/s
     REAL d_u(klon, llm)  ! output tendance physique de "u" (m/s/s)
@@ -112,9 +114,9 @@ contains
     INTEGER, SAVE :: npas, nexca
     logical rnpb
     parameter(rnpb=.true.)
-    !      ocean = type de modele ocean a utiliser: force, slab, couple
-    character(len=6) ocean
-    SAVE ocean
+
+    character(len=6), save:: ocean
+    ! (type de modèle océan à utiliser: "force" ou "slab" mais pas "couple")
 
     logical ok_ocean
     SAVE ok_ocean
@@ -317,11 +319,9 @@ contains
 
     INTEGER        longcles
     PARAMETER    ( longcles = 20 )
-    REAL clesphy0( longcles      )
+    REAL, intent(in):: clesphy0( longcles      )
 
     ! Variables propres a la physique
-
-    REAL, SAVE:: dtime ! pas temporel de la physique (s)
 
     INTEGER, save:: radpas
     ! (Radiative transfer computations are made every "radpas" call to
@@ -331,8 +331,6 @@ contains
     SAVE radsol               ! bilan radiatif au sol calcule par code radiatif
 
     INTEGER, SAVE:: itap ! number of calls to "physiq"
-    REAL co2_ppm_etat0
-    REAL solaire_etat0
 
     REAL ftsol(klon, nbsrf)
     SAVE ftsol                  ! temperature du sol
@@ -672,11 +670,6 @@ contains
     REAL d_tr(klon, llm, nbtr)
 
     REAL zx_rh(klon, llm)
-
-    INTEGER        length
-    PARAMETER    ( length = 100 )
-    REAL tabcntr0( length       )
-
     INTEGER ndex2d(iim*(jjm + 1)), ndex3d(iim*(jjm + 1)*llm)
 
     REAL zustrdr(klon), zvstrdr(klon)
@@ -858,20 +851,18 @@ contains
        frugs = 0.
        itap = 0
        itaprad = 0
-       CALL phyetat0("startphy.nc", dtime, co2_ppm_etat0, solaire_etat0, &
-            pctsrf, ftsol, ftsoil, &
-            ocean, tslab, seaice, & !IM "slab" ocean
-            fqsurf, qsol, fsnow, &
+       CALL phyetat0("startphy.nc", pctsrf, ftsol, ftsoil, ocean, tslab, &
+            seaice, fqsurf, qsol, fsnow, &
             falbe, falblw, fevap, rain_fall, snow_fall, solsw, sollwdown, &
             dlw, radsol, frugs, agesno, clesphy0, &
-            zmea, zstd, zsig, zgam, zthe, zpic, zval, rugoro, tabcntr0, &
+            zmea, zstd, zsig, zgam, zthe, zpic, zval, rugoro, &
             t_ancien, q_ancien, ancien_ok, rnebcon, ratqs, clwcon,  &
             run_off_lic_0)
 
        !   ATTENTION : il faudra a terme relire q2 dans l'etat initial
        q2(:, :, :)=1.e-8
 
-       radpas = NINT( 86400. / dtime / nbapp_rad)
+       radpas = NINT( 86400. / pdtphys / nbapp_rad)
 
        ! on remet le calendrier a zero
 
@@ -879,36 +870,29 @@ contains
           itau_phy = 0
        ENDIF
 
-       PRINT*, 'cycle_diurne =', cycle_diurne
+       PRINT *, 'cycle_diurne = ', cycle_diurne
 
        IF(ocean.NE.'force ') THEN
           ok_ocean=.TRUE.
        ENDIF
 
-       CALL printflag( tabcntr0, radpas, ok_ocean, ok_oasis, ok_journe, &
-            ok_instan, ok_region )
+       CALL printflag(radpas, ok_ocean, ok_oasis, ok_journe, ok_instan, &
+            ok_region)
 
-       IF (ABS(dtime-pdtphys).GT.0.001) THEN
-          WRITE(lunout, *) 'Pas physique n est pas correct', dtime, &
-               pdtphys
-          abort_message='Pas physique n est pas correct '
-          call abort_gcm(modname, abort_message, 1)
-       ENDIF
-
-       IF (dtime*REAL(radpas).GT.21600..AND.cycle_diurne) THEN 
-          WRITE(lunout, *)'Nbre d appels au rayonnement insuffisant'
-          WRITE(lunout, *)"Au minimum 4 appels par jour si cycle diurne"
+       IF (pdtphys*REAL(radpas).GT.21600..AND.cycle_diurne) THEN 
+          print *,'Nbre d appels au rayonnement insuffisant'
+          print *,"Au minimum 4 appels par jour si cycle diurne"
           abort_message='Nbre d appels au rayonnement insuffisant'
           call abort_gcm(modname, abort_message, 1)
        ENDIF
-       WRITE(lunout, *)"Clef pour la convection, iflag_con=", iflag_con
-       WRITE(lunout, *)"Clef pour le driver de la convection, ok_cvl=", &
+       print *,"Clef pour la convection, iflag_con=", iflag_con
+       print *,"Clef pour le driver de la convection, ok_cvl=", &
             ok_cvl
 
        ! Initialisation pour la convection de K.E. (sb):
        IF (iflag_con >= 3) THEN
 
-          WRITE(lunout, *)"*** Convection de Kerry Emanuel 4.3  "
+          print *,"*** Convection de Kerry Emanuel 4.3  "
 
           !IM15/11/02 rajout initialisation ibas_con, itop_con cf. SB =>BEG
           DO i = 1, klon
@@ -926,36 +910,28 @@ contains
           CALL SUGWD(klon, llm, paprs, pplay)
        ENDIF
 
-       lmt_pas = NINT(86400. / dtime)  ! tous les jours
+       lmt_pas = NINT(86400. / pdtphys)  ! tous les jours
        print *, 'Number of time steps of "physics" per day: ', lmt_pas
 
-       ecrit_ins = NINT(ecrit_ins/dtime)
-       ecrit_hf = NINT(ecrit_hf/dtime)
-       ecrit_day = NINT(ecrit_day/dtime)
-       ecrit_mth = NINT(ecrit_mth/dtime)
-       ecrit_tra = NINT(86400.*ecrit_tra/dtime)
-       ecrit_reg = NINT(ecrit_reg/dtime)
+       ecrit_ins = NINT(ecrit_ins/pdtphys)
+       ecrit_hf = NINT(ecrit_hf/pdtphys)
+       ecrit_day = NINT(ecrit_day/pdtphys)
+       ecrit_mth = NINT(ecrit_mth/pdtphys)
+       ecrit_tra = NINT(86400.*ecrit_tra/pdtphys)
+       ecrit_reg = NINT(ecrit_reg/pdtphys)
 
        ! Initialiser le couplage si necessaire
 
        npas = 0
        nexca = 0
-       if (ocean == 'couple') then
-          npas = itaufin/ iphysiq
-          nexca = 86400 / int(dtime)
-          write(lunout, *)' Ocean couple'
-          write(lunout, *)' Valeurs des pas de temps'
-          write(lunout, *)' npas = ', npas
-          write(lunout, *)' nexca = ', nexca
-       endif
 
-       write(lunout, *)'AVANT HIST IFLAG_CON=', iflag_con
+       print *,'AVANT HIST IFLAG_CON=', iflag_con
 
        !   Initialisation des sorties
 
-       call ini_histhf(dtime, presnivs, nid_hf, nid_hf3d)
-       call ini_histday(dtime, presnivs, ok_journe, nid_day)
-       call ini_histins(dtime, presnivs, ok_instan, nid_ins)
+       call ini_histhf(pdtphys, presnivs, nid_hf, nid_hf3d)
+       call ini_histday(pdtphys, presnivs, ok_journe, nid_day)
+       call ini_histins(pdtphys, presnivs, ok_instan, nid_ins)
        CALL ymds2ju(annee_ref, 1, int(day_ref), 0., date0)
        !XXXPB Positionner date0 pour initialisation de ORCHIDEE
        WRITE(*, *) 'physiq date0 : ', date0
@@ -1013,7 +989,7 @@ contains
 
     IF (if_ebil >= 1) THEN 
        ztit='after dynamic'
-       CALL diagetpq(airephy, ztit, ip_ebil, 1, 1, dtime &
+       CALL diagetpq(airephy, ztit, ip_ebil, 1, 1, pdtphys &
             , t_seri, q_seri, ql_seri, qs_seri, u_seri, v_seri, paprs &
             , d_h_vcol, d_qt, d_qw, d_ql, d_qs, d_ec)
        !     Comme les tendances de la physique sont ajoute dans la dynamique, 
@@ -1032,8 +1008,8 @@ contains
     IF (ancien_ok) THEN
        DO k = 1, llm
           DO i = 1, klon
-             d_t_dyn(i, k) = (t_seri(i, k)-t_ancien(i, k))/dtime
-             d_q_dyn(i, k) = (q_seri(i, k)-q_ancien(i, k))/dtime
+             d_t_dyn(i, k) = (t_seri(i, k)-t_ancien(i, k))/pdtphys
+             d_q_dyn(i, k) = (q_seri(i, k)-q_ancien(i, k))/pdtphys
           ENDDO
        ENDDO
     ELSE
@@ -1089,7 +1065,7 @@ contains
 
     IF (if_ebil >= 2) THEN 
        ztit='after reevap'
-       CALL diagetpq(airephy, ztit, ip_ebil, 2, 1, dtime &
+       CALL diagetpq(airephy, ztit, ip_ebil, 2, 1, pdtphys &
             , t_seri, q_seri, ql_seri, qs_seri, u_seri, v_seri, paprs &
             , d_h_vcol, d_qt, d_qw, d_ql, d_qs, d_ec)
        call diagphy(airephy, ztit, ip_ebil &
@@ -1120,7 +1096,7 @@ contains
 
     CALL orbite(REAL(julien), zlongi, dist)
     IF (cycle_diurne) THEN
-       zdtime = dtime * REAL(radpas)
+       zdtime = pdtphys * REAL(radpas)
        CALL zenang(zlongi, gmtime, zdtime, rmu0, fract)
     ELSE
        rmu0 = -999.999
@@ -1149,7 +1125,7 @@ contains
 
     fder = dlw
 
-    CALL clmain(dtime, itap, date0, pctsrf, pctsrf_new, &
+    CALL clmain(pdtphys, itap, date0, pctsrf, pctsrf_new, &
          t_seri, q_seri, u_seri, v_seri, &
          julien, rmu0, co2_ppm,  &
          ok_veget, ocean, npas, nexca, ftsol, &
@@ -1206,7 +1182,7 @@ contains
 
     IF (if_ebil >= 2) THEN 
        ztit='after clmain'
-       CALL diagetpq(airephy, ztit, ip_ebil, 2, 2, dtime &
+       CALL diagetpq(airephy, ztit, ip_ebil, 2, 2, pdtphys &
             , t_seri, q_seri, ql_seri, qs_seri, u_seri, v_seri, paprs &
             , d_h_vcol, d_qt, d_qw, d_ql, d_qs, d_ec)
        call diagphy(airephy, ztit, ip_ebil &
@@ -1310,14 +1286,14 @@ contains
     DO k = 1, llm
        DO i = 1, klon
           conv_q(i, k) = d_q_dyn(i, k)  &
-               + d_q_vdf(i, k)/dtime
+               + d_q_vdf(i, k)/pdtphys
           conv_t(i, k) = d_t_dyn(i, k)  &
-               + d_t_vdf(i, k)/dtime
+               + d_t_vdf(i, k)/pdtphys
        ENDDO
     ENDDO
     IF (check) THEN
        za = qcheck(klon, llm, paprs, q_seri, ql_seri, airephy)
-       WRITE(lunout, *) "avantcon=", za
+       print *, "avantcon=", za
     ENDIF
     zx_ajustq = .FALSE.
     IF (iflag_con == 2) zx_ajustq=.TRUE.
@@ -1335,7 +1311,7 @@ contains
     IF (iflag_con == 1) THEN
        stop 'reactiver le call conlmd dans physiq.F'
     ELSE IF (iflag_con == 2) THEN
-       CALL conflx(dtime, paprs, pplay, t_seri, q_seri, &
+       CALL conflx(pdtphys, paprs, pplay, t_seri, q_seri, &
             conv_t, conv_q, zxfluxq(1, 1), omega, &
             d_t_con, d_q_con, rain_con, snow_con, &
             pmfu, pmfd, pen_u, pde_u, pen_d, pde_d, &
@@ -1358,7 +1334,7 @@ contains
        IF (ok_cvl) THEN ! new driver for convectL
 
           CALL concvl (iflag_con, &
-               dtime, paprs, pplay, t_seri, q_seri, &
+               pdtphys, paprs, pplay, t_seri, q_seri, &
                u_seri, v_seri, tr_seri, ntra, &
                ema_work1, ema_work2, &
                d_t_con, d_q_con, d_u_con, d_v_con, d_tr, &
@@ -1374,7 +1350,7 @@ contains
 
        ELSE ! ok_cvl
           ! MAF conema3 ne contient pas les traceurs
-          CALL conema3 (dtime, &
+          CALL conema3 (pdtphys, &
                paprs, pplay, t_seri, q_seri, &
                u_seri, v_seri, tr_seri, ntra, &
                ema_work1, ema_work2, &
@@ -1421,7 +1397,7 @@ contains
        call clouds_gno &
             (klon, llm, q_seri, zqsat, clwcon0, ptconv, ratqsc, rnebcon0)
     ELSE
-       WRITE(lunout, *) "iflag_con non-prevu", iflag_con
+       print *, "iflag_con non-prevu", iflag_con
        stop 1
     ENDIF
 
@@ -1436,7 +1412,7 @@ contains
 
     IF (if_ebil >= 2) THEN 
        ztit='after convect'
-       CALL diagetpq(airephy, ztit, ip_ebil, 2, 2, dtime &
+       CALL diagetpq(airephy, ztit, ip_ebil, 2, 2, pdtphys &
             , t_seri, q_seri, ql_seri, qs_seri, u_seri, v_seri, paprs &
             , d_h_vcol, d_qt, d_qw, d_ql, d_qs, d_ec)
        call diagphy(airephy, ztit, ip_ebil &
@@ -1448,7 +1424,7 @@ contains
 
     IF (check) THEN
        za = qcheck(klon, llm, paprs, q_seri, ql_seri, airephy)
-       WRITE(lunout, *)"aprescon=", za
+       print *,"aprescon=", za
        zx_t = 0.0
        za = 0.0
        DO i = 1, klon
@@ -1456,8 +1432,8 @@ contains
           zx_t = zx_t + (rain_con(i)+ &
                snow_con(i))*airephy(i)/REAL(klon)
        ENDDO
-       zx_t = zx_t/za*dtime
-       WRITE(lunout, *)"Precip=", zx_t
+       zx_t = zx_t/za*pdtphys
+       print *,"Precip=", zx_t
     ENDIF
     IF (zx_ajustq) THEN
        DO i = 1, klon
@@ -1470,7 +1446,7 @@ contains
           ENDDO
        ENDDO
        DO i = 1, klon
-          z_factor(i) = (z_avant(i)-(rain_con(i)+snow_con(i))*dtime) &
+          z_factor(i) = (z_avant(i)-(rain_con(i)+snow_con(i))*pdtphys) &
                /z_apres(i)
        ENDDO
        DO k = 1, llm
@@ -1493,21 +1469,21 @@ contains
     fm_therm(:, :)=0.
     entr_therm(:, :)=0.
 
-    IF(prt_level>9)WRITE(lunout, *) &
+    IF(prt_level>9)print *, &
          'AVANT LA CONVECTION SECHE, iflag_thermals=' &
          , iflag_thermals, '   nsplit_thermals=', nsplit_thermals
     if(iflag_thermals < 0) then
        !  Rien
-       IF(prt_level>9)WRITE(lunout, *)'pas de convection'
+       IF(prt_level>9)print *,'pas de convection'
     else if(iflag_thermals == 0) then
        !  Ajustement sec
-       IF(prt_level>9)WRITE(lunout, *)'ajsec'
+       IF(prt_level>9)print *,'ajsec'
        CALL ajsec(paprs, pplay, t_seri, q_seri, d_t_ajs, d_q_ajs)
        t_seri(:, :) = t_seri(:, :) + d_t_ajs(:, :)
        q_seri(:, :) = q_seri(:, :) + d_q_ajs(:, :)
     else
        !  Thermiques
-       IF(prt_level>9)WRITE(lunout, *)'JUSTE AVANT, iflag_thermals=' &
+       IF(prt_level>9)print *,'JUSTE AVANT, iflag_thermals=' &
             , iflag_thermals, '   nsplit_thermals=', nsplit_thermals
        call calltherm(pdtphys &
             , pplay, paprs, pphi &
@@ -1518,7 +1494,7 @@ contains
 
     IF (if_ebil >= 2) THEN 
        ztit='after dry_adjust'
-       CALL diagetpq(airephy, ztit, ip_ebil, 2, 2, dtime &
+       CALL diagetpq(airephy, ztit, ip_ebil, 2, 2, pdtphys &
             , t_seri, q_seri, ql_seri, qs_seri, u_seri, v_seri, paprs &
             , d_h_vcol, d_qt, d_qw, d_ql, d_qs, d_ec)
     END IF
@@ -1564,7 +1540,7 @@ contains
 
     ! Appeler le processus de condensation a grande echelle
     ! et le processus de precipitation
-    CALL fisrtilp(dtime, paprs, pplay, &
+    CALL fisrtilp(pdtphys, paprs, pplay, &
          t_seri, q_seri, ptconv, ratqs, &
          d_t_lsc, d_q_lsc, d_ql_lsc, rneb, cldliq, &
          rain_lsc, snow_lsc, &
@@ -1585,7 +1561,7 @@ contains
     ENDDO
     IF (check) THEN
        za = qcheck(klon, llm, paprs, q_seri, ql_seri, airephy)
-       WRITE(lunout, *)"apresilp=", za
+       print *,"apresilp=", za
        zx_t = 0.0
        za = 0.0
        DO i = 1, klon
@@ -1593,13 +1569,13 @@ contains
           zx_t = zx_t + (rain_lsc(i) &
                + snow_lsc(i))*airephy(i)/REAL(klon)
        ENDDO
-       zx_t = zx_t/za*dtime
-       WRITE(lunout, *)"Precip=", zx_t
+       zx_t = zx_t/za*pdtphys
+       print *,"Precip=", zx_t
     ENDIF
 
     IF (if_ebil >= 2) THEN 
        ztit='after fisrt'
-       CALL diagetpq(airephy, ztit, ip_ebil, 2, 2, dtime &
+       CALL diagetpq(airephy, ztit, ip_ebil, 2, 2, pdtphys &
             , t_seri, q_seri, ql_seri, qs_seri, u_seri, v_seri, paprs &
             , d_h_vcol, d_qt, d_qw, d_ql, d_qs, d_ec)
        call diagphy(airephy, ztit, ip_ebil &
@@ -1687,7 +1663,7 @@ contains
 
     IF (if_ebil >= 2) THEN 
        ztit="after diagcld"
-       CALL diagetpq(airephy, ztit, ip_ebil, 2, 2, dtime &
+       CALL diagetpq(airephy, ztit, ip_ebil, 2, 2, pdtphys &
             , t_seri, q_seri, ql_seri, qs_seri, u_seri, v_seri, paprs &
             , d_h_vcol, d_qt, d_qw, d_ql, d_qs, d_ec)
     END IF
@@ -1791,13 +1767,13 @@ contains
     DO k = 1, llm
        DO i = 1, klon
           t_seri(i, k) = t_seri(i, k) &
-               + (heat(i, k)-cool(i, k)) * dtime/86400.
+               + (heat(i, k)-cool(i, k)) * pdtphys/86400.
        ENDDO
     ENDDO
 
     IF (if_ebil >= 2) THEN 
        ztit='after rad'
-       CALL diagetpq(airephy, ztit, ip_ebil, 2, 2, dtime &
+       CALL diagetpq(airephy, ztit, ip_ebil, 2, 2, pdtphys &
             , t_seri, q_seri, ql_seri, qs_seri, u_seri, v_seri, paprs &
             , d_h_vcol, d_qt, d_qw, d_ql, d_qs, d_ec)
        call diagphy(airephy, ztit, ip_ebil &
@@ -1843,7 +1819,7 @@ contains
           ENDIF
        ENDDO
 
-       CALL drag_noro(klon, llm, dtime, paprs, pplay, &
+       CALL drag_noro(klon, llm, pdtphys, paprs, pplay, &
             zmea, zstd, zsig, zgam, zthe, zpic, zval, &
             igwd, idx, itest, &
             t_seri, u_seri, v_seri, &
@@ -1874,7 +1850,7 @@ contains
           ENDIF
        ENDDO
 
-       CALL lift_noro(klon, llm, dtime, paprs, pplay, &
+       CALL lift_noro(klon, llm, pdtphys, paprs, pplay, &
             rlat, zmea, zstd, zpic, &
             itest, &
             t_seri, u_seri, v_seri, &
@@ -1900,9 +1876,9 @@ contains
     ENDDO
     DO k = 1, llm
        DO i = 1, klon
-          zustrph(i)=zustrph(i)+(u_seri(i, k)-u(i, k))/dtime* &
+          zustrph(i)=zustrph(i)+(u_seri(i, k)-u(i, k))/pdtphys* &
                (paprs(i, k)-paprs(i, k+1))/rg
-          zvstrph(i)=zvstrph(i)+(v_seri(i, k)-v(i, k))/dtime* &
+          zvstrph(i)=zvstrph(i)+(v_seri(i, k)-v(i, k))/pdtphys* &
                (paprs(i, k)-paprs(i, k+1))/rg
        ENDDO
     ENDDO
@@ -1919,7 +1895,7 @@ contains
 
     IF (if_ebil >= 2) THEN 
        ztit='after orography'
-       CALL diagetpq(airephy, ztit, ip_ebil, 2, 2, dtime &
+       CALL diagetpq(airephy, ztit, ip_ebil, 2, 2, pdtphys &
             , t_seri, q_seri, ql_seri, qs_seri, u_seri, v_seri, paprs &
             , d_h_vcol, d_qt, d_qw, d_ql, d_qs, d_ec)
     END IF
@@ -1929,15 +1905,11 @@ contains
     !   Calcul  des tendances traceurs
 
     call phytrac(rnpb, itap, lmt_pas, julien,  gmtime, firstcal, lafin, nq-2, &
-         dtime, u, v, t, paprs, pplay, &
-         pmfu,  pmfd,  pen_u,  pde_u,  pen_d,  pde_d, &
-         ycoefh, fm_therm, entr_therm, yu1, yv1, ftsol, &
-         pctsrf, frac_impa,  frac_nucl, &
-         presnivs, pphis, pphi, albsol, qx(1, 1, 1),  &
-         rhcl, cldfra,  rneb,  diafra,  cldliq,  &
-         itop_con, ibas_con, pmflxr, pmflxs, &
-         prfl, psfl, da, phi, mp, upwd, dnwd, &
-         tr_seri)
+         pdtphys, u, v, t, paprs, pplay, pmfu,  pmfd,  pen_u,  pde_u,  pen_d, &
+         pde_d, ycoefh, fm_therm, entr_therm, yu1, yv1, ftsol, pctsrf, &
+         frac_impa,  frac_nucl, presnivs, pphis, pphi, albsol, rhcl, cldfra, &
+         rneb,  diafra,  cldliq, itop_con, ibas_con, pmflxr, pmflxs, prfl, &
+         psfl, da, phi, mp, upwd, dnwd, tr_seri)
 
     IF (offline) THEN
 
@@ -1947,7 +1919,7 @@ contains
             fm_therm, entr_therm, &
             ycoefh, yu1, yv1, ftsol, pctsrf, &
             frac_impa, frac_nucl, &
-            pphis, airephy, dtime, itap)
+            pphis, airephy, pdtphys, itap)
 
     ENDIF
 
@@ -1972,13 +1944,13 @@ contains
           d_t_ec(i, k)=0.5/ZRCPD &
                *(u(i, k)**2+v(i, k)**2-u_seri(i, k)**2-v_seri(i, k)**2)
           t_seri(i, k)=t_seri(i, k)+d_t_ec(i, k)
-          d_t_ec(i, k) = d_t_ec(i, k)/dtime
+          d_t_ec(i, k) = d_t_ec(i, k)/pdtphys
        END DO
     END DO
     !-jld ec_conser
     IF (if_ebil >= 1) THEN 
        ztit='after physic'
-       CALL diagetpq(airephy, ztit, ip_ebil, 1, 1, dtime &
+       CALL diagetpq(airephy, ztit, ip_ebil, 1, 1, pdtphys &
             , t_seri, q_seri, ql_seri, qs_seri, u_seri, v_seri, paprs &
             , d_h_vcol, d_qt, d_qw, d_ql, d_qs, d_ec)
        !     Comme les tendances de la physique sont ajoute dans la dynamique, 
@@ -2016,11 +1988,11 @@ contains
 
     DO k = 1, llm
        DO i = 1, klon
-          d_u(i, k) = ( u_seri(i, k) - u(i, k) ) / dtime
-          d_v(i, k) = ( v_seri(i, k) - v(i, k) ) / dtime
-          d_t(i, k) = ( t_seri(i, k)-t(i, k) ) / dtime
-          d_qx(i, k, ivap) = ( q_seri(i, k) - qx(i, k, ivap) ) / dtime
-          d_qx(i, k, iliq) = ( ql_seri(i, k) - qx(i, k, iliq) ) / dtime
+          d_u(i, k) = ( u_seri(i, k) - u(i, k) ) / pdtphys
+          d_v(i, k) = ( v_seri(i, k) - v(i, k) ) / pdtphys
+          d_t(i, k) = ( t_seri(i, k)-t(i, k) ) / pdtphys
+          d_qx(i, k, ivap) = ( q_seri(i, k) - qx(i, k, ivap) ) / pdtphys
+          d_qx(i, k, iliq) = ( ql_seri(i, k) - qx(i, k, iliq) ) / pdtphys
        ENDDO
     ENDDO
 
@@ -2028,7 +2000,7 @@ contains
        DO iq = 3, nq
           DO  k = 1, llm
              DO  i = 1, klon
-                d_qx(i, k, iq) = ( tr_seri(i, k, iq-2) - qx(i, k, iq) ) / dtime
+                d_qx(i, k, iq) = ( tr_seri(i, k, iq-2) - qx(i, k, iq) ) / pdtphys
              ENDDO
           ENDDO
        ENDDO
@@ -2053,10 +2025,8 @@ contains
 
     IF (lafin) THEN
        itau_phy = itau_phy + itap
-       CALL phyredem ("restartphy.nc", dtime, radpas, &
-            rlat, rlon, pctsrf, ftsol, ftsoil, &
-            tslab, seaice,  & !IM "slab" ocean
-            fqsurf, qsol, &
+       CALL phyredem ("restartphy.nc", radpas, rlat, rlon, pctsrf, ftsol, &
+            ftsoil, tslab, seaice, fqsurf, qsol, &
             fsnow, falbe, falblw, fevap, rain_fall, snow_fall, &
             solsw, sollwdown, dlw, &
             radsol, frugs, agesno, &
@@ -2479,8 +2449,8 @@ contains
 
          ! Champs 2D:
 
-         zsto = dtime * ecrit_ins
-         zout = dtime * ecrit_ins
+         zsto = pdtphys * ecrit_ins
+         zout = pdtphys * ecrit_ins
          itau_w = itau_phy + itap
 
          i = NINT(zout/zsto)

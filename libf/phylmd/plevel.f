@@ -34,7 +34,7 @@ c   -----------
       logical lnew
 
       REAL, intent(in):: pgcm(ilon,ilev)
-      REAL Qgcm(ilon,ilev)
+      REAL, intent(in):: Qgcm(ilon,ilev)
       real pres
       REAL Qpres(ilon)
 

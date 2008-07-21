@@ -34,8 +34,7 @@ contains
     use comvert, only: ap, bp
     use conf_gcm_m, only: day_step, iconser, idissip, iphysiq, iperiod, nday, &
          offline, periodav
-    use logic, only: ok_guide, apdiss, apphys, conser, forward, iflag_phys, &
-         leapf, statcl
+    use logic, only: ok_guide, iflag_phys
     use comgeom
     use serre
     use temps, only: itaufin, day_ini, dt
@@ -49,7 +48,7 @@ contains
     use pressure_var, only: p3d
 
     integer nq
-    REAL clesphy0(:)
+    REAL, intent(in):: clesphy0(:)
 
     ! Variables dynamiques:
     REAL vcov(ip1jm, llm), ucov(ip1jmp1, llm) ! vents covariants
@@ -120,6 +119,7 @@ contains
 
     logical:: dissip_conservative = .true.
     LOGICAL:: prem = .true.
+    logical forward, leapf, apphys, conser, apdiss
 
     !---------------------------------------------------
 
@@ -167,7 +167,6 @@ contains
           ! gestion des appels de la physique et des dissipations:
 
           apphys = .FALSE.
-          statcl = .FALSE.
           conser = .FALSE.
           apdiss = .FALSE.
 
@@ -196,7 +195,8 @@ contains
 
           ! integrations dynamique et traceurs:
           CALL integrd(2, vcovm1, ucovm1, tetam1, psm1, massem1, dv, du, &
-               dteta, dq, dp, vcov, ucov, teta, q, ps, masse, phis, finvmaold)
+               dteta, dq, dp, vcov, ucov, teta, q, ps, masse, phis, &
+               finvmaold, leapf)
 
           ! calcul des tendances physiques:
 

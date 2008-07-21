@@ -604,7 +604,7 @@ c   tris des regions a traiter
       enddo
 
       if(n0.gt.1) then
-      IF (prt_level > 9) WRITE(lunout,*)
+      IF (prt_level > 9) print *,
      & 'Nombre de points pour lesquels on advect plus que le'
      &       ,'contenu de la maille : ',n0
 
@@ -648,9 +648,9 @@ c               u_mq(ij,l)=u_mq(ij,l)+zu_m*q(ijq,l)
 c         goto 8888
                 zz=0.5*(zsig-zsigd(ijq,l))/zsigg(ijq,l)
                 if(.not.(zz.gt.0..and.zz.le.0.5)) then
-                     WRITE(lunout,*)'probleme2 au point ij=',ij,
+                     print *,'probleme2 au point ij=',ij,
      s               '  l=',l
-                     WRITE(lunout,*)'zz=',zz
+                     print *,'zz=',zz
                      stop
                 endif
                 u_mq(ij,l)=u_mq(ij,l)+masse(ijq,l)*(
@@ -678,9 +678,9 @@ c               u_mq(ij,l)=u_mq(ij,l)+zu_m*q(ijq,l)
 c           goto 9999
                 zz=0.5*(zsig-zsigg(ijq,l))/zsigd(ijq,l)
                 if(.not.(zz.gt.0..and.zz.le.0.5)) then
-                     WRITE(lunout,*)'probleme22 au point ij=',ij
+                     print *,'probleme22 au point ij=',ij
      s               ,'  l=',l
-                     WRITE(lunout,*)'zz=',zz
+                     print *,'zz=',zz
                      stop
                 endif
                 u_mq(ij,l)=u_mq(ij,l)-masse(ijq,l)*(

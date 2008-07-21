@@ -1,13 +1,13 @@
 !
 ! $Header: /home/cvsroot/LMDZ4/libf/dyn3d/advect.F,v 1.1.1.1 2004/05/19 12:53:06 lmdzadmin Exp $
 !
-      SUBROUTINE advect(ucov,vcov,teta,w,massebx,masseby,du,dv,dteta)
+      SUBROUTINE advect(ucov,vcov,teta,w,massebx,masseby,du,dv,dteta,
+     $     conser)
 
       use dimens_m
       use paramet_m
       use comconst
       use comvert
-      use logic
       use comgeom
       use ener
       IMPLICIT NONE
@@ -37,6 +37,7 @@ c   ----------
       REAL vcov(ip1jm,llm),ucov(ip1jmp1,llm),teta(ip1jmp1,llm)
       REAL massebx(ip1jmp1,llm),masseby(ip1jm,llm),w(ip1jmp1,llm)
       REAL dv(ip1jm,llm),du(ip1jmp1,llm),dteta(ip1jmp1,llm)
+      logical, intent(in):: conser
 
 c   Local:
 c   ------

@@ -1,7 +1,7 @@
 module phyetat0_m
 
   use dimphy, only: klon, klev, zmasq
-  
+
   IMPLICIT none
 
   REAL, save:: rlat(klon), rlon(klon)
@@ -11,34 +11,29 @@ module phyetat0_m
 
 contains
 
-  SUBROUTINE phyetat0(fichnom,dtime,co2_ppm_etat0,solaire_etat0, &
-       pctsrf, tsol,tsoil, &
-       ocean, tslab,seaice, & !IM "slab" ocean
+  SUBROUTINE phyetat0(fichnom, pctsrf, tsol,tsoil, ocean, tslab,seaice, &
        qsurf,qsol,snow, &
        albe, alblw, evap, rain_fall, snow_fall, solsw, sollw, &
        fder,radsol,frugs,agesno,clesphy0, &
-       zmea,zstd,zsig,zgam,zthe,zpic,zval,rugsrel,tabcntr0, &
+       zmea,zstd,zsig,zgam,zthe,zpic,zval,rugsrel, &
        t_ancien,q_ancien,ancien_ok, rnebcon, ratqs,clwcon, &
        run_off_lic_0)
 
     ! From phylmd/phyetat0.F,v 1.4 2005/06/03 10:03:07
-
-    use dimens_m
-    use indicesol
-    use dimsoil
-    use temps
-    use clesphys
-
     ! Auteur(s) Z.X. Li (LMD/CNRS) date: 19930818
     ! Objet: Lecture de l'etat initial pour la physique
 
+    USE indicesol, ONLY : epsfra, is_lic, is_oce, is_sic, is_ter, nbsrf
+    USE dimsoil, ONLY : nsoilmx
+    USE temps, ONLY : itau_phy
+    USE clesphys2, ONLY : cycle_diurne, iflag_con, nbapp_rad, new_oliq, &
+         ok_limitvrai, ok_orodr, ok_orolf, soil_model
+    use netcdf, only: nf90_get_att, nf90_global
+    use netcdf95, only: handle_err
+
     include "netcdf.inc"
 
-    CHARACTER*(*) fichnom
-    REAL, intent(out):: dtime
-    INTEGER radpas
-    REAL, intent(out):: co2_ppm_etat0
-    REAL, intent(out):: solaire_etat0
+    CHARACTER(len=*) fichnom
     REAL tsol(klon,nbsrf)
     REAL tsoil(klon,nsoilmx,nbsrf)
     !IM "slab" ocean
@@ -73,11 +68,11 @@ contains
     real rnebcon(klon,klev),clwcon(klon,klev),ratqs(klon,klev)
     LOGICAL ancien_ok
 
-    CHARACTER*6 ocean
+    CHARACTER(len=*), intent(in):: ocean
 
     INTEGER        longcles
     PARAMETER    ( longcles = 20 )
-    REAL clesphy0( longcles )
+    REAL, intent(in):: clesphy0( longcles )
 
     REAL xmin, xmax
 
@@ -85,7 +80,6 @@ contains
     INTEGER ierr, i, nsrf, isoil 
     INTEGER length
     PARAMETER (length=100)
-    REAL tab_cntrl(length), tabcntr0(length)
     CHARACTER*7 str7
     CHARACTER*2 str2
 
@@ -103,88 +97,17 @@ contains
        STOP 1
     ENDIF
 
-    ! Lecture des parametres de controle:
+    iflag_con    = clesphy0(1)
+    nbapp_rad    = clesphy0(2)
+    cycle_diurne  = clesphy0(3) == 1
+    soil_model = clesphy0(4) == 1
+    new_oliq = clesphy0(5) == 1
+    ok_orodr = clesphy0(6) == 1
+    ok_orolf = clesphy0(7) == 1
+    ok_limitvrai = clesphy0(8) == 1
 
-    ierr = NF_INQ_VARID (nid, "controle", nvarid)
-    IF (ierr.NE.NF_NOERR) THEN
-       PRINT*, 'phyetat0: Le champ <controle> est absent'
-       stop 1
-    ENDIF
-    ierr = NF_GET_VAR_REAL(nid, nvarid, tab_cntrl)
-    IF (ierr.NE.NF_NOERR) THEN
-       PRINT*, 'phyetat0: Lecture echouee pour <controle>'
-       stop 1
-    ELSE
-       DO i = 1, length
-          tabcntr0( i ) = tab_cntrl( i )
-       ENDDO
-
-       cycle_diurne   = .FALSE.
-       soil_model     = .FALSE.
-       new_oliq       = .FALSE.
-       ok_orodr       = .FALSE.
-       ok_orolf       = .FALSE.
-       ok_limitvrai   = .FALSE.
-
-
-       IF( clesphy0(1).NE.tab_cntrl( 5 ) )  THEN
-          tab_cntrl( 5 ) = clesphy0(1)
-       ENDIF
-
-       IF( clesphy0(2).NE.tab_cntrl( 6 ) )  THEN
-          tab_cntrl( 6 ) = clesphy0(2)
-       ENDIF
-
-       IF( clesphy0(3).NE.tab_cntrl( 7 ) )  THEN
-          tab_cntrl( 7 ) = clesphy0(3)
-       ENDIF
-
-       IF( clesphy0(4).NE.tab_cntrl( 8 ) )  THEN
-          tab_cntrl( 8 ) = clesphy0(4)
-       ENDIF
-
-       IF( clesphy0(5).NE.tab_cntrl( 9 ) )  THEN
-          tab_cntrl( 9 ) = clesphy0( 5 )
-       ENDIF
-
-       IF( clesphy0(6).NE.tab_cntrl( 10 ) )  THEN
-          tab_cntrl( 10 ) = clesphy0( 6 )
-       ENDIF
-
-       IF( clesphy0(7).NE.tab_cntrl( 11 ) )  THEN
-          tab_cntrl( 11 ) = clesphy0( 7 )
-       ENDIF
-
-       IF( clesphy0(8).NE.tab_cntrl( 12 ) )  THEN
-          tab_cntrl( 12 ) = clesphy0( 8 )
-       ENDIF
-
-
-       dtime        = tab_cntrl(1)
-       radpas       = int(tab_cntrl(2))
-       co2_ppm_etat0      = tab_cntrl(3)
-       solaire_etat0      = tab_cntrl(4)
-       iflag_con    = tab_cntrl(5)
-       nbapp_rad    = tab_cntrl(6)
-
-
-       cycle_diurne    = .FALSE.
-       soil_model      = .FALSE.
-       new_oliq        = .FALSE.
-       ok_orodr        = .FALSE.
-       ok_orolf        = .FALSE.
-       ok_limitvrai    = .FALSE.
-
-       IF( tab_cntrl( 7) .EQ. 1. )    cycle_diurne  = .TRUE.
-       IF( tab_cntrl( 8) .EQ. 1. )       soil_model = .TRUE.
-       IF( tab_cntrl( 9) .EQ. 1. )         new_oliq = .TRUE.
-       IF( tab_cntrl(10) .EQ. 1. )         ok_orodr = .TRUE.
-       IF( tab_cntrl(11) .EQ. 1. )         ok_orolf = .TRUE.
-       IF( tab_cntrl(12) .EQ. 1. )     ok_limitvrai = .TRUE.
-    ENDIF
-
-    itau_phy = tab_cntrl(15)
-
+    ierr = nf90_get_att(nid, nf90_global, "itau_phy", itau_phy)
+    call handle_err("phyetat0 itau_phy", ierr, nid, nf90_global)
 
     ! Lecture des latitudes (coordonnees):
 

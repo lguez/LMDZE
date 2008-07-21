@@ -31,7 +31,8 @@ c kn : diffusivite turbulente des scalaires (au bas de chaque couche)
 c      (en sortie : la valeur a la fin du pas de temps)
 c 
 c.......................................................................
-      REAL dt,g,rconst
+      REAL, intent(in):: dt
+      real g,rconst
       real plev(klon,klev+1),temp(klon,klev)
       real ustar(klon),snstable
       REAL zlev(klon,klev+1)
@@ -226,7 +227,7 @@ c.......................................................................
 c
 c   Initialisation de q2
 
-      call yamada(ngrid,dt,g,rconst,plev,temp
+      call yamada(ngrid,g,rconst,plev,temp
      s   ,zlev,zlay,u,v,teta,cd,q2diag,km,kn,ustar
      s   ,l_mix)
       if (first.and.1.eq.1) then
@@ -654,28 +655,6 @@ c  CALCUL DE LA DIFFUSION VERTICALE DE Q2
            sss=sss+plev(1,ilev-1)-plev(1,ilev+1)
            sssq=sssq+(plev(1,ilev-1)-plev(1,ilev+1))*q2(1,ilev)
         enddo
-c        print*,'Q2moy avant',sssq/sss
-c       print*,'Q2q20 ',(q2(1,ilev),ilev=1,10)
-c       print*,'Q2km0 ',(km(1,ilev),ilev=1,10)
-c   ! C'est quoi ca qu'etait dans l'original???
-c       do igrid=1,ngrid
-c          q2(igrid,1)=10.
-c       enddo
-c        q2s=q2
-c       do iii=1,10
-c       call vdif_q2(dt,g,rconst,plev,temp,km,q2)
-c       do ilev=1,klev+1
-c          write(iii+49,*) q2(1,ilev),zlev(1,ilev)
-c       enddo
-c       enddo
-c       stop
-c       do ilev=1,klev
-c          print*,zlev(1,ilev),q2s(1,ilev),q2(1,ilev)
-c       enddo
-c        q2s=q2-q2s
-c       do ilev=1,klev
-c          print*,q2s(1,ilev),zlev(1,ilev)
-c       enddo
         do ilev=2,klev-1
            sss=sss+plev(1,ilev-1)-plev(1,ilev+1)
            sssq=sssq+(plev(1,ilev-1)-plev(1,ilev+1))*q2(1,ilev)

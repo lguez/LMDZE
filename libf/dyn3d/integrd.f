@@ -3,7 +3,8 @@
 !
       SUBROUTINE integrd
      $  (  nq,vcovm1,ucovm1,tetam1,psm1,massem1,
-     $     dv,du,dteta,dq,dp,vcov,ucov,teta,q,ps,masse,phis,finvmaold )
+     $     dv,du,dteta,dq,dp,vcov,ucov,teta,q,ps,masse,phis,finvmaold,
+     $     leapf )
 
       use dimens_m
       use paramet_m
@@ -50,6 +51,7 @@ c   ----------
       REAL dv(ip1jm,llm),du(ip1jmp1,llm)
       REAL dteta(ip1jmp1,llm),dp(ip1jmp1)
       REAL dq(ip1jmp1,llm,nq), finvmaold(ip1jmp1,llm)
+      logical, intent(in):: leapf
 
 c   Local:
 c   ------
@@ -156,34 +158,6 @@ c
       END IF
 
   10  CONTINUE
-
-
-c
-c   .......  integration de   q   ......
-c
-c$$$      IF( iadv(1).NE.3.AND.iadv(2).NE.3 )    THEN
-c$$$c
-c$$$       IF( forward. OR . leapf )  THEN
-c$$$        DO iq = 1,2
-c$$$        DO  l = 1,llm
-c$$$        DO ij = 1,ip1jmp1
-c$$$        q(ij,l,iq) = ( q(ij,l,iq)*finvmaold(ij,l) + dtvr *dq(ij,l,iq) )/
-c$$$     $                            finvmasse(ij,l)
-c$$$        ENDDO
-c$$$        ENDDO
-c$$$        ENDDO
-c$$$       ELSE
-c$$$         DO iq = 1,2
-c$$$         DO  l = 1,llm
-c$$$         DO ij = 1,ip1jmp1
-c$$$         q( ij,l,iq ) = q( ij,l,iq ) * finvmaold(ij,l) / finvmasse(ij,l)
-c$$$         ENDDO
-c$$$         ENDDO
-c$$$         ENDDO
-c$$$
-c$$$       END IF
-c$$$c
-c$$$      ENDIF
 
          DO l = 1, llm
           DO ij = 1, ip1jmp1

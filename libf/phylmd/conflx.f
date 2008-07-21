@@ -22,7 +22,7 @@ c         Olivier Boucher et Alexandre Armengaud pour melange
 c         et lessivage des traceurs passifs.
 c======================================================================
 c Entree:
-      REAL dtime            ! pas d'integration (s)
+      REAL, intent(in):: dtime            ! pas d'integration (s)
       REAL, intent(in):: pres_h(klon,klev+1) ! pression half-level (Pa)
       REAL, intent(in):: pres_f(klon,klev)! pression full-level (Pa)
       REAL t(klon,klev)     ! temperature (K)
@@ -249,7 +249,8 @@ c
       LOGICAL  llo1
       REAL dt_con(klon,klev), dq_con(klon,klev)
       REAL zmfmax, zdh
-      REAL pdtime, zqumqe, zdqmin, zalvdcp, zhsat, zzz
+      REAL, intent(in):: pdtime
+      real zqumqe, zdqmin, zalvdcp, zhsat, zzz
       REAL zhhat, zpbmpt, zgam, zeps, zfac
       INTEGER i, k, ikb, itopm2, kcum
 c
@@ -492,7 +493,7 @@ c
 c----------------------------------------------------------------------
 c calculer les tendances pour T et Q
 c----------------------------------------------------------------------
-      CALL flxdtdq(pdtime, itopm2, paph, ldcum, pten,
+      CALL flxdtdq(itopm2, paph, ldcum, pten,
      e     zmfus, zmfds, zmfuq, zmfdq, zmful, zdmfup, zdmfdp, zdpmel,
      s     dt_con,dq_con)
 c
@@ -724,7 +725,7 @@ C THIS ROUTINE DOES THE CALCULATIONS FOR CLOUD ASCENTS
 C FOR CUMULUS PARAMETERIZATION
 C----------------------------------------------------------------------
 C
-      REAL pdtime
+      REAL, intent(in):: pdtime
       REAL pten(klon,klev), ptenh(klon,klev)
       REAL pqen(klon,klev), pqenh(klon,klev), pqsen(klon,klev)
       REAL pgeo(klon,klev), pgeoh(klon,klev)
@@ -1053,7 +1054,8 @@ cjq 14/11/00 to fix the problem with the negative precipitation.
       LOGICAL  ldland(klon), ldcum(klon)
       INTEGER k, kp, i
       REAL zcons1, zcons2, zcucov, ztmelp2
-      REAL pdtime, zdp, zzp, zfac, zsnmlt, zrfl, zrnew
+      REAL, intent(in):: pdtime
+      real zdp, zzp, zfac, zsnmlt, zrfl, zrnew
       REAL zrmin, zrfln, zdrfl
       REAL zpds, zpdr, zdenom
       INTEGER ktopm2, itop, ikb
@@ -1258,7 +1260,7 @@ c
 c
       RETURN
       END
-      SUBROUTINE flxdtdq(pdtime, ktopm2, paph, ldcum, pten
+      SUBROUTINE flxdtdq(ktopm2, paph, ldcum, pten
      .  ,  pmfus, pmfds, pmfuq, pmfdq, pmful, pdmfup, pdmfdp
      .  ,  pdpmel, dt_con, dq_con)
       use dimens_m
@@ -1283,7 +1285,6 @@ C
       REAL dt_con(klon,klev), dq_con(klon,klev)
 c
       INTEGER ktopm2
-      REAL pdtime
 c
       INTEGER i, k
       REAL zalv, zdtdt, zdqdt

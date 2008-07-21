@@ -43,7 +43,7 @@ contains
     ! bl95_b*: parameters in the formula to link CDNC to aerosol mass conc 
 
     ! Sortie:
-    character (len = 6)  :: ocean
+    character(len=*), intent(out):: ocean
     logical              :: ok_veget, ok_newmicro
     logical              :: ok_journe, ok_mensuel, ok_instan        
     LOGICAL              :: ok_ade, ok_aie
@@ -64,7 +64,7 @@ contains
     !Config Key  = OCEAN 
     !Config Desc = Type d'ocean
     !Config Def  = force
-    !Config Help = Type d'ocean utilise: force, slab,couple
+    !Config Help = Type d'ocean utilise: force ou slab mais pas couple
     !
     ocean = 'force '
     call getin('OCEAN', ocean)
@@ -697,7 +697,6 @@ contains
     !
     bug_ozone = .false.
     call getin('bug_ozone',bug_ozone)
-
 
     write(numout,*)' *********'
     write(numout,*)' Configuration des parametres de la physique: '

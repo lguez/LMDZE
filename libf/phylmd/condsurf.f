@@ -5,7 +5,7 @@ c
       use indicesol
       use dimphy
       use temps
-      use clesphys
+      use clesphys2, only: ok_limitvrai
       IMPLICIT none
 c
 c I. Musat 05.2005

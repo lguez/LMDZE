@@ -27,7 +27,7 @@ c======================================================================
 c
 c Arguments:
 c
-      REAL dtime ! intervalle du temps (s)
+      REAL, intent(in):: dtime ! intervalle du temps (s)
       REAL, intent(in):: paprs(klon,klev+1) ! pression a inter-couche
       REAL, intent(in):: pplay(klon,klev) ! pression au milieu de couche
       REAL t(klon,klev) ! temperature (K)

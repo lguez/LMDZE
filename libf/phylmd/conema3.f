@@ -62,7 +62,7 @@ c
       INTEGER ntra,ntrac !number of tracers; if no tracer transport
                          ! is needed, set ntra = 1 (or 0)
       PARAMETER (ntrac=nqmx-2)
-      REAL dtime
+      REAL, intent(in):: dtime
 c
       REAL d_t2(klon,klev), d_q2(klon,klev) ! sbl
       REAL d_u2(klon,klev), d_v2(klon,klev) ! sbl
@@ -248,10 +248,6 @@ c -- creer cvthermo.h qui contiendra les cstes thermo de LMDZ:
 c       CALL cv_thermo(iflagcon)
 
 c -- appel schema de nuages:
-
-c       CALL CLOUDS_SUB_LS(klev,em_q,em_qs,em_t
-c    i          ,em_p,em_ph,dtime,em_qcondc
-c    o          ,em_cldf,em_cldq,em_pradj,em_ftadj,em_fradj,em_ifc)
 
         do k = 1, klev 
          cldf(i,k)  = em_cldf(k)  ! cloud fraction (0-1)

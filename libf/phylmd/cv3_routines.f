@@ -33,7 +33,7 @@ C   ***                     IT MUST BE LESS THAN 0              ***
       include "cvparam3.h"
 
       integer nd
-      real delt ! timestep (seconds)
+      real, intent(in):: delt ! timestep (seconds)
 
 c noff: integer limit for convection (nd-noff)
 c minorig: First level of convection
@@ -1835,7 +1835,8 @@ c
 c inputs:
       integer ncum, nd, na, ntra, nloc
       integer icb(nloc), inb(nloc)
-      real delt, plcl(nloc)
+      real, intent(in):: delt
+      real plcl(nloc)
       real t(nloc,nd), rr(nloc,nd), rs(nloc,nd)
       real u(nloc,nd), v(nloc,nd)
       real tra(nloc,nd,ntra)
@@ -2177,7 +2178,7 @@ c       end do
 c inputs:
       integer ncum,nd,na,ntra,nloc
       integer icb(nloc), inb(nloc)
-      real delt
+      real, intent(in):: delt
       real t(nloc,nd), rr(nloc,nd), u(nloc,nd), v(nloc,nd)
       real tra(nloc,nd,ntra), sig(nloc,nd)
       real gz(nloc,na), ph(nloc,nd+1), h(nloc,na), hp(nloc,na)

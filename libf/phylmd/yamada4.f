@@ -38,7 +38,8 @@ c    iflag_pbl=8 : MY 2.5
 c    iflag_pbl=9 : un test ?
 
 c.......................................................................
-      REAL dt,g,rconst
+      REAL, intent(in):: dt
+      real g,rconst
       real plev(klon,klev+1),temp(klon,klev)
       real ustar(klon)
       real kmin,qmin,pblhmin(klon),coriol(klon)
@@ -390,11 +391,6 @@ cabde      print*,'KML=',l(ig,k),q2(ig,k),sm(ig,k)
 c     print*,'KML=',km(ig,k),kn(ig,k)
                                                           enddo
       enddo
-
-c     if (iflag_pbl.ge.7..and.0.eq.1) then
-c        q2(:,1)=q2(:,2)
-c        call vdif_q2(dt,g,rconst,plev,temp,kq,q2)
-c     endif
 
 c   Traitement des cas noctrunes avec l'introduction d'une longueur
 c   minilale.

@@ -28,7 +28,7 @@ c d_ven----output-R- le changement de "ven"
 c flux_v---output-R- (diagnostic) flux du vent: (kg m/s)/(m**2 s)
 c======================================================================
       INTEGER knon
-      REAL dtime
+      REAL, intent(in):: dtime
       REAL u1lay(klon), v1lay(klon)
       REAL coef(klon,klev)
       REAL t(klon,klev), ven(klon,klev)

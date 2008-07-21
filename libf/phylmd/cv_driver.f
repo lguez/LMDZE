@@ -70,7 +70,7 @@ c
       integer nd
       integer ndp1
       integer noff
-      integer iflag_con
+      integer, intent(in):: iflag_con
       integer ntra
       real t1(len,nd)
       real q1(len,nd)
@@ -101,7 +101,7 @@ c
       real, intent(in):: tra1(len,nd,ntra)
       real ftra1(len,nd,ntra)
 
-      real delt
+      real, intent(in):: delt
 
 !-------------------------------------------------------------------
 ! --- ARGUMENTS
@@ -653,7 +653,7 @@ c-------------------------------------------------------------
 
       include "cvthermo.h" 
 
-      integer iflag_con
+      integer, intent(in):: iflag_con
 
 
 c original set from convect:

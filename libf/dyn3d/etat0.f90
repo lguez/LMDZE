@@ -36,7 +36,7 @@ contains
     use serre, only: alphax
     use dimsoil, only: nsoilmx
     use temps, only: itau_dyn, itau_phy, annee_ref, day_ref, dt
-    use clesphys, only: ok_orodr, nbapp_rad
+    use clesphys2, only: ok_orodr, nbapp_rad
     use grid_atob, only: grille_m
     use grid_change, only: init_dyn_phy, dyn_phy
     use q_sat_m, only: q_sat
@@ -353,7 +353,7 @@ contains
     ratqs = 0.
     run_off_lic_0 = 0.
 
-    call phyredem("startphy.nc", phystep, radpas, latfi, lonfi, pctsrf, &
+    call phyredem("startphy.nc", radpas, latfi, lonfi, pctsrf, &
          tsolsrf, tsoil, tslab, seaice, qsolsrf, qsol, snsrf, albe, alblw, &
          evap, rain_fall, snow_fall, solsw, sollw, fder, radsol, frugs, &
          agesno, zmea, zstd, zsig, zgam, zthe, zpic, zval, rugsrel, &

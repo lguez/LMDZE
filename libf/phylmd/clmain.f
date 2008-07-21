@@ -116,7 +116,7 @@ c pblT------- T au nveau HCL
 c======================================================================
 c$$$ PB ajout pour soil
 c
-      REAL dtime
+      REAL, intent(in):: dtime
       real date0
       integer, intent(in):: itap
       REAL t(klon,klev), q(klon,klev)
@@ -149,7 +149,7 @@ cIM cf JLD
       LOGICAL, intent(in):: debut
       logical, intent(in):: lafin
       logical ok_veget
-      character*6 ocean
+      character(len=*), intent(IN):: ocean
       integer npas, nexca
 c
       REAL pctsrf(klon,nbsrf)
@@ -176,7 +176,7 @@ cAA
       REAL zv1(klon)
 cAA
 c$$$ PB ajout pour soil
-      LOGICAL soil_model
+      LOGICAL, intent(in):: soil_model
 cIM ajout seuils cdrm, cdrh
       REAL cdmmax, cdhmax
 cIM: 261103
@@ -657,7 +657,7 @@ c  du papier sur les thermiques.
          call ustarhb(knon,yu,yv,y_cd_m, yustar)
 
         if (prt_level > 9) THEN
-          WRITE(lunout,*)'USTAR = ',yustar
+          print *,'USTAR = ',yustar
         ENDIF
 
 c   iflag_pbl peut etre utilise comme longuer de melange
@@ -911,7 +911,6 @@ c
          enddo
       enddo
 cIM "slab" ocean 
-      IF(OCEAN.EQ.'slab  '.OR.OCEAN.EQ.'force ') THEN
        IF (nsrf.EQ.is_oce) THEN
         DO j = 1, knon
 c on projette sur la grille globale
@@ -935,7 +934,6 @@ cIM 230604 on pondere lorsque l'on fait le bilan au sol :  flux_g(i) = y_flux_g(
          ENDIF
         ENDDO
        ENDIF !nsrf.EQ.is_sic
-      ENDIF !OCEAN
 c
       IF(OCEAN.EQ.'slab  ') THEN
        IF(nsrf.EQ.is_oce) then

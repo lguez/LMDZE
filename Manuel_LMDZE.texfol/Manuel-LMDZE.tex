@@ -81,9 +81,9 @@ svn checkout \
 
 Pour compiler \verb+gcm+ :
 \begin{enumerate}
-\item Choisir la résolution spatiale dans \verb+dimens_m.f+.  Choisir
-  la valeur de \verb+kdlon+ dans \verb+phylmd/raddim.f+. Pour cela,
-  consulter le tableau (\ref{tab:kdlon}), les
+\item Choisir la résolution spatiale dans \verb+dimens_m.f90+.
+  Choisir la valeur de \verb+kdlon+ dans \verb+phylmd/raddim.f90+.
+  Pour cela, consulter le tableau (\ref{tab:kdlon}), les
   \href{http://www.lmd.jussieu.fr/~lmdz/LMDZ4/choisir_une_resolution.html}{conseils}
   et le programme
   \href{file:///user/guez/Documents/Informatique_fonctionnement/Tests/choixdim.f}{\texttt{choixdim}}.
@@ -118,15 +118,30 @@ Enterprise Edition V9.1 Version: 09.01.0000.0005 et les options
 \part{Utilisation comme boîte noire}
 
 Cf. liste des fichiers d'entrée nécessaires sur le
-\href{file:///user/guez/Documents/Informatique_fonctionnement/Programs/Documentation
-  IOIPSL LMDZ/inout LMDZE.odg}{schéma des entrées-sorties}. Les
-fichiers \verb+ECDYN.nc+ et \verb+ECPHY.nc+ contiennent des données du
-centre européen, pour un jour particulier, avec une résolution de 1°.
+\href{file:///user/guez/Documents/Informatique_fonctionnement/Programs/Guide_IPSL_climate_models/inout
+  LMDZE.odg}{schéma des entrées-sorties}.
 
-Le fichier \verb+amipbc_sic_1x1.nc+ donne la fraction de 
-la surface de la mer couverte par de la glace. (Cette définition 
-suppose que la fraction en question est indépendante de l'échelle 
-spatiale considérée.)
+Les fichiers \verb+ECDYN.nc+ et \verb+ECPHY.nc+ contiennent des
+données de réanalyse ERA 40 de l'ECMWF, pour un jour particulier, avec
+une résolution de 1°. Refaire ces fichiers pour la date initiale
+choisie. Les
+\href{http://dataipsl.ipsl.jussieu.fr/data-ipsl/ecmwf-4.html}{données
+  ERA 40} sont accessibles par le centre de données de l'IPSL.
+
+Le fichier \verb+amipbc_sic_1x1.nc+ donne la fraction de la surface de
+la mer couverte par de la glace. Les fichiers \verb+amipbc_sic_1x1.nc+
+et \verb+amipbc_sst_1x1.nc+ viennent du projet
+\href{http://www-pcmdi.llnl.gov/projects/amip/AMIP2EXPDSN/BCS/bcsintro.php}{AMIP
+  II}.
+
+\verb+Rugos.nc+ contient la contribution saisonnière de la longueur de
+rugosité (excluant la contribution des variations de relief). Ces
+données viennent de la NASA. \verb+Relief.nc+ contient des données de
+la NASA, corrigées sur l'antarctique, probablement par Gerhard Krinner
+à partir de données Radar. \verb+Albedo.nc+ contient probablement des
+données de Yann Polcher. L'équipe de développement d'Orchidée a
+peut-être des informations sur l'origine du fichier
+\verb+landiceref.nc+.
 
 Cf. la
 \href{file:///user/guez/Documents/Informatique_fonctionnement/Programs/Documentation

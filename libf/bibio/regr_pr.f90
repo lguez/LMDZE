@@ -60,7 +60,7 @@ contains
        ! Average on pressure at each longitude:
        do i = 1, iim
           regr_pr_av(i, j, llm:1:-1) &
-               = regr1_step_av(v(j, 1:), press_in, p3d(i, j, llm+1:1:-1))
+               = regr1_step_av(v(j, :), press_in, p3d(i, j, llm+1:1:-1))
           ! (invert order of indices because "p3d" is decreasing)
        end do
     end do

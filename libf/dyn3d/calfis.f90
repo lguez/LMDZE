@@ -99,7 +99,7 @@ contains
     REAL pdpsfi(iim + 1,jjm + 1)
 
     INTEGER, PARAMETER:: longcles = 20
-    REAL clesphy0(longcles)
+    REAL, intent(in):: clesphy0(longcles)
 
     !    Local variables :
 

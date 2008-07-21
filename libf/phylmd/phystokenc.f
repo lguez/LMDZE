@@ -34,7 +34,7 @@ c
 c   divers:
 c   -------
 c
-      real pdtphys ! pas d'integration pour la physique (seconde)
+      real, intent(in):: pdtphys ! pas d'integration pour la physique (seconde)
 c
       integer physid
       integer, intent(in):: itap
@@ -53,7 +53,7 @@ c
 	real pt(klon,klev),t(klon,klev)
 c
       REAL, intent(in):: rlon(klon), rlat(klon)
-      real dtime
+      real, intent(in):: dtime
       REAL zx_tmp_3d(iim,jjm+1,klev),zx_tmp_2d(iim,jjm+1)
 
 c   Couche limite:

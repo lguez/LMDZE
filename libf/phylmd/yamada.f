@@ -1,7 +1,7 @@
 !
 ! $Header: /home/cvsroot/LMDZ4/libf/phylmd/yamada.F,v 1.1 2004/06/22 11:45:36 lmdzadmin Exp $
 !
-      SUBROUTINE yamada(ngrid,dt,g,rconst,plev,temp
+      SUBROUTINE yamada(ngrid,g,rconst,plev,temp
      s   ,zlev,zlay,u,v,teta,cd,q2,km,kn,ustar
      s   ,l_mix)
       use dimens_m
@@ -10,7 +10,6 @@
 c.......................................................................
 c.......................................................................
 c
-c dt : pas de temps
 c g  : g
 c zlev : altitude a chaque niveau (interface inferieure de la couche
 c        de meme indice)
@@ -31,7 +30,7 @@ c kn : diffusivite turbulente des scalaires (au bas de chaque couche)
 c      (en sortie : la valeur a la fin du pas de temps)
 c
 c.......................................................................
-      REAL dt,g,rconst
+      REAL g,rconst
       real plev(klon,klev+1),temp(klon,klev)
       real ustar(klon),snstable
       REAL zlev(klon,klev+1)

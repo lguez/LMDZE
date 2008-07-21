@@ -13,7 +13,7 @@ contains
        nqmax, pdtphys, u, v, t_seri, paprs, pplay, pmfu, pmfd, pen_u, &
        pde_u, pen_d, pde_d, coefh, fm_therm, entr_therm, yu1, yv1, ftsol, &
        pctsrf, frac_impa, frac_nucl, presnivs, pphis, &
-       pphi, albsol, sh, rh, cldfra, rneb, diafra, cldliq, itop_con, &
+       pphi, albsol, rh, cldfra, rneb, diafra, cldliq, itop_con, &
        ibas_con, pmflxr, pmflxs, prfl, psfl, da, phi, mp, upwd, dnwd, tr_seri)
 
     ! From phylmd/phytrac.F, version 1.15 2006/02/21 08:08:30
@@ -33,7 +33,8 @@ contains
     use dimens_m, only: iim, jjm, llm
     use indicesol, only: nbsrf
     use dimphy, only: klon, nbtr
-    use clesphys, only: ecrit_tra, iflag_con
+    use clesphys, only: ecrit_tra
+    use clesphys2, only: iflag_con
     use abort_gcm_m, only: abort_gcm
     use YOMCST, only: rg
     use ctherm, only: iflag_thermals
@@ -66,7 +67,6 @@ contains
 
     real u(klon, llm)
     real v(klon, llm)
-    real sh(klon, llm)     ! humidite specifique
     real rh(klon, llm)     ! humidite relative
     real cldliq(klon, llm) ! eau liquide nuageuse
     real cldfra(klon, llm) ! fraction nuageuse (tous les nuages)

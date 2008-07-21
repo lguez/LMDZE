@@ -6,13 +6,12 @@ module logic
   ! Help = Choix du schema d'integration temporel.
   ! y = pure Matsuno sinon c'est du Matsuno-leapfrog
 
-  LOGICAL, save:: forward, leapf, apphys, statcl, conser
-  logical, save:: apdiss, apdelq, saison
+  logical:: fxyhypb = .TRUE.
+  ! (fonction f(y) à dérivée tangente hyperbolique, sinon à dérivée
+  ! sinusoïdale)
 
-  logical, save:: fxyhypb
-  ! fonction f(y) hyperbolique, sinon sinusoïdale
-
-  logical, save:: ysinus
+  logical:: ysinus = .TRUE.
+  ! (Fonction f(y) avec y = Sin(latit.) si = .true. sinon y = latit.)
 
   logical:: ok_guide= .FALSE.
   ! Help = Guidage
@@ -22,5 +21,21 @@ module logic
   ! 0 : pas de physique
   ! 1 : physique normale (appel à phylmd, phymars...) (default)
   ! 2 : rappel Newtonien pour la température + friction au sol
+
+contains
+
+  subroutine read_logic
+
+    namelist /logic_nml/ purmats, fxyhypb, ysinus, ok_guide, iflag_phys
+
+    !------------------------------------
+
+    print *, "Call sequence information: read_logic"
+
+    print *, "Enter namelist 'logic_nml'."
+    read(unit=*, nml=logic_nml)
+    write(unit=*, nml=logic_nml)
+
+  end subroutine read_logic
 
 end module logic

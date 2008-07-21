@@ -178,10 +178,10 @@ c       initialisation des fichiers
 c   ncum est la frequence de stokage en pas de temps
         ncum=dt_cum/dt_app
         if (abs(ncum*dt_app-dt_cum).gt.1.e-5*dt_app) then
-           WRITE(lunout,*)
+           print *,
      .            'Pb : le pas de cumule doit etre multiple du pas'
-           WRITE(lunout,*)'dt_app=',dt_app
-           WRITE(lunout,*)'dt_cum=',dt_cum
+           print *,'dt_app=',dt_app
+           print *,'dt_cum=',dt_cum
            stop
         endif
 
@@ -253,7 +253,7 @@ c      print*,'1HISTDEF'
       do iQ=1,nQ
          do itr=1,ntr
       IF (prt_level > 5)
-     . WRITE(lunout,*)'var ',itr,iQ
+     . print *,'var ',itr,iQ
      .      ,znom(itr,iQ),znoml(itr,iQ),zunites(itr,iQ)
             call histdef(fileid,znom(itr,iQ),znoml(itr,iQ),
      .        zunites(itr,iQ),1,jjm,thoriid,llm,1,llm,zvertiid,
@@ -340,7 +340,7 @@ c
       endif
 
       IF (prt_level > 5)
-     . WRITE(lunout,*)'dans bilan_dyn ',icum,'->',icum+1
+     . print *,'dans bilan_dyn ',icum,'->',icum+1
       icum=icum+1
 
 c   accumulation des flux de masse horizontaux
@@ -406,7 +406,7 @@ c   calcul de la vitesse verticale
          enddo
       enddo
       IF (prt_level > 5)
-     . WRITE(lunout,*)'Apres les calculs fait a chaque pas'
+     . print *,'Apres les calculs fait a chaque pas'
 c=====================================================================
 c   PAS DE TEMPS D'ECRITURE
 c=====================================================================
@@ -414,7 +414,7 @@ c=====================================================================
 c=====================================================================
 
       IF (prt_level > 5)
-     . WRITE(lunout,*)'Pas d ecriture'
+     . print *,'Pas d ecriture'
 
 c   Normalisation
       do iQ=1,nQ
