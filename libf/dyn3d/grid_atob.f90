@@ -37,7 +37,7 @@ contains
     !        grille_m: champ de sortie deja transforme
     !=======================================================================
 
-    use nrutil, only: assert_eq
+    use numer_rec, only: assert_eq
 
     REAL, intent(in):: xdata(:),ydata(:) 
     REAL, intent(in):: entree(:, :)
@@ -413,7 +413,7 @@ contains
 
     ! Methode naive (voir grille_m)
 
-    use nrutil, only: assert_eq
+    use numer_rec, only: assert_eq
 
     REAL, intent(in):: xdata(:), ydata(:), entree(:,:), x(:), y(:), mask(:,:)
 
@@ -532,7 +532,7 @@ contains
     ! Methode naive (voir grille_m)
     !=======================================================================
 
-    use nrutil, only: assert_eq
+    use numer_rec, only: assert_eq
 
     REAL, intent(in):: xdata(:),ydata(:) 
     REAL, intent(in):: glace01(:,:)

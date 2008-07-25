@@ -24,7 +24,7 @@ contains
     use advtrac_m, only: tname
     use netcdf95, only: nf95_open, nf95_inq_varid, handle_err, NF95_CLOSE
     use netcdf, only: NF90_NOWRITE, NF90_GET_VAR, NF90_NOERR
-    use nrutil, only: assert
+    use numer_rec, only: assert
 
     !   Arguments:
     REAL, intent(out):: vcov(: , :), ucov(:, :), teta(:, :)

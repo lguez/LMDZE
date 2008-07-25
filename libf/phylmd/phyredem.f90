@@ -1,7 +1,7 @@
-SUBROUTINE phyredem(fichnom,radpas,rlat,rlon,pctsrf,tsol,tsoil, &
+SUBROUTINE phyredem(fichnom, rlat,rlon,pctsrf,tsol,tsoil, &
      tslab,seaice,qsurf,qsol,snow,albedo,alblw,evap,rain_fall,snow_fall, &
      solsw,sollw,fder,radsol,frugs,agesno,zmea,zstd,zsig,zgam,zthe,zpic, &
-     zval,rugsrel,t_ancien,q_ancien,rnebcon,ratqs,clwcon,run_off_lic_0)
+     zval, t_ancien,q_ancien,rnebcon,ratqs,clwcon,run_off_lic_0)
 
   ! From phylmd/phyredem.F,v 1.3 2005/05/25 13:10:09
   ! Auteur(s) Z.X. Li (LMD/CNRS) date: 19930818
@@ -19,7 +19,6 @@ SUBROUTINE phyredem(fichnom,radpas,rlat,rlon,pctsrf,tsol,tsoil, &
   INCLUDE 'netcdf.inc'
 
   CHARACTER(len=*) fichnom
-  INTEGER :: radpas
   REAL, INTENT (IN) :: rlat(klon), rlon(klon)
   REAL :: tsol(klon,nbsrf)
   REAL :: tsoil(klon,nsoilmx,nbsrf)
@@ -42,13 +41,12 @@ SUBROUTINE phyredem(fichnom,radpas,rlat,rlon,pctsrf,tsol,tsoil, &
   REAL :: frugs(klon,nbsrf)
   REAL :: agesno(klon,nbsrf)
   REAL :: zmea(klon)
-  REAL :: zstd(klon)
-  REAL :: zsig(klon)
+  REAL, intent(in):: zstd(klon)
+  REAL, intent(in):: zsig(klon)
   REAL :: zgam(klon)
   REAL :: zthe(klon)
   REAL :: zpic(klon)
   REAL :: zval(klon)
-  REAL :: rugsrel(klon)
   REAL :: pctsrf(klon,nbsrf)
   REAL :: t_ancien(klon,klev), q_ancien(klon,klev)
   REAL :: clwcon(klon,klev), rnebcon(klon,klev), ratqs(klon,klev)
@@ -358,10 +356,6 @@ SUBROUTINE phyredem(fichnom,radpas,rlat,rlon,pctsrf,tsol,tsoil, &
   ierr = nf_def_var(nid,'ZVAL',nf_float,1,idim2,nvarid)
   ierr = nf_enddef(nid)
   ierr = nf_put_var_real(nid,nvarid,zval)
-  ierr = nf_redef(nid)
-  ierr = nf_def_var(nid,'RUGSREL',nf_float,1,idim2,nvarid)
-  ierr = nf_enddef(nid)
-  ierr = nf_put_var_real(nid,nvarid,rugsrel)
 
   ierr = nf_redef(nid)
   ierr = nf_def_var(nid,'TANCIEN',nf_float,1,idim3,nvarid)

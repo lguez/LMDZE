@@ -6,8 +6,7 @@ module leapfrog_m
 
 contains
 
-  SUBROUTINE leapfrog(ucov, vcov, teta, ps, masse, phis, nq, q, clesphy0, &
-       time_0)
+  SUBROUTINE leapfrog(ucov, vcov, teta, ps, masse, phis, nq, q, time_0)
 
     ! From dyn3d/leapfrog.F, version 1.6 2005/04/13 08:58:34
 
@@ -48,7 +47,6 @@ contains
     use pressure_var, only: p3d
 
     integer nq
-    REAL, intent(in):: clesphy0(:)
 
     ! Variables dynamiques:
     REAL vcov(ip1jm, llm), ucov(ip1jmp1, llm) ! vents covariants
@@ -220,7 +218,7 @@ contains
 
              CALL calfis(nq, lafin, rdayvrai, time, ucov, vcov, teta, q, &
                   masse, ps, pk, phis, phi, du, dv, dteta, dq, w, &
-                  clesphy0, dufi, dvfi, dtetafi, dqfi, dpfi)
+                  dufi, dvfi, dtetafi, dqfi, dpfi)
 
              ! ajout des tendances physiques:
              CALL addfi(nqmx, dtphys, &

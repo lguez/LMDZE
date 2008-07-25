@@ -30,8 +30,6 @@ contains
 
     !------------------------------------
 
-    print *, "Call sequence information: read_logic"
-
     print *, "Enter namelist 'logic_nml'."
     read(unit=*, nml=logic_nml)
     write(unit=*, nml=logic_nml)

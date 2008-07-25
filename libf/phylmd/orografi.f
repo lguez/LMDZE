@@ -35,7 +35,9 @@ c
       REAL, intent(in):: dtime
       REAL, intent(in):: paprs(klon,klev+1)
       REAL, intent(in):: pplay(klon,klev)
-      REAL pmea(nlon),pstd(nlon),psig(nlon),pgam(nlon),pthe(nlon)
+      REAL pmea(nlon)
+      real, intent(in):: pstd(nlon),psig(nlon)
+      real pgam(nlon),pthe(nlon)
       REAL ppic(nlon),pval(nlon)
       REAL pulow(nlon),pvlow(nlon),pustr(nlon),pvstr(nlon)
       REAL t(nlon,nlev), u(nlon,nlev), v(nlon,nlev)
@@ -203,8 +205,10 @@ c
       real  pum1(nlon,nlev),
      *      pvm1(nlon,nlev),
      *      ptm1(nlon,nlev),
-     *      pmea(nlon),pstd(nlon),psig(nlon),
-     *      pgamma(nlon),ptheta(nlon),ppic(nlon),pval(nlon),
+     *      pmea(nlon)
+      real, intent(in):: pstd(nlon)
+      real, intent(in):: psig(nlon)
+      real pgamma(nlon),ptheta(nlon),ppic(nlon),pval(nlon),
      *      pgeom1(nlon,nlev),
      *      papm1(nlon,nlev),
      *      paphm1(nlon,nlev+1)
@@ -494,7 +498,8 @@ c
      *     pzdep(nlon,klev)
        real pulow(nlon),pvlow(nlon),ptheta(nlon),pgamma(nlon),pnu(nlon),
      *     pd1(nlon),pd2(nlon),pdmod(nlon)
-      real pstd(nlon),pmea(nlon),ppic(nlon),pval(nlon)
+      real, intent(in):: pstd(nlon)
+      real pmea(nlon),ppic(nlon),pval(nlon)
 c
 c-----------------------------------------------------------------------
 c
@@ -951,9 +956,10 @@ c
 c
       real prho(nlon,nlev+1),pstab(nlon,nlev+1),ptau(nlon,nlev+1),
      *     pvph(nlon,nlev+1),
-     *     pgeom1(nlon,nlev),pstd(nlon)
+     *     pgeom1(nlon,nlev)
+      real, intent(in):: pstd(nlon)
 c
-      real psig(nlon)
+      real, intent(in):: psig(nlon)
       real pmea(nlon),ppic(nlon)
       real pdmod(nlon)
 c
@@ -1092,8 +1098,9 @@ C
      *     PRHO  (NLON,NLEV+1), PVPH (NLON,NLEV+1),
      *     PRI   (NLON,NLEV+1), PTAU(NLON,NLEV+1)
      
-      REAL pdmod (NLON) , psig(NLON),
-     *     pvar(NLON)
+      REAL pdmod (NLON)
+      real, intent(in):: psig(NLON)
+      real, intent(in):: pvar(NLON)
      
 C-----------------------------------------------------------------------
 C
@@ -1328,7 +1335,7 @@ c
       REAL, intent(in):: pplay(klon,klev)
       REAL, intent(in):: plat(nlon)
       real pmea(nlon)
-      REAL pstd(nlon)
+      REAL, intent(in):: pstd(nlon)
       REAL ppic(nlon)
       REAL pulow(nlon),pvlow(nlon),pustr(nlon),pvstr(nlon)
       REAL t(nlon,nlev), u(nlon,nlev), v(nlon,nlev)
@@ -1459,15 +1466,11 @@ C
      *      PVOM(NLON,NLEV),
      *      PULOW(NLON),
      *      PVLOW(NLON)
-      REAL  PUM1(NLON,NLEV),
-     *      PVM1(NLON,NLEV),
-     *      PTM1(NLON,NLEV)
+      REAL  PUM1(NLON,NLEV), PVM1(NLON,NLEV), PTM1(NLON,NLEV)
       real, intent(in):: PLAT(NLON)
-      real PMEA(NLON),
-     *      PVAROR(NLON),
-     *      ppic(NLON),
-     *      PGEOM1(NLON,NLEV),
-     *      PAPHM1(NLON,NLEV+1)
+      real PMEA(NLON)
+      real, intent(in):: PVAROR(NLON)
+      real ppic(NLON), PGEOM1(NLON,NLEV), PAPHM1(NLON,NLEV+1)
 C
       INTEGER  KTEST(NLON)
       real, intent(in):: ptsphy
@@ -1601,11 +1604,9 @@ C
       DO 301 JL=1,klon
       IF(KTEST(JL).EQ.1) THEN
        ZTAU(JL,KLEV+1)= - GKLIFT*ZRHO(JL,KLEV+1)*2.*ROMEGA*
-C    *                 (2*PVAROR(JL)+PMEA(JL))*
      *                 2*PVAROR(JL)*
      *                 SIN(ZPI/180.*PLAT(JL))*PVLOW(JL)
        ZTAV(JL,KLEV+1)=   GKLIFT*ZRHO(JL,KLEV+1)*2.*ROMEGA*
-C    *                 (2*PVAROR(JL)+PMEA(JL))*
      *                 2*PVAROR(JL)*
      *                 SIN(ZPI/180.*PLAT(JL))*PULOW(JL)
       ELSE

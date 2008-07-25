@@ -19,7 +19,7 @@ contains
          nf95_get_coord
     use netcdf, only:  nf90_nowrite, nf90_get_var
     use regr_pr, only: regr_pr_av
-    use nrutil, only: assert
+    use numer_rec, only: assert
 
     real, intent(out):: o3_mob_regr(:, :, :) ! (iim + 1, jjm + 1, llm)
     ! (ozone mole fraction from Mobidic adapted to the LMDZ grid)

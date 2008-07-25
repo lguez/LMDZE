@@ -45,7 +45,6 @@ contains
 
     !-------------------------------------------------
 
-    print *, "Call sequence information: read_comdissnew"
     print *, "Enter namelist 'comdissnew_nml'."
     read(unit=*, nml=comdissnew_nml)
     write(unit=*, nml=comdissnew_nml)

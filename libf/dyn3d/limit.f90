@@ -24,7 +24,7 @@ contains
     use start_init_orog_m, only: masque
     use conf_dat2d_m, only: conf_dat2d
     use inter_barxy_m, only: inter_barxy
-    use interpolation, only: spline, splint
+    use numer_rec, only: spline, splint
     use grid_change, only: dyn_phy
 
     use netcdf95, only: handle_err, nf95_get_coord, NF95_CLOSE, NF95_DEF_DIM, &

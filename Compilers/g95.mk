@@ -8,7 +8,7 @@ FC = g95
 netcdf_inc_dir = /home/guez_local/include/NetCDF_g95 /home/guez_local/include
 netcdf_lib_dir = /home/guez_local/lib /home/guez_local/lib/NetCDF_g95
 
-numer_rec_dir = /home/guez_local/lib/Numer_Rec_Lionel/a
+numer_rec_dir = /home/guez_local/lib/Numer_Rec_Lionel/l
 netcdf95_dir = /home/guez_local/lib/NetCDF95/g95
 IOIPSL_dir = /home/guez_local/lib/IOIPSL_Lionel/ac
 

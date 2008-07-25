@@ -20,7 +20,7 @@ contains
     use netcdf, only: nf90_get_var
     use grid_change, only: dyn_phy
     use regr_pr, only: regr_pr_av
-    use nrutil, only: assert
+    use numer_rec, only: assert
 
     integer, intent(in):: ncid ! NetCDF ID of the file
     character(len=*), intent(in):: name ! of the NetCDF variable
@@ -85,7 +85,7 @@ contains
     use netcdf, only: nf90_get_var
     use grid_change, only: dyn_phy
     use regr_pr, only: regr_pr_int
-    use nrutil, only: assert
+    use numer_rec, only: assert
 
     integer, intent(in):: ncid ! NetCDF ID of the file
     character(len=*), intent(in):: name ! of the NetCDF variable

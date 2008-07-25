@@ -19,8 +19,7 @@ contains
 
     ! "vs" has rank 1.
 
-    use nrutil, only: assert_eq
-    use interpolation, only: hunt, polint
+    use numer_rec, only: assert_eq, hunt !!, polint
 
     real, intent(in):: vs(:)
     ! (values of the function at source points "xs")
@@ -46,9 +45,9 @@ contains
     do it = 1, size(xt)
        call hunt(xs, xt(it), is)
        is_b = min(max(is, 1), ns - 1)
-       call polint(xs(is_b:is_b+1), vs(is_b:is_b+1), xt(it), vt(it))
-!!$       vt(it) = ((xs(is_b+1) - xt(it)) * vs(is_b) &
-!!$            + (xt(it) - xs(is_b)) * vs(is_b+1)) / (xs(is_b+1) - xs(is_b))
+!!       call polint(xs(is_b:is_b+1), vs(is_b:is_b+1), xt(it), vt(it))
+       vt(it) = ((xs(is_b+1) - xt(it)) * vs(is_b) &
+            + (xt(it) - xs(is_b)) * vs(is_b+1)) / (xs(is_b+1) - xs(is_b))
     end do
 
   end function regr11_lint
@@ -59,8 +58,7 @@ contains
 
     ! "vs" has rank 2.
 
-    use nrutil, only: assert_eq
-    use interpolation, only: hunt
+    use numer_rec, only: assert_eq, hunt
 
     real, intent(in):: vs(:, :)
     ! (values of the function at source points "xs")

@@ -29,7 +29,7 @@ PROGRAM gcm
 
   use logic, only: iflag_phys
   use comgeom, only: rlatu, aire_2d, cu_2d, cv_2d, rlonv
-  use temps, only: day_ref, annee_ref, day_ini, day_end, itau_phy, itau_dyn
+  use temps, only: day_ref, annee_ref, day_ini, day_end, itau_dyn
   use com_io_dyn, only: histid, histvid, histaveid
   use tracstoke, only: istdyn, istphy
   use abort_gcm_m, only: abort_gcm
@@ -40,10 +40,10 @@ PROGRAM gcm
   use advtrac_m, only: iniadvtrac
   use leapfrog_m, only: leapfrog
   use dynredem0_m, only: dynredem0
+  use clesphys2, only: read_clesphys2
 
   IMPLICIT NONE
 
-  REAL clesphy0(20)
   REAL zdtvr ! time step for dynamics, in s
 
   ! Variables dynamiques :
@@ -92,7 +92,8 @@ PROGRAM gcm
   endif
 
   ! Lecture des fichiers "gcm.def" ou "run.def" :
-  CALL conf_gcm(clesphy0)
+  call read_clesphys2
+  CALL conf_gcm
 
   ! Initialisation des traceurs
   ! Choix du schéma pour l'advection dans le fichier "traceur.def" ou via INCA
@@ -127,7 +128,6 @@ PROGRAM gcm
         day_ref = dayref
         day_ini = dayref
         itau_dyn = 0
-        itau_phy = 0
         time_0 = 0.
      endif
   ELSE
@@ -203,7 +203,7 @@ PROGRAM gcm
   istphy = istdyn / iphysiq     
 
   ! Intégration temporelle du modèle :
-  CALL leapfrog(ucov, vcov, teta, ps, masse, phis, nq, q, clesphy0, time_0)
+  CALL leapfrog(ucov, vcov, teta, ps, masse, phis, nq, q, time_0)
 
   call histclo
   print *, 'Simulation finished'

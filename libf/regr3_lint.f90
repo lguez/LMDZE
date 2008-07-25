@@ -19,8 +19,7 @@ contains
 
     ! "vs" has rank 3.
 
-    use nrutil, only: assert_eq
-    use interpolation, only: hunt
+    use numer_rec, only: assert_eq, hunt
 
     real, intent(in):: vs(:, :, :)
     ! (values of the function at source points "xs")

@@ -25,8 +25,7 @@ contains
 
     ! "vs" has rank 1.
 
-    use nrutil, only: assert_eq, assert
-    use interpolation, only: locate
+    use numer_rec, only: assert_eq, assert, locate
 
     real, intent(in):: vs(:) ! values of steps on the source grid
     ! (Step "is" is between "xs(is)" and "xs(is + 1)".)
@@ -83,8 +82,7 @@ contains
 
     ! "vs" has rank 2.
 
-    use nrutil, only: assert_eq, assert
-    use interpolation, only: locate
+    use numer_rec, only: assert_eq, assert, locate
 
     real, intent(in):: vs(:, :) ! values of steps on the source grid
     ! (Step "is" is between "xs(is)" and "xs(is + 1)".)
@@ -142,8 +140,7 @@ contains
 
     ! "vs" has rank 3.
 
-    use nrutil, only: assert_eq, assert
-    use interpolation, only: locate
+    use numer_rec, only: assert_eq, assert, locate
 
     real, intent(in):: vs(:, :, :) ! values of steps on the source grid
     ! (Step "is" is between "xs(is)" and "xs(is + 1)".)

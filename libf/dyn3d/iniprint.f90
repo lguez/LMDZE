@@ -14,7 +14,6 @@ contains
 
     !-------------------------------------------------
 
-    print *, "Call sequence information: read_iniprint"
     print *, "Enter namelist 'iniprint_nml'."
     read(unit=*, nml=iniprint_nml)
     write(unit=*, nml=iniprint_nml)

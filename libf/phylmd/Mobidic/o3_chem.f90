@@ -13,12 +13,11 @@ contains
     ! This procedure evolves the ozone mass fraction through a time
     ! step taking only chemistry into account.
 
-    use nrutil, only: assert
+    use numer_rec, only: assert, pi
     use dimphy, only: klon
     use dimens_m, only: llm
     use regr_pr_comb_coefoz_m, only: c_Mob, a4_mass, a2, r_het_interm
     use orbite_m, only: orbite, zenang
-    use nrtype, only: pi
 
     integer, intent(in):: julien ! jour julien, 1 <= julien <= 360
     real, intent(in):: gmtime ! heure de la journée en fraction de jour
@@ -113,7 +112,7 @@ contains
     ! This function computes the production rate of ozone by chemistry.
 
     use regr_pr_comb_coefoz_m, only: a6_mass
-    use nrutil, only: assert
+    use numer_rec, only: assert
     use dimens_m, only: llm
     use dimphy, only: klon
 

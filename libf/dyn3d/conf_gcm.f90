@@ -47,7 +47,7 @@ module conf_gcm_m
 
 contains
 
-  SUBROUTINE conf_gcm(clesphy0)
+  SUBROUTINE conf_gcm
 
     ! Auteurs : L. Fairhead, P. Le Van
     ! Version du 29/04/97
@@ -65,19 +65,12 @@ contains
     use logic, only: read_logic
     use serre, only: clon, clat, grossismx, grossismy, alphax, alphay, &
          dzoomx, dzoomy, taux, tauy
-    use clesphys2, only: ok_limitvrai, ok_orolf, iflag_con, nbapp_rad, &
-         ok_orodr, cycle_diurne, new_oliq, soil_model
     use iniprint, only: read_iniprint
-
-    INTEGER, PARAMETER:: longcles = 20
-
-    REAL, intent(out), optional:: clesphy0(longcles)
 
     namelist /conf_gcm_nml/dayref, anneeref, raz_date, nday, day_step, &
          iperiod, iapp_tracvl, iconser, iecri, periodav, idissip, &
-         iphysiq, cycle_diurne, soil_model, new_oliq, &
-         ok_orodr, ok_orolf, ok_limitvrai, nbapp_rad, iflag_con, clon, clat, &
-         grossismx, grossismy, dzoomx, dzoomy, taux, tauy, offline
+         iphysiq, clon, clat, grossismx, grossismy, dzoomx, dzoomy, taux, &
+         tauy, offline
 
     !------------------------------------
 
@@ -90,19 +83,6 @@ contains
     print *, "Enter namelist 'conf_gcm_nml'."
     read(unit=*, nml=conf_gcm_nml)
     write(unit=*, nml=conf_gcm_nml)
-
-    if (present(clesphy0)) then
-       clesphy0(:) = 0.
-       clesphy0(1) = REAL(iflag_con)
-       clesphy0(2) = REAL(nbapp_rad)
-
-       IF (cycle_diurne) clesphy0(3) = 1.
-       IF (soil_model) clesphy0(4) = 1.
-       IF (new_oliq) clesphy0(5) = 1.
-       IF (ok_orodr) clesphy0(6) = 1.
-       IF (ok_orolf) clesphy0(7) = 1.
-       IF (ok_limitvrai) clesphy0(8) = 1.
-    end if
 
     IF (grossismx < 1.) THEN
        PRINT *, 'Error: grossismx < 1'

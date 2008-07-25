@@ -365,9 +365,9 @@ l'intermédiaire du sous-programme \verb+getin+ de IOIPSL. \verb+getin+
 n'est appelé que dans les fichiers \verb+phylmd/conf_phys.f+,
 \verb+dyn3d/conf_gcm.F+ et \verb+dyn3d/getparam.f+.
 
-La résolution des fichiers de conditions initiales et de conditions
-aux limites étant a priori différente de celle de LMDZ, LMDZ re-maille
-ces données par interpolation ou moyenne.
+La résolution spatiale des fichiers de conditions initiales et de
+conditions aux limites étant a priori différente de celle de LMDZ,
+LMDZ re-maille ces données par interpolation ou moyenne.
 
 Dans le module \verb+start_init_orog_m+, la variable \verb+phis+ est
 allouée et modifiée par \verb+start_init_orog+. Dans
@@ -392,71 +392,117 @@ de cette procédure. Cf. figure (\ref{fig:leapfrog}).
   ``Matsuno-leapfrog'']{Principe de l'intégration temporelle selon le
     schéma ``Matsuno-leapfrog'', dans \texttt{leapfrog}. Cas où
     \texttt{iphysiq} = 10. ``FM'' : \Eng{forward} Matsuno, ``BM'' :
-    \Eng{backward} Matsuno. Les flèches courbent représentent des pas
+    \Eng{backward} Matsuno. Les flèches courbes représentent des pas
     ``leapfrog''.  Les numéros sur les flèches indiquent l'ordre des
     intégrations.  Six intégrations sont nécessaires pour avancer de
     cinq pas de temps.}
   \label{fig:leapfrog}
 \end{figure}
 
+Concernant la variable \verb+itau_phy+ du module \verb+temps+. Dans le
+programme \verb+etat0_lim+ : \verb+itau_phy+ est mis à 0 par
+\verb+etat0+ et écrit dans \verb+startphy.nc+ par
+\verb+phyredem+. Dans le programme \verb+gcm+ :
+\begin{itemize}
+\item à la première exécution de \verb+physiq+, \verb+phyetat0+ lit
+  \verb+itau_phy+ dans \verb+startphy.nc+, \verb+physiq+ met
+  \verb+itau_phy+ à 0 si \verb+raz_date==1+ ;
+\item les procédures \verb+ini_hist*+ et \verb+clmain+ passent
+  \verb+itau_phy+ à \verb+histbeg_totreg+ ;
+\item les procédures \verb+write_hist*+ utilisent \verb+itau_phy+ pour
+  calculer \verb+itau_w+, qui est passé à \verb+histwrite+ ;
+\item à la dernière exécution de \verb+physiq+, \verb+physiq+ ajoute
+  \verb+itap+ à \verb+itau_phy+, \verb+phyredem+ écrit \verb+itau_phy+
+  dans \verb+startphy.nc+.
+\end{itemize}
+
 \subsection{Maillage horizontal}
 
-Trois grilles à trois dimensions. Une grille de base pour, entre 
-autres, la température et l'humidité relative. François L. l'appelle 
-la grille physique. Une grille décalée en longitude par rapport 
-à la grille de base, d'un demi-pas de longitude, pour la vitesse 
-zonale \textit{u}. Une grille décalée en latitude par rapport à la 
-grille de base, d'un demi-pas de latitude, pour la vitesse \textit{v}. 
-François L. appelle ces deux dernières grilles les grilles dynamiques. 
-Les points de la grille de base de dernier indice de longitude 
-et ceux de premier indice de longitude ont la même longitude. 
-De même, les points de la grille de base de dernier indice de 
-latitude et ceux de premier indice de latitude ont la même latitude. 
-On peut dire que la grille de base est « repliée sur elle 
-même » en longitude et latitude. Les deux grilles décalées 
-ont autant de points que la grille de base. Elles sont aussi 
-repliées sur elles-mêmes en longitude et latitude. \textit{Cf}. :
+Trois grilles à trois dimensions. Une grille de base pour, entre
+autres, la température et l'humidité relative. François L. l'appelle
+la grille physique. Une grille décalée en longitude par rapport à la
+grille de base, d'un demi-pas de longitude, pour la vitesse zonale
+\textit{u}. Une grille décalée en latitude par rapport à la grille de
+base, d'un demi-pas de latitude, pour la vitesse \textit{v}.  François
+L. appelle ces deux dernières grilles les grilles dynamiques.  Les
+points de la grille de base de dernier indice de longitude et ceux de
+premier indice de longitude ont la même longitude.  On peut dire que
+la grille de base est « repliée sur elle même » en longitude. Les deux
+grilles décalées sont aussi repliées sur elles-mêmes en longitude. La
+grille décalée en longitude a autant de points que la grille de base.
+\textit{Cf}. :
 \begin{itemize}
 \item Arakawa et Lamb [1977 \#737] ;
 \item description du modèle par Phu L. V. (juin 1989) ;
 \item
-  \href{file:///user/guez/Documents/Informatique_fonctionnement/Programs/Documentation
-    IOIPSL LMDZ/Manuel_LMDZE.texfol/Discrétisation équations
-    LMDZ.ps}{Discrétisation des équations de la dynamique dans LMDZ}
-  (16 novembre 1995) ;
+  \href{file:///user/guez/Documents/Informatique_fonctionnement/Programs/Guide_IPSL_climate_models/Discrétisation
+    équations LMDZ.ps}{Discrétisation des équations de la dynamique
+    dans LMDZ} (16 novembre 1995) ;
 \item manuel de LMDZ pour Mars (5 avril 2004) ;
 \item commentaires dans la procédure \verb+inigeom +;
 \item
-  \href{file:///user/guez/Documents/Informatique_fonctionnement/Programs/Documentation
-    IOIPSL LMDZ/Grilles horizontales LMDZ.odg}{schéma des grilles
-    horizontales}.
+  \href{file:///user/guez/Documents/Informatique_fonctionnement/Programs/LMDZ/LMDZE/Documentation/Grilles
+    horizontales LMDZ.odg}{schéma des grilles horizontales}.
 \end{itemize}
-\verb+iim+ est le nombre de longitudes distinctes dans la 
-grille de base (scalaire). Les valeurs de ces longitudes sont 
-dans le tableau \verb+rlonv+. La taille de rlonv est \verb-iim+1- 
-et \verb-rlonv(iim+1)=rlonv(1)-. \verb+jjm+ est le 
-nombre d'intervalles de latitude dans la grille de base. Les 
-valeurs de ces longitudes sont dans le tableau \verb+rlatu+. 
-La taille de rlatu est \verb-jjm+1-. Pour la partie physique 
-du modèle, les points distincts de la grille scalaire sont classés 
-par ordre de latitude décroissante et, pour une même latitude, 
-par ordre de longitude croissante (cf. figure 2.2 du manuel de 
-LMDZ pour Mars). Chacun des points distincts de la grille scalaire 
-peut donc être identifié par un indice dans ce classement : 
-un seul indice au lieu de 2 indices faisant référence à la latitude 
-et à la longitude. Les tableaux \verb+latfi+ et \verb+lonfi+ 
-contiennent les coordonnées associées à cet indice simple.
+La variable \verb+iim+ du module \verb+dimens_m+ est le nombre de
+longitudes distinctes dans la grille de base (scalaire). Les valeurs
+de ces longitudes sont dans le tableau \verb+rlonv+ du module
+\verb+comgeom+. La taille de \verb+rlonv+ est \verb-iim+1- et :
+\begin{verbatim}
+rlonv(iim+1) = rlonv(1)
+\end{verbatim}
+La variable \verb+jjm+ du module \verb+dimens_m+ est le nombre
+d'intervalles de latitude dans la grille de base. Les valeurs de ces
+latitudes sont dans le tableau \verb+rlatu+ du module \verb+comgeom+.
+La taille de \verb+rlatu+ est \verb-jjm+1-.  Pour la partie physique
+du modèle, les points distincts de la grille scalaire sont classés par
+ordre de latitude décroissante et, pour une même latitude, par ordre
+de longitude croissante (cf.  figure 2.2 du manuel de LMDZ pour Mars).
+Chacun des points distincts de la grille scalaire peut donc être
+identifié par un indice dans ce classement : un seul indice au lieu de
+2 indices faisant référence à la latitude et à la longitude. Les
+tableaux \verb+latitude+ et \verb+longitude+ du fichier
+\verb+startphy.nc+ contiennent les coordonnées associées à cet indice
+simple. Passage du couple d'indices $(i, j)$ à l'indice simple $i'$ :
+\begin{align*}
+  i = 1, j = 1 & \Rightarrow i' = 1 \\
+  \left.
+    \begin{array}{l}
+      i \le \mathtt{iim} \\
+      j \in \{2, \ldots, \mathtt{jjm}\}
+    \end{array}
+  \right\} & \Rightarrow i' = 1 + (j - 2) \mathtt{iim} + i \\
+  i = 1, j = \mathtt{jjm} + 1 & \Rightarrow i' = \mathtt{klon}
+\end{align*}
+Réciproquement :
+\begin{align*}
+  i' = 1 & \Rightarrow i = 1, j = 1 \\
+  i' \in \{2, \ldots, \mathtt{klon} - 1\} & \Rightarrow
+  \left\{
+    \begin{array}{l}
+      i = (i' - 2) [\mathtt{iim}] + 1 \\
+      j = (i' - 2) / \mathtt{iim} + 2
+    \end{array}
+  \right. \\
+  i' = \mathtt{klon} & \Rightarrow
+  \left\{
+    \begin{array}{l}
+      i = 1 \\
+      j = \mathtt{jjm} + 1
+    \end{array}
+  \right.
+\end{align*}
 
 Pour le remplissage des tableaux \verb+latfi+, \verb+lonfi+,
 \verb+zcufi+ et \verb+zcvfi+ dans \verb+gcm+, cf.
-\href{file:///user/guez/Documents/Informatique_fonctionnement/Programs/Documentation
-  IOIPSL LMDZ/Grilles horizontales LMDZ.odg}{schéma des grilles
-  horizontales}. Dans cette figure, dans le tableau \verb+mask_v+, le
-point d'indice \verb-(1, jjm + 1)- est marqué
-{\textquotedbl}T(2){\textquotedbl} pour rappeler qu'il est recopié
-dans deux éléments de \verb+zcvfi+. zcufi et zcvfi sont les valeurs de
-cu et cv affectées aux points de la grille « physique ».  Par exemple,
-regardons le
+\href{file:///user/guez/Documents/Informatique_fonctionnement/Programs/LMDZ/LMDZE/Documentation/Grilles
+  horizontales LMDZ.odg}{schéma des grilles horizontales}. Dans cette
+figure, dans le tableau \verb+mask_v+, le point d'indice
+\verb-(1, jjm + 1)- est marqué {\textquotedbl}T(2){\textquotedbl} pour
+rappeler qu'il est recopié dans deux éléments de \verb+zcvfi+.
+\verb+zcufi+ et \verb+zcvfi+ sont les valeurs de \verb+cu+ et
+\verb+cv+ affectées aux points de la grille « physique ».  Par
+exemple, regardons le
 \href{file:///user/guez/Documents/Informatique_fonctionnement/Programs/Documentation
   IOIPSL LMDZ/Grilles horizontales LMDZ.odg}{schéma} et considérons le
 cas de \verb+cv+ et \verb+zcvfi+. \verb+cv+ est bien défini sur les
@@ -471,16 +517,13 @@ aurait plus de sens. Mais Phu L. V. semble dire que la faible
 importance des tableaux \verb+zcufi+ et \verb+zcvfi+ ne justifie pas
 de compliquer ainsi. Cf. son message du 27/10/6.
 
-Dans la version que j'ai téléchargée, la résolution (modifiable) est
-de 96 longitudes \ensuremath{\times} 71 latitudes \ensuremath{\times}
-19 niveaux.  François L. préfère 72 latitudes pour avoir une grille
-sur des valeurs rondes. Laurent Li utilise LMDZ avec la résolution 72
-longitudes \ensuremath{\times} 45 latitudes \ensuremath{\times} 19
-niveaux. Soit une résolution de 5° en longitude et 4° en latitude.
-LMDZ ne converge plus lorsque la résolution devient trop fine.
-\textit{Cf.} aussi la
-\href{http://www.lmd.jussieu.fr/~lmdz/LMDZ4/choisir_une_resolution.html}{documentation
-  officielle de LMDZ4}.
+La résolution horizontale standard est de 96 longitudes $\times$ 72
+latitudes. (Un avantage annexe est que la grille des latitudes tombe
+alors sur des valeurs rondes.) LMDZ ne converge plus lorsque la
+résolution devient trop fine.  \textit{Cf.} aussi la documentation
+officielle de LMDZ4 sur le
+\href{http://www.lmd.jussieu.fr/~lmdz/LMDZ4/choisir_une_resolution.html}{choix
+  d'une résolution horizontale}.
 
 \subsection{Maillage vertical}
 

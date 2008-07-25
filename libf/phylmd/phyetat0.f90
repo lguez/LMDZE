@@ -14,8 +14,8 @@ contains
   SUBROUTINE phyetat0(fichnom, pctsrf, tsol,tsoil, ocean, tslab,seaice, &
        qsurf,qsol,snow, &
        albe, alblw, evap, rain_fall, snow_fall, solsw, sollw, &
-       fder,radsol,frugs,agesno,clesphy0, &
-       zmea,zstd,zsig,zgam,zthe,zpic,zval,rugsrel, &
+       fder,radsol,frugs,agesno, &
+       zmea,zstd,zsig,zgam,zthe,zpic,zval, &
        t_ancien,q_ancien,ancien_ok, rnebcon, ratqs,clwcon, &
        run_off_lic_0)
 
@@ -26,8 +26,6 @@ contains
     USE indicesol, ONLY : epsfra, is_lic, is_oce, is_sic, is_ter, nbsrf
     USE dimsoil, ONLY : nsoilmx
     USE temps, ONLY : itau_phy
-    USE clesphys2, ONLY : cycle_diurne, iflag_con, nbapp_rad, new_oliq, &
-         ok_limitvrai, ok_orodr, ok_orolf, soil_model
     use netcdf, only: nf90_get_att, nf90_global
     use netcdf95, only: handle_err
 
@@ -53,13 +51,12 @@ contains
     REAL frugs(klon,nbsrf)
     REAL agesno(klon,nbsrf)
     REAL zmea(klon)
-    REAL zstd(klon)
-    REAL zsig(klon)
+    REAL, intent(out):: zstd(klon)
+    REAL, intent(out):: zsig(klon)
     REAL zgam(klon)
     REAL zthe(klon)
     REAL zpic(klon)
     REAL zval(klon)
-    REAL rugsrel(klon)
     REAL pctsrf(klon, nbsrf)
     REAL fractint(klon)
     REAL run_off_lic_0(klon)
@@ -70,16 +67,10 @@ contains
 
     CHARACTER(len=*), intent(in):: ocean
 
-    INTEGER        longcles
-    PARAMETER    ( longcles = 20 )
-    REAL, intent(in):: clesphy0( longcles )
-
     REAL xmin, xmax
 
     INTEGER nid, nvarid
     INTEGER ierr, i, nsrf, isoil 
-    INTEGER length
-    PARAMETER (length=100)
     CHARACTER*7 str7
     CHARACTER*2 str2
 
@@ -96,15 +87,6 @@ contains
        write(6,*)' ierr = ', ierr
        STOP 1
     ENDIF
-
-    iflag_con    = clesphy0(1)
-    nbapp_rad    = clesphy0(2)
-    cycle_diurne  = clesphy0(3) == 1
-    soil_model = clesphy0(4) == 1
-    new_oliq = clesphy0(5) == 1
-    ok_orodr = clesphy0(6) == 1
-    ok_orolf = clesphy0(7) == 1
-    ok_limitvrai = clesphy0(8) == 1
 
     ierr = nf90_get_att(nid, nf90_global, "itau_phy", itau_phy)
     call handle_err("phyetat0 itau_phy", ierr, nid, nf90_global)
@@ -989,26 +971,6 @@ contains
        xmax = MAX(zval(i),xmax)
     ENDDO
     PRINT*,'OROGRAPHIE SOUS-MAILLE zval:', xmin, xmax
-
-
-    ierr = NF_INQ_VARID (nid, "RUGSREL", nvarid)
-    IF (ierr.NE.NF_NOERR) THEN
-       PRINT*, 'phyetat0: Le champ <RUGSREL> est absent'
-       stop 1
-    ENDIF
-    ierr = NF_GET_VAR_REAL(nid, nvarid, rugsrel)
-    IF (ierr.NE.NF_NOERR) THEN
-       PRINT*, 'phyetat0: Lecture echouee pour <RUGSREL>'
-       stop 1
-    ENDIF
-    xmin = 1.0E+20
-    xmax = -1.0E+20
-    DO i = 1, klon
-       xmin = MIN(rugsrel(i),xmin)
-       xmax = MAX(rugsrel(i),xmax)
-    ENDDO
-    PRINT*,'Rugosite relief (ecart-type) rugsrel:', xmin, xmax
-
 
     ancien_ok = .TRUE.
 

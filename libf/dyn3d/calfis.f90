@@ -8,7 +8,7 @@ contains
 
   SUBROUTINE calfis(nq, lafin, rdayvrai, heure, pucov, pvcov, pteta, pq, &
        pmasse, pps, ppk, pphis, pphi, pducov, pdvcov, pdteta, pdq, pw, &
-       clesphy0, pdufi, pdvfi, pdhfi, pdqfi, pdpsfi)
+       pdufi, pdvfi, pdhfi, pdqfi, pdpsfi)
 
     ! From dyn3d/calfis.F,v 1.3 2005/05/25 13:10:09
 
@@ -99,7 +99,6 @@ contains
     REAL pdpsfi(iim + 1,jjm + 1)
 
     INTEGER, PARAMETER:: longcles = 20
-    REAL, intent(in):: clesphy0(longcles)
 
     !    Local variables :
 
@@ -332,7 +331,7 @@ contains
     !   Appel de la physique:
 
     CALL physiq(nq, firstcal, lafin, rdayvrai, heure, dtphys, &
-         zplev, zplay, zphi, zphis, presnivs, clesphy0, zufi, zvfi, &
+         zplev, zplay, zphi, zphis, presnivs, zufi, zvfi, &
          ztfi, zqfi, pvervel, zdufi, zdvfi, zdtfi, zdqfi, zdpsrf, pducov, &
          PVteta) ! IM diagnostique PVteta, Amip2
 

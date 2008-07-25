@@ -141,7 +141,8 @@ cIM cf JLD
       REAL run_off_lic_0(klon), y_run_off_lic_0(klon)
 
       REAL flux_u(klon,klev, nbsrf), flux_v(klon,klev, nbsrf)
-      REAL rugmer(klon), agesno(klon,nbsrf),rugoro(klon)
+      REAL rugmer(klon), agesno(klon,nbsrf)
+      real, intent(in):: rugoro(klon)
       REAL cdragh(klon), cdragm(klon)
       integer jour            ! jour de l'annee en cours
       real rmu0(klon)         ! cosinus de l'angle solaire zenithal
@@ -253,9 +254,7 @@ c
       LOGICAL first_appel
       SAVE first_appel
       DATA first_appel/.true./
-      LOGICAL debugindex
-      SAVE debugindex
-      DATA debugindex/.false./
+      LOGICAL:: debugindex = .false.
       integer idayref
       REAL t2m(klon,nbsrf), q2m(klon,nbsrf)
       REAL u10m(klon,nbsrf), v10m(klon,nbsrf)

@@ -142,10 +142,8 @@ CONTAINS
     ! interpolations needed.
 
     USE ioipsl, only: flinget
-    use nrutil, only: assert_eq
-
+    use numer_rec, only: assert_eq, spline, splint
     use inter_barxy_m, only: inter_barxy
-    use interpolation, only: spline, splint
     use gr_int_dyn_m, only: gr_int_dyn
     use conf_dat3d_m, only: conf_dat3d
 

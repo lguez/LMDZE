@@ -10,7 +10,7 @@ module physiq_m
 contains
 
   SUBROUTINE physiq(nq, firstcal, lafin, rdayvrai, gmtime, pdtphys, paprs, &
-       pplay, pphi, pphis, presnivs, clesphy0, u, v, t, qx, omega, d_u, d_v, &
+       pplay, pphi, pphis, presnivs, u, v, t, qx, omega, d_u, d_v, &
        d_t, d_qx, d_ps, dudyn, PVteta)
 
     ! From phylmd/physiq.F, v 1.22 2006/02/20 09:38:28
@@ -319,7 +319,6 @@ contains
 
     INTEGER        longcles
     PARAMETER    ( longcles = 20 )
-    REAL, intent(in):: clesphy0( longcles      )
 
     ! Variables propres a la physique
 
@@ -357,31 +356,15 @@ contains
     REAL falblw(klon, nbsrf)
     SAVE falblw                 ! albedo par type de surface
 
-    !  Parametres de l'Orographie a l'Echelle Sous-Maille (OESM):
-
-    REAL zmea(klon)
-    SAVE zmea                   ! orographie moyenne
-
-    REAL zstd(klon)
-    SAVE zstd                   ! deviation standard de l'OESM
-
-    REAL zsig(klon)
-    SAVE zsig                   ! pente de l'OESM
-
-    REAL zgam(klon)
-    save zgam                   ! anisotropie de l'OESM
-
-    REAL zthe(klon)
-    SAVE zthe                   ! orientation de l'OESM
-
-    REAL zpic(klon)
-    SAVE zpic                   ! Maximum de l'OESM
-
-    REAL zval(klon)
-    SAVE zval                   ! Minimum de l'OESM
-
-    REAL rugoro(klon)
-    SAVE rugoro                 ! longueur de rugosite de l'OESM
+    ! Paramètres de l'orographie à l'échelle sous-maille (OESM) :
+    REAL, save:: zmea(klon) ! orographie moyenne
+    REAL, save:: zstd(klon) ! deviation standard de l'OESM
+    REAL, save:: zsig(klon) ! pente de l'OESM
+    REAL, save:: zgam(klon) ! anisotropie de l'OESM
+    REAL, save:: zthe(klon) ! orientation de l'OESM
+    REAL, save:: zpic(klon) ! Maximum de l'OESM
+    REAL, save:: zval(klon) ! Minimum de l'OESM
+    REAL, save:: rugoro(klon) ! longueur de rugosite de l'OESM
 
     REAL zulow(klon), zvlow(klon)
 
@@ -794,17 +777,17 @@ contains
     ok_sync=.TRUE.
     IF (nq  <  2) THEN
        abort_message = 'eaux vapeur et liquide sont indispensables'
-       CALL abort_gcm (modname, abort_message, 1)
+       CALL abort_gcm(modname, abort_message, 1)
     ENDIF
 
     test_firstcal: IF (firstcal) THEN
        !  initialiser
-       u10m(:, :)=0.
-       v10m(:, :)=0.
-       t2m(:, :)=0.
-       q2m(:, :)=0.
-       ffonte(:, :)=0.
-       fqcalving(:, :)=0.
+       u10m=0.
+       v10m=0.
+       t2m=0.
+       q2m=0.
+       ffonte=0.
+       fqcalving=0.
        piz_ae(:, :, :)=0.
        tau_ae(:, :, :)=0.
        cg_ae(:, :, :)=0.
@@ -817,23 +800,23 @@ contains
        solswai(:)=0.
        solswad(:)=0.
 
-       d_u_con(:, :) = 0.0
-       d_v_con(:, :) = 0.0
-       rnebcon0(:, :) = 0.0
-       clwcon0(:, :) = 0.0
-       rnebcon(:, :) = 0.0
-       clwcon(:, :) = 0.0
+       d_u_con = 0.0
+       d_v_con = 0.0
+       rnebcon0 = 0.0
+       clwcon0 = 0.0
+       rnebcon = 0.0
+       clwcon = 0.0
 
-       pblh(:, :)   =0.        ! Hauteur de couche limite
-       plcl(:, :)   =0.        ! Niveau de condensation de la CLA
-       capCL(:, :)  =0.        ! CAPE de couche limite
-       oliqCL(:, :) =0.        ! eau_liqu integree de couche limite
-       cteiCL(:, :) =0.        ! cloud top instab. crit. couche limite
-       pblt(:, :)   =0.        ! T a la Hauteur de couche limite
-       therm(:, :)  =0.
-       trmb1(:, :)  =0.        ! deep_cape
-       trmb2(:, :)  =0.        ! inhibition 
-       trmb3(:, :)  =0.        ! Point Omega
+       pblh   =0.        ! Hauteur de couche limite
+       plcl   =0.        ! Niveau de condensation de la CLA
+       capCL  =0.        ! CAPE de couche limite
+       oliqCL =0.        ! eau_liqu integree de couche limite
+       cteiCL =0.        ! cloud top instab. crit. couche limite
+       pblt   =0.        ! T a la Hauteur de couche limite
+       therm  =0.
+       trmb1  =0.        ! deep_cape
+       trmb2  =0.        ! inhibition 
+       trmb3  =0.        ! Point Omega
 
        IF (if_ebil >= 1) d_h_vcol_phy=0.
 
@@ -854,8 +837,8 @@ contains
        CALL phyetat0("startphy.nc", pctsrf, ftsol, ftsoil, ocean, tslab, &
             seaice, fqsurf, qsol, fsnow, &
             falbe, falblw, fevap, rain_fall, snow_fall, solsw, sollwdown, &
-            dlw, radsol, frugs, agesno, clesphy0, &
-            zmea, zstd, zsig, zgam, zthe, zpic, zval, rugoro, &
+            dlw, radsol, frugs, agesno, &
+            zmea, zstd, zsig, zgam, zthe, zpic, zval, &
             t_ancien, q_ancien, ancien_ok, rnebcon, ratqs, clwcon,  &
             run_off_lic_0)
 
@@ -904,10 +887,10 @@ contains
        ENDIF
 
        IF (ok_orodr) THEN
-          DO i=1, klon
-             rugoro(i) = MAX(1.0e-05, zstd(i)*zsig(i)/2.0)
-          ENDDO
+          rugoro = MAX(1e-5, zstd * zsig / 2)
           CALL SUGWD(klon, llm, paprs, pplay)
+       else
+          rugoro = 0.
        ENDIF
 
        lmt_pas = NINT(86400. / pdtphys)  ! tous les jours
@@ -956,8 +939,8 @@ contains
           ENDDO
        ENDDO
     ENDDO
-    da(:, :)=0.
-    mp(:, :)=0.
+    da=0.
+    mp=0.
     phi(:, :, :)=0.
 
     ! Ne pas affecter les valeurs entrees de u, v, h, et q
@@ -1332,7 +1315,6 @@ contains
        ! (driver commun aux versions 3 et 4)
 
        IF (ok_cvl) THEN ! new driver for convectL
-
           CALL concvl (iflag_con, &
                pdtphys, paprs, pplay, t_seri, q_seri, &
                u_seri, v_seri, tr_seri, ntra, &
@@ -1346,8 +1328,7 @@ contains
                da, phi, mp)
 
           clwcon0=qcondc
-          pmfu(:, :)=upwd(:, :)+dnwd(:, :)
-
+          pmfu=upwd+dnwd
        ELSE ! ok_cvl
           ! MAF conema3 ne contient pas les traceurs
           CALL conema3 (pdtphys, &
@@ -1361,7 +1342,6 @@ contains
                pbase &
                , bbase, dtvpdt1, dtvpdq1, dplcldt, dplcldr &
                , clwcon0)
-
        ENDIF ! ok_cvl
 
        IF (.NOT. ok_gust) THEN
@@ -1393,7 +1373,7 @@ contains
        ENDDO
 
        !   calcul des proprietes des nuages convectifs
-       clwcon0(:, :)=fact_cldcon*clwcon0(:, :)
+       clwcon0=fact_cldcon*clwcon0
        call clouds_gno &
             (klon, llm, q_seri, zqsat, clwcon0, ptconv, ratqsc, rnebcon0)
     ELSE
@@ -1462,12 +1442,12 @@ contains
 
     ! Convection seche (thermiques ou ajustement)
 
-    d_t_ajs(:, :)=0.
-    d_u_ajs(:, :)=0.
-    d_v_ajs(:, :)=0.
-    d_q_ajs(:, :)=0.
-    fm_therm(:, :)=0.
-    entr_therm(:, :)=0.
+    d_t_ajs=0.
+    d_u_ajs=0.
+    d_v_ajs=0.
+    d_q_ajs=0.
+    fm_therm=0.
+    entr_therm=0.
 
     IF(prt_level>9)print *, &
          'AVANT LA CONVECTION SECHE, iflag_thermals=' &
@@ -1479,8 +1459,8 @@ contains
        !  Ajustement sec
        IF(prt_level>9)print *,'ajsec'
        CALL ajsec(paprs, pplay, t_seri, q_seri, d_t_ajs, d_q_ajs)
-       t_seri(:, :) = t_seri(:, :) + d_t_ajs(:, :)
-       q_seri(:, :) = q_seri(:, :) + d_q_ajs(:, :)
+       t_seri = t_seri + d_t_ajs
+       q_seri = q_seri + d_q_ajs
     else
        !  Thermiques
        IF(prt_level>9)print *,'JUSTE AVANT, iflag_thermals=' &
@@ -1531,11 +1511,11 @@ contains
        !   1e4 (en gros 3 heures), en dur pour le moment, est le temps de
        !   relaxation des ratqs
        facteur=exp(-pdtphys*facttemps)
-       ratqs(:, :)=max(ratqs(:, :)*facteur, ratqss(:, :))
-       ratqs(:, :)=max(ratqs(:, :), ratqsc(:, :))
+       ratqs=max(ratqs*facteur, ratqss)
+       ratqs=max(ratqs, ratqsc)
     else
        !   on ne prend que le ratqs stable pour fisrtilp
-       ratqs(:, :)=ratqss(:, :)
+       ratqs=ratqss
     endif
 
     ! Appeler le processus de condensation a grande echelle
@@ -1635,8 +1615,8 @@ contains
        enddo
 
        !   On prend la somme des fractions nuageuses et des contenus en eau
-       cldfra(:, :)=min(max(cldfra(:, :), rnebcon(:, :)), 1.)
-       cldliq(:, :)=cldliq(:, :)+rnebcon(:, :)*clwcon(:, :)
+       cldfra=min(max(cldfra, rnebcon), 1.)
+       cldliq=cldliq+rnebcon*clwcon
 
     ENDIF
 
@@ -1802,12 +1782,11 @@ contains
        bils(i) = radsol(i) - sens(i) + zxfluxlat(i)
     ENDDO
 
-    !moddeblott(jan95)
+    !mod deb lott(jan95)
     ! Appeler le programme de parametrisation de l'orographie
     ! a l'echelle sous-maille:
 
     IF (ok_orodr) THEN
-
        !  selection des points pour lesquels le shema est actif:
        igwd=0
        DO i=1, klon
@@ -1834,8 +1813,7 @@ contains
              v_seri(i, k) = v_seri(i, k) + d_v_oro(i, k)
           ENDDO
        ENDDO
-
-    ENDIF ! fin de test sur ok_orodr
+    ENDIF
 
     IF (ok_orolf) THEN
 
@@ -2000,7 +1978,7 @@ contains
        DO iq = 3, nq
           DO  k = 1, llm
              DO  i = 1, klon
-                d_qx(i, k, iq) = ( tr_seri(i, k, iq-2) - qx(i, k, iq) ) / pdtphys
+                d_qx(i, k, iq) = (tr_seri(i, k, iq-2) - qx(i, k, iq)) / pdtphys
              ENDDO
           ENDDO
        ENDDO
@@ -2025,12 +2003,12 @@ contains
 
     IF (lafin) THEN
        itau_phy = itau_phy + itap
-       CALL phyredem ("restartphy.nc", radpas, rlat, rlon, pctsrf, ftsol, &
+       CALL phyredem("restartphy.nc", rlat, rlon, pctsrf, ftsol, &
             ftsoil, tslab, seaice, fqsurf, qsol, &
             fsnow, falbe, falblw, fevap, rain_fall, snow_fall, &
             solsw, sollwdown, dlw, &
             radsol, frugs, agesno, &
-            zmea, zstd, zsig, zgam, zthe, zpic, zval, rugoro, &
+            zmea, zstd, zsig, zgam, zthe, zpic, zval, &
             t_ancien, q_ancien, rnebcon, ratqs, clwcon, run_off_lic_0)
     ENDIF
 

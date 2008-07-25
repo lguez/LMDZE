@@ -20,7 +20,7 @@ contains
     ! The variable is regridded by averaging.
 
     use dimens_m, only: iim, jjm, llm
-    use nrutil, only: assert
+    use numer_rec, only: assert
     use regr1_step_av_m, only: regr1_step_av
     use pressure_var, only: p3d
 
@@ -93,7 +93,7 @@ contains
     ! The variable is regridded by interpolation.
 
     use dimens_m, only: iim, jjm, llm
-    use nrutil, only: assert
+    use numer_rec, only: assert
     use regr1_lint_m, only: regr1_lint
     use pressure_var, only: pls
 

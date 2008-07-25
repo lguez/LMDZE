@@ -36,7 +36,6 @@ contains
     use serre, only: alphax
     use dimsoil, only: nsoilmx
     use temps, only: itau_dyn, itau_phy, annee_ref, day_ref, dt
-    use clesphys2, only: ok_orodr, nbapp_rad
     use grid_atob, only: grille_m
     use grid_change, only: init_dyn_phy, dyn_phy
     use q_sat_m, only: q_sat
@@ -81,7 +80,6 @@ contains
     REAL zsig(klon), zgam(klon)
     REAL zthe(klon)
     REAL zpic(klon), zval(klon)
-    REAL rugsrel(klon)
     REAL t_ancien(klon, llm), q_ancien(klon, llm)      !
     REAL run_off_lic_0(klon)
     real clwcon(klon, llm), rnebcon(klon, llm), ratqs(klon, llm)
@@ -104,7 +102,6 @@ contains
     REAL pbaru(ip1jmp1, llm), pbarv(ip1jm, llm)
     REAL w(ip1jmp1, llm)
     REAL phystep
-    INTEGER radpas
 
     !---------------------------------
 
@@ -192,23 +189,20 @@ contains
        q3d(:, :, :, 5) = q3d(:, :, :, 5)  * 48. / 29.
     end if
 
-    tsol(:) = pack(tsol_2d, dyn_phy)
-    qsol(:) = pack(qsol_2d, dyn_phy)
-    sn(:) = 0. ! snow
-    radsol(:) = 0.
-    tslab(:) = 0. ! IM "slab" ocean
-    seaice(:) = 0.
-    rugmer(:) = 0.001
-    zmea(:) = pack(relief, dyn_phy)
-    zstd(:) = pack(zstd_2d, dyn_phy)
-    zsig(:) = pack(zsig_2d, dyn_phy)
-    zgam(:) = pack(zgam_2d, dyn_phy)
-    zthe(:) = pack(zthe_2d, dyn_phy)
-    zpic(:) = pack(zpic_2d, dyn_phy)
-    zval(:) = pack(zval_2d, dyn_phy)
-
-    rugsrel(:) = 0.
-    IF (ok_orodr) rugsrel(:) = MAX(1.e-05, zstd(:) * zsig(:) / 2)
+    tsol = pack(tsol_2d, dyn_phy)
+    qsol = pack(qsol_2d, dyn_phy)
+    sn = 0. ! snow
+    radsol = 0.
+    tslab = 0. ! IM "slab" ocean
+    seaice = 0.
+    rugmer = 0.001
+    zmea = pack(relief, dyn_phy)
+    zstd = pack(zstd_2d, dyn_phy)
+    zsig = pack(zsig_2d, dyn_phy)
+    zgam = pack(zgam_2d, dyn_phy)
+    zthe = pack(zthe_2d, dyn_phy)
+    zpic = pack(zpic_2d, dyn_phy)
+    zval = pack(zval_2d, dyn_phy)
 
     ! On initialise les sous-surfaces:
     ! Lecture du fichier glace de terre pour fixer la fraction de terre 
@@ -240,8 +234,8 @@ contains
        lat_lic(:, :) = lat_lic(:, :) * pi/ 180.
     ENDIF
 
-    dlon_lic(:) = lon_lic(:, 1)
-    dlat_lic(:) = lat_lic(1, :) 
+    dlon_lic = lon_lic(:, 1)
+    dlat_lic = lat_lic(1, :) 
 
     flic_tmp(:iim, :) = grille_m(dlon_lic, dlat_lic, fraclic, rlonv(:iim), &
          rlatu)
@@ -252,24 +246,24 @@ contains
     pctsrf(:, is_lic) = pack(flic_tmp, dyn_phy)
     ! Adéquation avec le maque terre/mer
     WHERE (pctsrf(:, is_lic) < EPSFRA ) pctsrf(:, is_lic) = 0.
-    WHERE (zmasq(:) < EPSFRA) pctsrf(:, is_lic) = 0.
-    pctsrf(:, is_ter) = zmasq(:)
-    where (zmasq(:) > EPSFRA)
-       where (pctsrf(:, is_lic) >= zmasq(:))
-          pctsrf(:, is_lic) = zmasq(:)
+    WHERE (zmasq < EPSFRA) pctsrf(:, is_lic) = 0.
+    pctsrf(:, is_ter) = zmasq
+    where (zmasq > EPSFRA)
+       where (pctsrf(:, is_lic) >= zmasq)
+          pctsrf(:, is_lic) = zmasq
           pctsrf(:, is_ter) = 0.
        elsewhere
-          pctsrf(:, is_ter) = zmasq(:) - pctsrf(:, is_lic)
+          pctsrf(:, is_ter) = zmasq - pctsrf(:, is_lic)
           where (pctsrf(:, is_ter) < EPSFRA)
              pctsrf(:, is_ter) = 0.
-             pctsrf(:, is_lic) = zmasq(:)
+             pctsrf(:, is_lic) = zmasq
           end where
        end where
     end where
 
     ! Sous-surface océan et glace de mer (pour démarrer on met glace
     ! de mer à 0) :
-    pctsrf(:, is_oce) = 1. - zmasq(:)
+    pctsrf(:, is_oce) = 1. - zmasq
     WHERE (pctsrf(:, is_oce) < EPSFRA) pctsrf(:, is_oce) = 0.
 
     ! Vérification que somme des sous-surfaces vaut 1:
@@ -306,11 +300,8 @@ contains
     ! Ecriture état initial physique:
     print *, 'dtvr = ', dtvr
     print *, "iphysiq = ", iphysiq
-    print *, "nbapp_rad = ", nbapp_rad
     phystep   = dtvr * REAL(iphysiq)
-    radpas    = NINT (86400./phystep/ nbapp_rad)
     print *, 'phystep = ', phystep
-    print *, "radpas = ", radpas
 
     ! Initialisations :
     tsolsrf(:, is_ter) = tsol
@@ -340,12 +331,12 @@ contains
     q_ancien = 0.
     agesno = 0.
     !IM "slab" ocean
-    tslab(:) = tsolsrf(:, is_oce)
+    tslab = tsolsrf(:, is_oce)
     seaice = 0.
 
-    frugs(:, is_oce) = rugmer(:)
-    frugs(:, is_ter) = MAX(1.e-05, zstd(:) * zsig(:) / 2)
-    frugs(:, is_lic) = MAX(1.e-05, zstd(:) * zsig(:) / 2)
+    frugs(:, is_oce) = rugmer
+    frugs(:, is_ter) = MAX(1.e-05, zstd * zsig / 2)
+    frugs(:, is_lic) = MAX(1.e-05, zstd * zsig / 2)
     frugs(:, is_sic) = 0.001
     fder = 0.
     clwcon = 0.
@@ -353,10 +344,10 @@ contains
     ratqs = 0.
     run_off_lic_0 = 0.
 
-    call phyredem("startphy.nc", radpas, latfi, lonfi, pctsrf, &
+    call phyredem("startphy.nc", latfi, lonfi, pctsrf, &
          tsolsrf, tsoil, tslab, seaice, qsolsrf, qsol, snsrf, albe, alblw, &
          evap, rain_fall, snow_fall, solsw, sollw, fder, radsol, frugs, &
-         agesno, zmea, zstd, zsig, zgam, zthe, zpic, zval, rugsrel, &
+         agesno, zmea, zstd, zsig, zgam, zthe, zpic, zval, &
          t_ancien, q_ancien, rnebcon, ratqs, clwcon, run_off_lic_0)
     CALL histclo
 

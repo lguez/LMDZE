@@ -780,7 +780,7 @@ contains
 
     use dimens_m, only: llm
     use dimphy, only: klon, nbtr
-    use nrutil, only: assert
+    use numer_rec, only: assert
 
     IMPLICIT none
 
@@ -816,7 +816,7 @@ contains
 
     use dimens_m, only: llm
     use dimphy, only: klon
-    use nrutil, only: assert
+    use numer_rec, only: assert
 
     IMPLICIT none
 

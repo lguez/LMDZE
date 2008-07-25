@@ -17,8 +17,7 @@ module clesphys2
   ! Help = Permet de mettre en route la
   ! nouvelle parametrisation de l'eau liquide
 
-  LOGICAL:: ok_orodr= .TRUE.
-  ! Desc = Orodr  ou  non   pour l orographie
+  LOGICAL:: ok_orodr= .TRUE. ! orodr pour l'orographie
 
   LOGICAL:: ok_orolf = .TRUE.
   ! Desc = Orolf  ou  non   pour l orographie
@@ -32,10 +31,35 @@ module clesphys2
   ! (nombre d'appels des routines de rayonnements par jour)
 
   INTEGER:: iflag_con = 2
-  ! Help = Flag  pour la convection les options suivantes existent :
-  ! 1 pour LMD,
-  ! 2 pour Tiedtke,
-  ! 3 pour CCM(NCAR)  
-  ! Flag  pour la convection (1 pour LMD, 2 pour Tiedtke, 3 KE, 4 KE vect)
+  ! Flag pour la convection :
+  ! 1 LMD,
+  ! 2 Tiedtke,
+  ! 3 CCM(NCAR)  
+  ! 3 KE
+  ! 4 KE vect
+
+contains
+
+  subroutine read_clesphys2
+
+    namelist /clesphys2_nml/cycle_diurne, soil_model, new_oliq, &
+         ok_orodr, ok_orolf, ok_limitvrai, nbapp_rad, iflag_con
+
+    !------------------------------------
+
+    print *, "Enter namelist 'clesphys2_nml'."
+    read(unit=*, nml=clesphys2_nml)
+    write(unit=*, nml=clesphys2_nml)
+
+    select case (iflag_con)
+    case (1)
+       PRINT *, 'Schéma convection LMD'
+    case (2)
+       PRINT *, 'Schéma convection Tiedtke'
+    case (3)
+       PRINT *, 'Schéma convection CCM'
+    END select
+
+  end subroutine read_clesphys2
 
 end module clesphys2
