@@ -520,7 +520,7 @@ c       print*,'klon, ncum = ',len,ncum
        CALL cv3_mixing(nloc,ncum,nd,nd,ntra,icb,nk,inb    ! na->nd
      :                     ,ph,t,q,qs,u,v,tra,h,lv,qnk
      :                     ,hp,tv,tvp,ep,clw,m,sig
-     o ,ment,qent,uent,vent,sij,elij,ments,qents,traent)
+     o ,ment,qent,uent,vent, nent,sij,elij,ments,qents,traent)
       endif
 
       if (iflag_con.eq.4) then

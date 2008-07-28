@@ -1427,7 +1427,7 @@ c!      sig(icb-1)=sig(icb)
       SUBROUTINE cv3_mixing(nloc,ncum,nd,na,ntra,icb,nk,inb
      :                    ,ph,t,rr,rs,u,v,tra,h,lv,qnk
      :                    ,hp,tv,tvp,ep,clw,m,sig
-     :   ,ment,qent,uent,vent,sij,elij,ments,qents,traent)
+     :   ,ment,qent,uent,vent, nent, sij,elij,ments,qents,traent)
       implicit none
 
 !---------------------------------------------------------------------
@@ -1459,11 +1459,11 @@ c outputs:
       real traent(nloc,nd,nd,ntra) 
       real ments(nloc,nd,nd), qents(nloc,nd,nd)
       real sigij(nloc,nd,nd)
+      integer nent(nloc,nd)
 
 c local variables:
       integer i, j, k, il, im, jm
       integer num1, num2
-      integer nent(nloc,na)
       real rti, bf2, anum, denom, dei, altem, cwat, stemp, qp
       real alt, smid, sjmin, sjmax, delp, delm
       real asij(nloc), smax(nloc), scrit(nloc)

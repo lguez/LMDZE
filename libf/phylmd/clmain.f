@@ -455,7 +455,7 @@ C (a affiner)
       pctsrf_pot(:,is_oce) = 1. - zmasq(:)
       pctsrf_pot(:,is_sic) = 1. - zmasq(:)
 
-      DO 99999 nsrf = 1, nbsrf
+      DO nsrf = 1, nbsrf
 
 c chercher les indices:
       DO j = 1, klon
@@ -491,7 +491,7 @@ c          tabindx(1:knon)=(/FLOAT(i),i=1:knon/)
           CALL histwrite(nidbg,cl_surf(nsrf),itap,debugtab,iim*(jjm+1)
      $        ,ndexbg)
       ENDIF 
-      IF (knon.EQ.0) GOTO 99999
+      IF (knon.EQ.0) cycle
       DO j = 1, knon
       i = ni(j)
         ypct(j) = pctsrf(i,nsrf)
@@ -940,7 +940,7 @@ c
         seaice(1:klon) = y_seaice(1:klon)
        ENDIF !nsrf
       ENDIF !OCEAN
-99999 CONTINUE
+      end do
 C
 C On utilise les nouvelles surfaces
 C A rajouter: conservation de l'albedo

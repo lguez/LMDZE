@@ -22,6 +22,8 @@ CR_etat0_lim: ${sources_etat0_lim}
 CR_gcm: ${sources_gcm}
 	nag_xref95 ${nag_cross_options} -listing $@ $^
 
+CG_etat0_lim CG_gcm CR_etat0_lim CR_gcm: objects
+
 .PHONY: clean_nag
 clean_nag:
 	rm -f CG_etat0_lim CG_gcm CR_etat0_lim CR_gcm
