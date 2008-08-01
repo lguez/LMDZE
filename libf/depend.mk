@@ -103,7 +103,6 @@ guide.o : inigrads.o pression.o exner_hyb.o q_sat.o ener.o tracstoke.o temps.o s
 hbtm.o : FCTTRE.o YOETHF.o YOMCST.o dimphy.o dimens_m.o 
 hgardfou.o : YOMCST.o dimphy.o indicesol.o dimens_m.o 
 ini_hist.o : indicesol.o clesphys.o phyetat0.o dimphy.o temps.o dimens_m.o 
-ini_undefSTD.o : dimphy.o dimens_m.o 
 iniconst.o : temps.o conf_gcm.o comvert.o comconst.o paramet_m.o dimens_m.o 
 inidissip.o : comdissipn.h conf_gcm.o comvert.o comconst.o paramet_m.o dimens_m.o 
 inifgn.o : coefils.h serre.o comgeom.o paramet_m.o dimens_m.o 
@@ -133,7 +132,6 @@ limz.o : comgeom.o logic.o comvert.o comconst.o paramet_m.o dimens_m.o
 massbar.o : comgeom.o comconst.o paramet_m.o dimens_m.o 
 massbarxy.o : comgeom.o comconst.o paramet_m.o dimens_m.o 
 massdair.o : comgeom.o comconst.o paramet_m.o dimens_m.o 
-moy_undefSTD.o : dimphy.o dimens_m.o 
 newmicro.o : nuagecom.o YOMCST.o dimphy.o dimens_m.o 
 nflxtr.o : YOECUMF.o YOMCST.o dimphy.o dimens_m.o 
 nuage.o : FCTTRE.o YOETHF.o YOMCST.o dimphy.o dimens_m.o 

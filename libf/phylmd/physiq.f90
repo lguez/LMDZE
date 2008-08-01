@@ -474,11 +474,6 @@ contains
     EXTERNAL radlwsw   ! rayonnements solaire et infrarouge
     EXTERNAL transp    ! transport total de l'eau et de l'energie
 
-    EXTERNAL ini_undefSTD  !initialise a 0 une variable a 1 niveau de pression
-
-    EXTERNAL undefSTD
-    ! (somme les valeurs definies d'1 var a 1 niveau de pression)
-
     ! Variables locales
 
     real clwcon(klon, llm), rnebcon(klon, llm)
