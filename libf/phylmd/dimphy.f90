@@ -19,6 +19,6 @@ module dimphy
   INTEGER, PARAMETER:: nbtr = nqmx - 2 + 1 / (nqmx-1)
   ! (nombre de vrais traceurs)
 
-  REAL,save:: zmasq(KLON)
+  REAL,save:: zmasq(KLON) ! fraction of land
 
 end module dimphy

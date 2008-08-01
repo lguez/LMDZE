@@ -52,17 +52,17 @@ c
      . nqmx, fluxid,fluxvid,fluxdid) 
 	
 	ndex(1) = 0
-        call histwrite(fluxid, 'phis', 1, phis, iip1*jjp1, ndex)
-        call histwrite(fluxid, 'aire', 1, aire, iip1*jjp1, ndex)
+        call histwrite(fluxid, 'phis', 1, phis)
+        call histwrite(fluxid, 'aire', 1, aire)
 	
 	ndex(1) = 0
         nscal = 1
         tst(1) = time_step
-        call histwrite(fluxdid, 'dtvr', 1, tst, nscal, ndex)
+        call histwrite(fluxdid, 'dtvr', 1, tst)
         ist(1)=istdyn
-        call histwrite(fluxdid, 'istdyn', 1, ist, nscal, ndex)
+        call histwrite(fluxdid, 'istdyn', 1, ist)
         istp(1)= istphy
-        call histwrite(fluxdid, 'istphy', 1, istp, nscal, ndex)
+        call histwrite(fluxdid, 'istphy', 1, istp)
 	
 	first = .false.
 
@@ -130,23 +130,17 @@ c     2. groupement des mailles pres du pole.
          iadvtr=0
 	Print*,'ITAU auqel on stoke les fluxmasses',itau
 	
-	call histwrite(fluxid, 'masse', itau, massem,
-     .               iip1*jjp1*llm, ndex)
+	call histwrite(fluxid, 'masse', itau, massem)
 	
-	call histwrite(fluxid, 'pbaru', itau, pbarug,
-     .               iip1*jjp1*llm, ndex)
+	call histwrite(fluxid, 'pbaru', itau, pbarug)
 	
-	call histwrite(fluxvid, 'pbarv', itau, pbarvg,
-     .               iip1*jjm*llm, ndex)
+	call histwrite(fluxvid, 'pbarv', itau, pbarvg)
 	
-        call histwrite(fluxid, 'w' ,itau, wg, 
-     .             iip1*jjp1*llm, ndex) 
+        call histwrite(fluxid, 'w' ,itau, wg) 
 	
-	call histwrite(fluxid, 'teta' ,itau, tetac, 
-     .             iip1*jjp1*llm, ndex) 
+	call histwrite(fluxid, 'teta' ,itau, tetac) 
 	
-	call histwrite(fluxid, 'phi' ,itau, phic, 
-     .             iip1*jjp1*llm, ndex) 
+	call histwrite(fluxid, 'phi' ,itau, phic) 
 	
 C
 

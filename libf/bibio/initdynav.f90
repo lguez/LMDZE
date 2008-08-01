@@ -82,7 +82,7 @@ contains
        enddo
     enddo
 
-    call histbeg_totreg(infile, iip1, rlong(:,1), jjp1, rlat(1,:), &
+    call histbeg_totreg(infile, rlong(:,1), rlat(1,:), &
          1, iip1, 1, jjp1, &
          tau0, zjulian, tstep, thoriid, fileid)
 
@@ -99,27 +99,27 @@ contains
     write(6,*)'inithistave',tstep
     call histdef(fileid, 'u', 'vents u scalaires moyennes', &
          'm/s', iip1, jjp1, thoriid, llm, 1, llm, zvertiid, &
-         32, 'ave(X)', t_ops, t_wrt)
+         'ave(X)', t_ops, t_wrt)
 
     !
     !  Vents V
     !
     call histdef(fileid, 'v', 'vents v scalaires moyennes', &
          'm/s', iip1, jjp1, thoriid, llm, 1, llm, zvertiid, &
-         32, 'ave(X)', t_ops, t_wrt)
+         'ave(X)', t_ops, t_wrt)
 
     !
     !  Temperature
     !
     call histdef(fileid, 'temp', 'temperature moyennee', 'K', &
          iip1, jjp1, thoriid, llm, 1, llm, zvertiid, &
-         32, 'ave(X)', t_ops, t_wrt)
+         'ave(X)', t_ops, t_wrt)
     !
     !  Temperature potentielle
     !
     call histdef(fileid, 'theta', 'temperature potentielle', 'K', &
          iip1, jjp1, thoriid, llm, 1, llm, zvertiid, &
-         32, 'ave(X)', t_ops, t_wrt)
+         'ave(X)', t_ops, t_wrt)
 
 
     !
@@ -127,33 +127,33 @@ contains
     !
     call histdef(fileid, 'phi', 'geopotentiel moyenne', '-', &
          iip1, jjp1, thoriid, llm, 1, llm, zvertiid, &
-         32, 'ave(X)', t_ops, t_wrt)
+         'ave(X)', t_ops, t_wrt)
     !
     !  Traceurs
     !
     DO iq=1,nq
        call histdef(fileid, ttext(iq), ttext(iq), '-', &
             iip1, jjp1, thoriid, llm, 1, llm, zvertiid, &
-            32, 'ave(X)', t_ops, t_wrt)
+            'ave(X)', t_ops, t_wrt)
     enddo
     !
     !  Masse
     !
     call histdef(fileid, 'masse', 'masse', 'kg', &
          iip1, jjp1, thoriid, 1, 1, 1, -99, &
-         32, 'ave(X)', t_ops, t_wrt)
+         'ave(X)', t_ops, t_wrt)
     !
     !  Pression au sol
     !
     call histdef(fileid, 'ps', 'pression naturelle au sol', 'Pa', &
          iip1, jjp1, thoriid, 1, 1, 1, -99, &
-         32, 'ave(X)', t_ops, t_wrt)
+         'ave(X)', t_ops, t_wrt)
     !
     !  Pression au sol
     !
     call histdef(fileid, 'phis', 'geopotentiel au sol', '-', &
          iip1, jjp1, thoriid, 1, 1, 1, -99, &
-         32, 'ave(X)', t_ops, t_wrt)
+         'ave(X)', t_ops, t_wrt)
     !
     !  Fin
     !

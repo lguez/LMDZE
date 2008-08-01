@@ -31,8 +31,7 @@ contains
     use conf_gcm_m, only: raz_date, offline, iphysiq
     use dimsoil, only: nsoilmx
     use temps, only: itau_phy, day_ref, annee_ref, itaufin
-    use clesphys, only: ecrit_hf, ecrit_hf2mth, &
-         ecrit_ins, ecrit_mth, ecrit_day, &
+    use clesphys, only: ecrit_hf, ecrit_ins, ecrit_mth, &
          cdmmax, cdhmax, &
          co2_ppm, ecrit_reg, ecrit_tra, ksta, ksta_ter, &
          ok_kzmin
@@ -53,6 +52,7 @@ contains
     use phyetat0_m, only: phyetat0, rlat, rlon
     use hgardfou_m, only: hgardfou
     use conf_phys_m, only: conf_phys
+    use phyredem_m, only: phyredem
 
     ! Declaration des constantes et des fonctions thermodynamiques :
     use fcttre, only: thermcep, foeew, qsats, qsatl
@@ -60,7 +60,10 @@ contains
     ! Variables argument:
 
     INTEGER nq ! input nombre de traceurs (y compris vapeur d'eau)
-    REAL, intent(in):: rdayvrai ! input numero du jour de l'experience
+
+    REAL, intent(in):: rdayvrai
+    ! (elapsed time since January 1st 0h of the starting year, in days)
+
     REAL, intent(in):: gmtime ! heure de la journée en fraction de jour
     REAL, intent(in):: pdtphys ! pas d'integration pour la physique (seconde)
     LOGICAL, intent(in):: firstcal ! first call to "calfis"
@@ -68,7 +71,7 @@ contains
 
     REAL, intent(in):: paprs(klon, llm+1)
     ! (pression pour chaque inter-couche, en Pa)
-    
+
     REAL, intent(in):: pplay(klon, llm)
     ! (input pression pour le mileu de chaque couche (en Pa))
 
@@ -425,9 +428,6 @@ contains
     !IM cf FH pour Tiedtke 080604
     REAL rain_tiedtke(klon), snow_tiedtke(klon)
 
-    REAL total_rain(klon), nday_rain(klon)
-    save nday_rain
-
     REAL evap(klon), devap(klon) ! evaporation et sa derivee
     REAL sens(klon), dsens(klon) ! chaleur sensible et sa derivee
     REAL dlw(klon)    ! derivee infra rouge
@@ -471,7 +471,6 @@ contains
     EXTERNAL fisrtilp  ! schema de condensation a grande echelle (pluie)
     EXTERNAL nuage     ! calculer les proprietes radiatives
     EXTERNAL ozonecm   ! prescrire l'ozone
-    EXTERNAL phyredem  ! ecrire l'etat de redemarrage de la physique
     EXTERNAL radlwsw   ! rayonnements solaire et infrarouge
     EXTERNAL transp    ! transport total de l'eau et de l'energie
 
@@ -667,8 +666,7 @@ contains
 
     REAL zx_tmp_2d(iim, jjm + 1), zx_tmp_3d(iim, jjm + 1, llm)
 
-    INTEGER nid_day, nid_ins
-    SAVE nid_day, nid_ins
+    INTEGER, SAVE:: nid_day, nid_ins
 
     REAL ve_lay(klon, llm) ! transport meri. de l'energie a chaque niveau vert.
     REAL vq_lay(klon, llm) ! transport meri. de l'eau a chaque niveau vert.
@@ -848,10 +846,7 @@ contains
        radpas = NINT( 86400. / pdtphys / nbapp_rad)
 
        ! on remet le calendrier a zero
-
-       IF (raz_date == 1) THEN
-          itau_phy = 0
-       ENDIF
+       IF (raz_date) itau_phy = 0
 
        PRINT *, 'cycle_diurne = ', cycle_diurne
 
@@ -898,7 +893,6 @@ contains
 
        ecrit_ins = NINT(ecrit_ins/pdtphys)
        ecrit_hf = NINT(ecrit_hf/pdtphys)
-       ecrit_day = NINT(ecrit_day/pdtphys)
        ecrit_mth = NINT(ecrit_mth/pdtphys)
        ecrit_tra = NINT(86400.*ecrit_tra/pdtphys)
        ecrit_reg = NINT(ecrit_reg/pdtphys)
@@ -1947,9 +1941,6 @@ contains
 
     !   SORTIES
 
-    !IM Interpolation sur les niveaux de pression du NMC
-    call calcul_STDlev
-
     !cc prw = eau precipitable
     DO i = 1, klon
        prw(i) = 0.
@@ -1958,9 +1949,6 @@ contains
                q_seri(i, k)*(paprs(i, k)-paprs(i, k+1))/RG
        ENDDO
     ENDDO
-
-    !IM initialisation + calculs divers diag AMIP2
-    call calcul_divers
 
     ! Convertir les incrementations en tendances
 
@@ -2014,379 +2002,21 @@ contains
 
   contains
 
-    subroutine calcul_STDlev
-
-      !     From phylmd/calcul_STDlev.h, v 1.1 2005/05/25 13:10:09
-
-      !IM on initialise les champs en debut du jour ou du mois 
-
-      CALL ini_undefSTD(nlevSTD, itap, &
-           ecrit_day, ecrit_mth, &
-           tnondef, tsumSTD)
-      CALL ini_undefSTD(nlevSTD, itap, &
-           ecrit_day, ecrit_mth, &
-           tnondef, usumSTD)
-      CALL ini_undefSTD(nlevSTD, itap, &
-           ecrit_day, ecrit_mth, &
-           tnondef, vsumSTD)
-      CALL ini_undefSTD(nlevSTD, itap, &
-           ecrit_day, ecrit_mth, &
-           tnondef, wsumSTD)
-      CALL ini_undefSTD(nlevSTD, itap, &
-           ecrit_day, ecrit_mth, &
-           tnondef, phisumSTD)
-      CALL ini_undefSTD(nlevSTD, itap, &
-           ecrit_day, ecrit_mth, &
-           tnondef, qsumSTD)
-      CALL ini_undefSTD(nlevSTD, itap, &
-           ecrit_day, ecrit_mth, &
-           tnondef, rhsumSTD)
-      CALL ini_undefSTD(nlevSTD, itap, &
-           ecrit_day, ecrit_mth, &
-           tnondef, uvsumSTD)
-      CALL ini_undefSTD(nlevSTD, itap, &
-           ecrit_day, ecrit_mth, &
-           tnondef, vqsumSTD)
-      CALL ini_undefSTD(nlevSTD, itap, &
-           ecrit_day, ecrit_mth, &
-           tnondef, vTsumSTD)
-      CALL ini_undefSTD(nlevSTD, itap, &
-           ecrit_day, ecrit_mth, &
-           tnondef, wqsumSTD)
-      CALL ini_undefSTD(nlevSTD, itap, &
-           ecrit_day, ecrit_mth, &
-           tnondef, vphisumSTD)
-      CALL ini_undefSTD(nlevSTD, itap, &
-           ecrit_day, ecrit_mth, &
-           tnondef, wTsumSTD)
-      CALL ini_undefSTD(nlevSTD, itap, &
-           ecrit_day, ecrit_mth, &
-           tnondef, u2sumSTD)
-      CALL ini_undefSTD(nlevSTD, itap, &
-           ecrit_day, ecrit_mth, &
-           tnondef, v2sumSTD)
-      CALL ini_undefSTD(nlevSTD, itap, &
-           ecrit_day, ecrit_mth, &
-           tnondef, T2sumSTD)
-
-      !IM on interpole sur les niveaux STD de pression a chaque pas de
-      !temps de la physique
-
-      DO k=1, nlevSTD
-
-         CALL plevel(klon, llm, .true., pplay, rlevSTD(k), &
-              t_seri, tlevSTD(:, k))
-         CALL plevel(klon, llm, .true., pplay, rlevSTD(k), &
-              u_seri, ulevSTD(:, k))
-         CALL plevel(klon, llm, .true., pplay, rlevSTD(k), &
-              v_seri, vlevSTD(:, k))
-
-         DO l=1, llm
-            DO i=1, klon
-               zx_tmp_fi3d(i, l)=paprs(i, l)
-            ENDDO !i
-         ENDDO !l
-         CALL plevel(klon, llm, .true., zx_tmp_fi3d, rlevSTD(k), &
-              omega, wlevSTD(:, k))
-
-         CALL plevel(klon, llm, .true., pplay, rlevSTD(k), &
-              zphi/RG, philevSTD(:, k))
-         CALL plevel(klon, llm, .true., pplay, rlevSTD(k), &
-              qx(:, :, ivap), qlevSTD(:, k))
-         CALL plevel(klon, llm, .true., pplay, rlevSTD(k), &
-              zx_rh*100., rhlevSTD(:, k))
-
-         DO l=1, llm
-            DO i=1, klon
-               zx_tmp_fi3d(i, l)=u_seri(i, l)*v_seri(i, l)
-            ENDDO !i
-         ENDDO !l
-         CALL plevel(klon, llm, .true., pplay, rlevSTD(k), &
-              zx_tmp_fi3d, uvSTD(:, k))
-
-         DO l=1, llm
-            DO i=1, klon
-               zx_tmp_fi3d(i, l)=v_seri(i, l)*q_seri(i, l)
-            ENDDO !i
-         ENDDO !l
-         CALL plevel(klon, llm, .true., pplay, rlevSTD(k), &
-              zx_tmp_fi3d, vqSTD(:, k))
-
-         DO l=1, llm
-            DO i=1, klon
-               zx_tmp_fi3d(i, l)=v_seri(i, l)*t_seri(i, l)
-            ENDDO !i
-         ENDDO !l
-         CALL plevel(klon, llm, .true., pplay, rlevSTD(k), &
-              zx_tmp_fi3d, vTSTD(:, k))
-
-         DO l=1, llm
-            DO i=1, klon
-               zx_tmp_fi3d(i, l)=omega(i, l)*qx(i, l, ivap)
-            ENDDO !i 
-         ENDDO !l
-         CALL plevel(klon, llm, .true., pplay, rlevSTD(k), &
-              zx_tmp_fi3d, wqSTD(:, k))
-
-         DO l=1, llm
-            DO i=1, klon
-               zx_tmp_fi3d(i, l)=v_seri(i, l)*zphi(i, l)/RG
-            ENDDO !i
-         ENDDO !l
-         CALL plevel(klon, llm, .true., pplay, rlevSTD(k), &
-              zx_tmp_fi3d, vphiSTD(:, k))
-
-         DO l=1, llm
-            DO i=1, klon
-               zx_tmp_fi3d(i, l)=omega(i, l)*t_seri(i, l)
-            ENDDO !i
-         ENDDO !l
-         CALL plevel(klon, llm, .true., pplay, rlevSTD(k), &
-              zx_tmp_fi3d, wTSTD(:, k))
-
-         DO l=1, llm
-            DO i=1, klon
-               zx_tmp_fi3d(i, l)=u_seri(i, l)*u_seri(i, l)
-            ENDDO !i
-         ENDDO !l
-         CALL plevel(klon, llm, .true., pplay, rlevSTD(k), &
-              zx_tmp_fi3d, u2STD(:, k))
-
-         DO l=1, llm
-            DO i=1, klon
-               zx_tmp_fi3d(i, l)=v_seri(i, l)*v_seri(i, l)
-            ENDDO !i
-         ENDDO !l
-         CALL plevel(klon, llm, .true., pplay, rlevSTD(k), &
-              zx_tmp_fi3d, v2STD(:, k))
-
-         DO l=1, llm
-            DO i=1, klon
-               zx_tmp_fi3d(i, l)=t_seri(i, l)*t_seri(i, l)
-            ENDDO !i
-         ENDDO !l
-         CALL plevel(klon, llm, .true., pplay, rlevSTD(k), &
-              zx_tmp_fi3d, T2STD(:, k))
-
-      ENDDO !k=1, nlevSTD
-
-      !IM on somme les valeurs definies a chaque pas de temps de la
-      ! physique ou toutes les 6 heures
-
-      oknondef(1:klon, 1:nlevSTD, 1:nout)=.TRUE.
-      CALL undefSTD(nlevSTD, itap, tlevSTD, &
-           ecrit_hf, &
-           oknondef, tnondef, tsumSTD)
-
-      oknondef(1:klon, 1:nlevSTD, 1:nout)=.FALSE.
-      CALL undefSTD(nlevSTD, itap, ulevSTD, &
-           ecrit_hf, &
-           oknondef, tnondef, usumSTD)
-
-      oknondef(1:klon, 1:nlevSTD, 1:nout)=.FALSE.
-      CALL undefSTD(nlevSTD, itap, vlevSTD, &
-           ecrit_hf, &
-           oknondef, tnondef, vsumSTD)
-
-      oknondef(1:klon, 1:nlevSTD, 1:nout)=.FALSE.
-      CALL undefSTD(nlevSTD, itap, wlevSTD, &
-           ecrit_hf, &
-           oknondef, tnondef, wsumSTD)
-
-      oknondef(1:klon, 1:nlevSTD, 1:nout)=.FALSE.
-      CALL undefSTD(nlevSTD, itap, philevSTD, &
-           ecrit_hf, &
-           oknondef, tnondef, phisumSTD)
-
-      oknondef(1:klon, 1:nlevSTD, 1:nout)=.FALSE.
-      CALL undefSTD(nlevSTD, itap, qlevSTD, &
-           ecrit_hf, &
-           oknondef, tnondef, qsumSTD)
-
-      oknondef(1:klon, 1:nlevSTD, 1:nout)=.FALSE.
-      CALL undefSTD(nlevSTD, itap, rhlevSTD, &
-           ecrit_hf, &
-           oknondef, tnondef, rhsumSTD)
-
-      oknondef(1:klon, 1:nlevSTD, 1:nout)=.FALSE.
-      CALL undefSTD(nlevSTD, itap, uvSTD, &
-           ecrit_hf, &
-           oknondef, tnondef, uvsumSTD)
-
-      oknondef(1:klon, 1:nlevSTD, 1:nout)=.FALSE.
-      CALL undefSTD(nlevSTD, itap, vqSTD, &
-           ecrit_hf, &
-           oknondef, tnondef, vqsumSTD)
-
-      oknondef(1:klon, 1:nlevSTD, 1:nout)=.FALSE.
-      CALL undefSTD(nlevSTD, itap, vTSTD, &
-           ecrit_hf, &
-           oknondef, tnondef, vTsumSTD)
-
-      oknondef(1:klon, 1:nlevSTD, 1:nout)=.FALSE.
-      CALL undefSTD(nlevSTD, itap, wqSTD, &
-           ecrit_hf, &
-           oknondef, tnondef, wqsumSTD)
-
-      oknondef(1:klon, 1:nlevSTD, 1:nout)=.FALSE.
-      CALL undefSTD(nlevSTD, itap, vphiSTD, &
-           ecrit_hf, &
-           oknondef, tnondef, vphisumSTD)
-
-      oknondef(1:klon, 1:nlevSTD, 1:nout)=.FALSE.
-      CALL undefSTD(nlevSTD, itap, wTSTD, &
-           ecrit_hf, &
-           oknondef, tnondef, wTsumSTD)
-
-      oknondef(1:klon, 1:nlevSTD, 1:nout)=.FALSE.
-      CALL undefSTD(nlevSTD, itap, u2STD, &
-           ecrit_hf, &
-           oknondef, tnondef, u2sumSTD)
-
-      oknondef(1:klon, 1:nlevSTD, 1:nout)=.FALSE.
-      CALL undefSTD(nlevSTD, itap, v2STD, &
-           ecrit_hf, &
-           oknondef, tnondef, v2sumSTD)
-
-      oknondef(1:klon, 1:nlevSTD, 1:nout)=.FALSE.
-      CALL undefSTD(nlevSTD, itap, T2STD, &
-           ecrit_hf, &
-           oknondef, tnondef, T2sumSTD)
-
-      !IM on moyenne a la fin du jour ou du mois 
-
-      CALL moy_undefSTD(nlevSTD, itap, &
-           ecrit_day, ecrit_mth, ecrit_hf2mth, &
-           tnondef, tsumSTD)
-
-      CALL moy_undefSTD(nlevSTD, itap, &
-           ecrit_day, ecrit_mth, ecrit_hf2mth, &
-           tnondef, usumSTD)
-
-      CALL moy_undefSTD(nlevSTD, itap, &
-           ecrit_day, ecrit_mth, ecrit_hf2mth, &
-           tnondef, vsumSTD)
-
-      CALL moy_undefSTD(nlevSTD, itap, &
-           ecrit_day, ecrit_mth, ecrit_hf2mth, &
-           tnondef, wsumSTD)
-
-      CALL moy_undefSTD(nlevSTD, itap, &
-           ecrit_day, ecrit_mth, ecrit_hf2mth, &
-           tnondef, phisumSTD)
-
-      CALL moy_undefSTD(nlevSTD, itap, &
-           ecrit_day, ecrit_mth, ecrit_hf2mth, &
-           tnondef, qsumSTD)
-
-      CALL moy_undefSTD(nlevSTD, itap, &
-           ecrit_day, ecrit_mth, ecrit_hf2mth, &
-           tnondef, rhsumSTD)
-
-      CALL moy_undefSTD(nlevSTD, itap, &
-           ecrit_day, ecrit_mth, ecrit_hf2mth, &
-           tnondef, uvsumSTD)
-
-      CALL moy_undefSTD(nlevSTD, itap, &
-           ecrit_day, ecrit_mth, ecrit_hf2mth, &
-           tnondef, vqsumSTD)
-
-      CALL moy_undefSTD(nlevSTD, itap, &
-           ecrit_day, ecrit_mth, ecrit_hf2mth, &
-           tnondef, vTsumSTD)
-
-      CALL moy_undefSTD(nlevSTD, itap, &
-           ecrit_day, ecrit_mth, ecrit_hf2mth, &
-           tnondef, wqsumSTD)
-
-      CALL moy_undefSTD(nlevSTD, itap, &
-           ecrit_day, ecrit_mth, ecrit_hf2mth, &
-           tnondef, vphisumSTD)
-
-      CALL moy_undefSTD(nlevSTD, itap, &
-           ecrit_day, ecrit_mth, ecrit_hf2mth, &
-           tnondef, wTsumSTD)
-
-      CALL moy_undefSTD(nlevSTD, itap, &
-           ecrit_day, ecrit_mth, ecrit_hf2mth, &
-           tnondef, u2sumSTD)
-
-      CALL moy_undefSTD(nlevSTD, itap, &
-           ecrit_day, ecrit_mth, ecrit_hf2mth, &
-           tnondef, v2sumSTD)
-
-      CALL moy_undefSTD(nlevSTD, itap, &
-           ecrit_day, ecrit_mth, ecrit_hf2mth, &
-           tnondef, T2sumSTD)
-
-      !IM interpolation a chaque pas de temps du SWup(clr) et
-      !SWdn(clr) a 200 hPa
-
-      CALL plevel(klon, klevp1, .true., paprs, 20000., &
-           swdn0, SWdn200clr)
-      CALL plevel(klon, klevp1, .false., paprs, 20000., &
-           swdn, SWdn200)
-      CALL plevel(klon, klevp1, .false., paprs, 20000., &
-           swup0, SWup200clr)
-      CALL plevel(klon, klevp1, .false., paprs, 20000., &
-           swup, SWup200)
-
-      CALL plevel(klon, klevp1, .false., paprs, 20000., &
-           lwdn0, LWdn200clr)
-      CALL plevel(klon, klevp1, .false., paprs, 20000., &
-           lwdn, LWdn200)
-      CALL plevel(klon, klevp1, .false., paprs, 20000., &
-           lwup0, LWup200clr)
-      CALL plevel(klon, klevp1, .false., paprs, 20000., &
-           lwup, LWup200)
-
-    end SUBROUTINE calcul_STDlev
-
-    !****************************************************
-
-    SUBROUTINE calcul_divers
-
-      ! From phylmd/calcul_divers.h, v 1.1 2005/05/25 13:10:09
-
-      ! initialisations diverses au "debut" du mois
-
-      IF(MOD(itap, ecrit_mth) == 1) THEN
-         DO i=1, klon
-            nday_rain(i)=0.
-         ENDDO
-      ENDIF
-
-      IF(MOD(itap, ecrit_day) == 0) THEN
-         !IM calcul total_rain, nday_rain
-         DO i = 1, klon
-            total_rain(i)=rain_fall(i)+snow_fall(i)  
-            IF(total_rain(i).GT.0.) nday_rain(i)=nday_rain(i)+1.
-         ENDDO
-      ENDIF
-
-    End SUBROUTINE calcul_divers
-
-    !***********************************************
-
     subroutine write_histday
 
-      !     From phylmd/write_histday.h, v 1.3 2005/05/25 13:10:09
+      use grid_change, only: gr_phy_write_3d
+
+      !------------------------------------------------
 
       if (ok_journe) THEN
-
          ndex2d = 0
          ndex3d = 0
-
-         ! Champs 2D:
-
          itau_w = itau_phy + itap
-
-         !   FIN ECRITURE DES CHAMPS 3D
+         call histwrite(nid_day, "Sigma_O3_Royer", itau_w, gr_phy_write_3d(wo))
 
          if (ok_sync) then
             call histsync(nid_day)
          endif
-
       ENDIF
 
     End subroutine write_histday
@@ -2433,231 +2063,212 @@ contains
 
          i = NINT(zout/zsto)
          CALL gr_fi_ecrit(1, klon, iim, (jjm + 1), pphis, zx_tmp_2d)
-         CALL histwrite(nid_ins, "phis", itau_w, zx_tmp_2d, iim*(jjm + 1), ndex2d)
+         CALL histwrite(nid_ins, "phis", itau_w, zx_tmp_2d)
 
          i = NINT(zout/zsto)
          CALL gr_fi_ecrit(1, klon, iim, (jjm + 1), airephy, zx_tmp_2d)
-         CALL histwrite(nid_ins, "aire", itau_w, zx_tmp_2d, iim*(jjm + 1), ndex2d)
+         CALL histwrite(nid_ins, "aire", itau_w, zx_tmp_2d)
 
          DO i = 1, klon
             zx_tmp_fi2d(i) = paprs(i, 1)
          ENDDO
          CALL gr_fi_ecrit(1, klon, iim, (jjm + 1), zx_tmp_fi2d, zx_tmp_2d)
-         CALL histwrite(nid_ins, "psol", itau_w, zx_tmp_2d, iim*(jjm + 1), ndex2d)
+         CALL histwrite(nid_ins, "psol", itau_w, zx_tmp_2d)
 
          DO i = 1, klon
             zx_tmp_fi2d(i) = rain_fall(i) + snow_fall(i)
          ENDDO
          CALL gr_fi_ecrit(1, klon, iim, (jjm + 1), zx_tmp_fi2d, zx_tmp_2d)
-         CALL histwrite(nid_ins, "precip", itau_w, zx_tmp_2d, iim*(jjm + 1), ndex2d)
+         CALL histwrite(nid_ins, "precip", itau_w, zx_tmp_2d)
 
          DO i = 1, klon
             zx_tmp_fi2d(i) = rain_lsc(i) + snow_lsc(i)
          ENDDO
          CALL gr_fi_ecrit(1, klon, iim, (jjm + 1), zx_tmp_fi2d, zx_tmp_2d)
-         CALL histwrite(nid_ins, "plul", itau_w, zx_tmp_2d, iim*(jjm + 1), ndex2d)
+         CALL histwrite(nid_ins, "plul", itau_w, zx_tmp_2d)
 
          DO i = 1, klon
             zx_tmp_fi2d(i) = rain_con(i) + snow_con(i)
          ENDDO
          CALL gr_fi_ecrit(1, klon, iim, (jjm + 1), zx_tmp_fi2d, zx_tmp_2d)
-         CALL histwrite(nid_ins, "pluc", itau_w, zx_tmp_2d, iim*(jjm + 1), ndex2d)
+         CALL histwrite(nid_ins, "pluc", itau_w, zx_tmp_2d)
 
          CALL gr_fi_ecrit(1, klon, iim, (jjm + 1), zxtsol, zx_tmp_2d)
-         CALL histwrite(nid_ins, "tsol", itau_w, zx_tmp_2d, iim*(jjm + 1), ndex2d)
+         CALL histwrite(nid_ins, "tsol", itau_w, zx_tmp_2d)
          !ccIM
          CALL gr_fi_ecrit(1, klon, iim, (jjm + 1), zt2m, zx_tmp_2d)
-         CALL histwrite(nid_ins, "t2m", itau_w, zx_tmp_2d, iim*(jjm + 1), ndex2d)
+         CALL histwrite(nid_ins, "t2m", itau_w, zx_tmp_2d)
 
          CALL gr_fi_ecrit(1, klon, iim, (jjm + 1), zq2m, zx_tmp_2d)
-         CALL histwrite(nid_ins, "q2m", itau_w, zx_tmp_2d, iim*(jjm + 1), ndex2d)
+         CALL histwrite(nid_ins, "q2m", itau_w, zx_tmp_2d)
 
          CALL gr_fi_ecrit(1, klon, iim, (jjm + 1), zu10m, zx_tmp_2d)
-         CALL histwrite(nid_ins, "u10m", itau_w, zx_tmp_2d, iim*(jjm + 1), ndex2d)
+         CALL histwrite(nid_ins, "u10m", itau_w, zx_tmp_2d)
 
          CALL gr_fi_ecrit(1, klon, iim, (jjm + 1), zv10m, zx_tmp_2d)
-         CALL histwrite(nid_ins, "v10m", itau_w, zx_tmp_2d, iim*(jjm + 1), ndex2d)
+         CALL histwrite(nid_ins, "v10m", itau_w, zx_tmp_2d)
 
          CALL gr_fi_ecrit(1, klon, iim, (jjm + 1), snow_fall, zx_tmp_2d)
-         CALL histwrite(nid_ins, "snow", itau_w, zx_tmp_2d, iim*(jjm + 1), ndex2d)
+         CALL histwrite(nid_ins, "snow", itau_w, zx_tmp_2d)
 
          CALL gr_fi_ecrit(1, klon, iim, (jjm + 1), cdragm, zx_tmp_2d)
-         CALL histwrite(nid_ins, "cdrm", itau_w, zx_tmp_2d, iim*(jjm + 1), ndex2d)
+         CALL histwrite(nid_ins, "cdrm", itau_w, zx_tmp_2d)
 
          CALL gr_fi_ecrit(1, klon, iim, (jjm + 1), cdragh, zx_tmp_2d)
-         CALL histwrite(nid_ins, "cdrh", itau_w, zx_tmp_2d, iim*(jjm + 1), ndex2d)
+         CALL histwrite(nid_ins, "cdrh", itau_w, zx_tmp_2d)
 
          CALL gr_fi_ecrit(1, klon, iim, (jjm + 1), toplw, zx_tmp_2d)
-         CALL histwrite(nid_ins, "topl", itau_w, zx_tmp_2d, iim*(jjm + 1), ndex2d)
+         CALL histwrite(nid_ins, "topl", itau_w, zx_tmp_2d)
 
          CALL gr_fi_ecrit(1, klon, iim, (jjm + 1), evap, zx_tmp_2d)
-         CALL histwrite(nid_ins, "evap", itau_w, zx_tmp_2d, iim*(jjm + 1), ndex2d)
+         CALL histwrite(nid_ins, "evap", itau_w, zx_tmp_2d)
 
          CALL gr_fi_ecrit(1, klon, iim, (jjm + 1), solsw, zx_tmp_2d)
-         CALL histwrite(nid_ins, "sols", itau_w, zx_tmp_2d, iim*(jjm + 1), ndex2d)
+         CALL histwrite(nid_ins, "sols", itau_w, zx_tmp_2d)
 
          CALL gr_fi_ecrit(1, klon, iim, (jjm + 1), sollw, zx_tmp_2d)
-         CALL histwrite(nid_ins, "soll", itau_w, zx_tmp_2d, iim*(jjm + 1), ndex2d)
+         CALL histwrite(nid_ins, "soll", itau_w, zx_tmp_2d)
 
          CALL gr_fi_ecrit(1, klon, iim, (jjm + 1), sollwdown, zx_tmp_2d)
-         CALL histwrite(nid_ins, "solldown", itau_w, zx_tmp_2d, iim*(jjm + 1), &
-              ndex2d)
+         CALL histwrite(nid_ins, "solldown", itau_w, zx_tmp_2d)
 
          CALL gr_fi_ecrit(1, klon, iim, (jjm + 1), bils, zx_tmp_2d)
-         CALL histwrite(nid_ins, "bils", itau_w, zx_tmp_2d, iim*(jjm + 1), ndex2d)
+         CALL histwrite(nid_ins, "bils", itau_w, zx_tmp_2d)
 
          zx_tmp_fi2d(1:klon)=-1*sens(1:klon)
          !     CALL gr_fi_ecrit(1, klon, iim, (jjm + 1), sens, zx_tmp_2d)
          CALL gr_fi_ecrit(1, klon, iim, (jjm + 1), zx_tmp_fi2d, zx_tmp_2d)
-         CALL histwrite(nid_ins, "sens", itau_w, zx_tmp_2d, iim*(jjm + 1), ndex2d)
+         CALL histwrite(nid_ins, "sens", itau_w, zx_tmp_2d)
 
          CALL gr_fi_ecrit(1, klon, iim, (jjm + 1), fder, zx_tmp_2d)
-         CALL histwrite(nid_ins, "fder", itau_w, zx_tmp_2d, iim*(jjm + 1), ndex2d)
+         CALL histwrite(nid_ins, "fder", itau_w, zx_tmp_2d)
 
          CALL gr_fi_ecrit(1, klon, iim, (jjm + 1), d_ts(1, is_oce), zx_tmp_2d)
-         CALL histwrite(nid_ins, "dtsvdfo", itau_w, zx_tmp_2d, iim*(jjm + 1), &
-              ndex2d)
+         CALL histwrite(nid_ins, "dtsvdfo", itau_w, zx_tmp_2d)
 
          CALL gr_fi_ecrit(1, klon, iim, (jjm + 1), d_ts(1, is_ter), zx_tmp_2d)
-         CALL histwrite(nid_ins, "dtsvdft", itau_w, zx_tmp_2d, iim*(jjm + 1), &
-              ndex2d)
+         CALL histwrite(nid_ins, "dtsvdft", itau_w, zx_tmp_2d)
 
          CALL gr_fi_ecrit(1, klon, iim, (jjm + 1), d_ts(1, is_lic), zx_tmp_2d)
-         CALL histwrite(nid_ins, "dtsvdfg", itau_w, zx_tmp_2d, iim*(jjm + 1), &
-              ndex2d)
+         CALL histwrite(nid_ins, "dtsvdfg", itau_w, zx_tmp_2d)
 
          CALL gr_fi_ecrit(1, klon, iim, (jjm + 1), d_ts(1, is_sic), zx_tmp_2d)
-         CALL histwrite(nid_ins, "dtsvdfi", itau_w, zx_tmp_2d, iim*(jjm + 1), &
-              ndex2d)
+         CALL histwrite(nid_ins, "dtsvdfi", itau_w, zx_tmp_2d)
 
          DO nsrf = 1, nbsrf
             !XXX
             zx_tmp_fi2d(1 : klon) = pctsrf( 1 : klon, nsrf)*100.
             CALL gr_fi_ecrit(1, klon, iim, (jjm + 1), zx_tmp_fi2d, zx_tmp_2d)
             CALL histwrite(nid_ins, "pourc_"//clnsurf(nsrf), itau_w, &
-                 zx_tmp_2d, iim*(jjm + 1), ndex2d) 
+                 zx_tmp_2d) 
 
             zx_tmp_fi2d(1 : klon) = pctsrf( 1 : klon, nsrf)
             CALL gr_fi_ecrit(1, klon, iim, (jjm + 1), zx_tmp_fi2d, zx_tmp_2d)
             CALL histwrite(nid_ins, "fract_"//clnsurf(nsrf), itau_w, &
-                 zx_tmp_2d, iim*(jjm + 1), ndex2d) 
+                 zx_tmp_2d) 
 
             zx_tmp_fi2d(1 : klon) = fluxt( 1 : klon, 1, nsrf)
             CALL gr_fi_ecrit(1, klon, iim, (jjm + 1), zx_tmp_fi2d, zx_tmp_2d)
             CALL histwrite(nid_ins, "sens_"//clnsurf(nsrf), itau_w, &
-                 zx_tmp_2d, iim*(jjm + 1), ndex2d) 
+                 zx_tmp_2d) 
 
             zx_tmp_fi2d(1 : klon) = fluxlat( 1 : klon, nsrf)
             CALL gr_fi_ecrit(1, klon, iim, (jjm + 1), zx_tmp_fi2d, zx_tmp_2d)
             CALL histwrite(nid_ins, "lat_"//clnsurf(nsrf), itau_w, &
-                 zx_tmp_2d, iim*(jjm + 1), ndex2d) 
+                 zx_tmp_2d) 
 
             zx_tmp_fi2d(1 : klon) = ftsol( 1 : klon, nsrf)
             CALL gr_fi_ecrit(1, klon, iim, (jjm + 1), zx_tmp_fi2d, zx_tmp_2d)
             CALL histwrite(nid_ins, "tsol_"//clnsurf(nsrf), itau_w, &
-                 zx_tmp_2d, iim*(jjm + 1), ndex2d) 
+                 zx_tmp_2d) 
 
             zx_tmp_fi2d(1 : klon) = fluxu( 1 : klon, 1, nsrf)
             CALL gr_fi_ecrit(1, klon, iim, (jjm + 1), zx_tmp_fi2d, zx_tmp_2d)
             CALL histwrite(nid_ins, "taux_"//clnsurf(nsrf), itau_w, &
-                 zx_tmp_2d, iim*(jjm + 1), ndex2d) 
+                 zx_tmp_2d) 
 
             zx_tmp_fi2d(1 : klon) = fluxv( 1 : klon, 1, nsrf)
             CALL gr_fi_ecrit(1, klon, iim, (jjm + 1), zx_tmp_fi2d, zx_tmp_2d)
             CALL histwrite(nid_ins, "tauy_"//clnsurf(nsrf), itau_w, &
-                 zx_tmp_2d, iim*(jjm + 1), ndex2d)
+                 zx_tmp_2d)
 
             zx_tmp_fi2d(1 : klon) = frugs( 1 : klon, nsrf)
             CALL gr_fi_ecrit(1, klon, iim, (jjm + 1), zx_tmp_fi2d, zx_tmp_2d)
             CALL histwrite(nid_ins, "rugs_"//clnsurf(nsrf), itau_w, &
-                 zx_tmp_2d, iim*(jjm + 1), ndex2d) 
+                 zx_tmp_2d) 
 
             zx_tmp_fi2d(1 : klon) = falbe( 1 : klon, nsrf)
             CALL gr_fi_ecrit(1, klon, iim, (jjm + 1), zx_tmp_fi2d, zx_tmp_2d)
             CALL histwrite(nid_ins, "albe_"//clnsurf(nsrf), itau_w, &
-                 zx_tmp_2d, iim*(jjm + 1), ndex2d) 
+                 zx_tmp_2d) 
 
          END DO
          CALL gr_fi_ecrit(1, klon, iim, (jjm + 1), albsol, zx_tmp_2d)
-         CALL histwrite(nid_ins, "albs", itau_w, zx_tmp_2d, iim*(jjm + 1), ndex2d)
+         CALL histwrite(nid_ins, "albs", itau_w, zx_tmp_2d)
          CALL gr_fi_ecrit(1, klon, iim, (jjm + 1), albsollw, zx_tmp_2d)
-         CALL histwrite(nid_ins, "albslw", itau_w, zx_tmp_2d, iim*(jjm + 1), ndex2d)
+         CALL histwrite(nid_ins, "albslw", itau_w, zx_tmp_2d)
 
          CALL gr_fi_ecrit(1, klon, iim, (jjm + 1), zxrugs, zx_tmp_2d)
-         CALL histwrite(nid_ins, "rugs", itau_w, zx_tmp_2d, iim*(jjm + 1), ndex2d)
+         CALL histwrite(nid_ins, "rugs", itau_w, zx_tmp_2d)
 
          !IM cf. AM 081204 BEG
 
          !HBTM2
 
          CALL gr_fi_ecrit(1, klon, iim, (jjm + 1), s_pblh, zx_tmp_2d)
-         CALL histwrite(nid_ins, "s_pblh", itau_w, zx_tmp_2d, iim*(jjm + 1), ndex2d)
+         CALL histwrite(nid_ins, "s_pblh", itau_w, zx_tmp_2d)
 
          CALL gr_fi_ecrit(1, klon, iim, (jjm + 1), s_pblt, zx_tmp_2d)
-         CALL histwrite(nid_ins, "s_pblt", itau_w, zx_tmp_2d, iim*(jjm + 1), ndex2d)
+         CALL histwrite(nid_ins, "s_pblt", itau_w, zx_tmp_2d)
 
          CALL gr_fi_ecrit(1, klon, iim, (jjm + 1), s_lcl, zx_tmp_2d)
-         CALL histwrite(nid_ins, "s_lcl", itau_w, zx_tmp_2d, iim*(jjm + 1), ndex2d)
+         CALL histwrite(nid_ins, "s_lcl", itau_w, zx_tmp_2d)
 
          CALL gr_fi_ecrit(1, klon, iim, (jjm + 1), s_capCL, zx_tmp_2d)
-         CALL histwrite(nid_ins, "s_capCL", itau_w, zx_tmp_2d, iim*(jjm + 1), &
-              ndex2d)
+         CALL histwrite(nid_ins, "s_capCL", itau_w, zx_tmp_2d)
 
          CALL gr_fi_ecrit(1, klon, iim, (jjm + 1), s_oliqCL, zx_tmp_2d)
-         CALL histwrite(nid_ins, "s_oliqCL", itau_w, zx_tmp_2d, iim*(jjm + 1), &
-              ndex2d)
+         CALL histwrite(nid_ins, "s_oliqCL", itau_w, zx_tmp_2d)
 
          CALL gr_fi_ecrit(1, klon, iim, (jjm + 1), s_cteiCL, zx_tmp_2d)
-         CALL histwrite(nid_ins, "s_cteiCL", itau_w, zx_tmp_2d, iim*(jjm + 1), &
-              ndex2d)
+         CALL histwrite(nid_ins, "s_cteiCL", itau_w, zx_tmp_2d)
 
          CALL gr_fi_ecrit(1, klon, iim, (jjm + 1), s_therm, zx_tmp_2d)
-         CALL histwrite(nid_ins, "s_therm", itau_w, zx_tmp_2d, iim*(jjm + 1), &
-              ndex2d)
+         CALL histwrite(nid_ins, "s_therm", itau_w, zx_tmp_2d)
 
          CALL gr_fi_ecrit(1, klon, iim, (jjm + 1), s_trmb1, zx_tmp_2d)
-         CALL histwrite(nid_ins, "s_trmb1", itau_w, zx_tmp_2d, iim*(jjm + 1), &
-              ndex2d)
+         CALL histwrite(nid_ins, "s_trmb1", itau_w, zx_tmp_2d)
 
          CALL gr_fi_ecrit(1, klon, iim, (jjm + 1), s_trmb2, zx_tmp_2d)
-         CALL histwrite(nid_ins, "s_trmb2", itau_w, zx_tmp_2d, iim*(jjm + 1), &
-              ndex2d)
+         CALL histwrite(nid_ins, "s_trmb2", itau_w, zx_tmp_2d)
 
          CALL gr_fi_ecrit(1, klon, iim, (jjm + 1), s_trmb3, zx_tmp_2d)
-         CALL histwrite(nid_ins, "s_trmb3", itau_w, zx_tmp_2d, iim*(jjm + 1), &
-              ndex2d)
+         CALL histwrite(nid_ins, "s_trmb3", itau_w, zx_tmp_2d)
 
          !IM cf. AM 081204 END
 
          ! Champs 3D:
 
          CALL gr_fi_ecrit(llm, klon, iim, (jjm + 1), t_seri, zx_tmp_3d)
-         CALL histwrite(nid_ins, "temp", itau_w, zx_tmp_3d, &
-              iim*(jjm + 1)*llm, ndex3d)
+         CALL histwrite(nid_ins, "temp", itau_w, zx_tmp_3d)
 
          CALL gr_fi_ecrit(llm, klon, iim, (jjm + 1), u_seri, zx_tmp_3d)
-         CALL histwrite(nid_ins, "vitu", itau_w, zx_tmp_3d, &
-              iim*(jjm + 1)*llm, ndex3d)
+         CALL histwrite(nid_ins, "vitu", itau_w, zx_tmp_3d)
 
          CALL gr_fi_ecrit(llm, klon, iim, (jjm + 1), v_seri, zx_tmp_3d)
-         CALL histwrite(nid_ins, "vitv", itau_w, zx_tmp_3d, &
-              iim*(jjm + 1)*llm, ndex3d)
+         CALL histwrite(nid_ins, "vitv", itau_w, zx_tmp_3d)
 
          CALL gr_fi_ecrit(llm, klon, iim, (jjm + 1), zphi, zx_tmp_3d)
-         CALL histwrite(nid_ins, "geop", itau_w, zx_tmp_3d, &
-              iim*(jjm + 1)*llm, ndex3d)
+         CALL histwrite(nid_ins, "geop", itau_w, zx_tmp_3d)
 
          CALL gr_fi_ecrit(llm, klon, iim, (jjm + 1), pplay, zx_tmp_3d)
-         CALL histwrite(nid_ins, "pres", itau_w, zx_tmp_3d, &
-              iim*(jjm + 1)*llm, ndex3d)
+         CALL histwrite(nid_ins, "pres", itau_w, zx_tmp_3d)
 
          CALL gr_fi_ecrit(llm, klon, iim, (jjm + 1), d_t_vdf, zx_tmp_3d)
-         CALL histwrite(nid_ins, "dtvdf", itau_w, zx_tmp_3d, &
-              iim*(jjm + 1)*llm, ndex3d)
+         CALL histwrite(nid_ins, "dtvdf", itau_w, zx_tmp_3d)
 
          CALL gr_fi_ecrit(llm, klon, iim, (jjm + 1), d_q_vdf, zx_tmp_3d)
-         CALL histwrite(nid_ins, "dqvdf", itau_w, zx_tmp_3d, &
-              iim*(jjm + 1)*llm, ndex3d)
+         CALL histwrite(nid_ins, "dqvdf", itau_w, zx_tmp_3d)
 
          if (ok_sync) then
             call histsync(nid_ins)
@@ -2680,26 +2291,21 @@ contains
       ! Champs 3D:
 
       CALL gr_fi_ecrit(llm, klon, iim, (jjm + 1), t_seri, zx_tmp_3d)
-      CALL histwrite(nid_hf3d, "temp", itau_w, zx_tmp_3d, &
-           iim*(jjm + 1)*llm, ndex3d)
+      CALL histwrite(nid_hf3d, "temp", itau_w, zx_tmp_3d)
 
       CALL gr_fi_ecrit(llm, klon, iim, (jjm + 1), qx(1, 1, ivap), zx_tmp_3d)
-      CALL histwrite(nid_hf3d, "ovap", itau_w, zx_tmp_3d, &
-           iim*(jjm + 1)*llm, ndex3d)
+      CALL histwrite(nid_hf3d, "ovap", itau_w, zx_tmp_3d)
 
       CALL gr_fi_ecrit(llm, klon, iim, (jjm + 1), u_seri, zx_tmp_3d)
-      CALL histwrite(nid_hf3d, "vitu", itau_w, zx_tmp_3d, &
-           iim*(jjm + 1)*llm, ndex3d)
+      CALL histwrite(nid_hf3d, "vitu", itau_w, zx_tmp_3d)
 
       CALL gr_fi_ecrit(llm, klon, iim, (jjm + 1), v_seri, zx_tmp_3d)
-      CALL histwrite(nid_hf3d, "vitv", itau_w, zx_tmp_3d, &
-           iim*(jjm + 1)*llm, ndex3d)
+      CALL histwrite(nid_hf3d, "vitv", itau_w, zx_tmp_3d)
 
       if (nbtr >= 3) then
          CALL gr_fi_ecrit(llm, klon, iim, (jjm + 1), tr_seri(1, 1, 3), &
               zx_tmp_3d)
-         CALL histwrite(nid_hf3d, "O3", itau_w, zx_tmp_3d, iim*(jjm + 1)*llm, &
-              ndex3d)
+         CALL histwrite(nid_hf3d, "O3", itau_w, zx_tmp_3d)
       end if
 
       if (ok_sync) then

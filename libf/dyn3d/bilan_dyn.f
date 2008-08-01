@@ -223,7 +223,7 @@ c   ---------------------------------------------------------
       rlong=0.
       rlatg=rlatv*180./pi
        
-      call histbeg_totreg(infile, 1, rlong(:1), jjm, rlatg,
+      call histbeg_totreg(infile, rlong(:1), rlatg,
      .             1, 1, 1, jjm,
      .             tau0, zjulian, dt_cum, thoriid, fileid)
 
@@ -257,14 +257,14 @@ c      print*,'1HISTDEF'
      .      ,znom(itr,iQ),znoml(itr,iQ),zunites(itr,iQ)
             call histdef(fileid,znom(itr,iQ),znoml(itr,iQ),
      .        zunites(itr,iQ),1,jjm,thoriid,llm,1,llm,zvertiid,
-     .        32,'ave(X)',dt_cum,dt_cum)
+     .        'ave(X)',dt_cum,dt_cum)
          enddo
 c   Declarations pour les fonctions de courant
 c      print*,'2HISTDEF'
           call histdef(fileid,'psi'//nom(iQ)
      .      ,'stream fn. '//znoml(itot,iQ),
      .      zunites(itot,iQ),1,jjm,thoriid,llm,1,llm,zvertiid,
-     .      32,'ave(X)',dt_cum,dt_cum)
+     .      'ave(X)',dt_cum,dt_cum)
       enddo
 
 
@@ -272,15 +272,15 @@ c   Declarations pour les champs de transport d'air
 c      print*,'3HISTDEF'
       call histdef(fileid, 'masse', 'masse',
      .             'kg', 1, jjm, thoriid, llm, 1, llm, zvertiid,
-     .             32, 'ave(X)', dt_cum, dt_cum)
+     .             'ave(X)', dt_cum, dt_cum)
       call histdef(fileid, 'v', 'v',
      .             'm/s', 1, jjm, thoriid, llm, 1, llm, zvertiid,
-     .             32, 'ave(X)', dt_cum, dt_cum)
+     .             'ave(X)', dt_cum, dt_cum)
 c   Declarations pour les fonctions de courant
 c      print*,'4HISTDEF'
           call histdef(fileid,'psi','stream fn. MMC ','mega t/s',
      .      1,jjm,thoriid,llm,1,llm,zvertiid,
-     .      32,'ave(X)',dt_cum,dt_cum)
+     .      'ave(X)',dt_cum,dt_cum)
 
 
 c   Declaration des champs 1D de transport en latitude
@@ -289,7 +289,7 @@ c      print*,'5HISTDEF'
          do itr=2,ntr
             call histdef(fileid,'a'//znom(itr,iQ),znoml(itr,iQ),
      .        zunites(itr,iQ),1,jjm,thoriid,1,1,1,-99,
-     .        32,'ave(X)',dt_cum,dt_cum)
+     .        'ave(X)',dt_cum,dt_cum)
          enddo
       enddo
 
@@ -534,19 +534,15 @@ c   sorties proprement dites
       if (i_sortie.eq.1) then
       do iQ=1,nQ
          do itr=1,ntr
-            call histwrite(fileid,znom(itr,iQ),itau,zvQ(:,:,itr,iQ)
-     s      ,jjm*llm,ndex3d)
+            call histwrite(fileid,znom(itr,iQ),itau,zvQ(:,:,itr,iQ))
          enddo
-         call histwrite(fileid,'psi'//nom(iQ),itau,psiQ(:,1:llm,iQ)
-     s      ,jjm*llm,ndex3d)
+         call histwrite(fileid,'psi'//nom(iQ),itau,psiQ(:,1:llm,iQ))
       enddo
 
-      call histwrite(fileid,'masse',itau,zmasse
-     s   ,jjm*llm,ndex3d)
-      call histwrite(fileid,'v',itau,zv
-     s   ,jjm*llm,ndex3d)
+      call histwrite(fileid,'masse',itau,zmasse)
+      call histwrite(fileid,'v',itau,zv)
       psi=psi*1.e-9
-      call histwrite(fileid,'psi',itau,psi(:,1:llm),jjm*llm,ndex3d)
+      call histwrite(fileid,'psi',itau,psi(:,1:llm))
 
       endif
 
@@ -566,8 +562,7 @@ c   -----------------
                zavQ(:,itr,iQ)=zavQ(:,itr,iQ)+zvQ(:,l,itr,iQ)*zmasse(:,l)
             enddo
             zavQ(:,itr,iQ)=zavQ(:,itr,iQ)/zamasse(:)
-            call histwrite(fileid,'a'//znom(itr,iQ),itau,zavQ(:,itr,iQ)
-     s      ,jjm*llm,ndex3d)
+            call histwrite(fileid,'a'//znom(itr,iQ),itau,zavQ(:,itr,iQ))
          enddo
       enddo
 

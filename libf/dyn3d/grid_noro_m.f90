@@ -59,7 +59,7 @@ contains
     REAL, intent(out):: zpic(:, :) ! Maximum altitude
     real, intent(out):: zval(:, :) ! Minimum altitude
 
-    real, intent(out):: mask(:, :)
+    real, intent(out):: mask(:, :) ! fraction of land
 
     ! Variables local to the procedure:
 
@@ -141,7 +141,7 @@ contains
        zusn(i, jusn+2)=zusn(i+iusn/2, jusn+1)
        zusn(i+iusn/2+iext, jusn+2)=zusn(i, jusn+1)
     ENDDO
-    !  
+
     ! COMPUTE LIMITS OF MODEL GRIDPOINT AREA
     !     ( REGULAR GRID)
 
@@ -190,7 +190,7 @@ contains
     ENDDO
 
     !  SUMMATION OVER GRIDPOINT AREA
-    ! 
+
     zleny=pi/real(jusn)*rad
     xincr=pi/2./real(jusn)
     DO ii = 1, iim+1
@@ -324,13 +324,13 @@ contains
           zllmval=AMAX1(zval(ii, jj), zllmval)
        ENDDO
     ENDDO
-    print *, '  MEAN ORO:', zllmmea
-    print *, '  ST. DEV.:', zllmstd
-    print *, '  PENTE:', zllmsig
-    print *, ' ANISOTROP:', zllmgam
-    print *, '  ANGLE:', zminthe, zllmthe
-    print *, '  pic:', zllmpic
-    print *, '  val:', zllmval
+    print *, 'MEAN ORO: ', zllmmea
+    print *, 'ST. DEV.: ', zllmstd
+    print *, 'PENTE: ', zllmsig
+    print *, 'ANISOTROP: ', zllmgam
+    print *, 'ANGLE: ', zminthe, zllmthe
+    print *, 'pic: ', zllmpic
+    print *, 'val: ', zllmval
 
     ! gamma and theta a 1. and 0. at poles
     zmea(iim+1, :)=zmea(1, :)

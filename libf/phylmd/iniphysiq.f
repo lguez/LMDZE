@@ -3,10 +3,7 @@
 !
 c
 c
-      SUBROUTINE iniphysiq(ngrid,nlayer,
-     $           punjours,
-     $           pdayref,ptimestep,
-     $           plat,plon,parea,pcu,pcv,
+      SUBROUTINE iniphysiq(ngrid,nlayer, plat,plon,parea,pcu,pcv,
      $           prad,pg,pr,pcpp)
       use dimens_m
       use dimphy
@@ -48,13 +45,10 @@ c   declarations:
 c   -------------
  
 
-      REAL prad,pg,pr,pcpp,punjours
+      REAL prad,pg,pr,pcpp
  
       INTEGER ngrid,nlayer
       REAL plat(ngrid),plon(ngrid),parea(klon),pcu(klon),pcv(klon)
-      INTEGER pdayref
- 
-      REAL ptimestep
  
       IF (nlayer.NE.klev) THEN
          PRINT*,'STOP in inifis'

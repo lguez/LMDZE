@@ -120,18 +120,18 @@ PROGRAM gcm
   if (annee_ref /= anneeref .or. day_ref /= dayref) then
      print *, 'Attention : les dates initiales lues dans le fichier ' // &
           '"start" ne correspondent pas à celles lues dans "gcm.def".'
-     if (raz_date /= 1) then
-        print *, 'On garde les dates du fichier "start".'
-     else
+     if (raz_date) then
         print *, 'On réinitialise à la date lue dans "gcm.def".'
         annee_ref = anneeref
         day_ref = dayref
         day_ini = dayref
         itau_dyn = 0
         time_0 = 0.
+     else
+        print *, 'On garde les dates du fichier "start".'
      endif
   ELSE
-     raz_date = 0
+     raz_date = .false.
   endif
 
   ! Initialisation des constantes dynamiques :
@@ -181,7 +181,7 @@ PROGRAM gcm
 
      airefi = pack(aire_2d, dyn_phy)
      print *, 'Attention : vitesse verticale nulle dans la physique.'
-     CALL iniphysiq(klon, llm, daysec, day_ini, dtphys, latfi, lonfi, airefi, &
+     CALL iniphysiq(klon, llm, latfi, lonfi, airefi, &
           zcufi, zcvfi, rad, g, r, cpp)
   ENDIF
 

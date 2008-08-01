@@ -6,7 +6,7 @@ SUBROUTINE gr_fi_ecrit(nfield, nlon, iim, jjmp1, fi, ecrit)
   IMPLICIT none
 
   ! Transforme une variable de la grille physique à la grille d'écriture.
-  ! Cf. version moderne "gr_phy_write", dans le cas où "nfield" vaut 1.
+  ! Cf. version moderne "gr_phy_write_2d", dans le cas où "nfield" vaut 1.
 
   INTEGER, intent(in):: nfield, nlon, iim, jjmp1
   REAL, intent(in):: fi(nlon, nfield)

@@ -5,7 +5,7 @@ MODULE start_init_orog_m
 
   IMPLICIT NONE
 
-  REAL, ALLOCATABLE, SAVE:: masque(:, :) ! fraction of land (iim + 1, jjm + 1)
+  REAL, ALLOCATABLE, SAVE:: mask(:, :) ! fraction of land (iim + 1, jjm + 1)
   REAL, ALLOCATABLE, SAVE:: phis(:, :) ! surface geopotential, in m2 s-2
 
 CONTAINS
@@ -107,21 +107,21 @@ CONTAINS
 
     ! Allocate the data we need to put in the interpolated fields:
     ALLOCATE(phis(iim + 1, jjm + 1))
-    ALLOCATE(masque(iim + 1, jjm + 1))
+    ALLOCATE(mask(iim + 1, jjm + 1))
 
     CALL grid_noro(lon_rad, lat_rad, relief_hi, rlonv, rlatu, phis, relief, &
-         zstd_2d, zsig_2d, zgam_2d, zthe_2d, zpic_2d, zval_2d, masque)
+         zstd_2d, zsig_2d, zgam_2d, zthe_2d, zpic_2d, zval_2d, mask)
 
     phis(iim + 1, :) = phis(1, :)
     phis(:, :) = phis(:, :) * 9.81
 
-    masque(2:, 1) = masque(1, 1) ! north pole
-    masque(2:, jjm + 1) = masque(1, jjm + 1) ! south pole
-    masque(iim + 1, 2:jjm) = masque(1, 2:jjm) ! Greenwich
-    WHERE (masque < EPSFRA)
-       masque = 0.
-    elsewhere (1. - masque < EPSFRA)
-       masque = 1.
+    mask(2:, 1) = mask(1, 1) ! north pole
+    mask(2:, jjm + 1) = mask(1, jjm + 1) ! south pole
+    mask(iim + 1, 2:jjm) = mask(1, 2:jjm) ! Greenwich
+    WHERE (mask < EPSFRA)
+       mask = 0.
+    elsewhere (1. - mask < EPSFRA)
+       mask = 1.
     endwhere
 
   END SUBROUTINE start_init_orog

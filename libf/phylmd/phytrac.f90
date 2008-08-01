@@ -509,106 +509,36 @@ contains
       itau_w = itau_phy + itap
 
       CALL gr_fi_ecrit(1, klon, iim, jjm+1, pphis, zx_tmp_2d)
-      CALL histwrite(nid_tra, "phis", itau_w, zx_tmp_2d, iim*(jjm+1), ndex2d)
+      CALL histwrite(nid_tra, "phis", itau_w, zx_tmp_2d)
 
       CALL gr_fi_ecrit(1, klon, iim, jjm+1, airephy, zx_tmp_2d)      
-      CALL histwrite(nid_tra, "aire", itau_w, zx_tmp_2d, iim*(jjm+1), ndex2d)
+      CALL histwrite(nid_tra, "aire", itau_w, zx_tmp_2d)
 
       CALL gr_fi_ecrit(llm, klon, iim, jjm+1, zmasse, zx_tmp_3d)      
-      CALL histwrite(nid_tra, "zmasse", itau_w, zx_tmp_3d, iim*(jjm+1)*llm, &
-           ndex3d)
+      CALL histwrite(nid_tra, "zmasse", itau_w, zx_tmp_3d)
 
       DO it=1, nqmax
          CALL gr_fi_ecrit(llm, klon, iim, jjm+1, tr_seri(1, 1, it), zx_tmp_3d)
-         CALL histwrite(nid_tra, tnom(it+2), itau_w, zx_tmp_3d, &
-              iim*(jjm+1)*llm, ndex3d)
+         CALL histwrite(nid_tra, tnom(it+2), itau_w, zx_tmp_3d)
          if (lessivage) THEN
             CALL gr_fi_ecrit(llm, klon, iim, jjm+1, flestottr(1, 1, it), &
                  zx_tmp_3d)
-            CALL histwrite(nid_tra, "fl"//tnom(it+2), itau_w, zx_tmp_3d, &
-                 iim*(jjm+1)*llm, ndex3d)
+            CALL histwrite(nid_tra, "fl"//tnom(it+2), itau_w, zx_tmp_3d)
          endif
 
          CALL gr_fi_ecrit(llm, klon, iim, jjm+1, d_tr_th(1, 1, it), zx_tmp_3d)
-         CALL histwrite(nid_tra, "d_tr_th_"//tnom(it+2), itau_w, zx_tmp_3d, &
-              iim*(jjm+1)*llm, ndex3d)
+         CALL histwrite(nid_tra, "d_tr_th_"//tnom(it+2), itau_w, zx_tmp_3d)
          CALL gr_fi_ecrit(llm, klon, iim, jjm+1, d_tr_cv(1, 1, it), zx_tmp_3d)
-         CALL histwrite(nid_tra, "d_tr_cv_"//tnom(it+2), itau_w, zx_tmp_3d, &
-              iim*(jjm+1)*llm, ndex3d)
+         CALL histwrite(nid_tra, "d_tr_cv_"//tnom(it+2), itau_w, zx_tmp_3d)
          CALL gr_fi_ecrit(llm, klon, iim, jjm+1, d_tr_cl(1, 1, it), zx_tmp_3d)
-         CALL histwrite(nid_tra, "d_tr_cl_"//tnom(it+2), itau_w, zx_tmp_3d, &
-              iim*(jjm+1)*llm, ndex3d)
+         CALL histwrite(nid_tra, "d_tr_cl_"//tnom(it+2), itau_w, zx_tmp_3d)
       ENDDO
 
-      CALL gr_fi_ecrit(1, klon, iim, jjm+1, yu1, zx_tmp_2d)
-      CALL histwrite(nid_tra, "pyu1", itau_w, zx_tmp_2d, &
-           iim*(jjm+1), ndex2d)
-
-      CALL gr_fi_ecrit(1, klon, iim, jjm+1, yv1, zx_tmp_2d)
-      CALL histwrite(nid_tra, "pyv1", itau_w, zx_tmp_2d, &
-           iim*(jjm+1), ndex2d)
-
-      CALL gr_fi_ecrit(1, klon, iim, jjm+1, pftsol1, zx_tmp_2d)
-      CALL histwrite(nid_tra, "ftsol1", itau_w, zx_tmp_2d, &
-           iim*(jjm+1), ndex2d)
-
-      CALL gr_fi_ecrit(1, klon, iim, jjm+1, pftsol2, zx_tmp_2d)
-      CALL histwrite(nid_tra, "ftsol2", itau_w, zx_tmp_2d, &
-           iim*(jjm+1), ndex2d)
-
-      CALL gr_fi_ecrit(1, klon, iim, jjm+1, pftsol3, zx_tmp_2d)
-      CALL histwrite(nid_tra, "ftsol3", itau_w, zx_tmp_2d, &
-           iim*(jjm+1), ndex2d)
-
-      CALL gr_fi_ecrit(1, klon, iim, jjm+1, pftsol4, zx_tmp_2d)
-      CALL histwrite(nid_tra, "ftsol4", itau_w, zx_tmp_2d, &
-           iim*(jjm+1), ndex2d)
-
-      CALL gr_fi_ecrit(1, klon, iim, jjm+1, ppsrf1, zx_tmp_2d)
-      CALL histwrite(nid_tra, "psrf1", itau_w, zx_tmp_2d, &
-           iim*(jjm+1), ndex2d)
-
-      CALL gr_fi_ecrit(1, klon, iim, jjm+1, ppsrf2, zx_tmp_2d)
-      CALL histwrite(nid_tra, "psrf2", itau_w, zx_tmp_2d, &
-           iim*(jjm+1), ndex2d)
-
-      CALL gr_fi_ecrit(1, klon, iim, jjm+1, ppsrf3, zx_tmp_2d)
-      CALL histwrite(nid_tra, "psrf3", itau_w, zx_tmp_2d, &
-           iim*(jjm+1), ndex2d)
-
-      CALL gr_fi_ecrit(1, klon, iim, jjm+1, ppsrf4, zx_tmp_2d)
-      CALL histwrite(nid_tra, "psrf4", itau_w, zx_tmp_2d, &
-           iim*(jjm+1), ndex2d)
       CALL gr_fi_ecrit(llm, klon, iim, jjm+1, pplay, zx_tmp_3d)
-      CALL histwrite(nid_tra, "pplay", itau_w, zx_tmp_3d, &
-           iim*(jjm+1)*llm, ndex3d)
+      CALL histwrite(nid_tra, "pplay", itau_w, zx_tmp_3d)
 
       CALL gr_fi_ecrit(llm, klon, iim, jjm+1, t_seri, zx_tmp_3d)
-      CALL histwrite(nid_tra, "t", itau_w, zx_tmp_3d, &
-           iim*(jjm+1)*llm, ndex3d)
-      CALL gr_fi_ecrit(llm, klon, iim, jjm+1, pmfu, zx_tmp_3d)
-      CALL histwrite(nid_tra, "mfu", itau_w, zx_tmp_3d, &
-           iim*(jjm+1)*llm, ndex3d)
-      CALL gr_fi_ecrit(llm, klon, iim, jjm+1, pmfd, zx_tmp_3d)
-      CALL histwrite(nid_tra, "mfd", itau_w, zx_tmp_3d, &
-           iim*(jjm+1)*llm, ndex3d)
-      CALL gr_fi_ecrit(llm, klon, iim, jjm+1, pen_u, zx_tmp_3d)
-      CALL histwrite(nid_tra, "en_u", itau_w, zx_tmp_3d, &
-           iim*(jjm+1)*llm, ndex3d)
-      CALL gr_fi_ecrit(llm, klon, iim, jjm+1, pen_d, zx_tmp_3d)
-      CALL histwrite(nid_tra, "en_d", itau_w, zx_tmp_3d, &
-           iim*(jjm+1)*llm, ndex3d)
-      CALL gr_fi_ecrit(llm, klon, iim, jjm+1, pde_d, zx_tmp_3d)
-      CALL histwrite(nid_tra, "de_d", itau_w, zx_tmp_3d, &
-           iim*(jjm+1)*llm, ndex3d)
-      CALL gr_fi_ecrit(llm, klon, iim, jjm+1, pde_u, zx_tmp_3d)
-      CALL histwrite(nid_tra, "de_u", itau_w, zx_tmp_3d, &
-           iim*(jjm+1)*llm, ndex3d)
-      CALL gr_fi_ecrit(llm, klon, iim, jjm+1, coefh, zx_tmp_3d)
-      CALL histwrite(nid_tra, "coefh", itau_w, zx_tmp_3d, &
-           iim*(jjm+1)*llm, ndex3d)
-
-      ! abder
+      CALL histwrite(nid_tra, "t", itau_w, zx_tmp_3d)
 
       if (ok_sync) then
          call histsync(nid_tra)
@@ -630,7 +560,7 @@ contains
     use advtrac_m, only: niadv, tnom, ttext
     use dimphy, only: klon
     use clesphys, only: ecrit_tra
-    use grid_change, only: gr_phy_write
+    use grid_change, only: gr_phy_write_2d
     use phyetat0_m, only: rlon, rlat
 
     INTEGER, intent(out):: nid_tra
@@ -653,8 +583,8 @@ contains
     !---------------------------------------------------------
 
     CALL ymds2ju(annee_ref, month=1, day=day_ref, sec=0.0, julian=zjulian)
-    zx_lat(:, :) = gr_phy_write(rlat)
-    CALL histbeg_totreg("histrac", iim, rlon(2:iim+1), jjm+1, zx_lat(1, :), &
+    zx_lat(:, :) = gr_phy_write_2d(rlat)
+    CALL histbeg_totreg("histrac", rlon(2:iim+1), zx_lat(1, :), &
          1, iim, 1, jjm+1, itau_phy, zjulian, pdtphys, nhori, nid_tra)
     CALL histvert(nid_tra, "presnivs", "Vertical levels", "mb", llm, &
          presnivs, nvert)
@@ -663,102 +593,50 @@ contains
     zout = pdtphys * REAL(ecrit_tra)
 
     CALL histdef(nid_tra, "phis", "Surface geop. height", "-", &
-         iim, jjm+1, nhori, 1, 1, 1, -99, 32, &
+         iim, jjm+1, nhori, 1, 1, 1, -99, &
          "once",  zsto, zout)
     CALL histdef(nid_tra, "aire", "Grid area", "-", &
-         iim, jjm+1, nhori, 1, 1, 1, -99, 32, &
+         iim, jjm+1, nhori, 1, 1, 1, -99, &
          "once",  zsto, zout)
     CALL histdef(nid_tra, "zmasse", "column density of air in cell", &
-         "kg m-2", iim, jjm + 1, nhori, llm, 1, llm, nvert, 32, "ave(X)", &
+         "kg m-2", iim, jjm + 1, nhori, llm, 1, llm, nvert, "ave(X)", &
          zsto, zout)
 
-    DO it=1, nqmax
+    DO it = 1, nqmax
        ! champ 2D
        iq=it+2
        iiq=niadv(iq)
        CALL histdef(nid_tra, tnom(iq), ttext(iiq), "U/kga", iim, jjm+1, &
-            nhori, llm, 1, llm, nvert, 32, "ave(X)", zsto, zout)
+            nhori, llm, 1, llm, nvert, "ave(X)", zsto, zout)
        if (lessivage) THEN
           CALL histdef(nid_tra, "fl"//tnom(iq), "Flux "//ttext(iiq), &
-               "U/m2/s", iim, jjm+1, nhori, llm, 1, llm, nvert, 32, &
+               "U/m2/s", iim, jjm+1, nhori, llm, 1, llm, nvert, &
                "ave(X)", zsto, zout)
        endif
 
        !---Ajout Olivia
        CALL histdef(nid_tra, "d_tr_th_"//tnom(iq), &
             "tendance thermique"// ttext(iiq), "?", &
-            iim, jjm+1, nhori, llm, 1, llm, nvert, 32, &
+            iim, jjm+1, nhori, llm, 1, llm, nvert, &
             "ave(X)", zsto, zout)
        CALL histdef(nid_tra, "d_tr_cv_"//tnom(iq), &
             "tendance convection"// ttext(iiq), "?", &
-            iim, jjm+1, nhori, llm, 1, llm, nvert, 32, &
+            iim, jjm+1, nhori, llm, 1, llm, nvert, &
             "ave(X)", zsto, zout)
        CALL histdef(nid_tra, "d_tr_cl_"//tnom(iq), &
             "tendance couche limite"// ttext(iiq), "?", &
-            iim, jjm+1, nhori, llm, 1, llm, nvert, 32, &
+            iim, jjm+1, nhori, llm, 1, llm, nvert, &
             "ave(X)", zsto, zout)
        !---fin Olivia	 
 
     ENDDO
 
-    CALL histdef(nid_tra, "pyu1", "Vent niv 1", "-", &
-         iim, jjm+1, nhori, 1, 1, 1, -99, 32, &
+    CALL histdef(nid_tra, "pplay", "", "-", &
+         iim, jjm+1, nhori, llm, 1, llm, nvert, &
          "inst(X)", zout, zout)
-
-    CALL histdef(nid_tra, "pyv1", "Vent niv 1", "-", &
-         iim, jjm+1, nhori, 1, 1, 1, -99, 32, &
-         "inst(X)",  zout, zout)
-    CALL histdef(nid_tra, "psrf1", "nature sol", "-", &
-         iim, jjm+1, nhori, 1, 1, 1, -99, 32, &
-         "inst(X)",  zout, zout)
-    CALL histdef(nid_tra, "psrf2", "nature sol", "-", &
-         iim, jjm+1, nhori, 1, 1, 1, -99, 32, &
-         "inst(X)",  zout, zout)
-    CALL histdef(nid_tra, "psrf3", "nature sol", "-", &
-         iim, jjm+1, nhori, 1, 1, 1, -99, 32, &
-         "inst(X)",  zout, zout)
-    CALL histdef(nid_tra, "psrf4", "nature sol", "-", &
-         iim, jjm+1, nhori, 1, 1, 1, -99, 32, &
-         "inst(X)",  zout, zout)
-    CALL histdef(nid_tra, "ftsol1", "temper sol", "-", &
-         iim, jjm+1, nhori, 1, 1, 1, -99, 32, &
-         "inst(X)",  zout, zout)
-    CALL histdef(nid_tra, "ftsol2", "temper sol", "-", &
-         iim, jjm+1, nhori, 1, 1, 1, -99, 32, &
-         "inst(X)",  zout, zout)
-    CALL histdef(nid_tra, "ftsol3", "temper sol", "-", &
-         iim, jjm+1, nhori, 1, 1, 1, -99, 32, &
-         "inst(X)",  zout, zout)
-    CALL histdef(nid_tra, "ftsol4", "temper sol", "-", &
-         iim, jjm+1, nhori, 1, 1, 1, -99, 32, &
-         "inst(X)",  zout, zout)
-    CALL histdef(nid_tra, "pplay", "flux u mont", "-", &
-         iim, jjm+1, nhori, llm, 1, llm, nvert, 32, &
+    CALL histdef(nid_tra, "t", "", "-", &
+         iim, jjm+1, nhori, llm, 1, llm, nvert, &
          "inst(X)", zout, zout)
-    CALL histdef(nid_tra, "t", "flux u mont", "-", &
-         iim, jjm+1, nhori, llm, 1, llm, nvert, 32, &
-         "inst(X)", zout, zout)
-    CALL histdef(nid_tra, "mfu", "flux u mont", "-", &
-         iim, jjm+1, nhori, llm, 1, llm, nvert, 32, &
-         "ave(X)", zsto, zout)
-    CALL histdef(nid_tra, "mfd", "flux u decen", "-", &
-         iim, jjm+1, nhori, llm, 1, llm, nvert, 32, &
-         "ave(X)", zsto, zout)
-    CALL histdef(nid_tra, "en_u", "flux u mont", "-", &
-         iim, jjm+1, nhori, llm, 1, llm, nvert, 32, &
-         "ave(X)", zsto, zout)
-    CALL histdef(nid_tra, "en_d", "flux u mont", "-", &
-         iim, jjm+1, nhori, llm, 1, llm, nvert, 32, &
-         "ave(X)", zsto, zout)
-    CALL histdef(nid_tra, "de_d", "flux u mont", "-", &
-         iim, jjm+1, nhori, llm, 1, llm, nvert, 32, &
-         "ave(X)", zsto, zout)
-    CALL histdef(nid_tra, "de_u", "flux u decen", "-", &
-         iim, jjm+1, nhori, llm, 1, llm, nvert, 32, &
-         "ave(X)", zsto, zout)
-    CALL histdef(nid_tra, "coefh", "turbulent coef", "-", &
-         iim, jjm+1, nhori, llm, 1, llm, nvert, 32, &
-         "ave(X)", zsto, zout)
 
     CALL histend(nid_tra)
 

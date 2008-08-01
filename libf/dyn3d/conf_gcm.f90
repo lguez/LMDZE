@@ -33,10 +33,10 @@ module conf_gcm_m
 
   integer:: anneeref = 1998 ! Annee de l'etat initial (avec 4 chiffres)
 
-  integer:: raz_date = 0 ! Remise a zero de la date initiale
-  ! 0 pas de remise a zero, on garde la date du fichier restart
-  ! 1 prise en compte de la date de gcm.def avec remise a zero
-  ! des compteurs de pas de temps
+  logical:: raz_date = .false.
+  ! (remise a zero de la date initiale, prise en compte de la date de
+  ! gcm.def avec remise a zero des compteurs de pas de temps)
+  ! (pas de remise a zero: on garde la date du fichier restart)
 
   REAL:: periodav= 1.
   ! periode de stockage fichier histmoy (en jour) 

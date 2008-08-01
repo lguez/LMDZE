@@ -134,11 +134,11 @@ c
       ndex3d = 0
       i=itap 
       CALL gr_fi_ecrit(1,klon,iim,jjm+1,pphis,zx_tmp_2d)
-      CALL histwrite(physid,"phis",i,zx_tmp_2d,iim*(jjm+1),ndex2d)
+      CALL histwrite(physid,"phis",i,zx_tmp_2d)
 c
       i=itap
       CALL gr_fi_ecrit(1,klon,iim,jjm+1,paire,zx_tmp_2d)
-      CALL histwrite(physid,"aire",i,zx_tmp_2d,iim*(jjm+1),ndex2d)
+      CALL histwrite(physid,"aire",i,zx_tmp_2d)
 
       iadvtr=iadvtr+1
 c
@@ -245,30 +245,22 @@ c
 
 ccccc
          CALL gr_fi_ecrit(klev,klon,iim,jjm+1, t, zx_tmp_3d)
-         CALL histwrite(physid,"t",itap,zx_tmp_3d,
-     .                                   iim*(jjm+1)*klev,ndex3d)
+         CALL histwrite(physid,"t",itap,zx_tmp_3d)
 
          CALL gr_fi_ecrit(klev,klon,iim,jjm+1, mfu, zx_tmp_3d)
-      CALL histwrite(physid,"mfu",itap,zx_tmp_3d,
-     .                                   iim*(jjm+1)*klev,ndex3d)
+      CALL histwrite(physid,"mfu",itap,zx_tmp_3d)
 	CALL gr_fi_ecrit(klev,klon,iim,jjm+1, mfd, zx_tmp_3d)
-      CALL histwrite(physid,"mfd",itap,zx_tmp_3d,
-     .                                   iim*(jjm+1)*klev,ndex3d)
+      CALL histwrite(physid,"mfd",itap,zx_tmp_3d)
         CALL gr_fi_ecrit(klev,klon,iim,jjm+1, en_u, zx_tmp_3d)
-      CALL histwrite(physid,"en_u",itap,zx_tmp_3d,
-     .                                   iim*(jjm+1)*klev,ndex3d)
+      CALL histwrite(physid,"en_u",itap,zx_tmp_3d)
         CALL gr_fi_ecrit(klev,klon,iim,jjm+1, de_u, zx_tmp_3d)
-      CALL histwrite(physid,"de_u",itap,zx_tmp_3d,
-     .                                   iim*(jjm+1)*klev,ndex3d)
+      CALL histwrite(physid,"de_u",itap,zx_tmp_3d)
         CALL gr_fi_ecrit(klev,klon,iim,jjm+1, en_d, zx_tmp_3d)
-      CALL histwrite(physid,"en_d",itap,zx_tmp_3d,
-     .                                   iim*(jjm+1)*klev,ndex3d)
+      CALL histwrite(physid,"en_d",itap,zx_tmp_3d)
         CALL gr_fi_ecrit(klev,klon,iim,jjm+1, de_d, zx_tmp_3d)       
-      CALL histwrite(physid,"de_d",itap,zx_tmp_3d,    
-     .                                   iim*(jjm+1)*klev,ndex3d)
+      CALL histwrite(physid,"de_d",itap,zx_tmp_3d)
         CALL gr_fi_ecrit(klev,klon,iim,jjm+1, coefh, zx_tmp_3d)         
-      CALL histwrite(physid,"coefh",itap,zx_tmp_3d,    
-     .                                   iim*(jjm+1)*klev,ndex3d)	
+      CALL histwrite(physid,"coefh",itap,zx_tmp_3d)	
 
 c ajou...
 	do k=1,klev
@@ -278,54 +270,40 @@ c ajou...
 	enddo
 
       CALL gr_fi_ecrit(klev,klon,iim,jjm+1, fm_therm1, zx_tmp_3d)
-      CALL histwrite(physid,"fm_th",itap,zx_tmp_3d,
-     .                                 iim*(jjm+1)*klev,ndex3d)
+      CALL histwrite(physid,"fm_th",itap,zx_tmp_3d)
 c
       CALL gr_fi_ecrit(klev,klon,iim,jjm+1, entr_therm, zx_tmp_3d)
-      CALL histwrite(physid,"en_th",itap,zx_tmp_3d,
-     .                                iim*(jjm+1)*klev,ndex3d)
+      CALL histwrite(physid,"en_th",itap,zx_tmp_3d)
 cccc
        CALL gr_fi_ecrit(klev,klon,iim,jjm+1,frac_impa,zx_tmp_3d)
-        CALL histwrite(physid,"frac_impa",itap,zx_tmp_3d,
-     .  iim*(jjm+1)*klev,ndex3d)
+        CALL histwrite(physid,"frac_impa",itap,zx_tmp_3d)
 
         CALL gr_fi_ecrit(klev,klon,iim,jjm+1,frac_nucl,zx_tmp_3d)
-        CALL histwrite(physid,"frac_nucl",itap,zx_tmp_3d,
-     .  iim*(jjm+1)*klev,ndex3d)
+        CALL histwrite(physid,"frac_nucl",itap,zx_tmp_3d)
  
         CALL gr_fi_ecrit(1, klon,iim,jjm+1, pyu1,zx_tmp_2d)
-      CALL histwrite(physid,"pyu1",itap,zx_tmp_2d,iim*(jjm+1),
-     .                                                ndex2d)
+      CALL histwrite(physid,"pyu1",itap,zx_tmp_2d)
 	
 	CALL gr_fi_ecrit(1, klon,iim,jjm+1, pyv1,zx_tmp_2d)
-      CALL histwrite(physid,"pyv1",itap,zx_tmp_2d,iim*(jjm+1)
-     .                                                ,ndex2d)
+      CALL histwrite(physid,"pyv1",itap,zx_tmp_2d)
 	
 	CALL gr_fi_ecrit(1,klon,iim,jjm+1, pftsol1, zx_tmp_2d)
-      CALL histwrite(physid,"ftsol1",itap,zx_tmp_2d,
-     .                                   iim*(jjm+1),ndex2d)
+      CALL histwrite(physid,"ftsol1",itap,zx_tmp_2d)
          CALL gr_fi_ecrit(1,klon,iim,jjm+1, pftsol2, zx_tmp_2d)
-      CALL histwrite(physid,"ftsol2",itap,zx_tmp_2d,
-     .                                   iim*(jjm+1),ndex2d)
+      CALL histwrite(physid,"ftsol2",itap,zx_tmp_2d)
           CALL gr_fi_ecrit(1,klon,iim,jjm+1, pftsol3, zx_tmp_2d)
-      CALL histwrite(physid,"ftsol3",itap,zx_tmp_2d,
-     .                                   iim*(jjm+1),ndex2d)
+      CALL histwrite(physid,"ftsol3",itap,zx_tmp_2d)
          CALL gr_fi_ecrit(1,klon,iim,jjm+1, pftsol4, zx_tmp_2d)
-      CALL histwrite(physid,"ftsol4",itap,zx_tmp_2d,
-     .                                   iim*(jjm+1),ndex2d)
+      CALL histwrite(physid,"ftsol4",itap,zx_tmp_2d)
 
         CALL gr_fi_ecrit(1,klon,iim,jjm+1, ppsrf1, zx_tmp_2d)
-      CALL histwrite(physid,"psrf1",itap,zx_tmp_2d,   
-     .                                   iim*(jjm+1),ndex2d)
+      CALL histwrite(physid,"psrf1",itap,zx_tmp_2d)
         CALL gr_fi_ecrit(1,klon,iim,jjm+1, ppsrf2, zx_tmp_2d)
-      CALL histwrite(physid,"psrf2",itap,zx_tmp_2d,
-     .                                   iim*(jjm+1),ndex2d)
+      CALL histwrite(physid,"psrf2",itap,zx_tmp_2d)
         CALL gr_fi_ecrit(1,klon,iim,jjm+1, ppsrf3, zx_tmp_2d)
-      CALL histwrite(physid,"psrf3",itap,zx_tmp_2d,
-     .                                   iim*(jjm+1),ndex2d)
+      CALL histwrite(physid,"psrf3",itap,zx_tmp_2d)
         CALL gr_fi_ecrit(1,klon,iim,jjm+1, ppsrf4, zx_tmp_2d)
-      CALL histwrite(physid,"psrf4",itap,zx_tmp_2d,
-     .                                   iim*(jjm+1),ndex2d)
+      CALL histwrite(physid,"psrf4",itap,zx_tmp_2d)
 
       if (ok_sync) call histsync(physid)
 c     if (ok_sync) call histsync

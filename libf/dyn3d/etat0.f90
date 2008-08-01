@@ -6,6 +6,8 @@ module etat0_mod
   IMPLICIT NONE
 
   REAL pctsrf(klon, nbsrf)
+  ! ("pctsrf(i, :)" is the composition of the surface at horizontal
+  !  position "i")
 
   private nbsrf, klon
 
@@ -15,11 +17,11 @@ contains
 
     ! From "etat0_netcdf.F", version 1.3 2005/05/25 13:10:09
 
-    ! This subroutine creates "masque".
+    ! This subroutine creates "mask".
 
     USE ioipsl, only: flinget, flinclo, flinopen_nozoom, flininfo, histclo
 
-    USE start_init_orog_m, only: start_init_orog, masque, phis
+    USE start_init_orog_m, only: start_init_orog, mask, phis
     use start_init_phys_m, only: qsol_2d
     use startdyn, only: start_inter_3d, start_init_dyn
     use dimens_m, only: iim, jjm, llm, nqmx
@@ -45,6 +47,7 @@ contains
     use dynredem0_m, only: dynredem0
     use regr_lat_time_coefoz_m, only: regr_lat_time_coefoz
     use regr_pr_o3_m, only: regr_pr_o3
+    use phyredem_m, only: phyredem
 
     ! Variables local to the procedure:
 
@@ -128,15 +131,15 @@ contains
     lonfi(klon) = 0.
 
     call start_init_orog(relief, zstd_2d, zsig_2d, zgam_2d, zthe_2d, zpic_2d, &
-         zval_2d) ! also compute "masque" and "phis"
+         zval_2d) ! also compute "mask" and "phis"
     call init_dyn_phy ! define the mask "dyn_phy" for distinct grid points
-    zmasq = pack(masque, dyn_phy)
+    zmasq = pack(mask, dyn_phy)
     PRINT *, 'Masque construit'
 
     CALL start_init_dyn(tsol_2d, psol) ! also compute "qsol_2d"
 
     ! Compute pressure on intermediate levels:
-    forall(l = 1: llm + 1) p3d(:, :, l) = ap(l) + bp(l) * psol(:, :)
+    forall(l = 1: llm + 1) p3d(:, :, l) = ap(l) + bp(l) * psol
     CALL exner_hyb(psol, p3d, pks, pk)
     IF (MINVAL(pk) == MAXVAL(pk)) stop '"pk" should not be constant'
 
@@ -227,11 +230,11 @@ contains
     print *, "jml_lic = ", jml_lic
 
     ! Si les coordonnées sont en degrés, on les transforme :
-    IF (MAXVAL( lon_lic(:, :) ) > pi)  THEN
-       lon_lic(:, :) = lon_lic(:, :) * pi / 180.
+    IF (MAXVAL( lon_lic ) > pi)  THEN
+       lon_lic = lon_lic * pi / 180.
     ENDIF
-    IF (maxval( lat_lic(:, :) ) > pi) THEN 
-       lat_lic(:, :) = lat_lic(:, :) * pi/ 180.
+    IF (maxval( lat_lic ) > pi) THEN 
+       lat_lic = lat_lic * pi/ 180.
     ENDIF
 
     dlon_lic = lon_lic(:, 1)
@@ -242,7 +245,7 @@ contains
     flic_tmp(iim + 1, :) = flic_tmp(1, :)
 
     ! Passage sur la grille physique
-    pctsrf(:, :)=0.
+    pctsrf = 0.
     pctsrf(:, is_lic) = pack(flic_tmp, dyn_phy)
     ! Adéquation avec le maque terre/mer
     WHERE (pctsrf(:, is_lic) < EPSFRA ) pctsrf(:, is_lic) = 0.
@@ -267,8 +270,10 @@ contains
     WHERE (pctsrf(:, is_oce) < EPSFRA) pctsrf(:, is_oce) = 0.
 
     ! Vérification que somme des sous-surfaces vaut 1:
-    ji = count(abs(sum(pctsrf(:, :), dim = 2) - 1. ) > EPSFRA)
-    IF (ji /= 0) PRINT *, 'Problème répartition sous maille pour', ji, 'points'
+    ji = count(abs(sum(pctsrf, dim = 2) - 1.) > EPSFRA)
+    IF (ji /= 0) then
+       PRINT *, 'Problème répartition sous maille pour ', ji, 'points'
+    end IF
 
     ! Calcul intermédiaire:
     CALL massdair(p3d, masse)
@@ -317,7 +322,7 @@ contains
     albe(:, is_oce) = 0.5
     albe(:, is_sic) = 0.6
     alblw = albe
-    evap(:, :) = 0.
+    evap = 0.
     qsolsrf(:, is_ter) = 150.
     qsolsrf(:, is_lic) = 150.
     qsolsrf(:, is_oce) = 150.

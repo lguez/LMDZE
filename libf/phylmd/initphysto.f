@@ -97,7 +97,7 @@ C
          CALL gr_fi_ecrit(1,klon,iim,jjm+1,rlat,zx_lat)
 
 
-      call histbeg_totreg(infile, iim, zx_lon(:,1), jjm+1, zx_lat(1,:),
+      call histbeg_totreg(infile, zx_lon(:,1), zx_lat(1,:),
      .             1, iim, 1, jjm+1,
      .             tau0, zjulian, tstep, nhoriid, fileid)
 
@@ -118,63 +118,63 @@ C
 	write(*,*) 'apres histvert ds initphysto'
 
        CALL histdef(fileid, "phis", "Surface geop. height", "-",
-     .                iim,jjm+1,nhoriid, 1,1,1, -99, 32,
+     .                iim,jjm+1,nhoriid, 1,1,1, -99, 
      .                "once", t_ops, t_wrt)
 c
 	write(*,*) 'apres phis ds initphysto'
 
          CALL histdef(fileid, "aire", "Grid area", "-",
-     .                iim,jjm+1,nhoriid, 1,1,1, -99, 32,
+     .                iim,jjm+1,nhoriid, 1,1,1, -99, 
      .                "once", t_ops, t_wrt)
          write(*,*) 'apres aire ds initphysto'
 
          CALL histdef(fileid, "dtime", "tps phys ", "s",
-     .                1,1,nhoriid, 1,1,1, -99, 32,
+     .                1,1,nhoriid, 1,1,1, -99, 
      .                "once", t_ops, t_wrt)
 	
 	 CALL histdef(fileid, "istphy", "tps stock", "s",
-     .                1,1,nhoriid, 1,1,1, -99, 32,
+     .                1,1,nhoriid, 1,1,1, -99, 
      .                "once", t_ops, t_wrt)
 
 C T 
 C
       call histdef(fileid, 't', 'Temperature', 'K',
      .             iim, jjm+1, nhoriid, llm, 1, llm, zvertiid,
-     .             32, 'inst(X)', t_ops, t_wrt)
+     .              'inst(X)', t_ops, t_wrt)
         write(*,*) 'apres t ds initphysto'
 C mfu 
 C
       call histdef(fileid, 'mfu', 'flx m. pan. mt', 'kg m/s',
      .             iim, jjm+1, nhoriid, llm, 1, llm, zvertiid,
-     .             32, 'inst(X)', t_ops, t_wrt)
+     .              'inst(X)', t_ops, t_wrt)
         write(*,*) 'apres mfu ds initphysto'
 C
 C mfd 
 C
       call histdef(fileid, 'mfd', 'flx m. pan. des', 'kg m/s',
      .             iim, jjm+1, nhoriid, llm, 1, llm, zvertiid,
-     .             32, 'inst(X)', t_ops, t_wrt)
+     .              'inst(X)', t_ops, t_wrt)
 
 C
 C en_u 
 C
       call histdef(fileid, 'en_u', 'flx ent pan mt', 'kg m/s',
      .             iim, jjm+1, nhoriid, llm, 1, llm, zvertiid,
-     .             32, 'inst(X)', t_ops, t_wrt)
+     .              'inst(X)', t_ops, t_wrt)
                write(*,*) 'apres en_u ds initphysto'
 C
 C de_u 
 C
       call histdef(fileid, 'de_u', 'flx det pan mt', 'kg m/s',
      .             iim, jjm+1, nhoriid, llm, 1, llm, zvertiid,
-     .             32, 'inst(X)', t_ops, t_wrt)
+     .              'inst(X)', t_ops, t_wrt)
 
 C
 C en_d 
 C
       call histdef(fileid, 'en_d', 'flx ent pan dt', 'kg m/s',
      .             iim, jjm+1, nhoriid, llm, 1, llm, zvertiid,
-     .             32, 'inst(X)', t_ops, t_wrt)
+     .              'inst(X)', t_ops, t_wrt)
 C
 
 C
@@ -182,46 +182,46 @@ C de_d
 C
       call histdef(fileid, 'de_d', 'flx det pan dt', 'kg m/s',
      .             iim, jjm+1, nhoriid, llm, 1, llm, zvertiid,
-     .             32, 'inst(X)', t_ops, t_wrt)
+     .              'inst(X)', t_ops, t_wrt)
 
 c coefh frac_impa,frac_nucl
 	
 	call histdef(fileid, "coefh", " ", " ",
      .             iim, jjm+1, nhoriid, llm, 1, llm, zvertiid,
-     .             32, "inst(X)", t_ops, t_wrt)
+     .              "inst(X)", t_ops, t_wrt)
 
 c abderrahmane le 16 09 02
         call histdef(fileid, "fm_th", " ", " ",
      .             iim, jjm+1, nhoriid, llm, 1, llm, zvertiid,
-     .             32, "inst(X)", t_ops, t_wrt)
+     .              "inst(X)", t_ops, t_wrt)
 
         call histdef(fileid, "en_th", " ", " ",
      .             iim, jjm+1, nhoriid, llm, 1, llm, zvertiid,
-     .             32, "inst(X)", t_ops, t_wrt)
+     .              "inst(X)", t_ops, t_wrt)
 c fin aj
 	
 	write(*,*) 'apres coefh ds initphysto'	
 
 	call histdef(fileid, 'frac_impa', ' ', ' ',
      .             iim, jjm+1, nhoriid, llm, 1, llm, zvertiid,
-     .             32, 'inst(X)', t_ops, t_wrt)
+     .              'inst(X)', t_ops, t_wrt)
 	
 	call histdef(fileid, 'frac_nucl', ' ', ' ',
      .             iim, jjm+1, nhoriid, llm, 1, llm, zvertiid,
-     .             32, 'inst(X)', t_ops, t_wrt)
+     .              'inst(X)', t_ops, t_wrt)
 
 c
 c pyu1
 c
       CALL histdef(fileid, "pyu1", " ", " ",
-     .                iim,jjm+1,nhoriid, 1,1,1, -99, 32,
+     .                iim,jjm+1,nhoriid, 1,1,1, -99, 
      .                "inst(X)", t_ops, t_wrt)
 
 c
 c pyv1
 c
 	CALL histdef(fileid, "pyv1", " ", " ",
-     .                iim,jjm+1,nhoriid, 1,1,1, -99, 32,
+     .                iim,jjm+1,nhoriid, 1,1,1, -99, 
      .                "inst(X)", t_ops, t_wrt)
 	
 	write(*,*) 'apres pyv1 ds initphysto'
@@ -229,14 +229,14 @@ c
 c ftsol1
 c
 	call histdef(fileid, "ftsol1", " ", " ",
-     .             iim, jjm+1, nhoriid, 1, 1,1, -99,32,
+     .             iim, jjm+1, nhoriid, 1, 1,1, -99,
      .             "inst(X)", t_ops, t_wrt)
 
 c
 c ftsol2
 c
         call histdef(fileid, "ftsol2", " ", " ",
-     .             iim, jjm+1, nhoriid, 1, 1,1, -99,32,
+     .             iim, jjm+1, nhoriid, 1, 1,1, -99,
      .             "inst(X)", t_ops, t_wrt)
 
 c
@@ -244,49 +244,49 @@ c ftsol3
 c
         call histdef(fileid, "ftsol3", " ", " ",
      .             iim, jjm+1, nhoriid, 1, 1,1, -99,
-     .             32, "inst(X)", t_ops, t_wrt)
+     .              "inst(X)", t_ops, t_wrt)
 
 c
 c ftsol4
 c
         call histdef(fileid, "ftsol4", " ", " ",
      .             iim, jjm+1, nhoriid, 1, 1,1, -99,
-     .             32, "inst(X)", t_ops, t_wrt)
+     .              "inst(X)", t_ops, t_wrt)
 	
 c
 c rain
 c
         call histdef(fileid, "rain", " ", " ",
      .             iim, jjm+1, nhoriid, 1, 1,1, -99,
-     .             32, "inst(X)", t_ops, t_wrt)
+     .              "inst(X)", t_ops, t_wrt)
 
 c
 c psrf1
 c
 	call histdef(fileid, "psrf1", " ", " ",
      .             iim, jjm+1, nhoriid, 1, 1, 1, -99,
-     .             32, "inst(X)", t_ops, t_wrt)
+     .              "inst(X)", t_ops, t_wrt)
 	
 c
 c psrf2
 c
         call histdef(fileid, "psrf2", " ", " ",
      .             iim, jjm+1, nhoriid, 1, 1, 1, -99,
-     .             32, "inst(X)", t_ops, t_wrt)
+     .              "inst(X)", t_ops, t_wrt)
 
 c
 c psrf3
 c
         call histdef(fileid, "psrf3", " ", " ",
      .             iim, jjm+1, nhoriid, 1, 1, 1, -99,
-     .             32, "inst(X)", t_ops, t_wrt)
+     .              "inst(X)", t_ops, t_wrt)
 
 c
 c psrf4
 c
         call histdef(fileid, "psrf4", " ", " ",
      .             iim, jjm+1, nhoriid, 1, 1, 1, -99,
-     .             32, "inst(X)", t_ops, t_wrt)
+     .              "inst(X)", t_ops, t_wrt)
 	
 	write(*,*) 'avant histend ds initphysto'	
 

@@ -83,7 +83,7 @@ contains
        enddo
     enddo
 
-    call histbeg_totreg(infile, iip1, rlong(:,1), jjp1, rlat(1,:), &
+    call histbeg_totreg(infile, rlong(:,1), rlat(1,:), &
          1, iip1, 1, jjp1, &
          tau0, zjulian, tstep, uhoriid, fileid)
     !
@@ -98,7 +98,7 @@ contains
        enddo
     enddo
 
-    call histbeg_totreg('dyn_histv.nc', iip1, rlong(:,1), jjm, rlat(1,:jjm), &
+    call histbeg_totreg('dyn_histv.nc', rlong(:,1), rlat(1,:jjm), &
          1, iip1, 1, jjm, &
          tau0, zjulian, tstep, vhoriid, filevid)
     !
@@ -111,7 +111,7 @@ contains
        enddo
     enddo
 
-    call histhori(fileid, iip1, rlong, jjp1, rlat, 'scalar', &
+    call histhori_regular(fileid, iip1, rlong, jjp1, rlat, 'scalar', &
          'Grille points scalaires', thoriid)
     !
     !  Appel a histvert pour la grille verticale
@@ -128,52 +128,52 @@ contains
     !
     call histdef(fileid, 'ucov', 'vents u covariants', 'm/s', &
          iip1, jjp1, uhoriid, llm, 1, llm, zvertiid, &
-         32, 'inst(X)', t_ops, t_wrt)
+         'inst(X)', t_ops, t_wrt)
     !
     !  Vents V
     !
     call histdef(filevid, 'vcov', 'vents v covariants', 'm/s', &
          iip1, jjm, vhoriid, llm, 1, llm, zvertiid, &
-         32, 'inst(X)', t_ops, t_wrt)
+         'inst(X)', t_ops, t_wrt)
 
     !
     !  Temperature potentielle
     !
     call histdef(fileid, 'teta', 'temperature potentielle', '-', &
          iip1, jjp1, thoriid, llm, 1, llm, zvertiid, &
-         32, 'inst(X)', t_ops, t_wrt)
+         'inst(X)', t_ops, t_wrt)
     !
     !  Geopotentiel
     !
     call histdef(fileid, 'phi', 'geopotentiel instantane', '-', &
          iip1, jjp1, thoriid, llm, 1, llm, zvertiid, &
-         32, 'inst(X)', t_ops, t_wrt)
+         'inst(X)', t_ops, t_wrt)
     !
     !  Traceurs
     !
     DO iq=1,nq
        call histdef(fileid, ttext(iq),  ttext(iq), '-', &
             iip1, jjp1, thoriid, llm, 1, llm, zvertiid, &
-            32, 'inst(X)', t_ops, t_wrt)
+            'inst(X)', t_ops, t_wrt)
     enddo
     !
     !  Masse
     !
     call histdef(fileid, 'masse', 'masse', 'kg', &
          iip1, jjp1, thoriid, 1, 1, 1, -99, &
-         32, 'inst(X)', t_ops, t_wrt)
+         'inst(X)', t_ops, t_wrt)
     !
     !  Pression au sol
     !
     call histdef(fileid, 'ps', 'pression naturelle au sol', 'Pa', &
          iip1, jjp1, thoriid, 1, 1, 1, -99, &
-         32, 'inst(X)', t_ops, t_wrt)
+         'inst(X)', t_ops, t_wrt)
     !
     !  Pression au sol
     !
     call histdef(fileid, 'phis', 'geopotentiel au sol', '-', &
          iip1, jjp1, thoriid, 1, 1, 1, -99, &
-         32, 'inst(X)', t_ops, t_wrt)
+         'inst(X)', t_ops, t_wrt)
     !
     !  Fin
     !

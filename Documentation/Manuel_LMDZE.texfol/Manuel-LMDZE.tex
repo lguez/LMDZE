@@ -139,9 +139,14 @@ rugosité (excluant la contribution des variations de relief). Ces
 données viennent de la NASA. \verb+Relief.nc+ contient des données de
 la NASA, corrigées sur l'antarctique, probablement par Gerhard Krinner
 à partir de données Radar. \verb+Albedo.nc+ contient probablement des
-données de Yann Polcher. L'équipe de développement d'Orchidée a
-peut-être des informations sur l'origine du fichier
-\verb+landiceref.nc+.
+données de Yann Polcher.
+
+L'équipe de développement d'Orchidée a peut-être des informations sur
+l'origine du fichier \verb+landiceref.nc+. Dans ce fichier, la
+variable \verb+masq+ prend seulement les valeurs 0 ou 1. La variable
+\verb+landice+ prend des valeurs différentes de 0 et 1, entre
+\nombre{0,125} et \nombre{0,875}, en un petit nombre de points (163
+points), sur des côtes.
 
 Cf. la
 \href{file:///user/guez/Documents/Informatique_fonctionnement/Programs/Documentation
@@ -283,12 +288,13 @@ wc -l `find . -name "*.[fh]" -o -name "*.f90"`
 \end{verbatim}
 donne environ $7 \cdot 10^{4}$ lignes.
 
-\section{Intérêt de placer un makefile dans chaque répertoire}
+\section{Le makefile}
 
-J'admets l'intérêt de séparer les fichiers sources dans les
-répertoires \verb+dyn3d+, \verb+bibio+ etc. Avec un aussi grand nombre
-de fichiers, ce classement apporte de la clarté. À partir de là se
-pose la question de l'intérêt de placer un \verb+makefile+ dans chaque
+Intérêt de placer un makefile dans chaque répertoire. J'admets
+l'intérêt de séparer les fichiers sources dans les répertoires
+\verb+dyn3d+, \verb+bibio+ etc. Avec un aussi grand nombre de
+fichiers, ce classement apporte de la clarté. À partir de là se pose
+la question de l'intérêt de placer un \verb+makefile+ dans chaque
 répertoire. Cette organisation suppose déjà l'absence de dépendance
 circulaire entre les répertoires pour la compilation.  Admettons qu'il
 n'y en ait pas. Il y aurait logiquement un \verb+makefile+ au dessus
@@ -307,6 +313,16 @@ des répertoires. Mais alors comment le \verb+makefile+ supérieur
 sait-il mettre à jour ces objets ? En conclusion, je crois qu'il ne
 faut pas placer un \verb+makefile+ dans chaque répertoire.  Un unique
 \verb+makefile+ au dessus des répertoires est la bonne solution.
+
+Dans les règles qui fabriquent les arbres des appels et les listes de
+variables, les commandes doivent utiliser la variable \verb+$^+ pour
+récupérer le chemin des sources. Une règle ne peut pas par exemple
+utiliser directement \verb+${sources_etat0_lim}+. Par ailleurs, on ne
+peut pas avoir une règle supplémentaire :
+\begin{verbatim}
+CG_etat0_lim CG_gcm CR_etat0_lim CR_gcm: ${objects}
+\end{verbatim}
+parce qu'alors les objets apparaîtraient dans les commandes.
 
 \section{Description des programmes}
 
@@ -849,9 +865,8 @@ donc :
 \subsection{Module \texttt{inter\_barxy\_m}}
 
 Cf.
-\href{file:///user/guez/Documents/Informatique_fonctionnement/Programs/Documentation
-  IOIPSL LMDZ/Mouvement de données/inter_barxy.odg}{graphique de
-  transmission de données}.
+\href{file:///user/guez/Documents/Informatique_fonctionnement/Programs/LMDZ/LMDZE/Documentation/inter_barxy.odg}{graphique
+  de transmission de données}.
 
 Le seul cas où \verb+size(champint, 2)+ vaut \verb+jjm+ dans
 \verb+inter_barxy+ se produit suite à l'appel :
@@ -1980,34 +1995,5 @@ messages des 13/3/6 et 14/3/6.
 \item[L11] Correction d'un bogue dans \verb+o3_chem+ : le filtrage
   selon la direction du Soleil doit affecter $b$ et non \verb+r_het+.
 \end{description}
-
-\section{Utilisation de module à la place de l'inclusion de fichier}
-
-Pour remplacer les \verb+include+ de fichiers particuliers, 
-par exemple \verb+temp.h+ et \verb+temps.inc+, par 
-des \verb+use temps+ dans tous les fichiers, dans chacun 
-des répertoires \verb+bibio+, \verb+dyn3d+, \verb+filtrez+ 
-et \verb+phylmd+ :
-\begin{verbatim}
-%M
-.+\.f\(90\)?$
-Q
-include +\(['"]\)temps\.\(h\|inc\)\1
-      use temps
-\end{verbatim}
-Pour chaque fichier, taper ensuite ``!''. Enregistrer tous 
-les fichiers modifiés avec la commande \verb+Ctrl-x s !+. 
-Tous les fichiers modifiés étant encore ouverts, dans chacun 
-d'entre eux, déplacer la ligne \verb+use+ au bon endroit, 
-enregistrer et fermer le \Eng{buffer}.
-
-Effacer le fichier \verb+.h+.  Ajouter le fichier \verb+.f+ dans la
-liste des objets pour l'un ou l'autre exécutable (selon qu'ils
-l'utilisent ou non).
-\begin{verbatim}
-make depend
-make.sh
-\end{verbatim}
-Corriger les mauvaises positions restantes des instructions \verb+use+.
 
 \end{document}

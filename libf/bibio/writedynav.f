@@ -87,51 +87,45 @@ C
 C  Vents U scalaire
 C
       call gr_u_scal(llm, unat, us)
-      call histwrite(histid, 'u', itau_w, us, 
-     .               iip1*jjp1*llm, ndex3d)
+      call histwrite(histid, 'u', itau_w, us)
 C
 C  Vents V scalaire
 C
       call gr_v_scal(llm, vnat, vs)
-      call histwrite(histid, 'v', itau_w, vs, 
-     .               iip1*jjp1*llm, ndex3d)
+      call histwrite(histid, 'v', itau_w, vs)
 C
 C  Temperature potentielle moyennee
 C
-      call histwrite(histid, 'theta', itau_w, teta, 
-     .                iip1*jjp1*llm, ndex3d)
+      call histwrite(histid, 'theta', itau_w, teta)
 C
 C  Temperature moyennee
 C
       do ii = 1, ijp1llm
         tm(ii) = teta(ii) * ppk(ii)/cpp
       enddo
-      call histwrite(histid, 'temp', itau_w, tm, 
-     .                iip1*jjp1*llm, ndex3d)
+      call histwrite(histid, 'temp', itau_w, tm)
 C
 C  Geopotentiel
 C
-      call histwrite(histid, 'phi', itau_w, phi, 
-     .                iip1*jjp1*llm, ndex3d)
+      call histwrite(histid, 'phi', itau_w, phi)
 C
 C  Traceurs
 C
         DO iq=1,nq
-          call histwrite(histid, ttext(iq), itau_w, q(:,:,iq), 
-     .                   iip1*jjp1*llm, ndex3d)
+          call histwrite(histid, ttext(iq), itau_w, q(:,:,iq))
         enddo
 C
 C  Masse
 C
-       call histwrite(histid, 'masse', itau_w, masse, iip1*jjp1, ndex2d)
+       call histwrite(histid, 'masse', itau_w, masse)
 C
 C  Pression au sol
 C
-       call histwrite(histid, 'ps', itau_w, ps, iip1*jjp1, ndex2d)
+       call histwrite(histid, 'ps', itau_w, ps)
 C
 C  Geopotentiel au sol
 C
-       call histwrite(histid, 'phis', itau_w, phis, iip1*jjp1, ndex2d)
+       call histwrite(histid, 'phis', itau_w, phis)
 C
 C  Fin
 C

@@ -7,7 +7,6 @@ contains
   SUBROUTINE dynredem0(fichnom, iday_end, phis)
 
     ! From dyn3d/dynredem.F, v 1.2 2004/06/22 11:45:30
-
     ! Ecriture du fichier de redémarrage au format NetCDF (initialisation)
 
     USE IOIPSL, only: ymds2ju, ju2ymds

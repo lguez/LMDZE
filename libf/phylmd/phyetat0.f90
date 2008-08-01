@@ -1,13 +1,13 @@
 module phyetat0_m
 
-  use dimphy, only: klon, klev, zmasq
+  use dimphy, only: klon
 
   IMPLICIT none
 
   REAL, save:: rlat(klon), rlon(klon)
   ! latitude et longitude pour chaque point, in degrees
 
-  private klon, klev, zmasq
+  private klon
 
 contains
 
@@ -28,6 +28,7 @@ contains
     USE temps, ONLY : itau_phy
     use netcdf, only: nf90_get_att, nf90_global
     use netcdf95, only: handle_err
+    use dimphy, only: zmasq, klev
 
     include "netcdf.inc"
 

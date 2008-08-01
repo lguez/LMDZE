@@ -62,7 +62,7 @@ C
       character*3 str
       character*10 ctrac
       integer iq
-      real rlong(iip1,jjp1), rlat(iip1,jjp1),rl(1,1)
+      real rlong(iip1,jjp1), rlat(iip1,jjp1)
       integer uhoriid, vhoriid, thoriid, zvertiid,dhoriid,dvertiid
       integer ii,jj
       integer zan, idayref
@@ -90,7 +90,7 @@ C
         enddo
       enddo
  
-      call histbeg_totreg(infile, iip1, rlong(:,1), jjp1, rlat(1,:),
+      call histbeg_totreg(infile, rlong(:,1), rlat(1,:),
      .             1, iip1, 1, jjp1,
      .             tau0, zjulian, tstep, uhoriid, fileid)
 C
@@ -106,12 +106,11 @@ C  un meme fichier)
         enddo
       enddo
 
-      call histbeg_totreg('fluxstokev.nc', iip1, rlong(:,1), jjm,
-     .             rlat(1,:),1, iip1, 1, jjm,
+      call histbeg_totreg('fluxstokev.nc', rlong(:,1),
+     .             rlat(1,:jjm),1, iip1, 1, jjm,
      .             tau0, zjulian, tstep, vhoriid, filevid)
 	
-	rl(1,1) = 1.	
-      call histbeg_regular('defstoke.nc', 1, rl, 1, rl,
+      call histbeg_totreg('defstoke.nc', (/1./), (/1./),
      .             1, 1, 1, 1,
      .             tau0, zjulian, tstep, dhoriid, filedid)
 
@@ -125,7 +124,7 @@ C
         enddo
       enddo
 
-      call histhori(fileid, iip1, rlong, jjp1, rlat, 'scalar',
+      call histhori_regular(fileid, iip1, rlong, jjp1, rlat, 'scalar',
      .              'Grille points scalaires', thoriid)
 	
 C
@@ -148,23 +147,23 @@ C
 C  Appels a histdef pour la definition des variables a sauvegarder
 	
 	CALL histdef(fileid, "phis", "Surface geop. height", "-",
-     .                iip1,jjp1,thoriid, 1,1,1, -99, 32,
+     .                iip1,jjp1,thoriid, 1,1,1, -99,
      .                "once", t_ops, t_wrt)
 
          CALL histdef(fileid, "aire", "Grid area", "-",
-     .                iip1,jjp1,thoriid, 1,1,1, -99, 32,
+     .                iip1,jjp1,thoriid, 1,1,1, -99,
      .                "once", t_ops, t_wrt)
 	
 	CALL histdef(filedid, "dtvr", "tps dyn", "s",
-     .                1,1,dhoriid, 1,1,1, -99, 32,
+     .                1,1,dhoriid, 1,1,1, -99,
      .                "once", t_ops, t_wrt)
         
          CALL histdef(filedid, "istdyn", "tps stock", "s",
-     .                1,1,dhoriid, 1,1,1, -99, 32,
+     .                1,1,dhoriid, 1,1,1, -99,
      .                "once", t_ops, t_wrt)
          
          CALL histdef(filedid, "istphy", "tps stock phy", "s",
-     .                1,1,dhoriid, 1,1,1, -99, 32,
+     .                1,1,dhoriid, 1,1,1, -99,
      .                "once", t_ops, t_wrt)
 
 
@@ -173,33 +172,33 @@ C Masse
 C
       call histdef(fileid, 'masse', 'Masse', 'kg',
      .             iip1, jjp1, thoriid, llm, 1, llm, zvertiid,
-     .             32, 'inst(X)', t_ops, t_wrt)
+     .             'inst(X)', t_ops, t_wrt)
 C
 C  Pbaru 
 C
       call histdef(fileid, 'pbaru', 'flx de masse zonal', 'kg m/s',
      .             iip1, jjp1, uhoriid, llm, 1, llm, zvertiid,
-     .             32, 'inst(X)', t_ops, t_wrt)
+     .             'inst(X)', t_ops, t_wrt)
 
 C
 C  Pbarv 
 C
       call histdef(filevid, 'pbarv', 'flx de masse mer', 'kg m/s',
      .             iip1, jjm, vhoriid, llm, 1, llm, zvertiid,
-     .             32, 'inst(X)', t_ops, t_wrt)
+     .             'inst(X)', t_ops, t_wrt)
 C
 C  w 
 C
       call histdef(fileid, 'w', 'flx de masse vert', 'kg m/s',
      .             iip1, jjp1, thoriid, llm, 1, llm, zvertiid,
-     .             32, 'inst(X)', t_ops, t_wrt)
+     .             'inst(X)', t_ops, t_wrt)
 
 C
 C  Temperature potentielle
 C
       call histdef(fileid, 'teta', 'temperature potentielle', '-',
      .             iip1, jjp1, thoriid, llm, 1, llm, zvertiid,
-     .             32, 'inst(X)', t_ops, t_wrt)
+     .             'inst(X)', t_ops, t_wrt)
 C
 
 C
@@ -207,7 +206,7 @@ C Geopotentiel
 C
       call histdef(fileid, 'phi', 'geopotentiel instantane', '-',
      .             iip1, jjp1, thoriid, llm, 1, llm, zvertiid,
-     .             32, 'inst(X)', t_ops, t_wrt)
+     .             'inst(X)', t_ops, t_wrt)
 C
 C  Fin
 C

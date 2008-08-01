@@ -76,7 +76,7 @@ dynredem0.o : advtrac_m.o ener.o temps.o serre.o comgeom.o logic.o comvert.o com
 dynredem1.o : advtrac_m.o abort_gcm.o temps.o paramet_m.o dimens_m.o 
 ener.o : dimens_m.o 
 enercin.o : comgeom.o paramet_m.o dimens_m.o 
-etat0.o : regr_pr_o3.o regr_lat_time_coefoz.o dynredem0.o pressure_var.o advtrac_m.o exner_hyb.o q_sat.o grid_change.o grid_atob.o temps.o dimsoil.o serre.o comgeom.o conf_gcm.o comvert.o comdissnew.o comconst.o paramet_m.o dimens_m.o startdyn.o start_init_phys_m.o start_init_orog_m.o dimphy.o indicesol.o 
+etat0.o : phyredem.o regr_pr_o3.o regr_lat_time_coefoz.o dynredem0.o pressure_var.o advtrac_m.o exner_hyb.o q_sat.o grid_change.o grid_atob.o temps.o dimsoil.o serre.o comgeom.o conf_gcm.o comvert.o comdissnew.o comconst.o paramet_m.o dimens_m.o startdyn.o start_init_phys_m.o start_init_orog_m.o dimphy.o indicesol.o 
 etat0_lim.o : limit.o etat0.o conf_gcm.o comconst.o 
 exner_hyb.o : comgeom.o comvert.o comconst.o dimens_m.o 
 filtreg.o : coefils.h parafilt.o paramet_m.o dimens_m.o 
@@ -149,7 +149,7 @@ paramet_m.o : dimens_m.o
 pentes_ini.o : comgeom.o comvert.o comconst.o paramet_m.o dimens_m.o 
 phyetat0.o : temps.o dimsoil.o indicesol.o dimphy.o 
 phyredem.o : temps.o dimsoil.o dimphy.o indicesol.o 
-physiq.o : FCTTRE.o conf_phys.o hgardfou.o phyetat0.o orbite.o ini_hist.o YOETHF.o radopt.o radepsi.o oasis_m.o phytrac.o ctherm.o comgeomphy.o YOMCST.o abort_gcm.o iniprint.o clesphys2.o clesphys.o temps.o dimsoil.o conf_gcm.o dimphy.o indicesol.o dimens_m.o 
+physiq.o : grid_change.o FCTTRE.o phyredem.o conf_phys.o hgardfou.o phyetat0.o orbite.o ini_hist.o YOETHF.o radopt.o radepsi.o oasis_m.o phytrac.o ctherm.o comgeomphy.o YOMCST.o abort_gcm.o iniprint.o clesphys2.o clesphys.o temps.o dimsoil.o conf_gcm.o dimphy.o indicesol.o dimens_m.o 
 phystokenc.o : tracstoke.o conf_gcm.o dimphy.o indicesol.o dimens_m.o 
 phytrac.o : grid_change.o comgeomphy.o advtrac_m.o temps.o o3_chem.o phyetat0.o regr_pr_comb_coefoz.o ctherm.o YOMCST.o abort_gcm.o clesphys2.o clesphys.o dimphy.o indicesol.o dimens_m.o 
 plevel.o : dimphy.o dimens_m.o 

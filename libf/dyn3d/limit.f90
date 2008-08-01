@@ -21,7 +21,7 @@ contains
     use conf_gcm_m, only: day_step
     use comgeom, only: rlonu, rlatv
     use etat0_mod, only: pctsrf
-    use start_init_orog_m, only: masque
+    use start_init_orog_m, only: mask
     use conf_dat2d_m, only: conf_dat2d
     use inter_barxy_m, only: inter_barxy
     use numer_rec, only: spline, splint
@@ -95,6 +95,8 @@ contains
     PRINT *, 'Processing rugosity...'
     call NF95_OPEN('Rugos.nc', NF90_NOWRITE, ncid)
 
+    ! Read coordinate variables:
+
     call nf95_get_coord(ncid, "longitude", dlon_ini)
     imdep = size(dlon_ini)
 
@@ -108,7 +110,8 @@ contains
     allocate(dlon(imdep), dlat(jmdep))
     call NF95_INQ_VARID(ncid, 'RUGOS', varid)
 
-    ! Compute "champtime":
+    ! Read the primary variable day by day and regrid horizontally,
+    ! result in "champtime":
     DO  l = 1, lmdep
        ierr = NF90_GET_VAR(ncid, varid, champ, start=(/1, 1, l/))
        call handle_err("NF90_GET_VAR", ierr)
@@ -117,7 +120,7 @@ contains
        CALL inter_barxy(dlon, dlat(:jmdep -1), LOG(champ), rlonu(:iim), &
             rlatv, champtime(:, :, l))
        champtime(:, :, l) = EXP(champtime(:, :, l))
-       where (nint(masque(:iim, :)) /= 1) champtime(:, :, l) = 0.001
+       where (nint(mask(:iim, :)) /= 1) champtime(:, :, l) = 0.001
     end do
 
     call NF95_CLOSE(ncid)
@@ -125,6 +128,7 @@ contains
     DEALLOCATE(dlon, dlat, champ, dlon_ini, dlat_ini)
     allocate(yder(lmdep))
 
+    ! Interpolate monthly values to daily values, at each horizontal position:
     DO j = 1, jjm + 1
        DO i = 1, iim
           yder(:) = SPLINE(timeyear, champtime(i, j, :))

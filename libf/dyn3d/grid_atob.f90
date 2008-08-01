@@ -6,7 +6,7 @@ module grid_atob
 
 contains
 
-  real function grille_m(xdata, ydata, entree, x, y)
+  function grille_m(xdata, ydata, entree, x, y)
 
     !=======================================================================
     ! Z. X. Li (le 1 avril 1994) (voir aussi A. Harzallah et L. Fairhead)
@@ -43,7 +43,7 @@ contains
     REAL, intent(in):: entree(:, :)
     REAL, intent(in):: x(:), y(:)
 
-    dimension grille_m(size(x), size(y))
+    real grille_m(size(x), size(y))
 
     ! Variables local to the procedure:
     INTEGER imdep, jmdep, imar, jmar

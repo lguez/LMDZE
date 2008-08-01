@@ -16,12 +16,13 @@ C No outputs, every AAM quantities are written on the IAM
 C File. 
 c
 c Modif : I.Musat (LMD/CNRS) date : 20041020
-c Outputs : axial components of wind AAM "aam" and total surface torque "torsfc",
+c Outputs : axial components of wind AAM "aam" and total surface torque 
+C "torsfc",
 c but no write in the iam file.
 c
 C WARNING: Only valid for regular rectangular grids.
 C REMARK: CALL DANS PHYSIQ AFTER lift_noro:
-C        CALL aaam_bud (27,klon,klev,rjourvrai,gmtime,
+C        CALL aaam_bud (27,klon,klev, gmtime,
 C    C               ra,rg,romega,
 C    C               rlat,rlon,pphis,
 C    C               zustrdr,zustrli,zustrph,
