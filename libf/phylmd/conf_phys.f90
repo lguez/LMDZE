@@ -48,11 +48,12 @@ contains
     logical              :: ok_journe, ok_mensuel, ok_instan        
     LOGICAL              :: ok_ade, ok_aie
     REAL                 :: bl95_b0, bl95_b1
-    real                 :: fact_cldcon, facttemps,ratqsbas,ratqshaut
+    real, intent(out):: fact_cldcon
+    real, intent(out):: facttemps
+    real ratqsbas,ratqshaut
     integer              :: iflag_cldcon, if_ebil
 
     ! Local
-    integer              :: numout = 6
     real                 :: zzz
 
     integer :: iflag_thermals,nsplit_thermals
@@ -698,66 +699,66 @@ contains
     bug_ozone = .false.
     call getin('bug_ozone',bug_ozone)
 
-    write(numout,*)' *********'
-    write(numout,*)' Configuration des parametres de la physique: '
-    write(numout,*)' Config ocean = ', ocean
-    write(numout,*)' Config veget = ', ok_veget
-    write(numout,*)' Sortie journaliere = ', ok_journe
-    write(numout,*)' Sortie mensuelle = ', ok_mensuel
-    write(numout,*)' Sortie instantanee = ', ok_instan
-    write(numout,*)' Sortie bilan d''energie, if_ebil =', if_ebil
-    write(numout,*)' Excentricite = ',R_ecc
-    write(numout,*)' Equinoxe = ',R_peri
-    write(numout,*)' Inclinaison =',R_incl
-    write(numout,*)' Constante solaire =',solaire
-    write(numout,*)' co2_ppm =',co2_ppm
-    write(numout,*)' RCO2 = ',RCO2
-    write(numout,*)' CH4_ppb =',CH4_ppb,' RCH4 = ',RCH4
-    write(numout,*)' N2O_ppb =',N2O_ppb,' RN2O =  ',RN2O
-    write(numout,*)' CFC11_ppt=',CFC11_ppt,' RCFC11 =  ',RCFC11
-    write(numout,*)' CFC12_ppt=',CFC12_ppt,' RCFC12 =  ',RCFC12
-    write(numout,*)' epmax = ', epmax
-    write(numout,*)' ok_adj_ema = ', ok_adj_ema
-    write(numout,*)' iflag_clw = ', iflag_clw
-    write(numout,*)' cld_lc_lsc = ', cld_lc_lsc
-    write(numout,*)' cld_lc_con = ', cld_lc_con
-    write(numout,*)' cld_tau_lsc = ', cld_tau_lsc
-    write(numout,*)' cld_tau_con = ', cld_tau_con
-    write(numout,*)' ffallv_lsc = ', ffallv_lsc
-    write(numout,*)' ffallv_con = ', ffallv_con
-    write(numout,*)' coef_eva = ', coef_eva
-    write(numout,*)' reevap_ice = ', reevap_ice
-    write(numout,*)' iflag_pdf = ', iflag_pdf
-    write(numout,*)' iflag_cldcon = ', iflag_cldcon
-    write(numout,*)' fact_cldcon = ', fact_cldcon
-    write(numout,*)' facttemps = ', facttemps
-    write(numout,*)' ok_newmicro = ',ok_newmicro 
-    write(numout,*)' ratqsbas = ',ratqsbas 
-    write(numout,*)' ratqshaut = ',ratqshaut 
-    write(numout,*)' top_height = ',top_height 
-    write(numout,*)' overlap = ',overlap 
-    write(numout,*)' cdmmax = ',cdmmax 
-    write(numout,*)' cdhmax = ',cdhmax 
-    write(numout,*)' ksta = ',ksta 
-    write(numout,*)' ksta_ter = ',ksta_ter 
-    write(numout,*)' ok_kzmin = ',ok_kzmin 
-    write(numout,*)' ok_ade = ',ok_ade
-    write(numout,*)' ok_aie = ',ok_aie
-    write(numout,*)' bl95_b0 = ',bl95_b0
-    write(numout,*)' bl95_b1 = ',bl95_b1
-    write(numout,*)' lev_histhf = ',lev_histhf 
-    write(numout,*)' lev_histday = ',lev_histday 
-    write(numout,*)' lev_histmth = ',lev_histmth 
-    write(numout,*)' iflag_pbl = ', iflag_pbl
-    write(numout,*)' iflag_thermals = ', iflag_thermals
-    write(numout,*)' type_run = ',type_run 
-    write(numout,*)' ok_isccp = ',ok_isccp 
-    write(numout,*)' ok_regdyn = ',ok_regdyn
-    write(numout,*)' lonmin lonmax latmin latmax bilKP_ins =',&
+    print *, ' *********'
+    print *, ' Configuration des parametres de la physique: '
+    print *, ' Config ocean = ', ocean
+    print *, ' Config veget = ', ok_veget
+    print *, ' Sortie journaliere = ', ok_journe
+    print *, ' Sortie mensuelle = ', ok_mensuel
+    print *, ' Sortie instantanee = ', ok_instan
+    print *, ' Sortie bilan d''energie, if_ebil =', if_ebil
+    print *, ' Excentricite = ',R_ecc
+    print *, ' Equinoxe = ',R_peri
+    print *, ' Inclinaison =',R_incl
+    print *, ' Constante solaire =',solaire
+    print *, ' co2_ppm =',co2_ppm
+    print *, ' RCO2 = ',RCO2
+    print *, ' CH4_ppb =',CH4_ppb,' RCH4 = ',RCH4
+    print *, ' N2O_ppb =',N2O_ppb,' RN2O =  ',RN2O
+    print *, ' CFC11_ppt=',CFC11_ppt,' RCFC11 =  ',RCFC11
+    print *, ' CFC12_ppt=',CFC12_ppt,' RCFC12 =  ',RCFC12
+    print *, ' epmax = ', epmax
+    print *, ' ok_adj_ema = ', ok_adj_ema
+    print *, ' iflag_clw = ', iflag_clw
+    print *, ' cld_lc_lsc = ', cld_lc_lsc
+    print *, ' cld_lc_con = ', cld_lc_con
+    print *, ' cld_tau_lsc = ', cld_tau_lsc
+    print *, ' cld_tau_con = ', cld_tau_con
+    print *, ' ffallv_lsc = ', ffallv_lsc
+    print *, ' ffallv_con = ', ffallv_con
+    print *, ' coef_eva = ', coef_eva
+    print *, ' reevap_ice = ', reevap_ice
+    print *, ' iflag_pdf = ', iflag_pdf
+    print *, ' iflag_cldcon = ', iflag_cldcon
+    print *, ' fact_cldcon = ', fact_cldcon
+    print *, ' facttemps = ', facttemps
+    print *, ' ok_newmicro = ',ok_newmicro 
+    print *, ' ratqsbas = ',ratqsbas 
+    print *, ' ratqshaut = ',ratqshaut 
+    print *, ' top_height = ',top_height 
+    print *, ' overlap = ',overlap 
+    print *, ' cdmmax = ',cdmmax 
+    print *, ' cdhmax = ',cdhmax 
+    print *, ' ksta = ',ksta 
+    print *, ' ksta_ter = ',ksta_ter 
+    print *, ' ok_kzmin = ',ok_kzmin 
+    print *, ' ok_ade = ',ok_ade
+    print *, ' ok_aie = ',ok_aie
+    print *, ' bl95_b0 = ',bl95_b0
+    print *, ' bl95_b1 = ',bl95_b1
+    print *, ' lev_histhf = ',lev_histhf 
+    print *, ' lev_histday = ',lev_histday 
+    print *, ' lev_histmth = ',lev_histmth 
+    print *, ' iflag_pbl = ', iflag_pbl
+    print *, ' iflag_thermals = ', iflag_thermals
+    print *, ' type_run = ',type_run 
+    print *, ' ok_isccp = ',ok_isccp 
+    print *, ' ok_regdyn = ',ok_regdyn
+    print *, ' lonmin lonmax latmin latmax bilKP_ins =',&
          lonmin_ins, lonmax_ins, latmin_ins, latmax_ins
-    write(numout,*) 'ecrit_ ins, hf, hf2mth, day, mth, reg, tra', ecrit_ins, &
+    print *,  'ecrit_ ins, hf, hf2mth, day, mth, reg, tra', ecrit_ins, &
          ecrit_hf, ecrit_hf2mth, ecrit_day, ecrit_mth, ecrit_reg, ecrit_tra
-    write(numout,*)' bug_ozone = ', bug_ozone
+    print *, ' bug_ozone = ', bug_ozone
 
   end subroutine conf_phys
 

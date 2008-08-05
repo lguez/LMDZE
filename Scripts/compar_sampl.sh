@@ -2,7 +2,8 @@
 
 # This script produces vertical distributions for all sampling
 # methods, for a given value of "llm". Run this script from the
-# directory containing "test_disvert".
+# directory containing "test_disvert". The Fortran program needs to be
+# recompiled when "llm" changes.
 
 trap 'echo -e \\a; exit 1' ERR
 

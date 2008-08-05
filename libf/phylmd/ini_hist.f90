@@ -123,47 +123,44 @@ contains
 
   !******************************************************************
 
-  subroutine ini_histday(dtime, presnivs, ok_journe, nid_day)
+  subroutine ini_histday(dtime, presnivs, ok_journe, nid_day, nq)
 
     ! From phylmd/ini_histday.h, v 1.3 2005/05/25 13:10:09
 
     use dimens_m, only: iim, jjm, llm
-    use dimphy, only: klon
     use temps, only: itau_phy, day_ref, annee_ref
     USE ioipsl, only: ymds2ju, histbeg_totreg, histvert, histend, histdef
     use phyetat0_m, only: rlon, rlat
     use clesphys, only: ecrit_day
+    use grid_change, only: gr_phy_write_2d
 
     REAL, intent(in):: dtime ! pas temporel de la physique (s)
     real, intent(in):: presnivs(:)
     logical, intent(in):: ok_journe
     integer, intent(out):: nid_day
+    INTEGER, intent(in):: nq ! nombre de traceurs (y compris vapeur d'eau)
 
-    REAL zx_lon(iim, jjm + 1), zx_lat(iim, jjm + 1)
-    integer i, nhori, nvert, idayref
+    ! Variables local to the procedure:
+    REAL zx_lat(iim, jjm + 1)
+    integer nhori, nvert
     real zjulian
 
     !--------------------------------
 
     IF (ok_journe) THEN
-       idayref = day_ref
-       CALL ymds2ju(annee_ref, 1, idayref, 0.0, zjulian)
-
-       CALL gr_fi_ecrit(1, klon, iim, jjm + 1, rlon, zx_lon)
-       DO i = 1, iim
-          zx_lon(i, 1) = rlon(i+1)
-          zx_lon(i, jjm + 1) = rlon(i+1)
-       ENDDO
-       CALL gr_fi_ecrit(1, klon, iim, jjm + 1, rlat, zx_lat)
-       CALL histbeg_totreg("histday", zx_lon(:, 1), zx_lat(1, :), 1, iim, 1, &
-            jjm + 1, itau_phy, zjulian, dtime, nhori, nid_day)
+       CALL ymds2ju(annee_ref, 1, day_ref, 0., zjulian)
+       zx_lat = gr_phy_write_2d(rlat)
+       CALL histbeg_totreg("histday", rlon(2: iim+1), zx_lat(1, :), 1, iim, &
+            1, jjm + 1, itau_phy, zjulian, dtime, nhori, nid_day)
        CALL histvert(nid_day, "presnivs", "Vertical levels", "mb", &
             llm, presnivs/100., nvert)
-       call histdef(nid_day, "Sigma_O3_Royer", &
-            "column-density of ozone, in a cell, from Royer", "DU", &
-            pxsize=iim, pysize=jjm+1, phoriid=nhori, pzsize=llm, par_oriz=1, &
-            par_szz=llm, pzid=nvert, popp="ave(X)", pfreq_opp=dtime, &
-            pfreq_wrt=real(ecrit_day))
+       if (nq <= 4) then
+          call histdef(nid_day, "Sigma_O3_Royer", &
+               "column-density of ozone, in a cell, from Royer", "DU", &
+               pxsize=iim, pysize=jjm+1, phoriid=nhori, pzsize=llm, &
+               par_oriz=1, par_szz=llm, pzid=nvert, popp="ave(X)", &
+               pfreq_opp=dtime, pfreq_wrt=real(ecrit_day))
+       end if
        CALL histend(nid_day)
     ENDIF
 
@@ -463,5 +460,99 @@ contains
     ENDIF
 
   end subroutine ini_histins
+
+  !*************************************************
+
+  subroutine ini_histrac(nid_tra, pdtphys, presnivs, nqmax, lessivage)
+
+    ! From phylmd/ini_histrac.h, version 1.10 2006/02/21 08:08:30
+
+    use dimens_m, only: iim, jjm, llm
+    use ioipsl, only: ymds2ju, histbeg_totreg, histvert, histdef, histend
+    use temps, only: annee_ref, day_ref, itau_phy
+    use advtrac_m, only: niadv, tnom, ttext
+    use dimphy, only: klon
+    use clesphys, only: ecrit_tra
+    use grid_change, only: gr_phy_write_2d
+    use phyetat0_m, only: rlon, rlat
+
+    INTEGER, intent(out):: nid_tra
+    real, intent(in):: pdtphys  ! pas d'integration pour la physique (s)
+    REAL, intent(in):: presnivs(:)
+
+    integer, intent(in):: nqmax
+    ! (nombre de traceurs auxquels on applique la physique)
+
+    logical, intent(in):: lessivage
+
+    ! Variables local to the procedure:
+
+    REAL zjulian
+    REAL zx_lat(iim, jjm+1)
+    INTEGER nhori, nvert
+    REAL zsto, zout
+    integer it, iq, iiq
+
+    !---------------------------------------------------------
+
+    CALL ymds2ju(annee_ref, month=1, day=day_ref, sec=0.0, julian=zjulian)
+    zx_lat(:, :) = gr_phy_write_2d(rlat)
+    CALL histbeg_totreg("histrac", rlon(2:iim+1), zx_lat(1, :), &
+         1, iim, 1, jjm+1, itau_phy, zjulian, pdtphys, nhori, nid_tra)
+    CALL histvert(nid_tra, "presnivs", "Vertical levels", "mb", llm, &
+         presnivs, nvert)
+
+    zsto = pdtphys
+    zout = pdtphys * REAL(ecrit_tra)
+
+    CALL histdef(nid_tra, "phis", "Surface geop. height", "-", &
+         iim, jjm+1, nhori, 1, 1, 1, -99, &
+         "once",  zsto, zout)
+    CALL histdef(nid_tra, "aire", "Grid area", "-", &
+         iim, jjm+1, nhori, 1, 1, 1, -99, &
+         "once",  zsto, zout)
+    CALL histdef(nid_tra, "zmasse", "column density of air in cell", &
+         "kg m-2", iim, jjm + 1, nhori, llm, 1, llm, nvert, "ave(X)", &
+         zsto, zout)
+
+    DO it = 1, nqmax
+       ! champ 2D
+       iq=it+2
+       iiq=niadv(iq)
+       CALL histdef(nid_tra, tnom(iq), ttext(iiq), "U/kga", iim, jjm+1, &
+            nhori, llm, 1, llm, nvert, "ave(X)", zsto, zout)
+       if (lessivage) THEN
+          CALL histdef(nid_tra, "fl"//tnom(iq), "Flux "//ttext(iiq), &
+               "U/m2/s", iim, jjm+1, nhori, llm, 1, llm, nvert, &
+               "ave(X)", zsto, zout)
+       endif
+
+       !---Ajout Olivia
+       CALL histdef(nid_tra, "d_tr_th_"//tnom(iq), &
+            "tendance thermique"// ttext(iiq), "?", &
+            iim, jjm+1, nhori, llm, 1, llm, nvert, &
+            "ave(X)", zsto, zout)
+       CALL histdef(nid_tra, "d_tr_cv_"//tnom(iq), &
+            "tendance convection"// ttext(iiq), "?", &
+            iim, jjm+1, nhori, llm, 1, llm, nvert, &
+            "ave(X)", zsto, zout)
+       CALL histdef(nid_tra, "d_tr_cl_"//tnom(iq), &
+            "tendance couche limite"// ttext(iiq), "?", &
+            iim, jjm+1, nhori, llm, 1, llm, nvert, &
+            "ave(X)", zsto, zout)
+       !---fin Olivia	 
+
+    ENDDO
+
+    CALL histdef(nid_tra, "pplay", "", "-", &
+         iim, jjm+1, nhori, llm, 1, llm, nvert, &
+         "inst(X)", zout, zout)
+    CALL histdef(nid_tra, "t", "", "-", &
+         iim, jjm+1, nhori, llm, 1, llm, nvert, &
+         "inst(X)", zout, zout)
+
+    CALL histend(nid_tra)
+
+  end subroutine ini_histrac
 
 end module ini_hist

@@ -30,7 +30,8 @@ c kn : diffusivite turbulente des scalaires (au bas de chaque couche)
 c      (en sortie : la valeur a la fin du pas de temps)
 c
 c.......................................................................
-      REAL g,rconst
+      REAL, intent(in):: g
+      real rconst
       real plev(klon,klev+1),temp(klon,klev)
       real ustar(klon),snstable
       REAL zlev(klon,klev+1)

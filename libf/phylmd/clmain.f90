@@ -5,10 +5,9 @@ SUBROUTINE clmain(dtime, itap, date0, pctsrf, pctsrf_new, t, q, u, v,&
      rain_f, snow_f, solsw, sollw, sollwdown, fder, rlon, rlat, cufi,&
      cvfi, rugos, debut, lafin, agesno, rugoro, d_t, d_q, d_u, d_v,&
      d_ts, flux_t, flux_q, flux_u, flux_v, cdragh, cdragm, q2,&
-     dflux_t, dflux_q, zcoefh, zu1, zv1, t2m, q2m, u10m, v10m, &
-     pblh, capcl, oliqcl, cteicl, pblt, therm, trmb1, trmb2, trmb3,&
-     plcl, fqcalving, ffonte, run_off_lic_0, & !IM "slab" ocean
-     flux_o, flux_g, tslab, seaice)
+     dflux_t, dflux_q, zcoefh, zu1, zv1, t2m, q2m, u10m, v10m, pblh,&
+     capcl, oliqcl, cteicl, pblt, therm, trmb1, trmb2, trmb3, plcl,&
+     fqcalving, ffonte, run_off_lic_0, flux_o, flux_g, tslab, seaice)
 
   ! From phylmd/clmain.F, v 1.6 2005/11/16 14:47:19
 
@@ -86,18 +85,16 @@ SUBROUTINE clmain(dtime, itap, date0, pctsrf, pctsrf_new, t, q, u, v,&
 
   !$$$ PB ajout pour soil
 
-  USE ioipsl
-  USE interface_surf
-  USE dimens_m
-  USE indicesol
-  USE dimphy
-  USE dimsoil
-  USE temps
-  USE iniprint
-  USE yomcst
-  USE yoethf
-  USE fcttre
-  USE conf_phys_m
+  USE ioipsl, ONLY : histbeg_totreg, histdef, histend, histsync, &
+       histwrite, ymds2ju
+  USE dimens_m, ONLY : iim, jjm
+  USE indicesol, ONLY : epsfra, is_lic, is_oce, is_sic, is_ter, nbsrf
+  USE dimphy, ONLY : klev, klon, zmasq
+  USE dimsoil, ONLY : nsoilmx
+  USE temps, ONLY : annee_ref, day_ini, itau_phy
+  USE iniprint, ONLY : prt_level
+  USE yomcst, ONLY : rd, rg, rkappa
+  USE conf_phys_m, ONLY : iflag_pbl
   USE gath_cpl, ONLY : gath2cpl
 
   IMPLICIT NONE
@@ -224,9 +221,9 @@ SUBROUTINE clmain(dtime, itap, date0, pctsrf, pctsrf_new, t, q, u, v,&
 
   ! maf pour sorties IOISPL en cas de debugagage
 
-  CHARACTER*80 cldebug
+  CHARACTER (80) cldebug
   SAVE cldebug
-  CHARACTER*8 cl_surf(nbsrf)
+  CHARACTER (8) cl_surf(nbsrf)
   SAVE cl_surf
   INTEGER nhoridbg, nidbg
   SAVE nhoridbg, nidbg
@@ -299,7 +296,7 @@ SUBROUTINE clmain(dtime, itap, date0, pctsrf, pctsrf_new, t, q, u, v,&
   ytherm = 0.
 
   IF (check) THEN
-     print *, modname, '  klon=', klon
+     PRINT *, modname, '  klon=', klon
   END IF
 
   IF (debugindex .AND. first_appel) THEN
@@ -451,7 +448,7 @@ SUBROUTINE clmain(dtime, itap, date0, pctsrf, pctsrf_new, t, q, u, v,&
      END DO
 
      IF (check) THEN
-        print *, 'CLMAIN, nsrf, knon =', nsrf, knon
+        PRINT *, 'CLMAIN, nsrf, knon =', nsrf, knon
      END IF
 
      ! variables pour avoir une sortie IOIPSL des INDEX
@@ -527,11 +524,9 @@ SUBROUTINE clmain(dtime, itap, date0, pctsrf, pctsrf_new, t, q, u, v,&
         END DO
      END DO
 
-
      ! calculer Cdrag et les coefficients d'echange
-     CALL coefkz(nsrf, knon, ypaprs, ypplay, & !IM 261103
-          ksta, ksta_ter, & !IM 261103
-          yts, yrugos, yu, yv, yt, yq, yqsurf, ycoefm, ycoefh)
+     CALL coefkz(nsrf, knon, ypaprs, ypplay, ksta, ksta_ter, yts,&
+          yrugos, yu, yv, yt, yq, yqsurf, ycoefm, ycoefh)
      !IM 081204 BEG
      !CR test
      IF (iflag_pbl==1) THEN
@@ -586,13 +581,14 @@ SUBROUTINE clmain(dtime, itap, date0, pctsrf, pctsrf_new, t, q, u, v,&
         yzlay(1:knon, 1) = rd*yt(1:knon, 1)/(0.5*(ypaprs(1:knon, &
              1)+ypplay(1:knon, 1)))*(ypaprs(1:knon, 1)-ypplay(1:knon, 1))/rg
         DO k = 2, klev
-           yzlay(1:knon, k) = yzlay(1:knon, k-1) + rd*0.5*(yt(1:knon, k-1)+yt(1: &
-                knon, k))/ypaprs(1:knon, k)*(ypplay(1:knon, k-1)-ypplay(1:knon, k))/ &
+           yzlay(1:knon, k) = yzlay(1:knon, k-1) &
+                + rd*0.5*(yt(1:knon, k-1) +yt(1: knon, k)) &
+                / ypaprs(1:knon, k) *(ypplay(1:knon, k-1)-ypplay(1:knon, k))/ &
                 rg
         END DO
         DO k = 1, klev
-           yteta(1:knon, k) = yt(1:knon, k)*(ypaprs(1:knon, 1)/ypplay(1:knon, k)) &
-                **rkappa*(1.+0.61*yq(1:knon, k))
+           yteta(1:knon, k) = yt(1:knon, k)*(ypaprs(1:knon, 1) &
+                / ypplay(1:knon, k))**rkappa * (1.+0.61*yq(1:knon, k))
         END DO
         yzlev(1:knon, 1) = 0.
         yzlev(1:knon, klev+1) = 2.*yzlay(1:knon, klev) - yzlay(1:knon, klev-1)
@@ -644,10 +640,10 @@ SUBROUTINE clmain(dtime, itap, date0, pctsrf, pctsrf_new, t, q, u, v,&
      ! calculer la diffusion des vitesses "u" et "v"
      !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
-     CALL clvent(knon, dtime, yu1, yv1, ycoefm, yt, yu, ypaprs, ypplay, ydelp, &
-          y_d_u, y_flux_u)
-     CALL clvent(knon, dtime, yu1, yv1, ycoefm, yt, yv, ypaprs, ypplay, ydelp, &
-          y_d_v, y_flux_v)
+     CALL clvent(knon, dtime, yu1, yv1, ycoefm, yt, yu, ypaprs, ypplay, &
+          ydelp, y_d_u, y_flux_u)
+     CALL clvent(knon, dtime, yu1, yv1, ycoefm, yt, yv, ypaprs, ypplay, &
+          ydelp, y_d_v, y_flux_v)
 
      ! pour le couplage
      ytaux = y_flux_u(:, 1)
@@ -801,8 +797,8 @@ SUBROUTINE clmain(dtime, itap, date0, pctsrf, pctsrf_new, t, q, u, v,&
      END DO
 
      CALL stdlevvar(klon, knon, nsrf, zxli, uzon, vmer, tair1, qair1, zgeo1, &
-          tairsol, qairsol, rugo1, psfce, patm, &
-          yt2m, yq2m, yt10m, yq10m, yu10m, yustar)
+          tairsol, qairsol, rugo1, psfce, patm, yt2m, yq2m, yt10m, yq10m, &
+          yu10m, yustar)
      !IM 081204 END
 
      DO j = 1, knon

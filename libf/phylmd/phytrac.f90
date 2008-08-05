@@ -14,7 +14,8 @@ contains
        pde_u, pen_d, pde_d, coefh, fm_therm, entr_therm, yu1, yv1, ftsol, &
        pctsrf, frac_impa, frac_nucl, presnivs, pphis, &
        pphi, albsol, rh, cldfra, rneb, diafra, cldliq, itop_con, &
-       ibas_con, pmflxr, pmflxs, prfl, psfl, da, phi, mp, upwd, dnwd, tr_seri)
+       ibas_con, pmflxr, pmflxs, prfl, psfl, da, phi, mp, upwd, dnwd, &
+       tr_seri, zmasse)
 
     ! From phylmd/phytrac.F, version 1.15 2006/02/21 08:08:30
 
@@ -30,7 +31,7 @@ contains
     ! (peu propre).
     ! Pourrait-on avoir une variable qui indiquerait le type de traceur ?
 
-    use dimens_m, only: iim, jjm, llm
+    use dimens_m, only: llm
     use indicesol, only: nbsrf
     use dimphy, only: klon, nbtr
     use clesphys, only: ecrit_tra
@@ -41,6 +42,11 @@ contains
     use regr_pr_comb_coefoz_m, only: regr_pr_comb_coefoz
     use phyetat0_m, only: rlat
     use o3_chem_m, only: o3_chem
+    use ini_hist, only: ini_histrac
+    use radiornpb_m, only: radiornpb
+    use minmaxqfi_m, only: minmaxqfi
+    use numer_rec, only: assert
+    use press_coefoz_m, only: press_coefoz
 
     ! Arguments:
 
@@ -62,7 +68,7 @@ contains
     real, intent(in):: pdtphys  ! pas d'integration pour la physique (s)
     real, intent(in):: t_seri(klon, llm) ! temperature, in K
 
-    real tr_seri(klon, llm, nbtr)
+    real, intent(inout):: tr_seri(klon, llm, nbtr)
     ! (mass fractions of tracers, excluding water, at mid-layers)
 
     real u(klon, llm)
@@ -89,12 +95,10 @@ contains
     logical, intent(in):: firstcal ! first call to "calfis"
     logical, intent(in):: lafin ! fin de la physique
 
-    integer nsplit
     REAL pmflxr(klon, llm+1), pmflxs(klon, llm+1)   !--lessivage convection
     REAL prfl(klon, llm+1),   psfl(klon, llm+1)     !--lessivage large-scale
 
     !   convection:
-
     REAL pmfu(klon, llm)  ! flux de masse dans le panache montant
     REAL pmfd(klon, llm)  ! flux de masse dans le panache descendant
     REAL pen_u(klon, llm) ! flux entraine dans le panache montant
@@ -129,10 +133,14 @@ contains
     real ftsol(klon, nbsrf)  ! Temperature du sol (surf)(Kelvin)
     real pctsrf(klon, nbsrf) ! Pourcentage de sol f(nature du sol)
 
-    real pftsol1(klon), pftsol2(klon), pftsol3(klon), pftsol4(klon)
-    real ppsrf1(klon), ppsrf2(klon), ppsrf3(klon), ppsrf4(klon)
+    real, intent(in):: zmasse(:, :)  ! (klon, llm)
+    ! (column-density of mass of air in a cell, in kg m-2)
 
-    !  VARIABLES LOCALES TRACEURS
+    ! Variables local to the procedure:
+
+    integer nsplit
+
+    !  TRACEURS
 
     ! Sources et puits des traceurs:
 
@@ -192,13 +200,7 @@ contains
     REAL flestottr(klon, llm, nbtr) ! flux de lessivage 
     !                                    ! dans chaque couche 
 
-    real zmasse(klon, llm) 
-    ! (column-density of mass of air in a layer, in kg m-2)
-
     real ztra_th(klon, llm)
-
-    character(len=20) modname
-    character(len=80) abort_message
     integer isplit
 
     ! Controls:
@@ -209,15 +211,12 @@ contains
 
     !--------------------------------------
 
-    modname='phytrac'
+    call assert(shape(zmasse) == (/klon, llm/), "phytrac")
 
     if (firstcal) then
        print *, 'phytrac: pdtphys = ', pdtphys
        PRINT *, 'Fréquence de sortie des traceurs : ecrit_tra = ', ecrit_tra
-       if (nbtr < nqmax) then
-          abort_message='See above'
-          call abort_gcm(modname, abort_message, 1)
-       endif
+       if (nbtr < nqmax) call abort_gcm('phytrac', 'See above', 1)
        inirnpb=rnpb
 
        ! Initialisation des sorties :
@@ -245,6 +244,10 @@ contains
           radio(it) = .FALSE. ! par défaut pas de passage par "radiornpb"
           clsol(it) = .FALSE.  ! Par defaut couche limite avec flux prescrit
        ENDDO
+
+       if (nqmax >= 3) then
+          call press_coefoz ! read input pressure levels for ozone coefficients
+       end if
     ENDIF
 
     ! Initialisation du traceur dans le sol (couche limite radonique)
@@ -260,19 +263,6 @@ contains
             scavtr)
        inirnpb=.false.
     endif
-
-    do i=1, klon
-       pftsol1(i) = ftsol(i, 1)
-       pftsol2(i) = ftsol(i, 2)
-       pftsol3(i) = ftsol(i, 3)
-       pftsol4(i) = ftsol(i, 4)
-
-       ppsrf1(i) = pctsrf(i, 1)
-       ppsrf2(i) = pctsrf(i, 2)
-       ppsrf3(i) = pctsrf(i, 3)
-       ppsrf4(i) = pctsrf(i, 4)
-
-    enddo
 
     ! Calcul de l'effet de la convection
 
@@ -298,8 +288,6 @@ contains
                'convection, tracer index = ' // itn)
        ENDDO
     endif
-
-    forall (k=1: llm) zmasse(:, k) = (paprs(:, k)-paprs(:, k+1)) / rg
 
     ! Calcul de l'effet des thermiques
 
@@ -496,7 +484,6 @@ contains
       integer, intent(in):: nid_tra
 
       ! Variables local to the procedure:
-      INTEGER ndex2d(iim*(jjm+1)), ndex3d(iim*(jjm+1)*llm)
       integer it
       integer itau_w   ! pas de temps ecriture
       REAL zx_tmp_2d(iim, jjm+1), zx_tmp_3d(iim, jjm+1, llm)
@@ -504,8 +491,6 @@ contains
 
       !-----------------------------------------------------
 
-      ndex2d = 0
-      ndex3d = 0
       itau_w = itau_phy + itap
 
       CALL gr_fi_ecrit(1, klon, iim, jjm+1, pphis, zx_tmp_2d)
@@ -547,184 +532,5 @@ contains
     end subroutine write_histrac
 
   END SUBROUTINE phytrac
-
-  !*************************************************
-
-  subroutine ini_histrac(nid_tra, pdtphys, presnivs, nqmax, lessivage)
-
-    ! From phylmd/ini_histrac.h, version 1.10 2006/02/21 08:08:30
-
-    use dimens_m, only: iim, jjm, llm
-    use ioipsl, only: ymds2ju, histbeg_totreg, histvert, histdef, histend
-    use temps, only: annee_ref, day_ref, itau_phy
-    use advtrac_m, only: niadv, tnom, ttext
-    use dimphy, only: klon
-    use clesphys, only: ecrit_tra
-    use grid_change, only: gr_phy_write_2d
-    use phyetat0_m, only: rlon, rlat
-
-    INTEGER, intent(out):: nid_tra
-    real, intent(in):: pdtphys  ! pas d'integration pour la physique (s)
-    REAL, intent(in):: presnivs(:)
-
-    integer, intent(in):: nqmax
-    ! (nombre de traceurs auxquels on applique la physique)
-
-    logical, intent(in):: lessivage
-
-    ! Variables local to the procedure:
-
-    REAL zjulian
-    REAL zx_lat(iim, jjm+1)
-    INTEGER nhori, nvert
-    REAL zsto, zout
-    integer it, iq, iiq
-
-    !---------------------------------------------------------
-
-    CALL ymds2ju(annee_ref, month=1, day=day_ref, sec=0.0, julian=zjulian)
-    zx_lat(:, :) = gr_phy_write_2d(rlat)
-    CALL histbeg_totreg("histrac", rlon(2:iim+1), zx_lat(1, :), &
-         1, iim, 1, jjm+1, itau_phy, zjulian, pdtphys, nhori, nid_tra)
-    CALL histvert(nid_tra, "presnivs", "Vertical levels", "mb", llm, &
-         presnivs, nvert)
-
-    zsto = pdtphys
-    zout = pdtphys * REAL(ecrit_tra)
-
-    CALL histdef(nid_tra, "phis", "Surface geop. height", "-", &
-         iim, jjm+1, nhori, 1, 1, 1, -99, &
-         "once",  zsto, zout)
-    CALL histdef(nid_tra, "aire", "Grid area", "-", &
-         iim, jjm+1, nhori, 1, 1, 1, -99, &
-         "once",  zsto, zout)
-    CALL histdef(nid_tra, "zmasse", "column density of air in cell", &
-         "kg m-2", iim, jjm + 1, nhori, llm, 1, llm, nvert, "ave(X)", &
-         zsto, zout)
-
-    DO it = 1, nqmax
-       ! champ 2D
-       iq=it+2
-       iiq=niadv(iq)
-       CALL histdef(nid_tra, tnom(iq), ttext(iiq), "U/kga", iim, jjm+1, &
-            nhori, llm, 1, llm, nvert, "ave(X)", zsto, zout)
-       if (lessivage) THEN
-          CALL histdef(nid_tra, "fl"//tnom(iq), "Flux "//ttext(iiq), &
-               "U/m2/s", iim, jjm+1, nhori, llm, 1, llm, nvert, &
-               "ave(X)", zsto, zout)
-       endif
-
-       !---Ajout Olivia
-       CALL histdef(nid_tra, "d_tr_th_"//tnom(iq), &
-            "tendance thermique"// ttext(iiq), "?", &
-            iim, jjm+1, nhori, llm, 1, llm, nvert, &
-            "ave(X)", zsto, zout)
-       CALL histdef(nid_tra, "d_tr_cv_"//tnom(iq), &
-            "tendance convection"// ttext(iiq), "?", &
-            iim, jjm+1, nhori, llm, 1, llm, nvert, &
-            "ave(X)", zsto, zout)
-       CALL histdef(nid_tra, "d_tr_cl_"//tnom(iq), &
-            "tendance couche limite"// ttext(iiq), "?", &
-            iim, jjm+1, nhori, llm, 1, llm, nvert, &
-            "ave(X)", zsto, zout)
-       !---fin Olivia	 
-
-    ENDDO
-
-    CALL histdef(nid_tra, "pplay", "", "-", &
-         iim, jjm+1, nhori, llm, 1, llm, nvert, &
-         "inst(X)", zout, zout)
-    CALL histdef(nid_tra, "t", "", "-", &
-         iim, jjm+1, nhori, llm, 1, llm, nvert, &
-         "inst(X)", zout, zout)
-
-    CALL histend(nid_tra)
-
-  end subroutine ini_histrac
-
-  !*************************************************
-
-  function radiornpb(tr_seri, pdtphys, tautr)
-
-    ! From phylmd/radiornpb.F, v 1.2 2005/05/25 13:10:09
-
-    ! Auteurs: AA + CG (LGGE/CNRS) Date 24-06-94
-    ! Objet: Decroissance radioactive d'un traceur dans l'atmosphere
-    !G 24 06 94 : Pour un traceur, le radon
-    !G 16 12 94 : Plus un 2eme traceur, le 210Pb. Le radon decroit en plomb.
-
-    ! Le pas de temps "pdtphys" est supposé beaucoup plus petit que la
-    ! constante de temps de décroissance.
-
-    use dimens_m, only: llm
-    use dimphy, only: klon, nbtr
-    use numer_rec, only: assert
-
-    IMPLICIT none
-
-    REAL, intent(in):: tr_seri(:, :, :), pdtphys, tautr(:)
-    real radiornpb(klon, llm, 2)
-
-    ! Variable local to the procedure:
-    INTEGER it
-
-    !-----------------------------------------------
-
-    call assert(shape(tr_seri) == (/klon, llm, nbtr/), "radiornpb tr_seri")
-    call assert(size(tautr) == nbtr, "radiornpb tautr")
-
-    DO it = 1, 2
-       IF (tautr(it) > 0.) THEN
-          radiornpb(:, :, it) = - tr_seri(:, :, it) * pdtphys / tautr(it)
-       ELSE
-          radiornpb(:, :, it) = 0.
-       END IF
-    END DO
-
-    !G161294 : Cas particulier radon 1 => plomb 2
-    radiornpb(:, :, 2) = radiornpb(:, :, 2) - radiornpb(:, :, 1)
-
-  END function radiornpb
-
-  !*************************************************
-
-  SUBROUTINE minmaxqfi(zq, qmin, qmax, comment)
-
-    ! From phylmd/minmaxqfi.F, version 1.1.1.1 2004/05/19 12:53:09
-
-    use dimens_m, only: llm
-    use dimphy, only: klon
-    use numer_rec, only: assert
-
-    IMPLICIT none
-
-    real, intent(in):: zq(:, :), qmin, qmax
-    CHARACTER(len=*), intent(in):: comment
-
-    ! Variables local to the procedure:
-
-    INTEGER jadrs(klon), jbad, k, i
-
-    !---------------------------------
-
-    call assert(shape(zq) == (/klon, llm/), "minmaxqfi")
-
-    DO k = 1, llm
-       jbad = 0
-       DO i = 1, klon
-          IF (zq(i, k) > qmax .OR. zq(i, k) < qmin) THEN
-             jbad = jbad + 1
-             jadrs(jbad) = i
-          ENDIF
-       ENDDO
-       IF (jbad > 0) THEN
-          PRINT *, comment
-          DO i = 1, jbad
-             PRINT *, "zq(", jadrs(i), ", ", k, ") = ", zq(jadrs(i), k)
-          ENDDO
-       ENDIF
-    ENDDO
-
-  end SUBROUTINE minmaxqfi
 
 end module phytrac_m

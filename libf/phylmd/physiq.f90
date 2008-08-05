@@ -53,13 +53,14 @@ contains
     use hgardfou_m, only: hgardfou
     use conf_phys_m, only: conf_phys
     use phyredem_m, only: phyredem
+    use qcheck_m, only: qcheck
 
     ! Declaration des constantes et des fonctions thermodynamiques :
     use fcttre, only: thermcep, foeew, qsats, qsatl
 
     ! Variables argument:
 
-    INTEGER nq ! input nombre de traceurs (y compris vapeur d'eau)
+    INTEGER, intent(in):: nq ! nombre de traceurs (y compris vapeur d'eau)
 
     REAL, intent(in):: rdayvrai
     ! (elapsed time since January 1st 0h of the starting year, in days)
@@ -133,10 +134,8 @@ contains
     REAL fluxg(klon)    !flux turbulents ocean-atmosphere
 
     ! Modele thermique du sol, a activer pour le cycle diurne:
-    logical ok_veget
-    save ok_veget
-    LOGICAL ok_journe ! sortir le fichier journalier
-    save ok_journe
+    logical, save:: ok_veget
+    LOGICAL, save:: ok_journe ! sortir le fichier journalier
 
     LOGICAL ok_mensuel ! sortir le fichier mensuel
 
@@ -218,14 +217,6 @@ contains
     INTEGER nout
     PARAMETER(nout=3) !nout=1 : day; =2 : mth; =3 : NMC
 
-    REAL tsumSTD(klon, nlevSTD, nout)
-    REAL usumSTD(klon, nlevSTD, nout), vsumSTD(klon, nlevSTD, nout)
-    REAL wsumSTD(klon, nlevSTD, nout), phisumSTD(klon, nlevSTD, nout)
-    REAL qsumSTD(klon, nlevSTD, nout), rhsumSTD(klon, nlevSTD, nout)
-
-    SAVE tsumSTD, usumSTD, vsumSTD, wsumSTD, phisumSTD,  &
-         qsumSTD, rhsumSTD
-
     logical oknondef(klon, nlevSTD, nout)
     real tnondef(klon, nlevSTD, nout) 
     save tnondef
@@ -239,26 +230,11 @@ contains
     real vTSTD(klon, nlevSTD)
     real wqSTD(klon, nlevSTD)
 
-    real uvsumSTD(klon, nlevSTD, nout)
-    real vqsumSTD(klon, nlevSTD, nout)
-    real vTsumSTD(klon, nlevSTD, nout)
-    real wqsumSTD(klon, nlevSTD, nout)
-
     real vphiSTD(klon, nlevSTD)
     real wTSTD(klon, nlevSTD)
     real u2STD(klon, nlevSTD)
     real v2STD(klon, nlevSTD)
     real T2STD(klon, nlevSTD)
-
-    real vphisumSTD(klon, nlevSTD, nout)
-    real wTsumSTD(klon, nlevSTD, nout)
-    real u2sumSTD(klon, nlevSTD, nout)
-    real v2sumSTD(klon, nlevSTD, nout)
-    real T2sumSTD(klon, nlevSTD, nout)
-
-    SAVE uvsumSTD, vqsumSTD, vTsumSTD, wqsumSTD
-    SAVE vphisumSTD, wTsumSTD, u2sumSTD, v2sumSTD, T2sumSTD
-    !MI Amip2
 
     ! prw: precipitable water
     real prw(klon)
@@ -459,7 +435,7 @@ contains
     REAL albsollw(klon)
     SAVE albsollw                 ! albedo du sol total
 
-    REAL, SAVE:: wo(klon, llm) ! ozone
+    REAL, SAVE:: wo(klon, llm) ! column density of ozone in a cell, in kDU
 
     ! Declaration des procedures appelees
 
@@ -621,21 +597,16 @@ contains
     save ratqsbas, ratqshaut, ratqs
 
     ! Parametres lies au nouveau schema de nuages (SB, PDF)
-    real fact_cldcon
-    real facttemps
+    real, save:: fact_cldcon
+    real, save:: facttemps
     logical ok_newmicro
     save ok_newmicro
-    save fact_cldcon, facttemps
     real facteur
 
     integer iflag_cldcon
     save iflag_cldcon
 
     logical ptconv(klon, llm)
-
-    ! Variables liees a l'ecriture de la bande histoire physique
-
-    integer itau_w   ! pas de temps ecriture = itap + itau_phy
 
     ! Variables locales pour effectuer les appels en serie
 
@@ -647,7 +618,6 @@ contains
     REAL d_tr(klon, llm, nbtr)
 
     REAL zx_rh(klon, llm)
-    INTEGER ndex2d(iim*(jjm + 1)), ndex3d(iim*(jjm + 1)*llm)
 
     REAL zustrdr(klon), zvstrdr(klon)
     REAL zustrli(klon), zvstrli(klon)
@@ -758,6 +728,11 @@ contains
     SAVE trmb1
     SAVE trmb2
     SAVE trmb3
+
+    real zmasse(klon, llm) 
+    ! (column-density of mass of air in a cell, in kg m-2)
+
+    real, parameter:: dobson_u = 2.1415e-05 ! Dobson unit, in kg m-2
 
     !----------------------------------------------------------------
 
@@ -902,7 +877,7 @@ contains
        !   Initialisation des sorties
 
        call ini_histhf(pdtphys, presnivs, nid_hf, nid_hf3d)
-       call ini_histday(pdtphys, presnivs, ok_journe, nid_day)
+       call ini_histday(pdtphys, presnivs, ok_journe, nid_day, nq)
        call ini_histins(pdtphys, presnivs, ok_instan, nid_ins)
        CALL ymds2ju(annee_ref, 1, int(day_ref), 0., date0)
        !XXXPB Positionner date0 pour initialisation de ORCHIDEE
@@ -1012,9 +987,14 @@ contains
     julien = MOD(NINT(rdayvrai), 360)
     if (julien == 0) julien = 360
 
+    forall (k = 1: llm) zmasse(:, k) = (paprs(:, k)-paprs(:, k+1)) / rg
+
     ! Mettre en action les conditions aux limites (albedo, sst, etc.).
     ! Prescrire l'ozone et calculer l'albedo sur l'ocean.
 
+!!$    if (nq >= 5) then
+!!$       wo = qx(:, :, 5) * zmasse / dobson_u / 1e3
+!!$    else IF (MOD(itap - 1, lmt_pas) == 0) THEN
     IF (MOD(itap - 1, lmt_pas) == 0) THEN
        CALL ozonecm(REAL(julien), rlat, paprs, wo)
     ENDIF
@@ -1276,7 +1256,7 @@ contains
        DO k = 1, llm
           DO i = 1, klon
              z_avant(i) = z_avant(i) + (q_seri(i, k)+ql_seri(i, k)) &
-                  *(paprs(i, k)-paprs(i, k+1))/RG
+                  *zmasse(i, k)
           ENDDO
        ENDDO
     ENDIF
@@ -1304,8 +1284,7 @@ contains
        ! (driver commun aux versions 3 et 4)
 
        IF (ok_cvl) THEN ! new driver for convectL
-          CALL concvl (iflag_con, &
-               pdtphys, paprs, pplay, t_seri, q_seri, &
+          CALL concvl (iflag_con, pdtphys, paprs, pplay, t_seri, q_seri, &
                u_seri, v_seri, tr_seri, ntra, &
                ema_work1, ema_work2, &
                d_t_con, d_q_con, d_u_con, d_v_con, d_tr, &
@@ -1320,8 +1299,7 @@ contains
           pmfu=upwd+dnwd
        ELSE ! ok_cvl
           ! MAF conema3 ne contient pas les traceurs
-          CALL conema3 (pdtphys, &
-               paprs, pplay, t_seri, q_seri, &
+          CALL conema3 (pdtphys, paprs, pplay, t_seri, q_seri, &
                u_seri, v_seri, tr_seri, ntra, &
                ema_work1, ema_work2, &
                d_t_con, d_q_con, d_u_con, d_v_con, d_tr, &
@@ -1411,7 +1389,7 @@ contains
        DO k = 1, llm
           DO i = 1, klon
              z_apres(i) = z_apres(i) + (q_seri(i, k)+ql_seri(i, k)) &
-                  *(paprs(i, k)-paprs(i, k+1))/RG
+                  *zmasse(i, k)
           ENDDO
        ENDDO
        DO i = 1, klon
@@ -1568,7 +1546,7 @@ contains
              do i=1, klon
                 if (d_q_con(i, k) < 0.) then
                    rain_tiedtke(i)=rain_tiedtke(i)-d_q_con(i, k)/pdtphys &
-                        *(paprs(i, k)-paprs(i, k+1))/rg
+                        *zmasse(i, k)
                 endif
              enddo
           enddo
@@ -1843,16 +1821,14 @@ contains
     ENDDO
     DO k = 1, llm
        DO i = 1, klon
-          zustrph(i)=zustrph(i)+(u_seri(i, k)-u(i, k))/pdtphys* &
-               (paprs(i, k)-paprs(i, k+1))/rg
-          zvstrph(i)=zvstrph(i)+(v_seri(i, k)-v(i, k))/pdtphys* &
-               (paprs(i, k)-paprs(i, k+1))/rg
+          zustrph(i)=zustrph(i)+(u_seri(i, k)-u(i, k))/pdtphys* zmasse(i, k)
+          zvstrph(i)=zvstrph(i)+(v_seri(i, k)-v(i, k))/pdtphys* zmasse(i, k)
        ENDDO
     ENDDO
 
     !IM calcul composantes axiales du moment angulaire et couple des montagnes
 
-    CALL aaam_bud (27, klon, llm, gmtime, &
+    CALL aaam_bud(27, klon, llm, gmtime, &
          ra, rg, romega, &
          rlat, rlon, pphis, &
          zustrdr, zustrli, zustrph, &
@@ -1876,7 +1852,7 @@ contains
          pde_d, ycoefh, fm_therm, entr_therm, yu1, yv1, ftsol, pctsrf, &
          frac_impa,  frac_nucl, presnivs, pphis, pphi, albsol, rhcl, cldfra, &
          rneb,  diafra,  cldliq, itop_con, ibas_con, pmflxr, pmflxs, prfl, &
-         psfl, da, phi, mp, upwd, dnwd, tr_seri)
+         psfl, da, phi, mp, upwd, dnwd, tr_seri, zmasse)
 
     IF (offline) THEN
 
@@ -1940,8 +1916,7 @@ contains
     DO i = 1, klon
        prw(i) = 0.
        DO k = 1, llm
-          prw(i) = prw(i) + &
-               q_seri(i, k)*(paprs(i, k)-paprs(i, k+1))/RG
+          prw(i) = prw(i) + q_seri(i, k)*zmasse(i, k)
        ENDDO
     ENDDO
 
@@ -1968,7 +1943,6 @@ contains
     ENDIF
 
     ! Sauvegarder les valeurs de t et q a la fin de la physique:
-
     DO k = 1, llm
        DO i = 1, klon
           t_ancien(i, k) = t_seri(i, k)
@@ -1977,13 +1951,11 @@ contains
     ENDDO
 
     !   Ecriture des sorties
-
     call write_histhf
     call write_histday
     call write_histins
 
     ! Si c'est la fin, il faut conserver l'etat de redemarrage
-
     IF (lafin) THEN
        itau_phy = itau_phy + itap
        CALL phyredem("restartphy.nc", rlat, rlon, pctsrf, ftsol, &
@@ -2000,15 +1972,17 @@ contains
     subroutine write_histday
 
       use grid_change, only: gr_phy_write_3d
+      integer itau_w  ! pas de temps ecriture
 
       !------------------------------------------------
 
       if (ok_journe) THEN
-         ndex2d = 0
-         ndex3d = 0
          itau_w = itau_phy + itap
-         call histwrite(nid_day, "Sigma_O3_Royer", itau_w, gr_phy_write_3d(wo))
-
+         if (nq <= 4) then
+            call histwrite(nid_day, "Sigma_O3_Royer", itau_w, &
+                 gr_phy_write_3d(wo) * 1e3)
+            ! (convert "wo" from kDU to DU)
+         end if
          if (ok_sync) then
             call histsync(nid_day)
          endif
@@ -2022,10 +1996,7 @@ contains
 
       ! From phylmd/write_histhf.h, v 1.5 2005/05/25 13:10:09
 
-      ndex2d = 0
-      ndex3d = 0
-
-      itau_w = itau_phy + itap
+      !------------------------------------------------
 
       call write_histhf3d
 
@@ -2042,14 +2013,11 @@ contains
       ! From phylmd/write_histins.h, v 1.2 2005/05/25 13:10:09
 
       real zout
+      integer itau_w  ! pas de temps ecriture
 
       !--------------------------------------------------
 
       IF (ok_instan) THEN
-
-         ndex2d = 0
-         ndex3d = 0
-
          ! Champs 2D:
 
          zsto = pdtphys * ecrit_ins
@@ -2278,8 +2246,9 @@ contains
 
       ! From phylmd/write_histhf3d.h, v 1.2 2005/05/25 13:10:09
 
-      ndex2d = 0
-      ndex3d = 0
+      integer itau_w  ! pas de temps ecriture
+
+      !-------------------------------------------------------
 
       itau_w = itau_phy + itap
 
@@ -2310,40 +2279,5 @@ contains
     end subroutine write_histhf3d
 
   END SUBROUTINE physiq
-
-  !****************************************************
-
-  FUNCTION qcheck(klon, klev, paprs, q, ql, aire)
-
-    ! From phylmd/physiq.F, v 1.22 2006/02/20 09:38:28
-
-    use YOMCST
-    IMPLICIT none
-
-    ! Calculer et imprimer l'eau totale. A utiliser pour verifier
-    ! la conservation de l'eau
-
-    INTEGER klon, klev
-    REAL, intent(in):: paprs(klon, klev+1)
-    real q(klon, klev), ql(klon, klev)
-    REAL aire(klon)
-    REAL qtotal, zx, qcheck
-    INTEGER i, k
-
-    zx = 0.0
-    DO i = 1, klon
-       zx = zx + aire(i)
-    ENDDO
-    qtotal = 0.0
-    DO k = 1, klev
-       DO i = 1, klon
-          qtotal = qtotal + (q(i, k)+ql(i, k)) * aire(i) &
-               *(paprs(i, k)-paprs(i, k+1))/RG
-       ENDDO
-    ENDDO
-
-    qcheck = qtotal/zx
-
-  END FUNCTION qcheck
 
 end module physiq_m

@@ -1,9 +1,10 @@
-SUBROUTINE concvl(iflag_con,dtime,paprs,pplay,t,q,u,v,tra,ntra,work1, &
-     work2,d_t,d_q,d_u,d_v,d_tra,rain,snow,kbas,ktop,upwd,dnwd,dnwdbis,ma, &
-     cape,tvp,iflag,pbase,bbase,dtvpdt1,dtvpdq1,dplcldt,dplcldr,qcondc,wd, &
-     pmflxr,pmflxs,da,phi,mp)
+SUBROUTINE concvl(iflag_con, dtime, paprs, pplay, t, q, u, v, tra,&
+     ntra, work1, work2, d_t, d_q, d_u, d_v, d_tra, rain, snow, kbas,&
+     ktop, upwd, dnwd, dnwdbis, ma, cape, tvp, iflag, pbase, bbase,&
+     dtvpdt1, dtvpdq1, dplcldt, dplcldr, qcondc, wd, pmflxr, pmflxs,&
+     da, phi, mp)
 
-  ! From phylmd/concvl.F,v 1.3 2005/04/15 12:36:17
+  ! From phylmd/concvl.F, v 1.3 2005/04/15 12:36:17
   ! Auteur(s): Z.X. Li (LMD/CNRS) date: 19930818
   ! Objet: schema de convection de Emanuel (1991) interface
 
@@ -39,8 +40,10 @@ SUBROUTINE concvl(iflag_con,dtime,paprs,pplay,t,q,u,v,tra,ntra,work1, &
   ! Cape----output-R-CAPE (J/kg)
   ! Tvp-----output-R-Temperature virtuelle d'une parcelle soulevee
   !                  adiabatiquement a partir du niveau 1 (K)
-  ! deltapb-output-R-distance entre LCL et base de la colonne (<0 ; Pa)
-  ! Ice_flag-input-L-TRUE->prise en compte de la thermodynamique de la glace
+  ! deltapb-output-R-distance entre LCL et base de la colonne (<0 ;
+  !  Pa)
+  ! Ice_flag-input-L-TRUE->prise en compte de la thermodynamique de
+  !  la glace
 
   INTEGER ntrac
   PARAMETER (ntrac=nqmx-2)
@@ -48,34 +51,35 @@ SUBROUTINE concvl(iflag_con,dtime,paprs,pplay,t,q,u,v,tra,ntra,work1, &
   INTEGER, INTENT (IN) :: iflag_con
 
   REAL, INTENT (IN) :: dtime
-  REAL, INTENT (IN) :: paprs(klon,klev+1)
-  REAL, INTENT (IN) :: pplay(klon,klev)
-  REAL t(klon,klev), q(klon,klev), u(klon,klev), v(klon,klev)
-  REAL tra(klon,klev,ntrac)
+  REAL, INTENT (IN) :: paprs(klon, klev+1)
+  REAL, INTENT (IN) :: pplay(klon, klev)
+  REAL t(klon, klev), q(klon, klev), u(klon, klev), v(klon, klev)
+  REAL, INTENT (IN):: tra(klon, klev, ntrac)
   INTEGER ntra
-  REAL work1(klon,klev), work2(klon,klev)
-  REAL pmflxr(klon,klev+1), pmflxs(klon,klev+1)
+  REAL work1(klon, klev), work2(klon, klev)
+  REAL pmflxr(klon, klev+1), pmflxs(klon, klev+1)
 
-  REAL d_t(klon,klev), d_q(klon,klev), d_u(klon,klev), d_v(klon,klev)
-  REAL d_tra(klon,klev,ntrac)
+  REAL d_t(klon, klev), d_q(klon, klev), d_u(klon, klev), d_v(klon,&
+       klev)
+  REAL d_tra(klon, klev, ntrac)
   REAL rain(klon), snow(klon)
 
   INTEGER kbas(klon), ktop(klon)
-  REAL em_ph(klon,klev+1), em_p(klon,klev)
-  REAL upwd(klon,klev), dnwd(klon,klev), dnwdbis(klon,klev)
-  REAL ma(klon,klev), cape(klon), tvp(klon,klev)
-  REAL da(klon,klev), phi(klon,klev,klev), mp(klon,klev)
+  REAL em_ph(klon, klev+1), em_p(klon, klev)
+  REAL upwd(klon, klev), dnwd(klon, klev), dnwdbis(klon, klev)
+  REAL ma(klon, klev), cape(klon), tvp(klon, klev)
+  REAL da(klon, klev), phi(klon, klev, klev), mp(klon, klev)
   INTEGER iflag(klon)
   REAL pbase(klon), bbase(klon)
-  REAL dtvpdt1(klon,klev), dtvpdq1(klon,klev)
+  REAL dtvpdt1(klon, klev), dtvpdq1(klon, klev)
   REAL dplcldt(klon), dplcldr(klon)
-  REAL qcondc(klon,klev)
+  REAL qcondc(klon, klev)
   REAL wd(klon)
 
   REAL zx_t, zdelta, zx_qs, zcor
 
   INTEGER i, k, itra
-  REAL qs(klon,klev)
+  REAL qs(klon, klev)
   REAL cbmf(klon)
   SAVE cbmf
   INTEGER ifrst
@@ -95,14 +99,14 @@ SUBROUTINE concvl(iflag_con,dtime,paprs,pplay,t,q,u,v,tra,ntra,work1, &
 
   DO k = 1, klev + 1
      DO i = 1, klon
-        em_ph(i,k) = paprs(i,k)/100.0
-        pmflxs(i,k) = 0.
+        em_ph(i, k) = paprs(i, k)/100.0
+        pmflxs(i, k) = 0.
      END DO
   END DO
 
   DO k = 1, klev
      DO i = 1, klon
-        em_p(i,k) = pplay(i,k)/100.0
+        em_p(i, k) = pplay(i, k)/100.0
      END DO
   END DO
 
@@ -110,11 +114,11 @@ SUBROUTINE concvl(iflag_con,dtime,paprs,pplay,t,q,u,v,tra,ntra,work1, &
   IF (iflag_con==4) THEN
      DO k = 1, klev
         DO i = 1, klon
-           zx_t = t(i,k)
-           zdelta = max(0.,sign(1.,rtt-zx_t))
-           zx_qs = min(0.5,r2es*foeew(zx_t,zdelta)/em_p(i,k)/100.0)
+           zx_t = t(i, k)
+           zdelta = max(0., sign(1., rtt-zx_t))
+           zx_qs = min(0.5, r2es*foeew(zx_t, zdelta)/em_p(i, k)/100.0)
            zcor = 1./(1.-retv*zx_qs)
-           qs(i,k) = zx_qs*zcor
+           qs(i, k) = zx_qs*zcor
         END DO
      END DO
   ELSE
@@ -122,13 +126,13 @@ SUBROUTINE concvl(iflag_con,dtime,paprs,pplay,t,q,u,v,tra,ntra,work1, &
      ! convergence numerique)
      DO k = 1, klev
         DO i = 1, klon
-           zx_t = t(i,k)
-           zdelta = max(0.,sign(1.,rtt-zx_t))
-           zx_qs = r2es*foeew(zx_t,zdelta)/em_p(i,k)/100.0
-           zx_qs = min(0.5,zx_qs)
+           zx_t = t(i, k)
+           zdelta = max(0., sign(1., rtt-zx_t))
+           zx_qs = r2es*foeew(zx_t, zdelta)/em_p(i, k)/100.0
+           zx_qs = min(0.5, zx_qs)
            zcor = 1./(1.-retv*zx_qs)
            zx_qs = zx_qs*zcor
-           qs(i,k) = zx_qs
+           qs(i, k) = zx_qs
         END DO
      END DO
   END IF
@@ -137,9 +141,10 @@ SUBROUTINE concvl(iflag_con,dtime,paprs,pplay,t,q,u,v,tra,ntra,work1, &
   !		iflag_con = 3  -> equivalent to convect3
   !		iflag_con = 4  -> equivalent to convect1/2
 
-  CALL cv_driver(klon,klev,klev+1,ntra,iflag_con,t,q,qs,u,v,tra,em_p, &
-       em_ph,iflag,d_t,d_q,d_u,d_v,d_tra,rain,pmflxr,cbmf,work1,work2,kbas, &
-       ktop,dtime,ma,upwd,dnwd,dnwdbis,qcondc,wd,cape,da,phi,mp)
+  CALL cv_driver(klon, klev, klev+1, ntra, iflag_con, t, q, qs, u, v,&
+       tra, em_p, em_ph, iflag, d_t, d_q, d_u, d_v, d_tra, rain,&
+       pmflxr, cbmf, work1, work2, kbas, ktop, dtime, ma, upwd, dnwd,&
+       dnwdbis, qcondc, wd, cape, da, phi, mp)
 
   DO i = 1, klon
      rain(i) = rain(i)/86400.
@@ -147,16 +152,16 @@ SUBROUTINE concvl(iflag_con,dtime,paprs,pplay,t,q,u,v,tra,ntra,work1, &
 
   DO k = 1, klev
      DO i = 1, klon
-        d_t(i,k) = dtime*d_t(i,k)
-        d_q(i,k) = dtime*d_q(i,k)
-        d_u(i,k) = dtime*d_u(i,k)
-        d_v(i,k) = dtime*d_v(i,k)
+        d_t(i, k) = dtime*d_t(i, k)
+        d_q(i, k) = dtime*d_q(i, k)
+        d_u(i, k) = dtime*d_u(i, k)
+        d_v(i, k) = dtime*d_v(i, k)
      END DO
   END DO
   DO itra = 1, ntra
      DO k = 1, klev
         DO i = 1, klon
-           d_tra(i,k,itra) = dtime*d_tra(i,k,itra)
+           d_tra(i, k, itra) = dtime*d_tra(i, k, itra)
         END DO
      END DO
   END DO
@@ -165,7 +170,7 @@ SUBROUTINE concvl(iflag_con,dtime,paprs,pplay,t,q,u,v,tra,ntra,work1, &
      DO itra = 1, ntra
         DO k = 1, klev
            DO i = 1, klon
-              d_tra(i,k,itra) = 0.
+              d_tra(i, k, itra) = 0.
            END DO
         END DO
      END DO

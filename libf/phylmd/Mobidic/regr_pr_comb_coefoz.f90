@@ -61,16 +61,6 @@ contains
     ! Variables local to the procedure:
     integer ncid ! for NetCDF
 
-    real, pointer:: plev(:)
-    ! (pressure level of input data, converted to Pa, in strictly
-    ! increasing order)
-
-    integer n_plev ! number of pressure levels in the input data
-
-    real, allocatable:: press_in_edg(:)
-    ! (edges of pressure intervals for input data, in Pa, in strictly
-    ! increasing order)
-
     real coefoz(klon, llm)
     ! (temporary storage for an ozone coefficient)
     ! (On the "physics" grid.
@@ -97,26 +87,12 @@ contains
 
     call nf95_open("coefoz_LMDZ.nc", nf90_nowrite, ncid)
 
-    call nf95_get_coord(ncid, "plev", plev)
-    ! Convert from hPa to Pa because "regr_pr_av" and "regr_pr_int" require so:
-    plev = plev * 100.
-    n_plev = size(plev)
+    call regr_pr_av_coefoz(ncid, "a2", julien, a2)
 
-    ! Compute edges of pressure intervals:
-    allocate(press_in_edg(n_plev + 1))
-    press_in_edg(1) = 0.
-    ! We choose edges halfway in logarithm:
-    forall (k = 2:n_plev) press_in_edg(k) = sqrt(plev(k - 1) * plev(k))
-    press_in_edg(n_plev + 1) = huge(0.)
-    ! (infinity, but any value guaranteed to be greater than the
-    ! surface pressure would do)
-
-    call regr_pr_av_coefoz(ncid, "a2", julien, press_in_edg, a2)
-
-    call regr_pr_av_coefoz(ncid, "a4", julien, press_in_edg, a4_mass)
+    call regr_pr_av_coefoz(ncid, "a4", julien, a4_mass)
     a4_mass = a4_mass * 48. / 29.
 
-    call regr_pr_av_coefoz(ncid, "a6", julien, press_in_edg, a6)
+    call regr_pr_av_coefoz(ncid, "a6", julien, a6)
 
     ! Compute "a6_mass" avoiding underflow, do not divide by 1e4
     ! before dividing by molecular mass:
@@ -127,26 +103,24 @@ contains
     ! (We use as few local variables as possible, in order to spare
     ! main memory.)
 
-    call regr_pr_av_coefoz(ncid, "P_net_Mob", julien, press_in_edg, c_Mob)
+    call regr_pr_av_coefoz(ncid, "P_net_Mob", julien, c_Mob)
 
-    call regr_pr_av_coefoz(ncid, "r_Mob", julien, press_in_edg, coefoz)
+    call regr_pr_av_coefoz(ncid, "r_Mob", julien, coefoz)
     c_mob = c_mob - a2 * coefoz
 
-    call regr_pr_int_coefoz(ncid, "Sigma_Mob", julien, plev, top_value=0., &
-         v3=coefoz)
+    call regr_pr_int_coefoz(ncid, "Sigma_Mob", julien, top_value=0., v3=coefoz)
     c_mob = (c_mob - a6 * coefoz) * 48. / 29.
 
-    call regr_pr_av_coefoz(ncid, "temp_Mob", julien, press_in_edg, coefoz)
+    call regr_pr_av_coefoz(ncid, "temp_Mob", julien, coefoz)
     c_mob = c_mob - a4_mass * coefoz
 
-    call regr_pr_av_coefoz(ncid, "R_Het", julien, press_in_edg, r_het_interm)
+    call regr_pr_av_coefoz(ncid, "R_Het", julien, r_het_interm)
     ! Heterogeneous chemistry is only at high latitudes:
     forall (k = 1: llm)
        where (abs(rlat) <= 45.) r_het_interm(:, k) = 0.
     end forall
     r_het_interm = r_het_interm * (Clx / 3.8e-9)**2
 
-    deallocate(plev) ! pointer
     call nf95_close(ncid)
 
   end subroutine regr_pr_comb_coefoz

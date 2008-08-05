@@ -4,7 +4,7 @@ module regr_pr_coefoz
 
 contains
 
-  subroutine regr_pr_av_coefoz(ncid, name, julien, press_in_edg, v3)
+  subroutine regr_pr_av_coefoz(ncid, name, julien, v3)
 
     ! "regr_pr_av_coefoz" stands for "regrid pressure averaging
     ! coefficient ozone".
@@ -21,14 +21,11 @@ contains
     use grid_change, only: dyn_phy
     use regr_pr, only: regr_pr_av
     use numer_rec, only: assert
+    use press_coefoz_m, only: press_in_edg
 
     integer, intent(in):: ncid ! NetCDF ID of the file
     character(len=*), intent(in):: name ! of the NetCDF variable
     integer, intent(in):: julien ! jour julien, 1 <= julien <= 360
-
-    real, intent(in):: press_in_edg(:)
-    ! (edges of pressure intervals for Mobidic data, in Pa, in
-    ! strictly increasing order)
 
     real, intent(out):: v3(:, :) ! (klon, llm)
     ! (ozone coefficient from Mobidic on the "physics" grid)
@@ -71,7 +68,7 @@ contains
 
   !***************************************************************
 
-  subroutine regr_pr_int_coefoz(ncid, name, julien, plev, top_value, v3)
+  subroutine regr_pr_int_coefoz(ncid, name, julien, top_value, v3)
 
     ! This procedure reads a single Mobidic ozone coefficient from
     !"coefoz_LMDZ.nc", at the current day, regrids this parameter in
@@ -86,13 +83,11 @@ contains
     use grid_change, only: dyn_phy
     use regr_pr, only: regr_pr_int
     use numer_rec, only: assert
+    use press_coefoz_m, only: plev
 
     integer, intent(in):: ncid ! NetCDF ID of the file
     character(len=*), intent(in):: name ! of the NetCDF variable
     integer, intent(in):: julien ! jour julien, 1 <= julien <= 360
-
-    real, intent(in):: plev(:)
-    ! (pressure levels of Mobidic data, in Pa, in strictly increasing order)
 
     real, intent(in):: top_value
     ! (extra value of ozone coefficient at 0 pressure)

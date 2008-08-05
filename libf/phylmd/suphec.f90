@@ -24,9 +24,9 @@ contains
     IF (firstcall) THEN
        PRINT *, 'suphec initialise les constantes du GCM'
        firstcall = .FALSE.
-       !
+
        !*       1.    DEFINE FUNDAMENTAL CONSTANTS.
-       !
+
        WRITE(UNIT=6,FMT='(''0*** Constants of the ICM   ***'')')
        RPI=2.*ASIN(1.)
        RCLUM=299792458.
@@ -43,18 +43,17 @@ contains
             RKBOL
        WRITE(UNIT=6,FMT='(''            N = '',E13.7,''mol-1'')') &
             RNAVO
-       !
-       !
+
        !*       2.    DEFINE ASTRONOMICAL CONSTANTS.
-       !
+
        RDAY=86400.
        REA=149597870000.
        REPSM=0.409093
-       !
+
        RSIYEA=365.25*RDAY*2.*RPI/6.283076
        RSIDAY=RDAY/(1.+RDAY/RSIYEA)
        ROMEGA=2.*RPI/RSIDAY
-       !
+
        WRITE(UNIT=6,FMT='('' *** Astronomical constants ***'')')
        WRITE(UNIT=6,FMT='(''          day = '',E13.7,'' s'')')RDAY
        WRITE(UNIT=6,FMT='('' half g. axis = '',E13.7,'' m'')')REA
@@ -63,9 +62,9 @@ contains
        WRITE(UNIT=6,FMT='(''  sideral day = '',E13.7,'' s'')')RSIDAY
        WRITE(UNIT=6,FMT='(''        omega = '',E13.7,'' s-1'')') &
             ROMEGA
-       !
+
        !*       3.    DEFINE GEOIDE.
-       !
+
        RG=9.80665
        RA=6371229.
        R1SA=SNGL(1.D0/DBLE(RA))
@@ -74,19 +73,16 @@ contains
             RG
        WRITE(UNIT=6,FMT='('' Earth radius = '',E13.7,'' m'')')RA
        WRITE(UNIT=6,FMT='('' Inverse E.R. = '',E13.7,'' m'')')R1SA
-       !
-       !
+
        !*       4.    DEFINE RADIATION CONSTANTS.
-       !
-       ! z.x.li      RSIGMA=2. * RPI**5 * RKBOL**4 /(15.* RCLUM**2 * RHPLA**3)
+
        rsigma = 2.*rpi**5 * (rkbol/rhpla)**3 * rkbol/rclum/rclum/15.
        !IM init. dans conf_phys.F90   RI0=1365.
        WRITE(UNIT=6,FMT='('' ***        Radiation       ***'')')
        WRITE(UNIT=6,FMT='('' Stefan-Bol.  = '',E13.7,'' W m-2 K-4'')')  RSIGMA
 
-       !
        !*       5.    DEFINE THERMODYNAMIC CONSTANTS, GAS PHASE.
-       !
+
        R=RNAVO*RKBOL
        RMD=28.9644
        RMO3=47.9942
@@ -112,24 +108,21 @@ contains
        WRITE(UNIT=6,FMT='(''         Cvv  = '',e13.7)') RCVV
        WRITE(UNIT=6,FMT='(''      Rd/Cpd  = '',e13.7)') RKAPPA
        WRITE(UNIT=6,FMT='(''     Rv/Rd-1  = '',e13.7)') RETV
-       !
-       !
+
        !*       6.    DEFINE THERMODYNAMIC CONSTANTS, LIQUID PHASE.
-       !
+
        RCW=RCPV
        WRITE(UNIT=6,FMT='('' *** Thermodynamic, liquid  ***'')')
        WRITE(UNIT=6,FMT='(''         Cw   = '',E13.7)') RCW
-       !
-       !
+
        !*       7.    DEFINE THERMODYNAMIC CONSTANTS, SOLID PHASE.
-       !
+
        RCS=RCPV
        WRITE(UNIT=6,FMT='('' *** thermodynamic, solid   ***'')')
        WRITE(UNIT=6,FMT='(''         Cs   = '',E13.7)') RCS
-       !
-       !
+
        !*       8.    DEFINE THERMODYNAMIC CONSTANTS, TRANSITION OF PHASE.
-       !
+
        RTT=273.16
        RLVTT=2.5008E+6
        RLSTT=2.8345E+6
@@ -142,10 +135,9 @@ contains
        WRITE(UNIT=6,FMT='(''        RLMlt  = '',E13.7)') RLMLT
        WRITE(UNIT=6,FMT='('' Normal press. = '',E13.7)') RATM
        WRITE(UNIT=6,FMT='('' Latent heat :  '')')
-       !
-       !
+
        !*       9.    SATURATED VAPOUR PRESSURE.
-       !
+
        RESTT=611.14
        RGAMW=(RCW-RCPV)/RV
        RBETW=RLVTT/RV+RGAMW*RTT
@@ -156,10 +148,9 @@ contains
        RGAMD=RGAMS-RGAMW
        RBETD=RBETS-RBETW
        RALPD=RALPS-RALPW
-       !
-       !
+
        ! calculer les constantes pour les fonctions thermodynamiques
-       !
+
        RVTMP2=RCPV/RCPD-1.
        RHOH2O=RATM/100.
        R2ES=RESTT*RD/RV
@@ -169,7 +160,6 @@ contains
        R4IES=7.66
        R5LES=R3LES*(RTT-R4LES)
        R5IES=R3IES*(RTT-R4IES)
-
     ELSE
        PRINT *, 'suphec DEJA APPELE '
     ENDIF

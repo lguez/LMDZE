@@ -32,7 +32,8 @@ c      (en sortie : la valeur a la fin du pas de temps)
 c 
 c.......................................................................
       REAL, intent(in):: dt
-      real g,rconst
+      real, intent(in):: g
+      real rconst
       real plev(klon,klev+1),temp(klon,klev)
       real ustar(klon),snstable
       REAL zlev(klon,klev+1)

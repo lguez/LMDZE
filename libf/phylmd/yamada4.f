@@ -39,7 +39,8 @@ c    iflag_pbl=9 : un test ?
 
 c.......................................................................
       REAL, intent(in):: dt
-      real g,rconst
+      real, intent(in):: g
+      real rconst
       real plev(klon,klev+1),temp(klon,klev)
       real ustar(klon)
       real kmin,qmin,pblhmin(klon),coriol(klon)
