@@ -57,14 +57,14 @@ contains
     use comconst, only: kappa, cpp, dtphys, g, pi
     use comvert, only: preff, presnivs
     use comgeom, only: apoln, cu_2d, cv_2d, unsaire_2d, apols, rlonu, rlonv
-    use advtrac_m, only: niadv
+    use iniadvtrac_m, only: niadv
     use grid_change, only: dyn_phy, gr_fi_dyn
     use physiq_m, only: physiq
     use pressure_var, only: p3d, pls
 
     !    0.  Declarations :
 
-    INTEGER nq
+    INTEGER, intent(in):: nq
 
     !    Arguments :
 

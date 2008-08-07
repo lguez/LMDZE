@@ -44,7 +44,7 @@ contains
     use serre
     use temps
     use ener
-    use advtrac_m
+    use iniadvtrac_m
 
     !   Arguments
     character(len=*) infile

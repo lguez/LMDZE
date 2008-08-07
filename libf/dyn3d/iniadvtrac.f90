@@ -1,4 +1,4 @@
-module advtrac_m
+module iniadvtrac_m
 
   ! From advtrac.h, v 1.1.1.1 2004/05/19 12:53:06
 
@@ -106,7 +106,7 @@ contains
        if (nq_local > nqmx) then
           print *, 'nombre de traceurs trop important'
           print *, 'verifier traceur.def'
-          stop
+          stop 1
        endif
 
        do iq=1, nq_local
@@ -215,4 +215,4 @@ contains
 
   END subroutine iniadvtrac
 
-end module advtrac_m
+end module iniadvtrac_m

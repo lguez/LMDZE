@@ -48,10 +48,7 @@ contains
     ! -- packs the coefficients to the "physics" horizontal grid ;
     ! -- combines the eight coefficients to define the five module variables.
 
-    ! We assume that, in "coefoz_LMDZ.nc", the pressure levels are in hPa
-    ! and strictly increasing.
-
-    use netcdf95, only: nf95_open, nf95_close, nf95_get_coord
+    use netcdf95, only: nf95_open, nf95_close
     use netcdf, only: nf90_nowrite
     use regr_pr_coefoz, only: regr_pr_av_coefoz, regr_pr_int_coefoz
     use phyetat0_m, only: rlat
@@ -59,6 +56,7 @@ contains
     integer, intent(in):: julien ! jour julien, 1 <= julien <= 360
 
     ! Variables local to the procedure:
+
     integer ncid ! for NetCDF
 
     real coefoz(klon, llm)

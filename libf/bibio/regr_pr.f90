@@ -23,6 +23,7 @@ contains
     use numer_rec, only: assert
     use regr1_step_av_m, only: regr1_step_av
     use pressure_var, only: p3d
+    use grid_change, only: dyn_phy
 
     real, intent(in):: v(:, :)
     ! ("v(j, l)" is at latitude "rlatu(j)" and for pressure interval
@@ -46,22 +47,13 @@ contains
     call assert(size(press_in) == size(v, 2) + 1, "regr_pr_av 2")
 
     ! Regrid in pressure by averaging a step function of pressure.
-
-    ! Poles ("p3d" does not depend on longitude):
-    do j = 1, jjm + 1, jjm
-       ! Average on pressure, only for first longitude:
-       regr_pr_av(1, j, llm:1:-1) &
-            = regr1_step_av(v(j, :), press_in, p3d(1, j, llm+1:1:-1))
-       ! (invert order of indices because "p3d" is decreasing)
-    end do
-
-    ! Latitudes other than poles ("p3d" depends on longitude):
-    do j = 2, jjm
-       ! Average on pressure at each longitude:
+    do j = 1, jjm + 1
        do i = 1, iim
-          regr_pr_av(i, j, llm:1:-1) &
-               = regr1_step_av(v(j, :), press_in, p3d(i, j, llm+1:1:-1))
-          ! (invert order of indices because "p3d" is decreasing)
+          if (dyn_phy(i, j)) then
+             regr_pr_av(i, j, llm:1:-1) &
+                  = regr1_step_av(v(j, :), press_in, p3d(i, j, llm+1:1:-1))
+             ! (invert order of indices because "p3d" is decreasing)
+          end if
        end do
     end do
 
@@ -96,6 +88,7 @@ contains
     use numer_rec, only: assert
     use regr1_lint_m, only: regr1_lint
     use pressure_var, only: pls
+    use grid_change, only: dyn_phy
 
     real, intent(in):: v(:, :)
     ! ("v(j, l)" is at latitude "rlatu(j)" and pressure level "press_in(l)".)
@@ -117,22 +110,13 @@ contains
     call assert(size(press_in) == size(v, 2), "regr_pr_int 2")
 
     ! Regrid in pressure by linear interpolation
-
-    ! Poles ("pls" does not depend on longitude):
-    do j = 1, jjm + 1, jjm
-       ! Interpolate in pressure, only for first longitude:
-       regr_pr_int(1, j, llm:1:-1) &
-            = regr1_lint(v(j, :), press_in, pls(1, j, llm:1:-1))
-       ! (invert order of indices because "pls" is decreasing)
-    end do
-
-    ! Latitudes other than poles ("pls" depends on longitude):
-    do j = 2, jjm
-       ! Average on pressure at each longitude:
+    do j = 1, jjm + 1
        do i = 1, iim
-          regr_pr_int(i, j, llm:1:-1) &
-               = regr1_lint(v(j, :), press_in, pls(i, j, llm:1:-1))
-          ! (invert order of indices because "pls" is decreasing)
+          if (dyn_phy(i, j)) then
+             regr_pr_int(i, j, llm:1:-1) &
+                  = regr1_lint(v(j, :), press_in, pls(i, j, llm:1:-1))
+             ! (invert order of indices because "pls" is decreasing)
+          end if
        end do
     end do
 

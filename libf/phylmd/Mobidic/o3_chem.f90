@@ -13,6 +13,10 @@ contains
     ! This procedure evolves the ozone mass fraction through a time
     ! step taking only chemistry into account.
 
+    ! All the 2-dimensional arrays are on the "physics" grid.
+    ! Their shape is "(/klon, llm/)".
+    ! Index "(i, :)" is for longitude "rlon(i)", latitude "rlat(i)".
+
     use numer_rec, only: assert, pi
     use dimphy, only: klon
     use dimens_m, only: llm
@@ -21,20 +25,16 @@ contains
 
     integer, intent(in):: julien ! jour julien, 1 <= julien <= 360
     real, intent(in):: gmtime ! heure de la journée en fraction de jour
-    real, intent(in):: t_seri(:, :) ! temperature,  in K
+    real, intent(in):: t_seri(:, :) ! (klon, llm) temperature, in K
 
-    real, intent(in):: zmasse(:, :)
+    real, intent(in):: zmasse(:, :) ! (klon, llm)
     ! (column-density of mass of air in a cell, in kg m-2)
-    ! (On the "physics" grid.
-    ! "zmasse(i, k)" is at longitude "rlon(i)", latitude "rlat(i)", for
-    ! layer "k".)
+    ! "zmasse(:, k)" is for layer "k".)
 
     real, intent(in):: pdtphys ! time step for physics, in s
 
-    real, intent(inout):: q(:, :) ! mass fraction of ozone
-    ! (On the "physics" grid.
-    ! "q(i, k)" is at longitude "rlon(i)", latitude "rlat(i)", middle of
-    ! layer "k".)
+    real, intent(inout):: q(:, :) ! (klon, llm) mass fraction of ozone
+    ! "q(:, k)" is at middle of layer "k".)
 
     ! Variables local to the procedure:
     integer k
@@ -42,22 +42,16 @@ contains
     real c(klon, llm)
     ! (constant term during a time step in the net mass production
     ! rate of ozone by chemistry, per unit mass of air, in s-1)
-    ! (On the "physics" grid.
-    ! "c(i, k)" is at longitude "rlon(i)", latitude "rlat(i)", middle of
-    ! layer "k".)
+    ! "c(:, k)" is at middle of layer "k".)
 
     real b(klon, llm)
     ! (coefficient of "q" in the net mass production
     ! rate of ozone by chemistry, per unit mass of air, in s-1)
-    ! (On the "physics" grid.
-    ! "b(i, k)" is at longitude "rlon(i)", latitude "rlat(i)", middle of
-    ! layer "k".)
+    ! "b(:, k)" is at middle of layer "k".)
 
     real dq_o3_chem(klon, llm)
     ! (variation of ozone mass fraction due to chemistry during a time step)
-    ! (On the "physics" grid.
-    ! "dq_o3_chem(i, k)" is at longitude "rlon(i)", latitude
-    ! "rlat(i)", middle of layer "k".)
+    ! "dq_o3_chem(:, k)" is at middle of layer "k".)
 
     real earth_long
     ! (longitude vraie de la Terre dans son orbite solaire, par
@@ -111,50 +105,42 @@ contains
 
     ! This function computes the production rate of ozone by chemistry.
 
+    ! All the 2-dimensional arrays are on the "physics" grid.
+    ! Their shape is "(/klon, llm/)".
+    ! Index "(i, :)" is for longitude "rlon(i)", latitude "rlat(i)".
+
     use regr_pr_comb_coefoz_m, only: a6_mass
     use numer_rec, only: assert
     use dimens_m, only: llm
     use dimphy, only: klon
 
     real, intent(in):: q(:, :) ! mass fraction of ozone
-    ! (On the "physics" grid.
-    ! "q(i, k)" is at longitude "rlon(i)", latitude "rlat(i)", middle of
-    ! layer "k".)
+    ! "q(:, k)" is at middle of layer "k".)
 
     real, intent(in):: zmasse(:, :)
     ! (column-density of mass of air in a layer, in kg m-2)
-    ! (On the "physics" grid.
-    ! "zmasse(i, k)" is at longitude "rlon(i)", latitude "rlat(i)", middle of
-    ! layer "k".)
+    ! ("zmasse(:, k)" is for layer "k".)
 
     real, intent(in):: c(:, :)
     ! (constant term during a time step in the net mass production
     ! rate of ozone by chemistry, per unit mass of air, in s-1)
-    ! (On the "physics" grid.
-    ! "c(i, k)" is at longitude "rlon(i)", latitude "rlat(i)", middle of
-    ! layer "k".)
+    ! "c(:, k)" is at middle of layer "k".)
 
     real, intent(in):: b(:, :)
-    ! (coefficient of "q" in the net mass production
-    ! rate of ozone by chemistry, per unit mass of air, in s-1)
-    ! (On the "physics" grid.
-    ! "b(i, k)" is at longitude "rlon(i)", latitude "rlat(i)", middle of
-    ! layer "k".)
+    ! (coefficient of "q" in the net mass production rate of ozone by
+    ! chemistry, per unit mass of air, in s-1)
+    ! ("b(:, k)" is at middle of layer "k".)
 
     real o3_prod(klon, llm)
     ! (net mass production rate of ozone by chemistry, per unit mass
     ! of air, in s-1)
-    ! (On the "physics" grid.
-    ! "o3_prod(i, k)" is at longitude "rlon(i)", latitude "rlat(i)", middle of
-    ! layer "k".)
+    ! ("o3_prod(:, k)" is at middle of layer "k".)
 
     ! Variables local to the procedure:
 
     real sigma_mass(klon, llm)
     ! (mass column-density of ozone above point, in kg m-2)
-    ! (On the "physics" grid.
-    ! "sigma_mass(i, k)" is at longitude "rlon(i)", latitude
-    ! "rlat(i)", middle of layer "k".)
+    ! ("sigma_mass(:, k)" is at middle of layer "k".)
 
     integer k
 

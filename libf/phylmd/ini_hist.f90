@@ -463,14 +463,14 @@ contains
 
   !*************************************************
 
-  subroutine ini_histrac(nid_tra, pdtphys, presnivs, nqmax, lessivage)
+  subroutine ini_histrac(nid_tra, pdtphys, presnivs, nq_phys, lessivage)
 
     ! From phylmd/ini_histrac.h, version 1.10 2006/02/21 08:08:30
 
     use dimens_m, only: iim, jjm, llm
     use ioipsl, only: ymds2ju, histbeg_totreg, histvert, histdef, histend
     use temps, only: annee_ref, day_ref, itau_phy
-    use advtrac_m, only: niadv, tnom, ttext
+    use iniadvtrac_m, only: niadv, tnom, ttext
     use dimphy, only: klon
     use clesphys, only: ecrit_tra
     use grid_change, only: gr_phy_write_2d
@@ -480,7 +480,7 @@ contains
     real, intent(in):: pdtphys  ! pas d'integration pour la physique (s)
     REAL, intent(in):: presnivs(:)
 
-    integer, intent(in):: nqmax
+    integer, intent(in):: nq_phys
     ! (nombre de traceurs auxquels on applique la physique)
 
     logical, intent(in):: lessivage
@@ -515,7 +515,7 @@ contains
          "kg m-2", iim, jjm + 1, nhori, llm, 1, llm, nvert, "ave(X)", &
          zsto, zout)
 
-    DO it = 1, nqmax
+    DO it = 1, nq_phys
        ! champ 2D
        iq=it+2
        iiq=niadv(iq)

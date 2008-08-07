@@ -37,7 +37,7 @@ PROGRAM gcm
   use initdynav_m, only: initdynav
   use dynetat0_m, only: dynetat0
   use grid_change, only: dyn_phy, init_dyn_phy
-  use advtrac_m, only: iniadvtrac
+  use iniadvtrac_m, only: iniadvtrac
   use leapfrog_m, only: leapfrog
   use dynredem0_m, only: dynredem0
   use clesphys2, only: read_clesphys2

@@ -10,7 +10,7 @@ module phytrac_m
 contains
 
   SUBROUTINE phytrac(rnpb, itap, lmt_pas, julien, gmtime, firstcal, lafin, &
-       nqmax, pdtphys, u, v, t_seri, paprs, pplay, pmfu, pmfd, pen_u, &
+       nq_phys, pdtphys, u, v, t_seri, paprs, pplay, pmfu, pmfd, pen_u, &
        pde_u, pen_d, pde_d, coefh, fm_therm, entr_therm, yu1, yv1, ftsol, &
        pctsrf, frac_impa, frac_nucl, presnivs, pphis, &
        pphi, albsol, rh, cldfra, rneb, diafra, cldliq, itop_con, &
@@ -19,7 +19,7 @@ contains
 
     ! From phylmd/phytrac.F, version 1.15 2006/02/21 08:08:30
 
-    ! Authors : Frédéric Hourdin, Abderrahmane Idelkadi, Marie-Alice
+    ! Authors: Frédéric Hourdin, Abderrahmane Idelkadi, Marie-Alice
     ! Foujols, Olivia
     ! Objet : moniteur général des tendances des traceurs
 
@@ -56,7 +56,7 @@ contains
 
     logical, intent(in):: rnpb
 
-    integer, intent(in):: nqmax
+    integer, intent(in):: nq_phys
     ! (nombre de traceurs auxquels on applique la physique)
 
     integer, intent(in):: itap  ! number of calls to "physiq"
@@ -68,7 +68,7 @@ contains
     real, intent(in):: pdtphys  ! pas d'integration pour la physique (s)
     real, intent(in):: t_seri(klon, llm) ! temperature, in K
 
-    real, intent(inout):: tr_seri(klon, llm, nbtr)
+    real, intent(inout):: tr_seri(:, :, :) ! (klon, llm, nbtr)
     ! (mass fractions of tracers, excluding water, at mid-layers)
 
     real u(klon, llm)
@@ -211,16 +211,17 @@ contains
 
     !--------------------------------------
 
-    call assert(shape(zmasse) == (/klon, llm/), "phytrac")
+    call assert(shape(zmasse) == (/klon, llm/), "phytrac zmasse")
+    call assert(shape(tr_seri) == (/klon, llm, nbtr/), "phytrac tr_seri")
 
     if (firstcal) then
        print *, 'phytrac: pdtphys = ', pdtphys
        PRINT *, 'Fréquence de sortie des traceurs : ecrit_tra = ', ecrit_tra
-       if (nbtr < nqmax) call abort_gcm('phytrac', 'See above', 1)
+       if (nbtr < nq_phys) call abort_gcm('phytrac', 'nbtr < nq_phys', 1)
        inirnpb=rnpb
 
        ! Initialisation des sorties :
-       call ini_histrac(nid_tra, pdtphys, presnivs, nqmax, lessivage)
+       call ini_histrac(nid_tra, pdtphys, presnivs, nq_phys, lessivage)
 
        ! Initialisation de certaines variables pour le radon et le plomb 
        ! Initialisation du traceur dans le sol (couche limite radonique)
@@ -239,13 +240,13 @@ contains
 
        ! Initialisation de la nature des traceurs
 
-       DO it = 1, nqmax
+       DO it = 1, nq_phys
           aerosol(it) = .FALSE.  ! Tous les traceurs sont des gaz par defaut
           radio(it) = .FALSE. ! par défaut pas de passage par "radiornpb"
           clsol(it) = .FALSE.  ! Par defaut couche limite avec flux prescrit
        ENDDO
 
-       if (nqmax >= 3) then
+       if (nq_phys >= 3) then
           call press_coefoz ! read input pressure levels for ozone coefficients
        end if
     ENDIF
@@ -267,7 +268,7 @@ contains
     ! Calcul de l'effet de la convection
 
     if (convection) then
-       DO it=1, nqmax
+       DO it=1, nq_phys
           if (iflag_con.eq.2) then
              ! tiedke
              CALL nflxtr(pdtphys, pmfu, pmfd, pen_u, pde_u, pen_d, pde_d, &
@@ -291,7 +292,7 @@ contains
 
     ! Calcul de l'effet des thermiques
 
-    do it=1, nqmax
+    do it=1, nq_phys
        do k=1, llm
           do i=1, klon
              d_tr_th(i, k, it)=0.
@@ -303,7 +304,7 @@ contains
 
     if (iflag_thermals > 0) then
        nsplit=10
-       DO it=1, nqmax
+       DO it=1, nq_phys
           do isplit=1, nsplit
              ! Thermiques 
              call dqthermcell(klon, llm, pdtphys/nsplit &
@@ -332,7 +333,7 @@ contains
        ENDDO
 
        ! MAF modif pour tenir compte du cas rnpb + traceur
-       DO it=1, nqmax
+       DO it=1, nq_phys
           if (clsol(it)) then 
              ! couche limite avec quantite dans le sol calculee
              CALL cltracrn(it, pdtphys, yu1, yv1, &
@@ -380,7 +381,7 @@ contains
     ! si radio=true mais pour l'instant radiornpb propre au cas rnpb
     if (rnpb) then
        d_tr_dec(:, :, :) = radiornpb(tr_seri, pdtphys, tautr)
-       DO it=1, nqmax
+       DO it=1, nq_phys
           if (radio(it)) then
              tr_seri(:, :, it) = tr_seri(:, :, it) + d_tr_dec(:, :, it)
              WRITE(unit=itn, fmt='(i1)') it
@@ -389,7 +390,7 @@ contains
        ENDDO
     endif ! rnpb decroissance  radioactive
 
-    if (nqmax >= 3) then
+    if (nq_phys >= 3) then
        ! Ozone as a tracer:
        if (mod(itap - 1, lmt_pas) == 0) then
           ! Once per day, update the coefficients for ozone chemistry:
@@ -407,7 +408,7 @@ contains
 
        ! tendance des aerosols nuclees et impactes 
 
-       DO it = 1, nqmax
+       DO it = 1, nq_phys
           IF (aerosol(it)) THEN
              DO k = 1, llm
                 DO i = 1, klon
@@ -423,7 +424,7 @@ contains
        ! Mises a jour des traceurs + calcul des flux de lessivage 
        ! Mise a jour due a l'impaction et a la nucleation
 
-       DO it = 1, nqmax
+       DO it = 1, nq_phys
           IF (aerosol(it)) THEN
              DO k = 1, llm
                 DO i = 1, klon
@@ -436,7 +437,7 @@ contains
 
        ! Flux lessivage total 
 
-       DO it = 1, nqmax
+       DO it = 1, nq_phys
           DO k = 1, llm
              DO i = 1, klon
                 flestottr(i, k, it) = flestottr(i, k, it) - &
@@ -450,7 +451,7 @@ contains
     ENDIF
 
     !   Ecriture des sorties
-    call write_histrac(lessivage, nqmax, itap, nid_tra)
+    call write_histrac(lessivage, nq_phys, itap, nid_tra)
 
     if (lafin) then
        print *, "C'est la fin de la physique."
@@ -464,20 +465,20 @@ contains
 
   contains
 
-    subroutine write_histrac(lessivage, nqmax, itap, nid_tra)
+    subroutine write_histrac(lessivage, nq_phys, itap, nid_tra)
 
       ! From phylmd/write_histrac.h, version 1.9 2006/02/21 08:08:30
 
       use dimens_m, only: iim, jjm, llm
       use ioipsl, only: histwrite, histsync
       use temps, only: itau_phy
-      use advtrac_m, only: tnom
+      use iniadvtrac_m, only: tnom
       use comgeomphy, only: airephy
       use dimphy, only: klon
 
       logical, intent(in):: lessivage
 
-      integer, intent(in):: nqmax
+      integer, intent(in):: nq_phys
       ! (nombre de traceurs auxquels on applique la physique)
 
       integer, intent(in):: itap  ! number of calls to "physiq"
@@ -502,7 +503,7 @@ contains
       CALL gr_fi_ecrit(llm, klon, iim, jjm+1, zmasse, zx_tmp_3d)      
       CALL histwrite(nid_tra, "zmasse", itau_w, zx_tmp_3d)
 
-      DO it=1, nqmax
+      DO it=1, nq_phys
          CALL gr_fi_ecrit(llm, klon, iim, jjm+1, tr_seri(1, 1, it), zx_tmp_3d)
          CALL histwrite(nid_tra, tnom(it+2), itau_w, zx_tmp_3d)
          if (lessivage) THEN

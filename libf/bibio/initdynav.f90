@@ -20,7 +20,7 @@ contains
     use serre
     use temps
     use ener
-    use advtrac_m, only: ttext
+    use iniadvtrac_m, only: ttext
 
     !   Routine d'initialisation des ecritures des fichiers histoires LMDZ
     !   au format IOIPSL. Initialisation du fichier histoire moyenne.

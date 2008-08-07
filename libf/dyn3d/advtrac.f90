@@ -17,7 +17,7 @@ SUBROUTINE advtrac(pbaru,pbarv,p,masse,q,iapptrac,teta,pk)
   USE comgeom
   USE temps
   USE ener
-  USE advtrac_m
+  USE iniadvtrac_m
   USE comdissip
   IMPLICIT NONE
 

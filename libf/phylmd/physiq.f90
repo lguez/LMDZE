@@ -656,8 +656,7 @@ contains
     INTEGER   ip_ebil  ! PRINT level for energy conserv. diag.
     SAVE      ip_ebil
     DATA      ip_ebil/0/
-    INTEGER   if_ebil ! level for energy conserv. dignostics
-    SAVE      if_ebil
+    INTEGER, SAVE:: if_ebil ! level for energy conservation diagnostics
     !+jld ec_conser
     REAL d_t_ec(klon, llm)    ! tendance du a la conersion Ec -> E thermique
     REAL ZRCPD
@@ -992,10 +991,9 @@ contains
     ! Mettre en action les conditions aux limites (albedo, sst, etc.).
     ! Prescrire l'ozone et calculer l'albedo sur l'ocean.
 
-!!$    if (nq >= 5) then
-!!$       wo = qx(:, :, 5) * zmasse / dobson_u / 1e3
-!!$    else IF (MOD(itap - 1, lmt_pas) == 0) THEN
-    IF (MOD(itap - 1, lmt_pas) == 0) THEN
+    if (nq >= 5) then
+       wo = qx(:, :, 5) * zmasse / dobson_u / 1e3
+    else IF (MOD(itap - 1, lmt_pas) == 0) THEN
        CALL ozonecm(REAL(julien), rlat, paprs, wo)
     ENDIF
 
@@ -1284,7 +1282,7 @@ contains
        ! (driver commun aux versions 3 et 4)
 
        IF (ok_cvl) THEN ! new driver for convectL
-          CALL concvl (iflag_con, pdtphys, paprs, pplay, t_seri, q_seri, &
+          CALL concvl(iflag_con, pdtphys, paprs, pplay, t_seri, q_seri, &
                u_seri, v_seri, tr_seri, ntra, &
                ema_work1, ema_work2, &
                d_t_con, d_q_con, d_u_con, d_v_con, d_tr, &

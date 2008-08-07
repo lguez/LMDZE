@@ -21,7 +21,7 @@ contains
     use serre, only: clon, clat, grossismy, grossismx
     use temps, only: day_ref, day_ini, itau_dyn, annee_ref
     use ener, only: etot0, ang0, ptot0, stot0, ztot0
-    use advtrac_m, only: tname
+    use iniadvtrac_m, only: tname
     use netcdf95, only: nf95_open, nf95_inq_varid, handle_err, NF95_CLOSE
     use netcdf, only: NF90_NOWRITE, NF90_GET_VAR, NF90_NOERR
     use numer_rec, only: assert

@@ -46,7 +46,7 @@ contains
     use pression_m, only: pression
     use pressure_var, only: p3d
 
-    integer nq
+    integer, intent(in):: nq
 
     ! Variables dynamiques:
     REAL vcov(ip1jm, llm), ucov(ip1jmp1, llm) ! vents covariants

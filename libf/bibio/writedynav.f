@@ -40,7 +40,7 @@ C   Declarations
       use serre
       use temps
       use ener
-      use advtrac_m
+      use iniadvtrac_m
       implicit none
 
 

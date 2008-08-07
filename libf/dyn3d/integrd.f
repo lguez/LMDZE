@@ -14,7 +14,7 @@
       use comgeom
       use serre
       use temps
-      use advtrac_m
+      use iniadvtrac_m
       use pression_m, only: pression
 
       IMPLICIT NONE

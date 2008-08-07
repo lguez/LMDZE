@@ -27,7 +27,7 @@ contains
 
     call histclo
     print *, 'Stopping in ', modname
-    print *, 'Reason = ', trim(message)
+    print *, 'Reason: ', trim(message)
     print *, 'Houston, we have a problem ', ierr
     STOP 1
 

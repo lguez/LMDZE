@@ -75,9 +75,10 @@ LMDZE utilise quatre bibliothèques. Cf. figure (\ref{fig:libraries}).
 Pour télécharger le programme :
 \begin{verbatim}
 svn checkout \
-   svn+ssh://forge.ipsl.jussieu.fr/ipsl/forge/projets/lmdze/svn/trunk \
-   LMDZE_program
+   svn+ssh://guez@forge.ipsl.jussieu.fr/ipsl/forge/projets/lmdze/svn/trunk \
+   LMDZE
 \end{verbatim}
+(\verb+guez@+ est inutile si l'utilisateur courant est \verb+guez+.)
 
 Pour compiler \verb+gcm+ :
 \begin{enumerate}
@@ -493,18 +494,11 @@ simple. Passage du couple d'indices $(i, j)$ à l'indice simple $i'$ :
 Réciproquement :
 \begin{align*}
   i' = 1 & \Rightarrow i = 1, j = 1 \\
-  i' \in \{2, \ldots, \mathtt{klon} - 1\} & \Rightarrow
+  i' \in \{2, \ldots, \mathtt{klon}\} & \Rightarrow
   \left\{
     \begin{array}{l}
       i = (i' - 2) [\mathtt{iim}] + 1 \\
       j = (i' - 2) / \mathtt{iim} + 2
-    \end{array}
-  \right. \\
-  i' = \mathtt{klon} & \Rightarrow
-  \left\{
-    \begin{array}{l}
-      i = 1 \\
-      j = \mathtt{jjm} + 1
     \end{array}
   \right.
 \end{align*}
@@ -929,7 +923,7 @@ passé à \verb+calfis+ et à \verb+physiq+. \verb+physiq+ impose
 \verb+nq+ $\ge 2$. Donc \verb+nqmx+ doit être supérieur à 2.
 \verb+nbtr+ (variable de \verb+dimphy+) vaut 1 pour \verb+nqmx+
 \verb+=+ \verb+2+ et \verb+nqmx+ -- \verb+2+ pour \verb+nqmx+ $\ge 3$.
-\verb+nq-2+ est passé à \verb+phytrac+ et devient \verb+nqmax+ dans
+\verb+nq-2+ est passé à \verb+phytrac+ et devient \verb+nq_phys+ dans
 \verb+phytrac+. À cause de l'appel de \verb+dynredem1+ par
 \verb+etat0+, \verb+nq+ doit être égal à \verb+nqmx+. \verb+initrrnpb+
 impose \verb+nbtr+ $\ge 2$, mais il n'est appelé que si \verb+rnpb+
@@ -974,28 +968,27 @@ est écrite dans \verb+restarttrac+ par \verb+phytrac+.
 
 Résumé. On part d'une certaine paramétrisation de la chimie
 stratosphérique de l'ozone, préparée par Daniel Cariolle et Hubert
-Teyssedre. La paramétrisation calcule en chaque point une production
-chimique d'ozone. On suit l'ozone ainsi produit comme un traceur
-passif, c'est-à-dire qu'il n'a aucun effet sur le reste du modèle.
-Les paramètres chimiques sont remaillés pour LMDZ, en latitude et en
+Teyssèdre. La paramétrisation calcule en chaque point une production
+chimique d'ozone. On suit l'ozone ainsi produit comme un traceur. Les
+coefficients chimiques sont remaillés pour LMDZ, en latitude et en
 temps, dans \verb+etat0_lim+. Le remaillage vertical est fait une fois
 par jour dans \verb+gcm+. On néglige donc l'effet sur le remaillage de
 la variation temporelle de pression à la surface pendant une journée.
 Le champ initial d'ozone spécifié dans \verb+etat0_lim+ est le champ
-de référence de D. Cariolle (un des paramètres). Pour les passages de
+de référence de D. Cariolle (un des coefficients). Pour les passages de
 fraction molaire d'ozone à fraction massique, on néglige la présence
 de vapeur d'eau dans l'air.  L'évolution de la fraction massique
 d'ozone pendant un pas de temps de la physique est calculée dans
 \verb+phytrac+ : les contributions du transport et de la chimie sont
 intégrées séparément. La température, la masse volumique de l'air et
 la direction du Soleil sont considérées comme constantes pendant un
-pas de temps de la physique. Un des paramètres de D. Cariolle est la
+pas de temps de la physique. Un des coefficients de D. Cariolle est la
 densité-colonne d'ozone au dessus d'un point donné. Cette
 densité-colonne est calculée dans l'approximation ``plans
 parallèles''. La production chimique est intégrée pendant un pas de
 temps de la physique par la méthode du point milieu. Une fois par jour
 de simulation, dans \verb+gcm+, une procédure lit dans un fichier tous
-les paramètres chimiques au bon jour, remaillés en latitude pour LMDZ.
+les coefficients chimiques au bon jour, remaillés en latitude pour LMDZ.
 
 Cf. Cariolle (1986 \#761),
 \href{file:/user/guez/Documents/Commentaires_lectures/Autres_publications/-1991/Cariolle_1986_761.texfol/Cariolle_1986_761.dvi}{commentaires
@@ -1011,8 +1004,8 @@ dimension temps$^{-1}$.
 Phu L. V. conseille d'utiliser le schéma de transport numéro 10 (choix
 dans \verb+traceur.def+).
 
-Nous notons avec un indice ``Mob'' les valeurs des paramètres tirés de
-Mobidic.
+Nous notons avec un indice ``Mob'' les valeurs des coefficients de D.
+Cariolle et H. Teyssèdre, par référence au modèle Mobidic.
 
 \subsubsection{La paramétrisation de la chimie}
 
@@ -1251,7 +1244,7 @@ ne tenant compte que de la présence de l'eau :
 \subsubsection{Choix du type de remaillage}
 
 Copiant ce qui était déjà fait pour la vapeur d'eau, j'ai d'abord
-choisi de remailler verticalement les paramètres de Cariolle en
+choisi de remailler verticalement les coefficients de Cariolle en
 interpolant une spline cubique de la pression. (Noter que ce n'est pas
 une interpolation en logarithme de pression.) Si on interpole
 simplement les données de Cariolle et que la pression à laquelle on
@@ -1271,7 +1264,7 @@ négatives.) Cf. exécutions
 et
 \href{file:///user/guez/Documents/Utilisation_LMDZ/Results_etat0_lim/check_coefoz_38.ps}{38}
 de \verb+etat0_lim+. Le remaillage vertical est donc maintenant fait
-par moyenne pour la plupart des paramètres chimiques, comme le
+par moyenne pour la plupart des coefficients chimiques, comme le
 remaillage horizontal.
 
 Considérons le remaillage de la fraction molaire $r_\mathrm{Mob}$ (le
@@ -1482,14 +1475,14 @@ Cf. figures (\ref{fig:regr_latit}), (\ref{fig:regr_p_stepav}) et
 \subsubsection{Remaillage : dans quel programme, à quel moment ?  Quelles
   entrées-sorties ?}
 
-Les paramètres chimiques doivent être remaillés en latitude pour LMDZ.
+Les coefficients chimiques doivent être remaillés en latitude pour LMDZ.
 Ce remaillage en latitude peut être fait une fois pour toutes, dans
 \verb+etat0_lim+. Par ailleurs, au cours d'une simulation, la pression
 à une longitude, une latitude et un niveau vertical donnés change
 parce que la pression à la surface change. Donc il faut en principe
 faire le remaillage en pression des données de Cariolle à chaque pas
 de temps physique. Enfin, nous voulons lisser les variations
-temporelles des paramètres chimiques en les interpolant
+temporelles des coefficients chimiques en les interpolant
 journalièrement. Ce remaillage temporel peut être fait une fois pour
 toutes, dans \verb+etat0_lim+.
 
@@ -1502,9 +1495,9 @@ pouvons faire les trois remaillages (latitude, pression, temps) dans
 \verb+etat0_lim+. Nous négligerions alors pour le remaillage vertical
 l'évolution des pressions aux interfaces des couches. Mais la
 \href{file:///user/guez/Documents/Informatique_fonctionnement/Programs/Guide_IPSL_climate_models/taille.ods}{taille
-  du fichier contenant les paramètres remaillés} serait alors trop
+  du fichier contenant les coefficients remaillés} serait alors trop
 grande.\footnote{Le remaillage en pression dans \texttt{etat0\_lim}
-  serait une bonne solution si nous utilisions les paramètres mensuels
+  serait une bonne solution si nous utilisions les coefficients mensuels
   sans interpolation journalière.}
 
 Nous devons donc faire un des trois remaillages dans \verb+gcm+.
@@ -1541,7 +1534,7 @@ des pressions aux interfaces des couches pendant un jour.
 
 Nous devons encore nous demander s'il vaut mieux lire tout le contenu
 de \verb+coefoz_LMDZ.nc+ au début de l'exécution de \verb+gcm+ ou lire
-dans le fichier une fois par jour les paramètres au bon jour. Si nous
+dans le fichier une fois par jour les coefficients au bon jour. Si nous
 lisons tout en une seule fois, nous gagnons en temps d'exécution (nous
 limitons les accès au disque) mais nous augmentons la
 \href{file:///user/guez/Documents/Informatique_fonctionnement/Programs/Guide_IPSL_climate_models/taille.ods}{mémoire
@@ -1560,8 +1553,8 @@ temps après \verb+etat0+.
 Dans quel fichier \verb+etat0_lim+ doit-il écrire les coefficients
 remaillés ? Le fichier \verb+limit.nc+ n'est pas très adapté car les
 coefficients ne sont pas sur la grille de la ``physique''. De plus,
-les paramètres chimiques ne sont pas des conditions à la limite. Par
-ailleurs, les paramètres chimiques sont les mêmes dans plusieurs
+les coefficients chimiques ne sont pas des conditions à la limite. Par
+ailleurs, les coefficients chimiques sont les mêmes dans plusieurs
 exécutions successives de \verb+gcm+, donc ils ne peuvent pas être
 dans \verb+start+ ou \verb+startphy+. Nous créons donc un nouveau
 fichier \verb+coefoz_LMDZ.nc+. Cf.
@@ -1750,7 +1743,7 @@ combinaison peut être calculée une fois par jour. Distinguons donc :
   - a_6 \Sigma_\mathrm{Mob} - a_4 T_\mathrm{Mob})
   \frac{\mu_{\mathrm{O}_3}}{\mu_\mathrm{moy}}
 \end{displaymath}
-$c_\mathrm{Mob}$ regroupe les quatre paramètres ``climatologiques''.
+$c_\mathrm{Mob}$ regroupe les quatre coefficients ``climatologiques''.
 On a :
 \begin{displaymath}
   c = c_\mathrm{Mob} + a_4 \frac{\mu_{\mathrm{O}_3}}{\mu_\mathrm{moy}} T
@@ -1782,7 +1775,8 @@ a un indice horizontal simple.
     verts symbolisent des modules. Les procédures du plus bas niveau
     sont celles qui effectuent réellement le remaillage. Elles sont
     les plus générales et ne font pas référence aux notions de
-    pression, latitude ou temps.}
+    pression, latitude ou temps. Entre parenthèses : les opérations
+    non effectuées par les procédures de niveau inférieur.}
   \label{fig:regridding_proced}
 \end{figure}
 Il faut lire dans le fichier \verb+coefoz_LMDZ.nc+, remailler en
@@ -1831,7 +1825,10 @@ Cf. figure (\ref{fig:ozone}).
 \begin{figure}[htbp]
   \centering
   \includegraphics{Graphiques/ozone}
-  \caption{Vue d'ensemble de ce qui concerne le traceur ozone.}
+  \caption{Vue d'ensemble de ce qui concerne le traceur ozone dans les
+    programmes entiers \texttt{etat0\_lim} et \texttt{gcm}. On fait
+    apparaître les fichiers, les principales procédures et variables
+    concernées.}
   \label{fig:ozone}
 \end{figure}
 Les résultats du programme \texttt{gcm} pour l'ozone apparaissent dans
