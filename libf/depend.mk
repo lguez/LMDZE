@@ -164,10 +164,9 @@ radlwsw.o : raddimlw.o radopt.o radepsi.o dimens_m.o YOETHF.o raddim.o YOMCST.o 
 read_reanalyse.o : q_sat.o pression.o exner_hyb.o comconst.o guide.o comgeom.o comvert.o paramet_m.o dimens_m.o 
 readsulfate.o : chem.h YOMCST.o temps.o dimphy.o dimens_m.o 
 regr_lat_time_coefoz.o : regr3_lint.o regr1_step_av.o comconst.o comgeom.o dimens_m.o 
-regr_pr.o : regr1_lint.o grid_change.o pressure_var.o regr1_step_av.o dimens_m.o 
-regr_pr_coefoz.o : press_coefoz.o regr_pr.o grid_change.o dimphy.o dimens_m.o 
+regr_pr_coefoz.o : regr1_lint.o pressure_var.o regr1_step_av.o press_coefoz.o grid_change.o dimphy.o dimens_m.o 
 regr_pr_comb_coefoz.o : phyetat0.o regr_pr_coefoz.o dimphy.o dimens_m.o 
-regr_pr_o3.o : regr_pr.o dimens_m.o conf_gcm.o 
+regr_pr_o3.o : pressure_var.o regr1_step_av.o grid_change.o dimens_m.o conf_gcm.o 
 rotat.o : comgeom.o paramet_m.o dimens_m.o 
 rotat_nfil.o : comgeom.o paramet_m.o dimens_m.o 
 rotatf.o : comgeom.o paramet_m.o dimens_m.o 

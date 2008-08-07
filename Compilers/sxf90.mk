@@ -1,28 +1,32 @@
 # These are compiler dependent macros, meant to be included in the
-# LMDZE makefile.
+# makefile for LMDZE.
 
-# For "sxf90" 2.0 on Brodie
+# For "sxf90" 2.0
 
-COMPILE.f = $(FC) $(F90FLAGS) -c
 FC = sxf90
 
+netcdf_inc_dir = /SXlocal/pub/netCDF/3.6.1/include
+netcdf_lib_dir = /SXlocal/pub/netCDF/3.6.1/lib
+
+numer_rec_dir = ${workdir}/lib/Numer_Rec_Lionel/f
+netcdf95_dir = ${workdir}/lib/NetCDF95_sxf90
+IOIPSL_dir = ${workdir}/lib/IOIPSL_Lionel_am
+
 # Include flags:
-inc_flags = -I${libf_dir} -I${libf_dir}/dyn3d -I${libf_dir}/phylmd -I${libf_dir}/filtrez -I/SXlocal/pub/netCDF/3.6.1/include -I${workdir}/lib/IOIPSL_Lionel_ah -I${workdir}/lib/Numer_Rec_Lionel_f
+inc_flags = $(addprefix -I, ${libf_dir} ${libf_dir}/dyn3d ${libf_dir}/phylmd ${libf_dir}/filtrez ${netcdf_inc_dir} ${numer_rec_dir} ${netcdf95_dir} ${IOIPSL_dir})
 
 # Other flags which do not affect run time performance:
 lang_flags = -f4 -Nw -Wf "-msg b -msg d -msg o -s"
 
 # Flags which affect run time performance:
-perf_flags =
+perf_flags = -Cdebug -eP -eR -Pstack -Wf "-init heap=nan -init stack=nan -K a -M zdiv flovf fxovf inv setall -stmtid"
 
-##-Cdebug -eP -eR -Pstack -Wf "-init heap=nan -init stack=nan -K a -M zdiv flovf fxovf inv setall -stmtid"
 # "-M flunf" produces an error in "jacobi"
 
 FFLAGS = ${inc_flags} ${perf_flags}
 F90FLAGS = ${inc_flags} ${lang_flags} ${perf_flags}
 
-LDFLAGS =
-##-Wl "-f nan"
+LDFLAGS = -Wl "-f nan"
 # "-Wl,-f nan" requires "-Wf,-K a"
 
-LDLIBS = -L${workdir}/lib/IOIPSL_Lionel_ah -lioipsl -L/SXlocal/pub/netCDF/netCDF-3.6.1/lib -lnetcdf -L${workdir}/lib/Numer_Rec_Lionel_f -lnumer_rec
+LDLIBS = $(addprefix -L, ${netcdf_lib_dir} ${numer_rec_dir} ${netcdf95_dir} ${IOIPSL_dir}) -lioipsl -lnetcdf95 -lnetcdf -lnumer_rec

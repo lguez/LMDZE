@@ -9,17 +9,28 @@ contains
     ! "regr_pr_o3" stands for "regrid pressure ozone".
     ! This procedure reads Mobidic ozone mole fraction from
     ! "coefoz_LMDZ.nc" at the initial day and regrids it in pressure.
+    ! Ozone mole fraction from "coefoz_LMDZ.nc" is a 2D latitude --
+    ! pressure variable.
+    ! The target horizontal LMDZ grid is the "scalar" grid: "rlonv", "rlatu".
+    ! The target vertical LMDZ grid is the grid of layer boundaries.
+    ! We assume that the input variable is already on the LMDZ "rlatu"
+    ! latitude grid.
+    ! The input variable does not depend on longitude, but the
+    ! pressure at LMDZ layers does.
+    ! Therefore, the values on the LMDZ grid do depend on longitude.
     ! Regridding is by averaging, assuming a step function.
-    ! We assume that, in the input file, the pressure levels are in hPa
-    ! and strictly increasing.
+    ! We assume that, in the input file, the pressure levels are in
+    ! hPa and strictly increasing.
 
     use conf_gcm_m, only: dayref
     use dimens_m, only: iim, jjm, llm
     use netcdf95, only: nf95_open, nf95_close, nf95_inq_varid, handle_err, &
          nf95_get_coord
     use netcdf, only:  nf90_nowrite, nf90_get_var
-    use regr_pr, only: regr_pr_av
     use numer_rec, only: assert
+    use grid_change, only: dyn_phy
+    use regr1_step_av_m, only: regr1_step_av
+    use pressure_var, only: p3d
 
     real, intent(out):: o3_mob_regr(:, :, :) ! (iim + 1, jjm + 1, llm)
     ! (ozone mole fraction from Mobidic adapted to the LMDZ grid)
@@ -37,7 +48,7 @@ contains
 
     integer ncid, varid, ncerr ! for NetCDF
     integer n_plev ! number of pressure levels in Mobidic data
-    integer j
+    integer i, j
 
     real, allocatable:: r_mob(:, :)! (jjm + 1, n_plev)
     ! (ozone mole fraction from Mobidic at day "dayref")
@@ -78,7 +89,25 @@ contains
 
     call nf95_close(ncid)
 
-    o3_mob_regr = regr_pr_av(r_mob, press_in_edg)
+    ! Regrid in pressure by averaging a step function of pressure.
+    do j = 1, jjm + 1
+       do i = 1, iim
+          if (dyn_phy(i, j)) then
+             o3_mob_regr(i, j, llm:1:-1) &
+                  = regr1_step_av(r_mob(j, :), press_in_edg, &
+                  p3d(i, j, llm+1:1:-1))
+             ! (invert order of indices because "p3d" is decreasing)
+          end if
+       end do
+    end do
+
+    ! Duplicate pole values on all longitudes:
+    o3_mob_regr(2:, 1, :) = spread(o3_mob_regr(1, 1, :), dim=1, ncopies=iim)
+    o3_mob_regr(2:, jjm + 1, :) &
+         = spread(o3_mob_regr(1, jjm + 1, :), dim=1, ncopies=iim)
+
+    ! Duplicate first longitude to last longitude:
+    o3_mob_regr(iim + 1, 2:jjm, :) = o3_mob_regr(1, 2:jjm, :)
 
   end subroutine regr_pr_o3
 

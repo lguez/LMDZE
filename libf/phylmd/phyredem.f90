@@ -69,7 +69,8 @@ contains
     PRINT *, 'Call sequence information: phyredem'
     CALL nf95_create(fichnom, nf90_clobber, nid)
 
-    call nf95_put_att(nid, nf90_global, 'title', 'Fichier redémarrage physique')
+    call nf95_put_att(nid, nf90_global, 'title', &
+         'Fichier redémarrage physique')
     call nf95_put_att(nid, nf90_global, "itau_phy", itau_phy)
 
     ierr = nf_def_dim(nid, 'points_physiques', klon, idim2)

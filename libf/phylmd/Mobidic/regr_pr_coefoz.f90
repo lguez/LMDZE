@@ -1,5 +1,14 @@
 module regr_pr_coefoz
 
+  ! Both procedures of this module read a single Mobidic ozone
+  ! coefficient from "coefoz_LMDZ.nc", at the current day, regrid this
+  ! coefficient in pressure to the LMDZ vertical grid and pack it to the LMDZ
+  ! horizontal "physics" grid.
+  ! The input data is a 2D latitude -- pressure field.
+  ! The target horizontal LMDZ grid is the "scalar" grid: "rlonv", "rlatu".
+  ! We assume that the input data is already on the LMDZ "rlatu"
+  ! latitude grid.
+
   implicit none
 
 contains
@@ -8,10 +17,10 @@ contains
 
     ! "regr_pr_av_coefoz" stands for "regrid pressure averaging
     ! coefficient ozone".
-    ! This procedure reads a single Mobidic ozone coefficient from
-    ! "coefoz_LMDZ.nc", at the current day, regrids this parameter in
-    ! pressure to the LMDZ vertical grid and packs it to the LMDZ
-    ! horizontal "physics" grid.
+    ! The target vertical LMDZ grid is the grid of layer boundaries.
+    ! The input data does not depend on longitude, but the pressure
+    ! at LMDZ layers does.
+    ! Therefore, the values on the LMDZ grid do depend on longitude.
     ! Regridding in pressure is done by averaging a step function.
 
     use dimens_m, only: iim, jjm, llm
@@ -19,9 +28,10 @@ contains
     use netcdf95, only: nf95_inq_varid, handle_err
     use netcdf, only: nf90_get_var
     use grid_change, only: dyn_phy
-    use regr_pr, only: regr_pr_av
     use numer_rec, only: assert
     use press_coefoz_m, only: press_in_edg
+    use regr1_step_av_m, only: regr1_step_av
+    use pressure_var, only: p3d
 
     integer, intent(in):: ncid ! NetCDF ID of the file
     character(len=*), intent(in):: name ! of the NetCDF variable
@@ -34,7 +44,7 @@ contains
 
     ! Variables local to the procedure:
     integer varid, ncerr
-    integer k
+    integer i, j, k
 
     real  v1(jjm + 1, size(press_in_edg) - 1)
     ! (ozone coefficient from "coefoz_LMDZ.nc" at day "julien")
@@ -42,7 +52,7 @@ contains
     ! pressure interval "[press_in_edg(k), press_in_edg(k+1)]".)
 
     real v2(iim + 1, jjm + 1, llm)
-    ! (ozone parameter from Mobidic on the "dynamics" grid)
+    ! (ozone coefficient from Mobidic on the "dynamics" grid)
     ! "v2(i, j, k)" is at longitude "rlonv(i)", latitude
     ! "rlatu(j)", middle of layer "k".)
 
@@ -60,7 +70,16 @@ contains
     v1 = v1(jjm+1:1:-1, :)
 
     ! Regrid in pressure at each horizontal position:
-    v2 = regr_pr_av(v1, press_in_edg)
+    do j = 1, jjm + 1
+       do i = 1, iim
+          if (dyn_phy(i, j)) then
+             v2(i, j, llm:1:-1) &
+                  = regr1_step_av(v1(j, :), press_in_edg, &
+                  p3d(i, j, llm+1:1:-1))
+             ! (invert order of indices because "p3d" is decreasing)
+          end if
+       end do
+    end do
 
     forall (k = 1:llm) v3(:, k) = pack(v2(:, :, k), dyn_phy)
 
@@ -70,10 +89,12 @@ contains
 
   subroutine regr_pr_int_coefoz(ncid, name, julien, top_value, v3)
 
-    ! This procedure reads a single Mobidic ozone coefficient from
-    !"coefoz_LMDZ.nc", at the current day, regrids this parameter in
-    ! pressure to the LMDZ vertical grid and packs it to the LMDZ
-    ! horizontal "physics" grid.
+    ! "regr_pr_int_coefoz" stands for "regrid pressure interpolation
+    ! coefficient ozone".
+    ! The target vertical LMDZ grid is the grid of mid-layers.
+    ! The input data does not depend on longitude, but the pressure
+    ! at LMDZ mid-layers does.
+    ! Therefore, the values on the LMDZ grid do depend on longitude.
     ! Regridding is by linear interpolation.
 
     use dimens_m, only: iim, jjm, llm
@@ -81,9 +102,10 @@ contains
     use netcdf95, only: nf95_inq_varid, handle_err
     use netcdf, only: nf90_get_var
     use grid_change, only: dyn_phy
-    use regr_pr, only: regr_pr_int
     use numer_rec, only: assert
     use press_coefoz_m, only: plev
+    use regr1_lint_m, only: regr1_lint
+    use pressure_var, only: pls
 
     integer, intent(in):: ncid ! NetCDF ID of the file
     character(len=*), intent(in):: name ! of the NetCDF variable
@@ -93,20 +115,20 @@ contains
     ! (extra value of ozone coefficient at 0 pressure)
 
     real, intent(out):: v3(:, :) ! (klon, llm)
-    ! (ozone parameter from Mobidic on the "physics" grid)
+    ! (ozone coefficient from Mobidic on the "physics" grid)
     ! ("v3(i, k)" is at longitude "xlon(i)", latitude
     ! "xlat(i)", middle of layer "k".)
 
     ! Variables local to the procedure:
     integer varid, ncerr
-    integer k
+    integer i, j, k
 
     real  v1(jjm + 1, 0:size(plev))
     ! (ozone coefficient from "coefoz_LMDZ.nc" at day "julien")
     ! ("v1(j, k >=1)" is at latitude "rlatu(j)" and pressure "plev(k)".)
 
     real v2(iim + 1, jjm + 1, llm)
-    ! (ozone parameter from Mobidic on the "dynamics" grid)
+    ! (ozone coefficient from Mobidic on the "dynamics" grid)
     ! "v2(i, j, k)" is at longitude "rlonv(i)", latitude
     ! "rlatu(j)", middle of layer "k".)
 
@@ -127,7 +149,15 @@ contains
     v1(:, 0) = top_value
 
     ! Regrid in pressure at each horizontal position:
-    v2 = regr_pr_int(v1, (/0., plev/))
+    do j = 1, jjm + 1
+       do i = 1, iim
+          if (dyn_phy(i, j)) then
+             v2(i, j, llm:1:-1) &
+                  = regr1_lint(v1(j, :), (/0., plev/), pls(i, j, llm:1:-1))
+             ! (invert order of indices because "pls" is decreasing)
+          end if
+       end do
+    end do
 
     forall (k = 1:llm) v3(:, k) = pack(v2(:, :, k), dyn_phy)
 
