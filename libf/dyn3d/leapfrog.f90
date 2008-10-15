@@ -94,7 +94,7 @@ contains
 
     INTEGER itau, itaufinp1
     INTEGER iday ! jour julien
-    REAL time ! Heure de la journee en fraction d'1 jour
+    REAL time ! time of day, as a fraction of day length
 
     REAL SSUM
     real finvmaold(ip1jmp1, llm)
@@ -335,7 +335,7 @@ contains
                 dt = 2. * dtvr
              END IF
           ELSE
-             ! ...... pas leapfrog .....
+             ! pas leapfrog
              leapf = .TRUE.
              dt = 2. * dtvr
           END IF

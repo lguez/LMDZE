@@ -8,16 +8,16 @@ trap 'echo -e \\a; exit 1' ERR
 
 # Specify directories:
 
-REL_dir=/usr/local/guez/LMDZE_work/Results_etat0_lim
+REL_dir=/usr/local/guez/LMDZ/LMDZE_work/Results_etat0_lim
 ##REL_dir=$workdir/LMDZE/Results_etat0_lim
 
 IGCM_dir=~/Documents/Utilisation_LMDZ/Input_gcm
 ##IGCM_dir=~
 
-executable_dir=/usr/local/guez/LMDZE_work/Compil_prod_g95
+executable_dir=/usr/local/guez/LMDZ/LMDZE_work/Compil_prod_g95
 ##executable_dir=$workdir/LMDZE/Compil_prod
 
-RGCM_dir=/usr/local/guez/LMDZE_work/Results_gcm
+RGCM_dir=/usr/local/guez/LMDZ/LMDZE_work/Results_gcm
 ##RGCM_dir=$workdir/LMDZE/Results_gcm
 # (used only for a restart or a comparison)
 

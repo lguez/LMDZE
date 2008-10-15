@@ -6,9 +6,9 @@ module comvert
 
   private llm
 
-  real ap(llm+1) ! in Pa
+  real ap(llm+1), pa ! in Pa
   real bp(llm+1), dpres(llm)
-  real presnivs(llm), pa ! in Pa
+  real presnivs(llm) ! pressions approximatives des milieux couches, en Pa
   real, parameter:: preff = 101325. ! in Pa
   real nivsigs(llm), nivsig(llm+1)
 

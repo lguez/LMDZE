@@ -18,10 +18,10 @@ contains
     USE dimphy, ONLY : klev, klon, zmasq
     USE dimsoil, ONLY : nsoilmx
     USE temps, ONLY : itau_phy
-    USE netcdf95, ONLY : nf95_create, nf95_put_att
-    USE netcdf, ONLY : nf90_clobber, nf90_global
-
-    INCLUDE 'netcdf.inc'
+    USE netcdf95, ONLY : nf95_create, nf95_put_att, nf95_def_dim, &
+         nf95_def_var, nf95_enddef, nf95_redef
+    USE netcdf, ONLY : nf90_clobber, nf90_global, nf90_float, nf90_put_var, &
+         nf90_close
 
     CHARACTER(len=*) fichnom
     REAL, INTENT (IN) :: rlat(klon), rlon(klon)
@@ -73,341 +73,341 @@ contains
          'Fichier redémarrage physique')
     call nf95_put_att(nid, nf90_global, "itau_phy", itau_phy)
 
-    ierr = nf_def_dim(nid, 'points_physiques', klon, idim2)
-    ierr = nf_def_dim(nid, 'horizon_vertical', klon*klev, idim3)
+    call nf95_def_dim(nid, 'points_physiques', klon, idim2)
+    call nf95_def_dim(nid, 'horizon_vertical', klon*klev, idim3)
 
-    ierr = nf_def_var(nid, 'longitude', nf_float, 1, idim2, nvarid)
-    ierr = nf_put_att_text(nid, nvarid, 'title', 32, &
+    call nf95_def_var(nid, 'longitude', nf90_float, idim2, nvarid)
+    call nf95_put_att(nid, nvarid, 'title', &
          'Longitudes de la grille physique')
-    ierr = nf_enddef(nid)
-    ierr = nf_put_var_real(nid, nvarid, rlon)
+    call nf95_enddef(nid)
+    ierr = nf90_put_var(nid, nvarid, rlon)
 
-    ierr = nf_redef(nid)
-    ierr = nf_def_var(nid, 'latitude', nf_float, 1, idim2, nvarid)
-    ierr = nf_put_att_text(nid, nvarid, 'title', 31, &
+    call nf95_redef(nid)
+    call nf95_def_var(nid, 'latitude', nf90_float, idim2, nvarid)
+    call nf95_put_att(nid, nvarid, 'title', &
          'Latitudes de la grille physique')
-    ierr = nf_enddef(nid)
-    ierr = nf_put_var_real(nid, nvarid, rlat)
+    call nf95_enddef(nid)
+    ierr = nf90_put_var(nid, nvarid, rlat)
 
     ! PB ajout du masque terre/mer
 
-    ierr = nf_redef(nid)
-    ierr = nf_def_var(nid, 'masque', nf_float, 1, idim2, nvarid)
-    ierr = nf_put_att_text(nid, nvarid, 'title', 16, 'masque terre mer')
-    ierr = nf_enddef(nid)
-    ierr = nf_put_var_real(nid, nvarid, zmasq)
+    call nf95_redef(nid)
+    call nf95_def_var(nid, 'masque', nf90_float, idim2, nvarid)
+    call nf95_put_att(nid, nvarid, 'title', 'masque terre mer')
+    call nf95_enddef(nid)
+    ierr = nf90_put_var(nid, nvarid, zmasq)
     ! BP ajout des fraction de chaque sous-surface
 
     ! 1. fraction de terre
 
-    ierr = nf_redef(nid)
-    ierr = nf_def_var(nid, 'FTER', nf_float, 1, idim2, nvarid)
-    ierr = nf_put_att_text(nid, nvarid, 'title', 21, 'fraction de continent')
-    ierr = nf_enddef(nid)
-    ierr = nf_put_var_real(nid, nvarid, pctsrf(1:klon, is_ter))
+    call nf95_redef(nid)
+    call nf95_def_var(nid, 'FTER', nf90_float, idim2, nvarid)
+    call nf95_put_att(nid, nvarid, 'title', 'fraction de continent')
+    call nf95_enddef(nid)
+    ierr = nf90_put_var(nid, nvarid, pctsrf(:, is_ter))
 
     ! 2. Fraction de glace de terre
 
-    ierr = nf_redef(nid)
-    ierr = nf_def_var(nid, 'FLIC', nf_float, 1, idim2, nvarid)
-    ierr = nf_put_att_text(nid, nvarid, 'title', 24, 'fraction glace de terre')
-    ierr = nf_enddef(nid)
-    ierr = nf_put_var_real(nid, nvarid, pctsrf(1:klon, is_lic))
+    call nf95_redef(nid)
+    call nf95_def_var(nid, 'FLIC', nf90_float, idim2, nvarid)
+    call nf95_put_att(nid, nvarid, 'title', 'fraction glace de terre')
+    call nf95_enddef(nid)
+    ierr = nf90_put_var(nid, nvarid, pctsrf(:, is_lic))
 
     ! 3. fraction ocean
 
-    ierr = nf_redef(nid)
-    ierr = nf_def_var(nid, 'FOCE', nf_float, 1, idim2, nvarid)
-    ierr = nf_put_att_text(nid, nvarid, 'title', 14, 'fraction ocean')
-    ierr = nf_enddef(nid)
-    ierr = nf_put_var_real(nid, nvarid, pctsrf(1:klon, is_oce))
+    call nf95_redef(nid)
+    call nf95_def_var(nid, 'FOCE', nf90_float, idim2, nvarid)
+    call nf95_put_att(nid, nvarid, 'title', 'fraction ocean')
+    call nf95_enddef(nid)
+    ierr = nf90_put_var(nid, nvarid, pctsrf(:, is_oce))
 
     ! 4. Fraction glace de mer
 
-    ierr = nf_redef(nid)
-    ierr = nf_def_var(nid, 'FSIC', nf_float, 1, idim2, nvarid)
-    ierr = nf_put_att_text(nid, nvarid, 'title', 18, 'fraction glace mer')
-    ierr = nf_enddef(nid)
-    ierr = nf_put_var_real(nid, nvarid, pctsrf(1:klon, is_sic))
+    call nf95_redef(nid)
+    call nf95_def_var(nid, 'FSIC', nf90_float, idim2, nvarid)
+    call nf95_put_att(nid, nvarid, 'title', 'fraction glace mer')
+    call nf95_enddef(nid)
+    ierr = nf90_put_var(nid, nvarid, pctsrf(:, is_sic))
 
 
 
     DO nsrf = 1, nbsrf
        IF (nsrf<=99) THEN
           WRITE (str2, '(i2.2)') nsrf
-          ierr = nf_redef(nid)
-          ierr = nf_def_var(nid, 'TS'//str2, nf_float, 1, idim2, nvarid)
-          ierr = nf_put_att_text(nid, nvarid, 'title', 28, &
+          call nf95_redef(nid)
+          call nf95_def_var(nid, 'TS'//str2, nf90_float, idim2, nvarid)
+          call nf95_put_att(nid, nvarid, 'title', &
                'Temperature de surface No.'//str2)
-          ierr = nf_enddef(nid)
+          call nf95_enddef(nid)
        ELSE
           PRINT *, 'Trop de sous-mailles'
           STOP 1
        END IF
-       ierr = nf_put_var_real(nid, nvarid, tsol(1, nsrf))
+       ierr = nf90_put_var(nid, nvarid, tsol(:, nsrf))
     END DO
 
     DO nsrf = 1, nbsrf
        DO isoil = 1, nsoilmx
           IF (isoil<=99 .AND. nsrf<=99) THEN
              WRITE (str7, '(i2.2, "srf", i2.2)') isoil, nsrf
-             ierr = nf_redef(nid)
-             ierr = nf_def_var(nid, 'Tsoil'//str7, nf_float, 1, idim2, nvarid)
-             ierr = nf_put_att_text(nid, nvarid, 'title', 29, &
+             call nf95_redef(nid)
+             call nf95_def_var(nid, 'Tsoil'//str7, nf90_float, idim2, nvarid)
+             call nf95_put_att(nid, nvarid, 'title', &
                   'Temperature du sol No.'//str7)
-             ierr = nf_enddef(nid)
+             call nf95_enddef(nid)
           ELSE
              PRINT *, 'Trop de couches'
              STOP 1
           END IF
-          ierr = nf_put_var_real(nid, nvarid, tsoil(1, isoil, nsrf))
+          ierr = nf90_put_var(nid, nvarid, tsoil(:, isoil, nsrf))
        END DO
     END DO
 
     !IM "slab" ocean
-    ierr = nf_redef(nid)
-    ierr = nf_def_var(nid, 'TSLAB', nf_float, 1, idim2, nvarid)
-    ierr = nf_put_att_text(nid, nvarid, 'title', 33, &
+    call nf95_redef(nid)
+    call nf95_def_var(nid, 'TSLAB', nf90_float, idim2, nvarid)
+    call nf95_put_att(nid, nvarid, 'title', &
          'Ecart de la SST (pour slab-ocean)')
-    ierr = nf_enddef(nid)
-    ierr = nf_put_var_real(nid, nvarid, tslab)
+    call nf95_enddef(nid)
+    ierr = nf90_put_var(nid, nvarid, tslab)
 
-    ierr = nf_redef(nid)
-    ierr = nf_def_var(nid, 'SEAICE', nf_float, 1, idim2, nvarid)
-    ierr = nf_put_att_text(nid, nvarid, 'title', 33, &
+    call nf95_redef(nid)
+    call nf95_def_var(nid, 'SEAICE', nf90_float, idim2, nvarid)
+    call nf95_put_att(nid, nvarid, 'title', &
          'Glace de mer kg/m2 (pour slab-ocean)')
-    ierr = nf_enddef(nid)
-    ierr = nf_put_var_real(nid, nvarid, seaice)
+    call nf95_enddef(nid)
+    ierr = nf90_put_var(nid, nvarid, seaice)
 
     DO nsrf = 1, nbsrf
        IF (nsrf<=99) THEN
           WRITE (str2, '(i2.2)') nsrf
-          ierr = nf_redef(nid)
-          ierr = nf_def_var(nid, 'QS'//str2, nf_float, 1, idim2, nvarid)
-          ierr = nf_put_att_text(nid, nvarid, 'title', 25, &
+          call nf95_redef(nid)
+          call nf95_def_var(nid, 'QS'//str2, nf90_float, idim2, nvarid)
+          call nf95_put_att(nid, nvarid, 'title', &
                'Humidite de surface No.'//str2)
-          ierr = nf_enddef(nid)
+          call nf95_enddef(nid)
        ELSE
           PRINT *, 'Trop de sous-mailles'
           STOP 1
        END IF
-       ierr = nf_put_var_real(nid, nvarid, qsurf(1, nsrf))
+       ierr = nf90_put_var(nid, nvarid, qsurf(:, nsrf))
     END DO
 
-    ierr = nf_redef(nid)
-    ierr = nf_def_var(nid, 'QSOL', nf_float, 1, idim2, nvarid)
-    ierr = nf_put_att_text(nid, nvarid, 'title', 20, 'Eau dans le sol (mm)')
-    ierr = nf_enddef(nid)
-    ierr = nf_put_var_real(nid, nvarid, qsol)
+    call nf95_redef(nid)
+    call nf95_def_var(nid, 'QSOL', nf90_float, idim2, nvarid)
+    call nf95_put_att(nid, nvarid, 'title', 'Eau dans le sol (mm)')
+    call nf95_enddef(nid)
+    ierr = nf90_put_var(nid, nvarid, qsol)
 
     DO nsrf = 1, nbsrf
        IF (nsrf<=99) THEN
           WRITE (str2, '(i2.2)') nsrf
-          ierr = nf_redef(nid)
-          ierr = nf_def_var(nid, 'ALBE'//str2, nf_float, 1, idim2, nvarid)
-          ierr = nf_put_att_text(nid, nvarid, 'title', 23, &
+          call nf95_redef(nid)
+          call nf95_def_var(nid, 'ALBE'//str2, nf90_float, idim2, nvarid)
+          call nf95_put_att(nid, nvarid, 'title', &
                'albedo de surface No.'//str2)
-          ierr = nf_enddef(nid)
+          call nf95_enddef(nid)
        ELSE
           PRINT *, 'Trop de sous-mailles'
           STOP 1
        END IF
-       ierr = nf_put_var_real(nid, nvarid, albedo(1, nsrf))
+       ierr = nf90_put_var(nid, nvarid, albedo(:, nsrf))
     END DO
 
     !IM BEG albedo LW
     DO nsrf = 1, nbsrf
        IF (nsrf<=99) THEN
           WRITE (str2, '(i2.2)') nsrf
-          ierr = nf_redef(nid)
-          ierr = nf_def_var(nid, 'ALBLW'//str2, nf_float, 1, idim2, nvarid)
-          ierr = nf_put_att_text(nid, nvarid, 'title', 23, &
+          call nf95_redef(nid)
+          call nf95_def_var(nid, 'ALBLW'//str2, nf90_float, idim2, nvarid)
+          call nf95_put_att(nid, nvarid, 'title', &
                'albedo LW de surface No.'//str2)
-          ierr = nf_enddef(nid)
+          call nf95_enddef(nid)
        ELSE
           PRINT *, 'Trop de sous-mailles'
           STOP 1
        END IF
-       ierr = nf_put_var_real(nid, nvarid, alblw(1, nsrf))
+       ierr = nf90_put_var(nid, nvarid, alblw(:, nsrf))
     END DO
     !IM END albedo LW
 
     DO nsrf = 1, nbsrf
        IF (nsrf<=99) THEN
           WRITE (str2, '(i2.2)') nsrf
-          ierr = nf_redef(nid)
-          ierr = nf_def_var(nid, 'EVAP'//str2, nf_float, 1, idim2, nvarid)
-          ierr = nf_put_att_text(nid, nvarid, 'title', 28, &
+          call nf95_redef(nid)
+          call nf95_def_var(nid, 'EVAP'//str2, nf90_float, idim2, nvarid)
+          call nf95_put_att(nid, nvarid, 'title', &
                'Evaporation de surface No.'//str2)
-          ierr = nf_enddef(nid)
+          call nf95_enddef(nid)
        ELSE
           PRINT *, 'Trop de sous-mailles'
           STOP 1
        END IF
-       ierr = nf_put_var_real(nid, nvarid, evap(1, nsrf))
+       ierr = nf90_put_var(nid, nvarid, evap(:, nsrf))
     END DO
 
 
     DO nsrf = 1, nbsrf
        IF (nsrf<=99) THEN
           WRITE (str2, '(i2.2)') nsrf
-          ierr = nf_redef(nid)
-          ierr = nf_def_var(nid, 'SNOW'//str2, nf_float, 1, idim2, nvarid)
-          ierr = nf_put_att_text(nid, nvarid, 'title', 22, &
+          call nf95_redef(nid)
+          call nf95_def_var(nid, 'SNOW'//str2, nf90_float, idim2, nvarid)
+          call nf95_put_att(nid, nvarid, 'title', &
                'Neige de surface No.'//str2)
-          ierr = nf_enddef(nid)
+          call nf95_enddef(nid)
        ELSE
           PRINT *, 'Trop de sous-mailles'
           STOP 1
        END IF
-       ierr = nf_put_var_real(nid, nvarid, snow(1, nsrf))
+       ierr = nf90_put_var(nid, nvarid, snow(:, nsrf))
     END DO
 
 
-    ierr = nf_redef(nid)
-    ierr = nf_def_var(nid, 'RADS', nf_float, 1, idim2, nvarid)
-    ierr = nf_put_att_text(nid, nvarid, 'title', 28, &
+    call nf95_redef(nid)
+    call nf95_def_var(nid, 'RADS', nf90_float, idim2, nvarid)
+    call nf95_put_att(nid, nvarid, 'title', &
          'Rayonnement net a la surface')
-    ierr = nf_enddef(nid)
-    ierr = nf_put_var_real(nid, nvarid, radsol)
+    call nf95_enddef(nid)
+    ierr = nf90_put_var(nid, nvarid, radsol)
 
-    ierr = nf_redef(nid)
-    ierr = nf_def_var(nid, 'solsw', nf_float, 1, idim2, nvarid)
-    ierr = nf_put_att_text(nid, nvarid, 'title', 32, &
+    call nf95_redef(nid)
+    call nf95_def_var(nid, 'solsw', nf90_float, idim2, nvarid)
+    call nf95_put_att(nid, nvarid, 'title', &
          'Rayonnement solaire a la surface')
-    ierr = nf_enddef(nid)
-    ierr = nf_put_var_real(nid, nvarid, solsw)
+    call nf95_enddef(nid)
+    ierr = nf90_put_var(nid, nvarid, solsw)
 
-    ierr = nf_redef(nid)
-    ierr = nf_def_var(nid, 'sollw', nf_float, 1, idim2, nvarid)
-    ierr = nf_put_att_text(nid, nvarid, 'title', 27, &
+    call nf95_redef(nid)
+    call nf95_def_var(nid, 'sollw', nf90_float, idim2, nvarid)
+    call nf95_put_att(nid, nvarid, 'title', &
          'Rayonnement IF a la surface')
-    ierr = nf_enddef(nid)
-    ierr = nf_put_var_real(nid, nvarid, sollw)
+    call nf95_enddef(nid)
+    ierr = nf90_put_var(nid, nvarid, sollw)
 
-    ierr = nf_redef(nid)
-    ierr = nf_def_var(nid, 'fder', nf_float, 1, idim2, nvarid)
-    ierr = nf_put_att_text(nid, nvarid, 'title', 14, 'Derive de flux')
-    ierr = nf_enddef(nid)
-    ierr = nf_put_var_real(nid, nvarid, fder)
+    call nf95_redef(nid)
+    call nf95_def_var(nid, 'fder', nf90_float, idim2, nvarid)
+    call nf95_put_att(nid, nvarid, 'title', 'Derive de flux')
+    call nf95_enddef(nid)
+    ierr = nf90_put_var(nid, nvarid, fder)
 
-    ierr = nf_redef(nid)
-    ierr = nf_def_var(nid, 'rain_f', nf_float, 1, idim2, nvarid)
-    ierr = nf_put_att_text(nid, nvarid, 'title', 21, 'precipitation liquide')
-    ierr = nf_enddef(nid)
-    ierr = nf_put_var_real(nid, nvarid, rain_fall)
+    call nf95_redef(nid)
+    call nf95_def_var(nid, 'rain_f', nf90_float, idim2, nvarid)
+    call nf95_put_att(nid, nvarid, 'title', 'precipitation liquide')
+    call nf95_enddef(nid)
+    ierr = nf90_put_var(nid, nvarid, rain_fall)
 
-    ierr = nf_redef(nid)
-    ierr = nf_def_var(nid, 'snow_f', nf_float, 1, idim2, nvarid)
-    ierr = nf_put_att_text(nid, nvarid, 'title', 20, 'precipitation solide')
-    ierr = nf_enddef(nid)
-    ierr = nf_put_var_real(nid, nvarid, snow_fall)
+    call nf95_redef(nid)
+    call nf95_def_var(nid, 'snow_f', nf90_float, idim2, nvarid)
+    call nf95_put_att(nid, nvarid, 'title', 'precipitation solide')
+    call nf95_enddef(nid)
+    ierr = nf90_put_var(nid, nvarid, snow_fall)
 
     DO nsrf = 1, nbsrf
        IF (nsrf<=99) THEN
           WRITE (str2, '(i2.2)') nsrf
-          ierr = nf_redef(nid)
-          ierr = nf_def_var(nid, 'RUG'//str2, nf_float, 1, idim2, nvarid)
-          ierr = nf_put_att_text(nid, nvarid, 'title', 23, &
+          call nf95_redef(nid)
+          call nf95_def_var(nid, 'RUG'//str2, nf90_float, idim2, nvarid)
+          call nf95_put_att(nid, nvarid, 'title', &
                'rugosite de surface No.'//str2)
-          ierr = nf_enddef(nid)
+          call nf95_enddef(nid)
        ELSE
           PRINT *, 'Trop de sous-mailles'
           STOP 1
        END IF
-       ierr = nf_put_var_real(nid, nvarid, frugs(1, nsrf))
+       ierr = nf90_put_var(nid, nvarid, frugs(:, nsrf))
     END DO
 
     DO nsrf = 1, nbsrf
        IF (nsrf<=99) THEN
           WRITE (str2, '(i2.2)') nsrf
-          ierr = nf_redef(nid)
-          ierr = nf_def_var(nid, 'AGESNO'//str2, nf_float, 1, idim2, nvarid)
-          ierr = nf_put_att_text(nid, nvarid, 'title', 15, &
+          call nf95_redef(nid)
+          call nf95_def_var(nid, 'AGESNO'//str2, nf90_float, idim2, nvarid)
+          call nf95_put_att(nid, nvarid, 'title', &
                'Age de la neige surface No.'//str2)
-          ierr = nf_enddef(nid)
+          call nf95_enddef(nid)
        ELSE
           PRINT *, 'Trop de sous-mailles'
           STOP 1
        END IF
-       ierr = nf_put_var_real(nid, nvarid, agesno(1, nsrf))
+       ierr = nf90_put_var(nid, nvarid, agesno(:, nsrf))
     END DO
 
-    ierr = nf_redef(nid)
-    ierr = nf_def_var(nid, 'ZMEA', nf_float, 1, idim2, nvarid)
-    ierr = nf_enddef(nid)
-    ierr = nf_put_var_real(nid, nvarid, zmea)
+    call nf95_redef(nid)
+    call nf95_def_var(nid, 'ZMEA', nf90_float, idim2, nvarid)
+    call nf95_enddef(nid)
+    ierr = nf90_put_var(nid, nvarid, zmea)
 
-    ierr = nf_redef(nid)
-    ierr = nf_def_var(nid, 'ZSTD', nf_float, 1, idim2, nvarid)
-    ierr = nf_enddef(nid)
-    ierr = nf_put_var_real(nid, nvarid, zstd)
-    ierr = nf_redef(nid)
-    ierr = nf_def_var(nid, 'ZSIG', nf_float, 1, idim2, nvarid)
-    ierr = nf_enddef(nid)
-    ierr = nf_put_var_real(nid, nvarid, zsig)
-    ierr = nf_redef(nid)
-    ierr = nf_def_var(nid, 'ZGAM', nf_float, 1, idim2, nvarid)
-    ierr = nf_enddef(nid)
-    ierr = nf_put_var_real(nid, nvarid, zgam)
-    ierr = nf_redef(nid)
-    ierr = nf_def_var(nid, 'ZTHE', nf_float, 1, idim2, nvarid)
-    ierr = nf_enddef(nid)
-    ierr = nf_put_var_real(nid, nvarid, zthe)
-    ierr = nf_redef(nid)
-    ierr = nf_def_var(nid, 'ZPIC', nf_float, 1, idim2, nvarid)
-    ierr = nf_enddef(nid)
-    ierr = nf_put_var_real(nid, nvarid, zpic)
-    ierr = nf_redef(nid)
-    ierr = nf_def_var(nid, 'ZVAL', nf_float, 1, idim2, nvarid)
-    ierr = nf_enddef(nid)
-    ierr = nf_put_var_real(nid, nvarid, zval)
+    call nf95_redef(nid)
+    call nf95_def_var(nid, 'ZSTD', nf90_float, idim2, nvarid)
+    call nf95_enddef(nid)
+    ierr = nf90_put_var(nid, nvarid, zstd)
+    call nf95_redef(nid)
+    call nf95_def_var(nid, 'ZSIG', nf90_float, idim2, nvarid)
+    call nf95_enddef(nid)
+    ierr = nf90_put_var(nid, nvarid, zsig)
+    call nf95_redef(nid)
+    call nf95_def_var(nid, 'ZGAM', nf90_float, idim2, nvarid)
+    call nf95_enddef(nid)
+    ierr = nf90_put_var(nid, nvarid, zgam)
+    call nf95_redef(nid)
+    call nf95_def_var(nid, 'ZTHE', nf90_float, idim2, nvarid)
+    call nf95_enddef(nid)
+    ierr = nf90_put_var(nid, nvarid, zthe)
+    call nf95_redef(nid)
+    call nf95_def_var(nid, 'ZPIC', nf90_float, idim2, nvarid)
+    call nf95_enddef(nid)
+    ierr = nf90_put_var(nid, nvarid, zpic)
+    call nf95_redef(nid)
+    call nf95_def_var(nid, 'ZVAL', nf90_float, idim2, nvarid)
+    call nf95_enddef(nid)
+    ierr = nf90_put_var(nid, nvarid, zval)
 
-    ierr = nf_redef(nid)
-    ierr = nf_def_var(nid, 'TANCIEN', nf_float, 1, idim3, nvarid)
-    ierr = nf_enddef(nid)
-    ierr = nf_put_var_real(nid, nvarid, t_ancien)
+    call nf95_redef(nid)
+    call nf95_def_var(nid, 'TANCIEN', nf90_float, idim3, nvarid)
+    call nf95_enddef(nid)
+    ierr = nf90_put_var(nid, nvarid, t_ancien)
 
-    ierr = nf_redef(nid)
-    ierr = nf_def_var(nid, 'QANCIEN', nf_float, 1, idim3, nvarid)
-    ierr = nf_enddef(nid)
-    ierr = nf_put_var_real(nid, nvarid, q_ancien)
+    call nf95_redef(nid)
+    call nf95_def_var(nid, 'QANCIEN', nf90_float, idim3, nvarid)
+    call nf95_enddef(nid)
+    ierr = nf90_put_var(nid, nvarid, q_ancien)
 
-    ierr = nf_redef(nid)
-    ierr = nf_def_var(nid, 'RUGMER', nf_float, 1, idim2, nvarid)
-    ierr = nf_put_att_text(nid, nvarid, 'title', 28, &
+    call nf95_redef(nid)
+    call nf95_def_var(nid, 'RUGMER', nf90_float, idim2, nvarid)
+    call nf95_put_att(nid, nvarid, 'title', &
          'Longueur de rugosite sur mer')
-    ierr = nf_enddef(nid)
-    ierr = nf_put_var_real(nid, nvarid, frugs(1, is_oce))
+    call nf95_enddef(nid)
+    ierr = nf90_put_var(nid, nvarid, frugs(:, is_oce))
 
-    ierr = nf_redef(nid)
-    ierr = nf_def_var(nid, 'CLWCON', nf_float, 1, idim2, nvarid)
-    ierr = nf_put_att_text(nid, nvarid, 'title', 28, 'Eau liquide convective')
-    ierr = nf_enddef(nid)
-    ierr = nf_put_var_real(nid, nvarid, clwcon)
+    call nf95_redef(nid)
+    call nf95_def_var(nid, 'CLWCON', nf90_float, idim2, nvarid)
+    call nf95_put_att(nid, nvarid, 'title', 'Eau liquide convective')
+    call nf95_enddef(nid)
+    ierr = nf90_put_var(nid, nvarid, clwcon)
 
-    ierr = nf_redef(nid)
-    ierr = nf_def_var(nid, 'RNEBCON', nf_float, 1, idim2, nvarid)
-    ierr = nf_put_att_text(nid, nvarid, 'title', 28, 'Nebulosite convective')
-    ierr = nf_enddef(nid)
-    ierr = nf_put_var_real(nid, nvarid, rnebcon)
+    call nf95_redef(nid)
+    call nf95_def_var(nid, 'RNEBCON', nf90_float, idim2, nvarid)
+    call nf95_put_att(nid, nvarid, 'title', 'Nebulosite convective')
+    call nf95_enddef(nid)
+    ierr = nf90_put_var(nid, nvarid, rnebcon)
 
-    ierr = nf_redef(nid)
-    ierr = nf_def_var(nid, 'RATQS', nf_float, 1, idim2, nvarid)
-    ierr = nf_put_att_text(nid, nvarid, 'title', 5, 'Ratqs')
-    ierr = nf_enddef(nid)
-    ierr = nf_put_var_real(nid, nvarid, ratqs)
+    call nf95_redef(nid)
+    call nf95_def_var(nid, 'RATQS', nf90_float, idim2, nvarid)
+    call nf95_put_att(nid, nvarid, 'title', 'Ratqs')
+    call nf95_enddef(nid)
+    ierr = nf90_put_var(nid, nvarid, ratqs)
 
     ! run_off_lic_0
 
-    ierr = nf_redef(nid)
-    ierr = nf_def_var(nid, 'RUNOFFLIC0', nf_float, 1, idim2, nvarid)
-    ierr = nf_put_att_text(nid, nvarid, 'title', 10, 'Runofflic0')
-    ierr = nf_enddef(nid)
-    ierr = nf_put_var_real(nid, nvarid, run_off_lic_0)
+    call nf95_redef(nid)
+    call nf95_def_var(nid, 'RUNOFFLIC0', nf90_float, idim2, nvarid)
+    call nf95_put_att(nid, nvarid, 'title', 'Runofflic0')
+    call nf95_enddef(nid)
+    ierr = nf90_put_var(nid, nvarid, run_off_lic_0)
 
 
-    ierr = nf_close(nid)
+    ierr = nf90_close(nid)
 
   END SUBROUTINE phyredem
 

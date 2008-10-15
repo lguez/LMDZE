@@ -89,7 +89,7 @@ contains
 
     call nf95_close(ncid)
 
-    ! Regrid in pressure by averaging a step function of pressure.
+    ! Regrid in pressure by averaging a step function of pressure:
     do j = 1, jjm + 1
        do i = 1, iim
           if (dyn_phy(i, j)) then

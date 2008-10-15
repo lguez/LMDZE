@@ -137,10 +137,17 @@ et \verb+amipbc_sst_1x1.nc+ viennent du projet
 
 \verb+Rugos.nc+ contient la contribution saisonnière de la longueur de
 rugosité (excluant la contribution des variations de relief). Ces
-données viennent de la NASA. \verb+Relief.nc+ contient des données de
-la NASA, corrigées sur l'antarctique, probablement par Gerhard Krinner
-à partir de données Radar. \verb+Albedo.nc+ contient probablement des
+données viennent de la NASA. \verb+Albedo.nc+ contient probablement des
 données de Yann Polcher.
+
+\verb+Relief.nc+ contient peut-être des données de la NASA, corrigées
+sur l'Antarctique, peut-être par Gerhard Krinner à partir de données
+Radar. Origines possibles :
+\href{http://dss.ucar.edu/datasets/ds754.0}{U.S. Navy 10-Minute Global
+  Elevation and Geographic Characteristics},
+\href{ftp://ftp.ngdc.noaa.gov/Solid_Earth/cdroms/TerrainBase_94/data/global/fnoc}{U.S.
+  Navy Fleet Numeric Oceanography Center Global 10-Minute digital
+  terrain model}. Cf. Webster [2003, § 2] et Joseph [1980].
 
 L'équipe de développement d'Orchidée a peut-être des informations sur
 l'origine du fichier \verb+landiceref.nc+. Dans ce fichier, la
@@ -964,48 +971,68 @@ distributions finales sont écrites dans \verb+restart.nc+ par
 \verb+dynredem1+. Par ailleurs, la concentration de radon dans le sol
 est écrite dans \verb+restarttrac+ par \verb+phytrac+.
 
-\subsection{L'ozone en tant que traceur}
+Si on encadre les valeurs de l'abondance d'un traceur, on fausse le
+bilan de masse pour ce traceur.
 
-Résumé. On part d'une certaine paramétrisation de la chimie
-stratosphérique de l'ozone, préparée par Daniel Cariolle et Hubert
-Teyssèdre. La paramétrisation calcule en chaque point une production
+\subsection{L'ozone}
+
+Résumé. On part d'une paramétrisation de la chimie stratosphérique de
+l'ozone, préparée par Daniel Cariolle et Hubert Teyssèdre (version
+2.3). La paramétrisation calcule en chaque point une production
 chimique d'ozone. On suit l'ozone ainsi produit comme un traceur. Les
 coefficients chimiques sont remaillés pour LMDZ, en latitude et en
 temps, dans \verb+etat0_lim+. Le remaillage vertical est fait une fois
 par jour dans \verb+gcm+. On néglige donc l'effet sur le remaillage de
 la variation temporelle de pression à la surface pendant une journée.
 Le champ initial d'ozone spécifié dans \verb+etat0_lim+ est le champ
-de référence de D. Cariolle (un des coefficients). Pour les passages de
-fraction molaire d'ozone à fraction massique, on néglige la présence
-de vapeur d'eau dans l'air.  L'évolution de la fraction massique
-d'ozone pendant un pas de temps de la physique est calculée dans
-\verb+phytrac+ : les contributions du transport et de la chimie sont
-intégrées séparément. La température, la masse volumique de l'air et
-la direction du Soleil sont considérées comme constantes pendant un
+de référence de D. Cariolle (un des coefficients). Pour les passages
+de fraction molaire d'ozone à fraction massique, on néglige la
+présence de vapeur d'eau dans l'air.  L'évolution de la fraction
+massique d'ozone pendant un pas de temps de la physique est calculée
+dans \verb+phytrac+ : les contributions du transport et de la chimie
+sont intégrées séparément. La température, la masse volumique de l'air
+et la direction du Soleil sont considérées comme constantes pendant un
 pas de temps de la physique. Un des coefficients de D. Cariolle est la
 densité-colonne d'ozone au dessus d'un point donné. Cette
 densité-colonne est calculée dans l'approximation ``plans
 parallèles''. La production chimique est intégrée pendant un pas de
 temps de la physique par la méthode du point milieu. Une fois par jour
 de simulation, dans \verb+gcm+, une procédure lit dans un fichier tous
-les coefficients chimiques au bon jour, remaillés en latitude pour LMDZ.
+les coefficients chimiques au bon jour, remaillés en latitude pour
+LMDZ.
 
 Cf. Cariolle (1986 \#761),
 \href{file:/user/guez/Documents/Commentaires_lectures/Autres_publications/-1991/Cariolle_1986_761.texfol/Cariolle_1986_761.dvi}{commentaires
   sur Cariolle (1986 \# 761)}, texte des courriels (François L.,
-29/11/6 ; D. Cariolle, 29/11/6 ; François L., 12/1/7), fichiers
-\verb+O3_readme.txt+ de D. Cariolle et \verb+coefoz_v2_3.nc+.
+29/11/6 ; D. Cariolle, 29/11/6 ; François L., 12/1/7),
+\href{file:///user/guez/Documents/Informatique_fonctionnement/O3_Cariolle.txt}{fiche}
+de D. Cariolle, \verb+coefoz_v2_3.nc+, Cariolle (2007 \#772).
 Attention : les symboles ne désignent apparemment pas les mêmes
-grandeurs dans Cariolle (1986, \#761) et dans la paramétrisation de
-2005. $r$ passe d'une concentration massique à une fraction molaire.
-$P$ et $L$ passent de la dimension masse$^{-1}$ temps$^{-1}$ à la
-dimension temps$^{-1}$.
+grandeurs dans Cariolle (1986, \#761) et dans la paramétrisation 2.3.
+$r$ passe d'une concentration massique à une fraction molaire.  $P$ et
+$L$ passent de la dimension masse$^{-1}$ temps$^{-1}$ à la dimension
+temps$^{-1}$.
 
-Phu L. V. conseille d'utiliser le schéma de transport numéro 10 (choix
-dans \verb+traceur.def+).
+Frédéric H. et Phu L. V. indiquent qu'il est nécessaire d'utiliser le
+schéma de transport numéro 10 (choix dans \verb+traceur.def+).
 
 Nous notons avec un indice ``Mob'' les valeurs des coefficients de D.
 Cariolle et H. Teyssèdre, par référence au modèle Mobidic.
+
+Est-il utile de faire subir à l'ozone les traitements de
+\verb+phytrac+ : effets de la convection, des ``thermiques'', de la
+couche limite, du lessivage ? Frédéric H. pense que oui. Cf. l'extrait
+de sa
+\href{file:///user/guez/Documents/Hourdin_Amma_excerpt.pdf}{présentation
+  à une réunion AMMA}. Il compare le champ troposphérique d'ozone
+obtenu par un modèle incluant la chimie (LMDZ-Inca ou Mocage) et le
+champ troposhérique d'un traceur stratosphérique idéalisé. On voit que
+la distribution troposphérique d'ozone dans un modèle incluant la
+chimie doit être influencée en grande partie par l'ozone d'origine
+stratosphérique. Et la distribution troposphérique s'explique bien par
+les phénomènes de convection. Donc on obtiendrait une distribution
+troposhérique d'ozone non dénuée d'intérêt en appliquant les
+phénomènes troposphériques de transport sous-maille à l'ozone de Cariolle.
 
 \subsubsection{La paramétrisation de la chimie}
 
@@ -1024,8 +1051,9 @@ dérivée partielle comme noté dans l'équation (5) de Cariolle (1986
 l'atmosphère. Cf.
 \href{file:/user/guez/Documents/Commentaires_lectures/Autres_publications/-1991/Cariolle_1986_761.texfol/Cariolle_1986_761.dvi}{commentaires
   sur Cariolle (1986 \# 761)}. La paramétrisation donne-t-elle la
-dérivée lagrangienne de la fraction molaire, comme noté dans le
-fichier \verb+O3_readme.txt+ ?  Notons :
+dérivée lagrangienne de la fraction molaire, comme noté dans la
+\href{file:///user/guez/Documents/Informatique_fonctionnement/O3_Cariolle.txt}{fiche}
+de D. Cariolle ?  Notons :
 \begin{description}
 \item[$r$] : fraction molaire d'ozone
 \item[$q$] : fraction massique d'ozone
@@ -1246,7 +1274,7 @@ ne tenant compte que de la présence de l'eau :
 Copiant ce qui était déjà fait pour la vapeur d'eau, j'ai d'abord
 choisi de remailler verticalement les coefficients de Cariolle en
 interpolant une spline cubique de la pression. (Noter que ce n'est pas
-une interpolation en logarithme de pression.) Si on interpole
+une spline cubique du logarithme de la pression.) Si on interpole
 simplement les données de Cariolle et que la pression à laquelle on
 interpole est à l'extérieur du tableau de pressions de Cariolle alors
 la formule d'interpolation devient sans crier gare une formule
@@ -1380,10 +1408,24 @@ On a :
 \end{equation}
 En remaillant $r_\mathrm{Mob}$ et $T$, nous avons supposé qu'ils
 étaient constants sur des intervalles de pression centrés sur les
-niveaux de pression de Mobidic. Considérons donc un tel intervalle,
-centré sur la pression $p_1$, correspondant à une altitude $z_1$.
-Supposons aussi $\mu_\mathrm{moy}$ et $g$ constants. Sur l'intervalle,
-l'échelle $H$ de gradient de pression est constante :
+niveaux de pression de Mobidic. Cf. figure
+(\ref{fig:Sigma_interp_vert}).
+\begin{figure}[htbp]
+  \centering
+  \includegraphics{Graphiques/Sigma_interp_vert}
+  \caption{Interpolation verticale de $\Sigma_\mathrm{Mob}$. Les
+    disques bleus sont les valeurs de $\Sigma_\mathrm{Mob}$ avant
+    remaillage vertical. La ligne brisée noire (points anguleux noirs)
+    est la fonction $\Sigma_\mathrm{Mob}(p)$ qu'il faudrait
+    normalement supposer. La ligne brisée rouge (points anguleux
+    rouges) est la fonction $\Sigma_\mathrm{Mob}(p)$ que nous
+    supposons en fait.}
+  \label{fig:Sigma_interp_vert}
+\end{figure}
+Considérons donc un tel intervalle, centré sur la pression $p_1$,
+correspondant à une altitude $z_1$.  Supposons aussi
+$\mu_\mathrm{moy}$ et $g$ constants. Sur l'intervalle, l'échelle $H$
+de gradient de pression est constante :
 \begin{displaymath}
   p(z) = p(z_1) \exp\left(- \frac{z - z_1}{H}\right)
 \end{displaymath}
@@ -1576,7 +1618,8 @@ Cf. figure (\ref{fig:regr_lat_time_coefoz}).
   \centering
   \includegraphics{Graphiques/regr_lat_time_coefoz}
   \caption{Schéma des entrées-sorties de
-    \texttt{regr\_lat\_time\_coefoz}.}
+    \texttt{regr\_lat\_time\_coefoz}. \texttt{rlatv} donne les limites
+    en latitude des cellules de LMDZ. Cf. figure (\ref{fig:cell}).}
   \label{fig:regr_lat_time_coefoz}
 \end{figure}
 
@@ -1622,9 +1665,12 @@ constantes pendant \verb+pdtphys+. La direction du Soleil, qui
 intervient dans le terme de chimie hétérogène, pourrait être
 considérée comme une fonction du temps. Je choisis pour simplifier de
 considérer aussi la direction du Soleil comme une constante pendant un
-pas de temps de la physique. Récrivons alors $P_\mathrm{net}
-\mu_{\mathrm{O}_3} / \mu_\mathrm{moy}$ en mettant en évidence les
-constantes. Posons :
+pas de temps de la physique. J'utilise la procédure \verb+zenang+ pour
+calculer la moyenne de la direction du Soleil pendant un pas de temps
+de la physique. Frédéric H. pense que les résultats seront meilleurs que
+si nous utilisions une direction instantanée. Récrivons alors
+$P_\mathrm{net} \mu_{\mathrm{O}_3} / \mu_\mathrm{moy}$ en mettant en
+évidence les constantes. Posons :
 \begin{align*}
   & c := [P_\mathrm{net,Mob} - a_2 r_\mathrm{Mob}
   + a_4 (T - T_\mathrm{Mob}) - a_6 \Sigma_\mathrm{Mob}]
@@ -1723,8 +1769,9 @@ premier ordre.
 La somme partielle dans (\ref{eq:dqk_dt}) est la densité-colonne
 d'ozone au dessus de la base de la couche $k$. Nous pourrions raffiner
 en calculant à partir de là des densités-colonnes au dessus des
-milieux de couches (par interpolation linéaire en pression). Je reste
-pour l'instant à l'équation (\ref{eq:dqk_dt}).
+milieux de couches (par interpolation linéaire en pression) (d'autant
+plus que $\Sigma_\mathrm{Mob}$ est interpolé en milieu de couche). Je
+reste pour l'instant à l'équation (\ref{eq:dqk_dt}).
 
 Les équations différentielles du premier ordre du système
 (\ref{eq:dqk_dt}) sont linéaires à coefficients constants. Nous
@@ -1764,19 +1811,18 @@ selon la latitude et la prise en compte du coefficient Clx peuvent
 \subsubsection{Les procédures \texttt{regr\_pr\_comb\_coefoz} et
   \texttt{regr\_pr\_(av|int)\_coefoz}}
 
-Les procédures du module \verb+regr_pr+ (cf. figure
-(\ref{fig:regridding_proced})) fournissent des variables ayant un
-double indice horizontal alors que \verb+tr_seri+ dans \verb+phytrac+
-a un indice horizontal simple.
+Le remaillage en pression (cf. figure (\ref{fig:regridding_proced}))
+fournit d'abord des variables ayant un double indice horizontal alors
+que \verb+tr_seri+ dans \verb+phytrac+ a un indice horizontal simple.
 \begin{figure}[htbp]
   \centering
   \includegraphics{Graphiques/regridding_proced}
-  \caption{Arbre des appels des procédures de remaillage. Les cadres
-    verts symbolisent des modules. Les procédures du plus bas niveau
-    sont celles qui effectuent réellement le remaillage. Elles sont
-    les plus générales et ne font pas référence aux notions de
-    pression, latitude ou temps. Entre parenthèses : les opérations
-    non effectuées par les procédures de niveau inférieur.}
+  \caption{Arbre des appels des procédures de remaillage. Le cadre
+    vert symbolise un module. Les procédures du plus bas niveau sont
+    celles qui effectuent réellement le remaillage. Elles sont les
+    plus générales et ne font pas référence aux notions de pression,
+    latitude ou temps. Entre parenthèses : les opérations non
+    effectuées par les procédures de niveau inférieur.}
   \label{fig:regridding_proced}
 \end{figure}
 Il faut lire dans le fichier \verb+coefoz_LMDZ.nc+, remailler en
@@ -1868,7 +1914,6 @@ généralités différentes. Cf. figure (\ref{fig:regridding_proced}).
 \item[\texttt{regr\_lat\_time\_coefoz}] : lecture, remaillage en temps et
   latitude, écriture
 \item[\texttt{regr\_pr\_o3}] : lecture, remaillage en pression
-\item[\texttt{regr\_pr}] : remaillage en pression
 \item[\texttt{regr1\_lint}, \texttt{regr1\_step\_av},
   \texttt{regr3\_lint}] : remaillage
 \end{description}

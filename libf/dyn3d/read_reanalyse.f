@@ -17,6 +17,8 @@ c -----------------------------------------------------------------
       use comvert
       use comgeom
       use guide_m
+      use netcdf
+
       IMPLICIT NONE
 
 c common
@@ -69,50 +71,50 @@ c -----------------------------------------------------------------
 
 c Vent zonal
             if (guide_u) then
-            ncidu=NCOPN('u.nc',NCNOWRIT,rcode)
-            varidu=NCVID(ncidu,'UWND',rcode)
+            rcode=nf90_open('u.nc',nf90_nowrite,ncidu)
+            rcode = nf90_inq_varid(ncidu, 'UWND', varidu)
             print*,'ncidu,varidu',ncidu,varidu
             if (ncidpl.eq.-99) ncidpl=ncidu
             endif
 
 c Vent meridien
             if (guide_v) then
-            ncidv=NCOPN('v.nc',NCNOWRIT,rcode)
-            varidv=NCVID(ncidv,'VWND',rcode)
+            rcode=nf90_open('v.nc',nf90_nowrite,ncidv)
+            rcode = nf90_inq_varid(ncidv, 'VWND', varidv)
             print*,'ncidv,varidv',ncidv,varidv
             if (ncidpl.eq.-99) ncidpl=ncidv
             endif
 
 c Temperature
             if (guide_T) then
-            ncidt=NCOPN('T.nc',NCNOWRIT,rcode)
-            varidt=NCVID(ncidt,'AIR',rcode)
+            rcode=nf90_open('T.nc',nf90_nowrite,ncidt)
+            rcode = nf90_inq_varid(ncidt, 'AIR', varidt)
             print*,'ncidt,varidt',ncidt,varidt
             if (ncidpl.eq.-99) ncidpl=ncidt
             endif
 
 c Humidite
             if (guide_Q) then
-            ncidQ=NCOPN('hur.nc',NCNOWRIT,rcode)
-            varidQ=NCVID(ncidQ,'RH',rcode)
+            rcode=nf90_open('hur.nc',nf90_nowrite,ncidQ)
+            rcode = nf90_inq_varid(ncidQ, 'RH', varidQ)
             print*,'ncidQ,varidQ',ncidQ,varidQ
             if (ncidpl.eq.-99) ncidpl=ncidQ
             endif
 
 c Pression de surface
             if (guide_P) then
-            ncidps=NCOPN('ps.nc',NCNOWRIT,rcode)
-            varidps=NCVID(ncidps,'SP',rcode)
+            rcode=nf90_open('ps.nc',nf90_nowrite,ncidps)
+            rcode = nf90_inq_varid(ncidps, 'SP', varidps)
             print*,'ncidps,varidps',ncidps,varidps
             endif
 
 c Coordonnee verticale
             if (ncep) then
                print*,'Vous etes entrain de lire des donnees NCEP'
-               varidpl=NCVID(ncidpl,'LEVEL',rcode)
+               rcode = nf90_inq_varid(ncidpl, 'LEVEL', varidpl)
             else
                print*,'Vous etes entrain de lire des donnees ECMWF'
-               varidpl=NCVID(ncidpl,'PRESSURE',rcode)
+               rcode = nf90_inq_varid(ncidpl, 'PRESSURE', varidpl)
             endif
             print*,'ncidu,varidpl',ncidu,varidpl
       endif

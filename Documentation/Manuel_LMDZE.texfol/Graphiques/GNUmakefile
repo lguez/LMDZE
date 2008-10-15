@@ -1,6 +1,6 @@
 gp_files = b_s disvert f_x strato1 strato2
 
-odg_files = Cellule leapfrog libraries ozone regridding_proced regr_latit regr_lat_time_coefoz regr_pr_coefoz regr_p_stepav regr_p_lint
+odg_files = Cellule leapfrog libraries ozone regridding_proced regr_latit regr_lat_time_coefoz regr_pr_coefoz regr_p_stepav regr_p_lint Sigma_interp_vert
 
 compare_sampl_files = compare_sampl_9 compare_sampl_19 compare_sampl_30 compare_sampl_41
 
@@ -14,7 +14,7 @@ compare_sampl_%.eps compare_sampl_%.tex: test_disvert_%_LMD5.csv test_disvert_%_
 	echo 'call "compare_sampl.gp" '"$*" | gnuplot -
 	sed -i 's/\includegraphics{/\includegraphics{Graphiques\//' compare_sampl_$*.tex
 
-# Join rules for pdf and eps from odg to avoid circular dependancy
+# Join rules for pdf and eps from odg to avoid circular dependency
 # between eps and pdf:
 %.pdf %.eps: %.odg
 	unoconv $<

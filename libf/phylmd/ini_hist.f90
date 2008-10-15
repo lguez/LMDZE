@@ -6,7 +6,7 @@ module ini_hist
 
 contains
 
-  subroutine ini_histhf(dtime, presnivs, nid_hf, nid_hf3d)
+  subroutine ini_histhf(dtime, nid_hf, nid_hf3d)
 
     ! From phylmd/ini_histhf.h, version 1.3 2005/05/25 13:10:09
 
@@ -15,9 +15,9 @@ contains
     use dimphy, only: klon
     USE ioipsl, only: ymds2ju, histbeg_totreg, histvert, histend
     use phyetat0_m, only: rlon, rlat
+    use comvert, only: presnivs
 
     REAL, intent(in):: dtime ! pas temporel de la physique (s)
-    real, intent(in):: presnivs(:)
     integer, intent(out):: nid_hf, nid_hf3d
 
     REAL zx_lon(iim, jjm + 1), zx_lat(iim, jjm + 1)
@@ -43,14 +43,14 @@ contains
     CALL histvert(nid_hf, "presnivs", "Vertical levels", "mb", &
          llm, presnivs/100., nvert)
 
-    call ini_histhf3d(dtime, presnivs, nid_hf3d)
+    call ini_histhf3d(dtime, nid_hf3d)
     CALL histend(nid_hf)
 
   end subroutine ini_histhf
 
   !******************************************************************
 
-  subroutine ini_histhf3d(dtime, presnivs, nid_hf3d)
+  subroutine ini_histhf3d(dtime, nid_hf3d)
 
     ! From phylmd/ini_histhf3d.h, v 1.2 2005/05/25 13:10:09
 
@@ -62,9 +62,9 @@ contains
     use clesphys, only: ecrit_hf
     use phyetat0_m, only: rlon, rlat
     USE ioipsl, only: ymds2ju, histbeg_totreg, histvert, histend, histdef
+    use comvert, only: presnivs
 
     REAL, intent(in):: dtime ! pas temporel de la physique (s)
-    real, intent(in):: presnivs(:)
     integer, intent(out):: nid_hf3d
 
     real zstohf, zout
@@ -123,7 +123,7 @@ contains
 
   !******************************************************************
 
-  subroutine ini_histday(dtime, presnivs, ok_journe, nid_day, nq)
+  subroutine ini_histday(dtime, ok_journe, nid_day, nq)
 
     ! From phylmd/ini_histday.h, v 1.3 2005/05/25 13:10:09
 
@@ -133,9 +133,9 @@ contains
     use phyetat0_m, only: rlon, rlat
     use clesphys, only: ecrit_day
     use grid_change, only: gr_phy_write_2d
+    use comvert, only: presnivs
 
     REAL, intent(in):: dtime ! pas temporel de la physique (s)
-    real, intent(in):: presnivs(:)
     logical, intent(in):: ok_journe
     integer, intent(out):: nid_day
     INTEGER, intent(in):: nq ! nombre de traceurs (y compris vapeur d'eau)
@@ -168,7 +168,7 @@ contains
 
   !****************************************************
 
-  subroutine ini_histins(dtime, presnivs, ok_instan, nid_ins)
+  subroutine ini_histins(dtime, ok_instan, nid_ins)
 
     ! From phylmd/ini_histins.h, v 1.2 2005/05/25 13:10:09
 
@@ -179,9 +179,9 @@ contains
     use indicesol, only: nbsrf, clnsurf
     USE ioipsl, only: ymds2ju, histbeg_totreg, histvert, histend, histdef
     use phyetat0_m, only: rlon, rlat
+    use comvert, only: presnivs
 
     REAL, intent(in):: dtime ! pas temporel de la physique (s)
-    real, intent(in):: presnivs(:)
     logical, intent(in):: ok_instan
     integer, intent(out):: nid_ins
 
@@ -463,7 +463,7 @@ contains
 
   !*************************************************
 
-  subroutine ini_histrac(nid_tra, pdtphys, presnivs, nq_phys, lessivage)
+  subroutine ini_histrac(nid_tra, pdtphys, nq_phys, lessivage)
 
     ! From phylmd/ini_histrac.h, version 1.10 2006/02/21 08:08:30
 
@@ -475,10 +475,10 @@ contains
     use clesphys, only: ecrit_tra
     use grid_change, only: gr_phy_write_2d
     use phyetat0_m, only: rlon, rlat
+    use comvert, only: presnivs
 
     INTEGER, intent(out):: nid_tra
     real, intent(in):: pdtphys  ! pas d'integration pour la physique (s)
-    REAL, intent(in):: presnivs(:)
 
     integer, intent(in):: nq_phys
     ! (nombre de traceurs auxquels on applique la physique)

@@ -172,10 +172,10 @@ CONTAINS
     lml = size(pls_in, 3)
 
     print *, "iml = ", iml, ", jml = ", jml
-    print *, 'Going into flinget to extract the 3D field.'
     print *, "fid_dyn = ", fid_dyn, ", varname = ", varname
     print *, "iml_dyn = ", iml_dyn, ", jml_dyn = ", jml_dyn, &
          ", llm_dyn = ", llm_dyn, ", ttm_dyn = ", ttm_dyn
+    print *, 'Going into flinget to extract the 3D field.'
     CALL flinget(fid_dyn, varname, iml_dyn, jml_dyn, llm_dyn, ttm_dyn, 1, 1, &
          var_ana3d)
 

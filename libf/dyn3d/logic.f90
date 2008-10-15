@@ -13,8 +13,7 @@ module logic
   logical:: ysinus = .TRUE.
   ! (Fonction f(y) avec y = Sin(latit.) si = .true. sinon y = latit.)
 
-  logical:: ok_guide= .FALSE.
-  ! Help = Guidage
+  logical:: ok_guide= .FALSE. ! guidage
 
   INTEGER:: iflag_phys = 1
   ! contrôle l'appel à la physique :

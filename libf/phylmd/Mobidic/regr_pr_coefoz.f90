@@ -21,7 +21,7 @@ contains
     ! The input data does not depend on longitude, but the pressure
     ! at LMDZ layers does.
     ! Therefore, the values on the LMDZ grid do depend on longitude.
-    ! Regridding in pressure is done by averaging a step function.
+    ! Regridding in pressure is done by averaging a step function of pressure.
 
     use dimens_m, only: iim, jjm, llm
     use dimphy, only: klon
@@ -40,11 +40,11 @@ contains
     real, intent(out):: v3(:, :) ! (klon, llm)
     ! (ozone coefficient from Mobidic on the "physics" grid)
     ! ("v3(i, k)" is at longitude "xlon(i)", latitude
-    ! "xlat(i)", middle of layer "k".)
+    ! "xlat(i)", in layer "k".)
 
     ! Variables local to the procedure:
-    integer varid, ncerr
-    integer i, j, k
+
+    integer varid, ncerr ! for NetCDF
 
     real  v1(jjm + 1, size(press_in_edg) - 1)
     ! (ozone coefficient from "coefoz_LMDZ.nc" at day "julien")
@@ -52,9 +52,11 @@ contains
     ! pressure interval "[press_in_edg(k), press_in_edg(k+1)]".)
 
     real v2(iim + 1, jjm + 1, llm)
-    ! (ozone coefficient from Mobidic on the "dynamics" grid)
-    ! "v2(i, j, k)" is at longitude "rlonv(i)", latitude
-    ! "rlatu(j)", middle of layer "k".)
+    ! (ozone coefficient on the "dynamics" grid)
+    ! ("v2(i, j, k)" is at longitude "rlonv(i)", latitude
+    ! "rlatu(j)" and for pressure interval "[p3d(i, j, k+1), p3d(i, j, k)]".)
+
+    integer i, j, k
 
     !--------------------------------------------
 
@@ -65,8 +67,8 @@ contains
     ! Get data at the right day from the input file:
     ncerr = nf90_get_var(ncid, varid, v1, start=(/1, 1, julien/))
     call handle_err("regr_pr_av_coefoz nf90_get_var " // name, ncerr, ncid)
-    ! Latitudes are in increasing order in the input file while
-    ! "rlatu" is in decreasing order so we need to invert order:
+    ! Latitudes are in ascending order in the input file while
+    ! "rlatu" is in descending order so we need to invert order:
     v1 = v1(jjm+1:1:-1, :)
 
     ! Regrid in pressure at each horizontal position:
@@ -76,7 +78,7 @@ contains
              v2(i, j, llm:1:-1) &
                   = regr1_step_av(v1(j, :), press_in_edg, &
                   p3d(i, j, llm+1:1:-1))
-             ! (invert order of indices because "p3d" is decreasing)
+             ! (invert order of indices because "p3d" is in descending order)
           end if
        end do
     end do
@@ -120,17 +122,19 @@ contains
     ! "xlat(i)", middle of layer "k".)
 
     ! Variables local to the procedure:
-    integer varid, ncerr
-    integer i, j, k
+
+    integer varid, ncerr ! for NetCDF
 
     real  v1(jjm + 1, 0:size(plev))
     ! (ozone coefficient from "coefoz_LMDZ.nc" at day "julien")
     ! ("v1(j, k >=1)" is at latitude "rlatu(j)" and pressure "plev(k)".)
 
     real v2(iim + 1, jjm + 1, llm)
-    ! (ozone coefficient from Mobidic on the "dynamics" grid)
+    ! (ozone coefficient on the "dynamics" grid)
     ! "v2(i, j, k)" is at longitude "rlonv(i)", latitude
-    ! "rlatu(j)", middle of layer "k".)
+    ! "rlatu(j)" and pressure "pls(i, j, k)".)
+
+    integer i, j, k
 
     !--------------------------------------------
 
@@ -141,8 +145,8 @@ contains
     ! Get data at the right day from the input file:
     ncerr = nf90_get_var(ncid, varid, v1(:, 1:), start=(/1, 1, julien/))
     call handle_err("regr_pr_int_coefoz nf90_get_var " // name, ncerr, ncid)
-    ! Latitudes are in increasing order in the input file while
-    ! "rlatu" is in decreasing order so we need to invert order:
+    ! Latitudes are in ascending order in the input file while
+    ! "rlatu" is in descending order so we need to invert order:
     v1(:, 1:) = v1(jjm+1:1:-1, 1:)
 
     ! Complete "v1" with the value at 0 pressure:
@@ -154,7 +158,7 @@ contains
           if (dyn_phy(i, j)) then
              v2(i, j, llm:1:-1) &
                   = regr1_lint(v1(j, :), (/0., plev/), pls(i, j, llm:1:-1))
-             ! (invert order of indices because "pls" is decreasing)
+             ! (invert order of indices because "pls" is in descending order)
           end if
        end do
     end do

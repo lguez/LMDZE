@@ -187,10 +187,8 @@ c   ncum est la frequence de stokage en pas de temps
 
         if (i_sortie.eq.1) then
          file='dynzon'
-         call inigrads(ifile
-     s  ,(/0./),180./pi,0.,0.,rlatv,-90.,90.,180./pi
-     s  ,presnivs,1.
-     s  ,dt_cum,file,'dyn_zon ')
+         call inigrads(ifile ,(/0./),180./pi,0.,0.,rlatv,-90.,90.,
+     $        180./pi ,presnivs,1. ,dt_cum,file,'dyn_zon ')
         endif
 
         nom(itemp)='T'

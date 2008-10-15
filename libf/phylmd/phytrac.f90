@@ -12,10 +12,9 @@ contains
   SUBROUTINE phytrac(rnpb, itap, lmt_pas, julien, gmtime, firstcal, lafin, &
        nq_phys, pdtphys, u, v, t_seri, paprs, pplay, pmfu, pmfd, pen_u, &
        pde_u, pen_d, pde_d, coefh, fm_therm, entr_therm, yu1, yv1, ftsol, &
-       pctsrf, frac_impa, frac_nucl, presnivs, pphis, &
-       pphi, albsol, rh, cldfra, rneb, diafra, cldliq, itop_con, &
-       ibas_con, pmflxr, pmflxs, prfl, psfl, da, phi, mp, upwd, dnwd, &
-       tr_seri, zmasse)
+       pctsrf, frac_impa, frac_nucl, pphis, pphi, albsol, rh, cldfra, rneb, &
+       diafra, cldliq, itop_con, ibas_con, pmflxr, pmflxs, prfl, psfl, da, &
+       phi, mp, upwd, dnwd, tr_seri, zmasse)
 
     ! From phylmd/phytrac.F, version 1.15 2006/02/21 08:08:30
 
@@ -91,7 +90,6 @@ contains
 
     real pphi(klon, llm) ! geopotentiel
     real pphis(klon)
-    REAL, intent(in):: presnivs(llm)
     logical, intent(in):: firstcal ! first call to "calfis"
     logical, intent(in):: lafin ! fin de la physique
 
@@ -221,7 +219,7 @@ contains
        inirnpb=rnpb
 
        ! Initialisation des sorties :
-       call ini_histrac(nid_tra, pdtphys, presnivs, nq_phys, lessivage)
+       call ini_histrac(nid_tra, pdtphys, nq_phys, lessivage)
 
        ! Initialisation de certaines variables pour le radon et le plomb 
        ! Initialisation du traceur dans le sol (couche limite radonique)
@@ -475,6 +473,7 @@ contains
       use iniadvtrac_m, only: tnom
       use comgeomphy, only: airephy
       use dimphy, only: klon
+      use grid_change, only: gr_phy_write_2d, gr_phy_write_3d
 
       logical, intent(in):: lessivage
 
@@ -494,37 +493,27 @@ contains
 
       itau_w = itau_phy + itap
 
-      CALL gr_fi_ecrit(1, klon, iim, jjm+1, pphis, zx_tmp_2d)
-      CALL histwrite(nid_tra, "phis", itau_w, zx_tmp_2d)
-
-      CALL gr_fi_ecrit(1, klon, iim, jjm+1, airephy, zx_tmp_2d)      
-      CALL histwrite(nid_tra, "aire", itau_w, zx_tmp_2d)
-
-      CALL gr_fi_ecrit(llm, klon, iim, jjm+1, zmasse, zx_tmp_3d)      
-      CALL histwrite(nid_tra, "zmasse", itau_w, zx_tmp_3d)
+      CALL histwrite(nid_tra, "phis", itau_w, gr_phy_write_2d(pphis))
+      CALL histwrite(nid_tra, "aire", itau_w, gr_phy_write_2d(airephy))
+      CALL histwrite(nid_tra, "zmasse", itau_w, gr_phy_write_3d(zmasse))
 
       DO it=1, nq_phys
-         CALL gr_fi_ecrit(llm, klon, iim, jjm+1, tr_seri(1, 1, it), zx_tmp_3d)
-         CALL histwrite(nid_tra, tnom(it+2), itau_w, zx_tmp_3d)
+         CALL histwrite(nid_tra, tnom(it+2), itau_w, &
+              gr_phy_write_3d(tr_seri(:, :, it)))
          if (lessivage) THEN
-            CALL gr_fi_ecrit(llm, klon, iim, jjm+1, flestottr(1, 1, it), &
-                 zx_tmp_3d)
-            CALL histwrite(nid_tra, "fl"//tnom(it+2), itau_w, zx_tmp_3d)
+            CALL histwrite(nid_tra, "fl"//tnom(it+2), itau_w, &
+                 gr_phy_write_3d(flestottr(:, :, it)))
          endif
-
-         CALL gr_fi_ecrit(llm, klon, iim, jjm+1, d_tr_th(1, 1, it), zx_tmp_3d)
-         CALL histwrite(nid_tra, "d_tr_th_"//tnom(it+2), itau_w, zx_tmp_3d)
-         CALL gr_fi_ecrit(llm, klon, iim, jjm+1, d_tr_cv(1, 1, it), zx_tmp_3d)
-         CALL histwrite(nid_tra, "d_tr_cv_"//tnom(it+2), itau_w, zx_tmp_3d)
-         CALL gr_fi_ecrit(llm, klon, iim, jjm+1, d_tr_cl(1, 1, it), zx_tmp_3d)
-         CALL histwrite(nid_tra, "d_tr_cl_"//tnom(it+2), itau_w, zx_tmp_3d)
+         CALL histwrite(nid_tra, "d_tr_th_"//tnom(it+2), itau_w, &
+              gr_phy_write_3d(d_tr_th(:, :, it)))
+         CALL histwrite(nid_tra, "d_tr_cv_"//tnom(it+2), itau_w, &
+              gr_phy_write_3d(d_tr_cv(:, :, it)))
+         CALL histwrite(nid_tra, "d_tr_cl_"//tnom(it+2), itau_w, &
+              gr_phy_write_3d(d_tr_cl(:, :, it)))
       ENDDO
 
-      CALL gr_fi_ecrit(llm, klon, iim, jjm+1, pplay, zx_tmp_3d)
-      CALL histwrite(nid_tra, "pplay", itau_w, zx_tmp_3d)
-
-      CALL gr_fi_ecrit(llm, klon, iim, jjm+1, t_seri, zx_tmp_3d)
-      CALL histwrite(nid_tra, "t", itau_w, zx_tmp_3d)
+      CALL histwrite(nid_tra, "pplay", itau_w, gr_phy_write_3d(pplay))
+      CALL histwrite(nid_tra, "t", itau_w, gr_phy_write_3d(t_seri))
 
       if (ok_sync) then
          call histsync(nid_tra)

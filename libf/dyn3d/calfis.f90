@@ -55,7 +55,7 @@ contains
     use dimens_m, only: iim, jjm, llm, nqmx
     use dimphy, only: klon
     use comconst, only: kappa, cpp, dtphys, g, pi
-    use comvert, only: preff, presnivs
+    use comvert, only: preff
     use comgeom, only: apoln, cu_2d, cv_2d, unsaire_2d, apols, rlonu, rlonv
     use iniadvtrac_m, only: niadv
     use grid_change, only: dyn_phy, gr_fi_dyn
@@ -331,7 +331,7 @@ contains
     !   Appel de la physique:
 
     CALL physiq(nq, firstcal, lafin, rdayvrai, heure, dtphys, &
-         zplev, zplay, zphi, zphis, presnivs, zufi, zvfi, &
+         zplev, zplay, zphi, zphis, zufi, zvfi, &
          ztfi, zqfi, pvervel, zdufi, zdvfi, zdtfi, zdqfi, zdpsrf, pducov, &
          PVteta) ! IM diagnostique PVteta, Amip2
 

@@ -121,6 +121,7 @@ contains
     use dimphy, only: klon
     use YOMCST, only: r_incl
     use phyetat0_m, only: rlat, rlon
+    use comconst, only: pi
 
     ! Author : O. Boucher (LMD/CNRS), d'après les routines "zenith" et
     ! "angle" de Z.X. Li
@@ -132,18 +133,18 @@ contains
     ! moyennes de "pmu0" et non des valeurs instantanées.
     ! Du coup "frac" prend toutes les valeurs entre 0 et 1.
 
-    ! Date : premiere version le 13 decembre 1994
-    !          revu pour  GCM  le 30 septembre 1996
+    ! Date : première version le 13 decembre 1994
+    !        revu pour  GCM  le 30 septembre 1996
 
     real, intent(in):: longi
     ! (longitude vraie de la terre dans son plan solaire a partir de
-    ! l'equinoxe de printemps (degre))
+    ! l'equinoxe de printemps) (in degrees)
 
     real, intent(in):: gmtime ! temps universel en fraction de jour
     real, intent(in):: pdtrad ! pas de temps du rayonnement (secondes)
 
     real, intent(out):: pmu0(klon)
-    ! (cosinus de l'angle zenithal moyen entre gmtime et gmtime+pdtrad)
+    ! (cosine of mean zenith angle between "gmtime" and "gmtime+pdtrad")
 
     real, intent(out), optional:: frac(klon)
     ! (ensoleillement moyen entre gmtime et gmtime+pdtrad)
@@ -152,53 +153,54 @@ contains
 
     integer i
     real gmtime1, gmtime2
-    real pi_local, deux_pi_local, incl
+    real deux_pi, incl
+
     real omega1, omega2, omega
-    ! omega1, omega2 : temps 1 et 2 exprime en radian avec 0 a midi.
-    ! omega : heure en radian du coucher de soleil 
-    ! -omega est donc l'heure en radian de lever du soleil
+    ! omega1, omega2 : temps 1 et 2 exprimés en radians avec 0 à midi.
+    ! omega : heure en radians du coucher de soleil 
+    ! -omega est donc l'heure en radians de lever du soleil
+
     real omegadeb, omegafin
     real zfrac1, zfrac2, z1_mu, z2_mu
-    real lat_sun          ! declinaison en radian
-    real lon_sun          ! longitude solaire en radian
-    real latr             ! latitude du pt de grille en radian
+    real lat_sun          ! déclinaison en radians
+    real lon_sun          ! longitude solaire en radians
+    real latr             ! latitude du point de grille en radians
 
     !----------------------------------------------------------------------
 
-    pi_local = 4.0 * ATAN(1.0)
-    deux_pi_local = 2.0 * pi_local
-    incl=R_incl * pi_local / 180.
+    deux_pi = 2 * pi
+    incl=R_incl * pi / 180.
 
-    lon_sun = longi * pi_local / 180.0
-    lat_sun = ASIN (SIN(lon_sun)*SIN(incl) )
+    lon_sun = longi * pi / 180.
+    lat_sun = ASIN(SIN(lon_sun)*SIN(incl))
 
     gmtime1=gmtime*86400.
     gmtime2=gmtime*86400.+pdtrad
 
     DO i = 1, klon
-       latr = rlat(i) * pi_local / 180.
+       latr = rlat(i) * pi / 180.
        omega=0.0  !--nuit polaire
-       IF (latr >= (pi_local/2.-lat_sun) &
-            .OR. latr <= (-pi_local/2.-lat_sun)) THEN
-          omega = pi_local  ! journee polaire
+       IF (latr >= (pi/2.-lat_sun) &
+            .OR. latr <= (-pi/2.-lat_sun)) THEN
+          omega = pi  ! journee polaire
        ENDIF
-       IF (latr < (pi_local/2.+lat_sun).AND. &
-            latr.GT.(-pi_local/2.+lat_sun).AND. &
-            latr < (pi_local/2.-lat_sun).AND. &
-            latr.GT.(-pi_local/2.-lat_sun)) THEN
+       IF (latr < (pi/2.+lat_sun).AND. &
+            latr.GT.(-pi/2.+lat_sun).AND. &
+            latr < (pi/2.-lat_sun).AND. &
+            latr.GT.(-pi/2.-lat_sun)) THEN
           omega = -TAN(latr)*TAN(lat_sun)
           omega = ACOS(omega)
        ENDIF
 
        omega1 = gmtime1 + rlon(i)*86400.0/360.0
-       omega1 = omega1 / 86400.0*deux_pi_local
-       omega1 = MOD (omega1+deux_pi_local, deux_pi_local)
-       omega1 = omega1 - pi_local
+       omega1 = omega1 / 86400.0*deux_pi
+       omega1 = MOD (omega1+deux_pi, deux_pi)
+       omega1 = omega1 - pi
 
        omega2 = gmtime2 + rlon(i)*86400.0/360.0
-       omega2 = omega2 / 86400.0*deux_pi_local
-       omega2 = MOD (omega2+deux_pi_local, deux_pi_local)
-       omega2 = omega2 - pi_local
+       omega2 = omega2 / 86400.0*deux_pi
+       omega2 = MOD (omega2+deux_pi, deux_pi)
+       omega2 = omega2 - pi
 
        test_omega12: IF (omega1 <= omega2) THEN  
           ! on est dans la meme journee locale
@@ -247,7 +249,7 @@ contains
           ENDIF
           !-----------------------moyenne 
           if (present(frac)) &
-               frac(i)=(zfrac1+zfrac2)/(omega2+deux_pi_local-omega1)
+               frac(i)=(zfrac1+zfrac2)/(omega2+deux_pi-omega1)
           pmu0(i)=(zfrac1*z1_mu+zfrac2*z2_mu)/MAX(zfrac1+zfrac2, 1.E-10)
        ENDIF test_omega12
     ENDDO

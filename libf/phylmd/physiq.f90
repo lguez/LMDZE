@@ -10,7 +10,7 @@ module physiq_m
 contains
 
   SUBROUTINE physiq(nq, firstcal, lafin, rdayvrai, gmtime, pdtphys, paprs, &
-       pplay, pphi, pphis, presnivs, u, v, t, qx, omega, d_u, d_v, &
+       pplay, pphi, pphis, u, v, t, qx, omega, d_u, d_v, &
        d_t, d_qx, d_ps, dudyn, PVteta)
 
     ! From phylmd/physiq.F, v 1.22 2006/02/20 09:38:28
@@ -80,9 +80,6 @@ contains
     ! (input geopotentiel de chaque couche (g z) (reference sol))
 
     REAL pphis(klon) ! input geopotentiel du sol
-
-    REAL presnivs(llm)
-    ! (input pressions approximat. des milieux couches ( en PA))
 
     REAL u(klon, llm)  ! input vitesse dans la direction X (de O a E) en m/s
     REAL v(klon, llm)  ! input vitesse Y (de S a N) en m/s
@@ -875,9 +872,9 @@ contains
 
        !   Initialisation des sorties
 
-       call ini_histhf(pdtphys, presnivs, nid_hf, nid_hf3d)
-       call ini_histday(pdtphys, presnivs, ok_journe, nid_day, nq)
-       call ini_histins(pdtphys, presnivs, ok_instan, nid_ins)
+       call ini_histhf(pdtphys, nid_hf, nid_hf3d)
+       call ini_histday(pdtphys, ok_journe, nid_day, nq)
+       call ini_histins(pdtphys, ok_instan, nid_ins)
        CALL ymds2ju(annee_ref, 1, int(day_ref), 0., date0)
        !XXXPB Positionner date0 pour initialisation de ORCHIDEE
        WRITE(*, *) 'physiq date0 : ', date0
@@ -1848,7 +1845,7 @@ contains
     call phytrac(rnpb, itap, lmt_pas, julien,  gmtime, firstcal, lafin, nq-2, &
          pdtphys, u, v, t, paprs, pplay, pmfu,  pmfd,  pen_u,  pde_u,  pen_d, &
          pde_d, ycoefh, fm_therm, entr_therm, yu1, yv1, ftsol, pctsrf, &
-         frac_impa,  frac_nucl, presnivs, pphis, pphi, albsol, rhcl, cldfra, &
+         frac_impa,  frac_nucl, pphis, pphi, albsol, rhcl, cldfra, &
          rneb,  diafra,  cldliq, itop_con, ibas_con, pmflxr, pmflxs, prfl, &
          psfl, da, phi, mp, upwd, dnwd, tr_seri, zmasse)
 

@@ -10,7 +10,7 @@ module pressure_var
   ! for layer "l")
 
   REAL p3d(iim + 1, jjm + 1, llm+1) ! pressure at layer interfaces, in Pa
-  ! "p3d(i, j, l)" is at longitude "rlonv(i)", latitude "rlatu(j)",
+  ! ("p3d(i, j, l)" is at longitude "rlonv(i)", latitude "rlatu(j)",
   ! for interface "l")
 
   private iim, jjm, llm
