@@ -92,7 +92,8 @@ contains
 
     REAL tppn(iim), tpps(iim), tpn, tps
 
-    INTEGER itau, itaufinp1
+    INTEGER itau ! index of the time step of the dynamics, starts at 0
+    integer itaufinp1
     INTEGER iday ! jour julien
     REAL time ! time of day, as a fraction of day length
 

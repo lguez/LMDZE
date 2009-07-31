@@ -296,7 +296,7 @@ contains
     day_ref = dayref
     annee_ref = anneeref
 
-    CALL geopot(ip1jmp1, tpot, pk , pks,  phis  , phi)
+    CALL geopot(ip1jmp1, tpot, pk , pks,  phis, phi)
     CALL caldyn0(0, uvent, vvent, tpot, psol, masse, pk, phis, phi, w, &
          pbaru, pbarv, 0)
     CALL dynredem0("start.nc", dayref, phis)

@@ -25,7 +25,7 @@ contains
     use conf_gcm_m, only: dayref
     use dimens_m, only: iim, jjm, llm
     use netcdf95, only: nf95_open, nf95_close, nf95_inq_varid, handle_err, &
-         nf95_get_coord
+         nf95_gw_var
     use netcdf, only:  nf90_nowrite, nf90_get_var
     use numer_rec, only: assert
     use grid_change, only: dyn_phy
@@ -61,7 +61,8 @@ contains
 
     call nf95_open("coefoz_LMDZ.nc", nf90_nowrite, ncid)
 
-    call nf95_get_coord(ncid, "plev", plev)
+    call nf95_inq_varid(ncid, "plev", varid)
+    call nf95_gw_var(ncid, varid, plev)
     ! Convert from hPa to Pa because "regr_pr_av" requires so:
     plev = plev * 100.
     n_plev = size(plev)

@@ -8,7 +8,7 @@ module comvert
 
   real ap(llm+1), pa ! in Pa
   real bp(llm+1), dpres(llm)
-  real presnivs(llm) ! pressions approximatives des milieux couches, en Pa
+  real presnivs(llm) ! pressions approximatives des milieux de couches, en Pa
   real, parameter:: preff = 101325. ! in Pa
   real nivsigs(llm), nivsig(llm+1)
 
@@ -26,11 +26,11 @@ contains
     ! "nivsigs" and "nivsig".
     ! "pa" should be defined before this procedure is called.
 
-    use comconst, only: pi
+    use numer_rec, only: pi
 
     REAL s(llm+1)
-    ! (atmospheric hybrid sigma-pressure coordinate at the interface
-    ! between layers "l" and "l-1")
+    ! "s(l)" is the atmospheric hybrid sigma-pressure coordinate at
+    ! the interface between layers "l" and "l-1"
 
     real ds(llm)
     ! "ds(l)" : épaisseur de la couche "l" dans la coordonnée "s"

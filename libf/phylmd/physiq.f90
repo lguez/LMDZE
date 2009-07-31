@@ -54,6 +54,7 @@ contains
     use conf_phys_m, only: conf_phys
     use phyredem_m, only: phyredem
     use qcheck_m, only: qcheck
+    use ozonecm_m, only: ozonecm
 
     ! Declaration des constantes et des fonctions thermodynamiques :
     use fcttre, only: thermcep, foeew, qsats, qsatl
@@ -443,7 +444,6 @@ contains
     EXTERNAL conema3  ! convect4.3
     EXTERNAL fisrtilp  ! schema de condensation a grande echelle (pluie)
     EXTERNAL nuage     ! calculer les proprietes radiatives
-    EXTERNAL ozonecm   ! prescrire l'ozone
     EXTERNAL radlwsw   ! rayonnements solaire et infrarouge
     EXTERNAL transp    ! transport total de l'eau et de l'energie
 
@@ -991,7 +991,7 @@ contains
     if (nq >= 5) then
        wo = qx(:, :, 5) * zmasse / dobson_u / 1e3
     else IF (MOD(itap - 1, lmt_pas) == 0) THEN
-       CALL ozonecm(REAL(julien), rlat, paprs, wo)
+       wo = ozonecm(REAL(julien), paprs)
     ENDIF
 
     ! Re-evaporer l'eau liquide nuageuse

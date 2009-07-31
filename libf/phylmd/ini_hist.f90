@@ -547,9 +547,8 @@ contains
     CALL histdef(nid_tra, "pplay", "", "-", &
          iim, jjm+1, nhori, llm, 1, llm, nvert, &
          "inst(X)", zout, zout)
-    CALL histdef(nid_tra, "t", "", "-", &
-         iim, jjm+1, nhori, llm, 1, llm, nvert, &
-         "inst(X)", zout, zout)
+    CALL histdef(nid_tra, "T", "temperature", "K", iim, jjm+1, nhori, llm, &
+         1, llm, nvert, "inst(X)", zout, zout)
 
     CALL histend(nid_tra)
 

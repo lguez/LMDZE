@@ -34,8 +34,7 @@ CONTAINS
     !   Local:
 
     INTEGER :: iq, l
-    INTEGER :: length
-    PARAMETER (length=100)
+    INTEGER, PARAMETER:: length = 100
     REAL :: tab_cntrl(length) ! tableau des parametres du run
 
     !   Variables locales pour NetCDF:

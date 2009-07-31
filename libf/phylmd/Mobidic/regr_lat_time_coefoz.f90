@@ -42,7 +42,7 @@ contains
     use comconst, only: pi
     use regr1_step_av_m, only: regr1_step_av
     use regr3_lint_m, only: regr3_lint
-    use netcdf95, only: nf95_open, nf95_get_coord, nf95_close, &
+    use netcdf95, only: nf95_open, nf95_gw_var, nf95_close, &
          nf95_inq_varid, handle_err, nf95_put_var
     use netcdf, only: nf90_nowrite, nf90_get_var
 
@@ -98,7 +98,7 @@ contains
     ! (name of NetCDF primary variable in the output file)
 
     integer varid_in(n_o3_param), varid_out(n_o3_param), varid_plev, varid_time
-    integer ncerr
+    integer ncerr, varid
     ! (for NetCDF)
 
     real, parameter:: tmidmonth(0:13) = (/(-15. + 30. * j, j = 0, 13)/)
@@ -150,11 +150,12 @@ contains
     name_in(i_v) = "R_Het"
     name_out(i_v) = "R_Het"
 
-    call nf95_open("coefoz_v2_3.nc", nf90_nowrite, ncid_in)
+    call nf95_open("coefoz.nc", nf90_nowrite, ncid_in)
 
     ! Get coordinates from the input file:
 
-    call nf95_get_coord(ncid_in, "latitude", latitude)
+    call nf95_inq_varid(ncid_in, "latitude", varid)
+    call nf95_gw_var(ncid_in, varid, latitude)
     ! Convert from degrees to rad, because "rlatv" is in rad:
     latitude = latitude / 180. * pi
     n_lat = size(latitude)
@@ -170,7 +171,8 @@ contains
     lat_in_edg(n_lat + 1) = pi / 2
     deallocate(latitude) ! pointer
 
-    call nf95_get_coord(ncid_in, "plev", plev)
+    call nf95_inq_varid(ncid_in, "plev", varid)
+    call nf95_gw_var(ncid_in, varid, plev)
     n_plev = size(plev)
     ! (We only need the pressure coordinate to copy it to the output file.)
 

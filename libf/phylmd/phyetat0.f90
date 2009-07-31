@@ -4,8 +4,7 @@ module phyetat0_m
 
   IMPLICIT none
 
-  REAL, save:: rlat(klon), rlon(klon)
-  ! latitude et longitude pour chaque point, in degrees
+  REAL, save:: rlat(klon), rlon(klon) ! latitude and longitude, in degrees
 
   private klon
 

@@ -10,8 +10,8 @@ module YOMCST
   REAL RDAY,REA,REPSM,RSIYEA,RSIDAY,ROMEGA
 
   ! A1.1.bis Constantes concernant l'orbite de la Terre:
-  REAL R_ecc ! excentricite
-  real R_peri ! equinoxe
+  REAL R_ecc ! excentricité
+  real R_peri ! équinoxe
   real R_incl ! inclinaison
 
   ! A1.2 Geoide

@@ -13,17 +13,26 @@ SUBROUTINE inigeom
   ! sinusoïdale.
 
 
-  USE dimens_m
-  USE paramet_m
-  USE comconst
-  USE comdissnew
-  USE logic
-  USE comgeom
-  USE serre
+  USE dimens_m, ONLY : iim, jjm
+  USE paramet_m, ONLY : iip1, jjp1
+  USE comconst, ONLY : g, omeg, pi, rad
+  USE comdissnew, ONLY : coefdis, nitergdiv, nitergrot, niterh
+  USE logic, ONLY : fxyhypb, ysinus
+  USE comgeom, ONLY : aireij1_2d, aireij2_2d, aireij3_2d, aireij4_2d, &
+       airesurg_2d, aireu_2d, airev_2d, aire_2d, airuscv2_2d, airvscu2_2d, &
+       aiuscv2gam_2d, aivscu2gam_2d, alpha1p2_2d, alpha1p4_2d, alpha1_2d, &
+       alpha2p3_2d, alpha2_2d, alpha3p4_2d, alpha3_2d, alpha4_2d, apoln, &
+       apols, constang_2d, cuscvugam_2d, cusurcvu_2d, cuvscvgam1_2d, &
+       cuvscvgam2_2d, cuvsurcv_2d, cu_2d, cvscuvgam_2d, cvsurcuv_2d, &
+       cvuscugam1_2d, cvuscugam2_2d, cvusurcu_2d, cv_2d, fext_2d, rlatu, &
+       rlatv, rlonu, rlonv, unsairez_2d, unsaire_2d, unsairz_gam_2d, &
+       unsair_gam1_2d, unsair_gam2_2d, unsapolnga1, unsapolnga2, unsapolsga1, &
+       unsapolsga2, unscu2_2d, unscv2_2d, xprimu, xprimv
+  USE serre, ONLY : alphax, alphay, clat, clon, dzoomx, dzoomy, grossismx, &
+       grossismy, pxo, pyo, taux, tauy, transx, transy
+
   IMPLICIT NONE
 
-
-  !------------------------------------------------------------------
   !   ....  Variables  locales   ....
 
   INTEGER i, j, itmax, itmay, iter
@@ -213,15 +222,15 @@ SUBROUTINE inigeom
         eps = .1E-7
 
         xo1 = 0.
-        DO  iter = 1, itmax
+        DO iter = 1, itmax
            x1 = xo1
            f = x1 + alphax*sin(x1-pxo)
            df = 1. + alphax*cos(x1-pxo)
            x1 = x1 - f/df
            xdm = abs(x1-xo1)
-           IF (xdm<=eps) exit
+           IF (xdm<=eps) EXIT
            xo1 = x1
-        end DO
+        END DO
 
         transx = xo1
 
@@ -235,9 +244,9 @@ SUBROUTINE inigeom
            df = 1. + alphay*cos(y1-pyo)
            y1 = y1 - f/df
            ydm = abs(y1-yo1)
-           IF (ydm<=eps) exit
+           IF (ydm<=eps) EXIT
            yo1 = y1
-        end DO
+        END DO
 
         transy = yo1
 
@@ -353,7 +362,7 @@ SUBROUTINE inigeom
            cuij3(i,1) = radclatm*xprm
            cvij2(i,1) = 0.5*rad*yprm
            cvij3(i,1) = cvij2(i,1)
-        end DO
+        END DO
 
         DO i = 1, iim
            aireij1_2d(i,1) = 0.
@@ -384,7 +393,7 @@ SUBROUTINE inigeom
            cuij4(i,jjp1) = radclatp*xprm
            cvij1(i,jjp1) = 0.5*rad*yprp
            cvij4(i,jjp1) = cvij1(i,jjp1)
-        end DO
+        END DO
 
         DO i = 1, iim
            aireij2_2d(i,jjp1) = 0.
@@ -432,7 +441,7 @@ SUBROUTINE inigeom
            cvij2(i,j) = 0.5*rad*yprm
            cvij3(i,j) = cvij2(i,j)
            cvij4(i,j) = cvij1(i,j)
-        end DO
+        END DO
 
      END IF
 
@@ -451,7 +460,7 @@ SUBROUTINE inigeom
      aireij3_2d(iip1,j) = aireij3_2d(1,j)
      aireij4_2d(iip1,j) = aireij4_2d(1,j)
 
-  end DO
+  END DO
 
   !    ..............................................................
 
@@ -467,7 +476,7 @@ SUBROUTINE inigeom
         alpha1p4_2d(i,j) = alpha1_2d(i,j) + alpha4_2d(i,j)
         alpha2p3_2d(i,j) = alpha2_2d(i,j) + alpha3_2d(i,j)
         alpha3p4_2d(i,j) = alpha3_2d(i,j) + alpha4_2d(i,j)
-     end DO
+     END DO
 
 
      aire_2d(iip1,j) = aire_2d(1,j)
@@ -479,7 +488,7 @@ SUBROUTINE inigeom
      alpha1p4_2d(iip1,j) = alpha1p4_2d(1,j)
      alpha2p3_2d(iip1,j) = alpha2p3_2d(1,j)
      alpha3p4_2d(iip1,j) = alpha3p4_2d(1,j)
-  end DO
+  END DO
 
 
   DO j = 1, jjp1
@@ -490,13 +499,13 @@ SUBROUTINE inigeom
         unsair_gam1_2d(i,j) = unsaire_2d(i,j)**(-gamdi_gdiv)
         unsair_gam2_2d(i,j) = unsaire_2d(i,j)**(-gamdi_h)
         airesurg_2d(i,j) = aire_2d(i,j)/g
-     end DO
+     END DO
      aireu_2d(iip1,j) = aireu_2d(1,j)
      unsaire_2d(iip1,j) = unsaire_2d(1,j)
      unsair_gam1_2d(iip1,j) = unsair_gam1_2d(1,j)
      unsair_gam2_2d(iip1,j) = unsair_gam2_2d(1,j)
      airesurg_2d(iip1,j) = airesurg_2d(1,j)
-  end DO
+  END DO
 
 
   DO j = 1, jjm
@@ -517,7 +526,7 @@ SUBROUTINE inigeom
      fext_2d(iip1,j) = fext_2d(1,j)
      unsairz_gam_2d(iip1,j) = unsairz_gam_2d(1,j)
 
-  end DO
+  END DO
 
 
   !    .....      Calcul  des elongations cu_2d,cv_2d, cvu     .........

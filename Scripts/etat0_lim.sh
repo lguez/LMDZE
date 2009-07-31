@@ -10,6 +10,8 @@
 in_dir=~/Documents/Utilisation_LMDZ/Input_etat0_lim
 ##in_dir=$workdir/LMDZE/Input_etat0_lim
 
+data_dir=~/Documents/Datasets
+
 executable_dir=/usr/local/guez/LMDZ/LMDZE_work/Compil_prod_g95
 ##executable_dir=$workdir/LMDZE/Compil_prod
 
@@ -42,7 +44,9 @@ rm -f limit.nc start.nc startphy.nc coefoz_LMDZ.nc
 # (If these are symbolic links then the Fortran program might not be
 # able to replace them.)
 
-cd $in_dir
+test -d $in_dir/$iel_id
+
+cd $data_dir
 test -f Albedo.nc
 test -f amipbc_sic_1x1.nc
 test -f amipbc_sst_1x1.nc
@@ -50,12 +54,13 @@ test -f ECPHY.nc
 test -f ECDYN.nc
 test -f landiceref.nc
 test -f Relief.nc
-test -f Ozone/coefoz_v2_3.nc
+test -f Ozone/coefoz_v2_8.nc
 test -f Rugos.nc
-test -d $iel_id
 cd -
 
-ln -s -f $in_dir/Albedo.nc $in_dir/amipbc_*.nc $in_dir/ECPHY.nc $in_dir/ECDYN.nc $in_dir/landiceref.nc $in_dir/Relief.nc $in_dir/Rugos.nc $in_dir/Ozone/coefoz_v2_3.nc .
+ln -s -f $data_dir/Albedo.nc $data_dir/amipbc_*.nc $data_dir/ECPHY.nc $data_dir/ECDYN.nc $data_dir/landiceref.nc $data_dir/Relief.nc $data_dir/Rugos.nc .
+
+ln -sf $data_dir/Ozone/coefoz_v2_8.nc coefoz.nc
 
 rm -f *.def
 test -f $in_dir/$iel_id/run.def

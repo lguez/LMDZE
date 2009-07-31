@@ -6,11 +6,11 @@
 FC = g95
 
 netcdf_inc_dir = /home/guez_local/include/NetCDF_g95 /home/guez_local/include
-netcdf_lib_dir = /home/guez_local/lib /home/guez_local/lib/NetCDF_g95
+netcdf_lib_dir = /home/guez_local/lib/NetCDF_g95 /home/guez_local/lib
 
-numer_rec_dir = /home/guez_local/lib/Numer_Rec_Lionel/n
+numer_rec_dir = /home/guez_local/lib/Numer_Rec_Lionel/w
 netcdf95_dir = /home/guez_local/lib/NetCDF95/g95
-IOIPSL_dir = /home/guez_local/lib/IOIPSL_Lionel/an
+IOIPSL_dir = /home/guez_local/lib/IOIPSL_Lionel/aq
 
 # Include flags:
 inc_flags = $(addprefix -I, ${libf_dir} ${libf_dir}/dyn3d ${libf_dir}/phylmd ${libf_dir}/filtrez ${netcdf_inc_dir} ${numer_rec_dir} ${netcdf95_dir} ${IOIPSL_dir})

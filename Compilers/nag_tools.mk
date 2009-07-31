@@ -1,10 +1,10 @@
 # These are compiler dependent macros, meant to be included in the
 # makefile for LMDZE.
 
-# For the NAGWare Fortran 95 module builder and other NAG tools.
+# For the NAGWare Fortran 95 module builder and other NAG tools
 
 # Include flags:
-inc_flags = -I${libf_dir} -I${libf_dir}/dyn3d -I${libf_dir}/phylmd -I${libf_dir}/filtrez -I/home/guez_local/include -I/home/guez_local/include/NetCDF_nag_modules95 -I/home/guez_local/lib/IOIPSL_Lionel/al -I/home/guez_local/lib/Numer_Rec_Lionel/g -I/home/guez_local/lib/NetCDF95/nag_modules95
+inc_flags = -I${libf_dir} -I${libf_dir}/dyn3d -I${libf_dir}/phylmd -I${libf_dir}/filtrez -I/home/guez_local/include -I/home/guez_local/include/NetCDF_nag_modules95 -I/home/guez_local/lib/IOIPSL_Lionel/ap -I/home/guez_local/lib/Numer_Rec_Lionel/s -I/home/guez_local/lib/NetCDF95/nag_modules95
 
 # NAG general options:
 nag_gl_options = ${inc_flags} -dusty -mismatch_all

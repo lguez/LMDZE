@@ -513,7 +513,7 @@ contains
       ENDDO
 
       CALL histwrite(nid_tra, "pplay", itau_w, gr_phy_write_3d(pplay))
-      CALL histwrite(nid_tra, "t", itau_w, gr_phy_write_3d(t_seri))
+      CALL histwrite(nid_tra, "T", itau_w, gr_phy_write_3d(t_seri))
 
       if (ok_sync) then
          call histsync(nid_tra)

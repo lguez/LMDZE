@@ -384,7 +384,6 @@ contains
        ENDDO
     ENDDO
 
-
     DO i = 1, imar
        DO j = 1, jmar
           IF (num_tot(i,j) .GT. 0.001) THEN
@@ -465,7 +464,6 @@ contains
           rugosite(i,j) = 0.0
        ENDDO
     ENDDO
-
 
     !  .....  Modif  P. Le Van ( 23/08/95 )  ....
 
@@ -586,7 +584,6 @@ contains
        ENDDO
     ENDDO
 
-
     !  .....  Modif  P. Le Van ( 23/08/95 )  ....
 
     DO ii = 1, imar
@@ -608,7 +605,6 @@ contains
           ENDDO
        ENDDO
     ENDDO
-
 
     DO i = 1, imar
        DO j = 1, jmar
@@ -649,14 +645,9 @@ contains
 
   SUBROUTINE rugsoro(imrel, jmrel, xrel, yrel, relief, immod, jmmod, xmod, &
        ymod, rugs)
-    !=======================================================================
-    ! Calculer la longueur de rugosite liee au relief en utilisant
-    ! l'ecart-type dans une maille de 1x1
-    !=======================================================================
 
-    REAL zzmin
-
-    REAL amin, AMAX
+    ! Calcule la longueur de rugosite liee au relief en utilisant
+    ! l'ecart-type dans une maille de 1x1.
 
     INTEGER, intent(in):: imrel, jmrel
     REAL, intent(in):: xrel(imrel),yrel(jmrel)
@@ -666,6 +657,8 @@ contains
     REAL, intent(in):: xmod(immod),ymod(jmmod)
     REAL, intent(out):: rugs(immod,jmmod)
 
+    REAL zzmin
+    REAL amin, AMAX
     INTEGER imtmp, jmtmp
     PARAMETER (imtmp=360,jmtmp=180)
     REAL xtmp(imtmp), ytmp(jmtmp)
@@ -678,6 +671,8 @@ contains
 
     REAL distans(400*400)
     INTEGER i_proche, j_proche, ij_proche
+
+    !---------------------------------------------------------
 
     IF (immod.GT.2200 .OR. jmmod.GT.1100) THEN
        PRINT*, 'immod ou jmmod trop grand', immod, jmmod
@@ -722,11 +717,10 @@ contains
     DO i = 1, imtmp
        DO j = 1, jmtmp
           number(i,j) = 0.0
-          cham1tmp(i,j) = 0.0
-          cham2tmp(i,j) = 0.0
+          cham1tmp(i,j) = 0d0
+          cham2tmp(i,j) = 0d0
        ENDDO
     ENDDO
-
 
     !  .....  Modif  P. Le Van ( 23/08/95 )  ....
 
@@ -744,7 +738,7 @@ contains
                       number(ii,jj) = number(ii,jj) + 1.0
                       cham1tmp(ii,jj) = cham1tmp(ii,jj) + relief(i,j)
                       cham2tmp(ii,jj) = cham2tmp(ii,jj)  &
-                           + relief(i,j)*relief(i,j)
+                           + relief(i,j) * relief(i,j)
                    ENDIF
                 ENDDO
              ENDIF
@@ -757,7 +751,7 @@ contains
           IF (number(i,j) .GT. 0.001) THEN
              cham1tmp(i,j) = cham1tmp(i,j) / number(i,j)
              cham2tmp(i,j) = cham2tmp(i,j) / number(i,j)
-             zzzz=cham2tmp(i,j)-cham1tmp(i,j)**2
+             zzzz = cham2tmp(i,j) - cham1tmp(i,j)**2
              if (zzzz .lt. 0.0) then
                 if (zzzz .gt. -7.5) then
                    zzzz = 0.0
@@ -784,7 +778,6 @@ contains
     ENDDO
     PRINT*, 'Ecart-type 1x1:', amin, AMAX
 
-
     a(1) = xmod(1) - (xmod(2)-xmod(1))/2.0
     b(1) = (xmod(1)+xmod(2))/2.0
     DO i = 2, immod-1
@@ -809,9 +802,6 @@ contains
           rugs(i,j) = 0.0
        ENDDO
     ENDDO
-
-
-    !  .....  Modif  P. Le Van ( 23/08/95 )  ....
 
     DO ii = 1, immod
        DO jj = 1, jmmod

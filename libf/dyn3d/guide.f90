@@ -54,9 +54,9 @@ SUBROUTINE guide(itau, ucov, vcov, teta, q, masse, ps)
 
   !=======================================================================
 
-  !   ...  Dans inigeom , nouveaux calculs pour les elongations  cu , cv 
-  !        et possibilite d'appeler une fonction f(y)  a derivee tangente 
-  !        hyperbolique a la  place de la fonction a derivee sinusoidale.         
+  ! Dans inigeom , nouveaux calculs pour les elongations  cu , cv 
+  ! et possibilite d'appeler une fonction f(y)  a derivee tangente 
+  ! hyperbolique a la  place de la fonction a derivee sinusoidale.         
 
   !   ...  Possibilite de choisir le shema de Van-leer pour l'advection de
   !         q  , en faisant iadv = 10  dans   traceur  (29/04/97) .
@@ -249,8 +249,8 @@ SUBROUTINE guide(itau, ucov, vcov, teta, q, masse, ps)
      PRINT *, 'nlev', nlev
      rcod = nf90_close(ncidpl)
      !   Lecture du premier etat des reanalyses.
-     CALL read_reanalyse(1, ps, ucovrea2, vcovrea2, tetarea2, qrea2, masserea2, &
-          psrea2, 1, nlev)
+     CALL read_reanalyse(1, ps, ucovrea2, vcovrea2, tetarea2, qrea2, &
+          masserea2, psrea2, 1, nlev)
      qrea2(:, :) = max(qrea2(:, :), 0.1)
 
 
@@ -286,8 +286,8 @@ SUBROUTINE guide(itau, ucov, vcov, teta, q, masse, ps)
              count_no_rea, ' non lectures'
         step_rea = step_rea + 1
         itau_test = itau
-        CALL read_reanalyse(step_rea, ps, ucovrea2, vcovrea2, tetarea2, qrea2, &
-             masserea2, psrea2, 1, nlev)
+        CALL read_reanalyse(step_rea, ps, ucovrea2, vcovrea2, tetarea2, &
+             qrea2, masserea2, psrea2, 1, nlev)
         qrea2(:, :) = max(qrea2(:, :), 0.1)
         factt = dtvr*iperiod/daysec
         ztau(:) = factt/max(alpha_t(:), 1.E-10)

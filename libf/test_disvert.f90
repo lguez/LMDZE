@@ -2,7 +2,6 @@ program test_disvert
 
   use dimens_m, only: llm
   use comvert, only: pa, disvert, ap, bp, preff
-  use comconst, only: initialize
   use new_unit_m, only: new_unit
 
   implicit none
@@ -14,7 +13,6 @@ program test_disvert
   !---------------------
 
   print *, "llm = ", llm
-  call initialize
   pa = 5e4
   call disvert
   sigma = ap / pa + bp

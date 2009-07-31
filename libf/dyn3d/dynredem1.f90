@@ -7,74 +7,69 @@ SUBROUTINE dynredem1(fichnom, time, vcov, ucov, teta, q, masse, ps)
   USE dimens_m, ONLY : iim, jjm, llm, nqmx
   USE temps, ONLY : itaufin, itau_dyn
   USE iniadvtrac_m, ONLY : tname
-  use netcdf, only: nf90_open, nf90_write, nf90_noerr, nf90_put_var, &
-       nf90_get_var, nf90_close
-  use netcdf95, only: nf95_inq_varid
+  use netcdf, only: nf90_write
+  use netcdf95, only: nf95_close, nf95_gw_var, nf95_inq_varid, nf95_open, &
+       nf95_put_var
 
   IMPLICIT NONE
 
+  CHARACTER(len=*), INTENT (IN) :: fichnom
+  REAL, INTENT (IN):: time
   REAL, INTENT (IN) :: vcov(iim + 1, jjm, llm), ucov(iim+1, jjm+1, llm)
   REAL, INTENT (IN) :: teta(iim+1, jjm+1, llm)
-  REAL, INTENT (IN) :: ps(iim+1, jjm+1), masse(iim+1, jjm+1, llm)
   REAL, INTENT (IN) :: q(iim+1, jjm+1, llm, nqmx)
-  CHARACTER(len=*), INTENT (IN) :: fichnom
+  REAL, INTENT (IN) :: ps(iim+1, jjm+1), masse(iim+1, jjm+1, llm)
 
-  REAL :: time
-  INTEGER :: nid, nvarid
-  INTEGER :: ierr
-  INTEGER :: iq
-  INTEGER :: length
-  PARAMETER (length=100)
-  REAL :: tab_cntrl(length) ! tableau des parametres du run
+  ! Variables local to the procedure:
+  INTEGER nid, nvarid, ierr
+  INTEGER iq
+  REAL, pointer:: tab_cntrl(:) ! tableau des paramètres du run
   INTEGER :: nb = 0
 
   !---------------------------------------------------------
 
   PRINT *, 'Call sequence information: dynredem1'
 
-  ierr = nf90_open(fichnom, nf90_write, nid)
-  IF (ierr/=nf90_noerr) THEN
-     PRINT *, 'Pb. d ouverture ' // fichnom
-     STOP 1
-  END IF
+  call nf95_open(fichnom, nf90_write, nid)
 
-  !  Ecriture/extension de la coordonnee temps
-
+  ! Écriture/extension de la coordonnée temps
   nb = nb + 1
   call nf95_inq_varid(nid, 'temps', nvarid)
-  ierr = nf90_put_var(nid, nvarid, time, (/nb/))
-  PRINT *, 'Enregistrement pour ', nb, time
+  call nf95_put_var(nid, nvarid, time, start=(/nb/))
+  PRINT *, 'Enregistrement pour :'
+  print *, "nb = ", nb
+  print *, "time = ", time
 
-
-  !  Re-ecriture du tableau de controle, itaufin n'est plus defini quand
-  !  on passe dans dynredem0
+  ! Récriture du tableau de contrôle, "itaufin" n'est plus défini quand
+  ! on passe dans "dynredem0"
   call nf95_inq_varid(nid, 'controle', nvarid)
-  ierr = nf90_get_var(nid, nvarid, tab_cntrl)
-  tab_cntrl(31) = real(itau_dyn+itaufin)
-  ierr = nf90_put_var(nid, nvarid, tab_cntrl)
+  call nf95_gw_var(nid, nvarid, tab_cntrl)
+  tab_cntrl(31) = real(itau_dyn + itaufin)
+  call nf95_put_var(nid, nvarid, tab_cntrl)
+  deallocate(tab_cntrl) ! pointer
 
-  !  Ecriture des champs
+  ! Écriture des champs
 
   call nf95_inq_varid(nid, 'ucov', nvarid)
-  ierr = nf90_put_var(nid, nvarid, ucov)
+  call nf95_put_var(nid, nvarid, ucov)
 
   call nf95_inq_varid(nid, 'vcov', nvarid)
-  ierr = nf90_put_var(nid, nvarid, vcov)
+  call nf95_put_var(nid, nvarid, vcov)
 
   call nf95_inq_varid(nid, 'teta', nvarid)
-  ierr = nf90_put_var(nid, nvarid, teta)
+  call nf95_put_var(nid, nvarid, teta)
 
   DO iq = 1, nqmx
      call nf95_inq_varid(nid, tname(iq), nvarid)
-     ierr = nf90_put_var(nid, nvarid, q(:, :, :, iq))
+     call nf95_put_var(nid, nvarid, q(:, :, :, iq))
   END DO
 
   call nf95_inq_varid(nid, 'masse', nvarid)
-  ierr = nf90_put_var(nid, nvarid, masse)
+  call nf95_put_var(nid, nvarid, masse)
 
   call nf95_inq_varid(nid, 'ps', nvarid)
-  ierr = nf90_put_var(nid, nvarid, ps)
+  call nf95_put_var(nid, nvarid, ps)
 
-  ierr = nf90_close(nid)
+  call nf95_close(nid)
 
 END SUBROUTINE dynredem1

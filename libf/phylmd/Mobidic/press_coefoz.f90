@@ -19,11 +19,11 @@ contains
     ! We assume that, in "coefoz_LMDZ.nc", the pressure levels are in hPa
     ! and strictly increasing.
 
-    use netcdf95, only: nf95_open, nf95_close, nf95_get_coord
+    use netcdf95, only: nf95_open, nf95_close, nf95_inq_varid, nf95_gw_var
     use netcdf, only: nf90_nowrite
 
     ! Variables local to the procedure:
-    integer ncid ! for NetCDF
+    integer ncid, varid ! for NetCDF
     integer n_plev ! number of pressure levels in the input data
     integer k
 
@@ -33,7 +33,8 @@ contains
 
     call nf95_open("coefoz_LMDZ.nc", nf90_nowrite, ncid)
 
-    call nf95_get_coord(ncid, "plev", plev)
+    call nf95_inq_varid(ncid, "plev", varid)
+    call nf95_gw_var(ncid, varid, plev)
     ! Convert from hPa to Pa because "regr_pr_av" and "regr_pr_int"
     ! require so:
     plev = plev * 100.
