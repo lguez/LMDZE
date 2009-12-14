@@ -136,7 +136,7 @@ CONTAINS
 
   !********************************
 
-  function start_inter_3d(varname, lon_in2, lat_in2, pls_in)
+  subroutine start_inter_3d(varname, lon_in2, lat_in2, pls_in, var3d)
 
     ! This procedure gets a 3D variable from a file and does the
     ! interpolations needed.
@@ -150,8 +150,7 @@ CONTAINS
     CHARACTER(len=*), intent(in):: varname
     REAL, intent(in):: lon_in2(:), lat_in2(:)
     REAL, intent(in):: pls_in(:, :, :)
-
-    REAL start_inter_3d(size(lon_in2), size(pls_in, 2), size(pls_in, 3))
+    REAL, intent(out):: var3d(:, :, :)
 
     ! LOCAL:
     INTEGER iml, jml, lml
@@ -167,12 +166,13 @@ CONTAINS
 
     print *, "Call sequence information: start_inter_3d"
 
-    iml = assert_eq(size(pls_in, 1), size(lon_in2), "start_inter_3d iml")
-    jml = size(pls_in, 2)
-    lml = size(pls_in, 3)
+    iml = assert_eq(size(pls_in, 1), size(lon_in2), size(var3d, 1), &
+         "start_inter_3d iml")
+    jml = assert_eq(size(pls_in, 2), size(var3d, 2), "start_inter_3d jml")
+    lml = assert_eq(size(pls_in, 3), size(var3d, 3), "start_inter_3d lml")
 
     print *, "iml = ", iml, ", jml = ", jml
-    print *, "fid_dyn = ", fid_dyn, ", varname = ", varname
+    print *, "varname = ", varname
     print *, "iml_dyn = ", iml_dyn, ", jml_dyn = ", jml_dyn, &
          ", llm_dyn = ", llm_dyn, ", ttm_dyn = ", ttm_dyn
     print *, 'Going into flinget to extract the 3D field.'
@@ -196,13 +196,13 @@ CONTAINS
           ay(:) = var_tmp3d(ii, ij, llm_dyn:1:-1)
           yder(:) = SPLINE(ax, ay)
           do il=1, lml
-             start_inter_3d(ii, ij, il) &
+             var3d(ii, ij, il) &
                   = SPLINT(ax, ay, yder, pls_in(ii, ij, il))
           END do
        ENDDO
     ENDDO
-    start_inter_3d(iml, :, :) = start_inter_3d(1, :, :) 
+    var3d(iml, :, :) = var3d(1, :, :) 
 
-  END function start_inter_3d
+  END subroutine start_inter_3d
 
 END MODULE startdyn

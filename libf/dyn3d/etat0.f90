@@ -48,6 +48,7 @@ contains
     use regr_lat_time_coefoz_m, only: regr_lat_time_coefoz
     use regr_pr_o3_m, only: regr_pr_o3
     use phyredem_m, only: phyredem
+    use caldyn0_m, only: caldyn0
 
     ! Variables local to the procedure:
 
@@ -147,15 +148,15 @@ contains
     PRINT *, "minval(pls(:, :, :)) = ", minval(pls(:, :, :))
     print *, "maxval(pls(:, :, :)) = ", maxval(pls(:, :, :))
 
-    uvent(:, :, :) = start_inter_3d('U', rlonv, rlatv, pls)
+    call start_inter_3d('U', rlonv, rlatv, pls, uvent)
     forall (l = 1: llm) uvent(:iim, :, l) = uvent(:iim, :, l) * cu_2d(:iim, :)
     uvent(iim+1, :, :) = uvent(1, :, :)
 
-    vvent(:, :, :) = start_inter_3d('V', rlonu, rlatu(:jjm), pls(:, :jjm, :))
+    call start_inter_3d('V', rlonu, rlatu(:jjm), pls(:, :jjm, :), vvent)
     forall (l = 1: llm) vvent(:iim, :, l) = vvent(:iim, :, l) * cv_2d(:iim, :)
     vvent(iim + 1, :, :) = vvent(1, :, :)
 
-    t3d(:, :, :) = start_inter_3d('TEMP', rlonu, rlatv, pls)
+    call start_inter_3d('TEMP', rlonu, rlatv, pls, t3d)
     PRINT *,  'minval(t3d(:, :, :)) = ', minval(t3d(:, :, :))
     print *, "maxval(t3d(:, :, :)) = ", maxval(t3d(:, :, :))
 
@@ -174,7 +175,8 @@ contains
     IF (MINVAL(qsat) == MAXVAL(qsat)) stop '"qsat" should not be constant'
 
     ! Water vapor:
-    q3d(:, :, :, 1) = 0.01 * start_inter_3d('R', rlonu, rlatv, pls) * qsat
+    call start_inter_3d('R', rlonu, rlatv, pls, q3d(:, :, :, 1))
+    q3d(:, :, :, 1) = 0.01 * q3d(:, :, :, 1) * qsat
     WHERE (q3d(:, :, :, 1) < 0.) q3d(:, :, :, 1) = 1E-10
     DO l = 1, llm
        q3d(:, 1, l, 1) = SUM(aire_2d(:, 1) * q3d(:, 1, l, 1)) / apoln
@@ -297,10 +299,10 @@ contains
     annee_ref = anneeref
 
     CALL geopot(ip1jmp1, tpot, pk , pks,  phis, phi)
-    CALL caldyn0(0, uvent, vvent, tpot, psol, masse, pk, phis, phi, w, &
-         pbaru, pbarv, 0)
+    CALL caldyn0(uvent, vvent, tpot, psol, masse, pk, phis, phi, w, pbaru, &
+         pbarv)
     CALL dynredem0("start.nc", dayref, phis)
-    CALL dynredem1("start.nc", 0., vvent, uvent, tpot, q3d, masse, psol)
+    CALL dynredem1("start.nc", vvent, uvent, tpot, q3d, masse, psol)
 
     ! Ecriture état initial physique:
     print *, 'dtvr = ', dtvr

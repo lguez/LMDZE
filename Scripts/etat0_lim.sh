@@ -7,15 +7,15 @@
 
 # Specify directories:
 
-in_dir=~/Documents/Utilisation_LMDZ/Input_etat0_lim
-##in_dir=$workdir/LMDZE/Input_etat0_lim
+##in_dir=~/Documents/Around_LMDZ/Around_LMDZE/Input_etat0_lim
+in_dir=$workdir/LMDZE/Input_etat0_lim
 
 data_dir=~/Documents/Datasets
 
-executable_dir=/usr/local/guez/LMDZ/LMDZE_work/Compil_prod_g95
+executable_dir=/usr/local/guez/LMDZ_work/LMDZE/Compil_prod_g95
 ##executable_dir=$workdir/LMDZE/Compil_prod
 
-res_dir=/usr/local/guez/LMDZ/LMDZE_work/Results_etat0_lim
+res_dir=/usr/local/guez/LMDZ_work/LMDZE/Results_etat0_lim
 # (only for comparison with a previous run)
 
 read -p \
@@ -50,17 +50,18 @@ cd $data_dir
 test -f Albedo.nc
 test -f amipbc_sic_1x1.nc
 test -f amipbc_sst_1x1.nc
-test -f ECPHY.nc
+##test -f ECPHY.nc
 test -f ECDYN.nc
 test -f landiceref.nc
 test -f Relief.nc
-test -f Ozone/coefoz_v2_8.nc
+test -f Ozone/Cariolle/Cariolle_v2_8/coefoz_v2_8.nc
 test -f Rugos.nc
 cd -
 
-ln -s -f $data_dir/Albedo.nc $data_dir/amipbc_*.nc $data_dir/ECPHY.nc $data_dir/ECDYN.nc $data_dir/landiceref.nc $data_dir/Relief.nc $data_dir/Rugos.nc .
+ln -s -f $data_dir/Albedo.nc $data_dir/amipbc_*.nc $data_dir/ECDYN.nc $data_dir/landiceref.nc $data_dir/Relief.nc $data_dir/Rugos.nc .
 
-ln -sf $data_dir/Ozone/coefoz_v2_8.nc coefoz.nc
+ln -sf $data_dir/Ozone/Cariolle/Cariolle_v2_8/coefoz_v2_8.nc coefoz.nc
+ln -sf $data_dir/ECDYN.nc ECPHY.nc
 
 rm -f *.def
 test -f $in_dir/$iel_id/run.def

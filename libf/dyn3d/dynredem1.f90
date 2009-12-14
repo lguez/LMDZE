@@ -1,7 +1,6 @@
-SUBROUTINE dynredem1(fichnom, time, vcov, ucov, teta, q, masse, ps)
+SUBROUTINE dynredem1(fichnom, vcov, ucov, teta, q, masse, ps)
 
   ! From dyn3d/dynredem.F, v 1.2 2004/06/22 11:45:30
-
   ! Ecriture du fichier de redémarrage au format NetCDF
 
   USE dimens_m, ONLY : iim, jjm, llm, nqmx
@@ -14,14 +13,13 @@ SUBROUTINE dynredem1(fichnom, time, vcov, ucov, teta, q, masse, ps)
   IMPLICIT NONE
 
   CHARACTER(len=*), INTENT (IN) :: fichnom
-  REAL, INTENT (IN):: time
   REAL, INTENT (IN) :: vcov(iim + 1, jjm, llm), ucov(iim+1, jjm+1, llm)
   REAL, INTENT (IN) :: teta(iim+1, jjm+1, llm)
   REAL, INTENT (IN) :: q(iim+1, jjm+1, llm, nqmx)
   REAL, INTENT (IN) :: ps(iim+1, jjm+1), masse(iim+1, jjm+1, llm)
 
   ! Variables local to the procedure:
-  INTEGER nid, nvarid, ierr
+  INTEGER nid, nvarid
   INTEGER iq
   REAL, pointer:: tab_cntrl(:) ! tableau des paramètres du run
   INTEGER :: nb = 0
@@ -35,10 +33,8 @@ SUBROUTINE dynredem1(fichnom, time, vcov, ucov, teta, q, masse, ps)
   ! Écriture/extension de la coordonnée temps
   nb = nb + 1
   call nf95_inq_varid(nid, 'temps', nvarid)
-  call nf95_put_var(nid, nvarid, time, start=(/nb/))
-  PRINT *, 'Enregistrement pour :'
-  print *, "nb = ", nb
-  print *, "time = ", time
+  call nf95_put_var(nid, nvarid, values=0., start=(/nb/))
+  PRINT *, "Enregistrement pour nb = ", nb
 
   ! Récriture du tableau de contrôle, "itaufin" n'est plus défini quand
   ! on passe dans "dynredem0"

@@ -8,7 +8,7 @@ FC = sxf90
 netcdf_inc_dir = /SXlocal/pub/netCDF/3.6.1/include
 netcdf_lib_dir = /SXlocal/pub/netCDF/3.6.1/lib
 
-numer_rec_dir = ${workdir}/lib/Numer_Rec_Lionel/f
+numer_rec_dir = ${workdir}/lib/Numer_Rec_Lionel/x
 netcdf95_dir = ${workdir}/lib/NetCDF95_sxf90
 IOIPSL_dir = ${workdir}/lib/IOIPSL_Lionel_am
 

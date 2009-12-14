@@ -28,9 +28,9 @@ contains
     use indicesol, only: nbsrf, is_ter, is_lic, is_sic, is_oce, &
          clnsurf, epsfra
     use dimphy, only: klon, nbtr
-    use conf_gcm_m, only: raz_date, offline, iphysiq
+    use conf_gcm_m, only: raz_date, offline
     use dimsoil, only: nsoilmx
-    use temps, only: itau_phy, day_ref, annee_ref, itaufin
+    use temps, only: itau_phy, day_ref, annee_ref
     use clesphys, only: ecrit_hf, ecrit_ins, ecrit_mth, &
          cdmmax, cdhmax, &
          co2_ppm, ecrit_reg, ecrit_tra, ksta, ksta_ter, &
@@ -180,17 +180,9 @@ contains
     REAL swup0(klon, klevp1), swup(klon, klevp1)
     SAVE swdn0, swdn, swup0, swup
 
-    REAL SWdn200clr(klon), SWdn200(klon)
-    REAL SWup200clr(klon), SWup200(klon)
-    SAVE SWdn200clr, SWdn200, SWup200clr, SWup200
-
     REAL lwdn0(klon, klevp1), lwdn(klon, klevp1)
     REAL lwup0(klon, klevp1), lwup(klon, klevp1)
     SAVE lwdn0, lwdn, lwup0, lwup 
-
-    REAL LWdn200clr(klon), LWdn200(klon)
-    REAL LWup200clr(klon), LWup200(klon)
-    SAVE LWdn200clr, LWdn200, LWup200clr, LWup200
 
     !IM Amip2
     ! variables a une pression donnee
@@ -206,34 +198,6 @@ contains
          '500 ', '400 ', '300 ', '250 ', '200 ', '150 ', '100 ', &
          '70  ', '50  ', '30  ', '20  ', '10  '/
 
-    real tlevSTD(klon, nlevSTD), qlevSTD(klon, nlevSTD)
-    real rhlevSTD(klon, nlevSTD), philevSTD(klon, nlevSTD)
-    real ulevSTD(klon, nlevSTD), vlevSTD(klon, nlevSTD)
-    real wlevSTD(klon, nlevSTD) 
-
-    ! nout : niveau de output des variables a une pression donnee
-    INTEGER nout
-    PARAMETER(nout=3) !nout=1 : day; =2 : mth; =3 : NMC
-
-    logical oknondef(klon, nlevSTD, nout)
-    real tnondef(klon, nlevSTD, nout) 
-    save tnondef
-
-    ! les produits uvSTD, vqSTD, .., T2STD sont calcules
-    ! a partir des valeurs instantannees toutes les 6 h
-    ! qui sont moyennees sur le mois
-
-    real uvSTD(klon, nlevSTD)
-    real vqSTD(klon, nlevSTD)
-    real vTSTD(klon, nlevSTD)
-    real wqSTD(klon, nlevSTD)
-
-    real vphiSTD(klon, nlevSTD)
-    real wTSTD(klon, nlevSTD)
-    real u2STD(klon, nlevSTD)
-    real v2STD(klon, nlevSTD)
-    real T2STD(klon, nlevSTD)
-
     ! prw: precipitable water
     real prw(klon)
 
@@ -242,7 +206,7 @@ contains
     REAL flwp(klon), fiwp(klon)
     REAL flwc(klon, llm), fiwc(klon, llm)
 
-    INTEGER l, kmax, lmax
+    INTEGER kmax, lmax
     PARAMETER(kmax=8, lmax=8)
     INTEGER kmaxm1, lmaxm1
     PARAMETER(kmaxm1=kmax-1, lmaxm1=lmax-1)
@@ -293,9 +257,6 @@ contains
 
     integer nid_hf, nid_hf3d
     save nid_hf, nid_hf3d
-
-    INTEGER        longcles
-    PARAMETER    ( longcles = 20 )
 
     ! Variables propres a la physique
 
@@ -624,8 +585,6 @@ contains
     REAL dudyn(iim+1, jjm + 1, llm)
 
     REAL zx_tmp_fi2d(klon)      ! variable temporaire grille physique
-    REAL zx_tmp_fi3d(klon, llm) ! variable temporaire pour champs 3D 
-
     REAL zx_tmp_2d(iim, jjm + 1), zx_tmp_3d(iim, jjm + 1, llm)
 
     INTEGER, SAVE:: nid_day, nid_ins

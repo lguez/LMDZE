@@ -117,7 +117,7 @@ c   ----------------------------------------------
 
       IF( conser )  THEN
         CALL sortvarc
-     $ ( itau,ucov,teta,ps,masse,pk,phis,vorpot,phi,bern,dp,time,vcov )
+     $ ( itau,ucov,teta,ps,masse,pk,phis,vorpot,phi,bern,dp,time)
 
       ENDIF
 

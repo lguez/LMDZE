@@ -9,6 +9,6 @@ module parafilt
 
   implicit none
 
-  INTEGER, PARAMETER:: nfilun=12, nfilus=11, nfilvn=12, nfilvs=12
+  INTEGER, PARAMETER:: nfilun=6, nfilus=5, nfilvn=5, nfilvs=5
 
 end module parafilt

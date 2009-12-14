@@ -19,14 +19,11 @@ PROGRAM gcm
   use dimens_m, only: iim, jjm, llm, nqmx
   use dimphy, only: klon
   use paramet_m, only: ip1jm, ip1jmp1
-  use comconst, only: daysec, cpp, dtvr, dtphys, g, rad, r, initialize
-
+  use comconst, only: daysec, cpp, dtvr, g, rad, r, initialize
   use comdissnew, only: lstardis, nitergdiv, nitergrot, niterh, tetagdiv, &
        tetagrot, tetatemp
-
   use conf_gcm_m, only: day_step, iperiod, anneeref, dayref, iecri, iphysiq, &
        nday, raz_date, periodav, conf_gcm
-
   use logic, only: iflag_phys
   use comgeom, only: rlatu, aire_2d, cu_2d, cv_2d, rlonv
   use temps, only: day_ref, annee_ref, day_ini, day_end, itau_dyn
@@ -64,7 +61,6 @@ PROGRAM gcm
   LOGICAL:: true_calendar = .false. ! default value
 
   ! Variables pour l'initialisation de la physique :
-  integer nq
   REAL zcufi(klon), zcvfi(klon) ! "cu" and "cv" values on the scalar grid
   REAL latfi(klon), lonfi(klon)
   REAL airefi(klon)
@@ -97,7 +93,7 @@ PROGRAM gcm
 
   ! Initialisation des traceurs
   ! Choix du schéma pour l'advection dans le fichier "traceur.def" ou via INCA
-  call iniadvtrac(nq)
+  call iniadvtrac
 
   ! Lecture du fichier "start.nc" :
   CALL dynetat0(vcov, ucov, teta, q, masse, ps, phis, time_0)
@@ -203,7 +199,7 @@ PROGRAM gcm
   istphy = istdyn / iphysiq     
 
   ! Intégration temporelle du modèle :
-  CALL leapfrog(ucov, vcov, teta, ps, masse, phis, nq, q, time_0)
+  CALL leapfrog(ucov, vcov, teta, ps, masse, phis, q, time_0)
 
   call histclo
   print *, 'Simulation finished'

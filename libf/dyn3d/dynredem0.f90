@@ -6,7 +6,7 @@ CONTAINS
 
   SUBROUTINE dynredem0(fichnom, iday_end, phis)
 
-    ! From dyn3d/dynredem.F, v 1.2 2004/06/22 11:45:30
+    ! From dyn3d/dynredem.F, version 1.2 2004/06/22 11:45:30
     ! Ecriture du fichier de redémarrage au format NetCDF (initialisation)
 
     USE ioipsl, ONLY : ju2ymds, ymds2ju
@@ -54,7 +54,7 @@ CONTAINS
 
     PRINT *, 'Call sequence information: dynredem0'
 
-    CALL ymds2ju(annee_ref, 1, iday_end, 0.0, zjulian)
+    CALL ymds2ju(annee_ref, 1, iday_end, 0., zjulian)
     CALL ju2ymds(zjulian, yyears0, mmois0, jjour0, hours)
 
     DO l = 1, length

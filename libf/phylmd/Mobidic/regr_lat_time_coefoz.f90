@@ -127,7 +127,7 @@ contains
     name_out(i_v) = "a2"
 
     i_v = i_v + 1
-    name_in(i_v) = "r"
+    name_in(i_v) = "tro3"
     name_out(i_v) = "r_Mob"
 
     i_v = i_v + 1

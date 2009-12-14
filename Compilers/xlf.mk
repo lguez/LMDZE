@@ -1,13 +1,16 @@
 # These are compiler dependent macros, meant to be included in the
-# LMDZE makefile.
+# makefile for LMDZE.
 
 # For XL Fortran
 
-COMPILE.f = $(FC) $(F90FLAGS) -c
 FC = xlf95
 
+numer_rec_dir =  ${workdir}/lib/Numer_Rec_Lionel_v
+netcdf95_dir = ${workdir}/lib/NetCDF95
+IOIPSL_dir = ${workdir}/lib/IOIPSL_Lionel_ar
+
 # Include flags:
-inc_flags = -I${libf_dir} -I${libf_dir}/dyn3d -I${libf_dir}/phylmd -I${libf_dir}/filtrez -I${workdir}/IOIPSL_Lionel_y ${NETCDF} -I${workdir}/Numer_Rec_Lionel
+inc_flags = $(addprefix -I, ${libf_dir} ${libf_dir}/dyn3d ${libf_dir}/phylmd ${libf_dir}/filtrez ${numer_rec_dir} ${netcdf95_dir} ${IOIPSL_dir}) ${NETCDF_FFLAGS}
 
 # Other flags which do not affect run time performance:
 lang_flags = -qlanglvl=95pure -qnodirective -qnoescape -qsuppress=1520-050 -qwarn64
@@ -15,10 +18,11 @@ lang_flags = -qlanglvl=95pure -qnodirective -qnoescape -qsuppress=1520-050 -qwar
 ##-qattr=full -qxref=full
 
 # Flags which affect run time performance:
-perf_flags = -qcheck -qdbg -qfloat=nans -qfloat=nomaf:rndsngl:nofold -qflttrap=overflow:zerodivide:enable -qfullpath -qinitauto=7FBFFFFF -qnooptimize -qnosave -qsigtrap -qspillsize=1024
+perf_flags = -qdbg -qfloat=nans -qfloat=nomaf:rndsngl:nofold -qflttrap=overflow:zerodivide:enable -qfullpath -qinitauto=7FBFFFFF -qnooptimize -qnosave -qsigtrap -qspillsize=1024
 
 ##-O3 -qnostrict -qessl -qextchk
 ## "-qflttrap=invalid" gives an error in "orografi.F"
+##-qcheck severe error in etat0
 
 FFLAGS = ${inc_flags} -qfixed ${perf_flags}
 F90FLAGS = ${inc_flags} ${lang_flags} ${perf_flags}
@@ -26,6 +30,6 @@ F90FLAGS = ${inc_flags} ${lang_flags} ${perf_flags}
 LDFLAGS = 
 ##-O3 -bnoquiet
 
-LDLIBS = -L${workdir}/IOIPSL_Lionel_y -lioipsl -L${workdir}/Numer_Rec_Lionel -lnumer_rec -L/usr/local/pub/lib -lnetcdf
+LDLIBS = $(addprefix -L, ${numer_rec_dir} ${netcdf95_dir} ${IOIPSL_dir}) -lioipsl -lnetcdf95 -lnumer_rec ${NETCDF_LDFLAGS}
 
 ##-lessl

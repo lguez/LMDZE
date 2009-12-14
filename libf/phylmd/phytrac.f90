@@ -486,7 +486,6 @@ contains
       ! Variables local to the procedure:
       integer it
       integer itau_w   ! pas de temps ecriture
-      REAL zx_tmp_2d(iim, jjm+1), zx_tmp_3d(iim, jjm+1, llm)
       logical, parameter:: ok_sync = .true.
 
       !-----------------------------------------------------

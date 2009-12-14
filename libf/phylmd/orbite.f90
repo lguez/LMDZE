@@ -110,8 +110,9 @@ CONTAINS
 
     !----------------------------------------------------------------------
 
-    call assert((/size(pmu0), size(frac)/) == klon, "zenang")
-
+    if (present(frac)) call assert((/size(pmu0), size(frac)/) == klon, &
+         "zenang")
+    
     deux_pi = 2*pi
 
     lat_sun = asin(sin(longi * pi / 180.) * sin(r_incl * pi / 180.))

@@ -8,17 +8,13 @@ SUBROUTINE advtrac(pbaru,pbarv,p,masse,q,iapptrac,teta,pk)
   !            D. Le Croller (07/2001)
   !            M.A Filiberti (04/2002)
 
-  USE dimens_m
-  USE paramet_m
-  USE comconst
-  USE comvert
-  USE conf_gcm_m
-  USE logic
-  USE comgeom
-  USE temps
-  USE ener
-  USE iniadvtrac_m
-  USE comdissip
+  USE dimens_m, ONLY : iim, jjm, llm, nqmx
+  USE paramet_m, ONLY : iip1, iip2, ijmllm, ijp1llm, ip1jm, ip1jmp1, jjp1, &
+       llmp1
+  USE comconst, ONLY : dtvr
+  USE conf_gcm_m, ONLY : iapp_tracvl
+  USE iniadvtrac_m, ONLY : iadv
+
   IMPLICIT NONE
 
 
@@ -291,9 +287,6 @@ SUBROUTINE advtrac(pbaru,pbarv,p,masse,q,iapptrac,teta,pk)
      !   on reinitialise a zero les flux de masse cumules
      !---------------------------------------------------
      iadvtr = 0
-
-
   END IF
-  ! if iadvtr.EQ.iapp_tracvl                                 
-  RETURN
+
 END SUBROUTINE advtrac

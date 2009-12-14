@@ -18,7 +18,7 @@ module iniadvtrac_m
 
 contains
 
-  subroutine iniadvtrac(nq)
+  subroutine iniadvtrac
 
     ! From dyn3d/iniadvtrac.F, version 1.3 2005/04/13 08:58:34
 
@@ -27,7 +27,7 @@ contains
     ! Modification M.-A. Filiberti 02/02 lecture de "traceur.def"
     ! Modification de l'intégration de "q" (26/04/94)
 
-    integer, intent(out), optional:: nq
+    use numer_rec, only: assert
 
     ! Variables local to the procedure:
 
@@ -103,24 +103,20 @@ contains
        print *, 'Ouverture de "traceur.def" ok'
        read(unit=90, fmt=*) nq_local
        print *, 'nombre de traceurs ', nq_local
-       if (nq_local > nqmx) then
-          print *, 'nombre de traceurs trop important'
-          print *, 'verifier traceur.def'
-          stop 1
-       endif
+       call assert(nq_local == nqmx, "iniadvtrac nq_local")
 
-       do iq=1, nq_local
+       do iq=1, nqmx
           read(90, 999) hadv(iq), vadv(iq), tnom(iq)
        end do
        close(90)  
        PRINT *, 'lecture de traceur.def :'   
-       do iq=1, nq_local
+       do iq=1, nqmx
           write(*, *) hadv(iq), vadv(iq), tnom(iq)
        end do
     else
        print *, 'Problème à l''ouverture de "traceur.def"'
        print *, 'Attention : on prend des valeurs par défaut.'
-       nq_local = 4
+       call assert(nqmx == 4, "iniadvtrac nqmx")
        hadv(1) = 14
        vadv(1) = 14
        tnom(1) = 'H2Ov'
@@ -135,7 +131,7 @@ contains
        tnom(4) = 'PB'
     ENDIF
     PRINT *, 'Valeur de traceur.def :'
-    do iq=1, nq_local
+    do iq=1, nqmx
        write(*, *) hadv(iq), vadv(iq), tnom(iq)
     end do
 
@@ -143,7 +139,7 @@ contains
     ! détemine le nom long :
     iiq=0
     ii=0
-    do iq=1, nq_local
+    do iq=1, nqmx
        iiq=iiq+1
        if (hadv(iq) /= vadv(iq)) then
           if (hadv(iq) == 10.and.vadv(iq) == 16) then
@@ -209,7 +205,6 @@ contains
           niadv(iiq)=iq
        endif
     end do
-    if (present(nq)) nq = nq_local
 
 999 format (i2, 1x, i2, 1x, a8)
 

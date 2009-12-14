@@ -6,7 +6,7 @@ module leapfrog_m
 
 contains
 
-  SUBROUTINE leapfrog(ucov, vcov, teta, ps, masse, phis, nq, q, time_0)
+  SUBROUTINE leapfrog(ucov, vcov, teta, ps, masse, phis, q, time_0)
 
     ! From dyn3d/leapfrog.F, version 1.6 2005/04/13 08:58:34
 
@@ -27,8 +27,8 @@ contains
     ! Pour Van-Leer + Vapeur d'eau saturee, iadv(1)=4. (F.Codron, 10/99)
     ! Pour Van-Leer iadv=10 
 
-    use dimens_m, only: iim, jjm, llm, nqmx
-    use paramet_m, only: ip1jmp1, ip1jm, ijmllm, ijp1llm, jjp1, iip1, iip2
+    use dimens_m, only: iim, llm, nqmx
+    use paramet_m, only: ip1jmp1, ip1jm, ijmllm, ijp1llm, jjp1, iip1
     use comconst, only: dtvr, daysec, dtphys
     use comvert, only: ap, bp
     use conf_gcm_m, only: day_step, iconser, idissip, iphysiq, iperiod, nday, &
@@ -45,8 +45,6 @@ contains
     use guide_m, only: guide
     use pression_m, only: pression
     use pressure_var, only: p3d
-
-    integer, intent(in):: nq
 
     ! Variables dynamiques:
     REAL vcov(ip1jm, llm), ucov(ip1jmp1, llm) ! vents covariants
@@ -104,7 +102,6 @@ contains
     INTEGER ij, l
 
     REAL rdayvrai, rdaym_ini
-    LOGICAL:: callinigrads = .true.
 
     !+jld variables test conservation energie
     REAL ecin(ip1jmp1, llm), ecin0(ip1jmp1, llm)
@@ -117,7 +114,6 @@ contains
     INTEGER:: ip_ebil_dyn = 0 ! PRINT level for energy conserv. diag.
 
     logical:: dissip_conservative = .true.
-    LOGICAL:: prem = .true.
     logical forward, leapf, apphys, conser, apdiss
 
     !---------------------------------------------------
@@ -217,7 +213,7 @@ contains
                      teta, q(:, :, 1), q(:, :, 2))
              ENDIF
 
-             CALL calfis(nq, lafin, rdayvrai, time, ucov, vcov, teta, q, &
+             CALL calfis(nqmx, lafin, rdayvrai, time, ucov, vcov, teta, q, &
                   masse, ps, pk, phis, phi, du, dv, dteta, dq, w, &
                   dufi, dvfi, dtetafi, dqfi, dpfi)
 
@@ -318,7 +314,7 @@ contains
           ENDIF
 
           IF (itau == itaufin) THEN
-             CALL dynredem1("restart.nc", 0., vcov, ucov, teta, q, masse, ps)
+             CALL dynredem1("restart.nc", vcov, ucov, teta, q, masse, ps)
              CLOSE(99)
           ENDIF
 
