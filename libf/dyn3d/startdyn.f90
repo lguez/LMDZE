@@ -196,8 +196,7 @@ CONTAINS
           ay(:) = var_tmp3d(ii, ij, llm_dyn:1:-1)
           yder(:) = SPLINE(ax, ay)
           do il=1, lml
-             var3d(ii, ij, il) &
-                  = SPLINT(ax, ay, yder, pls_in(ii, ij, il))
+             var3d(ii, ij, il) = SPLINT(ax, ay, yder, pls_in(ii, ij, il))
           END do
        ENDDO
     ENDDO

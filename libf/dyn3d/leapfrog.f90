@@ -1,7 +1,5 @@
 module leapfrog_m
 
-  ! This module is clean: no C preprocessor directive, no include line.
-
   IMPLICIT NONE
 
 contains
@@ -10,25 +8,24 @@ contains
 
     ! From dyn3d/leapfrog.F, version 1.6 2005/04/13 08:58:34
 
-    ! Version du 10/01/98, avec coordonnees verticales hybrides, avec
-    ! nouveaux operat. dissipation * (gradiv2, divgrad2, nxgraro2)
+    ! Version du 10/01/98, avec coordonnées verticales hybrides, avec
+    ! nouveaux opérateurs dissipation "*" (gradiv2, divgrad2, nxgraro2)
 
-    ! Auteur: P. Le Van /L. Fairhead/F.Hourdin
-    ! Objet:
-    ! GCM LMD nouvelle grille
+    ! Auteurs : P. Le Van, L. Fairhead, F. Hourdin
+    ! Objet: nouvelle grille
 
-    ! ... Dans inigeom, nouveaux calculs pour les elongations cu, cv
-    ! et possibilite d'appeler une fonction f(y) a derivee tangente
-    ! hyperbolique a la place de la fonction a derivee sinusoidale.
+    ! Dans "inigeom", nouveaux calculs pour les élongations cu, cv
+    ! et possibilité d'appeler une fonction f(y) à dérivée tangente
+    ! hyperbolique à la place de la fonction à dérivée sinusoïdale.
 
-    ! ... Possibilité de choisir le schéma pour l'advection de
-    ! q, en modifiant iadv dans "traceur.def" (10/02) .
+    ! Possibilité de choisir le schéma pour l'advection de
+    ! q, en modifiant iadv dans "traceur.def".
 
-    ! Pour Van-Leer + Vapeur d'eau saturee, iadv(1)=4. (F.Codron, 10/99)
+    ! Pour Van-Leer + vapeur d'eau saturée, iadv(1)=4.
     ! Pour Van-Leer iadv=10 
 
     use dimens_m, only: iim, llm, nqmx
-    use paramet_m, only: ip1jmp1, ip1jm, ijmllm, ijp1llm, jjp1, iip1
+    use paramet_m, only: ip1jmp1, ip1jm, ijp1llm, jjp1, iip1
     use comconst, only: dtvr, daysec, dtphys
     use comvert, only: ap, bp
     use conf_gcm_m, only: day_step, iconser, idissip, iphysiq, iperiod, nday, &
@@ -54,7 +51,7 @@ contains
     REAL masse(ip1jmp1, llm) ! masse d'air
     REAL phis(ip1jmp1) ! geopotentiel au sol
 
-    REAL time_0
+    REAL, intent(in):: time_0
 
     ! Variables local to the procedure:
 
@@ -91,7 +88,6 @@ contains
     REAL tppn(iim), tpps(iim), tpn, tps
 
     INTEGER itau ! index of the time step of the dynamics, starts at 0
-    integer itaufinp1
     INTEGER iday ! jour julien
     REAL time ! time of day, as a fraction of day length
 
@@ -103,7 +99,7 @@ contains
 
     REAL rdayvrai, rdaym_ini
 
-    !+jld variables test conservation energie
+    ! Variables test conservation energie
     REAL ecin(ip1jmp1, llm), ecin0(ip1jmp1, llm)
     ! Tendance de la temp. potentiel d (theta) / d t due a la 
     ! tansformation d'energie cinetique en energie thermique
@@ -121,8 +117,6 @@ contains
     print *, "Call sequence information: leapfrog"
 
     itaufin = nday * day_step
-    itaufinp1 = itaufin + 1
-
     itau = 0
     iday = day_ini
     time = time_0
@@ -131,21 +125,21 @@ contains
        iday = iday + 1
     ENDIF
 
+    dq = 0.
     ! On initialise la pression et la fonction d'Exner :
-    dq=0.
     CALL pression(ip1jmp1, ap, bp, ps, p3d)
     CALL exner_hyb(ps, p3d, pks, pk, pkf)
 
     ! Debut de l'integration temporelle:
     outer_loop:do
-       if (ok_guide.and.(itaufin - itau - 1) * dtvr > 21600) then
+       if (ok_guide.and.(itaufin - itau - 1) * dtvr > 21600.) then
           call guide(itau, ucov, vcov, teta, q, masse, ps)
        else
           IF (prt_level > 9) print *, &
-               'Attention : on ne guide pas les 6 dernieres heures.'
+               'Attention : on ne guide pas les 6 dernières heures.'
        endif
 
-       CALL SCOPY(ijmllm, vcov, 1, vcovm1, 1)
+       CALL SCOPY(ip1jm * llm, vcov, 1, vcovm1, 1)
        CALL SCOPY(ijp1llm, ucov, 1, ucovm1, 1)
        CALL SCOPY(ijp1llm, teta, 1, tetam1, 1)
        CALL SCOPY(ijp1llm, masse, 1, massem1, 1)
@@ -300,7 +294,7 @@ contains
              ENDIF
           ENDIF
 
-          IF (itau == itaufinp1) exit outer_loop
+          IF (itau == itaufin + 1) exit outer_loop
 
           ! ecriture du fichier histoire moyenne:
 

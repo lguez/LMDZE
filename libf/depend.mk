@@ -133,6 +133,17 @@ limit.o : grid_change.o inter_barxy.o conf_dat2d.o start_init_orog_m.o etat0.o c
 limx.o : comgeom.o logic.o comvert.o comconst.o paramet_m.o dimens_m.o 
 limy.o : comgeom.o logic.o comvert.o comconst.o paramet_m.o dimens_m.o 
 limz.o : comgeom.o logic.o comvert.o comconst.o paramet_m.o dimens_m.o 
+lw.o : raddimlw.o raddim.o YOMCST.o clesphys.o dimphy.o dimens_m.o 
+lwb.o : raddimlw.o raddim.o dimphy.o dimens_m.o 
+lwbv.o : raddimlw.o raddim.o YOMCST.o dimphy.o dimens_m.o 
+lwc.o : radopt.o radepsi.o raddim.o dimphy.o dimens_m.o 
+lwtt.o : raddimlw.o raddim.o dimphy.o dimens_m.o 
+lwttm.o : raddimlw.o raddim.o dimphy.o dimens_m.o 
+lwu.o : raddimlw.o radopt.o radepsi.o raddim.o YOMCST.o clesphys.o dimphy.o dimens_m.o 
+lwv.o : raddimlw.o raddim.o YOMCST.o dimphy.o dimens_m.o 
+lwvb.o : raddimlw.o radopt.o raddim.o dimphy.o dimens_m.o 
+lwvd.o : raddimlw.o raddim.o dimphy.o dimens_m.o 
+lwvn.o : raddimlw.o raddim.o dimphy.o dimens_m.o 
 massbar.o : comgeom.o comconst.o paramet_m.o dimens_m.o 
 massbarxy.o : comgeom.o comconst.o paramet_m.o dimens_m.o 
 massdair.o : comgeom.o comconst.o paramet_m.o dimens_m.o 
@@ -164,9 +175,9 @@ pressure_var.o : dimens_m.o
 psextbar.o : comgeom.o paramet_m.o dimens_m.o 
 qcheck.o : YOMCST.o 
 qminimum.o : comvert.o paramet_m.o dimens_m.o 
-raddim.o : dimens_m.o 
+raddim.o : dimphy.o dimens_m.o 
 radiornpb.o : dimphy.o dimens_m.o 
-radlwsw.o : raddimlw.o radopt.o radepsi.o dimens_m.o YOETHF.o raddim.o YOMCST.o clesphys.o dimphy.o 
+radlwsw.o : YOETHF.o raddim.o YOMCST.o clesphys.o dimphy.o 
 read_reanalyse.o : q_sat.o pression.o exner_hyb.o comconst.o guide.o comgeom.o comvert.o paramet_m.o dimens_m.o 
 readsulfate.o : chem.h YOMCST.o temps.o dimphy.o dimens_m.o 
 regr_lat_time_coefoz.o : regr3_lint.o regr1_step_av.o comconst.o comgeom.o dimens_m.o 
@@ -186,6 +197,15 @@ startdyn.o : conf_dat3d.o start_init_phys_m.o start_init_orog_m.o gr_int_dyn_m.o
 stdlevvar.o : YOETHF.o YOMCST.o 
 sugwd.o : YOEGWD.o 
 suphec.o : YOETHF.o YOMCST.o 
+sw.o : raddim.o YOMCST.o clesphys.o dimphy.o dimens_m.o 
+sw1s.o : raddim.o dimphy.o dimens_m.o 
+sw2s.o : radepsi.o raddim.o dimphy.o dimens_m.o 
+swclr.o : radopt.o radepsi.o raddim.o dimphy.o dimens_m.o 
+swde.o : raddim.o dimphy.o dimens_m.o 
+swr.o : radopt.o radepsi.o raddim.o dimphy.o dimens_m.o 
+swtt.o : raddim.o dimphy.o dimens_m.o 
+swtt1.o : raddim.o dimphy.o dimens_m.o 
+swu.o : radopt.o radepsi.o raddim.o YOMCST.o clesphys.o dimphy.o dimens_m.o 
 test_disvert.o : new_unit.o comvert.o dimens_m.o 
 test_inter_barxy.o : comvert.o conf_gcm.o dimens_m.o comgeom.o comconst.o inter_barxy.o 
 tetalevel.o : dimphy.o paramet_m.o dimens_m.o 

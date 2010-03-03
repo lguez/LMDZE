@@ -17,7 +17,6 @@ contains
     ! Author: P. Le Van
 
     use numer_rec, only: assert_eq, assert
-
     use dimens_m, only: iim, jjm
     use comgeom, only: aire_2d, apoln, apols
 
@@ -349,7 +348,7 @@ contains
           dym        = 0.
           jmod       = jmod + 1
        ELSE
-          ! yjmod(jmod) == yjdat(jdat)
+          ! {yjmod(jmod) == yjdat(jdat)}
           dy         = yjmod(jmod) - y0
           dym        = dym + dy
           inter_bary(jmod) = (inter_bary(jmod) + dy * fdat(jdat)) / dym

@@ -7,8 +7,8 @@
 
 # Specify directories:
 
-##in_dir=~/Documents/Around_LMDZ/Around_LMDZE/Input_etat0_lim
-in_dir=$workdir/LMDZE/Input_etat0_lim
+in_dir=~/Documents/Around_LMDZ/Around_LMDZE/Input_etat0_lim
+##in_dir=$workdir/LMDZE/Input_etat0_lim
 
 data_dir=~/Documents/Datasets
 

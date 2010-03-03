@@ -533,7 +533,8 @@ SUBROUTINE inigeom
 
   DO j = 1, jjm
      DO i = 1, iim
-        cv_2d(i,j) = 0.5*(cvij2(i,j)+cvij3(i,j)+cvij1(i,j+1)+cvij4(i,j+1))
+        cv_2d(i,j) = 0.5 * &
+             (cvij2(i,j) + cvij3(i,j) + cvij1(i,j+1) + cvij4(i,j+1))
         cvu(i,j) = 0.5*(cvij1(i,j)+cvij4(i,j)+cvij2(i,j)+cvij3(i,j))
         cuv(i,j) = 0.5*(cuij2(i,j)+cuij3(i,j)+cuij1(i,j+1)+cuij4(i,j+1))
         unscv2_2d(i,j) = 1./(cv_2d(i,j)*cv_2d(i,j))

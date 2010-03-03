@@ -17,7 +17,7 @@ contains
     use comconst, only: pi
     use numer_rec, only: assert_eq
 
-    REAL, intent(in):: xd(:), yd(:) ! longitudes et latitudes initiales
+    REAL, intent(in):: xd(:), yd(:) ! longitudes et latitudes initiales, en rad
     REAL, intent(in):: zd(:) ! pressure levels, in Pa or hPa
 
     REAL, intent(out):: xf(:) ! longitude, in rad, - pi to pi
@@ -28,7 +28,7 @@ contains
     ! Variables locales :
 
     INTEGER lons, lats, levs
-    LOGICAL radianlon, invlon , radianlat
+    LOGICAL invlon
     REAL rlatmin, rlatmax, oldxd1
     INTEGER i
 
@@ -39,16 +39,8 @@ contains
     levs = assert_eq(size(zd), size(zf), size(champd, 3), "conf_dat3d levs")
 
     IF (xd(1) >= - pi - 0.5 .AND. xd(lons) <=  pi + 0.5) THEN
-       radianlon = .TRUE.
        invlon    = .FALSE.
     ELSE IF (xd(1) >= -0.5 .AND. xd(lons) <= 2 * pi+0.5) THEN
-       radianlon = .TRUE.
-       invlon    = .TRUE.
-    ELSE IF (xd(1) >= -180.5 .AND. xd(lons) <= 180.5) THEN
-       radianlon = .FALSE.
-       invlon    = .FALSE.
-    ELSE IF (xd(1) >= -0.5 .AND. xd(lons) <= 360.5) THEN
-       radianlon = .FALSE.
        invlon    = .TRUE.
     ELSE
        print *, 'Problème sur les longitudes des données'
@@ -58,26 +50,13 @@ contains
     rlatmin = MIN(yd(1), yd(lats))
     rlatmax = MAX(yd(1), yd(lats))
 
-    IF (rlatmin >= -pi / 2 - 0.5 .AND. rlatmax <= pi / 2 + 0.5) THEN
-       radianlat = .TRUE.
-    ELSE IF (rlatmin >= - 90. - 0.5 .AND. rlatmax <= 90. + 0.5) THEN
-       radianlat = .FALSE.
-    ELSE
+    IF (rlatmin < -pi / 2 - 0.5 .or. rlatmax > pi / 2 + 0.5) THEN
        print *, ' Problème sur les latitudes des données'
        stop 1
     ENDIF
 
-    IF (radianlon) THEN
-       xf(:) = xd(:)
-    else
-       xf(:) = xd(:) * pi / 180.
-    ENDIF
-
-    IF (radianlat) THEN
-       yf(:) = yd(:)
-    else
-       yf(:) = yd(:) * pi / 180.
-    ENDIF
+    xf(:) = xd(:)
+    yf(:) = yd(:)
 
     IF (invlon) THEN
        ! On tourne les longitudes pour avoir - pi  à pi

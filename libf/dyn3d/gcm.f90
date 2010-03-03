@@ -181,7 +181,6 @@ PROGRAM gcm
           zcufi, zcvfi, rad, g, r, cpp)
   ENDIF
 
-  ! Numéro de stockage pour les fichiers de redémarrage :
   ! Initialisation des entrées-sorties :
   day_end = day_ini + nday
   print *, "day_ini = ", day_ini
