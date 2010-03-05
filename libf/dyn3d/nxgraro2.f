@@ -16,9 +16,9 @@ c
 c
       use dimens_m
       use paramet_m
+            use comdissipn
       IMPLICIT NONE
 c
-      include "comdissipn.h"
 c
 c    ......  variables en arguments  .......
 c

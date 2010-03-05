@@ -91,7 +91,8 @@ SUBROUTINE clmain(dtime, itap, date0, pctsrf, pctsrf_new, t, q, u, v,&
   USE indicesol, ONLY : epsfra, is_lic, is_oce, is_sic, is_ter, nbsrf
   USE dimphy, ONLY : klev, klon, zmasq
   USE dimsoil, ONLY : nsoilmx
-  USE temps, ONLY : annee_ref, day_ini, itau_phy
+  USE temps, ONLY : annee_ref, itau_phy
+  USE dynetat0_m, ONLY : day_ini
   USE iniprint, ONLY : prt_level
   USE yomcst, ONLY : rd, rg, rkappa
   USE conf_phys_m, ONLY : iflag_pbl

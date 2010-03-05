@@ -7,50 +7,34 @@ contains
   SUBROUTINE leapfrog(ucov, vcov, teta, ps, masse, phis, q, time_0)
 
     ! From dyn3d/leapfrog.F, version 1.6 2005/04/13 08:58:34
-
-    ! Version du 10/01/98, avec coordonnées verticales hybrides, avec
-    ! nouveaux opérateurs dissipation "*" (gradiv2, divgrad2, nxgraro2)
-
     ! Auteurs : P. Le Van, L. Fairhead, F. Hourdin
-    ! Objet: nouvelle grille
 
-    ! Dans "inigeom", nouveaux calculs pour les élongations cu, cv
-    ! et possibilité d'appeler une fonction f(y) à dérivée tangente
-    ! hyperbolique à la place de la fonction à dérivée sinusoïdale.
-
-    ! Possibilité de choisir le schéma pour l'advection de
-    ! q, en modifiant iadv dans "traceur.def".
-
-    ! Pour Van-Leer + vapeur d'eau saturée, iadv(1)=4.
-    ! Pour Van-Leer iadv=10 
-
-    use dimens_m, only: iim, llm, nqmx
-    use paramet_m, only: ip1jmp1, ip1jm, ijp1llm, jjp1, iip1
-    use comconst, only: dtvr, daysec, dtphys
-    use comvert, only: ap, bp
-    use conf_gcm_m, only: day_step, iconser, idissip, iphysiq, iperiod, nday, &
-         offline, periodav
-    use logic, only: ok_guide, iflag_phys
-    use comgeom
-    use serre
-    use temps, only: itaufin, day_ini, dt
-    use iniprint, only: prt_level
-    use com_io_dyn
-    use ener
-    use calfis_m, only: calfis
-    use exner_hyb_m, only: exner_hyb
-    use guide_m, only: guide
-    use pression_m, only: pression
-    use pressure_var, only: p3d
+    USE dimens_m, ONLY : iim, llm, nqmx
+    USE paramet_m, ONLY : iip1, ip1jm, ip1jmp1, jjp1
+    USE comconst, ONLY : daysec, dtphys, dtvr
+    USE comvert, ONLY : ap, bp
+    USE conf_gcm_m, ONLY : day_step, iconser, idissip, iperiod, iphysiq, &
+         nday, offline, periodav
+    USE logic, ONLY : iflag_phys, ok_guide
+    USE comgeom, ONLY : aire, apoln, apols
+    USE temps, ONLY : dt, itaufin
+    USE dynetat0_m, ONLY : day_ini
+    USE iniprint, ONLY : prt_level
+    USE com_io_dyn, ONLY : histaveid
+    USE calfis_m, ONLY : calfis
+    USE exner_hyb_m, ONLY : exner_hyb
+    USE guide_m, ONLY : guide
+    USE pression_m, ONLY : pression
+    USE pressure_var, ONLY : p3d
 
     ! Variables dynamiques:
     REAL vcov(ip1jm, llm), ucov(ip1jmp1, llm) ! vents covariants
     REAL teta(ip1jmp1, llm) ! temperature potentielle 
-    REAL q(ip1jmp1, llm, nqmx) ! mass fractions of advected fields
     REAL ps(ip1jmp1) ! pression au sol, en Pa
+
     REAL masse(ip1jmp1, llm) ! masse d'air
     REAL phis(ip1jmp1) ! geopotentiel au sol
-
+    REAL q(ip1jmp1, llm, nqmx) ! mass fractions of advected fields
     REAL, intent(in):: time_0
 
     ! Variables local to the procedure:
@@ -90,10 +74,7 @@ contains
     INTEGER itau ! index of the time step of the dynamics, starts at 0
     INTEGER iday ! jour julien
     REAL time ! time of day, as a fraction of day length
-
-    REAL SSUM
     real finvmaold(ip1jmp1, llm)
-
     LOGICAL :: lafin=.false.
     INTEGER ij, l
 
@@ -120,11 +101,6 @@ contains
     itau = 0
     iday = day_ini
     time = time_0
-    IF (time > 1.) THEN
-       time = time - 1.
-       iday = iday + 1
-    ENDIF
-
     dq = 0.
     ! On initialise la pression et la fonction d'Exner :
     CALL pression(ip1jmp1, ap, bp, ps, p3d)
@@ -132,51 +108,36 @@ contains
 
     ! Debut de l'integration temporelle:
     outer_loop:do
-       if (ok_guide.and.(itaufin - itau - 1) * dtvr > 21600.) then
-          call guide(itau, ucov, vcov, teta, q, masse, ps)
-       else
-          IF (prt_level > 9) print *, &
-               'Attention : on ne guide pas les 6 dernières heures.'
-       endif
-
-       CALL SCOPY(ip1jm * llm, vcov, 1, vcovm1, 1)
-       CALL SCOPY(ijp1llm, ucov, 1, ucovm1, 1)
-       CALL SCOPY(ijp1llm, teta, 1, tetam1, 1)
-       CALL SCOPY(ijp1llm, masse, 1, massem1, 1)
-       CALL SCOPY(ip1jmp1, ps, 1, psm1, 1)
-
+       if (ok_guide .and. (itaufin - itau - 1) * dtvr > 21600.) &
+            call guide(itau, ucov, vcov, teta, q, masse, ps)
+       vcovm1 = vcov
+       ucovm1 = ucov
+       tetam1 = teta
+       massem1 = masse
+       psm1 = ps
        forward = .TRUE.
        leapf = .FALSE.
        dt = dtvr
-
-       CALL SCOPY(ijp1llm, masse, 1, finvmaold, 1)
+       finvmaold = masse
        CALL filtreg(finvmaold, jjp1, llm, - 2, 2, .TRUE., 1)
 
        do
           ! gestion des appels de la physique et des dissipations:
-
-          apphys = .FALSE.
-          conser = .FALSE.
-          apdiss = .FALSE.
-
-          IF (MOD(itau, iconser) == 0) conser = .TRUE.
-          IF (MOD(itau + 1, idissip) == 0) apdiss = .TRUE.
-          IF (MOD(itau + 1, iphysiq) == 0 .AND. iflag_phys /= 0) apphys=.TRUE.
+          apphys = MOD(itau + 1, iphysiq) == 0 .AND. iflag_phys /= 0
+          conser = MOD(itau, iconser) == 0
+          apdiss = MOD(itau + 1, idissip) == 0
 
           ! calcul des tendances dynamiques:
-
           CALL geopot(ip1jmp1, teta, pk, pks, phis, phi)
-
           CALL caldyn(itau, ucov, vcov, teta, ps, masse, pk, pkf, phis, phi, &
                conser, du, dv, dteta, dp, w, pbaru, pbarv, &
                time + iday - day_ini)
 
-          ! calcul des tendances advection des traceurs (dont l'humidite)
-
           IF (forward .OR. leapf) THEN
+             ! calcul des tendances advection des traceurs (dont l'humidite)
              CALL caladvtrac(q, pbaru, pbarv, p3d, masse, dq, teta, pk)
              IF (offline) THEN
-                !maf stokage du flux de masse pour traceurs OFF-LINE
+                ! Stokage du flux de masse pour traceurs off-line
                 CALL fluxstokenc(pbaru, pbarv, masse, teta, phi, phis, dtvr, &
                      itau)
              ENDIF
@@ -187,9 +148,8 @@ contains
                dteta, dq, dp, vcov, ucov, teta, q, ps, masse, phis, &
                finvmaold, leapf)
 
-          ! calcul des tendances physiques:
-
           IF (apphys) THEN
+             ! calcul des tendances physiques:
              IF (itau + 1 == itaufin) lafin = .TRUE.
 
              CALL pression(ip1jmp1, ap, bp, ps, p3d)
@@ -197,8 +157,6 @@ contains
 
              rdaym_ini = itau * dtvr / daysec
              rdayvrai = rdaym_ini + day_ini
-
-             ! Interface avec les routines de phylmd (phymars ...)
 
              ! Diagnostique de conservation de l'énergie : initialisation
              IF (ip_ebil_dyn >= 1) THEN 
@@ -227,9 +185,9 @@ contains
           CALL pression(ip1jmp1, ap, bp, ps, p3d)
           CALL exner_hyb(ps, p3d, pks, pk, pkf)
 
-          ! dissipation horizontale et verticale des petites echelles:
-
           IF (apdiss) THEN
+             ! dissipation horizontale et verticale des petites echelles:
+
              ! calcul de l'energie cinetique avant dissipation
              call covcont(llm, ucov, vcov, ucont, vcont)
              call enercin(vcov, ucov, vcont, ucont, ecin0)
@@ -250,14 +208,13 @@ contains
              teta=teta + dtetadis
 
              ! Calcul de la valeur moyenne, unique de h aux poles .....
-
              DO l = 1, llm
                 DO ij = 1, iim
                    tppn(ij) = aire(ij) * teta(ij, l)
                    tpps(ij) = aire(ij + ip1jm) * teta(ij + ip1jm, l)
                 ENDDO
-                tpn = SSUM(iim, tppn, 1) / apoln
-                tps = SSUM(iim, tpps, 1) / apols
+                tpn = SUM(tppn) / apoln
+                tps = SUM(tpps) / apols
 
                 DO ij = 1, iip1
                    teta(ij, l) = tpn
@@ -269,14 +226,13 @@ contains
                 tppn(ij) = aire(ij) * ps(ij)
                 tpps(ij) = aire(ij + ip1jm) * ps(ij + ip1jm)
              ENDDO
-             tpn = SSUM(iim, tppn, 1) / apoln
-             tps = SSUM(iim, tpps, 1) / apols
+             tpn = SUM(tppn) / apoln
+             tps = SUM(tpps) / apols
 
              DO ij = 1, iip1
                 ps(ij) = tpn
                 ps(ij + ip1jm) = tps
              ENDDO
-
           END IF
 
           ! fin de l'intégration dynamique et physique pour le pas "itau"
@@ -296,11 +252,8 @@ contains
 
           IF (itau == itaufin + 1) exit outer_loop
 
-          ! ecriture du fichier histoire moyenne:
-
-          ! Comment out the following calls when you do not want the output
-          ! files "dyn_hist_ave.nc" and "dynzon.nc"
           IF (MOD(itau, iperiod) == 0 .OR. itau == itaufin) THEN
+             ! ecriture du fichier histoire moyenne:
              CALL writedynav(histaveid, nqmx, itau, vcov, &
                   ucov, teta, pk, phi, q, masse, ps, phis)
              call bilan_dyn(2, dtvr * iperiod, dtvr * day_step * periodav, &
@@ -309,11 +262,9 @@ contains
 
           IF (itau == itaufin) THEN
              CALL dynredem1("restart.nc", vcov, ucov, teta, q, masse, ps)
-             CLOSE(99)
           ENDIF
 
           ! gestion de l'integration temporelle:
-
           IF (MOD(itau, iperiod) == 0) exit
           IF (MOD(itau - 1, iperiod) == 0) THEN
              IF (forward) THEN

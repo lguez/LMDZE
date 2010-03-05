@@ -33,25 +33,13 @@ module comgeom
 
   real apoln,apols
 
-  real unsairez_2d(iim + 1,jjm),airuscv2_2d(iim + 1,jjm)
-  real unsairez(ip1jm),airuscv2(ip1jm)
-  equivalence (unsairez, unsairez_2d), (airuscv2, airuscv2_2d)
+  real unsairez_2d(iim + 1,jjm)
+  real unsairez(ip1jm)
+  equivalence (unsairez, unsairez_2d)
 
-  real airvscu2_2d(iim + 1,jjm)       
-  real airvscu2(ip1jm)
-  equivalence (airvscu2, airvscu2_2d)
-
-  real aireij1_2d(iim + 1,jjm + 1),aireij2_2d(iim + 1,jjm + 1)
-  real aireij1(ip1jmp1),aireij2(ip1jmp1)
-  equivalence (aireij1, aireij1_2d), (aireij2, aireij2_2d)
-
-  real aireij3(ip1jmp1)
-  real aireij3_2d(iim + 1,jjm + 1)       
-  equivalence (aireij3, aireij3_2d)
-
-  real aireij4_2d(iim + 1,jjm + 1), alpha1_2d(iim + 1,jjm + 1)
-  real aireij4(ip1jmp1), alpha1(ip1jmp1)
-  equivalence (aireij4, aireij4_2d), (alpha1, alpha1_2d)
+  real alpha1_2d(iim + 1,jjm + 1)
+  real alpha1(ip1jmp1)
+  equivalence (alpha1, alpha1_2d)
 
   real alpha2_2d(iim + 1,jjm + 1)         
   real alpha2(ip1jmp1)
@@ -121,10 +109,6 @@ module comgeom
   real unsairz_gam_2d(iim + 1,jjm)
   real unsairz_gam(ip1jm)
   equivalence (unsairz_gam, unsairz_gam_2d)
-
-  real aivscu2gam_2d(iim + 1,jjm),aiuscv2gam_2d(iim + 1,jjm)
-  real aivscu2gam(ip1jm),aiuscv2gam(ip1jm)
-  equivalence (aivscu2gam, aivscu2gam_2d), (aiuscv2gam, aiuscv2gam_2d)
 
   real xprimu(iim + 1),xprimv(iim + 1)
 

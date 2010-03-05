@@ -12,7 +12,7 @@ SUBROUTINE sortvarc(itau,ucov,teta,ps,masse,pk,phis,vorpot,phi,bern,dp, &
   USE paramet_m, ONLY : iip1, iip2, ijp1llm, ip1jm, ip1jmp1, jjp1
   USE comconst, ONLY : daysec, dtvr, g, omeg, rad
   USE comgeom, ONLY : aire, cu, rlatu
-  USE temps, ONLY : day_ini
+  USE dynetat0_m, ONLY : day_ini
   USE ener, ONLY : ang, ang0, etot, etot0, ptot, ptot0, rmsdpdt, rmsv, &
        stot, stot0, ztot, ztot0
 

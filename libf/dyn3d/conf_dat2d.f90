@@ -1,6 +1,5 @@
 module conf_dat2d_m
 
-  ! This module is clean: no C preprocessor directive, no include line.
   ! From conf_dat2d.F, version 1.2 2006/01/27 15:14:22
 
   IMPLICIT NONE

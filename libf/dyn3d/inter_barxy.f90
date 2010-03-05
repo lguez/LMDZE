@@ -2,9 +2,6 @@ module inter_barxy_m
 
   ! From inter_barxy.F, version 1.1.1.1 2004/05/19 12:53:07
 
-  ! This file is clean: there is neither C preprocessor directive, nor
-  ! include line.
-
   implicit none
 
   private

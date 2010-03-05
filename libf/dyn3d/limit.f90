@@ -1,7 +1,5 @@
 module limit_mod
 
-  ! This module is clean: no C preprocessor directive, no include line.
-
   IMPLICIT none
 
 contains
@@ -15,10 +13,8 @@ contains
     ! Both grids must be regular.
 
     use dimens_m, only: iim, jjm
-    use comconst, only: daysec, dtvr
     use indicesol, only: epsfra, nbsrf, is_ter, is_oce, is_lic, is_sic
     use dimphy, only: klon, zmasq
-    use conf_gcm_m, only: day_step
     use comgeom, only: rlonu, rlatv
     use etat0_mod, only: pctsrf
     use start_init_orog_m, only: mask
@@ -85,10 +81,6 @@ contains
     print *, "Enter namelist 'limit_nml'."
     read (unit=*, nml=limit_nml)
     write(unit=*, nml=limit_nml)
-
-    ! Initializations:
-    dtvr = daysec / real(day_step)
-    CALL inigeom
 
     ! Process rugosity:
 

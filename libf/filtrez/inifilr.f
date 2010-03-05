@@ -11,6 +11,7 @@ c
       use comgeom
       use serre
              use parafilt
+            use coefils
       IMPLICIT NONE
 c
 c     version 3 .....
@@ -18,7 +19,6 @@ c     version 3 .....
 c     Correction  le 28/10/97    P. Le Van .
 c  -------------------------------------------------------------------
 c  -------------------------------------------------------------------
-      include "coefils.h"
 
       REAL  dlonu(iim),dlatu(jjm)
       REAL  rlamda( iim ),  eignvl( iim )

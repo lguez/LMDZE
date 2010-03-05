@@ -8,6 +8,7 @@ c
       use comconst
       use comdissnew
       use comgeom
+            use comdissipn
       IMPLICIT NONE
 
 
@@ -29,7 +30,6 @@ c-----------------------------------------------------------------------
 c   Declarations:
 c   -------------
 
-      include "comdissipn.h"
 
 c   Arguments:
 c   ----------

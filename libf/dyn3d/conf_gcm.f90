@@ -18,15 +18,14 @@ module conf_gcm_m
   ! frequence du groupement des flux (en pas de temps) 
 
   integer:: iconser= 240
-  ! periode de sortie des variables de controle
-  ! (En pas de temps)
+  ! période de sortie des variables de contrôle (en pas de temps)
 
   integer:: iecri= 1 ! période d'écriture du fichier "dyn_hist.nc" (en jours)
 
   integer:: idissip= 10 ! periode de la dissipation (en pas)
 
   integer:: iphysiq= 5
-  ! Help = Periode de la physique en pas de temps de la dynamique.
+  ! Période de la physique en pas de temps de la dynamique.
 
   integer:: dayref = 1 ! jour de l'année de l'état initial
   ! (= 350 si 20 décembre par exemple)

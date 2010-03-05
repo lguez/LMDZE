@@ -1,7 +1,7 @@
-!
-! $Header: /home/cvsroot/LMDZ4/libf/dyn3d/getparam.F90,v 1.1.1.1 2004/05/19 12:53:07 lmdzadmin Exp $
-!
 MODULE getparam
+
+  ! From dyn3d/getparam.F90,v 1.1.1.1 2004/05/19 12:53:07
+
    USE IOIPSL
    INTERFACE getpar
      MODULE PROCEDURE ini_getparam,fin_getparam,getparamr,getparami,getparaml

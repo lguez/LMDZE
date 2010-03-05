@@ -6,6 +6,7 @@
       use paramet_m
       use logic
       use comgeom
+            use comdissipn
       IMPLICIT NONE
 c
 c=======================================================================
@@ -23,7 +24,6 @@ c
 c   declarations:
 c   -------------
 c
-      include "comdissipn.h"
 c
       INTEGER klevel
       REAL h( ip1jmp1,klevel ), divgra( ip1jmp1,klevel )

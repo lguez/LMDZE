@@ -19,9 +19,9 @@ c
       use dimens_m
       use paramet_m
       use logic
+            use comdissipn
       IMPLICIT NONE
 c
-      include "comdissipn.h"
 
       INTEGER klevel
 c

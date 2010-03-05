@@ -49,6 +49,7 @@ contains
     use regr_pr_o3_m, only: regr_pr_o3
     use phyredem_m, only: phyredem
     use caldyn0_m, only: caldyn0
+    use inigeom_m, only: inigeom
 
     ! Variables local to the procedure:
 
@@ -305,7 +306,6 @@ contains
     CALL dynredem1("start.nc", vvent, uvent, tpot, q3d, masse, psol)
 
     ! Ecriture état initial physique:
-    print *, 'dtvr = ', dtvr
     print *, "iphysiq = ", iphysiq
     phystep   = dtvr * REAL(iphysiq)
     print *, 'phystep = ', phystep

@@ -1,15 +1,14 @@
 module dynetat0_m
 
-  ! This module is clean: no C preprocessor directive, no include line.
-
   IMPLICIT NONE
+
+  INTEGER day_ini
 
 contains
 
-  SUBROUTINE dynetat0(vcov, ucov, teta, q, masse, ps, phis, time)
+  SUBROUTINE dynetat0(vcov, ucov, teta, q, masse, ps, phis, time_0)
 
     ! From dynetat0.F, version 1.2 2004/06/22 11:45:30
-
     ! Authors:  P. Le Van, L. Fairhead
     ! Objet : lecture de l'état initial
 
@@ -19,7 +18,7 @@ contains
     use logic, only: fxyhypb, ysinus
     use comgeom, only: rlonu, rlatu, rlonv, rlatv, cu_2d, cv_2d, aire_2d
     use serre, only: clon, clat, grossismy, grossismx
-    use temps, only: day_ref, day_ini, itau_dyn, annee_ref
+    use temps, only: day_ref, itau_dyn, annee_ref
     use ener, only: etot0, ang0, ptot0, stot0, ztot0
     use iniadvtrac_m, only: tname
     use netcdf95, only: nf95_open, nf95_inq_varid, handle_err, NF95_CLOSE
@@ -31,13 +30,13 @@ contains
     REAL, intent(out):: q(:, :, :), masse(:, :)
     REAL, intent(out):: ps(:) ! in Pa
     REAL, intent(out):: phis(:, :)
-    REAL, intent(out):: time
+    REAL, intent(out):: time_0
 
     !   Variables 
     INTEGER length, iq
     PARAMETER (length = 100)
     REAL tab_cntrl(length) ! tableau des parametres du run
-    INTEGER ierr, nid, nvarid
+    INTEGER ierr, ncid, nvarid
 
     !-----------------------------------------------------------------------
 
@@ -52,11 +51,11 @@ contains
     call assert(size(q, 3) == nqmx, "dynetat0 q 3")
 
     ! Fichier état initial :
-    call nf95_open("start.nc", NF90_NOWRITE, nid)
+    call nf95_open("start.nc", NF90_NOWRITE, ncid)
 
-    call nf95_inq_varid(nid, "controle", nvarid)
-    ierr = NF90_GET_VAR(nid, nvarid, tab_cntrl)
-    call handle_err("dynetat0, controle", ierr, nid)
+    call nf95_inq_varid(ncid, "controle", nvarid)
+    ierr = NF90_GET_VAR(ncid, nvarid, tab_cntrl)
+    call handle_err("dynetat0, controle", ierr, ncid)
 
     im         = int(tab_cntrl(1))
     jm         = int(tab_cntrl(2))
@@ -104,79 +103,80 @@ contains
        STOP 1
     ENDIF
 
-    call NF95_INQ_VARID (nid, "rlonu", nvarid)
-    ierr = NF90_GET_VAR(nid, nvarid, rlonu)
-    call handle_err("dynetat0, rlonu", ierr, nid)
+    call NF95_INQ_VARID (ncid, "rlonu", nvarid)
+    ierr = NF90_GET_VAR(ncid, nvarid, rlonu)
+    call handle_err("dynetat0, rlonu", ierr, ncid)
 
-    call NF95_INQ_VARID (nid, "rlatu", nvarid)
-    ierr = NF90_GET_VAR(nid, nvarid, rlatu)
-    call handle_err("dynetat0, rlatu", ierr, nid)
+    call NF95_INQ_VARID (ncid, "rlatu", nvarid)
+    ierr = NF90_GET_VAR(ncid, nvarid, rlatu)
+    call handle_err("dynetat0, rlatu", ierr, ncid)
 
-    call NF95_INQ_VARID (nid, "rlonv", nvarid)
-    ierr = NF90_GET_VAR(nid, nvarid, rlonv)
-    call handle_err("dynetat0, rlonv", ierr, nid)
+    call NF95_INQ_VARID (ncid, "rlonv", nvarid)
+    ierr = NF90_GET_VAR(ncid, nvarid, rlonv)
+    call handle_err("dynetat0, rlonv", ierr, ncid)
 
-    call NF95_INQ_VARID (nid, "rlatv", nvarid)
-    ierr = NF90_GET_VAR(nid, nvarid, rlatv)
-    call handle_err("dynetat0, rlatv", ierr, nid)
+    call NF95_INQ_VARID (ncid, "rlatv", nvarid)
+    ierr = NF90_GET_VAR(ncid, nvarid, rlatv)
+    call handle_err("dynetat0, rlatv", ierr, ncid)
 
-    call NF95_INQ_VARID (nid, "cu", nvarid)
-    ierr = NF90_GET_VAR(nid, nvarid, cu_2d)
-    call handle_err("dynetat0, cu", ierr, nid)
+    call NF95_INQ_VARID (ncid, "cu", nvarid)
+    ierr = NF90_GET_VAR(ncid, nvarid, cu_2d)
+    call handle_err("dynetat0, cu", ierr, ncid)
 
-    call NF95_INQ_VARID (nid, "cv", nvarid)
-    ierr = NF90_GET_VAR(nid, nvarid, cv_2d)
-    call handle_err("dynetat0, cv", ierr, nid)
+    call NF95_INQ_VARID (ncid, "cv", nvarid)
+    ierr = NF90_GET_VAR(ncid, nvarid, cv_2d)
+    call handle_err("dynetat0, cv", ierr, ncid)
 
-    call NF95_INQ_VARID (nid, "aire", nvarid)
-    ierr = NF90_GET_VAR(nid, nvarid, aire_2d)
-    call handle_err("dynetat0, aire", ierr, nid)
+    call NF95_INQ_VARID (ncid, "aire", nvarid)
+    ierr = NF90_GET_VAR(ncid, nvarid, aire_2d)
+    call handle_err("dynetat0, aire", ierr, ncid)
 
-    call NF95_INQ_VARID (nid, "phisinit", nvarid)
-    ierr = NF90_GET_VAR(nid, nvarid, phis)
-    call handle_err("dynetat0, phisinit", ierr, nid)
+    call NF95_INQ_VARID (ncid, "phisinit", nvarid)
+    ierr = NF90_GET_VAR(ncid, nvarid, phis)
+    call handle_err("dynetat0, phisinit", ierr, ncid)
 
-    call NF95_INQ_VARID (nid, "temps", nvarid)
-    ierr = NF90_GET_VAR(nid, nvarid, time)
-    call handle_err("dynetat0, temps", ierr, nid)
+    call NF95_INQ_VARID (ncid, "temps", nvarid)
+    ierr = NF90_GET_VAR(ncid, nvarid, time_0)
+    call handle_err("dynetat0, temps", ierr, ncid)
 
-    call NF95_INQ_VARID (nid, "ucov", nvarid)
-    ierr = NF90_GET_VAR(nid, nvarid, ucov, count=(/iim + 1, jjm + 1, llm/))
-    call handle_err("dynetat0, ucov", ierr, nid)
+    call NF95_INQ_VARID (ncid, "ucov", nvarid)
+    ierr = NF90_GET_VAR(ncid, nvarid, ucov, count=(/iim + 1, jjm + 1, llm/))
+    call handle_err("dynetat0, ucov", ierr, ncid)
 
-    call NF95_INQ_VARID (nid, "vcov", nvarid)
-    ierr = NF90_GET_VAR(nid, nvarid, vcov, count=(/iim + 1, jjm, llm/))
-    call handle_err("dynetat0, vcov", ierr, nid)
+    call NF95_INQ_VARID (ncid, "vcov", nvarid)
+    ierr = NF90_GET_VAR(ncid, nvarid, vcov, count=(/iim + 1, jjm, llm/))
+    call handle_err("dynetat0, vcov", ierr, ncid)
 
-    call NF95_INQ_VARID (nid, "teta", nvarid)
-    ierr = NF90_GET_VAR(nid, nvarid, teta, count=(/iim + 1, jjm + 1, llm/))
-    call handle_err("dynetat0, teta", ierr, nid)
+    call NF95_INQ_VARID (ncid, "teta", nvarid)
+    ierr = NF90_GET_VAR(ncid, nvarid, teta, count=(/iim + 1, jjm + 1, llm/))
+    call handle_err("dynetat0, teta", ierr, ncid)
 
     DO iq = 1, nqmx
-       call NF95_INQ_VARID(nid, tname(iq), nvarid, ierr)
+       call NF95_INQ_VARID(ncid, tname(iq), nvarid, ierr)
        IF (ierr  /=  NF90_NOERR) THEN
           PRINT *, 'dynetat0: le champ "' // tname(iq) // '" est absent, ' // &
                "il est donc initialisé à zéro."
           q(:, :, iq) = 0.
        ELSE
-          ierr = NF90_GET_VAR(nid, nvarid, q(:, :, iq), &
+          ierr = NF90_GET_VAR(ncid, nvarid, q(:, :, iq), &
                count=(/iim + 1, jjm + 1, llm/))
-          call handle_err("dynetat0, " // tname(iq), ierr, nid)
+          call handle_err("dynetat0, " // tname(iq), ierr, ncid)
        ENDIF
     ENDDO
 
-    call NF95_INQ_VARID (nid, "masse", nvarid)
-    ierr = NF90_GET_VAR(nid, nvarid, masse, count=(/iim + 1, jjm + 1, llm/))
-    call handle_err("dynetat0, masse", ierr, nid)
+    call NF95_INQ_VARID (ncid, "masse", nvarid)
+    ierr = NF90_GET_VAR(ncid, nvarid, masse, count=(/iim + 1, jjm + 1, llm/))
+    call handle_err("dynetat0, masse", ierr, ncid)
 
-    call NF95_INQ_VARID (nid, "ps", nvarid)
-    ierr = NF90_GET_VAR(nid, nvarid, ps, count=(/iim + 1, jjm + 1/))
-    call handle_err("dynetat0, ps", ierr, nid)
+    call NF95_INQ_VARID (ncid, "ps", nvarid)
+    ierr = NF90_GET_VAR(ncid, nvarid, ps, count=(/iim + 1, jjm + 1/))
+    call handle_err("dynetat0, ps", ierr, ncid)
 
-    call NF95_CLOSE(nid)
+    call NF95_CLOSE(ncid)
 
-    day_ini=day_ini+INT(time)
-    time=time-INT(time)
+    day_ini=day_ini+INT(time_0)
+    time_0=time_0-INT(time_0)
+    ! {0 <= time0 < 1}
 
 1   FORMAT(//10x, 'la valeur de im =', i4, 2x, &
          'lue sur le fichier de demarrage est differente de la valeur ' &

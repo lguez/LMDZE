@@ -6,6 +6,7 @@ program test_inter_barxy
   use dimens_m, only: iim, jjm
   use conf_gcm_m, only: conf_gcm, day_step
   use comvert, only: pa
+  use inigeom_m, only: inigeom
 
   implicit none
 

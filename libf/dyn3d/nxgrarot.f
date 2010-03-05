@@ -18,10 +18,10 @@ c
       use dimens_m
       use paramet_m
       use logic
+            use comdissipn
       IMPLICIT NONE
 c
 c
-      include "comdissipn.h"
 c
       INTEGER klevel
       REAL xcov( ip1jmp1,klevel ), ycov( ip1jm,klevel )

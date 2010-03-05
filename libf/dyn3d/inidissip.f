@@ -15,8 +15,8 @@ c   -------------
       use comconst
       use comvert
       use conf_gcm_m
+            use comdissipn
       IMPLICIT NONE
-      include "comdissipn.h"
 
       LOGICAL lstardis
       INTEGER nitergdiv,nitergrot,niterh
@@ -203,7 +203,7 @@ c
 
       PRINT *,' INIDI tetamin dtvr ',tetamin,dtvr,iperiod
       idissip = INT( tetamin/( 2.*dtvr*iperiod) ) * iperiod
-      PRINT *,' INIDI tetamin idissip ',tetamin,idissip
+      PRINT *,' tetamin = ',tetamin
       idissip = MAX(iperiod,idissip)
       dtdiss  = idissip * dtvr
       PRINT *,' INIDI idissip dtdiss ',idissip,dtdiss

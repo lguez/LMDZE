@@ -26,18 +26,19 @@ PROGRAM gcm
        nday, raz_date, periodav, conf_gcm
   use logic, only: iflag_phys
   use comgeom, only: rlatu, aire_2d, cu_2d, cv_2d, rlonv
-  use temps, only: day_ref, annee_ref, day_ini, day_end, itau_dyn
+  use temps, only: day_ref, annee_ref, day_end, itau_dyn
   use com_io_dyn, only: histid, histvid, histaveid
   use tracstoke, only: istdyn, istphy
   use abort_gcm_m, only: abort_gcm
   use inithist_m, only: inithist
   use initdynav_m, only: initdynav
-  use dynetat0_m, only: dynetat0
+  use dynetat0_m, only: dynetat0, day_ini
   use grid_change, only: dyn_phy, init_dyn_phy
   use iniadvtrac_m, only: iniadvtrac
   use leapfrog_m, only: leapfrog
   use dynredem0_m, only: dynredem0
   use clesphys2, only: read_clesphys2
+  use inigeom_m, only: inigeom
 
   IMPLICIT NONE
 
@@ -53,9 +54,7 @@ PROGRAM gcm
   REAL phis(iim + 1, jjm + 1) ! géopotentiel au sol
 
   ! Variables pour le fichier histoire :
-  REAL time_0
-
-  !!INTEGER i
+  REAL time_0 ! time in day, as a fraction of day, in [0, 1[
 
   ! Calendrier :
   LOGICAL:: true_calendar = .false. ! default value

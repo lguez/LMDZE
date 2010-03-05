@@ -9,6 +9,7 @@ c
       use paramet_m
       use comgeom
       use serre
+            use coefils
       IMPLICIT NONE
 c
 
@@ -19,7 +20,6 @@ c
       REAL pi
       INTEGER i,j,k,imm1,nrot
 C
-      include "coefils.h"
 c
       EXTERNAL SSUM, acc, jacobi
 CC      EXTERNAL eigen
