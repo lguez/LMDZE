@@ -22,8 +22,6 @@ module conf_gcm_m
 
   integer:: iecri= 1 ! période d'écriture du fichier "dyn_hist.nc" (en jours)
 
-  integer:: idissip= 10 ! periode de la dissipation (en pas)
-
   integer:: iphysiq= 5
   ! Période de la physique en pas de temps de la dynamique.
 
@@ -67,7 +65,7 @@ contains
     use iniprint, only: read_iniprint
 
     namelist /conf_gcm_nml/dayref, anneeref, raz_date, nday, day_step, &
-         iperiod, iapp_tracvl, iconser, iecri, periodav, idissip, &
+         iperiod, iapp_tracvl, iconser, iecri, periodav, &
          iphysiq, clon, clat, grossismx, grossismy, dzoomx, dzoomy, taux, &
          tauy, offline
 

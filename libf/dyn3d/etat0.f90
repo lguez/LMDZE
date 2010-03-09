@@ -50,6 +50,7 @@ contains
     use phyredem_m, only: phyredem
     use caldyn0_m, only: caldyn0
     use inigeom_m, only: inigeom
+    use inidissip_m, only: inidissip
 
     ! Variables local to the procedure:
 
@@ -291,7 +292,6 @@ contains
 
     ! Initialisation pour traceurs:
     call iniadvtrac
-    ! Ecriture:
     CALL inidissip(lstardis, nitergdiv, nitergrot, niterh, tetagdiv, &
          tetagrot, tetatemp)
     itau_dyn = 0

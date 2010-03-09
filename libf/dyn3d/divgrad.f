@@ -6,7 +6,7 @@
       use paramet_m
       use logic
       use comgeom
-            use comdissipn
+            use inidissip_m
       IMPLICIT NONE
 c
 c=======================================================================
@@ -30,7 +30,8 @@ c
 c
       REAL ghy(ip1jm,llm), ghx(ip1jmp1,llm)
 
-      INTEGER  l,ij,iter,lh
+      INTEGER  l,ij,iter
+      integer, intent(in):: lh
 c
 c
 c

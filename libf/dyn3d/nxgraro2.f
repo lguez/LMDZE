@@ -16,7 +16,7 @@ c
 c
       use dimens_m
       use paramet_m
-            use comdissipn
+            use inidissip_m
       IMPLICIT NONE
 c
 c
@@ -29,7 +29,8 @@ c
 c    ......   variables locales     ........
 c
       REAL rot(ip1jm,llm) , signe, nugradrs
-      INTEGER l,ij,iter,lr
+      INTEGER l,ij,iter
+      integer, intent(in):: lr
 c    ........................................................
 c
 c

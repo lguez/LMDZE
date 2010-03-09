@@ -19,7 +19,7 @@ c
       use dimens_m
       use paramet_m
       use logic
-            use comdissipn
+            use inidissip_m
       IMPLICIT NONE
 c
 
@@ -30,7 +30,8 @@ c
 
       REAL div(ip1jmp1,llm)
 
-      INTEGER l,ij,iter,ld
+      INTEGER l,ij,iter
+      integer, intent(in):: ld
 c
 c
 c

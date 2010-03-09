@@ -15,7 +15,7 @@ c
       use dimens_m
       use paramet_m
       use comgeom
-            use comdissipn
+            use inidissip_m
       IMPLICIT NONE
 c
 
@@ -28,7 +28,8 @@ c
 c    .......    variables  locales    ..........
 c
       REAL     signe, nudivgrs, sqrtps( ip1jmp1,llm )
-      INTEGER  l,ij,iter,lh
+      INTEGER  l,ij,iter
+      integer, intent(in):: lh
 c    ...................................................................
 
 c

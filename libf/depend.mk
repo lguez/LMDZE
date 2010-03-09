@@ -37,7 +37,6 @@ coefkz.o : conf_phys.o FCTTRE.o YOETHF.o YOMCST.o iniprint.o dimphy.o indicesol.
 coefkz2.o : YOMCST.o iniprint.o dimphy.o indicesol.o dimens_m.o 
 coefkzmin.o : YOMCST.o dimphy.o dimens_m.o 
 comconst.o : dimens_m.o 
-comdissipn.o : dimens_m.o 
 comgeom.o : paramet_m.o dimens_m.o 
 comgeomphy.o : dimphy.o 
 comvert.o : dimens_m.o 
@@ -63,12 +62,12 @@ cvltr.o : YOECUMF.o YOMCST.o dimphy.o dimens_m.o
 diagedyn.o : YOETHF.o YOMCST.o comgeom.o paramet_m.o dimens_m.o 
 diagphy.o : YOETHF.o YOMCST.o dimphy.o dimens_m.o 
 dimphy.o : dimens_m.o 
-dissip.o : comdissipn.o comgeom.o comdissnew.o comconst.o paramet_m.o dimens_m.o 
+dissip.o : inidissip.o comdissnew.o paramet_m.o dimens_m.o 
 diverg.o : comgeom.o paramet_m.o dimens_m.o 
 diverg_gam.o : comgeom.o paramet_m.o dimens_m.o 
 divergf.o : comgeom.o paramet_m.o dimens_m.o 
-divgrad.o : comdissipn.o comgeom.o logic.o paramet_m.o dimens_m.o 
-divgrad2.o : comdissipn.o comgeom.o paramet_m.o dimens_m.o 
+divgrad.o : inidissip.o comgeom.o logic.o paramet_m.o dimens_m.o 
+divgrad2.o : inidissip.o comgeom.o paramet_m.o dimens_m.o 
 drag_noro.o : YOMCST.o dimphy.o dimens_m.o 
 dteta1.o : logic.o paramet_m.o dimens_m.o 
 dudv1.o : paramet_m.o dimens_m.o 
@@ -78,7 +77,7 @@ dynredem0.o : iniadvtrac.o ener.o temps.o serre.o comgeom.o logic.o comvert.o co
 dynredem1.o : iniadvtrac.o temps.o dimens_m.o 
 ener.o : dimens_m.o 
 enercin.o : comgeom.o paramet_m.o dimens_m.o 
-etat0.o : inigeom.o caldyn0.o phyredem.o regr_pr_o3.o regr_lat_time_coefoz.o dynredem0.o pressure_var.o iniadvtrac.o exner_hyb.o q_sat.o grid_change.o grid_atob.o temps.o dimsoil.o serre.o comgeom.o conf_gcm.o comvert.o comdissnew.o comconst.o paramet_m.o dimens_m.o startdyn.o start_init_phys_m.o start_init_orog_m.o dimphy.o indicesol.o 
+etat0.o : inidissip.o inigeom.o caldyn0.o phyredem.o regr_pr_o3.o regr_lat_time_coefoz.o dynredem0.o pressure_var.o iniadvtrac.o exner_hyb.o q_sat.o grid_change.o grid_atob.o temps.o dimsoil.o serre.o comgeom.o conf_gcm.o comvert.o comdissnew.o comconst.o paramet_m.o dimens_m.o startdyn.o start_init_phys_m.o start_init_orog_m.o dimphy.o indicesol.o 
 etat0_lim.o : limit.o etat0.o conf_gcm.o comconst.o 
 exner_hyb.o : comgeom.o comvert.o comconst.o dimens_m.o 
 filtreg.o : coefils.o parafilt.o paramet_m.o dimens_m.o 
@@ -90,13 +89,13 @@ fxy.o : serre.o comconst.o dimens_m.o
 fxyhyper.o : paramet_m.o dimens_m.o 
 fxysinus.o : fxy_sin.h comconst.o paramet_m.o dimens_m.o 
 fyhyp.o : paramet_m.o dimens_m.o 
-gcm.o : inigeom.o clesphys2.o dynredem0.o leapfrog.o iniadvtrac.o grid_change.o dynetat0.o initdynav.o inithist.o abort_gcm.o tracstoke.o com_io_dyn.o temps.o comgeom.o logic.o conf_gcm.o comdissnew.o comconst.o paramet_m.o dimphy.o dimens_m.o 
+gcm.o : tracstoke.o temps.o paramet_m.o logic.o leapfrog.o inithist.o initdynav.o inigeom.o inidissip.o iniadvtrac.o grid_change.o dynredem0.o dynetat0.o dimphy.o dimens_m.o conf_gcm.o comgeom.o comdissnew.o comconst.o com_io_dyn.o clesphys2.o abort_gcm.o 
 geopot.o : paramet_m.o dimens_m.o 
 gr_u_scal.o : comgeom.o paramet_m.o dimens_m.o 
 gr_v_scal.o : comgeom.o paramet_m.o dimens_m.o 
 grad.o : paramet_m.o dimens_m.o 
-gradiv.o : comdissipn.o logic.o paramet_m.o dimens_m.o 
-gradiv2.o : comdissipn.o comgeom.o paramet_m.o dimens_m.o 
+gradiv.o : inidissip.o logic.o paramet_m.o dimens_m.o 
+gradiv2.o : inidissip.o comgeom.o paramet_m.o dimens_m.o 
 grid_change.o : dimphy.o dimens_m.o 
 grid_noro_m.o : comconst.o dimens_m.o 
 groupe.o : comgeom.o comvert.o comconst.o paramet_m.o dimens_m.o 
@@ -108,8 +107,8 @@ hbtm.o : FCTTRE.o YOETHF.o YOMCST.o dimphy.o dimens_m.o
 hgardfou.o : YOMCST.o dimphy.o indicesol.o dimens_m.o 
 ini_hist.o : iniadvtrac.o indicesol.o grid_change.o clesphys.o comvert.o phyetat0.o dimphy.o temps.o dimens_m.o 
 iniadvtrac.o : dimens_m.o 
-iniconst.o : temps.o conf_gcm.o comvert.o comconst.o paramet_m.o dimens_m.o 
-inidissip.o : comdissipn.o conf_gcm.o comvert.o comconst.o paramet_m.o dimens_m.o 
+iniconst.o : conf_gcm.o comvert.o comconst.o dimens_m.o 
+inidissip.o : new_unit.o paramet_m.o conf_gcm.o comvert.o comconst.o dimens_m.o 
 inifgn.o : coefils.o serre.o comgeom.o paramet_m.o dimens_m.o 
 inifilr.o : coefils.o parafilt.o serre.o comgeom.o logic.o paramet_m.o dimens_m.o 
 inigeom.o : serre.o comgeom.o logic.o comdissnew.o comconst.o paramet_m.o dimens_m.o 
@@ -129,7 +128,7 @@ laplacien.o : comgeom.o paramet_m.o dimens_m.o
 laplacien_gam.o : comgeom.o paramet_m.o dimens_m.o 
 laplacien_rot.o : comgeom.o paramet_m.o dimens_m.o 
 laplacien_rotgam.o : comgeom.o paramet_m.o dimens_m.o 
-leapfrog.o : pressure_var.o pression.o guide.o exner_hyb.o calfis.o com_io_dyn.o iniprint.o dynetat0.o temps.o comgeom.o logic.o conf_gcm.o comvert.o comconst.o paramet_m.o dimens_m.o 
+leapfrog.o : temps.o pressure_var.o pression.o paramet_m.o logic.o inidissip.o guide.o exner_hyb.o dynetat0.o dimens_m.o conf_gcm.o comvert.o comgeom.o comconst.o com_io_dyn.o calfis.o 
 lift_noro.o : YOMCST.o dimphy.o dimens_m.o 
 limit.o : grid_change.o inter_barxy.o conf_dat2d.o start_init_orog_m.o etat0.o comgeom.o dimphy.o indicesol.o dimens_m.o 
 limx.o : comgeom.o logic.o comvert.o comconst.o paramet_m.o dimens_m.o 
@@ -155,8 +154,8 @@ nflxtr.o : YOECUMF.o YOMCST.o dimphy.o dimens_m.o
 nuage.o : FCTTRE.o YOETHF.o YOMCST.o dimphy.o dimens_m.o 
 nxgrad.o : comgeom.o paramet_m.o dimens_m.o 
 nxgrad_gam.o : comgeom.o paramet_m.o dimens_m.o 
-nxgraro2.o : comdissipn.o paramet_m.o dimens_m.o 
-nxgrarot.o : comdissipn.o logic.o paramet_m.o dimens_m.o 
+nxgraro2.o : inidissip.o paramet_m.o dimens_m.o 
+nxgrarot.o : inidissip.o logic.o paramet_m.o dimens_m.o 
 o3_chem.o : orbite.o regr_pr_comb_coefoz.o dimens_m.o dimphy.o 
 orbite.o : comconst.o phyetat0.o dimphy.o YOMCST.o 
 orodrag.o : YOEGWD.o YOMCST.o dimphy.o dimens_m.o 

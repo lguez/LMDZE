@@ -15,30 +15,31 @@ PROGRAM gcm
   ! Pour Van-Leer plus vapeur d'eau saturée : iadv(1)=4
   ! Pour Van-Leer : iadv=10
 
-  USE IOIPSL, only: ioconf_calendar, histclo
-  use dimens_m, only: iim, jjm, llm, nqmx
-  use dimphy, only: klon
-  use paramet_m, only: ip1jm, ip1jmp1
+  use abort_gcm_m, only: abort_gcm
+  use clesphys2, only: read_clesphys2
+  use com_io_dyn, only: histid, histvid, histaveid
   use comconst, only: daysec, cpp, dtvr, g, rad, r, initialize
   use comdissnew, only: lstardis, nitergdiv, nitergrot, niterh, tetagdiv, &
        tetagrot, tetatemp
+  use comgeom, only: rlatu, aire_2d, cu_2d, cv_2d, rlonv
   use conf_gcm_m, only: day_step, iperiod, anneeref, dayref, iecri, iphysiq, &
        nday, raz_date, periodav, conf_gcm
-  use logic, only: iflag_phys
-  use comgeom, only: rlatu, aire_2d, cu_2d, cv_2d, rlonv
-  use temps, only: day_ref, annee_ref, day_end, itau_dyn
-  use com_io_dyn, only: histid, histvid, histaveid
-  use tracstoke, only: istdyn, istphy
-  use abort_gcm_m, only: abort_gcm
-  use inithist_m, only: inithist
-  use initdynav_m, only: initdynav
+  use dimens_m, only: iim, jjm, llm, nqmx
+  use dimphy, only: klon
   use dynetat0_m, only: dynetat0, day_ini
+  use dynredem0_m, only: dynredem0
   use grid_change, only: dyn_phy, init_dyn_phy
   use iniadvtrac_m, only: iniadvtrac
-  use leapfrog_m, only: leapfrog
-  use dynredem0_m, only: dynredem0
-  use clesphys2, only: read_clesphys2
+  use inidissip_m, only: inidissip
   use inigeom_m, only: inigeom
+  use initdynav_m, only: initdynav
+  use inithist_m, only: inithist
+  USE IOIPSL, only: ioconf_calendar, histclo
+  use leapfrog_m, only: leapfrog
+  use logic, only: iflag_phys
+  use paramet_m, only: ip1jm, ip1jmp1
+  use temps, only: day_ref, annee_ref, day_end, itau_dyn
+  use tracstoke, only: istdyn, istphy
 
   IMPLICIT NONE
 

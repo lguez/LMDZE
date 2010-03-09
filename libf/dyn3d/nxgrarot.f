@@ -18,7 +18,7 @@ c
       use dimens_m
       use paramet_m
       use logic
-            use comdissipn
+            use inidissip_m
       IMPLICIT NONE
 c
 c
@@ -29,7 +29,8 @@ c
 c
       REAL rot(ip1jm,llm)
 
-      INTEGER l,ij,iter,lr
+      INTEGER l,ij,iter
+      integer, intent(in):: lr
 c
 c
 c

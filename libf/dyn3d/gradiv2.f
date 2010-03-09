@@ -18,7 +18,7 @@ c
       use dimens_m
       use paramet_m
       use comgeom
-            use comdissipn
+            use inidissip_m
       IMPLICIT NONE
 c
 c
@@ -32,7 +32,8 @@ c     ........       variables locales       .........
 c
       REAL div(ip1jmp1,llm)
       REAL signe, nugrads
-      INTEGER l,ij,iter,ld
+      INTEGER l,ij,iter
+      integer, intent(in):: ld
       
 c    ........................................................
 c

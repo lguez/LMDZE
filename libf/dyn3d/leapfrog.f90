@@ -7,25 +7,25 @@ contains
   SUBROUTINE leapfrog(ucov, vcov, teta, ps, masse, phis, q, time_0)
 
     ! From dyn3d/leapfrog.F, version 1.6 2005/04/13 08:58:34
-    ! Auteurs : P. Le Van, L. Fairhead, F. Hourdin
+    ! Auteurs: P. Le Van, L. Fairhead, F. Hourdin
 
-    USE dimens_m, ONLY : iim, llm, nqmx
-    USE paramet_m, ONLY : iip1, ip1jm, ip1jmp1, jjp1
-    USE comconst, ONLY : daysec, dtphys, dtvr
-    USE comvert, ONLY : ap, bp
-    USE conf_gcm_m, ONLY : day_step, iconser, idissip, iperiod, iphysiq, &
+    USE calfis_m, ONLY: calfis
+    USE com_io_dyn, ONLY: histaveid
+    USE comconst, ONLY: daysec, dtphys, dtvr
+    USE comgeom, ONLY: aire, apoln, apols
+    USE comvert, ONLY: ap, bp
+    USE conf_gcm_m, ONLY: day_step, iconser, iperiod, iphysiq, &
          nday, offline, periodav
-    USE logic, ONLY : iflag_phys, ok_guide
-    USE comgeom, ONLY : aire, apoln, apols
-    USE temps, ONLY : dt, itaufin
-    USE dynetat0_m, ONLY : day_ini
-    USE iniprint, ONLY : prt_level
-    USE com_io_dyn, ONLY : histaveid
-    USE calfis_m, ONLY : calfis
-    USE exner_hyb_m, ONLY : exner_hyb
-    USE guide_m, ONLY : guide
-    USE pression_m, ONLY : pression
-    USE pressure_var, ONLY : p3d
+    USE dimens_m, ONLY: iim, llm, nqmx
+    USE dynetat0_m, ONLY: day_ini
+    USE exner_hyb_m, ONLY: exner_hyb
+    USE guide_m, ONLY: guide
+    use inidissip_m, only: idissip
+    USE logic, ONLY: iflag_phys, ok_guide
+    USE paramet_m, ONLY: iip1, ip1jm, ip1jmp1, jjp1
+    USE pression_m, ONLY: pression
+    USE pressure_var, ONLY: p3d
+    USE temps, ONLY: dt, itaufin
 
     ! Variables dynamiques:
     REAL vcov(ip1jm, llm), ucov(ip1jmp1, llm) ! vents covariants
@@ -75,7 +75,7 @@ contains
     INTEGER iday ! jour julien
     REAL time ! time of day, as a fraction of day length
     real finvmaold(ip1jmp1, llm)
-    LOGICAL :: lafin=.false.
+    LOGICAL:: lafin=.false.
     INTEGER ij, l
 
     REAL rdayvrai, rdaym_ini
