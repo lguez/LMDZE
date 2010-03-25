@@ -7,6 +7,7 @@
       use logic
       use comgeom
             use inidissip_m
+      use filtreg_m, only: filtreg
       IMPLICIT NONE
 c
 c=======================================================================

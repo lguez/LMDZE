@@ -19,6 +19,7 @@ c
       use paramet_m
       use logic
             use inidissip_m
+      use filtreg_m, only: filtreg
       IMPLICIT NONE
 c
 c

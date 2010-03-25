@@ -9,23 +9,23 @@ CONTAINS
     ! From dyn3d/dynredem.F, version 1.2 2004/06/22 11:45:30
     ! Ecriture du fichier de redémarrage au format NetCDF (initialisation)
 
-    USE ioipsl, ONLY : ju2ymds, ymds2ju
-    USE dimens_m, ONLY : iim, jjm, llm, nqmx
-    USE paramet_m, ONLY : iip1, jjp1, llmp1
     USE comconst, ONLY : cpp, daysec, dtvr, g, kappa, omeg, rad
     USE comvert, ONLY : ap, bp, nivsig, nivsigs, pa, preff, presnivs
-    USE logic, ONLY : fxyhypb, ysinus
     USE comgeom, ONLY : aire_2d, cu_2d, cv_2d, rlatu, rlatv, rlonu, rlonv
-    USE serre, ONLY : clat, clon, dzoomx, dzoomy, grossismx, grossismy, &
-         taux, tauy
-    USE temps, ONLY : annee_ref, day_ref, itaufin, itau_dyn
+    USE dimens_m, ONLY : iim, jjm, llm, nqmx
     USE ener, ONLY : ang0, etot0, ptot0, stot0, ztot0
+    USE ioipsl, ONLY : ju2ymds, ymds2ju
     USE iniadvtrac_m, ONLY : tname, ttext
+    USE logic, ONLY : fxyhypb, ysinus
     USE netcdf95, ONLY : nf95_close, nf95_create, nf95_def_dim, &
          nf95_def_var, nf95_enddef, nf95_inq_varid, nf95_put_att, &
          nf95_put_var
     USE netcdf, ONLY : nf90_clobber, nf90_float, nf90_global, &
          nf90_unlimited
+    USE paramet_m, ONLY : iip1, jjp1, llmp1
+    USE serre, ONLY : clat, clon, dzoomx, dzoomy, grossismx, grossismy, &
+         taux, tauy
+    USE temps, ONLY : annee_ref, day_ref
 
     CHARACTER (len=*), INTENT (IN) :: fichnom
     INTEGER, INTENT (IN) :: iday_end
@@ -105,7 +105,6 @@ CONTAINS
     END IF
 
     tab_cntrl(30) = real(iday_end)
-    tab_cntrl(31) = real(itau_dyn+itaufin)
 
     CALL nf95_create(fichnom, nf90_clobber, nid)
     CALL nf95_put_att(nid, nf90_global, 'title', &

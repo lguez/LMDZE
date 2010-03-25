@@ -13,7 +13,6 @@
       use comgeom
       use temps
       use ener
-            use comdissip
       IMPLICIT NONE
 
 

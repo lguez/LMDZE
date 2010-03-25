@@ -24,6 +24,8 @@ c=======================================================================
       use comconst
       use logic
       use comgeom
+      use filtreg_m, only: filtreg
+
       IMPLICIT NONE
 c
       INTEGER ntetaSTD

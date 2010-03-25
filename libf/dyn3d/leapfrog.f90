@@ -6,26 +6,28 @@ contains
 
   SUBROUTINE leapfrog(ucov, vcov, teta, ps, masse, phis, q, time_0)
 
-    ! From dyn3d/leapfrog.F, version 1.6 2005/04/13 08:58:34
-    ! Auteurs: P. Le Van, L. Fairhead, F. Hourdin
+    ! From dyn3d/leapfrog.F, version 1.6, 2005/04/13 08:58:34
+    ! Authors: P. Le Van, L. Fairhead, F. Hourdin
 
     USE calfis_m, ONLY: calfis
     USE com_io_dyn, ONLY: histaveid
     USE comconst, ONLY: daysec, dtphys, dtvr
     USE comgeom, ONLY: aire, apoln, apols
     USE comvert, ONLY: ap, bp
-    USE conf_gcm_m, ONLY: day_step, iconser, iperiod, iphysiq, &
-         nday, offline, periodav
+    USE conf_gcm_m, ONLY: day_step, iconser, iperiod, iphysiq, nday, offline, &
+         periodav
     USE dimens_m, ONLY: iim, llm, nqmx
     USE dynetat0_m, ONLY: day_ini
+    use dynredem1_m, only: dynredem1
     USE exner_hyb_m, ONLY: exner_hyb
+    use filtreg_m, only: filtreg
     USE guide_m, ONLY: guide
     use inidissip_m, only: idissip
     USE logic, ONLY: iflag_phys, ok_guide
     USE paramet_m, ONLY: iip1, ip1jm, ip1jmp1, jjp1
     USE pression_m, ONLY: pression
     USE pressure_var, ONLY: p3d
-    USE temps, ONLY: dt, itaufin
+    USE temps, ONLY: dt, itau_dyn
 
     ! Variables dynamiques:
     REAL vcov(ip1jm, llm), ucov(ip1jmp1, llm) ! vents covariants
@@ -72,6 +74,7 @@ contains
     REAL tppn(iim), tpps(iim), tpn, tps
 
     INTEGER itau ! index of the time step of the dynamics, starts at 0
+    INTEGER itaufin
     INTEGER iday ! jour julien
     REAL time ! time of day, as a fraction of day length
     real finvmaold(ip1jmp1, llm)
@@ -87,11 +90,7 @@ contains
     ! cree par la dissipation
     REAL dtetaecdt(ip1jmp1, llm)
     REAL vcont(ip1jm, llm), ucont(ip1jmp1, llm)
-    CHARACTER*15 ztit
-    INTEGER:: ip_ebil_dyn = 0 ! PRINT level for energy conserv. diag.
-
-    logical:: dissip_conservative = .true.
-    logical forward, leapf, apphys, conser, apdiss
+    logical forward, leapf
 
     !---------------------------------------------------
 
@@ -106,7 +105,7 @@ contains
     CALL pression(ip1jmp1, ap, bp, ps, p3d)
     CALL exner_hyb(ps, p3d, pks, pk, pkf)
 
-    ! Debut de l'integration temporelle:
+    ! Début de l'integration temporelle :
     outer_loop:do
        if (ok_guide .and. (itaufin - itau - 1) * dtvr > 21600.) &
             call guide(itau, ucov, vcov, teta, q, masse, ps)
@@ -122,19 +121,14 @@ contains
        CALL filtreg(finvmaold, jjp1, llm, - 2, 2, .TRUE., 1)
 
        do
-          ! gestion des appels de la physique et des dissipations:
-          apphys = MOD(itau + 1, iphysiq) == 0 .AND. iflag_phys /= 0
-          conser = MOD(itau, iconser) == 0
-          apdiss = MOD(itau + 1, idissip) == 0
-
-          ! calcul des tendances dynamiques:
+          ! Calcul des tendances dynamiques:
           CALL geopot(ip1jmp1, teta, pk, pks, phis, phi)
           CALL caldyn(itau, ucov, vcov, teta, ps, masse, pk, pkf, phis, phi, &
-               conser, du, dv, dteta, dp, w, pbaru, pbarv, &
+               MOD(itau, iconser) == 0, du, dv, dteta, dp, w, pbaru, pbarv, &
                time + iday - day_ini)
 
           IF (forward .OR. leapf) THEN
-             ! calcul des tendances advection des traceurs (dont l'humidite)
+             ! Calcul des tendances advection des traceurs (dont l'humidité)
              CALL caladvtrac(q, pbaru, pbarv, p3d, masse, dq, teta, pk)
              IF (offline) THEN
                 ! Stokage du flux de masse pour traceurs off-line
@@ -148,7 +142,7 @@ contains
                dteta, dq, dp, vcov, ucov, teta, q, ps, masse, phis, &
                finvmaold, leapf)
 
-          IF (apphys) THEN
+          IF (MOD(itau + 1, iphysiq) == 0 .AND. iflag_phys /= 0) THEN
              ! calcul des tendances physiques:
              IF (itau + 1 == itaufin) lafin = .TRUE.
 
@@ -158,13 +152,6 @@ contains
              rdaym_ini = itau * dtvr / daysec
              rdayvrai = rdaym_ini + day_ini
 
-             ! Diagnostique de conservation de l'énergie : initialisation
-             IF (ip_ebil_dyn >= 1) THEN 
-                ztit='bil dyn'
-                CALL diagedyn(ztit, 2, 1, 1, dtphys, ucov, vcov, ps, p3d, pk, &
-                     teta, q(:, :, 1), q(:, :, 2))
-             ENDIF
-
              CALL calfis(nqmx, lafin, rdayvrai, time, ucov, vcov, teta, q, &
                   masse, ps, pk, phis, phi, du, dv, dteta, dq, w, &
                   dufi, dvfi, dtetafi, dqfi, dpfi)
@@ -173,19 +160,12 @@ contains
              CALL addfi(nqmx, dtphys, &
                   ucov, vcov, teta, q, ps, &
                   dufi, dvfi, dtetafi, dqfi, dpfi)
-
-             ! Diagnostique de conservation de l'énergie : difference
-             IF (ip_ebil_dyn >= 1) THEN 
-                ztit = 'bil phys'
-                CALL diagedyn(ztit, 2, 1, 1, dtphys, ucov, vcov, ps, p3d, pk, &
-                     teta, q(:, :, 1), q(:, :, 2))
-             ENDIF
           ENDIF
 
           CALL pression(ip1jmp1, ap, bp, ps, p3d)
           CALL exner_hyb(ps, p3d, pks, pk, pkf)
 
-          IF (apdiss) THEN
+          IF (MOD(itau + 1, idissip) == 0) THEN
              ! dissipation horizontale et verticale des petites echelles:
 
              ! calcul de l'energie cinetique avant dissipation
@@ -197,14 +177,12 @@ contains
              ucov=ucov + dudis
              vcov=vcov + dvdis
 
-             if (dissip_conservative) then
-                ! On rajoute la tendance due a la transform. Ec -> E
-                ! therm. cree lors de la dissipation
-                call covcont(llm, ucov, vcov, ucont, vcont)
-                call enercin(vcov, ucov, vcont, ucont, ecin)
-                dtetaecdt= (ecin0 - ecin) / pk
-                dtetadis=dtetadis + dtetaecdt
-             endif
+             ! On rajoute la tendance due a la transform. Ec -> E
+             ! therm. cree lors de la dissipation
+             call covcont(llm, ucov, vcov, ucont, vcont)
+             call enercin(vcov, ucov, vcont, ucont, ecin)
+             dtetaecdt= (ecin0 - ecin) / pk
+             dtetadis=dtetadis + dtetaecdt
              teta=teta + dtetadis
 
              ! Calcul de la valeur moyenne, unique de h aux poles .....
@@ -261,7 +239,8 @@ contains
           ENDIF
 
           IF (itau == itaufin) THEN
-             CALL dynredem1("restart.nc", vcov, ucov, teta, q, masse, ps)
+             CALL dynredem1("restart.nc", vcov, ucov, teta, q, masse, ps, &
+                  itau=itau_dyn+itaufin)
           ENDIF
 
           ! gestion de l'integration temporelle:

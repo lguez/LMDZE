@@ -15,6 +15,7 @@ SUBROUTINE sortvarc(itau,ucov,teta,ps,masse,pk,phis,vorpot,phi,bern,dp, &
   USE dynetat0_m, ONLY : day_ini
   USE ener, ONLY : ang, ang0, etot, etot0, ptot, ptot0, rmsdpdt, rmsv, &
        stot, stot0, ztot, ztot0
+  use filtreg_m, only: filtreg
 
   IMPLICIT NONE
 

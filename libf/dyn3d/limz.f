@@ -48,7 +48,6 @@ c
       REAL      SSUM,CVMGP,CVMGT
       integer ismax,ismin
       EXTERNAL  SSUM, convflu,ismin,ismax
-      EXTERNAL filtreg
 
       data first/.true./
 

@@ -13,30 +13,28 @@ module inidissip_m
 
 contains
 
-  SUBROUTINE inidissip(lstardis, nitergdiv, nitergrot, niterh, tetagdiv, &
-       tetagrot, tetatemp)
+  SUBROUTINE inidissip
 
     ! From dyn3d/inidissip.F, version 1.1.1.1 2004/05/19 12:53:06
     ! Initialisation de la dissipation horizontale                        
 
     USE comconst, ONLY : dtvr
+    use comdissnew, only: lstardis, nitergdiv, nitergrot, niterh, tetagdiv, &
+         tetagrot, tetatemp
     USE comvert, ONLY : preff, presnivs
     USE conf_gcm_m, ONLY : iperiod
     USE dimens_m, ONLY : jjm, llm
     USE paramet_m, ONLY : iip1, ip1jm, ip1jmp1, jjp1
     use new_unit_m, only: new_unit
-
-    LOGICAL, intent(in):: lstardis
-    INTEGER, intent(in):: nitergdiv, nitergrot, niterh
-    REAL, intent(in):: tetagdiv, tetagrot, tetatemp
+    use filtreg_m, only: filtreg
 
     ! Variables local to the procedure:
-    REAL zvert(llm)
+    REAL zvert(llm), max_zvert
     REAL zh(ip1jmp1), zu(ip1jmp1), zv(ip1jm), deltap(ip1jmp1, llm)
     REAL ullm, vllm, umin, vmin, zhmin, zhmax
     REAL zllm, z1llm
     INTEGER l, ij, idum, ii, unit
-    REAL tetamin
+    REAL tetamin ! in s
     REAL ran1
 
     !-----------------------------------------------------------------------
@@ -170,7 +168,8 @@ contains
     PRINT *, 'cdivh = ', cdivh
 
     ! Variation verticale du coefficient de dissipation :
-    zvert = 2. - 1. / (1. + (1. - preff / presnivs)**2)
+    zvert = 2. - 1. / (1. + (preff / presnivs - 1.)**2)
+    ! (between 1 and 2)
 
     tetaudiv = zvert / tetagdiv
     tetaurot = zvert / tetagrot
@@ -184,10 +183,11 @@ contains
     close(unit)
     print *, 'Created file "inidissip.csv".'
 
-    tetamin = min(1E6, minval(1. / tetaudiv), minval(1. / tetaurot), &
-         minval(1. / tetah))
+    max_zvert = maxval(zvert)
+    tetamin = min(1E6, tetagdiv / max_zvert, tetagrot / max_zvert, &
+         tetatemp / max_zvert)
     PRINT *, 'tetamin = ', tetamin
-    idissip = max(iperiod, int(tetamin / (2 * dtvr * iperiod)) * iperiod)
+    idissip = max(1, int(tetamin / (2 * dtvr * iperiod))) * iperiod
     PRINT *, 'idissip = ', idissip
     dtdiss = idissip * dtvr
     PRINT *, 'dtdiss = ', dtdiss

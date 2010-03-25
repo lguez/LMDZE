@@ -19,38 +19,36 @@ contains
 
     ! This subroutine creates "mask".
 
+    use caldyn0_m, only: caldyn0
+    use comconst, only: dtvr, daysec, cpp, kappa, pi
+    use comgeom, only: rlatu, rlonv, rlonu, rlatv, aire_2d, apoln, apols, &
+         cu_2d, cv_2d
+    use comvert, only: ap, bp, preff, pa
+    use conf_gcm_m, only: day_step, iphysiq, dayref, anneeref
+    use dimens_m, only: iim, jjm, llm, nqmx
+    use dimphy, only: zmasq
+    use dimsoil, only: nsoilmx
+    use dynredem0_m, only: dynredem0
+    use dynredem1_m, only: dynredem1
+    use exner_hyb_m, only: exner_hyb
+    use grid_atob, only: grille_m
+    use grid_change, only: init_dyn_phy, dyn_phy
+    use indicesol, only: is_oce, is_sic, is_ter, is_lic, epsfra
+    use iniadvtrac_m, only: iniadvtrac
+    use inidissip_m, only: inidissip
+    use inigeom_m, only: inigeom
     USE ioipsl, only: flinget, flinclo, flinopen_nozoom, flininfo, histclo
-
+    use paramet_m, only: ip1jm, ip1jmp1
+    use phyredem_m, only: phyredem
+    use pressure_var, only: pls, p3d
+    use q_sat_m, only: q_sat
+    use regr_lat_time_coefoz_m, only: regr_lat_time_coefoz
+    use regr_pr_o3_m, only: regr_pr_o3
+    use serre, only: alphax
     USE start_init_orog_m, only: start_init_orog, mask, phis
     use start_init_phys_m, only: qsol_2d
     use startdyn, only: start_inter_3d, start_init_dyn
-    use dimens_m, only: iim, jjm, llm, nqmx
-    use paramet_m, only: ip1jm, ip1jmp1
-    use comconst, only: dtvr, daysec, cpp, kappa, pi
-    use comdissnew, only: lstardis, nitergdiv, nitergrot, niterh, &
-         tetagdiv, tetagrot, tetatemp
-    use indicesol, only: is_oce, is_sic, is_ter, is_lic, epsfra
-    use comvert, only: ap, bp, preff, pa
-    use dimphy, only: zmasq
-    use conf_gcm_m, only: day_step, iphysiq, dayref, anneeref
-    use comgeom, only: rlatu, rlonv, rlonu, rlatv, aire_2d, apoln, apols, &
-         cu_2d, cv_2d
-    use serre, only: alphax
-    use dimsoil, only: nsoilmx
-    use temps, only: itau_dyn, itau_phy, annee_ref, day_ref, dt
-    use grid_atob, only: grille_m
-    use grid_change, only: init_dyn_phy, dyn_phy
-    use q_sat_m, only: q_sat
-    use exner_hyb_m, only: exner_hyb
-    use iniadvtrac_m, only: iniadvtrac
-    use pressure_var, only: pls, p3d
-    use dynredem0_m, only: dynredem0
-    use regr_lat_time_coefoz_m, only: regr_lat_time_coefoz
-    use regr_pr_o3_m, only: regr_pr_o3
-    use phyredem_m, only: phyredem
-    use caldyn0_m, only: caldyn0
-    use inigeom_m, only: inigeom
-    use inidissip_m, only: inidissip
+    use temps, only: itau_phy, annee_ref, day_ref, dt
 
     ! Variables local to the procedure:
 
@@ -292,9 +290,7 @@ contains
 
     ! Initialisation pour traceurs:
     call iniadvtrac
-    CALL inidissip(lstardis, nitergdiv, nitergrot, niterh, tetagdiv, &
-         tetagrot, tetatemp)
-    itau_dyn = 0
+    CALL inidissip
     itau_phy = 0
     day_ref = dayref
     annee_ref = anneeref
@@ -303,7 +299,7 @@ contains
     CALL caldyn0(uvent, vvent, tpot, psol, masse, pk, phis, phi, w, pbaru, &
          pbarv)
     CALL dynredem0("start.nc", dayref, phis)
-    CALL dynredem1("start.nc", vvent, uvent, tpot, q3d, masse, psol)
+    CALL dynredem1("start.nc", vvent, uvent, tpot, q3d, masse, psol, itau=0)
 
     ! Ecriture état initial physique:
     print *, "iphysiq = ", iphysiq

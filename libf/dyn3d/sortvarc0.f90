@@ -9,6 +9,7 @@ SUBROUTINE sortvarc0(ucov, teta, ps, masse, pk, phis, vorpot, phi, bern, dp)
   USE comconst, ONLY : daysec, g, omeg, rad
   USE comgeom, ONLY : aire, cu, rlatu
   USE ener, ONLY : ang0, etot0, ptot0, rmsdpdt, rmsv, stot0, ztot0
+  use filtreg_m, only: filtreg
 
   IMPLICIT NONE
 

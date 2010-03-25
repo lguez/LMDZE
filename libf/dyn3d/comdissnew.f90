@@ -14,27 +14,24 @@ module comdissnew
   ! gradiv
 
   INTEGER:: nitergrot= 2
-  ! Help = nombre d'iterations de l'operateur de dissipation  
+  ! Help = nombre d'iterations de l'operateur de dissipation 
   ! nxgradrot
 
   INTEGER:: niterh= 2
   ! Help = nombre d'iterations de l'operateur de dissipation
   ! divgrad
 
-  REAL::     tetagdiv= 7200.
-  ! Help = temps de dissipation des plus petites longeur 
-  ! d'ondes pour u,v (gradiv)
+  REAL:: tetagdiv= 7200. ! in s
+  ! temps de dissipation des plus petites longueurs d'ondes pour u,v (gradiv)
 
-  REAL:: tetagrot= 7200.
-  ! Help = temps de dissipation des plus petites longeur 
-  ! d'ondes pour u,v (nxgradrot)
+  REAL:: tetagrot= 7200. ! in s
+  ! temps de dissipation des plus petites longueurs d'ondes pour u,v
+  ! (nxgradrot)
 
-  REAL::  tetatemp= 7200.
-  ! Help =  temps de dissipation des plus petites longeur 
-  ! d'ondes pour h (divgrad)   
+  REAL:: tetatemp= 7200. ! in s
+  ! temps de dissipation des plus petites longueurs d'ondes pour h (divgrad) 
 
   REAL:: coefdis= 0.
-  ! Help = coefficient pour gamdissip  
 
 contains
 

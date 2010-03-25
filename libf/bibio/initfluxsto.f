@@ -2,7 +2,7 @@
 ! $Header: /home/cvsroot/LMDZ4/libf/bibio/initfluxsto.F,v 1.1.1.1 2004/05/19 12:53:05 lmdzadmin Exp $
 !
       subroutine initfluxsto
-     .  (infile,tstep,t_ops,t_wrt,nq,
+     .  (tstep,t_ops,t_wrt,nq,
      .                    fileid,filevid,filedid)
 
        USE IOIPSL
@@ -19,7 +19,6 @@ C                                  histend
 C
 C   Entree:
 C
-C      infile: nom du fichier histoire a creer
 C      day0,anne0: date de reference
 C      tstep: duree du pas de temps en seconde
 C      t_ops: frequence de l'operation pour IOIPSL
@@ -48,7 +47,6 @@ C   Declarations
 
 C   Arguments
 C
-      character*(*) infile
       integer*4 itau
       real tstep, t_ops, t_wrt
       integer fileid, filevid,filedid
@@ -56,8 +54,6 @@ C
       real nivd(1)
 
 C   Variables locales
-C
-      integer tau0
       real zjulian
       character*3 str
       character*10 ctrac
@@ -81,7 +77,6 @@ C
       zan = annee_ref
       idayref = day_ref
       CALL ymds2ju(zan, 1, idayref, 0.0, zjulian)
-      tau0 = itau_dyn
 	
 	do jj = 1, jjp1
         do ii = 1, iip1
@@ -90,9 +85,9 @@ C
         enddo
       enddo
  
-      call histbeg_totreg(infile, rlong(:,1), rlat(1,:),
+      call histbeg_totreg('fluxstoke', rlong(:,1), rlat(1,:),
      .             1, iip1, 1, jjp1,
-     .             tau0, zjulian, tstep, uhoriid, fileid)
+     .             itau_dyn, zjulian, tstep, uhoriid, fileid)
 C
 C  Creation du fichier histoire pour la grille en V (oblige pour l'instant,
 C  IOIPSL ne permet pas de grilles avec des nombres de point differents dans 
@@ -108,11 +103,11 @@ C  un meme fichier)
 
       call histbeg_totreg('fluxstokev.nc', rlong(:,1),
      .             rlat(1,:jjm),1, iip1, 1, jjm,
-     .             tau0, zjulian, tstep, vhoriid, filevid)
+     .             itau_dyn, zjulian, tstep, vhoriid, filevid)
 	
       call histbeg_totreg('defstoke.nc', (/1./), (/1./),
      .             1, 1, 1, 1,
-     .             tau0, zjulian, tstep, dhoriid, filedid)
+     .             itau_dyn, zjulian, tstep, dhoriid, filedid)
 
 C
 C  Appel a histhori pour rajouter les autres grilles horizontales

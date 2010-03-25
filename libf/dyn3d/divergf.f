@@ -13,6 +13,7 @@ c  *********************************************************************
       use dimens_m
       use paramet_m
       use comgeom
+      use filtreg_m, only: filtreg
       IMPLICIT NONE
 c
 c      x  et  y  sont des arguments  d'entree pour le s-prog

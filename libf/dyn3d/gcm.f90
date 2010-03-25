@@ -19,8 +19,6 @@ PROGRAM gcm
   use clesphys2, only: read_clesphys2
   use com_io_dyn, only: histid, histvid, histaveid
   use comconst, only: daysec, cpp, dtvr, g, rad, r, initialize
-  use comdissnew, only: lstardis, nitergdiv, nitergrot, niterh, tetagdiv, &
-       tetagrot, tetatemp
   use comgeom, only: rlatu, aire_2d, cu_2d, cv_2d, rlonv
   use conf_gcm_m, only: day_step, iperiod, anneeref, dayref, iecri, iphysiq, &
        nday, raz_date, periodav, conf_gcm
@@ -148,10 +146,7 @@ PROGRAM gcm
   ! Initialisation du filtre :
   CALL inifilr
 
-  ! Initialisation de la dissipation :
-  CALL inidissip(lstardis, nitergdiv, nitergrot, niterh, tetagdiv, tetagrot, &
-       tetatemp)
-
+  CALL inidissip
   call init_dyn_phy
 
   ! Initialisation de la physique :
@@ -188,10 +183,9 @@ PROGRAM gcm
 
   CALL dynredem0("restart.nc", day_end, phis)
   CALL inithist(day_ref, annee_ref, zdtvr, nqmx, histid, histvid, &
-       infile="dyn_hist.nc", t_ops = iecri * daysec, t_wrt = iecri * daysec)
+       t_ops = iecri * daysec, t_wrt = iecri * daysec)
   CALL initdynav(day_ref, annee_ref, zdtvr, nqmx, histaveid, &
-       infile='dyn_hist_ave.nc', t_ops = iperiod * zdtvr, &
-       t_wrt = periodav * daysec)
+       t_ops = iperiod * zdtvr, t_wrt = periodav * daysec)
 
   ! Choix des fréquences de stockage pour le hors-ligne :
   istdyn = day_step / 4     ! stockage toutes les 6 h = 1 jour / 4

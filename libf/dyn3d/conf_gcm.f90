@@ -49,9 +49,6 @@ contains
     ! Auteurs : L. Fairhead, P. Le Van
     ! Version du 29/04/97
 
-    ! Nouveaux paramètres nitergdiv, nitergrot, niterh, tetagdiv, tetagrot, 
-    ! tetatemp ajoutés pour la dissipation.
-
     ! On ne compare pas les valeurs des paramètres du zoom, grossismx, 
     ! grossismy, clon, clat, fxyhypb lues sur le fichier start avec
     ! celles passées par run.def, au début du gcm. 

@@ -13,7 +13,7 @@ netcdf95_dir = /home/guez_local/lib/NetCDF95/g95
 IOIPSL_dir = /home/guez_local/lib/IOIPSL_Lionel/aq
 
 # Include flags:
-inc_flags = $(addprefix -I, ${libf_dir} ${libf_dir}/dyn3d ${libf_dir}/phylmd ${libf_dir}/filtrez ${netcdf_inc_dir} ${numer_rec_dir} ${netcdf95_dir} ${IOIPSL_dir})
+inc_flags = $(addprefix -I, ${libf_dir} ${libf_dir}/phylmd ${netcdf_inc_dir} ${numer_rec_dir} ${netcdf95_dir} ${IOIPSL_dir})
 
 # Other flags which do not affect run time performance:
 lang_flags = -ffree-form -pedantic -std=f95 -Wall -Wextra -Wno=136,163,165

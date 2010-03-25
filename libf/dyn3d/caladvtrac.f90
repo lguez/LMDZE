@@ -10,6 +10,7 @@ SUBROUTINE caladvtrac(q, pbaru, pbarv, p, masse, dq, teta, pk)
   use paramet_m, only: ip1jmp1
   use comconst, only: dtvr
   use conf_gcm_m, only: iapp_tracvl
+  use filtreg_m, only: filtreg
 
   IMPLICIT NONE
 

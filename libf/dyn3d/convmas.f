@@ -7,6 +7,7 @@ c
       use paramet_m
       use comvert
       use logic
+      use filtreg_m, only: filtreg
       IMPLICIT NONE
 
 c=======================================================================

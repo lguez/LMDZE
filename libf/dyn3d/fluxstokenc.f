@@ -47,7 +47,7 @@ c
 
       if(first) then
 
-	CALL initfluxsto( 'fluxstoke',
+	CALL initfluxsto(
      .  time_step,istdyn* time_step,istdyn* time_step,
      . nqmx, fluxid,fluxvid,fluxdid) 
 	

@@ -410,23 +410,23 @@ contains
     integer, PARAMETER:: ISMo=300, JSMo=200
     real XF(ISMo, JSMo)
     real WEIGHTpb(-1:1, -1:1)
-    real sum
+    real my_sum
     integer i, is, js, j
 
     if(imar>ismo) stop 'surdimensionner ismo dans mva9 (grid_noro)'
     if(jmar>jsmo) stop 'surdimensionner jsmo dans mva9 (grid_noro)'
 
-    SUM=0.
+    MY_SUM=0.
     DO IS=-1, 1
        DO JS=-1, 1
           WEIGHTpb(IS, JS)=1./FLOAT((1+IS**2)*(1+JS**2))
-          SUM=SUM+WEIGHTpb(IS, JS)
+          MY_SUM=MY_SUM+WEIGHTpb(IS, JS)
        ENDDO
     ENDDO
 
     DO IS=-1, 1
        DO JS=-1, 1
-          WEIGHTpb(IS, JS)=WEIGHTpb(IS, JS)/SUM
+          WEIGHTpb(IS, JS)=WEIGHTpb(IS, JS)/MY_SUM
        ENDDO
     ENDDO
 

@@ -16,6 +16,7 @@
       use temps
       use iniadvtrac_m
       use pression_m, only: pression
+      use filtreg_m, only: filtreg
 
       IMPLICIT NONE
 

@@ -63,7 +63,7 @@ C
       INTEGER imjmp1
       PARAMETER( imjmp1=iim*jjp1)
 c     Input variables
-      CHARACTER*15 tit
+      CHARACTER(len=*), intent(in):: tit
       INTEGER iprt,idiag, idiag2
       REAL dtime
       REAL vcov(ip1jm,llm),ucov(ip1jmp1,llm) ! vents covariants
@@ -289,7 +289,6 @@ C
  9001   format('Dyn3d. Enthalpy Budget (W/m2) ',A15,1i6,10(F8.2))
         WRITE(6,9002) tit,pas(idiag), d_ec
  9002   format('Dyn3d. Cinetic Energy Budget (W/m2) ',A15,1i6,10(F8.2))
-C        WRITE(6,9003) tit,pas(idiag), ec_tot
  9003   format('Dyn3d. Cinetic Energy (W/m2) ',A15,1i6,10(E15.6))
         WRITE(6,9004) tit,pas(idiag), d_h_vcol+d_ec
  9004   format('Dyn3d. Total Energy Budget (W/m2) ',A15,1i6,10(F8.2))

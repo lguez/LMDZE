@@ -38,6 +38,7 @@ contains
     use comconst, only: kappa, cpp
     use comvert, only: preff
     use comgeom, only: aire_2d, apoln, apols
+    use filtreg_m, only: filtreg
 
     REAL, intent(in):: ps((iim + 1) * (jjm + 1))
     REAL, intent(in):: p((iim + 1) * (jjm + 1), llm + 1)

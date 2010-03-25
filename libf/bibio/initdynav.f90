@@ -6,21 +6,19 @@ module initdynav_m
 
 contains
 
-  subroutine initdynav(day0, anne0, tstep, nq, fileid, infile, t_ops, t_wrt)
+  subroutine initdynav(day0, anne0, tstep, nq, fileid, t_ops, t_wrt)
 
-    ! From initdynav.F,v 1.1.1.1 2004/05/19 12:53:05
+    ! From initdynav.F, version 1.1.1.1, 2004/05/19 12:53:05
+    !   L. Fairhead, LMD
 
-    USE IOIPSL, only: ymds2ju, histbeg_totreg, histvert, histdef, histend
-    use dimens_m
-    use paramet_m
-    use comconst, only: pi
-    use comvert, only: nivsigs
-    use logic
-    use comgeom
-    use serre
-    use temps
-    use ener
-    use iniadvtrac_m, only: ttext
+    USE ioipsl, ONLY : histbeg_totreg, histdef, histend, histvert, ymds2ju
+    USE dimens_m, ONLY : llm
+    USE paramet_m, ONLY : iip1, jjp1
+    USE comconst, ONLY : pi
+    USE comvert, ONLY : nivsigs
+    USE comgeom, ONLY : rlatu, rlonv
+    USE temps, ONLY : itau_dyn
+    USE iniadvtrac_m, ONLY : ttext
 
     !   Routine d'initialisation des ecritures des fichiers histoires LMDZ
     !   au format IOIPSL. Initialisation du fichier histoire moyenne.
@@ -32,7 +30,6 @@ contains
     !                                  histend
 
     !   Entree:
-    !      infile: nom du fichier histoire a creer
     !      day0,anne0: date de reference
     !      tstep : frequence d'ecriture
     !      t_ops: frequence de l'operation pour IOIPSL
@@ -42,10 +39,7 @@ contains
     !   Sortie:
     !      fileid: ID du fichier netcdf cree
 
-    !   L. Fairhead, LMD, 03/99
-
     !   Arguments
-    character(len=*) infile
     integer day0, anne0
     real, intent(in):: tstep, t_ops, t_wrt
     integer fileid
@@ -54,7 +48,6 @@ contains
 
     !   Variables locales
 
-    integer tau0
     real zjulian
     integer iq
     real rlong(iip1,jjp1), rlat(iip1,jjp1)
@@ -63,17 +56,11 @@ contains
 
     !----------------------------------------------------
 
-    !  Initialisations
-
-    pi = 4. * atan (1.)
-    !
     !  Appel a histbeg: creation du fichier netcdf et initialisations diverses
-    !         
 
     zan = anne0
     dayref = day0
     CALL ymds2ju(zan, 1, dayref, 0.0, zjulian)
-    tau0 = itau_dyn
 
     do jj = 1, jjp1
        do ii = 1, iip1
@@ -82,81 +69,79 @@ contains
        enddo
     enddo
 
-    call histbeg_totreg(infile, rlong(:,1), rlat(1,:), &
+    call histbeg_totreg('dyn_hist_ave.nc', rlong(:,1), rlat(1,:), &
          1, iip1, 1, jjp1, &
-         tau0, zjulian, tstep, thoriid, fileid)
+         itau_dyn, zjulian, tstep, thoriid, fileid)
 
-    !
+
     !  Appel a histvert pour la grille verticale
-    !
+
     call histvert(fileid, 'sigss', 'Niveaux sigma','Pa', &
          llm, nivsigs, zvertiid)
-    !
+
     !  Appels a histdef pour la definition des variables a sauvegarder
-    !
+
     !  Vents U
-    !
+
     write(6,*)'inithistave',tstep
     call histdef(fileid, 'u', 'vents u scalaires moyennes', &
          'm/s', iip1, jjp1, thoriid, llm, 1, llm, zvertiid, &
          'ave(X)', t_ops, t_wrt)
 
-    !
+
     !  Vents V
-    !
+
     call histdef(fileid, 'v', 'vents v scalaires moyennes', &
          'm/s', iip1, jjp1, thoriid, llm, 1, llm, zvertiid, &
          'ave(X)', t_ops, t_wrt)
 
-    !
+
     !  Temperature
-    !
+
     call histdef(fileid, 'temp', 'temperature moyennee', 'K', &
          iip1, jjp1, thoriid, llm, 1, llm, zvertiid, &
          'ave(X)', t_ops, t_wrt)
-    !
+
     !  Temperature potentielle
-    !
+
     call histdef(fileid, 'theta', 'temperature potentielle', 'K', &
          iip1, jjp1, thoriid, llm, 1, llm, zvertiid, &
          'ave(X)', t_ops, t_wrt)
 
 
-    !
+
     !  Geopotentiel
-    !
+
     call histdef(fileid, 'phi', 'geopotentiel moyenne', '-', &
          iip1, jjp1, thoriid, llm, 1, llm, zvertiid, &
          'ave(X)', t_ops, t_wrt)
-    !
+
     !  Traceurs
-    !
+
     DO iq=1,nq
        call histdef(fileid, ttext(iq), ttext(iq), '-', &
             iip1, jjp1, thoriid, llm, 1, llm, zvertiid, &
             'ave(X)', t_ops, t_wrt)
     enddo
-    !
+
     !  Masse
-    !
+
     call histdef(fileid, 'masse', 'masse', 'kg', &
          iip1, jjp1, thoriid, 1, 1, 1, -99, &
          'ave(X)', t_ops, t_wrt)
-    !
+
     !  Pression au sol
-    !
+
     call histdef(fileid, 'ps', 'pression naturelle au sol', 'Pa', &
          iip1, jjp1, thoriid, 1, 1, 1, -99, &
          'ave(X)', t_ops, t_wrt)
-    !
+
     !  Pression au sol
-    !
+
     call histdef(fileid, 'phis', 'geopotentiel au sol', '-', &
          iip1, jjp1, thoriid, 1, 1, 1, -99, &
          'ave(X)', t_ops, t_wrt)
-    !
-    !  Fin
-    !
+
     call histend(fileid)
 
   end subroutine initdynav

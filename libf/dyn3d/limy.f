@@ -52,7 +52,6 @@ c
       REAL      SSUM
       integer ismax,ismin
       EXTERNAL  SSUM, convflu,ismin,ismax
-      EXTERNAL filtreg
 
       data first/.true./
 

@@ -32,13 +32,6 @@ c
       REAL ghy(ip1jm,llm), ghx(ip1jmp1,llm)
 c    ......................................................
 
-c
-c
-c   ...  cvuscugam  = ( cvu/ cu ) ** (- gamdissip )
-c   ...  cuvscvgam  = ( cuv/ cv ) ** (- gamdissip )  calcules dans inigeom  ..
-c   ...  unsairegam =  1. /  aire ** (- gamdissip )
-c
-
       CALL SCOPY ( ip1jmp1 * klevel, teta, 1, divgra, 1 )
 c
       CALL   grad ( klevel, divgra, ghx, ghy )

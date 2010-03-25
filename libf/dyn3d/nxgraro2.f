@@ -17,6 +17,7 @@ c
       use dimens_m
       use paramet_m
             use inidissip_m
+      use filtreg_m, only: filtreg
       IMPLICIT NONE
 c
 c

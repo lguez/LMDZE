@@ -141,8 +141,6 @@ cym      character*10 zunites(ntr,nQ)
 c   Initialisation du fichier contenant les moyennes zonales.
 c   ---------------------------------------------------------
 
-      character*10 infile
-
       integer fileid
       integer thoriid, zvertiid
       save fileid
@@ -151,7 +149,6 @@ c   ---------------------------------------------------------
 
 C   Variables locales
 C
-      integer tau0
       real zjulian
       character*3 str
       character*10 ctrac
@@ -211,19 +208,16 @@ c   ncum est la frequence de stokage en pas de temps
 c   Initialisation du fichier contenant les moyennes zonales.
 c   ---------------------------------------------------------
 
-      infile='dynzon'
-
       zan = annee_ref
       dayref = day_ref
       CALL ymds2ju(zan, 1, dayref, 0.0, zjulian)
-      tau0 = itau_dyn
       
       rlong=0.
       rlatg=rlatv*180./pi
        
-      call histbeg_totreg(infile, rlong(:1), rlatg,
+      call histbeg_totreg('dynzon', rlong(:1), rlatg,
      .             1, 1, 1, jjm,
-     .             tau0, zjulian, dt_cum, thoriid, fileid)
+     .             itau_dyn, zjulian, dt_cum, thoriid, fileid)
 
 C
 C  Appel a histvert pour la grille verticale

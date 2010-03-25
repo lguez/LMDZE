@@ -24,6 +24,8 @@ c=======================================================================
       use paramet_m
       use logic
       use comgeom
+      use filtreg_m, only: filtreg
+
       IMPLICIT NONE
 
       REAL  rot( ip1jm,llm )

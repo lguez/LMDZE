@@ -6,7 +6,7 @@ module inithist_m
 
 contains
 
-  subroutine inithist(day0, anne0, tstep, nq, fileid, filevid, infile, t_ops, &
+  subroutine inithist(day0, anne0, tstep, nq, fileid, filevid, t_ops, &
        t_wrt)
 
     ! From inithist.F,v 1.1.1.1 2004/05/19 12:53:05
@@ -21,7 +21,6 @@ contains
     !                                  histend
 
     !   Entree:
-    !      infile: nom du fichier histoire a creer
     !      day0,anne0: date de reference
     !      tstep: duree du pas de temps en seconde
     !      t_ops: frequence de l'operation pour IOIPSL
@@ -47,15 +46,12 @@ contains
     use iniadvtrac_m
 
     !   Arguments
-    character(len=*) infile
     integer day0, anne0
     real, intent(in):: tstep, t_ops, t_wrt
     integer fileid, filevid
     integer nq
 
     !   Variables locales
-
-    integer tau0
     real zjulian
     integer iq
     real rlong(iip1,jjp1), rlat(iip1,jjp1)
@@ -74,7 +70,6 @@ contains
     zan = anne0
     dayref = day0
     CALL ymds2ju(zan, 1, dayref, 0.0, zjulian)
-    tau0 = itau_dyn
 
     do jj = 1, jjp1
        do ii = 1, iip1
@@ -83,12 +78,12 @@ contains
        enddo
     enddo
 
-    call histbeg_totreg(infile, rlong(:,1), rlat(1,:), &
+    call histbeg_totreg("dyn_hist.nc", rlong(:,1), rlat(1,:), &
          1, iip1, 1, jjp1, &
-         tau0, zjulian, tstep, uhoriid, fileid)
+         itau_dyn, zjulian, tstep, uhoriid, fileid)
     !
     !  Creation du fichier histoire pour la grille en V (oblige pour l'instant,
-    !  IOIPSL ne permet pas de grilles avec des nombres de point differents dans 
+    !  IOIPSL ne permet pas de grilles avec des nombres de point differents dans
     !  un meme fichier)
 
     do jj = 1, jjm
@@ -100,7 +95,7 @@ contains
 
     call histbeg_totreg('dyn_histv.nc', rlong(:,1), rlat(1,:jjm), &
          1, iip1, 1, jjm, &
-         tau0, zjulian, tstep, vhoriid, filevid)
+         itau_dyn, zjulian, tstep, vhoriid, filevid)
     !
     !  Appel a histhori pour rajouter les autres grilles horizontales
     !

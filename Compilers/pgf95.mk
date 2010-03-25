@@ -1,28 +1,29 @@
-# These are machine dependent macros, meant to be included in the
-# LMDZE makefile
+# These are compiler dependent macros, meant to be included in the
+# makefile for LMDZE.
 
-# For pgf95 6.1-4
+# For pgf95 version 6
 
-COMPILE.f = $(FC) $(F90FLAGS) -c
 FC = pgf95
 
-# Include flags:
-inc_flags = -I${libf_dir} -I${libf_dir}/dyn3d -I${libf_dir}/phylmd -I${libf_dir}/filtrez -I/usr/local/netcdf-pgi/include -I/home/guez/lib/IOIPSL_Lionel/ag -I/home/guez/lib/Numer_Rec_Lionel/d
+netcdf_inc_dir = /usr/local/netcdf-pgi/include
+netcdf_lib_dir = /usr/local/netcdf-pgi/lib
 
-# On Duke:
-## -I/usr/local/netcdf/amd64/include
+numer_rec_dir = /home/guez_local/lib/Numer_Rec_Lionel/o
+netcdf95_dir = /home/guez_local/lib/NetCDF95/pgf95
+IOIPSL_dir = /home/guez_local/lib/IOIPSL_Lionel/ad
+
+# Include flags:
+inc_flags = $(addprefix -I, ${libf_dir} ${libf_dir}/phylmd ${netcdf_inc_dir} ${numer_rec_dir} ${netcdf95_dir} ${IOIPSL_dir})
 
 # Other flags which do not affect run time performance:
-lang_flags = -Mstandard -Mfree
+lang_flags = -Mstandard -Minform=inform -Mfree -Minfo=all -Mallocatable=95 -Mbackslash
 
 # Flags which affect run time performance:
-perf_flags = -fastsse -O3
+perf_flags = -g -Kieee -Ktrap=fp -Mbounds -Mchkfpstk -Mchkptr -Mpgicoff
+##-fastsse -O3
 
 FFLAGS = ${inc_flags} ${perf_flags}
 F90FLAGS = ${inc_flags} ${lang_flags} ${perf_flags}
-LDFLAGS =
+LDFLAGS = -g
 
-LDLIBS = -L/home/guez/lib/IOIPSL_Lionel/ag -L/usr/local/netcdf-pgi/lib -L/home/guez/lib/Numer_Rec_Lionel/d -lioipsl -lnetcdf -lnumer_rec
-
-# On Duke:
-## -L/usr/local/netcdf/amd64/lib
+LDLIBS = $(addprefix -L, ${netcdf_lib_dir} ${numer_rec_dir} ${netcdf95_dir} ${IOIPSL_dir}) -lioipsl -lnetcdf95 -lnetcdf -lnumer_rec

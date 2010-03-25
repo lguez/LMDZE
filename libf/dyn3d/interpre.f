@@ -14,7 +14,6 @@
       use comgeom
       use temps
       use ener
-      use comdissip
        implicit none
 
 c---------------------------------------------------

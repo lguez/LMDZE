@@ -5,6 +5,7 @@
       use dimens_m
       use paramet_m
       use logic
+      use filtreg_m, only: filtreg
       IMPLICIT NONE
 
 c=======================================================================
