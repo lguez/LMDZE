@@ -27,7 +27,7 @@ contains
     USE paramet_m, ONLY: iip1, ip1jm, ip1jmp1, jjp1
     USE pression_m, ONLY: pression
     USE pressure_var, ONLY: p3d
-    USE temps, ONLY: dt, itau_dyn
+    USE temps, ONLY: itau_dyn
 
     ! Variables dynamiques:
     REAL vcov(ip1jm, llm), ucov(ip1jmp1, llm) ! vents covariants
@@ -91,6 +91,7 @@ contains
     REAL dtetaecdt(ip1jmp1, llm)
     REAL vcont(ip1jm, llm), ucont(ip1jmp1, llm)
     logical forward, leapf
+    REAL dt
 
     !---------------------------------------------------
 
@@ -140,7 +141,7 @@ contains
           ! integrations dynamique et traceurs:
           CALL integrd(2, vcovm1, ucovm1, tetam1, psm1, massem1, dv, du, &
                dteta, dq, dp, vcov, ucov, teta, q, ps, masse, phis, &
-               finvmaold, leapf)
+               finvmaold, leapf, dt)
 
           IF (MOD(itau + 1, iphysiq) == 0 .AND. iflag_phys /= 0) THEN
              ! calcul des tendances physiques:
@@ -177,15 +178,15 @@ contains
              ucov=ucov + dudis
              vcov=vcov + dvdis
 
-             ! On rajoute la tendance due a la transform. Ec -> E
-             ! therm. cree lors de la dissipation
+             ! On rajoute la tendance due à la transformation Ec -> E
+             ! thermique créée lors de la dissipation
              call covcont(llm, ucov, vcov, ucont, vcont)
              call enercin(vcov, ucov, vcont, ucont, ecin)
              dtetaecdt= (ecin0 - ecin) / pk
              dtetadis=dtetadis + dtetaecdt
              teta=teta + dtetadis
 
-             ! Calcul de la valeur moyenne, unique de h aux poles .....
+             ! Calcul de la valeur moyenne unique de h aux pôles
              DO l = 1, llm
                 DO ij = 1, iim
                    tppn(ij) = aire(ij) * teta(ij, l)

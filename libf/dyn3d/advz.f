@@ -33,7 +33,7 @@ C  w : flux de masse en z en Pa.m2.s-1
       INTEGER ntra
       PARAMETER (ntra = 1)
 
-      REAL dtz
+      REAL, intent(in):: dtz
       REAL w ( iip1,jjp1,llm )
     
 C  moments: SM  total mass in each grid box

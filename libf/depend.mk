@@ -59,7 +59,6 @@ cv3_routines.o : cvflag.h cvthermo.h cvparam3.h conema3_m.o
 cv_driver.o : cvthermo.h cvflag.h YOMCST.o dimphy.o dimens_m.o 
 cv_routines.o : cvthermo.h cvparam.h 
 cvltr.o : YOECUMF.o YOMCST.o dimphy.o dimens_m.o 
-diagedyn.o : YOETHF.o YOMCST.o comgeom.o paramet_m.o dimens_m.o 
 diagphy.o : YOETHF.o YOMCST.o dimphy.o dimens_m.o 
 dimphy.o : dimens_m.o 
 dissip.o : inidissip.o comdissnew.o paramet_m.o dimens_m.o 
@@ -119,7 +118,7 @@ initfluxsto.o : ener.o temps.o serre.o comgeom.o logic.o comvert.o comconst.o pa
 inithist.o : iniadvtrac.o ener.o temps.o serre.o comgeom.o logic.o comvert.o comconst.o paramet_m.o dimens_m.o 
 initphysto.o : ener.o temps.o serre.o comgeom.o logic.o dimphy.o indicesol.o comconst.o paramet_m.o dimens_m.o 
 initrrnpb.o : dimphy.o indicesol.o dimens_m.o 
-integrd.o : filtreg.o pression.o iniadvtrac.o temps.o serre.o comgeom.o logic.o comvert.o comconst.o paramet_m.o dimens_m.o 
+integrd.o : filtreg.o pression.o comgeom.o comvert.o paramet_m.o dimens_m.o 
 inter_barxy.o : comconst.o comgeom.o dimens_m.o 
 interface_surf.o : FCTTRE.o YOETHF.o clesphys.o albsno_m.o YOMCST.o indicesol.o gath_cpl.o abort_gcm.o 
 interpost.o : comgeom.o comvert.o comconst.o paramet_m.o dimens_m.o 
@@ -216,7 +215,6 @@ tourabs.o : filtreg.o comgeom.o logic.o comconst.o paramet_m.o dimens_m.o
 tourpot.o : filtreg.o comgeom.o logic.o paramet_m.o dimens_m.o 
 transp.o : YOMCST.o dimphy.o dimens_m.o 
 transp_lay.o : YOMCST.o dimphy.o dimens_m.o 
-undefSTD.o : dimphy.o dimens_m.o 
 ustarhb.o : FCTTRE.o YOETHF.o YOMCST.o dimphy.o dimens_m.o 
 vdif_kcay.o : dimphy.o dimens_m.o 
 vitvert.o : comvert.o paramet_m.o dimens_m.o 

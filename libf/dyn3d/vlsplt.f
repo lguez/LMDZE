@@ -35,7 +35,8 @@ c      REAL masse(iip1,jjp1,llm),pente_max
       REAL pbaru( ip1jmp1,llm ),pbarv( ip1jm,llm)
       REAL q(ip1jmp1,llm)
 c      REAL q(iip1,jjp1,llm)
-      REAL w(ip1jmp1,llm),pdt
+      REAL w(ip1jmp1,llm)
+      real, intent(in):: pdt
 c
 c      Local 
 c   ---------

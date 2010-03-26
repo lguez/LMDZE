@@ -48,7 +48,7 @@ contains
     USE start_init_orog_m, only: start_init_orog, mask, phis
     use start_init_phys_m, only: qsol_2d
     use startdyn, only: start_inter_3d, start_init_dyn
-    use temps, only: itau_phy, annee_ref, day_ref, dt
+    use temps, only: itau_phy, annee_ref, day_ref
 
     ! Variables local to the procedure:
 
@@ -106,6 +106,7 @@ contains
     REAL pbaru(ip1jmp1, llm), pbarv(ip1jm, llm)
     REAL w(ip1jmp1, llm)
     REAL phystep
+    real trash
 
     !---------------------------------
 
@@ -220,7 +221,7 @@ contains
     ALLOCATE(dlat_lic(jml_lic))
     ALLOCATE(fraclic(iml_lic, jml_lic))
     CALL flinopen_nozoom("landiceref.nc", iml_lic, jml_lic, &
-         llm_tmp, lon_lic, lat_lic, lev, ttm_tmp, itaul, date, dt,  &
+         llm_tmp, lon_lic, lat_lic, lev, ttm_tmp, itaul, date, trash,  &
          fid)
     CALL flinget(fid, 'landice', iml_lic, jml_lic, llm_tmp, ttm_tmp &
          , 1, 1, fraclic)

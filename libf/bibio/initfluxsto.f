@@ -48,7 +48,8 @@ C   Declarations
 C   Arguments
 C
       integer*4 itau
-      real tstep, t_ops, t_wrt
+      real, intent(in):: tstep
+      real t_ops, t_wrt
       integer fileid, filevid,filedid
       integer nq,ndex(1)
       real nivd(1)
