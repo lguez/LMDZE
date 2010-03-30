@@ -15,7 +15,7 @@ c    titlevar   Titre
 
 c   arguments
       integer if,nl
-      real field(imx*jmx*lmx)
+      real, intent(in):: field(imx*jmx*lmx)
       character*10 name,file
       character*10 titlevar
 

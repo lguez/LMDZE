@@ -12,11 +12,11 @@ contains
     USE calfis_m, ONLY: calfis
     USE com_io_dyn, ONLY: histaveid
     USE comconst, ONLY: daysec, dtphys, dtvr
-    USE comgeom, ONLY: aire, apoln, apols
+    USE comgeom, ONLY: aire_2d, apoln, apols
     USE comvert, ONLY: ap, bp
     USE conf_gcm_m, ONLY: day_step, iconser, iperiod, iphysiq, nday, offline, &
          periodav
-    USE dimens_m, ONLY: iim, llm, nqmx
+    USE dimens_m, ONLY: iim, jjm, llm, nqmx
     USE dynetat0_m, ONLY: day_ini
     use dynredem1_m, only: dynredem1
     USE exner_hyb_m, ONLY: exner_hyb
@@ -24,15 +24,15 @@ contains
     USE guide_m, ONLY: guide
     use inidissip_m, only: idissip
     USE logic, ONLY: iflag_phys, ok_guide
-    USE paramet_m, ONLY: iip1, ip1jm, ip1jmp1, jjp1
+    USE paramet_m, ONLY: ip1jmp1
     USE pression_m, ONLY: pression
     USE pressure_var, ONLY: p3d
     USE temps, ONLY: itau_dyn
 
     ! Variables dynamiques:
-    REAL vcov(ip1jm, llm), ucov(ip1jmp1, llm) ! vents covariants
-    REAL teta(ip1jmp1, llm) ! temperature potentielle 
-    REAL ps(ip1jmp1) ! pression au sol, en Pa
+    REAL vcov((iim + 1) * jjm, llm), ucov(ip1jmp1, llm) ! vents covariants
+    REAL, intent(inout):: teta(iim + 1, jjm + 1, llm) ! potential temperature
+    REAL ps(iim + 1, jjm + 1) ! pression au sol, en Pa
 
     REAL masse(ip1jmp1, llm) ! masse d'air
     REAL phis(ip1jmp1) ! geopotentiel au sol
@@ -44,34 +44,32 @@ contains
     ! Variables dynamiques:
 
     REAL pks(ip1jmp1) ! exner au sol
-    REAL pk(ip1jmp1, llm) ! exner au milieu des couches
+    REAL pk(iim + 1, jjm + 1, llm) ! exner au milieu des couches
     REAL pkf(ip1jmp1, llm) ! exner filt.au milieu des couches
     REAL phi(ip1jmp1, llm) ! geopotential
     REAL w(ip1jmp1, llm) ! vitesse verticale
 
     ! variables dynamiques intermediaire pour le transport
-    REAL pbaru(ip1jmp1, llm), pbarv(ip1jm, llm) !flux de masse
+    REAL pbaru(ip1jmp1, llm), pbarv((iim + 1) * jjm, llm) !flux de masse
 
     ! variables dynamiques au pas - 1
-    REAL vcovm1(ip1jm, llm), ucovm1(ip1jmp1, llm)
-    REAL tetam1(ip1jmp1, llm), psm1(ip1jmp1)
+    REAL vcovm1((iim + 1) * jjm, llm), ucovm1(ip1jmp1, llm)
+    REAL tetam1(iim + 1, jjm + 1, llm), psm1(iim + 1, jjm + 1)
     REAL massem1(ip1jmp1, llm)
 
     ! tendances dynamiques
-    REAL dv(ip1jm, llm), du(ip1jmp1, llm)
+    REAL dv((iim + 1) * jjm, llm), du(ip1jmp1, llm)
     REAL dteta(ip1jmp1, llm), dq(ip1jmp1, llm, nqmx), dp(ip1jmp1)
 
     ! tendances de la dissipation
-    REAL dvdis(ip1jm, llm), dudis(ip1jmp1, llm)
-    REAL dtetadis(ip1jmp1, llm)
+    REAL dvdis((iim + 1) * jjm, llm), dudis(ip1jmp1, llm)
+    REAL dtetadis(iim + 1, jjm + 1, llm)
 
     ! tendances physiques
-    REAL dvfi(ip1jm, llm), dufi(ip1jmp1, llm)
+    REAL dvfi((iim + 1) * jjm, llm), dufi(ip1jmp1, llm)
     REAL dtetafi(ip1jmp1, llm), dqfi(ip1jmp1, llm, nqmx), dpfi(ip1jmp1)
 
     ! variables pour le fichier histoire
-
-    REAL tppn(iim), tpps(iim), tpn, tps
 
     INTEGER itau ! index of the time step of the dynamics, starts at 0
     INTEGER itaufin
@@ -79,17 +77,17 @@ contains
     REAL time ! time of day, as a fraction of day length
     real finvmaold(ip1jmp1, llm)
     LOGICAL:: lafin=.false.
-    INTEGER ij, l
+    INTEGER l
 
     REAL rdayvrai, rdaym_ini
 
     ! Variables test conservation energie
-    REAL ecin(ip1jmp1, llm), ecin0(ip1jmp1, llm)
+    REAL ecin(iim + 1, jjm + 1, llm), ecin0(iim + 1, jjm + 1, llm)
     ! Tendance de la temp. potentiel d (theta) / d t due a la 
     ! tansformation d'energie cinetique en energie thermique
     ! cree par la dissipation
-    REAL dtetaecdt(ip1jmp1, llm)
-    REAL vcont(ip1jm, llm), ucont(ip1jmp1, llm)
+    REAL dtetaecdt(iim + 1, jjm + 1, llm)
+    REAL vcont((iim + 1) * jjm, llm), ucont(ip1jmp1, llm)
     logical forward, leapf
     REAL dt
 
@@ -119,7 +117,7 @@ contains
        leapf = .FALSE.
        dt = dtvr
        finvmaold = masse
-       CALL filtreg(finvmaold, jjp1, llm, - 2, 2, .TRUE., 1)
+       CALL filtreg(finvmaold, jjm + 1, llm, - 2, 2, .TRUE., 1)
 
        do
           ! Calcul des tendances dynamiques:
@@ -158,9 +156,8 @@ contains
                   dufi, dvfi, dtetafi, dqfi, dpfi)
 
              ! ajout des tendances physiques:
-             CALL addfi(nqmx, dtphys, &
-                  ucov, vcov, teta, q, ps, &
-                  dufi, dvfi, dtetafi, dqfi, dpfi)
+             CALL addfi(nqmx, dtphys, ucov, vcov, teta, q, ps, dufi, dvfi, &
+                  dtetafi, dqfi, dpfi)
           ENDIF
 
           CALL pression(ip1jmp1, ap, bp, ps, p3d)
@@ -187,31 +184,16 @@ contains
              teta=teta + dtetadis
 
              ! Calcul de la valeur moyenne unique de h aux pôles
-             DO l = 1, llm
-                DO ij = 1, iim
-                   tppn(ij) = aire(ij) * teta(ij, l)
-                   tpps(ij) = aire(ij + ip1jm) * teta(ij + ip1jm, l)
-                ENDDO
-                tpn = SUM(tppn) / apoln
-                tps = SUM(tpps) / apols
+             forall (l = 1: llm)
+                teta(:, 1, l) = SUM(aire_2d(:iim, 1) * teta(:iim, 1, l)) &
+                     / apoln
+                teta(:, jjm + 1, l) = SUM(aire_2d(:iim, jjm+1) &
+                     * teta(:iim, jjm + 1, l)) / apols
+             END forall
 
-                DO ij = 1, iip1
-                   teta(ij, l) = tpn
-                   teta(ij + ip1jm, l) = tps
-                ENDDO
-             ENDDO
-
-             DO ij = 1, iim
-                tppn(ij) = aire(ij) * ps(ij)
-                tpps(ij) = aire(ij + ip1jm) * ps(ij + ip1jm)
-             ENDDO
-             tpn = SUM(tppn) / apoln
-             tps = SUM(tpps) / apols
-
-             DO ij = 1, iip1
-                ps(ij) = tpn
-                ps(ij + ip1jm) = tps
-             ENDDO
+             ps(:, 1) = SUM(aire_2d(:iim, 1) * ps(:iim, 1)) / apoln
+             ps(:, jjm + 1) = SUM(aire_2d(:iim, jjm+1) * ps(:iim, jjm + 1)) &
+                  / apols
           END IF
 
           ! fin de l'intégration dynamique et physique pour le pas "itau"
@@ -239,10 +221,8 @@ contains
                   ps, masse, pk, pbaru, pbarv, teta, phi, ucov, vcov, q)
           ENDIF
 
-          IF (itau == itaufin) THEN
-             CALL dynredem1("restart.nc", vcov, ucov, teta, q, masse, ps, &
-                  itau=itau_dyn+itaufin)
-          ENDIF
+          IF (itau == itaufin) CALL dynredem1("restart.nc", vcov, ucov, teta, &
+               q, masse, ps, itau=itau_dyn+itaufin)
 
           ! gestion de l'integration temporelle:
           IF (MOD(itau, iperiod) == 0) exit
