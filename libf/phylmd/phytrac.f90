@@ -468,7 +468,8 @@ contains
       ! From phylmd/write_histrac.h, version 1.9 2006/02/21 08:08:30
 
       use dimens_m, only: iim, jjm, llm
-      use ioipsl, only: histwrite, histsync
+      use histcom, only: histsync
+      use histwrite_m, only: histwrite
       use temps, only: itau_phy
       use iniadvtrac_m, only: tnom
       use comgeomphy, only: airephy

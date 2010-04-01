@@ -10,7 +10,8 @@ c
      I                   pcoefh,yu1,yv1,ftsol,pctsrf,
      I                   frac_impa,frac_nucl,
      I                   pphis,paire,dtime,itap)
-      USE ioipsl
+      USE histwrite_m
+      use histcom
       use dimens_m
       use indicesol
       use dimphy

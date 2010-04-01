@@ -17,7 +17,7 @@ contains
 
     ! From phylmd/conf_phys.F90,v 1.7 2005/07/05 07:21:23
 
-    use IOIPSL, only: getin
+    use getincom, only: getin
     use clesphys, only: solaire, co2_ppm, rco2, ch4_ppb, rch4, n2o_ppb, rn2o, &
          cfc11_ppt, rcfc11, cfc12_ppt, rcfc12, top_height, overlap, cdmmax, &
          cdhmax, ksta, ksta_ter, ok_kzmin, lev_histhf, lev_histday, &

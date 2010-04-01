@@ -15,7 +15,7 @@ contains
     !         message = stuff to print
     !         ierr    = severity of situation ( = 0 normal )
 
-    USE IOIPSL, only: histclo
+    USE histcom, only: histclo
 
     character(len=*), intent(in):: modname
     integer, intent(in):: ierr

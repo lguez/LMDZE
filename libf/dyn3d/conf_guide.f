@@ -5,7 +5,6 @@ c
 c
       SUBROUTINE conf_guide
 c
-      use IOIPSL
       use getparam
       use guide_m
       IMPLICIT NONE

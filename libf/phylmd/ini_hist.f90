@@ -13,7 +13,8 @@ contains
     use dimens_m, only: iim, jjm, llm
     use temps, only: day_ref, annee_ref, itau_phy
     use dimphy, only: klon
-    USE ioipsl, only: ymds2ju, histbeg_totreg, histvert, histend
+    USE calendar, only: ymds2ju
+    use histcom, only: histbeg_totreg, histvert, histend
     use phyetat0_m, only: rlon, rlat
     use comvert, only: presnivs
 
@@ -61,7 +62,8 @@ contains
     use temps, only: itau_phy, day_ref, annee_ref
     use clesphys, only: ecrit_hf
     use phyetat0_m, only: rlon, rlat
-    USE ioipsl, only: ymds2ju, histbeg_totreg, histvert, histend, histdef
+    USE calendar, only: ymds2ju
+    use histcom, only: histbeg_totreg, histvert, histend, histdef
     use comvert, only: presnivs
 
     REAL, intent(in):: dtime ! pas temporel de la physique (s)
@@ -129,7 +131,8 @@ contains
 
     use dimens_m, only: iim, jjm, llm
     use temps, only: itau_phy, day_ref, annee_ref
-    USE ioipsl, only: ymds2ju, histbeg_totreg, histvert, histend, histdef
+    USE calendar, only: ymds2ju
+    use histcom, only: histbeg_totreg, histvert, histend, histdef
     use phyetat0_m, only: rlon, rlat
     use clesphys, only: ecrit_day
     use grid_change, only: gr_phy_write_2d
@@ -177,7 +180,8 @@ contains
     use temps, only: itau_phy, day_ref, annee_ref
     use clesphys, only: ecrit_ins
     use indicesol, only: nbsrf, clnsurf
-    USE ioipsl, only: ymds2ju, histbeg_totreg, histvert, histend, histdef
+    USE calendar, only: ymds2ju
+    use histcom, only: histbeg_totreg, histvert, histend, histdef
     use phyetat0_m, only: rlon, rlat
     use comvert, only: presnivs
 
@@ -468,7 +472,8 @@ contains
     ! From phylmd/ini_histrac.h, version 1.10 2006/02/21 08:08:30
 
     use dimens_m, only: iim, jjm, llm
-    use ioipsl, only: ymds2ju, histbeg_totreg, histvert, histdef, histend
+    USE calendar, only: ymds2ju
+    use histcom, only: histbeg_totreg, histvert, histend, histdef
     use temps, only: annee_ref, day_ref, itau_phy
     use iniadvtrac_m, only: niadv, tnom, ttext
     use dimphy, only: klon

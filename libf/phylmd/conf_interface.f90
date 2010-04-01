@@ -2,7 +2,7 @@ subroutine conf_interface(tau_calv)
 
   ! From phylmd/conf_phys.F90,v 1.7 2005/07/05 07:21:23
 
-  use IOIPSL
+  use getincom
   implicit none
 
   ! Configuration de l'interace atm/surf

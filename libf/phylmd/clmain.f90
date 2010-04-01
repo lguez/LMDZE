@@ -85,8 +85,9 @@ SUBROUTINE clmain(dtime, itap, date0, pctsrf, pctsrf_new, t, q, u, v,&
 
   !$$$ PB ajout pour soil
 
-  USE ioipsl, ONLY : histbeg_totreg, histdef, histend, histsync, &
-       histwrite, ymds2ju
+  USE histcom, ONLY : histbeg_totreg, histdef, histend, histsync
+  use histwrite_m, only: histwrite
+  use calendar, ONLY : ymds2ju
   USE dimens_m, ONLY : iim, jjm
   USE indicesol, ONLY : epsfra, is_lic, is_oce, is_sic, is_ter, nbsrf
   USE dimphy, ONLY : klev, klon, zmasq

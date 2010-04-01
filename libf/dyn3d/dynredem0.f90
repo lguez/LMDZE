@@ -14,7 +14,7 @@ CONTAINS
     USE comgeom, ONLY : aire_2d, cu_2d, cv_2d, rlatu, rlatv, rlonu, rlonv
     USE dimens_m, ONLY : iim, jjm, llm, nqmx
     USE ener, ONLY : ang0, etot0, ptot0, stot0, ztot0
-    USE ioipsl, ONLY : ju2ymds, ymds2ju
+    USE calendar, ONLY : ju2ymds, ymds2ju
     USE iniadvtrac_m, ONLY : tname, ttext
     USE logic, ONLY : fxyhypb, ysinus
     USE netcdf95, ONLY : nf95_close, nf95_create, nf95_def_dim, &

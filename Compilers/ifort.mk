@@ -1,7 +1,7 @@
 # These are machine dependent macros, meant to be included in the
 # LMDZE makefile
 
-# For ifort 9.0 (1 Jan 2005)
+# For ifort 9
 
 COMPILE.f = $(FC) $(F90FLAGS) -c
 

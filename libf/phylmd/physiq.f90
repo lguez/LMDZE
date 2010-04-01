@@ -23,7 +23,9 @@ contains
     !AA                  -  stockage des moyennes des champs necessaires
     !AA                     en mode traceur off-line 
 
-    USE ioipsl, only: ymds2ju, histwrite, histsync
+    USE calendar, only: ymds2ju
+    USE histwrite_m, only: histwrite
+    USE histcom, only: histsync
     use dimens_m, only: jjm, iim, llm
     use indicesol, only: nbsrf, is_ter, is_lic, is_sic, is_oce, &
          clnsurf, epsfra

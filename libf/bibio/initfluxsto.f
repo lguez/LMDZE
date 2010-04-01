@@ -5,8 +5,6 @@
      .  (tstep,t_ops,t_wrt,nq,
      .                    fileid,filevid,filedid)
 
-       USE IOIPSL
-
 C
 C   Routine d'initialisation des ecritures des fichiers histoires LMDZ
 C   au format IOIPSL
@@ -34,6 +32,8 @@ C
 C =====================================================================
 C
 C   Declarations
+       USE calendar
+       use histcom
        use dimens_m
       use paramet_m
       use comconst

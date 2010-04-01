@@ -32,7 +32,8 @@ PROGRAM gcm
   use inigeom_m, only: inigeom
   use initdynav_m, only: initdynav
   use inithist_m, only: inithist
-  USE IOIPSL, only: ioconf_calendar, histclo
+  USE calendar, only: ioconf_calendar
+  use histcom, only: histclo
   use leapfrog_m, only: leapfrog
   use logic, only: iflag_phys
   use paramet_m, only: ip1jm, ip1jmp1

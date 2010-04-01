@@ -13,7 +13,7 @@ CONTAINS
   SUBROUTINE start_init_orog(relief, zstd_2d, zsig_2d, zgam_2d, zthe_2d, &
        zpic_2d, zval_2d)
 
-    USE ioipsl, only: flininfo, flinopen_nozoom, flinget, flinclo
+    USE flincom, only: flininfo, flinopen_nozoom, flinget, flinclo
     use conf_dat2d_m, only: conf_dat2d
     use comgeom, only: rlatu, rlonv
     use dimens_m, only: iim, jjm

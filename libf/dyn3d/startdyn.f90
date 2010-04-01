@@ -22,7 +22,7 @@ CONTAINS
     ! Host associated variables appearing and modified in this procedure :
     ! iml_dyn, jml_dyn, llm_dyn, ttm_dyn, fid_dyn, lon_ini, lat_ini, levdyn_ini
 
-    USE ioipsl, only: flininfo, flinopen_nozoom, flinget
+    USE flincom, only: flininfo, flinopen_nozoom, flinget
     use comgeom, only: aire_2d, apoln, apols
     use conf_dat2d_m, only: conf_dat2d
     use inter_barxy_m, only: inter_barxy
@@ -141,7 +141,7 @@ CONTAINS
     ! This procedure gets a 3D variable from a file and does the
     ! interpolations needed.
 
-    USE ioipsl, only: flinget
+    USE flincom, only: flinget
     use numer_rec, only: assert_eq, spline, splint
     use inter_barxy_m, only: inter_barxy
     use gr_int_dyn_m, only: gr_int_dyn

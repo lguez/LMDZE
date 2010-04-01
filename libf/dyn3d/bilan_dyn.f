@@ -9,8 +9,9 @@ c   Prevoir en champ nq+1 le diagnostique de l'energie
 c   en faisant Qzon=Cv T + L * ...
 c             vQ..A=Cp T + L * ...
 
-      USE IOIPSL
-
+      USE histcom
+      use calendar
+      use histwrite_m
       use dimens_m
       use paramet_m
       use comconst

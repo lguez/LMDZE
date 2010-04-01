@@ -11,7 +11,8 @@ contains
     ! From initdynav.F, version 1.1.1.1, 2004/05/19 12:53:05
     !   L. Fairhead, LMD
 
-    USE ioipsl, ONLY : histbeg_totreg, histdef, histend, histvert, ymds2ju
+    USE histcom, ONLY: histbeg_totreg, histdef, histend, histvert
+    use calendar, ONLY: ymds2ju
     USE dimens_m, ONLY : llm
     USE paramet_m, ONLY : iip1, jjp1
     USE comconst, ONLY : pi

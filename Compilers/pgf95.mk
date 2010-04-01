@@ -1,7 +1,7 @@
 # These are compiler dependent macros, meant to be included in the
 # makefile for LMDZE.
 
-# For pgf95 version 6
+# For pgf95 version 7
 
 FC = pgf95
 
@@ -21,6 +21,8 @@ lang_flags = -Mstandard -Minform=inform -Mfree -Minfo=all -Mallocatable=95 -Mbac
 # Flags which affect run time performance:
 perf_flags = -g -Kieee -Ktrap=fp -Mbounds -Mchkfpstk -Mchkptr -Mpgicoff
 ##-fastsse -O3
+# "-Mbounds" gives an error in module "mathelp", procedure "trans_buff", 
+# for a "gcm" run.
 
 FFLAGS = ${inc_flags} ${perf_flags}
 F90FLAGS = ${inc_flags} ${lang_flags} ${perf_flags}

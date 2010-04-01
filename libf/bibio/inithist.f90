@@ -33,7 +33,8 @@ contains
 
     !   L. Fairhead, LMD, 03/99
 
-    USE IOIPSL
+    USE calendar
+    use histcom
     use dimens_m
     use paramet_m
     use comconst

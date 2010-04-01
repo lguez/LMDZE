@@ -7,8 +7,8 @@ C
      .  (infile,
      .  rlon, rlat, tstep,t_ops,t_wrt,nq,fileid)
 
-       USE IOIPSL
-
+      USE calendar
+      use histcom
       use dimens_m
       use paramet_m
       use comconst

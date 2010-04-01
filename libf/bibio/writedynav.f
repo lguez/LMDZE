@@ -4,7 +4,6 @@
       subroutine writedynav( histid, nq, time, vcov, 
      ,                          ucov,teta,ppk,phi,q,masse,ps,phis)
 
-      USE ioipsl
 C
 C   Ecriture du fichier histoire au format IOIPSL
 C
@@ -31,6 +30,8 @@ C
 C =====================================================================
 C
 C   Declarations
+      USE histwrite_m
+      use histcom
       use dimens_m
       use paramet_m
       use comconst

@@ -85,11 +85,11 @@ contains
        ELSE
 
           IF (iaire==1) THEN
-             CALL scopy(iim, sddv, 1, sdd1, 1)
-             CALL scopy(iim, unsddv, 1, sdd2, 1)
+             sdd1 = sddv
+             sdd2 = unsddv
           ELSE
-             CALL scopy(iim, unsddv, 1, sdd1, 1)
-             CALL scopy(iim, sddv, 1, sdd2, 1)
+             sdd1 = unsddv
+             sdd2 = sddv
           END IF
 
           jdfil1 = 2
@@ -104,11 +104,11 @@ contains
        ELSE
 
           IF (iaire==1) THEN
-             CALL scopy(iim, sddu, 1, sdd1, 1)
-             CALL scopy(iim, unsddu, 1, sdd2, 1)
+             sdd1 = sddu
+             sdd2 = unsddu
           ELSE
-             CALL scopy(iim, unsddu, 1, sdd1, 1)
-             CALL scopy(iim, sddu, 1, sdd2, 1)
+             sdd1 = unsddu
+             sdd2 = sddu
           END IF
 
           jdfil1 = 1

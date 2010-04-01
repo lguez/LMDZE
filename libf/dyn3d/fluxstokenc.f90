@@ -2,7 +2,7 @@ SUBROUTINE fluxstokenc(pbaru,pbarv,masse,teta,phi,phis,time_step,itau)
 
   !     Auteur :  F. Hourdin
 
-  USE ioipsl
+  USE histwrite_m
   USE dimens_m
   USE paramet_m
   USE comconst

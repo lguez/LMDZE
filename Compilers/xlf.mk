@@ -1,7 +1,7 @@
 # These are compiler dependent macros, meant to be included in the
 # makefile for LMDZE.
 
-# For XL Fortran
+# For IBM XL Fortran
 
 FC = xlf95
 
@@ -23,6 +23,8 @@ perf_flags = -qdbg -qfloat=nans -qfloat=nomaf:rndsngl:nofold -qflttrap=overflow:
 ##-O3 -qnostrict -qessl -qextchk
 ## "-qflttrap=invalid" gives an error in "orografi.F"
 ##-qcheck severe error in etat0
+# "-qcheck -qextchk" give an error in module "mathelp", procedure
+# "trans_buff", for a "gcm" run.
 
 FFLAGS = ${inc_flags} -qfixed ${perf_flags}
 F90FLAGS = ${inc_flags} ${lang_flags} ${perf_flags}

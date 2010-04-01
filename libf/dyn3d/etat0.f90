@@ -37,7 +37,8 @@ contains
     use iniadvtrac_m, only: iniadvtrac
     use inidissip_m, only: inidissip
     use inigeom_m, only: inigeom
-    USE ioipsl, only: flinget, flinclo, flinopen_nozoom, flininfo, histclo
+    USE flincom, only: flinget, flinclo, flinopen_nozoom, flininfo
+    use histcom, only: histclo
     use paramet_m, only: ip1jm, ip1jmp1
     use phyredem_m, only: phyredem
     use pressure_var, only: pls, p3d
