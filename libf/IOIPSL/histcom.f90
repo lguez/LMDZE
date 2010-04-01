@@ -18,10 +18,6 @@ MODULE histcom
 
   IMPLICIT NONE
 
-  PRIVATE
-  PUBLIC:: histbeg_totreg, histdef, histhori_regular, histvert, histend, &
-       histclo, histsync
-
 CONTAINS
 
   SUBROUTINE histbeg_totreg(pfilename, plon_1d, plat_1d, par_orix, par_szx, &
@@ -1044,12 +1040,6 @@ CONTAINS
     ! 3.0 Put the netcdf file into wrte mode
 
     iret = nf90_enddef(ncid)
-
-    ! 4.0 Give some informations to the user
-
-    WRITE (str70, '("All variables have been initialized on file:", I3)') &
-         pfileid
-    CALL histerr(1, 'histend', str70, '', ' ')
 
   END SUBROUTINE histend
 

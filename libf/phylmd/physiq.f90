@@ -1799,10 +1799,7 @@ contains
             , d_h_vcol, d_qt, d_qw, d_ql, d_qs, d_ec)
     END IF
 
-    !AA Installation de l'interface online-offline pour traceurs
-
-    !   Calcul  des tendances traceurs
-
+    ! Calcul  des tendances traceurs
     call phytrac(rnpb, itap, lmt_pas, julien,  gmtime, firstcal, lafin, nq-2, &
          pdtphys, u, v, t, paprs, pplay, pmfu,  pmfd,  pen_u,  pde_u,  pen_d, &
          pde_d, ycoefh, fm_therm, entr_therm, yu1, yv1, ftsol, pctsrf, &
@@ -1811,24 +1808,16 @@ contains
          psfl, da, phi, mp, upwd, dnwd, tr_seri, zmasse)
 
     IF (offline) THEN
-
-       print*, 'Attention on met a 0 les thermiques pour phystoke'
-       call phystokenc(pdtphys, rlon, rlat, &
-            t, pmfu, pmfd, pen_u, pde_u, pen_d, pde_d, &
-            fm_therm, entr_therm, &
-            ycoefh, yu1, yv1, ftsol, pctsrf, &
-            frac_impa, frac_nucl, &
-            pphis, airephy, pdtphys, itap)
-
+       call phystokenc(pdtphys, rlon, rlat, t, pmfu, pmfd, pen_u, pde_u, &
+            pen_d, pde_d, fm_therm, entr_therm, ycoefh, yu1, yv1, ftsol, &
+            pctsrf, frac_impa, frac_nucl, pphis, airephy, pdtphys, itap)
     ENDIF
 
     ! Calculer le transport de l'eau et de l'energie (diagnostique)
+    CALL transp(paprs, zxtsol, t_seri, q_seri, u_seri, v_seri, zphi, ve, vq, &
+         ue, uq)
 
-    CALL transp (paprs, zxtsol, &
-         t_seri, q_seri, u_seri, v_seri, zphi, &
-         ve, vq, ue, uq)
-
-    !IM diag. bilKP
+    ! diag. bilKP
 
     CALL transp_lay (paprs, zxtsol, &
          t_seri, q_seri, u_seri, v_seri, zphi, &

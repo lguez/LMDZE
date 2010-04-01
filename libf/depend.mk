@@ -86,7 +86,7 @@ filtreg.o : coefils.o parafilt.o dimens_m.o
 fisrtilp.o : comfisrtilp.o FCTTRE.o YOETHF.o YOMCST.o tracstoke.o dimphy.o dimens_m.o 
 flincom.o : stringop.o errioipsl.o calendar.o 
 flumass.o : comgeom.o paramet_m.o dimens_m.o 
-fluxstokenc.o : tracstoke.o temps.o comgeom.o comvert.o comconst.o paramet_m.o dimens_m.o histwrite.o 
+fluxstokenc.o : tracstoke.o comgeom.o paramet_m.o dimens_m.o histwrite.o 
 fxhyp.o : paramet_m.o dimens_m.o 
 fxy.o : serre.o comconst.o dimens_m.o 
 fxyhyper.o : paramet_m.o dimens_m.o 
@@ -111,7 +111,7 @@ gwstress.o : YOEGWD.o YOMCST.o dimphy.o dimens_m.o
 hbtm.o : FCTTRE.o YOETHF.o YOMCST.o dimphy.o dimens_m.o 
 hgardfou.o : YOMCST.o dimphy.o indicesol.o dimens_m.o 
 histcom.o : calendar.o mathelp.o stringop.o histcom_var.o errioipsl.o ioipslmpp.o 
-histwrite.o : stringop.o mathelp.o calendar.o errioipsl.o histcom_var.o 
+histwrite.o : stringop.o histcom_var.o mathelp.o calendar.o errioipsl.o 
 ini_hist.o : iniadvtrac.o indicesol.o grid_change.o clesphys.o comvert.o phyetat0.o histcom.o calendar.o dimphy.o temps.o dimens_m.o 
 iniadvtrac.o : dimens_m.o 
 iniconst.o : conf_gcm.o comvert.o comconst.o dimens_m.o 
@@ -228,8 +228,11 @@ transp_lay.o : YOMCST.o dimphy.o dimens_m.o
 ustarhb.o : FCTTRE.o YOETHF.o YOMCST.o dimphy.o dimens_m.o 
 vdif_kcay.o : dimphy.o dimens_m.o 
 vitvert.o : comvert.o paramet_m.o dimens_m.o 
-vlsplt.o : comgeom.o logic.o comvert.o comconst.o paramet_m.o dimens_m.o 
+vlsplt.o : logic.o comvert.o comconst.o paramet_m.o dimens_m.o 
 vlspltqs.o : comgeom.o logic.o comvert.o comconst.o paramet_m.o dimens_m.o 
+vlx.o : logic.o comvert.o comconst.o paramet_m.o dimens_m.o 
+vly.o : comgeom.o logic.o comvert.o comconst.o paramet_m.o dimens_m.o 
+vlz.o : logic.o comvert.o comconst.o paramet_m.o dimens_m.o 
 wrgrads.o : gradsdef.o 
 writedynav.o : iniadvtrac.o ener.o temps.o serre.o comgeom.o logic.o comvert.o comconst.o paramet_m.o dimens_m.o histcom.o histwrite.o 
 yamada.o : dimphy.o dimens_m.o 

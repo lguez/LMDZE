@@ -283,13 +283,6 @@ contains
     IF (offline) CALL fluxstokenc(pbaru, pbarv, masse, teta, phi, phis, dtvr, &
          itaufin)
 
-    ! integrations dynamique et traceurs:
-    CALL integrd(2, vcovm1, ucovm1, tetam1, psm1, massem1, dv, du, dteta, dq, &
-         dp, vcov, ucov, teta, q, ps, masse, phis, finvmaold, .false., dtvr)
-    
-    CALL pression(ip1jmp1, ap, bp, ps, p3d)
-    CALL exner_hyb(ps, p3d, pks, pk, pkf)
-
   END SUBROUTINE leapfrog
 
 end module leapfrog_m

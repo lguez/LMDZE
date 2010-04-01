@@ -33,7 +33,7 @@ c
 c   Arguments:
 c   ----------
       REAL masse(ip1jmp1,llm),pente_max
-      REAL pbaru( ip1jmp1,llm ),pbarv( ip1jm,llm)
+      REAL, intent(in):: pbaru( ip1jmp1,llm ),pbarv( ip1jm,llm)
       REAL q(ip1jmp1,llm)
       REAL w(ip1jmp1,llm)
       real, intent(in):: pdt

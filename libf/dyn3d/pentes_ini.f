@@ -30,7 +30,7 @@ c=======================================================================
 c   Arguments:
 c   ----------
       integer mode
-      REAL pbaru( ip1jmp1,llm ),pbarv( ip1jm,llm )
+      REAL, intent(in):: pbaru( ip1jmp1,llm ),pbarv( ip1jm,llm )
       REAL q( iip1,jjp1,llm,0:3)
       REAL w( ip1jmp1,llm )
       REAL masse( iip1,jjp1,llm)

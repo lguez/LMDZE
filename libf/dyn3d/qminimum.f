@@ -76,7 +76,6 @@ c
          DO i = 1, ip1jmp1
             IF (zx_pump(i).GT.0.0) THEN
                imprim = imprim + 1
-CC               PRINT*,'QMINIMUM:  en ',i,zx_pump(i)
             ENDIF
          ENDDO
       ENDIF

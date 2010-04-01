@@ -42,7 +42,7 @@ C  parbu,pbarv : flux de masse en x et y en Pa.m2.s-1
       PARAMETER (ntra = 1)
 
       REAL dty
-      REAL pbarv ( iip1,jjm, llm )
+      REAL, intent(in):: pbarv ( iip1,jjm, llm )
 
 C  moments: SM  total mass in each grid box
 C           S0  mass of tracer in each grid box

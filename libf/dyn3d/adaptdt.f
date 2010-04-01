@@ -21,7 +21,7 @@ c     Arguments
 c----------------------------------------------------------
       INTEGER n,nadv
       REAL dtbon 
-      REAL pbaru(iip1,jjp1,llm)
+      REAL, intent(in):: pbaru(iip1,jjp1,llm)
       REAL masse(iip1,jjp1,llm)
 c----------------------------------------------------------    
 c     Local

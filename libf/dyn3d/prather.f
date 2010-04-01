@@ -27,7 +27,7 @@ c=======================================================================
 c   Arguments:
 c   ----------
       INTEGER iq,nt
-      REAL pbaru( ip1jmp1,llm ),pbarv( ip1jm,llm )
+      REAL, intent(in):: pbaru( ip1jmp1,llm ),pbarv( ip1jm,llm )
       REAL masse(iip1,jjp1,llm)
       REAL q( iip1,jjp1,llm,0:9)
       REAL w( ip1jmp1,llm )

@@ -39,7 +39,7 @@ C ATTENTION partout ou on trouve ntra, insertion de boucle
 C           possible dans l'avenir.
 
       REAL dtx
-      REAL pbaru ( iip1,jjp1,llm )
+      REAL, intent(in):: pbaru ( iip1,jjp1,llm )
 
 C  moments: SM  total mass in each grid box
 C           S0  mass of tracer in each grid box

@@ -1,8 +1,6 @@
 MODULE histwrite_m
 
-  ! From histcom.f90, v 2.1 2004/04/21 09:27:10
-
-  use histcom_var
+  ! From histcom.f90, version 2.1 2004/04/21 09:27:10
 
   implicit none
 
@@ -10,13 +8,13 @@ MODULE histwrite_m
   PUBLIC histwrite
 
   INTERFACE histwrite
-     !- The "histwrite" procedures give the data to the input-output system.
-     !- They trigger the operations to be performed
-     !- and the writing to the file if needed.
+     ! The "histwrite" procedures give the data to the input-output system.
+     ! They trigger the operations to be performed and the writing to
+     ! the file if needed.
 
-     !- We test the work to be done at this time here so that at a
-     !- later stage we can call different operations and write subroutines
-     !- for the REAL and INTEGER interfaces.
+     ! We test the work to be done at this time here so that at a
+     ! later stage we can call different operations and write subroutines
+     ! for the REAL and INTEGER interfaces.
 
      ! INTEGER, INTENT(IN):: pfileid
      ! The ID of the file on which this variable is to be written.
@@ -51,6 +49,7 @@ CONTAINS
     USE errioipsl, ONLY : histerr
     use calendar, only: isittime
     USE mathelp, ONLY : mathop
+    use histcom_var
 
     INTEGER, INTENT(IN) :: pfileid, pitau
     REAL, INTENT(IN) :: pdata(:)
@@ -64,7 +63,7 @@ CONTAINS
     INTEGER, SAVE :: buff_tmp_sz
     CHARACTER(LEN=7) :: tmp_opp
 
-    !---------------------------------------------------------------------
+    !--------------------------------------------------------------------
 
     nbindex = size(nindex)
     nindex = 0
@@ -118,19 +117,19 @@ CONTAINS
 
     IF (do_oper.OR.do_write) THEN
 
-       !-- 5.1 Get the sizes of the data we will handle
+       !- 5.1 Get the sizes of the data we will handle
 
        IF (datasz_in(pfileid, varid, 1) <= 0) THEN
-          !---- There is the risk here that the user has over-sized the array.
-          !---- But how can we catch this ?
-          !---- In the worst case we will do impossible operations
-          !---- on part of the data !
+          !--- There is the risk here that the user has over-sized the array.
+          !--- But how can we catch this ?
+          !--- In the worst case we will do impossible operations
+          !--- on part of the data !
           datasz_in(pfileid, varid, 1) = SIZE(pdata)
           datasz_in(pfileid, varid, 2) = -1
           datasz_in(pfileid, varid, 3) = -1
        ENDIF
 
-       !-- 5.2 The maximum size of the data will give the size of the buffer
+       !- 5.2 The maximum size of the data will give the size of the buffer
 
        IF (datasz_max(pfileid, varid) <= 0) THEN
           largebuf = .FALSE.
@@ -159,9 +158,9 @@ CONTAINS
           buff_tmp_sz = datasz_max(pfileid, varid)
        ENDIF
 
-       !-- We have to do the first operation anyway.
-       !-- Thus we do it here and change the ranke
-       !-- of the data at the same time. This should speed up things.
+       !- We have to do the first operation anyway.
+       !- Thus we do it here and change the ranke
+       !- of the data at the same time. This should speed up things.
 
        nbpt_in = datasz_in(pfileid, varid, 1)
        nbpt_out = datasz_max(pfileid, varid)
@@ -181,17 +180,18 @@ CONTAINS
        last_opp_chk(pfileid, varid) = -99
        last_wrt_chk(pfileid, varid) = -99
     ENDIF
-    !---------------------------
+    !--------------------------
   END SUBROUTINE histwrite_r1d
 
   !===
 
   SUBROUTINE histwrite_r2d (pfileid, pvarname, pitau, pdata)
-    !---------------------------------------------------------------------
+    !--------------------------------------------------------------------
 
     use calendar, only: isittime
     USE errioipsl, ONLY : histerr
     USE mathelp, ONLY : mathop
+    use histcom_var
 
     INTEGER, INTENT(IN) :: pfileid, pitau
     REAL, DIMENSION(:, :), INTENT(IN) :: pdata
@@ -204,7 +204,7 @@ CONTAINS
     INTEGER, SAVE :: buff_tmp_sz
     CHARACTER(LEN=7) :: tmp_opp
 
-    !---------------------------------------------------------------------
+    !--------------------------------------------------------------------
 
     nbindex = size(nindex)
     nindex = 0
@@ -258,19 +258,19 @@ CONTAINS
 
     IF (do_oper.OR.do_write) THEN
 
-       !-- 5.1 Get the sizes of the data we will handle
+       !- 5.1 Get the sizes of the data we will handle
 
        IF (datasz_in(pfileid, varid, 1) <= 0) THEN
-          !---- There is the risk here that the user has over-sized the array.
-          !---- But how can we catch this ?
-          !---- In the worst case we will do impossible operations
-          !---- on part of the data !
+          !--- There is the risk here that the user has over-sized the array.
+          !--- But how can we catch this ?
+          !--- In the worst case we will do impossible operations
+          !--- on part of the data !
           datasz_in(pfileid, varid, 1) = SIZE(pdata, DIM=1)
           datasz_in(pfileid, varid, 2) = SIZE(pdata, DIM=2)
           datasz_in(pfileid, varid, 3) = -1
        ENDIF
 
-       !-- 5.2 The maximum size of the data will give the size of the buffer
+       !- 5.2 The maximum size of the data will give the size of the buffer
 
        IF (datasz_max(pfileid, varid) <= 0) THEN
           largebuf = .FALSE.
@@ -300,9 +300,9 @@ CONTAINS
           buff_tmp_sz = datasz_max(pfileid, varid)
        ENDIF
 
-       !-- We have to do the first operation anyway.
-       !-- Thus we do it here and change the ranke
-       !-- of the data at the same time. This should speed up things.
+       !- We have to do the first operation anyway.
+       !- Thus we do it here and change the ranke
+       !- of the data at the same time. This should speed up things.
 
        nbpt_in(1:2) = datasz_in(pfileid, varid, 1:2)
        nbpt_out = datasz_max(pfileid, varid)
@@ -322,17 +322,18 @@ CONTAINS
        last_opp_chk(pfileid, varid) = -99
        last_wrt_chk(pfileid, varid) = -99
     ENDIF
-    !---------------------------
+    !--------------------------
   END SUBROUTINE histwrite_r2d
 
   !===
 
   SUBROUTINE histwrite_r3d (pfileid, pvarname, pitau, pdata)
-    !---------------------------------------------------------------------
+    !--------------------------------------------------------------------
 
     use calendar, only: isittime
     USE errioipsl, ONLY : histerr
     USE mathelp, ONLY : mathop
+    use histcom_var
 
     INTEGER, INTENT(IN) :: pfileid, pitau
     REAL, DIMENSION(:, :, :), INTENT(IN) :: pdata
@@ -345,7 +346,7 @@ CONTAINS
     INTEGER, SAVE :: buff_tmp_sz
     CHARACTER(LEN=7) :: tmp_opp
 
-    !---------------------------------------------------------------------
+    !--------------------------------------------------------------------
 
     nbindex = size(nindex)
     nindex = 0
@@ -399,19 +400,19 @@ CONTAINS
 
     IF (do_oper.OR.do_write) THEN
 
-       !-- 5.1 Get the sizes of the data we will handle
+       !- 5.1 Get the sizes of the data we will handle
 
        IF (datasz_in(pfileid, varid, 1) <= 0) THEN
-          !---- There is the risk here that the user has over-sized the array.
-          !---- But how can we catch this ?
-          !---- In the worst case we will do impossible operations
-          !---- on part of the data !
+          !--- There is the risk here that the user has over-sized the array.
+          !--- But how can we catch this ?
+          !--- In the worst case we will do impossible operations
+          !--- on part of the data !
           datasz_in(pfileid, varid, 1) = SIZE(pdata, DIM=1)
           datasz_in(pfileid, varid, 2) = SIZE(pdata, DIM=2)
           datasz_in(pfileid, varid, 3) = SIZE(pdata, DIM=3)
        ENDIF
 
-       !-- 5.2 The maximum size of the data will give the size of the buffer
+       !- 5.2 The maximum size of the data will give the size of the buffer
 
        IF (datasz_max(pfileid, varid) <= 0) THEN
           largebuf = .FALSE.
@@ -442,9 +443,9 @@ CONTAINS
           buff_tmp_sz = datasz_max(pfileid, varid)
        ENDIF
 
-       !-- We have to do the first operation anyway.
-       !-- Thus we do it here and change the ranke
-       !-- of the data at the same time. This should speed up things.
+       !- We have to do the first operation anyway.
+       !- Thus we do it here and change the ranke
+       !- of the data at the same time. This should speed up things.
 
        nbpt_in(1:3) = datasz_in(pfileid, varid, 1:3)
        nbpt_out = datasz_max(pfileid, varid)
@@ -464,7 +465,7 @@ CONTAINS
        last_opp_chk(pfileid, varid) = -99
        last_wrt_chk(pfileid, varid) = -99
     ENDIF
-    !---------------------------
+    !--------------------------
   END SUBROUTINE histwrite_r3d
 
   !===
@@ -472,13 +473,14 @@ CONTAINS
   SUBROUTINE histwrite_real(pfileid, varid, pitau, nbdpt, buff_tmp, nbindex, &
        nindex, do_oper, do_write)
 
-    !- This subroutine is internal and does the calculations and writing
-    !- if needed. At a later stage it should be split into an operation
-    !- and writing subroutines.
-    !---------------------------------------------------------------------
+    ! This subroutine is internal and does the calculations and writing
+    ! if needed. At a later stage it should be split into an operation
+    ! and writing subroutines.
+    !--------------------------------------------------------------------
 
     USE mathelp, ONLY : mathop, trans_buff, moycum
     use netcdf, only: NF90_PUT_VAR
+    use histcom_var
 
     INTEGER, INTENT(IN) :: pfileid, pitau, varid, &
          &                      nbindex, nindex(nbindex), nbdpt
@@ -499,7 +501,7 @@ CONTAINS
     REAL, ALLOCATABLE, SAVE :: buffer_used(:)
     INTEGER, SAVE          :: buffer_sz
 
-    !---------------------------------------------------------------------
+    !--------------------------------------------------------------------
 
     ! The sizes which can be encoutered
 
@@ -553,8 +555,8 @@ CONTAINS
        i = pfileid
        nbout = nbdpt
 
-       !-- 3.4 We continue the sequence of operations
-       !--     we started in the interface routine
+       !- 3.4 We continue the sequence of operations
+       !-     we started in the interface routine
 
        DO io = 2, nbopp(i, varid), 2
           nbin = nbout
@@ -577,8 +579,8 @@ CONTAINS
             &       scsize(i, varid, 1), scsize(i, varid, 2), scsize(i, varid, 3), &
             &       buff_tmp, buff_tmp2_sz, buff_tmp2)
 
-       !-- 5.0 Do the operations if needed. In the case of instantaneous
-       !--     output we do not transfer to the buffer.
+       !- 5.0 Do the operations if needed. In the case of instantaneous
+       !-     output we do not transfer to the buffer.
 
        ipt = point(pfileid, varid)
 
@@ -600,14 +602,14 @@ CONTAINS
        ncvarid = ncvar_ids(pfileid, varid)
        ncid = ncdf_ids(pfileid)
 
-       !-- 6.1 Do the operations that are needed before writting
+       !- 6.1 Do the operations that are needed before writting
 
        IF (     (TRIM(tmp_opp) /= "inst") &
             &    .AND.(TRIM(tmp_opp) /= "once") ) THEN
           rtime = (rtime+last_wrt(pfileid, varid)*deltat(pfileid))/2.0
        ENDIF
 
-       !-- 6.2 Add a value to the time axis of this variable if needed
+       !- 6.2 Add a value to the time axis of this variable if needed
 
        IF (     (TRIM(tmp_opp) /= "l_max") &
             &    .AND.(TRIM(tmp_opp) /= "l_min") &
@@ -625,7 +627,7 @@ CONTAINS
           itime=1
        ENDIF
 
-       !-- 6.3 Write the data. Only in the case of instantaneous output
+       !- 6.3 Write the data. Only in the case of instantaneous output
        !       we do not write the buffer.
 
        IF (scsize(pfileid, varid, 3) == 1) THEN
@@ -665,36 +667,37 @@ CONTAINS
        last_wrt(pfileid, varid) = pitau
        nb_wrt(pfileid, varid) = nb_wrt(pfileid, varid)+1
        nb_opp(pfileid, varid) = 0
-       !---
+       !--
        !   After the write the file can be synchronized so that no data is
        !   lost in case of a crash. This feature gives up on the benefits of
        !   buffering and should only be used in debuging mode. A flag is
        !   needed here to switch to this mode.
-       !---
+       !--
        !   iret = NF90_SYNC (ncid)
 
     ENDIF
-    !----------------------------
+    !---------------------------
   END SUBROUTINE histwrite_real
 
   !*************************************************************
 
   SUBROUTINE histvar_seq (pfid, pvarname, pvid)
 
-    !- This subroutine optimized the search for the variable in the table.
-    !- In a first phase it will learn the succession of the variables
-    !- called and then it will use the table to guess what comes next.
-    !- It is the best solution to avoid lengthy searches through array
-    !- vectors.
+    ! This subroutine optimized the search for the variable in the table.
+    ! In a first phase it will learn the succession of the variables
+    ! called and then it will use the table to guess what comes next.
+    ! It is the best solution to avoid lengthy searches through array
+    ! vectors.
 
-    !- ARGUMENTS :
+    ! ARGUMENTS :
 
-    !- pfid  : id of the file on which we work
-    !- pvarname : The name of the variable we are looking for
-    !- pvid     : The var id we found
+    ! pfid  : id of the file on which we work
+    ! pvarname : The name of the variable we are looking for
+    ! pvid     : The var id we found
 
     USE stringop, ONLY: find_str
     USE errioipsl, ONLY : histerr
+    use histcom_var
 
     INTEGER, INTENT(in)  :: pfid
     CHARACTER(LEN=*), INTENT(IN) :: pvarname
@@ -712,13 +715,13 @@ CONTAINS
     CHARACTER(LEN=70) :: str70
     INTEGER      :: tab_str20_length(nb_var_max)
 
-    !---------------------------------------------------------------------
+    !--------------------------------------------------------------------
     nb = nb_var(pfid)
 
     IF (learning(pfid)) THEN
 
-       !-- 1.0 We compute the length over which we are going
-       !--     to check the overlap
+       !- 1.0 We compute the length over which we are going
+       !-     to check the overlap
 
        IF (overlap(pfid) <= 0) THEN
           IF (nb_var(pfid) > 6) THEN
@@ -728,7 +731,7 @@ CONTAINS
           ENDIF
        ENDIF
 
-       !-- 1.1 Find the position of this string
+       !- 1.1 Find the position of this string
 
        str20 = pvarname
        tab_str20(1:nb) = name(pfid, 1:nb)
@@ -745,8 +748,8 @@ CONTAINS
                &      TRIM(str20))
        ENDIF
 
-       !-- 1.2 If we have not given up we store the position
-       !--     in the sequence of calls
+       !- 1.2 If we have not given up we store the position
+       !-     in the sequence of calls
 
        IF ( varseq_err(pfid) .GE. 0 ) THEN
           sp = varseq_len(pfid)+1
@@ -766,12 +769,12 @@ CONTAINS
              varseq_err(pfid) = -1
           ENDIF
 
-          !---- 1.3 Check if we have found the right overlap
+          !--- 1.3 Check if we have found the right overlap
 
           IF (varseq_len(pfid) .GE. overlap(pfid)*2) THEN
 
-             !------ We skip a few variables if needed as they could come
-             !------ from the initialisation of the model.
+             !----- We skip a few variables if needed as they could come
+             !----- from the initialisation of the model.
 
              DO ib = 0, sp-overlap(pfid)*2
                 IF ( learning(pfid) .AND.&
@@ -788,8 +791,8 @@ CONTAINS
        ENDIF
     ELSE
 
-       !-- 2.0 Now we know how the calls to histwrite are sequenced
-       !--     and we can get a guess at the var ID
+       !- 2.0 Now we know how the calls to histwrite are sequenced
+       !-     and we can get a guess at the var ID
 
        nx = varseq_pos(pfid)+1
        IF (nx > varseq_len(pfid)) nx = 1
@@ -812,9 +815,9 @@ CONTAINS
           varseq_err(pfid) = varseq_err(pfid)+1
        ELSE
 
-          !---- We only keep the new position if we have found the variable
-          !---- this way. This way an out of sequence call to histwrite does
-          !---- not defeat the process.
+          !--- We only keep the new position if we have found the variable
+          !--- this way. This way an out of sequence call to histwrite does
+          !--- not defeat the process.
 
           varseq_pos(pfid) = nx
        ENDIF

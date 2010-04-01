@@ -116,19 +116,10 @@ c   Couche limite:
 c======================================================================
 
       ok_sync = .true.
-	print*,'Dans phystokenc.F'
-      print*,'iadvtr= ',iadvtr
-      print*,'istphy= ',istphy
-      print*,'istdyn= ',istdyn
 
       IF (iadvtr.eq.0) THEN
-	
 	CALL initphysto('phystoke',
      . rlon,rlat,dtime, dtime*istphy,dtime*istphy,nqmx,physid)
-  	
-	write(*,*) 'apres initphysto ds phystokenc' 
-
-	
       ENDIF
 c
       ndex2d = 0
