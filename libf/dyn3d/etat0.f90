@@ -37,7 +37,8 @@ contains
     use iniadvtrac_m, only: iniadvtrac
     use inidissip_m, only: inidissip
     use inigeom_m, only: inigeom
-    USE flincom, only: flinget, flinclo, flinopen_nozoom, flininfo
+    USE flincom, only: flinclo, flinopen_nozoom, flininfo
+    use flinget_m, only: flinget
     use histcom, only: histclo
     use paramet_m, only: ip1jm, ip1jmp1
     use phyredem_m, only: phyredem
@@ -221,7 +222,7 @@ contains
     ALLOCATE(dlon_lic(iml_lic))
     ALLOCATE(dlat_lic(jml_lic))
     ALLOCATE(fraclic(iml_lic, jml_lic))
-    CALL flinopen_nozoom("landiceref.nc", iml_lic, jml_lic, &
+    CALL flinopen_nozoom(iml_lic, jml_lic, &
          llm_tmp, lon_lic, lat_lic, lev, ttm_tmp, itaul, date, trash,  &
          fid)
     CALL flinget(fid, 'landice', iml_lic, jml_lic, llm_tmp, ttm_tmp &

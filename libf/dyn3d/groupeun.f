@@ -27,7 +27,6 @@ Champs 3D
       j2=2
       do ig=1,ngroup
          do j=j1-jd,j2-jd
-c           print*,'groupe ',ig,'  j= ',j,2**(ngroup-ig+1),'pts groupes'
             do i0=1,iim,2**(ngroup-ig+1)
                airen=0.
                airecn=0.

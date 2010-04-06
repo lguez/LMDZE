@@ -114,19 +114,6 @@ c   calcul des pentes aux poles
 
 c   calcul des pentes limites aux poles
 
-c     print*,dyqv(iip1+1)
-c     apn=abs(dyq(1)/dyqv(iip1+1))
-c     print*,dyq(ip1jm+1)
-c     print*,dyqv(ip1jm-iip1+1)
-c     aps=abs(dyq(ip1jm+1)/dyqv(ip1jm-iip1+1))
-c     do ij=2,iim
-c        apn=amax1(abs(dyq(ij)/dyqv(ij)),apn)
-c        aps=amax1(abs(dyq(ip1jm+ij)/dyqv(ip1jm-iip1+ij)),aps)
-c     enddo
-c     apn=min(pente_max/apn,1.)
-c     aps=min(pente_max/aps,1.)
-
-
 c   cas ou on a un extremum au pole
 
 c     if(dyqv(ismin(iim,dyqv,1))*dyqv(ismax(iim,dyqv,1)).le.0.)

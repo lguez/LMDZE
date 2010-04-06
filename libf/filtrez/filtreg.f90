@@ -13,7 +13,8 @@ contains
     ! pour l'opérateur filtre. 
 
     USE dimens_m, ONLY : iim, jjm
-    USE parafilt, ONLY : nfilun, nfilus, nfilvn, nfilvs
+    USE parafilt, ONLY: matriceun, matriceus, matricevn, matricevs, matrinvn, &
+         matrinvs
     USE coefils, ONLY : jfiltnu, jfiltnv, jfiltsu, jfiltsv, sddu, sddv, &
          unsddu, unsddv
 
@@ -48,10 +49,6 @@ contains
 
     INTEGER jdfil1, jdfil2, jffil1, jffil2, jdfil, jffil
     INTEGER i, j, l, k
-    REAL matriceun, matriceus, matricevn, matricevs, matrinvn, matrinvs
-    COMMON /matrfil/matriceun(iim, iim, nfilun), matriceus(iim, iim, nfilus), &
-         matricevn(iim, iim, nfilvn), matricevs(iim, iim, nfilvs), &
-         matrinvn(iim, iim, nfilun), matrinvs(iim, iim, nfilus)
     REAL eignq(iim), sdd1(iim), sdd2(iim)
     INTEGER hemisph
 
@@ -156,7 +153,8 @@ contains
                    END DO
                    DO i = 1, iim
                       DO k = 1, iim
-                         eignq(k) = eignq(k) + matriceun(k, i, j)*champ(i, j, l)
+                         eignq(k) = eignq(k) + matriceun(k, i, j) &
+                              * champ(i, j, l)
                       END DO
                    END DO
                 ELSE
@@ -165,7 +163,8 @@ contains
                    END DO
                    DO i = 1, iim
                       DO k = 1, iim
-                         eignq(k) = eignq(k) + matricevn(k, i, j)*champ(i, j, l)
+                         eignq(k) = eignq(k) + matricevn(k, i, j) &
+                              * champ(i, j, l)
                       END DO
                    END DO
                 END IF

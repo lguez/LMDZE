@@ -2,12 +2,16 @@ MODULE getincom
 
   ! From getincom.f90,v 2.0 2004/04/05 14:47:48
 
-  USE stringop, ONLY : findpos,nocomma,cmpblank,strlowercase,gensig,find_sig
+  USE nocomma_m, ONLY : nocomma
+  use cmpblank_m, only: cmpblank
+  use strlowercase_m, only: strlowercase
+  use gensig_m, only: gensig
+  use find_sig_m, only: find_sig
 
   IMPLICIT NONE
 
   PRIVATE
-  PUBLIC :: getin, getin_dump
+  PUBLIC :: getin
 
   INTERFACE getin
      MODULE PROCEDURE getinrs, getinr1d, getinr2d, &
@@ -2297,164 +2301,5 @@ CONTAINS
     END SELECT
     !----------------------------
   END SUBROUTINE getin_allocmem
-
-  !****************************
-
-  SUBROUTINE getin_dump (fileprefix)
-    !---------------------------------------------------------------------
-    !- This subroutine will dump the content of the database into  file
-    !- which has the same format as the run.def. The idea is that the user
-    !- can see which parameters were used and re-use the file for another
-    !- run.
-  
-    !- The argument file allows the user to change the name of the file
-    !- in which the data will be archived
-    !---------------------------------------------------------------------
-  
-    CHARACTER(*),OPTIONAL :: fileprefix
-  
-    CHARACTER(LEN=80) :: usedfileprefix = "used"
-    INTEGER :: ikey,if,iff,iv
-    CHARACTER(LEN=3) :: tmp3
-    CHARACTER(LEN=100) :: tmp_str, used_filename
-    LOGICAL :: check = .FALSE.
-    !---------------------------------------------------------------------
-    IF (PRESENT(fileprefix)) THEN
-       usedfileprefix = fileprefix(1:MIN(len_trim(fileprefix),80))
-    ENDIF
-  
-    DO if=1,nbfiles
-       !---
-       used_filename = TRIM(usedfileprefix)//'_'//TRIM(filelist(if))
-       IF (check) THEN
-          WRITE(*,*) &
-               &      'GETIN_DUMP : opens file : ',TRIM(used_filename),' if = ',if
-          WRITE(*,*) 'GETIN_DUMP : NUMBER OF KEYS : ',nb_keys
-       ENDIF
-       OPEN(unit=76,file=used_filename)
-     
-       !-- If this is the first file we need to add the list
-       !-- of file which belong to it
-     
-       IF ( (if == 1) .AND. (nbfiles > 1) ) THEN
-          WRITE(76,*) '# '
-          WRITE(76,*) '# This file is linked to the following files :'
-          WRITE(76,*) '# '
-          DO iff=2,nbfiles
-             WRITE(76,*) 'INCLUDEDEF = ',TRIM(filelist(iff))
-          ENDDO
-          WRITE(76,*) '# '
-       ENDIF
-       !---
-       DO ikey=1,nb_keys
-        
-          !---- Is this key form this file ?
-        
-          IF (keyfromfile(ikey) == if) THEN
-           
-             !---- Write some comments
-           
-             WRITE(76,*) '#'
-             SELECT CASE (keystatus(ikey))
-             CASE(1)
-                WRITE(76,*) '# Values of ', &
-                     &          TRIM(keystr(ikey)),' comes from the run.def.'
-             CASE(2)
-                WRITE(76,*) '# Values of ', &
-                     &          TRIM(keystr(ikey)),' are all defaults.'
-             CASE(3)
-                WRITE(76,*) '# Values of ', &
-                     &          TRIM(keystr(ikey)),' are a mix of run.def and defaults.'
-             CASE DEFAULT
-                WRITE(76,*) '# Dont know from where the value of ', &
-                     &          TRIM(keystr(ikey)),' comes.'
-             END SELECT
-             WRITE(76,*) '#'
-           
-             !---- Write the values
-           
-             SELECT CASE (keytype(ikey))
-              
-             CASE(1)
-                IF (keymemlen(ikey) == 1) THEN
-                   IF (keycompress(ikey) < 0) THEN
-                      WRITE(76,*) &
-                           &              TRIM(keystr(ikey)),' = ',intmem(keymemstart(ikey))
-                   ELSE
-                      WRITE(76,*) &
-                           &              TRIM(keystr(ikey)),' = ',keycompress(ikey), &
-                           &              ' * ',intmem(keymemstart(ikey))
-                   ENDIF
-                ELSE
-                   DO iv=0,keymemlen(ikey)-1
-                      WRITE(tmp3,'(I3.3)') iv+1
-                      WRITE(76,*) &
-                           &              TRIM(keystr(ikey)),'__',tmp3, &
-                           &              ' = ',intmem(keymemstart(ikey)+iv)
-                   ENDDO
-                ENDIF
-              
-             CASE(2)
-                IF (keymemlen(ikey) == 1) THEN
-                   IF (keycompress(ikey) < 0) THEN
-                      WRITE(76,*) &
-                           &              TRIM(keystr(ikey)),' = ',realmem(keymemstart(ikey))
-                   ELSE
-                      WRITE(76,*) &
-                           &              TRIM(keystr(ikey)),' = ',keycompress(ikey),&
-                           & ' * ',realmem(keymemstart(ikey))
-                   ENDIF
-                ELSE
-                   DO iv=0,keymemlen(ikey)-1
-                      WRITE(tmp3,'(I3.3)') iv+1
-                      WRITE(76,*) &
-                           &              TRIM(keystr(ikey)),'__',tmp3, &
-                           &              ' = ',realmem(keymemstart(ikey)+iv)
-                   ENDDO
-                ENDIF
-             CASE(3)
-                IF (keymemlen(ikey) == 1) THEN
-                   tmp_str = charmem(keymemstart(ikey))
-                   WRITE(76,*) TRIM(keystr(ikey)),' = ',TRIM(tmp_str)
-                ELSE
-                   DO iv=0,keymemlen(ikey)-1
-                      WRITE(tmp3,'(I3.3)') iv+1
-                      tmp_str = charmem(keymemstart(ikey)+iv)
-                      WRITE(76,*) &
-                           &              TRIM(keystr(ikey)),'__',tmp3,' = ',TRIM(tmp_str)
-                   ENDDO
-                ENDIF
-             CASE(4)
-                IF (keymemlen(ikey) == 1) THEN
-                   IF (logicmem(keymemstart(ikey))) THEN
-                      WRITE(76,*) TRIM(keystr(ikey)),' = TRUE '
-                   ELSE
-                      WRITE(76,*) TRIM(keystr(ikey)),' = FALSE '
-                   ENDIF
-                ELSE
-                   DO iv=0,keymemlen(ikey)-1
-                      WRITE(tmp3,'(I3.3)') iv+1
-                      IF (logicmem(keymemstart(ikey)+iv)) THEN
-                         WRITE(76,*) TRIM(keystr(ikey)),'__',tmp3,' = TRUE '
-                      ELSE
-                         WRITE(76,*) TRIM(keystr(ikey)),'__',tmp3,' = FALSE '
-                      ENDIF
-                   ENDDO
-                ENDIF
-              
-             CASE DEFAULT
-                WRITE(*,*) &
-                     &          'FATAL ERROR : Unknown type for variable ', &
-                     &          TRIM(keystr(ikey))
-                STOP 'getin_dump'
-             END SELECT
-          ENDIF
-       ENDDO
-     
-       CLOSE(unit=76)
-     
-    ENDDO
-    !------------------------
-  END SUBROUTINE getin_dump
 
 END MODULE getincom

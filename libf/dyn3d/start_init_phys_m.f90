@@ -11,7 +11,8 @@ CONTAINS
 
   SUBROUTINE start_init_phys(tsol_2d)
 
-    USE flincom, only: flininfo, flinopen_nozoom, flinget, flinclo
+    USE flincom, only: flininfo, flinopen_nozoom, flinclo
+    use flinget_m, only: flinget
     use conf_dat2d_m, only: conf_dat2d
     use inter_barxy_m, only: inter_barxy
     use gr_int_dyn_m, only: gr_int_dyn
@@ -50,7 +51,7 @@ CONTAINS
     ALLOCATE(lon_phys(iml_phys, jml_phys))
     ALLOCATE(levphys_ini(llm_tmp))
 
-    CALL flinopen_nozoom(physfname, iml_phys, jml_phys,  &
+    CALL flinopen_nozoom(iml_phys, jml_phys,  &
          llm_tmp, lon_phys, lat_phys, levphys_ini, ttm_tmp,  &
          itau, date, dt, fid_phys)
 

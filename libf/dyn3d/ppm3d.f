@@ -397,16 +397,13 @@ C
       do J=2,JMR
       DTDX(j)  = DT / ( DL*AE*COSP(J) )
 
-c     print*,'dtdx=',dtdx(j)
       DTDX5(j) = 0.5*DTDX(j)
       enddo
 C
       
       DTDY  = DT /(AE*DP)
-c      print*,'dtdy=',dtdy
       DTDY5 = 0.5*DTDY
 C
-c      write(6,*) 'J1=',J1,' J2=', J2
       endif
 C
 C *********** End Initialization **********************
@@ -726,7 +723,6 @@ C
       DO j=1,JNP
       DO i=1,IMR
             Q(i,j,k,IC) = DQ(i,j,k,IC) / delp2(i,j,k)
-c            print*,'i=',i,'j=',j,'k=',k,'Q(i,j,k,IC)=',Q(i,j,k,IC)
       enddo
       enddo
       enddo
@@ -863,18 +859,15 @@ C
       AL(i,k) = wk1(i,k-1) + c1 + c2 *
      &        ( wk2(i,k  )*(c1*(A1 - A2)+A2*flux(i,k-1)) -
      &          wk2(i,k-1)*A1*flux(i,k)  )
-C      print *,'AL1',i,k, AL(i,k)
 12    CONTINUE
 14    continue
 C
       do 20 i=1,IMR*NLAYM1
       AR(i,1) = AL(i,2)
-C      print *,'AR1',i,AR(i,1)
 20    continue
 C
       do 30 i=1,IMR*NLAY
       A6(i,1) = 3.*(wk1(i,1)+wk1(i,1) - (AL(i,1)+AR(i,1)))
-C      print *,'A61',i,A6(i,1)
 30    continue
 C
 C****6***0*********0*********0*********0*********0*********0**********72
@@ -895,11 +888,8 @@ C
         CM = wz2(i,1) / wk2(i,1)
         flux(i,2) = AR(i,1)+0.5*CM*(AL(i,1)-AR(i,1)+A6(i,1)*(1.-R23*CM))
       else
-C        print *,'test2-0',i,j,wz2(i,1),wk2(i,2)
         CP= wz2(i,1) / wk2(i,2)        
-C        print *,'testCP',CP
         flux(i,2) = AL(i,2)+0.5*CP*(AL(i,2)-AR(i,2)-A6(i,2)*(1.+R23*CP))
-C        print *,'test2',i, AL(i,2),AR(i,2),A6(i,2),R23
       endif
 140   continue
 C
@@ -1054,10 +1044,7 @@ c            LMT = IORD - 3
 c      endif
 C
       LMT = IORD - 3
-c      write(6,*) 'PPM option in E-W direction = ', LMT
-c      first = .false.
-C      endif
-C
+
       DO 10 i=1,IMR
 10    AL(i) = 0.5*(p(i-1)+p(i)) + (DC(i-1) - DC(i))*R3
 C
@@ -1335,25 +1322,19 @@ C Poles:
 	wk(i,JNP+2) = p(i+IMH,JNP-2)
 	wk(i+IMH,JNP+2) = p(i,JNP-2)
 	enddo
-c        write(*,*) 'toto 1' 
-C --------------------------------
+
       IF(IAD.eq.2) then
       do j=j1-1,j2+1
       do i=1,IMR
-c      write(*,*) 'avt NINT','i=',i,'j=',j
       JP = NINT(VA(i,j))      
       rv = JP - VA(i,j)
-c      write(*,*) 'VA=',VA(i,j), 'JP1=',JP,'rv=',rv
       JP = j - JP
-c      write(*,*) 'JP2=',JP
       a1 = 0.5*(wk(i,jp+1)+wk(i,jp-1)) - wk(i,jp)
       b1 = 0.5*(wk(i,jp+1)-wk(i,jp-1))
-c      write(*,*) 'a1=',a1,'b1=',b1
       ady(i,j) = wk(i,jp) + rv*(a1*rv + b1) - wk(i,j)
       enddo
       enddo
-c      write(*,*) 'toto 2'
-C
+
       ELSEIF(IAD.eq.1) then
 	do j=j1-1,j2+1
       do i=1,imr
@@ -1978,24 +1959,5 @@ C
 C Poles.
       if(q(1,1).lt.0. or. q(1,JNP).lt.0.) ipx = 1
       endif
-      return
-      end
-C
-      subroutine zflip(q,im,km,nc)
-C This routine flip the array q (in the vertical).
-      real q(im,km,nc)
-C local dynamic array
-      real qtmp(im,km)
-C
-      do 4000 IC = 1, nc
-C
-      do 1000 k=1,km
-      do 1000 i=1,im
-      qtmp(i,k) = q(i,km+1-k,IC)
-1000  continue
-C
-      do 2000 i=1,im*km
-2000  q(i,1,IC) = qtmp(i,1)
-4000  continue
       return
       end

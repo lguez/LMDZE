@@ -91,8 +91,6 @@ c Flux en l=1 (sol) nul
            do j=1,jjp1
               do i=1,iip1              
                fluxw(i,j,l)=w(i,j,l)*g*0.01/aire_2d(i,j)
-C               print*,i,j,l,'fluxw(i,j,l)=',fluxw(i,j,l),
-C     c                      'w(i,j,l)=',w(i,j,l)
               enddo
            enddo
       enddo

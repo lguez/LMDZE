@@ -22,23 +22,16 @@ MODULE calendar
   !-   un_jour : one day in seconds
   !-   un_an   : one year in days
   !---------------------------------------------------------------------
-  USE stringop, ONLY : strlowercase
+  USE strlowercase_m, ONLY : strlowercase
   USE errioipsl, ONLY : histerr
   !-
   PRIVATE
-  PUBLIC :: ymds2ju,ju2ymds,tlen2itau,isittime,ioconf_calendar, &
-       &          ioget_calendar,itau2date,ioget_timestamp, &
-       &          ioconf_startdate,itau2ymds,time_diff,time_add
+  PUBLIC :: ymds2ju,ju2ymds,isittime,ioconf_calendar, &
+       ioget_calendar,itau2date, ioconf_startdate
   !-
   INTERFACE ioget_calendar
      MODULE PROCEDURE &
           &    ioget_calendar_real1,ioget_calendar_real2,ioget_calendar_str
-  END INTERFACE
-  !-
-  INTERFACE ioconf_startdate
-     MODULE PROCEDURE &
-          &    ioconf_startdate_simple,ioconf_startdate_internal, &
-          &    ioconf_startdate_ymds
   END INTERFACE
   !-
   REAL,PARAMETER :: un_jour = 86400.0
@@ -254,99 +247,6 @@ CONTAINS
   !-
   !===
   !-
-  SUBROUTINE tlen2itau (input_str,dt,date,itau)
-    !---------------------------------------------------------------------
-    !- This subroutine transforms a sting containing a time length
-    !- into a number of time steps.
-    !- To do this operation the date (in julian days is needed as the
-    !- length of the month varies.
-    !- The following convention is used :
-    !-   n   : n time steps
-    !-   nS  : n seconds is transformed into itaus
-    !-   nH  : n hours
-    !-   nD  : n days
-    !-   nM  : n month
-    !-   nY  : n years
-    !- Combinations are also possible
-    !-   nYmD : nyears plus m days !
-    !---------------------------------------------------------------------
-    IMPLICIT NONE
-
-    CHARACTER(LEN=*),INTENT(IN) :: input_str
-    REAL,INTENT(IN)             :: dt,date
-
-    INTEGER,INTENT(OUT)         :: itau
-
-    INTEGER           :: y_pos,m_pos,d_pos,h_pos,s_pos
-    INTEGER           :: read_time
-    CHARACTER(LEN=13) :: fmt
-    CHARACTER(LEN=80) :: tmp_str
-
-    INTEGER :: year,month,day
-    REAL    :: sec,date_new,dd,ss
-    !---------------------------------------------------------------------
-    itau = 0
-    CALL ju2ymds (date,year,month,day,sec)
-
-    y_pos = MAX(INDEX(input_str,'y'),INDEX(input_str,'Y'))
-    m_pos = MAX(INDEX(input_str,'m'),INDEX(input_str,'M'))
-    d_pos = MAX(INDEX(input_str,'d'),INDEX(input_str,'D'))
-    h_pos = MAX(INDEX(input_str,'h'),INDEX(input_str,'H'))
-    s_pos = MAX(INDEX(input_str,'s'),INDEX(input_str,'S'))
-
-    IF (MAX(y_pos,m_pos,d_pos,s_pos) > 0) THEN
-       tmp_str = input_str
-       DO WHILE ( MAX(y_pos,m_pos,d_pos,s_pos) > 0)
-          !---- WRITE(*,*) tmp_str
-          !---- WRITE(*,*) y_pos,m_pos,d_pos,s_pos
-          IF (y_pos > 0) THEN
-             WRITE(fmt,'("(I",I10.10,")")') y_pos-1
-             READ(tmp_str(1:y_pos-1),fmt) read_time
-             CALL ymds2ju (year+read_time,month,day,sec,date_new)
-             dd = date_new-date
-             ss = INT(dd)*un_jour+dd-INT(dd)
-             itau = itau+NINT(ss/dt)
-             tmp_str = tmp_str(y_pos+1:LEN_TRIM(tmp_str))
-          ELSE IF (m_pos > 0) THEN
-             WRITE(fmt,'("(I",I10.10,")")') m_pos-1
-             READ(tmp_str(1:m_pos-1),fmt) read_time
-             CALL ymds2ju (year,month+read_time,day,sec,date_new)
-             dd = date_new-date
-             ss = INT(dd)*un_jour+ dd-INT(dd)
-             itau = itau+NINT(ss/dt)
-             tmp_str = tmp_str(m_pos+1:LEN_TRIM(tmp_str))
-          ELSE IF (d_pos > 0) THEN
-             WRITE(fmt,'("(I",I10.10,")")') d_pos-1
-             READ(tmp_str(1:d_pos-1),fmt) read_time
-             itau = itau+NINT(read_time*un_jour/dt)
-             tmp_str = tmp_str(d_pos+1:LEN_TRIM(tmp_str))
-          ELSE IF (h_pos > 0) THEN
-             WRITE(fmt,'("(I",I10.10,")")') h_pos-1
-             READ(tmp_str(1:h_pos-1),fmt) read_time
-             itau = itau+NINT(read_time*60.*60./dt)
-             tmp_str = tmp_str(d_pos+1:LEN_TRIM(tmp_str))
-          ELSE IF  (s_pos > 0) THEN
-             WRITE(fmt,'("(I",I10.10,")")') s_pos-1
-             READ(tmp_str(1:s_pos-1),fmt) read_time
-             itau = itau+NINT(read_time/dt)
-             tmp_str = tmp_str(s_pos+1:LEN_TRIM(tmp_str))
-          ENDIF
-      
-          y_pos = MAX(INDEX(tmp_str,'y'),INDEX(tmp_str,'Y'))
-          m_pos = MAX(INDEX(tmp_str,'m'),INDEX(tmp_str,'M'))
-          d_pos = MAX(INDEX(tmp_str,'d'),INDEX(tmp_str,'D'))
-          h_pos = MAX(INDEX(tmp_str,'h'),INDEX(tmp_str,'H'))
-          s_pos = MAX(INDEX(tmp_str,'s'),INDEX(tmp_str,'S'))
-       ENDDO
-    ELSE
-       WRITE(fmt,'("(I",I10.10,")")') LEN_TRIM(input_str)
-       READ(input_str(1:LEN_TRIM(input_str)),fmt) itau
-    ENDIF
-    !-----------------------
-  END SUBROUTINE tlen2itau
-  !-
-  !===
-  !-
   REAL FUNCTION itau2date (itau,date0,deltat)
     !---------------------------------------------------------------------
     !- This function transforms itau into a date. The date whith which
@@ -368,41 +268,6 @@ CONTAINS
     itau2date = REAL(itau)*deltat/un_jour+date0
     !---------------------
   END FUNCTION itau2date
-  !-
-  !===
-  !-
-  SUBROUTINE itau2ymds (itau,deltat,year,month,date,sec)
-    !---------------------------------------------------------------------
-    !- This subroutine transforms itau into a date. The date whith which
-    !- the time axis is going to be labeled
-
-    !- INPUT
-    !-   itau   : current time step
-    !-   deltat : time step between itau s
-
-    !- OUTPUT
-    !-   year : year
-    !-   month : month
-    !-   date : date
-    !-   sec  : seconds since midnight
-    !---------------------------------------------------------------------
-    IMPLICIT NONE
-
-    INTEGER,INTENT(IN) :: itau
-    REAL,INTENT(IN)    :: deltat
-
-    INTEGER,INTENT(OUT) :: year,month,date
-    REAL,INTENT(OUT)    :: sec
-
-    INTEGER :: julian_day
-    REAL    :: julian_sec
-    !---------------------------------------------------------------------
-    julian_day = start_day
-    julian_sec = start_sec+REAL(itau)*deltat
-
-    CALL ju2ymds_internal (julian_day,julian_sec,year,month,date,sec)
-    !-----------------------
-  END SUBROUTINE itau2ymds
   !-
   !===
   !-
@@ -637,77 +502,6 @@ CONTAINS
   !-
   !===
   !-
-  SUBROUTINE ioconf_startdate_simple (julian)
-    !---------------------------------------------------------------------
-    IMPLICIT NONE
-
-    REAL,INTENT(IN) :: julian
-
-    INTEGER :: julian_day
-    REAL    :: julian_sec
-    !---------------------------------------------------------------------
-    julian_day = INT(julian)
-    julian_sec = (julian-julian_day)*un_jour
-
-    CALL ioconf_startdate_internal (julian_day,julian_sec)
-    !-------------------------------------
-  END SUBROUTINE ioconf_startdate_simple
-  !-
-  !===
-  !-
-  SUBROUTINE ioconf_startdate_ymds (year,month,day,sec)
-    !---------------------------------------------------------------------
-    IMPLICIT NONE
-
-    INTEGER,INTENT(IN) :: year,month,day
-    REAL,INTENT(IN)    :: sec
-
-    INTEGER :: julian_day
-    REAL    :: julian_sec
-    !---------------------------------------------------------------------
-    CALL ymds2ju_internal (year,month,day,sec,julian_day,julian_sec)
-
-    CALL ioconf_startdate_internal (julian_day,julian_sec)
-    !-----------------------------------
-  END SUBROUTINE ioconf_startdate_ymds
-  !-
-  !===
-  !-
-  SUBROUTINE ioconf_startdate_internal (julian_day,julian_sec)
-    !---------------------------------------------------------------------
-    ! This subroutine allows to set the startdate for later
-    ! use. It allows the applications to access the date directly from
-    ! the timestep. In order to avoid any problems the start date will
-    ! be locked and can not be changed once set.
-    !---------------------------------------------------------------------
-    IMPLICIT NONE
-
-    INTEGER,INTENT(IN)  :: julian_day
-    REAL,INTENT(IN)     :: julian_sec
-
-    CHARACTER(len=70) :: str70a,str70b
-    !---------------------------------------------------------------------
-    IF (.NOT.lock_startdate) THEN
-       lock_startdate = .TRUE.
-       start_day = julian_day
-       start_sec = julian_sec
-    ELSE
-       WRITE(str70a,'("The date you tried to set : ",f10.4)') &
-            &   julian_day,julian_sec/un_jour
-       WRITE(str70b, &
-            &   '("The date which was already set in the calendar : ",f10.4)') &
-            &   start_day+start_sec/un_jour
-       CALL histerr (2,'ioconf_startdate', &
-            &   'The start date has already been set and you tried to change it', &
-            &   str70a,str70b)
-    ENDIF
-
-    lock_startdate = .TRUE.
-    !---------------------------------------
-  END SUBROUTINE ioconf_startdate_internal
-  !-
-  !===
-  !-
   SUBROUTINE ioget_calendar_str (str)
     !---------------------------------------------------------------------
     !- This subroutine returns the name of the calendar used here.
@@ -778,98 +572,5 @@ CONTAINS
     long_jour = un_jour
     !----------------------------------
   END SUBROUTINE ioget_calendar_real2
-  !-
-  !===
-  !-
-  SUBROUTINE ioget_timestamp (string)
-    !---------------------------------------------------------------------
-    IMPLICIT NONE
 
-    CHARACTER(LEN=30),INTENT(OUT) :: string
-
-    INTEGER :: date_time(8)
-    CHARACTER(LEN=10) :: bigben(3)
-    !---------------------------------------------------------------------
-    IF (INDEX(time_stamp,'XXXXXX') > 0) THEN
-       CALL DATE_AND_TIME (bigben(1),bigben(2),bigben(3),date_time)
-       !---
-       WRITE(time_stamp, &
-            &   "(I4.4,'-',A3,'-',I2.2,' ',I2.2,':',I2.2,':',I2.2,' GMT',a5)") &
-            &   date_time(1),cal(date_time(2)),date_time(3),date_time(5), &
-            &   date_time(6),date_time(7),bigben(3)
-    ENDIF
-
-    string = time_stamp
-    !-----------------------------
-  END SUBROUTINE ioget_timestamp
-  !-
-  !===
-  !-
-  SUBROUTINE time_add &
-       &  (year_s,month_s,day_s,sec_s,sec_increment, &
-       &   year_e,month_e,day_e,sec_e)
-    !---------------------------------------------------------------------
-    !- This subroutine allows to increment a date by a number of seconds.
-    !---------------------------------------------------------------------
-    IMPLICIT NONE
-
-    INTEGER,INTENT(IN) :: year_s,month_s,day_s
-    REAL,INTENT(IN)    :: sec_s
-    !!
-    ! Time in seconds to be added to the date
-    !!
-    REAL,INTENT(IN)    :: sec_increment
-
-    INTEGER,INTENT(OUT) :: year_e,month_e,day_e
-    REAL,INTENT(OUT)    :: sec_e
-
-    INTEGER :: julian_day
-    REAL    :: julian_sec
-    !---------------------------------------------------------------------
-    CALL ymds2ju_internal &
-         &  (year_s,month_s,day_s,sec_s,julian_day,julian_sec)
-
-    julian_sec = julian_sec+sec_increment
-
-    CALL ju2ymds_internal &
-         &  (julian_day,julian_sec,year_e,month_e,day_e,sec_e)
-    !----------------------
-  END SUBROUTINE time_add
-  !-
-  !===
-  !-
-  SUBROUTINE time_diff &
-       &  (year_s,month_s,day_s,sec_s,year_e,month_e,day_e,sec_e,sec_diff)
-    !---------------------------------------------------------------------
-    !- This subroutine allows to determine the number of seconds
-    !- between two dates.
-    !---------------------------------------------------------------------
-    IMPLICIT NONE
-
-    INTEGER,INTENT(IN) :: year_s,month_s,day_s
-    REAL,INTENT(IN)    :: sec_s
-    INTEGER,INTENT(IN) :: year_e,month_e,day_e
-    REAL,INTENT(IN)    :: sec_e
-    !!
-    ! Time in seconds between the two dates
-    !!
-    REAL,INTENT(OUT)    :: sec_diff
-
-    INTEGER :: julian_day_s,julian_day_e,day_diff
-    REAL    :: julian_sec_s,julian_sec_e
-    !---------------------------------------------------------------------
-    CALL ymds2ju_internal &
-         &  (year_s,month_s,day_s,sec_s,julian_day_s,julian_sec_s)
-    CALL ymds2ju_internal &
-         &  (year_e,month_e,day_e,sec_e,julian_day_e,julian_sec_e)
-
-    day_diff = julian_day_e-julian_day_s
-    sec_diff = julian_sec_e-julian_sec_s
-
-    sec_diff = sec_diff+day_diff*un_jour
-    !-----------------------
-  END SUBROUTINE time_diff
-  !-
-  !===
-  !-
 END MODULE calendar

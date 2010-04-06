@@ -7,7 +7,7 @@ module comvert
   private llm
 
   real ap(llm+1), pa ! in Pa
-  real bp(llm+1), dpres(llm)
+  real bp(llm+1)
   real presnivs(llm) ! pressions approximatives des milieux de couches, en Pa
   real, parameter:: preff = 101325. ! in Pa
   real nivsigs(llm), nivsig(llm+1)
@@ -22,8 +22,8 @@ contains
     ! Auteur : P. Le Van
 
     ! This procedure sets the vertical grid.
-    ! It defines the host variables "ap", "bp", "dpres", "presnivs",
-    ! "nivsigs" and "nivsig".
+    ! It defines the host variables "ap", "bp", "presnivs", "nivsigs"
+    ! and "nivsig".
     ! "pa" should be defined before this procedure is called.
 
     use numer_rec, only: pi
@@ -118,10 +118,8 @@ contains
     bp(llm + 1) = 0.
     ap = pa * (s - bp)
 
-    forall (l = 1: llm)
-       dpres(l) = bp(l) - bp(l+1)
-       presnivs(l) = 0.5 * (ap(l) + bp(l) * preff + ap(l+1) + bp(l+1) * preff)
-    end forall
+    forall (l = 1: llm) presnivs(l) = 0.5 &
+         * (ap(l) + bp(l) * preff + ap(l+1) + bp(l+1) * preff)
 
   END SUBROUTINE disvert
 

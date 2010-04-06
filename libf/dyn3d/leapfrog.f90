@@ -24,6 +24,7 @@ contains
     use filtreg_m, only: filtreg
     USE guide_m, ONLY: guide
     use inidissip_m, only: idissip
+    use integrd_m, only: integrd
     USE logic, ONLY: iflag_phys, ok_guide
     USE paramet_m, ONLY: ip1jmp1
     USE pression_m, ONLY: pression
@@ -31,7 +32,8 @@ contains
     USE temps, ONLY: itau_dyn
 
     ! Variables dynamiques:
-    REAL vcov((iim + 1) * jjm, llm), ucov(ip1jmp1, llm) ! vents covariants
+    REAL, intent(inout):: vcov((iim + 1) * jjm, llm) ! vent covariant
+    REAL, intent(inout):: ucov(ip1jmp1, llm) ! vent covariant
     REAL, intent(inout):: teta(iim + 1, jjm + 1, llm) ! potential temperature
     REAL ps(iim + 1, jjm + 1) ! pression au sol, en Pa
 
@@ -89,8 +91,6 @@ contains
     ! cree par la dissipation
     REAL dtetaecdt(iim + 1, jjm + 1, llm)
     REAL vcont((iim + 1) * jjm, llm), ucont(ip1jmp1, llm)
-    logical forward, leapf
-    REAL dt
 
     !---------------------------------------------------
 
@@ -108,8 +108,8 @@ contains
     CALL exner_hyb(ps, p3d, pks, pk, pkf)
 
     ! Début de l'integration temporelle :
-    outer_loop:do i = 1, itaufin / iperiod
-       ! {itau is a multiple of iperiod}
+    period_loop:do i = 1, itaufin / iperiod
+       ! {"itau" is a multiple of "iperiod"}
 
        ! 1. Matsuno forward:
 
@@ -137,7 +137,7 @@ contains
 
        ! integrations dynamique et traceurs:
        CALL integrd(2, vcovm1, ucovm1, tetam1, psm1, massem1, dv, du, dteta, &
-            dq, dp, vcov, ucov, teta, q, ps, masse, phis, finvmaold, .false., &
+            dp, vcov, ucov, teta, q, ps, masse, finvmaold, .false., &
             dtvr)
 
        CALL pression(ip1jmp1, ap, bp, ps, p3d)
@@ -160,7 +160,7 @@ contains
 
        ! integrations dynamique et traceurs:
        CALL integrd(2, vcovm1, ucovm1, tetam1, psm1, massem1, dv, du, dteta, &
-            dq, dp, vcov, ucov, teta, q, ps, masse, phis, finvmaold, .false., &
+            dp, vcov, ucov, teta, q, ps, masse, finvmaold, .false., &
             dtvr)
 
        CALL pression(ip1jmp1, ap, bp, ps, p3d)
@@ -168,7 +168,7 @@ contains
 
        ! 3. Leapfrog:
 
-       do j = 1, iperiod - 1
+       leapfrog_loop: do j = 1, iperiod - 1
           ! Calcul des tendances dynamiques:
           CALL geopot(ip1jmp1, teta, pk, pks, phis, phi)
           CALL caldyn(itau, ucov, vcov, teta, ps, masse, pk, pkf, phis, phi, &
@@ -183,7 +183,7 @@ contains
 
           ! integrations dynamique et traceurs:
           CALL integrd(2, vcovm1, ucovm1, tetam1, psm1, massem1, dv, du, &
-               dteta, dq, dp, vcov, ucov, teta, q, ps, masse, phis, &
+               dteta, dp, vcov, ucov, teta, q, ps, masse, &
                finvmaold, .true., 2 * dtvr)
 
           IF (MOD(itau + 1, iphysiq) == 0 .AND. iflag_phys /= 0) THEN
@@ -228,7 +228,7 @@ contains
              dtetadis=dtetadis + dtetaecdt
              teta=teta + dtetadis
 
-             ! Calcul de la valeur moyenne unique de h aux pôles
+             ! Calcul de la valeur moyenne aux pôles :
              forall (l = 1: llm)
                 teta(:, 1, l) = SUM(aire_2d(:iim, 1) * teta(:iim, 1, l)) &
                      / apoln
@@ -256,32 +256,18 @@ contains
              call bilan_dyn(2, dtvr * iperiod, dtvr * day_step * periodav, &
                   ps, masse, pk, pbaru, pbarv, teta, phi, ucov, vcov, q)
           ENDIF
-       end do
-    end do outer_loop
+       end do leapfrog_loop
+    end do period_loop
 
     ! {itau == itaufin}
     CALL dynredem1("restart.nc", vcov, ucov, teta, q, masse, ps, &
          itau=itau_dyn+itaufin)
-
-    vcovm1 = vcov
-    ucovm1 = ucov
-    tetam1 = teta
-    massem1 = masse
-    psm1 = ps
-    finvmaold = masse
-    CALL filtreg(finvmaold, jjm + 1, llm, - 2, 2, .TRUE., 1)
 
     ! Calcul des tendances dynamiques:
     CALL geopot(ip1jmp1, teta, pk, pks, phis, phi)
     CALL caldyn(itaufin, ucov, vcov, teta, ps, masse, pk, pkf, phis, phi, &
          MOD(itaufin, iconser) == 0, du, dv, dteta, dp, w, pbaru, pbarv, &
          time + iday - day_ini)
-
-    ! Calcul des tendances advection des traceurs (dont l'humidité)
-    CALL caladvtrac(q, pbaru, pbarv, p3d, masse, dq, teta, pk)
-    ! Stokage du flux de masse pour traceurs off-line:
-    IF (offline) CALL fluxstokenc(pbaru, pbarv, masse, teta, phi, phis, dtvr, &
-         itaufin)
 
   END SUBROUTINE leapfrog
 

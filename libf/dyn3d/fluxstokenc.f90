@@ -23,16 +23,14 @@ SUBROUTINE fluxstokenc(pbaru, pbarv, masse, teta, phi, phis, time_step, itau)
   real, SAVE:: tetac(ip1jmp1, llm), phic(ip1jmp1, llm)
 
   REAL pbarug(ip1jmp1, llm), pbarvg(iip1, jjm, llm), wg(ip1jmp1, llm)
-  INTEGER:: iadvtr = 0
   REAL tst(1), ist(1), istp(1)
   INTEGER ij, l
   INTEGER, save:: fluxid, fluxvid
   integer fluxdid
-  LOGICAL:: first = .TRUE.
 
   !-------------------------------------------------------------
 
-  IF (first) THEN
+  IF (itau == 0) THEN
      CALL initfluxsto(time_step, istdyn*time_step, istdyn*time_step, nqmx, &
           fluxid, fluxvid, fluxdid)
      CALL histwrite(fluxid, 'phis', 1, phis)
@@ -44,10 +42,6 @@ SUBROUTINE fluxstokenc(pbaru, pbarv, masse, teta, phi, phis, time_step, itau)
      istp(1) = istphy
      CALL histwrite(fluxdid, 'istphy', 1, istp)
 
-     first = .FALSE.
-  END IF
-
-  IF (itau == 0) THEN
      CALL initial0(ijp1llm, phic)
      CALL initial0(ijp1llm, tetac)
      CALL initial0(ijp1llm, pbaruc)
@@ -71,10 +65,8 @@ SUBROUTINE fluxstokenc(pbaru, pbarv, masse, teta, phi, phis, time_step, itau)
      CALL scopy(ip1jmp1*llm, masse, 1, massem, 1)
   END IF
 
-  iadvtr = iadvtr + 1
-
-  !   Test pour savoir si on advecte a ce pas de temps
-  IF (iadvtr == istdyn) THEN
+  IF (mod(itau + 1, istdyn) == 0) THEN
+     ! on advecte a ce pas de temps
      !    normalisation
      DO l = 1, llm
         DO ij = 1, ip1jmp1
@@ -92,8 +84,6 @@ SUBROUTINE fluxstokenc(pbaru, pbarv, masse, teta, phi, phis, time_step, itau)
      !     2. groupement des mailles pres du pole.
 
      CALL groupe(massem, pbaruc, pbarvc, pbarug, pbarvg, wg)
-     iadvtr = 0
-     PRINT *, 'ITAU auqel on stoke les fluxmasses', itau
 
      CALL histwrite(fluxid, 'masse', itau, massem)
      CALL histwrite(fluxid, 'pbaru', itau, pbarug)

@@ -329,8 +329,8 @@ CONTAINS
     ! pzaxid: Returns the ID of the axis.
     !            Note that this is not the netCDF ID !
 
-    USE stringop, ONLY: find_str, strlowercase
-    USE stringop, ONLY: find_str, strlowercase
+    USE find_str_m, ONLY: find_str
+    USE strlowercase_m, ONLY: strlowercase
     USE errioipsl, ONLY: histerr
     USE histcom_var, ONLY: nb_zax, nb_zax_max, ncdf_ids, zax_ids, &
          zax_name, zax_name_length, zax_size
@@ -457,7 +457,7 @@ CONTAINS
     ! to be performed on the variables, the frequency of this operation
     ! and finaly the frequency of the archiving.
 
-    USE stringop, ONLY: find_str
+    USE find_str_m, ONLY: find_str
     USE mathelp, ONLY: buildop
     USE errioipsl, ONLY: histerr
     USE histcom_var, ONLY: buff_pos, deltat, freq_opp, freq_wrt, fullop, &

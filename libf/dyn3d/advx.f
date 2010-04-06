@@ -448,24 +448,6 @@ C
 C
  1    CONTINUE
 C
-C ----------- AA Test en fin de ADVX ------ Controle des S*
-c OK
-c      DO 9998 l = 1, llm
-c      DO 9998 j = 1, jjp1
-c      DO 9998 i = 1, iip1
-c         IF (S0(i,j,l,ntra).lt.0..and.LIMIT) THEN 
-c            PRINT*, '-------------------'
-c            PRINT*, 'En fin de ADVX'
-c            PRINT*,'SM(',i,j,l,')=',SM(i,j,l)
-c            PRINT*,'S0(',i,j,l,')=',S0(i,j,l,ntra)
-c            print*, 'sx(',i,j,l,')=',sx(i,j,l,ntra)
-c            print*, 'sy(',i,j,l,')=',sy(i,j,l,ntra)
-c            print*, 'sz(',i,j,l,')=',sz(i,j,l,ntra)
-c            WRITE (*,*) 'On arrete !! - pbl en fin de ADVX1'
-cc            STOP
-c         ENDIF
-c 9998 CONTINUE
-c
 C ---------- bouclage cyclique 
       DO itrac=1,ntra
       DO l = 1,llm

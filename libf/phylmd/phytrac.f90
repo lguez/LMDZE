@@ -474,7 +474,8 @@ contains
       use iniadvtrac_m, only: tnom
       use comgeomphy, only: airephy
       use dimphy, only: klon
-      use grid_change, only: gr_phy_write_2d, gr_phy_write_3d
+      use grid_change, only: gr_phy_write_2d
+      use gr_phy_write_3d_m, only: gr_phy_write_3d
 
       logical, intent(in):: lessivage
 

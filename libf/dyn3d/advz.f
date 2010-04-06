@@ -78,22 +78,6 @@ C
       lat = jjp1
       niv = llm 
 
-C *** Test de passage d'arguments ******
- 
-c     DO 399 l = 1, llm
-c     DO 399 j = 1, jjp1
-c     DO 399 i = 1, iip1
-c        IF (S0(i,j,l,ntra) .lt. 0. ) THEN
-c           PRINT*,'S0(',i,j,l,')=',S0(i,j,l,ntra)
-c           print*, 'sx(',i,j,l,')=',sx(i,j,l,ntra)
-c           print*, 'sy(',i,j,l,')=',sy(i,j,l,ntra)
-c           print*, 'sz(',i,j,l,')=',sz(i,j,l,ntra)
-c           PRINT*, 'AIE !! debut ADVZ - pbl arg. passage dans ADVZ'
-c            STOP
-c        ENDIF
-  399 CONTINUE
-
-C-----------------------------------------------------------------
 C *** Test : diag de la qqtite totale de traceur 
 C            dans l'atmosphere avant l'advection en z
       sqi = 0.
@@ -267,25 +251,6 @@ C
 C  fin de la boucle principale sur les latitudes
 C
  1    CONTINUE
-C
-C-------------------------------------------------------------
-C
-C ----------- AA Test en fin de ADVX ------ Controle des S*
-
-c     DO 9999 l = 1, llm
-c     DO 9999 j = 1, jjp1
-c     DO 9999 i = 1, iip1
-c        IF (S0(i,j,l,ntra).lt.0..and.LIMIT) THEN 
-c           PRINT*, '-------------------'
-c           PRINT*, 'En fin de ADVZ'
-c           PRINT*,'S0(',i,j,l,')=',S0(i,j,l,ntra)
-c           print*, 'sx(',i,j,l,')=',sx(i,j,l,ntra)
-c           print*, 'sy(',i,j,l,')=',sy(i,j,l,ntra)
-c           print*, 'sz(',i,j,l,')=',sz(i,j,l,ntra)
-c           WRITE (*,*) 'On arrete !! - pbl en fin de ADVZ1'
-c            STOP
-c        ENDIF
- 9999 CONTINUE
 
 C *** ------------------- bouclage cyclique  en X ------------
       

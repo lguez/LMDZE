@@ -7,7 +7,7 @@ MODULE ioipslmpp
   IMPLICIT NONE
 !-
   PRIVATE
-  PUBLIC :: ioipsl_inimpp, ioipslmpp_file, ioipslmpp_addatt
+  PUBLIC :: ioipslmpp_file, ioipslmpp_addatt
 !-
   LOGICAL,SAVE :: ison_mpp=.FALSE., lock=.FALSE.
 !-
@@ -21,65 +21,6 @@ MODULE ioipslmpp
  & domain_abs_last, domain_halo_start_size, domain_halo_end_size
 !-
 CONTAINS
-!-
-!===
-!-
-SUBROUTINE ioipsl_inimpp &
- & (petotnb, penb, pglo, ploc, pabsf, pabsl, phals, phale)
-!---------------------------------------------------------------------
-!- This routine sets up the MPP activity of IOIPSL.
-!- It will store all the PE information and allow it to be stored
-!- in the netCDF file and change the file names.
-!-
-!- INPUT
-!-
-!- penb    : process number
-!- petotnb : total number of process
-!- pglo(1) : total number of points in first direction
-!- pglo(2) : total number of points in second direction
-!- ploc(1) : local number of points in first direction
-!- ploc(2) : local number of points in second direction
-!- pabsf(1) : absolute position of first local point for
-!-            first dimension
-!- pabsf(2) : absolute position of first local point for
-!-            second dimension
-!- pabsl(1) : absolute position of last local point for
-!-            first dimension
-!- pabsl(2) : absolute position of last local point for
-!-            second dimension
-!- phals(1) : start halo size in first direction
-!- phals(2) : start halo size in second direction
-!- phale(1) : end halo size in first direction
-!- phale(2) : end halo size in second direction
-!- phale(2) : end halo size in second direction
-!---------------------------------------------------------------------
-  IMPLICIT NONE
-!-
-  INTEGER,INTENT(in) :: penb, petotnb
-  INTEGER,DIMENSION(:),INTENT(in) :: &
- & pglo, ploc, pabsf, pabsl, phals, phale
-!---------------------------------------------------------------------
-  IF (lock) THEN
-    CALL histerr (3,'ioipslmpp','ioipslmpp called to late', &
- &                'please call ioipslmpp before first histbeg','')
-  ELSE
-!-- Take note of the fact that we are on an MPP.
-    ison_mpp=.TRUE.
-!--
-    pe_number = penb
-    pe_total_number = petotnb
-    domain_global_size(:) = pglo(:)
-    domain_local_size(:) = ploc(:)
-    domain_abs_first(:) = pabsf(:)
-    domain_abs_last(:) = pabsl(:)
-    domain_halo_start_size(:) = phals(:)
-    domain_halo_end_size(:) = phale(:)
-!-- Lock this information into the module
-!-- so that it does not get changed
-    lock = .TRUE.
-  ENDIF
-!---------------------------
-END SUBROUTINE ioipsl_inimpp
 !-
 !===
 !-

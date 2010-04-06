@@ -509,22 +509,9 @@ c
       do l=1,llm
             do ij=iip2,ip1jm
                zdq=qd(ij,l)-qg(ij,l)
-c              if((qd(ij,l)-q(ij,l))*(q(ij,l)-qg(ij,l)).lt.0.) then
-c                 print*,'probleme au point ij=',ij,'  l=',l
-c                 print*,qd(ij,l),q(ij,l),qg(ij,l)
-c                 qd(ij,l)=q(ij,l)
-c                 qg(ij,l)=q(ij,l)
-c              endif
                if(abs(zdq).gt.prec) then
                   zsigd(ij,l)=(q(ij,l)-qg(ij,l))/zdq
                   zsigg(ij,l)=1.-zsigd(ij,l)
-c                 if(.not.(zsigd(ij,l).ge.0..and.zsigd(ij,l).le.1. .and.
-c    s               zsigg(ij,l).ge.0..or.zsigg(ij,l).le.1.) ) then
-c                    print*,'probleme au point ij=',ij,'  l=',l
-c                    print*,'sigg=',zsigg(ij,l),'  sigd=',zsigd(ij,l)
-c                    print*,'q d,c,g ',qd(ij,l),q(ij,l),qg(ij,l),zdq
-c                    stop
-c                 endif
                else
                   zsigd(ij,l)=0.5
                   zsigg(ij,l)=0.5
@@ -573,10 +560,6 @@ c   calcul de la pente maximum dans la maille en valeur absolue
      s          +(zsig-zsigp)*(zq+zz*(zqm-zq)) )
              endif
           endif
-c         if(zsig.lt.0.) then
-c            print*,'au point ij=',ij,'  l=',l,'  sig=',zsig
-c            stop
-c         endif
       enddo
       enddo
 
@@ -619,7 +602,6 @@ c   indicage des mailles concernees par le traitement special
                   endif
                enddo
                niju=iju
-c              print*,'niju,nl',niju,nl(l)
 
 c  traitement des mailles
                do iju=1,niju
@@ -766,21 +748,9 @@ c
       do l=1,llm
             do ij=1,ip1jmp1
                zdq=qn(ij,l)-qs(ij,l)
-c              if((qn(ij,l)-q(ij,l))*(q(ij,l)-qs(ij,l)).lt.0.) then
-c                 print*,'probleme au point ij=',ij,'  l=',l,'  advnqx'
-c                 print*,qn(ij,l),q(ij,l),qs(ij,l)
-c                 qn(ij,l)=q(ij,l)
-c                 qs(ij,l)=q(ij,l)
-c              endif
                if(abs(zdq).gt.prec) then
                   zsign(ij)=(q(ij,l)-qs(ij,l))/zdq
                   zsigs(ij)=1.-zsign(ij)
-c                 if(.not.(zsign(ij).ge.0..and.zsign(ij).le.1. .and.
-c    s               zsigs(ij).ge.0..or.zsigs(ij).le.1.) ) then
-c                    print*,'probleme au point ij=',ij,'  l=',l
-c                    print*,'sigs=',zsigs(ij),'  sign=',zsign(ij)
-c                    stop
-c                 endif
                else
                   zsign(ij)=0.5
                   zsigs(ij)=0.5
@@ -893,13 +863,6 @@ c
       do l=1,llm
             do ij=1,ip1jmp1
                zdq=qb(ij,l)-qh(ij,l)
-c              if((qh(ij,l)-q(ij,l))*(q(ij,l)-qb(ij,l)).lt.0.) then
-c                 print*,'probleme au point ij=',ij,'  l=',l
-c                 print*,qh(ij,l),q(ij,l),qb(ij,l)
-c                 qh(ij,l)=q(ij,l)
-c                 qb(ij,l)=q(ij,l)
-c              endif
-
                if(abs(zdq).gt.prec) then
                   zsigb(ij,l)=(q(ij,l)-qh(ij,l))/zdq
                   zsigh(ij,l)=1.-zsigb(ij,l)
@@ -911,7 +874,6 @@ c              endif
             enddo
        enddo
 
-c      print*,'ok1'
 c   calcul de la pente maximum dans la maille en valeur absolue
        do l=2,llm
        do ij=1,ip1jmp1
@@ -955,6 +917,5 @@ c   calcul de la pente maximum dans la maille en valeur absolue
             masse(ij,l)=new_m
          enddo
       enddo
-c     print*,'ok3'
-      RETURN
+
       END

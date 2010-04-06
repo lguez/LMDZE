@@ -109,7 +109,6 @@ c     if (mode.eq.1) then
         ENDDO
         
       endif
-c   Fin modif Fred
 
 c *** q contient les qqtes de traceur avant l'advection 
 
@@ -126,10 +125,6 @@ c *** Rem : utilisation de SCOPY ulterieurement
          ENDDO
         ENDDO
        ENDDO
-
-c      PRINT*,'----- S0 just before conversion -------'
-c      PRINT*,'S0(16,12,1)=',s0(16,12,1) 
-c      PRINT*,'Q(16,12,1,4)=',q(16,12,1,4)
 
 c *** On calcule la masse d'air en kg
 
@@ -157,34 +152,9 @@ c *** A optimiser !!!
          ENDDO
        ENDDO
 
-c       ss0 = 0.
-c       DO l = 1,llm
-c        DO j = 1,jjp1
-c         DO i = 1,iim
-c            ss0 = ss0 + s0 ( i,j,l )
-c         ENDDO
-c        ENDDO
-c       ENDDO
-c       PRINT*, 'valeur tot s0 avant advection=',ss0
-
 c *** Appel des subroutines d'advection en X, en Y et en Z
 c *** Advection avec "time-splitting"
       
-c-----------------------------------------------------------
-c      PRINT*,'----- S0 just before ADVX -------'
-c      PRINT*,'S0(16,12,1)=',s0(16,12,1)
-
-c-----------------------------------------------------------
-c      do l=1,llm
-c         do j=1,jjp1
-c          do i=1,iip1
-c             zq=s0(i,j,l)/sm(i,j,l)
-c            if(zq.lt.qmin)
-c    ,       print*,'avant advx1, s0(',i,',',j,',',l,')=',zq
-c          enddo
-c         enddo
-c      enddo
-CCC
        if(mode.eq.2) then
           do l=1,llm
             s0s=0.
@@ -256,9 +226,7 @@ c   on rerentre les masses
          enddo
       endif
       call limx(s0,sx,sm,pente_max)
-c     call minmaxq(zq,1.e33,-1.e33,'avant advx     ')
        call advx( limit,.5*dtvr,pbaru,sm,s0,sx,sy,sz,lati,latf)
-c     call minmaxq(zq,1.e33,-1.e33,'avant advy     ')
       if (mode.eq.4) then
          do l=1,llm
             do i=1,iip1
@@ -271,7 +239,6 @@ c     call minmaxq(zq,1.e33,-1.e33,'avant advy     ')
       endif
        call   limy(s0,sy,sm,pente_max)
        call advy( limit,.5*dtvr,pbarv,sm,s0,sx,sy,sz ) 
-c     call minmaxq(zq,1.e33,-1.e33,'avant advz     ')
        do j=1,jjp1
           do i=1,iip1
              sz(i,j,1)=0.
@@ -303,7 +270,6 @@ c     call minmaxq(zq,1.e33,-1.e33,'avant advz     ')
        enddo
 
 
-c     call minmaxq(zq,1.e33,-1.e33,'avant advx     ')
       if (mode.eq.4) then
          do l=1,llm
             do i=1,iip1
@@ -316,16 +282,6 @@ c     call minmaxq(zq,1.e33,-1.e33,'avant advx     ')
       endif
        call limx(s0,sx,sm,pente_max)
        call advx( limit,.5*dtvr,pbaru,sm,s0,sx,sy,sz,lati,latf) 
-c     call minmaxq(zq,1.e33,-1.e33,'apres advx     ')
-c      do l=1,llm
-c         do j=1,jjp1
-c          do i=1,iip1
-c             zq=s0(i,j,l)/sm(i,j,l)
-c            if(zq.lt.qmin)
-c    ,       print*,'apres advx2, s0(',i,',',j,',',l,')=',zq
-c          enddo
-c         enddo
-c      enddo
 c ***   On repasse les S dans la variable q directement 14/10/94
 c   On revient a des rapports de melange en divisant par la masse
 
@@ -433,27 +389,16 @@ c bouclage en longitude
          enddo
       enddo
 
-c       PRINT*, ' SORTIE DE PENTES ---  ca peut glisser ....'
-
         DO l = 1,llm
     	 DO j = 1,jjp1
     	  DO i = 1,iip1
                 IF (q(i,j,l,0).lt.0.)  THEN
-c                    PRINT*,'------------ BIP-----------' 
-c                    PRINT*,'Q0(',i,j,l,')=',q(i,j,l,0)
-c                    PRINT*,'QX(',i,j,l,')=',q(i,j,l,1)
-c                    PRINT*,'QY(',i,j,l,')=',q(i,j,l,2)
-c                    PRINT*,'QZ(',i,j,l,')=',q(i,j,l,3)
-c       		     PRINT*,' PBL EN SORTIE DE PENTES'
                      q(i,j,l,0)=0.
-c                    STOP
                  ENDIF
           ENDDO
          ENDDO
         ENDDO
 
-c       PRINT*, '-------------------------------------------'
-        
        do l=1,llm
           do j=1,jjp1
            do i=1,iip1
@@ -464,15 +409,3 @@ c       PRINT*, '-------------------------------------------'
        enddo
       RETURN
       END
-
-
-
-
-
-
-
-
-
-
-
-

@@ -23,40 +23,41 @@ contains
     !AA                  -  stockage des moyennes des champs necessaires
     !AA                     en mode traceur off-line 
 
+    use abort_gcm_m, only: abort_gcm
     USE calendar, only: ymds2ju
-    USE histwrite_m, only: histwrite
-    USE histcom, only: histsync
-    use dimens_m, only: jjm, iim, llm
-    use indicesol, only: nbsrf, is_ter, is_lic, is_sic, is_oce, &
-         clnsurf, epsfra
-    use dimphy, only: klon, nbtr
-    use conf_gcm_m, only: raz_date, offline
-    use dimsoil, only: nsoilmx
-    use temps, only: itau_phy, day_ref, annee_ref
     use clesphys, only: ecrit_hf, ecrit_ins, ecrit_mth, &
          cdmmax, cdhmax, &
          co2_ppm, ecrit_reg, ecrit_tra, ksta, ksta_ter, &
          ok_kzmin
     use clesphys2, only: iflag_con, ok_orolf, ok_orodr, nbapp_rad, &
          cycle_diurne, new_oliq, soil_model
-    use iniprint, only: prt_level
-    use abort_gcm_m, only: abort_gcm
-    use YOMCST, only: rcpd, rtt, rlvtt, rg, ra, rsigma, retv, romega
     use comgeomphy
+    use conf_gcm_m, only: raz_date, offline
+    use conf_phys_m, only: conf_phys
     use ctherm
-    use phytrac_m, only: phytrac
+    use dimens_m, only: jjm, iim, llm
+    use dimphy, only: klon, nbtr
+    use dimsoil, only: nsoilmx
+    use hgardfou_m, only: hgardfou
+    USE histcom, only: histsync
+    USE histwrite_m, only: histwrite
+    use indicesol, only: nbsrf, is_ter, is_lic, is_sic, is_oce, &
+         clnsurf, epsfra
+    use ini_hist, only: ini_histhf, ini_histday, ini_histins
+    use iniprint, only: prt_level
     use oasis_m
+    use orbite_m, only: orbite, zenang
+    use ozonecm_m, only: ozonecm
+    use phyetat0_m, only: phyetat0, rlat, rlon
+    use phyredem_m, only: phyredem
+    use phystokenc_m, only: phystokenc
+    use phytrac_m, only: phytrac
+    use qcheck_m, only: qcheck
     use radepsi
     use radopt
+    use temps, only: itau_phy, day_ref, annee_ref
     use yoethf
-    use ini_hist, only: ini_histhf, ini_histday, ini_histins
-    use orbite_m, only: orbite, zenang
-    use phyetat0_m, only: phyetat0, rlat, rlon
-    use hgardfou_m, only: hgardfou
-    use conf_phys_m, only: conf_phys
-    use phyredem_m, only: phyredem
-    use qcheck_m, only: qcheck
-    use ozonecm_m, only: ozonecm
+    use YOMCST, only: rcpd, rtt, rlvtt, rg, ra, rsigma, retv, romega
 
     ! Declaration des constantes et des fonctions thermodynamiques :
     use fcttre, only: thermcep, foeew, qsats, qsatl
@@ -1916,7 +1917,7 @@ contains
 
     subroutine write_histday
 
-      use grid_change, only: gr_phy_write_3d
+      use gr_phy_write_3d_m, only: gr_phy_write_3d
       integer itau_w  ! pas de temps ecriture
 
       !------------------------------------------------

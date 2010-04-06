@@ -112,8 +112,6 @@
 
                ! l=1,llm
          ENDDO
-!print*,'Ok calcul des pentes'
-
            ! (pente_max.lt.-1.e-5)
       ELSE
 
@@ -156,8 +154,6 @@
          ENDDO
 
       ENDDO
-
-! print*,'Bouclage en iip1'
 
 !   calcul des flux a gauche et a droite
 

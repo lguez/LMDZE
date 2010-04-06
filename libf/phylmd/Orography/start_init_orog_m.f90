@@ -13,7 +13,8 @@ CONTAINS
   SUBROUTINE start_init_orog(relief, zstd_2d, zsig_2d, zgam_2d, zthe_2d, &
        zpic_2d, zval_2d)
 
-    USE flincom, only: flininfo, flinopen_nozoom, flinget, flinclo
+    USE flincom, only: flininfo, flinopen_nozoom, flinclo
+    use flinget_m, only: flinget
     use conf_dat2d_m, only: conf_dat2d
     use comgeom, only: rlatu, rlonv
     use dimens_m, only: iim, jjm
@@ -73,7 +74,7 @@ CONTAINS
     ALLOCATE(lon_rel(iml_rel, jml_rel))
     ALLOCATE(relief_hi(iml_rel, jml_rel))
 
-    CALL flinopen_nozoom(orogfname, iml_rel, jml_rel, llm_tmp, &
+    CALL flinopen_nozoom(iml_rel, jml_rel, llm_tmp, &
          lon_rel, lat_rel, lev, ttm_tmp, itau, date, dt, fid)
     ! 'RELIEF': high resolution orography 
     CALL flinget(fid, 'RELIEF', iml_rel, jml_rel, llm_tmp, ttm_tmp, 1, 1, &

@@ -95,21 +95,6 @@ C
       latf = jjm
       niv = llm
 
-C *** Test de passage d'arguments ******
-
-c      DO 399 l = 1, llm
-c       DO 399 j = 1, jjp1
-c        DO 399 i = 1, iip1
-c         IF (S0(i,j,l,ntra) .lt. 0. ) THEN
-c         PRINT*,'S0(',i,j,l,')=',S0(i,j,l,ntra)
-c	     print*, 'SSX(',i,j,l,')=',SSX(i,j,l,ntra)
-c         print*, 'SY(',i,j,l,')=',SY(i,j,l,ntra)
-c         print*, 'SZ(',i,j,l,')=',SZ(i,j,l,ntra)
-c         PRINT*, 'AIE !! debut ADVXP - pbl arg. passage dans ADVXP'
-cc            STOP
-c         ENDIF
-c  399 CONTINUE
-
 C *** Test : diagnostique de la qtite totale de traceur
 C            dans l'atmosphere avant l'advection
 c
@@ -605,23 +590,7 @@ C
       ENDIF
 C
  1    CONTINUE
-C
-C ----------- AA Test en fin de ADVX ------ Controle des S*
 
-c      DO 9999 l = 1, llm
-c      DO 9999 j = 1, jjp1
-c      DO 9999 i = 1, iip1
-c	   IF (S0(i,j,l,ntra).lt.0..and.LIMIT) THEN
-c           PRINT*, '-------------------'
-c	        PRINT*, 'En fin de ADVXP'
-c           PRINT*,'S0(',i,j,l,')=',S0(i,j,l,ntra)
-c	        print*, 'SSX(',i,j,l,')=',SSX(i,j,l,ntra)
-c           print*, 'SY(',i,j,l,')=',SY(i,j,l,ntra)
-c       	print*, 'SZ(',i,j,l,')=',SZ(i,j,l,ntra)
-c            WRITE (*,*) 'On arrete !! - pbl en fin de ADVXP'
-c            STOP
-c           ENDIF
-c 9999 CONTINUE
 c ---------- bouclage cyclique
 
       DO l = 1,llm

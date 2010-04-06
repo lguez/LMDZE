@@ -48,7 +48,7 @@ CONTAINS
 
     USE errioipsl, ONLY : histerr
     use calendar, only: isittime
-    USE mathelp, ONLY : mathop
+    USE mathop_m, ONLY : mathop
     use histcom_var
 
     INTEGER, INTENT(IN) :: pfileid, pitau
@@ -190,7 +190,7 @@ CONTAINS
 
     use calendar, only: isittime
     USE errioipsl, ONLY : histerr
-    USE mathelp, ONLY : mathop
+    USE mathop_m, ONLY : mathop
     use histcom_var
 
     INTEGER, INTENT(IN) :: pfileid, pitau
@@ -332,7 +332,7 @@ CONTAINS
 
     use calendar, only: isittime
     USE errioipsl, ONLY : histerr
-    USE mathelp, ONLY : mathop
+    USE mathop_m, ONLY : mathop
     use histcom_var
 
     INTEGER, INTENT(IN) :: pfileid, pitau
@@ -478,7 +478,8 @@ CONTAINS
     ! and writing subroutines.
     !--------------------------------------------------------------------
 
-    USE mathelp, ONLY : mathop, trans_buff, moycum
+    USE mathop_m, ONLY : mathop
+    USE mathelp, ONLY : trans_buff, moycum
     use netcdf, only: NF90_PUT_VAR
     use histcom_var
 
@@ -695,7 +696,7 @@ CONTAINS
     ! pvarname : The name of the variable we are looking for
     ! pvid     : The var id we found
 
-    USE stringop, ONLY: find_str
+    USE find_str_m, ONLY: find_str
     USE errioipsl, ONLY : histerr
     use histcom_var
 

@@ -74,8 +74,6 @@
       ENDIF
 
 !
-!PRINT*,'CALCUL EN LATITUDE'
-
       DO l = 1, llm
 !
 !   --------------------------------
@@ -154,73 +152,6 @@
          dyq(ij,l)=0.
          dyq(ip1jm+ij,l)=0.
       ENDDO
-
-!CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-!  En memoire de dIFferents tests sur la
-!  limitation des pentes aux poles.
-!CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-!     PRINT*,dyq(1)
-!     PRINT*,dyqv(iip1+1)
-!     apn=abs(dyq(1)/dyqv(iip1+1))
-!     PRINT*,dyq(ip1jm+1)
-!     PRINT*,dyqv(ip1jm-iip1+1)
-!     aps=abs(dyq(ip1jm+1)/dyqv(ip1jm-iip1+1))
-!     DO ij=2,iim
-!        apn=amax1(abs(dyq(ij)/dyqv(ij)),apn)
-!        aps=amax1(abs(dyq(ip1jm+ij)/dyqv(ip1jm-iip1+ij)),aps)
-!     ENDDO
-!     apn=min(pente_max/apn,1.)
-!     aps=min(pente_max/aps,1.)
-!
-!
-!   cas ou on a un extremum au pole
-!
-!     IF(dyqv(ismin(iim,dyqv,1))*dyqv(ismax(iim,dyqv,1)).le.0.)
-!    &   apn=0.
-!     IF(dyqv(ismax(iim,dyqv(ip1jm-iip1+1),1)+ip1jm-iip1+1)*
-!    &   dyqv(ismin(iim,dyqv(ip1jm-iip1+1),1)+ip1jm-iip1+1).le.0.)
-!    &   aps=0.
-!
-!   limitation des pentes aux poles
-!     DO ij=1,iip1
-!        dyq(ij)=apn*dyq(ij)
-!        dyq(ip1jm+ij)=aps*dyq(ip1jm+ij)
-!     ENDDO
-!
-!   test
-!      DO ij=1,iip1
-!         dyq(iip1+ij)=0.
-!         dyq(ip1jm+ij-iip1)=0.
-!      ENDDO
-!      DO ij=1,ip1jmp1
-!         dyq(ij)=dyq(ij)*cos(rlatu((ij-1)/iip1+1))
-!      ENDDO
-!
-! changement 10 07 96
-!     IF(dyqv(ismin(iim,dyqv,1))*dyqv(ismax(iim,dyqv,1)).le.0.)
-!    &   THEN
-!        DO ij=1,iip1
-!           dyqmax(ij)=0.
-!        ENDDO
-!     ELSE
-!        DO ij=1,iip1
-!           dyqmax(ij)=pente_max*abs(dyqv(ij))
-!        ENDDO
-!     ENDIF
-!
-!     IF(dyqv(ismax(iim,dyqv(ip1jm-iip1+1),1)+ip1jm-iip1+1)*
-!    & dyqv(ismin(iim,dyqv(ip1jm-iip1+1),1)+ip1jm-iip1+1).le.0.)
-!    &THEN
-!        DO ij=ip1jm+1,ip1jmp1
-!           dyqmax(ij)=0.
-!        ENDDO
-!     ELSE
-!        DO ij=ip1jm+1,ip1jmp1
-!           dyqmax(ij)=pente_max*abs(dyqv(ij-iip1))
-!        ENDDO
-!     ENDIF
-!   fin changement 10 07 96
-!CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 
 !   calcul des pentes limitees
 

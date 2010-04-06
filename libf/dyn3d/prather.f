@@ -248,10 +248,6 @@ c   filtrages aux poles
           q( i,1,llm+1-l,0)=qpn
           q( i,jjp1,llm+1-l,0)=qps
          enddo
-c       enddo
-c         print*,'qpn',qpn,'qps',qps
-c          print*,'dqzpn',dqzpn,'dqzps',dqzps
-c       enddo
            dyn1=0.
            dys1=0.
            dyn2=0.
@@ -336,9 +332,7 @@ c   bouclage en longitude
          PRINT*,'SY(',i,j,l,')=',q(i,j,l,2),
      $   q(i,j-1,l,2)   
          PRINT*,'SZ(',i,j,l,')=',q(i,j,l,3)
-c    		     PRINT*,' PBL EN SORTIE D'' ADVZP'
                      q(i,j,l,0)=0.
-c                  STOP
                ENDIF
            ENDDO
          ENDDO

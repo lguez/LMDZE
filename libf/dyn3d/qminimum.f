@@ -12,7 +12,7 @@ c  -- Objet : Traiter les valeurs trop petites (meme negatives)
 c             pour l'eau vapeur et l'eau liquide
 c
 c
-      INTEGER nq
+      INTEGER, intent(in):: nq
       REAL q(ip1jmp1,llm,nq), deltap(ip1jmp1,llm)
 c
       INTEGER iq_vap, iq_liq
@@ -54,7 +54,6 @@ c
       iq = iq_vap
 c
       DO k = llm, 2, -1
-ccc      zx_abc = dpres(k) / dpres(k-1)
       DO i = 1, ip1jmp1
          zx_abc = deltap(i,k)/deltap(i,k-1)
          zx_defau    = AMAX1( seuil_vap - q(i,k,iq), 0.0 )

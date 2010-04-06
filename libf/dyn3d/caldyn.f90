@@ -86,9 +86,7 @@ SUBROUTINE caldyn(itau, ucov, vcov, teta, ps, masse, pk, pkf, phis, phi, &
   END DO
 
   !   Sorties eventuelles des variables de controle:
-  IF (conser) THEN
-     CALL sortvarc(itau, ucov, teta, ps, masse, pk, phis, vorpot, phi, bern, &
-          dp, time)
-  END IF
+  IF (conser) CALL sortvarc(itau, ucov, teta, ps, masse, pk, phis, vorpot, &
+       phi, bern, dp, time)
 
 END SUBROUTINE caldyn

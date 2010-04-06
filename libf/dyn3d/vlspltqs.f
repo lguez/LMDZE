@@ -97,8 +97,6 @@ c   pour eviter une exponentielle.
          ENDDO
         ENDDO
 
-c      PRINT*,'Debut vlsplt version debug sans vlyqs'
-
         zzpbar = 0.5 * pdt
         zzw    = pdt
       DO l=1,llm
@@ -369,9 +367,6 @@ c  calcul du nombre de maille sur lequel on advecte plus que la maille.
       ENDDO
 
       IF(n0.gt.0) THEN
-ccc      PRINT*,'Nombre de points pour lesquels on advect plus que le'
-ccc     &       ,'contenu de la maille : ',n0
-
          DO l=1,llm
             IF(nl(l).gt.0) THEN
                iju=0
@@ -383,7 +378,6 @@ c   indicage des mailles concernees par le traitement special
                   ENDIF
                ENDDO
                niju=iju
-c              PRINT*,'niju,nl',niju,nl(l)
 
 c  traitement des mailles
                DO iju=1,niju
@@ -606,73 +600,6 @@ c   calcul des pentes limites aux poles
          dyq(ij,l)=fn*dyq(ij,l)
          dyq(ip1jm+ij,l)=fs*dyq(ip1jm+ij,l)
       ENDDO
-
-CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C  En memoire de dIFferents tests sur la 
-C  limitation des pentes aux poles.
-CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C     PRINT*,dyq(1)
-C     PRINT*,dyqv(iip1+1)
-C     apn=abs(dyq(1)/dyqv(iip1+1))
-C     PRINT*,dyq(ip1jm+1)
-C     PRINT*,dyqv(ip1jm-iip1+1)
-C     aps=abs(dyq(ip1jm+1)/dyqv(ip1jm-iip1+1))
-C     DO ij=2,iim
-C        apn=amax1(abs(dyq(ij)/dyqv(ij)),apn)
-C        aps=amax1(abs(dyq(ip1jm+ij)/dyqv(ip1jm-iip1+ij)),aps)
-C     ENDDO
-C     apn=min(pente_max/apn,1.)
-C     aps=min(pente_max/aps,1.)
-C
-C
-C   cas ou on a un extremum au pole
-C
-C     IF(dyqv(ismin(iim,dyqv,1))*dyqv(ismax(iim,dyqv,1)).le.0.)
-C    &   apn=0.
-C     IF(dyqv(ismax(iim,dyqv(ip1jm-iip1+1),1)+ip1jm-iip1+1)*
-C    &   dyqv(ismin(iim,dyqv(ip1jm-iip1+1),1)+ip1jm-iip1+1).le.0.)
-C    &   aps=0.
-C
-C   limitation des pentes aux poles
-C     DO ij=1,iip1
-C        dyq(ij)=apn*dyq(ij)
-C        dyq(ip1jm+ij)=aps*dyq(ip1jm+ij)
-C     ENDDO
-C
-C   test
-C      DO ij=1,iip1
-C         dyq(iip1+ij)=0.
-C         dyq(ip1jm+ij-iip1)=0.
-C      ENDDO
-C      DO ij=1,ip1jmp1
-C         dyq(ij)=dyq(ij)*cos(rlatu((ij-1)/iip1+1))
-C      ENDDO
-C
-C changement 10 07 96
-C     IF(dyqv(ismin(iim,dyqv,1))*dyqv(ismax(iim,dyqv,1)).le.0.)
-C    &   THEN
-C        DO ij=1,iip1
-C           dyqmax(ij)=0.
-C        ENDDO
-C     ELSE
-C        DO ij=1,iip1
-C           dyqmax(ij)=pente_max*abs(dyqv(ij))
-C        ENDDO
-C     ENDIF
-C
-C     IF(dyqv(ismax(iim,dyqv(ip1jm-iip1+1),1)+ip1jm-iip1+1)*
-C    & dyqv(ismin(iim,dyqv(ip1jm-iip1+1),1)+ip1jm-iip1+1).le.0.)
-C    &THEN
-C        DO ij=ip1jm+1,ip1jmp1
-C           dyqmax(ij)=0.
-C        ENDDO
-C     ELSE
-C        DO ij=ip1jm+1,ip1jmp1
-C           dyqmax(ij)=pente_max*abs(dyqv(ij-iip1))
-C        ENDDO
-C     ENDIF
-C   fin changement 10 07 96
-CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 
 c   calcul des pentes limitees
 
