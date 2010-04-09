@@ -1,13 +1,8 @@
 module conf_gcm_m
 
-  ! This module is clean: no C preprocessor directive, no include line
-
   IMPLICIT NONE
 
-  INTEGER:: nday= 10
-  ! Nombre de jours d'integration
-  ! On pourait aussi permettre des mois ou des annees !
-
+  INTEGER:: nday= 10 ! nombre de jours d'intégration
   integer:: day_step= 240 ! nombre de pas par jour, multiple de iperiod
 
   integer:: iperiod= 5
@@ -17,13 +12,11 @@ module conf_gcm_m
   ! Should normally be equal to "iperiod"
   ! frequence du groupement des flux (en pas de temps) 
 
-  integer:: iconser= 240
-  ! période de sortie des variables de contrôle (en pas de temps)
+  integer:: iconser= 240 ! période de sortie des variables de contrôle
+  ! (en pas de temps)
 
   integer:: iecri= 1 ! période d'écriture du fichier "dyn_hist.nc" (en jours)
-
-  integer:: iphysiq= 5
-  ! Période de la physique en pas de temps de la dynamique.
+  integer:: iphysiq= 5 ! période de la physique en pas de temps de la dynamique
 
   integer:: dayref = 1 ! jour de l'année de l'état initial
   ! (= 350 si 20 décembre par exemple)
@@ -35,12 +28,10 @@ module conf_gcm_m
   ! gcm.def avec remise a zero des compteurs de pas de temps)
   ! (pas de remise a zero: on garde la date du fichier restart)
 
-  REAL:: periodav= 1.
-  ! periode de stockage fichier histmoy (en jour) 
+  REAL:: periodav= 1. ! période de stockage fichier histmoy (en jour) 
 
   logical:: offline = .FALSE.
-  ! Nouvelle eau liquide
-  ! Permet de mettre en route la nouvelle parametrisation de l'eau liquide
+  ! permet de mettre en route la nouvelle parametrisation de l'eau liquide
 
 contains
 
@@ -55,6 +46,7 @@ contains
     ! Ces paramètres définissent entre autres la grille et doivent être
     ! cohérents, sinon il y aura divergence du gcm.
 
+    use abort_gcm_m, only: abort_gcm
     use comdissnew, only: read_comdissnew
     use logic, only: read_logic
     use serre, only: clon, clat, grossismx, grossismy, alphax, alphay, &
@@ -77,6 +69,15 @@ contains
     print *, "Enter namelist 'conf_gcm_nml'."
     read(unit=*, nml=conf_gcm_nml)
     write(unit=*, nml=conf_gcm_nml)
+
+    IF (MOD(day_step, iperiod) /= 0) call abort_gcm(modname = "gcm", &
+         message = &
+         'Il faut choisir un nombre de pas par jour multiple de "iperiod".', &
+         ierr = 1)
+
+    IF (MOD(day_step,iphysiq)/=0) call abort_gcm(modname = "gcm", message = &
+         'Il faut choisir un nombre de pas par jour multiple de "iphysiq".', &
+         ierr = 1)
 
     IF (grossismx < 1.) THEN
        PRINT *, 'Error: grossismx < 1'

@@ -1,7 +1,6 @@
 PROGRAM gcm
 
   ! General circulation model of LMD
-
   ! From "gcm.F", version 1.4, 2006/04/04 15:05:16
 
   ! Avec coordonnées verticales hybrides, avec nouveaux opérateurs de
@@ -15,7 +14,6 @@ PROGRAM gcm
   ! Pour Van-Leer plus vapeur d'eau saturée : iadv(1)=4
   ! Pour Van-Leer : iadv=10
 
-  use abort_gcm_m, only: abort_gcm
   use clesphys2, only: read_clesphys2
   use com_io_dyn, only: histid, histvid, histaveid
   use comconst, only: daysec, cpp, dtvr, g, rad, r, initialize
@@ -97,20 +95,6 @@ PROGRAM gcm
   ! Lecture du fichier "start.nc" :
   CALL dynetat0(vcov, ucov, teta, q, masse, ps, phis, time_0)
 
-  ! Lecture des paramètres de contrôle pour la simulation :
-  ! on recalcule éventuellement le pas de temps
-  IF (MOD(day_step, iperiod) /= 0) THEN
-     call abort_gcm(modname = "gcm", message = &
-          'Il faut choisir un nombre de pas par jour multiple de "iperiod".', &
-          ierr = 1)
-  ENDIF
-
-  IF (MOD(day_step,iphysiq)/=0) THEN
-     call abort_gcm(modname = "gcm", message = &
-          'Il faut choisir un nombre de pas par jour multiple de "iphysiq".', &
-          ierr = 1)
-  ENDIF
-
   ! On remet le calendrier à zero si demandé:
   if (annee_ref /= anneeref .or. day_ref /= dayref) then
      print *, 'Attention : les dates initiales lues dans le fichier ' // &
@@ -129,7 +113,7 @@ PROGRAM gcm
      raz_date = .false.
   endif
 
-  ! Initialisation des constantes dynamiques :
+  ! on recalcule éventuellement le pas de temps
   zdtvr = daysec / REAL(day_step)
   IF (dtvr /= zdtvr) THEN
      print *, 'Warning: the time steps in the ".def" file and in ' // &
@@ -139,6 +123,7 @@ PROGRAM gcm
      print *, 'Using the value from the ".def" file.'
      dtvr = zdtvr
   ENDIF
+
   CALL iniconst
 
   ! Initialisation de la géometrie :

@@ -1,17 +1,17 @@
 SUBROUTINE caldyn(itau, ucov, vcov, teta, ps, masse, pk, pkf, phis, phi, &
-     conser, du, dv, dteta, dp, w, pbaru, pbarv, time)
+     conser, du, dv, dteta, dp, w, pbaru, pbarv, time_0)
 
   ! From dyn3d/caldyn.F, v 1.1.1.1 2004/05/19 12:53:06
   !  Auteur :  P. Le Van
   !   Objet:
   !   Calcul des tendances dynamiques.
 
-  USE dimens_m
-  USE paramet_m
-  USE comconst
-  USE comvert
-  USE comgeom
+  USE dimens_m, ONLY : iim, llm
+  USE paramet_m, ONLY : iip1, ip1jm, ip1jmp1, jjp1, llmp1
+  USE comvert, ONLY : ap, bp
+  USE comgeom, ONLY : airesurg, constang
   USE pression_m, ONLY : pression
+  use sortvarc_m, only: sortvarc
 
   IMPLICIT NONE
 
@@ -28,7 +28,7 @@ SUBROUTINE caldyn(itau, ucov, vcov, teta, ps, masse, pk, pkf, phis, phi, &
   REAL dv(ip1jm, llm), du(ip1jmp1, llm)
   REAL dteta(ip1jmp1, llm), dp(ip1jmp1)
   REAL pbaru(ip1jmp1, llm), pbarv(ip1jm, llm)
-  REAL time
+  REAL, intent(in):: time_0
 
   !   Local:
 
@@ -87,6 +87,6 @@ SUBROUTINE caldyn(itau, ucov, vcov, teta, ps, masse, pk, pkf, phis, phi, &
 
   !   Sorties eventuelles des variables de controle:
   IF (conser) CALL sortvarc(itau, ucov, teta, ps, masse, pk, phis, vorpot, &
-       phi, bern, dp, time)
+       phi, bern, dp, time_0)
 
 END SUBROUTINE caldyn

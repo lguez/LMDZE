@@ -7,24 +7,17 @@ contains
   SUBROUTINE abort_gcm(modname, message, ierr)
 
     ! From abort_gcm.F, version 1.1.1.1 2004/05/19 12:53:05
-
-    ! Stops the simulation cleanly, closing files and printing various
-    ! comments
-
-    !  Input: modname = name of calling program
-    !         message = stuff to print
-    !         ierr    = severity of situation ( = 0 normal )
+    ! Stops the simulation, closing files and printing comments.
 
     USE histcom, only: histclo
 
-    character(len=*), intent(in):: modname
-    integer, intent(in):: ierr
-    character(len=*), intent(in):: message
+    character(len=*), intent(in):: modname ! name of calling program
+    integer, intent(in):: ierr ! severity of situation (= 0 normal)
+    character(len=*), intent(in):: message ! to print
 
     !-------------------
 
     print *, 'abort_gcm'
-
     call histclo
     print *, 'Stopping in ', modname
     print *, 'Reason: ', trim(message)

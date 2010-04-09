@@ -76,12 +76,9 @@ contains
 
     INTEGER itau ! index of the time step of the dynamics, starts at 0
     INTEGER itaufin
-    INTEGER iday ! jour julien
     REAL time ! time of day, as a fraction of day length
     real finvmaold(ip1jmp1, llm)
-    LOGICAL:: lafin=.false.
-    INTEGER i, j, l
-
+    INTEGER l
     REAL rdayvrai, rdaym_ini
 
     ! Variables test conservation energie
@@ -91,6 +88,8 @@ contains
     ! cree par la dissipation
     REAL dtetaecdt(iim + 1, jjm + 1, llm)
     REAL vcont((iim + 1) * jjm, llm), ucont(ip1jmp1, llm)
+    logical leapf
+    real dt
 
     !---------------------------------------------------
 
@@ -99,167 +98,129 @@ contains
     itaufin = nday * day_step
     ! "day_step" is a multiple of "iperiod", therefore "itaufin" is one too
 
-    itau = 0
-    iday = day_ini
-    time = time_0
     dq = 0.
+
     ! On initialise la pression et la fonction d'Exner :
     CALL pression(ip1jmp1, ap, bp, ps, p3d)
     CALL exner_hyb(ps, p3d, pks, pk, pkf)
 
     ! Début de l'integration temporelle :
-    period_loop:do i = 1, itaufin / iperiod
-       ! {"itau" is a multiple of "iperiod"}
-
-       ! 1. Matsuno forward:
-
-       if (ok_guide .and. (itaufin - itau - 1) * dtvr > 21600.) &
-            call guide(itau, ucov, vcov, teta, q, masse, ps)
-       vcovm1 = vcov
-       ucovm1 = ucov
-       tetam1 = teta
-       massem1 = masse
-       psm1 = ps
-       finvmaold = masse
-       CALL filtreg(finvmaold, jjm + 1, llm, - 2, 2, .TRUE., 1)
+    do itau = 0, itaufin - 1
+       leapf = mod(itau, iperiod) /= 0
+       if (leapf) then
+          dt = 2 * dtvr
+       else
+          ! Matsuno
+          dt = dtvr
+          if (ok_guide .and. (itaufin - itau - 1) * dtvr > 21600.) &
+               call guide(itau, ucov, vcov, teta, q, masse, ps)
+          vcovm1 = vcov
+          ucovm1 = ucov
+          tetam1 = teta
+          massem1 = masse
+          psm1 = ps
+          finvmaold = masse
+          CALL filtreg(finvmaold, jjm + 1, llm, - 2, 2, .TRUE., 1)
+       end if
 
        ! Calcul des tendances dynamiques:
        CALL geopot(ip1jmp1, teta, pk, pks, phis, phi)
        CALL caldyn(itau, ucov, vcov, teta, ps, masse, pk, pkf, phis, phi, &
             MOD(itau, iconser) == 0, du, dv, dteta, dp, w, pbaru, pbarv, &
-            time + iday - day_ini)
+            time_0)
 
        ! Calcul des tendances advection des traceurs (dont l'humidité)
        CALL caladvtrac(q, pbaru, pbarv, p3d, masse, dq, teta, pk)
+
        ! Stokage du flux de masse pour traceurs offline:
        IF (offline) CALL fluxstokenc(pbaru, pbarv, masse, teta, phi, phis, &
             dtvr, itau)
 
        ! integrations dynamique et traceurs:
        CALL integrd(2, vcovm1, ucovm1, tetam1, psm1, massem1, dv, du, dteta, &
-            dp, vcov, ucov, teta, q, ps, masse, finvmaold, .false., &
-            dtvr)
+            dp, vcov, ucov, teta, q, ps, masse, finvmaold, leapf, dt)
 
-       CALL pression(ip1jmp1, ap, bp, ps, p3d)
-       CALL exner_hyb(ps, p3d, pks, pk, pkf)
+       if (.not. leapf) then
+          ! Matsuno backward
+          CALL pression(ip1jmp1, ap, bp, ps, p3d)
+          CALL exner_hyb(ps, p3d, pks, pk, pkf)
 
-       ! 2. Matsuno backward:
-
-       itau = itau + 1
-       iday = day_ini + itau / day_step
-       time = REAL(itau - (iday - day_ini) * day_step) / day_step + time_0
-       IF (time > 1.) THEN
-          time = time - 1.
-          iday = iday + 1
-       ENDIF
-
-       ! Calcul des tendances dynamiques:
-       CALL geopot(ip1jmp1, teta, pk, pks, phis, phi)
-       CALL caldyn(itau, ucov, vcov, teta, ps, masse, pk, pkf, phis, phi, &
-            .false., du, dv, dteta, dp, w, pbaru, pbarv, time + iday - day_ini)
-
-       ! integrations dynamique et traceurs:
-       CALL integrd(2, vcovm1, ucovm1, tetam1, psm1, massem1, dv, du, dteta, &
-            dp, vcov, ucov, teta, q, ps, masse, finvmaold, .false., &
-            dtvr)
-
-       CALL pression(ip1jmp1, ap, bp, ps, p3d)
-       CALL exner_hyb(ps, p3d, pks, pk, pkf)
-
-       ! 3. Leapfrog:
-
-       leapfrog_loop: do j = 1, iperiod - 1
           ! Calcul des tendances dynamiques:
           CALL geopot(ip1jmp1, teta, pk, pks, phis, phi)
-          CALL caldyn(itau, ucov, vcov, teta, ps, masse, pk, pkf, phis, phi, &
-               .false., du, dv, dteta, dp, w, pbaru, pbarv, &
-               time + iday - day_ini)
-
-          ! Calcul des tendances advection des traceurs (dont l'humidité)
-          CALL caladvtrac(q, pbaru, pbarv, p3d, masse, dq, teta, pk)
-          ! Stokage du flux de masse pour traceurs off-line:
-          IF (offline) CALL fluxstokenc(pbaru, pbarv, masse, teta, phi, phis, &
-               dtvr, itau)
+          CALL caldyn(itau + 1, ucov, vcov, teta, ps, masse, pk, pkf, phis, &
+               phi, .false., du, dv, dteta, dp, w, pbaru, pbarv, time_0)
 
           ! integrations dynamique et traceurs:
           CALL integrd(2, vcovm1, ucovm1, tetam1, psm1, massem1, dv, du, &
-               dteta, dp, vcov, ucov, teta, q, ps, masse, &
-               finvmaold, .true., 2 * dtvr)
+               dteta, dp, vcov, ucov, teta, q, ps, masse, finvmaold, .false., &
+               dtvr)
+       end if
 
-          IF (MOD(itau + 1, iphysiq) == 0 .AND. iflag_phys /= 0) THEN
-             ! calcul des tendances physiques:
-             IF (itau + 1 == itaufin) lafin = .TRUE.
-
-             CALL pression(ip1jmp1, ap, bp, ps, p3d)
-             CALL exner_hyb(ps, p3d, pks, pk, pkf)
-
-             rdaym_ini = itau * dtvr / daysec
-             rdayvrai = rdaym_ini + day_ini
-
-             CALL calfis(nqmx, lafin, rdayvrai, time, ucov, vcov, teta, q, &
-                  masse, ps, pk, phis, phi, du, dv, dteta, dq, w, &
-                  dufi, dvfi, dtetafi, dqfi, dpfi)
-
-             ! ajout des tendances physiques:
-             CALL addfi(nqmx, dtphys, ucov, vcov, teta, q, ps, dufi, dvfi, &
-                  dtetafi, dqfi, dpfi)
-          ENDIF
+       IF (MOD(itau + 1, iphysiq) == 0 .AND. iflag_phys /= 0) THEN
+          ! calcul des tendances physiques:
 
           CALL pression(ip1jmp1, ap, bp, ps, p3d)
           CALL exner_hyb(ps, p3d, pks, pk, pkf)
 
-          IF (MOD(itau + 1, idissip) == 0) THEN
-             ! dissipation horizontale et verticale des petites echelles:
+          rdaym_ini = itau * dtvr / daysec
+          rdayvrai = rdaym_ini + day_ini
+          time = REAL(mod(itau, day_step)) / day_step + time_0
+          IF (time > 1.) time = time - 1.
 
-             ! calcul de l'energie cinetique avant dissipation
-             call covcont(llm, ucov, vcov, ucont, vcont)
-             call enercin(vcov, ucov, vcont, ucont, ecin0)
+          CALL calfis(nqmx, itau + 1 == itaufin, rdayvrai, time, ucov, vcov, &
+               teta, q, masse, ps, pk, phis, phi, du, dv, dteta, dq, w, dufi, &
+               dvfi, dtetafi, dqfi, dpfi)
 
-             ! dissipation
-             CALL dissip(vcov, ucov, teta, p3d, dvdis, dudis, dtetadis)
-             ucov=ucov + dudis
-             vcov=vcov + dvdis
+          ! ajout des tendances physiques:
+          CALL addfi(nqmx, dtphys, ucov, vcov, teta, q, ps, dufi, dvfi, &
+               dtetafi, dqfi, dpfi)
+       ENDIF
 
-             ! On rajoute la tendance due à la transformation Ec -> E
-             ! thermique créée lors de la dissipation
-             call covcont(llm, ucov, vcov, ucont, vcont)
-             call enercin(vcov, ucov, vcont, ucont, ecin)
-             dtetaecdt= (ecin0 - ecin) / pk
-             dtetadis=dtetadis + dtetaecdt
-             teta=teta + dtetadis
+       CALL pression(ip1jmp1, ap, bp, ps, p3d)
+       CALL exner_hyb(ps, p3d, pks, pk, pkf)
 
-             ! Calcul de la valeur moyenne aux pôles :
-             forall (l = 1: llm)
-                teta(:, 1, l) = SUM(aire_2d(:iim, 1) * teta(:iim, 1, l)) &
-                     / apoln
-                teta(:, jjm + 1, l) = SUM(aire_2d(:iim, jjm+1) &
-                     * teta(:iim, jjm + 1, l)) / apols
-             END forall
+       IF (MOD(itau + 1, idissip) == 0) THEN
+          ! dissipation horizontale et verticale des petites echelles:
 
-             ps(:, 1) = SUM(aire_2d(:iim, 1) * ps(:iim, 1)) / apoln
-             ps(:, jjm + 1) = SUM(aire_2d(:iim, jjm+1) * ps(:iim, jjm + 1)) &
-                  / apols
-          END IF
+          ! calcul de l'energie cinetique avant dissipation
+          call covcont(llm, ucov, vcov, ucont, vcont)
+          call enercin(vcov, ucov, vcont, ucont, ecin0)
 
-          itau = itau + 1
-          iday = day_ini + itau / day_step
-          time = REAL(itau - (iday - day_ini) * day_step) / day_step + time_0
-          IF (time > 1.) THEN
-             time = time - 1.
-             iday = iday + 1
-          ENDIF
+          ! dissipation
+          CALL dissip(vcov, ucov, teta, p3d, dvdis, dudis, dtetadis)
+          ucov=ucov + dudis
+          vcov=vcov + dvdis
 
-          IF (MOD(itau, iperiod) == 0) THEN
-             ! ecriture du fichier histoire moyenne:
-             CALL writedynav(histaveid, nqmx, itau, vcov, &
-                  ucov, teta, pk, phi, q, masse, ps, phis)
-             call bilan_dyn(2, dtvr * iperiod, dtvr * day_step * periodav, &
-                  ps, masse, pk, pbaru, pbarv, teta, phi, ucov, vcov, q)
-          ENDIF
-       end do leapfrog_loop
-    end do period_loop
+          ! On rajoute la tendance due à la transformation Ec -> E
+          ! thermique créée lors de la dissipation
+          call covcont(llm, ucov, vcov, ucont, vcont)
+          call enercin(vcov, ucov, vcont, ucont, ecin)
+          dtetaecdt= (ecin0 - ecin) / pk
+          dtetadis=dtetadis + dtetaecdt
+          teta=teta + dtetadis
 
-    ! {itau == itaufin}
+          ! Calcul de la valeur moyenne aux pôles :
+          forall (l = 1: llm)
+             teta(:, 1, l) = SUM(aire_2d(:iim, 1) * teta(:iim, 1, l)) &
+                  / apoln
+             teta(:, jjm + 1, l) = SUM(aire_2d(:iim, jjm+1) &
+                  * teta(:iim, jjm + 1, l)) / apols
+          END forall
+
+          ps(:, 1) = SUM(aire_2d(:iim, 1) * ps(:iim, 1)) / apoln
+          ps(:, jjm + 1) = SUM(aire_2d(:iim, jjm+1) * ps(:iim, jjm + 1)) &
+               / apols
+       END IF
+
+       IF (MOD(itau + 1, iperiod) == 0) THEN
+          ! ecriture du fichier histoire moyenne:
+          CALL writedynav(histaveid, nqmx, itau + 1, vcov, ucov, teta, pk, &
+               phi, q, masse, ps, phis)
+          call bilan_dyn(2, dtvr * iperiod, dtvr * day_step * periodav, ps, &
+               masse, pk, pbaru, pbarv, teta, phi, ucov, vcov, q)
+       ENDIF
+    end do
+
     CALL dynredem1("restart.nc", vcov, ucov, teta, q, masse, ps, &
          itau=itau_dyn+itaufin)
 
@@ -267,7 +228,7 @@ contains
     CALL geopot(ip1jmp1, teta, pk, pks, phis, phi)
     CALL caldyn(itaufin, ucov, vcov, teta, ps, masse, pk, pkf, phis, phi, &
          MOD(itaufin, iconser) == 0, du, dv, dteta, dp, w, pbaru, pbarv, &
-         time + iday - day_ini)
+         time_0)
 
   END SUBROUTINE leapfrog
 

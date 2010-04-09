@@ -21,7 +21,7 @@ bernoui.o : filtreg.o logic.o paramet_m.o dimens_m.o
 bilan_dyn.o : inigrads.o iniprint.o temps.o comgeom.o comvert.o comconst.o paramet_m.o dimens_m.o histwrite.o calendar.o histcom.o 
 caladvtrac.o : filtreg.o conf_gcm.o comconst.o paramet_m.o dimens_m.o 
 calbeta.o : YOMCST.o iniprint.o dimphy.o indicesol.o dimens_m.o 
-caldyn.o : pression.o comgeom.o comvert.o comconst.o paramet_m.o dimens_m.o 
+caldyn.o : sortvarc.o pression.o comgeom.o comvert.o paramet_m.o dimens_m.o 
 caldyn0.o : pression.o comgeom.o comvert.o paramet_m.o dimens_m.o 
 calendar.o : errioipsl.o strlowercase.o 
 calfis.o : pressure_var.o physiq.o grid_change.o iniadvtrac.o comgeom.o comvert.o comconst.o dimphy.o dimens_m.o 
@@ -47,7 +47,7 @@ condsurf.o : clesphys2.o temps.o dimphy.o indicesol.o dimens_m.o
 conema3.o : FCTTRE.o YOETHF.o conema3_m.o YOMCST.o dimphy.o dimens_m.o 
 conf_dat2d.o : comconst.o 
 conf_dat3d.o : comconst.o 
-conf_gcm.o : iniprint.o serre.o logic.o comdissnew.o 
+conf_gcm.o : iniprint.o serre.o logic.o comdissnew.o abort_gcm.o 
 conf_guide.o : guide.o getparam.o 
 conf_interface.o : getincom.o 
 conf_phys.o : nuagecom.o comfisrtilp.o conema3_m.o YOMCST.o clesphys.o getincom.o 
@@ -93,7 +93,7 @@ fxy.o : serre.o comconst.o dimens_m.o
 fxyhyper.o : paramet_m.o dimens_m.o 
 fxysinus.o : fxy_sin.h comconst.o paramet_m.o dimens_m.o 
 fyhyp.o : paramet_m.o dimens_m.o 
-gcm.o : tracstoke.o temps.o paramet_m.o logic.o leapfrog.o histcom.o calendar.o inithist.o initdynav.o inigeom.o inidissip.o iniadvtrac.o grid_change.o dynredem0.o dynetat0.o dimphy.o dimens_m.o conf_gcm.o comgeom.o comconst.o com_io_dyn.o clesphys2.o abort_gcm.o 
+gcm.o : tracstoke.o temps.o paramet_m.o logic.o leapfrog.o histcom.o calendar.o inithist.o initdynav.o inigeom.o inidissip.o iniadvtrac.o grid_change.o dynredem0.o dynetat0.o dimphy.o dimens_m.o conf_gcm.o comgeom.o comconst.o com_io_dyn.o clesphys2.o 
 geopot.o : paramet_m.o dimens_m.o 
 getincom.o : find_sig.o gensig.o strlowercase.o cmpblank.o nocomma.o 
 getparam.o : getincom.o 
@@ -202,7 +202,7 @@ rotat_nfil.o : comgeom.o paramet_m.o dimens_m.o
 rotatf.o : filtreg.o comgeom.o paramet_m.o dimens_m.o 
 screenc.o : YOMCST.o 
 soil.o : YOMCST.o dimsoil.o dimphy.o indicesol.o dimens_m.o 
-sortvarc.o : filtreg.o ener.o dynetat0.o comgeom.o comconst.o paramet_m.o dimens_m.o 
+sortvarc.o : filtreg.o ener.o dynetat0.o comgeom.o comconst.o paramet_m.o dimens_m.o conf_gcm.o 
 sortvarc0.o : filtreg.o ener.o comgeom.o comconst.o paramet_m.o dimens_m.o 
 start_init_orog_m.o : grid_noro_m.o comconst.o indicesol.o dimens_m.o comgeom.o conf_dat2d.o flinget.o flincom.o 
 start_init_phys_m.o : dimens_m.o comgeom.o gr_int_dyn_m.o inter_barxy.o conf_dat2d.o flinget.o flincom.o 
