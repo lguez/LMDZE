@@ -9,7 +9,7 @@ module physiq_m
 
 contains
 
-  SUBROUTINE physiq(nq, firstcal, lafin, rdayvrai, gmtime, pdtphys, paprs, &
+  SUBROUTINE physiq(firstcal, lafin, rdayvrai, gmtime, pdtphys, paprs, &
        pplay, pphi, pphis, u, v, t, qx, omega, d_u, d_v, &
        d_t, d_qx, d_ps, dudyn, PVteta)
 
@@ -35,7 +35,7 @@ contains
     use conf_gcm_m, only: raz_date, offline
     use conf_phys_m, only: conf_phys
     use ctherm
-    use dimens_m, only: jjm, iim, llm
+    use dimens_m, only: jjm, iim, llm, nqmx
     use dimphy, only: klon, nbtr
     use dimsoil, only: nsoilmx
     use hgardfou_m, only: hgardfou
@@ -43,7 +43,9 @@ contains
     USE histwrite_m, only: histwrite
     use indicesol, only: nbsrf, is_ter, is_lic, is_sic, is_oce, &
          clnsurf, epsfra
-    use ini_hist, only: ini_histhf, ini_histday, ini_histins
+    use ini_histhf_m, only: ini_histhf
+    use ini_histday_m, only: ini_histday
+    use ini_histins_m, only: ini_histins
     use iniprint, only: prt_level
     use oasis_m
     use orbite_m, only: orbite, zenang
@@ -63,8 +65,6 @@ contains
     use fcttre, only: thermcep, foeew, qsats, qsatl
 
     ! Variables argument:
-
-    INTEGER, intent(in):: nq ! nombre de traceurs (y compris vapeur d'eau)
 
     REAL, intent(in):: rdayvrai
     ! (elapsed time since January 1st 0h of the starting year, in days)
@@ -89,14 +89,14 @@ contains
     REAL v(klon, llm)  ! input vitesse Y (de S a N) en m/s
     REAL t(klon, llm)  ! input temperature (K)
 
-    REAL, intent(in):: qx(klon, llm, nq)
-    ! (humidite specifique (kg/kg) et fractions massiques des autres traceurs)
+    REAL, intent(in):: qx(klon, llm, nqmx)
+    ! (humidité spécifique et fractions massiques des autres traceurs)
 
     REAL omega(klon, llm)  ! input vitesse verticale en Pa/s
     REAL d_u(klon, llm)  ! output tendance physique de "u" (m/s/s)
     REAL d_v(klon, llm)  ! output tendance physique de "v" (m/s/s)
     REAL d_t(klon, llm)  ! output tendance physique de "t" (K/s)
-    REAL d_qx(klon, llm, nq)  ! output tendance physique de "qx" (kg/kg/s)
+    REAL d_qx(klon, llm, nqmx)  ! output tendance physique de "qx" (kg/kg/s)
     REAL d_ps(klon)  ! output tendance physique de la pression au sol
 
     INTEGER nbteta
@@ -701,7 +701,7 @@ contains
        END DO
     END IF
     ok_sync=.TRUE.
-    IF (nq  <  2) THEN
+    IF (nqmx  <  2) THEN
        abort_message = 'eaux vapeur et liquide sont indispensables'
        CALL abort_gcm(modname, abort_message, 1)
     ENDIF
@@ -835,7 +835,7 @@ contains
        !   Initialisation des sorties
 
        call ini_histhf(pdtphys, nid_hf, nid_hf3d)
-       call ini_histday(pdtphys, ok_journe, nid_day, nq)
+       call ini_histday(pdtphys, ok_journe, nid_day, nqmx)
        call ini_histins(pdtphys, ok_instan, nid_ins)
        CALL ymds2ju(annee_ref, 1, int(day_ref), 0., date0)
        !XXXPB Positionner date0 pour initialisation de ORCHIDEE
@@ -854,7 +854,7 @@ contains
           d_v(i, k) = 0.0
        ENDDO
     ENDDO
-    DO iq = 1, nq
+    DO iq = 1, nqmx
        DO k = 1, llm
           DO i = 1, klon
              d_qx(i, k, iq) = 0.0
@@ -877,8 +877,8 @@ contains
           qs_seri(i, k) = 0.
        ENDDO
     ENDDO
-    IF (nq >= 3) THEN
-       tr_seri(:, :, :nq-2) = qx(:, :, 3:nq)
+    IF (nqmx >= 3) THEN
+       tr_seri(:, :, :nqmx-2) = qx(:, :, 3:nqmx)
     ELSE
        tr_seri(:, :, 1) = 0.
     ENDIF
@@ -950,7 +950,7 @@ contains
     ! Mettre en action les conditions aux limites (albedo, sst, etc.).
     ! Prescrire l'ozone et calculer l'albedo sur l'ocean.
 
-    if (nq >= 5) then
+    if (nqmx >= 5) then
        wo = qx(:, :, 5) * zmasse / dobson_u / 1e3
     else IF (MOD(itap - 1, lmt_pas) == 0) THEN
        wo = ozonecm(REAL(julien), paprs)
@@ -1801,12 +1801,12 @@ contains
     END IF
 
     ! Calcul  des tendances traceurs
-    call phytrac(rnpb, itap, lmt_pas, julien,  gmtime, firstcal, lafin, nq-2, &
+    call phytrac(rnpb, itap, lmt_pas, julien,  gmtime, firstcal, lafin, nqmx-2, &
          pdtphys, u, v, t, paprs, pplay, pmfu,  pmfd,  pen_u,  pde_u,  pen_d, &
          pde_d, ycoefh, fm_therm, entr_therm, yu1, yv1, ftsol, pctsrf, &
-         frac_impa,  frac_nucl, pphis, pphi, albsol, rhcl, cldfra, &
-         rneb,  diafra,  cldliq, itop_con, ibas_con, pmflxr, pmflxs, prfl, &
-         psfl, da, phi, mp, upwd, dnwd, tr_seri, zmasse)
+         frac_impa,  frac_nucl, pphis, pphi, albsol, rhcl, cldfra, rneb, &
+         diafra, cldliq, pmflxr, pmflxs, prfl, psfl, da, phi, mp, upwd, dnwd, &
+         tr_seri, zmasse)
 
     IF (offline) THEN
        call phystokenc(pdtphys, rlon, rlat, t, pmfu, pmfd, pen_u, pde_u, &
@@ -1878,8 +1878,8 @@ contains
        ENDDO
     ENDDO
 
-    IF (nq >= 3) THEN
-       DO iq = 3, nq
+    IF (nqmx >= 3) THEN
+       DO iq = 3, nqmx
           DO  k = 1, llm
              DO  i = 1, klon
                 d_qx(i, k, iq) = (tr_seri(i, k, iq-2) - qx(i, k, iq)) / pdtphys
@@ -1924,7 +1924,7 @@ contains
 
       if (ok_journe) THEN
          itau_w = itau_phy + itap
-         if (nq <= 4) then
+         if (nqmx <= 4) then
             call histwrite(nid_day, "Sigma_O3_Royer", itau_w, &
                  gr_phy_write_3d(wo) * 1e3)
             ! (convert "wo" from kDU to DU)

@@ -16,7 +16,7 @@ module dimphy
 
   INTEGER, PARAMETER:: KLEV = llm
 
-  INTEGER, PARAMETER:: nbtr = nqmx - 2 + 1 / (nqmx-1)
+  INTEGER, PARAMETER:: nbtr = max(1, nqmx - 2)
   ! (nombre de vrais traceurs)
 
   REAL,save:: zmasq(KLON) ! fraction of land

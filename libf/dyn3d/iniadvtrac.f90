@@ -91,7 +91,7 @@ contains
        endif
        tnom(iq)=str1
        tname(iq)=tnom(iq) 
-       str2=tnom(iq) 
+       str2=tnom(iq)
        ttext(iq) = trim(str2) // descrq(iadv(iq))
     end do
 

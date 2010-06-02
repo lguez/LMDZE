@@ -167,7 +167,7 @@ contains
           time = REAL(mod(itau, day_step)) / day_step + time_0
           IF (time > 1.) time = time - 1.
 
-          CALL calfis(nqmx, itau + 1 == itaufin, rdayvrai, time, ucov, vcov, &
+          CALL calfis(itau + 1 == itaufin, rdayvrai, time, ucov, vcov, &
                teta, q, masse, ps, pk, phis, phi, du, dv, dteta, dq, w, dufi, &
                dvfi, dtetafi, dqfi, dpfi)
 

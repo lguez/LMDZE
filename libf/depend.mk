@@ -114,7 +114,11 @@ hbtm.o : FCTTRE.o YOETHF.o YOMCST.o dimphy.o dimens_m.o
 hgardfou.o : YOMCST.o dimphy.o indicesol.o dimens_m.o 
 histcom.o : calendar.o mathelp.o strlowercase.o find_str.o histcom_var.o errioipsl.o ioipslmpp.o 
 histwrite.o : find_str.o mathelp.o histcom_var.o mathop.o calendar.o errioipsl.o 
-ini_hist.o : iniadvtrac.o indicesol.o grid_change.o clesphys.o comvert.o phyetat0.o histcom.o calendar.o dimphy.o temps.o dimens_m.o 
+ini_histday.o : comvert.o grid_change.o clesphys.o phyetat0.o histcom.o calendar.o temps.o dimens_m.o 
+ini_histhf.o : ini_histhf3d.o comvert.o phyetat0.o histcom.o calendar.o dimphy.o temps.o dimens_m.o 
+ini_histhf3d.o : comvert.o histcom.o calendar.o phyetat0.o clesphys.o temps.o dimphy.o dimens_m.o 
+ini_histins.o : comvert.o phyetat0.o histcom.o calendar.o indicesol.o clesphys.o temps.o dimphy.o dimens_m.o 
+ini_histrac.o : comvert.o phyetat0.o grid_change.o clesphys.o dimphy.o iniadvtrac.o temps.o histcom.o calendar.o dimens_m.o 
 iniadvtrac.o : dimens_m.o 
 iniconst.o : conf_gcm.o comvert.o comconst.o dimens_m.o 
 inidissip.o : filtreg.o new_unit.o paramet_m.o conf_gcm.o comvert.o comdissnew.o comconst.o dimens_m.o 
@@ -179,9 +183,9 @@ paramet_m.o : dimens_m.o
 pentes_ini.o : comgeom.o comvert.o comconst.o paramet_m.o dimens_m.o 
 phyetat0.o : temps.o dimsoil.o indicesol.o dimphy.o 
 phyredem.o : temps.o dimsoil.o dimphy.o indicesol.o 
-physiq.o : gr_phy_write_3d.o FCTTRE.o YOMCST.o YOETHF.o temps.o radopt.o radepsi.o qcheck.o phytrac.o phystokenc.o phyredem.o phyetat0.o ozonecm.o orbite.o oasis_m.o iniprint.o ini_hist.o indicesol.o histwrite.o histcom.o hgardfou.o dimsoil.o dimphy.o dimens_m.o ctherm.o conf_phys.o conf_gcm.o comgeomphy.o clesphys2.o clesphys.o calendar.o abort_gcm.o 
+physiq.o : gr_phy_write_3d.o FCTTRE.o YOMCST.o YOETHF.o temps.o radopt.o radepsi.o qcheck.o phytrac.o phystokenc.o phyredem.o phyetat0.o ozonecm.o orbite.o oasis_m.o iniprint.o ini_histins.o ini_histday.o ini_histhf.o indicesol.o histwrite.o histcom.o hgardfou.o dimsoil.o dimphy.o dimens_m.o ctherm.o conf_phys.o conf_gcm.o comgeomphy.o clesphys2.o clesphys.o calendar.o abort_gcm.o 
 phystokenc.o : tracstoke.o dimphy.o indicesol.o dimens_m.o histcom.o histwrite.o 
-phytrac.o : gr_phy_write_3d.o grid_change.o comgeomphy.o iniadvtrac.o temps.o histwrite.o histcom.o press_coefoz.o minmaxqfi.o radiornpb.o ini_hist.o o3_chem.o phyetat0.o regr_pr_comb_coefoz.o ctherm.o YOMCST.o abort_gcm.o clesphys2.o clesphys.o dimphy.o indicesol.o dimens_m.o 
+phytrac.o : gr_phy_write_3d.o grid_change.o comgeomphy.o iniadvtrac.o temps.o histwrite.o histcom.o press_coefoz.o minmaxqfi.o radiornpb.o ini_histrac.o o3_chem.o phyetat0.o regr_pr_comb_coefoz.o ctherm.o YOMCST.o abort_gcm.o clesphys2.o clesphys.o dimphy.o indicesol.o dimens_m.o 
 prather.o : comgeom.o comvert.o comconst.o paramet_m.o dimens_m.o 
 pression.o : dimens_m.o 
 pressure_var.o : dimens_m.o 

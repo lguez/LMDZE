@@ -152,7 +152,7 @@ contains
     jmdep = size(dlat_ini)
 
     call nf95_inq_dimid(ncid, "time", dimid)
-    call NF95_INQuire_DIMension(ncid, dimid, len=lmdep)
+    call NF95_INQuire_DIMension(ncid, dimid, nclen=lmdep)
     print *, 'lmdep = ', lmdep
     ! PM 28/02/2002 : nouvelle coordonnée temporelle, fichiers AMIP
     ! pas en jours
@@ -251,7 +251,7 @@ contains
     jmdep = size(dlat_ini)
 
     call nf95_inq_dimid(ncid, "time", dimid)
-    call NF95_INQuire_DIMension(ncid, dimid, len=lmdep)
+    call NF95_INQuire_DIMension(ncid, dimid, nclen=lmdep)
     print *, 'lmdep = ', lmdep
     !PM28/02/2002 : nouvelle coord temporelle fichiers AMIP pas en jours
     !        Ici on suppose qu'on a 12 mois (de 30 jours).

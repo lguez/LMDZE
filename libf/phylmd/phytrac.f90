@@ -1,7 +1,5 @@
 module phytrac_m
 
-  ! This module is clean: no C preprocessor directive, no include line.
-
   IMPLICIT none
 
   private
@@ -13,7 +11,7 @@ contains
        nq_phys, pdtphys, u, v, t_seri, paprs, pplay, pmfu, pmfd, pen_u, &
        pde_u, pen_d, pde_d, coefh, fm_therm, entr_therm, yu1, yv1, ftsol, &
        pctsrf, frac_impa, frac_nucl, pphis, pphi, albsol, rh, cldfra, rneb, &
-       diafra, cldliq, itop_con, ibas_con, pmflxr, pmflxs, prfl, psfl, da, &
+       diafra, cldliq, pmflxr, pmflxs, prfl, psfl, da, &
        phi, mp, upwd, dnwd, tr_seri, zmasse)
 
     ! From phylmd/phytrac.F, version 1.15 2006/02/21 08:08:30
@@ -22,13 +20,9 @@ contains
     ! Foujols, Olivia
     ! Objet : moniteur général des tendances des traceurs
 
-    ! Remarques :
-    ! 1/ L'appel de "phytrac" se fait avec "nq-2" donc nous avons bien 
+    ! L'appel de "phytrac" se fait avec "nqmx-2" donc nous avons bien
     ! les vrais traceurs (en nombre "nbtr", sans la vapeur d'eau ni l'eau
     ! liquide) dans "phytrac".
-    ! 2/ Le choix du radon et du plomb se fait juste avec un "data" 
-    ! (peu propre).
-    ! Pourrait-on avoir une variable qui indiquerait le type de traceur ?
 
     use dimens_m, only: llm
     use indicesol, only: nbsrf
@@ -41,17 +35,11 @@ contains
     use regr_pr_comb_coefoz_m, only: regr_pr_comb_coefoz
     use phyetat0_m, only: rlat
     use o3_chem_m, only: o3_chem
-    use ini_hist, only: ini_histrac
+    use ini_histrac_m, only: ini_histrac
     use radiornpb_m, only: radiornpb
     use minmaxqfi_m, only: minmaxqfi
     use numer_rec, only: assert
     use press_coefoz_m, only: press_coefoz
-
-    ! Arguments:
-
-    !   EN ENTREE:
-
-    !   divers:
 
     logical, intent(in):: rnpb
 
@@ -61,8 +49,6 @@ contains
     integer, intent(in):: itap  ! number of calls to "physiq"
     integer, intent(in):: lmt_pas ! number of time steps of "physics" per day
     integer, intent(in):: julien !jour julien, 1 <= julien <= 360
-    integer itop_con(klon)
-    integer ibas_con(klon)
     real, intent(in):: gmtime ! heure de la journée en fraction de jour
     real, intent(in):: pdtphys  ! pas d'integration pour la physique (s)
     real, intent(in):: t_seri(klon, llm) ! temperature, in K
