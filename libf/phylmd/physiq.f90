@@ -9,11 +9,11 @@ module physiq_m
 
 contains
 
-  SUBROUTINE physiq(firstcal, lafin, rdayvrai, gmtime, pdtphys, paprs, &
+  SUBROUTINE physiq(lafin, rdayvrai, gmtime, pdtphys, paprs, &
        pplay, pphi, pphis, u, v, t, qx, omega, d_u, d_v, &
        d_t, d_qx, d_ps, dudyn, PVteta)
 
-    ! From phylmd/physiq.F, v 1.22 2006/02/20 09:38:28
+    ! From phylmd/physiq.F, version 1.22 2006/02/20 09:38:28
 
     ! Author : Z.X. Li (LMD/CNRS), date: 1993/08/18
 
@@ -71,7 +71,6 @@ contains
 
     REAL, intent(in):: gmtime ! heure de la journée en fraction de jour
     REAL, intent(in):: pdtphys ! pas d'integration pour la physique (seconde)
-    LOGICAL, intent(in):: firstcal ! first call to "calfis"
     logical, intent(in):: lafin ! dernier passage
 
     REAL, intent(in):: paprs(klon, llm+1)
@@ -86,7 +85,7 @@ contains
     REAL pphis(klon) ! input geopotentiel du sol
 
     REAL u(klon, llm)  ! input vitesse dans la direction X (de O a E) en m/s
-    REAL v(klon, llm)  ! input vitesse Y (de S a N) en m/s
+    REAL, intent(in):: v(klon, llm)  ! vitesse Y (de S a N) en m/s
     REAL t(klon, llm)  ! input temperature (K)
 
     REAL, intent(in):: qx(klon, llm, nqmx)
@@ -98,6 +97,8 @@ contains
     REAL d_t(klon, llm)  ! output tendance physique de "t" (K/s)
     REAL d_qx(klon, llm, nqmx)  ! output tendance physique de "qx" (kg/kg/s)
     REAL d_ps(klon)  ! output tendance physique de la pression au sol
+
+    LOGICAL:: firstcal = .true.
 
     INTEGER nbteta
     PARAMETER(nbteta=3)
@@ -1801,10 +1802,10 @@ contains
     END IF
 
     ! Calcul  des tendances traceurs
-    call phytrac(rnpb, itap, lmt_pas, julien,  gmtime, firstcal, lafin, nqmx-2, &
-         pdtphys, u, v, t, paprs, pplay, pmfu,  pmfd,  pen_u,  pde_u,  pen_d, &
-         pde_d, ycoefh, fm_therm, entr_therm, yu1, yv1, ftsol, pctsrf, &
-         frac_impa,  frac_nucl, pphis, pphi, albsol, rhcl, cldfra, rneb, &
+    call phytrac(rnpb, itap, lmt_pas, julien, gmtime, firstcal, lafin, &
+         nqmx-2, pdtphys, u, t, paprs, pplay, pmfu, pmfd, pen_u, pde_u, &
+         pen_d, pde_d, ycoefh, fm_therm, entr_therm, yu1, yv1, ftsol, pctsrf, &
+         frac_impa, frac_nucl, pphis, pphi, albsol, rhcl, cldfra, rneb, &
          diafra, cldliq, pmflxr, pmflxs, prfl, psfl, da, phi, mp, upwd, dnwd, &
          tr_seri, zmasse)
 
@@ -1912,6 +1913,8 @@ contains
             zmea, zstd, zsig, zgam, zthe, zpic, zval, &
             t_ancien, q_ancien, rnebcon, ratqs, clwcon, run_off_lic_0)
     ENDIF
+
+    firstcal = .FALSE.
 
   contains
 

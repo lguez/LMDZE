@@ -8,7 +8,7 @@ module phytrac_m
 contains
 
   SUBROUTINE phytrac(rnpb, itap, lmt_pas, julien, gmtime, firstcal, lafin, &
-       nq_phys, pdtphys, u, v, t_seri, paprs, pplay, pmfu, pmfd, pen_u, &
+       nq_phys, pdtphys, u, t_seri, paprs, pplay, pmfu, pmfd, pen_u, &
        pde_u, pen_d, pde_d, coefh, fm_therm, entr_therm, yu1, yv1, ftsol, &
        pctsrf, frac_impa, frac_nucl, pphis, pphi, albsol, rh, cldfra, rneb, &
        diafra, cldliq, pmflxr, pmflxs, prfl, psfl, da, &
@@ -57,7 +57,6 @@ contains
     ! (mass fractions of tracers, excluding water, at mid-layers)
 
     real u(klon, llm)
-    real v(klon, llm)
     real rh(klon, llm)     ! humidite relative
     real cldliq(klon, llm) ! eau liquide nuageuse
     real cldfra(klon, llm) ! fraction nuageuse (tous les nuages)

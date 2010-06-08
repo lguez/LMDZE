@@ -1,7 +1,5 @@
 module calfis_m
 
-  ! Clean: no C preprocessor directive, no include line
-
   IMPLICIT NONE
 
 contains
@@ -10,9 +8,8 @@ contains
        pmasse, pps, ppk, pphis, pphi, pducov, pdvcov, pdteta, pdq, pw, &
        pdufi, pdvfi, pdhfi, pdqfi, pdpsfi)
 
-    ! From dyn3d/calfis.F, v 1.3 2005/05/25 13:10:09
-
-    ! Auteurs : P. Le Van, F. Hourdin
+    ! From dyn3d/calfis.F, version 1.3 2005/05/25 13:10:09
+    ! Authors : P. Le Van, F. Hourdin
 
     !   1. rearrangement des tableaux et transformation
     !      variables dynamiques  >  variables physiques
@@ -52,13 +49,13 @@ contains
     !        pdtrad         radiative tendencies  \  both input
     !        pfluxrad       radiative fluxes      /  and output
 
-    use dimens_m, only: iim, jjm, llm, nqmx
-    use dimphy, only: klon
     use comconst, only: kappa, cpp, dtphys, g, pi
     use comvert, only: preff
     use comgeom, only: apoln, cu_2d, cv_2d, unsaire_2d, apols, rlonu, rlonv
-    use iniadvtrac_m, only: niadv
+    use dimens_m, only: iim, jjm, llm, nqmx
+    use dimphy, only: klon
     use grid_change, only: dyn_phy, gr_fi_dyn
+    use iniadvtrac_m, only: niadv
     use physiq_m, only: physiq
     use pressure_var, only: p3d, pls
 
@@ -94,8 +91,6 @@ contains
     REAL pdqfi(iim + 1, jjm + 1, llm, nqmx)
     REAL pdpsfi(iim + 1, jjm + 1)
 
-    INTEGER, PARAMETER:: longcles = 20
-
     !    Local variables :
 
     INTEGER i, j, l, ig0, ig, iq, iiq
@@ -103,21 +98,17 @@ contains
     REAL zplev(klon, llm+1), zplay(klon, llm)
     REAL zphi(klon, llm), zphis(klon)
 
-    REAL zufi(klon, llm), zvfi(klon, llm)
+    REAL zufi(klon, llm), v(klon, llm)
+    real zvfi(iim + 1, jjm + 1, llm)
     REAL ztfi(klon, llm) ! temperature
     real qx(klon, llm, nqmx) ! mass fractions of advected fields
-
-    REAL pcvgu(klon, llm), pcvgv(klon, llm)
-    REAL pcvgt(klon, llm), pcvgq(klon, llm, 2)
-
     REAL pvervel(klon, llm)
 
     REAL zdufi(klon, llm), zdvfi(klon, llm)
     REAL zdtfi(klon, llm), zdqfi(klon, llm, nqmx)
     REAL zdpsrf(klon)
 
-    REAL zsin(iim), zcos(iim), z1(iim)
-    REAL zsinbis(iim), zcosbis(iim), z1bis(iim)
+    REAL z1(iim)
     REAL pksurcp(iim + 1, jjm + 1)
 
     ! I. Musat: diagnostic PVteta, Amip2
@@ -125,9 +116,6 @@ contains
     REAL:: rtetaSTD(ntetaSTD) = (/350., 380., 405./)
     REAL PVteta(klon, ntetaSTD)
 
-    REAL SSUM
-
-    LOGICAL:: firstcal = .true.
     REAL, intent(in):: rdayvrai
 
     !-----------------------------------------------------------------------
@@ -165,11 +153,9 @@ contains
        pls(:, :, l) = preff * pksurcp**(1./ kappa)
        zplay(:, l) = pack(pls(:, :, l), dyn_phy)
        ztfi(:, l) = pack(pteta(:, :, l) * pksurcp, dyn_phy)
-       pcvgt(:, l) = pack(pdteta(:, :, l) * pksurcp / pmasse(:, :, l), dyn_phy)
     ENDDO
 
     !   43.bis traceurs
-
     DO iq=1, nqmx
        iiq=niadv(iq) 
        DO l=1, llm
@@ -185,24 +171,7 @@ contains
        ENDDO
     ENDDO
 
-    !   convergence dynamique pour les traceurs "EAU"
-
-    DO iq=1, 2
-       DO l=1, llm
-          pcvgq(1, l, iq)= pdq(1, 1, l, iq) / pmasse(1, 1, l)
-          ig0          = 2
-          DO j=2, jjm
-             DO i = 1, iim
-                pcvgq(ig0, l, iq) = pdq(i, j, l, iq) / pmasse(i, j, l)
-                ig0             = ig0 + 1
-             ENDDO
-          ENDDO
-          pcvgq(ig0, l, iq)= pdq(1, jjm + 1, l, iq) / pmasse(1, jjm + 1, l)
-       ENDDO
-    ENDDO
-
     !   Geopotentiel calcule par rapport a la surface locale:
-
     forall (l = 1:llm) zphi(:, l) = pack(pphi(:, :, l), dyn_phy)
     zphis = pack(pphis, dyn_phy)
     DO l=1, llm
@@ -211,8 +180,7 @@ contains
        ENDDO
     ENDDO
 
-    !   ....  Calcul de la vitesse  verticale  (en Pa*m*s  ou Kg/s)  ....
-
+    ! Calcul de la vitesse  verticale  (en Pa*m*s  ou Kg/s)
     DO l=1, llm
        pvervel(1, l)=pw(1, 1, l) * g /apoln
        ig0=2
@@ -228,65 +196,37 @@ contains
     !   45. champ u:
 
     DO  l=1, llm
-
        DO  j=2, jjm
           ig0 = 1+(j-2)*iim
           zufi(ig0+1, l)= 0.5 *  &
                (pucov(iim, j, l)/cu_2d(iim, j) + pucov(1, j, l)/cu_2d(1, j))
-          pcvgu(ig0+1, l)= 0.5 *  &
-               (pducov(iim, j, l)/cu_2d(iim, j) + pducov(1, j, l)/cu_2d(1, j))
           DO i=2, iim
              zufi(ig0+i, l)= 0.5 * &
                   (pucov(i-1, j, l)/cu_2d(i-1, j) &
                   + pucov(i, j, l)/cu_2d(i, j))
-             pcvgu(ig0+i, l)= 0.5 * &
-                  (pducov(i-1, j, l)/cu_2d(i-1, j) &
-                  + pducov(i, j, l)/cu_2d(i, j))
           end DO
        end DO
-
     end DO
 
     !   46.champ v:
 
-    DO l = 1, llm
-       DO j = 2, jjm
-          ig0 = 1 + (j - 2) * iim
-          DO i = 1, iim
-             zvfi(ig0+i, l)= 0.5 * (pvcov(i, j-1, l) / cv_2d(i, j-1) &
-                  + pvcov(i, j, l) / cv_2d(i, j))
-             pcvgv(ig0+i, l)= 0.5 * &
-                  (pdvcov(i, j-1, l)/cv_2d(i, j-1) &
-                  + pdvcov(i, j, l)/cv_2d(i, j))
-          ENDDO
-       ENDDO
-    ENDDO
+    forall (j = 2: jjm, l = 1: llm) zvfi(:iim, j, l)= 0.5 &
+         * (pvcov(:iim, j-1, l) / cv_2d(:iim, j-1) &
+         + pvcov(:iim, j, l) / cv_2d(:iim, j))
+    zvfi(iim + 1, 2:jjm, :) = zvfi(1, 2:jjm, :)
 
     !   47. champs de vents au pôle nord   
     !        U = 1 / pi  *  integrale [ v * cos(long) * d long ]
     !        V = 1 / pi  *  integrale [ v * sin(long) * d long ]
 
     DO l=1, llm
-
        z1(1)   =(rlonu(1)-rlonu(iim)+2.*pi)*pvcov(1, 1, l)/cv_2d(1, 1)
-       z1bis(1)=(rlonu(1)-rlonu(iim)+2.*pi)*pdvcov(1, 1, l)/cv_2d(1, 1)
        DO i=2, iim
           z1(i)   =(rlonu(i)-rlonu(i-1))*pvcov(i, 1, l)/cv_2d(i, 1)
-          z1bis(i)=(rlonu(i)-rlonu(i-1))*pdvcov(i, 1, l)/cv_2d(i, 1)
        ENDDO
 
-       DO i=1, iim
-          zcos(i)   = COS(rlonv(i))*z1(i)
-          zcosbis(i)= COS(rlonv(i))*z1bis(i)
-          zsin(i)   = SIN(rlonv(i))*z1(i)
-          zsinbis(i)= SIN(rlonv(i))*z1bis(i)
-       ENDDO
-
-       zufi(1, l)  = SSUM(iim, zcos, 1)/pi
-       pcvgu(1, l) = SSUM(iim, zcosbis, 1)/pi
-       zvfi(1, l)  = SSUM(iim, zsin, 1)/pi
-       pcvgv(1, l) = SSUM(iim, zsinbis, 1)/pi
-
+       zufi(1, l)  = SUM(COS(rlonv(:iim)) * z1) / pi
+       zvfi(:, 1, l)  = SUM(SIN(rlonv(:iim)) * z1) / pi
     ENDDO
 
     !   48. champs de vents au pôle sud:
@@ -294,40 +234,26 @@ contains
     !        V = 1 / pi  *  integrale [ v * sin(long) * d long ]
 
     DO l=1, llm
-
        z1(1)   =(rlonu(1)-rlonu(iim)+2.*pi)*pvcov(1, jjm, l) &
-            /cv_2d(1, jjm)
-       z1bis(1)=(rlonu(1)-rlonu(iim)+2.*pi)*pdvcov(1, jjm, l) &
             /cv_2d(1, jjm)
        DO i=2, iim
           z1(i)   =(rlonu(i)-rlonu(i-1))*pvcov(i, jjm, l)/cv_2d(i, jjm)
-          z1bis(i)=(rlonu(i)-rlonu(i-1))*pdvcov(i, jjm, l)/cv_2d(i, jjm)
        ENDDO
 
-       DO i=1, iim
-          zcos(i)    = COS(rlonv(i))*z1(i)
-          zcosbis(i) = COS(rlonv(i))*z1bis(i)
-          zsin(i)    = SIN(rlonv(i))*z1(i)
-          zsinbis(i) = SIN(rlonv(i))*z1bis(i)
-       ENDDO
-
-       zufi(klon, l)  = SSUM(iim, zcos, 1)/pi
-       pcvgu(klon, l) = SSUM(iim, zcosbis, 1)/pi
-       zvfi(klon, l)  = SSUM(iim, zsin, 1)/pi
-       pcvgv(klon, l) = SSUM(iim, zsinbis, 1)/pi
-
+       zufi(klon, l)  = SUM(COS(rlonv(:iim)) * z1) / pi
+       zvfi(:, jjm + 1, l)  = SUM(SIN(rlonv(:iim)) * z1) / pi
     ENDDO
 
+    forall(l= 1: llm) v(:, l) = pack(zvfi(:, :, l), dyn_phy)
+
     !IM calcul PV a teta=350, 380, 405K
-    CALL PVtheta(klon, llm, pucov, pvcov, pteta, &
-         ztfi, zplay, zplev, &
+    CALL PVtheta(klon, llm, pucov, pvcov, pteta, ztfi, zplay, zplev, &
          ntetaSTD, rtetaSTD, PVteta)
 
-    !   Appel de la physique:
-
-    CALL physiq(firstcal, lafin, rdayvrai, heure, dtphys, zplev, zplay, zphi, &
-         zphis, zufi, zvfi, ztfi, qx, pvervel, zdufi, zdvfi, zdtfi, zdqfi, &
-         zdpsrf, pducov, PVteta) ! IM diagnostique PVteta, Amip2
+    ! Appel de la physique :
+    CALL physiq(lafin, rdayvrai, heure, dtphys, zplev, zplay, zphi, &
+         zphis, zufi, v, ztfi, qx, pvervel, zdufi, zdvfi, &
+         zdtfi, zdqfi, zdpsrf, pducov, PVteta) ! diagnostic PVteta, Amip2
 
     !   transformation des tendances physiques en tendances dynamiques:
 
@@ -434,7 +360,6 @@ contains
     !      v = U * cos(long) + V * SIN(long)
 
     DO l=1, llm
-
        DO i=1, iim
           pdvfi(i, 1, l)= &
                zdufi(1, l)*COS(rlonv(i))+zdvfi(1, l)*SIN(rlonv(i))
@@ -448,10 +373,7 @@ contains
 
        pdvfi(iim + 1, 1, l)  = pdvfi(1, 1, l)
        pdvfi(iim + 1, jjm, l)= pdvfi(1, jjm, l)
-
     ENDDO
-
-    firstcal = .FALSE.
 
   END SUBROUTINE calfis
 

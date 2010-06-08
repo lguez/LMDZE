@@ -333,7 +333,7 @@ CONTAINS
           date_now = itau2date (itau,date0,dt)
           date_last_act = itau2date (last_action,date0,dt)
           CALL ju2ymds (date_last_act,year,month,day,sec)
-          monthp1 = month-freq
+          monthp1 = month - freq
           yearp = year
       
           !---- Here we compute what logically should be the next month

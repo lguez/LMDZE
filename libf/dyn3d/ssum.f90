@@ -1,6 +1,6 @@
 real function ssum(n,sx,incx)
 
-  ! From cray.F, v 1.1.1.1 2004/05/19 12:53:05
+  ! From cray.F, version 1.1.1.1 2004/05/19 12:53:05
 
   IMPLICIT NONE
 
