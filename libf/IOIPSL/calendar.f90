@@ -1,9 +1,9 @@
 MODULE calendar
-  !$Header: /home/ioipsl/CVSROOT/IOIPSL/src/calendar.f90,v 2.0 2004/04/05 14:47:47 adm Exp $
-  !-
-  !---------------------------------------------------------------------
-  !- This is the calendar which going to be used to do all
-  !- calculations on time. Three types of calendars are possible :
+
+  ! From IOIPSL/src/calendar.f90, version 2.0 2004/04/05 14:47:47
+
+  !- This is the calendar used to do all calculations on time. Three
+  !- types of calendars are possible :
   !-  - gregorian : The normal calendar. The time origin for the
   !-                julian day in this case is 24 Nov -4713
   !-  - nolap : A 365 day year without leap years.
@@ -21,7 +21,7 @@ MODULE calendar
   !-
   !-   un_jour : one day in seconds
   !-   un_an   : one year in days
-  !---------------------------------------------------------------------
+
   USE strlowercase_m, ONLY : strlowercase
   USE errioipsl, ONLY : histerr
   !-
@@ -62,7 +62,6 @@ CONTAINS
 
     INTEGER,INTENT(IN) :: year,month,day
     REAL,INTENT(IN)    :: sec
-
     REAL,INTENT(OUT) :: julian
 
     INTEGER :: julian_day
@@ -70,7 +69,7 @@ CONTAINS
     !---------------------------------------------------------------------
     CALL ymds2ju_internal (year,month,day,sec,julian_day,julian_sec)
 
-    julian = julian_day+julian_sec / un_jour
+    julian = julian_day + julian_sec / un_jour
     !---------------------
   END SUBROUTINE ymds2ju
 

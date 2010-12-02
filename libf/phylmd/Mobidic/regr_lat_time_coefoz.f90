@@ -241,7 +241,7 @@ contains
     use dimens_m, only: jjm
     use comgeom, only: rlatu
     use comconst, only: pi
-    use numer_rec, only: assert_eq
+    use nr_util, only: assert_eq
 
     use netcdf95, only: nf95_create, nf95_def_dim, nf95_def_var, &
          nf95_put_att, nf95_enddef, nf95_copy_att, nf95_put_var

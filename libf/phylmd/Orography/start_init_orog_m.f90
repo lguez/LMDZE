@@ -52,8 +52,6 @@ CONTAINS
     REAL, ALLOCATABLE:: lon_ini(:), lat_ini(:)
     REAL, ALLOCATABLE:: lon_rel(:, :), lat_rel(:, :)
 
-    CHARACTER(len=120) orogfname
-
     !-----------------------------------
 
     print *, "Call sequence information: start_init_orog"
@@ -65,10 +63,8 @@ CONTAINS
          size(zgam_2d, 2), size(zthe_2d, 2), size(zpic_2d, 2), &
          size(zval_2d, 2)/) /= jjm + 1)) stop "start_init_orog size 2"
 
-    orogfname = 'Relief.nc'
     print *, 'Reading the high resolution orography'
-
-    CALL flininfo(orogfname, iml_rel, jml_rel, llm_tmp, ttm_tmp, fid)
+    CALL flininfo('Relief.nc', iml_rel, jml_rel, llm_tmp, ttm_tmp, fid)
 
     ALLOCATE(lat_rel(iml_rel, jml_rel))
     ALLOCATE(lon_rel(iml_rel, jml_rel))

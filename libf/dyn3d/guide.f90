@@ -3,19 +3,19 @@ MODULE guide_m
   ! From dyn3d/guide.F, version 1.3 2005/05/25 13:10:09
   ! and dyn3d/guide.h, version 1.1.1.1 2004/05/19 12:53:06
 
-  REAL :: tau_min_u, tau_max_u
-  REAL :: tau_min_v, tau_max_v
-  REAL :: tau_min_t, tau_max_t
-  REAL :: tau_min_q, tau_max_q
-  REAL :: tau_min_p, tau_max_p
-  REAL :: aire_min, aire_max
+  REAL tau_min_u, tau_max_u
+  REAL tau_min_v, tau_max_v
+  REAL tau_min_t, tau_max_t
+  REAL tau_min_q, tau_max_q
+  REAL tau_min_p, tau_max_p
+  REAL aire_min, aire_max
 
 
-  LOGICAL :: guide_u, guide_v, guide_t, guide_q, guide_p
-  REAL :: lat_min_guide, lat_max_guide
+  LOGICAL guide_u, guide_v, guide_t, guide_q, guide_p
+  REAL lat_min_guide, lat_max_guide
 
-  LOGICAL :: ncep, ini_anal
-  INTEGER :: online
+  LOGICAL ncep, ini_anal
+  INTEGER online
 
 CONTAINS
 
@@ -41,54 +41,54 @@ CONTAINS
     INCLUDE 'netcdf.inc'
 
     !   variables dynamiques
-    REAL :: vcov(ip1jm, llm), ucov(ip1jmp1, llm) ! vents covariants
+    REAL vcov(ip1jm, llm), ucov(ip1jmp1, llm) ! vents covariants
     REAL, intent(inout):: teta(ip1jmp1, llm) ! temperature potentielle 
-    REAL :: q(ip1jmp1, llm) ! temperature potentielle 
-    REAL :: ps(ip1jmp1) ! pression  au sol
-    REAL :: masse(ip1jmp1, llm) ! masse d'air
+    REAL q(ip1jmp1, llm) ! temperature potentielle 
+    REAL ps(ip1jmp1) ! pression  au sol
+    REAL masse(ip1jmp1, llm) ! masse d'air
 
     !   common passe pour des sorties
-    REAL :: dxdys(iip1, jjp1), dxdyu(iip1, jjp1), dxdyv(iip1, jjm)
+    REAL dxdys(iip1, jjp1), dxdyu(iip1, jjp1), dxdyv(iip1, jjm)
     COMMON /comdxdy/dxdys, dxdyu, dxdyv
 
     !   variables dynamiques pour les reanalyses.
-    REAL :: ucovrea1(ip1jmp1, llm), vcovrea1(ip1jm, llm) !vts cov reas
-    REAL :: tetarea1(ip1jmp1, llm) ! temp pot  reales
-    REAL :: qrea1(ip1jmp1, llm) ! temp pot  reales
-    REAL :: psrea1(ip1jmp1) ! ps
-    REAL :: ucovrea2(ip1jmp1, llm), vcovrea2(ip1jm, llm) !vts cov reas
-    REAL :: tetarea2(ip1jmp1, llm) ! temp pot  reales
-    REAL :: qrea2(ip1jmp1, llm) ! temp pot  reales
-    REAL :: masserea2(ip1jmp1, llm) ! masse
-    REAL :: psrea2(ip1jmp1) ! ps
+    REAL ucovrea1(ip1jmp1, llm), vcovrea1(ip1jm, llm) !vts cov reas
+    REAL tetarea1(ip1jmp1, llm) ! temp pot  reales
+    REAL qrea1(ip1jmp1, llm) ! temp pot  reales
+    REAL psrea1(ip1jmp1) ! ps
+    REAL ucovrea2(ip1jmp1, llm), vcovrea2(ip1jm, llm) !vts cov reas
+    REAL tetarea2(ip1jmp1, llm) ! temp pot  reales
+    REAL qrea2(ip1jmp1, llm) ! temp pot  reales
+    REAL masserea2(ip1jmp1, llm) ! masse
+    REAL psrea2(ip1jmp1) ! ps
 
-    REAL :: alpha_q(ip1jmp1)
-    REAL :: alpha_t(ip1jmp1), alpha_p(ip1jmp1)
-    REAL :: alpha_u(ip1jmp1), alpha_v(ip1jm)
-    REAL :: dday_step, toto, reste, itau_test
-    INTEGER :: step_rea, count_no_rea
+    REAL alpha_q(ip1jmp1)
+    REAL alpha_t(ip1jmp1), alpha_p(ip1jmp1)
+    REAL alpha_u(ip1jmp1), alpha_v(ip1jm)
+    REAL dday_step, toto, reste, itau_test
+    INTEGER step_rea, count_no_rea
 
-    INTEGER :: ilon, ilat
-    REAL :: factt, ztau(ip1jmp1)
+    INTEGER ilon, ilat
+    REAL factt, ztau(ip1jmp1)
 
     INTEGER, INTENT (IN) :: itau
-    INTEGER :: ij, l
-    INTEGER :: ncidpl, varidpl, nlev, status
-    INTEGER :: rcod, rid
-    REAL :: ditau, tau, a
+    INTEGER ij, l
+    INTEGER ncidpl, varidpl, nlev, status
+    INTEGER rcod, rid
+    REAL ditau, tau, a
     SAVE nlev
 
     !  TEST SUR QSAT
-    REAL :: p(ip1jmp1, llmp1), pk(ip1jmp1, llm), pks(ip1jmp1)
-    REAL :: pkf(ip1jmp1, llm)
-    REAL :: pres(ip1jmp1, llm)
+    REAL p(ip1jmp1, llmp1), pk(ip1jmp1, llm), pks(ip1jmp1)
+    REAL pkf(ip1jmp1, llm)
+    REAL pres(ip1jmp1, llm)
 
-    REAL :: qsat(ip1jmp1, llm)
-    REAL :: unskap
-    REAL :: tnat(ip1jmp1, llm)
+    REAL qsat(ip1jmp1, llm)
+    REAL unskap
+    REAL tnat(ip1jmp1, llm)
 
 
-    LOGICAL :: first
+    LOGICAL first
     SAVE first
     DATA first/ .TRUE./
 
@@ -98,9 +98,9 @@ CONTAINS
     SAVE alpha_t, alpha_q, alpha_u, alpha_v, alpha_p, itau_test
     SAVE step_rea, count_no_rea
 
-    CHARACTER (10) :: file
-    INTEGER :: igrads
-    REAL :: dtgrads
+    CHARACTER (10) file
+    INTEGER igrads
+    REAL dtgrads
     SAVE igrads, dtgrads
     DATA igrads, dtgrads/2, 100./
 
@@ -356,25 +356,25 @@ CONTAINS
     IMPLICIT NONE
 
     !   arguments :
-    INTEGER :: type
-    INTEGER :: pim, pjm
-    REAL :: factt, taumin, taumax
-    REAL :: dxdy_, alpha(pim, pjm)
-    REAL :: dxdy_min, dxdy_max
+    INTEGER type
+    INTEGER pim, pjm
+    REAL factt, taumin, taumax
+    REAL dxdy_, alpha(pim, pjm)
+    REAL dxdy_min, dxdy_max
 
     !  local :
-    REAL :: alphamin, alphamax, gamma, xi
+    REAL alphamin, alphamax, gamma, xi
     SAVE gamma
-    INTEGER :: i, j, ilon, ilat
+    INTEGER i, j, ilon, ilat
 
-    LOGICAL :: first
+    LOGICAL first
     SAVE first
     DATA first/ .TRUE./
 
-    REAL :: zdx(iip1, jjp1), zdy(iip1, jjp1)
+    REAL zdx(iip1, jjp1), zdy(iip1, jjp1)
 
-    REAL :: zlat
-    REAL :: dxdys(iip1, jjp1), dxdyu(iip1, jjp1), dxdyv(iip1, jjm)
+    REAL zlat
+    REAL dxdys(iip1, jjp1), dxdyu(iip1, jjp1), dxdyv(iip1, jjm)
     COMMON /comdxdy/dxdys, dxdyu, dxdyv
 
     IF (first) THEN

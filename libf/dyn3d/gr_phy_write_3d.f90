@@ -13,7 +13,7 @@ contains
 
     use dimens_m, only: iim, jjm
     use dimphy, only: klon
-    use numer_rec, only: assert
+    use nr_util, only: assert
     use grid_change, only: gr_phy_write_2d
 
     REAL, intent(in):: pfi(:, :)

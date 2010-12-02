@@ -27,7 +27,7 @@ contains
     use netcdf95, only: nf95_open, nf95_close, nf95_inq_varid, handle_err, &
          nf95_gw_var
     use netcdf, only:  nf90_nowrite, nf90_get_var
-    use numer_rec, only: assert
+    use nr_util, only: assert
     use grid_change, only: dyn_phy
     use regr1_step_av_m, only: regr1_step_av
     use pressure_var, only: p3d

@@ -26,7 +26,7 @@ contains
     ! and "nivsig".
     ! "pa" should be defined before this procedure is called.
 
-    use numer_rec, only: pi
+    use nr_util, only: pi
 
     REAL s(llm+1)
     ! "s(l)" is the atmospheric hybrid sigma-pressure coordinate at

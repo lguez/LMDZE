@@ -114,10 +114,10 @@ contains
 
     print *, "Call sequence information: etat0"
 
-    ! Construct a grid:
-
     dtvr = daysec / real(day_step)
     print *, 'dtvr = ', dtvr
+
+    ! Construct a grid:
 
     pa = 5e4
     CALL iniconst
@@ -147,9 +147,9 @@ contains
     CALL exner_hyb(psol, p3d, pks, pk)
     IF (MINVAL(pk) == MAXVAL(pk)) stop '"pk" should not be constant'
 
-    pls(:, :, :) = preff * (pk(:, :, :) / cpp)**(1. / kappa)
-    PRINT *, "minval(pls(:, :, :)) = ", minval(pls(:, :, :))
-    print *, "maxval(pls(:, :, :)) = ", maxval(pls(:, :, :))
+    pls = preff * (pk / cpp)**(1. / kappa)
+    PRINT *, "minval(pls) = ", minval(pls)
+    print *, "maxval(pls) = ", maxval(pls)
 
     call start_inter_3d('U', rlonv, rlatv, pls, uvent)
     forall (l = 1: llm) uvent(:iim, :, l) = uvent(:iim, :, l) * cu_2d(:iim, :)
@@ -160,8 +160,8 @@ contains
     vvent(iim + 1, :, :) = vvent(1, :, :)
 
     call start_inter_3d('TEMP', rlonu, rlatv, pls, t3d)
-    PRINT *,  'minval(t3d(:, :, :)) = ', minval(t3d(:, :, :))
-    print *, "maxval(t3d(:, :, :)) = ", maxval(t3d(:, :, :))
+    PRINT *,  'minval(t3d) = ', minval(t3d)
+    print *, "maxval(t3d) = ", maxval(t3d)
 
     tpot(:iim, :, :) = t3d(:iim, :, :) * cpp / pk(:iim, :, :)
     tpot(iim + 1, :, :) = tpot(1, :, :)
@@ -172,9 +172,9 @@ contains
     ENDDO
 
     ! Calcul de l'humidité à saturation :
-    qsat(:, :, :) = q_sat(t3d, pls)
-    PRINT *, "minval(qsat(:, :, :)) = ", minval(qsat(:, :, :))
-    print *, "maxval(qsat(:, :, :)) = ", maxval(qsat(:, :, :))
+    qsat = q_sat(t3d, pls)
+    PRINT *, "minval(qsat) = ", minval(qsat)
+    print *, "maxval(qsat) = ", maxval(qsat)
     IF (MINVAL(qsat) == MAXVAL(qsat)) stop '"qsat" should not be constant'
 
     ! Water vapor:

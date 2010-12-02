@@ -42,7 +42,7 @@ contains
 
     use dimens_m, only: iim, jjm
     use comconst, only: pi
-    use numer_rec, only: assert
+    use nr_util, only: assert
 
     REAL, intent(in):: xdata(:), ydata(:) ! coordinates of input field
     REAL, intent(in):: zdata(:, :) ! input field

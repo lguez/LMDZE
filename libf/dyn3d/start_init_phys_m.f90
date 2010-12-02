@@ -31,9 +31,6 @@ CONTAINS
     INTEGER:: itau(1)
     INTEGER::  llm_tmp, ttm_tmp
 
-    CHARACTER(len=120) physfname
-    LOGICAL:: check=.TRUE.
-
     REAL, ALLOCATABLE:: lon_rad(:), lat_rad(:)
     REAL, ALLOCATABLE:: lon_ini(:), lat_ini(:)
     REAL, ALLOCATABLE:: var_ana(:, :)
@@ -43,9 +40,7 @@ CONTAINS
 
     print *, "Call sequence information: start_init_phys"
     if (any(shape(tsol_2d) /= (/iim + 1, jjm + 1/))) stop "start_init_phys"
-    physfname = 'ECPHY.nc'
-    IF ( check ) print *, 'Opening the surface analysis'
-    CALL flininfo(physfname, iml_phys, jml_phys, llm_tmp, ttm_tmp, fid_phys)
+    CALL flininfo('ECPHY.nc', iml_phys, jml_phys, llm_tmp, ttm_tmp, fid_phys)
 
     ALLOCATE(lat_phys(iml_phys, jml_phys))
     ALLOCATE(lon_phys(iml_phys, jml_phys))

@@ -13,7 +13,7 @@ contains
 
     ! Author: P. Le Van
 
-    use numer_rec, only: assert_eq, assert
+    use nr_util, only: assert_eq, assert
     use dimens_m, only: iim, jjm
     use comgeom, only: aire_2d, apoln, apols
 
@@ -111,7 +111,7 @@ contains
     !      ( L'indice 1 correspond a l'interface mailLE 1 / maille 2)
     !      ( Les abscisses sont exprimées en degres)
 
-    use numer_rec, only: assert_eq
+    use nr_util, only: assert_eq
 
     IMPLICIT NONE
 
@@ -296,7 +296,7 @@ contains
     ! Version unidimensionnelle, en latitude.
     ! L'indice 1 correspond à l'interface maille 1 -- maille 2.
 
-    use numer_rec, only: assert
+    use nr_util, only: assert
 
     IMPLICIT NONE
 
@@ -373,7 +373,7 @@ contains
     ! reverses their order.
     ! Finally, the procedure adds 90° as the last value of the array.
 
-    use numer_rec, only: assert_eq
+    use nr_util, only: assert_eq
     use comconst, only: pi
 
     IMPLICIT NONE

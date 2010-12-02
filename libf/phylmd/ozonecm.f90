@@ -23,7 +23,7 @@ contains
 
     use dimens_m, only: llm
     USE dimphy, ONLY : klon
-    use numer_rec, only: assert, pi
+    use nr_util, only: assert, pi
     use phyetat0_m, only: rlat
 
     REAL, INTENT (IN) :: rjour

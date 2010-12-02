@@ -15,7 +15,7 @@ SUBROUTINE fisrtilp(dtime,paprs,pplay,t,q,ptconv,ratqs,d_t,d_q,d_ql,rneb, &
   USE yoethf
   USE fcttre
   USE comfisrtilp
-  use numer_rec, only: erf
+  use numer_rec, only: nr_erf
 
   IMPLICIT NONE
 
@@ -338,10 +338,10 @@ SUBROUTINE fisrtilp(dtime,paprs,pplay,t,q,ptconv,ratqs,d_t,d_q,d_ql,rneb, &
               zpdf_b(i) = zpdf_k(i)/(2.*sqrt(2.))
               zpdf_e1(i) = zpdf_a(i) - zpdf_b(i)
               zpdf_e1(i) = sign(min(abs(zpdf_e1(i)),5.),zpdf_e1(i))
-              zpdf_e1(i) = 1. - erf(zpdf_e1(i))
+              zpdf_e1(i) = 1. - nr_erf(zpdf_e1(i))
               zpdf_e2(i) = zpdf_a(i) + zpdf_b(i)
               zpdf_e2(i) = sign(min(abs(zpdf_e2(i)),5.),zpdf_e2(i))
-              zpdf_e2(i) = 1. - erf(zpdf_e2(i))
+              zpdf_e2(i) = 1. - nr_erf(zpdf_e2(i))
               IF (zpdf_e1(i)<1.E-10) THEN
                  rneb(i,k) = 0.
                  zqn(i) = zqs(i)

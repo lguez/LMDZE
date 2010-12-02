@@ -27,7 +27,7 @@ contains
     ! Modification M.-A. Filiberti 02/02 lecture de "traceur.def"
     ! Modification de l'intégration de "q" (26/04/94)
 
-    use numer_rec, only: assert
+    use nr_util, only: assert
 
     ! Variables local to the procedure:
 

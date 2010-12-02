@@ -18,7 +18,7 @@ contains
 
     use dimens_m, only: llm
     use dimphy, only: klon, nbtr
-    use numer_rec, only: assert
+    use nr_util, only: assert
 
     REAL, intent(in):: tr_seri(:, :, :), pdtphys, tautr(:)
     real radiornpb(klon, llm, 2)

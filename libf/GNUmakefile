@@ -72,7 +72,7 @@ clobber: clean
 
 .PHONY: depend
 depend ${libf_dir}/depend.mk:
-	makedepf90 -Wmissing -Wconfused -I ${VPATH} -u netcdf -u numer_rec -u netcdf95 -nosrc ${sources} >${libf_dir}/depend.mk
+	makedepf90 -Wmissing -Wconfused -I ${VPATH} -u netcdf -u numer_rec -u netcdf95 -u nr_util -nosrc ${sources} >${libf_dir}/depend.mk
 
 # Dependencies between object files and include files:
 include ${libf_dir}/depend.mk

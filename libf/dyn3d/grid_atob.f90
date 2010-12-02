@@ -37,7 +37,7 @@ contains
     !        grille_m: champ de sortie deja transforme
     !=======================================================================
 
-    use numer_rec, only: assert_eq
+    use nr_util, only: assert_eq
 
     REAL, intent(in):: xdata(:),ydata(:) 
     REAL, intent(in):: entree(:, :)

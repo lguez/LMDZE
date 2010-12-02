@@ -38,7 +38,7 @@ contains
     use ini_histrac_m, only: ini_histrac
     use radiornpb_m, only: radiornpb
     use minmaxqfi_m, only: minmaxqfi
-    use numer_rec, only: assert
+    use nr_util, only: assert
     use press_coefoz_m, only: press_coefoz
 
     logical, intent(in):: rnpb

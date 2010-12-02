@@ -10,7 +10,7 @@ contains
 
     use dimens_m, only: llm
     use dimphy, only: klon
-    use numer_rec, only: assert
+    use nr_util, only: assert
 
     real, intent(in):: zq(:, :), qmin, qmax
     CHARACTER(len=*), intent(in):: comment

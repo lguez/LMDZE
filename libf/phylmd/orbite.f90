@@ -9,7 +9,7 @@ CONTAINS
   SUBROUTINE orbite(xjour, longi, dist)
 
     USE yomcst, ONLY : r_ecc, r_peri
-    use numer_rec, only: pi
+    use nr_util, only: pi
 
     ! Auteur(s): Z.X. Li (LMD/CNRS)
     ! Date: 1993/08/18
@@ -64,7 +64,7 @@ CONTAINS
     USE yomcst, ONLY : r_incl
     USE phyetat0_m, ONLY : rlat, rlon
     USE comconst, ONLY : pi
-    use numer_rec, only: assert
+    use nr_util, only: assert
 
     ! Author : O. Boucher (LMD/CNRS), d'après les routines "zenith" et
     ! "angle" de Z.X. Li

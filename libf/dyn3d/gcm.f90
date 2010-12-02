@@ -1,16 +1,12 @@
 PROGRAM gcm
 
-  ! General circulation model of LMD
-  ! From "gcm.F", version 1.4, 2006/04/04 15:05:16
-
-  ! Avec coordonnées verticales hybrides, avec nouveaux opérateurs de
-  ! dissipation * (gradiv2, divgrad2, nxgraro2)
-
   ! Authors: P. Le Van, L. Fairhead, F. Hourdin
-
+  ! From "gcm.F", version 1.4, 2006/04/04 15:05:16
+  ! General circulation model of LMD
+  ! Avec coordonnées verticales hybrides, avec nouveaux opérateurs de
+  ! dissipation "*" (gradiv2, divgrad2, nxgraro2)
   ! Possibilité de choisir le schéma pour l'advection de "q", en
   ! modifiant "iadv" dans "traceur.def".
-
   ! Pour Van-Leer plus vapeur d'eau saturée : iadv(1)=4
   ! Pour Van-Leer : iadv=10
 
@@ -95,7 +91,7 @@ PROGRAM gcm
   ! Lecture du fichier "start.nc" :
   CALL dynetat0(vcov, ucov, teta, q, masse, ps, phis, time_0)
 
-  ! On remet le calendrier à zero si demandé:
+  ! On remet le calendrier à zero si demandé :
   if (annee_ref /= anneeref .or. day_ref /= dayref) then
      print *, 'Attention : les dates initiales lues dans le fichier ' // &
           '"start" ne correspondent pas à celles lues dans "gcm.def".'
@@ -113,7 +109,7 @@ PROGRAM gcm
      raz_date = .false.
   endif
 
-  ! on recalcule éventuellement le pas de temps
+  ! On recalcule éventuellement le pas de temps :
   zdtvr = daysec / REAL(day_step)
   IF (dtvr /= zdtvr) THEN
      print *, 'Warning: the time steps in the ".def" file and in ' // &
@@ -124,14 +120,9 @@ PROGRAM gcm
      dtvr = zdtvr
   ENDIF
 
-  CALL iniconst
-
-  ! Initialisation de la géometrie :
-  CALL inigeom
-
-  ! Initialisation du filtre :
-  CALL inifilr
-
+  CALL iniconst 
+  CALL inigeom ! initialisation de la géometrie
+  CALL inifilr ! initialisation du filtre
   CALL inidissip
   call init_dyn_phy
 
@@ -157,9 +148,8 @@ PROGRAM gcm
      ! (that value of "cv_2d" is used twice in "zcvfi")
 
      airefi = pack(aire_2d, dyn_phy)
-     print *, 'Attention : vitesse verticale nulle dans la physique.'
-     CALL iniphysiq(klon, llm, latfi, lonfi, airefi, &
-          zcufi, zcvfi, rad, g, r, cpp)
+     CALL iniphysiq(klon, llm, latfi, lonfi, airefi, zcufi, zcvfi, rad, g, r, &
+          cpp)
   ENDIF
 
   ! Initialisation des entrées-sorties :
@@ -174,7 +164,7 @@ PROGRAM gcm
        t_ops = iperiod * zdtvr, t_wrt = periodav * daysec)
 
   ! Choix des fréquences de stockage pour le hors-ligne :
-  istdyn = day_step / 4     ! stockage toutes les 6 h = 1 jour / 4
+  istdyn = day_step / 4 ! stockage toutes les 6 h = 1 jour / 4
   istphy = istdyn / iphysiq     
 
   ! Intégration temporelle du modèle :

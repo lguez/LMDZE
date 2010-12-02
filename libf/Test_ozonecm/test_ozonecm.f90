@@ -10,7 +10,7 @@ program test_ozonecm
   use comvert, only: pa, disvert, ap, bp, preff, presnivs
   use ozonecm_m, only: ozonecm
   use phyetat0_m, only: rlat
-  use numer_rec, only: arth
+  use nr_util, only: arth
   use netcdf95, only: nf95_create, nf95_def_dim, nf95_def_var, nf95_put_att, &
        nf95_enddef, nf95_put_var, nf95_close
   use netcdf, only: nf90_clobber, nf90_float, nf90_global

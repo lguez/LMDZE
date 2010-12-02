@@ -28,7 +28,7 @@ contains
     use netcdf95, only: nf95_inq_varid, handle_err
     use netcdf, only: nf90_get_var
     use grid_change, only: dyn_phy
-    use numer_rec, only: assert
+    use nr_util, only: assert
     use press_coefoz_m, only: press_in_edg
     use regr1_step_av_m, only: regr1_step_av
     use pressure_var, only: p3d
@@ -104,7 +104,7 @@ contains
     use netcdf95, only: nf95_inq_varid, handle_err
     use netcdf, only: nf90_get_var
     use grid_change, only: dyn_phy
-    use numer_rec, only: assert
+    use nr_util, only: assert
     use press_coefoz_m, only: plev
     use regr1_lint_m, only: regr1_lint
     use pressure_var, only: pls

@@ -8,7 +8,7 @@ contains
 
     ! From dyn3d/leapfrog.F, version 1.6, 2005/04/13 08:58:34
     ! Authors: P. Le Van, L. Fairhead, F. Hourdin
-    ! schema matsuno + leapfrog
+    ! Matsuno-leapfrog scheme.
 
     USE calfis_m, ONLY: calfis
     USE com_io_dyn, ONLY: histaveid
@@ -32,11 +32,10 @@ contains
     USE temps, ONLY: itau_dyn
 
     ! Variables dynamiques:
-    REAL, intent(inout):: vcov((iim + 1) * jjm, llm) ! vent covariant
     REAL, intent(inout):: ucov(ip1jmp1, llm) ! vent covariant
+    REAL, intent(inout):: vcov((iim + 1) * jjm, llm) ! vent covariant
     REAL, intent(inout):: teta(iim + 1, jjm + 1, llm) ! potential temperature
     REAL ps(iim + 1, jjm + 1) ! pression au sol, en Pa
-
     REAL masse(ip1jmp1, llm) ! masse d'air
     REAL phis(ip1jmp1) ! geopotentiel au sol
     REAL q(ip1jmp1, llm, nqmx) ! mass fractions of advected fields

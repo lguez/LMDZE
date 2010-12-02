@@ -27,7 +27,7 @@ contains
     ! If required, the longitudes and latitudes are finally replaced
     ! by their mid-values.
 
-    use numer_rec, only: assert_eq
+    use nr_util, only: assert_eq
     use comconst, only: pi
 
     REAL, intent(in):: xd(:)

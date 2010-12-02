@@ -33,6 +33,7 @@ CONTAINS
     use gr_int_dyn_m, only: gr_int_dyn
     use start_init_orog_m, only: phis
     use start_init_phys_m, only: start_init_phys
+    use nr_util, only: assert
 
     REAL, intent(out):: tsol_2d(:, :)
     REAL, intent(out):: psol(:, :) ! surface pressure, in Pa
@@ -42,29 +43,23 @@ CONTAINS
     REAL date, dt
     INTEGER itau(1)
     INTEGER i, j
-
-    CHARACTER(len=120) physfname
-
     REAL, ALLOCATABLE:: lon_rad(:), lat_rad(:)
 
     REAL, ALLOCATABLE:: lon_dyn(:, :), lat_dyn(:, :)
     ! (longitude and latitude from the input file, in rad or degrees)
 
-    REAL, ALLOCATABLE:: var_ana(:, :), z(:, :)
+    REAL, ALLOCATABLE:: var_ana(:, :)
+    real z(iim + 1, jjm + 1)
     real tmp_var(iim, jjm + 1)
-    REAL, ALLOCATABLE:: xppn(:), xpps(:)
 
     !--------------------------
 
     print *, "Call sequence information: start_init_dyn"
-    if (any((/size(tsol_2d, 1), size(psol, 1)/) /= iim + 1)) stop &
-         "start_init_phys size 1"
-    if (any((/size(tsol_2d, 2), size(psol, 2)/) /= jjm + 1)) stop &
-         "start_init_phys size 2"
-    physfname = 'ECDYN.nc'
-    print *, 'Opening the surface analysis'
-    CALL flininfo(physfname, iml_dyn, jml_dyn, llm_dyn, ttm_dyn, fid_dyn)
-    print *, 'Values read from "' // trim(physfname) // '":'
+    call assert((/size(tsol_2d, 1), size(psol, 1)/) == iim + 1, &
+         "start_init_phys size 1")
+    call assert((/size(tsol_2d, 2), size(psol, 2)/) == jjm + 1, &
+         "start_init_phys size 2")
+    CALL flininfo('ECDYN.nc', iml_dyn, jml_dyn, llm_dyn, ttm_dyn, fid_dyn)
     print *, "iml_dyn = ", iml_dyn, ", jml_dyn = ", jml_dyn, &
          ", llm_dyn = ", llm_dyn, ", ttm_dyn = ", ttm_dyn
 
@@ -79,59 +74,44 @@ CONTAINS
     ALLOCATE(lon_rad(iml_dyn))
     ALLOCATE(lon_ini(iml_dyn))
 
-    IF (MAXVAL(lon_dyn(:, :)) > pi) THEN
+    IF (MAXVAL(lon_dyn) > pi) THEN
        ! Assume "lon_dyn" is in degrees 
-       lon_ini(:) = lon_dyn(:, 1) * pi / 180.
+       lon_ini = lon_dyn(:, 1) * pi / 180.
     ELSE
-       lon_ini(:) = lon_dyn(:, 1) 
+       lon_ini = lon_dyn(:, 1) 
     ENDIF
 
     ALLOCATE(lat_rad(jml_dyn))
     ALLOCATE(lat_ini(jml_dyn))
 
-    IF (MAXVAL(lat_dyn(:, :)) > pi) THEN
-       lat_ini(:) = lat_dyn(1, :) * pi / 180.
+    IF (MAXVAL(lat_dyn) > pi) THEN
+       lat_ini = lat_dyn(1, :) * pi / 180.
     ELSE
-       lat_ini(:) = lat_dyn(1, :) 
+       lat_ini = lat_dyn(1, :) 
     ENDIF
-
-    ALLOCATE(z(iim + 1, jjm + 1))
 
     ! 'Z': Surface geopotential
     CALL flinget(fid_dyn, 'Z', iml_dyn, jml_dyn, 0, ttm_dyn, 1, 1, var_ana)
     CALL conf_dat2d(lon_ini, lat_ini, lon_rad, lat_rad, var_ana)
     CALL inter_barxy(lon_rad, lat_rad(:jml_dyn -1), var_ana, rlonu(:iim), &
          rlatv, tmp_var)
-    z(:, :) = gr_int_dyn(tmp_var)
+    z = gr_int_dyn(tmp_var)
 
     ! 'SP': Surface pressure
     CALL flinget(fid_dyn, 'SP', iml_dyn, jml_dyn, 0, ttm_dyn, 1, 1, var_ana)
     CALL conf_dat2d(lon_ini, lat_ini, lon_rad, lat_rad, var_ana)
     CALL inter_barxy(lon_rad, lat_rad(:jml_dyn -1), var_ana, rlonu(:iim), &
          rlatv, tmp_var) 
-    psol(:, :) = gr_int_dyn(tmp_var)
+    psol = gr_int_dyn(tmp_var)
     CALL start_init_phys(tsol_2d)
 
-    ! PSOL is computed in Pascals
-
-    DO j = 1, jjm + 1
-       DO i = 1, iim
-          psol(i, j) = psol(i, j) &
-               * (1. + (z(i, j) - phis(i, j)) / 287. / tsol_2d(i, j))
-       ENDDO
-    ENDDO
+    psol(:iim, :) = psol(:iim, :) &
+         * (1. + (z(:iim, :) - phis(:iim, :)) / 287. / tsol_2d(:iim, :))
     psol(iim + 1, :) = psol(1, :)
 
-    ALLOCATE(xppn(iim))
-    ALLOCATE(xpps(iim)) 
-
-    DO  i = 1, iim
-       xppn(i) = aire_2d( i, 1) * psol( i, 1)
-       xpps(i) = aire_2d( i, jjm + 1) * psol( i, jjm + 1)
-    ENDDO
-
-    psol(:, 1) = SUM(xppn)/apoln
-    psol(:, jjm + 1) = SUM(xpps)/apols
+    psol(:, 1) = SUM(aire_2d(:iim, 1) * psol(:iim, 1)) / apoln
+    psol(:, jjm + 1) = SUM(aire_2d(:iim, jjm + 1) * psol(:iim, jjm + 1)) &
+         / apols
 
   END SUBROUTINE start_init_dyn
 
@@ -139,19 +119,20 @@ CONTAINS
 
   subroutine start_inter_3d(varname, lon_in2, lat_in2, pls_in, var3d)
 
-    ! This procedure gets a 3D variable from a file and does the
-    ! interpolations needed.
+    ! This procedure gets a 3D variable from a file and interpolates it.
 
     use flinget_m, only: flinget
-    use numer_rec, only: assert_eq, spline, splint
+    use nr_util, only: assert_eq
+    use numer_rec, only: spline, splint
     use inter_barxy_m, only: inter_barxy
     use gr_int_dyn_m, only: gr_int_dyn
     use conf_dat3d_m, only: conf_dat3d
 
     CHARACTER(len=*), intent(in):: varname
-    REAL, intent(in):: lon_in2(:), lat_in2(:)
-    REAL, intent(in):: pls_in(:, :, :)
-    REAL, intent(out):: var3d(:, :, :)
+    REAL, intent(in):: lon_in2(:) ! (iml)
+    REAL, intent(in):: lat_in2(:)
+    REAL, intent(in):: pls_in(:, :, :) ! (iml, jml, lml)
+    REAL, intent(out):: var3d(:, :, :) ! (iml, jml, lml)
 
     ! LOCAL:
     INTEGER iml, jml, lml
@@ -174,12 +155,9 @@ CONTAINS
 
     print *, "iml = ", iml, ", jml = ", jml
     print *, "varname = ", varname
-    print *, "iml_dyn = ", iml_dyn, ", jml_dyn = ", jml_dyn, &
-         ", llm_dyn = ", llm_dyn, ", ttm_dyn = ", ttm_dyn
     print *, 'Going into flinget to extract the 3D field.'
     CALL flinget(fid_dyn, varname, iml_dyn, jml_dyn, llm_dyn, ttm_dyn, 1, 1, &
          var_ana3d)
-
     CALL conf_dat3d(lon_ini, lat_ini, levdyn_ini, lon_rad, lat_rad, lev_dyn, &
          var_ana3d)
 
@@ -191,11 +169,11 @@ CONTAINS
 
     ! Pour l'interpolation verticale, on interpole du haut de l'atmosphère
     ! vers le sol :
-    ax(:) = lev_dyn(llm_dyn:1:-1)
+    ax = lev_dyn(llm_dyn:1:-1)
     DO ij=1, jml
        DO ii=1, iml-1
-          ay(:) = var_tmp3d(ii, ij, llm_dyn:1:-1)
-          yder(:) = SPLINE(ax, ay)
+          ay = var_tmp3d(ii, ij, llm_dyn:1:-1)
+          yder = SPLINE(ax, ay)
           do il=1, lml
              var3d(ii, ij, il) = SPLINT(ax, ay, yder, pls_in(ii, ij, il))
           END do

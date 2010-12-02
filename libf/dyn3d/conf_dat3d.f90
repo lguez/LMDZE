@@ -15,7 +15,7 @@ contains
     ! - pi/2 et pour que la coordonnée pression soit décroissante.
 
     use comconst, only: pi
-    use numer_rec, only: assert_eq
+    use nr_util, only: assert_eq
 
     REAL, intent(in):: xd(:), yd(:) ! longitudes et latitudes initiales, en rad
     REAL, intent(in):: zd(:) ! pressure levels, in Pa or hPa

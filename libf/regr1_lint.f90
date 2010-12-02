@@ -1,5 +1,7 @@
 module regr1_lint_m
 
+  ! Author: Lionel GUEZ
+
   implicit none
 
   interface regr1_lint
@@ -19,7 +21,8 @@ contains
 
     ! "vs" has rank 1.
 
-    use numer_rec, only: assert_eq, hunt !!, polint
+    use nr_util, only: assert_eq
+    use numer_rec, only: hunt !!, polint
 
     real, intent(in):: vs(:)
     ! (values of the function at source points "xs")
@@ -58,7 +61,8 @@ contains
 
     ! "vs" has rank 2.
 
-    use numer_rec, only: assert_eq, hunt
+    use nr_util, only: assert_eq
+    use numer_rec, only: hunt
 
     real, intent(in):: vs(:, :)
     ! (values of the function at source points "xs")
