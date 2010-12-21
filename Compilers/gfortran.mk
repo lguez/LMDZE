@@ -14,7 +14,7 @@ netcdf95_dir = /user/guez_local/lib/NetCDF95_gfortran
 inc_flags = $(addprefix -I, ${libf_dir} ${libf_dir}/phylmd ${netcdf_inc_dir} ${numer_rec_dir} ${netcdf95_dir} ${nr_util_dir})
 
 # Other flags which do not affect run time performance:
-lang_flags = -ffree-form -frange-check -std=f95 -pedantic-errors -Wall -Wconversion -Wimplicit-interface -Wunderflow -Wextra -Wunreachable-code
+lang_flags = -ffree-form -frange-check -std=f95 -pedantic-errors -Wall -Wimplicit-interface -Wunderflow -Wextra -Wunreachable-code
 
 # Flags which affect run time performance:
 perf_flags = -fbacktrace -ffpe-trap=invalid,zero,overflow -fbounds-check -g3 -O0 -fstack-protector-all

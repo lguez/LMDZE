@@ -7,7 +7,6 @@ contains
   SUBROUTINE filtreg(champ, nlat, nbniv, ifiltre, iaire, griscal, iter)
 
     ! From filtrez/filtreg.F, version 1.1.1.1, 2004/05/19 12:53:09
-
     ! Author: P. Le Van
     ! Objet : filtre matriciel longitudinal, avec les matrices précalculées
     ! pour l'opérateur filtre. 

@@ -98,6 +98,7 @@ SUBROUTINE clmain(dtime, itap, date0, pctsrf, pctsrf_new, t, q, u, v,&
   USE yomcst, ONLY : rd, rg, rkappa
   USE conf_phys_m, ONLY : iflag_pbl
   USE gath_cpl, ONLY : gath2cpl
+  use hbtm_m, only: hbtm
 
   IMPLICIT NONE
 
@@ -250,7 +251,7 @@ SUBROUTINE clmain(dtime, itap, date0, pctsrf, pctsrf_new, t, q, u, v,&
   ! -- LOOP
 
   REAL yt10m(klon), yq10m(klon)
-  !IM cf. AM : pbl, hbtm2 (Comme les autres diagnostics on cumule ds
+  !IM cf. AM : pbl, hbtm (Comme les autres diagnostics on cumule ds
   ! physiq ce qui permet de sortir les grdeurs par sous surface)
   REAL pblh(klon, nbsrf)
   REAL plcl(klon, nbsrf)
@@ -289,17 +290,11 @@ SUBROUTINE clmain(dtime, itap, date0, pctsrf, pctsrf_new, t, q, u, v,&
   PARAMETER (t_coup=273.15)
 
   CHARACTER (len=20) :: modname = 'clmain'
-  LOGICAL check
-  PARAMETER (check=.FALSE.)
 
   !------------------------------------------------------------
 
   ! initialisation Anne
   ytherm = 0.
-
-  IF (check) THEN
-     PRINT *, modname, '  klon=', klon
-  END IF
 
   IF (debugindex .AND. first_appel) THEN
      first_appel = .FALSE.
@@ -448,10 +443,6 @@ SUBROUTINE clmain(dtime, itap, date0, pctsrf, pctsrf_new, t, q, u, v,&
            ni(knon) = i
         END IF
      END DO
-
-     IF (check) THEN
-        PRINT *, 'CLMAIN, nsrf, knon =', nsrf, knon
-     END IF
 
      ! variables pour avoir une sortie IOIPSL des INDEX
      IF (debugindex) THEN
@@ -814,16 +805,13 @@ SUBROUTINE clmain(dtime, itap, date0, pctsrf, pctsrf_new, t, q, u, v,&
 
      END DO
 
-     !IM cf AM : pbl, HBTM
      DO i = 1, knon
         y_cd_h(i) = ycoefh(i, 1)
         y_cd_m(i) = ycoefm(i, 1)
      END DO
-     !     print*, 'appel hbtm2'
-     CALL hbtm(knon, ypaprs, ypplay, yt2m, yt10m, yq2m, yq10m, yustar, y_flux_t, &
-          y_flux_q, yu, yv, yt, yq, ypblh, ycapcl, yoliqcl, ycteicl, ypblt, ytherm, &
-          ytrmb1, ytrmb2, ytrmb3, ylcl)
-     !     print*, 'fin hbtm2'
+     CALL hbtm(knon, ypaprs, ypplay, yt2m, yt10m, yq2m, yq10m, yustar, &
+          y_flux_t, y_flux_q, yu, yv, yt, yq, ypblh, ycapcl, yoliqcl, &
+          ycteicl, ypblt, ytherm, ytrmb1, ytrmb2, ytrmb3, ylcl)
 
      DO j = 1, knon
         i = ni(j)

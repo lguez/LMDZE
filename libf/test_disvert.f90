@@ -15,6 +15,7 @@ program test_disvert
   ! "s(l)" : à l'interface des couches "l" et "l-1"
 
   real p(llm + 1) ! pressure at level, in Pa
+  real z(llm) ! pressure-altitude (km)
 
   !---------------------
 
@@ -23,13 +24,17 @@ program test_disvert
   call disvert
   s = ap / pa + bp
   p = ap + bp * preff
+  z = - 7. * log(ap(:llm) / preff + bp(:llm))
 
   call new_unit(unit)
   open(unit, file="test_disvert.csv", status="replace", action="write")
-  write(unit, fmt=*) '"ap (hPa)" "bp" "s" "p (hPa)"' ! title line
-  do l = 1, llm
-     write(unit, fmt=*) ap(l) / 100., bp(l), s(l), p(l) / 100.
+  ! Title line:
+  write(unit, fmt=*) '"ap (hPa)" "bp" "s" "p (hPa)", "z (km)", "delta z (km)"'
+  do l = 1, llm - 1
+     write(unit, fmt=*) ap(l) / 100., bp(l), s(l), p(l) / 100., z(l), &
+          z(l+1) - z(l)
   end do
+  write(unit, fmt=*) ap(llm) / 100., bp(llm), s(llm), p(llm) / 100., z(llm)
   close(unit)
   print *, 'The file "test_disvert.csv" has been created.'
 

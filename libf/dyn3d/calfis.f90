@@ -4,9 +4,9 @@ module calfis_m
 
 contains
 
-  SUBROUTINE calfis(lafin, rdayvrai, heure, pucov, pvcov, pteta, q, &
+  SUBROUTINE calfis(rdayvrai, heure, pucov, pvcov, pteta, q, &
        pmasse, pps, ppk, pphis, pphi, pducov, pdvcov, pdteta, pdq, pw, &
-       pdufi, pdvfi, pdhfi, pdqfi, pdpsfi)
+       pdufi, pdvfi, pdhfi, pdqfi, pdpsfi, lafin)
 
     ! From dyn3d/calfis.F, version 1.3 2005/05/25 13:10:09
     ! Authors : P. Le Van, F. Hourdin

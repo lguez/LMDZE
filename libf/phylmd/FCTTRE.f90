@@ -1,109 +1,104 @@
 module FCTTRE
 
-  ! From phylmd/FCTTRE.inc,v 1.2 2004/06/22 11:45:32
+  ! From phylmd/FCTTRE.inc, version 1.2 2004/06/22 11:45:32
 
-  !      This COMDECK includes the Thermodynamical functions for the cy39
-  !       ECMWF Physics package.
-  !       Consistent with YOMCST Basic physics constants, assuming the
-  !       partial pressure of water vapour is given by a first order
-  !       Taylor expansion of Qs(T) w.r.t. to Temperature, using constants
-  !       in YOETHF
+  ! This COMDECK includes the thermodynamical functions for the cycle
+  ! 39 ECMWF Physics package. Consistent with YOMCST basic physics
+  ! constants, assuming the partial pressure of water vapour is given
+  ! by a first order Taylor expansion of Qs(T) with respect to
+  ! temperature, using constants in yoethf.
 
   implicit none
 
-  LOGICAL, PARAMETER:: thermcep=.TRUE.
+  LOGICAL, PARAMETER:: thermcep= .TRUE.
 
 contains
 
-  REAL function FOEEW ( PTARG,PDELARG )
+  REAL function FOEEW(T, DEL)
 
     use yoethf, only: R3LES, R3IES, R4LES, R4IES
     use YOMCST, only: rtt
 
-    REAL, intent(in):: PTARG, PDELARG
+    REAL, intent(in):: T, DEL
 
     !-----------------------
 
-    FOEEW = EXP ((R3LES*(1.-PDELARG)+R3IES*PDELARG) * (PTARG-RTT) &
-         / (PTARG-(R4LES*(1.-PDELARG)+R4IES*PDELARG)) )
+    FOEEW = EXP((R3LES * (1. - DEL) + R3IES * DEL) * (T - RTT) &
+         / (T - (R4LES * (1. - DEL) + R4IES * DEL)))
 
   end function FOEEW
 
   !******************************************
 
-  REAL function FOEDE(PTARG,PDELARG,P5ARG,PQSARG,PCOARG)
+  REAL function FOEDE(T, DEL, P5ARG, QS, PCOARG)
 
     use yoethf, only: R4LES, R4IES
 
-    REAL, intent(in):: PTARG, PDELARG
-    real, intent(in):: P5ARG, PQSARG, PCOARG
+    REAL, intent(in):: T, DEL
+    real, intent(in):: P5ARG, QS, PCOARG
 
     !-----------------------
 
-    FOEDE = PQSARG*PCOARG*P5ARG / (PTARG-(R4LES*(1.-PDELARG)+R4IES*PDELARG))**2
+    FOEDE = QS*PCOARG*P5ARG / (T-(R4LES*(1.-DEL)+R4IES*DEL))**2
 
   end function FOEDE
 
   !******************************************
 
-  REAL function qsats(ptarg)
+  REAL function qsats(t)
 
-    REAL, intent(in):: PTARG
+    REAL, intent(in):: T
 
     !-----------------------
 
-    qsats = 100.0 * 0.622 * 10.0 &
-         ** (2.07023 - 0.00320991 * ptarg &
-         - 2484.896 / ptarg + 3.56654 * LOG10(ptarg))
+    qsats = 100.0 * 0.622 &
+         * 10.**(2.07023 - 0.00320991 * t - 2484.896 / t + 3.56654 * LOG10(t))
 
   end function qsats
 
   !******************************************
 
-  REAL function qsatl(ptarg)
+  REAL function qsatl(t)
 
-    REAL, intent(in):: PTARG
+    REAL, intent(in):: T
 
     !-----------------------
 
-    qsatl = 100.0 * 0.622 * 10.0 &
-         ** (23.8319 - 2948.964 / ptarg &
-         - 5.028 * LOG10(ptarg) &
-         - 29810.16 * EXP( - 0.0699382 * ptarg) &
-         + 25.21935 * EXP( - 2999.924 / ptarg))
+    qsatl = 100.0 * 0.622 * 10.**(23.8319 - 2948.964 / t &
+         - 5.028 * LOG10(t) - 29810.16 * EXP(- 0.0699382 * t) &
+         + 25.21935 * EXP(- 2999.924 / t))
 
   end function qsatl
 
   !******************************************
 
-  REAL function dqsats(ptarg,pqsarg)
+  REAL function dqsats(t, qs)
 
     use YOMCST, only: RLVTT, rcpd
 
-    REAL, intent(in):: PTARG, pqsarg
+    REAL, intent(in):: T, qs
 
     !-----------------------
 
-    dqsats = RLVTT/RCPD*pqsarg * (3.56654/ptarg &
-         +2484.896*LOG(10.)/ptarg**2 &
-         -0.00320991*LOG(10.))
+    dqsats = RLVTT / RCPD * qs * (3.56654/t &
+         +2484.896*LOG(10.)/t**2 - 0.00320991*LOG(10.))
 
   end function dqsats
 
   !******************************************
 
-  REAL function dqsatl(ptarg,pqsarg)
+  REAL function dqsatl(t, qs)
 
     use YOMCST, only: RLVTT, rcpd
 
-    REAL, intent(in):: PTARG, pqsarg
+    REAL, intent(in):: T, qs
 
     !-----------------------
 
-    dqsatl = RLVTT/RCPD*pqsarg*LOG(10.)* &
-         (2948.964/ptarg**2-5.028/LOG(10.)/ptarg &
-         +25.21935*2999.924/ptarg**2*EXP(-2999.924/ptarg) &
-         +29810.16*0.0699382*EXP(-0.0699382*ptarg))
+    dqsatl = RLVTT / RCPD * qs * LOG(10.) &
+         * (2948.964/t**2-5.028/LOG(10.)/t &
+         +25.21935*2999.924/t**2*EXP(-2999.924/t) &
+         +29810.16*0.0699382*EXP(-0.0699382*t))
 
   end function dqsatl
 

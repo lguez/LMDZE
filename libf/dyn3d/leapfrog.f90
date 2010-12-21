@@ -10,6 +10,7 @@ contains
     ! Authors: P. Le Van, L. Fairhead, F. Hourdin
     ! Matsuno-leapfrog scheme.
 
+    use addfi_m, only: addfi
     USE calfis_m, ONLY: calfis
     USE com_io_dyn, ONLY: histaveid
     USE comconst, ONLY: daysec, dtphys, dtvr
@@ -27,7 +28,6 @@ contains
     use integrd_m, only: integrd
     USE logic, ONLY: iflag_phys, ok_guide
     USE paramet_m, ONLY: ip1jmp1
-    USE pression_m, ONLY: pression
     USE pressure_var, ONLY: p3d
     USE temps, ONLY: itau_dyn
 
@@ -100,7 +100,7 @@ contains
     dq = 0.
 
     ! On initialise la pression et la fonction d'Exner :
-    CALL pression(ip1jmp1, ap, bp, ps, p3d)
+    forall (l = 1: llm + 1) p3d(:, :, l) = ap(l) + bp(l) * ps
     CALL exner_hyb(ps, p3d, pks, pk, pkf)
 
     ! Début de l'integration temporelle :
@@ -141,7 +141,7 @@ contains
 
        if (.not. leapf) then
           ! Matsuno backward
-          CALL pression(ip1jmp1, ap, bp, ps, p3d)
+          forall (l = 1: llm + 1) p3d(:, :, l) = ap(l) + bp(l) * ps
           CALL exner_hyb(ps, p3d, pks, pk, pkf)
 
           ! Calcul des tendances dynamiques:
@@ -158,7 +158,7 @@ contains
        IF (MOD(itau + 1, iphysiq) == 0 .AND. iflag_phys /= 0) THEN
           ! calcul des tendances physiques:
 
-          CALL pression(ip1jmp1, ap, bp, ps, p3d)
+          forall (l = 1: llm + 1) p3d(:, :, l) = ap(l) + bp(l) * ps
           CALL exner_hyb(ps, p3d, pks, pk, pkf)
 
           rdaym_ini = itau * dtvr / daysec
@@ -166,16 +166,16 @@ contains
           time = REAL(mod(itau, day_step)) / day_step + time_0
           IF (time > 1.) time = time - 1.
 
-          CALL calfis(itau + 1 == itaufin, rdayvrai, time, ucov, vcov, &
-               teta, q, masse, ps, pk, phis, phi, du, dv, dteta, dq, w, dufi, &
-               dvfi, dtetafi, dqfi, dpfi)
+          CALL calfis(rdayvrai, time, ucov, vcov, teta, q, masse, ps, pk, &
+               phis, phi, du, dv, dteta, dq, w, dufi, dvfi, dtetafi, dqfi, &
+               dpfi, lafin=itau+1==itaufin)
 
           ! ajout des tendances physiques:
           CALL addfi(nqmx, dtphys, ucov, vcov, teta, q, ps, dufi, dvfi, &
                dtetafi, dqfi, dpfi)
        ENDIF
 
-       CALL pression(ip1jmp1, ap, bp, ps, p3d)
+       forall (l = 1: llm + 1) p3d(:, :, l) = ap(l) + bp(l) * ps
        CALL exner_hyb(ps, p3d, pks, pk, pkf)
 
        IF (MOD(itau + 1, idissip) == 0) THEN

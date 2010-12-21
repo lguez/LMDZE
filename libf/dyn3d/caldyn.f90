@@ -10,7 +10,6 @@ SUBROUTINE caldyn(itau, ucov, vcov, teta, ps, masse, pk, pkf, phis, phi, &
   USE paramet_m, ONLY : iip1, ip1jm, ip1jmp1, jjp1, llmp1
   USE comvert, ONLY : ap, bp
   USE comgeom, ONLY : airesurg, constang
-  USE pression_m, ONLY : pression
   use sortvarc_m, only: sortvarc
 
   IMPLICIT NONE
@@ -45,7 +44,7 @@ SUBROUTINE caldyn(itau, ucov, vcov, teta, ps, masse, pk, pkf, phis, phi, &
   !   Calcul des tendances dynamiques:
 
   CALL covcont(llm, ucov, vcov, ucont, vcont)
-  CALL pression(ip1jmp1, ap, bp, ps, p)
+  forall (l = 1: llm + 1) p(:, l) = ap(l) + bp(l) * ps
   CALL psextbar(ps, psexbarxy)
   CALL massdair(p, masse)
   CALL massbar(masse, massebx, masseby)

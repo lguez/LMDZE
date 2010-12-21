@@ -8,7 +8,8 @@ module comgeomphy
 
   implicit none
 
-  real airephy(klon), cuphy(klon), cvphy(klon)
+  real airephy(klon)
+  real cuphy(klon), cvphy(klon) ! "cu" and "cv" values on the scalar grid
   REAL rlatd(klon), rlond(klon)
 
   save

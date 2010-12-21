@@ -14,6 +14,7 @@ PROGRAM gcm
   use com_io_dyn, only: histid, histvid, histaveid
   use comconst, only: daysec, cpp, dtvr, g, rad, r, initialize
   use comgeom, only: rlatu, aire_2d, cu_2d, cv_2d, rlonv
+  use comgeomphy, only: airephy, cuphy, cvphy, rlatd, rlond
   use conf_gcm_m, only: day_step, iperiod, anneeref, dayref, iecri, iphysiq, &
        nday, raz_date, periodav, conf_gcm
   use dimens_m, only: iim, jjm, llm, nqmx
@@ -31,6 +32,7 @@ PROGRAM gcm
   use leapfrog_m, only: leapfrog
   use logic, only: iflag_phys
   use paramet_m, only: ip1jm, ip1jmp1
+  use suphec_m, only: suphec
   use temps, only: day_ref, annee_ref, day_end, itau_dyn
   use tracstoke, only: istdyn, istphy
 
@@ -52,11 +54,6 @@ PROGRAM gcm
 
   ! Calendrier :
   LOGICAL:: true_calendar = .false. ! default value
-
-  ! Variables pour l'initialisation de la physique :
-  REAL zcufi(klon), zcvfi(klon) ! "cu" and "cv" values on the scalar grid
-  REAL latfi(klon), lonfi(klon)
-  REAL airefi(klon)
 
   logical mask_v(iim + 1, jjm) 
   ! (mask for points in the "v" grid, first index is for longitude,
@@ -128,28 +125,27 @@ PROGRAM gcm
 
   ! Initialisation de la physique :
   IF (iflag_phys == 1) THEN
-     latfi(1)=rlatu(1)
-     latfi(2:klon-1) = pack(spread(rlatu(2:jjm), 1, iim), .true.)
-     latfi(klon)= rlatu(jjm + 1)
+     rlatd(1)=rlatu(1)
+     rlatd(2:klon-1) = pack(spread(rlatu(2:jjm), 1, iim), .true.)
+     rlatd(klon)= rlatu(jjm + 1)
 
-     lonfi(1)=0.
-     lonfi(2:klon-1) = pack(spread(rlonv(:iim), 2, jjm - 1), .true.)
-     lonfi(klon)= 0.
+     rlond(1)=0.
+     rlond(2:klon-1) = pack(spread(rlonv(:iim), 2, jjm - 1), .true.)
+     rlond(klon)= 0.
 
-     zcufi = pack(cu_2d, dyn_phy)
+     cuphy = pack(cu_2d, dyn_phy)
 
      ! Construct a mask for points in the "v" grid:
      mask_v = .true.
      mask_v(2:, 1) = .false.
      mask_v(iim + 1, 2:) = .false.
 
-     zcvfi(:klon - 1) = pack(cv_2d, mask_v)
-     zcvfi(klon) = cv_2d(1, jjm)
-     ! (that value of "cv_2d" is used twice in "zcvfi")
+     cvphy(:klon - 1) = pack(cv_2d, mask_v)
+     cvphy(klon) = cv_2d(1, jjm)
+     ! (that value of "cv_2d" is used twice in "cvphy")
 
-     airefi = pack(aire_2d, dyn_phy)
-     CALL iniphysiq(klon, llm, latfi, lonfi, airefi, zcufi, zcvfi, rad, g, r, &
-          cpp)
+     airephy = pack(aire_2d, dyn_phy)
+     CALL suphec
   ENDIF
 
   ! Initialisation des entrées-sorties :

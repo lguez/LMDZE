@@ -7,6 +7,8 @@ c
 c
       use getparam
       use guide_m
+      use tau2alpha_m, only: lat_max_guide, lat_min_guide
+
       IMPLICIT NONE
 
 c-----------------------------------------------------------------------

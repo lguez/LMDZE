@@ -16,7 +16,6 @@ contains
     USE paramet_m, ONLY : iip1, ip1jm, ip1jmp1, jjp1, llmp1
     USE comvert, ONLY : ap, bp
     USE comgeom, ONLY : airesurg
-    USE pression_m, ONLY : pression
 
     !   Arguments:
     REAL, INTENT (IN) :: vcov(ip1jm, llm), ucov(ip1jmp1, llm)
@@ -37,7 +36,7 @@ contains
     REAL :: bern(ip1jmp1, llm)
     REAL :: massebxy(ip1jm, llm), dp(ip1jmp1)
 
-    INTEGER :: ij
+    INTEGER :: ij, l
 
     !-----------------------------------------------------------------------
 
@@ -46,7 +45,7 @@ contains
     !   Calcul des tendances dynamiques:
 
     CALL covcont(llm, ucov, vcov, ucont, vcont)
-    CALL pression(ip1jmp1, ap, bp, ps, p)
+    forall (l = 1: llm + 1) p(:, l) = ap(l) + bp(l) * ps
     CALL psextbar(ps, psexbarxy)
     CALL massdair(p, masse)
     CALL massbar(masse, massebx, masseby)

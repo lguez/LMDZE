@@ -16,7 +16,6 @@ contains
     USE paramet_m, ONLY : iip1, iip2, ijp1llm, ip1jm, ip1jmp1, jjp1, llmp1
     USE comvert, ONLY : ap, bp
     USE comgeom, ONLY : aire, apoln, apols
-    USE pression_m, ONLY : pression
     USE filtreg_m, ONLY : filtreg
 
     !   Arguments:                                                          
@@ -90,7 +89,7 @@ contains
 
     !  ... Calcul  de la nouvelle masse d'air au dernier temps integre t+1 .
 
-    CALL pression(ip1jmp1,ap,bp,ps,p)
+    forall (l = 1: llm + 1) p(:, l) = ap(l) + bp(l) * ps
     CALL massdair(p,masse)
 
     CALL scopy(ijp1llm,masse,1,finvmasse,1)
