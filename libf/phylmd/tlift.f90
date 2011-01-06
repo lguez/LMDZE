@@ -4,7 +4,7 @@ SUBROUTINE TLIFT(P,T,RR,RS,GZ,PLCL,ICB,NK, TVP,TPK,CLW,ND,NL, DTVPDT1,DTVPDQ1)
 
   ! Argument NK ajoute (jyg) = Niveau de depart de la convection
 
-  use YOMCST, only: rcpd, RCPV, rcw, rcs, rv, rd, rlvtt, RLMLT
+  use SUPHEC_M, only: rcpd, RCPV, rcw, rcs, rv, rd, rlvtt, RLMLT
 
   implicit none
 

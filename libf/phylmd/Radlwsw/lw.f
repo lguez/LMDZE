@@ -12,7 +12,7 @@ cIM ctes ds clesphys.h   SUBROUTINE LW(RCO2,RCH4,RN2O,RCFC11,RCFC12,
       use dimens_m
       use dimphy
       use clesphys
-      use YOMCST
+      use SUPHEC_M
       use raddim
             use raddimlw
       IMPLICIT none

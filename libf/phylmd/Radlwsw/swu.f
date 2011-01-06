@@ -6,7 +6,7 @@ cIM ctes ds clesphys.h   SUBROUTINE SWU (PSCT,RCO2,PCLDSW,PPMB,PPSOL,PRMU0,PFRAC
       use dimens_m
       use dimphy
       use clesphys
-      use YOMCST
+      use SUPHEC_M
       use raddim
       use radepsi
       use radopt

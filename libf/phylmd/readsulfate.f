@@ -6,7 +6,7 @@
       use dimens_m      
       use dimphy      
       use temps      
-      use YOMCST
+      use SUPHEC_M
       IMPLICIT none
       
 c Content: 
@@ -281,7 +281,7 @@ c-----------------------------------------------------------------------------
       use dimens_m      
       use dimphy      
       use temps      
-      use YOMCST
+      use SUPHEC_M
       IMPLICIT none
       
 c Content: 

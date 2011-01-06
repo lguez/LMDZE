@@ -10,7 +10,7 @@ SUBROUTINE orosetup(nlon, ktest, kkcrit, kkcrith, kcrit, kkenvh, kknu, kknu2, &
 
   USE dimens_m
   USE dimphy
-  USE yomcst
+  USE suphec_m
   USE yoegwd
 
   IMPLICIT NONE

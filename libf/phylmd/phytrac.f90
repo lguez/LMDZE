@@ -30,7 +30,7 @@ contains
     use clesphys, only: ecrit_tra
     use clesphys2, only: iflag_con
     use abort_gcm_m, only: abort_gcm
-    use YOMCST, only: rg
+    use SUPHEC_M, only: rg
     use ctherm, only: iflag_thermals
     use regr_pr_comb_coefoz_m, only: regr_pr_comb_coefoz
     use phyetat0_m, only: rlat

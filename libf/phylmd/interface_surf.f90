@@ -2,53 +2,51 @@ MODULE interface_surf
 
   ! From phylmd/interface_surf.F90, version 1.8 2005/05/25 13:10:09
 
-  ! Ce module regroupe toutes les routines gérant l'interface entre le modèle 
-  ! atmosphérique et les modèles de surface (sols continentaux,
-  ! océans, glaces).
-  ! Les routines sont les suivantes:
-  ! interfsurf_hq : routine d'aiguillage vers les interfaces avec les
-  !    différents modèles de surface
-  ! interfoce_* : routines d'interface proprement dites
+  ! Ce module regroupe toutes les routines gérant l'interface entre le
+  ! modèle atmosphérique et les modèles de surface (sols continentaux,
+  ! océans, glaces). Les routines sont les suivantes. "interfsurf_hq" :
+  ! routine d'aiguillage vers les interfaces avec les différents
+  ! modèles de surface ; "interfoce_*" : routines d'interface proprement
+  ! dites.
 
-  ! L. Fairhead, LMD, 02/2000
+  ! L. Fairhead, LMD, february 2000
 
   IMPLICIT none
 
   PRIVATE
   PUBLIC :: interfsurf_hq
 
-  ! run_off      ruissellement total
-  REAL, ALLOCATABLE, DIMENSION(:), SAVE    :: run_off, run_off_lic
-  real, allocatable, dimension(:), save    :: coastalflow, riverflow
+  ! run_off ruissellement total
+  REAL, ALLOCATABLE, DIMENSION(:), SAVE :: run_off, run_off_lic
+  real, allocatable, dimension(:), save :: coastalflow, riverflow
 
   REAL, ALLOCATABLE, DIMENSION(:, :), SAVE :: tmp_rriv, tmp_rcoa, tmp_rlic
-  !! pour simuler la fonte des glaciers antarctiques
+  ! pour simuler la fonte des glaciers antarctiques
   REAL, ALLOCATABLE, DIMENSION(:, :), SAVE :: coeff_iceberg
-  real, save                              :: surf_maille 
-  real, save                              :: cte_flux_iceberg = 6.3e7
-  integer, save                           :: num_antarctic = 1
-  REAL, save                              :: tau_calv
+  real, save :: surf_maille 
+  real, save :: cte_flux_iceberg = 6.3e7
+  integer, save :: num_antarctic = 1
+  REAL, save :: tau_calv
 
 CONTAINS
 
-  SUBROUTINE interfsurf_hq(itime, dtime, date0, jour, rmu0, &
-       & klon, iim, jjm, nisurf, knon, knindex, pctsrf, &
-       & rlon, rlat, cufi, cvfi, &
-       & debut, lafin, ok_veget, soil_model, nsoilmx, tsoil, qsol, &
-       & zlev,  u1_lay, v1_lay, temp_air, spechum, epot_air, ccanopy, & 
-       & tq_cdrag, petAcoef, peqAcoef, petBcoef, peqBcoef, &
-       & precip_rain, precip_snow, sollw, sollwdown, swnet, swdown, &
-       & fder, taux, tauy, &
-       & windsp, &
-       & rugos, rugoro, &
-       & albedo, snow, qsurf, &
-       & tsurf, p1lay, ps, radsol, &
-       & ocean, npas, nexca, zmasq, &
-       & evap, fluxsens, fluxlat, dflux_l, dflux_s, &              
-       & tsol_rad, tsurf_new, alb_new, alblw, emis_new, &
-       & z0_new, pctsrf_new, agesno, fqcalving, ffonte, run_off_lic_0, &
-       !IM "slab" ocean
-       & flux_o, flux_g, tslab, seaice)
+  SUBROUTINE interfsurf_hq(itime, dtime, date0, jour, rmu0,  &
+       klon, iim, jjm, nisurf, knon, knindex, pctsrf,  &
+       rlon, rlat, cufi, cvfi,  &
+       debut, lafin, ok_veget, soil_model, nsoilmx, tsoil, qsol,  &
+       zlev, u1_lay, v1_lay, temp_air, spechum, epot_air, ccanopy, & 
+       tq_cdrag, petAcoef, peqAcoef, petBcoef, peqBcoef,  &
+       precip_rain, precip_snow, sollw, sollwdown, swnet, swdown,  &
+       fder, taux, tauy,  &
+       windsp,  &
+       rugos, rugoro,  &
+       albedo, snow, qsurf,  &
+       tsurf, p1lay, ps, radsol,  &
+       ocean, npas, nexca, zmasq,  &
+       evap, fluxsens, fluxlat, dflux_l, dflux_s, & 
+       tsol_rad, tsurf_new, alb_new, alblw, emis_new,  &
+       z0_new, pctsrf_new, agesno, fqcalving, ffonte, run_off_lic_0, &
+       flux_o, flux_g, tslab, seaice)
 
     ! Cette routine sert d'aiguillage entre l'atmosphère et la surface
     ! en général (sols continentaux, océans, glaces) pour les flux de
@@ -62,70 +60,70 @@ CONTAINS
     use abort_gcm_m, only: abort_gcm
     use gath_cpl, only: gath2cpl
     use indicesol
-    use YOMCST
+    use SUPHEC_M
     use albsno_m, only: albsno
 
     ! Parametres d'entree
     ! input:
-    !   klon         nombre total de points de grille
-    !   iim, jjm     nbres de pts de grille
-    !   dtime        pas de temps de la physique (en s)
-    !   date0        jour initial 
-    !   jour         jour dans l'annee en cours,
-    !   rmu0         cosinus de l'angle solaire zenithal
-    !   nexca        pas de temps couplage
-    !   nisurf       index de la surface a traiter (1 = sol continental)
-    !   knon         nombre de points de la surface a traiter
-    !   knindex      index des points de la surface a traiter
-    !   pctsrf       tableau des pourcentages de surface de chaque maille
-    !   rlon         longitudes
-    !   rlat         latitudes
-    !   cufi, cvfi    resolution des mailles en x et y (m)
-    !   debut        logical: 1er appel a la physique
-    !   lafin        logical: dernier appel a la physique
-    !   ok_veget     logical: appel ou non au schema de surface continental
-    !                  (si false calcul simplifie des fluxs sur les continents)
-    !   zlev         hauteur de la premiere couche
-    !   u1_lay       vitesse u 1ere couche
-    !   v1_lay       vitesse v 1ere couche
-    !   temp_air     temperature de l'air 1ere couche
-    !   spechum      humidite specifique 1ere couche
-    !   epot_air     temp potentielle de l'air
-    !   ccanopy      concentration CO2 canopee
-    !   tq_cdrag     cdrag
-    !   petAcoef     coeff. A de la resolution de la CL pour t
-    !   peqAcoef     coeff. A de la resolution de la CL pour q
-    !   petBcoef     coeff. B de la resolution de la CL pour t
-    !   peqBcoef     coeff. B de la resolution de la CL pour q
-    !   precip_rain  precipitation liquide
-    !   precip_snow  precipitation solide
-    !   sollw        flux IR net a la surface
-    !   sollwdown    flux IR descendant a la surface
-    !   swnet        flux solaire net
-    !   swdown       flux solaire entrant a la surface
-    !   albedo       albedo de la surface
-    !   tsurf        temperature de surface
-    !   tslab        temperature slab ocean
-    !   pctsrf_slab  pourcentages (0-1) des sous-surfaces dans le slab
-    !   tmp_pctsrf_slab = pctsrf_slab
-    !   p1lay        pression 1er niveau (milieu de couche)
-    !   ps           pression au sol
-    !   radsol       rayonnement net aus sol (LW + SW)
-    !   ocean        type d'ocean utilise ("force" ou "slab" mais pas "couple")
-    !   fder         derivee des flux (pour le couplage)
-    !   taux, tauy   tension de vents
-    !   windsp       module du vent a 10m
-    !   rugos        rugosite
-    !   zmasq        masque terre/ocean
-    !   rugoro       rugosite orographique
-    !   run_off_lic_0 runoff glacier du pas de temps precedent
-    integer, intent(IN) :: itime     !  numero du pas de temps
+    ! klon nombre total de points de grille
+    ! iim, jjm nbres de pts de grille
+    ! dtime pas de temps de la physique (en s)
+    ! date0 jour initial 
+    ! jour jour dans l'annee en cours,
+    ! rmu0 cosinus de l'angle solaire zenithal
+    ! nexca pas de temps couplage
+    ! nisurf index de la surface a traiter (1 = sol continental)
+    ! knon nombre de points de la surface a traiter
+    ! knindex index des points de la surface a traiter
+    ! pctsrf tableau des pourcentages de surface de chaque maille
+    ! rlon longitudes
+    ! rlat latitudes
+    ! cufi, cvfi resolution des mailles en x et y (m)
+    ! debut logical: 1er appel a la physique
+    ! lafin logical: dernier appel a la physique
+    ! ok_veget logical: appel ou non au schema de surface continental
+    ! (si false calcul simplifie des fluxs sur les continents)
+    ! zlev hauteur de la premiere couche
+    ! u1_lay vitesse u 1ere couche
+    ! v1_lay vitesse v 1ere couche
+    ! temp_air temperature de l'air 1ere couche
+    ! spechum humidite specifique 1ere couche
+    ! epot_air temp potentielle de l'air
+    ! ccanopy concentration CO2 canopee
+    ! tq_cdrag cdrag
+    ! petAcoef coeff. A de la resolution de la CL pour t
+    ! peqAcoef coeff. A de la resolution de la CL pour q
+    ! petBcoef coeff. B de la resolution de la CL pour t
+    ! peqBcoef coeff. B de la resolution de la CL pour q
+    ! precip_rain precipitation liquide
+    ! precip_snow precipitation solide
+    ! sollw flux IR net a la surface
+    ! sollwdown flux IR descendant a la surface
+    ! swnet flux solaire net
+    ! swdown flux solaire entrant a la surface
+    ! albedo albedo de la surface
+    ! tsurf temperature de surface
+    ! tslab temperature slab ocean
+    ! pctsrf_slab pourcentages (0-1) des sous-surfaces dans le slab
+    ! tmp_pctsrf_slab = pctsrf_slab
+    ! p1lay pression 1er niveau (milieu de couche)
+    ! ps pression au sol
+    ! radsol rayonnement net aus sol (LW + SW)
+    ! ocean type d'ocean utilise ("force" ou "slab" mais pas "couple")
+    ! fder derivee des flux (pour le couplage)
+    ! taux, tauy tension de vents
+    ! windsp module du vent a 10m
+    ! rugos rugosite
+    ! zmasq masque terre/ocean
+    ! rugoro rugosite orographique
+    ! run_off_lic_0 runoff glacier du pas de temps precedent
+    integer, intent(IN) :: itime ! numero du pas de temps
     integer, intent(IN) :: iim, jjm
     integer, intent(IN) :: klon
     real, intent(IN) :: dtime
     real, intent(IN) :: date0
     integer, intent(IN) :: jour
-    real, intent(IN)    :: rmu0(klon)
+    real, intent(IN) :: rmu0(klon)
     integer, intent(IN) :: nisurf
     integer, intent(IN) :: knon
     integer, dimension(klon), intent(in) :: knindex
@@ -148,33 +146,33 @@ CONTAINS
     real, dimension(klon), intent(INOUT) :: tslab
     real, allocatable, dimension(:), save :: tmp_tslab
     real, dimension(klon), intent(OUT) :: flux_o, flux_g
-    real, dimension(klon), intent(INOUT)      :: seaice ! glace de mer (kg/m2)
+    real, dimension(klon), intent(INOUT) :: seaice ! glace de mer (kg/m2)
     REAL, DIMENSION(klon), INTENT(INOUT) :: radsol, fder
     real, dimension(klon), intent(IN) :: zmasq
     real, dimension(klon), intent(IN) :: taux, tauy, rugos, rugoro
     real, dimension(klon), intent(IN) :: windsp
     character(len=*), intent(IN):: ocean
-    integer              :: npas, nexca ! nombre et pas de temps couplage
+    integer :: npas, nexca ! nombre et pas de temps couplage
     real, dimension(klon), intent(INOUT) :: evap, snow, qsurf
     !! PB ajout pour soil
     logical, intent(in):: soil_model
-    integer          :: nsoilmx
+    integer :: nsoilmx
     REAL, DIMENSION(klon, nsoilmx) :: tsoil
     REAL, dimension(klon), intent(INOUT) :: qsol
-    REAL, dimension(klon)          :: soilcap
-    REAL, dimension(klon)          :: soilflux
+    REAL, dimension(klon) :: soilcap
+    REAL, dimension(klon) :: soilflux
 
     ! Parametres de sortie
     ! output:
-    !   evap         evaporation totale
-    !   fluxsens     flux de chaleur sensible
-    !   fluxlat      flux de chaleur latente
-    !   tsol_rad     
-    !   tsurf_new    temperature au sol
-    !   alb_new      albedo
-    !   emis_new     emissivite
-    !   z0_new       surface roughness
-    !   pctsrf_new   nouvelle repartition des surfaces
+    ! evap evaporation totale
+    ! fluxsens flux de chaleur sensible
+    ! fluxlat flux de chaleur latente
+    ! tsol_rad 
+    ! tsurf_new temperature au sol
+    ! alb_new albedo
+    ! emis_new emissivite
+    ! z0_new surface roughness
+    ! pctsrf_new nouvelle repartition des surfaces
     real, dimension(klon), intent(OUT):: fluxsens, fluxlat
     real, dimension(klon), intent(OUT):: tsol_rad, tsurf_new, alb_new
     real, dimension(klon), intent(OUT):: alblw
@@ -185,11 +183,11 @@ CONTAINS
     real, dimension(klon), intent(INOUT):: run_off_lic_0
 
     ! Flux thermique utiliser pour fondre la neige
-    !jld a rajouter   real, dimension(klon), intent(INOUT):: ffonte
+    !jld a rajouter real, dimension(klon), intent(INOUT):: ffonte
     real, dimension(klon), intent(INOUT):: ffonte
     ! Flux d'eau "perdue" par la surface et nécessaire pour que limiter la
     ! hauteur de neige, en kg/m2/s
-    !jld a rajouter   real, dimension(klon), intent(INOUT):: fqcalving
+    !jld a rajouter real, dimension(klon), intent(INOUT):: fqcalving
     real, dimension(klon), intent(INOUT):: fqcalving
     !IM: "slab" ocean - Local
     real, parameter :: t_grnd=271.35
@@ -203,17 +201,17 @@ CONTAINS
     ! Local
     character (len = 20), save :: modname = 'interfsurf_hq'
     character (len = 80) :: abort_message 
-    logical, save        :: first_call = .true.
-    integer, save        :: error
-    integer              :: ii
-    logical, save              :: check = .false.
+    logical, save :: first_call = .true.
+    integer, save :: error
+    integer :: ii
+    logical, save :: check = .false.
     real, dimension(klon):: cal, beta, dif_grnd, capsol
-    real, parameter      :: calice=1.0/(5.1444e+06*0.15), tau_gl=86400.*5.
-    real, parameter      :: calsno=1./(2.3867e+06*.15)
+    real, parameter :: calice=1.0/(5.1444e+06*0.15), tau_gl=86400.*5.
+    real, parameter :: calsno=1./(2.3867e+06*.15)
     real, dimension(klon):: tsurf_temp
     real, dimension(klon):: alb_neig, alb_eau
     real, DIMENSION(klon):: zfra
-    logical              :: cumul = .false.
+    logical :: cumul = .false.
     INTEGER, dimension(1) :: iloc
     real, dimension(klon):: fder_prev
     REAL, dimension(klon) :: bidule
@@ -275,7 +273,7 @@ CONTAINS
           call abort_gcm(modname, abort_message, 1)
        endif
     endif
-    if (.not. allocated(tmp_flux_g)) then  
+    if (.not. allocated(tmp_flux_g)) then 
        allocate(tmp_flux_g(klon), stat = error)
        DO i=1, knon
           tmp_flux_g(knindex(i))=flux_g(i)
@@ -285,7 +283,7 @@ CONTAINS
           call abort_gcm(modname, abort_message, 1)
        endif
     endif
-    if (.not. allocated(tmp_radsol)) then  
+    if (.not. allocated(tmp_radsol)) then 
        allocate(tmp_radsol(klon), stat = error)
        if (error /= 0) then
           abort_message='Pb allocation tmp_radsol'
@@ -351,7 +349,7 @@ CONTAINS
              abort_message='Pb allocation run_off'
              call abort_gcm(modname, abort_message, 1)
           endif
-          !cym      
+          !cym 
           run_off=0.0
           !cym
 
@@ -400,29 +398,29 @@ CONTAINS
              CALL soil(dtime, nisurf, knon, snow, tsurf, tsoil, soilcap, &
                   soilflux)
              cal(1:knon) = RCPD / soilcap(1:knon)
-             radsol(1:knon) = radsol(1:knon)  + soilflux(1:knon)
+             radsol(1:knon) = radsol(1:knon) + soilflux(1:knon)
           ELSE 
              cal = RCPD * capsol
           ENDIF
           CALL calcul_fluxs( klon, knon, nisurf, dtime, &
-               &   tsurf, p1lay, cal, beta, tq_cdrag, ps, &
-               &   precip_rain, precip_snow, snow, qsurf,  &
-               &   radsol, dif_grnd, temp_air, spechum, u1_lay, v1_lay, &
-               &   petAcoef, peqAcoef, petBcoef, peqBcoef, &
-               &   tsurf_new, evap, fluxlat, fluxsens, dflux_s, dflux_l)
+               tsurf, p1lay, cal, beta, tq_cdrag, ps, &
+               precip_rain, precip_snow, snow, qsurf, &
+               radsol, dif_grnd, temp_air, spechum, u1_lay, v1_lay, &
+               petAcoef, peqAcoef, petBcoef, peqBcoef, &
+               tsurf_new, evap, fluxlat, fluxsens, dflux_s, dflux_l)
 
           CALL fonte_neige( klon, knon, nisurf, dtime, &
-               &   tsurf, p1lay, cal, beta, tq_cdrag, ps, &
-               &   precip_rain, precip_snow, snow, qsol,  &
-               &   radsol, dif_grnd, temp_air, spechum, u1_lay, v1_lay, &
-               &   petAcoef, peqAcoef, petBcoef, peqBcoef, &
-               &   tsurf_new, evap, fluxlat, fluxsens, dflux_s, dflux_l, &
-               &   fqcalving, ffonte, run_off_lic_0)
+               tsurf, p1lay, cal, beta, tq_cdrag, ps, &
+               precip_rain, precip_snow, snow, qsol, &
+               radsol, dif_grnd, temp_air, spechum, u1_lay, v1_lay, &
+               petAcoef, peqAcoef, petBcoef, peqBcoef, &
+               tsurf_new, evap, fluxlat, fluxsens, dflux_s, dflux_l, &
+               fqcalving, ffonte, run_off_lic_0)
 
           call albsno(klon, knon, dtime, agesno, alb_neig, precip_snow)
           where (snow(1 : knon) .LT. 0.0001) agesno(1 : knon) = 0.
           zfra(1:knon) = max(0.0, min(1.0, snow(1:knon)/(snow(1:knon)+10.0)))
-          alb_new(1 : knon)  = alb_neig(1 : knon) *zfra(1:knon) + &
+          alb_new(1 : knon) = alb_neig(1 : knon) *zfra(1:knon) + &
                alb_new(1 : knon)*(1.0-zfra(1:knon))
           z0_new = sqrt(z0_new**2+rugoro**2)
           alblw(1 : knon) = alb_new(1 : knon)
@@ -449,13 +447,13 @@ CONTAINS
        agesno = 0.
 
        call calcul_fluxs( klon, knon, nisurf, dtime, &
-            &   tsurf_temp, p1lay, cal, beta, tq_cdrag, ps, &
-            &   precip_rain, precip_snow, snow, qsurf,  &
-            &   radsol, dif_grnd, temp_air, spechum, u1_lay, v1_lay, &
-            &   petAcoef, peqAcoef, petBcoef, peqBcoef, &
-            &   tsurf_new, evap, fluxlat, fluxsens, dflux_s, dflux_l)
+            tsurf_temp, p1lay, cal, beta, tq_cdrag, ps, &
+            precip_rain, precip_snow, snow, qsurf, &
+            radsol, dif_grnd, temp_air, spechum, u1_lay, v1_lay, &
+            petAcoef, peqAcoef, petBcoef, peqBcoef, &
+            tsurf_new, evap, fluxlat, fluxsens, dflux_s, dflux_l)
 
-       fder_prev = fder    
+       fder_prev = fder 
        fder = fder_prev + dflux_s + dflux_l
 
        iloc = maxloc(fder(1:klon))
@@ -463,7 +461,7 @@ CONTAINS
           WRITE(*, *)'**** Debug fder****'
           WRITE(*, *)'max fder(', iloc(1), ') = ', fder(iloc(1))
           WRITE(*, *)'fder_prev, dflux_s, dflux_l', fder_prev(iloc(1)), &
-               &                        dflux_s(iloc(1)), dflux_l(iloc(1))
+               dflux_s(iloc(1)), dflux_l(iloc(1))
        endif
 
        !IM: flux ocean-atmosphere utile pour le "slab" ocean
@@ -478,12 +476,12 @@ CONTAINS
        ! 2eme appel a interfoce pour le cumul des champs (en particulier
        ! fluxsens et fluxlat calcules dans calcul_fluxs)
 
-       if (ocean == 'slab  ') then
+       if (ocean == 'slab ') then
           seaice=tmp_seaice
           cumul = .true.
           call interfoce_slab(klon, debut, itime, dtime, jour, &
-               & tmp_radsol, tmp_flux_o, tmp_flux_g, pctsrf, &
-               & tslab, seaice, pctsrf_new)
+               tmp_radsol, tmp_flux_o, tmp_flux_g, pctsrf, &
+               tslab, seaice, pctsrf_new)
 
           tmp_pctsrf_slab=pctsrf_new
           DO i=1, knon
@@ -494,7 +492,7 @@ CONTAINS
        ! calcul albedo
        if ( minval(rmu0) == maxval(rmu0) .and. minval(rmu0) == -999.999 ) then
           CALL alboc(FLOAT(jour), rlat, alb_eau)
-       else  ! cycle diurne
+       else ! cycle diurne
           CALL alboc_cd(rmu0, alb_eau)
        endif
        DO ii =1, knon
@@ -509,7 +507,7 @@ CONTAINS
        ! Surface "glace de mer" appel a l'interface avec l'ocean
 
 
-       if (ocean == 'slab  ') then
+       if (ocean == 'slab ') then
           pctsrf_new=tmp_pctsrf_slab
 
           DO ii = 1, knon
@@ -526,7 +524,7 @@ CONTAINS
           IF (soil_model) THEN 
              CALL soil(dtime, nisurf, knon, snow, tsurf_new, tsoil, soilcap, soilflux)
              cal(1:knon) = RCPD / soilcap(1:knon)
-             radsol(1:knon) = radsol(1:knon)  + soilflux(1:knon)
+             radsol(1:knon) = radsol(1:knon) + soilflux(1:knon)
           ELSE 
              dif_grnd = 1.0 / tau_gl
              cal = RCPD * calice
@@ -536,11 +534,11 @@ CONTAINS
           beta = 1.0
 
        ELSE
-          !                              ! lecture conditions limites
+          ! ! lecture conditions limites
           CALL interfoce_lim(itime, dtime, jour, & 
-               &  klon, nisurf, knon, knindex, &
-               &  debut, &
-               &  tsurf_new, pctsrf_new)
+               klon, nisurf, knon, knindex, &
+               debut, &
+               tsurf_new, pctsrf_new)
 
           !IM cf LF
           DO ii = 1, knon
@@ -548,7 +546,7 @@ CONTAINS
              !IMbad IF (pctsrf_new(ii, nisurf) < EPSFRA) then
              IF (pctsrf_new(knindex(ii), nisurf) < EPSFRA) then
                 snow(ii) = 0.0
-                !IM cf LF/JLD         tsurf(ii) = RTT - 1.8
+                !IM cf LF/JLD tsurf(ii) = RTT - 1.8
                 tsurf_new(ii) = RTT - 1.8
                 IF (soil_model) tsoil(ii, :) = RTT -1.8
              endif
@@ -557,10 +555,10 @@ CONTAINS
           CALL calbeta(dtime, nisurf, knon, snow, qsol, beta, capsol, dif_grnd)
 
           IF (soil_model) THEN 
-             !IM cf LF/JLD        CALL soil(dtime, nisurf, knon, snow, tsurf, tsoil, soilcap, soilflux)
+             !IM cf LF/JLD CALL soil(dtime, nisurf, knon, snow, tsurf, tsoil, soilcap, soilflux)
              CALL soil(dtime, nisurf, knon, snow, tsurf_new, tsoil, soilcap, soilflux)
              cal(1:knon) = RCPD / soilcap(1:knon)
-             radsol(1:knon) = radsol(1:knon)  + soilflux(1:knon)
+             radsol(1:knon) = radsol(1:knon) + soilflux(1:knon)
              dif_grnd = 0.
           ELSE 
              dif_grnd = 1.0 / tau_gl
@@ -573,52 +571,52 @@ CONTAINS
        ENDIF
 
        CALL calcul_fluxs( klon, knon, nisurf, dtime, &
-            &   tsurf_temp, p1lay, cal, beta, tq_cdrag, ps, &
-            &   precip_rain, precip_snow, snow, qsurf,  &
-            &   radsol, dif_grnd, temp_air, spechum, u1_lay, v1_lay, &
-            &   petAcoef, peqAcoef, petBcoef, peqBcoef, &
-            &   tsurf_new, evap, fluxlat, fluxsens, dflux_s, dflux_l)
+            tsurf_temp, p1lay, cal, beta, tq_cdrag, ps, &
+            precip_rain, precip_snow, snow, qsurf, &
+            radsol, dif_grnd, temp_air, spechum, u1_lay, v1_lay, &
+            petAcoef, peqAcoef, petBcoef, peqBcoef, &
+            tsurf_new, evap, fluxlat, fluxsens, dflux_s, dflux_l)
 
        !IM: flux entre l'ocean et la glace de mer pour le "slab" ocean
        DO i = 1, knon
           flux_g(i) = 0.0
 
           !IM: faire dependre le coefficient de conduction de la glace de mer
-          !    de l'epaisseur de la glace de mer, dans l'hypothese ou le coeff.
-          !    actuel correspond a 3m de glace de mer, cf. L.Li
+          ! de l'epaisseur de la glace de mer, dans l'hypothese ou le coeff.
+          ! actuel correspond a 3m de glace de mer, cf. L.Li
 
-          !      IF(1.EQ.0) THEN
-          !       IF(siceh(i).GT.0.) THEN
-          !        new_dif_grnd(i) = dif_grnd(i)*3./siceh(i)
-          !       ELSE
-          !        new_dif_grnd(i) = 0.
-          !       ENDIF
-          !      ENDIF !(1.EQ.0) THEN
+          ! IF(1.EQ.0) THEN
+          ! IF(siceh(i).GT.0.) THEN
+          ! new_dif_grnd(i) = dif_grnd(i)*3./siceh(i)
+          ! ELSE
+          ! new_dif_grnd(i) = 0.
+          ! ENDIF
+          ! ENDIF !(1.EQ.0) THEN
 
           IF (cal(i).GT.1.0e-15) flux_g(i)=(tsurf_new(i)-t_grnd) &
-               &                          * dif_grnd(i) *RCPD/cal(i)
-          !   &                          * new_dif_grnd(i) *RCPD/cal(i)
+               * dif_grnd(i) *RCPD/cal(i)
+          ! & * new_dif_grnd(i) *RCPD/cal(i)
           tmp_flux_g(knindex(i))=flux_g(i)
           tmp_radsol(knindex(i))=radsol(i)
        ENDDO
 
        CALL fonte_neige( klon, knon, nisurf, dtime, &
-            &   tsurf_temp, p1lay, cal, beta, tq_cdrag, ps, &
-            &   precip_rain, precip_snow, snow, qsol,  &
-            &   radsol, dif_grnd, temp_air, spechum, u1_lay, v1_lay, &
-            &   petAcoef, peqAcoef, petBcoef, peqBcoef, &
-            &   tsurf_new, evap, fluxlat, fluxsens, dflux_s, dflux_l, &
-            &   fqcalving, ffonte, run_off_lic_0)
+            tsurf_temp, p1lay, cal, beta, tq_cdrag, ps, &
+            precip_rain, precip_snow, snow, qsol, &
+            radsol, dif_grnd, temp_air, spechum, u1_lay, v1_lay, &
+            petAcoef, peqAcoef, petBcoef, peqBcoef, &
+            tsurf_new, evap, fluxlat, fluxsens, dflux_s, dflux_l, &
+            fqcalving, ffonte, run_off_lic_0)
 
-       !     calcul albedo
+       ! calcul albedo
 
-       CALL albsno(klon, knon, dtime, agesno, alb_neig, precip_snow)  
+       CALL albsno(klon, knon, dtime, agesno, alb_neig, precip_snow) 
        WHERE (snow(1 : knon) .LT. 0.0001) agesno(1 : knon) = 0.
        zfra(1:knon) = MAX(0.0, MIN(1.0, snow(1:knon)/(snow(1:knon)+10.0)))
        alb_new(1 : knon) = alb_neig(1 : knon) *zfra(1:knon) + & 
             0.6 * (1.0-zfra(1:knon))
 
-       fder_prev = fder    
+       fder_prev = fder 
        fder = fder_prev + dflux_s + dflux_l
 
        iloc = maxloc(fder(1:klon))
@@ -626,7 +624,7 @@ CONTAINS
           WRITE(*, *)'**** Debug fder ****'
           WRITE(*, *)'max fder(', iloc(1), ') = ', fder(iloc(1))
           WRITE(*, *)'fder_prev, dflux_s, dflux_l', fder_prev(iloc(1)), &
-               &                        dflux_s(iloc(1)), dflux_l(iloc(1))
+               dflux_s(iloc(1)), dflux_l(iloc(1))
        endif
 
 
@@ -654,7 +652,7 @@ CONTAINS
        IF (soil_model) THEN 
           CALL soil(dtime, nisurf, knon, snow, tsurf, tsoil, soilcap, soilflux)
           cal(1:knon) = RCPD / soilcap(1:knon)
-          radsol(1:knon)  = radsol(1:knon) + soilflux(1:knon)
+          radsol(1:knon) = radsol(1:knon) + soilflux(1:knon)
        ELSE 
           cal = RCPD * calice
           WHERE (snow > 0.0) cal = RCPD * calsno
@@ -663,40 +661,40 @@ CONTAINS
        dif_grnd = 0.0
 
        call calcul_fluxs( klon, knon, nisurf, dtime, &
-            &   tsurf, p1lay, cal, beta, tq_cdrag, ps, &
-            &   precip_rain, precip_snow, snow, qsurf,  &
-            &   radsol, dif_grnd, temp_air, spechum, u1_lay, v1_lay, &
-            &   petAcoef, peqAcoef, petBcoef, peqBcoef, &
-            &   tsurf_new, evap, fluxlat, fluxsens, dflux_s, dflux_l)
+            tsurf, p1lay, cal, beta, tq_cdrag, ps, &
+            precip_rain, precip_snow, snow, qsurf, &
+            radsol, dif_grnd, temp_air, spechum, u1_lay, v1_lay, &
+            petAcoef, peqAcoef, petBcoef, peqBcoef, &
+            tsurf_new, evap, fluxlat, fluxsens, dflux_s, dflux_l)
 
        call fonte_neige( klon, knon, nisurf, dtime, &
-            &   tsurf, p1lay, cal, beta, tq_cdrag, ps, &
-            &   precip_rain, precip_snow, snow, qsol,  &
-            &   radsol, dif_grnd, temp_air, spechum, u1_lay, v1_lay, &
-            &   petAcoef, peqAcoef, petBcoef, peqBcoef, &
-            &   tsurf_new, evap, fluxlat, fluxsens, dflux_s, dflux_l, &
-            &   fqcalving, ffonte, run_off_lic_0)
+            tsurf, p1lay, cal, beta, tq_cdrag, ps, &
+            precip_rain, precip_snow, snow, qsol, &
+            radsol, dif_grnd, temp_air, spechum, u1_lay, v1_lay, &
+            petAcoef, peqAcoef, petBcoef, peqBcoef, &
+            tsurf_new, evap, fluxlat, fluxsens, dflux_s, dflux_l, &
+            fqcalving, ffonte, run_off_lic_0)
 
        ! passage du run-off des glaciers calcule dans fonte_neige au coupleur
        bidule=0.
-       bidule(1:knon)= run_off_lic(1:knon)    
+       bidule(1:knon)= run_off_lic(1:knon) 
        call gath2cpl(bidule, tmp_rlic, klon, knon, iim, jjm, knindex)
 
        ! calcul albedo
 
-       CALL albsno(klon, knon, dtime, agesno, alb_neig, precip_snow)  
+       CALL albsno(klon, knon, dtime, agesno, alb_neig, precip_snow) 
        WHERE (snow(1 : knon) .LT. 0.0001) agesno(1 : knon) = 0.
        zfra(1:knon) = MAX(0.0, MIN(1.0, snow(1:knon)/(snow(1:knon)+10.0)))
-       alb_new(1 : knon)  = alb_neig(1 : knon)*zfra(1:knon) + &
-            &                     0.6 * (1.0-zfra(1:knon))
+       alb_new(1 : knon) = alb_neig(1 : knon)*zfra(1:knon) + &
+            0.6 * (1.0-zfra(1:knon))
 
        !IM: plusieurs choix/tests sur l'albedo des "glaciers continentaux"
-       !       alb_new(1 : knon)  = 0.6 !IM cf FH/GK 
-       !       alb_new(1 : knon)  = 0.82
-       !       alb_new(1 : knon)  = 0.77 !211003 Ksta0.77
-       !       alb_new(1 : knon)  = 0.8 !KstaTER0.8 & LMD_ARMIP5
-       !IM: KstaTER0.77 & LMD_ARMIP6    
-       alb_new(1 : knon)  = 0.77
+       ! alb_new(1 : knon) = 0.6 !IM cf FH/GK 
+       ! alb_new(1 : knon) = 0.82
+       ! alb_new(1 : knon) = 0.77 !211003 Ksta0.77
+       ! alb_new(1 : knon) = 0.8 !KstaTER0.8 & LMD_ARMIP5
+       !IM: KstaTER0.77 & LMD_ARMIP6 
+       alb_new(1 : knon) = 0.77
 
 
        ! Rugosite
@@ -718,9 +716,9 @@ CONTAINS
 
   !************************
 
-  SUBROUTINE interfoce_slab(klon, debut, itap, dtime, ijour, &
-       & radsol, fluxo, fluxg, pctsrf, &
-       & tslab, seaice, pctsrf_slab)
+  SUBROUTINE interfoce_slab(klon, debut, itap, dtime, ijour,  &
+       radsol, fluxo, fluxg, pctsrf,  &
+       tslab, seaice, pctsrf_slab)
 
     ! Cette routine calcule la temperature d'un slab ocean, la glace de mer 
     ! et les pourcentages de la maille couverte par l'ocean libre et/ou 
@@ -729,24 +727,24 @@ CONTAINS
     ! I. Musat 04.02.2005
 
     ! input:
-    !   klon         nombre total de points de grille
-    !   debut        logical: 1er appel a la physique
-    !   itap         numero du pas de temps
-    !   dtime        pas de temps de la physique (en s)
-    !   ijour        jour dans l'annee en cours
-    !   radsol       rayonnement net au sol (LW + SW)
-    !   fluxo        flux turbulent (sensible + latent) sur les mailles oceaniques 
-    !   fluxg        flux de conduction entre la surface de la glace de mer et l'ocean
-    !   pctsrf       tableau des pourcentages de surface de chaque maille
+    ! klon nombre total de points de grille
+    ! debut logical: 1er appel a la physique
+    ! itap numero du pas de temps
+    ! dtime pas de temps de la physique (en s)
+    ! ijour jour dans l'annee en cours
+    ! radsol rayonnement net au sol (LW + SW)
+    ! fluxo flux turbulent (sensible + latent) sur les mailles oceaniques 
+    ! fluxg flux de conduction entre la surface de la glace de mer et l'ocean
+    ! pctsrf tableau des pourcentages de surface de chaque maille
     ! output: 
-    !   tslab        temperature de l'ocean libre
-    !   seaice       glace de mer (kg/m2)
-    !   pctsrf_slab  "pourcentages" (valeurs entre 0. et 1.) surfaces issus du slab
+    ! tslab temperature de l'ocean libre
+    ! seaice glace de mer (kg/m2)
+    ! pctsrf_slab "pourcentages" (valeurs entre 0. et 1.) surfaces issus du slab
 
     use indicesol
     use clesphys
     use abort_gcm_m, only: abort_gcm
-    use YOMCST
+    use SUPHEC_M
 
     ! Parametres d'entree
     integer, intent(IN) :: klon
@@ -760,7 +758,7 @@ CONTAINS
     real, dimension(klon, nbsrf), intent(IN) :: pctsrf
     ! Parametres de sortie
     real, dimension(klon), intent(INOUT) :: tslab
-    real, dimension(klon), intent(INOUT)        :: seaice ! glace de mer (kg/m2)
+    real, dimension(klon), intent(INOUT) :: seaice ! glace de mer (kg/m2)
     real, dimension(klon, nbsrf), intent(OUT) :: pctsrf_slab
 
     ! Variables locales :
@@ -769,11 +767,11 @@ CONTAINS
     real, allocatable, dimension(:), save :: tmp_tslab, tmp_seaice
     REAL, allocatable, dimension(:), save :: slab_bils
     REAL, allocatable, dimension(:), save :: lmt_bils
-    logical, save              :: check = .false.
+    logical, save :: check = .false.
 
     REAL, parameter :: cyang=50.0 * 4.228e+06 ! capacite calorifique volumetrique de l'eau J/(m2 K)
-    REAL, parameter :: cbing=0.334e+05        ! J/kg
-    real, dimension(klon)                 :: siceh !hauteur de la glace de mer (m)
+    REAL, parameter :: cbing=0.334e+05 ! J/kg
+    real, dimension(klon) :: siceh !hauteur de la glace de mer (m)
     INTEGER :: i
     integer :: sum_error, error
     REAL :: zz, za, zb
@@ -798,8 +796,8 @@ CONTAINS
 
        IF (check) THEN
           PRINT*, 'interfoce_slab klon, debut, itap, dtime, ijour, &
-               &          lmt_pas ', klon, debut, itap, dtime, ijour, &
-               &          lmt_pas
+               & lmt_pas ', klon, debut, itap, dtime, ijour, &
+               lmt_pas
        ENDIF !check
 
        PRINT*, '************************'
@@ -824,12 +822,12 @@ CONTAINS
 
     DO i = 1, klon
        IF((pctsrf_slab(i, is_oce).GT.epsfra).OR. &
-            &  (pctsrf_slab(i, is_sic).GT.epsfra)) THEN
+            (pctsrf_slab(i, is_sic).GT.epsfra)) THEN
 
           ! fabriquer de la glace si congelation atteinte:
 
           IF (tmp_tslab(i).LT.(RTT-1.8)) THEN
-             zz =  (RTT-1.8)-tmp_tslab(i)
+             zz = (RTT-1.8)-tmp_tslab(i)
              tmp_seaice(i) = tmp_seaice(i) + cyang/cbing * zz
              seaice(i) = tmp_seaice(i)
              tmp_tslab(i) = RTT-1.8
@@ -863,9 +861,9 @@ CONTAINS
           ! et pctsrf(i, is_sic) croit lineairement avec seaice de 0. a 20cm d'epaisseur
 
           pctsrf_slab(i, is_sic)=MIN(siceh(i)/0.20, &
-               &                      1.-(pctsrf_slab(i, is_ter)+pctsrf_slab(i, is_lic)))
+               1.-(pctsrf_slab(i, is_ter)+pctsrf_slab(i, is_lic)))
           pctsrf_slab(i, is_oce)=1.0 - &
-               &      (pctsrf_slab(i, is_ter)+pctsrf_slab(i, is_lic)+pctsrf_slab(i, is_sic))
+               (pctsrf_slab(i, is_ter)+pctsrf_slab(i, is_lic)+pctsrf_slab(i, is_sic))
        ENDIF !pctsrf
     ENDDO
 
@@ -875,9 +873,9 @@ CONTAINS
        za = radsol(i) + fluxo(i)
        zb = fluxg(i)
        IF((pctsrf_slab(i, is_oce).GT.epsfra).OR. &
-            &   (pctsrf_slab(i, is_sic).GT.epsfra)) THEN
+            (pctsrf_slab(i, is_sic).GT.epsfra)) THEN
           slab_bils(i)=slab_bils(i)+(za*pctsrf_slab(i, is_oce) &
-               &             +zb*pctsrf_slab(i, is_sic))/ FLOAT(lmt_pas)
+               +zb*pctsrf_slab(i, is_sic))/ FLOAT(lmt_pas)
        ENDIF
     ENDDO !klon
 
@@ -886,10 +884,10 @@ CONTAINS
     IF (MOD(itap, lmt_pas).EQ.0) THEN !fin de journee
        DO i = 1, klon
           IF ((pctsrf_slab(i, is_oce).GT.epsfra).OR. &
-               &    (pctsrf_slab(i, is_sic).GT.epsfra)) THEN
+               (pctsrf_slab(i, is_sic).GT.epsfra)) THEN
              tmp_tslab(i) = tmp_tslab(i) + &
-                  & (slab_bils(i)-lmt_bils(i)) &
-                  &                         /cyang*unjour
+                  (slab_bils(i)-lmt_bils(i)) &
+                  /cyang*unjour
              ! on remet l'accumulation a 0
              slab_bils(i) = 0.
           ENDIF !pctsrf
@@ -902,10 +900,10 @@ CONTAINS
 
   !************************
 
-  SUBROUTINE interfoce_lim(itime, dtime, jour, &
-       & klon, nisurf, knon, knindex, &
-       & debut,  &
-       & lmt_sst, pctsrf_new)
+  SUBROUTINE interfoce_lim(itime, dtime, jour,  &
+       klon, nisurf, knon, knindex,  &
+       debut,  &
+       lmt_sst, pctsrf_new)
 
     ! Cette routine sert d'interface entre le modele atmospherique et
     ! un fichier de conditions aux limites
@@ -916,7 +914,7 @@ CONTAINS
     use indicesol
 
     integer, intent(IN) :: itime ! numero du pas de temps courant
-    real   , intent(IN) :: dtime ! pas de temps de la physique (en s)
+    real , intent(IN) :: dtime ! pas de temps de la physique (en s)
     integer, intent(IN) :: jour ! jour a lire dans l'annee
     integer, intent(IN) :: nisurf ! index de la surface a traiter (1 = sol continental)
     integer, intent(IN) :: knon ! nombre de points dans le domaine a traiter
@@ -926,23 +924,23 @@ CONTAINS
 
     ! Parametres de sortie
     ! output:
-    !   lmt_sst      SST lues dans le fichier de CL
-    !   pctsrf_new   sous-maille fractionnelle
+    ! lmt_sst SST lues dans le fichier de CL
+    ! pctsrf_new sous-maille fractionnelle
     real, intent(out), dimension(klon) :: lmt_sst
     real, intent(out), dimension(klon, nbsrf) :: pctsrf_new
 
     ! Variables locales
-    integer     :: ii
-    INTEGER, save :: lmt_pas     ! frequence de lecture des conditions limites 
+    integer :: ii
+    INTEGER, save :: lmt_pas ! frequence de lecture des conditions limites 
     ! (en pas de physique)
-    logical, save :: deja_lu    ! pour indiquer que le jour a lire a deja
+    logical, save :: deja_lu ! pour indiquer que le jour a lire a deja
     ! lu pour une surface precedente
     integer, save :: jour_lu 
-    integer      :: ierr
+    integer :: ierr
     character (len = 20) :: modname = 'interfoce_lim'
     character (len = 80) :: abort_message
-    logical, save     :: newlmt = .TRUE.
-    logical, save     :: check = .FALSE.
+    logical, save :: newlmt = .TRUE.
+    logical, save :: check = .FALSE.
     ! Champs lus dans le fichier de CL
     real, allocatable , save, dimension(:) :: sst_lu, rug_lu, nat_lu
     real, allocatable , save, dimension(:, :) :: pct_tmp
@@ -950,7 +948,7 @@ CONTAINS
     ! quelques variables pour netcdf
 
     include "netcdf.inc"
-    integer              :: nid, nvarid
+    integer :: nid, nvarid
     integer, dimension(2) :: start, epais
 
     ! --------------------------------------------------
@@ -1042,7 +1040,7 @@ CONTAINS
              call abort_gcm(modname, abort_message, 1)
           endif
 
-       else  ! on en est toujours a rnatur
+       else ! on en est toujours a rnatur
 
           ierr = NF_INQ_VARID(nid, 'NAT', nvarid)
           if (ierr /= NF_NOERR) then
@@ -1064,7 +1062,7 @@ CONTAINS
           enddo
 
 
-          !  On se retrouve avec ocean en 1 et terre en 2 alors qu'on veut le contraire
+          ! On se retrouve avec ocean en 1 et terre en 2 alors qu'on veut le contraire
 
           pctsrf_new = pct_tmp
           pctsrf_new (:, 2)= pct_tmp (:, 1)
@@ -1107,10 +1105,10 @@ CONTAINS
 
   !************************
 
-  SUBROUTINE interfsur_lim(itime, dtime, jour, &
-       & klon, nisurf, knon, knindex, &
-       & debut,  &
-       & lmt_alb, lmt_rug)
+  SUBROUTINE interfsur_lim(itime, dtime, jour,  &
+       klon, nisurf, knon, knindex,  &
+       debut,  &
+       lmt_alb, lmt_rug)
 
     ! Cette routine sert d'interface entre le modèle atmosphérique et
     ! un fichier de conditions aux limites.
@@ -1121,16 +1119,16 @@ CONTAINS
 
     ! Parametres d'entree
     ! input:
-    !   itime        numero du pas de temps courant
-    !   dtime        pas de temps de la physique (en s)
-    !   jour         jour a lire dans l'annee
-    !   nisurf       index de la surface a traiter (1 = sol continental)
-    !   knon         nombre de points dans le domaine a traiter
-    !   knindex      index des points de la surface a traiter
-    !   klon         taille de la grille
-    !   debut        logical: 1er appel a la physique (initialisation)
+    ! itime numero du pas de temps courant
+    ! dtime pas de temps de la physique (en s)
+    ! jour jour a lire dans l'annee
+    ! nisurf index de la surface a traiter (1 = sol continental)
+    ! knon nombre de points dans le domaine a traiter
+    ! knindex index des points de la surface a traiter
+    ! klon taille de la grille
+    ! debut logical: 1er appel a la physique (initialisation)
     integer, intent(IN) :: itime
-    real   , intent(IN) :: dtime
+    real , intent(IN) :: dtime
     integer, intent(IN) :: jour
     integer, intent(IN) :: nisurf
     integer, intent(IN) :: knon
@@ -1140,32 +1138,32 @@ CONTAINS
 
     ! Parametres de sortie
     ! output:
-    !   lmt_sst      SST lues dans le fichier de CL
-    !   lmt_alb      Albedo lu 
-    !   lmt_rug      longueur de rugosité lue
-    !   pctsrf_new   sous-maille fractionnelle
+    ! lmt_sst SST lues dans le fichier de CL
+    ! lmt_alb Albedo lu 
+    ! lmt_rug longueur de rugosité lue
+    ! pctsrf_new sous-maille fractionnelle
     real, intent(out), dimension(klon) :: lmt_alb
     real, intent(out), dimension(klon) :: lmt_rug
 
     ! Variables locales
-    integer     :: ii
-    integer, save :: lmt_pas     ! frequence de lecture des conditions limites 
+    integer :: ii
+    integer, save :: lmt_pas ! frequence de lecture des conditions limites 
     ! (en pas de physique)
     logical, save :: deja_lu_sur! pour indiquer que le jour a lire a deja
     ! lu pour une surface precedente
     integer, save :: jour_lu_sur 
-    integer      :: ierr
+    integer :: ierr
     character (len = 20) :: modname = 'interfsur_lim'
     character (len = 80) :: abort_message
-    logical, save     :: newlmt = .false.
-    logical, save     :: check = .false.
+    logical, save :: newlmt = .false.
+    logical, save :: check = .false.
     ! Champs lus dans le fichier de CL
     real, allocatable , save, dimension(:) :: alb_lu, rug_lu
 
     ! quelques variables pour netcdf
 
     include "netcdf.inc"
-    integer , save             :: nid, nvarid
+    integer , save :: nid, nvarid
     integer, dimension(2), save :: start, epais
 
     !------------------------------------------------------------
@@ -1185,9 +1183,9 @@ CONTAINS
 
     ! Tester d'abord si c'est le moment de lire le fichier
     if (mod(itime-1, lmt_pas) == 0 .and. .not. deja_lu_sur) then
-   
+
        ! Ouverture du fichier
-   
+
        ierr = NF_OPEN ('limit.nc', NF_NOWRITE, nid)
        if (ierr.NE.NF_NOERR) then
           abort_message &
@@ -1201,9 +1199,9 @@ CONTAINS
        start(2) = jour
        epais(1) = klon
        epais(2) = 1
-   
+
        ! Lecture Albedo
-   
+
        ierr = NF_INQ_VARID(nid, 'ALB', nvarid)
        if (ierr /= NF_NOERR) then
           abort_message = 'Le champ <ALB> est absent'
@@ -1214,9 +1212,9 @@ CONTAINS
           abort_message = 'Lecture echouee pour <ALB>'
           call abort_gcm(modname, abort_message, 1)
        endif
-   
+
        ! Lecture rugosité
-   
+
        ierr = NF_INQ_VARID(nid, 'RUG', nvarid)
        if (ierr /= NF_NOERR) then
           abort_message = 'Le champ <RUG> est absent'
@@ -1228,9 +1226,9 @@ CONTAINS
           call abort_gcm(modname, abort_message, 1)
        endif
 
-   
+
        ! Fin de lecture
-   
+
        ierr = NF_CLOSE(nid)
        deja_lu_sur = .true.
        jour_lu_sur = jour
@@ -1238,8 +1236,8 @@ CONTAINS
 
     ! Recopie des variables dans les champs de sortie
 
-!!$  lmt_alb = 0.0
-!!$  lmt_rug = 0.0
+!!$ lmt_alb = 0.0
+!!$ lmt_rug = 0.0
     lmt_alb = 999999.
     lmt_rug = 999999.
     DO ii = 1, knon
@@ -1251,12 +1249,12 @@ CONTAINS
 
   !************************
 
-  SUBROUTINE calcul_fluxs( klon, knon, nisurf, dtime, &
-       & tsurf, p1lay, cal, beta, coef1lay, ps, &
-       & precip_rain, precip_snow, snow, qsurf, &
-       & radsol, dif_grnd, t1lay, q1lay, u1lay, v1lay, &
-       & petAcoef, peqAcoef, petBcoef, peqBcoef, &
-       & tsurf_new, evap, fluxlat, fluxsens, dflux_s, dflux_l)
+  SUBROUTINE calcul_fluxs( klon, knon, nisurf, dtime,  &
+       tsurf, p1lay, cal, beta, coef1lay, ps,  &
+       precip_rain, precip_snow, snow, qsurf,  &
+       radsol, dif_grnd, t1lay, q1lay, u1lay, v1lay,  &
+       petAcoef, peqAcoef, petBcoef, peqBcoef,  &
+       tsurf_new, evap, fluxlat, fluxsens, dflux_s, dflux_l)
 
     ! Cette routine calcule les fluxs en h et q a l'interface et eventuellement
     ! une temperature de surface (au cas ou ok_veget = false)
@@ -1264,43 +1262,43 @@ CONTAINS
     ! L. Fairhead 4/2000
 
     ! input:
-    !   knon         nombre de points a traiter
-    !   nisurf       surface a traiter
-    !   tsurf        temperature de surface
-    !   p1lay        pression 1er niveau (milieu de couche)
-    !   cal          capacite calorifique du sol
-    !   beta         evap reelle
-    !   coef1lay     coefficient d'echange
-    !   ps           pression au sol
-    !   precip_rain  precipitations liquides
-    !   precip_snow  precipitations solides
-    !   snow         champs hauteur de neige
-    !   runoff       runoff en cas de trop plein
-    !   petAcoef     coeff. A de la resolution de la CL pour t
-    !   peqAcoef     coeff. A de la resolution de la CL pour q
-    !   petBcoef     coeff. B de la resolution de la CL pour t
-    !   peqBcoef     coeff. B de la resolution de la CL pour q
-    !   radsol       rayonnement net aus sol (LW + SW)
-    !   dif_grnd     coeff. diffusion vers le sol profond
+    ! knon nombre de points a traiter
+    ! nisurf surface a traiter
+    ! tsurf temperature de surface
+    ! p1lay pression 1er niveau (milieu de couche)
+    ! cal capacite calorifique du sol
+    ! beta evap reelle
+    ! coef1lay coefficient d'echange
+    ! ps pression au sol
+    ! precip_rain precipitations liquides
+    ! precip_snow precipitations solides
+    ! snow champs hauteur de neige
+    ! runoff runoff en cas de trop plein
+    ! petAcoef coeff. A de la resolution de la CL pour t
+    ! peqAcoef coeff. A de la resolution de la CL pour q
+    ! petBcoef coeff. B de la resolution de la CL pour t
+    ! peqBcoef coeff. B de la resolution de la CL pour q
+    ! radsol rayonnement net aus sol (LW + SW)
+    ! dif_grnd coeff. diffusion vers le sol profond
 
     ! output:
-    !   tsurf_new    temperature au sol
-    !   qsurf        humidite de l'air au dessus du sol
-    !   fluxsens     flux de chaleur sensible
-    !   fluxlat      flux de chaleur latente
-    !   dflux_s      derivee du flux de chaleur sensible / Ts
-    !   dflux_l      derivee du flux de chaleur latente  / Ts
+    ! tsurf_new temperature au sol
+    ! qsurf humidite de l'air au dessus du sol
+    ! fluxsens flux de chaleur sensible
+    ! fluxlat flux de chaleur latente
+    ! dflux_s derivee du flux de chaleur sensible / Ts
+    ! dflux_l derivee du flux de chaleur latente / Ts
 
 
     use indicesol
     use abort_gcm_m, only: abort_gcm
-    use yoethf
+    use yoethf_m
     use fcttre, only: thermcep, foeew, qsats, qsatl, foede, dqsats, dqsatl
-    use YOMCST
+    use SUPHEC_M
 
     ! Parametres d'entree
     integer, intent(IN) :: knon, nisurf, klon
-    real   , intent(IN) :: dtime
+    real , intent(IN) :: dtime
     real, dimension(klon), intent(IN) :: petAcoef, peqAcoef
     real, dimension(klon), intent(IN) :: petBcoef, peqBcoef
     real, dimension(klon), intent(IN) :: ps, q1lay
@@ -1321,26 +1319,26 @@ CONTAINS
     real, dimension(klon) :: zx_pkh, zx_dq_s_dt, zx_qsat, zx_coef
     real, dimension(klon) :: zx_sl, zx_k1
     real, dimension(klon) :: zx_q_0 , d_ts
-    real                  :: zdelta, zcvm5, zx_qs, zcor, zx_dq_s_dh
-    real                  :: bilan_f, fq_fonte
-    REAL                  :: subli, fsno
-    REAL                  :: qsat_new, q1_new
+    real :: zdelta, zcvm5, zx_qs, zcor, zx_dq_s_dh
+    real :: bilan_f, fq_fonte
+    REAL :: subli, fsno
+    REAL :: qsat_new, q1_new
     real, parameter :: t_grnd = 271.35, t_coup = 273.15
     !! PB temporaire en attendant mieux pour le modele de neige
     REAL, parameter :: chasno = 3.334E+05/(2.3867E+06*0.15)
 
-    logical, save         :: check = .false.
-    character (len = 20)  :: modname = 'calcul_fluxs'
-    logical, save         :: fonte_neige = .false.
-    real, save            :: max_eau_sol = 150.0
+    logical, save :: check = .false.
+    character (len = 20) :: modname = 'calcul_fluxs'
+    logical, save :: fonte_neige = .false.
+    real, save :: max_eau_sol = 150.0
     character (len = 80) :: abort_message 
-    logical, save         :: first = .true., second=.false.
+    logical, save :: first = .true., second=.false.
 
     if (check) write(*, *)'Entree ', modname, ' surface = ', nisurf
 
     IF (check) THEN
        WRITE(*, *)' radsol (min, max)' &
-            &     , MINVAL(radsol(1:knon)), MAXVAL(radsol(1:knon))
+            , MINVAL(radsol(1:knon)), MAXVAL(radsol(1:knon))
        !!CALL flush(6)
     ENDIF
 
@@ -1353,18 +1351,18 @@ CONTAINS
 
     ! Traitement neige et humidite du sol
 
-!!$  WRITE(*, *)'test calcul_flux, surface ', nisurf
+!!$ WRITE(*, *)'test calcul_flux, surface ', nisurf
     !!PB test
-!!$    if (nisurf == is_oce) then
-!!$      snow = 0.
-!!$      qsol = max_eau_sol
-!!$    else
-!!$      where (precip_snow > 0.) snow = snow + (precip_snow * dtime)
-!!$      where (snow > epsilon(snow)) snow = max(0.0, snow - (evap * dtime))
-!!$!      snow = max(0.0, snow + (precip_snow - evap) * dtime)
-!!$      where (precip_rain > 0.) qsol = qsol + (precip_rain - evap) * dtime
-!!$    endif 
-!!$    IF (nisurf /= is_ter) qsol = max_eau_sol
+!!$ if (nisurf == is_oce) then
+!!$ snow = 0.
+!!$ qsol = max_eau_sol
+!!$ else
+!!$ where (precip_snow > 0.) snow = snow + (precip_snow * dtime)
+!!$ where (snow > epsilon(snow)) snow = max(0.0, snow - (evap * dtime))
+!!$! snow = max(0.0, snow + (precip_snow - evap) * dtime)
+!!$ where (precip_rain > 0.) qsol = qsol + (precip_rain - evap) * dtime
+!!$ endif 
+!!$ IF (nisurf /= is_ter) qsol = max_eau_sol
 
 
     ! Initialisation
@@ -1388,23 +1386,23 @@ CONTAINS
           zcor=1./(1.-retv*zx_qs)
           zx_qs=zx_qs*zcor
           zx_dq_s_dh = FOEDE(tsurf(i), zdelta, zcvm5, zx_qs, zcor) &
-               &                 /RLVTT / zx_pkh(i)
+               /RLVTT / zx_pkh(i)
        ELSE
           IF (tsurf(i).LT.t_coup) THEN
              zx_qs = qsats(tsurf(i)) / ps(i)
              zx_dq_s_dh = dqsats(tsurf(i), zx_qs)/RLVTT &
-                  &                    / zx_pkh(i)
+                  / zx_pkh(i)
           ELSE
              zx_qs = qsatl(tsurf(i)) / ps(i)
              zx_dq_s_dh = dqsatl(tsurf(i), zx_qs)/RLVTT &
-                  &               / zx_pkh(i)
+                  / zx_pkh(i)
           ENDIF
        ENDIF
        zx_dq_s_dt(i) = RCPD * zx_pkh(i) * zx_dq_s_dh
        zx_qsat(i) = zx_qs
        zx_coef(i) = coef1lay(i) &
-            & * (1.0+SQRT(u1lay(i)**2+v1lay(i)**2)) &
-            & * p1lay(i)/(RD*t1lay(i))
+            * (1.0+SQRT(u1lay(i)**2+v1lay(i)**2)) &
+            * p1lay(i)/(RD*t1lay(i))
 
     ENDDO
 
@@ -1422,11 +1420,11 @@ CONTAINS
        ! Q
        zx_oq(i) = 1. - (beta(i) * zx_k1(i) * peqBcoef(i) * dtime)
        zx_mq(i) = beta(i) * zx_k1(i) * &
-            &             (peqAcoef(i) - zx_qsat(i) &
-            &                          + zx_dq_s_dt(i) * tsurf(i)) &
-            &             / zx_oq(i)
+            (peqAcoef(i) - zx_qsat(i) &
+            + zx_dq_s_dt(i) * tsurf(i)) &
+            / zx_oq(i)
        zx_nq(i) = beta(i) * zx_k1(i) * (-1. * zx_dq_s_dt(i)) &
-            &                              / zx_oq(i)
+            / zx_oq(i)
 
        ! H
        zx_oh(i) = 1. - (zx_k1(i) * petBcoef(i) * dtime)
@@ -1435,23 +1433,23 @@ CONTAINS
 
        ! Tsurface
        tsurf_new(i) = (tsurf(i) + cal(i)/(RCPD * zx_pkh(i)) * dtime * &
-            &             (radsol(i) + zx_mh(i) + zx_sl(i) * zx_mq(i)) & 
-            &                 + dif_grnd(i) * t_grnd * dtime)/ &
-            &          ( 1. - dtime * cal(i)/(RCPD * zx_pkh(i)) * ( &
-            &                       zx_nh(i) + zx_sl(i) * zx_nq(i)) &  
-            &                     + dtime * dif_grnd(i))
+            (radsol(i) + zx_mh(i) + zx_sl(i) * zx_mq(i)) & 
+            + dif_grnd(i) * t_grnd * dtime)/ &
+            ( 1. - dtime * cal(i)/(RCPD * zx_pkh(i)) * ( &
+            zx_nh(i) + zx_sl(i) * zx_nq(i)) & 
+            + dtime * dif_grnd(i))
 
 
        ! Y'a-t-il fonte de neige?
 
-       !    fonte_neige = (nisurf /= is_oce) .AND. &
-       !     & (snow(i) > epsfra .OR. nisurf == is_sic .OR. nisurf == is_lic) &
-       !     & .AND. (tsurf_new(i) >= RTT)
-       !    if (fonte_neige) tsurf_new(i) = RTT  
+       ! fonte_neige = (nisurf /= is_oce) .AND. &
+       ! & (snow(i) > epsfra .OR. nisurf == is_sic .OR. nisurf == is_lic) &
+       ! & .AND. (tsurf_new(i) >= RTT)
+       ! if (fonte_neige) tsurf_new(i) = RTT 
        d_ts(i) = tsurf_new(i) - tsurf(i)
-       !    zx_h_ts(i) = tsurf_new(i) * RCPD * zx_pkh(i)
-       !    zx_q_0(i) = zx_qsat(i) + zx_dq_s_dt(i) * d_ts(i)
-       !== flux_q est le flux de vapeur d'eau: kg/(m**2 s)  positive vers bas
+       ! zx_h_ts(i) = tsurf_new(i) * RCPD * zx_pkh(i)
+       ! zx_q_0(i) = zx_qsat(i) + zx_dq_s_dt(i) * d_ts(i)
+       !== flux_q est le flux de vapeur d'eau: kg/(m**2 s) positive vers bas
        !== flux_t est le flux de cpt (energie sensible): j/(m**2 s)
        evap(i) = - zx_mq(i) - zx_nq(i) * tsurf_new(i) 
        fluxlat(i) = - evap(i) * zx_sl(i)
@@ -1469,58 +1467,58 @@ CONTAINS
 
   !************************
 
-  SUBROUTINE fonte_neige( klon, knon, nisurf, dtime, &
-       & tsurf, p1lay, cal, beta, coef1lay, ps, &
-       & precip_rain, precip_snow, snow, qsol, &
-       & radsol, dif_grnd, t1lay, q1lay, u1lay, v1lay, &
-       & petAcoef, peqAcoef, petBcoef, peqBcoef, &
-       & tsurf_new, evap, fluxlat, fluxsens, dflux_s, dflux_l, &
-       & fqcalving, ffonte, run_off_lic_0)
+  SUBROUTINE fonte_neige( klon, knon, nisurf, dtime,  &
+       tsurf, p1lay, cal, beta, coef1lay, ps,  &
+       precip_rain, precip_snow, snow, qsol,  &
+       radsol, dif_grnd, t1lay, q1lay, u1lay, v1lay,  &
+       petAcoef, peqAcoef, petBcoef, peqBcoef,  &
+       tsurf_new, evap, fluxlat, fluxsens, dflux_s, dflux_l,  &
+       fqcalving, ffonte, run_off_lic_0)
 
     ! Routine de traitement de la fonte de la neige dans le cas du traitement
     ! de sol simplifié
 
     ! LF 03/2001
     ! input:
-    !   knon         nombre de points a traiter
-    !   nisurf       surface a traiter
-    !   tsurf        temperature de surface
-    !   p1lay        pression 1er niveau (milieu de couche)
-    !   cal          capacite calorifique du sol
-    !   beta         evap reelle
-    !   coef1lay     coefficient d'echange
-    !   ps           pression au sol
-    !   precip_rain  precipitations liquides
-    !   precip_snow  precipitations solides
-    !   snow         champs hauteur de neige
-    !   qsol         hauteur d'eau contenu dans le sol
-    !   runoff       runoff en cas de trop plein
-    !   petAcoef     coeff. A de la resolution de la CL pour t
-    !   peqAcoef     coeff. A de la resolution de la CL pour q
-    !   petBcoef     coeff. B de la resolution de la CL pour t
-    !   peqBcoef     coeff. B de la resolution de la CL pour q
-    !   radsol       rayonnement net aus sol (LW + SW)
-    !   dif_grnd     coeff. diffusion vers le sol profond
+    ! knon nombre de points a traiter
+    ! nisurf surface a traiter
+    ! tsurf temperature de surface
+    ! p1lay pression 1er niveau (milieu de couche)
+    ! cal capacite calorifique du sol
+    ! beta evap reelle
+    ! coef1lay coefficient d'echange
+    ! ps pression au sol
+    ! precip_rain precipitations liquides
+    ! precip_snow precipitations solides
+    ! snow champs hauteur de neige
+    ! qsol hauteur d'eau contenu dans le sol
+    ! runoff runoff en cas de trop plein
+    ! petAcoef coeff. A de la resolution de la CL pour t
+    ! peqAcoef coeff. A de la resolution de la CL pour q
+    ! petBcoef coeff. B de la resolution de la CL pour t
+    ! peqBcoef coeff. B de la resolution de la CL pour q
+    ! radsol rayonnement net aus sol (LW + SW)
+    ! dif_grnd coeff. diffusion vers le sol profond
 
     ! output:
-    !   tsurf_new    temperature au sol
-    !   fluxsens     flux de chaleur sensible
-    !   fluxlat      flux de chaleur latente
-    !   dflux_s      derivee du flux de chaleur sensible / Ts
-    !   dflux_l      derivee du flux de chaleur latente  / Ts
+    ! tsurf_new temperature au sol
+    ! fluxsens flux de chaleur sensible
+    ! fluxlat flux de chaleur latente
+    ! dflux_s derivee du flux de chaleur sensible / Ts
+    ! dflux_l derivee du flux de chaleur latente / Ts
     ! in/out:
-    !   run_off_lic_0 run off glacier du pas de temps précedent
+    ! run_off_lic_0 run off glacier du pas de temps précedent
 
 
     use indicesol
-    use YOMCST
-    use yoethf
+    use SUPHEC_M
+    use yoethf_m
     use fcttre
     !IM cf JLD
 
     ! Parametres d'entree
     integer, intent(IN) :: knon, nisurf, klon
-    real   , intent(IN) :: dtime
+    real , intent(IN) :: dtime
     real, dimension(klon), intent(IN) :: petAcoef, peqAcoef
     real, dimension(klon), intent(IN) :: petBcoef, peqBcoef
     real, dimension(klon), intent(IN) :: ps, q1lay
@@ -1542,7 +1540,7 @@ CONTAINS
     ! Variables locales
     ! Masse maximum de neige (kg/m2). Au dessus de ce seuil, la neige
     ! en exces "s'ecoule" (calving)
-    !  real, parameter :: snow_max=1.
+    ! real, parameter :: snow_max=1.
     !IM cf JLD/GK
     real, parameter :: snow_max=3000.
     integer :: i
@@ -1551,9 +1549,9 @@ CONTAINS
     real, dimension(klon) :: zx_pkh, zx_dq_s_dt, zx_qsat, zx_coef
     real, dimension(klon) :: zx_sl, zx_k1
     real, dimension(klon) :: zx_q_0 , d_ts
-    real                  :: zdelta, zcvm5, zx_qs, zcor, zx_dq_s_dh
-    real                  :: bilan_f, fq_fonte
-    REAL                  :: subli, fsno
+    real :: zdelta, zcvm5, zx_qs, zcor, zx_dq_s_dh
+    real :: bilan_f, fq_fonte
+    REAL :: subli, fsno
     REAL, DIMENSION(klon) :: bil_eau_s, snow_evap
     real, parameter :: t_grnd = 271.35, t_coup = 273.15
     !! PB temporaire en attendant mieux pour le modele de neige
@@ -1563,13 +1561,13 @@ CONTAINS
     REAL, parameter :: chaice = 3.334E+05/(2.3867E+06*0.15)
     ! fin GKtest
 
-    logical, save         :: check = .FALSE.
-    character (len = 20)  :: modname = 'fonte_neige'
-    logical, save         :: neige_fond = .false.
-    real, save            :: max_eau_sol = 150.0
+    logical, save :: check = .FALSE.
+    character (len = 20) :: modname = 'fonte_neige'
+    logical, save :: neige_fond = .false.
+    real, save :: max_eau_sol = 150.0
     character (len = 80) :: abort_message 
-    logical, save         :: first = .true., second=.false.
-    real                 :: coeff_rel
+    logical, save :: first = .true., second=.false.
+    real :: coeff_rel
 
     if (check) write(*, *)'Entree ', modname, ' surface = ', nisurf
 
@@ -1587,23 +1585,23 @@ CONTAINS
           zcor=1./(1.-retv*zx_qs)
           zx_qs=zx_qs*zcor
           zx_dq_s_dh = FOEDE(tsurf(i), zdelta, zcvm5, zx_qs, zcor) &
-               &                 /RLVTT / zx_pkh(i)
+               /RLVTT / zx_pkh(i)
        ELSE
           IF (tsurf(i).LT.t_coup) THEN
              zx_qs = qsats(tsurf(i)) / ps(i)
              zx_dq_s_dh = dqsats(tsurf(i), zx_qs)/RLVTT &
-                  &                    / zx_pkh(i)
+                  / zx_pkh(i)
           ELSE
              zx_qs = qsatl(tsurf(i)) / ps(i)
              zx_dq_s_dh = dqsatl(tsurf(i), zx_qs)/RLVTT &
-                  &               / zx_pkh(i)
+                  / zx_pkh(i)
           ENDIF
        ENDIF
        zx_dq_s_dt(i) = RCPD * zx_pkh(i) * zx_dq_s_dh
        zx_qsat(i) = zx_qs
        zx_coef(i) = coef1lay(i) &
-            & * (1.0+SQRT(u1lay(i)**2+v1lay(i)**2)) &
-            & * p1lay(i)/(RD*t1lay(i))
+            * (1.0+SQRT(u1lay(i)**2+v1lay(i)**2)) &
+            * p1lay(i)/(RD*t1lay(i))
     ENDDO
 
     ! === Calcul de la temperature de surface ===
@@ -1620,11 +1618,11 @@ CONTAINS
        ! Q
        zx_oq(i) = 1. - (beta(i) * zx_k1(i) * peqBcoef(i) * dtime)
        zx_mq(i) = beta(i) * zx_k1(i) * &
-            &             (peqAcoef(i) - zx_qsat(i) &
-            &                          + zx_dq_s_dt(i) * tsurf(i)) &
-            &             / zx_oq(i)
+            (peqAcoef(i) - zx_qsat(i) &
+            + zx_dq_s_dt(i) * tsurf(i)) &
+            / zx_oq(i)
        zx_nq(i) = beta(i) * zx_k1(i) * (-1. * zx_dq_s_dt(i)) &
-            &                              / zx_oq(i)
+            / zx_oq(i)
 
        ! H
        zx_oh(i) = 1. - (zx_k1(i) * petBcoef(i) * dtime)
@@ -1640,7 +1638,7 @@ CONTAINS
        snow = MAX(0.0, snow)
     end where
 
-    !  bil_eau_s = bil_eau_s + (precip_rain * dtime) - (evap - snow_evap) * dtime
+    ! bil_eau_s = bil_eau_s + (precip_rain * dtime) - (evap - snow_evap) * dtime
     bil_eau_s = (precip_rain * dtime) - (evap - snow_evap) * dtime
 
 
@@ -1649,14 +1647,14 @@ CONTAINS
     ffonte=0.
     do i = 1, knon
        neige_fond = ((snow(i) > epsfra .OR. nisurf == is_sic .OR. nisurf == is_lic) &
-            & .AND. tsurf_new(i) >= RTT)
+            .AND. tsurf_new(i) >= RTT)
        if (neige_fond) then
           fq_fonte = MIN( MAX((tsurf_new(i)-RTT )/chasno, 0.0), snow(i))
           ffonte(i) = fq_fonte * RLMLT/dtime
           snow(i) = max(0., snow(i) - fq_fonte)
           bil_eau_s(i) = bil_eau_s(i) + fq_fonte 
-          tsurf_new(i) = tsurf_new(i) - fq_fonte * chasno  
-          !IM cf JLD OK     
+          tsurf_new(i) = tsurf_new(i) - fq_fonte * chasno 
+          !IM cf JLD OK 
           !IM cf JLD/ GKtest fonte aussi pour la glace
           IF (nisurf == is_sic .OR. nisurf == is_lic ) THEN
              fq_fonte = MAX((tsurf_new(i)-RTT )/chaice, 0.0)
@@ -1667,7 +1665,7 @@ CONTAINS
           d_ts(i) = tsurf_new(i) - tsurf(i)
        endif
 
-       !   s'il y a une hauteur trop importante de neige, elle s'coule
+       ! s'il y a une hauteur trop importante de neige, elle s'coule
        fqcalving(i) = max(0., snow(i) - snow_max)/dtime
        snow(i)=min(snow(i), snow_max)
 
@@ -1676,8 +1674,8 @@ CONTAINS
           run_off(i) = run_off(i) + MAX(qsol(i) - max_eau_sol, 0.0)
           qsol(i) = MIN(qsol(i), max_eau_sol) 
        else if (nisurf == is_lic) then
-          run_off_lic(i) = (coeff_rel *  fqcalving(i)) + &
-               &                        (1. - coeff_rel) * run_off_lic_0(i)
+          run_off_lic(i) = (coeff_rel * fqcalving(i)) + &
+               (1. - coeff_rel) * run_off_lic_0(i)
           run_off_lic_0(i) = run_off_lic(i)
           run_off_lic(i) = run_off_lic(i) + bil_eau_s(i)/dtime
        endif

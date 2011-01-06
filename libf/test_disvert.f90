@@ -29,13 +29,20 @@ program test_disvert
   call new_unit(unit)
   open(unit, file="test_disvert.csv", status="replace", action="write")
   ! Title line:
-  write(unit, fmt=*) '"ap (hPa)" "bp" "s" "p (hPa)", "z (km)", "delta z (km)"'
-  do l = 1, llm - 1
-     write(unit, fmt=*) ap(l) / 100., bp(l), s(l), p(l) / 100., z(l), &
-          z(l+1) - z(l)
+  write(unit, fmt=*) '"ap (hPa)" "bp" "s" "p (hPa)" "z (km)"'
+  do l = 1, llm
+     write(unit, fmt=*) ap(l) / 100., bp(l), s(l), p(l) / 100., z(l)
   end do
-  write(unit, fmt=*) ap(llm) / 100., bp(llm), s(llm), p(llm) / 100., z(llm)
   close(unit)
   print *, 'The file "test_disvert.csv" has been created.'
+
+  open(unit, file="delta_z.csv", status="replace", action="write")
+  ! Title line:
+  write(unit, fmt=*) '"z middle (km)" "delta z (km)"'
+  do l = 1, llm - 1
+     write(unit, fmt=*) (z(l) + z(l+1)) / 2, z(l+1) - z(l)
+  end do
+  close(unit)
+  print *, 'The file "delta_z.csv" has been created.'
 
 end program test_disvert

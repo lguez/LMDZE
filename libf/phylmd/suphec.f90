@@ -2,21 +2,57 @@ module suphec_m
 
   implicit none
 
+  ! A1.0 Fundamental constants
+  REAL RPI
+  real, parameter::    RCLUM=299792458.
+  real, parameter::    RHPLA=6.6260755E-34
+  real, parameter::    RKBOL=1.380658E-23
+  real, parameter::    RNAVO=6.0221367E+23
+
+  ! A1.1 Astronomical constants
+  REAL RSIYEA,RSIDAY,ROMEGA
+  real, parameter::    RDAY=86400.
+  real, parameter::    REA=149597870000.
+  real, parameter::    REPSM=0.409093
+
+  ! A1.2 Geoide
+  REAL R1SA
+  real, parameter::    RG=9.80665
+  real, parameter::    RA=6371229.
+
+  ! A1.3 Radiation
+  REAL RSIGMA
+
+  ! A1.4 Thermodynamic gas phase
+  REAL R,RD,RV,RCPD,RCPV,RCVD,RCVV
+  real, parameter::    RMD=28.9644
+  real, parameter::    RMO3=47.9942
+  real, parameter::    RMV=18.0153
+  REAL RKAPPA,RETV
+
+  ! A1.5,6 Thermodynamic liquid,solid phases
+  REAL RCW,RCS
+
+  ! A1.7 Thermodynamic transition of phase
+  REAL RLMLT
+  real, parameter::    RTT=273.16
+  real, parameter::    RLVTT=2.5008E+6
+  real, parameter::    RLSTT=2.8345E+6
+  real, parameter::    RATM=100000.
+
+  ! A1.8 Curve of saturation
+  REAL RALPW,RBETW,RGAMW,RALPS,RBETS,RGAMS
+  real, parameter::    RESTT=611.14
+  REAL RALPD,RBETD,RGAMD
+
+  save
+
 contains
 
   SUBROUTINE suphec
 
     ! From phylmd/suphec.F,v 1.2 2005/06/06 13:16:33
-
     ! Initialise certaines constantes et parametres physiques.
-
-    use YOMCST, only: rpi, rclum, rhpla, rkbol, rnavo, rday, rea, repsm, &
-         rsiyea, rsiday,romega, rg, ra, r1sa, rsigma, r, rmd, rmo3, rmv, rd, &
-         rv, rcpd, rcvd, rcpv, rcvv, rkappa, retv, rcw, rcs, rtt, rlvtt, &
-         rlstt, rlmlt, ratm, restt, rgamw, rbetw, ralpw, rgams, rbets, ralps, &
-         rgamd, rbetd, ralpd
-    use yoethf, only: r2es, r3ies, r3les, r4ies, r4les, r5ies, r5les, rhoh2o, &
-         rvtmp2
 
     !------------------------------------------
 
@@ -26,10 +62,6 @@ contains
 
     print *, 'Constants of the ICM'
     RPI=2.*ASIN(1.)
-    RCLUM=299792458.
-    RHPLA=6.6260755E-34
-    RKBOL=1.380658E-23
-    RNAVO=6.0221367E+23
     print *, 'Fundamental constants '
     print '(''           PI = '',E13.7,'' -'')', RPI
     print '(''            c = '',E13.7,''m s-1'')', RCLUM
@@ -38,10 +70,6 @@ contains
     print '(''            N = '',E13.7,''mol-1'')', RNAVO
 
     ! 2. DEFINE ASTRONOMICAL CONSTANTS
-
-    RDAY=86400.
-    REA=149597870000.
-    REPSM=0.409093
 
     RSIYEA=365.25*RDAY*2.*RPI/6.283076
     RSIDAY=RDAY/(1.+RDAY/RSIYEA)
@@ -57,8 +85,6 @@ contains
 
     ! 3.    DEFINE GEOIDE.
 
-    RG=9.80665
-    RA=6371229.
     R1SA=SNGL(1.D0/DBLE(RA))
     print *, '        Geoide      '
     print '(''      Gravity = '',E13.7,'' m s-2'')', RG
@@ -74,9 +100,6 @@ contains
     ! 5.    DEFINE THERMODYNAMIC CONSTANTS, GAS PHASE.
 
     R=RNAVO*RKBOL
-    RMD=28.9644
-    RMO3=47.9942
-    RMV=18.0153
     RD=1000.*R/RMD
     RV=1000.*R/RMV
     RCPD=3.5*RD
@@ -113,11 +136,7 @@ contains
 
     ! 8.    DEFINE THERMODYNAMIC CONSTANTS, TRANSITION OF PHASE.
 
-    RTT=273.16
-    RLVTT=2.5008E+6
-    RLSTT=2.8345E+6
     RLMLT=RLSTT-RLVTT
-    RATM=100000.
     print *, 'Thermodynamic, trans.  '
     print '('' Fusion point  = '',E13.7)',  RTT
     print '(''        RLvTt  = '',E13.7)',  RLVTT
@@ -127,7 +146,6 @@ contains
 
     ! 9.    SATURATED VAPOUR PRESSURE.
 
-    RESTT=611.14
     RGAMW=(RCW-RCPV)/RV
     RBETW=RLVTT/RV+RGAMW*RTT
     RALPW=LOG(RESTT)+RBETW/RTT+RGAMW*LOG(RTT)
@@ -137,18 +155,6 @@ contains
     RGAMD=RGAMS-RGAMW
     RBETD=RBETS-RBETW
     RALPD=RALPS-RALPW
-
-    ! calculer les constantes pour les fonctions thermodynamiques
-
-    RVTMP2=RCPV/RCPD-1.
-    RHOH2O=RATM/100.
-    R2ES=RESTT*RD/RV
-    R3LES=17.269
-    R3IES=21.875
-    R4LES=35.86
-    R4IES=7.66
-    R5LES=R3LES*(RTT-R4LES)
-    R5IES=R3IES*(RTT-R4IES)
 
   END SUBROUTINE suphec
 

@@ -46,8 +46,8 @@ C======================================================================
 C 
       use dimens_m
       use dimphy
-      use YOMCST
-      use yoethf
+      use SUPHEC_M
+      use yoethf_m
       implicit none
 
 C
@@ -206,8 +206,8 @@ c======================================================================
  
       use dimens_m
       use dimphy
-      use YOMCST
-      use yoethf
+      use SUPHEC_M
+      use yoethf_m
       IMPLICIT NONE
 C
 C

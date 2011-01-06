@@ -10,8 +10,8 @@ contains
 
     use dimens_m
     use dimphy
-    use YOMCST
-    use yoethf
+    use SUPHEC_M
+    use yoethf_m
     use fcttre
 
     ! D'apres Holstag & Boville et Troen & Mahrt

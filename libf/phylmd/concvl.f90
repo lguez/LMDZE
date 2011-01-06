@@ -10,8 +10,8 @@ SUBROUTINE concvl(iflag_con, dtime, paprs, pplay, t, q, u, v, tra,&
 
   USE dimens_m
   USE dimphy
-  USE yomcst
-  USE yoethf
+  USE suphec_m
+  USE yoethf_m
   USE fcttre
 
   IMPLICIT NONE

@@ -4,7 +4,7 @@
 
       USE dimens_m
       USE dimphy
-      USE yomcst
+      USE suphec_m
       USE yoegwd
       IMPLICIT NONE
 

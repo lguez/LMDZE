@@ -4,7 +4,7 @@ c
       SUBROUTINE cvltr(pdtime,da, phi, mp,paprs,x,upd,dnd,dx)
       use dimens_m
       use dimphy
-      use YOMCST
+      use SUPHEC_M
             use yoecumf 
       IMPLICIT NONE 
 c=====================================================================

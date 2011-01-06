@@ -9,8 +9,8 @@
                             ts, qsurf, rugos, okri, ri1, &
                             cdram, cdrah, cdran, zri1, pref)
       use indicesol
-      use YOMCST
-      use yoethf
+      use SUPHEC_M
+      use yoethf_m
       IMPLICIT none
 !-------------------------------------------------------------------------
 ! Objet : calcul des cdrags pour le moment (cdram) et les flux de chaleur 

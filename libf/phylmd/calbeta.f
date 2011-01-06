@@ -4,7 +4,7 @@
       use indicesol
       use dimphy
       use iniprint
-      use YOMCST
+      use SUPHEC_M
       IMPLICIT none
 c======================================================================
 c Auteur(s): Z.X. Li (LMD/CNRS) (adaptation du GCM du LMD)

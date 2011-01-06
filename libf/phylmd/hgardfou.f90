@@ -13,7 +13,7 @@ contains
     use dimens_m
     use indicesol
     use dimphy
-    use YOMCST
+    use SUPHEC_M
 
     REAL, intent(in):: t(klon, klev), tsol(klon, nbsrf)
 

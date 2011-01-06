@@ -31,6 +31,7 @@ contains
          ok_kzmin
     use clesphys2, only: iflag_con, ok_orolf, ok_orodr, nbapp_rad, &
          cycle_diurne, new_oliq, soil_model
+    use clmain_m, only: clmain
     use comgeomphy
     use conf_gcm_m, only: raz_date, offline
     use conf_phys_m, only: conf_phys
@@ -58,8 +59,8 @@ contains
     use radepsi
     use radopt
     use temps, only: itau_phy, day_ref, annee_ref
-    use yoethf
-    use YOMCST, only: rcpd, rtt, rlvtt, rg, ra, rsigma, retv, romega
+    use yoethf_m
+    use SUPHEC_M, only: rcpd, rtt, rlvtt, rg, ra, rsigma, retv, romega
 
     ! Declaration des constantes et des fonctions thermodynamiques :
     use fcttre, only: thermcep, foeew, qsats, qsatl
@@ -404,7 +405,6 @@ contains
 
     EXTERNAL alboc     ! calculer l'albedo sur ocean
     EXTERNAL ajsec     ! ajustement sec
-    EXTERNAL clmain    ! couche limite 
     !KE43
     EXTERNAL conema3  ! convect4.3
     EXTERNAL fisrtilp  ! schema de condensation a grande echelle (pluie)
@@ -1035,6 +1035,7 @@ contains
 
     fder = dlw
 
+    ! Couche limite:
     CALL clmain(pdtphys, itap, date0, pctsrf, pctsrf_new, &
          t_seri, q_seri, u_seri, v_seri, &
          julien, rmu0, co2_ppm,  &

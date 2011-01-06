@@ -26,6 +26,8 @@ contains
     ! Modification spéciale traceur F. Forget 05/94
     ! Modification M.-A. Filiberti 02/02 lecture de "traceur.def"
     ! Modification de l'intégration de "q" (26/04/94)
+    ! Pour Van-Leer plus vapeur d'eau saturée : iadv(1)=4
+    ! Pour Van-Leer : iadv=10
 
     use nr_util, only: assert
 

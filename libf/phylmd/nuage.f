@@ -10,7 +10,7 @@
      s                  cldtaupi, re, fl)
       use dimens_m
       use dimphy
-      use YOMCST
+      use SUPHEC_M
       IMPLICIT none
 c======================================================================
 c Auteur(s): Z.X. Li (LMD/CNRS) date: 19930910
@@ -231,7 +231,7 @@ C
      .                   diafra,dialiq)
       use dimens_m
       use dimphy
-      use YOMCST
+      use SUPHEC_M
       IMPLICIT none
 c
 c Laurent Li (LMD/CNRS), le 12 octobre 1998
@@ -315,8 +315,8 @@ c
       SUBROUTINE diagcld2(paprs,pplay,t,q, diafra,dialiq)
       use dimens_m
       use dimphy
-      use YOMCST
-      use yoethf
+      use SUPHEC_M
+      use yoethf_m
 c Fonctions thermodynamiques:
       use fcttre
       IMPLICIT none

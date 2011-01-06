@@ -1,17 +1,36 @@
-module yoethf
+module yoethf_m
 
   ! From phylmd/yoethf.inc,v 1.1.1.1 2004/05/19 12:53:09
-  ! DERIVED CONSTANTS SPECIFIC TO ECMWF THERMODYNAMICS
+  ! Derived constants specific to ECMWF thermodynamics
 
   implicit none
 
-  REAL R2ES, R3LES, R3IES, R4LES, R4IES, R5LES, R5IES
-  ! CONSTANTS USED FOR COMPUTATION OF SATURATION MIXING RATIO OVER
-  ! LIQUID WATER (R_LES) OR ICE (R_IES)
+  ! Constants used for computation of saturation mixing ratio over
+  ! liquid water (r_les) or ice (r_ies):
+  REAL R2ES, R5LES, R5IES
+  real, parameter:: R3LES = 17.269, R3IES = 21.875, R4LES = 35.86, R4IES = 7.66
 
-  REAL RVTMP2 ! RCPV / RCPD - 1.
-  real RHOH2O ! DENSITY OF LIQUID WATER (RATM / 100.)
+  REAL RVTMP2
+  real RHOH2O ! density of liquid water
 
   save
 
-end module yoethf
+contains
+
+  subroutine yoethf
+
+    ! Calcul des constantes pour les fonctions thermodynamiques
+
+    use SUPHEC_M, only: ratm, rcpd, rcpv, rd, restt, rtt, rv
+
+    !-----------------------------------------
+
+    RVTMP2=RCPV/RCPD-1.
+    RHOH2O=RATM/100.
+    R2ES=RESTT*RD/RV
+    R5LES=R3LES*(RTT-R4LES)
+    R5IES=R3IES*(RTT-R4IES)
+
+  end subroutine yoethf
+
+end module yoethf_m

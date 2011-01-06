@@ -6,7 +6,7 @@
                          ts, qsurf, rugos, psol, &
                          ustar, testar, qstar, okri, ri1, &
                          pref, delu, delte, delq)
-      use YOMCST
+      use SUPHEC_M
       IMPLICIT NONE
 !-----------------------------------------------------------------------
 ! 

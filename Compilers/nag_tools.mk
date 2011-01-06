@@ -4,7 +4,7 @@
 # For the NAGWare Fortran 95 module builder and other NAG tools
 
 # Include flags:
-inc_flags = $(addprefix -I, ${libf_dir} ${libf_dir}/dyn3d ${libf_dir}/phylmd ${libf_dir}/filtrez /home/guez_local/include /home/guez_local/include/NetCDF_nag_modules95 /home/guez_local/lib/Numer_Rec_Lionel/s /home/guez_local/lib/NR_util_g /home/guez_local/lib/NetCDF95/nag_modules95)
+inc_flags = $(addprefix -I, ${libf_dir} ${libf_dir}/dyn3d ${libf_dir}/phylmd ${libf_dir}/filtrez /net/vierne/user/guez_local/include ${HOME}/include ${HOME}/lib/Numer_Rec_Lionel_s ${HOME}/lib/NR_util_g ${HOME}/lib/NetCDF95)
 
 # NAG general options:
 nag_gl_options = ${inc_flags} -dusty -mismatch_all

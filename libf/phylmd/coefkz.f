@@ -10,8 +10,8 @@ cIM 261103
       use indicesol
       use dimphy
       use iniprint
-      use YOMCST
-      use yoethf
+      use SUPHEC_M
+      use yoethf_m
       use fcttre
       use conf_phys_m
       IMPLICIT none

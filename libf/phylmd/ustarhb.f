@@ -4,8 +4,8 @@
       SUBROUTINE ustarhb(knon,u,v,cd_m, ustar)
       use dimens_m
       use dimphy
-      use YOMCST
-      use yoethf
+      use SUPHEC_M
+      use yoethf_m
       use fcttre
       IMPLICIT none
 c======================================================================

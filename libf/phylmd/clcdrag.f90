@@ -6,8 +6,8 @@
                          ts, qsurf, rugos, &
                          pcfm, pcfh)
       use indicesol
-      use YOMCST
-      use yoethf
+      use SUPHEC_M
+      use yoethf_m
       IMPLICIT NONE
 ! ================================================================= c
 !

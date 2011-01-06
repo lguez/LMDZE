@@ -644,7 +644,7 @@ c differente de 10.0 dans convect3:
 
 !==================================================================
       SUBROUTINE cv_thermo(iflag_con)
-      use YOMCST 
+      use SUPHEC_M 
 	  implicit none
 
 c-------------------------------------------------------------
@@ -684,7 +684,7 @@ c maf       grav= 10.    ! implicitely or explicitely used in convect3
        grav= g    ! implicitely or explicitely used in convect3
       endif
 
-      rowl=1000.0 !(a quelle variable de YOMCST cela correspond-il?)
+      rowl=1000.0 !(a quelle variable de SUPHEC_M cela correspond-il?)
 
       clmcpv=cl-cpv
       clmcpd=cl-cpd

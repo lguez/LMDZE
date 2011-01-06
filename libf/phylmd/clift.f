@@ -39,7 +39,7 @@ c      ALF0=3.34E+05
 c
 c on utilise les constantes thermo du Centre Europeen: (sb)
 c
-      use YOMCST
+      use SUPHEC_M
 c
        CPD = RCPD
        CPV = RCPV

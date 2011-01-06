@@ -17,9 +17,9 @@
 c      
       use dimphy
       use clesphys 
-      use YOMCST
+      use SUPHEC_M
       use raddim, only: kflev, kdlon
-      use yoethf
+      use yoethf_m
       IMPLICIT none
 c======================================================================
 c Auteur(s): Z.X. Li (LMD/CNRS) date: 19960719

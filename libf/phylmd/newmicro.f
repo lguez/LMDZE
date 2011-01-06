@@ -11,7 +11,7 @@
      s                  cldtaupi, re, fl)
       use dimens_m
       use dimphy
-      use YOMCST
+      use SUPHEC_M
       use nuagecom
       IMPLICIT none
 c======================================================================

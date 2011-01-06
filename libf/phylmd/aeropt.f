@@ -6,7 +6,7 @@
 c
       use dimens_m
       use dimphy
-      use YOMCST
+      use SUPHEC_M
       IMPLICIT none
 c
 c

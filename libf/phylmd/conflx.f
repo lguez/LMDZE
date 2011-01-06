@@ -9,8 +9,8 @@
 c
       use dimens_m
       use dimphy
-      use YOMCST
-      use yoethf
+      use SUPHEC_M
+      use yoethf_m
       use fcttre
       IMPLICIT none
 c======================================================================
@@ -215,8 +215,8 @@ c     *                   ldcum, ktype,
      .                   dt_con, dq_con, pmflxr, pmflxs)
       use dimens_m
       use dimphy
-      use YOMCST
-      use yoethf
+      use SUPHEC_M
+      use yoethf_m
             use yoecumf
       IMPLICIT none
 C     ------------------------------------------------------------------
@@ -506,8 +506,8 @@ c
      .           klab,pen_u, pde_u, pen_d, pde_d)
       use dimens_m
       use dimphy
-      use YOMCST
-      use yoethf
+      use SUPHEC_M
+      use yoethf_m
       IMPLICIT none
 C----------------------------------------------------------------------
 C THIS ROUTINE INTERPOLATES LARGE-SCALE FIELDS OF T,Q ETC.
@@ -631,8 +631,8 @@ C
      *     ptu, pqu, plu, ldcum, kcbot, klab)
       use dimens_m
       use dimphy
-      use YOMCST
-      use yoethf
+      use SUPHEC_M
+      use yoethf_m
       IMPLICIT none
 C----------------------------------------------------------------------
 C THIS ROUTINE CALCULATES CLOUD BASE VALUES (T AND Q)
@@ -716,8 +716,8 @@ c
      .     pen_u, pde_u)
       use dimens_m
       use dimphy
-      use YOMCST
-      use yoethf
+      use SUPHEC_M
+      use yoethf_m
             use yoecumf
       IMPLICIT none
 C----------------------------------------------------------------------
@@ -1020,8 +1020,8 @@ C
      .  ,  pmflxr, pmflxs)
       use dimens_m
       use dimphy
-      use YOMCST
-      use yoethf
+      use SUPHEC_M
+      use yoethf_m
       use fcttre
             use yoecumf
       IMPLICIT none
@@ -1265,8 +1265,8 @@ c
      .  ,  pdpmel, dt_con, dq_con)
       use dimens_m
       use dimphy
-      use YOMCST
-      use yoethf
+      use SUPHEC_M
+      use yoethf_m
             use yoecumf
       IMPLICIT none
 c----------------------------------------------------------------------
@@ -1335,8 +1335,8 @@ C
      .     pmfd, pmfds, pmfdq, pdmfdp, kdtop, lddraf)
       use dimens_m
       use dimphy
-      use YOMCST
-      use yoethf
+      use SUPHEC_M
+      use yoethf_m
             use yoecumf
       IMPLICIT none
 C
@@ -1446,8 +1446,8 @@ C
      .           lddraf, pen_d, pde_d)
       use dimens_m
       use dimphy
-      use YOMCST
-      use yoethf
+      use SUPHEC_M
+      use yoethf_m
             use yoecumf
       IMPLICIT none
 C
@@ -1561,8 +1561,8 @@ c
       SUBROUTINE flxadjtq(pp, pt, pq, ldflag, kcall)
       use dimens_m
       use dimphy
-      use YOMCST
-      use yoethf
+      use SUPHEC_M
+      use yoethf_m
       use fcttre
       IMPLICIT none
 c======================================================================

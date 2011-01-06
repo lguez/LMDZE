@@ -24,7 +24,7 @@ contains
          lev_histmth, type_run, ok_isccp, ok_regdyn, lonmin_ins, lonmax_ins, &
          latmin_ins, latmax_ins, ecrit_ins, ecrit_hf, ecrit_hf2mth, &
          ecrit_day, ecrit_mth, ecrit_tra, ecrit_reg, bug_ozone
-    use YOMCST
+    use yomcst
     use conema3_m
     use comfisrtilp
     use nuagecom

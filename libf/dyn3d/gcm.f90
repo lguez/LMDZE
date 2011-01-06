@@ -2,13 +2,11 @@ PROGRAM gcm
 
   ! Authors: P. Le Van, L. Fairhead, F. Hourdin
   ! From "gcm.F", version 1.4, 2006/04/04 15:05:16
-  ! General circulation model of LMD
-  ! Avec coordonnées verticales hybrides, avec nouveaux opérateurs de
-  ! dissipation "*" (gradiv2, divgrad2, nxgraro2)
-  ! Possibilité de choisir le schéma pour l'advection de "q", en
-  ! modifiant "iadv" dans "traceur.def".
-  ! Pour Van-Leer plus vapeur d'eau saturée : iadv(1)=4
-  ! Pour Van-Leer : iadv=10
+
+  ! General circulation model of LMD. Avec coordonnée verticale
+  ! hybride, avec nouveaux opérateurs de dissipation "*" ("gradiv2",
+  ! "divgrad2", "nxgraro2"). Possibilité de choisir le schéma pour
+  ! l'advection de "q", en modifiant "iadv" dans "traceur.def".
 
   use clesphys2, only: read_clesphys2
   use com_io_dyn, only: histid, histvid, histaveid
@@ -35,6 +33,7 @@ PROGRAM gcm
   use suphec_m, only: suphec
   use temps, only: day_ref, annee_ref, day_end, itau_dyn
   use tracstoke, only: istdyn, istphy
+  use yoethf_m, only: yoethf
 
   IMPLICIT NONE
 
@@ -146,6 +145,7 @@ PROGRAM gcm
 
      airephy = pack(aire_2d, dyn_phy)
      CALL suphec
+     call yoethf
   ENDIF
 
   ! Initialisation des entrées-sorties :

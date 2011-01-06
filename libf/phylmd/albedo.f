@@ -6,7 +6,7 @@ c
       SUBROUTINE alboc(rjour,rlat,albedo)
       use dimens_m
       use dimphy
-      use YOMCST
+      use yomcst
       use orbite_m, only: orbite
       IMPLICIT none
 c======================================================================

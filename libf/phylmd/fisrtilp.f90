@@ -11,8 +11,8 @@ SUBROUTINE fisrtilp(dtime,paprs,pplay,t,q,ptconv,ratqs,d_t,d_q,d_ql,rneb, &
   USE dimens_m
   USE dimphy
   USE tracstoke
-  USE yomcst
-  USE yoethf
+  USE suphec_m
+  USE yoethf_m
   USE fcttre
   USE comfisrtilp
   use numer_rec, only: nr_erf

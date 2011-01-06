@@ -19,7 +19,7 @@ cFleur       Introduction des traceurs dans convect3 le 6 juin 200
 
       use dimens_m
       use dimphy
-      use YOMCST
+      use SUPHEC_M
 
       real, intent(in):: dtime, DELT
       PARAMETER (NA=60)

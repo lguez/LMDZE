@@ -2,7 +2,7 @@
      S                PFLUC,PBINT,PBSUI,PCTS,PCNTRB)
       use dimens_m
       use dimphy
-      use YOMCST
+      use SUPHEC_M
       use raddim
             use raddimlw
       IMPLICIT none

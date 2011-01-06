@@ -5,7 +5,7 @@
      .                 paprs,x,dx) 
       use dimens_m
       use dimphy
-      use YOMCST
+      use SUPHEC_M
             use yoecumf 
       IMPLICIT NONE 
 c=====================================================================

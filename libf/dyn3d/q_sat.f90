@@ -8,7 +8,7 @@ contains
 
     ! From dyn3d/q_sat.F, version 1.1.1.1 2004/05/19 12:53:05
 
-    ! Authors : Z. X. Li (LMD/CNRS).
+    ! Author: Z. X. Li (LMD/CNRS).
     ! Réécriture vectorisée par F. Hourdin.
     ! This procedure computes the mass fraction of saturating water
     ! vapor, with the formula of ECMWF.

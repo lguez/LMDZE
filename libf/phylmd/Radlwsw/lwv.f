@@ -4,7 +4,7 @@
      S  , PCNTRB,PCTS,PFLUC)
       use dimens_m
       use dimphy
-      use YOMCST
+      use SUPHEC_M
       use raddim
             use raddimlw
       IMPLICIT none

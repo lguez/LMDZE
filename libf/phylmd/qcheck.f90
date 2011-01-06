@@ -8,7 +8,7 @@ contains
 
     ! From phylmd/physiq.F, v 1.22 2006/02/20 09:38:28
 
-    use YOMCST
+    use SUPHEC_M
 
     ! Calculer et imprimer l'eau totale. A utiliser pour verifier
     ! la conservation de l'eau

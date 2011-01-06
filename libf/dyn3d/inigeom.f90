@@ -16,87 +16,40 @@ contains
     ! tangente hyperbolique
     ! calcul des coefficients (cu_2d, cv_2d, 1./cu_2d**2, 1./cv_2d**2)
 
-    ! les coef. ( cu_2d, cv_2d ) permettent de passer des vitesses naturelles
-    !      aux vitesses covariantes et contravariantes , ou vice-versa ...
+    ! les coef. (cu_2d, cv_2d) permettent de passer des vitesses naturelles
+    ! aux vitesses covariantes et contravariantes, ou vice-versa
 
-    ! on a :  u (covariant) = cu_2d * u (naturel)   , u(contrav)= u(nat)/cu_2d
-    !         v (covariant) = cv_2d * v (naturel)   , v(contrav)= v(nat)/cv_2d
+    ! on a :
+    ! u (covariant) = cu_2d * u (naturel), u(contrav)= u(nat)/cu_2d
+    ! v (covariant) = cv_2d * v (naturel), v(contrav)= v(nat)/cv_2d
 
-    !       on en tire :  u(covariant) = cu_2d * cu_2d * u(contravariant)
-    !                     v(covariant) = cv_2d * cv_2d * v(contravariant)
+    ! on en tire : 
+    ! u(covariant) = cu_2d * cu_2d * u(contravariant)
+    ! v(covariant) = cv_2d * cv_2d * v(contravariant)
 
-    !     on a l'application (  x(X) , y(Y) )   avec - im/2 +1 <  X  < im/2
-    !                                                          =     =
-    !                                           et   - jm/2    <  Y  < jm/2
-    !                                                          =     =
+    ! on a l'application (x(X), y(Y)) avec - im/2 +1 <= X <= im/2
+    ! et - jm/2 <= Y <= jm/2
 
-    !      .  x  est la longitude du point  en radians       .
-    !      .  y  est la  latitude du point  en radians       .
-    !      .                                                 .
-    !      .  on a :  cu_2d(i, j) = rad * COS(y) * dx/dX         .
-    !      .          cv( j ) = rad          * dy/dY         .
-    !      .        aire_2d(i, j) =  cu_2d(i, j) * cv(j)             .
-    !      .                                                 .
-    !      . y, dx/dX, dy/dY calcules aux points concernes   .
-    !                                                           ,
-    !    cv , bien que dependant de j uniquement, sera ici indice aussi en i
-    !          pour un adressage plus facile en  ij  .
+    ! x est la longitude du point en radians.
+    ! y est la latitude du point en radians.
+    ! 
+    ! on a : cu_2d(i, j) = rad * cos(y) * dx/dX
+    ! cv(j) = rad * dy/dY
+    ! aire_2d(i, j) = cu_2d(i, j) * cv(j)
+    ! 
+    ! y, dx/dX, dy/dY calcules aux points concernes
+    ! cv, bien que dependant de j uniquement, sera ici indice aussi en i
+    ! pour un adressage plus facile en ij.
 
-    !  **************  aux points  u  et  v ,           *****************
-    !      xprimu et xprimv sont respectivement les valeurs de  dx/dX
-    !      yprimu et yprimv    .  .  .  .  .  .  .  .  .  .  .  dy/dY
-    !      rlatu  et  rlatv    .  .  .  .  .  .  .  .  .  .  .la latitude
-    !      cvu    et   cv_2d      .  .  .  .  .  .  .  .  .  .  .    cv_2d
+    ! aux points u et v, 
+    ! xprimu et xprimv sont respectivement les valeurs de dx/dX
+    ! yprimu et yprimv sont respectivement les valeurs de dy/dY
+    ! rlatu et rlatv sont respectivement les valeurs de la latitude
+    ! cvu et cv_2d sont respectivement les valeurs de cv_2d
 
-    !  **************  aux points u, v, scalaires, et z  ****************
-    !      cu_2d, cuv, cuscal, cuz sont respectiv. les valeurs de    cu_2d
-
-    !         Exemple de distribution de variables sur la grille dans le
-    !             domaine de travail ( X, Y ) .
-    !                  DX=DY= 1
-
-    !        +     represente  un  point scalaire ( p.exp  la pression )
-    !        >     represente  la composante zonale du  vent
-    !        V     represente  la composante meridienne du vent
-    !        o     represente  la  vorticite
-
-    !     ----  , car aux poles , les comp.zonales covariantes sont nulles
-
-    !         i ->
-
-    !         1      2      3      4      5      6      7      8
-    !  j
-    !  v  1   + ---- + ---- + ---- + ---- + ---- + ---- + ---- + --
-
-    !         V   o  V   o  V   o  V   o  V   o  V   o  V   o  V  o
-
-    !     2   +   >  +   >  +   >  +   >  +   >  +   >  +   >  +  >
-
-    !         V   o  V   o  V   o  V   o  V   o  V   o  V   o  V  o
-
-    !     3   +   >  +   >  +   >  +   >  +   >  +   >  +   >  +  >
-
-    !         V   o  V   o  V   o  V   o  V   o  V   o  V   o  V  o
-
-    !     4   +   >  +   >  +   >  +   >  +   >  +   >  +   >  +  >
-
-    !         V   o  V   o  V   o  V   o  V   o  V   o  V   o  V  o
-
-    !     5   + ---- + ---- + ---- + ---- + ---- + ---- + ---- + --
-
-    !      Ci-dessus,  on voit que le nombre de pts.en longitude est egal
-    !                 a   IM = 8
-    !      De meme ,   le nombre d'intervalles entre les 2 poles est egal
-    !                 a   JM = 4
-
-    !      Les points scalaires ( + ) correspondent donc a des valeurs
-    !       entieres  de  i ( 1 a IM )   et  de  j ( 1 a  JM +1 )   .
-
-    !      Les vents    U       ( > ) correspondent a des valeurs  semi-
-    !       entieres  de i ( 1+ 0.5 a IM+ 0.5) et entieres de j ( 1 a JM+1)
-
-    !      Les vents    V       ( V ) correspondent a des valeurs entieres
-    !     de     i ( 1 a  IM ) et semi-entieres de  j ( 1 +0.5  a JM +0.5)
+    ! aux points u, v, scalaires, et z 
+    ! cu_2d, cuv, cuscal, cuz sont respectivement les valeurs de cu_2d
+    ! Cf. "inigeom.txt".
 
     USE dimens_m, ONLY : iim, jjm
     USE paramet_m, ONLY : iip1, jjp1
@@ -139,7 +92,7 @@ contains
     real aireij2_2d(iim + 1, jjm + 1)
     real aireij3_2d(iim + 1, jjm + 1), aireij4_2d(iim + 1, jjm + 1) 
     real airuscv2_2d(iim + 1, jjm) 
-    real airvscu2_2d(iim + 1, jjm), aiuscv2gam_2d(iim + 1, jjm)   
+    real airvscu2_2d(iim + 1, jjm), aiuscv2gam_2d(iim + 1, jjm) 
     real aivscu2gam_2d(iim + 1, jjm)
 
     !------------------------------------------------------------------
@@ -168,23 +121,21 @@ contains
 
     WRITE (6, 990)
 
-    IF ( .NOT. fxyhypb) THEN
+    IF (.NOT. fxyhypb) THEN
        IF (ysinus) THEN
-          print *, ' ***  Inigeom ,  Y = Sinus ( Latitude ) *** '
-
-          ! utilisation de f(x, y )  avec  y  =  sinus de la latitude  ...
-
+          print *, ' Inigeom, Y = Sinus (Latitude) '
+          ! utilisation de f(x, y) avec y = sinus de la latitude 
           CALL fxysinus(rlatu, yprimu, rlatv, yprimv, rlatu1, yprimu1, &
                rlatu2, yprimu2, rlonu, xprimu, rlonv, xprimv, rlonm025, &
                xprimm025, rlonp025, xprimp025)
        ELSE
-          print *, '*** Inigeom ,  Y = Latitude  , der. sinusoid . ***'
-          ! utilisation de f(x, y) a tangente sinusoidale , y etant la latit
+          print *, 'Inigeom, Y = Latitude, der. sinusoid .'
+          ! utilisation de f(x, y) a tangente sinusoidale, y etant la latit
 
           pxo = clon*pi/180.
           pyo = 2.*clat*pi/180.
 
-          ! determination de  transx ( pour le zoom ) par Newton-Raphson .
+          ! determination de transx (pour le zoom) par Newton-Raphson
 
           itmax = 10
           eps = .1E-7
@@ -223,8 +174,8 @@ contains
                rlonp025, xprimp025)
        END IF
     ELSE
-       ! ....  Utilisation  de fxyhyper , f(x, y) a derivee tangente hyperbol.
-       print *, '*** Inigeom , Y = Latitude  , der.tg. hyperbolique ***'
+       ! Utilisation de fxyhyper, f(x, y) à dérivée tangente hyperbolique
+       print *, 'Inigeom, Y = Latitude, dérivée tangente hyperbolique'
        CALL fxyhyper(clat, grossismy, dzoomy, tauy, clon, grossismx, dzoomx, &
             taux, rlatu, yprimu, rlatv, yprimv, rlatu1, yprimu1, rlatu2, &
             yprimu2, rlonu, xprimu, rlonv, xprimv, rlonm025, xprimm025, &
@@ -234,58 +185,58 @@ contains
     rlatu(1) = asin(1.)
     rlatu(jjp1) = -rlatu(1)
 
-    !   ....  calcul  aux  poles  ....
+    ! calcul aux poles 
 
     yprimu(1) = 0.
     yprimu(jjp1) = 0.
 
     un4rad2 = 0.25*rad*rad
 
-    ! calcul  des aires ( aire_2d, aireu_2d, airev_2d, 1./aire_2d, 1./airez )
-    !   -      et de   fext_2d ,  force de coriolis  extensive  .
+    ! calcul des aires (aire_2d, aireu_2d, airev_2d, 1./aire_2d, 1./airez)
+    ! - et de fext_2d, force de coriolis extensive
 
-    !   A 1 point scalaire P (i, j) de la grille, reguliere en (X, Y) , sont
-    !   affectees 4 aires entourant P , calculees respectivement aux points
-    !            ( i + 1/4, j - 1/4 )    :    aireij1_2d (i, j)
-    !            ( i + 1/4, j + 1/4 )    :    aireij2_2d (i, j)
-    !            ( i - 1/4, j + 1/4 )    :    aireij3_2d (i, j)
-    !            ( i - 1/4, j - 1/4 )    :    aireij4_2d (i, j)
+    ! A 1 point scalaire P (i, j) de la grille, reguliere en (X, Y), sont
+    ! affectees 4 aires entourant P, calculees respectivement aux points
+    ! (i + 1/4, j - 1/4) : aireij1_2d (i, j)
+    ! (i + 1/4, j + 1/4) : aireij2_2d (i, j)
+    ! (i - 1/4, j + 1/4) : aireij3_2d (i, j)
+    ! (i - 1/4, j - 1/4) : aireij4_2d (i, j)
 
-    !           ,
+    !,
     ! Les cotes de chacun de ces 4 carres etant egaux a 1/2 suivant (X, Y).
-    !   Chaque aire centree en 1 point scalaire P(i, j) est egale a la somme
+    ! Chaque aire centree en 1 point scalaire P(i, j) est egale a la somme
     ! des 4 aires aireij1_2d, aireij2_2d, aireij3_2d, aireij4_2d qui sont
     ! affectees au
-    !   point (i, j) .
-    !   On definit en outre les coefficients  alpha comme etant egaux a
+    ! point (i, j).
+    ! On definit en outre les coefficients alpha comme etant egaux a
     ! (aireij / aire_2d), c.a.d par exp.
     ! alpha1_2d(i, j)=aireij1_2d(i, j)/aire_2d(i, j)
 
-    !   De meme, toute aire centree en 1 point U est egale a la somme des
+    ! De meme, toute aire centree en 1 point U est egale a la somme des
     ! 4 aires aireij1_2d, aireij2_2d, aireij3_2d, aireij4_2d entourant
     ! le point U.
-    !    Idem pour  airev_2d, airez .
+    ! Idem pour airev_2d, airez.
 
-    !       On a , pour chaque maille :    dX = dY = 1
+    ! On a, pour chaque maille : dX = dY = 1
 
-    !                             . V
+    ! V
 
-    !                 aireij4_2d .        . aireij1_2d
+    ! aireij4_2d . . aireij1_2d
 
-    !                   U .       . P      . U
+    ! U . . P . U
 
-    !                 aireij3_2d .        . aireij2_2d
+    ! aireij3_2d . . aireij2_2d
 
-    !                             . V
+    ! V
 
     ! Calcul des 4 aires elementaires aireij1_2d, aireij2_2d,
     ! aireij3_2d, aireij4_2d
-    ! qui entourent chaque aire_2d(i, j) , ainsi que les 4 elongations
+    ! qui entourent chaque aire_2d(i, j), ainsi que les 4 elongations
     ! elementaires
     ! cuij et les 4 elongat. cvij qui sont calculees aux memes
-    !     endroits  que les aireij   .
+    ! endroits que les aireij.
 
-    !     .......  do 35  :   boucle sur les  jjm + 1  latitudes   .....
+    ! do 35 : boucle sur les jjm + 1 latitudes 
 
     DO j = 1, jjp1
 
@@ -382,7 +333,7 @@ contains
 
        END IF
 
-       !    ........       periodicite   ............
+       ! periodicite 
 
        cvij1(iip1, j) = cvij1(1, j)
        cvij2(iip1, j) = cvij2(1, j)
@@ -460,7 +411,7 @@ contains
 
     END DO
 
-    !    .....      Calcul  des elongations cu_2d, cv_2d, cvu     .........
+    ! Calcul des elongations cu_2d, cv_2d, cvu 
 
     DO j = 1, jjm
        DO i = 1, iim
@@ -508,7 +459,7 @@ contains
        cuscvugam_2d(iip1, j) = cuscvugam_2d(1, j)
     END DO
 
-    !   ....  calcul aux  poles  ....
+    ! calcul aux poles 
 
     DO i = 1, iip1
        cu_2d(i, 1) = 0.
@@ -538,7 +489,7 @@ contains
        aiuscv2gam_2d(iip1, j) = aiuscv2gam_2d(1, j)
     END DO
 
-    !   calcul des aires aux  poles :
+    ! calcul des aires aux poles :
 
     apoln = sum(aire_2d(:iim, 1))
     apols = sum(aire_2d(:iim, jjp1))
@@ -547,8 +498,8 @@ contains
     unsapolnga2 = 1./(apoln**(-gamdi_h))
     unsapolsga2 = 1./(apols**(-gamdi_h))
 
-    !   changement F. Hourdin calcul conservatif pour fext_2d
-    !   constang_2d contient le produit a * cos ( latitude ) * omega
+    ! changement F. Hourdin calcul conservatif pour fext_2d
+    ! constang_2d contient le produit a * cos (latitude) * omega
 
     DO i = 1, iim
        constang_2d(i, 1) = 0.
@@ -562,7 +513,7 @@ contains
        constang_2d(i, jjp1) = 0.
     END DO
 
-    !   periodicite en longitude
+    ! periodicite en longitude
 
     DO j = 1, jjm
        fext_2d(iip1, j) = fext_2d(1, j)
@@ -573,10 +524,10 @@ contains
 
     ! fin du changement
 
-    print *, '   ***  Coordonnees de la grille  *** '
+    print *, ' Coordonnees de la grille '
     WRITE (6, 995)
 
-    print *, '   LONGITUDES  aux pts.   V  ( degres )  '
+    print *, ' LONGITUDES aux pts. V (degres) '
     WRITE (6, 995)
     DO i = 1, iip1
        rlonvv(i) = rlonv(i)*180./pi
@@ -584,7 +535,7 @@ contains
     WRITE (6, 400) rlonvv
 
     WRITE (6, 995)
-    print *, '   LATITUDES   aux pts.   V  ( degres )  '
+    print *, ' LATITUDES aux pts. V (degres) '
     WRITE (6, 995)
     DO i = 1, jjm
        rlatuu(i) = rlatv(i)*180./pi
@@ -595,12 +546,12 @@ contains
        rlonvv(i) = rlonu(i)*180./pi
     END DO
     WRITE (6, 995)
-    print *, '   LONGITUDES  aux pts.   U  ( degres )  '
+    print *, ' LONGITUDES aux pts. U (degres) '
     WRITE (6, 995)
     WRITE (6, 400) rlonvv
     WRITE (6, 995)
 
-    print *, '   LATITUDES   aux pts.   U  ( degres )  '
+    print *, ' LATITUDES aux pts. U (degres) '
     WRITE (6, 995)
     DO i = 1, jjp1
        rlatuu(i) = rlatu(i)*180./pi

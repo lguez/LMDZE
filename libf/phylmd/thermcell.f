@@ -8,7 +8,7 @@ c    s                  ,pu_therm,pv_therm
 
       use dimens_m
       use dimphy
-      use YOMCST
+      use SUPHEC_M
       IMPLICIT NONE
 
 c=======================================================================

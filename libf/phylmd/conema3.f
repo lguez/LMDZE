@@ -10,9 +10,9 @@
 
       use dimens_m
       use dimphy
-      use YOMCST
+      use SUPHEC_M
       use conema3_m
-      use yoethf
+      use yoethf_m
       use fcttre
       IMPLICIT none
 c======================================================================

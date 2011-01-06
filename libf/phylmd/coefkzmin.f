@@ -6,7 +6,7 @@
 c      SUBROUTINE coefkzmin(ngrid,zlev,teta,ustar,km,kn)
       use dimens_m
       use dimphy
-      use YOMCST
+      use SUPHEC_M
       IMPLICIT NONE
 
 

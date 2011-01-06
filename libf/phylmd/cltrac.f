@@ -5,7 +5,7 @@
      s                  d_tr)
       use dimens_m
        use dimphy
-      use YOMCST
+      use SUPHEC_M
       IMPLICIT none
 c======================================================================
 c Auteur(s): O. Boucher (LOA/LMD) date: 19961127

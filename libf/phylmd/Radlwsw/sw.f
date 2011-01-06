@@ -15,7 +15,7 @@ cIM ctes ds clesphys.h   SUBROUTINE SW(PSCT, RCO2, PRMU0, PFRAC,
       use dimens_m
       use dimphy
       use clesphys
-      use YOMCST
+      use SUPHEC_M
       use raddim
       IMPLICIT none
 

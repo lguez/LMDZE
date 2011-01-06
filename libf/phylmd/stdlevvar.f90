@@ -5,8 +5,8 @@
                            u1, v1, t1, q1, z1, &
                            ts1, qsurf, rugos, psol, pat1, &
                            t_2m, q_2m, t_10m, q_10m, u_10m, ustar)
-      use YOMCST
-            use yoethf
+      use SUPHEC_M
+            use yoethf_m
       IMPLICIT NONE
 !-------------------------------------------------------------------------
 !

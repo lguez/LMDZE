@@ -3,7 +3,7 @@
 
       USE dimens_m
       USE dimphy
-      USE yomcst
+      USE suphec_m
       IMPLICIT NONE
 !======================================================================
 ! Auteur(s): F.Lott (LMD/CNRS) date: 19950201

@@ -3,10 +3,10 @@ module FCTTRE
   ! From phylmd/FCTTRE.inc, version 1.2 2004/06/22 11:45:32
 
   ! This COMDECK includes the thermodynamical functions for the cycle
-  ! 39 ECMWF Physics package. Consistent with YOMCST basic physics
+  ! 39 ECMWF Physics package. Consistent with SUPHEC_M basic physics
   ! constants, assuming the partial pressure of water vapour is given
   ! by a first order Taylor expansion of Qs(T) with respect to
-  ! temperature, using constants in yoethf.
+  ! temperature, using constants in yoethf_m.
 
   implicit none
 
@@ -16,8 +16,8 @@ contains
 
   REAL function FOEEW(T, DEL)
 
-    use yoethf, only: R3LES, R3IES, R4LES, R4IES
-    use YOMCST, only: rtt
+    use yoethf_m, only: R3LES, R3IES, R4LES, R4IES
+    use SUPHEC_M, only: rtt
 
     REAL, intent(in):: T, DEL
 
@@ -32,7 +32,7 @@ contains
 
   REAL function FOEDE(T, DEL, P5ARG, QS, PCOARG)
 
-    use yoethf, only: R4LES, R4IES
+    use yoethf_m, only: R4LES, R4IES
 
     REAL, intent(in):: T, DEL
     real, intent(in):: P5ARG, QS, PCOARG
@@ -74,7 +74,7 @@ contains
 
   REAL function dqsats(t, qs)
 
-    use YOMCST, only: RLVTT, rcpd
+    use SUPHEC_M, only: RLVTT, rcpd
 
     REAL, intent(in):: T, qs
 
@@ -89,7 +89,7 @@ contains
 
   REAL function dqsatl(t, qs)
 
-    use YOMCST, only: RLVTT, rcpd
+    use SUPHEC_M, only: RLVTT, rcpd
 
     REAL, intent(in):: T, qs
 

@@ -7,7 +7,7 @@
       use indicesol
       use dimphy
       use dimsoil
-      use YOMCST
+      use SUPHEC_M
       IMPLICIT NONE
 
 c=======================================================================

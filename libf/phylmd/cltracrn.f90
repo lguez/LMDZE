@@ -10,7 +10,7 @@ SUBROUTINE cltracrn( itr, dtime,u1lay, v1lay, &
 
   use indicesol, only: nbsrf
   use dimphy, only: klon, klev
-  use YOMCST, only: RD, rg
+  use SUPHEC_M, only: RD, rg
 
   IMPLICIT none
   !======================================================================
