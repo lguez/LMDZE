@@ -373,8 +373,7 @@ contains
     ! reverses their order.
     ! Finally, the procedure adds 90° as the last value of the array.
 
-    use nr_util, only: assert_eq
-    use comconst, only: pi
+    use nr_util, only: assert_eq, pi
 
     IMPLICIT NONE
 
@@ -432,7 +431,7 @@ contains
     ! This procedure converts to degrees, if necessary, and inverts the
     ! order.
 
-    use comconst, only: pi
+    use nr_util, only: pi
 
     IMPLICIT NONE
 

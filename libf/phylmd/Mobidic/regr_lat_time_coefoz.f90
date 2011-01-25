@@ -39,7 +39,7 @@ contains
 
     use dimens_m, only: jjm
     use comgeom, only: rlatv
-    use comconst, only: pi
+    use nr_util, only: pi
     use regr1_step_av_m, only: regr1_step_av
     use regr3_lint_m, only: regr3_lint
     use netcdf95, only: nf95_open, nf95_gw_var, nf95_close, &
@@ -240,8 +240,7 @@ contains
 
     use dimens_m, only: jjm
     use comgeom, only: rlatu
-    use comconst, only: pi
-    use nr_util, only: assert_eq
+    use nr_util, only: assert_eq, pi
 
     use netcdf95, only: nf95_create, nf95_def_dim, nf95_def_var, &
          nf95_put_att, nf95_enddef, nf95_copy_att, nf95_put_var

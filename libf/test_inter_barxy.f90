@@ -1,12 +1,13 @@
 program test_inter_barxy
 
-  use inter_barxy_m, only: inter_barxy
-  use comconst, only: pi, initialize, dtvr, daysec
+  use comconst, only: dtvr, daysec
   use comgeom, only: rlonu, rlatv
-  use dimens_m, only: iim, jjm
   use conf_gcm_m, only: conf_gcm, day_step
   use comvert, only: pa
+  use dimens_m, only: iim, jjm
+  use inter_barxy_m, only: inter_barxy
   use inigeom_m, only: inigeom
+  USE nr_util, ONLY : pi
 
   implicit none
 
@@ -17,8 +18,7 @@ program test_inter_barxy
   real, allocatable:: var_ana3d(:, :)
   REAL var_tmp2d(iim, jjm + 1)
 
-  LOGICAL:: interbar = .true. ! barycentric interpolation
-  namelist /main/iml_dyn, jml_dyn, interbar
+  namelist /main/iml_dyn, jml_dyn
 
   !------------------------
 
@@ -30,7 +30,6 @@ program test_inter_barxy
   allocate(lat_rad(jml_dyn-1), lat_ini(jml_dyn))
   allocate(var_ana3d(iml_dyn, jml_dyn))
 
-  call initialize
   CALL conf_gcm
   dtvr = daysec / real(day_step)
   print *, 'dtvr = ', dtvr

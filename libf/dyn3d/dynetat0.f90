@@ -10,9 +10,9 @@ contains
 
     ! From dynetat0.F, version 1.2, 2004/06/22 11:45:30
     ! Authors: P. Le Van, L. Fairhead
-    ! Objet : lecture de l'état initial
+    ! This procedure reads the initial state of the atmosphere.
 
-    use comconst, only: im, dtvr, jm, lllm, omeg
+    use comconst, only: im, dtvr, jm, lllm
     use comvert, only: pa
     use comgeom, only: rlonu, rlatu, rlonv, rlatv, cu_2d, cv_2d, aire_2d
     use dimens_m, only: iim, jjm, llm, nqmx
@@ -28,8 +28,8 @@ contains
     ! Arguments:
     REAL, intent(out):: vcov(: , :), ucov(:, :), teta(:, :)
     REAL, intent(out):: q(:, :, :), masse(:, :)
-    REAL, intent(out):: ps(:) ! in Pa
-    REAL, intent(out):: phis(:, :)
+    REAL, intent(out):: ps(:, :) ! (iim + 1, jjm + 1) in Pa
+    REAL, intent(out):: phis(:, :) ! (iim + 1, jjm + 1)
     REAL, intent(out):: time_0
 
     ! Variables 
@@ -43,9 +43,10 @@ contains
     print *, "Call sequence information: dynetat0"
 
     call assert(size(vcov, 1) == (iim + 1) * jjm, "dynetat0 vcov 1")
-    call assert((/size(ucov, 1), size(teta, 1), size(q, 1), size(masse, 1), &
-         size(ps)/) == (iim + 1) * (jjm + 1), "dynetat0 (iim + 1) * (jjm + 1)")
-    call assert(shape(phis) == (/iim + 1, jjm + 1/), "dynetat0 phis")
+    call assert((/size(ucov, 1), size(teta, 1), size(q, 1), size(masse, 1)/) &
+         == (iim + 1) * (jjm + 1), "dynetat0 (iim + 1) * (jjm + 1)")
+    call assert((/size(ps, 1), size(phis, 1)/) == iim + 1, "dynetat0 iim")
+    call assert((/size(ps, 2), size(phis, 2)/) == jjm + 1, "dynetat0 jjm")
     call assert((/size(vcov, 2), size(ucov, 2), size(teta, 2), size(q, 2), &
          size(masse, 2)/) == llm, "dynetat0 llm")
     call assert(size(q, 3) == nqmx, "dynetat0 q 3")
@@ -65,10 +66,6 @@ contains
 
     day_ref = int(tab_cntrl(4))
     annee_ref = int(tab_cntrl(5))
-
-    omeg = tab_cntrl(7)
-    PRINT *, 'omeg = ', omeg
-
     dtvr = tab_cntrl(12)
     etot0 = tab_cntrl(13)
     ptot0 = tab_cntrl(14)
@@ -140,7 +137,7 @@ contains
     call NF95_GET_VAR(ncid, varid, masse, count_nc=(/iim + 1, jjm + 1, llm/))
 
     call NF95_INQ_VARID (ncid, "ps", varid)
-    call NF95_GET_VAR(ncid, varid, ps, count_nc=(/iim + 1, jjm + 1/))
+    call NF95_GET_VAR(ncid, varid, ps)
 
     call NF95_CLOSE(ncid)
 

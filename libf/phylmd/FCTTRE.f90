@@ -7,6 +7,7 @@ module FCTTRE
   ! constants, assuming the partial pressure of water vapour is given
   ! by a first order Taylor expansion of Qs(T) with respect to
   ! temperature, using constants in yoethf_m.
+  ! Probably from Buck, 1981, Journal of Applied Meteorology, 20, 1527.
 
   implicit none
 

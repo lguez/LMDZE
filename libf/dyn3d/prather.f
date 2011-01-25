@@ -7,6 +7,7 @@
       use comconst
       use comvert
       use comgeom
+      USE nr_util, ONLY : pi
       IMPLICIT NONE
 
 c=======================================================================

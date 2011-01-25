@@ -7,11 +7,10 @@ module tau2alpha_m
 contains
 
   SUBROUTINE tau2alpha(type, pim, pjm, factt, taumin, taumax, alpha)
-    !=======================================================================
 
     USE dimens_m, ONLY : iim, jjm
     USE paramet_m, ONLY : iip1, jjp1
-    USE comconst, ONLY : pi
+    USE nr_util, ONLY : pi
     USE comgeom, ONLY : cu_2d, cv_2d, rlatu, rlatv
     USE serre, ONLY : clat, clon, grossismx, grossismy
 

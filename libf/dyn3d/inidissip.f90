@@ -66,10 +66,10 @@ contains
     CALL filtreg(zh, jjp1, 1, 2, 1, .TRUE., 1)
 
     CALL minmax(iip1*jjp1, zh, zhmin, zhmax)
-
-    IF (zhmin>=zhmax) THEN
-       PRINT *, '  Inidissip  zh min max  ', zhmin, zhmax
-       STOP 'probleme generateur alleatoire dans inidissip'
+    IF (zhmin >= zhmax) THEN
+       PRINT *, 'zhmin zhmax', zhmin, zhmax
+       print *, 'Problème générateur aléatoire dans inidissip'
+       STOP 1
     END IF
 
     zllm = abs(zhmax)
@@ -100,7 +100,6 @@ contains
     PRINT *, 'calcul des valeurs propres'
 
     DO  ii = 1, 2
-
        DO ij = 1, ip1jmp1
           zu(ij) = ran1(idum) - .5
        END DO
@@ -160,7 +159,6 @@ contains
              crot = zllm**(-1./nitergrot)
           END IF
        END IF
-
     END DO
 
     PRINT *, 'cdivu = ', cdivu

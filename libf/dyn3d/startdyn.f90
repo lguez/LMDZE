@@ -27,13 +27,12 @@ CONTAINS
     use comgeom, only: aire_2d, apoln, apols
     use conf_dat2d_m, only: conf_dat2d
     use inter_barxy_m, only: inter_barxy
-    use comconst, only: pi
     use comgeom, only: rlonu, rlatv
     use dimens_m, only: iim, jjm
     use gr_int_dyn_m, only: gr_int_dyn
     use start_init_orog_m, only: phis
     use start_init_phys_m, only: start_init_phys
-    use nr_util, only: assert
+    use nr_util, only: assert, pi
 
     REAL, intent(out):: tsol_2d(:, :)
     REAL, intent(out):: psol(:, :) ! surface pressure, in Pa

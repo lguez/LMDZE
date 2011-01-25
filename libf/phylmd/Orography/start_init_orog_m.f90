@@ -13,14 +13,14 @@ CONTAINS
   SUBROUTINE start_init_orog(relief, zstd_2d, zsig_2d, zgam_2d, zthe_2d, &
        zpic_2d, zval_2d)
 
-    USE flincom, only: flininfo, flinopen_nozoom, flinclo
-    use flinget_m, only: flinget
     use conf_dat2d_m, only: conf_dat2d
     use comgeom, only: rlatu, rlonv
     use dimens_m, only: iim, jjm
-    use indicesol, only: epsfra
-    use comconst, only: pi
+    USE flincom, only: flininfo, flinopen_nozoom, flinclo
+    use flinget_m, only: flinget
     use grid_noro_m, only: grid_noro
+    use indicesol, only: epsfra
+    use nr_util, only: pi
 
     REAL, intent(out):: relief(:, :) ! orographie moyenne
 

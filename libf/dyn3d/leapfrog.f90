@@ -136,8 +136,8 @@ contains
             dtvr, itau)
 
        ! integrations dynamique et traceurs:
-       CALL integrd(2, vcovm1, ucovm1, tetam1, psm1, massem1, dv, du, dteta, &
-            dp, vcov, ucov, teta, q, ps, masse, finvmaold, leapf, dt)
+       CALL integrd(vcovm1, ucovm1, tetam1, psm1, massem1, dv, du, dteta, dp, &
+            vcov, ucov, teta, q(:, :, :2), ps, masse, finvmaold, dt, leapf)
 
        if (.not. leapf) then
           ! Matsuno backward
@@ -150,9 +150,9 @@ contains
                phi, .false., du, dv, dteta, dp, w, pbaru, pbarv, time_0)
 
           ! integrations dynamique et traceurs:
-          CALL integrd(2, vcovm1, ucovm1, tetam1, psm1, massem1, dv, du, &
-               dteta, dp, vcov, ucov, teta, q, ps, masse, finvmaold, .false., &
-               dtvr)
+          CALL integrd(vcovm1, ucovm1, tetam1, psm1, massem1, dv, du, dteta, &
+               dp, vcov, ucov, teta, q(:, :, :2), ps, masse, finvmaold, dtvr, &
+               leapf=.false.)
        end if
 
        IF (MOD(itau + 1, iphysiq) == 0 .AND. iflag_phys /= 0) THEN

@@ -10,7 +10,7 @@ PROGRAM gcm
 
   use clesphys2, only: read_clesphys2
   use com_io_dyn, only: histid, histvid, histaveid
-  use comconst, only: daysec, cpp, dtvr, g, rad, r, initialize
+  use comconst, only: daysec, cpp, dtvr, g, rad, r
   use comgeom, only: rlatu, aire_2d, cu_2d, cv_2d, rlonv
   use comgeomphy, only: airephy, cuphy, cvphy, rlatd, rlond
   use conf_gcm_m, only: day_step, iperiod, anneeref, dayref, iecri, iphysiq, &
@@ -43,7 +43,7 @@ PROGRAM gcm
   REAL vcov(ip1jm, llm), ucov(ip1jmp1, llm) ! vents covariants
   REAL teta(ip1jmp1, llm) ! température potentielle 
   REAL q(ip1jmp1, llm, nqmx) ! champs advectés
-  REAL ps(ip1jmp1) ! pression au sol (Pa)
+  REAL ps(iim + 1, jjm + 1) ! pression au sol (Pa)
 
   REAL masse(ip1jmp1, llm) ! masse d'air
   REAL phis(iim + 1, jjm + 1) ! géopotentiel au sol
@@ -65,9 +65,6 @@ PROGRAM gcm
   print *, "Enter namelist 'main_nml'."
   read (unit=*, nml=main_nml)
   write(unit=*, nml=main_nml)
-
-  ! Initialisations:
-  call initialize
 
   ! Choix du calendrier :
   if (true_calendar) then

@@ -64,7 +64,7 @@ CONTAINS
 
   REAL FUNCTION ripx(ri)
     ! stretching in x
-    USE comconst, ONLY : pi
+    USE nr_util, ONLY : pi
     REAL, INTENT (IN) :: ri
 
     ripx = (ri - 1.) * 2 * pi / REAL(iim)
@@ -74,7 +74,7 @@ CONTAINS
 
   REAL FUNCTION fx(ri)
     ! stretching in x
-    USE comconst, ONLY : pi
+    USE nr_util, ONLY : pi
     USE serre, ONLY : alphax, pxo, transx
     REAL, INTENT (IN) :: ri
 
@@ -85,7 +85,7 @@ CONTAINS
 
   REAL FUNCTION fxprim(ri)
     ! stretching in x
-    USE comconst, ONLY : pi
+    USE nr_util, ONLY : pi
     USE serre, ONLY : alphax, pxo, transx
     REAL, INTENT (IN) :: ri
 
@@ -96,7 +96,7 @@ CONTAINS
 
   REAL FUNCTION bigy(rj)
     ! stretching in y
-    USE comconst, ONLY : pi
+    USE nr_util, ONLY : pi
     REAL, INTENT (IN) :: rj
 
     bigy = 2 * (REAL(jjm + 1) - rj) * pi / jjm
@@ -106,7 +106,7 @@ CONTAINS
 
   REAL FUNCTION fy(rj)
     ! stretching in y
-    USE comconst, ONLY : pi
+    USE nr_util, ONLY : pi
     USE serre, ONLY : alphay, pyo, transy
     REAL, INTENT (IN) :: rj
 
@@ -118,7 +118,7 @@ CONTAINS
 
   REAL FUNCTION fyprim(rj)
     ! stretching in y
-    USE comconst, ONLY : pi
+    USE nr_util, ONLY : pi
     USE serre, ONLY : alphay, pyo, transy
     REAL, INTENT (IN) :: rj
 

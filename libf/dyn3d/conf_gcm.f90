@@ -2,21 +2,21 @@ module conf_gcm_m
 
   IMPLICIT NONE
 
-  INTEGER:: nday= 10 ! nombre de jours d'intégration
-  integer:: day_step= 240 ! nombre de pas par jour, multiple de iperiod
+  INTEGER:: nday = 10 ! nombre de jours d'intégration
+  integer:: day_step = 240 ! nombre de pas par jour, multiple de iperiod
 
-  integer:: iperiod= 5
+  integer:: iperiod = 5
   ! periode pour le pas Matsuno (en pas de temps)
 
-  integer:: iapp_tracvl= 5
+  integer:: iapp_tracvl = 5
   ! Should normally be equal to "iperiod"
   ! frequence du groupement des flux (en pas de temps) 
 
-  integer:: iconser= 240 ! période de sortie des variables de contrôle
-  ! (en pas de temps)
+  integer:: iconser = 240
+  ! number of time steps between output of control variables
 
-  integer:: iecri= 1 ! période d'écriture du fichier "dyn_hist.nc" (en jours)
-  integer:: iphysiq= 5 ! période de la physique en pas de temps de la dynamique
+  integer:: iecri = 1 ! time interval between outputs to "dyn_hist.nc" (in days)
+  integer:: iphysiq = 5 ! période de la physique en pas de temps de la dynamique
 
   integer:: dayref = 1 ! jour de l'année de l'état initial
   ! (= 350 si 20 décembre par exemple)
@@ -28,7 +28,7 @@ module conf_gcm_m
   ! gcm.def avec remise a zero des compteurs de pas de temps)
   ! (pas de remise a zero: on garde la date du fichier restart)
 
-  REAL:: periodav= 1. ! période de stockage fichier histmoy (en jour) 
+  REAL:: periodav = 1. ! time interval between outputs to "histmoy" (in days) 
 
   logical:: offline = .FALSE.
   ! permet de mettre en route la nouvelle parametrisation de l'eau liquide
@@ -75,7 +75,7 @@ contains
          'Il faut choisir un nombre de pas par jour multiple de "iperiod".', &
          ierr = 1)
 
-    IF (MOD(day_step,iphysiq)/=0) call abort_gcm(modname = "gcm", message = &
+    IF (MOD(day_step,iphysiq)/= 0) call abort_gcm(modname = "gcm", message = &
          'Il faut choisir un nombre de pas par jour multiple de "iphysiq".', &
          ierr = 1)
 

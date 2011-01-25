@@ -27,8 +27,7 @@ contains
     ! If required, the longitudes and latitudes are finally replaced
     ! by their mid-values.
 
-    use nr_util, only: assert_eq
-    use comconst, only: pi
+    use nr_util, only: assert_eq, pi
 
     REAL, intent(in):: xd(:)
     ! (longitudes, in degrees or radians, in increasing order, from 0°

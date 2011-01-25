@@ -25,6 +25,7 @@ c=======================================================================
       use logic
       use comgeom
       use filtreg_m, only: filtreg
+      USE nr_util, ONLY : pi
 
       IMPLICIT NONE
 c

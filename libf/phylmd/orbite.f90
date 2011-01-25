@@ -63,8 +63,7 @@ CONTAINS
     USE dimphy, ONLY : klon
     USE yomcst, ONLY : r_incl
     USE phyetat0_m, ONLY : rlat, rlon
-    USE comconst, ONLY : pi
-    use nr_util, only: assert
+    use nr_util, only: assert, pi
 
     ! Author : O. Boucher (LMD/CNRS), d'après les routines "zenith" et
     ! "angle" de Z.X. Li

@@ -20,6 +20,7 @@ c             vQ..A=Cp T + L * ...
       use temps
       use iniprint
       use inigrads_m, only: inigrads
+      use nr_util, only: pi
 
       IMPLICIT NONE
 

@@ -25,7 +25,7 @@ SUBROUTINE clqh(dtime,itime, date0,jour,debut,lafin, &
   use iniprint
   use suphec_m, only: rcpd, rd, rg, rkappa
   use YOMCST
-  use yoethf
+  use yoethf_m
 
   IMPLICIT none
 

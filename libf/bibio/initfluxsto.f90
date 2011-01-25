@@ -34,6 +34,7 @@ SUBROUTINE initfluxsto(tstep, t_ops, t_wrt, nq, fileid, filevid, filedid)
   USE serre
   USE temps, ONLY : annee_ref, day_ref, itau_dyn
   USE ener
+  USE nr_util, ONLY : pi
 
   IMPLICIT NONE
 
@@ -59,8 +60,6 @@ SUBROUTINE initfluxsto(tstep, t_ops, t_wrt, nq, fileid, filevid, filedid)
   !---------------------------------------------------------
 
   !  Initialisations                                                      
-
-  pi = 4.*atan(1.)
   str = 'q  '
   ctrac = 'traceur   '
   ok_sync = .TRUE.

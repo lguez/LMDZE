@@ -23,17 +23,18 @@ CONTAINS
 
     ! Author: F.Hourdin
 
-    USE dimens_m, ONLY : jjm, llm
-    USE paramet_m, ONLY : iip1, ip1jm, ip1jmp1, jjp1, llmp1
-    USE comconst, ONLY : cpp, daysec, dtvr, kappa, pi
+    USE comconst, ONLY : cpp, daysec, dtvr, kappa
     USE comvert, ONLY : ap, bp, preff, presnivs
     USE conf_gcm_m, ONLY : day_step, iperiod
     USE comgeom, ONLY : aire, rlatu, rlonv
-    USE serre, ONLY : clat, clon
-    USE q_sat_m, ONLY : q_sat
+    USE dimens_m, ONLY : jjm, llm
     USE exner_hyb_m, ONLY : exner_hyb
     USE inigrads_m, ONLY : inigrads
     use netcdf, only: nf90_nowrite, nf90_open, nf90_close
+    use nr_util, only: pi
+    USE paramet_m, ONLY : iip1, ip1jm, ip1jmp1, jjp1, llmp1
+    USE q_sat_m, ONLY : q_sat
+    USE serre, ONLY : clat, clon
     use tau2alpha_m, only: tau2alpha
 
     INCLUDE 'netcdf.inc'

@@ -20,7 +20,7 @@ contains
     ! This subroutine creates "mask".
 
     use caldyn0_m, only: caldyn0
-    use comconst, only: dtvr, daysec, cpp, kappa, pi
+    use comconst, only: dtvr, daysec, cpp, kappa
     use comgeom, only: rlatu, rlonv, rlonu, rlatv, aire_2d, apoln, apols, &
          cu_2d, cv_2d
     use comvert, only: ap, bp, preff, pa
@@ -31,15 +31,16 @@ contains
     use dynredem0_m, only: dynredem0
     use dynredem1_m, only: dynredem1
     use exner_hyb_m, only: exner_hyb
+    USE flincom, only: flinclo, flinopen_nozoom, flininfo
+    use flinget_m, only: flinget
     use grid_atob, only: grille_m
     use grid_change, only: init_dyn_phy, dyn_phy
+    use histcom, only: histclo
     use indicesol, only: is_oce, is_sic, is_ter, is_lic, epsfra
     use iniadvtrac_m, only: iniadvtrac
     use inidissip_m, only: inidissip
     use inigeom_m, only: inigeom
-    USE flincom, only: flinclo, flinopen_nozoom, flininfo
-    use flinget_m, only: flinget
-    use histcom, only: histclo
+    use nr_util, only: pi
     use paramet_m, only: ip1jm, ip1jmp1
     use phyredem_m, only: phyredem
     use pressure_var, only: pls, p3d

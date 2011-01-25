@@ -37,6 +37,7 @@ SUBROUTINE initphysto(infile,rlon,rlat,tstep,t_ops,t_wrt,nq,fileid)
   USE serre
   USE temps
   USE ener
+  USE nr_util, ONLY : pi
 
   IMPLICIT NONE
 
@@ -67,8 +68,6 @@ SUBROUTINE initphysto(infile,rlon,rlat,tstep,t_ops,t_wrt,nq,fileid)
   !-----------------------------------------------------
 
   !  Initialisations
-
-  pi = 4.*atan(1.)
   str = 'q  '
   ctrac = 'traceur   '
   ok_sync = .TRUE.

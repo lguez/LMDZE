@@ -14,8 +14,7 @@ contains
     ! que la longitude varie de - pi à pi, la latitude de pi/2 à
     ! - pi/2 et pour que la coordonnée pression soit décroissante.
 
-    use comconst, only: pi
-    use nr_util, only: assert_eq
+    use nr_util, only: assert_eq, pi
 
     REAL, intent(in):: xd(:), yd(:) ! longitudes et latitudes initiales, en rad
     REAL, intent(in):: zd(:) ! pressure levels, in Pa or hPa

@@ -51,11 +51,7 @@ contains
     ! cu_2d, cuv, cuscal, cuz sont respectivement les valeurs de cu_2d
     ! Cf. "inigeom.txt".
 
-    USE dimens_m, ONLY : iim, jjm
-    USE paramet_m, ONLY : iip1, jjp1
-    USE comconst, ONLY : g, omeg, pi, rad
-    USE comdissnew, ONLY : coefdis, nitergdiv, nitergrot, niterh
-    USE logic, ONLY : fxyhypb, ysinus
+    USE comconst, ONLY : g, omeg, rad
     USE comgeom, ONLY : airesurg_2d, aireu_2d, airev_2d, aire_2d, &
          alpha1p2_2d, alpha1p4_2d, alpha1_2d, &
          alpha2p3_2d, alpha2_2d, alpha3p4_2d, alpha3_2d, alpha4_2d, apoln, &
@@ -65,6 +61,11 @@ contains
          rlatv, rlonu, rlonv, unsairez_2d, unsaire_2d, unsairz_gam_2d, &
          unsair_gam1_2d, unsair_gam2_2d, unsapolnga1, unsapolnga2, &
          unsapolsga1, unsapolsga2, unscu2_2d, unscv2_2d, xprimu, xprimv
+    USE comdissnew, ONLY : coefdis, nitergdiv, nitergrot, niterh
+    USE dimens_m, ONLY : iim, jjm
+    USE logic, ONLY : fxyhypb, ysinus
+    use nr_util, only: pi
+    USE paramet_m, ONLY : iip1, jjp1
     USE serre, ONLY : alphax, alphay, clat, clon, dzoomx, dzoomy, grossismx, &
          grossismy, pxo, pyo, taux, tauy, transx, transy
 

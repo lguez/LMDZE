@@ -11,15 +11,15 @@ contains
     ! From initdynav.F, version 1.1.1.1, 2004/05/19 12:53:05
     !   L. Fairhead, LMD
 
-    USE histcom, ONLY: histbeg_totreg, histdef, histend, histvert
     use calendar, ONLY: ymds2ju
-    USE dimens_m, ONLY : llm
-    USE paramet_m, ONLY : iip1, jjp1
-    USE comconst, ONLY : pi
     USE comvert, ONLY : nivsigs
     USE comgeom, ONLY : rlatu, rlonv
-    USE temps, ONLY : itau_dyn
+    USE dimens_m, ONLY : llm
+    USE histcom, ONLY: histbeg_totreg, histdef, histend, histvert
     USE iniadvtrac_m, ONLY : ttext
+    USE nr_util, ONLY : pi
+    USE paramet_m, ONLY : iip1, jjp1
+    USE temps, ONLY : itau_dyn
 
     !   Routine d'initialisation des ecritures des fichiers histoires LMDZ
     !   au format IOIPSL. Initialisation du fichier histoire moyenne.

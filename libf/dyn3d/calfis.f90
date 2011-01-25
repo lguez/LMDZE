@@ -49,13 +49,14 @@ contains
     !        pdtrad         radiative tendencies  \  both input
     !        pfluxrad       radiative fluxes      /  and output
 
-    use comconst, only: kappa, cpp, dtphys, g, pi
+    use comconst, only: kappa, cpp, dtphys, g
     use comvert, only: preff
     use comgeom, only: apoln, cu_2d, cv_2d, unsaire_2d, apols, rlonu, rlonv
     use dimens_m, only: iim, jjm, llm, nqmx
     use dimphy, only: klon
     use grid_change, only: dyn_phy, gr_fi_dyn
     use iniadvtrac_m, only: niadv
+    use nr_util, only: pi
     use physiq_m, only: physiq
     use pressure_var, only: p3d, pls
 

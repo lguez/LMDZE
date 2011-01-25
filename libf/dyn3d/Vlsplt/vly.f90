@@ -16,6 +16,7 @@
       use comvert
       use logic
       use comgeom
+      USE nr_util, ONLY : pi
       IMPLICIT NONE
 !
 !

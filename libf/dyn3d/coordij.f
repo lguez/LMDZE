@@ -15,6 +15,7 @@ c=======================================================================
       use comconst
       use comgeom
       use serre
+      use nr_util, only: pi
       IMPLICIT NONE
       REAL lon,lat
       INTEGER ilon,jlat
