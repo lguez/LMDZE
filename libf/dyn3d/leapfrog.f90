@@ -37,7 +37,7 @@ contains
     REAL, intent(inout):: ucov(ip1jmp1, llm) ! vent covariant
     REAL, intent(inout):: vcov((iim + 1) * jjm, llm) ! vent covariant
     REAL, intent(inout):: teta(iim + 1, jjm + 1, llm) ! potential temperature
-    REAL ps(iim + 1, jjm + 1) ! pression au sol, en Pa
+    REAL, intent(inout):: ps(iim + 1, jjm + 1) ! pression au sol, en Pa
     REAL masse(ip1jmp1, llm) ! masse d'air
     REAL phis(ip1jmp1) ! geopotentiel au sol
 

@@ -22,7 +22,8 @@ contains
 
     REAL vcov(ip1jm, llm), ucov(ip1jmp1, llm), teta(ip1jmp1, llm)
     REAL q(:, :, :, :) ! (iim + 1, jjm + 1, llm, nq)
-    REAL ps(ip1jmp1), masse(ip1jmp1, llm)
+    REAL, intent(inout):: ps(ip1jmp1)
+    REAL masse(ip1jmp1, llm)
 
     REAL vcovm1(ip1jm, llm), ucovm1(ip1jmp1, llm)
     REAL tetam1(ip1jmp1, llm), psm1(ip1jmp1), massem1(ip1jmp1, llm)
