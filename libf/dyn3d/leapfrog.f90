@@ -11,6 +11,8 @@ contains
     ! Matsuno-leapfrog scheme.
 
     use addfi_m, only: addfi
+    use bilan_dyn_m, only: bilan_dyn
+    use caladvtrac_m, only: caladvtrac
     USE calfis_m, ONLY: calfis
     USE com_io_dyn, ONLY: histaveid
     USE comconst, ONLY: daysec, dtphys, dtvr
@@ -38,7 +40,10 @@ contains
     REAL ps(iim + 1, jjm + 1) ! pression au sol, en Pa
     REAL masse(ip1jmp1, llm) ! masse d'air
     REAL phis(ip1jmp1) ! geopotentiel au sol
-    REAL q(ip1jmp1, llm, nqmx) ! mass fractions of advected fields
+
+    REAL, intent(inout):: q(:, :, :, :) ! (iim + 1, jjm + 1, llm, nqmx)
+    ! mass fractions of advected fields
+
     REAL, intent(in):: time_0
 
     ! Variables local to the procedure:
@@ -103,8 +108,7 @@ contains
     forall (l = 1: llm + 1) p3d(:, :, l) = ap(l) + bp(l) * ps
     CALL exner_hyb(ps, p3d, pks, pk, pkf)
 
-    ! Début de l'integration temporelle :
-    do itau = 0, itaufin - 1
+    time_integration: do itau = 0, itaufin - 1
        leapf = mod(itau, iperiod) /= 0
        if (leapf) then
           dt = 2 * dtvr
@@ -137,7 +141,7 @@ contains
 
        ! integrations dynamique et traceurs:
        CALL integrd(vcovm1, ucovm1, tetam1, psm1, massem1, dv, du, dteta, dp, &
-            vcov, ucov, teta, q(:, :, :2), ps, masse, finvmaold, dt, leapf)
+            vcov, ucov, teta, q(:, :, :, :2), ps, masse, finvmaold, dt, leapf)
 
        if (.not. leapf) then
           ! Matsuno backward
@@ -151,8 +155,8 @@ contains
 
           ! integrations dynamique et traceurs:
           CALL integrd(vcovm1, ucovm1, tetam1, psm1, massem1, dv, du, dteta, &
-               dp, vcov, ucov, teta, q(:, :, :2), ps, masse, finvmaold, dtvr, &
-               leapf=.false.)
+               dp, vcov, ucov, teta, q(:, :, :, :2), ps, masse, finvmaold, &
+               dtvr, leapf=.false.)
        end if
 
        IF (MOD(itau + 1, iphysiq) == 0 .AND. iflag_phys /= 0) THEN
@@ -212,13 +216,14 @@ contains
        END IF
 
        IF (MOD(itau + 1, iperiod) == 0) THEN
-          ! ecriture du fichier histoire moyenne:
+          ! Écriture du fichier histoire moyenne:
           CALL writedynav(histaveid, nqmx, itau + 1, vcov, ucov, teta, pk, &
                phi, q, masse, ps, phis)
-          call bilan_dyn(2, dtvr * iperiod, dtvr * day_step * periodav, ps, &
-               masse, pk, pbaru, pbarv, teta, phi, ucov, vcov, q)
+          call bilan_dyn(ps, masse, pk, pbaru, pbarv, teta, phi, ucov, vcov, &
+               q(:, :, :, 1), dt_app = dtvr * iperiod, &
+               dt_cum = dtvr * day_step * periodav)
        ENDIF
-    end do
+    end do time_integration
 
     CALL dynredem1("restart.nc", vcov, ucov, teta, q, masse, ps, &
          itau=itau_dyn+itaufin)

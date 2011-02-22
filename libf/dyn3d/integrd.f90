@@ -13,7 +13,7 @@ contains
 
     USE comvert, ONLY : ap, bp
     USE comgeom, ONLY : aire, apoln, apols
-    USE dimens_m, ONLY : iim, llm
+    USE dimens_m, ONLY : iim, jjm, llm
     USE filtreg_m, ONLY : filtreg
     use nr_util, only: assert
     USE paramet_m, ONLY : iip1, iip2, ijp1llm, ip1jm, ip1jmp1, jjp1, llmp1
@@ -21,7 +21,7 @@ contains
     ! Arguments: 
 
     REAL vcov(ip1jm, llm), ucov(ip1jmp1, llm), teta(ip1jmp1, llm)
-    REAL q(:, :, :) ! (ip1jmp1, llm, nq)
+    REAL q(:, :, :, :) ! (iim + 1, jjm + 1, llm, nq)
     REAL ps(ip1jmp1), masse(ip1jmp1, llm)
 
     REAL vcovm1(ip1jm, llm), ucovm1(ip1jmp1, llm)
@@ -49,8 +49,9 @@ contains
 
     !-----------------------------------------------------------------------
 
-    call assert(size(q, 1) == ip1jmp1, size(q, 2) == llm, "integrd")
-    nq = size(q, 3)
+    call assert(size(q, 1) == iim + 1, size(q, 2) == jjm + 1, &
+         size(q, 3) == llm, "integrd")
+    nq = size(q, 4)
 
     DO l = 1, llm
        DO ij = 1, iip1
@@ -149,15 +150,15 @@ contains
     DO iq = 1, nq
        DO l = 1, llm
           DO ij = 1, iim
-             qppn(ij) = aire(ij)*q(ij, l, iq)
-             qpps(ij) = aire(ij+ip1jm)*q(ij+ip1jm, l, iq)
+             qppn(ij) = aire(ij)*q(ij, 1, l, iq)
+             qpps(ij) = aire(ij+ip1jm)*q(ij, jjm + 1, l, iq)
           END DO
           qpn = ssum(iim, qppn, 1)/apoln
           qps = ssum(iim, qpps, 1)/apols
 
           DO ij = 1, iip1
-             q(ij, l, iq) = qpn
-             q(ij+ip1jm, l, iq) = qps
+             q(ij, 1, l, iq) = qpn
+             q(ij, jjm + 1, l, iq) = qps
           END DO
        END DO
     END DO

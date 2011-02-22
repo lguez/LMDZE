@@ -1036,27 +1036,19 @@ contains
     fder = dlw
 
     ! Couche limite:
-    CALL clmain(pdtphys, itap, date0, pctsrf, pctsrf_new, &
-         t_seri, q_seri, u_seri, v_seri, &
-         julien, rmu0, co2_ppm,  &
-         ok_veget, ocean, npas, nexca, ftsol, &
-         soil_model, cdmmax, cdhmax, &
-         ksta, ksta_ter, ok_kzmin, ftsoil, qsol,  &
-         paprs, pplay, fsnow, fqsurf, fevap, falbe, falblw, &
-         fluxlat, rain_fall, snow_fall, &
-         fsolsw, fsollw, sollwdown, fder, &
-         rlon, rlat, cuphy, cvphy, frugs, &
-         firstcal, lafin, agesno, rugoro, &
-         d_t_vdf, d_q_vdf, d_u_vdf, d_v_vdf, d_ts, &
-         fluxt, fluxq, fluxu, fluxv, cdragh, cdragm, &
-         q2, dsens, devap, &
-         ycoefh, yu1, yv1, t2m, q2m, u10m, v10m, &
-         pblh, capCL, oliqCL, cteiCL, pblT, &
-         therm, trmb1, trmb2, trmb3, plcl, &
-         fqcalving, ffonte, run_off_lic_0, &
-         fluxo, fluxg, tslab, seaice)
 
-    !XXX Incrementation des flux
+    CALL clmain(pdtphys, itap, date0, pctsrf, pctsrf_new, t_seri, q_seri, &
+         u_seri, v_seri, julien, rmu0, co2_ppm, ok_veget, ocean, npas, nexca, &
+         ftsol, soil_model, cdmmax, cdhmax, ksta, ksta_ter, ok_kzmin, ftsoil, &
+         qsol, paprs, pplay, fsnow, fqsurf, fevap, falbe, falblw, fluxlat, &
+         rain_fall, snow_fall, fsolsw, fsollw, sollwdown, fder, rlon, rlat, &
+         cuphy, cvphy, frugs, firstcal, lafin, agesno, rugoro, d_t_vdf, &
+         d_q_vdf, d_u_vdf, d_v_vdf, d_ts, fluxt, fluxq, fluxu, fluxv, cdragh, &
+         cdragm, q2, dsens, devap, ycoefh, yu1, yv1, t2m, q2m, u10m, v10m, &
+         pblh, capCL, oliqCL, cteiCL, pblT, therm, trmb1, trmb2, trmb3, plcl, &
+         fqcalving, ffonte, run_off_lic_0, fluxo, fluxg, tslab, seaice)
+
+    ! Incrémentation des flux
 
     zxfluxt=0.
     zxfluxq=0.

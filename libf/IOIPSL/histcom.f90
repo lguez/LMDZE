@@ -447,8 +447,8 @@ CONTAINS
 
   !**********************************
 
-  SUBROUTINE histdef(pfileid, pvarname, ptitle, punit, pxsize, pysize, phoriid, &
-       pzsize, par_oriz, par_szz, pzid, popp, pfreq_opp, pfreq_wrt)
+  SUBROUTINE histdef(pfileid, pvarname, ptitle, punit, pxsize, pysize, &
+       phoriid, pzsize, par_oriz, par_szz, pzid, popp, pfreq_opp, pfreq_wrt)
 
     ! With this subroutine each variable to be archived on the history
     ! tape should be declared.

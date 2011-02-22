@@ -1,59 +1,67 @@
-SUBROUTINE caladvtrac(q, pbaru, pbarv, p, masse, dq, teta, pk)
-
-  ! From dyn3d/caladvtrac.F, version 1.3 2005/04/13 08:58:34
-
-  ! Authors : F. Hourdin, P. Le Van, F. Forget, F. Codron
-  ! F. Codron (10/99) : ajout humidité spécifique pour eau vapeur
-  ! Schéma de Van Leer
-
-  use dimens_m, only: iim, jjm, llm, nqmx
-  use paramet_m, only: ip1jmp1
-  use comconst, only: dtvr
-  use conf_gcm_m, only: iapp_tracvl
-  use filtreg_m, only: filtreg
+module caladvtrac_m
 
   IMPLICIT NONE
 
-  REAL pbaru(ip1jmp1, llm), pbarv((iim + 1) * jjm, llm), masse(ip1jmp1, llm)
-  REAL, intent(in):: p(ip1jmp1, llm + 1)
-  real q(ip1jmp1, llm, nqmx)
+contains
 
-  real, intent(out):: dq(ip1jmp1, llm, 2)
-  ! (n'est utilisé et dimensionné que pour l'eau vapeur et liquide)
+  SUBROUTINE caladvtrac(q, pbaru, pbarv, p, masse, dq, teta, pk)
 
-  REAL teta(ip1jmp1, llm), pk(ip1jmp1, llm)
+    ! From dyn3d/caladvtrac.F, version 1.3 2005/04/13 08:58:34
 
-  ! Local:
+    ! Authors : F. Hourdin, P. Le Van, F. Forget, F. Codron
+    ! F. Codron (10/99) : ajout humidité spécifique pour eau vapeur
+    ! Schéma de Van Leer
 
-  EXTERNAL  advtrac, qminimum
-  INTEGER l, iq, iapptrac
-  REAL finmasse(ip1jmp1, llm), dtvrtrac
+    use advtrac_m, only: advtrac
+    use comconst, only: dtvr
+    use conf_gcm_m, only: iapp_tracvl
+    use dimens_m, only: iim, jjm, llm, nqmx
+    use filtreg_m, only: filtreg
+    use paramet_m, only: ip1jmp1
 
-  !------------------------------------------------
+    REAL pbaru(ip1jmp1, llm), pbarv((iim + 1) * jjm, llm)
+    real masse(iim + 1, jjm + 1, llm)
+    REAL, intent(in):: p(iim + 1, jjm + 1, llm + 1)
+    real, intent(inout):: q(:, :, :, :) ! (iim + 1, jjm + 1, llm, nqmx)
 
-  dq(:, :, :) = q(:, :, :2) ! initialisation
+    real, intent(out):: dq(iim + 1, jjm + 1, llm, 2)
+    ! (n'est utilisé et dimensionné que pour l'eau vapeur et liquide)
 
-  ! Advection:
-  CALL advtrac(pbaru, pbarv, p, masse, q, iapptrac, teta, pk)
+    REAL teta(ip1jmp1, llm), pk(ip1jmp1, llm)
 
-  IF (iapptrac == iapp_tracvl) THEN
-     ! Calcul  de deltap  qu'on stocke dans finmasse
-     forall (l = 1:llm) finmasse(:, l) =  p(:, l) - p(:, l+1) 
+    ! Local:
 
-     ! On appelle "qminimum" uniquement  pour l'eau vapeur et liquide
-     CALL qminimum(q, 2, finmasse)
+    EXTERNAL qminimum
+    INTEGER l, iq, iapptrac
+    REAL finmasse(iim + 1, jjm + 1, llm), dtvrtrac
 
-     finmasse(:, :) = masse(:, :)
-     CALL filtreg(finmasse, jjm + 1, llm, -2, 2, .TRUE., 1)
+    !------------------------------------------------
 
-     ! Calcul de "dq" pour l'eau, pour le passer à la physique
-     dtvrtrac = iapp_tracvl * dtvr
-     DO iq = 1, 2
-        dq(:, :, iq) = (q(:, :, iq) - dq(:, :, iq)) * finmasse(:, :) &
-             /  dtvrtrac
-     ENDDO
-  ELSE
-     dq(:, :, :)  = 0.
-  ENDIF
+    dq = q(:, :, :, :2) ! initialisation
 
-END SUBROUTINE caladvtrac
+    ! Advection:
+    CALL advtrac(pbaru, pbarv, p, masse, q, iapptrac, teta, pk)
+
+    IF (iapptrac == iapp_tracvl) THEN
+       ! Calcul  de deltap  qu'on stocke dans finmasse
+       forall (l = 1:llm) finmasse(:, :, l) =  p(:, :, l) - p(:, :, l+1) 
+
+       ! On appelle "qminimum" uniquement  pour l'eau vapeur et liquide
+       CALL qminimum(q, 2, finmasse)
+
+       finmasse = masse
+       CALL filtreg(finmasse, jjm + 1, llm, -2, 2, .TRUE., 1)
+
+       ! Calcul de "dq" pour l'eau, pour le passer à la physique
+       dtvrtrac = iapp_tracvl * dtvr
+       DO iq = 1, 2
+          dq(:, :, :, iq) = (q(:, :, :, iq) - dq(:, :, :, iq)) * finmasse &
+               /  dtvrtrac
+       ENDDO
+    ELSE
+       dq = 0.
+    ENDIF
+
+  END SUBROUTINE caladvtrac
+
+end module caladvtrac_m

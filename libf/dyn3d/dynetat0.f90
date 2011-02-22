@@ -27,7 +27,8 @@ contains
 
     ! Arguments:
     REAL, intent(out):: vcov(: , :), ucov(:, :), teta(:, :)
-    REAL, intent(out):: q(:, :, :), masse(:, :)
+    REAL, intent(out):: q(:, :, :, :) ! (iim + 1, jjm + 1, llm, nqmx)
+    REAL, intent(out):: masse(:, :)
     REAL, intent(out):: ps(:, :) ! (iim + 1, jjm + 1) in Pa
     REAL, intent(out):: phis(:, :) ! (iim + 1, jjm + 1)
     REAL, intent(out):: time_0
@@ -43,13 +44,15 @@ contains
     print *, "Call sequence information: dynetat0"
 
     call assert(size(vcov, 1) == (iim + 1) * jjm, "dynetat0 vcov 1")
-    call assert((/size(ucov, 1), size(teta, 1), size(q, 1), size(masse, 1)/) &
+    call assert((/size(ucov, 1), size(teta, 1), size(masse, 1)/) &
          == (iim + 1) * (jjm + 1), "dynetat0 (iim + 1) * (jjm + 1)")
-    call assert((/size(ps, 1), size(phis, 1)/) == iim + 1, "dynetat0 iim")
-    call assert((/size(ps, 2), size(phis, 2)/) == jjm + 1, "dynetat0 jjm")
-    call assert((/size(vcov, 2), size(ucov, 2), size(teta, 2), size(q, 2), &
+    call assert((/size(ps, 1), size(phis, 1), size(q, 1)/) == iim + 1, &
+         "dynetat0 iim")
+    call assert((/size(ps, 2), size(phis, 2), size(q, 2)/) == jjm + 1, &
+         "dynetat0 jjm")
+    call assert((/size(vcov, 2), size(ucov, 2), size(teta, 2), size(q, 3), &
          size(masse, 2)/) == llm, "dynetat0 llm")
-    call assert(size(q, 3) == nqmx, "dynetat0 q 3")
+    call assert(size(q, 4) == nqmx, "dynetat0 q nqmx")
 
     ! Fichier état initial :
     call nf95_open("start.nc", NF90_NOWRITE, ncid)
@@ -113,28 +116,27 @@ contains
     ! {0 <= time0 < 1}
 
     call NF95_INQ_VARID (ncid, "ucov", varid)
-    call NF95_GET_VAR(ncid, varid, ucov, count_nc=(/iim + 1, jjm + 1, llm/))
+    call NF95_GET_VAR(ncid, varid, ucov, count_nc=(/iim + 1, jjm + 1, llm, 1/))
 
     call NF95_INQ_VARID (ncid, "vcov", varid)
-    call NF95_GET_VAR(ncid, varid, vcov, count_nc=(/iim + 1, jjm, llm/))
+    call NF95_GET_VAR(ncid, varid, vcov, count_nc=(/iim + 1, jjm, llm, 1/))
 
     call NF95_INQ_VARID (ncid, "teta", varid)
-    call NF95_GET_VAR(ncid, varid, teta, count_nc=(/iim + 1, jjm + 1, llm/))
+    call NF95_GET_VAR(ncid, varid, teta, count_nc=(/iim + 1, jjm + 1, llm, 1/))
 
     DO iq = 1, nqmx
        call NF95_INQ_VARID(ncid, tname(iq), varid, ierr)
        IF (ierr /= NF90_NOERR) THEN
           PRINT *, 'dynetat0: "' // tname(iq) // '" not found, ' // &
                "setting it to zero..."
-          q(:, :, iq) = 0.
+          q(:, :, :, iq) = 0.
        ELSE
-          call NF95_GET_VAR(ncid, varid, q(:, :, iq), &
-               count_nc=(/iim + 1, jjm + 1, llm/))
+          call NF95_GET_VAR(ncid, varid, q(:, :, :, iq))
        ENDIF
     ENDDO
 
     call NF95_INQ_VARID (ncid, "masse", varid)
-    call NF95_GET_VAR(ncid, varid, masse, count_nc=(/iim + 1, jjm + 1, llm/))
+    call NF95_GET_VAR(ncid, varid, masse, count_nc=(/iim + 1, jjm + 1, llm, 1/))
 
     call NF95_INQ_VARID (ncid, "ps", varid)
     call NF95_GET_VAR(ncid, varid, ps)

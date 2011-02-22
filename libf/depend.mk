@@ -18,8 +18,8 @@ aeropt.o : suphec.o dimphy.o dimens_m.o
 ajsec.o : suphec.o dimphy.o dimens_m.o 
 albedo.o : orbite.o YOMCST.o dimphy.o dimens_m.o 
 bernoui.o : filtreg.o logic.o paramet_m.o dimens_m.o 
-bilan_dyn.o : inigrads.o iniprint.o temps.o comgeom.o comvert.o comconst.o paramet_m.o dimens_m.o histwrite.o calendar.o histcom.o 
-caladvtrac.o : filtreg.o conf_gcm.o comconst.o paramet_m.o dimens_m.o 
+bilan_dyn.o : inigrads.o temps.o comgeom.o comvert.o comconst.o paramet_m.o dimens_m.o histwrite.o calendar.o histcom.o 
+caladvtrac.o : paramet_m.o filtreg.o dimens_m.o conf_gcm.o comconst.o advtrac.o 
 calbeta.o : suphec.o iniprint.o dimphy.o indicesol.o dimens_m.o 
 caldyn.o : sortvarc.o comgeom.o comvert.o paramet_m.o dimens_m.o 
 caldyn0.o : comgeom.o comvert.o paramet_m.o dimens_m.o 
@@ -35,7 +35,7 @@ cltracrn.o : suphec.o dimphy.o indicesol.o
 clvent.o : suphec.o iniprint.o dimphy.o dimens_m.o 
 coefcdrag.o : yoethf.o suphec.o indicesol.o 
 coefils.o : dimens_m.o 
-coefkz.o : conf_phys.o FCTTRE.o yoethf.o suphec.o iniprint.o dimphy.o indicesol.o dimens_m.o 
+coefkz.o : conf_phys.o FCTTRE.o yoethf.o suphec.o iniprint.o dimphy.o indicesol.o 
 coefkz2.o : suphec.o iniprint.o dimphy.o indicesol.o dimens_m.o 
 coefkzmin.o : suphec.o dimphy.o dimens_m.o 
 comconst.o : dimens_m.o 
@@ -139,7 +139,7 @@ laplacien.o : filtreg.o comgeom.o paramet_m.o dimens_m.o
 laplacien_gam.o : comgeom.o paramet_m.o dimens_m.o 
 laplacien_rot.o : filtreg.o comgeom.o paramet_m.o dimens_m.o 
 laplacien_rotgam.o : comgeom.o paramet_m.o dimens_m.o 
-leapfrog.o : temps.o pressure_var.o paramet_m.o logic.o integrd.o inidissip.o guide.o filtreg.o exner_hyb.o dynredem1.o dynetat0.o dimens_m.o conf_gcm.o comvert.o comgeom.o comconst.o com_io_dyn.o calfis.o addfi.o 
+leapfrog.o : temps.o pressure_var.o paramet_m.o logic.o integrd.o inidissip.o guide.o filtreg.o exner_hyb.o dynredem1.o dynetat0.o dimens_m.o conf_gcm.o comvert.o comgeom.o comconst.o com_io_dyn.o calfis.o caladvtrac.o bilan_dyn.o addfi.o 
 lift_noro.o : suphec.o dimphy.o dimens_m.o 
 limit.o : grid_change.o inter_barxy.o conf_dat2d.o start_init_orog_m.o etat0.o comgeom.o dimphy.o indicesol.o dimens_m.o 
 limx.o : comgeom.o logic.o comvert.o comconst.o paramet_m.o dimens_m.o 
@@ -233,7 +233,7 @@ transp_lay.o : suphec.o dimphy.o dimens_m.o
 ustarhb.o : FCTTRE.o yoethf.o suphec.o dimphy.o dimens_m.o 
 vdif_kcay.o : dimphy.o dimens_m.o 
 vitvert.o : comvert.o paramet_m.o dimens_m.o 
-vlsplt.o : logic.o comvert.o comconst.o paramet_m.o dimens_m.o 
+vlsplt.o : paramet_m.o dimens_m.o 
 vlspltqs.o : comgeom.o logic.o comvert.o comconst.o paramet_m.o dimens_m.o 
 vlx.o : logic.o comvert.o comconst.o paramet_m.o dimens_m.o 
 vly.o : comgeom.o logic.o comvert.o comconst.o paramet_m.o dimens_m.o 

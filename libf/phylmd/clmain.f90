@@ -16,22 +16,22 @@ contains
        fqcalving, ffonte, run_off_lic_0, flux_o, flux_g, tslab, seaice)
 
     ! From phylmd/clmain.F, version 1.6 2005/11/16 14:47:19
+    ! Author: Z.X. Li (LMD/CNRS), date: 1993/08/18
+    ! Objet : interface de "couche limite" (diffusion verticale)
 
-    ! Tout ce qui a trait aux traceurs est dans phytrac maintenant.
+    ! Tout ce qui a trait aux traceurs est dans "phytrac" maintenant.
     ! Pour l'instant le calcul de la couche limite pour les traceurs
-    ! se fait avec cltrac et ne tient pas compte de la différentiation
+    ! se fait avec "cltrac" et ne tient pas compte de la différentiation
     ! des sous-fractions de sol.
 
     ! Pour pouvoir extraire les coefficients d'échanges et le vent
-    ! dans la première couche, trois champs supplémentaires ont été créés :
-    ! zcoefh, zu1 et zv1. Pour l'instant nous avons moyenné les valeurs
-    ! de ces trois champs sur les 4 sous-surfaces du modèle. Dans l'avenir
-    ! si les informations des sous-surfaces doivent être prises en compte
-    ! il faudra sortir ces mêmes champs en leur ajoutant une dimension,
-    ! c'est a dire nbsrf (nombre de sous-surfaces).
-
-    ! Auteur Z.X. Li (LMD/CNRS) date: 1993/08/18
-    ! Objet : interface de "couche limite" (diffusion verticale)
+    ! dans la première couche, trois champs supplémentaires ont été
+    ! créés : "zcoefh", "zu1" et "zv1". Pour l'instant nous avons
+    ! moyenné les valeurs de ces trois champs sur les 4 sous-surfaces
+    ! du modèle. Dans l'avenir, si les informations des sous-surfaces
+    ! doivent être prises en compte, il faudra sortir ces mêmes champs
+    ! en leur ajoutant une dimension, c'est-à-dire "nbsrf" (nombre de
+    ! sous-surfaces).
 
     ! Arguments:
     ! dtime----input-R- interval du temps (secondes)
@@ -221,9 +221,10 @@ contains
     INTEGER i, k, nsrf
 
     INTEGER ni(klon), knon, j
-    ! Introduction d'une variable "pourcentage potentiel" pour tenir compte
-    ! des eventuelles apparitions et/ou disparitions de la glace de mer
+
     REAL pctsrf_pot(klon, nbsrf)
+    ! "pourcentage potentiel" pour tenir compte des éventuelles
+    ! apparitions ou disparitions de la glace de mer
 
     REAL zx_alf1, zx_alf2 !valeur ambiante par extrapola.
 
@@ -298,7 +299,6 @@ contains
 
     !------------------------------------------------------------
 
-    ! initialisation Anne
     ytherm = 0.
 
     IF (debugindex .AND. first_appel) THEN
@@ -307,7 +307,7 @@ contains
        ! initialisation sorties netcdf
 
        idayref = day_ini
-       CALL ymds2ju(annee_ref, 1, idayref, 0.0, zjulian)
+       CALL ymds2ju(annee_ref, 1, idayref, 0., zjulian)
        CALL gr_fi_ecrit(1, klon, iim, jjm+1, rlon, zx_lon)
        DO i = 1, iim
           zx_lon(i, 1) = rlon(i+1)
@@ -342,75 +342,64 @@ contains
        v1lay(i) = v(i, 1)*zx_alf1 + v(i, 2)*zx_alf2
     END DO
 
-    ! initialisation:
-
-    DO i = 1, klon
-       rugmer(i) = 0.0
-       cdragh(i) = 0.0
-       cdragm(i) = 0.0
-       dflux_t(i) = 0.0
-       dflux_q(i) = 0.0
-       zu1(i) = 0.0
-       zv1(i) = 0.0
-    END DO
-    ypct = 0.0
-    yts = 0.0
-    ysnow = 0.0
-    yqsurf = 0.0
-    yalb = 0.0
-    yalblw = 0.0
-    yrain_f = 0.0
-    ysnow_f = 0.0
-    yfder = 0.0
-    ytaux = 0.0
-    ytauy = 0.0
-    ysolsw = 0.0
-    ysollw = 0.0
-    ysollwdown = 0.0
-    yrugos = 0.0
-    yu1 = 0.0
-    yv1 = 0.0
-    yrads = 0.0
-    ypaprs = 0.0
-    ypplay = 0.0
-    ydelp = 0.0
-    yu = 0.0
-    yv = 0.0
-    yt = 0.0
-    yq = 0.0
-    pctsrf_new = 0.0
-    y_flux_u = 0.0
-    y_flux_v = 0.0
+    ! Initialization:
+    rugmer = 0.
+    cdragh = 0.
+    cdragm = 0.
+    dflux_t = 0.
+    dflux_q = 0.
+    zu1 = 0.
+    zv1 = 0.
+    ypct = 0.
+    yts = 0.
+    ysnow = 0.
+    yqsurf = 0.
+    yalb = 0.
+    yalblw = 0.
+    yrain_f = 0.
+    ysnow_f = 0.
+    yfder = 0.
+    ytaux = 0.
+    ytauy = 0.
+    ysolsw = 0.
+    ysollw = 0.
+    ysollwdown = 0.
+    yrugos = 0.
+    yu1 = 0.
+    yv1 = 0.
+    yrads = 0.
+    ypaprs = 0.
+    ypplay = 0.
+    ydelp = 0.
+    yu = 0.
+    yv = 0.
+    yt = 0.
+    yq = 0.
+    pctsrf_new = 0.
+    y_flux_u = 0.
+    y_flux_v = 0.
     !$$ PB
-    y_dflux_t = 0.0
-    y_dflux_q = 0.0
+    y_dflux_t = 0.
+    y_dflux_q = 0.
     ytsoil = 999999.
     yrugoro = 0.
     ! -- LOOP
-    yu10mx = 0.0
-    yu10my = 0.0
-    ywindsp = 0.0
+    yu10mx = 0.
+    yu10my = 0.
+    ywindsp = 0.
     ! -- LOOP
-    DO nsrf = 1, nbsrf
-       DO i = 1, klon
-          d_ts(i, nsrf) = 0.0
-       END DO
-    END DO
+    d_ts = 0.
     !§§§ PB
     yfluxlat = 0.
     flux_t = 0.
     flux_q = 0.
     flux_u = 0.
     flux_v = 0.
-    DO k = 1, klev
-       DO i = 1, klon
-          d_t(i, k) = 0.0
-          d_q(i, k) = 0.0
-          d_u(i, k) = 0.0
-          d_v(i, k) = 0.0
-          zcoefh(i, k) = 0.0
-       END DO
-    END DO
+    d_t = 0.
+    d_q = 0.
+    d_u = 0.
+    d_v = 0.
+    zcoefh = 0.
 
     ! Boucler sur toutes les sous-fractions du sol:
 
@@ -427,7 +416,7 @@ contains
        ni = 0
        knon = 0
        DO i = 1, klon
-          ! pour determiner le domaine a traiter on utilise les surfaces
+          ! Pour déterminer le domaine à traiter, on utilise les surfaces
           ! "potentielles"
           IF (pctsrf_pot(i, nsrf) > epsfra) THEN
              knon = knon + 1
@@ -620,12 +609,6 @@ contains
        ! pour le couplage
        ytaux = y_flux_u(:, 1)
        ytauy = y_flux_v(:, 1)
-
-       ! FH modif sur le cdrag temperature
-       !$$$PB : déplace dans clcdrag
-       !$$$      do i=1, knon
-       !$$$         ycoefh(i, 1)=ycoefm(i, 1)*0.8
-       !$$$      enddo
 
        ! calculer la diffusion de "q" et de "h"
        CALL clqh(dtime, itap, date0, jour, debut, lafin, rlon, rlat,&

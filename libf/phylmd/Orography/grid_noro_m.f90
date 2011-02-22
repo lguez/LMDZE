@@ -254,7 +254,7 @@ contains
           zxtzy(ii, jj)=zxtzy(ii, jj)/weight(ii, jj)
           ztz(ii, jj)  =ztz(ii, jj)/weight(ii, jj)
           !  Standard deviation:
-          zstd(ii, jj)=sqrt(AMAX1(0., ztz(ii, jj)-zmea(ii, jj)**2))
+          zstd(ii, jj)=sqrt(MAX(0., ztz(ii, jj) - zmea(ii, jj)**2))
        ENDDO
     ENDDO
 

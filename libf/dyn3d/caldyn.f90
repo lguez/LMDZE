@@ -2,9 +2,8 @@ SUBROUTINE caldyn(itau, ucov, vcov, teta, ps, masse, pk, pkf, phis, phi, &
      conser, du, dv, dteta, dp, w, pbaru, pbarv, time_0)
 
   ! From dyn3d/caldyn.F, v 1.1.1.1 2004/05/19 12:53:06
-  !  Auteur :  P. Le Van
-  !   Objet:
-  !   Calcul des tendances dynamiques.
+  ! Auteur : P. Le Van
+  ! Objet : calcul des tendances dynamiques
 
   USE dimens_m, ONLY : iim, llm
   USE paramet_m, ONLY : iip1, ip1jm, ip1jmp1, jjp1, llmp1
@@ -14,13 +13,13 @@ SUBROUTINE caldyn(itau, ucov, vcov, teta, ps, masse, pk, pkf, phis, phi, &
 
   IMPLICIT NONE
 
-  !   Arguments:
+  ! Arguments:
 
   LOGICAL, INTENT (IN):: conser
   INTEGER, INTENT (IN):: itau
   REAL vcov(ip1jm, llm), ucov(ip1jmp1, llm), teta(ip1jmp1, llm)
   REAL ps(ip1jmp1), phis(ip1jmp1)
-  REAL, INTENT (IN) :: pk(iip1, jjp1, llm)
+  REAL, INTENT (IN):: pk(iip1, jjp1, llm)
   REAL pkf(ip1jmp1, llm)
   REAL vcont(ip1jm, llm), ucont(ip1jmp1, llm)
   REAL phi(ip1jmp1, llm), masse(ip1jmp1, llm)
@@ -29,7 +28,7 @@ SUBROUTINE caldyn(itau, ucov, vcov, teta, ps, masse, pk, pkf, phis, phi, &
   REAL pbaru(ip1jmp1, llm), pbarv(ip1jm, llm)
   REAL, intent(in):: time_0
 
-  !   Local:
+  ! Local:
 
   REAL ang(ip1jmp1, llm), p(ip1jmp1, llmp1)
   REAL massebx(ip1jmp1, llm), masseby(ip1jm, llm), psexbarxy(ip1jm)
@@ -41,7 +40,6 @@ SUBROUTINE caldyn(itau, ucov, vcov, teta, ps, masse, pk, pkf, phis, phi, &
   INTEGER ij, l
 
   !-----------------------------------------------------------------------
-  !   Calcul des tendances dynamiques:
 
   CALL covcont(llm, ucov, vcov, ucont, vcont)
   forall (l = 1: llm + 1) p(:, l) = ap(l) + bp(l) * ps
@@ -64,18 +62,16 @@ SUBROUTINE caldyn(itau, ucov, vcov, teta, ps, masse, pk, pkf, phis, phi, &
   CALL bernoui(ip1jmp1, llm, phi, ecin, bern)
   CALL dudv2(teta, pkf, bern, du, dv)
 
-
   DO l = 1, llm
      DO ij = 1, ip1jmp1
         ang(ij, l) = ucov(ij, l) + constang(ij)
      END DO
   END DO
 
-
   CALL advect(ang, vcov, teta, w, massebx, masseby, du, dv, dteta, conser)
 
-  !  WARNING probleme de peridocite de dv sur les PC/linux. Pb d'arrondi
-  !          probablement. Observe sur le code compile avec pgf90 3.0-1
+  ! WARNING probleme de peridocite de dv sur les PC/linux. Pb d'arrondi
+  ! probablement. Observe sur le code compile avec pgf90 3.0-1
   DO l = 1, llm
      DO ij = 1, ip1jm, iip1
         IF (dv(ij, l)/=dv(ij+iim, l)) THEN
@@ -84,7 +80,7 @@ SUBROUTINE caldyn(itau, ucov, vcov, teta, ps, masse, pk, pkf, phis, phi, &
      END DO
   END DO
 
-  !   Sorties eventuelles des variables de controle:
+  ! Sorties eventuelles des variables de controle :
   IF (conser) CALL sortvarc(itau, ucov, teta, ps, masse, pk, phis, vorpot, &
        phi, bern, dp, time_0)
 

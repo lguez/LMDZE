@@ -42,7 +42,7 @@ PROGRAM gcm
   ! Variables dynamiques :
   REAL vcov(ip1jm, llm), ucov(ip1jmp1, llm) ! vents covariants
   REAL teta(ip1jmp1, llm) ! température potentielle 
-  REAL q(ip1jmp1, llm, nqmx) ! champs advectés
+  REAL q(iim + 1, jjm + 1, llm, nqmx) ! champs advectés
   REAL ps(iim + 1, jjm + 1) ! pression au sol (Pa)
 
   REAL masse(ip1jmp1, llm) ! masse d'air

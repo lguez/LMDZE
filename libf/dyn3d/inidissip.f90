@@ -7,8 +7,8 @@ module inidissip_m
   private llm
 
   REAL dtdiss
-  integer idissip ! periode de la dissipation (en pas)
-  real tetaudiv(llm),tetaurot(llm),tetah(llm)   
+  integer idissip ! période de la dissipation (en pas)
+  real tetaudiv(llm), tetaurot(llm), tetah(llm) 
   real cdivu, crot, cdivh
 
 contains
@@ -16,7 +16,7 @@ contains
   SUBROUTINE inidissip
 
     ! From dyn3d/inidissip.F, version 1.1.1.1 2004/05/19 12:53:06
-    ! Initialisation de la dissipation horizontale                        
+    ! Initialisation de la dissipation horizontale 
 
     USE comconst, ONLY : dtvr
     use comdissnew, only: lstardis, nitergdiv, nitergrot, niterh, tetagdiv, &
@@ -31,8 +31,8 @@ contains
     ! Variables local to the procedure:
     REAL zvert(llm), max_zvert
     REAL zh(ip1jmp1), zu(ip1jmp1), zv(ip1jm), deltap(ip1jmp1, llm)
-    REAL ullm, vllm, umin, vmin, zhmin, zhmax
-    REAL zllm, z1llm
+    REAL zhmin, zhmax
+    REAL zllm
     INTEGER l, ij, idum, ii, unit
     REAL tetamin ! in s
     REAL ran1
@@ -41,26 +41,20 @@ contains
 
     PRINT *, 'Call sequence information: inidissip'
 
-    !   calcul des valeurs propres des operateurs par methode iterrative:   
+    ! Calcul des valeurs propres des opérateurs par méthode itérative :
 
     crot = -1.
     cdivu = -1.
     cdivh = -1.
 
-    !   calcul de la valeur propre de divgrad:                              
+    ! Calcul de la valeur propre de divgrad :
 
-    idum = 0
-    DO l = 1, llm
-       DO ij = 1, ip1jmp1
-          deltap(ij, l) = 1.
-       END DO
-    END DO
-
+    deltap = 1.
     idum = -1
-    zh(1) = ran1(idum) - .5
+    zh(1) = ran1(idum) - 0.5
     idum = 0
     DO ij = 2, ip1jmp1
-       zh(ij) = ran1(idum) - .5
+       zh(ij) = ran1(idum) - 0.5
     END DO
 
     CALL filtreg(zh, jjp1, 1, 2, 1, .TRUE., 1)
@@ -72,7 +66,6 @@ contains
        STOP 1
     END IF
 
-    zllm = abs(zhmax)
     DO l = 1, 50
        IF (lstardis) THEN
           CALL divgrad2(1, zh, deltap, niterh, zh)
@@ -80,42 +73,31 @@ contains
           CALL divgrad(1, zh, niterh, zh)
        END IF
 
-       CALL minmax(iip1*jjp1, zh, zhmin, zhmax)
-
-       zllm = abs(zhmax)
-       z1llm = 1./zllm
-       DO ij = 1, ip1jmp1
-          zh(ij) = zh(ij)*z1llm
-       END DO
+       zllm = abs(maxval(zh))
+       zh = zh / zllm
     END DO
 
     IF (lstardis) THEN
-       cdivh = 1./zllm
+       cdivh = 1. / zllm
     ELSE
-       cdivh = zllm**(-1./niterh)
+       cdivh = zllm**(- 1. / niterh)
     END IF
 
-    !   calcul des valeurs propres de gradiv (ii =1) et  nxgrarot(ii=2)     
+    ! Calcul des valeurs propres de gradiv (ii = 1) et nxgrarot (ii = 2) 
 
-    PRINT *, 'calcul des valeurs propres'
+    PRINT *, 'Calcul des valeurs propres'
 
-    DO  ii = 1, 2
+    DO ii = 1, 2
        DO ij = 1, ip1jmp1
-          zu(ij) = ran1(idum) - .5
+          zu(ij) = ran1(idum) - 0.5
        END DO
        CALL filtreg(zu, jjp1, 1, 2, 1, .TRUE., 1)
        DO ij = 1, ip1jm
-          zv(ij) = ran1(idum) - .5
+          zv(ij) = ran1(idum) - 0.5
        END DO
        CALL filtreg(zv, jjm, 1, 2, 1, .FALSE., 1)
 
-       CALL minmax(iip1*jjp1, zu, umin, ullm)
-       CALL minmax(iip1*jjm, zv, vmin, vllm)
-
-       ullm = abs(ullm)
-       vllm = abs(vllm)
-
-       DO  l = 1, 50
+       DO l = 1, 50
           IF (ii==1) THEN
              IF (lstardis) THEN
                 CALL gradiv2(1, zu, zv, nitergdiv, zu, zv)
@@ -130,33 +112,22 @@ contains
              END IF
           END IF
 
-          CALL minmax(iip1*jjp1, zu, umin, ullm)
-          CALL minmax(iip1*jjm, zv, vmin, vllm)
-
-          ullm = abs(ullm)
-          vllm = abs(vllm)
-
-          zllm = max(ullm, vllm)
-          z1llm = 1./zllm
-          DO ij = 1, ip1jmp1
-             zu(ij) = zu(ij)*z1llm
-          END DO
-          DO ij = 1, ip1jm
-             zv(ij) = zv(ij)*z1llm
-          END DO
+          zllm = max(abs(maxval(zu)), abs(maxval(zv)))
+          zu = zu / zllm
+          zv = zv / zllm
        end DO
 
        IF (ii==1) THEN
           IF (lstardis) THEN
-             cdivu = 1./zllm
+             cdivu = 1. / zllm
           ELSE
-             cdivu = zllm**(-1./nitergdiv)
+             cdivu = zllm**(- 1. / nitergdiv)
           END IF
        ELSE
           IF (lstardis) THEN
              crot = 1./zllm
           ELSE
-             crot = zllm**(-1./nitergrot)
+             crot = zllm**(-1. / nitergrot)
           END IF
        END IF
     END DO

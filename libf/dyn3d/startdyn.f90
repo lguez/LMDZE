@@ -41,7 +41,6 @@ CONTAINS
 
     REAL date, dt
     INTEGER itau(1)
-    INTEGER i, j
     REAL, ALLOCATABLE:: lon_rad(:), lat_rad(:)
 
     REAL, ALLOCATABLE:: lon_dyn(:, :), lat_dyn(:, :)

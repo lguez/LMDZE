@@ -16,7 +16,9 @@ module conf_gcm_m
   ! number of time steps between output of control variables
 
   integer:: iecri = 1 ! time interval between outputs to "dyn_hist.nc" (in days)
-  integer:: iphysiq = 5 ! période de la physique en pas de temps de la dynamique
+
+  integer:: iphysiq = 5
+  ! number of time steps of dynamics between calls to physics
 
   integer:: dayref = 1 ! jour de l'année de l'état initial
   ! (= 350 si 20 décembre par exemple)
@@ -70,12 +72,13 @@ contains
     read(unit=*, nml=conf_gcm_nml)
     write(unit=*, nml=conf_gcm_nml)
 
-    IF (MOD(day_step, iperiod) /= 0) call abort_gcm(modname = "gcm", &
+    IF (MOD(day_step, iperiod) /= 0) call abort_gcm(modname = "conf_gcm", &
          message = &
          'Il faut choisir un nombre de pas par jour multiple de "iperiod".', &
          ierr = 1)
 
-    IF (MOD(day_step,iphysiq)/= 0) call abort_gcm(modname = "gcm", message = &
+    IF (MOD(day_step,iphysiq)/= 0) call abort_gcm(modname = "conf_gcm", &
+         message = &
          'Il faut choisir un nombre de pas par jour multiple de "iphysiq".', &
          ierr = 1)
 
