@@ -54,9 +54,9 @@ CONTAINS
 
     print *, "Call sequence information: start_init_dyn"
     call assert((/size(tsol_2d, 1), size(psol, 1)/) == iim + 1, &
-         "start_init_phys size 1")
+         "start_init_dyn size 1")
     call assert((/size(tsol_2d, 2), size(psol, 2)/) == jjm + 1, &
-         "start_init_phys size 2")
+         "start_init_dyn size 2")
     CALL flininfo('ECDYN.nc', iml_dyn, jml_dyn, llm_dyn, ttm_dyn, fid_dyn)
     print *, "iml_dyn = ", iml_dyn, ", jml_dyn = ", jml_dyn, &
          ", llm_dyn = ", llm_dyn, ", ttm_dyn = ", ttm_dyn

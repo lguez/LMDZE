@@ -22,28 +22,31 @@ CONTAINS
     use indicesol, only: epsfra
     use nr_util, only: pi
 
-    REAL, intent(out):: relief(:, :) ! orographie moyenne
+    REAL, intent(out):: relief(:, :) ! (iim + 1, jjm + 1) orographie moyenne
 
-    REAL, intent(out):: zstd_2d(:, :)
+    REAL, intent(out):: zstd_2d(:, :) ! (iim + 1, jjm + 1)
     ! (deviation standard de l'orographie sous-maille)
 
-    REAL, intent(out):: zsig_2d(:, :)
+    REAL, intent(out):: zsig_2d(:, :) ! (iim + 1, jjm + 1)
     ! (pente de l'orographie sous-maille)
     
-    REAL, intent(out):: zgam_2d(:, :)
+    REAL, intent(out):: zgam_2d(:, :) ! (iim + 1, jjm + 1)
     ! (anisotropie de l'orographie sous maille)
 
-    REAL, intent(out):: zthe_2d(:, :)
+    REAL, intent(out):: zthe_2d(:, :) ! (iim + 1, jjm + 1)
     ! (orientation de l'axe oriente dans la direction de plus grande
     ! pente de l'orographie sous maille)
 
-    REAL, intent(out):: zpic_2d(:, :) ! hauteur pics de la SSO
-    REAL, intent(out):: zval_2d(:, :) ! hauteur vallees de la SSO
+    REAL, intent(out):: zpic_2d(:, :) ! (iim + 1, jjm + 1)
+    ! hauteur pics de la SSO
+
+    REAL, intent(out):: zval_2d(:, :) ! (iim + 1, jjm + 1)
+    ! hauteur vallees de la SSO
 
     ! Local:
 
-    INTEGER, SAVE:: iml_rel
-    INTEGER, SAVE:: jml_rel
+    INTEGER iml_rel
+    INTEGER jml_rel
     REAL lev(1), date, dt
     INTEGER itau(1), fid
     INTEGER  llm_tmp, ttm_tmp

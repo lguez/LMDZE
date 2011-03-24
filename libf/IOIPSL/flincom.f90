@@ -15,81 +15,63 @@ MODULE flincom
 
 CONTAINS
 
-  SUBROUTINE flinopen_nozoom(iim, jjm, llm, lon, lat, lev, &
-       ttm, itaus, date0, dt, fid_out)
+  SUBROUTINE flinopen_nozoom(iim, jjm, llm, lon, lat, lev, ttm, itaus, date0, &
+       dt, fid_out)
 
-    ! The routine will open an input file
-    ! INPUT
-    ! There is no test of the content of the file against the input
-    ! from the model
+    ! This procedure opens an input file. There is no test of the
+    ! content of the file against the input from the model.
 
-    ! iim: size in the x direction in the file (longitude)
-    ! jjm: size in the y direction
-    ! llm: number of levels
-    ! (llm = 0 means no axis to be expected)
-
-    ! WARNING:
-    ! It is for the user to check
-    ! that the dimensions of lon lat and lev are correct when passed to
-    ! flinopen. This can be done after the call when iim and jjm have
-    ! been retrieved from the netCDF file. In F90 this problem will
-    ! be solved with an internal assign
-    ! IF iim, jjm, llm or ttm are parameters in the calling program 
-    ! it will create a segmentation fault
-
-    ! ttm: size of time axis
-
-    ! OUTPUT
-
-    ! lon: array of (iim, jjm),
-    ! that contains the longitude of each point
-    ! lat: same for latitude
-    ! lev: An array of llm for the latitude
-    ! itaus: Time steps within this file
-    ! date0: Julian date at which itau = 0
-    ! dt: length of the time steps of the data
-
-    !---------------------------------------------------------------------
+    ! The user should check that the dimensions of lon lat and lev are
+    ! correct when passed to flinopen. This can be done after the call
+    ! when iim and jjm have been retrieved from the netCDF file. In
+    ! Fortran 90 this problem will be solved with an internal assign
+    ! IF iim, jjm, llm or ttm are parameters in the calling program it
+    ! will create a segmentation fault
 
     USE calendar, ONLY: ymds2ju, ioconf_calendar
     USE errioipsl, ONLY: histerr
     USE netcdf, ONLY: nf90_get_att, nf90_get_var, nf90_global, &
          nf90_inquire_variable
 
-    ! ARGUMENTS
+    INTEGER, intent(in):: iim ! size in the x direction in the file (longitude)
+    INTEGER, intent(in):: jjm ! size in the y direction
 
-    INTEGER, intent(in):: iim, jjm, llm, ttm
-    real, intent(out):: lon(iim, jjm), lat(iim, jjm), lev(llm)
-    INTEGER, intent(out):: itaus(ttm)
-    REAL, intent(out):: date0, dt
+    INTEGER, intent(in):: llm ! number of levels
+    ! (llm = 0 means no axis to be expected)
+
+    INTEGER, intent(in):: ttm ! size of time axis
+    real, intent(out):: lon(iim, jjm) ! longitude
+    real, intent(out):: lat(iim, jjm) ! latitude
+    real, intent(out):: lev(llm)
+    INTEGER, intent(out):: itaus(ttm) ! time steps within this file
+    REAL, intent(out):: date0 ! Julian date at which itau = 0
+    REAL, intent(out):: dt ! length of the time steps of the data
 
     INTEGER, intent(in):: fid_out
     ! (file ID which is later used to read the data)
 
-    ! LOCAL
-
-    INTEGER:: iret, vid, fid, nbdim, i
-    INTEGER:: gdtt_id, old_id, iv, gdtmaf_id
-    CHARACTER(LEN=250):: name
-    CHARACTER(LEN=80):: units, my_calendar
-    INTEGER:: year, month, day
-    REAL:: r_year, r_month, r_day
-    INTEGER:: year0, month0, day0, hours0, minutes0, seci
-    REAL:: sec, sec0
-    CHARACTER:: strc
-
+    ! Variables local to the procedure:
+    INTEGER iret, vid, fid, nbdim, i
+    INTEGER gdtt_id, old_id, iv, gdtmaf_id
+    CHARACTER(LEN=250) name
+    CHARACTER(LEN=80) units, my_calendar
+    INTEGER year, month, day
+    REAL r_year, r_month, r_day
+    INTEGER year0, month0, day0, hours0, minutes0, seci
+    REAL sec, sec0
+    CHARACTER strc
     REAL, DIMENSION(:), ALLOCATABLE:: vec_tmp
 
     !---------------------------------------------------------------------
 
-    IF ( (fid_out < 1).OR.(fid_out > nbfile_max) ) THEN
+    IF ((fid_out < 1) .OR. (fid_out > nbfile_max)) THEN
        ! Either the fid_out has not been initialized (0 or very large)
        ! then we have to open anyway. Else we only need to open the file
        ! if it has not been opened before.
        print *, "Call flinfo before flinopen"
        stop 1
     end IF
-    IF (.NOT.ncfileopen(fid_out)) THEN
+    IF (.NOT. ncfileopen(fid_out)) THEN
        print *, "Call flinfo before flinopen"
        stop 1
     end IF
@@ -98,12 +80,6 @@ CONTAINS
     ! and we trust that he knows the dimensions
 
     fid = ncids(fid_out)
-
-    ! 2.0 get the sizes and names of the different coordinates
-    ! and do a first set of verification.
-
-    ! 3.0 Check if we are realy talking about the same coodinate system
-    ! if not then we get the lon, lat and lev variables from the file
 
     ! 4.0 extracting the coordinates
 
@@ -123,12 +99,11 @@ CONTAINS
 
     CALL flinfindcood (fid_out, 'lat', vid, nbdim)
     IF (nbdim == 2) THEN
-       iret = NF90_GET_VAR (fid, vid, lat, &
-            start=(/ 1, 1 /), count=(/ iim, jjm /))
+       iret = NF90_GET_VAR (fid, vid, lat, start=(/ 1, 1 /), &
+            count=(/ iim, jjm /))
     ELSE
        ALLOCATE(vec_tmp(jjm))
-       iret = NF90_GET_VAR (fid, vid, vec_tmp, &
-            start=(/ 1 /), count=(/ jjm /))
+       iret = NF90_GET_VAR (fid, vid, vec_tmp, start=(/ 1 /), count=(/ jjm /))
        DO i=1, iim
           lat(i, :) = vec_tmp(:)
        ENDDO
@@ -138,8 +113,7 @@ CONTAINS
     IF (llm > 0) THEN
        CALL flinfindcood (fid_out, 'lev', vid, nbdim)
        IF (nbdim == 1) THEN
-          iret = NF90_GET_VAR (fid, vid, lev, &
-               start=(/ 1 /), count=(/ llm /))
+          iret = NF90_GET_VAR (fid, vid, lev, start=(/ 1 /), count=(/ llm /))
        ELSE
           CALL histerr (3, 'flinopen', &
                'Can not handle vertical coordinates that have more', &
@@ -187,7 +161,7 @@ CONTAINS
        ! Find the calendar
        my_calendar='XXXX'
        iret = NF90_GET_ATT (fid, gdtmaf_id, 'calendar', my_calendar)
-       IF ( INDEX(my_calendar, 'XXXX') < 1 ) THEN
+       IF (INDEX(my_calendar, 'XXXX') < 1) THEN
           CALL ioconf_calendar(my_calendar)
        ENDIF
 
@@ -231,7 +205,7 @@ CONTAINS
   SUBROUTINE flininfo(filename, iim, jjm, llm, ttm, fid_out)
 
     ! This subroutine allows to get some information.
-    ! It is usualy done within flinopen but the user may want to call
+    ! It is usually called by "flinopen" but the user may want to call
     ! it before in order to allocate the space needed to extract the
     ! data from the file.
 
@@ -244,14 +218,13 @@ CONTAINS
     CHARACTER(LEN=*), intent(in):: filename
     INTEGER, intent(out):: iim, jjm, llm, ttm, fid_out
 
-    ! LOCAL
-
+    ! Variables local to the procedure:
     INTEGER, SAVE:: nbfiles = 0
     INTEGER, SAVE:: ncdims(nbfile_max, 4)
-    INTEGER:: iret, fid, ndims, nvars, nb_atts, id_unlim
-    INTEGER:: iv, lll
-    CHARACTER(LEN=80):: name
-    CHARACTER(LEN=30):: axname
+    INTEGER iret, fid, ndims, nvars, nb_atts, id_unlim
+    INTEGER iv, lll
+    CHARACTER(LEN=80) name
+    CHARACTER(LEN=30) axname
 
     !---------------------------------------------------------------------
 
@@ -373,15 +346,15 @@ CONTAINS
 
     IF (found_rule) THEN
        iv = 0
-       DO WHILE ( (vid < 0).AND.(iv < ncnbva(fid_in)) )
+       DO WHILE ((vid < 0).AND.(iv < ncnbva(fid_in)))
           iv = iv+1
           str1 = ''
           iret = NF90_GET_ATT (ncids(fid_in), iv, 'units', str1)
           IF (iret == NF90_NOERR) THEN
              CALL strlowercase (str1)
-             IF ( (INDEX(str1, TRIM(dimuni1)) == 1) &
+             IF ((INDEX(str1, TRIM(dimuni1)) == 1) &
                   .OR.(INDEX(str1, TRIM(dimuni2)) == 1) &
-                  .OR.(INDEX(str1, TRIM(dimuni3)) == 1) ) THEN
+                  .OR.(INDEX(str1, TRIM(dimuni3)) == 1)) THEN
                 vid = iv
                 iret = NF90_INQUIRE_VARIABLE (ncids(fid_in), iv, ndims=ndim)
              ENDIF
@@ -411,7 +384,7 @@ CONTAINS
 
     IF (found_rule) THEN
        iv = 0
-       DO WHILE ( (vid < 0).AND.(iv < ncnbva(fid_in)) )
+       DO WHILE ((vid < 0).AND.(iv < ncnbva(fid_in)))
           iv = iv+1
           str1=''
           iret = NF90_INQUIRE_VARIABLE (ncids(fid_in), iv, &
@@ -445,7 +418,7 @@ CONTAINS
        IF (found_rule) THEN
           iret = NF90_INQUIRE_DIMENSION (ncids(fid_in), dimnb, name=dimname)
           iv = 0
-          DO WHILE ( (vid < 0).AND.(iv < ncnbva(fid_in)) )
+          DO WHILE ((vid < 0).AND.(iv < ncnbva(fid_in)))
              iv = iv+1
              str1=''
              iret = NF90_INQUIRE_VARIABLE (ncids(fid_in), iv, &

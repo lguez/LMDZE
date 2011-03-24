@@ -5,7 +5,7 @@ MODULE start_init_phys_m
 
   IMPLICIT NONE
 
-  REAL, ALLOCATABLE, SAVE, DIMENSION(:, :):: qsol_2d
+  REAL, ALLOCATABLE, SAVE:: qsol_2d(:, :)
 
 CONTAINS
 
@@ -21,7 +21,7 @@ CONTAINS
 
     REAL, intent(out):: tsol_2d(:, :)
 
-    !  LOCAL
+    ! Variables local to the procedure:
 
     INTEGER fid_phys, iml_phys, jml_phys
     REAL, ALLOCATABLE, DIMENSION(:, :):: lon_phys, lat_phys
@@ -46,9 +46,8 @@ CONTAINS
     ALLOCATE(lon_phys(iml_phys, jml_phys))
     ALLOCATE(levphys_ini(llm_tmp))
 
-    CALL flinopen_nozoom(iml_phys, jml_phys,  &
-         llm_tmp, lon_phys, lat_phys, levphys_ini, ttm_tmp,  &
-         itau, date, dt, fid_phys)
+    CALL flinopen_nozoom(iml_phys, jml_phys, llm_tmp, lon_phys, lat_phys, &
+         levphys_ini, ttm_tmp, itau, date, dt, fid_phys)
 
     DEALLOCATE(levphys_ini)
 
@@ -74,9 +73,8 @@ CONTAINS
        lat_ini(:) = lat_phys(1, :) 
     ENDIF
 
-    !   We get the two standard varibales
-    !   Surface temperature
-    ! 'ST'            : Surface temperature
+    ! We get the two standard variables
+    ! 'ST': surface temperature
     CALL flinget(fid_phys, 'ST', iml_phys, jml_phys,  &
          llm_tmp, ttm_tmp, 1, 1, var_ana)
     CALL conf_dat2d(lon_ini, lat_ini, lon_rad, lat_rad, var_ana)

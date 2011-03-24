@@ -27,6 +27,7 @@ contains
     ! "pa" should be defined before this procedure is called.
 
     use nr_util, only: pi
+    use new_unit_m, only: new_unit
 
     REAL s(llm+1)
     ! "s(l)" is the atmospheric hybrid sigma-pressure coordinate at
@@ -35,11 +36,11 @@ contains
     real ds(llm)
     ! "ds(l)" : épaisseur de la couche "l" dans la coordonnée "s"
 
-    INTEGER l
-    REAL alpha, x(llm)
+    INTEGER l, unit
+    REAL alpha, x(llm), trash
 
     character(len=7):: s_sampling = "LMD5"
-    ! (other allowed values are "param", "strato1" and "strato2")
+    ! (other allowed values are "param", "strato1", "strato2" and "read")
 
     real:: h = 7. ! scale height, in km
     ! (used only if "s_sampling" == "param" or "strato1")
@@ -63,15 +64,14 @@ contains
 
     ! Compute "s":
 
-    s(1) = 1.
-    s(llm+1) = 0.
-
     print *, "Enter namelist 'disvert_nml'."
     read(unit=*, nml=disvert_nml)
     write(unit=*, nml=disvert_nml)
 
     select case (s_sampling)
     case ("param")
+       s(1) = 1.
+       s(llm+1) = 0.
        alpha = deltaz / tanh(1./k0) * 2.
        forall (l = 2: llm) s(l) &
             = cosh((l - 1) / k0) **(- alpha * k0 / h) &
@@ -79,6 +79,8 @@ contains
             * beta **(l - 1 - (llm - k1)) / log(beta))
     case ("LMD5")
        ! Ancienne discrétisation
+       s(1) = 1.
+       s(llm+1) = 0.
        forall (l = 1: llm) ds(l) &
             = 1. + 7. * SIN(pi * (REAL(l)-0.5) / real(llm+1))**2
        ds = ds / sum(ds)
@@ -88,6 +90,8 @@ contains
        ENDDO
     case ("strato1")
        ! F. Lott 70 niveaux et plus
+       s(1) = 1.
+       s(llm+1) = 0.
        forall (l = 1: llm) dz(l) = 1.56 + TANH(REAL(l - 12) / 5.) &
                + TANH(REAL(l - llm) / 10.) / 2.
 
@@ -100,6 +104,8 @@ contains
             / (1. - exp(- zz(llm + 1) / h))
     case ("strato2")
        ! Recommended by F. Lott for a domain including the stratosphere
+       s(1) = 1.
+       s(llm+1) = 0.
        forall (l = 1: llm) x(l) = pi * (l - 0.5) / (llm + 1)
 
        ds = (1. + 7. * SIN(x)**2) * (1. - tanh(2 * x / pi - 1.))**2 / 4.
@@ -108,6 +114,20 @@ contains
        DO l = llm, 2, -1
           s(l) = s(l+1) + ds(l)
        ENDDO
+    case("read")
+       call new_unit(unit)
+       open(unit, file="hybrid.csv", status="old", action="read", &
+            position="rewind")
+       read(unit, fmt=*) ! skip title line
+       do l = 1, llm + 1
+          read(unit, fmt=*) trash, s(l)
+       end do
+       close(unit)
+       ! Quick check:
+       if (s(1) /= 1. .or. s(llm + 1) /= 0. .or. s(1) <= s(2)) then
+          print *, '"s" should be in descending order, from 1 to 0.'
+          stop 1
+       end if
     case default
        print *, 'Wrong value for "s_sampling"'
        stop 1

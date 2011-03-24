@@ -183,11 +183,8 @@ SUBROUTINE coefkz(nsrf, knon, paprs, pplay, ksta, ksta_ter, ts, rugos, u, v, &
      z1(i) = zgeop(i, 1)
   ENDDO
 
-  CALL clcdrag(klon, knon, nsrf, zxli,  &
-       u1, v1, t1, q1, z1, &
-       ts, qsurf, rugos, &
+  CALL clcdrag(klon, knon, nsrf, zxli, u1, v1, t1, q1, z1, ts, qsurf, rugos, &
        pcfm1, pcfh1) 
-  !IM  $             ts, qsurf, rugos,
 
   DO i = 1, knon
      pcfm(i, 1)=pcfm1(i)

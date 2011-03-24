@@ -13,7 +13,8 @@ module comconst
   REAL dtphys
   real, parameter:: rad = 6371229. ! radius of the Earth (in m)
   real r
-  real, parameter:: cpp = 1004.70885, kappa = 0.2857143
+  real, parameter:: cpp = 1004.70885 ! J K-1 kg-1
+  real, parameter:: kappa = 0.2857143
   REAL cotot, unsim
   real, parameter:: g = 9.8 ! acceleration of gravity (in m s-2)
 
