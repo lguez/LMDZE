@@ -26,7 +26,8 @@ c=======================================================================
 
 
 
-      REAL teta( ip1jmp1,llm ),pbaru( ip1jmp1,llm ),pbarv( ip1jm,llm)
+      REAL, intent(in):: teta( ip1jmp1,llm )
+      real pbaru( ip1jmp1,llm ),pbarv( ip1jm,llm)
       REAL dteta( ip1jmp1,llm )
       INTEGER   l,ij
 

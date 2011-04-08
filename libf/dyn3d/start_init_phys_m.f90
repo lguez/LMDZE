@@ -5,11 +5,9 @@ MODULE start_init_phys_m
 
   IMPLICIT NONE
 
-  REAL, ALLOCATABLE, SAVE:: qsol_2d(:, :)
-
 CONTAINS
 
-  SUBROUTINE start_init_phys(tsol_2d)
+  SUBROUTINE start_init_phys(tsol_2d, qsol_2d)
 
     USE flincom, only: flininfo, flinopen_nozoom, flinclo
     use flinget_m, only: flinget
@@ -18,16 +16,17 @@ CONTAINS
     use gr_int_dyn_m, only: gr_int_dyn
     use comgeom, only: rlonu, rlatv
     use dimens_m, only: iim, jjm
+    use nr_util, only: assert
 
-    REAL, intent(out):: tsol_2d(:, :)
+    REAL, intent(out):: tsol_2d(:, :), qsol_2d(:, :) ! (iim + 1, jjm + 1)
 
     ! Variables local to the procedure:
 
     INTEGER fid_phys, iml_phys, jml_phys
     REAL, ALLOCATABLE, DIMENSION(:, :):: lon_phys, lat_phys
-    REAL:: date, dt
-    REAL, DIMENSION(:), ALLOCATABLE:: levphys_ini
-    !ac
+    REAL date, dt
+    REAL, ALLOCATABLE:: levphys_ini(:)
+
     INTEGER:: itau(1)
     INTEGER::  llm_tmp, ttm_tmp
 
@@ -39,7 +38,12 @@ CONTAINS
     !-----------------------------------
 
     print *, "Call sequence information: start_init_phys"
-    if (any(shape(tsol_2d) /= (/iim + 1, jjm + 1/))) stop "start_init_phys"
+
+    call assert((/size(tsol_2d, 1), size(qsol_2d, 1)/) == iim + 1, &
+         "start_init_phys 1")
+    call assert((/size(tsol_2d, 2), size(qsol_2d, 2)/) == jjm + 1, &
+         "start_init_phys 2")
+
     CALL flininfo('ECPHY.nc', iml_phys, jml_phys, llm_tmp, ttm_tmp, fid_phys)
 
     ALLOCATE(lat_phys(iml_phys, jml_phys))
@@ -58,19 +62,19 @@ CONTAINS
     ALLOCATE(lon_rad(iml_phys))
     ALLOCATE(lon_ini(iml_phys))
 
-    IF ( MAXVAL(lon_phys(:, :)) > 2.0 * ASIN(1.0) ) THEN
-       lon_ini(:) = lon_phys(:, 1) * 2.0 * ASIN(1.0) / 180.0
+    IF ( MAXVAL(lon_phys) > 2.0 * ASIN(1.0) ) THEN
+       lon_ini = lon_phys(:, 1) * 2.0 * ASIN(1.0) / 180.0
     ELSE
-       lon_ini(:) = lon_phys(:, 1) 
+       lon_ini = lon_phys(:, 1) 
     ENDIF
 
     ALLOCATE(lat_rad(jml_phys))
     ALLOCATE(lat_ini(jml_phys))
 
-    IF ( MAXVAL(lat_phys(:, :)) > 2.0 * ASIN(1.0) ) THEN
-       lat_ini(:) = lat_phys(1, :) * 2.0 * ASIN(1.0) / 180.0
+    IF ( MAXVAL(lat_phys) > 2.0 * ASIN(1.0) ) THEN
+       lat_ini = lat_phys(1, :) * 2.0 * ASIN(1.0) / 180.0
     ELSE
-       lat_ini(:) = lat_phys(1, :) 
+       lat_ini = lat_phys(1, :) 
     ENDIF
 
     ! We get the two standard variables
@@ -81,16 +85,15 @@ CONTAINS
     CALL inter_barxy(lon_rad, lat_rad(:jml_phys -1), var_ana, rlonu(:iim), &
          rlatv, tmp_var) 
 
-    tsol_2d(:, :) = gr_int_dyn(tmp_var)
+    tsol_2d = gr_int_dyn(tmp_var)
 
-    ALLOCATE(qsol_2d(iim + 1, jjm + 1))
     ! Soil moisture
     CALL flinget(fid_phys, 'CDSW', iml_phys, jml_phys, &
          llm_tmp, ttm_tmp, 1, 1, var_ana)
     CALL conf_dat2d(lon_ini, lat_ini, lon_rad, lat_rad, var_ana)
     CALL inter_barxy(lon_rad, lat_rad(:jml_phys -1), var_ana, rlonu(:iim), &
             rlatv, tmp_var)
-    qsol_2d(:, :) = gr_int_dyn(tmp_var)
+    qsol_2d = gr_int_dyn(tmp_var)
 
     CALL flinclo(fid_phys)
 

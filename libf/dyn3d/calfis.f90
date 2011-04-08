@@ -80,7 +80,7 @@ contains
     REAL pdteta(iim + 1, jjm + 1, llm)
     REAL pdq(iim + 1, jjm + 1, llm, nqmx)
 
-    REAL pw(iim + 1, jjm + 1, llm)
+    REAL, intent(in):: pw(iim + 1, jjm + 1, llm)
 
     REAL pps(iim + 1, jjm + 1)
     REAL, intent(in):: ppk(iim + 1, jjm + 1, llm)

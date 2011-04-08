@@ -29,7 +29,7 @@ contains
 
     REAL :: tslab(klon), seaice(klon) !IM "slab" ocean
     REAL :: qsurf(klon, nbsrf)
-    REAL :: qsol(klon)
+    REAL, intent(in):: qsol(klon)
     REAL :: snow(klon, nbsrf)
     REAL :: albedo(klon, nbsrf)
 

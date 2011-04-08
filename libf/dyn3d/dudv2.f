@@ -29,7 +29,8 @@ c
 c=======================================================================
 c
 
-      REAL teta( ip1jmp1,llm ),pkf( ip1jmp1,llm ) ,bern( ip1jmp1,llm ),
+      REAL, intent(in):: teta( ip1jmp1,llm )
+      real pkf( ip1jmp1,llm ) ,bern( ip1jmp1,llm ),
      *         du( ip1jmp1,llm ),  dv( ip1jm,llm )
       INTEGER  l,ij
 c

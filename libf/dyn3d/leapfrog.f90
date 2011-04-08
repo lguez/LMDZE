@@ -13,6 +13,7 @@ contains
     use addfi_m, only: addfi
     use bilan_dyn_m, only: bilan_dyn
     use caladvtrac_m, only: caladvtrac
+    use caldyn_m, only: caldyn
     USE calfis_m, ONLY: calfis
     USE com_io_dyn, ONLY: histaveid
     USE comconst, ONLY: daysec, dtphys, dtvr
@@ -25,6 +26,7 @@ contains
     use dynredem1_m, only: dynredem1
     USE exner_hyb_m, ONLY: exner_hyb
     use filtreg_m, only: filtreg
+    use geopot_m, only: geopot
     USE guide_m, ONLY: guide
     use inidissip_m, only: idissip
     use integrd_m, only: integrd
@@ -36,7 +38,10 @@ contains
     ! Variables dynamiques:
     REAL, intent(inout):: ucov(ip1jmp1, llm) ! vent covariant
     REAL, intent(inout):: vcov((iim + 1) * jjm, llm) ! vent covariant
-    REAL, intent(inout):: teta(iim + 1, jjm + 1, llm) ! potential temperature
+
+    REAL, intent(inout):: teta(:, :, :) ! (iim + 1, jjm + 1, llm)
+    ! potential temperature
+
     REAL, intent(inout):: ps(iim + 1, jjm + 1) ! pression au sol, en Pa
     REAL masse(ip1jmp1, llm) ! masse d'air
     REAL phis(ip1jmp1) ! geopotentiel au sol
@@ -87,10 +92,11 @@ contains
 
     ! Variables test conservation energie
     REAL ecin(iim + 1, jjm + 1, llm), ecin0(iim + 1, jjm + 1, llm)
-    ! Tendance de la temp. potentiel d (theta) / d t due a la 
-    ! tansformation d'energie cinetique en energie thermique
-    ! cree par la dissipation
+
     REAL dtetaecdt(iim + 1, jjm + 1, llm)
+    ! tendance de la température potentielle due à la tansformation
+    ! d'énergie cinétique en énergie thermique créée par la dissipation
+
     REAL vcont((iim + 1) * jjm, llm), ucont(ip1jmp1, llm)
     logical leapf
     real dt

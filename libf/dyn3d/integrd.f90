@@ -20,7 +20,8 @@ contains
 
     ! Arguments: 
 
-    REAL vcov(ip1jm, llm), ucov(ip1jmp1, llm), teta(ip1jmp1, llm)
+    REAL vcov(ip1jm, llm), ucov(ip1jmp1, llm)
+    real, intent(inout):: teta(ip1jmp1, llm)
     REAL q(:, :, :, :) ! (iim + 1, jjm + 1, llm, nq)
     REAL, intent(inout):: ps(ip1jmp1)
     REAL masse(ip1jmp1, llm)
@@ -113,8 +114,8 @@ contains
 
        DO ij = 1, ip1jmp1
           hscr(ij) = teta(ij, l)
-          teta(ij, l) = tetam1(ij, l)*massem1(ij, l)/masse(ij, l) + &
-               dt*dteta(ij, l)/masse(ij, l)
+          teta(ij, l) = tetam1(ij, l)*massem1(ij, l)/masse(ij, l) &
+               + dt*dteta(ij, l)/masse(ij, l)
        END DO
 
        ! Calcul de la valeur moyenne, unique aux poles pour teta

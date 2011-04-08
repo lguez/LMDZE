@@ -33,6 +33,7 @@ contains
     use exner_hyb_m, only: exner_hyb
     USE flincom, only: flinclo, flinopen_nozoom, flininfo
     use flinget_m, only: flinget
+    use geopot_m, only: geopot
     use grid_atob, only: grille_m
     use grid_change, only: init_dyn_phy, dyn_phy
     use histcom, only: histclo
@@ -49,7 +50,7 @@ contains
     use regr_pr_o3_m, only: regr_pr_o3
     use serre, only: alphax
     USE start_init_orog_m, only: start_init_orog, mask, phis
-    use start_init_phys_m, only: qsol_2d
+    use start_init_phys_m, only: start_init_phys
     use startdyn, only: start_inter_3d, start_init_dyn
     use temps, only: itau_phy, annee_ref, day_ref
 
@@ -82,7 +83,7 @@ contains
     REAL rugmer(klon)
     real, dimension(iim + 1, jjm + 1):: relief, zstd_2d, zsig_2d, zgam_2d
     real, dimension(iim + 1, jjm + 1):: zthe_2d, zpic_2d, zval_2d
-    real, dimension(iim + 1, jjm + 1):: tsol_2d, psol
+    real, dimension(iim + 1, jjm + 1):: tsol_2d, qsol_2d, psol
     REAL zmea(klon), zstd(klon)
     REAL zsig(klon), zgam(klon)
     REAL zthe(klon)
@@ -141,7 +142,8 @@ contains
     zmasq = pack(mask, dyn_phy)
     PRINT *, 'Masque construit'
 
-    CALL start_init_dyn(tsol_2d, psol) ! also compute "qsol_2d"
+    call start_init_phys(tsol_2d, qsol_2d)
+    CALL start_init_dyn(tsol_2d, psol)
 
     ! Compute pressure on intermediate levels:
     forall(l = 1: llm + 1) p3d(:, :, l) = ap(l) + bp(l) * psol

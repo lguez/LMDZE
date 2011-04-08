@@ -16,10 +16,10 @@ CONTAINS
     use conf_dat2d_m, only: conf_dat2d
     use comgeom, only: rlatu, rlonv
     use dimens_m, only: iim, jjm
-    USE flincom, only: flininfo, flinopen_nozoom, flinclo
-    use flinget_m, only: flinget
     use grid_noro_m, only: grid_noro
     use indicesol, only: epsfra
+    use netcdf, only: nf90_nowrite
+    use netcdf95, only: nf95_open, nf95_gw_var, nf95_inq_varid, nf95_close
     use nr_util, only: pi
 
     REAL, intent(out):: relief(:, :) ! (iim + 1, jjm + 1) orographie moyenne
@@ -47,13 +47,10 @@ CONTAINS
 
     INTEGER iml_rel
     INTEGER jml_rel
-    REAL lev(1), date, dt
-    INTEGER itau(1), fid
-    INTEGER  llm_tmp, ttm_tmp
-    REAL, ALLOCATABLE:: relief_hi(:, :)
+    INTEGER ncid, varid
+    REAL, pointer:: relief_hi(:, :)
     REAL, ALLOCATABLE:: lon_rad(:), lat_rad(:)
-    REAL, ALLOCATABLE:: lon_ini(:), lat_ini(:)
-    REAL, ALLOCATABLE:: lon_rel(:, :), lat_rel(:, :)
+    REAL, pointer:: lon_ini(:), lat_ini(:)
 
     !-----------------------------------
 
@@ -66,42 +63,31 @@ CONTAINS
          size(zgam_2d, 2), size(zthe_2d, 2), size(zpic_2d, 2), &
          size(zval_2d, 2)/) /= jjm + 1)) stop "start_init_orog size 2"
 
-    print *, 'Reading the high resolution orography'
-    CALL flininfo('Relief.nc', iml_rel, jml_rel, llm_tmp, ttm_tmp, fid)
+    print *, 'Reading the high resolution orography...'
 
-    ALLOCATE(lat_rel(iml_rel, jml_rel))
-    ALLOCATE(lon_rel(iml_rel, jml_rel))
-    ALLOCATE(relief_hi(iml_rel, jml_rel))
+    call nf95_open('Relief.nc', nf90_nowrite, ncid)
 
-    CALL flinopen_nozoom(iml_rel, jml_rel, llm_tmp, &
-         lon_rel, lat_rel, lev, ttm_tmp, itau, date, dt, fid)
-    ! 'RELIEF': high resolution orography 
-    CALL flinget(fid, 'RELIEF', iml_rel, jml_rel, llm_tmp, ttm_tmp, 1, 1, &
-         relief_hi)
-    CALL flinclo(fid)
+    call nf95_inq_varid(ncid, "longitude", varid)
+    call nf95_gw_var(ncid, varid, lon_ini)
+    lon_ini = lon_ini * pi / 180. ! convert to rad
+    iml_rel = size(lon_ini)
 
-    ! In case we have a file which is in degrees we do the transformation:
+    call nf95_inq_varid(ncid, "latitude", varid)
+    call nf95_gw_var(ncid, varid, lat_ini)
+    lat_ini = lat_ini * pi / 180. ! convert to rad
+    jml_rel = size(lat_ini)
+
+    call nf95_inq_varid(ncid, "RELIEF", varid)
+    call nf95_gw_var(ncid, varid, relief_hi)
+
+    call nf95_close(ncid)
 
     ALLOCATE(lon_rad(iml_rel))
-    ALLOCATE(lon_ini(iml_rel))
-
-    IF (MAXVAL(lon_rel(:, :)) > pi) THEN
-       lon_ini(:) = lon_rel(:, 1) * pi / 180.
-    ELSE
-       lon_ini(:) = lon_rel(:, 1) 
-    ENDIF
-
     ALLOCATE(lat_rad(jml_rel))
-    ALLOCATE(lat_ini(jml_rel))
-
-    IF (MAXVAL(lat_rel(:, :)) > pi) THEN
-       lat_ini(:) = lat_rel(1, :) * pi / 180.
-    ELSE
-       lat_ini(:) = lat_rel(1, :) 
-    ENDIF
 
     CALL conf_dat2d(lon_ini, lat_ini, lon_rad, lat_rad, relief_hi , &
          interbar=.FALSE.)
+    deallocate(lon_ini, lat_ini) ! pointers
 
     print *, 'Compute all the parameters needed for the gravity wave drag code'
 
@@ -111,6 +97,7 @@ CONTAINS
 
     CALL grid_noro(lon_rad, lat_rad, relief_hi, rlonv, rlatu, phis, relief, &
          zstd_2d, zsig_2d, zgam_2d, zthe_2d, zpic_2d, zval_2d, mask)
+    deallocate(relief_hi) ! pointer
 
     phis(iim + 1, :) = phis(1, :)
     phis(:, :) = phis(:, :) * 9.81

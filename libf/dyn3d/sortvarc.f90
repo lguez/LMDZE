@@ -23,7 +23,8 @@ contains
 
     ! Arguments:
     INTEGER, INTENT (IN) :: itau
-    REAL :: ucov(ip1jmp1, llm), teta(ip1jmp1, llm), masse(ip1jmp1, llm)
+    REAL :: ucov(ip1jmp1, llm), masse(ip1jmp1, llm)
+    real, intent(in):: teta(ip1jmp1, llm)
     REAL :: ps(ip1jmp1), phis(ip1jmp1)
     REAL :: vorpot(ip1jm, llm)
     REAL :: phi(ip1jmp1, llm), bern(ip1jmp1, llm)

@@ -34,8 +34,8 @@ CONTAINS
     use start_init_phys_m, only: start_init_phys
     use nr_util, only: assert, pi
 
-    REAL, intent(out):: tsol_2d(:, :)
-    REAL, intent(out):: psol(:, :) ! surface pressure, in Pa
+    REAL, intent(in):: tsol_2d(:, :) ! (iim + 1, jjm + 1)
+    REAL, intent(out):: psol(:, :) ! (iim + 1, jjm + 1) surface pressure, in Pa
 
     ! Local:
 
@@ -101,7 +101,6 @@ CONTAINS
     CALL inter_barxy(lon_rad, lat_rad(:jml_dyn -1), var_ana, rlonu(:iim), &
          rlatv, tmp_var) 
     psol = gr_int_dyn(tmp_var)
-    CALL start_init_phys(tsol_2d)
 
     psol(:iim, :) = psol(:iim, :) &
          * (1. + (z(:iim, :) - phis(:iim, :)) / 287. / tsol_2d(:iim, :))

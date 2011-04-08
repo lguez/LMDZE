@@ -18,10 +18,12 @@ SUBROUTINE advect(ucov, vcov, teta, w, massebx, masseby, du, dv, dteta, conser)
 
   !   Arguments:                                                          
 
-  REAL vcov(ip1jm, llm), ucov(ip1jmp1, llm), teta(ip1jmp1, llm)
-  REAL massebx(ip1jmp1, llm), masseby(ip1jm, llm), w(ip1jmp1, llm)
+  REAL vcov(ip1jm, llm), ucov(ip1jmp1, llm)
+  real, intent(in):: teta(ip1jmp1, llm)
+  REAL massebx(ip1jmp1, llm), masseby(ip1jm, llm)
+  real, INTENT (IN):: w(ip1jmp1, llm)
   REAL dv(ip1jm, llm), du(ip1jmp1, llm), dteta(ip1jmp1, llm)
-  LOGICAL, INTENT (IN) :: conser
+  LOGICAL, INTENT (IN):: conser
 
   !   Local:                                                              
 

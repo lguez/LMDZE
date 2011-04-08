@@ -1351,20 +1351,6 @@ CONTAINS
 
     ! Traitement neige et humidite du sol
 
-!!$ WRITE(*, *)'test calcul_flux, surface ', nisurf
-    !!PB test
-!!$ if (nisurf == is_oce) then
-!!$ snow = 0.
-!!$ qsol = max_eau_sol
-!!$ else
-!!$ where (precip_snow > 0.) snow = snow + (precip_snow * dtime)
-!!$ where (snow > epsilon(snow)) snow = max(0.0, snow - (evap * dtime))
-!!$! snow = max(0.0, snow + (precip_snow - evap) * dtime)
-!!$ where (precip_rain > 0.) qsol = qsol + (precip_rain - evap) * dtime
-!!$ endif 
-!!$ IF (nisurf /= is_ter) qsol = max_eau_sol
-
-
     ! Initialisation
 
     evap = 0.

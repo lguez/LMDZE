@@ -9,12 +9,12 @@ contains
     ! From dyn3d/q_sat.F, version 1.1.1.1 2004/05/19 12:53:05
 
     ! Author: Z. X. Li (LMD/CNRS).
-    ! Réécriture vectorisée par F. Hourdin.
+    ! Récriture vectorisée par F. Hourdin.
     ! This procedure computes the mass fraction of saturating water
     ! vapor, with the formula of ECMWF.
 
     REAL, intent(in):: temp ! temperature, in K
-    REAL, intent(in):: pres ! total pressure, in hPa
+    REAL, intent(in):: pres ! total pressure, in Pa
 
     ! Variables local to the procedure:
 
