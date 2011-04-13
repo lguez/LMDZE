@@ -71,7 +71,7 @@ contains
 
     ! tendances dynamiques
     REAL dv((iim + 1) * jjm, llm), du(ip1jmp1, llm)
-    REAL dteta(ip1jmp1, llm), dq(ip1jmp1, llm, nqmx), dp(ip1jmp1)
+    REAL dteta(iim + 1, jjm + 1, llm), dq(ip1jmp1, llm, nqmx), dp(ip1jmp1)
 
     ! tendances de la dissipation
     REAL dvdis((iim + 1) * jjm, llm), dudis(ip1jmp1, llm)
@@ -79,7 +79,7 @@ contains
 
     ! tendances physiques
     REAL dvfi((iim + 1) * jjm, llm), dufi(ip1jmp1, llm)
-    REAL dtetafi(ip1jmp1, llm), dqfi(ip1jmp1, llm, nqmx), dpfi(ip1jmp1)
+    REAL dtetafi(iim + 1, jjm + 1, llm), dqfi(ip1jmp1, llm, nqmx), dpfi(ip1jmp1)
 
     ! variables pour le fichier histoire
 
@@ -177,8 +177,8 @@ contains
           IF (time > 1.) time = time - 1.
 
           CALL calfis(rdayvrai, time, ucov, vcov, teta, q, masse, ps, pk, &
-               phis, phi, du, dv, dteta, dq, w, dufi, dvfi, dtetafi, dqfi, &
-               dpfi, lafin=itau+1==itaufin)
+               phis, phi, du, dv, dq, w, dufi, dvfi, dtetafi, dqfi, dpfi, &
+               lafin=itau+1==itaufin)
 
           ! ajout des tendances physiques:
           CALL addfi(nqmx, dtphys, ucov, vcov, teta, q, ps, dufi, dvfi, &

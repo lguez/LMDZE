@@ -11,7 +11,8 @@ SUBROUTINE fluxstokenc(pbaru, pbarv, masse, teta, phi, phis, time_step, itau)
   IMPLICIT NONE
 
   REAL pbaru(ip1jmp1, llm), pbarv(ip1jm, llm)
-  REAL masse(ip1jmp1, llm), teta(ip1jmp1, llm), phi(ip1jmp1, llm)
+  REAL masse(ip1jmp1, llm), phi(ip1jmp1, llm)
+  real, intent(in):: teta(ip1jmp1, llm)
   REAL phis(ip1jmp1)
   REAL, intent(in):: time_step
   INTEGER, INTENT (IN) :: itau

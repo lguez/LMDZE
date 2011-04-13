@@ -114,8 +114,8 @@ contains
 
        DO ij = 1, ip1jmp1
           hscr(ij) = teta(ij, l)
-          teta(ij, l) = tetam1(ij, l)*massem1(ij, l)/masse(ij, l) &
-               + dt*dteta(ij, l)/masse(ij, l)
+          teta(ij, l) = tetam1(ij, l) * massem1(ij, l) / masse(ij, l) &
+               + dt * dteta(ij, l) / masse(ij, l)
        END DO
 
        ! Calcul de la valeur moyenne, unique aux poles pour teta

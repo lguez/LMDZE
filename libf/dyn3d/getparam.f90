@@ -1,22 +1,27 @@
 MODULE getparam
 
-  ! From dyn3d/getparam.F90,v 1.1.1.1 2004/05/19 12:53:07
+  ! From dyn3d/getparam.F90, version 1.1.1.1 2004/05/19 12:53:07
 
    USE getincom
+
    INTERFACE getpar
-     MODULE PROCEDURE ini_getparam,fin_getparam,getparamr,getparami,getparaml
+     MODULE PROCEDURE getparamr, getparami, getparaml
    END INTERFACE
 
+   private getparamr, getparami, getparaml
    INTEGER, PARAMETER :: out_eff=99
 
 CONTAINS
+
   SUBROUTINE ini_getparam(fichier)
     !
     IMPLICIT NONE
     !
     CHARACTER*(*) :: fichier
-    open(out_eff,file=fichier,status='unknown',form='formatted') 
+    open(out_eff, file=fichier, status='unknown', form='formatted') 
   END SUBROUTINE ini_getparam
+
+  !**********************************************************
 
   SUBROUTINE fin_getparam
     !
@@ -26,7 +31,9 @@ CONTAINS
 
   END SUBROUTINE fin_getparam
 
-  SUBROUTINE getparamr(TARGET,def_val,ret_val,comment)
+  !**********************************************************
+
+  SUBROUTINE getparamr(TARGET, def_val, ret_val, comment)
     !
     IMPLICIT NONE
     !
@@ -41,15 +48,17 @@ CONTAINS
     CHARACTER*(*) :: comment
 
     ret_val=def_val
-    call getin(TARGET,ret_val)
+    call getin(TARGET, ret_val)
 
-    write(out_eff,*) '******'
-    write(out_eff,*) comment
-    write(out_eff,*) TARGET,'=',ret_val
+    write(out_eff, *) '******'
+    write(out_eff, *) comment
+    write(out_eff, *) TARGET, '=', ret_val
 
   END SUBROUTINE getparamr
 
-  SUBROUTINE getparami(TARGET,def_val,ret_val,comment)
+  !**********************************************************
+
+  SUBROUTINE getparami(TARGET, def_val, ret_val, comment)
     !
     IMPLICIT NONE
     !
@@ -64,16 +73,18 @@ CONTAINS
     CHARACTER*(*) :: comment
 
     ret_val=def_val
-    call getin(TARGET,ret_val)
+    call getin(TARGET, ret_val)
 
-    write(out_eff,*) '***'
-    write(out_eff,*) '*** ',comment,' ***'
-    write(out_eff,*) comment
-    write(out_eff,*) TARGET,'=',ret_val
+    write(out_eff, *) '***'
+    write(out_eff, *) '*** ', comment, ' ***'
+    write(out_eff, *) comment
+    write(out_eff, *) TARGET, '=', ret_val
 
   END SUBROUTINE getparami
 
-  SUBROUTINE getparaml(TARGET,def_val,ret_val,comment)
+  !**********************************************************
+
+  SUBROUTINE getparaml(TARGET, def_val, ret_val, comment)
     !
     IMPLICIT NONE
     !
@@ -88,13 +99,12 @@ CONTAINS
     CHARACTER*(*) :: comment
 
     ret_val=def_val
-    call getin(TARGET,ret_val)
+    call getin(TARGET, ret_val)
 
-    write(out_eff,*) '***'
-    write(out_eff,*) '*** ',comment,' ***'
-    write(out_eff,*) TARGET,'=',ret_val
+    write(out_eff, *) '***'
+    write(out_eff, *) '*** ', comment, ' ***'
+    write(out_eff, *) TARGET, '=', ret_val
 
   END SUBROUTINE getparaml
-
 
 END MODULE getparam

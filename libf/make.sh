@@ -9,10 +9,10 @@
 
 set -xe
 
-compiler=nag_tools
+compiler=gfortran
 
-dest_dir=~/Bureau/Compil_prod_$compiler
-##dest_dir=/save/workdir_Lionel/LMDZ_work/LMDZE/Compil_prod_$compiler
+##dest_dir=~/Bureau/Compil_prod_$compiler
+dest_dir=/save/workdir_Lionel/LMDZ_work/LMDZE/Compil_prod_$compiler
 
 # (Do not just use the name of the compiler as a directory name, it
 # confuses some compilers.)

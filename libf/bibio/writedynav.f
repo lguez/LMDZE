@@ -51,7 +51,8 @@ C
 
       INTEGER histid, nq
       REAL vcov(ip1jm,llm),ucov(ip1jmp1,llm) 
-      REAL teta(ip1jmp1*llm),phi(ip1jmp1,llm),ppk(ip1jmp1*llm)                  
+      REAL, intent(in):: teta(ip1jmp1*llm)
+      real phi(ip1jmp1,llm),ppk(ip1jmp1*llm)                  
       REAL ps(ip1jmp1),masse(ip1jmp1,llm)                   
       REAL phis(ip1jmp1)                  
       REAL q(ip1jmp1,llm,nq)

@@ -27,7 +27,8 @@ contains
     real, intent(out):: dq(iim + 1, jjm + 1, llm, 2)
     ! (n'est utilisé et dimensionné que pour l'eau vapeur et liquide)
 
-    REAL teta(ip1jmp1, llm), pk(ip1jmp1, llm)
+    REAL, intent(in):: teta(ip1jmp1, llm)
+    real pk(ip1jmp1, llm)
 
     ! Local:
 

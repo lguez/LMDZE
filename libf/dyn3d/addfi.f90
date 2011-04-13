@@ -4,7 +4,7 @@ module addfi_m
 
 contains
 
-  SUBROUTINE addfi(nq, pdt, pucov, pvcov, pteta, pq, pps, pdufi, pdvfi, pdhfi,&
+  SUBROUTINE addfi(nq, pdt, pucov, pvcov, teta, pq, pps, pdufi, pdvfi, pdhfi,&
        pdqfi, pdpfi)
 
     ! From dyn3d/addfi.F,v 1.1.1.1 2004/05/19 12:53:06
@@ -18,7 +18,7 @@ contains
     !      pdt                    time step of integration
     !      pucov(ip1jmp1,llm)     first component of the covariant velocity
     !      pvcov(ip1ip1jm,llm)    second component of the covariant velocity
-    !      pteta(ip1jmp1,llm)     potential temperature
+    !      teta(ip1jmp1,llm)     potential temperature
     !      pts(ip1jmp1,llm)       surface temperature
     !      pdufi(ip1jmp1,llm)     |
     !      pdvfi(ip1jm,llm)       |   respective
@@ -45,10 +45,12 @@ contains
     REAL pdt
 
     REAL pvcov(ip1jm,llm),pucov(ip1jmp1,llm)
-    REAL pteta(ip1jmp1,llm),pq(ip1jmp1,llm,nq),pps(ip1jmp1)
+    REAL, intent(inout):: teta(ip1jmp1,llm)
+    real pq(ip1jmp1,llm,nq),pps(ip1jmp1)
 
     REAL pdvfi(ip1jm,llm),pdufi(ip1jmp1,llm)
-    REAL pdqfi(ip1jmp1,llm,nq),pdhfi(ip1jmp1,llm),pdpfi(ip1jmp1)
+    REAL pdqfi(ip1jmp1,llm,nq), pdpfi(ip1jmp1)
+    real, intent(in):: pdhfi(ip1jmp1,llm)
 
     !    Local variables :
 
@@ -64,21 +66,21 @@ contains
 
     DO k = 1,llm
        DO j = 1,ip1jmp1
-          pteta(j,k)= pteta(j,k) + pdhfi(j,k) * pdt
+          teta(j,k)= teta(j,k) + pdhfi(j,k) * pdt
        ENDDO
     ENDDO
 
     DO  k    = 1, llm
        DO  ij   = 1, iim
-          xpn(ij) = aire(   ij   ) * pteta(  ij    ,k)
-          xps(ij) = aire(ij+ip1jm) * pteta(ij+ip1jm,k)
+          xpn(ij) = aire(   ij   ) * teta(  ij    ,k)
+          xps(ij) = aire(ij+ip1jm) * teta(ij+ip1jm,k)
        ENDDO
        tpn      = SSUM(iim,xpn,1)/ apoln
        tps      = SSUM(iim,xps,1)/ apols
 
        DO ij   = 1, iip1
-          pteta(   ij   ,k)  = tpn
-          pteta(ij+ip1jm,k)  = tps
+          teta(   ij   ,k)  = tpn
+          teta(ij+ip1jm,k)  = tps
        ENDDO
     ENDDO
 

@@ -17,7 +17,7 @@
       use comvert
       use comgeom
       use exner_hyb_m, only: exner_hyb
-      use guide_m
+      use conf_guide_m
 
       implicit none
 

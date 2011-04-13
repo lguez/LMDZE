@@ -20,12 +20,12 @@ contains
     use iniadvtrac_m, only: tname
     use logic, only: fxyhypb, ysinus
     use serre, only: clon, clat, grossismy, grossismx
-    use netcdf95, only: NF95_GET_VAR, nf95_open, nf95_inq_varid, NF95_CLOSE
+    use netcdf95, only: NF95_GET_VAR, nf95_open, nf95_inq_varid, NF95_CLOSE, &
+         NF95_Gw_VAR
     use netcdf, only: NF90_NOWRITE, NF90_NOERR
     use nr_util, only: assert
     use temps, only: day_ref, itau_dyn, annee_ref
 
-    ! Arguments:
     REAL, intent(out):: vcov(: , :), ucov(:, :)
     REAL, intent(out):: teta(:, :, :) ! (iim + 1, jjm + 1, llm)
     REAL, intent(out):: q(:, :, :, :) ! (iim + 1, jjm + 1, llm, nqmx)
@@ -34,10 +34,9 @@ contains
     REAL, intent(out):: phis(:, :) ! (iim + 1, jjm + 1)
     REAL, intent(out):: time_0
 
-    ! Variables 
+    ! Local variables: 
     INTEGER iq
-    INTEGER, PARAMETER:: length = 100
-    REAL tab_cntrl(length) ! tableau des paramètres du run
+    REAL, pointer:: tab_cntrl(:) ! tableau des paramètres du run
     INTEGER ierr, ncid, varid
 
     !-----------------------------------------------------------------------
@@ -59,7 +58,7 @@ contains
     call nf95_open("start.nc", NF90_NOWRITE, ncid)
 
     call nf95_inq_varid(ncid, "controle", varid)
-    call NF95_GET_VAR(ncid, varid, tab_cntrl)
+    call NF95_Gw_VAR(ncid, varid, tab_cntrl)
 
     im = int(tab_cntrl(1))
     jm = int(tab_cntrl(2))
@@ -115,6 +114,8 @@ contains
     day_ini = tab_cntrl(30) + INT(time_0)
     time_0 = time_0 - INT(time_0)
     ! {0 <= time0 < 1}
+
+    deallocate(tab_cntrl) ! pointer
 
     call NF95_INQ_VARID (ncid, "ucov", varid)
     call NF95_GET_VAR(ncid, varid, ucov, count_nc=(/iim + 1, jjm + 1, llm, 1/))

@@ -1,15 +1,20 @@
 module tau2alpha_m
 
+    USE paramet_m, ONLY : iip1, jjp1
+    USE dimens_m, ONLY : jjm
+
     IMPLICIT NONE
 
+    private iip1, jjp1, jjm
+
     REAL lat_min_guide, lat_max_guide
+    REAL dxdys(iip1, jjp1), dxdyu(iip1, jjp1), dxdyv(iip1, jjm)
 
 contains
 
   SUBROUTINE tau2alpha(type, pim, pjm, factt, taumin, taumax, alpha)
 
-    USE dimens_m, ONLY : iim, jjm
-    USE paramet_m, ONLY : iip1, jjp1
+    USE dimens_m, ONLY : iim
     USE nr_util, ONLY : pi
     USE comgeom, ONLY : cu_2d, cv_2d, rlatu, rlatv
     USE serre, ONLY : clat, clon, grossismx, grossismy
@@ -17,7 +22,7 @@ contains
     !   arguments :
     INTEGER type
     INTEGER pim, pjm
-    REAL factt, taumin, taumax
+    REAL, intent(in):: factt, taumin, taumax
     REAL dxdy_, alpha(pim, pjm)
     REAL dxdy_min, dxdy_max
 
@@ -31,10 +36,9 @@ contains
     DATA first/ .TRUE./
 
     REAL zdx(iip1, jjp1), zdy(iip1, jjp1)
-
     REAL zlat
-    REAL dxdys(iip1, jjp1), dxdyu(iip1, jjp1), dxdyv(iip1, jjm)
-    COMMON /comdxdy/dxdys, dxdyu, dxdyv
+
+    !------------------------------------------------------------
 
     IF (first) THEN
        DO j = 2, jjm

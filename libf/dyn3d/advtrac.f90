@@ -23,7 +23,7 @@ contains
     REAL, intent(inout):: q(ip1jmp1, llm, nqmx)
     real masse(ip1jmp1, llm)
     REAL, intent(in):: p(ip1jmp1, llmp1)
-    real teta(ip1jmp1, llm)
+    real, intent(in):: teta(ip1jmp1, llm)
     REAL pk(ip1jmp1, llm)
 
     ! Variables locales

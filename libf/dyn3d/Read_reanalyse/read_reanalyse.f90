@@ -16,7 +16,7 @@
       use paramet_m
       use comvert
       use comgeom
-      use guide_m
+      use conf_guide_m
       use netcdf
 
       IMPLICIT NONE

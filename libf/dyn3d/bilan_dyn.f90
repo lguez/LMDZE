@@ -33,7 +33,7 @@ contains
     real masse(iip1, jjp1, llm), pk(iip1, jjp1, llm)
     real flux_u(iip1, jjp1, llm)
     real flux_v(iip1, jjm, llm)
-    real teta(iip1, jjp1, llm)
+    real, intent(in):: teta(iip1, jjp1, llm)
     real phi(iip1, jjp1, llm)
     real ucov(iip1, jjp1, llm)
     real vcov(iip1, jjm, llm)

@@ -11,8 +11,7 @@ contains
     ! Objet : calcul du géopotentiel aux milieux des couches
     ! L'intégration se fait de bas en haut.
 
-    USE dimens_m
-    USE paramet_m
+    USE dimens_m, ONLY: llm
 
     INTEGER, INTENT (IN):: ngrid
     REAL, INTENT (IN):: teta(ngrid, llm), pks(ngrid)

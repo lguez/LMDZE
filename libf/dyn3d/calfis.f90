@@ -4,9 +4,9 @@ module calfis_m
 
 contains
 
-  SUBROUTINE calfis(rdayvrai, heure, pucov, pvcov, pteta, q, pmasse, pps, &
-       ppk, pphis, pphi, pducov, pdvcov, pdteta, pdq, pw, pdufi, pdvfi, &
-       pdhfi, pdqfi, pdpsfi, lafin)
+  SUBROUTINE calfis(rdayvrai, heure, pucov, pvcov, teta, q, pmasse, pps, &
+       ppk, pphis, pphi, pducov, pdvcov, pdq, pw, pdufi, pdvfi, pdhfi, pdqfi, &
+       pdpsfi, lafin)
 
     ! From dyn3d/calfis.F, version 1.3 2005/05/25 13:10:09
     ! Authors: P. Le Van, F. Hourdin
@@ -33,7 +33,7 @@ contains
     ! Input :
     ! pucov covariant zonal velocity
     ! pvcov covariant meridional velocity 
-    ! pteta potential temperature
+    ! teta potential temperature
     ! pps surface pressure
     ! pmasse masse d'air dans chaque maille
     ! pts surface temperature (K)
@@ -66,7 +66,7 @@ contains
 
     REAL pvcov(iim + 1, jjm, llm)
     REAL pucov(iim + 1, jjm + 1, llm)
-    REAL pteta(iim + 1, jjm + 1, llm)
+    REAL, intent(in):: teta(iim + 1, jjm + 1, llm)
     REAL pmasse(iim + 1, jjm + 1, llm)
 
     REAL, intent(in):: q(iim + 1, jjm + 1, llm, nqmx)
@@ -77,7 +77,6 @@ contains
 
     REAL pdvcov(iim + 1, jjm, llm)
     REAL pducov(iim + 1, jjm + 1, llm)
-    REAL pdteta(iim + 1, jjm + 1, llm)
     REAL pdq(iim + 1, jjm + 1, llm, nqmx)
 
     REAL, intent(in):: pw(iim + 1, jjm + 1, llm)
@@ -87,7 +86,7 @@ contains
 
     REAL pdvfi(iim + 1, jjm, llm)
     REAL pdufi(iim + 1, jjm + 1, llm)
-    REAL pdhfi(iim + 1, jjm + 1, llm)
+    REAL, intent(out):: pdhfi(iim + 1, jjm + 1, llm)
     REAL pdqfi(iim + 1, jjm + 1, llm, nqmx)
     REAL pdpsfi(iim + 1, jjm + 1)
 
@@ -152,7 +151,7 @@ contains
        pksurcp = ppk(:, :, l) / cpp
        pls(:, :, l) = preff * pksurcp**(1./ kappa)
        zplay(:, l) = pack(pls(:, :, l), dyn_phy)
-       ztfi(:, l) = pack(pteta(:, :, l) * pksurcp, dyn_phy)
+       ztfi(:, l) = pack(teta(:, :, l) * pksurcp, dyn_phy)
     ENDDO
 
     ! 43.bis traceurs
@@ -247,7 +246,7 @@ contains
     forall(l= 1: llm) v(:, l) = pack(zvfi(:, :, l), dyn_phy)
 
     !IM calcul PV a teta=350, 380, 405K
-    CALL PVtheta(klon, llm, pucov, pvcov, pteta, ztfi, zplay, zplev, &
+    CALL PVtheta(klon, llm, pucov, pvcov, teta, ztfi, zplay, zplev, &
          ntetaSTD, rtetaSTD, PVteta)
 
     ! Appel de la physique :
