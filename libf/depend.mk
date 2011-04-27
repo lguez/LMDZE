@@ -111,7 +111,9 @@ gwstress.o : YOEGWD.o suphec.o dimphy.o dimens_m.o
 hbtm.o : FCTTRE.o yoethf.o suphec.o dimphy.o dimens_m.o 
 hgardfou.o : suphec.o dimphy.o indicesol.o dimens_m.o 
 histcom.o : calendar.o mathelp.o strlowercase.o find_str.o histcom_var.o errioipsl.o ioipslmpp.o 
-histwrite.o : find_str.o mathelp.o histcom_var.o mathop.o calendar.o errioipsl.o 
+histvar_seq.o : histcom_var.o errioipsl.o find_str.o 
+histwrite.o : histwrite_real.o histvar_seq.o histcom_var.o mathop.o calendar.o errioipsl.o 
+histwrite_real.o : histcom_var.o mathelp.o mathop.o 
 ini_histday.o : comvert.o grid_change.o clesphys.o phyetat0.o histcom.o calendar.o temps.o dimens_m.o 
 ini_histhf.o : ini_histhf3d.o comvert.o phyetat0.o histcom.o calendar.o dimphy.o temps.o dimens_m.o 
 ini_histhf3d.o : comvert.o histcom.o calendar.o phyetat0.o clesphys.o temps.o dimphy.o dimens_m.o 
@@ -239,7 +241,7 @@ vly.o : comgeom.o logic.o comvert.o comconst.o paramet_m.o dimens_m.o
 vlyqs.o : comgeom.o logic.o comvert.o comconst.o paramet_m.o dimens_m.o 
 vlz.o : logic.o comvert.o comconst.o paramet_m.o dimens_m.o 
 wrgrads.o : gradsdef.o 
-writedynav.o : iniadvtrac.o ener.o temps.o serre.o comgeom.o logic.o comvert.o comconst.o paramet_m.o dimens_m.o histcom.o histwrite.o 
+writedynav.o : iniadvtrac.o temps.o comconst.o paramet_m.o dimens_m.o histcom.o histwrite.o 
 yamada.o : dimphy.o dimens_m.o 
 yamada4.o : dimphy.o dimens_m.o 
 yoethf.o : suphec.o 
