@@ -145,7 +145,7 @@ contains
        IF (offline) CALL fluxstokenc(pbaru, pbarv, masse, teta, phi, phis, &
             dtvr, itau)
 
-       ! integrations dynamique et traceurs:
+       ! Integrations dynamique et traceurs:
        CALL integrd(vcovm1, ucovm1, tetam1, psm1, massem1, dv, du, dteta, dp, &
             vcov, ucov, teta, q(:, :, :, :2), ps, masse, finvmaold, dt, leapf)
 

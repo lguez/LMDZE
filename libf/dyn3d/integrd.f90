@@ -8,7 +8,7 @@ contains
        dteta, dp, vcov, ucov, teta, q, ps, masse, finvmaold, dt, leapf)
 
     ! From dyn3d/integrd.F, version 1.1.1.1 2004/05/19 12:53:05
-    ! Auteur: P. Le Van 
+    ! Author: P. Le Van 
     ! Objet: incrémentation des tendances dynamiques
 
     USE comvert, ONLY : ap, bp
@@ -16,34 +16,37 @@ contains
     USE dimens_m, ONLY : iim, jjm, llm
     USE filtreg_m, ONLY : filtreg
     use nr_util, only: assert
-    USE paramet_m, ONLY : iip1, iip2, ijp1llm, ip1jm, ip1jmp1, jjp1, llmp1
+    USE paramet_m, ONLY : iip1, iip2, ip1jm, ip1jmp1, jjp1, llmp1
 
     ! Arguments: 
 
-    REAL vcov(ip1jm, llm), ucov(ip1jmp1, llm)
-    real, intent(inout):: teta(ip1jmp1, llm)
+    REAL vcov(ip1jm, llm), ucov((iim + 1) * (jjm + 1), llm)
+    real, intent(inout):: teta((iim + 1) * (jjm + 1), llm)
     REAL q(:, :, :, :) ! (iim + 1, jjm + 1, llm, nq)
-    REAL, intent(inout):: ps(ip1jmp1)
-    REAL masse(ip1jmp1, llm)
+    REAL, intent(inout):: ps((iim + 1) * (jjm + 1))
+    REAL masse((iim + 1) * (jjm + 1), llm)
 
-    REAL vcovm1(ip1jm, llm), ucovm1(ip1jmp1, llm)
-    REAL tetam1(ip1jmp1, llm), psm1(ip1jmp1), massem1(ip1jmp1, llm)
+    REAL vcovm1(ip1jm, llm), ucovm1((iim + 1) * (jjm + 1), llm)
+    REAL tetam1((iim + 1) * (jjm + 1), llm), psm1((iim + 1) * (jjm + 1))
+    real massem1((iim + 1) * (jjm + 1), llm)
 
-    REAL dv(ip1jm, llm), du(ip1jmp1, llm)
-    REAL dteta(ip1jmp1, llm), dp(ip1jmp1)
-    REAL finvmaold(ip1jmp1, llm)
+    REAL dv(ip1jm, llm), du((iim + 1) * (jjm + 1), llm)
+    REAL dteta((iim + 1) * (jjm + 1), llm), dp((iim + 1) * (jjm + 1))
+    REAL finvmaold((iim + 1) * (jjm + 1), llm)
     LOGICAL, INTENT (IN) :: leapf
     real, intent(in):: dt
 
-    ! Local: 
+    ! Local variables: 
 
     INTEGER nq
-    REAL vscr(ip1jm), uscr(ip1jmp1), hscr(ip1jmp1), pscr(ip1jmp1)
-    REAL massescr(ip1jmp1, llm), finvmasse(ip1jmp1, llm)
-    REAL p(ip1jmp1, llmp1)
+    REAL vscr(ip1jm), uscr((iim + 1) * (jjm + 1)), hscr((iim + 1) * (jjm + 1))
+    real pscr((iim + 1) * (jjm + 1))
+    REAL massescr((iim + 1) * (jjm + 1), llm)
+    real finvmasse((iim + 1) * (jjm + 1), llm)
+    REAL p((iim + 1) * (jjm + 1), llmp1)
     REAL tpn, tps, tppn(iim), tpps(iim)
     REAL qpn, qps, qppn(iim), qpps(iim)
-    REAL deltap(ip1jmp1, llm)
+    REAL deltap((iim + 1) * (jjm + 1), llm)
 
     INTEGER l, ij, iq
 
@@ -64,25 +67,24 @@ contains
        END DO
     END DO
 
-    ! integration de ps
+    massescr = masse
 
-    CALL scopy(ip1jmp1*llm, masse, 1, massescr, 1)
+    ! Integration de ps :
 
-    DO ij = 1, ip1jmp1
-       pscr(ij) = ps(ij)
-       ps(ij) = psm1(ij) + dt*dp(ij)
-    END DO
+    pscr = ps
+    ps = psm1 + dt * dp
 
-    DO ij = 1, ip1jmp1
-       IF (ps(ij)<0.) THEN
-          PRINT *, ' Au point ij = ', ij, ' , pression sol neg. ', ps(ij)
-          STOP 'integrd'
+    DO ij = 1, (iim + 1) * (jjm + 1)
+       IF (ps(ij) < 0.) THEN
+          PRINT *, 'integrd: au point ij = ', ij, &
+               ', negative surface pressure ', ps(ij)
+          STOP 1
        END IF
     END DO
 
     DO ij = 1, iim
        tppn(ij) = aire(ij)*ps(ij)
-       tpps(ij) = aire(ij+ip1jm)*ps(ij+ip1jm)
+       tpps(ij) = aire(ij+ip1jm) * ps(ij+ip1jm)
     END DO
     tpn = ssum(iim, tppn, 1)/apoln
     tps = ssum(iim, tpps, 1)/apols
@@ -96,7 +98,7 @@ contains
     forall (l = 1: llm + 1) p(:, l) = ap(l) + bp(l) * ps
     CALL massdair(p, masse)
 
-    CALL scopy(ijp1llm, masse, 1, finvmasse, 1)
+    finvmasse = masse
     CALL filtreg(finvmasse, jjp1, llm, -2, 2, .TRUE., 1)
 
     ! integration de ucov, vcov, h
@@ -112,7 +114,7 @@ contains
           vcov(ij, l) = vcovm1(ij, l) + dt*dv(ij, l)
        END DO
 
-       DO ij = 1, ip1jmp1
+       DO ij = 1, (iim + 1) * (jjm + 1)
           hscr(ij) = teta(ij, l)
           teta(ij, l) = tetam1(ij, l) * massem1(ij, l) / masse(ij, l) &
                + dt * dteta(ij, l) / masse(ij, l)
@@ -133,14 +135,14 @@ contains
        END DO
 
        IF (leapf) THEN
-          CALL scopy(ip1jmp1, uscr(1), 1, ucovm1(1, l), 1)
+          CALL scopy((iim + 1) * (jjm + 1), uscr(1), 1, ucovm1(1, l), 1)
           CALL scopy(ip1jm, vscr(1), 1, vcovm1(1, l), 1)
-          CALL scopy(ip1jmp1, hscr(1), 1, tetam1(1, l), 1)
+          CALL scopy((iim + 1) * (jjm + 1), hscr(1), 1, tetam1(1, l), 1)
        END IF
     END DO
 
     DO l = 1, llm
-       DO ij = 1, ip1jmp1
+       DO ij = 1, (iim + 1) * (jjm + 1)
           deltap(ij, l) = p(ij, l) - p(ij, l+1)
        END DO
     END DO
@@ -165,13 +167,13 @@ contains
        END DO
     END DO
 
-    CALL scopy(ijp1llm, finvmasse, 1, finvmaold, 1)
+    CALL scopy((iim + 1) * (jjm + 1) * llm, finvmasse, 1, finvmaold, 1)
 
     ! Fin de l'integration de q
 
     IF (leapf) THEN
-       CALL scopy(ip1jmp1, pscr, 1, psm1, 1)
-       CALL scopy(ip1jmp1*llm, massescr, 1, massem1, 1)
+       CALL scopy((iim + 1) * (jjm + 1), pscr, 1, psm1, 1)
+       CALL scopy((iim + 1) * (jjm + 1)*llm, massescr, 1, massem1, 1)
     END IF
 
   END SUBROUTINE integrd

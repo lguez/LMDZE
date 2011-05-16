@@ -30,7 +30,7 @@ contains
     !   Local:
 
     REAL :: p(ip1jmp1, llmp1)
-    REAL :: massebx(ip1jmp1, llm), masseby(ip1jm, llm), psexbarxy(ip1jm)
+    REAL :: massebx(ip1jmp1, llm), masseby(ip1jm, llm)
     REAL :: vorpot(ip1jm, llm)
     REAL :: w(ip1jmp1, llm), ecin(ip1jmp1, llm), convm(ip1jmp1, llm)
     REAL :: bern(ip1jmp1, llm)
@@ -46,7 +46,6 @@ contains
 
     CALL covcont(llm, ucov, vcov, ucont, vcont)
     forall (l = 1: llm + 1) p(:, l) = ap(l) + bp(l) * ps
-    CALL psextbar(ps, psexbarxy)
     CALL massdair(p, masse)
     CALL massbar(masse, massebx, masseby)
     CALL massbarxy(masse, massebxy)

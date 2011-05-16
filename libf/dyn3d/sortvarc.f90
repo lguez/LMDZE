@@ -22,10 +22,10 @@ contains
     use filtreg_m, only: filtreg
 
     ! Arguments:
-    INTEGER, INTENT (IN) :: itau
+    INTEGER, INTENT(IN) :: itau
     REAL :: ucov(ip1jmp1, llm), masse(ip1jmp1, llm)
     real, intent(in):: teta(ip1jmp1, llm)
-    REAL :: ps(ip1jmp1), phis(ip1jmp1)
+    REAL, INTENT(IN):: ps(ip1jmp1), phis(ip1jmp1)
     REAL :: vorpot(ip1jm, llm)
     REAL :: phi(ip1jmp1, llm), bern(ip1jmp1, llm)
     REAL :: dp(ip1jmp1)

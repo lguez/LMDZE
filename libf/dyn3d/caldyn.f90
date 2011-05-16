@@ -11,6 +11,7 @@ contains
     ! Auteur : P. Le Van
     ! Objet : calcul des tendances dynamiques
 
+    use advect_m, only: advect
     USE dimens_m, ONLY : iim, llm
     USE paramet_m, ONLY : iip1, ip1jm, ip1jmp1, jjp1, llmp1
     USE comvert, ONLY : ap, bp
@@ -19,25 +20,26 @@ contains
 
     ! Arguments:
 
-    LOGICAL, INTENT (IN):: conser
-    INTEGER, INTENT (IN):: itau
+    LOGICAL, INTENT(IN):: conser
+    INTEGER, INTENT(IN):: itau
     REAL vcov(ip1jm, llm), ucov(ip1jmp1, llm)
     real, intent(in):: teta(ip1jmp1, llm)
-    REAL ps(ip1jmp1), phis(ip1jmp1)
-    REAL, INTENT (IN):: pk(iip1, jjp1, llm)
+    REAL, INTENT(IN):: ps(ip1jmp1), phis(ip1jmp1)
+    REAL, INTENT(IN):: pk(iip1, jjp1, llm)
     REAL pkf(ip1jmp1, llm)
     REAL vcont(ip1jm, llm), ucont(ip1jmp1, llm)
     REAL phi(ip1jmp1, llm), masse(ip1jmp1, llm)
     REAL dv(ip1jm, llm), du(ip1jmp1, llm)
-    REAL dteta(ip1jmp1, llm), dp(ip1jmp1)
+    REAL dteta(ip1jmp1, llm)
+    real, INTENT(out):: dp(ip1jmp1)
     REAL pbaru(ip1jmp1, llm), pbarv(ip1jm, llm)
     REAL, intent(in):: time_0
-    REAL, INTENT (out):: w(ip1jmp1, llm)
+    REAL, INTENT(out):: w(ip1jmp1, llm)
 
     ! Local:
 
     REAL ang(ip1jmp1, llm), p(ip1jmp1, llmp1)
-    REAL massebx(ip1jmp1, llm), masseby(ip1jm, llm), psexbarxy(ip1jm)
+    REAL massebx(ip1jmp1, llm), masseby(ip1jm, llm)
     REAL vorpot(ip1jm, llm)
     real ecin(ip1jmp1, llm), convm(ip1jmp1, llm)
     REAL bern(ip1jmp1, llm)
@@ -49,18 +51,13 @@ contains
 
     CALL covcont(llm, ucov, vcov, ucont, vcont)
     forall (l = 1: llm + 1) p(:, l) = ap(l) + bp(l) * ps
-    CALL psextbar(ps, psexbarxy)
     CALL massdair(p, masse)
     CALL massbar(masse, massebx, masseby)
     CALL massbarxy(masse, massebxy)
     CALL flumass(massebx, masseby, vcont, ucont, pbaru, pbarv)
     CALL dteta1(teta, pbaru, pbarv, dteta)
     CALL convmas(pbaru, pbarv, convm)
-
-    DO ij = 1, ip1jmp1
-       dp(ij) = convm(ij, 1)/airesurg(ij)
-    END DO
-
+    dp = convm(:, 1) / airesurg
     CALL vitvert(convm, w)
     CALL tourpot(vcov, ucov, massebxy, vorpot)
     CALL dudv1(vorpot, pbaru, pbarv, du, dv)
