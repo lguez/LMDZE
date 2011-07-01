@@ -98,7 +98,7 @@ c
       REAL dragu(nlon),liftu(nlon),phyu(nlon)             
       REAL dragv(nlon),liftv(nlon),phyv(nlon)             
       REAL, intent(in):: p(nlon,nlev+1)
-      real u(nlon,nlev), v(nlon,nlev)
+      real, intent(in):: u(nlon,nlev), v(nlon,nlev)
 c
 c Variables locales:
 c

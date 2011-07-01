@@ -6,8 +6,8 @@ module suphec_m
   REAL RPI
   real, parameter:: RCLUM = 299792458.
   real, parameter:: RHPLA = 6.6260755E-34
-  real, parameter:: RKBOL = 1.380658E-23
-  real, parameter:: RNAVO = 6.0221367E+23
+  real, parameter:: RKBOL = 1.380658E-23 ! Boltzmann constant, in J K-1
+  real, parameter:: RNAVO = 6.0221367E+23 ! Avogadro number, in mol-1
 
   ! A1.1 Astronomical constants
   REAL RSIYEA, RSIDAY, ROMEGA
@@ -16,15 +16,20 @@ module suphec_m
   real, parameter:: REPSM = 0.409093
 
   ! A1.2 Geoide
-  real, parameter:: RG = 9.80665
+  real, parameter:: RG = 9.80665 ! acceleration of gravity, in m s-2
   real, parameter:: RA = 6371229.
 
   ! A1.3 Radiation
   REAL RSIGMA
 
   ! A1.4 Thermodynamic gas phase
-  REAL R, RD, RV, RCPD, RCPV, RCVD, RCVV
-  real, parameter:: RMD = 28.9644
+  REAL, parameter:: R = RNAVO * RKBOL ! ideal gas constant, in J K-1 mol-1
+  real RV, RCPD, RCPV, RCVD, RCVV
+  real, parameter:: RMD = 28.9644 ! molar mass of dry air, in g mol-1
+
+  real, parameter:: RD = 1000. * R / RMD
+  ! specific ideal gas constant for dry air, in J K-1 kg-1
+
   real, parameter:: RMO3 = 47.9942
   real, parameter:: RMV = 18.0153
   REAL RKAPPA, RETV
@@ -96,8 +101,6 @@ contains
 
     ! 5. DEFINE THERMODYNAMIC CONSTANTS, GAS PHASE.
 
-    R = RNAVO * RKBOL
-    RD = 1000. * R / RMD
     RV = 1000.*R/RMV
     RCPD = 3.5*RD
     RCVD = RCPD-RD
@@ -107,7 +110,6 @@ contains
     RETV = RV/RD-1.
     print *, 'Thermodynamic, gas '
     print '('' Perfect gas = '', e13.7)', R
-    print '('' Dry air mass = '', e13.7)', RMD
     print '('' Ozone mass = '', e13.7)', RMO3
     print '('' Vapour mass = '', e13.7)', RMV
     print '('' Dry air constant = '', e13.7)', RD

@@ -30,7 +30,10 @@ SUBROUTINE clcdrag(klon, knon, nsrf, zxli, u, v, t, q, zgeop, ts, qsurf, &
   ! dimension de la grille physique (= nb_pts_latitude X nb_pts_longitude)
 
   INTEGER, intent(in) :: knon, nsrf
-  LOGICAL, intent(in) :: zxli
+
+  ! Fonctions thermodynamiques et fonctions d'instabilite
+  LOGICAL, intent(in) :: zxli ! utiliser un jeu de fonctions simples
+
   REAL, intent(in), dimension(klon) :: u, v, t, q
   REAL, intent(in):: zgeop(klon) ! géopotentiel au 1er niveau du modèle
   REAL, intent(in), dimension(klon) :: ts, qsurf
@@ -50,11 +53,6 @@ SUBROUTINE clcdrag(klon, knon, nsrf, zxli, u, v, t, q, zgeop, ts, qsurf, &
   REAL, dimension(klon) :: zcdn
   REAL, dimension(klon) :: zri
 
-  ! Fonctions thermodynamiques et fonctions d'instabilite
-  REAL :: fsta, fins, x
-  fsta(x) = 1.0 / (1.0+10.0*x*(1+8.0*x))
-  fins(x) = SQRT(1.0-18.0*x)
-
   !--------------------------------------------------------------------
 
   ! Calculer le frottement au sol (Cdrag)
@@ -70,7 +68,7 @@ SUBROUTINE clcdrag(klon, knon, nsrf, zxli, u, v, t, q, zgeop, ts, qsurf, &
      IF (zri(i) .gt. 0.) THEN      
         ! situation stable
         zri(i) = min(20.,zri(i))
-        IF (.NOT.zxli) THEN
+        IF (.NOT. zxli) THEN
            zscf = SQRT(1.+cd*ABS(zri(i)))
            FRIV = AMAX1(1. / (1.+2.*CB*zri(i)/ZSCF), 0.1)
            zcfm1(i) = zcdn(i) * FRIV
@@ -84,7 +82,7 @@ SUBROUTINE clcdrag(klon, knon, nsrf, zxli, u, v, t, q, zgeop, ts, qsurf, &
         ENDIF
      ELSE                          
         ! situation instable
-        IF (.NOT.zxli) THEN
+        IF (.NOT. zxli) THEN
            zucf = 1./(1.+3.0*cb*cc*zcdn(i)*SQRT(ABS(zri(i)) &
                 *(1.0+zgeop(i)/(RG*rugos(i)))))
            zcfm2(i) = zcdn(i)*amax1((1.-2.0*cb*zri(i)*zucf),0.1)
@@ -100,5 +98,23 @@ SUBROUTINE clcdrag(klon, knon, nsrf, zxli, u, v, t, q, zgeop, ts, qsurf, &
              * (1. + zcr**1.25)**(1. / 1.25)
      ENDIF
   END DO
+
+  contains
+
+    ! Fonctions thermodynamiques et fonctions d'instabilite
+
+    function fsta(x)
+      REAL fsta
+      real, intent(in):: x
+      fsta = 1.0 / (1.0+10.0*x*(1+8.0*x))
+    end function fsta
+
+    !*******************************************************
+
+    function fins(x)
+      REAL fins
+      real, intent(in):: x
+      fins = SQRT(1.0-18.0*x)
+    end function fins
 
 END SUBROUTINE clcdrag

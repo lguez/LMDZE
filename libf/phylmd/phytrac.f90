@@ -8,13 +8,12 @@ module phytrac_m
 contains
 
   SUBROUTINE phytrac(rnpb, itap, lmt_pas, julien, gmtime, firstcal, lafin, &
-       nq_phys, pdtphys, u, t_seri, paprs, pplay, pmfu, pmfd, pen_u, &
-       pde_u, pen_d, pde_d, coefh, fm_therm, entr_therm, yu1, yv1, ftsol, &
-       pctsrf, frac_impa, frac_nucl, pphis, pphi, albsol, rh, cldfra, rneb, &
-       diafra, cldliq, pmflxr, pmflxs, prfl, psfl, da, &
-       phi, mp, upwd, dnwd, tr_seri, zmasse)
+       nq_phys, pdtphys, u, t_seri, paprs, pplay, pmfu, pmfd, pen_u, pde_u, &
+       pen_d, pde_d, coefh, fm_therm, entr_therm, yu1, yv1, ftsol, pctsrf, &
+       frac_impa, frac_nucl, pphis, albsol, rh, cldfra, rneb, diafra, cldliq, &
+       pmflxr, pmflxs, prfl, psfl, da, phi, mp, upwd, dnwd, tr_seri, zmasse)
 
-    ! From phylmd/phytrac.F, version 1.15 2006/02/21 08:08:30
+    ! From phylmd/phytrac.F, version 1.15 2006/02/21 08:08:30 (SVN revision 679)
 
     ! Authors: Frédéric Hourdin, Abderrahmane Idelkadi, Marie-Alice
     ! Foujols, Olivia
@@ -23,6 +22,10 @@ contains
     ! L'appel de "phytrac" se fait avec "nqmx-2" donc nous avons bien
     ! les vrais traceurs (en nombre "nbtr", sans la vapeur d'eau ni l'eau
     ! liquide) dans "phytrac".
+
+    ! Modifications pour les traceurs :
+    ! - uniformisation des parametrisations ds phytrac
+    ! - stockage des moyennes des champs necessaires en mode traceur off-line 
 
     use dimens_m, only: llm
     use indicesol, only: nbsrf
@@ -56,7 +59,7 @@ contains
     real, intent(inout):: tr_seri(:, :, :) ! (klon, llm, nbtr)
     ! (mass fractions of tracers, excluding water, at mid-layers)
 
-    real u(klon, llm)
+    real, intent(in):: u(klon, llm)
     real rh(klon, llm)     ! humidite relative
     real cldliq(klon, llm) ! eau liquide nuageuse
     real cldfra(klon, llm) ! fraction nuageuse (tous les nuages)
@@ -73,7 +76,6 @@ contains
     real, intent(in):: pplay(klon, llm)
     ! (pression pour le mileu de chaque couche, en Pa)
 
-    real pphi(klon, llm) ! geopotentiel
     real pphis(klon)
     logical, intent(in):: firstcal ! first call to "calfis"
     logical, intent(in):: lafin ! fin de la physique

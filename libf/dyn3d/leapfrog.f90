@@ -22,6 +22,7 @@ contains
     USE conf_gcm_m, ONLY: day_step, iconser, iperiod, iphysiq, nday, offline, &
          periodav
     USE dimens_m, ONLY: iim, jjm, llm, nqmx
+    use dissip_m, only: dissip
     USE dynetat0_m, ONLY: day_ini
     use dynredem1_m, only: dynredem1
     USE exner_hyb_m, ONLY: exner_hyb
@@ -58,7 +59,7 @@ contains
     REAL pks(ip1jmp1) ! exner au sol
     REAL pk(iim + 1, jjm + 1, llm) ! exner au milieu des couches
     REAL pkf(ip1jmp1, llm) ! exner filt.au milieu des couches
-    REAL phi(ip1jmp1, llm) ! geopotential
+    REAL phi(iim + 1, jjm + 1, llm) ! geopotential
     REAL w(ip1jmp1, llm) ! vitesse verticale
 
     ! variables dynamiques intermediaire pour le transport
@@ -70,7 +71,7 @@ contains
     REAL massem1(ip1jmp1, llm)
 
     ! tendances dynamiques
-    REAL dv((iim + 1) * jjm, llm), du(ip1jmp1, llm)
+    REAL dv((iim + 1) * jjm, llm), dudyn(ip1jmp1, llm)
     REAL dteta(iim + 1, jjm + 1, llm), dq(ip1jmp1, llm, nqmx), dp(ip1jmp1)
 
     ! tendances de la dissipation
@@ -135,8 +136,8 @@ contains
        ! Calcul des tendances dynamiques:
        CALL geopot(ip1jmp1, teta, pk, pks, phis, phi)
        CALL caldyn(itau, ucov, vcov, teta, ps, masse, pk, pkf, phis, phi, &
-            MOD(itau, iconser) == 0, du, dv, dteta, dp, w, pbaru, pbarv, &
-            time_0)
+            dudyn, dv, dteta, dp, w, pbaru, pbarv, time_0, &
+            conser=MOD(itau, iconser)==0)
 
        ! Calcul des tendances advection des traceurs (dont l'humidité)
        CALL caladvtrac(q, pbaru, pbarv, p3d, masse, dq, teta, pk)
@@ -146,8 +147,9 @@ contains
             dtvr, itau)
 
        ! Integrations dynamique et traceurs:
-       CALL integrd(vcovm1, ucovm1, tetam1, psm1, massem1, dv, du, dteta, dp, &
-            vcov, ucov, teta, q(:, :, :, :2), ps, masse, finvmaold, dt, leapf)
+       CALL integrd(vcovm1, ucovm1, tetam1, psm1, massem1, dv, dudyn, dteta, &
+            dp, vcov, ucov, teta, q(:, :, :, :2), ps, masse, finvmaold, dt, &
+            leapf)
 
        if (.not. leapf) then
           ! Matsuno backward
@@ -157,12 +159,13 @@ contains
           ! Calcul des tendances dynamiques:
           CALL geopot(ip1jmp1, teta, pk, pks, phis, phi)
           CALL caldyn(itau + 1, ucov, vcov, teta, ps, masse, pk, pkf, phis, &
-               phi, .false., du, dv, dteta, dp, w, pbaru, pbarv, time_0)
+               phi, dudyn, dv, dteta, dp, w, pbaru, pbarv, time_0, &
+               conser=.false.)
 
           ! integrations dynamique et traceurs:
-          CALL integrd(vcovm1, ucovm1, tetam1, psm1, massem1, dv, du, dteta, &
-               dp, vcov, ucov, teta, q(:, :, :, :2), ps, masse, finvmaold, &
-               dtvr, leapf=.false.)
+          CALL integrd(vcovm1, ucovm1, tetam1, psm1, massem1, dv, dudyn, &
+               dteta, dp, vcov, ucov, teta, q(:, :, :, :2), ps, masse, &
+               finvmaold, dtvr, leapf=.false.)
        end if
 
        IF (MOD(itau + 1, iphysiq) == 0 .AND. iflag_phys /= 0) THEN
@@ -177,7 +180,7 @@ contains
           IF (time > 1.) time = time - 1.
 
           CALL calfis(rdayvrai, time, ucov, vcov, teta, q, masse, ps, pk, &
-               phis, phi, du, dv, dq, w, dufi, dvfi, dtetafi, dqfi, dpfi, &
+               phis, phi, dudyn, dv, dq, w, dufi, dvfi, dtetafi, dqfi, dpfi, &
                lafin=itau+1==itaufin)
 
           ! ajout des tendances physiques:
@@ -237,9 +240,8 @@ contains
     ! Calcul des tendances dynamiques:
     CALL geopot(ip1jmp1, teta, pk, pks, phis, phi)
     CALL caldyn(itaufin, ucov, vcov, teta, ps, masse, pk, pkf, phis, phi, &
-         MOD(itaufin, iconser) == 0, du, dv, dteta, dp, w, pbaru, pbarv, &
-         time_0)
-
+         dudyn, dv, dteta, dp, w, pbaru, pbarv, time_0, &
+         conser=MOD(itaufin, iconser)==0)
   END SUBROUTINE leapfrog
 
 end module leapfrog_m

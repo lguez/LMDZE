@@ -9,9 +9,10 @@ netcdf_lib_dir = /user/guez_local/lib
 numer_rec_dir = /user/guez_local/lib/Numer_Rec_Lionel_b
 nr_util_dir = /user/guez_local/lib/NR_util_j
 netcdf95_dir = /user/guez_local/lib/NetCDF95_gfortran
+l_util_dir = /user/guez_local/lib/L_util
 
 # Include flags:
-inc_flags = $(addprefix -I, ${libf_dir} ${libf_dir}/phylmd ${netcdf_inc_dir} ${numer_rec_dir} ${netcdf95_dir} ${nr_util_dir})
+inc_flags = $(addprefix -I, ${libf_dir} ${libf_dir}/phylmd ${netcdf_inc_dir} ${numer_rec_dir} ${netcdf95_dir} ${nr_util_dir} ${l_util_dir})
 
 # Other flags which do not affect run time performance:
 lang_flags = -ffree-form -frange-check -std=f95 -pedantic-errors -Wall -Wunderflow -Wextra
@@ -22,4 +23,4 @@ perf_flags = -fbacktrace -ffpe-trap=invalid,zero,overflow -fbounds-check -g3 -O0
 FFLAGS = ${inc_flags} ${perf_flags}
 F90FLAGS = ${inc_flags} ${lang_flags} ${perf_flags}
 
-LDLIBS = $(addprefix -L, ${netcdf_lib_dir} ${numer_rec_dir} ${netcdf95_dir} ${nr_util_dir}) -lnetcdf95 -lnetcdff -lnetcdf -lhdf5_hl -lhdf5 -lnumer_rec -lnr_util
+LDLIBS = $(addprefix -L, ${netcdf_lib_dir} ${numer_rec_dir} ${netcdf95_dir} ${nr_util_dir} ${l_util_dir}) -ll_util -lnetcdf95 -lnetcdff -lnetcdf -lhdf5_hl -lhdf5 -lnumer_rec -lnr_util

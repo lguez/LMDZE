@@ -9,7 +9,7 @@ module ener
   private llm
 
   REAL ang0, etot0, ptot0, ztot0, stot0, ang, etot, ptot, ztot, stot, rmsdpdt
-  real rmsv, gtot(llm - 1)
+  real rmsv
 
   save
 

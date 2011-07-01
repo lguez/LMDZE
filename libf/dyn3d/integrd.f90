@@ -4,7 +4,7 @@ module integrd_m
 
 contains
 
-  SUBROUTINE integrd(vcovm1, ucovm1, tetam1, psm1, massem1, dv, du, &
+  SUBROUTINE integrd(vcovm1, ucovm1, tetam1, psm1, massem1, dv, dudyn, &
        dteta, dp, vcov, ucov, teta, q, ps, masse, finvmaold, dt, leapf)
 
     ! From dyn3d/integrd.F, version 1.1.1.1 2004/05/19 12:53:05
@@ -30,7 +30,7 @@ contains
     REAL tetam1((iim + 1) * (jjm + 1), llm), psm1((iim + 1) * (jjm + 1))
     real massem1((iim + 1) * (jjm + 1), llm)
 
-    REAL dv(ip1jm, llm), du((iim + 1) * (jjm + 1), llm)
+    REAL dv(ip1jm, llm), dudyn((iim + 1) * (jjm + 1), llm)
     REAL dteta((iim + 1) * (jjm + 1), llm), dp((iim + 1) * (jjm + 1))
     REAL finvmaold((iim + 1) * (jjm + 1), llm)
     LOGICAL, INTENT (IN) :: leapf
@@ -106,7 +106,7 @@ contains
     DO l = 1, llm
        DO ij = iip2, ip1jm
           uscr(ij) = ucov(ij, l)
-          ucov(ij, l) = ucovm1(ij, l) + dt*du(ij, l)
+          ucov(ij, l) = ucovm1(ij, l) + dt*dudyn(ij, l)
        END DO
 
        DO ij = 1, ip1jm

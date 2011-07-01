@@ -73,6 +73,7 @@ c
 
       SUBROUTINE cv_prelim(len,nd,ndp1,t,q,p,ph
      :                    ,lv,cpn,tv,gz,h,hm)
+            use cvthermo
       implicit none
 
 !=====================================================================
@@ -91,7 +92,6 @@ c local variables:
       integer k, i
       real cpx(len,nd)
 
-      include "cvthermo.h"
       include "cvparam.h"
 
 
@@ -256,9 +256,9 @@ c
 
       SUBROUTINE cv_undilute1(len,nd,t,q,qs,gz,p,nk,icb,icbmax
      :                       ,tp,tvp,clw)
+            use cvthermo
       implicit none
 
-      include "cvthermo.h"
       include "cvparam.h"
 
 c inputs:
@@ -487,6 +487,7 @@ c local variables:
      :                       ,tnk,qnk,gznk,t,q,qs,gz
      :                       ,p,dph,h,tv,lv
      o                       ,inb,inb1,tp,tvp,clw,hp,ep,sigp,frac)
+            use cvthermo
       implicit none
 
 C---------------------------------------------------------------------
@@ -499,7 +500,6 @@ C     &
 C     FIND THE LEVEL OF NEUTRAL BUOYANCY
 C---------------------------------------------------------------------
 
-      include "cvthermo.h"
       include "cvparam.h"
 
 c inputs:
@@ -770,6 +770,7 @@ c
       SUBROUTINE cv_closure(nloc,ncum,nd,nk,icb
      :                     ,tv,tvp,p,ph,dph,plcl,cpn
      :                     ,iflag,cbmf)
+            use cvthermo
       implicit none
 
 c inputs:
@@ -788,7 +789,6 @@ c local variables:
       real dtpbl(nloc), dtmin(nloc), tvpplcl(nloc), tvaplcl(nloc)
       real work(nloc)
 
-      include "cvthermo.h"
       include "cvparam.h"
 
 c-------------------------------------------------------------------
@@ -856,9 +856,9 @@ c
      :                    ,ph,t,q,qs,u,v,h,lv,qnk
      :                    ,hp,tv,tvp,ep,clw,cbmf
      :                    ,m,ment,qent,uent,vent,nent,sij,elij)
+            use cvthermo
       implicit none
 
-      include "cvthermo.h"
       include "cvparam.h"
 
 c inputs:
@@ -1115,10 +1115,10 @@ c
       SUBROUTINE cv_unsat(nloc,ncum,nd,inb,t,q,qs,gz,u,v,p,ph
      :                  ,h,lv,ep,sigp,clw,m,ment,elij
      :                  ,iflag,mp,qp,up,vp,wt,water,evap)
+            use cvthermo
       implicit none
 
 
-      include "cvthermo.h"
       include "cvparam.h"
 
 c inputs:
@@ -1320,9 +1320,9 @@ c
      :             ,tv,tvp
      o             ,iflag,wd,qprime,tprime
      o             ,precip,cbmf,ft,fq,fu,fv,Ma,qcondc)
+            use cvthermo
       implicit none
 
-      include "cvthermo.h"
       include "cvparam.h"
 
 c inputs

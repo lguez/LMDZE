@@ -92,29 +92,32 @@ contains
     ! pblh------- HCL
     ! pblT------- T au nveau HCL
 
-    USE histcom, ONLY : histbeg_totreg, histdef, histend, histsync
-    use histwrite_m, only: histwrite
     use calendar, ONLY : ymds2ju
+    use coefkz_m, only: coefkz
+    use coefkzmin_m, only: coefkzmin
+    USE conf_phys_m, ONLY : iflag_pbl
     USE dimens_m, ONLY : iim, jjm
-    USE indicesol, ONLY : epsfra, is_lic, is_oce, is_sic, is_ter, nbsrf
     USE dimphy, ONLY : klev, klon, zmasq
     USE dimsoil, ONLY : nsoilmx
-    USE temps, ONLY : annee_ref, itau_phy
     USE dynetat0_m, ONLY : day_ini
-    USE iniprint, ONLY : prt_level
-    USE suphec_m, ONLY : rd, rg, rkappa
-    USE conf_phys_m, ONLY : iflag_pbl
     USE gath_cpl, ONLY : gath2cpl
     use hbtm_m, only: hbtm
+    USE histcom, ONLY : histbeg_totreg, histdef, histend, histsync
+    use histwrite_m, only: histwrite
+    USE indicesol, ONLY : epsfra, is_lic, is_oce, is_sic, is_ter, nbsrf
+    USE iniprint, ONLY : prt_level
+    USE suphec_m, ONLY : rd, rg, rkappa
+    USE temps, ONLY : annee_ref, itau_phy
+    use yamada4_m, only: yamada4
 
     REAL, INTENT (IN) :: dtime
     REAL date0
     INTEGER, INTENT (IN) :: itap
     REAL t(klon, klev), q(klon, klev)
-    REAL u(klon, klev), v(klon, klev)
-    REAL, INTENT (IN) :: paprs(klon, klev+1)
-    REAL, INTENT (IN) :: pplay(klon, klev)
-    REAL, INTENT (IN) :: rlon(klon), rlat(klon)
+    REAL, INTENT (IN):: u(klon, klev), v(klon, klev)
+    REAL, INTENT (IN):: paprs(klon, klev+1)
+    REAL, INTENT (IN):: pplay(klon, klev)
+    REAL, INTENT (IN):: rlon(klon), rlat(klon)
     REAL cufi(klon), cvfi(klon)
     REAL d_t(klon, klev), d_q(klon, klev)
     REAL d_u(klon, klev), d_v(klon, klev)
@@ -179,7 +182,7 @@ contains
     REAL ytsoil(klon, nsoilmx)
     REAL qsol(klon)
 
-    EXTERNAL clqh, clvent, coefkz, calbeta, cltrac
+    EXTERNAL clqh, clvent, calbeta, cltrac
 
     REAL yts(klon), yrugos(klon), ypct(klon), yz0_new(klon)
     REAL yalb(klon)
@@ -208,13 +211,11 @@ contains
     PARAMETER (ok_nonloc=.FALSE.)
     REAL ycoefm0(klon, klev), ycoefh0(klon, klev)
 
-    !IM 081204 hcl_Anne ? BEG
     REAL yzlay(klon, klev), yzlev(klon, klev+1), yteta(klon, klev)
     REAL ykmm(klon, klev+1), ykmn(klon, klev+1)
     REAL ykmq(klon, klev+1)
     REAL yq2(klon, klev+1), q2(klon, klev+1, nbsrf)
     REAL q2diag(klon, klev+1)
-    !IM 081204 hcl_Anne ? END
 
     REAL u1lay(klon), v1lay(klon)
     REAL delp(klon, klev)
@@ -436,7 +437,7 @@ contains
           CALL histwrite(nidbg, cl_surf(nsrf), itap, debugtab)
        END IF
 
-       IF (knon==0) CYCLE
+       IF (knon == 0) CYCLE
 
        DO j = 1, knon
           i = ni(j)
@@ -468,8 +469,8 @@ contains
           ywindsp(j) = sqrt(yu10mx(j)*yu10mx(j)+yu10my(j)*yu10my(j))
        END DO
 
-       !     IF bucket model for continent, copy soil water content
-       IF (nsrf==is_ter .AND. .NOT. ok_veget) THEN
+       ! IF bucket model for continent, copy soil water content
+       IF (nsrf == is_ter .AND. .NOT. ok_veget) THEN
           DO j = 1, knon
              i = ni(j)
              yqsol(j) = qsol(i)
@@ -500,10 +501,7 @@ contains
        ! calculer Cdrag et les coefficients d'echange
        CALL coefkz(nsrf, knon, ypaprs, ypplay, ksta, ksta_ter, yts,&
             yrugos, yu, yv, yt, yq, yqsurf, ycoefm, ycoefh)
-       !IM 081204 BEG
-       !CR test
-       IF (iflag_pbl==1) THEN
-          !IM 081204 END
+       IF (iflag_pbl == 1) THEN
           CALL coefkz2(nsrf, knon, ypaprs, ypplay, yt, ycoefm0, ycoefh0)
           DO k = 1, klev
              DO i = 1, knon
@@ -513,36 +511,28 @@ contains
           END DO
        END IF
 
-       !IM cf JLD : on seuille ycoefm et ycoefh
-       IF (nsrf==is_oce) THEN
+       ! on seuille ycoefm et ycoefh
+       IF (nsrf == is_oce) THEN
           DO j = 1, knon
-             !           ycoefm(j, 1)=min(ycoefm(j, 1), 1.1E-3)
              ycoefm(j, 1) = min(ycoefm(j, 1), cdmmax)
-             !           ycoefh(j, 1)=min(ycoefh(j, 1), 1.1E-3)
              ycoefh(j, 1) = min(ycoefh(j, 1), cdhmax)
           END DO
        END IF
 
-       !IM: 261103
        IF (ok_kzmin) THEN
-          !IM cf FH: 201103 BEG
-          !   Calcul d'une diffusion minimale pour les conditions tres stables.
-          CALL coefkzmin(knon, ypaprs, ypplay, yu, yv, yt, yq, ycoefm, &
+          ! Calcul d'une diffusion minimale pour les conditions tres stables
+          CALL coefkzmin(knon, ypaprs, ypplay, yu, yv, yt, yq, ycoefm(:, 1), &
                ycoefm0, ycoefh0)
 
-          IF (1==1) THEN
-             DO k = 1, klev
-                DO i = 1, knon
-                   ycoefm(i, k) = max(ycoefm(i, k), ycoefm0(i, k))
-                   ycoefh(i, k) = max(ycoefh(i, k), ycoefh0(i, k))
-                END DO
+          DO k = 1, klev
+             DO i = 1, knon
+                ycoefm(i, k) = max(ycoefm(i, k), ycoefm0(i, k))
+                ycoefh(i, k) = max(ycoefh(i, k), ycoefh0(i, k))
              END DO
-          END IF
-          !IM cf FH: 201103 END
-          !IM: 261103
-       END IF !ok_kzmin
+          END DO
+       END IF
 
-       IF (iflag_pbl>=3) THEN
+       IF (iflag_pbl >= 3) THEN
           ! MELLOR ET YAMADA adapté à Mars, Richard Fournier et Frédéric Hourdin
           yzlay(1:knon, 1) = rd*yt(1:knon, 1)/(0.5*(ypaprs(1:knon, &
                1)+ypplay(1:knon, 1)))*(ypaprs(1:knon, 1)-ypplay(1:knon, 1))/rg
@@ -568,30 +558,23 @@ contains
              END DO
           END DO
 
-          !   Bug introduit volontairement pour converger avec les resultats
-          !  du papier sur les thermiques.
-          IF (1==1) THEN
-             y_cd_m(1:knon) = ycoefm(1:knon, 1)
-             y_cd_h(1:knon) = ycoefh(1:knon, 1)
-          ELSE
-             y_cd_h(1:knon) = ycoefm(1:knon, 1)
-             y_cd_m(1:knon) = ycoefh(1:knon, 1)
-          END IF
+          y_cd_m(1:knon) = ycoefm(1:knon, 1)
+          y_cd_h(1:knon) = ycoefh(1:knon, 1)
           CALL ustarhb(knon, yu, yv, y_cd_m, yustar)
 
           IF (prt_level>9) THEN
              PRINT *, 'USTAR = ', yustar
           END IF
 
-          !   iflag_pbl peut etre utilise comme longuer de melange
+          ! iflag_pbl peut être utilisé comme longueur de mélange
 
-          IF (iflag_pbl>=11) THEN
+          IF (iflag_pbl >= 11) THEN
              CALL vdif_kcay(knon, dtime, rg, rd, ypaprs, yt, yzlev, yzlay, &
                   yu, yv, yteta, y_cd_m, yq2, q2diag, ykmm, ykmn, yustar, &
                   iflag_pbl)
           ELSE
-             CALL yamada4(knon, dtime, rg, rd, ypaprs, yt, yzlev, yzlay, yu, &
-                  yv, yteta, y_cd_m, yq2, ykmm, ykmn, ykmq, yustar, iflag_pbl)
+             CALL yamada4(knon, dtime, rg, yzlev, yzlay, yu, yv, yteta, &
+                  y_cd_m, yq2, ykmm, ykmn, ykmq, yustar, iflag_pbl)
           END IF
 
           ycoefm(1:knon, 1) = y_cd_m(1:knon)
@@ -624,7 +607,7 @@ contains
 
        ! calculer la longueur de rugosite sur ocean
        yrugm = 0.
-       IF (nsrf==is_oce) THEN
+       IF (nsrf == is_oce) THEN
           DO j = 1, knon
              yrugm(j) = 0.018*ycoefm(j, 1)*(yu1(j)**2+yv1(j)**2)/rg + &
                   0.11*14E-6/sqrt(ycoefm(j, 1)*(yu1(j)**2+yv1(j)**2))
@@ -645,17 +628,12 @@ contains
              ycoefm(j, k) = ycoefm(j, k)*ypct(j)
              y_d_t(j, k) = y_d_t(j, k)*ypct(j)
              y_d_q(j, k) = y_d_q(j, k)*ypct(j)
-             !§§§ PB
              flux_t(i, k, nsrf) = y_flux_t(j, k)
              flux_q(i, k, nsrf) = y_flux_q(j, k)
              flux_u(i, k, nsrf) = y_flux_u(j, k)
              flux_v(i, k, nsrf) = y_flux_v(j, k)
-             !$$$ PB        y_flux_t(j, k) = y_flux_t(j, k) * ypct(j)
-             !$$$ PB        y_flux_q(j, k) = y_flux_q(j, k) * ypct(j)
              y_d_u(j, k) = y_d_u(j, k)*ypct(j)
              y_d_v(j, k) = y_d_v(j, k)*ypct(j)
-             !$$$ PB        y_flux_u(j, k) = y_flux_u(j, k) * ypct(j)
-             !$$$ PB        y_flux_v(j, k) = y_flux_v(j, k) * ypct(j)
           END DO
        END DO
 
@@ -676,12 +654,10 @@ contains
           qsurf(i, nsrf) = yqsurf(j)
           rugos(i, nsrf) = yz0_new(j)
           fluxlat(i, nsrf) = yfluxlat(j)
-          !$$$ pb         rugmer(i) = yrugm(j)
-          IF (nsrf==is_oce) THEN
+          IF (nsrf == is_oce) THEN
              rugmer(i) = yrugm(j)
              rugos(i, nsrf) = yrugm(j)
           END IF
-          !IM cf JLD ??
           agesno(i, nsrf) = yagesno(j)
           fqcalving(i, nsrf) = y_fqcalving(j)
           ffonte(i, nsrf) = y_ffonte(j)
@@ -692,13 +668,13 @@ contains
           zu1(i) = zu1(i) + yu1(j)
           zv1(i) = zv1(i) + yv1(j)
        END DO
-       IF (nsrf==is_ter) THEN
+       IF (nsrf == is_ter) THEN
           DO j = 1, knon
              i = ni(j)
              qsol(i) = yqsol(j)
           END DO
        END IF
-       IF (nsrf==is_lic) THEN
+       IF (nsrf == is_lic) THEN
           DO j = 1, knon
              i = ni(j)
              run_off_lic_0(i) = y_run_off_lic_0(j)
@@ -718,12 +694,8 @@ contains
           DO k = 1, klev
              d_t(i, k) = d_t(i, k) + y_d_t(j, k)
              d_q(i, k) = d_q(i, k) + y_d_q(j, k)
-             !$$$ PB        flux_t(i, k) = flux_t(i, k) + y_flux_t(j, k)
-             !$$$         flux_q(i, k) = flux_q(i, k) + y_flux_q(j, k)
              d_u(i, k) = d_u(i, k) + y_d_u(j, k)
              d_v(i, k) = d_v(i, k) + y_d_v(j, k)
-             !$$$  PB       flux_u(i, k) = flux_u(i, k) + y_flux_u(j, k)
-             !$$$         flux_v(i, k) = flux_v(i, k) + y_flux_v(j, k)
              zcoefh(i, k) = zcoefh(i, k) + ycoefh(j, k)
           END DO
        END DO
@@ -740,7 +712,7 @@ contains
                1)))*(ypaprs(j, 1)-ypplay(j, 1))
           tairsol(j) = yts(j) + y_d_ts(j)
           rugo1(j) = yrugos(j)
-          IF (nsrf==is_oce) THEN
+          IF (nsrf == is_oce) THEN
              rugo1(j) = rugos(i, nsrf)
           END IF
           psfce(j) = ypaprs(j, 1)
@@ -752,7 +724,6 @@ contains
        CALL stdlevvar(klon, knon, nsrf, zxli, uzon, vmer, tair1, qair1, zgeo1, &
             tairsol, qairsol, rugo1, psfce, patm, yt2m, yq2m, yt10m, yq10m, &
             yu10m, yustar)
-       !IM 081204 END
 
        DO j = 1, knon
           i = ni(j)
@@ -794,7 +765,7 @@ contains
           END DO
        END DO
        !IM "slab" ocean
-       IF (nsrf==is_oce) THEN
+       IF (nsrf == is_oce) THEN
           DO j = 1, knon
              ! on projette sur la grille globale
              i = ni(j)
@@ -806,11 +777,10 @@ contains
           END DO
        END IF
 
-       IF (nsrf==is_sic) THEN
+       IF (nsrf == is_sic) THEN
           DO j = 1, knon
              i = ni(j)
              ! On pondère lorsque l'on fait le bilan au sol :
-             ! flux_g(i) = y_flux_g(j)*ypct(j)
              IF (pctsrf_new(i, is_sic)>epsfra) THEN
                 flux_g(i) = y_flux_g(j)
              ELSE
@@ -819,19 +789,15 @@ contains
           END DO
 
        END IF
-       !nsrf.EQ.is_sic                                            
-       IF (ocean=='slab  ') THEN
-          IF (nsrf==is_oce) THEN
+       IF (ocean == 'slab  ') THEN
+          IF (nsrf == is_oce) THEN
              tslab(1:klon) = ytslab(1:klon)
              seaice(1:klon) = y_seaice(1:klon)
-             !nsrf                                                      
           END IF
-          !OCEAN                                                      
        END IF
     END DO
 
     ! On utilise les nouvelles surfaces
-    ! A rajouter: conservation de l'albedo
 
     rugos(:, is_oce) = rugmer
     pctsrf = pctsrf_new

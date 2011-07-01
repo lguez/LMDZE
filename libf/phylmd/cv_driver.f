@@ -631,9 +631,9 @@ c
 
 !==================================================================
       SUBROUTINE cv_flag
+            use cvflag
       implicit none
 
-      include "cvflag.h"
 
 c -- si .TRUE., on rend la gravite plus explicite et eventuellement
 c differente de 10.0 dans convect3: 
@@ -645,13 +645,13 @@ c differente de 10.0 dans convect3:
 !==================================================================
       SUBROUTINE cv_thermo(iflag_con)
       use SUPHEC_M 
+            use cvthermo 
 	  implicit none
 
 c-------------------------------------------------------------
 c Set thermodynamical constants for convectL
 c-------------------------------------------------------------
 
-      include "cvthermo.h" 
 
       integer, intent(in):: iflag_con
 

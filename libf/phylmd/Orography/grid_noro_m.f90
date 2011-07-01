@@ -4,8 +4,6 @@ module grid_noro_m
 
   implicit none
 
-  private mva9
-
 contains
 
   SUBROUTINE grid_noro(xdata, ydata, zdata, x, y, zphi, zmea, zstd, zsig, &
@@ -42,6 +40,7 @@ contains
 
     use dimens_m, only: iim, jjm
     use nr_util, only: assert, pi
+    use mva9_m, only: mva9
 
     REAL, intent(in):: xdata(:), ydata(:) ! coordinates of input field
     REAL, intent(in):: zdata(:, :) ! input field
@@ -273,13 +272,13 @@ contains
 
     !  FIRST FILTER, MOVING AVERAGE OVER 9 POINTS.
 
-    CALL MVA9(zmea, iim+1, jjm+1)
-    CALL MVA9(zstd, iim+1, jjm+1)
-    CALL MVA9(zpic, iim+1, jjm+1)
-    CALL MVA9(zval, iim+1, jjm+1)
-    CALL MVA9(zxtzx, iim+1, jjm+1)
-    CALL MVA9(zxtzy, iim+1, jjm+1) 
-    CALL MVA9(zytzy, iim+1, jjm+1)
+    CALL MVA9(zmea)
+    CALL MVA9(zstd)
+    CALL MVA9(zpic)
+    CALL MVA9(zval)
+    CALL MVA9(zxtzx)
+    CALL MVA9(zxtzy) 
+    CALL MVA9(zytzy)
 
     ! Masque prenant en compte maximum de terre
     ! On seuil a 10% de terre de terre car en dessous les parametres
@@ -394,77 +393,5 @@ contains
     zthe(:, jjm + 1)=0.
 
   END SUBROUTINE grid_noro
-
-  !******************************************
-
-  SUBROUTINE MVA9(X, IMAR, JMAR)
-
-    ! From dyn3d/grid_noro.F, v 1.1.1.1 2004/05/19 12:53:06
-
-    ! MAKE A MOVING AVERAGE OVER 9 GRIDPOINTS OF THE X FIELDS
-
-    integer, intent(in):: imar, jmar
-    REAL, intent(inout):: X(IMAR, JMAR)
-
-    integer, PARAMETER:: ISMo=300, JSMo=200
-    real XF(ISMo, JSMo)
-    real WEIGHTpb(-1:1, -1:1)
-    real my_sum
-    integer i, is, js, j
-
-    if(imar>ismo) stop 'surdimensionner ismo dans mva9 (grid_noro)'
-    if(jmar>jsmo) stop 'surdimensionner jsmo dans mva9 (grid_noro)'
-
-    MY_SUM=0.
-    DO IS=-1, 1
-       DO JS=-1, 1
-          WEIGHTpb(IS, JS)=1./FLOAT((1+IS**2)*(1+JS**2))
-          MY_SUM=MY_SUM+WEIGHTpb(IS, JS)
-       ENDDO
-    ENDDO
-
-    DO IS=-1, 1
-       DO JS=-1, 1
-          WEIGHTpb(IS, JS)=WEIGHTpb(IS, JS)/MY_SUM
-       ENDDO
-    ENDDO
-
-    DO J=2, JMAR-1
-       DO I=2, IMAR-1
-          XF(I, J)=0.
-          DO IS=-1, 1
-             DO JS=-1, 1
-                XF(I, J)=XF(I, J)+X(I+IS, J+JS)*WEIGHTpb(IS, JS)
-             ENDDO
-          ENDDO
-       ENDDO
-    ENDDO
-
-    DO J=2, JMAR-1
-       XF(1, J)=0.
-       IS=IMAR-1
-       DO JS=-1, 1 
-          XF(1, J)=XF(1, J)+X(IS, J+JS)*WEIGHTpb(-1, JS)
-       ENDDO
-       DO IS=0, 1 
-          DO JS=-1, 1 
-             XF(1, J)=XF(1, J)+X(1+IS, J+JS)*WEIGHTpb(IS, JS)
-          ENDDO
-       ENDDO
-       XF(IMAR, J)=XF(1, J)
-    ENDDO
-
-    DO I=1, IMAR
-       XF(I, 1)=XF(I, 2)
-       XF(I, JMAR)=XF(I, JMAR-1)
-    ENDDO
-
-    DO I=1, IMAR
-       DO J=1, JMAR
-          X(I, J)=XF(I, J)
-       ENDDO
-    ENDDO
-
-  END SUBROUTINE MVA9
 
 end module grid_noro_m

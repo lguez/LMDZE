@@ -4,9 +4,8 @@ module calfis_m
 
 contains
 
-  SUBROUTINE calfis(rdayvrai, heure, pucov, pvcov, teta, q, pmasse, pps, &
-       ppk, pphis, pphi, pducov, pdvcov, pdq, pw, pdufi, pdvfi, pdhfi, pdqfi, &
-       pdpsfi, lafin)
+  SUBROUTINE calfis(rdayvrai, time, ucov, vcov, teta, q, masse, ps, pk, phis, &
+       phi, dudyn, dv, dq, w, dufi, dvfi, dtetafi, dqfi, dpfi, lafin)
 
     ! From dyn3d/calfis.F, version 1.3 2005/05/25 13:10:09
     ! Authors: P. Le Van, F. Hourdin
@@ -31,18 +30,18 @@ contains
     ! grandeur horizontalement.
 
     ! Input :
-    ! pucov covariant zonal velocity
-    ! pvcov covariant meridional velocity 
+    ! ucov covariant zonal velocity
+    ! vcov covariant meridional velocity 
     ! teta potential temperature
-    ! pps surface pressure
-    ! pmasse masse d'air dans chaque maille
+    ! ps surface pressure
+    ! masse masse d'air dans chaque maille
     ! pts surface temperature (K)
     ! callrad clef d'appel au rayonnement
 
     ! Output :
-    ! pdufi tendency for the natural zonal velocity (ms-1)
-    ! pdvfi tendency for the natural meridional velocity 
-    ! pdhfi tendency for the potential temperature
+    ! dufi tendency for the natural zonal velocity (ms-1)
+    ! dvfi tendency for the natural meridional velocity 
+    ! dtetafi tendency for the potential temperature
     ! pdtsfi tendency for the surface temperature
 
     ! pdtrad radiative tendencies \ input and output
@@ -62,50 +61,50 @@ contains
     ! Arguments :
 
     LOGICAL, intent(in):: lafin
-    REAL, intent(in):: heure ! heure de la journée en fraction de jour
+    REAL, intent(in):: time ! heure de la journée en fraction de jour
 
-    REAL pvcov(iim + 1, jjm, llm)
-    REAL pucov(iim + 1, jjm + 1, llm)
+    REAL vcov(iim + 1, jjm, llm)
+    REAL ucov(iim + 1, jjm + 1, llm)
     REAL, intent(in):: teta(iim + 1, jjm + 1, llm)
-    REAL pmasse(iim + 1, jjm + 1, llm)
+    REAL masse(iim + 1, jjm + 1, llm)
 
     REAL, intent(in):: q(iim + 1, jjm + 1, llm, nqmx)
     ! (mass fractions of advected fields)
 
-    REAL pphis(iim + 1, jjm + 1)
-    REAL pphi(iim + 1, jjm + 1, llm)
+    REAL phis(iim + 1, jjm + 1)
+    REAL, intent(in):: phi(iim + 1, jjm + 1, llm)
 
-    REAL pdvcov(iim + 1, jjm, llm)
-    REAL pducov(iim + 1, jjm + 1, llm)
-    REAL pdq(iim + 1, jjm + 1, llm, nqmx)
+    REAL dv(iim + 1, jjm, llm)
+    REAL dudyn(iim + 1, jjm + 1, llm)
+    REAL dq(iim + 1, jjm + 1, llm, nqmx)
 
-    REAL, intent(in):: pw(iim + 1, jjm + 1, llm)
+    REAL, intent(in):: w(iim + 1, jjm + 1, llm)
 
-    REAL pps(iim + 1, jjm + 1)
-    REAL, intent(in):: ppk(iim + 1, jjm + 1, llm)
+    REAL ps(iim + 1, jjm + 1)
+    REAL, intent(in):: pk(iim + 1, jjm + 1, llm)
 
-    REAL pdvfi(iim + 1, jjm, llm)
-    REAL pdufi(iim + 1, jjm + 1, llm)
-    REAL, intent(out):: pdhfi(iim + 1, jjm + 1, llm)
-    REAL pdqfi(iim + 1, jjm + 1, llm, nqmx)
-    REAL pdpsfi(iim + 1, jjm + 1)
+    REAL dvfi(iim + 1, jjm, llm)
+    REAL dufi(iim + 1, jjm + 1, llm)
+    REAL, intent(out):: dtetafi(iim + 1, jjm + 1, llm)
+    REAL dqfi(iim + 1, jjm + 1, llm, nqmx)
+    REAL dpfi(iim + 1, jjm + 1)
 
     ! Local variables :
 
     INTEGER i, j, l, ig0, ig, iq, iiq
     REAL zpsrf(klon)
-    REAL zplev(klon, llm+1), zplay(klon, llm)
-    REAL zphi(klon, llm), zphis(klon)
+    REAL paprs(klon, llm+1), play(klon, llm)
+    REAL pphi(klon, llm), pphis(klon)
 
-    REAL zufi(klon, llm), v(klon, llm)
+    REAL u(klon, llm), v(klon, llm)
     real zvfi(iim + 1, jjm + 1, llm)
-    REAL ztfi(klon, llm) ! temperature
+    REAL t(klon, llm) ! temperature
     real qx(klon, llm, nqmx) ! mass fractions of advected fields
-    REAL pvervel(klon, llm)
+    REAL omega(klon, llm)
 
-    REAL zdufi(klon, llm), zdvfi(klon, llm)
-    REAL zdtfi(klon, llm), zdqfi(klon, llm, nqmx)
-    REAL zdpsrf(klon)
+    REAL d_u(klon, llm), d_v(klon, llm)
+    REAL d_t(klon, llm), d_qx(klon, llm, nqmx)
+    REAL d_ps(klon)
 
     REAL z1(iim)
     REAL pksurcp(iim + 1, jjm + 1)
@@ -127,31 +126,31 @@ contains
     ! 40. transformation des variables dynamiques en variables physiques:
     ! 41. pressions au sol (en Pascals)
 
-    zpsrf(1) = pps(1, 1)
+    zpsrf(1) = ps(1, 1)
 
     ig0 = 2
     DO j = 2, jjm
-       CALL SCOPY(iim, pps(1, j), 1, zpsrf(ig0), 1)
+       CALL SCOPY(iim, ps(1, j), 1, zpsrf(ig0), 1)
        ig0 = ig0+iim
     ENDDO
 
-    zpsrf(klon) = pps(1, jjm + 1)
+    zpsrf(klon) = ps(1, jjm + 1)
 
     ! 42. pression intercouches :
 
-    ! zplev defini aux (llm +1) interfaces des couches 
-    ! zplay defini aux (llm) milieux des couches  
+    ! paprs defini aux (llm +1) interfaces des couches 
+    ! play defini aux (llm) milieux des couches  
 
     ! Exner = cp * (p(l) / preff) ** kappa 
 
-    forall (l = 1: llm+1) zplev(:, l) = pack(p3d(:, :, l), dyn_phy)
+    forall (l = 1: llm+1) paprs(:, l) = pack(p3d(:, :, l), dyn_phy)
 
     ! 43. temperature naturelle (en K) et pressions milieux couches
     DO l=1, llm
-       pksurcp = ppk(:, :, l) / cpp
+       pksurcp = pk(:, :, l) / cpp
        pls(:, :, l) = preff * pksurcp**(1./ kappa)
-       zplay(:, l) = pack(pls(:, :, l), dyn_phy)
-       ztfi(:, l) = pack(teta(:, :, l) * pksurcp, dyn_phy)
+       play(:, l) = pack(pls(:, :, l), dyn_phy)
+       t(:, l) = pack(teta(:, :, l) * pksurcp, dyn_phy)
     ENDDO
 
     ! 43.bis traceurs
@@ -171,25 +170,21 @@ contains
     ENDDO
 
     ! Geopotentiel calcule par rapport a la surface locale:
-    forall (l = 1:llm) zphi(:, l) = pack(pphi(:, :, l), dyn_phy)
-    zphis = pack(pphis, dyn_phy)
-    DO l=1, llm
-       DO ig=1, klon
-          zphi(ig, l)=zphi(ig, l)-zphis(ig)
-       ENDDO
-    ENDDO
+    forall (l = 1:llm) pphi(:, l) = pack(phi(:, :, l), dyn_phy)
+    pphis = pack(phis, dyn_phy)
+    forall (l = 1:llm) pphi(:, l)=pphi(:, l) - pphis
 
     ! Calcul de la vitesse verticale (en Pa*m*s ou Kg/s)
     DO l=1, llm
-       pvervel(1, l)=pw(1, 1, l) * g /apoln
+       omega(1, l)=w(1, 1, l) * g /apoln
        ig0=2
        DO j=2, jjm
           DO i = 1, iim
-             pvervel(ig0, l) = pw(i, j, l) * g * unsaire_2d(i, j)
+             omega(ig0, l) = w(i, j, l) * g * unsaire_2d(i, j)
              ig0 = ig0 + 1
           ENDDO
        ENDDO
-       pvervel(ig0, l)=pw(1, jjm + 1, l) * g /apols
+       omega(ig0, l)=w(1, jjm + 1, l) * g /apols
     ENDDO
 
     ! 45. champ u:
@@ -197,12 +192,12 @@ contains
     DO l=1, llm
        DO j=2, jjm
           ig0 = 1+(j-2)*iim
-          zufi(ig0+1, l)= 0.5 * &
-               (pucov(iim, j, l)/cu_2d(iim, j) + pucov(1, j, l)/cu_2d(1, j))
+          u(ig0+1, l)= 0.5 * &
+               (ucov(iim, j, l)/cu_2d(iim, j) + ucov(1, j, l)/cu_2d(1, j))
           DO i=2, iim
-             zufi(ig0+i, l)= 0.5 * &
-                  (pucov(i-1, j, l)/cu_2d(i-1, j) &
-                  + pucov(i, j, l)/cu_2d(i, j))
+             u(ig0+i, l)= 0.5 * &
+                  (ucov(i-1, j, l)/cu_2d(i-1, j) &
+                  + ucov(i, j, l)/cu_2d(i, j))
           end DO
        end DO
     end DO
@@ -210,8 +205,8 @@ contains
     ! 46.champ v:
 
     forall (j = 2: jjm, l = 1: llm) zvfi(:iim, j, l)= 0.5 &
-         * (pvcov(:iim, j-1, l) / cv_2d(:iim, j-1) &
-         + pvcov(:iim, j, l) / cv_2d(:iim, j))
+         * (vcov(:iim, j-1, l) / cv_2d(:iim, j-1) &
+         + vcov(:iim, j, l) / cv_2d(:iim, j))
     zvfi(iim + 1, 2:jjm, :) = zvfi(1, 2:jjm, :)
 
     ! 47. champs de vents au pôle nord 
@@ -219,12 +214,12 @@ contains
     ! V = 1 / pi * integrale [ v * sin(long) * d long ]
 
     DO l=1, llm
-       z1(1) =(rlonu(1)-rlonu(iim)+2.*pi)*pvcov(1, 1, l)/cv_2d(1, 1)
+       z1(1) =(rlonu(1)-rlonu(iim)+2.*pi)*vcov(1, 1, l)/cv_2d(1, 1)
        DO i=2, iim
-          z1(i) =(rlonu(i)-rlonu(i-1))*pvcov(i, 1, l)/cv_2d(i, 1)
+          z1(i) =(rlonu(i)-rlonu(i-1))*vcov(i, 1, l)/cv_2d(i, 1)
        ENDDO
 
-       zufi(1, l) = SUM(COS(rlonv(:iim)) * z1) / pi
+       u(1, l) = SUM(COS(rlonv(:iim)) * z1) / pi
        zvfi(:, 1, l) = SUM(SIN(rlonv(:iim)) * z1) / pi
     ENDDO
 
@@ -233,66 +228,51 @@ contains
     ! V = 1 / pi * integrale [ v * sin(long) * d long ]
 
     DO l=1, llm
-       z1(1) =(rlonu(1)-rlonu(iim)+2.*pi)*pvcov(1, jjm, l) &
+       z1(1) =(rlonu(1)-rlonu(iim)+2.*pi)*vcov(1, jjm, l) &
             /cv_2d(1, jjm)
        DO i=2, iim
-          z1(i) =(rlonu(i)-rlonu(i-1))*pvcov(i, jjm, l)/cv_2d(i, jjm)
+          z1(i) =(rlonu(i)-rlonu(i-1))*vcov(i, jjm, l)/cv_2d(i, jjm)
        ENDDO
 
-       zufi(klon, l) = SUM(COS(rlonv(:iim)) * z1) / pi
+       u(klon, l) = SUM(COS(rlonv(:iim)) * z1) / pi
        zvfi(:, jjm + 1, l) = SUM(SIN(rlonv(:iim)) * z1) / pi
     ENDDO
 
     forall(l= 1: llm) v(:, l) = pack(zvfi(:, :, l), dyn_phy)
 
     !IM calcul PV a teta=350, 380, 405K
-    CALL PVtheta(klon, llm, pucov, pvcov, teta, ztfi, zplay, zplev, &
+    CALL PVtheta(klon, llm, ucov, vcov, teta, t, play, paprs, &
          ntetaSTD, rtetaSTD, PVteta)
 
     ! Appel de la physique :
-    CALL physiq(lafin, rdayvrai, heure, dtphys, zplev, zplay, zphi, &
-         zphis, zufi, v, ztfi, qx, pvervel, zdufi, zdvfi, &
-         zdtfi, zdqfi, zdpsrf, pducov, PVteta) ! diagnostic PVteta, Amip2
+    CALL physiq(lafin, rdayvrai, time, dtphys, paprs, play, pphi, pphis, u, &
+         v, t, qx, omega, d_u, d_v, d_t, d_qx, d_ps, dudyn, PVteta)
 
     ! transformation des tendances physiques en tendances dynamiques:
 
     ! tendance sur la pression :
 
-    pdpsfi = gr_fi_dyn(zdpsrf)
+    dpfi = gr_fi_dyn(d_ps)
 
     ! 62. enthalpie potentielle
-
-    DO l=1, llm
-
-       DO i=1, iim + 1
-          pdhfi(i, 1, l) = cpp * zdtfi(1, l) / ppk(i, 1 , l)
-          pdhfi(i, jjm + 1, l) = cpp * zdtfi(klon, l)/ ppk(i, jjm + 1, l)
-       ENDDO
-
-       DO j=2, jjm
-          ig0=1+(j-2)*iim
-          DO i=1, iim
-             pdhfi(i, j, l) = cpp * zdtfi(ig0+i, l) / ppk(i, j, l)
-          ENDDO
-          pdhfi(iim + 1, j, l) = pdhfi(1, j, l)
-       ENDDO
-
-    ENDDO
+    do l=1, llm
+       dtetafi(:, :, l) = cpp * gr_fi_dyn(d_t(:, l)) / pk(:, :, l)
+    end do
 
     ! 62. humidite specifique
 
     DO iq=1, nqmx
        DO l=1, llm
           DO i=1, iim + 1
-             pdqfi(i, 1, l, iq) = zdqfi(1, l, iq)
-             pdqfi(i, jjm + 1, l, iq) = zdqfi(klon, l, iq)
+             dqfi(i, 1, l, iq) = d_qx(1, l, iq)
+             dqfi(i, jjm + 1, l, iq) = d_qx(klon, l, iq)
           ENDDO
           DO j=2, jjm
              ig0=1+(j-2)*iim
              DO i=1, iim
-                pdqfi(i, j, l, iq) = zdqfi(ig0+i, l, iq)
+                dqfi(i, j, l, iq) = d_qx(ig0+i, l, iq)
              ENDDO
-             pdqfi(iim + 1, j, l, iq) = pdqfi(1, j, l, iq)
+             dqfi(iim + 1, j, l, iq) = dqfi(1, j, l, iq)
           ENDDO
        ENDDO
     ENDDO
@@ -300,21 +280,21 @@ contains
     ! 63. traceurs
 
     ! initialisation des tendances
-    pdqfi=0.
+    dqfi=0.
 
     DO iq=1, nqmx
        iiq=niadv(iq)
        DO l=1, llm
           DO i=1, iim + 1
-             pdqfi(i, 1, l, iiq) = zdqfi(1, l, iq)
-             pdqfi(i, jjm + 1, l, iiq) = zdqfi(klon, l, iq)
+             dqfi(i, 1, l, iiq) = d_qx(1, l, iq)
+             dqfi(i, jjm + 1, l, iiq) = d_qx(klon, l, iq)
           ENDDO
           DO j=2, jjm
              ig0=1+(j-2)*iim
              DO i=1, iim
-                pdqfi(i, j, l, iiq) = zdqfi(ig0+i, l, iq)
+                dqfi(i, j, l, iiq) = d_qx(ig0+i, l, iq)
              ENDDO
-             pdqfi(iim + 1, j, l, iiq) = pdqfi(1, j, l, iq)
+             dqfi(iim + 1, j, l, iiq) = dqfi(1, j, l, iq)
           ENDDO
        ENDDO
     ENDDO
@@ -324,19 +304,19 @@ contains
     DO l=1, llm
 
        DO i=1, iim + 1
-          pdufi(i, 1, l) = 0.
-          pdufi(i, jjm + 1, l) = 0.
+          dufi(i, 1, l) = 0.
+          dufi(i, jjm + 1, l) = 0.
        ENDDO
 
        DO j=2, jjm
           ig0=1+(j-2)*iim
           DO i=1, iim-1
-             pdufi(i, j, l)= &
-                  0.5*(zdufi(ig0+i, l)+zdufi(ig0+i+1, l))*cu_2d(i, j)
+             dufi(i, j, l)= &
+                  0.5*(d_u(ig0+i, l)+d_u(ig0+i+1, l))*cu_2d(i, j)
           ENDDO
-          pdufi(iim, j, l)= &
-               0.5*(zdufi(ig0+1, l)+zdufi(ig0+iim, l))*cu_2d(iim, j)
-          pdufi(iim + 1, j, l)=pdufi(1, j, l)
+          dufi(iim, j, l)= &
+               0.5*(d_u(ig0+1, l)+d_u(ig0+iim, l))*cu_2d(iim, j)
+          dufi(iim + 1, j, l)=dufi(1, j, l)
        ENDDO
 
     ENDDO
@@ -348,10 +328,10 @@ contains
        DO j=2, jjm-1
           ig0=1+(j-2)*iim
           DO i=1, iim
-             pdvfi(i, j, l)= &
-                  0.5*(zdvfi(ig0+i, l)+zdvfi(ig0+i+iim, l))*cv_2d(i, j)
+             dvfi(i, j, l)= &
+                  0.5*(d_v(ig0+i, l)+d_v(ig0+i+iim, l))*cv_2d(i, j)
           ENDDO
-          pdvfi(iim + 1, j, l) = pdvfi(1, j, l)
+          dvfi(iim + 1, j, l) = dvfi(1, j, l)
        ENDDO
     ENDDO
 
@@ -360,18 +340,18 @@ contains
 
     DO l=1, llm
        DO i=1, iim
-          pdvfi(i, 1, l)= &
-               zdufi(1, l)*COS(rlonv(i))+zdvfi(1, l)*SIN(rlonv(i))
-          pdvfi(i, jjm, l)=zdufi(klon, l)*COS(rlonv(i)) &
-               +zdvfi(klon, l)*SIN(rlonv(i))
-          pdvfi(i, 1, l)= &
-               0.5*(pdvfi(i, 1, l)+zdvfi(i+1, l))*cv_2d(i, 1)
-          pdvfi(i, jjm, l)= &
-               0.5*(pdvfi(i, jjm, l)+zdvfi(klon-iim-1+i, l))*cv_2d(i, jjm)
+          dvfi(i, 1, l)= &
+               d_u(1, l)*COS(rlonv(i))+d_v(1, l)*SIN(rlonv(i))
+          dvfi(i, jjm, l)=d_u(klon, l)*COS(rlonv(i)) &
+               +d_v(klon, l)*SIN(rlonv(i))
+          dvfi(i, 1, l)= &
+               0.5*(dvfi(i, 1, l)+d_v(i+1, l))*cv_2d(i, 1)
+          dvfi(i, jjm, l)= &
+               0.5*(dvfi(i, jjm, l)+d_v(klon-iim-1+i, l))*cv_2d(i, jjm)
        ENDDO
 
-       pdvfi(iim + 1, 1, l) = pdvfi(1, 1, l)
-       pdvfi(iim + 1, jjm, l)= pdvfi(1, jjm, l)
+       dvfi(iim + 1, 1, l) = dvfi(1, 1, l)
+       dvfi(iim + 1, jjm, l)= dvfi(1, jjm, l)
     ENDDO
 
   END SUBROUTINE calfis

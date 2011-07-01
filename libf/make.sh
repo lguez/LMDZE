@@ -18,6 +18,8 @@ dest_dir=/save/workdir_Lionel/LMDZ_work/LMDZE/Compil_prod_$compiler
 # (Do not just use the name of the compiler as a directory name, it
 # confuses some compilers.)
 
+test -d $dest_dir
+
 if [[ ../Compilers/$compiler.mk -nt $dest_dir/compiler.mk ]]
 then
     cp --force ../Compilers/$compiler.mk $dest_dir/compiler.mk

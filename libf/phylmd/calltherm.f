@@ -18,7 +18,7 @@
       REAL t_seri(klon,klev),q_seri(klon,klev)
       REAL, intent(in):: paprs(klon,klev+1)
       REAL, intent(in):: pplay(klon,klev)
-      REAL pphi(klon,klev)
+      REAL, intent(in):: pphi(klon,klev)
 
 CFH Update Thermiques
       REAL d_t_ajs(klon,klev), d_q_ajs(klon,klev)

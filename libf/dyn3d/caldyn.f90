@@ -5,7 +5,7 @@ module caldyn_m
 contains
 
   SUBROUTINE caldyn(itau, ucov, vcov, teta, ps, masse, pk, pkf, phis, phi, &
-       conser, du, dv, dteta, dp, w, pbaru, pbarv, time_0)
+       dudyn, dv, dteta, dp, w, pbaru, pbarv, time_0, conser)
 
     ! From dyn3d/caldyn.F, v 1.1.1.1 2004/05/19 12:53:06
     ! Auteur : P. Le Van
@@ -29,7 +29,7 @@ contains
     REAL pkf(ip1jmp1, llm)
     REAL vcont(ip1jm, llm), ucont(ip1jmp1, llm)
     REAL phi(ip1jmp1, llm), masse(ip1jmp1, llm)
-    REAL dv(ip1jm, llm), du(ip1jmp1, llm)
+    REAL dv(ip1jm, llm), dudyn(ip1jmp1, llm)
     REAL dteta(ip1jmp1, llm)
     real, INTENT(out):: dp(ip1jmp1)
     REAL pbaru(ip1jmp1, llm), pbarv(ip1jm, llm)
@@ -60,10 +60,10 @@ contains
     dp = convm(:, 1) / airesurg
     CALL vitvert(convm, w)
     CALL tourpot(vcov, ucov, massebxy, vorpot)
-    CALL dudv1(vorpot, pbaru, pbarv, du, dv)
+    CALL dudv1(vorpot, pbaru, pbarv, dudyn, dv)
     CALL enercin(vcov, ucov, vcont, ucont, ecin)
     CALL bernoui(ip1jmp1, llm, phi, ecin, bern)
-    CALL dudv2(teta, pkf, bern, du, dv)
+    CALL dudv2(teta, pkf, bern, dudyn, dv)
 
     DO l = 1, llm
        DO ij = 1, ip1jmp1
@@ -71,7 +71,7 @@ contains
        END DO
     END DO
 
-    CALL advect(ang, vcov, teta, w, massebx, masseby, du, dv, dteta, conser)
+    CALL advect(ang, vcov, teta, w, massebx, masseby, dudyn, dv, dteta)
 
     ! WARNING probleme de peridocite de dv sur les PC/linux. Pb d'arrondi
     ! probablement. Observe sur le code compile avec pgf90 3.0-1

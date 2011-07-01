@@ -7,7 +7,7 @@ module inidissip_m
   private llm
 
   REAL dtdiss
-  integer idissip ! période de la dissipation (en pas)
+  integer idissip ! période de la dissipation (en pas de temps)
   real tetaudiv(llm), tetaurot(llm), tetah(llm) 
   real cdivu, crot, cdivh
 
@@ -25,7 +25,7 @@ contains
     USE conf_gcm_m, ONLY : iperiod
     USE dimens_m, ONLY : jjm, llm
     USE paramet_m, ONLY : iip1, ip1jm, ip1jmp1, jjp1
-    use new_unit_m, only: new_unit
+    use l_util, only: new_unit
     use filtreg_m, only: filtreg
 
     ! Variables local to the procedure:

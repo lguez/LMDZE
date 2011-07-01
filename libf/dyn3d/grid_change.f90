@@ -32,7 +32,7 @@ contains
 
     use dimphy, only: klon
 
-    REAL, intent(in):: pfi(:)
+    REAL, intent(in):: pfi(:) ! (klon)
     real gr_fi_dyn(iim + 1, jjm + 1)
 
     ! Variable local to the procedure:

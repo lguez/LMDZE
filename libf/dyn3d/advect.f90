@@ -4,8 +4,7 @@ module advect_m
 
 contains
 
-  SUBROUTINE advect(ucov, vcov, teta, w, massebx, masseby, du, dv, dteta, &
-       conser)
+  SUBROUTINE advect(ucov, vcov, teta, w, massebx, masseby, du, dv, dteta)
 
     ! From dyn3d/advect.F, version 1.1.1.1 2004/05/19 12:53:06
     ! Authors: P. Le Van , F. Hourdin
@@ -16,7 +15,6 @@ contains
     USE paramet_m, ONLY : iip1, iip2, ip1jm, ip1jmp1
     USE comconst, ONLY : daysec
     USE comgeom, ONLY : unsaire
-    USE ener, ONLY : gtot
 
     ! Arguments:
     REAL, intent(in):: vcov(ip1jm, llm), ucov(ip1jmp1, llm)
@@ -24,22 +22,15 @@ contains
     REAL, intent(in):: massebx(ip1jmp1, llm), masseby(ip1jm, llm)
     real, INTENT (IN):: w(ip1jmp1, llm)
     REAL, intent(inout):: dv(ip1jm, llm), du(ip1jmp1, llm), dteta(ip1jmp1, llm)
-    LOGICAL, INTENT (IN):: conser
 
     ! Local:
     REAL uav(ip1jmp1, llm), vav(ip1jm, llm), wsur2(ip1jmp1)
-    REAL unsaire2(ip1jmp1)
-    REAL deuxjour, ww, uu, vv
+    REAL ww, uu, vv
     INTEGER ij, l
 
     !-----------------------------------------------------------------------
 
     ! 2. Calculs preliminaires :
-
-    IF (conser) THEN
-       deuxjour = 2. * daysec
-       unsaire2 = unsaire**2
-    END IF
 
     ! Calcul de \bar{u}^{yy}
     DO l = 1, llm
@@ -108,10 +99,6 @@ contains
           dteta(ij, l) = dteta(ij, l) - ww
           dteta(ij, l + 1) = dteta(ij, l + 1) + ww
        end DO
-
-       IF (conser) THEN
-          gtot(l) = deuxjour * sqrt(sum(wsur2**2 * unsaire2) / ip1jmp1)
-       END IF
     END DO
 
   END SUBROUTINE advect
