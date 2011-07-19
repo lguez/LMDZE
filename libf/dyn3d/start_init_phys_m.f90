@@ -10,25 +10,26 @@ CONTAINS
   SUBROUTINE start_init_phys(tsol_2d, qsol_2d)
 
     USE flincom, only: flininfo, flinopen_nozoom, flinclo
-    use flinget_m, only: flinget
     use conf_dat2d_m, only: conf_dat2d
     use inter_barxy_m, only: inter_barxy
     use gr_int_dyn_m, only: gr_int_dyn
     use comgeom, only: rlonu, rlatv
     use dimens_m, only: iim, jjm
     use nr_util, only: assert
+    use netcdf, only: nf90_nowrite
+    use netcdf95, only: nf95_open, nf95_close, nf95_get_var, nf95_inq_varid
 
     REAL, intent(out):: tsol_2d(:, :), qsol_2d(:, :) ! (iim + 1, jjm + 1)
 
     ! Variables local to the procedure:
 
-    INTEGER fid_phys, iml_phys, jml_phys
+    INTEGER fid_phys, iml_phys, jml_phys, ncid, varid
     REAL, ALLOCATABLE, DIMENSION(:, :):: lon_phys, lat_phys
     REAL date, dt
     REAL, ALLOCATABLE:: levphys_ini(:)
 
-    INTEGER:: itau(1)
-    INTEGER::  llm_tmp, ttm_tmp
+    INTEGER itau(1)
+    INTEGER  llm_tmp, ttm_tmp
 
     REAL, ALLOCATABLE:: lon_rad(:), lat_rad(:)
     REAL, ALLOCATABLE:: lon_ini(:), lat_ini(:)
@@ -52,6 +53,7 @@ CONTAINS
 
     CALL flinopen_nozoom(iml_phys, jml_phys, llm_tmp, lon_phys, lat_phys, &
          levphys_ini, ttm_tmp, itau, date, dt, fid_phys)
+    CALL flinclo(fid_phys)
 
     DEALLOCATE(levphys_ini)
 
@@ -77,25 +79,26 @@ CONTAINS
        lat_ini = lat_phys(1, :) 
     ENDIF
 
+    call nf95_open('ECPHY.nc', nf90_nowrite, ncid)
+
     ! We get the two standard variables
     ! 'ST': surface temperature
-    CALL flinget(fid_phys, 'ST', iml_phys, jml_phys,  &
-         llm_tmp, ttm_tmp, 1, 1, var_ana)
+    call nf95_inq_varid(ncid, 'ST', varid)
+    call nf95_get_var(ncid, varid, var_ana)
     CALL conf_dat2d(lon_ini, lat_ini, lon_rad, lat_rad, var_ana)
     CALL inter_barxy(lon_rad, lat_rad(:jml_phys -1), var_ana, rlonu(:iim), &
          rlatv, tmp_var) 
-
     tsol_2d = gr_int_dyn(tmp_var)
 
     ! Soil moisture
-    CALL flinget(fid_phys, 'CDSW', iml_phys, jml_phys, &
-         llm_tmp, ttm_tmp, 1, 1, var_ana)
+    call nf95_inq_varid(ncid, 'CDSW', varid)
+    call nf95_get_var(ncid, varid, var_ana)
     CALL conf_dat2d(lon_ini, lat_ini, lon_rad, lat_rad, var_ana)
     CALL inter_barxy(lon_rad, lat_rad(:jml_phys -1), var_ana, rlonu(:iim), &
             rlatv, tmp_var)
     qsol_2d = gr_int_dyn(tmp_var)
 
-    CALL flinclo(fid_phys)
+    call nf95_close(ncid)
 
   END SUBROUTINE start_init_phys
 

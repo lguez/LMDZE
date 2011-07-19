@@ -6,8 +6,7 @@ contains
 
   SUBROUTINE exner_hyb(ps, p, pks, pk, pkf)
 
-    ! From dyn3d/exner_hyb.F, v 1.1.1.1 2004/05/19 12:53:07
-
+    ! From dyn3d/exner_hyb.F, version 1.1.1.1 2004/05/19 12:53:07
     ! Authors: P. Le Van, F. Hourdin
 
     ! Calcule la fonction d'Exner :
@@ -17,14 +16,14 @@ contains
     ! "p(l)" et "p(l+1)", définies aux interfaces des couches.
 
     ! Au sommet de l'atmosphère :
-    ! p(llm+1) = 0.
+    ! p(llm+1) = 0
     ! "ps" et "pks" sont la pression et la fonction d'Exner au sol.
 
     ! À partir des relations :
     !(1) \overline{p * \delta_z pk}^z = kappa * pk * \delta_z p
     !(2) pk(l) = beta(l) * pk(l-1)
     ! (cf. documentation), on détermine successivement, du haut vers
-    ! le bas des couches, les coefficients : beta(llm)..., beta(l)...,
+    ! le bas des couches, les coefficients : beta(llm), ..., beta(l), ...,
     ! beta(2) puis "pk(:, :, 1)". Ensuite, on calcule, du bas vers le
     ! haut des couches, "pk(:, :, l)" donné par la relation (2), pour
     ! l = 2 à l = llm.
@@ -42,7 +41,7 @@ contains
     real, intent(out):: pk(iim + 1, jjm + 1, llm)
     real, intent(out), optional:: pkf(iim + 1, jjm + 1, llm)
 
-    ! Variables locales
+    ! Variables locales :
     real beta(iim + 1, jjm + 1, 2:llm)
     INTEGER l
     REAL unpl2k

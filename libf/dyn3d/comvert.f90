@@ -27,7 +27,7 @@ contains
     ! "pa" should be defined before this procedure is called.
 
     use nr_util, only: pi
-    use l_util, only: new_unit
+    use jumble, only: new_unit
 
     REAL s(llm+1)
     ! "s(l)" is the atmospheric hybrid sigma-pressure coordinate at

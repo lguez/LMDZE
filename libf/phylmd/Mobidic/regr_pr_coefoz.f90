@@ -30,7 +30,7 @@ contains
     use grid_change, only: dyn_phy
     use nr_util, only: assert
     use press_coefoz_m, only: press_in_edg
-    use l_util, only: regr1_step_av
+    use jumble, only: regr1_step_av
     use pressure_var, only: p3d
 
     integer, intent(in):: ncid ! NetCDF ID of the file
@@ -106,7 +106,7 @@ contains
     use grid_change, only: dyn_phy
     use nr_util, only: assert
     use press_coefoz_m, only: plev
-    use l_util, only: regr1_lint
+    use jumble, only: regr1_lint
     use pressure_var, only: pls
 
     integer, intent(in):: ncid ! NetCDF ID of the file

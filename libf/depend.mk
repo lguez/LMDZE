@@ -92,13 +92,12 @@ dynredem0.o : temps.o serre.o paramet_m.o logic.o iniadvtrac.o calendar.o ener.o
 dynredem1.o : iniadvtrac.o dimens_m.o 
 ener.o : dimens_m.o 
 enercin.o : comgeom.o paramet_m.o dimens_m.o 
-etat0.o : temps.o startdyn.o start_init_phys_m.o start_init_orog_m.o serre.o regr_pr_o3.o regr_lat_time_coefoz.o q_sat.o pressure_var.o phyredem.o paramet_m.o inigeom.o inidissip.o iniadvtrac.o histcom.o grid_change.o grid_atob.o geopot.o flinget.o flincom.o exner_hyb.o dynredem1.o dynredem0.o dimsoil.o dimens_m.o conf_gcm.o comvert.o comgeom.o comconst.o caldyn0.o dimphy.o indicesol.o 
+etat0.o : temps.o startdyn.o start_init_phys_m.o start_init_orog_m.o serre.o regr_pr_o3.o regr_lat_time_coefoz.o q_sat.o pressure_var.o phyredem.o paramet_m.o inigeom.o inidissip.o iniadvtrac.o histcom.o grid_change.o grid_atob.o geopot.o flincom.o exner_hyb.o dynredem1.o dynredem0.o dimsoil.o dimens_m.o conf_gcm.o comvert.o comgeom.o comconst.o caldyn0.o dimphy.o indicesol.o 
 etat0_lim.o : limit.o etat0.o conf_gcm.o 
 exner_hyb.o : filtreg.o comgeom.o comvert.o comconst.o dimens_m.o 
 filtreg.o : coefils.o parafilt.o dimens_m.o 
 fisrtilp.o : comfisrtilp.o FCTTRE.o yoethf.o suphec.o tracstoke.o dimphy.o dimens_m.o 
 flincom.o : strlowercase.o errioipsl.o calendar.o 
-flinget.o : flincom.o errioipsl.o strlowercase.o 
 flumass.o : comgeom.o paramet_m.o dimens_m.o 
 fluxstokenc.o : tracstoke.o comgeom.o paramet_m.o dimens_m.o histwrite.o 
 fxhyp.o : paramet_m.o dimens_m.o 
@@ -223,8 +222,8 @@ soil.o : suphec.o dimsoil.o dimphy.o indicesol.o dimens_m.o
 sortvarc.o : filtreg.o ener.o dynetat0.o comgeom.o comconst.o paramet_m.o dimens_m.o conf_gcm.o 
 sortvarc0.o : filtreg.o ener.o comgeom.o comconst.o paramet_m.o dimens_m.o 
 start_init_orog_m.o : indicesol.o grid_noro_m.o dimens_m.o comgeom.o conf_dat2d.o 
-start_init_phys_m.o : dimens_m.o comgeom.o gr_int_dyn_m.o inter_barxy.o conf_dat2d.o flinget.o flincom.o 
-startdyn.o : conf_dat3d.o start_init_phys_m.o start_init_orog_m.o gr_int_dyn_m.o dimens_m.o inter_barxy.o conf_dat2d.o comgeom.o flinget.o flincom.o 
+start_init_phys_m.o : dimens_m.o comgeom.o gr_int_dyn_m.o inter_barxy.o conf_dat2d.o flincom.o 
+startdyn.o : conf_dat3d.o start_init_phys_m.o start_init_orog_m.o gr_int_dyn_m.o dimens_m.o inter_barxy.o conf_dat2d.o comgeom.o flincom.o 
 stdlevvar.o : yoethf.o suphec.o 
 sugwd.o : YOEGWD.o 
 sw.o : raddim.o suphec.o clesphys.o dimphy.o dimens_m.o 

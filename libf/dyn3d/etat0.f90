@@ -32,7 +32,6 @@ contains
     use dynredem1_m, only: dynredem1
     use exner_hyb_m, only: exner_hyb
     USE flincom, only: flinclo, flinopen_nozoom, flininfo
-    use flinget_m, only: flinget
     use geopot_m, only: geopot
     use grid_atob, only: grille_m
     use grid_change, only: init_dyn_phy, dyn_phy
@@ -41,6 +40,8 @@ contains
     use iniadvtrac_m, only: iniadvtrac
     use inidissip_m, only: inidissip
     use inigeom_m, only: inigeom
+    use netcdf, only: nf90_nowrite
+    use netcdf95, only: nf95_open, nf95_close, nf95_get_var, nf95_inq_varid
     use nr_util, only: pi
     use paramet_m, only: ip1jm, ip1jmp1
     use phyredem_m, only: phyredem
@@ -93,7 +94,7 @@ contains
     real clwcon(klon, llm), rnebcon(klon, llm), ratqs(klon, llm)
     ! déclarations pour lecture glace de mer
     INTEGER iml_lic, jml_lic, llm_tmp, ttm_tmp
-    INTEGER itaul(1), fid
+    INTEGER itaul(1), fid, ncid, varid
     REAL lev(1), date
     REAL, ALLOCATABLE:: lon_lic(:, :), lat_lic(:, :)
     REAL, ALLOCATABLE:: dlon_lic(:), dlat_lic(:)
@@ -228,8 +229,10 @@ contains
     CALL flinopen_nozoom(iml_lic, jml_lic, &
          llm_tmp, lon_lic, lat_lic, lev, ttm_tmp, itaul, date, trash,  &
          fid)
-    CALL flinget(fid, 'landice', iml_lic, jml_lic, llm_tmp, ttm_tmp &
-         , 1, 1, fraclic)
+    call nf95_open("landiceref.nc", nf90_nowrite, ncid)
+    call nf95_inq_varid(ncid, 'landice', varid)
+    call nf95_get_var(ncid, varid, fraclic)
+    call nf95_close(ncid)
     CALL flinclo(fid)
 
     ! Interpolation sur la grille T du modèle :
