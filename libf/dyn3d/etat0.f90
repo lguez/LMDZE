@@ -17,8 +17,6 @@ contains
 
     ! From "etat0_netcdf.F", version 1.3 2005/05/25 13:10:09
 
-    ! This subroutine creates "mask".
-
     use caldyn0_m, only: caldyn0
     use comconst, only: dtvr, daysec, cpp, kappa
     use comgeom, only: rlatu, rlonv, rlonu, rlatv, aire_2d, apoln, apols, &
@@ -149,7 +147,10 @@ contains
     ! Compute pressure on intermediate levels:
     forall(l = 1: llm + 1) p3d(:, :, l) = ap(l) + bp(l) * psol
     CALL exner_hyb(psol, p3d, pks, pk)
-    IF (MINVAL(pk) == MAXVAL(pk)) stop '"pk" should not be constant'
+    IF (MINVAL(pk) == MAXVAL(pk)) then
+       print *, '"pk" should not be constant'
+       stop 1
+    end IF
 
     pls = preff * (pk / cpp)**(1. / kappa)
     PRINT *, "minval(pls) = ", minval(pls)
@@ -216,9 +217,9 @@ contains
     zpic = pack(zpic_2d, dyn_phy)
     zval = pack(zval_2d, dyn_phy)
 
-    ! On initialise les sous-surfaces:
+    ! On initialise les sous-surfaces.
     ! Lecture du fichier glace de terre pour fixer la fraction de terre 
-    ! et de glace de terre:
+    ! et de glace de terre :
     CALL flininfo("landiceref.nc", iml_lic, jml_lic, llm_tmp, &
          ttm_tmp, fid)
     ALLOCATE(lat_lic(iml_lic, jml_lic))
@@ -229,11 +230,11 @@ contains
     CALL flinopen_nozoom(iml_lic, jml_lic, &
          llm_tmp, lon_lic, lat_lic, lev, ttm_tmp, itaul, date, trash,  &
          fid)
+    CALL flinclo(fid)
     call nf95_open("landiceref.nc", nf90_nowrite, ncid)
     call nf95_inq_varid(ncid, 'landice', varid)
     call nf95_get_var(ncid, varid, fraclic)
     call nf95_close(ncid)
-    CALL flinclo(fid)
 
     ! Interpolation sur la grille T du modèle :
     PRINT *, 'Dimensions de "landice"'

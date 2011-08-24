@@ -1,70 +1,70 @@
 !
 ! $Header: /home/cvsroot/LMDZ4/libf/phylmd/cv_driver.F,v 1.3 2005/04/15 12:36:17 lmdzadmin Exp $
 !
-      SUBROUTINE cv_driver(len,nd,ndp1,ntra,iflag_con,
-     &                   t1,q1,qs1,u1,v1,tra1,
-     &                   p1,ph1,iflag1,ft1,fq1,fu1,fv1,ftra1,
-     &                   precip1,VPrecip1,
-     &                   cbmf1,sig1,w01,
-     &                   icb1,inb1,
-     &                   delt,Ma1,upwd1,dnwd1,dnwd01,qcondc1,wd1,cape1,
-     &                   da1,phi1,mp1)
-C
+      SUBROUTINE cv_driver(len,nd,ndp1,ntra,iflag_con, &
+                         t1,q1,qs1,u1,v1,tra1, &
+                         p1,ph1,iflag1,ft1,fq1,fu1,fv1,ftra1, &
+                         precip1,VPrecip1, &
+                         cbmf1,sig1,w01, &
+                         icb1,inb1, &
+                         delt,Ma1,upwd1,dnwd1,dnwd01,qcondc1,wd1,cape1, &
+                         da1,phi1,mp1)
+!
       use dimens_m
       use dimphy
       implicit none
-C
-C.............................START PROLOGUE............................
-C
-C PARAMETERS:
-C      Name            Type         Usage            Description
-C   ----------      ----------     -------  ----------------------------
-C
-C      len           Integer        Input        first (i) dimension
-C      nd            Integer        Input        vertical (k) dimension
-C      ndp1          Integer        Input        nd + 1
-C      ntra          Integer        Input        number of tracors
-C      iflag_con     Integer        Input        version of convect (3/4)
-C      t1            Real           Input        temperature
-C      q1            Real           Input        specific hum
-C      qs1           Real           Input        sat specific hum
-C      u1            Real           Input        u-wind
-C      v1            Real           Input        v-wind
-C      tra1          Real           Input        tracors
-C      p1            Real           Input        full level pressure
-C      ph1           Real           Input        half level pressure
-C      iflag1        Integer        Output       flag for Emanuel conditions
-C      ft1           Real           Output       temp tend
-C      fq1           Real           Output       spec hum tend
-C      fu1           Real           Output       u-wind tend
-C      fv1           Real           Output       v-wind tend
-C      ftra1         Real           Output       tracor tend
-C      precip1       Real           Output       precipitation
-C      VPrecip1      Real           Output       vertical profile of precipitations
-C      cbmf1         Real           Output       cloud base mass flux
-C      sig1          Real           In/Out       section adiabatic updraft
-C      w01           Real           In/Out       vertical velocity within adiab updraft
-C      delt          Real           Input        time step
-C      Ma1           Real           Output       mass flux adiabatic updraft
-C      upwd1         Real           Output       total upward mass flux (adiab+mixed)
-C      dnwd1         Real           Output       saturated downward mass flux (mixed)
-C      dnwd01        Real           Output       unsaturated downward mass flux 
-C      qcondc1       Real           Output       in-cld mixing ratio of condensed water
-C      wd1           Real           Output       downdraft velocity scale for sfc fluxes
-C      cape1         Real           Output       CAPE
-C
-C S. Bony, Mar 2002:
-C 	* Several modules corresponding to different physical processes
-C 	* Several versions of convect may be used:
-C  		- iflag_con=3: version lmd  (previously named convect3) 
-C  		- iflag_con=4: version 4.3b (vect. version, previously convect1/2) 
-C   + tard: 	- iflag_con=5: version lmd with ice (previously named convectg) 
-C S. Bony, Oct 2002:
-C	* Vectorization of convect3 (ie version lmd)
-C
-C..............................END PROLOGUE.............................
-c
-c
+!
+!.............................START PROLOGUE............................
+!
+! PARAMETERS:
+!      Name            Type         Usage            Description
+!   ----------      ----------     -------  ----------------------------
+!
+!      len           Integer        Input        first (i) dimension
+!      nd            Integer        Input        vertical (k) dimension
+!      ndp1          Integer        Input        nd + 1
+!      ntra          Integer        Input        number of tracors
+!      iflag_con     Integer        Input        version of convect (3/4)
+!      t1            Real           Input        temperature
+!      q1            Real           Input        specific hum
+!      qs1           Real           Input        sat specific hum
+!      u1            Real           Input        u-wind
+!      v1            Real           Input        v-wind
+!      tra1          Real           Input        tracors
+!      p1            Real           Input        full level pressure
+!      ph1           Real           Input        half level pressure
+!      iflag1        Integer        Output       flag for Emanuel conditions
+!      ft1           Real           Output       temp tend
+!      fq1           Real           Output       spec hum tend
+!      fu1           Real           Output       u-wind tend
+!      fv1           Real           Output       v-wind tend
+!      ftra1         Real           Output       tracor tend
+!      precip1       Real           Output       precipitation
+!      VPrecip1      Real           Output       vertical profile of precipitations
+!      cbmf1         Real           Output       cloud base mass flux
+!      sig1          Real           In/Out       section adiabatic updraft
+!      w01           Real           In/Out       vertical velocity within adiab updraft
+!      delt          Real           Input        time step
+!      Ma1           Real           Output       mass flux adiabatic updraft
+!      upwd1         Real           Output       total upward mass flux (adiab+mixed)
+!      dnwd1         Real           Output       saturated downward mass flux (mixed)
+!      dnwd01        Real           Output       unsaturated downward mass flux
+!      qcondc1       Real           Output       in-cld mixing ratio of condensed water
+!      wd1           Real           Output       downdraft velocity scale for sfc fluxes
+!      cape1         Real           Output       CAPE
+!
+! S. Bony, Mar 2002:
+!     * Several modules corresponding to different physical processes
+!     * Several versions of convect may be used:
+!        - iflag_con=3: version lmd  (previously named convect3)
+!        - iflag_con=4: version 4.3b (vect. version, previously convect1/2)
+!   + tard:    - iflag_con=5: version lmd with ice (previously named convectg)
+! S. Bony, Oct 2002:
+!     * Vectorization of convect3 (ie version lmd)
+!
+!..............................END PROLOGUE.............................
+!
+!
 
       integer len
       integer nd
@@ -94,7 +94,7 @@ c
 
       real qcondc1(len,nd)     ! cld
       real wd1(len)            ! gust
-      real cape1(len)     
+      real cape1(len)
 
       real da1(len,nd),phi1(len,nd,nd),mp1(len,nd)
       real da(len,nd),phi(len,nd,nd),mp(len,nd)
@@ -212,9 +212,9 @@ c
 !  det:   Array of detrainment mass flux of dimension ND.
 !
 !-------------------------------------------------------------------
-c
-c  Local arrays
-c
+!
+!  Local arrays
+!
 
       integer i,k,n,il,j
       integer icbmax
@@ -244,11 +244,11 @@ c
       real sig1(klon,klev)
       real w01(klon,klev)
       real th1(klon,klev)
-c
+!
       integer ncum
-c
-c (local) compressed fields:
-c
+!
+! (local) compressed fields:
+!
       integer nloc
       parameter (nloc=klon) ! pour l'instant
 
@@ -293,21 +293,21 @@ c
 ! --- SET CONSTANTS AND PARAMETERS
 !-------------------------------------------------------------------
 
-c -- set simulation flags:
-c   (common cvflag)
+! -- set simulation flags:
+!   (common cvflag)
 
        CALL cv_flag
 
-c -- set thermodynamical constants:
-c 	(common cvthermo)
+! -- set thermodynamical constants:
+!     (common cvthermo)
 
        CALL cv_thermo(iflag_con)
 
-c -- set convect parameters 
-c
-c 	includes microphysical parameters and parameters that 
-c  	control the rate of approach to quasi-equilibrium) 
-c 	(common cvparam)
+! -- set convect parameters
+!
+!     includes microphysical parameters and parameters that
+!     control the rate of approach to quasi-equilibrium)
+!     (common cvparam)
 
       if (iflag_con.eq.3) then
        CALL cv3_param(nd,delt)
@@ -330,8 +330,8 @@ c 	(common cvparam)
          tvp1(i,k)=0.0
          tp1(i,k)=0.0
          clw1(i,k)=0.0
-cym
-         clw(i,k)=0.0	 
+!ym
+         clw(i,k)=0.0
          gz1(i,k) = 0.
          VPrecip1(i,k) = 0.
          Ma1(i,k)=0.0
@@ -346,9 +346,9 @@ cym
        do 31 k=1,nd
         do 32 i=1,len
          ftra1(i,k,j)=0.0
- 32     continue    
- 31    continue    
- 30   continue    
+ 32     continue
+ 31    continue
+ 30   continue
 
       do 60 i=1,len
         precip1(i)=0.0
@@ -370,13 +370,13 @@ cym
 !--------------------------------------------------------------------
 
       if (iflag_con.eq.3) then
-       CALL cv3_prelim(len,nd,ndp1,t1,q1,p1,ph1            ! nd->na
-     o               ,lv1,cpn1,tv1,gz1,h1,hm1,th1)
+       CALL cv3_prelim(len,nd,ndp1,t1,q1,p1,ph1             &
+                     ,lv1,cpn1,tv1,gz1,h1,hm1,th1)! nd->na
       endif
 
       if (iflag_con.eq.4) then
-       CALL cv_prelim(len,nd,ndp1,t1,q1,p1,ph1
-     o               ,lv1,cpn1,tv1,gz1,h1,hm1)
+       CALL cv_prelim(len,nd,ndp1,t1,q1,p1,ph1 &
+                     ,lv1,cpn1,tv1,gz1,h1,hm1)
       endif
 
 !--------------------------------------------------------------------
@@ -384,30 +384,30 @@ cym
 !--------------------------------------------------------------------
 
       if (iflag_con.eq.3) then
-       CALL cv3_feed(len,nd,t1,q1,qs1,p1,ph1,hm1,gz1           ! nd->na
-     o         ,nk1,icb1,icbmax,iflag1,tnk1,qnk1,gznk1,plcl1)
-      endif 
-
-      if (iflag_con.eq.4) then
-       CALL cv_feed(len,nd,t1,q1,qs1,p1,hm1,gz1
-     o         ,nk1,icb1,icbmax,iflag1,tnk1,qnk1,gznk1,plcl1)
-      endif 
-
-!--------------------------------------------------------------------
-! --- UNDILUTE (ADIABATIC) UPDRAFT / 1st part 
-! (up through ICB for convect4, up through ICB+1 for convect3)
-!     Calculates the lifted parcel virtual temperature at nk, the
-!     actual temperature, and the adiabatic liquid water content. 
-!--------------------------------------------------------------------
-
-      if (iflag_con.eq.3) then
-       CALL cv3_undilute1(len,nd,t1,q1,qs1,gz1,plcl1,p1,nk1,icb1  ! nd->na
-     o                        ,tp1,tvp1,clw1,icbs1)
+       CALL cv3_feed(len,nd,t1,q1,qs1,p1,ph1,hm1,gz1            &
+               ,nk1,icb1,icbmax,iflag1,tnk1,qnk1,gznk1,plcl1) ! nd->na
       endif
 
       if (iflag_con.eq.4) then
-       CALL cv_undilute1(len,nd,t1,q1,qs1,gz1,p1,nk1,icb1,icbmax
-     :                        ,tp1,tvp1,clw1)
+       CALL cv_feed(len,nd,t1,q1,qs1,p1,hm1,gz1 &
+               ,nk1,icb1,icbmax,iflag1,tnk1,qnk1,gznk1,plcl1)
+      endif
+
+!--------------------------------------------------------------------
+! --- UNDILUTE (ADIABATIC) UPDRAFT / 1st part
+! (up through ICB for convect4, up through ICB+1 for convect3)
+!     Calculates the lifted parcel virtual temperature at nk, the
+!     actual temperature, and the adiabatic liquid water content.
+!--------------------------------------------------------------------
+
+      if (iflag_con.eq.3) then
+       CALL cv3_undilute1(len,nd,t1,q1,qs1,gz1,plcl1,p1,nk1,icb1   &
+                              ,tp1,tvp1,clw1,icbs1) ! nd->na
+      endif
+
+      if (iflag_con.eq.4) then
+       CALL cv_undilute1(len,nd,t1,q1,qs1,gz1,p1,nk1,icb1,icbmax &
+                              ,tp1,tvp1,clw1)
       endif
 
 !-------------------------------------------------------------------
@@ -415,8 +415,8 @@ cym
 !-------------------------------------------------------------------
 
       if (iflag_con.eq.3) then
-       CALL cv3_trigger(len,nd,icb1,plcl1,p1,th1,tv1,tvp1      ! nd->na
-     o                 ,pbase1,buoybase1,iflag1,sig1,w01)
+       CALL cv3_trigger(len,nd,icb1,plcl1,p1,th1,tv1,tvp1       &
+                       ,pbase1,buoybase1,iflag1,sig1,w01) ! nd->na
       endif
 
       if (iflag_con.eq.4) then
@@ -435,41 +435,41 @@ cym
         endif
  400  continue
 
-c       print*,'klon, ncum = ',len,ncum
+!       print*,'klon, ncum = ',len,ncum
 
       IF (ncum.gt.0) THEN
 
 !^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 ! --- COMPRESS THE FIELDS
-!		(-> vectorization over convective gridpoints)
+!        (-> vectorization over convective gridpoints)
 !^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
       if (iflag_con.eq.3) then
-       CALL cv3_compress( len,nloc,ncum,nd,ntra
-     :    ,iflag1,nk1,icb1,icbs1
-     :    ,plcl1,tnk1,qnk1,gznk1,pbase1,buoybase1
-     :    ,t1,q1,qs1,u1,v1,gz1,th1
-     :    ,tra1
-     :    ,h1,lv1,cpn1,p1,ph1,tv1,tp1,tvp1,clw1 
-     :    ,sig1,w01
-     o    ,iflag,nk,icb,icbs
-     o    ,plcl,tnk,qnk,gznk,pbase,buoybase
-     o    ,t,q,qs,u,v,gz,th
-     o    ,tra
-     o    ,h,lv,cpn,p,ph,tv,tp,tvp,clw 
-     o    ,sig,w0  )
+       CALL cv3_compress( len,nloc,ncum,nd,ntra &
+          ,iflag1,nk1,icb1,icbs1 &
+          ,plcl1,tnk1,qnk1,gznk1,pbase1,buoybase1 &
+          ,t1,q1,qs1,u1,v1,gz1,th1 &
+          ,tra1 &
+          ,h1,lv1,cpn1,p1,ph1,tv1,tp1,tvp1,clw1  &
+          ,sig1,w01 &
+          ,iflag,nk,icb,icbs &
+          ,plcl,tnk,qnk,gznk,pbase,buoybase &
+          ,t,q,qs,u,v,gz,th &
+          ,tra &
+          ,h,lv,cpn,p,ph,tv,tp,tvp,clw  &
+          ,sig,w0  )
       endif
 
       if (iflag_con.eq.4) then
-       CALL cv_compress( len,nloc,ncum,nd
-     :    ,iflag1,nk1,icb1
-     :    ,cbmf1,plcl1,tnk1,qnk1,gznk1
-     :    ,t1,q1,qs1,u1,v1,gz1
-     :    ,h1,lv1,cpn1,p1,ph1,tv1,tp1,tvp1,clw1
-     o    ,iflag,nk,icb
-     o    ,cbmf,plcl,tnk,qnk,gznk
-     o    ,t,q,qs,u,v,gz,h,lv,cpn,p,ph,tv,tp,tvp,clw 
-     o    ,dph )
+       CALL cv_compress( len,nloc,ncum,nd &
+          ,iflag1,nk1,icb1 &
+          ,cbmf1,plcl1,tnk1,qnk1,gznk1 &
+          ,t1,q1,qs1,u1,v1,gz1 &
+          ,h1,lv1,cpn1,p1,ph1,tv1,tp1,tvp1,clw1 &
+          ,iflag,nk,icb &
+          ,cbmf,plcl,tnk,qnk,gznk &
+          ,t,q,qs,u,v,gz,h,lv,cpn,p,ph,tv,tp,tvp,clw  &
+          ,dph )
       endif
 
 !-------------------------------------------------------------------
@@ -483,17 +483,17 @@ c       print*,'klon, ncum = ',len,ncum
 !-------------------------------------------------------------------
 
       if (iflag_con.eq.3) then
-       CALL cv3_undilute2(nloc,ncum,nd,icb,icbs,nk        !na->nd
-     :                        ,tnk,qnk,gznk,t,q,qs,gz
-     :                        ,p,h,tv,lv,pbase,buoybase,plcl
-     o                        ,inb,tp,tvp,clw,hp,ep,sigp,buoy)
+       CALL cv3_undilute2(nloc,ncum,nd,icb,icbs,nk         &
+                              ,tnk,qnk,gznk,t,q,qs,gz &
+                              ,p,h,tv,lv,pbase,buoybase,plcl &
+                              ,inb,tp,tvp,clw,hp,ep,sigp,buoy) !na->nd
       endif
 
       if (iflag_con.eq.4) then
-       CALL cv_undilute2(nloc,ncum,nd,icb,nk
-     :                        ,tnk,qnk,gznk,t,q,qs,gz
-     :                        ,p,dph,h,tv,lv
-     o             ,inb,inbis,tp,tvp,clw,hp,ep,sigp,frac)
+       CALL cv_undilute2(nloc,ncum,nd,icb,nk &
+                              ,tnk,qnk,gznk,t,q,qs,gz &
+                              ,p,dph,h,tv,lv &
+                   ,inb,inbis,tp,tvp,clw,hp,ep,sigp,frac)
       endif
 
 !-------------------------------------------------------------------
@@ -501,15 +501,15 @@ c       print*,'klon, ncum = ',len,ncum
 !-------------------------------------------------------------------
 
       if (iflag_con.eq.3) then
-       CALL cv3_closure(nloc,ncum,nd,icb,inb              ! na->nd
-     :                       ,pbase,p,ph,tv,buoy
-     o                       ,sig,w0,cape,m)
+       CALL cv3_closure(nloc,ncum,nd,icb,inb               &
+                             ,pbase,p,ph,tv,buoy &
+                             ,sig,w0,cape,m) ! na->nd
       endif
 
       if (iflag_con.eq.4) then
-       CALL cv_closure(nloc,ncum,nd,nk,icb
-     :                ,tv,tvp,p,ph,dph,plcl,cpn
-     o                ,iflag,cbmf)
+       CALL cv_closure(nloc,ncum,nd,nk,icb &
+                      ,tv,tvp,p,ph,dph,plcl,cpn &
+                      ,iflag,cbmf)
       endif
 
 !-------------------------------------------------------------------
@@ -517,17 +517,17 @@ c       print*,'klon, ncum = ',len,ncum
 !-------------------------------------------------------------------
 
       if (iflag_con.eq.3) then
-       CALL cv3_mixing(nloc,ncum,nd,nd,ntra,icb,nk,inb    ! na->nd
-     :                     ,ph,t,q,qs,u,v,tra,h,lv,qnk
-     :                     ,hp,tv,tvp,ep,clw,m,sig
-     o ,ment,qent,uent,vent, nent,sij,elij,ments,qents,traent)
+       CALL cv3_mixing(nloc,ncum,nd,nd,ntra,icb,nk,inb     &
+                           ,ph,t,q,qs,u,v,tra,h,lv,qnk &
+                           ,hp,tv,tvp,ep,clw,m,sig &
+       ,ment,qent,uent,vent, nent,sij,elij,ments,qents,traent)! na->nd
       endif
 
       if (iflag_con.eq.4) then
-       CALL cv_mixing(nloc,ncum,nd,icb,nk,inb,inbis
-     :                     ,ph,t,q,qs,u,v,h,lv,qnk
-     :                     ,hp,tv,tvp,ep,clw,cbmf
-     o                     ,m,ment,qent,uent,vent,nent,sij,elij)
+       CALL cv_mixing(nloc,ncum,nd,icb,nk,inb,inbis &
+                           ,ph,t,q,qs,u,v,h,lv,qnk &
+                           ,hp,tv,tvp,ep,clw,cbmf &
+                           ,m,ment,qent,uent,vent,nent,sij,elij)
       endif
 
 !-------------------------------------------------------------------
@@ -535,17 +535,17 @@ c       print*,'klon, ncum = ',len,ncum
 !-------------------------------------------------------------------
 
       if (iflag_con.eq.3) then
-       CALL cv3_unsat(nloc,ncum,nd,nd,ntra,icb,inb    ! na->nd
-     :               ,t,q,qs,gz,u,v,tra,p,ph
-     :               ,th,tv,lv,cpn,ep,sigp,clw
-     :               ,m,ment,elij,delt,plcl
-     o          ,mp,qp,up,vp,trap,wt,water,evap,b)
+       CALL cv3_unsat(nloc,ncum,nd,nd,ntra,icb,inb     &
+                     ,t,q,qs,gz,u,v,tra,p,ph &
+                     ,th,tv,lv,cpn,ep,sigp,clw &
+                     ,m,ment,elij,delt,plcl &
+                ,mp,qp,up,vp,trap,wt,water,evap,b)! na->nd
       endif
 
       if (iflag_con.eq.4) then
-       CALL cv_unsat(nloc,ncum,nd,inb,t,q,qs,gz,u,v,p,ph
-     :                   ,h,lv,ep,sigp,clw,m,ment,elij
-     o                   ,iflag,mp,qp,up,vp,wt,water,evap)
+       CALL cv_unsat(nloc,ncum,nd,inb,t,q,qs,gz,u,v,p,ph &
+                         ,h,lv,ep,sigp,clw,m,ment,elij &
+                         ,iflag,mp,qp,up,vp,wt,water,evap)
       endif
 
 !-------------------------------------------------------------------
@@ -555,26 +555,26 @@ c       print*,'klon, ncum = ',len,ncum
 !-------------------------------------------------------------------
 
       if (iflag_con.eq.3) then
-       CALL cv3_yield(nloc,ncum,nd,nd,ntra            ! na->nd
-     :                     ,icb,inb,delt
-     :                     ,t,q,u,v,tra,gz,p,ph,h,hp,lv,cpn,th
-     :                     ,ep,clw,m,tp,mp,qp,up,vp,trap
-     :                     ,wt,water,evap,b
-     :                     ,ment,qent,uent,vent,nent,elij,traent,sig
-     :                     ,tv,tvp
-     o                     ,iflag,precip,VPrecip,ft,fq,fu,fv,ftra
-     o                     ,upwd,dnwd,dnwd0,ma,mike,tls,tps,qcondc,wd)
+       CALL cv3_yield(nloc,ncum,nd,nd,ntra             &
+                           ,icb,inb,delt &
+                           ,t,q,u,v,tra,gz,p,ph,h,hp,lv,cpn,th &
+                           ,ep,clw,m,tp,mp,qp,up,vp,trap &
+                           ,wt,water,evap,b &
+                           ,ment,qent,uent,vent,nent,elij,traent,sig &
+                           ,tv,tvp &
+                           ,iflag,precip,VPrecip,ft,fq,fu,fv,ftra &
+                           ,upwd,dnwd,dnwd0,ma,mike,tls,tps,qcondc,wd)! na->nd
       endif
 
       if (iflag_con.eq.4) then
-       CALL cv_yield(nloc,ncum,nd,nk,icb,inb,delt
-     :              ,t,q,u,v,gz,p,ph,h,hp,lv,cpn
-     :              ,ep,clw,frac,m,mp,qp,up,vp
-     :              ,wt,water,evap
-     :              ,ment,qent,uent,vent,nent,elij
-     :              ,tv,tvp
-     o              ,iflag,wd,qprime,tprime
-     o              ,precip,cbmf,ft,fq,fu,fv,Ma,qcondc)
+       CALL cv_yield(nloc,ncum,nd,nk,icb,inb,delt &
+                    ,t,q,u,v,gz,p,ph,h,hp,lv,cpn &
+                    ,ep,clw,frac,m,mp,qp,up,vp &
+                    ,wt,water,evap &
+                    ,ment,qent,uent,vent,nent,elij &
+                    ,tv,tvp &
+                    ,iflag,wd,qprime,tprime &
+                    ,precip,cbmf,ft,fq,fu,fv,Ma,qcondc)
       endif
 
 !^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -582,44 +582,44 @@ c       print*,'klon, ncum = ',len,ncum
 !^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
       if (iflag_con.eq.3) then
-       CALL cv3_tracer(nloc,len,ncum,nd,nd,
-     :                  ment,sij,da,phi)
+       CALL cv3_tracer(nloc,len,ncum,nd,nd, &
+                        ment,sij,da,phi)
       endif
 
 !^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 ! --- UNCOMPRESS THE FIELDS
 !^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-c set iflag1 =42 for non convective points 
+! set iflag1 =42 for non convective points
       do  i=1,len
         iflag1(i)=42
       end do
-c
+!
       if (iflag_con.eq.3) then
-       CALL cv3_uncompress(nloc,len,ncum,nd,ntra,idcum
-     :          ,iflag
-     :          ,precip,VPrecip,sig,w0
-     :          ,ft,fq,fu,fv,ftra
-     :          ,inb 
-     :          ,Ma,upwd,dnwd,dnwd0,qcondc,wd,cape
-     :          ,da,phi,mp
-     o          ,iflag1
-     o          ,precip1,VPrecip1,sig1,w01
-     o          ,ft1,fq1,fu1,fv1,ftra1
-     o          ,inb1
-     o          ,Ma1,upwd1,dnwd1,dnwd01,qcondc1,wd1,cape1 
-     o          ,da1,phi1,mp1)
+       CALL cv3_uncompress(nloc,len,ncum,nd,ntra,idcum &
+                ,iflag &
+                ,precip,VPrecip,sig,w0 &
+                ,ft,fq,fu,fv,ftra &
+                ,inb  &
+                ,Ma,upwd,dnwd,dnwd0,qcondc,wd,cape &
+                ,da,phi,mp &
+                ,iflag1 &
+                ,precip1,VPrecip1,sig1,w01 &
+                ,ft1,fq1,fu1,fv1,ftra1 &
+                ,inb1 &
+                ,Ma1,upwd1,dnwd1,dnwd01,qcondc1,wd1,cape1  &
+                ,da1,phi1,mp1)
       endif
 
       if (iflag_con.eq.4) then
-       CALL cv_uncompress(nloc,len,ncum,nd,idcum
-     :          ,iflag
-     :          ,precip,cbmf
-     :          ,ft,fq,fu,fv
-     :          ,Ma,qcondc            
-     o          ,iflag1
-     o          ,precip1,cbmf1
-     o          ,ft1,fq1,fu1,fv1
-     o          ,Ma1,qcondc1 )           
+       CALL cv_uncompress(nloc,len,ncum,nd,idcum &
+                ,iflag &
+                ,precip,cbmf &
+                ,ft,fq,fu,fv &
+                ,Ma,qcondc             &
+                ,iflag1 &
+                ,precip1,cbmf1 &
+                ,ft1,fq1,fu1,fv1 &
+                ,Ma1,qcondc1 )
       endif
 
       ENDIF ! ncum>0
@@ -628,76 +628,3 @@ c
 
       return
       end
-
-!==================================================================
-      SUBROUTINE cv_flag
-            use cvflag
-      implicit none
-
-
-c -- si .TRUE., on rend la gravite plus explicite et eventuellement
-c differente de 10.0 dans convect3: 
-      cvflag_grav = .TRUE.
-
-      return
-      end
-
-!==================================================================
-      SUBROUTINE cv_thermo(iflag_con)
-      use SUPHEC_M 
-            use cvthermo 
-	  implicit none
-
-c-------------------------------------------------------------
-c Set thermodynamical constants for convectL
-c-------------------------------------------------------------
-
-
-      integer, intent(in):: iflag_con
-
-
-c original set from convect:
-      if (iflag_con.eq.4) then
-       cpd=1005.7
-       cpv=1870.0
-       cl=4190.0
-       rrv=461.5
-       rrd=287.04
-       lv0=2.501E6
-       g=9.8
-       t0=273.15
-       grav=g
-      endif
-
-c constants consistent with LMDZ:
-      if (iflag_con.eq.3) then
-       cpd = RCPD
-       cpv = RCPV
-       cl  = RCW
-       rrv = RV
-       rrd = RD
-       lv0 = RLVTT
-       g   = RG     ! not used in convect3
-c ori      t0  = RTT
-       t0  = 273.15 ! convect3 (RTT=273.16)
-c maf       grav= 10.    ! implicitely or explicitely used in convect3
-       grav= g    ! implicitely or explicitely used in convect3
-      endif
-
-      rowl=1000.0 !(a quelle variable de SUPHEC_M cela correspond-il?)
-
-      clmcpv=cl-cpv
-      clmcpd=cl-cpd
-      cpdmcp=cpd-cpv
-      cpvmcpd=cpv-cpd
-      cpvmcl=cl-cpv ! for convect3
-      eps=rrd/rrv
-      epsi=1.0/eps
-      epsim1=epsi-1.0
-c      ginv=1.0/g
-      ginv=1.0/grav
-      hrd=0.5*rrd
-
-      return
-      end
-

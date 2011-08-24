@@ -29,6 +29,7 @@ module suphec_m
 
   real, parameter:: RD = 1000. * R / RMD
   ! specific ideal gas constant for dry air, in J K-1 kg-1
+  ! (factor 1000: conversion from g to kg)
 
   real, parameter:: RMO3 = 47.9942
   real, parameter:: RMV = 18.0153

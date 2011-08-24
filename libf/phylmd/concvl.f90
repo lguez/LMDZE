@@ -13,7 +13,7 @@ contains
     ! From phylmd/concvl.F, version 1.3 2005/04/15 12:36:17
     ! Author: Z.X. Li (LMD/CNRS)
     ! date: 1993/08/18
-    ! Objet: schema de convection de Emanuel (1991) interface
+    ! Objet: schéma de convection de Emanuel (1991) interface
 
     USE dimens_m, ONLY : nqmx
     USE dimphy, ONLY : klev, klon

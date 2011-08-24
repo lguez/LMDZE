@@ -8,13 +8,7 @@ contains
        flux_q, u, v, t, q, pblh, cape, EauLiq, ctei, pblT, therm, trmb1, &
        trmb2, trmb3, plcl)
 
-    use dimens_m
-    use dimphy
-    use SUPHEC_M
-    use yoethf_m
-    use fcttre
-
-    ! D'apres Holstag & Boville et Troen & Mahrt
+    ! D'après Holstag et Boville et Troen et Mahrt
     ! JAS 47 BLM
     ! Algorithme thèse Anne Mathieu
     ! Critère d'entraînement Peter Duynkerke (JAS 50)
@@ -34,6 +28,11 @@ contains
     ! flux, t, q2m, t, q10m, on va utiliser systematiquement les grandeurs a 2m
     ! mais on garde la possibilité de changer si besoin est (jusqu'à présent
     ! la forme de HB avec le 1er niveau modele etait conservee)
+
+    USE dimphy, ONLY: klev, klon, max
+    USE suphec_m, ONLY: rcpd, rd, retv, rg, rkappa, rlvtt, rtt, rv
+    USE yoethf_m, ONLY: r2es, rvtmp2
+    USE fcttre, ONLY: foeew
 
     REAL RLvCp, REPS
     ! Arguments:
@@ -447,7 +446,7 @@ contains
 
     ! Main level loop to compute the diffusivities and
     ! counter-gradient terms:
-    DO k = 2, isommet
+    loop_level: DO k = 2, isommet
        ! Find levels within boundary layer:
        DO i = 1, knon
           unslev(i) = .FALSE.
@@ -517,8 +516,8 @@ contains
 
        ! For all layers, compute integral info and CTEI
        DO i = 1, knon
-          if (check(i).or.omegafl(i)) then
-             if (.not.Zsat(i)) then
+          if (check(i) .or. omegafl(i)) then
+             if (.not. Zsat(i)) then
                 T2 = T2m(i) * s(i, k)
                 ! thermodyn functions
                 zdelta=MAX(0., SIGN(1., RTT - T2))
@@ -543,7 +542,7 @@ contains
              ! cette ligne a deja ete faite normalement ?
           endif
        ENDDO
-    end DO
+    end DO loop_level
 
   END SUBROUTINE HBTM
 

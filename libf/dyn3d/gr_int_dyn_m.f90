@@ -25,8 +25,8 @@ contains
 
     gr_int_dyn(:, 1) = sum(champin(:, 1)) / iim ! north pole
     gr_int_dyn(:, jp1) = sum(champin(:, jp1)) / iim ! south pole
-    gr_int_dyn(:iim, 2:jp1 - 1) = champin(:, 2:jp1 - 1)
-    gr_int_dyn(iim + 1, 2:jp1 - 1) = gr_int_dyn(1, 2:jp1 - 1)
+    gr_int_dyn(: iim, 2: jp1 - 1) = champin(:, 2: jp1 - 1)
+    gr_int_dyn(iim + 1, 2: jp1 - 1) = gr_int_dyn(1, 2: jp1 - 1)
 
   END function gr_int_dyn
 

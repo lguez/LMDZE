@@ -33,66 +33,8 @@ contains
     ! en leur ajoutant une dimension, c'est-à-dire "nbsrf" (nombre de
     ! sous-surfaces).
 
-    ! Arguments:
-    ! dtime----input-R- interval du temps (secondes)
-    ! itap-----input-I- numero du pas de temps
-    ! date0----input-R- jour initial
-    ! t--------input-R- temperature (K)
-    ! q--------input-R- vapeur d'eau (kg/kg)
-    ! u--------input-R- vitesse u
-    ! v--------input-R- vitesse v
-    ! ts-------input-R- temperature du sol (en Kelvin)
-    ! paprs----input-R- pression a intercouche (Pa)
-    ! pplay----input-R- pression au milieu de couche (Pa)
-    ! radsol---input-R- flux radiatif net (positif vers le sol) en W/m**2
-    ! rlat-----input-R- latitude en degree
-    ! rugos----input-R- longeur de rugosite (en m)
-    ! cufi-----input-R- resolution des mailles en x (m)
-    ! cvfi-----input-R- resolution des mailles en y (m)
-
-    ! d_t------output-R- le changement pour "t"
-    ! d_q------output-R- le changement pour "q"
-    ! d_u------output-R- le changement pour "u"
-    ! d_v------output-R- le changement pour "v"
-    ! d_ts-----output-R- le changement pour "ts"
-    ! flux_t---output-R- flux de chaleur sensible (CpT) J/m**2/s (W/m**2)
-    !                    (orientation positive vers le bas)
-    ! flux_q---output-R- flux de vapeur d'eau (kg/m**2/s)
-    ! flux_u---output-R- tension du vent X: (kg m/s)/(m**2 s) ou Pascal
-    ! flux_v---output-R- tension du vent Y: (kg m/s)/(m**2 s) ou Pascal
-    ! dflux_t derive du flux sensible
-    ! dflux_q derive du flux latent
-    !IM "slab" ocean
-    ! flux_g---output-R-  flux glace (pour OCEAN='slab  ')
-    ! flux_o---output-R-  flux ocean (pour OCEAN='slab  ')
-
-    ! tslab-in/output-R temperature du slab ocean (en Kelvin) 
-    ! uniqmnt pour slab
-
-    ! seaice---output-R-  glace de mer (kg/m2) (pour OCEAN='slab  ')
-    !cc
-    ! ffonte----Flux thermique utilise pour fondre la neige
-    ! fqcalving-Flux d'eau "perdue" par la surface et necessaire pour limiter la
-    !           hauteur de neige, en kg/m2/s
-    ! on rajoute en output yu1 et yv1 qui sont les vents dans
-    ! la premiere couche
-    ! ces 4 variables sont maintenant traites dans phytrac
-    ! itr--------input-I- nombre de traceurs
-    ! tr---------input-R- q. de traceurs
-    ! flux_surf--input-R- flux de traceurs a la surface
-    ! d_tr-------output-R tendance de traceurs
-    !IM cf. AM : PBL
-    ! trmb1-------deep_cape
-    ! trmb2--------inhibition
-    ! trmb3-------Point Omega
-    ! Cape(klon)-------Cape du thermique
-    ! EauLiq(klon)-------Eau liqu integr du thermique
-    ! ctei(klon)-------Critere d'instab d'entrainmt des nuages de CL
-    ! lcl------- Niveau de condensation
-    ! pblh------- HCL
-    ! pblT------- T au nveau HCL
-
     use calendar, ONLY : ymds2ju
+    use clqh_m, only: clqh
     use coefkz_m, only: coefkz
     use coefkzmin_m, only: coefkzmin
     USE conf_phys_m, ONLY : iflag_pbl
@@ -110,29 +52,62 @@ contains
     USE temps, ONLY : annee_ref, itau_phy
     use yamada4_m, only: yamada4
 
-    REAL, INTENT (IN) :: dtime
+    ! Arguments:
+
+    REAL, INTENT (IN) :: dtime ! interval du temps (secondes)
     REAL date0
+    ! date0----input-R- jour initial
     INTEGER, INTENT (IN) :: itap
+    ! itap-----input-I- numero du pas de temps
     REAL t(klon, klev), q(klon, klev)
+    ! t--------input-R- temperature (K)
+    ! q--------input-R- vapeur d'eau (kg/kg)
     REAL, INTENT (IN):: u(klon, klev), v(klon, klev)
+    ! u--------input-R- vitesse u
+    ! v--------input-R- vitesse v
     REAL, INTENT (IN):: paprs(klon, klev+1)
+    ! paprs----input-R- pression a intercouche (Pa)
     REAL, INTENT (IN):: pplay(klon, klev)
+    ! pplay----input-R- pression au milieu de couche (Pa)
     REAL, INTENT (IN):: rlon(klon), rlat(klon)
+    ! rlat-----input-R- latitude en degree
     REAL cufi(klon), cvfi(klon)
+    ! cufi-----input-R- resolution des mailles en x (m)
+    ! cvfi-----input-R- resolution des mailles en y (m)
     REAL d_t(klon, klev), d_q(klon, klev)
+    ! d_t------output-R- le changement pour "t"
+    ! d_q------output-R- le changement pour "q"
     REAL d_u(klon, klev), d_v(klon, klev)
+    ! d_u------output-R- le changement pour "u"
+    ! d_v------output-R- le changement pour "v"
     REAL flux_t(klon, klev, nbsrf), flux_q(klon, klev, nbsrf)
+    ! flux_t---output-R- flux de chaleur sensible (CpT) J/m**2/s (W/m**2)
+    !                    (orientation positive vers le bas)
+    ! flux_q---output-R- flux de vapeur d'eau (kg/m**2/s)
     REAL dflux_t(klon), dflux_q(klon)
+    ! dflux_t derive du flux sensible
+    ! dflux_q derive du flux latent
     !IM "slab" ocean
     REAL flux_o(klon), flux_g(klon)
+    !IM "slab" ocean
+    ! flux_g---output-R-  flux glace (pour OCEAN='slab  ')
+    ! flux_o---output-R-  flux ocean (pour OCEAN='slab  ')
     REAL y_flux_o(klon), y_flux_g(klon)
     REAL tslab(klon), ytslab(klon)
+    ! tslab-in/output-R temperature du slab ocean (en Kelvin) 
+    ! uniqmnt pour slab
     REAL seaice(klon), y_seaice(klon)
+    ! seaice---output-R-  glace de mer (kg/m2) (pour OCEAN='slab  ')
     REAL y_fqcalving(klon), y_ffonte(klon)
     REAL fqcalving(klon, nbsrf), ffonte(klon, nbsrf)
+    ! ffonte----Flux thermique utilise pour fondre la neige
+    ! fqcalving-Flux d'eau "perdue" par la surface et necessaire pour limiter la
+    !           hauteur de neige, en kg/m2/s
     REAL run_off_lic_0(klon), y_run_off_lic_0(klon)
 
     REAL flux_u(klon, klev, nbsrf), flux_v(klon, klev, nbsrf)
+    ! flux_u---output-R- tension du vent X: (kg m/s)/(m**2 s) ou Pascal
+    ! flux_v---output-R- tension du vent Y: (kg m/s)/(m**2 s) ou Pascal
     REAL rugmer(klon), agesno(klon, nbsrf)
     REAL, INTENT (IN) :: rugoro(klon)
     REAL cdragh(klon), cdragm(klon)
@@ -149,7 +124,9 @@ contains
 
     REAL pctsrf(klon, nbsrf)
     REAL ts(klon, nbsrf)
+    ! ts-------input-R- temperature du sol (en Kelvin)
     REAL d_ts(klon, nbsrf)
+    ! d_ts-----output-R- le changement pour "ts"
     REAL snow(klon, nbsrf)
     REAL qsurf(klon, nbsrf)
     REAL evap(klon, nbsrf)
@@ -163,6 +140,7 @@ contains
 
     REAL sollw(klon, nbsrf), solsw(klon, nbsrf), sollwdown(klon)
     REAL rugos(klon, nbsrf)
+    ! rugos----input-R- longeur de rugosite (en m)
     ! la nouvelle repartition des surfaces sortie de l'interface
     REAL pctsrf_new(klon, nbsrf)
 
@@ -182,12 +160,14 @@ contains
     REAL ytsoil(klon, nsoilmx)
     REAL qsol(klon)
 
-    EXTERNAL clqh, clvent, calbeta, cltrac
+    EXTERNAL clvent, calbeta, cltrac
 
     REAL yts(klon), yrugos(klon), ypct(klon), yz0_new(klon)
     REAL yalb(klon)
     REAL yalblw(klon)
     REAL yu1(klon), yv1(klon)
+    ! on rajoute en output yu1 et yv1 qui sont les vents dans
+    ! la premiere couche
     REAL ysnow(klon), yqsurf(klon), yagesno(klon), yqsol(klon)
     REAL yrain_f(klon), ysnow_f(klon)
     REAL ysollw(klon), ysolsw(klon), ysollwdown(klon)
@@ -261,15 +241,20 @@ contains
     !IM cf. AM : pbl, hbtm (Comme les autres diagnostics on cumule ds
     ! physiq ce qui permet de sortir les grdeurs par sous surface)
     REAL pblh(klon, nbsrf)
+    ! pblh------- HCL
     REAL plcl(klon, nbsrf)
     REAL capcl(klon, nbsrf)
     REAL oliqcl(klon, nbsrf)
     REAL cteicl(klon, nbsrf)
     REAL pblt(klon, nbsrf)
+    ! pblT------- T au nveau HCL
     REAL therm(klon, nbsrf)
     REAL trmb1(klon, nbsrf)
+    ! trmb1-------deep_cape
     REAL trmb2(klon, nbsrf)
+    ! trmb2--------inhibition
     REAL trmb3(klon, nbsrf)
+    ! trmb3-------Point Omega
     REAL ypblh(klon)
     REAL ylcl(klon)
     REAL ycapcl(klon)
@@ -412,8 +397,8 @@ contains
     pctsrf_pot(:, is_oce) = 1. - zmasq
     pctsrf_pot(:, is_sic) = 1. - zmasq
 
-    DO nsrf = 1, nbsrf
-       ! chercher les indices:
+    loop_surface: DO nsrf = 1, nbsrf
+       ! Chercher les indices :
        ni = 0
        knon = 0
        DO i = 1, klon
@@ -795,7 +780,7 @@ contains
              seaice(1:klon) = y_seaice(1:klon)
           END IF
        END IF
-    END DO
+    END DO loop_surface
 
     ! On utilise les nouvelles surfaces
 
