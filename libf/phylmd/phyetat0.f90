@@ -18,15 +18,16 @@ contains
 
     ! From phylmd/phyetat0.F, version 1.4 2005/06/03 10:03:07
     ! Author: Z.X. Li (LMD/CNRS)
-    ! Date: 19930818
+    ! Date: 1993/08/18
     ! Objet : Lecture de l'état initial pour la physique
 
     USE indicesol, ONLY : epsfra, is_lic, is_oce, is_sic, is_ter, nbsrf
     USE dimsoil, ONLY : nsoilmx
     USE temps, ONLY : itau_phy
     use netcdf, only: nf90_get_att, nf90_global, nf90_inq_varid, NF90_NOERR, &
-         nf90_get_var, NF90_NOWRITE
-    use netcdf95, only: handle_err, nf95_get_var, nf95_close, NF95_OPEN
+         NF90_NOWRITE
+    use netcdf95, only: handle_err, nf95_get_var, nf95_close, NF95_OPEN, &
+         nf95_inq_varid
     use dimphy, only: zmasq, klev
 
     CHARACTER(len=*), intent(in):: fichnom
@@ -84,39 +85,22 @@ contains
 
     ! Lecture des latitudes (coordonnees):
 
-    ierr = NF90_INQ_VARID(ncid, "latitude", varid)
-    IF (ierr /= NF90_NOERR) THEN
-       PRINT *, 'phyetat0: Le champ <latitude> est absent'
-       stop 1
-    ENDIF
-    ierr = NF90_GET_VAR(ncid, varid, rlat)
-    IF (ierr /= NF90_NOERR) THEN
-       PRINT *, 'phyetat0: Lecture echouee pour <latitude>'
-       stop 1
-    ENDIF
+    call NF95_INQ_VARID(ncid, "latitude", varid)
+    call NF95_GET_VAR(ncid, varid, rlat)
 
     ! Lecture des longitudes (coordonnees):
 
-    ierr = NF90_INQ_VARID(ncid, "longitude", varid)
-    IF (ierr /= NF90_NOERR) THEN
-       PRINT *, 'phyetat0: Le champ <longitude> est absent'
-       stop 1
-    ENDIF
-    ierr = NF90_GET_VAR(ncid, varid, rlon)
-    IF (ierr /= NF90_NOERR) THEN
-       PRINT *, 'phyetat0: Lecture echouee pour <latitude>'
-       stop 1
-    ENDIF
+    call NF95_INQ_VARID(ncid, "longitude", varid)
+    call NF95_GET_VAR(ncid, varid, rlon)
 
     ! Lecture du masque terre mer
 
     ierr = NF90_INQ_VARID(ncid, "masque", varid)
-    IF (ierr ==  NF90_NOERR) THEN
+    IF (ierr == NF90_NOERR) THEN
        call nf95_get_var(ncid, varid, zmasq)
     else
        PRINT *, 'phyetat0: Le champ <masque> est absent'
        PRINT *, 'fichier startphy non compatible avec phyetat0'
-       !      stop 1
     ENDIF
     ! Lecture des fractions pour chaque sous-surface
 
@@ -127,59 +111,53 @@ contains
     ! fraction de terre
 
     ierr = NF90_INQ_VARID(ncid, "FTER", varid)
-    IF (ierr ==  NF90_NOERR) THEN
-       call nf95_get_var(ncid, varid, pctsrf(1 : klon, is_ter))
+    IF (ierr == NF90_NOERR) THEN
+       call nf95_get_var(ncid, varid, pctsrf(:, is_ter))
     else
        PRINT *, 'phyetat0: Le champ <FTER> est absent'
-       !$$$         stop 1
     ENDIF
 
     ! fraction de glace de terre
 
     ierr = NF90_INQ_VARID(ncid, "FLIC", varid)
-    IF (ierr ==  NF90_NOERR) THEN
-       call nf95_get_var(ncid, varid, pctsrf(1 : klon, is_lic))
+    IF (ierr == NF90_NOERR) THEN
+       call nf95_get_var(ncid, varid, pctsrf(:, is_lic))
     else
        PRINT *, 'phyetat0: Le champ <FLIC> est absent'
-       !$$$         stop 1
     ENDIF
 
     ! fraction d'ocean
 
     ierr = NF90_INQ_VARID(ncid, "FOCE", varid)
-    IF (ierr ==  NF90_NOERR) THEN
-       call nf95_get_var(ncid, varid, pctsrf(1 : klon, is_oce))
+    IF (ierr == NF90_NOERR) THEN
+       call nf95_get_var(ncid, varid, pctsrf(:, is_oce))
     else
        PRINT *, 'phyetat0: Le champ <FOCE> est absent'
-       !$$$         stop 1
     ENDIF
 
     ! fraction glace de mer
 
     ierr = NF90_INQ_VARID(ncid, "FSIC", varid)
-    IF (ierr ==  NF90_NOERR) THEN
-       call nf95_get_var(ncid, varid, pctsrf(1 : klon, is_sic))
+    IF (ierr == NF90_NOERR) THEN
+       call nf95_get_var(ncid, varid, pctsrf(:, is_sic))
     else
        PRINT *, 'phyetat0: Le champ <FSIC> est absent'
-       !$$$         stop 1
     ENDIF
 
-    !  Verification de l'adequation entre le masque et les sous-surfaces
+    ! Verification de l'adequation entre le masque et les sous-surfaces
 
-    fractint( 1 : klon) = pctsrf(1 : klon, is_ter)  &
-         + pctsrf(1 : klon, is_lic)
+    fractint = pctsrf(:, is_ter) + pctsrf(:, is_lic)
     DO i = 1 , klon
-       IF ( abs(fractint(i) - zmasq(i) ) .GT. EPSFRA ) THEN
-          WRITE(*, *) 'phyetat0: attention fraction terre pas ',  &
+       IF ( abs(fractint(i) - zmasq(i) ) > EPSFRA ) THEN
+          WRITE(*, *) 'phyetat0: attention fraction terre pas ', &
                'coherente ', i, zmasq(i), pctsrf(i, is_ter) &
                , pctsrf(i, is_lic)
        ENDIF
     END DO
-    fractint(1 : klon) =  pctsrf(1 : klon, is_oce)  &
-         + pctsrf(1 : klon, is_sic)
+    fractint = pctsrf(:, is_oce) + pctsrf(:, is_sic)
     DO i = 1 , klon
-       IF ( abs( fractint(i) - (1. - zmasq(i))) .GT. EPSFRA ) THEN
-          WRITE(*, *) 'phyetat0 attention fraction ocean pas ',  &
+       IF ( abs( fractint(i) - (1. - zmasq(i))) > EPSFRA ) THEN
+          WRITE(*, *) 'phyetat0 attention fraction ocean pas ', &
                'coherente ', i, zmasq(i) , pctsrf(i, is_oce) &
                , pctsrf(i, is_sic)
        ENDIF
@@ -190,23 +168,15 @@ contains
     ierr = NF90_INQ_VARID(ncid, "TS", varid)
     IF (ierr /= NF90_NOERR) THEN
        PRINT *, 'phyetat0 : Le champ <TS> est absent'
-       PRINT *, '          Mais je vais essayer de lire TS**'
+       PRINT *, ' Mais je vais essayer de lire TS**'
        DO nsrf = 1, nbsrf
-          IF (nsrf.GT.99) THEN
+          IF (nsrf > 99) THEN
              PRINT *, "Trop de sous-mailles"
              stop 1
           ENDIF
           WRITE(str2, '(i2.2)') nsrf
-          ierr = NF90_INQ_VARID(ncid, "TS"//str2, varid)
-          IF (ierr /= NF90_NOERR) THEN
-             PRINT *, "phyetat0: Le champ <TS"//str2//"> est absent"
-             stop 1
-          ENDIF
-          ierr = NF90_GET_VAR(ncid, varid, tsol(1, nsrf))
-          IF (ierr /= NF90_NOERR) THEN
-             PRINT *, "phyetat0: Lecture echouee pour <TS"//str2//">"
-             stop 1
-          ENDIF
+          call NF95_INQ_VARID(ncid, "TS"//str2, varid)
+          call NF95_GET_VAR(ncid, varid, tsol(:, nsrf))
           xmin = 1.0E+20
           xmax = -1.0E+20
           DO i = 1, klon
@@ -217,7 +187,7 @@ contains
        ENDDO
     ELSE
        PRINT *, 'phyetat0: Le champ <TS> est present'
-       PRINT *, '          J ignore donc les autres temperatures TS**'
+       PRINT *, ' J ignore donc les autres temperatures TS**'
        call nf95_get_var(ncid, varid, tsol(:, 1))
        xmin = 1.0E+20
        xmax = -1.0E+20
@@ -237,7 +207,7 @@ contains
 
     DO nsrf = 1, nbsrf
        DO isoil=1, nsoilmx
-          IF (isoil.GT.99 .AND. nsrf.GT.99) THEN
+          IF (isoil > 99 .AND. nsrf > 99) THEN
              PRINT *, "Trop de couches ou sous-mailles"
              stop 1
           ENDIF
@@ -245,30 +215,22 @@ contains
           ierr = NF90_INQ_VARID(ncid, 'Tsoil'//str7, varid)
           IF (ierr /= NF90_NOERR) THEN
              PRINT *, "phyetat0: Le champ <Tsoil"//str7//"> est absent"
-             PRINT *, "          Il prend donc la valeur de surface"
+             PRINT *, " Il prend donc la valeur de surface"
              DO i=1, klon
                 tsoil(i, isoil, nsrf)=tsol(i, nsrf)
              ENDDO
           ELSE
-             ierr = NF90_GET_VAR(ncid, varid, tsoil(1, isoil, nsrf))
-             IF (ierr /= NF90_NOERR) THEN
-                PRINT *, "Lecture echouee pour <Tsoil"//str7//">"
-                stop 1
-             ENDIF
+             call NF95_GET_VAR(ncid, varid, tsoil(:, isoil, nsrf))
           ENDIF
        ENDDO
     ENDDO
 
     !IM "slab" ocean 
 
-    ! Lecture de tslab (pour slab ocean seulement):      
+    ! Lecture de tslab (pour slab ocean seulement): 
 
-    IF (ocean .eq. 'slab  ') then
-       ierr = NF90_INQ_VARID(ncid, "TSLAB", varid)
-       IF (ierr /= NF90_NOERR) THEN
-          PRINT *, "phyetat0: Le champ <TSLAB> est absent"
-          stop 1
-       ENDIF
+    IF (ocean .eq. 'slab ') then
+       call NF95_INQ_VARID(ncid, "TSLAB", varid)
        call nf95_get_var(ncid, varid, tslab)
        xmin = 1.0E+20
        xmax = -1.0E+20
@@ -280,11 +242,7 @@ contains
 
        ! Lecture de seaice (pour slab ocean seulement):
 
-       ierr = NF90_INQ_VARID(ncid, "SEAICE", varid)
-       IF (ierr /= NF90_NOERR) THEN
-          PRINT *, "phyetat0: Le champ <SEAICE> est absent"
-          stop 1
-       ENDIF
+       call NF95_INQ_VARID(ncid, "SEAICE", varid)
        call nf95_get_var(ncid, varid, seaice)
        xmin = 1.0E+20
        xmax = -1.0E+20
@@ -303,23 +261,15 @@ contains
     ierr = NF90_INQ_VARID(ncid, "QS", varid)
     IF (ierr /= NF90_NOERR) THEN
        PRINT *, 'phyetat0: Le champ <QS> est absent'
-       PRINT *, '          Mais je vais essayer de lire QS**'
+       PRINT *, ' Mais je vais essayer de lire QS**'
        DO nsrf = 1, nbsrf
-          IF (nsrf.GT.99) THEN
+          IF (nsrf > 99) THEN
              PRINT *, "Trop de sous-mailles"
              stop 1
           ENDIF
           WRITE(str2, '(i2.2)') nsrf
-          ierr = NF90_INQ_VARID(ncid, "QS"//str2, varid)
-          IF (ierr /= NF90_NOERR) THEN
-             PRINT *, "phyetat0: Le champ <QS"//str2//"> est absent"
-             stop 1
-          ENDIF
-          ierr = NF90_GET_VAR(ncid, varid, qsurf(1, nsrf))
-          IF (ierr /= NF90_NOERR) THEN
-             PRINT *, "phyetat0: Lecture echouee pour <QS"//str2//">"
-             stop 1
-          ENDIF
+          call NF95_INQ_VARID(ncid, "QS"//str2, varid)
+          call NF95_GET_VAR(ncid, varid, qsurf(:, nsrf))
           xmin = 1.0E+20
           xmax = -1.0E+20
           DO i = 1, klon
@@ -330,7 +280,7 @@ contains
        ENDDO
     ELSE
        PRINT *, 'phyetat0: Le champ <QS> est present'
-       PRINT *, '          J ignore donc les autres humidites QS**'
+       PRINT *, ' J ignore donc les autres humidites QS**'
        call nf95_get_var(ncid, varid, qsurf(:, 1))
        xmin = 1.0E+20
        xmax = -1.0E+20
@@ -349,11 +299,11 @@ contains
     ! Eau dans le sol (pour le modele de sol "bucket")
 
     ierr = NF90_INQ_VARID(ncid, "QSOL", varid)
-    IF (ierr ==  NF90_NOERR) THEN
+    IF (ierr == NF90_NOERR) THEN
        call nf95_get_var(ncid, varid, qsol)
     else
        PRINT *, 'phyetat0: Le champ <QSOL> est absent'
-       PRINT *, '          Valeur par defaut nulle'
+       PRINT *, ' Valeur par defaut nulle'
        qsol = 0.
     ENDIF
     xmin = 1.0E+20
@@ -369,23 +319,15 @@ contains
     ierr = NF90_INQ_VARID(ncid, "SNOW", varid)
     IF (ierr /= NF90_NOERR) THEN
        PRINT *, 'phyetat0: Le champ <SNOW> est absent'
-       PRINT *, '          Mais je vais essayer de lire SNOW**'
+       PRINT *, ' Mais je vais essayer de lire SNOW**'
        DO nsrf = 1, nbsrf
-          IF (nsrf.GT.99) THEN
+          IF (nsrf > 99) THEN
              PRINT *, "Trop de sous-mailles"
              stop 1
           ENDIF
           WRITE(str2, '(i2.2)') nsrf
-          ierr = NF90_INQ_VARID(ncid, "SNOW"//str2, varid)
-          IF (ierr /= NF90_NOERR) THEN
-             PRINT *, "phyetat0: Le champ <SNOW"//str2//"> est absent"
-             stop 1
-          ENDIF
-          ierr = NF90_GET_VAR(ncid, varid, snow(1, nsrf))
-          IF (ierr /= NF90_NOERR) THEN
-             PRINT *, "phyetat0: Lecture echouee pour <SNOW"//str2//">"
-             stop 1
-          ENDIF
+          call NF95_INQ_VARID(ncid, "SNOW"//str2, varid)
+          call NF95_GET_VAR(ncid, varid, snow(:, nsrf))
           xmin = 1.0E+20
           xmax = -1.0E+20
           DO i = 1, klon
@@ -396,7 +338,7 @@ contains
        ENDDO
     ELSE
        PRINT *, 'phyetat0: Le champ <SNOW> est present'
-       PRINT *, '          J ignore donc les autres neiges SNOW**'
+       PRINT *, ' J ignore donc les autres neiges SNOW**'
        call nf95_get_var(ncid, varid, snow(:, 1))
        xmin = 1.0E+20
        xmax = -1.0E+20
@@ -417,23 +359,15 @@ contains
     ierr = NF90_INQ_VARID(ncid, "ALBE", varid)
     IF (ierr /= NF90_NOERR) THEN
        PRINT *, 'phyetat0: Le champ <ALBE> est absent'
-       PRINT *, '          Mais je vais essayer de lire ALBE**'
+       PRINT *, ' Mais je vais essayer de lire ALBE**'
        DO nsrf = 1, nbsrf
-          IF (nsrf.GT.99) THEN
+          IF (nsrf > 99) THEN
              PRINT *, "Trop de sous-mailles"
              stop 1
           ENDIF
           WRITE(str2, '(i2.2)') nsrf
-          ierr = NF90_INQ_VARID(ncid, "ALBE"//str2, varid)
-          IF (ierr /= NF90_NOERR) THEN
-             PRINT *, "phyetat0: Le champ <ALBE"//str2//"> est absent"
-             stop 1
-          ENDIF
-          ierr = NF90_GET_VAR(ncid, varid, albe(1, nsrf))
-          IF (ierr /= NF90_NOERR) THEN
-             PRINT *, "phyetat0: Lecture echouee pour <ALBE"//str2//">"
-             stop 1
-          ENDIF
+          call NF95_INQ_VARID(ncid, "ALBE"//str2, varid)
+          call NF95_GET_VAR(ncid, varid, albe(:, nsrf))
           xmin = 1.0E+20
           xmax = -1.0E+20
           DO i = 1, klon
@@ -444,7 +378,7 @@ contains
        ENDDO
     ELSE
        PRINT *, 'phyetat0: Le champ <ALBE> est present'
-       PRINT *, '          J ignore donc les autres ALBE**'
+       PRINT *, ' J ignore donc les autres ALBE**'
        call nf95_get_var(ncid, varid, albe(:, 1))
        xmin = 1.0E+20
        xmax = -1.0E+20
@@ -465,8 +399,8 @@ contains
     ierr = NF90_INQ_VARID(ncid, "ALBLW", varid)
     IF (ierr /= NF90_NOERR) THEN
        PRINT *, 'phyetat0: Le champ <ALBLW> est absent'
-       !        PRINT *, '          Mais je vais essayer de lire ALBLW**'
-       PRINT *, '          Mais je vais prendre ALBE**'
+       ! PRINT *, ' Mais je vais essayer de lire ALBLW**'
+       PRINT *, ' Mais je vais prendre ALBE**'
        DO nsrf = 1, nbsrf
           DO i = 1, klon
              alblw(i, nsrf) = albe(i, nsrf)
@@ -474,7 +408,7 @@ contains
        ENDDO
     ELSE
        PRINT *, 'phyetat0: Le champ <ALBLW> est present'
-       PRINT *, '          J ignore donc les autres ALBLW**'
+       PRINT *, ' J ignore donc les autres ALBLW**'
        call nf95_get_var(ncid, varid, alblw(:, 1))
        xmin = 1.0E+20
        xmax = -1.0E+20
@@ -490,28 +424,20 @@ contains
        ENDDO
     ENDIF
 
-    ! Lecture de evaporation:  
+    ! Lecture de evaporation: 
 
     ierr = NF90_INQ_VARID(ncid, "EVAP", varid)
     IF (ierr /= NF90_NOERR) THEN
        PRINT *, 'phyetat0: Le champ <EVAP> est absent'
-       PRINT *, '          Mais je vais essayer de lire EVAP**'
+       PRINT *, ' Mais je vais essayer de lire EVAP**'
        DO nsrf = 1, nbsrf
-          IF (nsrf.GT.99) THEN
+          IF (nsrf > 99) THEN
              PRINT *, "Trop de sous-mailles"
              stop 1
           ENDIF
           WRITE(str2, '(i2.2)') nsrf
-          ierr = NF90_INQ_VARID(ncid, "EVAP"//str2, varid)
-          IF (ierr /= NF90_NOERR) THEN
-             PRINT *, "phyetat0: Le champ <EVAP"//str2//"> est absent"
-             stop 1
-          ENDIF
-          ierr = NF90_GET_VAR(ncid, varid, evap(1, nsrf))
-          IF (ierr /= NF90_NOERR) THEN
-             PRINT *, "phyetat0: Lecture echouee pour <EVAP"//str2//">"
-             stop 1
-          ENDIF
+          call NF95_INQ_VARID(ncid, "EVAP"//str2, varid)
+          call NF95_GET_VAR(ncid, varid, evap(:, nsrf))
           xmin = 1.0E+20
           xmax = -1.0E+20
           DO i = 1, klon
@@ -522,7 +448,7 @@ contains
        ENDDO
     ELSE
        PRINT *, 'phyetat0: Le champ <EVAP> est present'
-       PRINT *, '          J ignore donc les autres EVAP**'
+       PRINT *, ' J ignore donc les autres EVAP**'
        call nf95_get_var(ncid, varid, evap(:, 1))
        xmin = 1.0E+20
        xmax = -1.0E+20
@@ -540,16 +466,8 @@ contains
 
     ! Lecture precipitation liquide:
 
-    ierr = NF90_INQ_VARID(ncid, "rain_f", varid)
-    IF (ierr /= NF90_NOERR) THEN
-       PRINT *, 'phyetat0: Le champ <rain_f> est absent'
-       stop 1
-    ENDIF
-    ierr = NF90_GET_VAR(ncid, varid, rain_fall)
-    IF (ierr /= NF90_NOERR) THEN
-       PRINT *, 'phyetat0: Lecture echouee pour <rain_f>'
-       stop 1
-    ENDIF
+    call NF95_INQ_VARID(ncid, "rain_f", varid)
+    call NF95_GET_VAR(ncid, varid, rain_fall)
     xmin = 1.0E+20
     xmax = -1.0E+20
     DO i = 1, klon
@@ -560,16 +478,8 @@ contains
 
     ! Lecture precipitation solide:
 
-    ierr = NF90_INQ_VARID(ncid, "snow_f", varid)
-    IF (ierr /= NF90_NOERR) THEN
-       PRINT *, 'phyetat0: Le champ <snow_f> est absent'
-       stop 1
-    ENDIF
-    ierr = NF90_GET_VAR(ncid, varid, snow_fall)
-    IF (ierr /= NF90_NOERR) THEN
-       PRINT *, 'phyetat0: Lecture echouee pour <snow_f>'
-       stop 1
-    ENDIF
+    call NF95_INQ_VARID(ncid, "snow_f", varid)
+    call NF95_GET_VAR(ncid, varid, snow_fall)
     xmin = 1.0E+20
     xmax = -1.0E+20
     DO i = 1, klon
@@ -634,16 +544,8 @@ contains
 
     ! Lecture du rayonnement net au sol:
 
-    ierr = NF90_INQ_VARID(ncid, "RADS", varid)
-    IF (ierr /= NF90_NOERR) THEN
-       PRINT *, 'phyetat0: Le champ <RADS> est absent'
-       stop 1
-    ENDIF
-    ierr = NF90_GET_VAR(ncid, varid, radsol)
-    IF (ierr /= NF90_NOERR) THEN
-       PRINT *, 'phyetat0: Lecture echouee pour <RADS>'
-       stop 1
-    ENDIF
+    call NF95_INQ_VARID(ncid, "RADS", varid)
+    call NF95_GET_VAR(ncid, varid, radsol)
     xmin = 1.0E+20
     xmax = -1.0E+20
     DO i = 1, klon
@@ -657,23 +559,15 @@ contains
     ierr = NF90_INQ_VARID(ncid, "RUG", varid)
     IF (ierr /= NF90_NOERR) THEN
        PRINT *, 'phyetat0: Le champ <RUG> est absent'
-       PRINT *, '          Mais je vais essayer de lire RUG**'
+       PRINT *, ' Mais je vais essayer de lire RUG**'
        DO nsrf = 1, nbsrf
-          IF (nsrf.GT.99) THEN
+          IF (nsrf > 99) THEN
              PRINT *, "Trop de sous-mailles"
              stop 1
           ENDIF
           WRITE(str2, '(i2.2)') nsrf
-          ierr = NF90_INQ_VARID(ncid, "RUG"//str2, varid)
-          IF (ierr /= NF90_NOERR) THEN
-             PRINT *, "phyetat0: Le champ <RUG"//str2//"> est absent"
-             stop 1
-          ENDIF
-          ierr = NF90_GET_VAR(ncid, varid, frugs(1, nsrf))
-          IF (ierr /= NF90_NOERR) THEN
-             PRINT *, "phyetat0: Lecture echouee pour <RUG"//str2//">"
-             stop 1
-          ENDIF
+          call NF95_INQ_VARID(ncid, "RUG"//str2, varid)
+          call NF95_GET_VAR(ncid, varid, frugs(:, nsrf))
           xmin = 1.0E+20
           xmax = -1.0E+20
           DO i = 1, klon
@@ -684,7 +578,7 @@ contains
        ENDDO
     ELSE
        PRINT *, 'phyetat0: Le champ <RUG> est present'
-       PRINT *, '          J ignore donc les autres RUG**'
+       PRINT *, ' J ignore donc les autres RUG**'
        call nf95_get_var(ncid, varid, frugs(:, 1))
        xmin = 1.0E+20
        xmax = -1.0E+20
@@ -705,9 +599,9 @@ contains
     ierr = NF90_INQ_VARID(ncid, "AGESNO", varid)
     IF (ierr /= NF90_NOERR) THEN
        PRINT *, 'phyetat0: Le champ <AGESNO> est absent'
-       PRINT *, '          Mais je vais essayer de lire AGESNO**'
+       PRINT *, ' Mais je vais essayer de lire AGESNO**'
        DO nsrf = 1, nbsrf
-          IF (nsrf.GT.99) THEN
+          IF (nsrf > 99) THEN
              PRINT *, "Trop de sous-mailles"
              stop 1
           ENDIF
@@ -717,11 +611,7 @@ contains
              PRINT *, "phyetat0: Le champ <AGESNO"//str2//"> est absent"
              agesno = 50.0
           ENDIF
-          ierr = NF90_GET_VAR(ncid, varid, agesno(1, nsrf))
-          IF (ierr /= NF90_NOERR) THEN
-             PRINT *, "phyetat0: Lecture echouee pour <AGESNO"//str2//">"
-             stop 1
-          ENDIF
+          call NF95_GET_VAR(ncid, varid, agesno(:, nsrf))
           xmin = 1.0E+20
           xmax = -1.0E+20
           DO i = 1, klon
@@ -732,7 +622,7 @@ contains
        ENDDO
     ELSE
        PRINT *, 'phyetat0: Le champ <AGESNO> est present'
-       PRINT *, '          J ignore donc les autres AGESNO**'
+       PRINT *, ' J ignore donc les autres AGESNO**'
        call nf95_get_var(ncid, varid, agesno(:, 1))
        xmin = 1.0E+20
        xmax = -1.0E+20
@@ -748,16 +638,8 @@ contains
        ENDDO
     ENDIF
 
-    ierr = NF90_INQ_VARID(ncid, "ZMEA", varid)
-    IF (ierr /= NF90_NOERR) THEN
-       PRINT *, 'phyetat0: Le champ <ZMEA> est absent'
-       stop 1
-    ENDIF
-    ierr = NF90_GET_VAR(ncid, varid, zmea)
-    IF (ierr /= NF90_NOERR) THEN
-       PRINT *, 'phyetat0: Lecture echouee pour <ZMEA>'
-       stop 1
-    ENDIF
+    call NF95_INQ_VARID(ncid, "ZMEA", varid)
+    call NF95_GET_VAR(ncid, varid, zmea)
     xmin = 1.0E+20
     xmax = -1.0E+20
     DO i = 1, klon
@@ -766,16 +648,8 @@ contains
     ENDDO
     PRINT *, 'OROGRAPHIE SOUS-MAILLE zmea:', xmin, xmax
 
-    ierr = NF90_INQ_VARID(ncid, "ZSTD", varid)
-    IF (ierr /= NF90_NOERR) THEN
-       PRINT *, 'phyetat0: Le champ <ZSTD> est absent'
-       stop 1
-    ENDIF
-    ierr = NF90_GET_VAR(ncid, varid, zstd)
-    IF (ierr /= NF90_NOERR) THEN
-       PRINT *, 'phyetat0: Lecture echouee pour <ZSTD>'
-       stop 1
-    ENDIF
+    call NF95_INQ_VARID(ncid, "ZSTD", varid)
+    call NF95_GET_VAR(ncid, varid, zstd)
     xmin = 1.0E+20
     xmax = -1.0E+20
     DO i = 1, klon
@@ -784,16 +658,8 @@ contains
     ENDDO
     PRINT *, 'OROGRAPHIE SOUS-MAILLE zstd:', xmin, xmax
 
-    ierr = NF90_INQ_VARID(ncid, "ZSIG", varid)
-    IF (ierr /= NF90_NOERR) THEN
-       PRINT *, 'phyetat0: Le champ <ZSIG> est absent'
-       stop 1
-    ENDIF
-    ierr = NF90_GET_VAR(ncid, varid, zsig)
-    IF (ierr /= NF90_NOERR) THEN
-       PRINT *, 'phyetat0: Lecture echouee pour <ZSIG>'
-       stop 1
-    ENDIF
+    call NF95_INQ_VARID(ncid, "ZSIG", varid)
+    call NF95_GET_VAR(ncid, varid, zsig)
     xmin = 1.0E+20
     xmax = -1.0E+20
     DO i = 1, klon
@@ -802,16 +668,8 @@ contains
     ENDDO
     PRINT *, 'OROGRAPHIE SOUS-MAILLE zsig:', xmin, xmax
 
-    ierr = NF90_INQ_VARID(ncid, "ZGAM", varid)
-    IF (ierr /= NF90_NOERR) THEN
-       PRINT *, 'phyetat0: Le champ <ZGAM> est absent'
-       stop 1
-    ENDIF
-    ierr = NF90_GET_VAR(ncid, varid, zgam)
-    IF (ierr /= NF90_NOERR) THEN
-       PRINT *, 'phyetat0: Lecture echouee pour <ZGAM>'
-       stop 1
-    ENDIF
+    call NF95_INQ_VARID(ncid, "ZGAM", varid)
+    call NF95_GET_VAR(ncid, varid, zgam)
     xmin = 1.0E+20
     xmax = -1.0E+20
     DO i = 1, klon
@@ -820,16 +678,8 @@ contains
     ENDDO
     PRINT *, 'OROGRAPHIE SOUS-MAILLE zgam:', xmin, xmax
 
-    ierr = NF90_INQ_VARID(ncid, "ZTHE", varid)
-    IF (ierr /= NF90_NOERR) THEN
-       PRINT *, 'phyetat0: Le champ <ZTHE> est absent'
-       stop 1
-    ENDIF
-    ierr = NF90_GET_VAR(ncid, varid, zthe)
-    IF (ierr /= NF90_NOERR) THEN
-       PRINT *, 'phyetat0: Lecture echouee pour <ZTHE>'
-       stop 1
-    ENDIF
+    call NF95_INQ_VARID(ncid, "ZTHE", varid)
+    call NF95_GET_VAR(ncid, varid, zthe)
     xmin = 1.0E+20
     xmax = -1.0E+20
     DO i = 1, klon
@@ -838,16 +688,8 @@ contains
     ENDDO
     PRINT *, 'OROGRAPHIE SOUS-MAILLE zthe:', xmin, xmax
 
-    ierr = NF90_INQ_VARID(ncid, "ZPIC", varid)
-    IF (ierr /= NF90_NOERR) THEN
-       PRINT *, 'phyetat0: Le champ <ZPIC> est absent'
-       stop 1
-    ENDIF
-    ierr = NF90_GET_VAR(ncid, varid, zpic)
-    IF (ierr /= NF90_NOERR) THEN
-       PRINT *, 'phyetat0: Lecture echouee pour <ZPIC>'
-       stop 1
-    ENDIF
+    call NF95_INQ_VARID(ncid, "ZPIC", varid)
+    call NF95_GET_VAR(ncid, varid, zpic)
     xmin = 1.0E+20
     xmax = -1.0E+20
     DO i = 1, klon
@@ -856,16 +698,8 @@ contains
     ENDDO
     PRINT *, 'OROGRAPHIE SOUS-MAILLE zpic:', xmin, xmax
 
-    ierr = NF90_INQ_VARID(ncid, "ZVAL", varid)
-    IF (ierr /= NF90_NOERR) THEN
-       PRINT *, 'phyetat0: Le champ <ZVAL> est absent'
-       stop 1
-    ENDIF
-    ierr = NF90_GET_VAR(ncid, varid, zval)
-    IF (ierr /= NF90_NOERR) THEN
-       PRINT *, 'phyetat0: Lecture echouee pour <ZVAL>'
-       stop 1
-    ENDIF
+    call NF95_INQ_VARID(ncid, "ZVAL", varid)
+    call NF95_GET_VAR(ncid, varid, zval)
     xmin = 1.0E+20
     xmax = -1.0E+20
     DO i = 1, klon
