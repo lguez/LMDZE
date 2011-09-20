@@ -25,7 +25,7 @@ c Entree:
       REAL, intent(in):: dtime            ! pas d'integration (s)
       REAL, intent(in):: pres_h(klon,klev+1) ! pression half-level (Pa)
       REAL, intent(in):: pres_f(klon,klev)! pression full-level (Pa)
-      REAL t(klon,klev)     ! temperature (K)
+      REAL, intent(in):: t(klon,klev)     ! temperature (K)
       REAL q(klon,klev)     ! humidite specifique (g/g)
       REAL w(klon,klev)     ! vitesse verticale (Pa/s)
       REAL con_t(klon,klev) ! convergence de temperature (K/s)

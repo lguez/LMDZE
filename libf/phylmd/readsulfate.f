@@ -7,6 +7,7 @@
       use dimphy      
       use temps      
       use SUPHEC_M
+      use chem      
       IMPLICIT none
       
 c Content: 
@@ -34,7 +35,6 @@ c 21/08/01: Introduce flag to read in just one decade
 c      
 c Include-files:
 c --------------     
-      include "chem.h"      
 c 
 c Input:
 c ------
@@ -282,6 +282,7 @@ c-----------------------------------------------------------------------------
       use dimphy      
       use temps      
       use SUPHEC_M
+      use chem      
       IMPLICIT none
       
 c Content: 
@@ -305,7 +306,6 @@ c see above
 c      
 c Include-files:
 c --------------     
-      include "chem.h"      
 c 
 c Input:
 c ------

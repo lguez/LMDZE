@@ -94,7 +94,7 @@ c
       real, intent(in):: rg
       real ome
       REAL, intent(in):: plat(nlon),plon(nlon)
-      real phis(nlon)
+      real, intent(in):: phis(nlon)
       REAL dragu(nlon),liftu(nlon),phyu(nlon)             
       REAL dragv(nlon),liftv(nlon),phyv(nlon)             
       REAL, intent(in):: p(nlon,nlev+1)

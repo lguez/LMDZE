@@ -76,7 +76,7 @@ contains
     real, intent(in):: pplay(klon, llm)
     ! (pression pour le mileu de chaque couche, en Pa)
 
-    real pphis(klon)
+    real, intent(in):: pphis(klon)
     logical, intent(in):: firstcal ! first call to "calfis"
     logical, intent(in):: lafin ! fin de la physique
 

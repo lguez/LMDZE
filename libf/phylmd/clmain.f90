@@ -59,7 +59,7 @@ contains
     ! date0----input-R- jour initial
     INTEGER, INTENT (IN) :: itap
     ! itap-----input-I- numero du pas de temps
-    REAL t(klon, klev), q(klon, klev)
+    REAL, INTENT(IN):: t(klon, klev), q(klon, klev)
     ! t--------input-R- temperature (K)
     ! q--------input-R- vapeur d'eau (kg/kg)
     REAL, INTENT (IN):: u(klon, klev), v(klon, klev)

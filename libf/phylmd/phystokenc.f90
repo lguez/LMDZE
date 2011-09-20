@@ -36,7 +36,7 @@ contains
     REAL pde_u(klon, klev) ! flux detraine dans le panache montant
     REAL pen_d(klon, klev) ! flux entraine dans le panache descendant
     REAL pde_d(klon, klev) ! flux detraine dans le panache descendant
-    REAL pt(klon, klev)
+    REAL, intent(in):: pt(klon, klev)
 
     REAL, INTENT (IN) :: rlon(klon), rlat(klon)
     REAL, INTENT (IN) :: dtime
@@ -48,7 +48,8 @@ contains
     !   Couche limite:                                                      
 
     REAL yv1(klon)
-    REAL yu1(klon), pphis(klon), paire(klon)
+    REAL yu1(klon), paire(klon)
+    REAL, INTENT(IN):: pphis(klon)
     REAL pcoefh(klon, klev) ! coeff melange Couche limite
 
     ! Arguments necessaires pour les sources et puits de traceur            
