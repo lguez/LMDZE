@@ -18,7 +18,8 @@ c
 c
       REAL, intent(in):: paprs(klon,klev+1)
       real tsol(klon)
-      REAL t(klon,klev), q(klon,klev), u(klon,klev), v(klon,klev)
+      REAL, INTENT (IN):: t(klon,klev)
+      real q(klon,klev), u(klon,klev), v(klon,klev)
       REAL utran_e(klon), utran_q(klon), vtran_e(klon), vtran_q(klon)
 c
       INTEGER i, l

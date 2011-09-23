@@ -1,7 +1,5 @@
 module grid_noro_m
 
-  ! Clean: no C preprocessor directive, no include line
-
   implicit none
 
 contains

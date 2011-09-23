@@ -1,7 +1,5 @@
 module inithist_m
 
-  ! This module is clean: no C preprocessor directive, no include line
-
   implicit none
 
 contains

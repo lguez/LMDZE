@@ -30,10 +30,11 @@
       REAL, INTENT (IN) :: pplay(klon,klev)
       REAL, INTENT (IN) :: plat(nlon)
       REAL pmea(nlon)
-      REAL, INTENT (IN) :: pstd(nlon)
+      REAL, INTENT (IN):: pstd(nlon)
       REAL ppic(nlon)
       REAL pulow(nlon), pvlow(nlon), pustr(nlon), pvstr(nlon)
-      REAL t(nlon,nlev), u(nlon,nlev), v(nlon,nlev)
+      REAL, INTENT (IN):: t(nlon,nlev)
+      real u(nlon,nlev), v(nlon,nlev)
       REAL d_t(nlon,nlev), d_u(nlon,nlev), d_v(nlon,nlev)
 
       INTEGER i, k, ktest(nlon)

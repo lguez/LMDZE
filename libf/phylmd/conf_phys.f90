@@ -1,7 +1,5 @@
 module conf_phys_m
 
-  ! This module is clean: no C preprocessor directive, no include line.
-
   implicit none
 
   integer iflag_pbl

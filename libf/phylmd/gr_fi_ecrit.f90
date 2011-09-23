@@ -1,7 +1,6 @@
 SUBROUTINE gr_fi_ecrit(nfield, nlon, iim, jjmp1, fi, ecrit)
 
   ! From phylmd/physiq.F, version 1.22 2006/02/20 09:38:28
-  ! This procedure is clean: no C preprocessor directive, no include line.
 
   IMPLICIT none
 

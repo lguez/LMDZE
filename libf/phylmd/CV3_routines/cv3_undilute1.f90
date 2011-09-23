@@ -22,7 +22,8 @@
 ! inputs:
       integer len, nd
       integer nk(len), icb(len)
-      real t(len,nd), q(len,nd), qs(len,nd), gz(len,nd)
+      real, intent(in):: t(len,nd)
+      real q(len,nd), qs(len,nd), gz(len,nd)
       real p(len,nd)
       real plcl(len) ! convect3
 

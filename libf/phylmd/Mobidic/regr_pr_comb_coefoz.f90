@@ -1,7 +1,5 @@
 module regr_pr_comb_coefoz_m
 
-  ! This module is clean: no C preprocessor directive, no include line.
-
   use dimens_m, only: llm
   use dimphy, only: klon
 

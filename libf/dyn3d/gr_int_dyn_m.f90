@@ -1,7 +1,5 @@
 module gr_int_dyn_m
 
-  ! Clean: no C preprocessor directive, no include line
-
   implicit none
 
 contains

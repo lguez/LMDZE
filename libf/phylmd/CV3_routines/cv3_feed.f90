@@ -21,7 +21,8 @@
 
 ! inputs:
         integer len, nd
-      real t(len,nd), q(len,nd), qs(len,nd), p(len,nd)
+      real, intent(in):: t(len,nd)
+      real q(len,nd), qs(len,nd), p(len,nd)
       real hm(len,nd), gz(len,nd)
       real ph(len,nd+1)
 

@@ -1,7 +1,5 @@
 module o3_chem_m
 
-  ! This module is clean: no C preprocessor directive, no include line.
-
   IMPLICIT none
 
   private o3_prod

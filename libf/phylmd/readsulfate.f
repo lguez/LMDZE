@@ -33,8 +33,6 @@ c 27/06/01: 10yr-mean-values to interpolate
 c 20/08/01: Correct the error through integer-values in interpolations      
 c 21/08/01: Introduce flag to read in just one decade
 c      
-c Include-files:
-c --------------     
 c 
 c Input:
 c ------
@@ -304,8 +302,6 @@ c Modifications:
 c --------------
 c see above 
 c      
-c Include-files:
-c --------------     
 c 
 c Input:
 c ------

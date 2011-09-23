@@ -24,8 +24,8 @@ SUBROUTINE fisrtilp(dtime,paprs,pplay,t,q,ptconv,ratqs,d_t,d_q,d_ql,rneb, &
   REAL, INTENT (IN) :: & ! intervalle du temps (s)                
        dtime
   REAL, INTENT (IN) :: paprs(klon,klev+1) ! pression a inter-couche   
-  REAL, INTENT (IN) :: pplay(klon,klev) ! pression au milieu de couche
-  REAL t(klon,klev) ! temperature (K)                               
+  REAL, INTENT (IN):: pplay(klon,klev) ! pression au milieu de couche
+  REAL, INTENT (IN):: t(klon,klev) ! temperature (K)
   REAL q(klon,klev) ! humidite specifique (kg/kg)                   
   REAL d_t(klon,klev) ! incrementation de la temperature (K)        
   REAL d_q(klon,klev) ! incrementation de la vapeur d'eau           

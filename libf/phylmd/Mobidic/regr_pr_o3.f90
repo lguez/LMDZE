@@ -29,7 +29,7 @@ contains
     use netcdf, only:  nf90_nowrite, nf90_get_var
     use nr_util, only: assert
     use grid_change, only: dyn_phy
-    use jumble, only: regr1_step_av
+    use numer_rec, only: regr1_step_av
     use pressure_var, only: p3d
 
     real, intent(out):: o3_mob_regr(:, :, :) ! (iim + 1, jjm + 1, llm)

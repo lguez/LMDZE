@@ -27,7 +27,8 @@ SUBROUTINE thermcell(ngrid, nlay, ptimestep, pplay, pplev, pphi, pu, pv, pt, &
 
   INTEGER ngrid, nlay, w2di, tho
   real ptimestep, l_mix, r_aspect
-  REAL pt(ngrid, nlay), pdtadj(ngrid, nlay)
+  REAL, intent(in):: pt(ngrid, nlay)
+  real pdtadj(ngrid, nlay)
   REAL pu(ngrid, nlay), pduadj(ngrid, nlay)
   REAL pv(ngrid, nlay), pdvadj(ngrid, nlay)
   REAL po(ngrid, nlay), pdoadj(ngrid, nlay)

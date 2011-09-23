@@ -41,7 +41,7 @@ SUBROUTINE nuage (paprs, pplay, &
   !
   REAL, intent(in):: paprs(klon,klev+1)
   real, intent(in):: pplay(klon,klev)
-  REAL t(klon,klev)
+  REAL, intent(in):: t(klon,klev)
   !
   REAL pclc(klon,klev)
   REAL pqlwp(klon,klev)

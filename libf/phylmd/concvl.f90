@@ -20,6 +20,7 @@ contains
     USE suphec_m, ONLY : retv, rtt
     USE yoethf_m, ONLY : r2es
     USE fcttre, ONLY : foeew
+    use cv_driver_m, only: cv_driver
 
     ! Arguments:
     ! dtime--input-R-pas d'integration (s)
@@ -58,7 +59,8 @@ contains
     REAL, INTENT (IN) :: dtime
     REAL, INTENT (IN) :: paprs(klon, klev+1)
     REAL, INTENT (IN) :: pplay(klon, klev)
-    REAL t(klon, klev), q(klon, klev), u(klon, klev), v(klon, klev)
+    REAL, intent(in):: t(klon, klev)
+    real q(klon, klev), u(klon, klev), v(klon, klev)
     REAL, INTENT (IN):: tra(klon, klev, ntrac)
     INTEGER ntra
     REAL work1(klon, klev), work2(klon, klev)

@@ -25,12 +25,12 @@ contains
 
     use dimens_m, only: iim, jjm, llm
     use dimphy, only: klon
-    use netcdf95, only: nf95_inq_varid, handle_err
-    use netcdf, only: nf90_get_var
     use grid_change, only: dyn_phy
+    use netcdf, only: nf90_get_var
+    use netcdf95, only: nf95_inq_varid, handle_err
     use nr_util, only: assert
+    use numer_rec, only: regr1_step_av
     use press_coefoz_m, only: press_in_edg
-    use jumble, only: regr1_step_av
     use pressure_var, only: p3d
 
     integer, intent(in):: ncid ! NetCDF ID of the file
@@ -101,12 +101,12 @@ contains
 
     use dimens_m, only: iim, jjm, llm
     use dimphy, only: klon
-    use netcdf95, only: nf95_inq_varid, handle_err
-    use netcdf, only: nf90_get_var
     use grid_change, only: dyn_phy
+    use netcdf, only: nf90_get_var
+    use netcdf95, only: nf95_inq_varid, handle_err
     use nr_util, only: assert
+    use numer_rec, only: regr1_lint
     use press_coefoz_m, only: plev
-    use jumble, only: regr1_lint
     use pressure_var, only: pls
 
     integer, intent(in):: ncid ! NetCDF ID of the file

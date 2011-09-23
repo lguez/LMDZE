@@ -5,7 +5,6 @@ SUBROUTINE cltracrn( itr, dtime,u1lay, v1lay, &
      lat, &
      d_tr,d_trs )
 
-  ! This procedure is clean: no C preprocessor directive, no include line.
   ! From phylmd/cltracrn.F,v 1.2 2005/05/25 13:10:09
 
   use indicesol, only: nbsrf

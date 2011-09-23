@@ -25,10 +25,8 @@ contains
 
     ! Jean-Louis Dufresne, July 2002
 
-    use dimens_m
-    use dimphy
-    use SUPHEC_M
-    use yoethf_m
+    USE dimphy, ONLY: klev, klon
+    USE suphec_m, ONLY: rcpd, rcpv, rcs, rcw, rg, rlstt, rlvtt
 
     ! Arguments: 
     ! airephy-------input-R- grid area
