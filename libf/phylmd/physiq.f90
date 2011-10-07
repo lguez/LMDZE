@@ -13,6 +13,7 @@ contains
     ! This is the main procedure for the "physics" part of the program.
 
     USE abort_gcm_m, ONLY: abort_gcm
+    use ajsec_m, only: ajsec
     USE calendar, ONLY: ymds2ju
     use calltherm_m, only: calltherm
     USE clesphys, ONLY: cdhmax, cdmmax, co2_ppm, ecrit_hf, ecrit_ins, &
@@ -48,6 +49,7 @@ contains
     USE phystokenc_m, ONLY: phystokenc
     USE phytrac_m, ONLY: phytrac
     USE qcheck_m, ONLY: qcheck
+    use radlwsw_m, only: radlwsw
     USE suphec_m, ONLY: ra, rcpd, retv, rg, rlvtt, romega, rsigma, rtt
     USE temps, ONLY: annee_ref, day_ref, itau_phy
     USE yoethf_m, ONLY: r2es, rvtmp2
@@ -387,12 +389,10 @@ contains
     ! Declaration des procedures appelees
 
     EXTERNAL alboc ! calculer l'albedo sur ocean
-    EXTERNAL ajsec ! ajustement sec
     !KE43
     EXTERNAL conema3 ! convect4.3
     EXTERNAL fisrtilp ! schema de condensation a grande echelle (pluie)
     EXTERNAL nuage ! calculer les proprietes radiatives
-    EXTERNAL radlwsw ! rayonnements solaire et infrarouge
     EXTERNAL transp ! transport total de l'eau et de l'energie
 
     ! Variables locales
@@ -420,7 +420,9 @@ contains
     REAL zxfluxu(klon, llm)
     REAL zxfluxv(klon, llm)
 
-    REAL heat(klon, llm) ! chauffage solaire
+    ! Le rayonnement n'est pas calcule tous les pas, il faut donc
+    ! que les variables soient rémanentes
+    REAL, save:: heat(klon, llm) ! chauffage solaire
     REAL heat0(klon, llm) ! chauffage solaire ciel clair
     REAL cool(klon, llm) ! refroidissement infrarouge
     REAL cool0(klon, llm) ! refroidissement infrarouge ciel clair
@@ -430,9 +432,7 @@ contains
     REAL albpla(klon)
     REAL fsollw(klon, nbsrf) ! bilan flux IR pour chaque sous surface
     REAL fsolsw(klon, nbsrf) ! flux solaire absorb. pour chaque sous surface
-    ! Le rayonnement n'est pas calcule tous les pas, il faut donc
-    ! sauvegarder les sorties du rayonnement
-    SAVE heat, cool, albpla, topsw, toplw, solsw, sollw, sollwdown
+    SAVE cool, albpla, topsw, toplw, solsw, sollw, sollwdown
     SAVE topsw0, toplw0, solsw0, sollw0, heat0, cool0
 
     INTEGER itaprad

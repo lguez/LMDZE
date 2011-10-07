@@ -22,31 +22,20 @@ MODULE interface_surf
 
   REAL, ALLOCATABLE, DIMENSION(:, :), SAVE :: tmp_rriv, tmp_rcoa, tmp_rlic
   ! pour simuler la fonte des glaciers antarctiques
-  REAL, ALLOCATABLE, DIMENSION(:, :), SAVE :: coeff_iceberg
-  real, save :: surf_maille 
-  real, save :: cte_flux_iceberg = 6.3e7
-  integer, save :: num_antarctic = 1
   REAL, save :: tau_calv
 
 CONTAINS
 
-  SUBROUTINE interfsurf_hq(itime, dtime, date0, jour, rmu0,  &
-       klon, iim, jjm, nisurf, knon, knindex, pctsrf,  &
-       rlon, rlat, cufi, cvfi,  &
-       debut, lafin, ok_veget, soil_model, nsoilmx, tsoil, qsol,  &
-       zlev, u1_lay, v1_lay, temp_air, spechum, epot_air, ccanopy, & 
-       tq_cdrag, petAcoef, peqAcoef, petBcoef, peqBcoef,  &
-       precip_rain, precip_snow, sollw, sollwdown, swnet, swdown,  &
-       fder, taux, tauy,  &
-       windsp,  &
-       rugos, rugoro,  &
-       albedo, snow, qsurf,  &
-       tsurf, p1lay, ps, radsol,  &
-       ocean, npas, nexca, zmasq,  &
-       evap, fluxsens, fluxlat, dflux_l, dflux_s, & 
-       tsol_rad, tsurf_new, alb_new, alblw, emis_new,  &
-       z0_new, pctsrf_new, agesno, fqcalving, ffonte, run_off_lic_0, &
-       flux_o, flux_g, tslab, seaice)
+  SUBROUTINE interfsurf_hq(itime, dtime, date0, jour, rmu0, klon, iim, jjm, &
+       nisurf, knon, knindex, pctsrf, rlon, rlat, cufi, cvfi, debut, lafin, &
+       ok_veget, soil_model, nsoilmx, tsoil, qsol, zlev, u1_lay, v1_lay, &
+       temp_air, spechum, epot_air, ccanopy, tq_cdrag, petAcoef, peqAcoef, &
+       petBcoef, peqBcoef, precip_rain, precip_snow, sollw, sollwdown, swnet, &
+       swdown, fder, taux, tauy, windsp, rugos, rugoro, albedo, snow, qsurf, &
+       tsurf, p1lay, ps, radsol, ocean, npas, nexca, zmasq, evap, fluxsens, &
+       fluxlat, dflux_l, dflux_s, tsol_rad, tsurf_new, alb_new, alblw, &
+       emis_new, z0_new, pctsrf_new, agesno, fqcalving, ffonte, &
+       run_off_lic_0, flux_o, flux_g, tslab, seaice)
 
     ! Cette routine sert d'aiguillage entre l'atmosphère et la surface
     ! en général (sols continentaux, océans, glaces) pour les flux de

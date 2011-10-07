@@ -24,16 +24,20 @@ module suphec_m
 
   ! A1.4 Thermodynamic gas phase
   REAL, parameter:: R = RNAVO * RKBOL ! ideal gas constant, in J K-1 mol-1
-  real RV, RCPD, RCPV, RCVD, RCVV
+  real RV, RCPV, RCVD, RCVV
   real, parameter:: RMD = 28.9644 ! molar mass of dry air, in g mol-1
 
   real, parameter:: RD = 1000. * R / RMD
   ! specific ideal gas constant for dry air, in J K-1 kg-1
   ! (factor 1000: conversion from g to kg)
 
+  real, parameter:: RCPD = 7. / 2 * RD 
+  ! specific heat capacity for dry air, in J K-1 kg-1
+
   real, parameter:: RMO3 = 47.9942
   real, parameter:: RMV = 18.0153
-  REAL RKAPPA, RETV
+  REAL, parameter:: RKAPPA = RD/RCPD
+  real RETV
 
   ! A1.5, 6 Thermodynamic liquid, solid phases
   REAL RCW, RCS
@@ -56,8 +60,8 @@ contains
 
   SUBROUTINE suphec
 
-    ! From phylmd/suphec.F, v 1.2 2005/06/06 13:16:33
-    ! Initialise certaines constantes et parametres physiques.
+    ! From phylmd/suphec.F, version 1.2 2005/06/06 13:16:33
+    ! Initialise certaines constantes et certains paramètres physiques.
 
     !------------------------------------------
 
@@ -103,11 +107,9 @@ contains
     ! 5. DEFINE THERMODYNAMIC CONSTANTS, GAS PHASE.
 
     RV = 1000.*R/RMV
-    RCPD = 3.5*RD
     RCVD = RCPD-RD
     RCPV = 4. *RV
     RCVV = RCPV-RV
-    RKAPPA = RD/RCPD
     RETV = RV/RD-1.
     print *, 'Thermodynamic, gas '
     print '('' Perfect gas = '', e13.7)', R

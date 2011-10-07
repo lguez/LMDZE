@@ -37,7 +37,7 @@ contains
     ! "ds(l)" : épaisseur de la couche "l" dans la coordonnée "s"
 
     INTEGER l, unit
-    REAL alpha, x(llm), trash
+    REAL alpha, x(llm)
 
     character(len=7):: s_sampling = "LMD5"
     ! (other allowed values are "param", "strato1", "strato2" and "read")
@@ -120,7 +120,7 @@ contains
             position="rewind")
        read(unit, fmt=*) ! skip title line
        do l = 1, llm + 1
-          read(unit, fmt=*) trash, s(l)
+          read(unit, fmt=*) s(l)
        end do
        close(unit)
        ! Quick check:
