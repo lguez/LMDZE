@@ -6,6 +6,7 @@
       USE dimphy
       USE suphec_m
       USE yoegwd
+      use gwprofil_m, only: gwprofil
       IMPLICIT NONE
 
 

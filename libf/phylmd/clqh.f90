@@ -22,7 +22,7 @@ contains
     USE dimphy, ONLY : klev, klon, zmasq
     USE dimsoil, ONLY : nsoilmx
     USE indicesol, ONLY : is_ter, nbsrf
-    USE interface_surf, ONLY : interfsurf_hq
+    USE interfsurf_hq_m, ONLY : interfsurf_hq
     USE suphec_m, ONLY : rcpd, rd, rg, rkappa
 
     ! Arguments:

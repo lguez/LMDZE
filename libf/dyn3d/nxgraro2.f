@@ -1,7 +1,7 @@
 !
 ! $Header: /home/cvsroot/LMDZ4/libf/dyn3d/nxgraro2.F,v 1.1.1.1 2004/05/19 12:53:06 lmdzadmin Exp $
 !
-       SUBROUTINE nxgraro2 (klevel,xcov, ycov, lr, grx, gry )
+       SUBROUTINE nxgraro2 (klevel,xcov, ycov, lr, grx, gry, crot )
 c
 c      P.Le Van .
 c   ***********************************************************
@@ -16,7 +16,6 @@ c
 c
       use dimens_m
       use paramet_m
-            use inidissip_m
       use filtreg_m, only: filtreg
       IMPLICIT NONE
 c
@@ -26,6 +25,7 @@ c
       INTEGER klevel
       REAL xcov( ip1jmp1,klevel ), ycov( ip1jm,klevel )
       REAL  grx( ip1jmp1,klevel ),  gry( ip1jm,klevel )
+      real, intent(in):: crot
 c
 c    ......   variables locales     ........
 c

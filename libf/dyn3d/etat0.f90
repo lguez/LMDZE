@@ -37,6 +37,7 @@ contains
     use indicesol, only: is_oce, is_sic, is_ter, is_lic, epsfra
     use iniadvtrac_m, only: iniadvtrac
     use inidissip_m, only: inidissip
+    use inifilr_m, only: inifilr
     use inigeom_m, only: inigeom
     use netcdf, only: nf90_nowrite
     use netcdf95, only: nf95_open, nf95_close, nf95_get_var, nf95_inq_varid
@@ -50,7 +51,8 @@ contains
     use serre, only: alphax
     USE start_init_orog_m, only: start_init_orog, mask, phis
     use start_init_phys_m, only: start_init_phys
-    use startdyn, only: start_inter_3d, start_init_dyn
+    use startdyn, only: start_init_dyn
+    use start_inter_3d_m, only: start_inter_3d
     use temps, only: itau_phy, annee_ref, day_ref
 
     ! Variables local to the procedure:

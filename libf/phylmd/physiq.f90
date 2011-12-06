@@ -50,6 +50,7 @@ contains
     USE phytrac_m, ONLY: phytrac
     USE qcheck_m, ONLY: qcheck
     use radlwsw_m, only: radlwsw
+    use sugwd_m, only: sugwd
     USE suphec_m, ONLY: ra, rcpd, retv, rg, rlvtt, romega, rsigma, rtt
     USE temps, ONLY: annee_ref, day_ref, itau_phy
     USE yoethf_m, ONLY: r2es, rvtmp2
@@ -776,7 +777,7 @@ contains
 
        IF (ok_orodr) THEN
           rugoro = MAX(1e-5, zstd * zsig / 2)
-          CALL SUGWD(klon, llm, paprs, play)
+          CALL SUGWD(paprs, play)
        else
           rugoro = 0.
        ENDIF

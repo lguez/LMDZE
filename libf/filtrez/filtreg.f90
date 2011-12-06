@@ -12,10 +12,9 @@ contains
     ! pour l'opérateur filtre. 
 
     USE dimens_m, ONLY : iim, jjm
-    USE parafilt, ONLY: matriceun, matriceus, matricevn, matricevs, matrinvn, &
-         matrinvs
-    USE coefils, ONLY : jfiltnu, jfiltnv, jfiltsu, jfiltsv, sddu, sddv, &
-         unsddu, unsddv
+    USE coefils, ONLY : sddu, sddv, unsddu, unsddv
+    use inifilr_m, only: jfiltnu, jfiltnv, jfiltsu, jfiltsv, matriceun, &
+         matriceus, matricevn, matricevs, matrinvn, matrinvs
 
     INTEGER, intent(in):: nlat ! nombre de latitudes a filtrer
     integer, intent(in):: nbniv ! nombre de niveaux verticaux a filtrer 
@@ -53,33 +52,35 @@ contains
 
     !-----------------------------------------------------------
 
-    IF (ifiltre==1 .OR. ifiltre==-1) STOP &
-         'Pas de transformee simple dans cette version'
+    IF (ifiltre==1 .OR. ifiltre==-1) then
+       print *, 'Pas de transformee simple dans cette version'
+       STOP 1
+    end IF
 
     IF (iter==2) THEN
        PRINT *, ' Pas d iteration du filtre dans cette version !', &
             ' Utiliser old_filtreg et repasser !'
-       STOP
+       STOP 1
     END IF
 
     IF (ifiltre==-2 .AND. .NOT. griscal) THEN
        PRINT *, ' Cette routine ne calcule le filtre inverse que ', &
             ' sur la grille des scalaires !'
-       STOP
+       STOP 1
     END IF
 
     IF (ifiltre/=2 .AND. ifiltre/=-2) THEN
        PRINT *, ' Probleme dans filtreg car ifiltre NE 2 et NE -2', &
             ' corriger et repasser !'
-       STOP
+       STOP 1
     END IF
 
     IF (griscal) THEN
        IF (nlat /= jjm + 1) THEN
-          PRINT 1111
-          STOP
+          PRINT *, 'Erreur dans le dimensionnement du tableau CHAMP a ' &
+               // 'filtrer, sur la grille des scalaires'
+          STOP 1
        ELSE
-
           IF (iaire==1) THEN
              sdd1 = sddv
              sdd2 = unsddv
@@ -94,11 +95,11 @@ contains
           jffil2 = jjm
        END IF
     ELSE
-       IF (nlat/=jjm) THEN
-          PRINT 2222
-          STOP
+       IF (nlat /= jjm) THEN
+          PRINT *, 'Erreur dans le dimensionnement du tableau CHAMP a ' &
+               // 'filtrer, sur la grille de V ou de Z'
+          STOP 1
        ELSE
-
           IF (iaire==1) THEN
              sdd1 = sddu
              sdd2 = unsddu
@@ -114,9 +115,7 @@ contains
        END IF
     END IF
 
-
     DO hemisph = 1, 2
-
        IF (hemisph==1) THEN
           jdfil = jdfil1
           jffil = jffil1
@@ -125,21 +124,16 @@ contains
           jffil = jffil2
        END IF
 
-
        DO l = 1, nbniv
           DO j = jdfil, jffil
-
-
              DO i = 1, iim
                 champ(i, j, l) = champ(i, j, l)*sdd1(i)
              END DO
 
-
              IF (hemisph==1) THEN
-
                 IF (ifiltre==-2) THEN
                    DO k = 1, iim
-                      eignq(k) = 0.0
+                      eignq(k) = 0.
                    END DO
                    DO k = 1, iim
                       DO i = 1, iim
@@ -148,7 +142,7 @@ contains
                    END DO
                 ELSE IF (griscal) THEN
                    DO k = 1, iim
-                      eignq(k) = 0.0
+                      eignq(k) = 0.
                    END DO
                    DO i = 1, iim
                       DO k = 1, iim
@@ -158,7 +152,7 @@ contains
                    END DO
                 ELSE
                    DO k = 1, iim
-                      eignq(k) = 0.0
+                      eignq(k) = 0.
                    END DO
                    DO i = 1, iim
                       DO k = 1, iim
@@ -167,12 +161,10 @@ contains
                       END DO
                    END DO
                 END IF
-
              ELSE
-
                 IF (ifiltre==-2) THEN
                    DO k = 1, iim
-                      eignq(k) = 0.0
+                      eignq(k) = 0.
                    END DO
                    DO i = 1, iim
                       DO k = 1, iim
@@ -182,7 +174,7 @@ contains
                    END DO
                 ELSE IF (griscal) THEN
                    DO k = 1, iim
-                      eignq(k) = 0.0
+                      eignq(k) = 0.
                    END DO
                    DO i = 1, iim
                       DO k = 1, iim
@@ -192,7 +184,7 @@ contains
                    END DO
                 ELSE
                    DO k = 1, iim
-                      eignq(k) = 0.0
+                      eignq(k) = 0.
                    END DO
                    DO i = 1, iim
                       DO k = 1, iim
@@ -201,7 +193,6 @@ contains
                       END DO
                    END DO
                 END IF
-
              END IF
 
              IF (ifiltre==2) THEN
@@ -215,17 +206,9 @@ contains
              END IF
 
              champ(iim + 1, j, l) = champ(1, j, l)
-
           END DO
-
        END DO
-
     end DO
-
-1111 FORMAT (//20X, 'ERREUR dans le dimensionnement du tableau &
-         & CHAMP a filtrer, sur la grille des scalaires'/)
-2222 FORMAT (//20X, 'ERREUR dans le dimensionnement du tableau &
-         &CHAMP a filtrer, sur la grille de V ou de Z'/)
 
   END SUBROUTINE filtreg
 

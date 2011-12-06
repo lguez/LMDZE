@@ -128,8 +128,6 @@ contains
     call nf95_enddef(nid)
     call nf95_put_var(nid, nvarid, pctsrf(:, is_sic))
 
-
-
     DO nsrf = 1, nbsrf
        IF (nsrf<=99) THEN
           WRITE (str2, '(i2.2)') nsrf
@@ -245,7 +243,6 @@ contains
        call nf95_put_var(nid, nvarid, evap(:, nsrf))
     END DO
 
-
     DO nsrf = 1, nbsrf
        IF (nsrf<=99) THEN
           WRITE (str2, '(i2.2)') nsrf
@@ -260,7 +257,6 @@ contains
        END IF
        call nf95_put_var(nid, nvarid, snow(:, nsrf))
     END DO
-
 
     call nf95_redef(nid)
     call nf95_def_var(nid, 'RADS', nf90_float, idim2, nvarid)
@@ -403,7 +399,6 @@ contains
     call nf95_put_att(nid, nvarid, 'title', 'Runofflic0')
     call nf95_enddef(nid)
     call nf95_put_var(nid, nvarid, run_off_lic_0)
-
 
     call nf95_close(nid)
 

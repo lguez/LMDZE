@@ -14,7 +14,9 @@ contains
     USE dimens_m, ONLY : iim, jjm, llm
     USE paramet_m, ONLY : iip1, iip2, ip1jmp1, llmp1
     USE comdissnew, ONLY : lstardis, nitergdiv, nitergrot, niterh
-    USE inidissip_m, ONLY : dtdiss, tetah, tetaudiv, tetaurot
+    USE inidissip_m, ONLY : dtdiss, tetah, tetaudiv, tetaurot, cdivu, crot, &
+         cdivh
+    use gradiv2_m, only: gradiv2
 
     ! Arguments:
     REAL vcov((iim + 1) * jjm, llm), ucov(ip1jmp1, llm), teta(ip1jmp1, llm)
@@ -44,9 +46,9 @@ contains
     ! Calcul de la partie grad (div) :
 
     IF (lstardis) THEN
-       CALL gradiv2(llm, ucov, vcov, nitergdiv, gdx, gdy)
+       CALL gradiv2(llm, ucov, vcov, nitergdiv, gdx, gdy, cdivu)
     ELSE
-       CALL gradiv(llm, ucov, vcov, nitergdiv, gdx, gdy)
+       CALL gradiv(llm, ucov, vcov, nitergdiv, gdx, gdy, cdivu)
     END IF
 
     DO l = 1, llm
@@ -66,9 +68,9 @@ contains
     ! calcul de la partie n X grad (rot) :
 
     IF (lstardis) THEN
-       CALL nxgraro2(llm, ucov, vcov, nitergrot, grx, gry)
+       CALL nxgraro2(llm, ucov, vcov, nitergrot, grx, gry, crot)
     ELSE
-       CALL nxgrarot(llm, ucov, vcov, nitergrot, grx, gry)
+       CALL nxgrarot(llm, ucov, vcov, nitergrot, grx, gry, crot)
     END IF
 
 
@@ -94,9 +96,9 @@ contains
           END DO
        END DO
 
-       CALL divgrad2(llm, teta, deltapres, niterh, gdx)
+       CALL divgrad2(llm, teta, deltapres, niterh, gdx, cdivh)
     ELSE
-       CALL divgrad(llm, teta, niterh, gdx)
+       CALL divgrad(llm, teta, niterh, gdx, cdivh)
     END IF
 
     forall (l = 1: llm) dh(:, l) = dh(:, l) - te3dt(l) * gdx(:, l)

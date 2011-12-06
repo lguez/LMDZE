@@ -22,6 +22,7 @@ PROGRAM gcm
   use grid_change, only: dyn_phy, init_dyn_phy
   use iniadvtrac_m, only: iniadvtrac
   use inidissip_m, only: inidissip
+  use inifilr_m, only: inifilr
   use inigeom_m, only: inigeom
   use initdynav_m, only: initdynav
   use inithist_m, only: inithist

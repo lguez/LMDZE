@@ -2,9 +2,9 @@ module ctherm
 
   implicit none
 
-  integer, save:: iflag_thermals,nsplit_thermals
+  integer, save:: iflag_thermals, nsplit_thermals
 
-  !  A inclure eventuellement dans les fichiers de configuration
+  ! À inclure éventuellement dans les fichiers de configuration.
 
   real:: r_aspect_thermals = 4.
   real:: l_mix_thermals = 10.

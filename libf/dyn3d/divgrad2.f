@@ -1,7 +1,7 @@
 !
 ! $Header: /home/cvsroot/LMDZ4/libf/dyn3d/divgrad2.F,v 1.1.1.1 2004/05/19 12:53:06 lmdzadmin Exp $
 !
-      SUBROUTINE divgrad2 ( klevel, h, deltapres, lh, divgra )
+      SUBROUTINE divgrad2 ( klevel, h, deltapres, lh, divgra, cdivh )
 c
 c     P. Le Van
 c
@@ -15,7 +15,6 @@ c
       use dimens_m
       use paramet_m
       use comgeom
-            use inidissip_m
       IMPLICIT NONE
 c
 
@@ -24,6 +23,7 @@ c
       INTEGER klevel
       REAL h( ip1jmp1,klevel ), deltapres( ip1jmp1,klevel )
       REAL divgra( ip1jmp1,klevel)
+      real, intent(in):: cdivh
 c
 c    .......    variables  locales    ..........
 c

@@ -1,12 +1,11 @@
 !
 ! $Header: /home/cvsroot/LMDZ4/libf/dyn3d/divgrad.F,v 1.1.1.1 2004/05/19 12:53:05 lmdzadmin Exp $
 !
-      SUBROUTINE divgrad (klevel,h, lh, divgra )
+      SUBROUTINE divgrad (klevel,h, lh, divgra, cdivh )
       use dimens_m
       use paramet_m
       use logic
       use comgeom
-            use inidissip_m
       use filtreg_m, only: filtreg
       IMPLICIT NONE
 c
@@ -28,6 +27,7 @@ c
 c
       INTEGER klevel
       REAL h( ip1jmp1,klevel ), divgra( ip1jmp1,klevel )
+      real, intent(in):: cdivh
 c
       REAL ghy(ip1jm,llm), ghx(ip1jmp1,llm)
 

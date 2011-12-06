@@ -1,7 +1,7 @@
 !
 ! $Header: /home/cvsroot/LMDZ4/libf/dyn3d/nxgrarot.F,v 1.1.1.1 2004/05/19 12:53:06 lmdzadmin Exp $
 !
-      SUBROUTINE nxgrarot (klevel,xcov, ycov, lr, grx, gry )
+      SUBROUTINE nxgrarot (klevel,xcov, ycov, lr, grx, gry, crot )
 c   ***********************************************************
 c
 c    Auteur :  P.Le Van  
@@ -18,7 +18,6 @@ c
       use dimens_m
       use paramet_m
       use logic
-            use inidissip_m
       use filtreg_m, only: filtreg
       IMPLICIT NONE
 c
@@ -27,6 +26,7 @@ c
       INTEGER klevel
       REAL xcov( ip1jmp1,klevel ), ycov( ip1jm,klevel )
       REAL  grx( ip1jmp1,klevel ),  gry( ip1jm,klevel )
+      real, intent(in):: crot
 c
       REAL rot(ip1jm,llm)
 

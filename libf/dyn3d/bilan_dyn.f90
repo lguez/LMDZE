@@ -12,7 +12,7 @@ contains
 
     ! Sous-programme consacré à des diagnostics dynamiques de base
     ! De façon générale, les moyennes des scalaires Q sont pondérées par
-    ! la masse. Les flux de masse sont eux simplement moyennés.
+    ! la masse. Les flux de masse sont, eux, simplement moyennés.
 
     USE histcom, ONLY: histbeg_totreg, histdef, histend, histvert
     USE calendar, ONLY: ymds2ju
@@ -41,35 +41,26 @@ contains
 
     ! Local:
 
-    integer, save:: icum, ncum
+    integer:: icum  = 0
+    integer, save:: ncum
     logical:: first = .true.
     real zz, zqy, zfactv(jjm, llm)
 
-    integer, parameter:: nQ=7
-
-    character(len=6), save:: nom(nQ)
-    character(len=6), save:: unites(nQ)
-
-    character(len=10) file
-    integer, parameter:: ifile=4
-
-    integer itemp, igeop, iecin, iang, iu, iovap, iun
-    integer:: i_sortie = 1
+    integer, parameter:: nQ = 7
+    character(len=4), parameter:: nom(nQ) = (/'T   ', 'gz  ', 'K   ', 'ang ', &
+         'u   ', 'ovap', 'un  '/)
+    character(len=5), parameter:: unites(nQ) = (/'K    ', 'm2/s2', 'm2/s2', &
+         'ang  ', 'm/s  ', 'kg/kg', 'un   '/)
 
     real:: time = 0.
     integer:: itau = 0
-
-    data itemp, igeop, iecin, iang, iu, iovap, iun/1, 2, 3, 4, 5, 6, 7/
-
     real ww
 
     ! Variables dynamiques intermédiaires
     REAL vcont(iip1, jjm, llm), ucont(iip1, jjp1, llm)
     REAL ang(iip1, jjp1, llm), unat(iip1, jjp1, llm)
     REAL massebx(iip1, jjp1, llm), masseby(iip1, jjm, llm)
-    REAL vorpot(iip1, jjm, llm)
     REAL w(iip1, jjp1, llm), ecin(iip1, jjp1, llm), convm(iip1, jjp1, llm)
-    REAL bern(iip1, jjp1, llm)
 
     ! Champ contenant les scalaires advectés
     real Q(iip1, jjp1, llm, nQ)
@@ -82,27 +73,25 @@ contains
     real, save:: Q_cum(iip1, jjp1, llm, nQ)
     real, save:: flux_uQ_cum(iip1, jjp1, llm, nQ)
     real, save:: flux_vQ_cum(iip1, jjm, llm, nQ)
-    real flux_wQ_cum(iip1, jjp1, llm, nQ)
     real dQ(iip1, jjp1, llm, nQ)
 
     ! champs de tansport en moyenne zonale
     integer itr
-    integer, parameter:: ntr=5
+    integer, parameter:: ntr = 5
 
     character(len=10), save:: znom(ntr, nQ)
-    character(len=20), save:: znoml(ntr, nQ)
-    character(len=10), save:: zunites(ntr, nQ)
+    character(len=26), save:: znoml(ntr, nQ)
+    character(len=12), save:: zunites(ntr, nQ)
 
-    integer iave, itot, immc, itrs, istn
-    data iave, itot, immc, itrs, istn/1, 2, 3, 4, 5/
-    character(len=3) ctrs(ntr)
-    data ctrs/' ', 'TOT', 'MMC', 'TRS', 'STN'/
+    integer, parameter:: iave = 1, itot = 2, immc = 3, itrs = 4, istn = 5
+    character(len=3), parameter:: ctrs(ntr) = (/'   ', 'TOT', 'MMC', 'TRS', &
+         'STN'/)
 
     real zvQ(jjm, llm, ntr, nQ), zvQtmp(jjm, llm)
-    real zavQ(jjm, ntr, nQ), psiQ(jjm, llm+1, nQ)
-    real zmasse(jjm, llm), zamasse(jjm)
+    real zavQ(jjm, 2: ntr, nQ), psiQ(jjm, llm + 1, nQ)
+    real zmasse(jjm, llm)
 
-    real zv(jjm, llm), psi(jjm, llm+1)
+    real zv(jjm, llm), psi(jjm, llm + 1)
 
     integer i, j, l, iQ
 
@@ -110,14 +99,8 @@ contains
 
     integer, save:: fileid
     integer thoriid, zvertiid
-    integer ndex3d(jjm*llm)
-
-    ! Variables locales
 
     real zjulian
-    character(len=3) str
-    character(len=10) ctrac
-    integer ii, jj
     integer zan, dayref
 
     real rlong(jjm), rlatg(jjm)
@@ -128,43 +111,24 @@ contains
 
     ! Initialisation
 
-    time=time+dt_app
-    itau=itau+1
+    time = time + dt_app
+    itau = itau + 1
 
-    if (first) then
-       icum=0
+    first_call: if (first) then
        ! initialisation des fichiers
-       first=.false.
+       first = .false.
        ! ncum est la frequence de stokage en pas de temps
-       ncum=dt_cum/dt_app
+       ncum = dt_cum / dt_app
        if (abs(ncum * dt_app - dt_cum) > 1e-5 * dt_app) then
           print *, 'Problème : le pas de cumul doit être multiple du pas'
-          print *, 'dt_app=', dt_app
-          print *, 'dt_cum=', dt_cum
+          print *, 'dt_app = ', dt_app
+          print *, 'dt_cum = ', dt_cum
           stop 1
        endif
 
-       if (i_sortie == 1) then
-          file='dynzon'
-          call inigrads(ifile , (/0./), 180./pi, 0., 0., rlatv, -90., 90., &
-               180./pi , presnivs, 1. , dt_cum, file, 'dyn_zon ')
-       endif
-
-       nom(itemp)='T'
-       nom(igeop)='gz'
-       nom(iecin)='K'
-       nom(iang)='ang'
-       nom(iu)='u'
-       nom(iovap)='ovap'
-       nom(iun)='un'
-
-       unites(itemp)='K'
-       unites(igeop)='m2/s2'
-       unites(iecin)='m2/s2'
-       unites(iang)='ang'
-       unites(iu)='m/s'
-       unites(iovap)='kg/kg'
-       unites(iun)='un'
+       call inigrads(i_f=4, x=(/0./), fx=180./pi, xmin=0., xmax=0., y=rlatv, &
+            ymin=-90., ymax=90., fy=180./pi, z=presnivs, fz=1., dt=dt_cum, &
+            file='dynzon', titlel='dyn_zon ')
 
        ! Initialisation du fichier contenant les moyennes zonales
 
@@ -172,8 +136,8 @@ contains
        dayref = day_ref
        CALL ymds2ju(zan, 1, dayref, 0.0, zjulian)
 
-       rlong=0.
-       rlatg=rlatv*180./pi
+       rlong = 0.
+       rlatg = rlatv*180./pi
 
        call histbeg_totreg('dynzon', rlong(:1), rlatg, 1, 1, 1, jjm, itau_dyn, &
             zjulian, dt_cum, thoriid, fileid)
@@ -184,23 +148,23 @@ contains
             zvertiid)
 
        ! Appels à histdef pour la définition des variables à sauvegarder
-       do iQ=1, nQ
-          do itr=1, ntr
-             if(itr == 1) then
-                znom(itr, iQ)=nom(iQ)
-                znoml(itr, iQ)=nom(iQ)
-                zunites(itr, iQ)=unites(iQ)
+       do iQ = 1, nQ
+          do itr = 1, ntr
+             if (itr == 1) then
+                znom(itr, iQ) = nom(iQ)
+                znoml(itr, iQ) = nom(iQ)
+                zunites(itr, iQ) = unites(iQ)
              else
-                znom(itr, iQ)=ctrs(itr)//'v'//nom(iQ)
-                znoml(itr, iQ)='transport : v * '//nom(iQ)//' '//ctrs(itr)
-                zunites(itr, iQ)='m/s * '//unites(iQ)
+                znom(itr, iQ) = ctrs(itr)//'v'//nom(iQ)
+                znoml(itr, iQ) = 'transport : v * '//nom(iQ)//' '//ctrs(itr)
+                zunites(itr, iQ) = 'm/s * '//unites(iQ)
              endif
           enddo
        enddo
 
        ! Déclarations des champs avec dimension verticale
-       do iQ=1, nQ
-          do itr=1, ntr
+       do iQ = 1, nQ
+          do itr = 1, ntr
              call histdef(fileid, znom(itr, iQ), znoml(itr, iQ), &
                   zunites(itr, iQ), 1, jjm, thoriid, llm, 1, llm, zvertiid, &
                   'ave(X)', dt_cum, dt_cum)
@@ -224,8 +188,8 @@ contains
             'ave(X)', dt_cum, dt_cum)
 
        ! Declaration des champs 1D de transport en latitude
-       do iQ=1, nQ
-          do itr=2, ntr
+       do iQ = 1, nQ
+          do itr = 2, ntr
              call histdef(fileid, 'a'//znom(itr, iQ), znoml(itr, iQ), &
                   zunites(itr, iQ), 1, jjm, thoriid, 1, 1, 1, -99, &
                   'ave(X)', dt_cum, dt_cum)
@@ -233,7 +197,7 @@ contains
        enddo
 
        CALL histend(fileid)
-    endif
+    endif first_call
 
     ! Calcul des champs dynamiques
 
@@ -243,68 +207,54 @@ contains
     CALL enercin(vcov, ucov, vcont, ucont, ecin)
 
     ! moment cinétique
-    do l=1, llm
-       ang(:, :, l)=ucov(:, :, l)+constang_2d
-       unat(:, :, l)=ucont(:, :, l)*cu_2d
+    do l = 1, llm
+       ang(:, :, l) = ucov(:, :, l) + constang_2d
+       unat(:, :, l) = ucont(:, :, l)*cu_2d
     enddo
 
-    Q(:, :, :, itemp)=teta*pk/cpp
-    Q(:, :, :, igeop)=phi
-    Q(:, :, :, iecin)=ecin
-    Q(:, :, :, iang)=ang
-    Q(:, :, :, iu)=unat
-    Q(:, :, :, iovap)=trac
-    Q(:, :, :, iun)=1.
+    Q(:, :, :, 1) = teta * pk / cpp
+    Q(:, :, :, 2) = phi
+    Q(:, :, :, 3) = ecin
+    Q(:, :, :, 4) = ang
+    Q(:, :, :, 5) = unat
+    Q(:, :, :, 6) = trac
+    Q(:, :, :, 7) = 1.
 
     ! Cumul
 
-    if(icum == 0) then
-       ps_cum=0.
-       masse_cum=0.
-       flux_u_cum=0.
-       flux_v_cum=0.
-       Q_cum=0.
-       flux_vQ_cum=0.
-       flux_uQ_cum=0.
+    if (icum == 0) then
+       ps_cum = 0.
+       masse_cum = 0.
+       flux_u_cum = 0.
+       flux_v_cum = 0.
+       Q_cum = 0.
+       flux_vQ_cum = 0.
+       flux_uQ_cum = 0.
     endif
 
-    icum=icum+1
+    icum = icum + 1
 
     ! Accumulation des flux de masse horizontaux
-    ps_cum=ps_cum+ps
-    masse_cum=masse_cum+masse
-    flux_u_cum=flux_u_cum+flux_u
-    flux_v_cum=flux_v_cum+flux_v
-    do iQ=1, nQ
-       Q_cum(:, :, :, iQ)=Q_cum(:, :, :, iQ)+Q(:, :, :, iQ)*masse
+    ps_cum = ps_cum + ps
+    masse_cum = masse_cum + masse
+    flux_u_cum = flux_u_cum + flux_u
+    flux_v_cum = flux_v_cum + flux_v
+    do iQ = 1, nQ
+       Q_cum(:, :, :, iQ) = Q_cum(:, :, :, iQ) + Q(:, :, :, iQ)*masse
     enddo
 
     ! FLUX ET TENDANCES
 
     ! Flux longitudinal
-    do iQ=1, nQ
-       do l=1, llm
-          do j=1, jjp1
-             do i=1, iim
-                flux_uQ_cum(i, j, l, iQ)=flux_uQ_cum(i, j, l, iQ) &
-                     +flux_u(i, j, l)*0.5*(Q(i, j, l, iQ)+Q(i+1, j, l, iQ))
-             enddo
-             flux_uQ_cum(iip1, j, l, iQ)=flux_uQ_cum(1, j, l, iQ)
-          enddo
-       enddo
-    enddo
+    forall (iQ = 1: nQ, i = 1: iim) flux_uQ_cum(i, :, :, iQ) &
+         = flux_uQ_cum(i, :, :, iQ) &
+         + flux_u(i, :, :) * 0.5 * (Q(i, :, :, iQ) + Q(i + 1, :, :, iQ))
+    flux_uQ_cum(iip1, :, :, :) = flux_uQ_cum(1, :, :, :)
 
-    ! flux méridien
-    do iQ=1, nQ
-       do l=1, llm
-          do j=1, jjm
-             do i=1, iip1
-                flux_vQ_cum(i, j, l, iQ)=flux_vQ_cum(i, j, l, iQ) &
-                     +flux_v(i, j, l)*0.5*(Q(i, j, l, iQ)+Q(i, j+1, l, iQ))
-             enddo
-          enddo
-       enddo
-    enddo
+    ! Flux méridien
+    forall (iQ = 1: nQ, j = 1: jjm) flux_vQ_cum(:, j, :, iQ) &
+         = flux_vQ_cum(:, j, :, iQ) &
+         + flux_v(:, j, :) * 0.5 * (Q(:, j, :, iQ) + Q(:, j + 1, :, iQ))
 
     ! tendances
 
@@ -315,13 +265,13 @@ contains
     call convmas(flux_u_cum, flux_v_cum, convm)
     CALL vitvert(convm, w)
 
-    do iQ=1, nQ
-       do l=1, llm-1
-          do j=1, jjp1
-             do i=1, iip1
-                ww=-0.5*w(i, j, l+1)*(Q(i, j, l, iQ)+Q(i, j, l+1, iQ))
-                dQ(i, j, l , iQ)=dQ(i, j, l , iQ)-ww
-                dQ(i, j, l+1, iQ)=dQ(i, j, l+1, iQ)+ww
+    do iQ = 1, nQ
+       do l = 1, llm-1
+          do j = 1, jjp1
+             do i = 1, iip1
+                ww = -0.5*w(i, j, l + 1)*(Q(i, j, l, iQ) + Q(i, j, l + 1, iQ))
+                dQ(i, j, l, iQ) = dQ(i, j, l, iQ)-ww
+                dQ(i, j, l + 1, iQ) = dQ(i, j, l + 1, iQ) + ww
              enddo
           enddo
        enddo
@@ -331,120 +281,111 @@ contains
 
     writing_step: if (icum == ncum) then
        ! Normalisation
-       do iQ=1, nQ
-          Q_cum(:, :, :, iQ)=Q_cum(:, :, :, iQ)/masse_cum
+       do iQ = 1, nQ
+          Q_cum(:, :, :, iQ) = Q_cum(:, :, :, iQ)/masse_cum
        enddo
-       zz=1./float(ncum)
-       ps_cum=ps_cum*zz
-       masse_cum=masse_cum*zz
-       flux_u_cum=flux_u_cum*zz
-       flux_v_cum=flux_v_cum*zz
-       flux_uQ_cum=flux_uQ_cum*zz
-       flux_vQ_cum=flux_vQ_cum*zz
-       dQ=dQ*zz
+       zz = 1. / real(ncum)
+       ps_cum = ps_cum*zz
+       masse_cum = masse_cum*zz
+       flux_u_cum = flux_u_cum*zz
+       flux_v_cum = flux_v_cum*zz
+       flux_uQ_cum = flux_uQ_cum*zz
+       flux_vQ_cum = flux_vQ_cum*zz
+       dQ = dQ*zz
 
        ! A retravailler eventuellement
        ! division de dQ par la masse pour revenir aux bonnes grandeurs
-       do iQ=1, nQ
-          dQ(:, :, :, iQ)=dQ(:, :, :, iQ)/masse_cum
+       do iQ = 1, nQ
+          dQ(:, :, :, iQ) = dQ(:, :, :, iQ)/masse_cum
        enddo
 
        ! Transport méridien
 
        ! cumul zonal des masses des mailles
 
-       zv=0.
-       zmasse=0.
+       zv = 0.
+       zmasse = 0.
        call massbar(masse_cum, massebx, masseby)
-       do l=1, llm
-          do j=1, jjm
-             do i=1, iim
-                zmasse(j, l)=zmasse(j, l)+masseby(i, j, l)
-                zv(j, l)=zv(j, l)+flux_v_cum(i, j, l)
+       do l = 1, llm
+          do j = 1, jjm
+             do i = 1, iim
+                zmasse(j, l) = zmasse(j, l) + masseby(i, j, l)
+                zv(j, l) = zv(j, l) + flux_v_cum(i, j, l)
              enddo
-             zfactv(j, l)=cv_2d(1, j)/zmasse(j, l)
+             zfactv(j, l) = cv_2d(1, j)/zmasse(j, l)
           enddo
        enddo
 
        ! Transport dans le plan latitude-altitude
 
-       zvQ=0.
-       psiQ=0.
-       do iQ=1, nQ
-          zvQtmp=0.
-          do l=1, llm
-             do j=1, jjm
+       zvQ = 0.
+       psiQ = 0.
+       do iQ = 1, nQ
+          zvQtmp = 0.
+          do l = 1, llm
+             do j = 1, jjm
                 ! Calcul des moyennes zonales du transort total et de zvQtmp
-                do i=1, iim
-                   zvQ(j, l, itot, iQ)=zvQ(j, l, itot, iQ) &
-                        +flux_vQ_cum(i, j, l, iQ)
-                   zqy= 0.5*(Q_cum(i, j, l, iQ)*masse_cum(i, j, l)+ &
-                        Q_cum(i, j+1, l, iQ)*masse_cum(i, j+1, l))
-                   zvQtmp(j, l)=zvQtmp(j, l)+flux_v_cum(i, j, l)*zqy &
-                        /(0.5*(masse_cum(i, j, l)+masse_cum(i, j+1, l)))
-                   zvQ(j, l, iave, iQ)=zvQ(j, l, iave, iQ)+zqy
+                do i = 1, iim
+                   zvQ(j, l, itot, iQ) = zvQ(j, l, itot, iQ) &
+                        + flux_vQ_cum(i, j, l, iQ)
+                   zqy =  0.5 * (Q_cum(i, j, l, iQ) * masse_cum(i, j, l) &
+                        + Q_cum(i, j + 1, l, iQ) * masse_cum(i, j + 1, l))
+                   zvQtmp(j, l) = zvQtmp(j, l) + flux_v_cum(i, j, l) * zqy &
+                        / (0.5 * (masse_cum(i, j, l) + masse_cum(i, j + 1, l)))
+                   zvQ(j, l, iave, iQ) = zvQ(j, l, iave, iQ) + zqy
                 enddo
                 ! Decomposition
-                zvQ(j, l, iave, iQ)=zvQ(j, l, iave, iQ)/zmasse(j, l)
-                zvQ(j, l, itot, iQ)=zvQ(j, l, itot, iQ)*zfactv(j, l)
-                zvQtmp(j, l)=zvQtmp(j, l)*zfactv(j, l)
-                zvQ(j, l, immc, iQ)=zv(j, l)*zvQ(j, l, iave, iQ)*zfactv(j, l)
-                zvQ(j, l, itrs, iQ)=zvQ(j, l, itot, iQ)-zvQtmp(j, l)
-                zvQ(j, l, istn, iQ)=zvQtmp(j, l)-zvQ(j, l, immc, iQ)
+                zvQ(j, l, iave, iQ) = zvQ(j, l, iave, iQ)/zmasse(j, l)
+                zvQ(j, l, itot, iQ) = zvQ(j, l, itot, iQ)*zfactv(j, l)
+                zvQtmp(j, l) = zvQtmp(j, l)*zfactv(j, l)
+                zvQ(j, l, immc, iQ) = zv(j, l)*zvQ(j, l, iave, iQ)*zfactv(j, l)
+                zvQ(j, l, itrs, iQ) = zvQ(j, l, itot, iQ)-zvQtmp(j, l)
+                zvQ(j, l, istn, iQ) = zvQtmp(j, l)-zvQ(j, l, immc, iQ)
              enddo
           enddo
           ! fonction de courant meridienne pour la quantite Q
-          do l=llm, 1, -1
-             do j=1, jjm
-                psiQ(j, l, iQ)=psiQ(j, l+1, iQ)+zvQ(j, l, itot, iQ)
+          do l = llm, 1, -1
+             do j = 1, jjm
+                psiQ(j, l, iQ) = psiQ(j, l + 1, iQ) + zvQ(j, l, itot, iQ)
              enddo
           enddo
        enddo
 
        ! fonction de courant pour la circulation meridienne moyenne
-       psi=0.
-       do l=llm, 1, -1
-          do j=1, jjm
-             psi(j, l)=psi(j, l+1)+zv(j, l)
-             zv(j, l)=zv(j, l)*zfactv(j, l)
+       psi = 0.
+       do l = llm, 1, -1
+          do j = 1, jjm
+             psi(j, l) = psi(j, l + 1) + zv(j, l)
+             zv(j, l) = zv(j, l)*zfactv(j, l)
           enddo
        enddo
 
        ! sorties proprement dites
-       if (i_sortie == 1) then
-          do iQ=1, nQ
-             do itr=1, ntr
-                call histwrite(fileid, znom(itr, iQ), itau, zvQ(:, :, itr, iQ))
-             enddo
-             call histwrite(fileid, 'psi'//nom(iQ), itau, psiQ(:, 1:llm, iQ))
+       do iQ = 1, nQ
+          do itr = 1, ntr
+             call histwrite(fileid, znom(itr, iQ), itau, zvQ(:, :, itr, iQ))
           enddo
+          call histwrite(fileid, 'psi'//nom(iQ), itau, psiQ(:, :llm, iQ))
+       enddo
 
-          call histwrite(fileid, 'masse', itau, zmasse)
-          call histwrite(fileid, 'v', itau, zv)
-          psi=psi*1.e-9
-          call histwrite(fileid, 'psi', itau, psi(:, 1:llm))
-       endif
+       call histwrite(fileid, 'masse', itau, zmasse)
+       call histwrite(fileid, 'v', itau, zv)
+       psi = psi*1.e-9
+       call histwrite(fileid, 'psi', itau, psi(:, :llm))
 
        ! Moyenne verticale
 
-       zamasse=0.
-       do l=1, llm
-          zamasse(:)=zamasse(:)+zmasse(:, l)
-       enddo
-       zavQ=0.
-       do iQ=1, nQ
-          do itr=2, ntr
-             do l=1, llm
-                zavQ(:, itr, iQ) = zavQ(:, itr, iQ) &
-                     + zvQ(:, l, itr, iQ) * zmasse(:, l)
-             enddo
-             zavQ(:, itr, iQ)=zavQ(:, itr, iQ)/zamasse(:)
+       forall (iQ = 1: nQ, itr = 2: ntr) zavQ(:, itr, iQ) &
+            = sum(zvQ(:, :, itr, iQ) * zmasse, dim=2) / sum(zmasse, dim=2)
+
+       do iQ = 1, nQ
+          do itr = 2, ntr
              call histwrite(fileid, 'a'//znom(itr, iQ), itau, zavQ(:, itr, iQ))
           enddo
        enddo
 
-       ! on doit pouvoir tracer systematiquement la fonction de courant.
-       icum=0
+       ! On doit pouvoir tracer systematiquement la fonction de courant.
+       icum = 0
     endif writing_step
 
   end SUBROUTINE bilan_dyn

@@ -1,37 +1,29 @@
 module comdissnew
 
-  ! The variables declared here are read from the file "run.def"
-
   implicit none
 
-  LOGICAL:: lstardis= .TRUE.
-  ! Help = choix de l'operateur de dissipation
-  ! 'y' si on veut star et 'n' si on veut non-star
-  ! Moi y en a pas comprendre ! 
+  LOGICAL:: lstardis = .TRUE. ! choix de l'opérateur de dissipation star
 
-  INTEGER:: nitergdiv= 1
-  ! Help = nombre d'iterations de l'operateur de dissipation 
-  ! gradiv
+  INTEGER:: nitergdiv = 1
+  ! nombre d'itérations de l'opérateur de dissipation gradiv
 
-  INTEGER:: nitergrot= 2
-  ! Help = nombre d'iterations de l'operateur de dissipation 
-  ! nxgradrot
+  INTEGER:: nitergrot = 2
+  ! nombre d'itérations de l'opérateur de dissipation nxgradrot
 
-  INTEGER:: niterh= 2
-  ! Help = nombre d'iterations de l'operateur de dissipation
-  ! divgrad
+  INTEGER:: niterh = 2
+  ! nombre d'itérations de l'opérateur de dissipation divgrad
 
-  REAL:: tetagdiv= 7200. ! in s
-  ! temps de dissipation des plus petites longueurs d'ondes pour u,v (gradiv)
+  REAL:: tetagdiv = 7200. ! in s
+  ! temps de dissipation des plus petites longueurs d'ondes pour u, v (gradiv)
 
-  REAL:: tetagrot= 7200. ! in s
-  ! temps de dissipation des plus petites longueurs d'ondes pour u,v
+  REAL:: tetagrot = 7200. ! in s
+  ! temps de dissipation des plus petites longueurs d'ondes pour u, v
   ! (nxgradrot)
 
-  REAL:: tetatemp= 7200. ! in s
+  REAL:: tetatemp = 7200. ! in s
   ! temps de dissipation des plus petites longueurs d'ondes pour h (divgrad) 
 
-  REAL:: coefdis= 0.
+  REAL:: coefdis = 0.
 
 contains
 

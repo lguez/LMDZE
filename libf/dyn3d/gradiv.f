@@ -1,7 +1,7 @@
 !
 ! $Header: /home/cvsroot/LMDZ4/libf/dyn3d/gradiv.F,v 1.1.1.1 2004/05/19 12:53:06 lmdzadmin Exp $
 !
-      SUBROUTINE gradiv(klevel, xcov, ycov, ld, gdx, gdy )
+      SUBROUTINE gradiv(klevel, xcov, ycov, ld, gdx, gdy, cdivu)
 c
 c    Auteur :   P. Le Van
 c
@@ -19,7 +19,6 @@ c
       use dimens_m
       use paramet_m
       use logic
-            use inidissip_m
       use filtreg_m, only: filtreg
       IMPLICIT NONE
 c
@@ -28,7 +27,7 @@ c
 c
       REAL xcov( ip1jmp1,klevel ), ycov( ip1jm,klevel )
       REAL gdx( ip1jmp1,klevel ),   gdy( ip1jm,klevel )
-
+      real, intent(in):: cdivu
       REAL div(ip1jmp1,llm)
 
       INTEGER l,ij,iter

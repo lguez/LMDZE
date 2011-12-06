@@ -12,6 +12,7 @@ contains
     USE dimphy, ONLY: klev, klon
     USE ctherm, ONLY: l_mix_thermals, nsplit_thermals, r_aspect_thermals, &
          tho_thermals, w2di_thermals
+    use thermcell_m, only: thermcell
 
     REAL, intent(in):: dtime
 
