@@ -10,9 +10,9 @@ contains
     ! From LMDZ4/libf/dyn3d/bilan_dyn.F, version 1.5 2005/03/16
     ! 10:12:17 fairhead
 
-    ! Sous-programme consacré à des diagnostics dynamiques de base
-    ! De façon générale, les moyennes des scalaires Q sont pondérées par
-    ! la masse. Les flux de masse sont, eux, simplement moyennés.
+    ! Sous-programme consacré à des diagnostics dynamiques de base.
+    ! De façon générale, les moyennes des scalaires Q sont pondérées
+    ! par la masse. Les flux de masse sont, eux, simplement moyennés.
 
     USE histcom, ONLY: histbeg_totreg, histdef, histend, histvert
     USE calendar, ONLY: ymds2ju
@@ -373,10 +373,10 @@ contains
        psi = psi*1.e-9
        call histwrite(fileid, 'psi', itau, psi(:, :llm))
 
-       ! Moyenne verticale
+       ! Intégrale verticale
 
        forall (iQ = 1: nQ, itr = 2: ntr) zavQ(:, itr, iQ) &
-            = sum(zvQ(:, :, itr, iQ) * zmasse, dim=2) / sum(zmasse, dim=2)
+            = sum(zvQ(:, :, itr, iQ) * zmasse, dim=2) / cv_2d(1, :)
 
        do iQ = 1, nQ
           do itr = 2, ntr

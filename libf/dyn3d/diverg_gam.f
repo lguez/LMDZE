@@ -28,7 +28,7 @@ c   ---------------------------------------------------------------------
 c
 c    ..........          variables en arguments    ...................
 c
-      INTEGER klevel
+      INTEGER, intent(in):: klevel
       REAL x( ip1jmp1,klevel ),y( ip1jm,klevel ),div( ip1jmp1,klevel )
       REAL cuvscvgam(ip1jm),cvuscugam(ip1jmp1),unsairegam(ip1jmp1)
       REAL unsapolnga,unsapolsga

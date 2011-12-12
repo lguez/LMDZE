@@ -24,7 +24,7 @@ c
 c
 c
       INTEGER klevel
-      REAL xcov( ip1jmp1,klevel ), ycov( ip1jm,klevel )
+      REAL, intent(in):: xcov( ip1jmp1,klevel ), ycov( ip1jm,klevel )
       REAL  grx( ip1jmp1,klevel ),  gry( ip1jm,klevel )
       real, intent(in):: crot
 c
@@ -35,8 +35,8 @@ c
 c
 c
 c
-      CALL SCOPY ( ip1jmp1*klevel, xcov, 1, grx, 1 )
-      CALL SCOPY (  ip1jm*klevel, ycov, 1, gry, 1 )
+      grx = xcov
+      gry = ycov
 c
       DO 10 iter = 1,lr
       CALL  rotat (klevel,grx, gry, rot )

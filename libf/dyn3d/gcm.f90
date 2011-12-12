@@ -30,7 +30,6 @@ PROGRAM gcm
   use histcom, only: histclo
   use leapfrog_m, only: leapfrog
   use logic, only: iflag_phys
-  use paramet_m, only: ip1jm, ip1jmp1
   use suphec_m, only: suphec
   use temps, only: day_ref, annee_ref, day_end, itau_dyn
   use tracstoke, only: istdyn, istphy
@@ -41,12 +40,11 @@ PROGRAM gcm
   REAL zdtvr ! time step for dynamics, in s
 
   ! Variables dynamiques :
-  REAL vcov(ip1jm, llm), ucov(ip1jmp1, llm) ! vents covariants
+  REAL ucov(iim + 1, jjm + 1, llm), vcov(iim + 1, jjm, llm)  ! vent covariant
   REAL teta(iim + 1, jjm + 1, llm) ! température potentielle 
   REAL q(iim + 1, jjm + 1, llm, nqmx) ! champs advectés
   REAL ps(iim + 1, jjm + 1) ! pression au sol (Pa)
-
-  REAL masse(ip1jmp1, llm) ! masse d'air
+  REAL masse(iim + 1, jjm + 1, llm) ! masse d'air
   REAL phis(iim + 1, jjm + 1) ! géopotentiel au sol
 
   ! Variables pour le fichier histoire :

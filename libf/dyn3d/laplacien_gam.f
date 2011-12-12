@@ -22,7 +22,7 @@ c
 c
 c    ............     variables  en arguments    ..........
 c
-      INTEGER klevel
+      INTEGER, intent(in):: klevel
       REAL teta( ip1jmp1,klevel ), divgra( ip1jmp1,klevel )
       REAL cuvsga(ip1jm) , cvusga( ip1jmp1 ),unsaigam(ip1jmp1),
      *     unsapolnga, unsapolsga

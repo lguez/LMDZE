@@ -21,7 +21,7 @@ c
 c    .......    variables en arguments   .......
 c
       INTEGER klevel
-      REAL h( ip1jmp1,klevel ), deltapres( ip1jmp1,klevel )
+      REAL, intent(in):: h( ip1jmp1,klevel ), deltapres( ip1jmp1,klevel)
       REAL divgra( ip1jmp1,klevel)
       real, intent(in):: cdivh
 c
@@ -35,8 +35,7 @@ c    ...................................................................
 c
       signe    = (-1.)**lh
       nudivgrs = signe * cdivh
-
-      CALL SCOPY ( ip1jmp1 * klevel, h, 1, divgra, 1 )
+      divgra = h
 
 c
       CALL laplacien( klevel, divgra, divgra )

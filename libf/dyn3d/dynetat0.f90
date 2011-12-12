@@ -26,10 +26,11 @@ contains
     use nr_util, only: assert
     use temps, only: day_ref, itau_dyn, annee_ref
 
-    REAL, intent(out):: vcov(: , :), ucov(:, :)
+    REAL, intent(out):: vcov(: , :, :) ! (iim + 1, jjm, llm)
+    REAL, intent(out):: ucov(:, :, :) ! (iim + 1, jjm + 1, llm)
     REAL, intent(out):: teta(:, :, :) ! (iim + 1, jjm + 1, llm)
     REAL, intent(out):: q(:, :, :, :) ! (iim + 1, jjm + 1, llm, nqmx)
-    REAL, intent(out):: masse(:, :)
+    REAL, intent(out):: masse(:, :, :) ! (iim + 1, jjm + 1, llm)
     REAL, intent(out):: ps(:, :) ! (iim + 1, jjm + 1) in Pa
     REAL, intent(out):: phis(:, :) ! (iim + 1, jjm + 1)
     REAL, intent(out):: time_0
@@ -43,15 +44,13 @@ contains
 
     print *, "Call sequence information: dynetat0"
 
-    call assert(size(vcov, 1) == (iim + 1) * jjm, "dynetat0 vcov 1")
-    call assert((/size(ucov, 1), size(masse, 1)/) == (iim + 1) * (jjm + 1), &
-         "dynetat0 (iim + 1) * (jjm + 1)")
-    call assert((/size(ps, 1), size(phis, 1), size(q, 1), size(teta, 1)/) &
-         == iim + 1, "dynetat0 iim")
-    call assert((/size(ps, 2), size(phis, 2), size(q, 2), size(teta, 2)/) &
-         == jjm + 1, "dynetat0 jjm")
-    call assert((/size(vcov, 2), size(ucov, 2), size(teta, 3), size(q, 3), &
-         size(masse, 2)/) == llm, "dynetat0 llm")
+    call assert((/size(ucov, 1), size(vcov, 1), size(masse, 1), size(ps, 1), &
+         size(phis, 1), size(q, 1), size(teta, 1)/) == iim + 1, "dynetat0 iim")
+    call assert((/size(ucov, 2), size(vcov, 2) + 1, size(masse, 2), &
+         size(ps, 2), size(phis, 2), size(q, 2), size(teta, 2)/) == jjm + 1, &
+         "dynetat0 jjm")
+    call assert((/size(vcov, 3), size(ucov, 3), size(teta, 3), size(q, 3), &
+         size(masse, 3)/) == llm, "dynetat0 llm")
     call assert(size(q, 4) == nqmx, "dynetat0 q nqmx")
 
     ! Fichier état initial :
@@ -118,10 +117,10 @@ contains
     deallocate(tab_cntrl) ! pointer
 
     call NF95_INQ_VARID (ncid, "ucov", varid)
-    call NF95_GET_VAR(ncid, varid, ucov, count_nc=(/iim + 1, jjm + 1, llm, 1/))
+    call NF95_GET_VAR(ncid, varid, ucov)
 
     call NF95_INQ_VARID (ncid, "vcov", varid)
-    call NF95_GET_VAR(ncid, varid, vcov, count_nc=(/iim + 1, jjm, llm, 1/))
+    call NF95_GET_VAR(ncid, varid, vcov)
 
     call NF95_INQ_VARID (ncid, "teta", varid)
     call NF95_GET_VAR(ncid, varid, teta)
@@ -138,7 +137,7 @@ contains
     ENDDO
 
     call NF95_INQ_VARID (ncid, "masse", varid)
-    call NF95_GET_VAR(ncid, varid, masse, count_nc=(/iim + 1, jjm + 1, llm, 1/))
+    call NF95_GET_VAR(ncid, varid, masse)
 
     call NF95_INQ_VARID (ncid, "ps", varid)
     call NF95_GET_VAR(ncid, varid, ps)

@@ -21,7 +21,7 @@ c
 c
 c    .........      variables  en arguments   ..............
 c
-      INTEGER klevel
+      INTEGER, intent(in):: klevel
       REAL teta( ip1jmp1,klevel ), divgra( ip1jmp1,klevel )
 c
 c    ............     variables  locales      ..............

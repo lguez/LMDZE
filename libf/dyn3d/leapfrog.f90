@@ -32,20 +32,20 @@ contains
     use inidissip_m, only: idissip
     use integrd_m, only: integrd
     USE logic, ONLY: iflag_phys, ok_guide
-    USE paramet_m, ONLY: ip1jmp1
+    use nr_util, only: assert
     USE pressure_var, ONLY: p3d
     USE temps, ONLY: itau_dyn
 
     ! Variables dynamiques:
-    REAL, intent(inout):: ucov(ip1jmp1, llm) ! vent covariant
-    REAL, intent(inout):: vcov((iim + 1) * jjm, llm) ! vent covariant
+    REAL, intent(inout):: ucov(:, :, :) ! (iim + 1, jjm + 1, llm) vent covariant
+    REAL, intent(inout):: vcov(:, :, :) ! (iim + 1, jjm, llm) ! vent covariant
 
     REAL, intent(inout):: teta(:, :, :) ! (iim + 1, jjm + 1, llm)
     ! potential temperature
 
     REAL, intent(inout):: ps(:, :) ! (iim + 1, jjm + 1) pression au sol, en Pa
-    REAL masse(ip1jmp1, llm) ! masse d'air
-    REAL phis(ip1jmp1) ! geopotentiel au sol
+    REAL masse((iim + 1) * (jjm + 1), llm) ! masse d'air
+    REAL phis((iim + 1) * (jjm + 1)) ! geopotentiel au sol
 
     REAL, intent(inout):: q(:, :, :, :) ! (iim + 1, jjm + 1, llm, nqmx)
     ! mass fractions of advected fields
@@ -56,38 +56,41 @@ contains
 
     ! Variables dynamiques:
 
-    REAL pks(ip1jmp1) ! exner au sol
+    REAL pks((iim + 1) * (jjm + 1)) ! exner au sol
     REAL pk(iim + 1, jjm + 1, llm) ! exner au milieu des couches
-    REAL pkf(ip1jmp1, llm) ! exner filt.au milieu des couches
+    REAL pkf((iim + 1) * (jjm + 1), llm) ! exner filt.au milieu des couches
     REAL phi(iim + 1, jjm + 1, llm) ! geopotential
-    REAL w(ip1jmp1, llm) ! vitesse verticale
+    REAL w((iim + 1) * (jjm + 1), llm) ! vitesse verticale
 
-    ! variables dynamiques intermediaire pour le transport
-    REAL pbaru(ip1jmp1, llm), pbarv((iim + 1) * jjm, llm) !flux de masse
+    ! Variables dynamiques intermediaire pour le transport
+    ! Flux de masse :
+    REAL pbaru((iim + 1) * (jjm + 1), llm), pbarv((iim + 1) * jjm, llm)
 
     ! variables dynamiques au pas - 1
-    REAL vcovm1((iim + 1) * jjm, llm), ucovm1(ip1jmp1, llm)
+    REAL vcovm1(iim + 1, jjm, llm), ucovm1(iim + 1, jjm + 1, llm)
     REAL tetam1(iim + 1, jjm + 1, llm), psm1(iim + 1, jjm + 1)
-    REAL massem1(ip1jmp1, llm)
+    REAL massem1((iim + 1) * (jjm + 1), llm)
 
     ! tendances dynamiques
-    REAL dv((iim + 1) * jjm, llm), dudyn(ip1jmp1, llm)
-    REAL dteta(iim + 1, jjm + 1, llm), dq(ip1jmp1, llm, nqmx), dp(ip1jmp1)
+    REAL dv((iim + 1) * jjm, llm), dudyn((iim + 1) * (jjm + 1), llm)
+    REAL dteta(iim + 1, jjm + 1, llm), dq((iim + 1) * (jjm + 1), llm, nqmx)
+    real dp((iim + 1) * (jjm + 1))
 
     ! tendances de la dissipation
-    REAL dvdis((iim + 1) * jjm, llm), dudis(ip1jmp1, llm)
+    REAL dvdis(iim + 1, jjm, llm), dudis(iim + 1, jjm + 1, llm)
     REAL dtetadis(iim + 1, jjm + 1, llm)
 
     ! tendances physiques
-    REAL dvfi((iim + 1) * jjm, llm), dufi(ip1jmp1, llm)
-    REAL dtetafi(iim + 1, jjm + 1, llm), dqfi(ip1jmp1, llm, nqmx), dpfi(ip1jmp1)
+    REAL dvfi((iim + 1) * jjm, llm), dufi((iim + 1) * (jjm + 1), llm)
+    REAL dtetafi(iim + 1, jjm + 1, llm), dqfi((iim + 1) * (jjm + 1), llm, nqmx)
+    real dpfi((iim + 1) * (jjm + 1))
 
     ! variables pour le fichier histoire
 
     INTEGER itau ! index of the time step of the dynamics, starts at 0
     INTEGER itaufin
     REAL time ! time of day, as a fraction of day length
-    real finvmaold(ip1jmp1, llm)
+    real finvmaold((iim + 1) * (jjm + 1), llm)
     INTEGER l
     REAL rdayvrai, rdaym_ini
 
@@ -95,16 +98,17 @@ contains
     REAL ecin(iim + 1, jjm + 1, llm), ecin0(iim + 1, jjm + 1, llm)
 
     REAL dtetaecdt(iim + 1, jjm + 1, llm)
-    ! tendance de la température potentielle due à la tansformation
-    ! d'énergie cinétique en énergie thermique créée par la dissipation
+    ! tendance de la température potentielle due à la transformation
+    ! d'énergie cinétique en énergie thermique par la dissipation
 
-    REAL vcont((iim + 1) * jjm, llm), ucont(ip1jmp1, llm)
+    REAL vcont((iim + 1) * jjm, llm), ucont((iim + 1) * (jjm + 1), llm)
     logical leapf
     real dt
 
     !---------------------------------------------------
 
     print *, "Call sequence information: leapfrog"
+    call assert(shape(ucov) == (/iim + 1, jjm + 1, llm/), "leapfrog")
 
     itaufin = nday * day_step
     ! "day_step" is a multiple of "iperiod", therefore "itaufin" is one too
@@ -134,7 +138,7 @@ contains
        end if
 
        ! Calcul des tendances dynamiques:
-       CALL geopot(ip1jmp1, teta, pk, pks, phis, phi)
+       CALL geopot((iim + 1) * (jjm + 1), teta, pk, pks, phis, phi)
        CALL caldyn(itau, ucov, vcov, teta, ps, masse, pk, pkf, phis, phi, &
             dudyn, dv, dteta, dp, w, pbaru, pbarv, time_0, &
             conser=MOD(itau, iconser)==0)
@@ -157,7 +161,7 @@ contains
           CALL exner_hyb(ps, p3d, pks, pk, pkf)
 
           ! Calcul des tendances dynamiques:
-          CALL geopot(ip1jmp1, teta, pk, pks, phis, phi)
+          CALL geopot((iim + 1) * (jjm + 1), teta, pk, pks, phis, phi)
           CALL caldyn(itau + 1, ucov, vcov, teta, ps, masse, pk, pkf, phis, &
                phi, dudyn, dv, dteta, dp, w, pbaru, pbarv, time_0, &
                conser=.false.)
@@ -192,24 +196,24 @@ contains
        CALL exner_hyb(ps, p3d, pks, pk, pkf)
 
        IF (MOD(itau + 1, idissip) == 0) THEN
-          ! dissipation horizontale et verticale des petites echelles:
+          ! Dissipation horizontale et verticale des petites échelles
 
-          ! calcul de l'energie cinetique avant dissipation
+          ! calcul de l'énergie cinétique avant dissipation
           call covcont(llm, ucov, vcov, ucont, vcont)
           call enercin(vcov, ucov, vcont, ucont, ecin0)
 
           ! dissipation
           CALL dissip(vcov, ucov, teta, p3d, dvdis, dudis, dtetadis)
-          ucov=ucov + dudis
-          vcov=vcov + dvdis
+          ucov = ucov + dudis
+          vcov = vcov + dvdis
 
-          ! On rajoute la tendance due à la transformation Ec -> E
-          ! thermique créée lors de la dissipation
+          ! On ajoute la tendance due à la transformation énergie
+          ! cinétique en énergie thermique par la dissipation
           call covcont(llm, ucov, vcov, ucont, vcont)
           call enercin(vcov, ucov, vcont, ucont, ecin)
           dtetaecdt= (ecin0 - ecin) / pk
-          dtetadis=dtetadis + dtetaecdt
-          teta=teta + dtetadis
+          dtetadis = dtetadis + dtetaecdt
+          teta = teta + dtetadis
 
           ! Calcul de la valeur moyenne aux pôles :
           forall (l = 1: llm)
@@ -238,7 +242,7 @@ contains
          itau=itau_dyn+itaufin)
 
     ! Calcul des tendances dynamiques:
-    CALL geopot(ip1jmp1, teta, pk, pks, phis, phi)
+    CALL geopot((iim + 1) * (jjm + 1), teta, pk, pks, phis, phi)
     CALL caldyn(itaufin, ucov, vcov, teta, ps, masse, pk, pkf, phis, phi, &
          dudyn, dv, dteta, dp, w, pbaru, pbarv, time_0, &
          conser=MOD(itaufin, iconser)==0)

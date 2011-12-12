@@ -25,7 +25,7 @@ c
 
       INTEGER klevel
 c
-      REAL xcov( ip1jmp1,klevel ), ycov( ip1jm,klevel )
+      REAL, intent(in):: xcov( ip1jmp1,klevel ), ycov( ip1jm,klevel )
       REAL gdx( ip1jmp1,klevel ),   gdy( ip1jm,klevel )
       real, intent(in):: cdivu
       REAL div(ip1jmp1,llm)
@@ -35,8 +35,8 @@ c
 c
 c
 c
-      CALL SCOPY( ip1jmp1*klevel,xcov,1,gdx,1 )
-      CALL SCOPY( ip1jm*klevel,  ycov,1,gdy,1 )
+      gdx = xcov
+      gdy = ycov
 c
       DO 10 iter = 1,ld
 c

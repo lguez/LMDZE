@@ -16,7 +16,7 @@ c
       use paramet_m
       IMPLICIT NONE
 c
-      INTEGER klevel
+      INTEGER, intent(in):: klevel
       REAL  pg( ip1jmp1,klevel )
       REAL pgx( ip1jmp1,klevel ) , pgy( ip1jm,klevel )
       INTEGER  l,ij

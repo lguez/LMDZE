@@ -26,7 +26,8 @@ c   -------------
 c
 c
       INTEGER klevel
-      REAL h( ip1jmp1,klevel ), divgra( ip1jmp1,klevel )
+      REAL, intent(in):: h( ip1jmp1,klevel )
+      real divgra( ip1jmp1,klevel )
       real, intent(in):: cdivh
 c
       REAL ghy(ip1jm,llm), ghx(ip1jmp1,llm)
@@ -36,7 +37,7 @@ c
 c
 c
 c
-      CALL SCOPY ( ip1jmp1*klevel,h,1,divgra,1 )
+      divgra = h
 c
       DO 10 iter = 1,lh
 

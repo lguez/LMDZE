@@ -12,7 +12,7 @@ COMPILE.f90 = $(FC) $(F90FLAGS) -c
 # Directories:
 libf_dir = .
 
-VPATH = ${libf_dir}:${libf_dir}/dyn3d:${libf_dir}/dyn3d/Vlsplt:${libf_dir}/filtrez:${libf_dir}/phylmd:${libf_dir}/bibio:${libf_dir}/phylmd/Mobidic:${libf_dir}/phylmd/Orography:${libf_dir}/phylmd/Radlwsw:${libf_dir}/IOIPSL:${libf_dir}/IOIPSL/Stringop:${libf_dir}/dyn3d/Read_reanalyse:${libf_dir}/phylmd/Thermcell:${libf_dir}/phylmd/CV3_routines:${libf_dir}/phylmd/Conflx:${libf_dir}/phylmd/CV_routines:${libf_dir}/phylmd/Interface_surf
+VPATH = ${libf_dir}:${libf_dir}/dyn3d:${libf_dir}/dyn3d/Vlsplt:${libf_dir}/filtrez:${libf_dir}/phylmd:${libf_dir}/bibio:${libf_dir}/phylmd/Mobidic:${libf_dir}/phylmd/Orography:${libf_dir}/phylmd/Radlwsw:${libf_dir}/IOIPSL:${libf_dir}/IOIPSL/Stringop:${libf_dir}/dyn3d/Read_reanalyse:${libf_dir}/phylmd/Thermcell:${libf_dir}/phylmd/CV3_routines:${libf_dir}/phylmd/Conflx:${libf_dir}/phylmd/CV_routines:${libf_dir}/phylmd/Interface_surf:${libf_dir}/dyn3d/Dissipation
 
 # Compiler-dependent part:
 -include compiler.mk
