@@ -12,7 +12,7 @@ module paramet_m
 
   integer, PARAMETER:: kftd = iim/2 -ndm 
   integer, PARAMETER:: ip1jm = (iim + 1) * jjm
-  integer, PARAMETER:: ip1jmp1 = (iim + 1) * (jjm + 1) 
+  integer, PARAMETER:: ip1jmp1 = (iim + 1) * (jjm + 1)
   integer, PARAMETER:: ip1jmi1 = ip1jm - (iim + 1) 
   integer, PARAMETER:: ijp1llm = (iim + 1) * (jjm + 1) * llm
   integer, PARAMETER:: ijmllm= ip1jm * llm 

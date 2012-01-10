@@ -19,16 +19,16 @@ contains
     INTEGER, intent(in):: klevel
 
     ! composantes covariantes de v:
-    REAL, intent(in):: xcov(ip1jmp1,klevel), ycov(ip1jm,klevel)
+    REAL, intent(in):: xcov(ip1jmp1, klevel), ycov(ip1jm, klevel)
 
     integer, intent(in):: ld
-    REAL, intent(out):: gdx(ip1jmp1,klevel), gdy(ip1jm,klevel)
+    REAL, intent(out):: gdx(ip1jmp1, klevel), gdy(ip1jm, klevel)
     real, intent(in):: cdivu
 
     ! Variables locales :
-    REAL div(ip1jmp1,llm)
+    REAL div(ip1jmp1, llm)
     REAL nugrads
-    INTEGER l,ij,iter
+    INTEGER iter
 
     !--------------------------------------------------------------
 
@@ -37,28 +37,22 @@ contains
 
     CALL divergf(klevel, gdx, gdy, div)
 
-    IF(ld.GT.1) THEN
-       CALL laplacien (klevel, div, div)
+    IF (ld > 1) THEN
+       CALL laplacien(klevel, div, div)
 
-       ! Iteration de l'operateur laplacien_gam
+       ! Itération de l'opérateur laplacien_gam
        DO iter = 1, ld -2
-          CALL laplacien_gam (klevel,cuvscvgam1,cvuscugam1,unsair_gam1, &
+          CALL laplacien_gam(klevel, cuvscvgam1, cvuscugam1, unsair_gam1, &
                unsapolnga1, unsapolsga1, div, div)
-       ENDDO
+       END DO
     ENDIF
 
     CALL filtreg(div, jjp1, klevel, 2, 1, .TRUE., 1)
-    CALL grad (klevel, div, gdx, gdy)
+    CALL grad(klevel, div, gdx, gdy)
     nugrads = (-1.)**ld * cdivu
 
-    DO l = 1, klevel
-       DO ij = 1, ip1jmp1
-          gdx(ij,l) = gdx(ij,l) * nugrads
-       ENDDO
-       DO ij = 1, ip1jm
-          gdy(ij,l) = gdy(ij,l) * nugrads
-       ENDDO
-    ENDDO
+    gdx = gdx * nugrads
+    gdy = gdy * nugrads
 
   END SUBROUTINE gradiv2
 

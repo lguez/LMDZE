@@ -12,6 +12,7 @@ contains
 
     ! This is the main procedure for the "physics" part of the program.
 
+    use aaam_bud_m, only: aaam_bud
     USE abort_gcm_m, ONLY: abort_gcm
     use ajsec_m, only: ajsec
     USE calendar, ONLY: ymds2ju
@@ -1658,11 +1659,8 @@ contains
        ENDDO
     ENDDO
 
-    !IM calcul composantes axiales du moment angulaire et couple des montagnes
-
-    CALL aaam_bud(27, klon, llm, time, ra, rg, romega, rlat, rlon, pphis, &
-         zustrdr, zustrli, zustrph, zvstrdr, zvstrli, zvstrph, paprs, u, v, &
-         aam, torsfc)
+    CALL aaam_bud(ra, rg, romega, rlat, rlon, pphis, zustrdr, zustrli, &
+         zustrph, zvstrdr, zvstrli, zvstrph, paprs, u, v, aam, torsfc)
 
     IF (if_ebil >= 2) THEN 
        ztit = 'after orography'

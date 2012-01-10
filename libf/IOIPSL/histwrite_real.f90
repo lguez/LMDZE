@@ -17,8 +17,16 @@ contains
     use netcdf, only: NF90_PUT_VAR
     use histcom_var
 
-    INTEGER, INTENT(IN) :: pfileid, pitau, varid, &
-         &                      nbindex, nindex(nbindex), nbdpt
+    INTEGER, INTENT(IN) :: pfileid, pitau, varid, nbdpt
+
+    INTEGER, INTENT(IN) :: nbindex
+    ! number of indices provided
+    ! If it is equal to the size of the full field as provided in histdef
+    ! then nothing is done.
+
+    INTEGER, INTENT(IN) :: nindex(nbindex)
+    ! The indices used to expand the variable (pdata) onto the full field
+
     REAL, DIMENSION(:)  :: buff_tmp
     LOGICAL, INTENT(IN) :: do_oper, do_write
 

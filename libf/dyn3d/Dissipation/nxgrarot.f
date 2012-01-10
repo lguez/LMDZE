@@ -25,7 +25,7 @@ c
 c
       INTEGER klevel
       REAL, intent(in):: xcov( ip1jmp1,klevel ), ycov( ip1jm,klevel )
-      REAL  grx( ip1jmp1,klevel ),  gry( ip1jm,klevel )
+      REAL, intent(out)::  grx( ip1jmp1,klevel ),  gry( ip1jm,klevel )
       real, intent(in):: crot
 c
       REAL rot(ip1jm,llm)

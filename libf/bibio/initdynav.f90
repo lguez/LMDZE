@@ -2,9 +2,11 @@ module initdynav_m
 
   implicit none
 
+  integer histaveid
+
 contains
 
-  subroutine initdynav(day0, anne0, tstep, nq, fileid, t_ops, t_wrt)
+  subroutine initdynav(day0, anne0, tstep, nq, t_ops, t_wrt)
 
     ! From initdynav.F, version 1.1.1.1, 2004/05/19 12:53:05
     ! L. Fairhead, LMD
@@ -23,10 +25,9 @@ contains
 
     integer, intent(in):: day0, anne0 ! date de reference
     real, intent(in):: tstep ! frequence d'ecriture
+    integer, intent(in):: nq ! nombre de traceurs
     real, intent(in):: t_ops ! frequence de l'operation pour IOIPSL
     real, intent(in):: t_wrt ! frequence d'ecriture sur le fichier
-    integer, intent(out):: fileid ! ID du fichier netcdf cree
-    integer, intent(in):: nq ! nombre de traceurs
 
     ! Variables locales
     integer thoriid, zvertiid
@@ -52,44 +53,44 @@ contains
     enddo
 
     call histbeg_totreg('dyn_hist_ave.nc', rlong(:, 1), rlat(1, :), 1, iip1, &
-         1, jjp1, itau_dyn, zjulian, tstep, thoriid, fileid)
-    call histvert(fileid, 'sigss', 'Niveaux sigma', 'Pa', llm, nivsigs, &
+         1, jjp1, itau_dyn, zjulian, tstep, thoriid, histaveid)
+    call histvert(histaveid, 'sigss', 'Niveaux sigma', 'Pa', llm, nivsigs, &
          zvertiid)
 
-    call histdef(fileid, 'u', 'vents u scalaires moyennes', &
+    call histdef(histaveid, 'u', 'vents u scalaires moyennes', &
          'm/s', iip1, jjp1, thoriid, llm, 1, llm, zvertiid, &
          'ave(X)', t_ops, t_wrt)
-    call histdef(fileid, 'v', 'vents v scalaires moyennes', &
+    call histdef(histaveid, 'v', 'vents v scalaires moyennes', &
          'm/s', iip1, jjp1, thoriid, llm, 1, llm, zvertiid, &
          'ave(X)', t_ops, t_wrt)
-    call histdef(fileid, 'temp', 'temperature moyennee', 'K', &
+    call histdef(histaveid, 'temp', 'temperature moyennee', 'K', &
          iip1, jjp1, thoriid, llm, 1, llm, zvertiid, &
          'ave(X)', t_ops, t_wrt)
-    call histdef(fileid, 'theta', 'temperature potentielle', 'K', &
+    call histdef(histaveid, 'theta', 'temperature potentielle', 'K', &
          iip1, jjp1, thoriid, llm, 1, llm, zvertiid, &
          'ave(X)', t_ops, t_wrt)
-    call histdef(fileid, 'phi', 'geopotentiel moyenne', '-', &
+    call histdef(histaveid, 'phi', 'geopotentiel moyenne', '-', &
          iip1, jjp1, thoriid, llm, 1, llm, zvertiid, &
          'ave(X)', t_ops, t_wrt)
 
     ! Traceurs
     DO iq = 1, nq
-       call histdef(fileid, ttext(iq), ttext(iq), '-', &
+       call histdef(histaveid, ttext(iq), ttext(iq), '-', &
             iip1, jjp1, thoriid, llm, 1, llm, zvertiid, &
             'ave(X)', t_ops, t_wrt)
     enddo
 
-    call histdef(fileid, 'masse', 'masse', 'kg', &
+    call histdef(histaveid, 'masse', 'masse', 'kg', &
          iip1, jjp1, thoriid, 1, 1, 1, -99, &
          'ave(X)', t_ops, t_wrt)
-    call histdef(fileid, 'ps', 'pression naturelle au sol', 'Pa', &
+    call histdef(histaveid, 'ps', 'pression naturelle au sol', 'Pa', &
          iip1, jjp1, thoriid, 1, 1, 1, -99, &
          'ave(X)', t_ops, t_wrt)
-    call histdef(fileid, 'phis', 'geopotentiel au sol', '-', &
+    call histdef(histaveid, 'phis', 'geopotentiel au sol', '-', &
          iip1, jjp1, thoriid, 1, 1, 1, -99, &
          'ave(X)', t_ops, t_wrt)
 
-    call histend(fileid)
+    call histend(histaveid)
 
   end subroutine initdynav
 

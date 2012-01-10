@@ -1055,7 +1055,7 @@ CONTAINS
     USE histcom_var, ONLY: nb_files, ncdf_ids
     USE netcdf, ONLY: nf90_sync
 
-    INTEGER, INTENT (IN), OPTIONAL:: file
+    INTEGER, INTENT(IN), OPTIONAL:: file
 
     INTEGER:: ifile, ncid, iret
 

@@ -27,7 +27,7 @@ c
 c
       INTEGER klevel
       REAL, intent(in):: h( ip1jmp1,klevel )
-      real divgra( ip1jmp1,klevel )
+      real, intent(out):: divgra( ip1jmp1,klevel )
       real, intent(in):: cdivh
 c
       REAL ghy(ip1jm,llm), ghx(ip1jmp1,llm)

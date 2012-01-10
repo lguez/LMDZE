@@ -5,46 +5,46 @@ module bilan_dyn_m
 contains
 
   SUBROUTINE bilan_dyn(ps, masse, pk, flux_u, flux_v, teta, phi, ucov, vcov, &
-       trac, dt_app, dt_cum)
+       trac, dt_app)
 
-    ! From LMDZ4/libf/dyn3d/bilan_dyn.F, version 1.5 2005/03/16
-    ! 10:12:17 fairhead
+    ! From LMDZ4/libf/dyn3d/bilan_dyn.F, version 1.5 2005/03/16 10:12:17
 
     ! Sous-programme consacré à des diagnostics dynamiques de base.
     ! De façon générale, les moyennes des scalaires Q sont pondérées
     ! par la masse. Les flux de masse sont, eux, simplement moyennés.
 
-    USE histcom, ONLY: histbeg_totreg, histdef, histend, histvert
     USE calendar, ONLY: ymds2ju
-    USE histwrite_m, ONLY: histwrite
-    USE dimens_m, ONLY: iim, jjm, llm
-    USE paramet_m, ONLY: iip1, jjp1
+    USE conf_gcm_m, ONLY: day_step, iperiod, periodav
     USE comconst, ONLY: cpp
     USE comvert, ONLY: presnivs
     USE comgeom, ONLY: constang_2d, cu_2d, cv_2d, rlatv
-    USE temps, ONLY: annee_ref, day_ref, itau_dyn
-    USE inigrads_m, ONLY: inigrads
+    USE dimens_m, ONLY: iim, jjm, llm
+    USE histcom, ONLY: histbeg_totreg, histdef, histend, histvert
+    USE histwrite_m, ONLY: histwrite
     USE nr_util, ONLY: pi
+    USE paramet_m, ONLY: iip1, jjp1
+    USE temps, ONLY: annee_ref, day_ref, itau_dyn
 
     ! Arguments:
 
-    real, intent(in):: dt_app, dt_cum
-    real ps(iip1, jjp1)
-    real masse(iip1, jjp1, llm), pk(iip1, jjp1, llm)
-    real flux_u(iip1, jjp1, llm)
-    real flux_v(iip1, jjm, llm)
+    real, intent(in):: ps(iip1, jjp1)
+    real, intent(in):: masse(iip1, jjp1, llm), pk(iip1, jjp1, llm)
+    real, intent(in):: flux_u(iip1, jjp1, llm)
+    real, intent(in):: flux_v(iip1, jjm, llm)
     real, intent(in):: teta(iip1, jjp1, llm)
-    real phi(iip1, jjp1, llm)
-    real ucov(iip1, jjp1, llm)
-    real vcov(iip1, jjm, llm)
+    real, intent(in):: phi(iip1, jjp1, llm)
+    real, intent(in):: ucov(iip1, jjp1, llm)
+    real, intent(in):: vcov(iip1, jjm, llm)
     real, intent(in):: trac(:, :, :) ! (iim + 1, jjm + 1, llm)
+    real, intent(in):: dt_app
 
     ! Local:
 
+    real dt_cum
     integer:: icum  = 0
     integer, save:: ncum
     logical:: first = .true.
-    real zz, zqy, zfactv(jjm, llm)
+    real zqy, zfactv(jjm, llm)
 
     integer, parameter:: nQ = 7
     character(len=4), parameter:: nom(nQ) = (/'T   ', 'gz  ', 'K   ', 'ang ', &
@@ -52,7 +52,6 @@ contains
     character(len=5), parameter:: unites(nQ) = (/'K    ', 'm2/s2', 'm2/s2', &
          'ang  ', 'm/s  ', 'kg/kg', 'un   '/)
 
-    real:: time = 0.
     integer:: itau = 0
     real ww
 
@@ -90,9 +89,7 @@ contains
     real zvQ(jjm, llm, ntr, nQ), zvQtmp(jjm, llm)
     real zavQ(jjm, 2: ntr, nQ), psiQ(jjm, llm + 1, nQ)
     real zmasse(jjm, llm)
-
     real zv(jjm, llm), psi(jjm, llm + 1)
-
     integer i, j, l, iQ
 
     ! Initialisation du fichier contenant les moyennes zonales.
@@ -109,26 +106,12 @@ contains
 
     !!print *, "Call sequence information: bilan_dyn"
 
-    ! Initialisation
-
-    time = time + dt_app
-    itau = itau + 1
-
     first_call: if (first) then
        ! initialisation des fichiers
        first = .false.
        ! ncum est la frequence de stokage en pas de temps
-       ncum = dt_cum / dt_app
-       if (abs(ncum * dt_app - dt_cum) > 1e-5 * dt_app) then
-          print *, 'Problème : le pas de cumul doit être multiple du pas'
-          print *, 'dt_app = ', dt_app
-          print *, 'dt_cum = ', dt_cum
-          stop 1
-       endif
-
-       call inigrads(i_f=4, x=(/0./), fx=180./pi, xmin=0., xmax=0., y=rlatv, &
-            ymin=-90., ymax=90., fy=180./pi, z=presnivs, fz=1., dt=dt_cum, &
-            file='dynzon', titlel='dyn_zon ')
+       ncum = day_step / iperiod * periodav
+       dt_cum = ncum * dt_app
 
        ! Initialisation du fichier contenant les moyennes zonales
 
@@ -169,25 +152,25 @@ contains
                   zunites(itr, iQ), 1, jjm, thoriid, llm, 1, llm, zvertiid, &
                   'ave(X)', dt_cum, dt_cum)
           enddo
-          ! Declarations pour les fonctions de courant
+          ! Déclarations pour les fonctions de courant
           call histdef(fileid, 'psi'//nom(iQ), 'stream fn. '//znoml(itot, iQ), &
                zunites(itot, iQ), 1, jjm, thoriid, llm, 1, llm, zvertiid, &
                'ave(X)', dt_cum, dt_cum)
        enddo
 
-       ! Declarations pour les champs de transport d'air
+       ! Déclarations pour les champs de transport d'air
        call histdef(fileid, 'masse', 'masse', &
             'kg', 1, jjm, thoriid, llm, 1, llm, zvertiid, &
             'ave(X)', dt_cum, dt_cum)
        call histdef(fileid, 'v', 'v', &
             'm/s', 1, jjm, thoriid, llm, 1, llm, zvertiid, &
             'ave(X)', dt_cum, dt_cum)
-       ! Declarations pour les fonctions de courant
+       ! Déclarations pour les fonctions de courant
        call histdef(fileid, 'psi', 'stream fn. MMC ', 'mega t/s', &
             1, jjm, thoriid, llm, 1, llm, zvertiid, &
             'ave(X)', dt_cum, dt_cum)
 
-       ! Declaration des champs 1D de transport en latitude
+       ! Déclaration des champs 1D de transport en latitude
        do iQ = 1, nQ
           do itr = 2, ntr
              call histdef(fileid, 'a'//znom(itr, iQ), znoml(itr, iQ), &
@@ -198,6 +181,8 @@ contains
 
        CALL histend(fileid)
     endif first_call
+
+    itau = itau + 1
 
     ! Calcul des champs dynamiques
 
@@ -284,14 +269,13 @@ contains
        do iQ = 1, nQ
           Q_cum(:, :, :, iQ) = Q_cum(:, :, :, iQ)/masse_cum
        enddo
-       zz = 1. / real(ncum)
-       ps_cum = ps_cum*zz
-       masse_cum = masse_cum*zz
-       flux_u_cum = flux_u_cum*zz
-       flux_v_cum = flux_v_cum*zz
-       flux_uQ_cum = flux_uQ_cum*zz
-       flux_vQ_cum = flux_vQ_cum*zz
-       dQ = dQ*zz
+       ps_cum = ps_cum / ncum
+       masse_cum = masse_cum / ncum
+       flux_u_cum = flux_u_cum / ncum
+       flux_v_cum = flux_v_cum / ncum
+       flux_uQ_cum = flux_uQ_cum / ncum
+       flux_vQ_cum = flux_vQ_cum / ncum
+       dQ = dQ / ncum
 
        ! A retravailler eventuellement
        ! division de dQ par la masse pour revenir aux bonnes grandeurs

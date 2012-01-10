@@ -22,7 +22,7 @@ c    .......    variables en arguments   .......
 c
       INTEGER klevel
       REAL, intent(in):: h( ip1jmp1,klevel ), deltapres( ip1jmp1,klevel)
-      REAL divgra( ip1jmp1,klevel)
+      REAL, intent(out):: divgra( ip1jmp1,klevel)
       real, intent(in):: cdivh
 c
 c    .......    variables  locales    ..........

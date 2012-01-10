@@ -15,12 +15,10 @@ contains
     use caladvtrac_m, only: caladvtrac
     use caldyn_m, only: caldyn
     USE calfis_m, ONLY: calfis
-    USE com_io_dyn, ONLY: histaveid
     USE comconst, ONLY: daysec, dtphys, dtvr
     USE comgeom, ONLY: aire_2d, apoln, apols
     USE comvert, ONLY: ap, bp
-    USE conf_gcm_m, ONLY: day_step, iconser, iperiod, iphysiq, nday, offline, &
-         periodav
+    USE conf_gcm_m, ONLY: day_step, iconser, iperiod, iphysiq, nday, offline
     USE dimens_m, ONLY: iim, jjm, llm, nqmx
     use dissip_m, only: dissip
     USE dynetat0_m, ONLY: day_ini
@@ -35,6 +33,7 @@ contains
     use nr_util, only: assert
     USE pressure_var, ONLY: p3d
     USE temps, ONLY: itau_dyn
+    use writedynav_m, only: writedynav
 
     ! Variables dynamiques:
     REAL, intent(inout):: ucov(:, :, :) ! (iim + 1, jjm + 1, llm) vent covariant
@@ -66,26 +65,26 @@ contains
     ! Flux de masse :
     REAL pbaru((iim + 1) * (jjm + 1), llm), pbarv((iim + 1) * jjm, llm)
 
-    ! variables dynamiques au pas - 1
+    ! Variables dynamiques au pas - 1
     REAL vcovm1(iim + 1, jjm, llm), ucovm1(iim + 1, jjm + 1, llm)
     REAL tetam1(iim + 1, jjm + 1, llm), psm1(iim + 1, jjm + 1)
     REAL massem1((iim + 1) * (jjm + 1), llm)
 
-    ! tendances dynamiques
+    ! Tendances dynamiques
     REAL dv((iim + 1) * jjm, llm), dudyn((iim + 1) * (jjm + 1), llm)
     REAL dteta(iim + 1, jjm + 1, llm), dq((iim + 1) * (jjm + 1), llm, nqmx)
     real dp((iim + 1) * (jjm + 1))
 
-    ! tendances de la dissipation
+    ! Tendances de la dissipation :
     REAL dvdis(iim + 1, jjm, llm), dudis(iim + 1, jjm + 1, llm)
     REAL dtetadis(iim + 1, jjm + 1, llm)
 
-    ! tendances physiques
+    ! Tendances physiques
     REAL dvfi((iim + 1) * jjm, llm), dufi((iim + 1) * (jjm + 1), llm)
     REAL dtetafi(iim + 1, jjm + 1, llm), dqfi((iim + 1) * (jjm + 1), llm, nqmx)
     real dpfi((iim + 1) * (jjm + 1))
 
-    ! variables pour le fichier histoire
+    ! Variables pour le fichier histoire
 
     INTEGER itau ! index of the time step of the dynamics, starts at 0
     INTEGER itaufin
@@ -96,10 +95,6 @@ contains
 
     ! Variables test conservation energie
     REAL ecin(iim + 1, jjm + 1, llm), ecin0(iim + 1, jjm + 1, llm)
-
-    REAL dtetaecdt(iim + 1, jjm + 1, llm)
-    ! tendance de la température potentielle due à la transformation
-    ! d'énergie cinétique en énergie thermique par la dissipation
 
     REAL vcont((iim + 1) * jjm, llm), ucont((iim + 1) * (jjm + 1), llm)
     logical leapf
@@ -211,8 +206,7 @@ contains
           ! cinétique en énergie thermique par la dissipation
           call covcont(llm, ucov, vcov, ucont, vcont)
           call enercin(vcov, ucov, vcont, ucont, ecin)
-          dtetaecdt= (ecin0 - ecin) / pk
-          dtetadis = dtetadis + dtetaecdt
+          dtetadis = dtetadis + (ecin0 - ecin) / pk
           teta = teta + dtetadis
 
           ! Calcul de la valeur moyenne aux pôles :
@@ -230,11 +224,10 @@ contains
 
        IF (MOD(itau + 1, iperiod) == 0) THEN
           ! Écriture du fichier histoire moyenne:
-          CALL writedynav(histaveid, nqmx, itau + 1, vcov, ucov, teta, pk, &
-               phi, q, masse, ps, phis)
+          CALL writedynav(nqmx, itau + 1, vcov, ucov, teta, pk, phi, q, &
+               masse, ps, phis)
           call bilan_dyn(ps, masse, pk, pbaru, pbarv, teta, phi, ucov, vcov, &
-               q(:, :, :, 1), dt_app = dtvr * iperiod, &
-               dt_cum = dtvr * day_step * periodav)
+               q(:, :, :, 1), dt_app = dtvr * iperiod)
        ENDIF
     end do time_integration
 
@@ -246,6 +239,7 @@ contains
     CALL caldyn(itaufin, ucov, vcov, teta, ps, masse, pk, pkf, phis, phi, &
          dudyn, dv, dteta, dp, w, pbaru, pbarv, time_0, &
          conser=MOD(itaufin, iconser)==0)
+
   END SUBROUTINE leapfrog
 
 end module leapfrog_m

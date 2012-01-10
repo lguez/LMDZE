@@ -14,7 +14,7 @@ module comdissnew
   ! nombre d'itérations de l'opérateur de dissipation divgrad
 
   REAL:: tetagdiv = 7200. ! in s
-  ! temps de dissipation des plus petites longueurs d'ondes pour u, v (gradiv)
+  ! temps de dissipation des plus petites longueurs d'ondes pour u, v (grad div)
 
   REAL:: tetagrot = 7200. ! in s
   ! temps de dissipation des plus petites longueurs d'ondes pour u, v

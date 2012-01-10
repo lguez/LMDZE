@@ -30,7 +30,8 @@ module conf_gcm_m
   ! gcm.def avec remise a zero des compteurs de pas de temps)
   ! (pas de remise a zero: on garde la date du fichier restart)
 
-  REAL:: periodav = 1. ! time interval between outputs to "histmoy" (in days) 
+  integer:: periodav = 1 
+  ! time interval between outputs in the dynamical part, in days
 
   logical:: offline = .FALSE.
   ! permet de mettre en route la nouvelle parametrisation de l'eau liquide

@@ -7,7 +7,7 @@ contains
   subroutine inigrads(i_f, x, fx, xmin, xmax, y, ymin, ymax, fy, z, fz, dt, &
        file, titlel)
 
-    ! From dyn3d/inigrads.F, v 1.1.1.1 2004/05/19 12:53:07
+    ! From dyn3d/inigrads.F, version 1.1.1.1 2004/05/19 12:53:07
 
     use gradsdef, only: unit, title, ivar, fichier, firsttime, dtime, iid, &
          ifd, imd, xd, iid, jid, jfd, jmd, yd, lmd, zd, irec

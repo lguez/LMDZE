@@ -26,14 +26,6 @@ MODULE histwrite_m
      ! REAL, INTENT(IN):: pdata(:) or (:, :) or (:, :, :)
      ! values of the variable
 
-     ! INTEGER, INTENT(IN):: nbindex
-     ! number of indices provided
-     ! If it is equal to the size of the full field as provided in histdef
-     ! then nothing is done.
-
-     ! INTEGER, INTENT(IN):: nindex(nbindex)
-     ! The indices used to expand the variable (pdata) onto the full field
-
      ! The difference between the procedures is the rank of "pdata".
 
      MODULE PROCEDURE histwrite_r1d, histwrite_r2d, histwrite_r3d
@@ -48,21 +40,24 @@ CONTAINS
     USE errioipsl, ONLY : histerr
     use calendar, only: isittime
     USE mathop_m, ONLY : mathop
-    use histcom_var
+    USE histcom_var, ONLY : datasz_in, datasz_max, date0, deltat, &
+         freq_opp, freq_wrt, fuchnbout, last_opp, last_opp_chk, last_wrt, &
+         last_wrt_chk, missing_val, nbopp, nb_files, scal, scsize, sopps, &
+         topp
     use histvar_seq_m, only: histvar_seq
     use histwrite_real_m, only: histwrite_real
 
-    INTEGER, INTENT(IN) :: pfileid, pitau
-    REAL, INTENT(IN) :: pdata(:)
-    CHARACTER(LEN=*), INTENT(IN) :: pvarname
+    INTEGER, INTENT(IN):: pfileid, pitau
+    REAL, INTENT(IN):: pdata(:)
+    CHARACTER(LEN=*), INTENT(IN):: pvarname
 
     ! Variables local to the procedure:
     integer nbindex, nindex(size(pdata))
-    LOGICAL :: do_oper, do_write, largebuf
-    INTEGER :: varid, io, nbpt_in, nbpt_out
-    REAL, ALLOCATABLE, SAVE :: buff_tmp(:)
-    INTEGER, SAVE :: buff_tmp_sz
-    CHARACTER(LEN=7) :: tmp_opp
+    LOGICAL:: do_oper, do_write, largebuf
+    INTEGER:: varid, io, nbpt_in, nbpt_out
+    REAL, ALLOCATABLE, SAVE:: buff_tmp(:)
+    INTEGER, SAVE:: buff_tmp_sz
+    CHARACTER(LEN=7):: tmp_opp
 
     !--------------------------------------------------------------------
 
@@ -70,7 +65,6 @@ CONTAINS
     nindex = 0
 
     ! 1.0 Try to catch errors like specifying the wrong file ID.
-    !     Thanks Marine for showing us what errors users can make !
 
     IF ( (pfileid < 1).OR.(pfileid > nb_files) ) THEN
        CALL histerr (3, "histwrite", &
@@ -181,31 +175,33 @@ CONTAINS
        last_opp_chk(pfileid, varid) = -99
        last_wrt_chk(pfileid, varid) = -99
     ENDIF
-    !--------------------------
+
   END SUBROUTINE histwrite_r1d
 
-  !===
+  !************************************************************************
 
   SUBROUTINE histwrite_r2d (pfileid, pvarname, pitau, pdata)
-    !--------------------------------------------------------------------
 
     use calendar, only: isittime
     USE errioipsl, ONLY : histerr
     USE mathop_m, ONLY : mathop
-    use histcom_var
+    USE histcom_var, ONLY : datasz_in, datasz_max, date0, deltat, &
+         freq_opp, freq_wrt, fuchnbout, last_opp, last_opp_chk, last_wrt, &
+         last_wrt_chk, missing_val, nbopp, nb_files, scal, scsize, sopps, &
+         topp
     use histvar_seq_m, only: histvar_seq
     use histwrite_real_m, only: histwrite_real
 
-    INTEGER, INTENT(IN) :: pfileid, pitau
-    REAL, DIMENSION(:, :), INTENT(IN) :: pdata
-    CHARACTER(LEN=*), INTENT(IN) :: pvarname
+    INTEGER, INTENT(IN):: pfileid, pitau
+    REAL, INTENT(IN):: pdata(:, :)
+    CHARACTER(LEN=*), INTENT(IN):: pvarname
 
     integer nbindex, nindex(size(pdata))
-    LOGICAL :: do_oper, do_write, largebuf
-    INTEGER :: varid, io, nbpt_in(1:2), nbpt_out
-    REAL, ALLOCATABLE, SAVE :: buff_tmp(:)
-    INTEGER, SAVE :: buff_tmp_sz
-    CHARACTER(LEN=7) :: tmp_opp
+    LOGICAL:: do_oper, do_write, largebuf
+    INTEGER:: varid, io, nbpt_in(1:2), nbpt_out
+    REAL, ALLOCATABLE, SAVE:: buff_tmp(:)
+    INTEGER, SAVE:: buff_tmp_sz
+    CHARACTER(LEN=7):: tmp_opp
 
     !--------------------------------------------------------------------
 
@@ -213,7 +209,6 @@ CONTAINS
     nindex = 0
 
     ! 1.0 Try to catch errors like specifying the wrong file ID.
-    !     Thanks Marine for showing us what errors users can make !
 
     IF ( (pfileid < 1).OR.(pfileid > nb_files) ) THEN
        CALL histerr (3, "histwrite", &
@@ -325,31 +320,33 @@ CONTAINS
        last_opp_chk(pfileid, varid) = -99
        last_wrt_chk(pfileid, varid) = -99
     ENDIF
-    !--------------------------
+
   END SUBROUTINE histwrite_r2d
 
-  !===
+  !************************************************************************
 
   SUBROUTINE histwrite_r3d (pfileid, pvarname, pitau, pdata)
-    !--------------------------------------------------------------------
 
     use calendar, only: isittime
     USE errioipsl, ONLY : histerr
     USE mathop_m, ONLY : mathop
-    use histcom_var
+    USE histcom_var, ONLY : datasz_in, datasz_max, date0, deltat, &
+         freq_opp, freq_wrt, fuchnbout, last_opp, last_opp_chk, last_wrt, &
+         last_wrt_chk, missing_val, nbopp, nb_files, scal, scsize, sopps, &
+         topp
     use histvar_seq_m, only: histvar_seq
     use histwrite_real_m, only: histwrite_real
 
-    INTEGER, INTENT(IN) :: pfileid, pitau
-    REAL, DIMENSION(:, :, :), INTENT(IN) :: pdata
-    CHARACTER(LEN=*), INTENT(IN) :: pvarname
+    INTEGER, INTENT(IN):: pfileid, pitau
+    REAL, DIMENSION(:, :, :), INTENT(IN):: pdata
+    CHARACTER(LEN=*), INTENT(IN):: pvarname
 
     integer nbindex, nindex(size(pdata))
-    LOGICAL :: do_oper, do_write, largebuf
-    INTEGER :: varid, io, nbpt_in(1:3), nbpt_out
-    REAL, ALLOCATABLE, SAVE :: buff_tmp(:)
-    INTEGER, SAVE :: buff_tmp_sz
-    CHARACTER(LEN=7) :: tmp_opp
+    LOGICAL:: do_oper, do_write, largebuf
+    INTEGER:: varid, io, nbpt_in(1:3), nbpt_out
+    REAL, ALLOCATABLE, SAVE:: buff_tmp(:)
+    INTEGER, SAVE:: buff_tmp_sz
+    CHARACTER(LEN=7):: tmp_opp
 
     !--------------------------------------------------------------------
 
@@ -470,7 +467,7 @@ CONTAINS
        last_opp_chk(pfileid, varid) = -99
        last_wrt_chk(pfileid, varid) = -99
     ENDIF
-    !--------------------------
+
   END SUBROUTINE histwrite_r3d
 
 END MODULE histwrite_m

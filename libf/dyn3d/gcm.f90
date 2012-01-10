@@ -9,7 +9,6 @@ PROGRAM gcm
   ! l'advection de "q", en modifiant "iadv" dans "traceur.def".
 
   use clesphys2, only: read_clesphys2
-  use com_io_dyn, only: histid, histvid, histaveid
   use comconst, only: daysec, cpp, dtvr, g, rad, r
   use comgeom, only: rlatu, aire_2d, cu_2d, cv_2d, rlonv
   use comgeomphy, only: airephy, cuphy, cvphy, rlatd, rlond
@@ -150,10 +149,10 @@ PROGRAM gcm
   print *, "day_end = ", day_end
 
   CALL dynredem0("restart.nc", day_end, phis)
-  CALL inithist(day_ref, annee_ref, zdtvr, nqmx, histid, histvid, &
-       t_ops = iecri * daysec, t_wrt = iecri * daysec)
-  CALL initdynav(day_ref, annee_ref, zdtvr, nqmx, histaveid, &
-       t_ops = iperiod * zdtvr, t_wrt = periodav * daysec)
+  CALL inithist(day_ref, annee_ref, zdtvr, nqmx, t_ops = iecri * daysec, &
+       t_wrt = iecri * daysec)
+  CALL initdynav(day_ref, annee_ref, zdtvr, nqmx, t_ops = iperiod * zdtvr, &
+       t_wrt = periodav * daysec)
 
   ! Choix des fréquences de stockage pour le hors-ligne :
   istdyn = day_step / 4 ! stockage toutes les 6 h = 1 jour / 4

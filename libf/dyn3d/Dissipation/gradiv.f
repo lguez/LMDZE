@@ -26,7 +26,7 @@ c
       INTEGER klevel
 c
       REAL, intent(in):: xcov( ip1jmp1,klevel ), ycov( ip1jm,klevel )
-      REAL gdx( ip1jmp1,klevel ),   gdy( ip1jm,klevel )
+      REAL, intent(out):: gdx( ip1jmp1,klevel ),   gdy( ip1jm,klevel )
       real, intent(in):: cdivu
       REAL div(ip1jmp1,llm)
 
