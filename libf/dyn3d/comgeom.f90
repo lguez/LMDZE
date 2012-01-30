@@ -7,31 +7,31 @@ module comgeom
 
   private iim, jjm, ip1jmp1, ip1jm
 
-  real cu_2d(iim + 1, jjm + 1), cv_2d(iim + 1, jjm)
-  real cu(ip1jmp1), cv(ip1jm)
+  real cu_2d(iim + 1, jjm + 1), cv_2d(iim + 1, jjm) ! in m
+  real cu(ip1jmp1), cv(ip1jm) ! in m
   equivalence (cu, cu_2d), (cv, cv_2d)
 
-  real unscu2_2d(iim + 1, jjm + 1)
-  real unscu2(ip1jmp1)
+  real unscu2_2d(iim + 1, jjm + 1) ! in m-2
+  real unscu2(ip1jmp1) ! in m-2
   equivalence (unscu2, unscu2_2d)
 
-  real unscv2_2d(iim + 1, jjm)
-  real unscv2(ip1jm)
+  real unscv2_2d(iim + 1, jjm) ! in m-2
+  real unscv2(ip1jm) ! in m-2
   equivalence (unscv2, unscv2_2d)
 
-  real aire_2d(iim + 1, jjm + 1), airesurg_2d(iim + 1, jjm + 1)
-  real aire(ip1jmp1), airesurg(ip1jmp1)
+  real aire(ip1jmp1), aire_2d(iim + 1, jjm + 1) ! in m2
+  real airesurg_2d(iim + 1, jjm + 1), airesurg(ip1jmp1)
   equivalence (aire, aire_2d), (airesurg, airesurg_2d)
 
   real aireu_2d(iim + 1, jjm + 1) ! in m2
   real aireu(ip1jmp1) ! in m2
   equivalence (aireu, aireu_2d)
 
-  real airev_2d(iim + 1, jjm), unsaire_2d(iim + 1, jjm + 1)
-  real airev(ip1jm), unsaire(ip1jmp1)
+  real airev(ip1jm), airev_2d(iim + 1, jjm) ! in m2
+  real unsaire(ip1jmp1), unsaire_2d(iim + 1, jjm + 1) ! in m-2
   equivalence (airev, airev_2d), (unsaire, unsaire_2d)
 
-  real apoln, apols
+  real apoln, apols ! in m2
 
   real unsairez_2d(iim + 1, jjm)
   real unsairez(ip1jm)
@@ -76,12 +76,13 @@ module comgeom
   real rlonv(iim + 1)
   ! (longitudes of points of the "scalar" and "v" grid, in rad)
 
-  real cuvsurcv_2d(iim + 1, jjm), cvsurcuv_2d(iim + 1, jjm)  
-  real cuvsurcv(ip1jm), cvsurcuv(ip1jm)
+  real cuvsurcv_2d(iim + 1, jjm), cvsurcuv_2d(iim + 1, jjm) ! no dimension
+  real cuvsurcv(ip1jm), cvsurcuv(ip1jm) ! no dimension
   equivalence (cuvsurcv, cuvsurcv_2d), (cvsurcuv, cvsurcuv_2d)
 
   real cvusurcu_2d(iim + 1, jjm + 1), cusurcvu_2d(iim + 1, jjm + 1)
-  real cvusurcu(ip1jmp1), cusurcvu(ip1jmp1)
+  ! no dimension
+  real cvusurcu(ip1jmp1), cusurcvu(ip1jmp1) ! no dimension
   equivalence (cvusurcu, cvusurcu_2d), (cusurcvu, cusurcvu_2d)
 
   real cuvscvgam1_2d(iim + 1, jjm)

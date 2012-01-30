@@ -17,21 +17,15 @@ contains
     USE comgeom, ONLY: apoln, apols, cuvsurcv, cvusurcu, unsaire
     USE filtreg_m, ONLY: filtreg
 
-    ! div est un argument de sortie pour le s-prog
-
-    ! variables en arguments 
-
     INTEGER, intent(in):: klevel
     REAL, intent(in):: x(ip1jmp1, klevel), y(ip1jm, klevel)
-    real div(ip1jmp1, klevel)
+    real, intent(out):: div(ip1jmp1, klevel) ! in (unit of x, y) m-2
 
-    ! variables locales 
+    ! Variables locales :
 
     INTEGER l, ij
-    REAL aiy1(iip1) , aiy2(iip1)
+    REAL aiy1(iim) , aiy2(iim)
     REAL sumypn, sumyps
-
-    REAL SSUM
 
     !------------------------------------------------------------
 
@@ -52,8 +46,8 @@ contains
           aiy1(ij) = cuvsurcv(ij) * y(ij , l)
           aiy2(ij) = cuvsurcv(ij+ ip1jmi1) * y(ij+ ip1jmi1, l)
        ENDDO
-       sumypn = SSUM (iim, aiy1, 1) / apoln
-       sumyps = SSUM (iim, aiy2, 1) / apols
+       sumypn = SUM(aiy1) / apoln
+       sumyps = SUM(aiy2) / apols
 
        DO ij = 1, iip1
           div(ij , l) = - sumypn

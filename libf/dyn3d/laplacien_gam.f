@@ -13,6 +13,7 @@ c   ************************************************************
 c    klevel et teta  sont des arguments  d'entree pour le s-prog
 c      divgra     est  un argument  de sortie pour le s-prog
 c
+      use grad_m, only: grad
       use dimens_m
       use paramet_m
       use comgeom

@@ -2,6 +2,7 @@
 ! $Header: /home/cvsroot/LMDZ4/libf/dyn3d/divgrad.F,v 1.1.1.1 2004/05/19 12:53:05 lmdzadmin Exp $
 !
       SUBROUTINE divgrad (klevel,h, lh, divgra, cdivh )
+      use grad_m, only: grad
       use dimens_m
       use paramet_m
       use conf_gcm_m

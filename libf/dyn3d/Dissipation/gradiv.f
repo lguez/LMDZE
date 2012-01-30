@@ -16,6 +16,7 @@ c    xcov , ycov et ld  sont des arguments  d'entree pour le s-prog
 c     gdx   et  gdy     sont des arguments de sortie pour le s-prog
 c
 c
+      use grad_m, only: grad
       use dimens_m
       use paramet_m
       use conf_gcm_m

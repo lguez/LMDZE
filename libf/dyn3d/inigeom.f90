@@ -76,7 +76,7 @@ contains
     REAL eps, x1, xo1, f, df, xdm, y1, yo1, ydm
     REAL coslatm, coslatp, radclatm, radclatp
     REAL, dimension(iip1, jjp1):: cuij1, cuij2, cuij3, cuij4 ! in m
-    REAL, dimension(iip1, jjp1):: cvij1, cvij2, cvij3, cvij4
+    REAL, dimension(iip1, jjp1):: cvij1, cvij2, cvij3, cvij4 ! in m
     REAL rlatu1(jjm), yprimu1(jjm), rlatu2(jjm), yprimu2(jjm)
     real yprimv(jjm), yprimu(jjp1)
     REAL gamdi_gdiv, gamdi_grot, gamdi_h
@@ -332,7 +332,7 @@ contains
                + cvij3(i, j))
           cuv(i, j) = 0.5 * (cuij2(i, j) + cuij3(i, j) + cuij1(i, j + 1) &
                + cuij4(i, j + 1))
-          unscv2_2d(i, j) = 1. / (cv_2d(i, j) * cv_2d(i, j))
+          unscv2_2d(i, j) = 1. / cv_2d(i, j)**2
        END DO
        DO i = 1, iim
           cuvsurcv_2d(i, j) = airev_2d(i, j) * unscv2_2d(i, j)
@@ -356,7 +356,7 @@ contains
        DO i = 1, iim
           cu_2d(i, j) = 0.5 * (cuij1(i, j) + cuij4(i + 1, j) + cuij2(i, j) &
                + cuij3(i + 1, j))
-          unscu2_2d(i, j) = 1. / (cu_2d(i, j) * cu_2d(i, j))
+          unscu2_2d(i, j) = 1. / cu_2d(i, j)**2
           cvusurcu_2d(i, j) = aireu_2d(i, j) * unscu2_2d(i, j)
           cusurcvu_2d(i, j) = 1. / cvusurcu_2d(i, j)
           cvuscugam1_2d(i, j) = cvusurcu_2d(i, j)**(-gamdi_gdiv)

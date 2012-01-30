@@ -8,13 +8,14 @@ contains
 
     ! From LMDZ4/libf/dyn3d/gradiv2.F, version 1.1.1.1 2004/05/19 12:53:07
     ! P. Le Van
-    ! Calcul de grad div du vecteur v.
+    ! Calcul du gradient de la divergence du vecteur v.
 
     USE dimens_m, ONLY : iim, jjm, llm
     use divergf_m, only: divergf
     USE comgeom, ONLY : cuvscvgam1, cvuscugam1, unsair_gam1, unsapolnga1, &
          unsapolsga1
     USE filtreg_m, ONLY : filtreg
+    use grad_m, only: grad
     use nr_util, only: assert_eq, assert
 
     ! Composantes covariantes de v :
@@ -39,10 +40,7 @@ contains
     klevel = assert_eq(size(xcov, 3), size(ycov, 3), size(gdx, 3), &
          size(gdy, 3), "gradiv2 klevel")
 
-    gdx = xcov
-    gdy = ycov
-
-    CALL divergf(klevel, gdx, gdy, div)
+    CALL divergf(klevel, xcov, ycov, div)
 
     IF (ld > 1) THEN
        CALL laplacien(klevel, div, div)

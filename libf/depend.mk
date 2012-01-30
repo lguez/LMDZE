@@ -96,7 +96,7 @@ dissip.o : gradiv2.o inidissip.o comdissnew.o dimens_m.o
 diverg.o : comgeom.o paramet_m.o dimens_m.o 
 diverg_gam.o : comgeom.o paramet_m.o dimens_m.o 
 divergf.o : filtreg.o comgeom.o paramet_m.o dimens_m.o 
-divgrad.o : filtreg.o comgeom.o conf_gcm.o paramet_m.o dimens_m.o 
+divgrad.o : filtreg.o comgeom.o conf_gcm.o paramet_m.o dimens_m.o grad.o 
 divgrad2.o : comgeom.o paramet_m.o dimens_m.o 
 dqthermcell.o : dimphy.o dimens_m.o 
 dqthermcell2.o : dimphy.o dimens_m.o 
@@ -143,8 +143,8 @@ gr_phy_write_3d.o : grid_change.o dimphy.o dimens_m.o
 gr_u_scal.o : comgeom.o paramet_m.o dimens_m.o 
 gr_v_scal.o : comgeom.o paramet_m.o dimens_m.o 
 grad.o : paramet_m.o dimens_m.o 
-gradiv.o : filtreg.o conf_gcm.o paramet_m.o dimens_m.o 
-gradiv2.o : filtreg.o comgeom.o divergf.o dimens_m.o 
+gradiv.o : filtreg.o conf_gcm.o paramet_m.o dimens_m.o grad.o 
+gradiv2.o : grad.o filtreg.o comgeom.o divergf.o dimens_m.o 
 grid_change.o : dimphy.o dimens_m.o 
 grid_noro_m.o : mva9.o dimens_m.o 
 groupe.o : comgeom.o comvert.o comconst.o paramet_m.o dimens_m.o 
@@ -185,8 +185,8 @@ interfsurf_hq.o : interfoce_slab.o interfoce_lim.o fonte_neige.o calcul_fluxs.o 
 interpost.o : comgeom.o comvert.o comconst.o paramet_m.o dimens_m.o 
 interpre.o : ener.o temps.o comgeom.o conf_gcm.o comvert.o comconst.o paramet_m.o dimens_m.o 
 ioipslmpp.o : errioipsl.o 
-laplacien.o : divergf.o filtreg.o comgeom.o paramet_m.o dimens_m.o 
-laplacien_gam.o : comgeom.o paramet_m.o dimens_m.o 
+laplacien.o : divergf.o filtreg.o comgeom.o paramet_m.o dimens_m.o grad.o 
+laplacien_gam.o : comgeom.o paramet_m.o dimens_m.o grad.o 
 laplacien_rot.o : filtreg.o comgeom.o paramet_m.o dimens_m.o 
 laplacien_rotgam.o : comgeom.o paramet_m.o dimens_m.o 
 leapfrog.o : writedynav.o temps.o pressure_var.o integrd.o inidissip.o guide.o geopot.o filtreg.o exner_hyb.o dynredem1.o dynetat0.o dissip.o dimens_m.o conf_gcm.o comvert.o comgeom.o comconst.o calfis.o caldyn.o caladvtrac.o bilan_dyn.o addfi.o 
