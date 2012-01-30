@@ -22,7 +22,7 @@ c=======================================================================
 
       use dimens_m
       use paramet_m
-      use logic
+      use conf_gcm_m
       use comgeom
       use filtreg_m, only: filtreg
 

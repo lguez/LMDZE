@@ -28,6 +28,7 @@ contains
 
     use nr_util, only: pi
     use jumble, only: new_unit
+    use unit_nml_m, only: unit_nml
 
     REAL s(llm+1)
     ! "s(l)" is the atmospheric hybrid sigma-pressure coordinate at
@@ -66,7 +67,7 @@ contains
 
     print *, "Enter namelist 'disvert_nml'."
     read(unit=*, nml=disvert_nml)
-    write(unit=*, nml=disvert_nml)
+    write(unit_nml, nml=disvert_nml)
 
     select case (s_sampling)
     case ("param")

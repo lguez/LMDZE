@@ -7,7 +7,7 @@ SUBROUTINE coefkz2(nsrf, knon, paprs, pplay, t, pcfm, pcfh)
   use dimens_m
   use indicesol
   use dimphy
-  use iniprint
+  use conf_gcm_m
   use SUPHEC_M
 
   IMPLICIT none

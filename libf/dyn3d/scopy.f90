@@ -3,8 +3,8 @@ subroutine scopy(n, sx, incx, sy, incy)
   ! From cray.F, version 1.1.1.1, 2004/05/19 12:53:05
 
   ! This subroutine should not exist in a Fortran 95 program. If the
-  ! actual arguments are of rank 1 then replace each call to this
-  ! subroutine by the simple statement in this subroutine.
+  ! actual arguments 2 and 4 are of rank 1 then replace each call to
+  ! this subroutine by the simple statement in this subroutine.
 
   IMPLICIT NONE
 

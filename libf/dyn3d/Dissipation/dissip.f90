@@ -48,7 +48,7 @@ contains
     ! Calcul de la partie grad (div) :
 
     IF (lstardis) THEN
-       CALL gradiv2(llm, ucov, vcov, nitergdiv, gdx, gdy, cdivu)
+       CALL gradiv2(ucov, vcov, nitergdiv, gdx, gdy, cdivu)
     ELSE
        CALL gradiv(llm, ucov, vcov, nitergdiv, gdx, gdy, cdivu)
     END IF

@@ -47,7 +47,7 @@ contains
     USE histcom, ONLY : histbeg_totreg, histdef, histend, histsync
     use histwrite_m, only: histwrite
     USE indicesol, ONLY : epsfra, is_lic, is_oce, is_sic, is_ter, nbsrf
-    USE iniprint, ONLY : prt_level
+    USE conf_gcm_m, ONLY : prt_level
     USE suphec_m, ONLY : rd, rg, rkappa
     USE temps, ONLY : annee_ref, itau_phy
     use yamada4_m, only: yamada4

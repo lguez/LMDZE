@@ -7,49 +7,46 @@ contains
   SUBROUTINE inigeom
 
     ! Auteur : P. Le Van
-    ! Version du 01/04/2001
 
     ! Calcul des élongations cuij1, ..., cuij4, cvij1, ..., cvij4 aux mêmes
     ! endroits que les aires aireij1_2d, ..., aireij4_2d.
 
-    ! Choix entre une fonction "f(y)" à dérivée sinusoïdale ou à dérivée
-    ! tangente hyperbolique
-    ! calcul des coefficients (cu_2d, cv_2d, 1./cu_2d**2, 1./cv_2d**2)
+    ! Choix entre une fonction "f(y)" à dérivée sinusoïdale ou à
+    ! dérivée tangente hyperbolique. Calcul des coefficients cu_2d,
+    ! cv_2d, 1. / cu_2d**2, 1. / cv_2d**2. Les coefficients cu_2d et cv_2d
+    ! permettent de passer des vitesses naturelles aux vitesses
+    ! covariantes et contravariantes, ou vice-versa.
 
-    ! les coef. (cu_2d, cv_2d) permettent de passer des vitesses naturelles
-    ! aux vitesses covariantes et contravariantes, ou vice-versa
+    ! On a :
+    ! u(covariant) = cu_2d * u(naturel), u(contravariant) = u(naturel) / cu_2d
+    ! v(covariant) = cv_2d * v(naturel), v(contravariant) = v(naturel) / cv_2d
 
-    ! on a :
-    ! u (covariant) = cu_2d * u (naturel), u(contrav)= u(nat)/cu_2d
-    ! v (covariant) = cv_2d * v (naturel), v(contrav)= v(nat)/cv_2d
-
-    ! on en tire : 
+    ! On en tire : 
     ! u(covariant) = cu_2d * cu_2d * u(contravariant)
     ! v(covariant) = cv_2d * cv_2d * v(contravariant)
 
-    ! on a l'application (x(X), y(Y)) avec - im/2 +1 <= X <= im/2
-    ! et - jm/2 <= Y <= jm/2
+    ! On a l'application (x(X), y(Y)) avec - im / 2 + 1 <= X <= im / 2
+    ! et - jm / 2 <= Y <= jm / 2
 
     ! x est la longitude du point en radians.
     ! y est la latitude du point en radians.
     ! 
-    ! on a : cu_2d(i, j) = rad * cos(y) * dx/dX
-    ! cv(j) = rad * dy/dY
+    ! On a : cu_2d(i, j) = rad * cos(y) * dx / dX
+    ! cv(j) = rad * dy / dY
     ! aire_2d(i, j) = cu_2d(i, j) * cv(j)
     ! 
-    ! y, dx/dX, dy/dY calcules aux points concernes
-    ! cv, bien que dependant de j uniquement, sera ici indice aussi en i
-    ! pour un adressage plus facile en ij.
+    ! y, dx / dX, dy / dY calculés aux points concernés. cv, bien que
+    ! dépendant de j uniquement, sera ici indicé aussi en i pour un
+    ! adressage plus facile en ij.
 
-    ! aux points u et v, 
-    ! xprimu et xprimv sont respectivement les valeurs de dx/dX
-    ! yprimu et yprimv sont respectivement les valeurs de dy/dY
-    ! rlatu et rlatv sont respectivement les valeurs de la latitude
-    ! cvu et cv_2d sont respectivement les valeurs de cv_2d
+    ! xprimu et xprimv sont respectivement les valeurs de dx / dX aux
+    ! points u et v. yprimu et yprimv sont respectivement les valeurs
+    ! de dy / dY aux points u et v. rlatu et rlatv sont respectivement
+    ! les valeurs de la latitude aux points u et v. cvu et cv_2d sont
+    ! respectivement les valeurs de cv_2d aux points u et v.
 
-    ! aux points u, v, scalaires, et z 
     ! cu_2d, cuv, cuscal, cuz sont respectivement les valeurs de cu_2d
-    ! Cf. "inigeom.txt".
+    ! aux points u, v, scalaires, et z. Cf. "inigeom.txt".
 
     USE comconst, ONLY : g, omeg, rad
     USE comgeom, ONLY : airesurg_2d, aireu_2d, airev_2d, aire_2d, &
@@ -62,8 +59,10 @@ contains
          unsair_gam1_2d, unsair_gam2_2d, unsapolnga1, unsapolnga2, &
          unsapolsga1, unsapolsga2, unscu2_2d, unscv2_2d, xprimu, xprimv
     USE comdissnew, ONLY : coefdis, nitergdiv, nitergrot, niterh
+    use conf_gcm_m, ONLY : fxyhypb, ysinus
     USE dimens_m, ONLY : iim, jjm
-    USE logic, ONLY : fxyhypb, ysinus
+    use fxy_m, only: fxy
+    use jumble, only: new_unit
     use nr_util, only: pi
     USE paramet_m, ONLY : iip1, jjp1
     USE serre, ONLY : alphax, alphay, clat, clon, dzoomx, dzoomy, grossismx, &
@@ -71,27 +70,19 @@ contains
 
     ! Variables locales
 
-    INTEGER i, j, itmax, itmay, iter
+    INTEGER i, j, itmax, itmay, iter, unit
     REAL cvu(iip1, jjp1), cuv(iip1, jjm)
-    REAL ai14, ai23, airez, rlatp, rlatm, xprm, xprp, un4rad2, yprp, yprm
+    REAL ai14, ai23, airez, un4rad2
     REAL eps, x1, xo1, f, df, xdm, y1, yo1, ydm
     REAL coslatm, coslatp, radclatm, radclatp
-    REAL cuij1(iip1, jjp1), cuij2(iip1, jjp1), cuij3(iip1, jjp1), &
-         cuij4(iip1, jjp1)
-    REAL cvij1(iip1, jjp1), cvij2(iip1, jjp1), cvij3(iip1, jjp1), &
-         cvij4(iip1, jjp1)
-    REAL rlonvv(iip1), rlatuu(jjp1)
-    REAL rlatu1(jjm), yprimu1(jjm), rlatu2(jjm), yprimu2(jjm), yprimv(jjm), &
-         yprimu(jjp1)
+    REAL, dimension(iip1, jjp1):: cuij1, cuij2, cuij3, cuij4 ! in m
+    REAL, dimension(iip1, jjp1):: cvij1, cvij2, cvij3, cvij4
+    REAL rlatu1(jjm), yprimu1(jjm), rlatu2(jjm), yprimu2(jjm)
+    real yprimv(jjm), yprimu(jjp1)
     REAL gamdi_gdiv, gamdi_grot, gamdi_h
-
     REAL rlonm025(iip1), xprimm025(iip1), rlonp025(iip1), xprimp025(iip1)
-    SAVE rlatu1, yprimu1, rlatu2, yprimu2, yprimv, yprimu
-    SAVE rlonm025, xprimm025, rlonp025, xprimp025
-
-    real aireij1_2d(iim + 1, jjm + 1)
-    real aireij2_2d(iim + 1, jjm + 1)
-    real aireij3_2d(iim + 1, jjm + 1), aireij4_2d(iim + 1, jjm + 1) 
+    real, dimension(iim + 1, jjm + 1):: aireij1_2d, aireij2_2d, aireij3_2d, &
+         aireij4_2d ! in m2
     real airuscv2_2d(iim + 1, jjm) 
     real airvscu2_2d(iim + 1, jjm), aiuscv2gam_2d(iim + 1, jjm) 
     real aivscu2gam_2d(iim + 1, jjm)
@@ -101,17 +92,17 @@ contains
     PRINT *, 'Call sequence information: inigeom'
 
     IF (nitergdiv/=2) THEN
-       gamdi_gdiv = coefdis/(real(nitergdiv)-2.)
+       gamdi_gdiv = coefdis / (real(nitergdiv)-2.)
     ELSE
        gamdi_gdiv = 0.
     END IF
     IF (nitergrot/=2) THEN
-       gamdi_grot = coefdis/(real(nitergrot)-2.)
+       gamdi_grot = coefdis / (real(nitergrot)-2.)
     ELSE
        gamdi_grot = 0.
     END IF
     IF (niterh/=2) THEN
-       gamdi_h = coefdis/(real(niterh)-2.)
+       gamdi_h = coefdis / (real(niterh)-2.)
     ELSE
        gamdi_h = 0.
     END IF
@@ -119,8 +110,6 @@ contains
     print *, 'gamdi_gdiv = ', gamdi_gdiv
     print *, "gamdi_grot = ", gamdi_grot
     print *, "gamdi_h = ", gamdi_h
-
-    WRITE (6, 990)
 
     IF (.NOT. fxyhypb) THEN
        IF (ysinus) THEN
@@ -133,8 +122,8 @@ contains
           print *, 'Inigeom, Y = Latitude, der. sinusoid .'
           ! utilisation de f(x, y) a tangente sinusoidale, y etant la latit
 
-          pxo = clon*pi/180.
-          pyo = 2.*clat*pi/180.
+          pxo = clon * pi / 180.
+          pyo = 2. * clat * pi / 180.
 
           ! determination de transx (pour le zoom) par Newton-Raphson
 
@@ -144,9 +133,9 @@ contains
           xo1 = 0.
           DO iter = 1, itmax
              x1 = xo1
-             f = x1 + alphax*sin(x1-pxo)
-             df = 1. + alphax*cos(x1-pxo)
-             x1 = x1 - f/df
+             f = x1 + alphax * sin(x1-pxo)
+             df = 1. + alphax * cos(x1-pxo)
+             x1 = x1 - f / df
              xdm = abs(x1-xo1)
              IF (xdm<=eps) EXIT
              xo1 = x1
@@ -160,9 +149,9 @@ contains
           yo1 = 0.
           DO iter = 1, itmay
              y1 = yo1
-             f = y1 + alphay*sin(y1-pyo)
-             df = 1. + alphay*cos(y1-pyo)
-             y1 = y1 - f/df
+             f = y1 + alphay * sin(y1-pyo)
+             df = 1. + alphay * cos(y1-pyo)
+             y1 = y1 - f / df
              ydm = abs(y1-yo1)
              IF (ydm<=eps) EXIT
              yo1 = y1
@@ -183,182 +172,105 @@ contains
             rlonp025, xprimp025)
     END IF
 
-    rlatu(1) = asin(1.)
+    rlatu(1) = pi / 2.
     rlatu(jjp1) = -rlatu(1)
 
-    ! calcul aux poles 
+    ! Calcul aux pôles 
 
     yprimu(1) = 0.
     yprimu(jjp1) = 0.
 
-    un4rad2 = 0.25*rad*rad
+    un4rad2 = 0.25 * rad * rad
 
-    ! calcul des aires (aire_2d, aireu_2d, airev_2d, 1./aire_2d, 1./airez)
-    ! - et de fext_2d, force de coriolis extensive
+    ! Cf. "inigeom.txt". Calcul des quatre aires élémentaires
+    ! aireij1_2d, aireij2_2d, aireij3_2d, aireij4_2d qui entourent
+    ! chaque aire_2d(i, j), ainsi que les quatre élongations
+    ! élémentaires cuij et les quatre élongations cvij qui sont
+    ! calculées aux mêmes endroits que les aireij.
 
-    ! A 1 point scalaire P (i, j) de la grille, reguliere en (X, Y), sont
-    ! affectees 4 aires entourant P, calculees respectivement aux points
-    ! (i + 1/4, j - 1/4) : aireij1_2d (i, j)
-    ! (i + 1/4, j + 1/4) : aireij2_2d (i, j)
-    ! (i - 1/4, j + 1/4) : aireij3_2d (i, j)
-    ! (i - 1/4, j - 1/4) : aireij4_2d (i, j)
+    coslatm = cos(rlatu1(1))
+    radclatm = 0.5 * rad * coslatm
 
-    !,
-    ! Les cotes de chacun de ces 4 carres etant egaux a 1/2 suivant (X, Y).
-    ! Chaque aire centree en 1 point scalaire P(i, j) est egale a la somme
-    ! des 4 aires aireij1_2d, aireij2_2d, aireij3_2d, aireij4_2d qui sont
-    ! affectees au
-    ! point (i, j).
-    ! On definit en outre les coefficients alpha comme etant egaux a
-    ! (aireij / aire_2d), c.a.d par exp.
-    ! alpha1_2d(i, j)=aireij1_2d(i, j)/aire_2d(i, j)
+    aireij1_2d(:iim, 1) = 0.
+    aireij2_2d(:iim, 1) = un4rad2 * coslatm * xprimp025(:iim) * yprimu1(1)
+    aireij3_2d(:iim, 1) = un4rad2 * coslatm * xprimm025(:iim) * yprimu1(1)
+    aireij4_2d(:iim, 1) = 0.
 
-    ! De meme, toute aire centree en 1 point U est egale a la somme des
-    ! 4 aires aireij1_2d, aireij2_2d, aireij3_2d, aireij4_2d entourant
-    ! le point U.
-    ! Idem pour airev_2d, airez.
+    cuij1(:iim, 1) = 0.
+    cuij2(:iim, 1) = radclatm * xprimp025(:iim)
+    cuij3(:iim, 1) = radclatm * xprimm025(:iim)
+    cuij4(:iim, 1) = 0.
 
-    ! On a, pour chaque maille : dX = dY = 1
+    cvij1(:iim, 1) = 0.
+    cvij2(:iim, 1) = 0.5 * rad * yprimu1(1)
+    cvij3(:iim, 1) = cvij2(:iim, 1)
+    cvij4(:iim, 1) = 0.
 
-    ! V
+    do j = 2, jjm
+       coslatm = cos(rlatu1(j))
+       coslatp = cos(rlatu2(j-1))
+       radclatp = 0.5 * rad * coslatp
+       radclatm = 0.5 * rad * coslatm
+       ai14 = un4rad2 * coslatp * yprimu2(j-1)
+       ai23 = un4rad2 * coslatm * yprimu1(j)
 
-    ! aireij4_2d . . aireij1_2d
+       aireij1_2d(:iim, j) = ai14 * xprimp025(:iim)
+       aireij2_2d(:iim, j) = ai23 * xprimp025(:iim)
+       aireij3_2d(:iim, j) = ai23 * xprimm025(:iim)
+       aireij4_2d(:iim, j) = ai14 * xprimm025(:iim)
+       cuij1(:iim, j) = radclatp * xprimp025(:iim)
+       cuij2(:iim, j) = radclatm * xprimp025(:iim)
+       cuij3(:iim, j) = radclatm * xprimm025(:iim)
+       cuij4(:iim, j) = radclatp * xprimm025(:iim)
+       cvij1(:iim, j) = 0.5 * rad * yprimu2(j-1)
+       cvij2(:iim, j) = 0.5 * rad * yprimu1(j)
+       cvij3(:iim, j) = cvij2(:iim, j)
+       cvij4(:iim, j) = cvij1(:iim, j)
+    end do
 
-    ! U . . P . U
+    coslatp = cos(rlatu2(jjm))
+    radclatp = 0.5 * rad * coslatp
 
-    ! aireij3_2d . . aireij2_2d
+    aireij1_2d(:iim, jjp1) = un4rad2 * coslatp * xprimp025(:iim) * yprimu2(jjm)
+    aireij2_2d(:iim, jjp1) = 0.
+    aireij3_2d(:iim, jjp1) = 0.
+    aireij4_2d(:iim, jjp1) = un4rad2 * coslatp * xprimm025(:iim) * yprimu2(jjm)
 
-    ! V
+    cuij1(:iim, jjp1) = radclatp * xprimp025(:iim)
+    cuij2(:iim, jjp1) = 0.
+    cuij3(:iim, jjp1) = 0.
+    cuij4(:iim, jjp1) = radclatp * xprimm025(:iim)
 
-    ! Calcul des 4 aires elementaires aireij1_2d, aireij2_2d,
-    ! aireij3_2d, aireij4_2d
-    ! qui entourent chaque aire_2d(i, j), ainsi que les 4 elongations
-    ! elementaires
-    ! cuij et les 4 elongat. cvij qui sont calculees aux memes
-    ! endroits que les aireij.
+    cvij1(:iim, jjp1) = 0.5 * rad * yprimu2(jjm)
+    cvij2(:iim, jjp1) = 0.
+    cvij3(:iim, jjp1) = 0.
+    cvij4(:iim, jjp1) = cvij1(:iim, jjp1)
 
-    ! do 35 : boucle sur les jjm + 1 latitudes 
+    ! Périodicité :
+ 
+    cvij1(iip1, :) = cvij1(1, :)
+    cvij2(iip1, :) = cvij2(1, :)
+    cvij3(iip1, :) = cvij3(1, :)
+    cvij4(iip1, :) = cvij4(1, :)
 
-    DO j = 1, jjp1
+    cuij1(iip1, :) = cuij1(1, :)
+    cuij2(iip1, :) = cuij2(1, :)
+    cuij3(iip1, :) = cuij3(1, :)
+    cuij4(iip1, :) = cuij4(1, :)
 
-       IF (j==1) THEN
-
-          yprm = yprimu1(j)
-          rlatm = rlatu1(j)
-
-          coslatm = cos(rlatm)
-          radclatm = 0.5*rad*coslatm
-
-          DO i = 1, iim
-             xprp = xprimp025(i)
-             xprm = xprimm025(i)
-             aireij2_2d(i, 1) = un4rad2*coslatm*xprp*yprm
-             aireij3_2d(i, 1) = un4rad2*coslatm*xprm*yprm
-             cuij2(i, 1) = radclatm*xprp
-             cuij3(i, 1) = radclatm*xprm
-             cvij2(i, 1) = 0.5*rad*yprm
-             cvij3(i, 1) = cvij2(i, 1)
-          END DO
-
-          DO i = 1, iim
-             aireij1_2d(i, 1) = 0.
-             aireij4_2d(i, 1) = 0.
-             cuij1(i, 1) = 0.
-             cuij4(i, 1) = 0.
-             cvij1(i, 1) = 0.
-             cvij4(i, 1) = 0.
-          END DO
-
-       END IF
-
-       IF (j==jjp1) THEN
-          yprp = yprimu2(j-1)
-          rlatp = rlatu2(j-1)
-
-          coslatp = cos(rlatp)
-          radclatp = 0.5*rad*coslatp
-
-          DO i = 1, iim
-             xprp = xprimp025(i)
-             xprm = xprimm025(i)
-             aireij1_2d(i, jjp1) = un4rad2*coslatp*xprp*yprp
-             aireij4_2d(i, jjp1) = un4rad2*coslatp*xprm*yprp
-             cuij1(i, jjp1) = radclatp*xprp
-             cuij4(i, jjp1) = radclatp*xprm
-             cvij1(i, jjp1) = 0.5*rad*yprp
-             cvij4(i, jjp1) = cvij1(i, jjp1)
-          END DO
-
-          DO i = 1, iim
-             aireij2_2d(i, jjp1) = 0.
-             aireij3_2d(i, jjp1) = 0.
-             cvij2(i, jjp1) = 0.
-             cvij3(i, jjp1) = 0.
-             cuij2(i, jjp1) = 0.
-             cuij3(i, jjp1) = 0.
-          END DO
-
-       END IF
-
-       IF (j>1 .AND. j<jjp1) THEN
-
-          rlatp = rlatu2(j-1)
-          yprp = yprimu2(j-1)
-          rlatm = rlatu1(j)
-          yprm = yprimu1(j)
-
-          coslatm = cos(rlatm)
-          coslatp = cos(rlatp)
-          radclatp = 0.5*rad*coslatp
-          radclatm = 0.5*rad*coslatm
-
-          DO i = 1, iim
-             xprp = xprimp025(i)
-             xprm = xprimm025(i)
-
-             ai14 = un4rad2*coslatp*yprp
-             ai23 = un4rad2*coslatm*yprm
-             aireij1_2d(i, j) = ai14*xprp
-             aireij2_2d(i, j) = ai23*xprp
-             aireij3_2d(i, j) = ai23*xprm
-             aireij4_2d(i, j) = ai14*xprm
-             cuij1(i, j) = radclatp*xprp
-             cuij2(i, j) = radclatm*xprp
-             cuij3(i, j) = radclatm*xprm
-             cuij4(i, j) = radclatp*xprm
-             cvij1(i, j) = 0.5*rad*yprp
-             cvij2(i, j) = 0.5*rad*yprm
-             cvij3(i, j) = cvij2(i, j)
-             cvij4(i, j) = cvij1(i, j)
-          END DO
-
-       END IF
-
-       ! periodicite 
-
-       cvij1(iip1, j) = cvij1(1, j)
-       cvij2(iip1, j) = cvij2(1, j)
-       cvij3(iip1, j) = cvij3(1, j)
-       cvij4(iip1, j) = cvij4(1, j)
-       cuij1(iip1, j) = cuij1(1, j)
-       cuij2(iip1, j) = cuij2(1, j)
-       cuij3(iip1, j) = cuij3(1, j)
-       cuij4(iip1, j) = cuij4(1, j)
-       aireij1_2d(iip1, j) = aireij1_2d(1, j)
-       aireij2_2d(iip1, j) = aireij2_2d(1, j)
-       aireij3_2d(iip1, j) = aireij3_2d(1, j)
-       aireij4_2d(iip1, j) = aireij4_2d(1, j)
-
-    END DO
+    aireij1_2d(iip1, :) = aireij1_2d(1, :)
+    aireij2_2d(iip1, :) = aireij2_2d(1, :)
+    aireij3_2d(iip1, :) = aireij3_2d(1, :)
+    aireij4_2d(iip1, :) = aireij4_2d(1, :)
 
     DO j = 1, jjp1
        DO i = 1, iim
           aire_2d(i, j) = aireij1_2d(i, j) + aireij2_2d(i, j) &
                + aireij3_2d(i, j) + aireij4_2d(i, j)
-          alpha1_2d(i, j) = aireij1_2d(i, j)/aire_2d(i, j)
-          alpha2_2d(i, j) = aireij2_2d(i, j)/aire_2d(i, j)
-          alpha3_2d(i, j) = aireij3_2d(i, j)/aire_2d(i, j)
-          alpha4_2d(i, j) = aireij4_2d(i, j)/aire_2d(i, j)
+          alpha1_2d(i, j) = aireij1_2d(i, j) / aire_2d(i, j)
+          alpha2_2d(i, j) = aireij2_2d(i, j) / aire_2d(i, j)
+          alpha3_2d(i, j) = aireij3_2d(i, j) / aire_2d(i, j)
+          alpha4_2d(i, j) = aireij4_2d(i, j) / aire_2d(i, j)
           alpha1p2_2d(i, j) = alpha1_2d(i, j) + alpha2_2d(i, j)
           alpha1p4_2d(i, j) = alpha1_2d(i, j) + alpha4_2d(i, j)
           alpha2p3_2d(i, j) = alpha2_2d(i, j) + alpha3_2d(i, j)
@@ -379,11 +291,11 @@ contains
     DO j = 1, jjp1
        DO i = 1, iim
           aireu_2d(i, j) = aireij1_2d(i, j) + aireij2_2d(i, j) + &
-               aireij4_2d(i+1, j) + aireij3_2d(i+1, j)
-          unsaire_2d(i, j) = 1./aire_2d(i, j)
+               aireij4_2d(i + 1, j) + aireij3_2d(i + 1, j)
+          unsaire_2d(i, j) = 1. / aire_2d(i, j)
           unsair_gam1_2d(i, j) = unsaire_2d(i, j)**(-gamdi_gdiv)
           unsair_gam2_2d(i, j) = unsaire_2d(i, j)**(-gamdi_h)
-          airesurg_2d(i, j) = aire_2d(i, j)/g
+          airesurg_2d(i, j) = aire_2d(i, j) / g
        END DO
        aireu_2d(iip1, j) = aireu_2d(1, j)
        unsaire_2d(iip1, j) = unsaire_2d(1, j)
@@ -393,38 +305,38 @@ contains
     END DO
 
     DO j = 1, jjm
-
        DO i = 1, iim
           airev_2d(i, j) = aireij2_2d(i, j) + aireij3_2d(i, j) + &
-               aireij1_2d(i, j+1) + aireij4_2d(i, j+1)
+               aireij1_2d(i, j + 1) + aireij4_2d(i, j + 1)
        END DO
        DO i = 1, iim
-          airez = aireij2_2d(i, j) + aireij1_2d(i, j+1) + aireij3_2d(i+1, j) &
-               + aireij4_2d(i+1, j+1)
-          unsairez_2d(i, j) = 1./airez
+          airez = aireij2_2d(i, j) + aireij1_2d(i, j + 1) &
+               + aireij3_2d(i + 1, j) + aireij4_2d(i + 1, j + 1)
+          unsairez_2d(i, j) = 1. / airez
           unsairz_gam_2d(i, j) = unsairez_2d(i, j)**(-gamdi_grot)
-          fext_2d(i, j) = airez*sin(rlatv(j))*2.*omeg
+          fext_2d(i, j) = airez * sin(rlatv(j)) * 2. * omeg
        END DO
        airev_2d(iip1, j) = airev_2d(1, j)
        unsairez_2d(iip1, j) = unsairez_2d(1, j)
        fext_2d(iip1, j) = fext_2d(1, j)
        unsairz_gam_2d(iip1, j) = unsairz_gam_2d(1, j)
-
     END DO
 
-    ! Calcul des elongations cu_2d, cv_2d, cvu 
+    ! Calcul des élongations cu_2d, cv_2d, cvu 
 
     DO j = 1, jjm
        DO i = 1, iim
           cv_2d(i, j) = 0.5 * &
-               (cvij2(i, j) + cvij3(i, j) + cvij1(i, j+1) + cvij4(i, j+1))
-          cvu(i, j) = 0.5*(cvij1(i, j)+cvij4(i, j)+cvij2(i, j)+cvij3(i, j))
-          cuv(i, j) = 0.5*(cuij2(i, j)+cuij3(i, j)+cuij1(i, j+1)+cuij4(i, j+1))
-          unscv2_2d(i, j) = 1./(cv_2d(i, j)*cv_2d(i, j))
+               (cvij2(i, j) + cvij3(i, j) + cvij1(i, j + 1) + cvij4(i, j + 1))
+          cvu(i, j) = 0.5 * (cvij1(i, j) + cvij4(i, j) + cvij2(i, j) &
+               + cvij3(i, j))
+          cuv(i, j) = 0.5 * (cuij2(i, j) + cuij3(i, j) + cuij1(i, j + 1) &
+               + cuij4(i, j + 1))
+          unscv2_2d(i, j) = 1. / (cv_2d(i, j) * cv_2d(i, j))
        END DO
        DO i = 1, iim
-          cuvsurcv_2d(i, j) = airev_2d(i, j)*unscv2_2d(i, j)
-          cvsurcuv_2d(i, j) = 1./cuvsurcv_2d(i, j)
+          cuvsurcv_2d(i, j) = airev_2d(i, j) * unscv2_2d(i, j)
+          cvsurcuv_2d(i, j) = 1. / cuvsurcv_2d(i, j)
           cuvscvgam1_2d(i, j) = cuvsurcv_2d(i, j)**(-gamdi_gdiv)
           cuvscvgam2_2d(i, j) = cuvsurcv_2d(i, j)**(-gamdi_h)
           cvscuvgam_2d(i, j) = cvsurcuv_2d(i, j)**(-gamdi_grot)
@@ -442,11 +354,11 @@ contains
 
     DO j = 2, jjm
        DO i = 1, iim
-          cu_2d(i, j) = 0.5 * (cuij1(i, j) + cuij4(i+1, j) + cuij2(i, j) &
-               + cuij3(i+1, j))
-          unscu2_2d(i, j) = 1./(cu_2d(i, j)*cu_2d(i, j))
-          cvusurcu_2d(i, j) = aireu_2d(i, j)*unscu2_2d(i, j)
-          cusurcvu_2d(i, j) = 1./cvusurcu_2d(i, j)
+          cu_2d(i, j) = 0.5 * (cuij1(i, j) + cuij4(i + 1, j) + cuij2(i, j) &
+               + cuij3(i + 1, j))
+          unscu2_2d(i, j) = 1. / (cu_2d(i, j) * cu_2d(i, j))
+          cvusurcu_2d(i, j) = aireu_2d(i, j) * unscu2_2d(i, j)
+          cusurcvu_2d(i, j) = 1. / cvusurcu_2d(i, j)
           cvuscugam1_2d(i, j) = cvusurcu_2d(i, j)**(-gamdi_gdiv)
           cvuscugam2_2d(i, j) = cvusurcu_2d(i, j)**(-gamdi_h)
           cuscvugam_2d(i, j) = cusurcvu_2d(i, j)**(-gamdi_grot)
@@ -460,7 +372,7 @@ contains
        cuscvugam_2d(iip1, j) = cuscvugam_2d(1, j)
     END DO
 
-    ! calcul aux poles 
+    ! Calcul aux pôles 
 
     DO i = 1, iip1
        cu_2d(i, 1) = 0.
@@ -474,7 +386,7 @@ contains
 
     DO j = 1, jjm
        DO i = 1, iim
-          airvscu2_2d(i, j) = airev_2d(i, j)/(cuv(i, j)*cuv(i, j))
+          airvscu2_2d(i, j) = airev_2d(i, j) / (cuv(i, j) * cuv(i, j))
           aivscu2gam_2d(i, j) = airvscu2_2d(i, j)**(-gamdi_grot)
        END DO
        airvscu2_2d(iip1, j) = airvscu2_2d(1, j)
@@ -483,23 +395,23 @@ contains
 
     DO j = 2, jjm
        DO i = 1, iim
-          airuscv2_2d(i, j) = aireu_2d(i, j)/(cvu(i, j)*cvu(i, j))
+          airuscv2_2d(i, j) = aireu_2d(i, j) / (cvu(i, j) * cvu(i, j))
           aiuscv2gam_2d(i, j) = airuscv2_2d(i, j)**(-gamdi_grot)
        END DO
        airuscv2_2d(iip1, j) = airuscv2_2d(1, j)
        aiuscv2gam_2d(iip1, j) = aiuscv2gam_2d(1, j)
     END DO
 
-    ! calcul des aires aux poles :
+    ! Calcul des aires aux pôles :
 
     apoln = sum(aire_2d(:iim, 1))
     apols = sum(aire_2d(:iim, jjp1))
-    unsapolnga1 = 1./(apoln**(-gamdi_gdiv))
-    unsapolsga1 = 1./(apols**(-gamdi_gdiv))
-    unsapolnga2 = 1./(apoln**(-gamdi_h))
-    unsapolsga2 = 1./(apols**(-gamdi_h))
+    unsapolnga1 = 1. / (apoln**(-gamdi_gdiv))
+    unsapolsga1 = 1. / (apols**(-gamdi_gdiv))
+    unsapolnga2 = 1. / (apoln**(-gamdi_h))
+    unsapolsga2 = 1. / (apols**(-gamdi_h))
 
-    ! changement F. Hourdin calcul conservatif pour fext_2d
+    ! Changement F. Hourdin calcul conservatif pour fext_2d
     ! constang_2d contient le produit a * cos (latitude) * omega
 
     DO i = 1, iim
@@ -507,14 +419,15 @@ contains
     END DO
     DO j = 1, jjm - 1
        DO i = 1, iim
-          constang_2d(i, j+1) = rad*omeg*cu_2d(i, j+1)*cos(rlatu(j+1))
+          constang_2d(i, j + 1) = rad * omeg * cu_2d(i, j + 1) &
+               * cos(rlatu(j + 1))
        END DO
     END DO
     DO i = 1, iim
        constang_2d(i, jjp1) = 0.
     END DO
 
-    ! periodicite en longitude
+    ! Périodicité en longitude
 
     DO j = 1, jjm
        fext_2d(iip1, j) = fext_2d(1, j)
@@ -523,46 +436,13 @@ contains
        constang_2d(iip1, j) = constang_2d(1, j)
     END DO
 
-    ! fin du changement
-
-    print *, ' Coordonnees de la grille '
-    WRITE (6, 995)
-
-    print *, ' LONGITUDES aux pts. V (degres) '
-    WRITE (6, 995)
-    DO i = 1, iip1
-       rlonvv(i) = rlonv(i)*180./pi
-    END DO
-    WRITE (6, 400) rlonvv
-
-    WRITE (6, 995)
-    print *, ' LATITUDES aux pts. V (degres) '
-    WRITE (6, 995)
-    DO i = 1, jjm
-       rlatuu(i) = rlatv(i)*180./pi
-    END DO
-    WRITE (6, 400) (rlatuu(i), i=1, jjm)
-
-    DO i = 1, iip1
-       rlonvv(i) = rlonu(i)*180./pi
-    END DO
-    WRITE (6, 995)
-    print *, ' LONGITUDES aux pts. U (degres) '
-    WRITE (6, 995)
-    WRITE (6, 400) rlonvv
-    WRITE (6, 995)
-
-    print *, ' LATITUDES aux pts. U (degres) '
-    WRITE (6, 995)
-    DO i = 1, jjp1
-       rlatuu(i) = rlatu(i)*180./pi
-    END DO
-    WRITE (6, 400) (rlatuu(i), i=1, jjp1)
-    WRITE (6, 995)
-
-400 FORMAT (1X, 8F8.2)
-990 FORMAT (//)
-995 FORMAT (/)
+    call new_unit(unit)
+    open(unit, file="longitude_latitude.txt", status="replace", action="write")
+    write(unit, fmt=*) '"longitudes at V points (degrees)"', rlonv * 180. / pi
+    write(unit, fmt=*) '"latitudes at V points (degrees)"', rlatv * 180. / pi
+    write(unit, fmt=*) '"longitudes at U points (degrees)"', rlonu * 180. / pi
+    write(unit, fmt=*) '"latitudes at U points (degrees)"', rlatu * 180. / pi
+    close(unit)
 
   END SUBROUTINE inigeom
 

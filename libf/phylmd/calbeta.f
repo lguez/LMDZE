@@ -3,7 +3,7 @@
       use dimens_m
       use indicesol
       use dimphy
-      use iniprint
+      use conf_gcm_m
       use SUPHEC_M
       IMPLICIT none
 c======================================================================

@@ -37,10 +37,10 @@ CONTAINS
 
   SUBROUTINE histwrite_r1d(pfileid, pvarname, pitau, pdata)
 
-    USE errioipsl, ONLY : histerr
+    USE errioipsl, ONLY: histerr
     use calendar, only: isittime
-    USE mathop_m, ONLY : mathop
-    USE histcom_var, ONLY : datasz_in, datasz_max, date0, deltat, &
+    USE mathop_m, ONLY: mathop
+    USE histcom_var, ONLY: datasz_in, datasz_max, date0, deltat, &
          freq_opp, freq_wrt, fuchnbout, last_opp, last_opp_chk, last_wrt, &
          last_wrt_chk, missing_val, nbopp, nb_files, scal, scsize, sopps, &
          topp
@@ -48,8 +48,8 @@ CONTAINS
     use histwrite_real_m, only: histwrite_real
 
     INTEGER, INTENT(IN):: pfileid, pitau
-    REAL, INTENT(IN):: pdata(:)
     CHARACTER(LEN=*), INTENT(IN):: pvarname
+    REAL, INTENT(IN):: pdata(:)
 
     ! Variables local to the procedure:
     integer nbindex, nindex(size(pdata))
@@ -183,9 +183,9 @@ CONTAINS
   SUBROUTINE histwrite_r2d (pfileid, pvarname, pitau, pdata)
 
     use calendar, only: isittime
-    USE errioipsl, ONLY : histerr
-    USE mathop_m, ONLY : mathop
-    USE histcom_var, ONLY : datasz_in, datasz_max, date0, deltat, &
+    USE errioipsl, ONLY: histerr
+    USE mathop_m, ONLY: mathop
+    USE histcom_var, ONLY: datasz_in, datasz_max, date0, deltat, &
          freq_opp, freq_wrt, fuchnbout, last_opp, last_opp_chk, last_wrt, &
          last_wrt_chk, missing_val, nbopp, nb_files, scal, scsize, sopps, &
          topp
@@ -328,9 +328,9 @@ CONTAINS
   SUBROUTINE histwrite_r3d (pfileid, pvarname, pitau, pdata)
 
     use calendar, only: isittime
-    USE errioipsl, ONLY : histerr
-    USE mathop_m, ONLY : mathop
-    USE histcom_var, ONLY : datasz_in, datasz_max, date0, deltat, &
+    USE errioipsl, ONLY: histerr
+    USE mathop_m, ONLY: mathop
+    USE histcom_var, ONLY: datasz_in, datasz_max, date0, deltat, &
          freq_opp, freq_wrt, fuchnbout, last_opp, last_opp_chk, last_wrt, &
          last_wrt_chk, missing_val, nbopp, nb_files, scal, scsize, sopps, &
          topp

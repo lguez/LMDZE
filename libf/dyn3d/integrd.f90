@@ -27,7 +27,8 @@ contains
     REAL masse((iim + 1) * (jjm + 1), llm)
 
     REAL vcovm1(ip1jm, llm), ucovm1((iim + 1) * (jjm + 1), llm)
-    REAL tetam1((iim + 1) * (jjm + 1), llm), psm1((iim + 1) * (jjm + 1))
+    REAL, intent(inout):: tetam1((iim + 1) * (jjm + 1), llm)
+    REAL, intent(inout):: psm1((iim + 1) * (jjm + 1))
     real massem1((iim + 1) * (jjm + 1), llm)
 
     REAL dv(ip1jm, llm), dudyn((iim + 1) * (jjm + 1), llm)
@@ -114,11 +115,9 @@ contains
           vcov(ij, l) = vcovm1(ij, l) + dt*dv(ij, l)
        END DO
 
-       DO ij = 1, (iim + 1) * (jjm + 1)
-          hscr(ij) = teta(ij, l)
-          teta(ij, l) = tetam1(ij, l) * massem1(ij, l) / masse(ij, l) &
-               + dt * dteta(ij, l) / masse(ij, l)
-       END DO
+       hscr = teta(:, l)
+       teta(:, l) = tetam1(:, l) * massem1(:, l) / masse(:, l) &
+            + dt * dteta(:, l) / masse(:, l)
 
        ! Calcul de la valeur moyenne, unique aux poles pour teta
 
@@ -135,9 +134,9 @@ contains
        END DO
 
        IF (leapf) THEN
-          CALL scopy((iim + 1) * (jjm + 1), uscr(1), 1, ucovm1(1, l), 1)
-          CALL scopy(ip1jm, vscr(1), 1, vcovm1(1, l), 1)
-          CALL scopy((iim + 1) * (jjm + 1), hscr(1), 1, tetam1(1, l), 1)
+          ucovm1(:, l)  =uscr
+          vcovm1(:, l) = vscr
+          tetam1(:, l) = hscr
        END IF
     END DO
 
@@ -167,13 +166,13 @@ contains
        END DO
     END DO
 
-    CALL scopy((iim + 1) * (jjm + 1) * llm, finvmasse, 1, finvmaold, 1)
+    finvmaold = finvmasse
 
     ! Fin de l'integration de q
 
     IF (leapf) THEN
-       CALL scopy((iim + 1) * (jjm + 1), pscr, 1, psm1, 1)
-       CALL scopy((iim + 1) * (jjm + 1)*llm, massescr, 1, massem1, 1)
+       psm1 = pscr
+       massem1 = massescr
     END IF
 
   END SUBROUTINE integrd

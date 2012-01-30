@@ -14,7 +14,7 @@
       use paramet_m
       use comconst
       use comvert
-      use logic
+      use conf_gcm_m
       IMPLICIT NONE
 !
 !

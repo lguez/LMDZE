@@ -39,6 +39,8 @@ contains
 
   subroutine read_clesphys2
 
+    use unit_nml_m, only: unit_nml
+
     namelist /clesphys2_nml/cycle_diurne, soil_model, new_oliq, &
          ok_orodr, ok_orolf, ok_limitvrai, nbapp_rad, iflag_con
 
@@ -46,7 +48,7 @@ contains
 
     print *, "Enter namelist 'clesphys2_nml'."
     read(unit=*, nml=clesphys2_nml)
-    write(unit=*, nml=clesphys2_nml)
+    write(unit_nml, nml=clesphys2_nml)
 
     select case (iflag_con)
     case (1)

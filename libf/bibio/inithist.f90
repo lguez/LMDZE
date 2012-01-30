@@ -29,7 +29,6 @@ contains
     use paramet_m
     use comconst
     use comvert
-    use logic
     use comgeom
     use serre
     use temps

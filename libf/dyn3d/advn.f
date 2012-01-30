@@ -18,9 +18,8 @@ c   --------------------------------------------------------------------
       use paramet_m
       use comconst
       use comvert
-      use logic
+      use conf_gcm_m
       use comgeom
-      use iniprint
       IMPLICIT NONE
 c
 
@@ -137,7 +136,7 @@ c
 c   --------------------------------------------------------------------
       use dimens_m
       use paramet_m
-      use iniprint
+      use conf_gcm_m
       IMPLICIT NONE
 c
 c
@@ -254,7 +253,7 @@ c
 c   --------------------------------------------------------------------
       use dimens_m
       use paramet_m
-      use iniprint
+      use conf_gcm_m
       IMPLICIT NONE
 c
 c
@@ -350,7 +349,7 @@ c
 c   --------------------------------------------------------------------
       use dimens_m
       use paramet_m
-      use iniprint
+      use conf_gcm_m
       IMPLICIT NONE
 c
 c
@@ -474,8 +473,7 @@ c   --------------------------------------------------------------------
       use paramet_m
       use comconst
       use comvert
-      use logic
-      use iniprint
+      use conf_gcm_m
       IMPLICIT NONE
 c
 c
@@ -719,7 +717,7 @@ c   --------------------------------------------------------------------
       use dimens_m
       use paramet_m
       use comgeom
-      use iniprint
+      use conf_gcm_m
       IMPLICIT NONE
 c
 c
@@ -834,7 +832,7 @@ c   --------------------------------------------------------------------
       use dimens_m
       use paramet_m
       use comgeom
-      use iniprint
+      use conf_gcm_m
       IMPLICIT NONE
 c
 c

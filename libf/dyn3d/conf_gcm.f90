@@ -36,6 +36,27 @@ module conf_gcm_m
   logical:: offline = .FALSE.
   ! permet de mettre en route la nouvelle parametrisation de l'eau liquide
 
+  integer:: prt_level = 0 ! niveau d'impression souhaité (0 = minimum)
+
+  LOGICAL:: purmats= .FALSE.
+  ! Help = Choix du schema d'integration temporel.
+  ! y = pure Matsuno sinon c'est du Matsuno-leapfrog
+
+  logical:: fxyhypb = .TRUE.
+  ! (fonction f(y) à dérivée tangente hyperbolique, sinon à dérivée
+  ! sinusoïdale)
+
+  logical:: ysinus = .TRUE.
+  ! (Fonction f(y) avec y = Sin(latit.) si = .true. sinon y = latit.)
+
+  logical:: ok_guide= .FALSE. ! guidage
+
+  INTEGER:: iflag_phys = 1
+  ! contrôle l'appel à la physique :
+  ! 0 : pas de physique
+  ! 1 : physique normale (appel à phylmd, phymars...) (default)
+  ! 2 : rappel Newtonien pour la température + friction au sol
+
 contains
 
   SUBROUTINE conf_gcm
@@ -51,27 +72,36 @@ contains
 
     use abort_gcm_m, only: abort_gcm
     use comdissnew, only: read_comdissnew
-    use logic, only: read_logic
     use serre, only: clon, clat, grossismx, grossismy, alphax, alphay, &
          dzoomx, dzoomy, taux, tauy
-    use iniprint, only: read_iniprint
+    use unit_nml_m, only: unit_nml
 
     namelist /conf_gcm_nml/dayref, anneeref, raz_date, nday, day_step, &
          iperiod, iapp_tracvl, iconser, iecri, periodav, &
          iphysiq, clon, clat, grossismx, grossismy, dzoomx, dzoomy, taux, &
          tauy, offline
 
+    namelist /iniprint_nml/prt_level
+
+    namelist /logic_nml/ purmats, fxyhypb, ysinus, ok_guide, iflag_phys
+
     !------------------------------------
 
     print *, "Call sequence information: conf_gcm"
 
-    call read_iniprint
-    call read_logic
+    print *, "Enter namelist 'iniprint_nml'."
+    read(unit=*, nml=iniprint_nml)
+    write(unit_nml, nml=iniprint_nml)
+
+    print *, "Enter namelist 'logic_nml'."
+    read(unit=*, nml=logic_nml)
+    write(unit_nml, nml=logic_nml)
+
     call read_comdissnew
 
     print *, "Enter namelist 'conf_gcm_nml'."
     read(unit=*, nml=conf_gcm_nml)
-    write(unit=*, nml=conf_gcm_nml)
+    write(unit_nml, nml=conf_gcm_nml)
 
     IF (MOD(day_step, iperiod) /= 0) call abort_gcm(modname = "conf_gcm", &
          message = &

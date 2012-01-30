@@ -18,7 +18,8 @@ contains
     USE comconst, ONLY: daysec, dtphys, dtvr
     USE comgeom, ONLY: aire_2d, apoln, apols
     USE comvert, ONLY: ap, bp
-    USE conf_gcm_m, ONLY: day_step, iconser, iperiod, iphysiq, nday, offline
+    USE conf_gcm_m, ONLY: day_step, iconser, iperiod, iphysiq, nday, offline, &
+         iflag_phys, ok_guide
     USE dimens_m, ONLY: iim, jjm, llm, nqmx
     use dissip_m, only: dissip
     USE dynetat0_m, ONLY: day_ini
@@ -29,7 +30,6 @@ contains
     USE guide_m, ONLY: guide
     use inidissip_m, only: idissip
     use integrd_m, only: integrd
-    USE logic, ONLY: iflag_phys, ok_guide
     use nr_util, only: assert
     USE pressure_var, ONLY: p3d
     USE temps, ONLY: itau_dyn
@@ -227,7 +227,7 @@ contains
           CALL writedynav(nqmx, itau + 1, vcov, ucov, teta, pk, phi, q, &
                masse, ps, phis)
           call bilan_dyn(ps, masse, pk, pbaru, pbarv, teta, phi, ucov, vcov, &
-               q(:, :, :, 1), dt_app = dtvr * iperiod)
+               q(:, :, :, 1))
        ENDIF
     end do time_integration
 

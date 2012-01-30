@@ -15,6 +15,8 @@ c
       use paramet_m
       use comgeom
       use filtreg_m, only: filtreg
+      use divergf_m, only: divergf
+
       IMPLICIT NONE
 c
 

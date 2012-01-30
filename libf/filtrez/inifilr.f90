@@ -35,7 +35,7 @@ contains
     ! The modes are filtered from modfrst to modemax.
 
     USE dimens_m, ONLY : iim, jjm
-    USE logic, ONLY : fxyhypb, ysinus
+    use conf_gcm_m, ONLY : fxyhypb, ysinus
     USE comgeom, ONLY : rlatu, rlatv, xprimu
     use nr_util, only: pi
     USE serre, ONLY : alphax

@@ -29,6 +29,8 @@ contains
 
   subroutine read_comdissnew
 
+    use unit_nml_m, only: unit_nml
+    
     namelist /comdissnew_nml/lstardis, nitergdiv, nitergrot, niterh, &
          tetagdiv, tetagrot, tetatemp, coefdis
 
@@ -36,7 +38,7 @@ contains
 
     print *, "Enter namelist 'comdissnew_nml'."
     read(unit=*, nml=comdissnew_nml)
-    write(unit=*, nml=comdissnew_nml)
+    write(unit_nml, nml=comdissnew_nml)
 
   end subroutine read_comdissnew
 

@@ -905,11 +905,7 @@ contains
     ! Mettre en action les conditions aux limites (albedo, sst, etc.).
 
     ! Prescrire l'ozone et calculer l'albedo sur l'ocean.
-    if (nqmx >= 5) then
-       wo = qx(:, :, 5) * zmasse / dobson_u / 1e3
-    else IF (MOD(itap - 1, lmt_pas) == 0) THEN
-       wo = ozonecm(REAL(julien), paprs)
-    ENDIF
+    wo = ozonecm(REAL(julien), paprs)
 
     ! Évaporation de l'eau liquide nuageuse :
     DO k = 1, llm

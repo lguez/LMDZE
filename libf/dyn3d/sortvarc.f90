@@ -44,6 +44,8 @@ contains
 
     !-----------------------------------------------------------------------
 
+    print *, "Call sequence information: sortvarc"
+
     time = real(itau) / day_step + time_0
     dtvrs1j = dtvr/daysec
     rjour = real(int(itau*dtvrs1j))

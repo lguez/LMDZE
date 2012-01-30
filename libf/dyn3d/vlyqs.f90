@@ -15,7 +15,7 @@
       use paramet_m
       use comconst
       use comvert
-      use logic
+      use conf_gcm_m
       use comgeom
       USE nr_util, ONLY : pi
       IMPLICIT NONE

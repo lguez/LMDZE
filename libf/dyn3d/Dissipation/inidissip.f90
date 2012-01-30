@@ -6,9 +6,9 @@ module inidissip_m
 
   private llm
 
-  REAL dtdiss
+  REAL dtdiss ! in s
   integer idissip ! période de la dissipation (en pas de temps)
-  real tetaudiv(llm), tetaurot(llm), tetah(llm) 
+  real tetaudiv(llm), tetaurot(llm), tetah(llm) ! in s
   real cdivu, crot, cdivh
 
 contains
@@ -26,15 +26,15 @@ contains
     USE comvert, ONLY : preff, presnivs
     USE conf_gcm_m, ONLY : iperiod
     USE dimens_m, ONLY : iim, jjm, llm
-    USE paramet_m, ONLY : jjp1
-    use jumble, only: new_unit
     use filtreg_m, only: filtreg
     use gradiv2_m, only: gradiv2
+    use jumble, only: new_unit
+    USE paramet_m, ONLY : jjp1
 
     ! Variables local to the procedure:
-    REAL zvert(llm), max_zvert
-    REAL, dimension(iim + 1, jjm + 1):: zh, zu
-    real zv(iim + 1, jjm), deltap(iim + 1, jjm + 1, llm)
+    REAL zvert(llm), max_zvert ! no dimension
+    REAL, dimension(iim + 1, jjm + 1, 1):: zh, zu, gx, divgra, deltap
+    real zv(iim + 1, jjm, 1), gy(iim + 1, jjm, 1)
     REAL zllm
     INTEGER l, seed_size, ii, unit
     REAL tetamin ! in s
@@ -53,13 +53,13 @@ contains
 
     DO l = 1, 50
        IF (lstardis) THEN
-          CALL divgrad2(1, zh, deltap, niterh, zh, -1.)
+          CALL divgrad2(1, zh, deltap, niterh, divgra, -1.)
        ELSE
-          CALL divgrad(1, zh, niterh, zh, -1.)
+          CALL divgrad(1, zh, niterh, divgra, -1.)
        END IF
 
-       zllm = abs(maxval(zh))
-       zh = zh / zllm
+       zllm = abs(maxval(divgra))
+       zh = divgra / zllm
     END DO
 
     IF (lstardis) THEN
@@ -79,14 +79,14 @@ contains
 
     DO l = 1, 50
        IF (lstardis) THEN
-          CALL gradiv2(1, zu, zv, nitergdiv, zu, zv, -1.)
+          CALL gradiv2(zu, zv, nitergdiv, gx, gy, -1.)
        ELSE
-          CALL gradiv(1, zu, zv, nitergdiv, zu, zv, -1.)
+          CALL gradiv(1, zu, zv, nitergdiv, gx, gy, -1.)
        END IF
 
-       zllm = max(abs(maxval(zu)), abs(maxval(zv)))
-       zu = zu / zllm
-       zv = zv / zllm
+       zllm = max(abs(maxval(gx)), abs(maxval(gy)))
+       zu = gx / zllm
+       zv = gy / zllm
     end DO
 
     IF (lstardis) THEN
@@ -106,20 +106,20 @@ contains
 
     DO l = 1, 50
        IF (lstardis) THEN
-          CALL nxgraro2(1, zu, zv, nitergrot, zu, zv, -1.)
+          CALL nxgraro2(1, zu, zv, nitergrot, gx, gy, -1.)
        ELSE
-          CALL nxgrarot(1, zu, zv, nitergrot, zu, zv, -1.)
+          CALL nxgrarot(1, zu, zv, nitergrot, gx, gy, -1.)
        END IF
 
-       zllm = max(abs(maxval(zu)), abs(maxval(zv)))
-       zu = zu / zllm
-       zv = zv / zllm
+       zllm = max(abs(maxval(gx)), abs(maxval(gy)))
+       zu = gx / zllm
+       zv = gy / zllm
     end DO
 
     IF (lstardis) THEN
        crot = 1. / zllm
     ELSE
-       crot = zllm**(-1. / nitergrot)
+       crot = zllm**(- 1. / nitergrot)
     END IF
     PRINT *, 'crot = ', crot
 
@@ -133,7 +133,7 @@ contains
 
     call new_unit(unit)
     open(unit, file="inidissip.csv", status="replace", action="write")
-    write(unit, fmt=*) "tetaudiv tetaurot tetah" ! title line
+    write(unit, fmt=*) '"tetaudiv (s)" "tetaurot (s)" "tetah (s)"' ! title line
     do l = 1, llm
        write(unit, fmt=*) tetaudiv(l), tetaurot(l), tetah(l)
     end do
@@ -147,7 +147,7 @@ contains
     idissip = max(1, int(tetamin / (2 * dtvr * iperiod))) * iperiod
     PRINT *, 'idissip = ', idissip
     dtdiss = idissip * dtvr
-    PRINT *, 'dtdiss = ', dtdiss
+    PRINT *, 'dtdiss = ', dtdiss, "s"
 
   END SUBROUTINE inidissip
 

@@ -5,7 +5,7 @@ module bilan_dyn_m
 contains
 
   SUBROUTINE bilan_dyn(ps, masse, pk, flux_u, flux_v, teta, phi, ucov, vcov, &
-       trac, dt_app)
+       trac)
 
     ! From LMDZ4/libf/dyn3d/bilan_dyn.F, version 1.5 2005/03/16 10:12:17
 
@@ -13,17 +13,12 @@ contains
     ! De façon générale, les moyennes des scalaires Q sont pondérées
     ! par la masse. Les flux de masse sont, eux, simplement moyennés.
 
-    USE calendar, ONLY: ymds2ju
-    USE conf_gcm_m, ONLY: day_step, iperiod, periodav
     USE comconst, ONLY: cpp
-    USE comvert, ONLY: presnivs
-    USE comgeom, ONLY: constang_2d, cu_2d, cv_2d, rlatv
+    USE comgeom, ONLY: constang_2d, cu_2d, cv_2d
     USE dimens_m, ONLY: iim, jjm, llm
-    USE histcom, ONLY: histbeg_totreg, histdef, histend, histvert
     USE histwrite_m, ONLY: histwrite
-    USE nr_util, ONLY: pi
+    use init_dynzon_m, only: ncum, fileid, znom, ntr, nq, nom
     USE paramet_m, ONLY: iip1, jjp1
-    USE temps, ONLY: annee_ref, day_ref, itau_dyn
 
     ! Arguments:
 
@@ -36,23 +31,13 @@ contains
     real, intent(in):: ucov(iip1, jjp1, llm)
     real, intent(in):: vcov(iip1, jjm, llm)
     real, intent(in):: trac(:, :, :) ! (iim + 1, jjm + 1, llm)
-    real, intent(in):: dt_app
 
     ! Local:
 
-    real dt_cum
     integer:: icum  = 0
-    integer, save:: ncum
-    logical:: first = .true.
+    integer:: itau = 0
     real zqy, zfactv(jjm, llm)
 
-    integer, parameter:: nQ = 7
-    character(len=4), parameter:: nom(nQ) = (/'T   ', 'gz  ', 'K   ', 'ang ', &
-         'u   ', 'ovap', 'un  '/)
-    character(len=5), parameter:: unites(nQ) = (/'K    ', 'm2/s2', 'm2/s2', &
-         'ang  ', 'm/s  ', 'kg/kg', 'un   '/)
-
-    integer:: itau = 0
     real ww
 
     ! Variables dynamiques intermédiaires
@@ -76,15 +61,7 @@ contains
 
     ! champs de tansport en moyenne zonale
     integer itr
-    integer, parameter:: ntr = 5
-
-    character(len=10), save:: znom(ntr, nQ)
-    character(len=26), save:: znoml(ntr, nQ)
-    character(len=12), save:: zunites(ntr, nQ)
-
     integer, parameter:: iave = 1, itot = 2, immc = 3, itrs = 4, istn = 5
-    character(len=3), parameter:: ctrs(ntr) = (/'   ', 'TOT', 'MMC', 'TRS', &
-         'STN'/)
 
     real zvQ(jjm, llm, ntr, nQ), zvQtmp(jjm, llm)
     real zavQ(jjm, 2: ntr, nQ), psiQ(jjm, llm + 1, nQ)
@@ -92,97 +69,7 @@ contains
     real zv(jjm, llm), psi(jjm, llm + 1)
     integer i, j, l, iQ
 
-    ! Initialisation du fichier contenant les moyennes zonales.
-
-    integer, save:: fileid
-    integer thoriid, zvertiid
-
-    real zjulian
-    integer zan, dayref
-
-    real rlong(jjm), rlatg(jjm)
-
     !-----------------------------------------------------------------
-
-    !!print *, "Call sequence information: bilan_dyn"
-
-    first_call: if (first) then
-       ! initialisation des fichiers
-       first = .false.
-       ! ncum est la frequence de stokage en pas de temps
-       ncum = day_step / iperiod * periodav
-       dt_cum = ncum * dt_app
-
-       ! Initialisation du fichier contenant les moyennes zonales
-
-       zan = annee_ref
-       dayref = day_ref
-       CALL ymds2ju(zan, 1, dayref, 0.0, zjulian)
-
-       rlong = 0.
-       rlatg = rlatv*180./pi
-
-       call histbeg_totreg('dynzon', rlong(:1), rlatg, 1, 1, 1, jjm, itau_dyn, &
-            zjulian, dt_cum, thoriid, fileid)
-
-       ! Appel à histvert pour la grille verticale
-
-       call histvert(fileid, 'presnivs', 'Niveaux sigma', 'mb', llm, presnivs, &
-            zvertiid)
-
-       ! Appels à histdef pour la définition des variables à sauvegarder
-       do iQ = 1, nQ
-          do itr = 1, ntr
-             if (itr == 1) then
-                znom(itr, iQ) = nom(iQ)
-                znoml(itr, iQ) = nom(iQ)
-                zunites(itr, iQ) = unites(iQ)
-             else
-                znom(itr, iQ) = ctrs(itr)//'v'//nom(iQ)
-                znoml(itr, iQ) = 'transport : v * '//nom(iQ)//' '//ctrs(itr)
-                zunites(itr, iQ) = 'm/s * '//unites(iQ)
-             endif
-          enddo
-       enddo
-
-       ! Déclarations des champs avec dimension verticale
-       do iQ = 1, nQ
-          do itr = 1, ntr
-             call histdef(fileid, znom(itr, iQ), znoml(itr, iQ), &
-                  zunites(itr, iQ), 1, jjm, thoriid, llm, 1, llm, zvertiid, &
-                  'ave(X)', dt_cum, dt_cum)
-          enddo
-          ! Déclarations pour les fonctions de courant
-          call histdef(fileid, 'psi'//nom(iQ), 'stream fn. '//znoml(itot, iQ), &
-               zunites(itot, iQ), 1, jjm, thoriid, llm, 1, llm, zvertiid, &
-               'ave(X)', dt_cum, dt_cum)
-       enddo
-
-       ! Déclarations pour les champs de transport d'air
-       call histdef(fileid, 'masse', 'masse', &
-            'kg', 1, jjm, thoriid, llm, 1, llm, zvertiid, &
-            'ave(X)', dt_cum, dt_cum)
-       call histdef(fileid, 'v', 'v', &
-            'm/s', 1, jjm, thoriid, llm, 1, llm, zvertiid, &
-            'ave(X)', dt_cum, dt_cum)
-       ! Déclarations pour les fonctions de courant
-       call histdef(fileid, 'psi', 'stream fn. MMC ', 'mega t/s', &
-            1, jjm, thoriid, llm, 1, llm, zvertiid, &
-            'ave(X)', dt_cum, dt_cum)
-
-       ! Déclaration des champs 1D de transport en latitude
-       do iQ = 1, nQ
-          do itr = 2, ntr
-             call histdef(fileid, 'a'//znom(itr, iQ), znoml(itr, iQ), &
-                  zunites(itr, iQ), 1, jjm, thoriid, 1, 1, 1, -99, &
-                  'ave(X)', dt_cum, dt_cum)
-          enddo
-       enddo
-
-       CALL histend(fileid)
-    endif first_call
-
-    itau = itau + 1
 
     ! Calcul des champs dynamiques
 
@@ -217,6 +104,7 @@ contains
        flux_uQ_cum = 0.
     endif
 
+    itau = itau + 1
     icum = icum + 1
 
     ! Accumulation des flux de masse horizontaux

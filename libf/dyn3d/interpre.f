@@ -10,7 +10,7 @@
       use comconst
       use comvert
       use conf_gcm_m
-      use logic
+      use conf_gcm_m
       use comgeom
       use temps
       use ener

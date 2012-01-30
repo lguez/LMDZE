@@ -29,7 +29,7 @@ SUBROUTINE initfluxsto(tstep, t_ops, t_wrt, nq, fileid, filevid, filedid)
   USE paramet_m
   USE comconst
   USE comvert
-  USE logic
+  use conf_gcm_m
   USE comgeom
   USE serre
   USE temps, ONLY : annee_ref, day_ref, itau_dyn

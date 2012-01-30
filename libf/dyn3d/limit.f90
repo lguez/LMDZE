@@ -12,23 +12,23 @@ contains
     ! It uses files with climatological data.
     ! Both grids must be regular.
 
-    use dimens_m, only: iim, jjm
-    use indicesol, only: epsfra, nbsrf, is_ter, is_oce, is_lic, is_sic
-    use dimphy, only: klon, zmasq
     use comgeom, only: rlonu, rlatv
-    use etat0_mod, only: pctsrf
-    use start_init_orog_m, only: mask
     use conf_dat2d_m, only: conf_dat2d
-    use inter_barxy_m, only: inter_barxy
-    use numer_rec, only: spline, splint
+    use dimens_m, only: iim, jjm
+    use dimphy, only: klon, zmasq
+    use etat0_mod, only: pctsrf
     use grid_change, only: dyn_phy
-
+    use indicesol, only: epsfra, nbsrf, is_ter, is_oce, is_lic, is_sic
+    use inter_barxy_m, only: inter_barxy
     use netcdf95, only: handle_err, nf95_gw_var, NF95_CLOSE, NF95_DEF_DIM, &
          nf95_enddef, NF95_CREATE, nf95_inq_dimid, nf95_inquire_dimension, &
          nf95_inq_varid, NF95_OPEN
     use netcdf, only: NF90_CLOBBER, nf90_def_var, NF90_FLOAT, NF90_GET_VAR, &
          NF90_GLOBAL, NF90_NOWRITE, NF90_PUT_ATT, NF90_PUT_VAR, &
          NF90_UNLIMITED
+    use numer_rec, only: spline, splint
+    use start_init_orog_m, only: mask
+    use unit_nml_m, only: unit_nml
 
     ! Variables local to the procedure:
 
@@ -80,7 +80,7 @@ contains
 
     print *, "Enter namelist 'limit_nml'."
     read (unit=*, nml=limit_nml)
-    write(unit=*, nml=limit_nml)
+    write(unit_nml, nml=limit_nml)
 
     ! Process rugosity:
 

@@ -8,30 +8,32 @@ PROGRAM gcm
   ! "divgrad2", "nxgraro2"). Possibilité de choisir le schéma pour
   ! l'advection de "q", en modifiant "iadv" dans "traceur.def".
 
+  USE calendar, only: ioconf_calendar
   use clesphys2, only: read_clesphys2
   use comconst, only: daysec, cpp, dtvr, g, rad, r
   use comgeom, only: rlatu, aire_2d, cu_2d, cv_2d, rlonv
   use comgeomphy, only: airephy, cuphy, cvphy, rlatd, rlond
   use conf_gcm_m, only: day_step, iperiod, anneeref, dayref, iecri, iphysiq, &
-       nday, raz_date, periodav, conf_gcm
+       nday, raz_date, periodav, conf_gcm, iflag_phys
   use dimens_m, only: iim, jjm, llm, nqmx
   use dimphy, only: klon
   use dynetat0_m, only: dynetat0, day_ini
   use dynredem0_m, only: dynredem0
   use grid_change, only: dyn_phy, init_dyn_phy
+  use histcom, only: histclo
   use iniadvtrac_m, only: iniadvtrac
   use inidissip_m, only: inidissip
   use inifilr_m, only: inifilr
   use inigeom_m, only: inigeom
   use initdynav_m, only: initdynav
   use inithist_m, only: inithist
-  USE calendar, only: ioconf_calendar
-  use histcom, only: histclo
+  use init_dynzon_m, only: init_dynzon
+  use jumble, only: new_unit
   use leapfrog_m, only: leapfrog
-  use logic, only: iflag_phys
   use suphec_m, only: suphec
   use temps, only: day_ref, annee_ref, day_end, itau_dyn
   use tracstoke, only: istdyn, istphy
+  use unit_nml_m, only: unit_nml
   use yoethf_m, only: yoethf
 
   IMPLICIT NONE
@@ -60,9 +62,14 @@ PROGRAM gcm
 
   !------------------------------------------------------------
 
+  call new_unit(unit_nml)
+  open(unit_nml, file="used_namelists", status="replace", action="write")
+
+  CALL conf_gcm
+
   print *, "Enter namelist 'main_nml'."
   read (unit=*, nml=main_nml)
-  write(unit=*, nml=main_nml)
+  write(unit_nml, nml=main_nml)
 
   ! Choix du calendrier :
   if (true_calendar) then
@@ -73,7 +80,6 @@ PROGRAM gcm
 
   ! Lecture des fichiers "gcm.def" ou "run.def" :
   call read_clesphys2
-  CALL conf_gcm
 
   ! Initialisation des traceurs
   ! Choix du schéma pour l'advection dans le fichier "traceur.def" ou via INCA
@@ -112,6 +118,7 @@ PROGRAM gcm
   ENDIF
 
   CALL iniconst 
+  close(unit_nml)
   CALL inigeom ! initialisation de la géometrie
   CALL inifilr ! initialisation du filtre
   CALL inidissip
@@ -153,6 +160,7 @@ PROGRAM gcm
        t_wrt = iecri * daysec)
   CALL initdynav(day_ref, annee_ref, zdtvr, nqmx, t_ops = iperiod * zdtvr, &
        t_wrt = periodav * daysec)
+  call init_dynzon(dt_app = dtvr * iperiod)
 
   ! Choix des fréquences de stockage pour le hors-ligne :
   istdyn = day_step / 4 ! stockage toutes les 6 h = 1 jour / 4

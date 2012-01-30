@@ -32,7 +32,7 @@ SUBROUTINE initphysto(infile,rlon,rlat,tstep,t_ops,t_wrt,nq,fileid)
   USE comconst
   USE indicesol
   USE dimphy
-  USE logic
+  use conf_gcm_m
   USE comgeom
   USE serre
   USE temps

@@ -18,7 +18,7 @@ contains
     use dimens_m, only: iim, jjm, llm, nqmx
     use ener, only: etot0, ang0, ptot0, stot0, ztot0
     use iniadvtrac_m, only: tname
-    use logic, only: fxyhypb, ysinus
+    use conf_gcm_m, only: fxyhypb, ysinus
     use serre, only: clon, clat, grossismy, grossismx
     use netcdf95, only: NF95_GET_VAR, nf95_open, nf95_inq_varid, NF95_CLOSE, &
          NF95_Gw_VAR

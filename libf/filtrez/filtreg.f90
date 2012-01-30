@@ -124,8 +124,8 @@ contains
           jffil = jffil2
        END IF
 
-       DO l = 1, nbniv
-          DO j = jdfil, jffil
+       loop_vertical: DO l = 1, nbniv
+          loop_latitude: DO j = jdfil, jffil
              DO i = 1, iim
                 champ(i, j, l) = champ(i, j, l)*sdd1(i)
              END DO
@@ -206,8 +206,8 @@ contains
              END IF
 
              champ(iim + 1, j, l) = champ(1, j, l)
-          END DO
-       END DO
+          END DO loop_latitude
+       END DO loop_vertical
     end DO
 
   END SUBROUTINE filtreg

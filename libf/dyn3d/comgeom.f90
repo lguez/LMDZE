@@ -23,8 +23,8 @@ module comgeom
   real aire(ip1jmp1), airesurg(ip1jmp1)
   equivalence (aire, aire_2d), (airesurg, airesurg_2d)
 
-  real aireu_2d(iim + 1, jjm + 1)           
-  real aireu(ip1jmp1)
+  real aireu_2d(iim + 1, jjm + 1) ! in m2
+  real aireu(ip1jmp1) ! in m2
   equivalence (aireu, aireu_2d)
 
   real airev_2d(iim + 1, jjm), unsaire_2d(iim + 1, jjm + 1)

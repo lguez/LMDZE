@@ -3,7 +3,7 @@
      s                  d_ven,flux_v)
       use dimens_m
       use dimphy
-      use iniprint
+      use conf_gcm_m
       use SUPHEC_M
       IMPLICIT none
 c======================================================================
