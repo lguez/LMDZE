@@ -24,7 +24,12 @@ SUBROUTINE initfluxsto(tstep, t_ops, t_wrt, nq, fileid, filevid, filedid)
   !   L. Fairhead, 03/99                                             
 
   USE calendar
-  USE histcom
+  USE histbeg_totreg_m, ONLY : histbeg_totreg
+  USE histdef_m, ONLY : histdef
+  USE histend_m, ONLY : histend
+  use histhori_regular_m, only: histhori_regular
+  use histsync_m, only: histsync
+  USE histvert_m, ONLY : histvert
   USE dimens_m
   USE paramet_m
   USE comconst

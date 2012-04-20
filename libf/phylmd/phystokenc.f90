@@ -13,7 +13,7 @@ contains
     ! Objet: moniteur général des tendances traceurs                        
 
     USE histwrite_m, ONLY : histwrite
-    USE histcom, ONLY : histsync
+    USE histsync_m, ONLY : histsync
     USE dimens_m, ONLY : iim, jjm, nqmx
     USE indicesol, ONLY : nbsrf
     USE dimphy, ONLY : klev, klon

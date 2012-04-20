@@ -16,6 +16,7 @@ contains
 
     use abort_gcm_m, only: abort_gcm
     use indicesol
+    use netcdf
 
     integer, intent(IN) :: itime ! numero du pas de temps courant
     real , intent(IN) :: dtime ! pas de temps de la physique (en s)
@@ -51,7 +52,6 @@ contains
 
     ! quelques variables pour netcdf
 
-    include "netcdf.inc"
     integer :: nid, nvarid
     integer, dimension(2) :: start, epais
 
@@ -76,8 +76,8 @@ contains
 
        ! Ouverture du fichier
 
-       ierr = NF_OPEN ('limit.nc', NF_NOWRITE, nid)
-       if (ierr.NE.NF_NOERR) then
+       ierr = NF90_OPEN ('limit.nc', NF90_NOWRITE, nid)
+       if (ierr.NE.NF90_NOERR) then
           abort_message &
                = 'Pb d''ouverture du fichier de conditions aux limites'
           call abort_gcm(modname, abort_message, 1)
@@ -94,65 +94,65 @@ contains
 
           ! Fraction "ocean"
 
-          ierr = NF_INQ_VARID(nid, 'FOCE', nvarid)
-          if (ierr /= NF_NOERR) then
+          ierr = NF90_INQ_VARID(nid, 'FOCE', nvarid)
+          if (ierr /= NF90_NOERR) then
              abort_message = 'Le champ <FOCE> est absent'
              call abort_gcm(modname, abort_message, 1)
           endif
-          ierr = NF_GET_VARA_REAL(nid, nvarid, start, epais, pct_tmp(1, is_oce))
-          if (ierr /= NF_NOERR) then
+          ierr = NF90_GET_VAR(nid, nvarid, pct_tmp(:, is_oce), start, epais)
+          if (ierr /= NF90_NOERR) then
              abort_message = 'Lecture echouee pour <FOCE>'
              call abort_gcm(modname, abort_message, 1)
           endif
 
           ! Fraction "glace de mer"
 
-          ierr = NF_INQ_VARID(nid, 'FSIC', nvarid)
-          if (ierr /= NF_NOERR) then
+          ierr = NF90_INQ_VARID(nid, 'FSIC', nvarid)
+          if (ierr /= NF90_NOERR) then
              abort_message = 'Le champ <FSIC> est absent'
              call abort_gcm(modname, abort_message, 1)
           endif
-          ierr = NF_GET_VARA_REAL(nid, nvarid, start, epais, pct_tmp(1, is_sic))
-          if (ierr /= NF_NOERR) then
+          ierr = NF90_GET_VAR(nid, nvarid, pct_tmp(:, is_sic), start, epais)
+          if (ierr /= NF90_NOERR) then
              abort_message = 'Lecture echouee pour <FSIC>'
              call abort_gcm(modname, abort_message, 1)
           endif
 
           ! Fraction "terre"
 
-          ierr = NF_INQ_VARID(nid, 'FTER', nvarid)
-          if (ierr /= NF_NOERR) then
+          ierr = NF90_INQ_VARID(nid, 'FTER', nvarid)
+          if (ierr /= NF90_NOERR) then
              abort_message = 'Le champ <FTER> est absent'
              call abort_gcm(modname, abort_message, 1)
           endif
-          ierr = NF_GET_VARA_REAL(nid, nvarid, start, epais, pct_tmp(1, is_ter))
-          if (ierr /= NF_NOERR) then
+          ierr = NF90_GET_VAR(nid, nvarid, pct_tmp(:, is_ter), start, epais)
+          if (ierr /= NF90_NOERR) then
              abort_message = 'Lecture echouee pour <FTER>'
              call abort_gcm(modname, abort_message, 1)
           endif
 
           ! Fraction "glacier terre"
 
-          ierr = NF_INQ_VARID(nid, 'FLIC', nvarid)
-          if (ierr /= NF_NOERR) then
+          ierr = NF90_INQ_VARID(nid, 'FLIC', nvarid)
+          if (ierr /= NF90_NOERR) then
              abort_message = 'Le champ <FLIC> est absent'
              call abort_gcm(modname, abort_message, 1)
           endif
-          ierr = NF_GET_VARA_REAL(nid, nvarid, start, epais, pct_tmp(1, is_lic))
-          if (ierr /= NF_NOERR) then
+          ierr = NF90_GET_VAR(nid, nvarid, pct_tmp(:, is_lic), start, epais)
+          if (ierr /= NF90_NOERR) then
              abort_message = 'Lecture echouee pour <FLIC>'
              call abort_gcm(modname, abort_message, 1)
           endif
 
        else ! on en est toujours a rnatur
 
-          ierr = NF_INQ_VARID(nid, 'NAT', nvarid)
-          if (ierr /= NF_NOERR) then
+          ierr = NF90_INQ_VARID(nid, 'NAT', nvarid)
+          if (ierr /= NF90_NOERR) then
              abort_message = 'Le champ <NAT> est absent'
              call abort_gcm(modname, abort_message, 1)
           endif
-          ierr = NF_GET_VARA_REAL(nid, nvarid, start, epais, nat_lu)
-          if (ierr /= NF_NOERR) then
+          ierr = NF90_GET_VAR(nid, nvarid, nat_lu, start, epais)
+          if (ierr /= NF90_NOERR) then
              abort_message = 'Lecture echouee pour <NAT>'
              call abort_gcm(modname, abort_message, 1)
           endif
@@ -176,13 +176,13 @@ contains
 
        ! Lecture SST
 
-       ierr = NF_INQ_VARID(nid, 'SST', nvarid)
-       if (ierr /= NF_NOERR) then
+       ierr = NF90_INQ_VARID(nid, 'SST', nvarid)
+       if (ierr /= NF90_NOERR) then
           abort_message = 'Le champ <SST> est absent'
           call abort_gcm(modname, abort_message, 1)
        endif
-       ierr = NF_GET_VARA_REAL(nid, nvarid, start, epais, sst_lu)
-       if (ierr /= NF_NOERR) then
+       ierr = NF90_GET_VAR(nid, nvarid, sst_lu, start, epais)
+       if (ierr /= NF90_NOERR) then
           abort_message = 'Lecture echouee pour <SST>'
           call abort_gcm(modname, abort_message, 1)
        endif
@@ -190,7 +190,7 @@ contains
 
        ! Fin de lecture
 
-       ierr = NF_CLOSE(nid)
+       ierr = NF90_CLOSE(nid)
        deja_lu = .true.
        jour_lu = jour
     endif

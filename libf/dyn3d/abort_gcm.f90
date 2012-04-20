@@ -9,7 +9,7 @@ contains
     ! From abort_gcm.F, version 1.1.1.1 2004/05/19 12:53:05
     ! Stops the simulation, closing files and printing comments.
 
-    USE histcom, only: histclo
+    USE histclo_m, only: histclo
 
     character(len=*), intent(in):: modname ! name of calling program
     integer, intent(in):: ierr ! severity of situation (= 0 normal)

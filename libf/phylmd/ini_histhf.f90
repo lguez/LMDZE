@@ -12,7 +12,9 @@ contains
     use temps, only: day_ref, annee_ref, itau_phy
     use dimphy, only: klon
     USE calendar, only: ymds2ju
-    use histcom, only: histbeg_totreg, histvert, histend
+    USE histbeg_totreg_m, ONLY : histbeg_totreg
+    USE histend_m, ONLY : histend
+    USE histvert_m, ONLY : histvert
     use phyetat0_m, only: rlon, rlat
     use comvert, only: presnivs
     use ini_histhf3d_m, only: ini_histhf3d

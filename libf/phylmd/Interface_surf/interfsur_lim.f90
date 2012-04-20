@@ -15,6 +15,7 @@ contains
     ! L. Fairhead 02/2000
 
     use abort_gcm_m, only: abort_gcm
+    use netcdf
 
     ! Parametres d'entree
     ! input:
@@ -61,7 +62,6 @@ contains
 
     ! quelques variables pour netcdf
 
-    include "netcdf.inc"
     integer , save :: nid, nvarid
     integer, dimension(2), save :: start, epais
 
@@ -85,8 +85,8 @@ contains
 
        ! Ouverture du fichier
 
-       ierr = NF_OPEN ('limit.nc', NF_NOWRITE, nid)
-       if (ierr.NE.NF_NOERR) then
+       ierr = NF90_OPEN ('limit.nc', NF90_NOWRITE, nid)
+       if (ierr.NE.NF90_NOERR) then
           abort_message &
                = 'Pb d''ouverture du fichier de conditions aux limites'
           call abort_gcm(modname, abort_message, 1)
@@ -101,26 +101,26 @@ contains
 
        ! Lecture Albedo
 
-       ierr = NF_INQ_VARID(nid, 'ALB', nvarid)
-       if (ierr /= NF_NOERR) then
+       ierr = NF90_INQ_VARID(nid, 'ALB', nvarid)
+       if (ierr /= NF90_NOERR) then
           abort_message = 'Le champ <ALB> est absent'
           call abort_gcm(modname, abort_message, 1)
        endif
-       ierr = NF_GET_VARA_REAL(nid, nvarid, start, epais, alb_lu)
-       if (ierr /= NF_NOERR) then
+       ierr = NF90_GET_VAR(nid, nvarid, alb_lu, start, epais)
+       if (ierr /= NF90_NOERR) then
           abort_message = 'Lecture echouee pour <ALB>'
           call abort_gcm(modname, abort_message, 1)
        endif
 
        ! Lecture rugosité
 
-       ierr = NF_INQ_VARID(nid, 'RUG', nvarid)
-       if (ierr /= NF_NOERR) then
+       ierr = NF90_INQ_VARID(nid, 'RUG', nvarid)
+       if (ierr /= NF90_NOERR) then
           abort_message = 'Le champ <RUG> est absent'
           call abort_gcm(modname, abort_message, 1)
        endif
-       ierr = NF_GET_VARA_REAL(nid, nvarid, start, epais, rug_lu)
-       if (ierr /= NF_NOERR) then
+       ierr = NF90_GET_VAR(nid, nvarid, rug_lu, start, epais)
+       if (ierr /= NF90_NOERR) then
           abort_message = 'Lecture echouee pour <RUG>'
           call abort_gcm(modname, abort_message, 1)
        endif
@@ -128,7 +128,7 @@ contains
 
        ! Fin de lecture
 
-       ierr = NF_CLOSE(nid)
+       ierr = NF90_CLOSE(nid)
        deja_lu_sur = .true.
        jour_lu_sur = jour
     endif

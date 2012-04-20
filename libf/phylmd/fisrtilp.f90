@@ -15,7 +15,7 @@ SUBROUTINE fisrtilp(dtime,paprs,pplay,t,q,ptconv,ratqs,d_t,d_q,d_ql,rneb, &
   USE yoethf_m
   USE fcttre
   USE comfisrtilp
-  use numer_rec, only: nr_erf
+  use numer_rec_95, only: nr_erf
 
   IMPLICIT NONE
 

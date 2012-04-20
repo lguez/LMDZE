@@ -29,7 +29,7 @@ contains
     use netcdf, only: nf90_get_var
     use netcdf95, only: nf95_inq_varid, handle_err
     use nr_util, only: assert
-    use numer_rec, only: regr1_step_av
+    use numer_rec_95, only: regr1_step_av
     use press_coefoz_m, only: press_in_edg
     use pressure_var, only: p3d
 
@@ -105,7 +105,7 @@ contains
     use netcdf, only: nf90_get_var
     use netcdf95, only: nf95_inq_varid, handle_err
     use nr_util, only: assert
-    use numer_rec, only: regr1_lint
+    use numer_rec_95, only: regr1_lint
     use press_coefoz_m, only: plev
     use pressure_var, only: pls
 

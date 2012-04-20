@@ -44,7 +44,10 @@ contains
     USE dynetat0_m, ONLY : day_ini
     USE gath_cpl, ONLY : gath2cpl
     use hbtm_m, only: hbtm
-    USE histcom, ONLY : histbeg_totreg, histdef, histend, histsync
+    USE histsync_m, ONLY : histsync
+    USE histbeg_totreg_m, ONLY : histbeg_totreg
+    USE histend_m, ONLY : histend
+    USE histdef_m, ONLY : histdef
     use histwrite_m, only: histwrite
     USE indicesol, ONLY : epsfra, is_lic, is_oce, is_sic, is_ter, nbsrf
     USE conf_gcm_m, ONLY : prt_level

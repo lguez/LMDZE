@@ -224,8 +224,8 @@ contains
 
        IF (MOD(itau + 1, iperiod) == 0) THEN
           ! Écriture du fichier histoire moyenne:
-          CALL writedynav(nqmx, itau + 1, vcov, ucov, teta, pk, phi, q, &
-               masse, ps, phis)
+          CALL writedynav(vcov, ucov, teta, pk, phi, q, masse, ps, phis, &
+               time = itau + 1)
           call bilan_dyn(ps, masse, pk, pbaru, pbarv, teta, phi, ucov, vcov, &
                q(:, :, :, 1))
        ENDIF

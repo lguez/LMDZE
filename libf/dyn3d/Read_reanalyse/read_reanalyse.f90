@@ -24,9 +24,6 @@
 ! common
 ! ------
 
-      include "netcdf.inc"
-
-
 ! arguments
 ! ---------
       integer nlevnc
@@ -123,7 +120,7 @@
 ! Niveaux de pression
       print*,'WARNING!!! Il n y a pas de test de coherence'
       print*,'sur le nombre de niveaux verticaux dans le fichier nc'
-      status=NF_GET_VARA_REAL(ncidpl,varidpl,1,nlevnc,pl)
+      status=NF90_GET_VAR(ncidpl,varidpl,pl)
 !  passage en pascal
       pl(:)=100.*pl(:)
       if (first) then
@@ -161,7 +158,7 @@
 
       if (guide_u) then
       print*,'avant la lecture de UNCEP nd de niv:',nlevnc
-      status=NF_GET_VARA_REAL(ncidu,varidu,start,count,unc)
+      status=NF90_GET_VAR(ncidu,varidu,unc,start,count)
 !     call dump2d(iip1,jjp1,unc,'VENT NCEP   ')
 !     call dump2d(iip1,40,unc(1,1,nlevnc),'VENT NCEP   ')
       print*,'WARNING!!! Correction bidon pour palier a un '
@@ -176,7 +173,7 @@
       print*,'ncidt=',ncidt,'varidt=',varidt,'start=',start
       print*,'count=',count
       if (guide_T) then
-      status=NF_GET_VARA_REAL(ncidt,varidt,start,count,tnc)
+      status=NF90_GET_VAR(ncidt,varidt,tnc,start,count)
       call dump2d(iip1,jjp1,tnc,'TNC COUCHE 1 AAA ')
       call correctbid(iim,jjp1*nlevnc,tnc)
       call dump2d(iip1,jjp1,tnc,'TNC COUCHE 1 BBB ')
@@ -186,7 +183,7 @@
 !  --------
 
       if (guide_Q) then
-      status=NF_GET_VARA_REAL(ncidQ,varidQ,start,count,Qnc)
+      status=NF90_GET_VAR(ncidQ,varidQ,Qnc,start,count)
       call correctbid(iim,jjp1*nlevnc,Qnc)
       call dump2d(iip1,jjp1,Qnc,'QNC COUCHE 1 ')
       endif
@@ -196,7 +193,7 @@
 !  -------------
 
       if (guide_v) then
-      status=NF_GET_VARA_REAL(ncidv,varidv,start,count,vnc)
+      status=NF90_GET_VAR(ncidv,varidv,vnc,start,count)
       call correctbid(iim,jjm*nlevnc,vnc)
       call dump2d(iip1,jjm,vnc,'VNC COUCHE 1 ')
       endif
@@ -211,7 +208,7 @@
 !  -------------------
 
       if (guide_P) then
-      status=NF_GET_VARA_REAL(ncidps,varidps,start,count,psnc)
+      status=NF90_GET_VAR(ncidps,varidps,psnc,start,count)
       call dump2d(iip1,jjp1,psnc,'PSNC COUCHE 1 ')
       call correctbid(iim,jjp1,psnc)
       endif

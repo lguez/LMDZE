@@ -39,7 +39,7 @@ contains
     use dimens_m, only: jjm
     use comgeom, only: rlatv
     use nr_util, only: pi
-    use numer_rec, only: regr1_step_av, regr3_lint
+    use numer_rec_95, only: regr1_step_av, regr3_lint
     use netcdf95, only: nf95_open, nf95_gw_var, nf95_close, &
          nf95_inq_varid, handle_err, nf95_put_var
     use netcdf, only: nf90_nowrite, nf90_get_var

@@ -494,7 +494,7 @@ c-----------------------------------------------------------------------------
       SUBROUTINE getso4fromfile (cyr, so4)
       use dimens_m      
       use dimphy
-      include "netcdf.inc"
+            use netcdf
       CHARACTER*15 fname
       CHARACTER*4 cyr
       

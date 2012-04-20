@@ -4,13 +4,17 @@ module ini_histrac_m
 
 contains
 
+
   subroutine ini_histrac(nid_tra, pdtphys, nq_phys, lessivage)
 
     ! From phylmd/ini_histrac.h, version 1.10 2006/02/21 08:08:30
 
     use dimens_m, only: iim, jjm, llm
     USE calendar, only: ymds2ju
-    use histcom, only: histbeg_totreg, histvert, histend, histdef
+    USE histbeg_totreg_m, ONLY : histbeg_totreg
+    USE histdef_m, ONLY : histdef
+    USE histend_m, ONLY : histend
+    USE histvert_m, ONLY : histvert
     use temps, only: annee_ref, day_ref, itau_phy
     use iniadvtrac_m, only: niadv, tnom, ttext
     use dimphy, only: klon

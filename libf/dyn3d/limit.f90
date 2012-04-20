@@ -26,7 +26,7 @@ contains
     use netcdf, only: NF90_CLOBBER, nf90_def_var, NF90_FLOAT, NF90_GET_VAR, &
          NF90_GLOBAL, NF90_NOWRITE, NF90_PUT_ATT, NF90_PUT_VAR, &
          NF90_UNLIMITED
-    use numer_rec, only: spline, splint
+    use numer_rec_95, only: spline, splint
     use start_init_orog_m, only: mask
     use unit_nml_m, only: unit_nml
 

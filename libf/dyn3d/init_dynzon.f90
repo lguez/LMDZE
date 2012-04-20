@@ -16,7 +16,10 @@ contains
     ! From LMDZ4/libf/dyn3d/bilan_dyn.F, version 1.5 2005/03/16 10:12:17
 
     USE conf_gcm_m, ONLY : day_step, iperiod, periodav
-    USE histcom, ONLY : histbeg_totreg, histdef, histend, histvert
+    USE histbeg_totreg_m, ONLY : histbeg_totreg
+    USE histdef_m, ONLY : histdef
+    USE histend_m, ONLY : histend
+    USE histvert_m, ONLY : histvert
     USE calendar, ONLY : ymds2ju
     USE dimens_m, ONLY : jjm, llm
     USE comvert, ONLY : presnivs

@@ -247,7 +247,7 @@ contains
     cvij4(:iim, jjp1) = cvij1(:iim, jjp1)
 
     ! Périodicité :
- 
+
     cvij1(iip1, :) = cvij1(1, :)
     cvij2(iip1, :) = cvij2(1, :)
     cvij3(iip1, :) = cvij3(1, :)
@@ -374,15 +374,13 @@ contains
 
     ! Calcul aux pôles 
 
-    DO i = 1, iip1
-       cu_2d(i, 1) = 0.
-       unscu2_2d(i, 1) = 0.
-       cvu(i, 1) = 0.
+    cu_2d(:, 1) = 0.
+    unscu2_2d(:, 1) = 0.
+    cvu(:, 1) = 0.
 
-       cu_2d(i, jjp1) = 0.
-       unscu2_2d(i, jjp1) = 0.
-       cvu(i, jjp1) = 0.
-    END DO
+    cu_2d(:, jjp1) = 0.
+    unscu2_2d(:, jjp1) = 0.
+    cvu(:, jjp1) = 0.
 
     DO j = 1, jjm
        DO i = 1, iim

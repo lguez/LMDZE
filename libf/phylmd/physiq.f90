@@ -35,7 +35,7 @@ contains
     use drag_noro_m, only: drag_noro
     USE fcttre, ONLY: foeew, qsatl, qsats, thermcep
     USE hgardfou_m, ONLY: hgardfou
-    USE histcom, ONLY: histsync
+    USE histsync_m, ONLY: histsync
     USE histwrite_m, ONLY: histwrite
     USE indicesol, ONLY: clnsurf, epsfra, is_lic, is_oce, is_sic, is_ter, &
          nbsrf

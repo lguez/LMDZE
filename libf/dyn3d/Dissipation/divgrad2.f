@@ -13,6 +13,7 @@ c   h ,klevel,lh et pext  sont des arguments  d'entree pour le s-prg
 c         divgra     est  un argument  de sortie pour le s-prg
 c
       use dimens_m
+      use laplacien_m, only: laplacien
       use paramet_m
       use comgeom
       IMPLICIT NONE
@@ -38,7 +39,7 @@ c
       divgra = h
 
 c
-      CALL laplacien( klevel, divgra, divgra )
+      CALL laplacien( klevel, divgra )
      
       DO l = 1, klevel
        DO ij = 1, ip1jmp1
@@ -67,7 +68,7 @@ c    ...............................................................
         ENDDO
       ENDDO
 c
-      CALL laplacien ( klevel, divgra, divgra )
+      CALL laplacien ( klevel, divgra )
 c
       DO l  = 1,klevel
       DO ij = 1,ip1jmp1

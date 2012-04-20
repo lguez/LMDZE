@@ -33,7 +33,7 @@ contains
     use geopot_m, only: geopot
     use grid_atob, only: grille_m
     use grid_change, only: init_dyn_phy, dyn_phy
-    use histcom, only: histclo
+    use histclo_m, only: histclo
     use indicesol, only: is_oce, is_sic, is_ter, is_lic, epsfra
     use iniadvtrac_m, only: iniadvtrac
     use inidissip_m, only: inidissip

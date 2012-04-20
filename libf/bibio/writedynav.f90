@@ -4,8 +4,7 @@ module writedynav_m
 
 contains
 
-  subroutine writedynav(nq, time, vcov, ucov, teta, ppk, phi, q, masse, ps, &
-       phis)
+  subroutine writedynav(vcov, ucov, teta, ppk, phi, q, masse, ps, phis, time)
 
     ! From LMDZ4/libf/bibio/writedynav.F, version 1.1.1.1 2004/05/19 12:53:05
     ! Ecriture du fichier histoire au format IOIPSL
@@ -13,7 +12,6 @@ contains
     ! Appels successifs des routines histwrite
 
     ! Entree:
-    ! time: temps de l'ecriture
     ! vcov: vents v covariants
     ! ucov: vents u covariants
     ! phi : geopotentiel instantane
@@ -23,8 +21,9 @@ contains
 
     ! L. Fairhead, LMD, 03/99
 
+    use covnat_m, only: covnat
     USE histwrite_m, ONLY: histwrite
-    USE histcom, ONLY: histsync
+    USE histsync_m, ONLY: histsync
     USE dimens_m, ONLY: llm
     USE paramet_m, ONLY: iip1, ijp1llm, ip1jm, ip1jmp1, jjp1
     USE comconst, ONLY: cpp
@@ -32,15 +31,14 @@ contains
     USE iniadvtrac_m, ONLY: ttext
     use initdynav_m, only: histaveid
 
-    INTEGER nq
     REAL vcov(ip1jm, llm), ucov(ip1jmp1, llm) 
     REAL, intent(in):: teta(ip1jmp1*llm) ! temperature potentielle
     real phi(ip1jmp1, llm), ppk(ip1jmp1*llm) 
     REAL ps(ip1jmp1)
     real, intent(in):: masse(ip1jmp1, llm) 
     REAL phis(ip1jmp1) 
-    REAL q(ip1jmp1, llm, nq)
-    integer, intent(in):: time
+    REAL, intent(in):: q(:, :, :, :) ! (iim + 1, jjm + 1, llm, nqmx)
+    integer, intent(in):: time ! temps de l'ecriture
 
     ! Variables locales
     integer ndex2d(iip1*jjp1), ndex3d(iip1*jjp1*llm), iq, ii, ll
@@ -89,8 +87,8 @@ contains
     call histwrite(histaveid, 'phi', itau_w, phi)
 
     ! Traceurs
-    DO iq=1, nq
-       call histwrite(histaveid, ttext(iq), itau_w, q(:, :, iq))
+    DO iq = 1, size(q, 4)
+       call histwrite(histaveid, ttext(iq), itau_w, q(:, :, :, iq))
     enddo
 
     ! Masse

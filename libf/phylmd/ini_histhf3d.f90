@@ -16,7 +16,10 @@ contains
     use clesphys, only: ecrit_hf
     use phyetat0_m, only: rlon, rlat
     USE calendar, only: ymds2ju
-    use histcom, only: histbeg_totreg, histvert, histend, histdef
+    USE histbeg_totreg_m, ONLY : histbeg_totreg
+    USE histdef_m, ONLY : histdef
+    USE histend_m, ONLY : histend
+    USE histvert_m, ONLY : histvert
     use comvert, only: presnivs
 
     REAL, intent(in):: dtime ! pas temporel de la physique (s)

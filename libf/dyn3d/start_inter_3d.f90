@@ -9,7 +9,7 @@ contains
     ! This procedure gets a 3D variable from a file and interpolates it.
 
     use nr_util, only: assert_eq
-    use numer_rec, only: spline, splint
+    use numer_rec_95, only: spline, splint
     use inter_barxy_m, only: inter_barxy
     use gr_int_dyn_m, only: gr_int_dyn
     use conf_dat3d_m, only: conf_dat3d

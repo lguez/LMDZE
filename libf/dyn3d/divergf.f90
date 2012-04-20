@@ -6,7 +6,7 @@ contains
 
   SUBROUTINE divergf(klevel, x, y, div)
 
-    ! From libf/dyn3d/divergf.F, v 1.1.1.1 2004/05/19 12:53:05
+    ! From libf/dyn3d/divergf.F, version 1.1.1.1 2004/05/19 12:53:05
 
     ! P. Le Van
     ! Calcule la divergence à tous les niveaux d'un vecteur de

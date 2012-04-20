@@ -9,7 +9,8 @@
       use paramet_m, only: ip1jm, ip1jmp1, iip1, jjp1
       use temps, only: itau_dyn
       use histwrite_m, only: histwrite
-      use histcom, only: histsync
+      use histsync_m, only: histsync
+      use covnat_m, only: covnat
 
       implicit none
 

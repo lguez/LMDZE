@@ -14,7 +14,10 @@ contains
     use clesphys, only: ecrit_ins
     use indicesol, only: nbsrf, clnsurf
     USE calendar, only: ymds2ju
-    use histcom, only: histbeg_totreg, histvert, histend, histdef
+    USE histbeg_totreg_m, ONLY : histbeg_totreg
+    USE histdef_m, ONLY : histdef
+    USE histend_m, ONLY : histend
+    USE histvert_m, ONLY : histvert
     use phyetat0_m, only: rlon, rlat
     use comvert, only: presnivs
 

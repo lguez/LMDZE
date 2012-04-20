@@ -6,6 +6,7 @@ c
       use dimphy
       use temps
       use clesphys2, only: ok_limitvrai
+            use netcdf
       IMPLICIT none
 c
 c I. Musat 05.2005
@@ -19,7 +20,6 @@ c jourvrai : input  , vrai jour de la simulation
 c
 c lmt_bils: bilan chaleur au sol (a utiliser pour "slab-ocean")
 c
-      include "netcdf.inc"
       INTEGER nid, nvarid
       INTEGER debut(2)
       INTEGER epais(2)
@@ -80,8 +80,8 @@ c           PRINT *,' Fichier  Limite ',fich
 c
 c Ouvrir le fichier en format NetCDF:
 c
-      ierr = NF_OPEN (fich, NF_NOWRITE,nid)
-      IF (ierr.NE.NF_NOERR) THEN
+      ierr = NF90_OPEN (fich, NF90_NOWRITE,nid)
+      IF (ierr.NE.NF90_NOERR) THEN
         WRITE(6,*)' Pb d''ouverture du fichier ', fich
         WRITE(6,*)' Le fichier limit ',fich,' (avec 4 chiffres , pour' 
         WRITE(6,*)'       l an 2000 )  ,  n existe  pas !  ' 
@@ -98,14 +98,14 @@ c
 c
 c Bilan flux de chaleur au sol:
 c
-      ierr = NF_INQ_VARID (nid, "BILS", nvarid)
-      IF (ierr .NE. NF_NOERR) THEN
+      ierr = NF90_INQ_VARID (nid, "BILS", nvarid)
+      IF (ierr .NE. NF90_NOERR) THEN
          PRINT*, "condsurf: Le champ <BILS> est absent"
          stop 1
       ENDIF
 c     PRINT*,'debut,epais',debut,epais
-      ierr = NF_GET_VARA_REAL(nid, nvarid,debut,epais,lmt_bils)
-      IF (ierr .NE. NF_NOERR) THEN
+      ierr = NF90_GET_VAR(nid, nvarid,lmt_bils,debut,epais)
+      IF (ierr .NE. NF90_NOERR) THEN
          PRINT*, "condsurf: Lecture echouee pour <BILS>"
          stop 1
       ENDIF
@@ -113,7 +113,7 @@ c     ENDDO !k = 1, jour
 c
 c Fermer le fichier:
 c
-      ierr = NF_CLOSE(nid)
+      ierr = NF90_CLOSE(nid)
 c
 c
 c     PRINT*, 'lmt_bils est lu pour jour: ', jour

@@ -17,6 +17,7 @@ contains
     USE filtreg_m, ONLY : filtreg
     use grad_m, only: grad
     use nr_util, only: assert_eq, assert
+    use laplacien_m, only: laplacien
 
     ! Composantes covariantes de v :
     REAL, intent(in):: xcov(:, :, :) ! (iim + 1, jjm + 1, klevel)
@@ -43,7 +44,7 @@ contains
     CALL divergf(klevel, xcov, ycov, div)
 
     IF (ld > 1) THEN
-       CALL laplacien(klevel, div, div)
+       CALL laplacien(klevel, div)
 
        ! Itération de l'opérateur laplacien_gam
        DO iter = 1, ld -2

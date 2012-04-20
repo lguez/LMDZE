@@ -20,7 +20,7 @@ PROGRAM gcm
   use dynetat0_m, only: dynetat0, day_ini
   use dynredem0_m, only: dynredem0
   use grid_change, only: dyn_phy, init_dyn_phy
-  use histcom, only: histclo
+  use histclo_m, only: histclo
   use iniadvtrac_m, only: iniadvtrac
   use inidissip_m, only: inidissip
   use inifilr_m, only: inifilr

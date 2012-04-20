@@ -17,7 +17,10 @@ contains
     USE comvert, ONLY : nivsigs
     USE comgeom, ONLY : rlatu, rlonv
     USE dimens_m, ONLY : llm
-    USE histcom, ONLY: histbeg_totreg, histdef, histend, histvert
+    USE histbeg_totreg_m, ONLY : histbeg_totreg
+    USE histdef_m, ONLY : histdef
+    USE histend_m, ONLY : histend
+    USE histvert_m, ONLY : histvert
     USE iniadvtrac_m, ONLY : ttext
     USE nr_util, ONLY : pi
     USE paramet_m, ONLY : iip1, jjp1

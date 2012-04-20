@@ -8,7 +8,7 @@ contains
        dragv, liftv, phyv, p, u, v, aam, torsfc)
 
     ! Author: F. Lott (LMD/CNRS). Date: 2003/10/20. Object: Compute
-    ! different terms of the axial AAAM Budget and mountain torque.
+    ! different terms of the axial AAAM budget and mountain torque.
     ! Only valid for regular rectangular grids. Should be called after
     ! "lift_noro".
 
