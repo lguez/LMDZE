@@ -37,7 +37,8 @@ c   Declarations:
 c   -------------
 
 
-      REAL pbaru( ip1jmp1,llm ),pbarv( ip1jm,llm ),convm(  ip1jmp1,llm )
+      REAL, intent(in):: pbaru( ip1jmp1,llm ),pbarv( ip1jm,llm )
+      real, intent(out):: convm(  ip1jmp1,llm )
       INTEGER   l,ij
 
 

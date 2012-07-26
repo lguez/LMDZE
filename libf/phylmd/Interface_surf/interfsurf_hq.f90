@@ -100,7 +100,7 @@ contains
     integer, intent(IN) :: nisurf
     integer, intent(IN) :: knon
     integer, dimension(klon), intent(in) :: knindex
-    real, dimension(klon, nbsrf), intent(IN) :: pctsrf
+    real, intent(IN):: pctsrf(klon, nbsrf)
     logical, intent(IN) :: debut, lafin, ok_veget
     real, dimension(klon), intent(IN) :: rlon, rlat
     real, dimension(klon), intent(IN) :: cufi, cvfi

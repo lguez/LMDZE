@@ -6,14 +6,14 @@ contains
 
   SUBROUTINE concvl(iflag_con, dtime, paprs, pplay, t, q, u, v, tra, &
        ntra, work1, work2, d_t, d_q, d_u, d_v, d_tra, rain, snow, kbas, &
-       ktop, upwd, dnwd, dnwdbis, ma, cape, tvp, iflag, pbase, bbase, &
+       ktop, upwd, dnwd, dnwd0, ma, cape, tvp, iflag, pbase, bbase, &
        dtvpdt1, dtvpdq1, dplcldt, dplcldr, qcondc, wd, pmflxr, pmflxs, &
        da, phi, mp)
 
     ! From phylmd/concvl.F, version 1.3 2005/04/15 12:36:17
-    ! Author: Z.X. Li (LMD/CNRS)
+    ! Author: Z. X. Li (LMD/CNRS)
     ! date: 1993/08/18
-    ! Objet: schéma de convection de Emanuel (1991) interface
+    ! Objet : schéma de convection d'Emanuel (1991), interface
 
     USE dimens_m, ONLY : nqmx
     USE dimphy, ONLY : klev, klon
@@ -22,59 +22,46 @@ contains
     USE fcttre, ONLY : foeew
     use cv_driver_m, only: cv_driver
 
-    ! Arguments:
-    ! dtime--input-R-pas d'integration (s)
-    ! s-------input-R-la valeur "s" pour chaque couche
-    ! sigs----input-R-la valeur "sigma" de chaque couche
-    ! sig-----input-R-la valeur de "sigma" pour chaque niveau
-    ! psolpa--input-R-la pression au sol (en Pa)
-    ! pskapa--input-R-exponentiel kappa de psolpa
-    ! h-------input-R-enthalpie potentielle (Cp*T/P**kappa)
-    ! q-------input-R-vapeur d'eau (en kg/kg)
-
-    ! work*: input et output: deux variables de travail,
-    !                            on peut les mettre a 0 au debut
-    ! ALE-----input-R-energie disponible pour soulevement
-
-    ! d_h-----output-R-increment de l'enthalpie potentielle (h)
-    ! d_q-----output-R-increment de la vapeur d'eau
-    ! rain----output-R-la pluie (mm/s)
-    ! snow----output-R-la neige (mm/s)
-    ! upwd----output-R-saturated updraft mass flux (kg/m**2/s)
-    ! dnwd----output-R-saturated downdraft mass flux (kg/m**2/s)
-    ! dnwd0---output-R-unsaturated downdraft mass flux (kg/m**2/s)
-    ! Cape----output-R-CAPE (J/kg)
-    ! Tvp-----output-R-Temperature virtuelle d'une parcelle soulevee
-    !                  adiabatiquement a partir du niveau 1 (K)
-    ! deltapb-output-R-distance entre LCL et base de la colonne (<0 ;
-    !  Pa)
-    ! Ice_flag-input-L-TRUE->prise en compte de la thermodynamique de
-    !  la glace
-
-    INTEGER ntrac
-    PARAMETER (ntrac=nqmx-2)
+    INTEGER, PARAMETER:: ntrac = nqmx - 2
 
     INTEGER, INTENT (IN) :: iflag_con
-
-    REAL, INTENT (IN) :: dtime
+    REAL, INTENT (IN) :: dtime ! pas d'integration (s)
     REAL, INTENT (IN) :: paprs(klon, klev+1)
     REAL, INTENT (IN) :: pplay(klon, klev)
     REAL, intent(in):: t(klon, klev)
     real q(klon, klev), u(klon, klev), v(klon, klev)
+    ! q-------input-R-vapeur d'eau (en kg/kg)
     REAL, INTENT (IN):: tra(klon, klev, ntrac)
     INTEGER ntra
     REAL work1(klon, klev), work2(klon, klev)
+    ! work*: input et output: deux variables de travail,
+    !                            on peut les mettre a 0 au debut
     REAL pmflxr(klon, klev+1), pmflxs(klon, klev+1)
 
     REAL d_t(klon, klev), d_q(klon, klev), d_u(klon, klev), d_v(klon, &
          klev)
+    ! d_q-----output-R-increment de la vapeur d'eau
     REAL d_tra(klon, klev, ntrac)
     REAL rain(klon), snow(klon)
+    ! rain----output-R-la pluie (mm/s)
+    ! snow----output-R-la neige (mm/s)
 
     INTEGER kbas(klon), ktop(klon)
     REAL em_ph(klon, klev+1), em_p(klon, klev)
-    REAL upwd(klon, klev), dnwd(klon, klev), dnwdbis(klon, klev)
+
+    REAL, intent(out):: upwd(klon, klev)
+    ! saturated updraft mass flux (kg/m**2/s)
+
+    real, intent(out):: dnwd(klon, klev)
+    ! saturated downdraft mass flux (kg/m**2/s)
+
+    real, intent(out):: dnwd0(klon, klev)
+    ! unsaturated downdraft mass flux (kg/m**2/s)
+
     REAL ma(klon, klev), cape(klon), tvp(klon, klev)
+    ! Cape----output-R-CAPE (J/kg)
+    ! Tvp-----output-R-Temperature virtuelle d'une parcelle soulevee
+    !                  adiabatiquement a partir du niveau 1 (K)
     REAL da(klon, klev), phi(klon, klev, klev), mp(klon, klev)
     INTEGER iflag(klon)
     REAL pbase(klon), bbase(klon)
@@ -87,15 +74,12 @@ contains
 
     INTEGER i, k, itra
     REAL qs(klon, klev)
-    REAL cbmf(klon)
-    SAVE cbmf
-    INTEGER ifrst
-    SAVE ifrst
-    DATA ifrst/0/
+    REAL, save:: cbmf(klon)
+    INTEGER:: ifrst = 0
 
     !-----------------------------------------------------------------
 
-    snow(:) = 0
+    snow = 0
 
     IF (ifrst==0) THEN
        ifrst = 1
@@ -148,10 +132,10 @@ contains
     !		iflag_con = 3  -> equivalent to convect3
     !		iflag_con = 4  -> equivalent to convect1/2
 
-    CALL cv_driver(klon, klev, klev+1, ntra, iflag_con, t, q, qs, u, v, &
-         tra, em_p, em_ph, iflag, d_t, d_q, d_u, d_v, d_tra, rain, &
-         pmflxr, cbmf, work1, work2, kbas, ktop, dtime, ma, upwd, dnwd, &
-         dnwdbis, qcondc, wd, cape, da, phi, mp)
+    CALL cv_driver(klon, klev, klev+1, ntra, iflag_con, t, q, qs, u, v, tra, &
+         em_p, em_ph, iflag, d_t, d_q, d_u, d_v, d_tra, rain, pmflxr, cbmf, &
+         work1, work2, kbas, ktop, dtime, ma, upwd, dnwd, dnwd0, qcondc, &
+         wd, cape, da, phi, mp)
 
     DO i = 1, klon
        rain(i) = rain(i)/86400.

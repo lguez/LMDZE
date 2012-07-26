@@ -22,7 +22,7 @@ contains
     INTEGER, INTENT (IN) :: itau
 
     ! Variables local to the procedure:
-    INTEGER nid, nvarid
+    INTEGER ncid, varid
     INTEGER iq
     INTEGER:: nb = 0
 
@@ -30,42 +30,42 @@ contains
 
     PRINT *, 'Call sequence information: dynredem1'
 
-    call nf95_open(fichnom, nf90_write, nid)
+    call nf95_open(fichnom, nf90_write, ncid)
 
     ! Écriture/extension de la coordonnée temps
     nb = nb + 1
-    call nf95_inq_varid(nid, 'temps', nvarid)
-    call nf95_put_var(nid, nvarid, values=0., start=(/nb/))
+    call nf95_inq_varid(ncid, 'temps', varid)
+    call nf95_put_var(ncid, varid, values=0., start=(/nb/))
     PRINT *, "Enregistrement pour nb = ", nb
 
     ! Récriture du tableau de contrôle, "itaufin" n'est pas défini quand
     ! on passe dans "dynredem0"
-    call nf95_inq_varid(nid, 'controle', nvarid)
-    call nf95_put_var(nid, nvarid, real(itau), start=(/31/))
+    call nf95_inq_varid(ncid, 'controle', varid)
+    call nf95_put_var(ncid, varid, real(itau), start=(/31/))
 
     ! Écriture des champs
 
-    call nf95_inq_varid(nid, 'ucov', nvarid)
-    call nf95_put_var(nid, nvarid, ucov)
+    call nf95_inq_varid(ncid, 'ucov', varid)
+    call nf95_put_var(ncid, varid, ucov)
 
-    call nf95_inq_varid(nid, 'vcov', nvarid)
-    call nf95_put_var(nid, nvarid, vcov)
+    call nf95_inq_varid(ncid, 'vcov', varid)
+    call nf95_put_var(ncid, varid, vcov)
 
-    call nf95_inq_varid(nid, 'teta', nvarid)
-    call nf95_put_var(nid, nvarid, teta)
+    call nf95_inq_varid(ncid, 'teta', varid)
+    call nf95_put_var(ncid, varid, teta)
 
     DO iq = 1, nqmx
-       call nf95_inq_varid(nid, tname(iq), nvarid)
-       call nf95_put_var(nid, nvarid, q(:, :, :, iq))
+       call nf95_inq_varid(ncid, tname(iq), varid)
+       call nf95_put_var(ncid, varid, q(:, :, :, iq))
     END DO
 
-    call nf95_inq_varid(nid, 'masse', nvarid)
-    call nf95_put_var(nid, nvarid, masse)
+    call nf95_inq_varid(ncid, 'masse', varid)
+    call nf95_put_var(ncid, varid, masse)
 
-    call nf95_inq_varid(nid, 'ps', nvarid)
-    call nf95_put_var(nid, nvarid, ps)
+    call nf95_inq_varid(ncid, 'ps', varid)
+    call nf95_put_var(ncid, varid, ps)
 
-    call nf95_close(nid)
+    call nf95_close(ncid)
 
   END SUBROUTINE dynredem1
 

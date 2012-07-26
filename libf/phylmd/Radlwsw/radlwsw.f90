@@ -39,8 +39,6 @@ contains
     ! cldfra---input-R- fraction nuageuse (entre 0 et 1)
     ! cldtaupd---input-R- epaisseur optique des nuages dans le visible (present-day value)
     ! cldemi---input-R- emissivite des nuages dans l'IR (entre 0 et 1)
-    ! ok_ade---input-L- apply the Aerosol Direct Effect or not?
-    ! ok_aie---input-L- apply the Aerosol Indirect Effect or not?
     ! tau_ae, piz_ae, cg_ae-input-R- aerosol optical properties (calculated in aeropt.F)
     ! cldtaupi-input-R- epaisseur optique des nuages dans le visible
     !                   calculated for pre-industrial (pi) aerosol concentrations, i.e. with smaller
@@ -51,7 +49,6 @@ contains
     ! radsol---output-R- bilan radiatif net au sol (W/m**2) (+ vers le bas)
     ! albpla---output-R- albedo planetaire (entre 0 et 1)
     ! topsw----output-R- flux solaire net au sommet de l'atm.
-    ! toplw----output-R- ray. IR montant au sommet de l'atmosphere
     ! solsw----output-R- flux solaire net a la surface
     ! sollw----output-R- ray. IR montant a la surface
     ! solswad---output-R- ray. solaire net absorbe a la surface (aerosol dir)
@@ -83,9 +80,14 @@ contains
 
     real cool(klon, klev)
     real heat0(klon, klev), cool0(klon, klev)
-    real radsol(klon), topsw(klon), toplw(klon)
+    real radsol(klon), topsw(klon)
+
+    real, intent(out):: toplw(klon)
+    ! rayonnement infrarouge montant au sommet de l'atmosphère
+
     real solsw(klon), sollw(klon), albpla(klon)
-    real topsw0(klon), toplw0(klon), solsw0(klon), sollw0(klon)
+    real topsw0(klon), solsw0(klon), sollw0(klon)
+    real, intent(out):: toplw0(klon)
     real sollwdown(klon)
     !IM output 3D 
     DOUBLE PRECISION ZFSUP(KDLON, KLEV+1)
@@ -100,7 +102,7 @@ contains
 
     DOUBLE PRECISION zx_alpha1, zx_alpha2
 
-    INTEGER k, kk, i, j, iof, nb_gr
+    INTEGER k, kk, i, iof, nb_gr
     EXTERNAL lw
 
     DOUBLE PRECISION PSCT
@@ -153,6 +155,8 @@ contains
 
     logical ok_ade, ok_aie 
     ! switches whether to use aerosol direct (indirect) effects or not
+    ! ok_ade---input-L- apply the Aerosol Direct Effect or not?
+    ! ok_aie---input-L- apply the Aerosol Indirect Effect or not?
 
     double precision tauae(kdlon, klev, 2) ! aer opt properties
     double precision pizae(kdlon, klev, 2)
@@ -188,9 +192,7 @@ contains
     zdist = dist
     PSCT = solaire / zdist / zdist
 
-    loop_nbgr: DO j = 1, nb_gr
-       iof = kdlon * (j - 1)
-
+    loop_iof: DO iof = 0, klon - kdlon, kdlon
        DO i = 1, kdlon
           zfract(i) = fract(iof+i)
           zrmu0(i) = rmu0(iof+i)
@@ -355,7 +357,7 @@ contains
              cool0(iof+i, k) = zcool0(i, k)/zznormcp
           ENDDO
        ENDDO
-    end DO loop_nbgr
+    end DO loop_iof
 
   END SUBROUTINE radlwsw
 

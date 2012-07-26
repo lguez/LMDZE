@@ -9,46 +9,43 @@ CONTAINS
     ! From dyn3d/dynredem.F, version 1.2 2004/06/22 11:45:30
     ! Ecriture du fichier de redémarrage au format NetCDF (initialisation)
 
-    USE comconst, ONLY : cpp, daysec, dtvr, g, kappa, omeg, rad
-    USE comvert, ONLY : ap, bp, nivsig, nivsigs, pa, preff, presnivs
-    USE comgeom, ONLY : aire_2d, cu_2d, cv_2d, rlatu, rlatv, rlonu, rlonv
-    USE dimens_m, ONLY : iim, jjm, llm, nqmx
-    USE ener, ONLY : ang0, etot0, ptot0, stot0, ztot0
-    USE calendar, ONLY : ju2ymds, ymds2ju
-    USE iniadvtrac_m, ONLY : tname, ttext
-    use conf_gcm_m, ONLY : fxyhypb, ysinus
-    USE netcdf95, ONLY : nf95_close, nf95_create, nf95_def_dim, &
-         nf95_def_var, nf95_enddef, nf95_inq_varid, nf95_put_att, &
-         nf95_put_var
-    USE netcdf, ONLY : nf90_clobber, nf90_float, nf90_global, &
-         nf90_unlimited
-    USE paramet_m, ONLY : iip1, jjp1, llmp1
-    USE serre, ONLY : clat, clon, dzoomx, dzoomy, grossismx, grossismy, &
-         taux, tauy
-    USE temps, ONLY : annee_ref, day_ref
+    USE comconst, ONLY: cpp, daysec, dtvr, g, kappa, omeg, rad
+    USE comvert, ONLY: ap, bp, nivsig, nivsigs, pa, preff, presnivs
+    USE comgeom, ONLY: aire_2d, cu_2d, cv_2d, rlatu, rlatv, rlonu, rlonv
+    USE dimens_m, ONLY: iim, jjm, llm, nqmx
+    USE ener, ONLY: ang0, etot0, ptot0, stot0, ztot0
+    USE calendar, ONLY: ju2ymds, ymds2ju
+    USE iniadvtrac_m, ONLY: tname, ttext
+    use conf_gcm_m, ONLY: fxyhypb, ysinus
+    USE netcdf95, ONLY: nf95_close, nf95_create, nf95_def_dim, nf95_def_var, &
+         nf95_enddef, nf95_inq_varid, nf95_put_att, nf95_put_var
+    USE netcdf, ONLY: nf90_clobber, nf90_float, nf90_global, nf90_unlimited
+    USE paramet_m, ONLY: iip1, jjp1, llmp1
+    USE serre, ONLY: clat, clon, dzoomx, dzoomy, grossismx, grossismy, taux, &
+         tauy
+    USE temps, ONLY: annee_ref, day_ref
 
-    CHARACTER (len=*), INTENT (IN) :: fichnom
-    INTEGER, INTENT (IN) :: iday_end
-    REAL, INTENT (IN) :: phis(:, :)
+    CHARACTER(len=*), INTENT(IN):: fichnom
+    INTEGER, INTENT(IN):: iday_end
+    REAL, INTENT(IN):: phis(:, :)
 
-    !   Local:
+    ! Local:
 
-    INTEGER :: iq, l
+    INTEGER iq, l
     INTEGER, PARAMETER:: length = 100
-    REAL :: tab_cntrl(length) ! tableau des parametres du run
+    REAL tab_cntrl(length) ! tableau des paramètres du run
 
-    !   Variables locales pour NetCDF:
+    ! Variables locales pour NetCDF:
 
-    INTEGER :: dims2(2), dims3(3), dims4(4)
-    INTEGER :: idim_index
-    INTEGER :: idim_rlonu, idim_rlonv, idim_rlatu, idim_rlatv
-    INTEGER :: idim_s, idim_sig
-    INTEGER :: idim_tim
-    INTEGER :: ncid, varid
+    INTEGER idim_index
+    INTEGER idim_rlonu, idim_rlonv, idim_rlatu, idim_rlatv
+    INTEGER idim_s, idim_sig
+    INTEGER idim_tim
+    INTEGER ncid, varid
 
-    REAL :: zjulian, hours
-    INTEGER :: yyears0, jjour0, mmois0
-    CHARACTER (len=30) :: unites
+    REAL zjulian, hours
+    INTEGER yyears0, jjour0, mmois0
+    CHARACTER(len=30) unites
 
     !-----------------------------------------------------------------------
 
@@ -80,7 +77,7 @@ CONTAINS
     tab_cntrl(18) = pa
     tab_cntrl(19) = preff
 
-    ! Paramètres  pour le zoom :
+    ! Paramètres pour le zoom :
 
     tab_cntrl(20) = clon
     tab_cntrl(21) = clat
@@ -155,80 +152,56 @@ CONTAINS
 
     ! Coefficients de passage cov. <-> contra. <--> naturel
 
-    dims2(1) = idim_rlonu
-    dims2(2) = idim_rlatu
-    CALL nf95_def_var(ncid, 'cu', nf90_float, dims2, varid)
+    CALL nf95_def_var(ncid, 'cu', nf90_float, (/idim_rlonu, idim_rlatu/), varid)
     CALL nf95_put_att(ncid, varid, 'title', 'Coefficient de passage pour U')
 
-    dims2(1) = idim_rlonv
-    dims2(2) = idim_rlatv
-    CALL nf95_def_var(ncid, 'cv', nf90_float, dims2, varid)
+    CALL nf95_def_var(ncid, 'cv', nf90_float, (/idim_rlonv, idim_rlatv/), varid)
     CALL nf95_put_att(ncid, varid, 'title', 'Coefficient de passage pour V')
 
     ! Aire de chaque maille:
 
-    dims2(1) = idim_rlonv
-    dims2(2) = idim_rlatu
-    CALL nf95_def_var(ncid, 'aire', nf90_float, dims2, varid)
+    CALL nf95_def_var(ncid, 'aire', nf90_float, (/idim_rlonv, idim_rlatu/), &
+         varid)
     CALL nf95_put_att(ncid, varid, 'title', 'Aires de chaque maille')
 
     ! Geopentiel au sol:
 
-    dims2(1) = idim_rlonv
-    dims2(2) = idim_rlatu
-    CALL nf95_def_var(ncid, 'phisinit', nf90_float, dims2, varid)
+    CALL nf95_def_var(ncid, 'phisinit', nf90_float, &
+         (/idim_rlonv, idim_rlatu/), varid)
     CALL nf95_put_att(ncid, varid, 'title', 'Geopotentiel au sol')
 
     ! Definir les variables pour pouvoir les enregistrer plus tard:
 
     CALL nf95_def_var(ncid, 'temps', nf90_float, idim_tim, varid)
     CALL nf95_put_att(ncid, varid, 'title', 'Temps de simulation')
-    WRITE (unites, 200) yyears0, mmois0, jjour0
+    WRITE(unites, 200) yyears0, mmois0, jjour0
 200 FORMAT ('days since ', I4, '-', I2.2, '-', I2.2, ' 00:00:00')
     CALL nf95_put_att(ncid, varid, 'units', unites)
 
-
-    dims4(1) = idim_rlonu
-    dims4(2) = idim_rlatu
-    dims4(3) = idim_s
-    dims4(4) = idim_tim
-    CALL nf95_def_var(ncid, 'ucov', nf90_float, dims4, varid)
+    CALL nf95_def_var(ncid, 'ucov', nf90_float, &
+         (/idim_rlonu, idim_rlatu, idim_s, idim_tim/), varid)
     CALL nf95_put_att(ncid, varid, 'title', 'Vitesse U')
 
-    dims4(1) = idim_rlonv
-    dims4(2) = idim_rlatv
-    dims4(3) = idim_s
-    dims4(4) = idim_tim
-    CALL nf95_def_var(ncid, 'vcov', nf90_float, dims4, varid)
+    CALL nf95_def_var(ncid, 'vcov', nf90_float, &
+         (/idim_rlonv, idim_rlatv, idim_s, idim_tim/), varid)
     CALL nf95_put_att(ncid, varid, 'title', 'Vitesse V')
 
-    dims4(1) = idim_rlonv
-    dims4(2) = idim_rlatu
-    dims4(3) = idim_s
-    dims4(4) = idim_tim
-    CALL nf95_def_var(ncid, 'teta', nf90_float, dims4, varid)
+    CALL nf95_def_var(ncid, 'teta', nf90_float, &
+         (/idim_rlonv, idim_rlatu, idim_s, idim_tim/), varid)
     CALL nf95_put_att(ncid, varid, 'title', 'Temperature')
 
-    dims4(1) = idim_rlonv
-    dims4(2) = idim_rlatu
-    dims4(3) = idim_s
-    dims4(4) = idim_tim
     DO iq = 1, nqmx
-       CALL nf95_def_var(ncid, tname(iq), nf90_float, dims4, varid)
+       CALL nf95_def_var(ncid, tname(iq), nf90_float, &
+            (/idim_rlonv, idim_rlatu, idim_s, idim_tim/), varid)
        CALL nf95_put_att(ncid, varid, 'title', ttext(iq))
     END DO
 
-    dims4(1) = idim_rlonv
-    dims4(2) = idim_rlatu
-    dims4(3) = idim_s
-    dims4(4) = idim_tim
-    CALL nf95_def_var(ncid, 'masse', nf90_float, dims4, varid)
+    CALL nf95_def_var(ncid, 'masse', nf90_float, &
+         (/idim_rlonv, idim_rlatu, idim_s, idim_tim/), varid)
     CALL nf95_put_att(ncid, varid, 'title', 'C est quoi ?')
 
-    dims3(1) = idim_rlonv
-    dims3(2) = idim_rlatu
-    dims3(3) = idim_tim
-    CALL nf95_def_var(ncid, 'ps', nf90_float, dims3, varid)
+    CALL nf95_def_var(ncid, 'ps', nf90_float, &
+         (/idim_rlonv, idim_rlatu, idim_tim/), varid)
     CALL nf95_put_att(ncid, varid, 'title', 'Pression au sol')
 
     CALL nf95_enddef(ncid)

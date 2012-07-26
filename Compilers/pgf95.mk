@@ -3,8 +3,6 @@
 
 # For pgf95 version 7
 
-FC = pgf95
-
 netcdf_inc_dir = /usr/local/netcdf-pgi/include
 netcdf_lib_dir = /usr/local/netcdf-pgi/lib
 

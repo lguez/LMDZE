@@ -22,59 +22,59 @@ contains
          slab_ori, slab_sz, sopps, tax_last, tax_name, tax_name_length, &
          title, topp, unit_name, var_axid, var_haxid, var_zaxid, zax_name, &
          zax_size, zorig, zsize
-    USE calendar, ONLY: ioget_calendar
+    USE ioget_calendar_m, ONLY: ioget_calendar
 
-    INTEGER, INTENT (IN):: fileid
+    INTEGER, INTENT(IN):: fileid
     ! (ID of the file the variable should be archived in)
 
-    CHARACTER (len=*), INTENT (IN):: varname
+    CHARACTER(len=*), INTENT(IN):: varname
     ! (name of the variable, short and easy to remember)
 
-    CHARACTER (len=*), INTENT (IN):: ptitle ! full name of the variable
-    CHARACTER (len=*), INTENT (IN):: unit ! units of the variable
+    CHARACTER(len=*), INTENT(IN):: ptitle ! full name of the variable
+    CHARACTER(len=*), INTENT(IN):: unit ! units of the variable
 
     ! The next 3 arguments give the size of that data
     ! that will be passed to histwrite. The zoom will be
     ! done there with the horizontal information obtained
     ! in "histbeg" and the vertical information to follow.
-    INTEGER, INTENT (IN):: xsize, ysize ! Sizes in X and Y directions
-    INTEGER, INTENT (IN):: horiid ! ID of the horizontal axis
+    INTEGER, INTENT(IN):: xsize, ysize ! Sizes in X and Y directions
+    INTEGER, INTENT(IN):: horiid ! ID of the horizontal axis
 
     ! The next two arguments give the vertical zoom to use.
 
-    INTEGER, INTENT (IN):: pzsize
+    INTEGER, INTENT(IN):: pzsize
     ! (Size in Z direction (If 1 then no axis is declared for this
     ! variable and pzid is not used)
 
-    INTEGER, INTENT (IN):: par_oriz ! Off set of the zoom
-    INTEGER, INTENT (IN):: par_szz ! Size of the zoom
+    INTEGER, INTENT(IN):: par_oriz ! Off set of the zoom
+    INTEGER, INTENT(IN):: par_szz ! Size of the zoom
 
-    INTEGER, INTENT (IN):: pzid
+    INTEGER, INTENT(IN):: pzid
     ! (ID of the vertical axis to use. It has to have the size of the zoom.)
 
-    CHARACTER (len=*), INTENT (IN):: popp
+    CHARACTER(len=*), INTENT(IN):: popp
     ! Operation to be performed. The following options exist today:
     ! inst: keeps instantaneous values for writting
     ! ave: Computes the average from call between writes
 
-    REAL, INTENT (IN):: pfreq_opp ! Frequency of this operation (in seconds)
+    REAL, INTENT(IN):: pfreq_opp ! Frequency of this operation (in seconds)
 
-    REAL, INTENT (IN):: pfreq_wrt
+    REAL, INTENT(IN):: pfreq_wrt
     ! (Frequency at which the variable should be written, in seconds)
 
     ! Local:
 
     INTEGER:: iv, i, nb
-    CHARACTER (len=70):: str70, str71, str72
-    CHARACTER (len=20):: tmp_name
-    CHARACTER (len=20):: str20, tab_str20(nb_var_max)
+    CHARACTER(len=70):: str70, str71, str72
+    CHARACTER(len=20):: tmp_name
+    CHARACTER(len=20):: str20, tab_str20(nb_var_max)
     INTEGER:: tab_str20_length(nb_var_max)
-    CHARACTER (len=40):: str40, tab_str40(nb_var_max)
+    CHARACTER(len=40):: str40, tab_str40(nb_var_max)
     INTEGER:: tab_str40_length(nb_var_max)
-    CHARACTER (len=10):: str10
-    CHARACTER (len=80):: tmp_str80
-    CHARACTER (len=7):: tmp_topp, tmp_sopp(nbopp_max)
-    CHARACTER (len=120):: ex_topps
+    CHARACTER(len=10):: str10
+    CHARACTER(len=80):: tmp_str80
+    CHARACTER(len=7):: tmp_topp, tmp_sopp(nbopp_max)
+    CHARACTER(len=120):: ex_topps
     REAL:: tmp_scal(nbopp_max), un_an, un_jour, test_fopp, test_fwrt
     INTEGER:: pos, buff_sz
 

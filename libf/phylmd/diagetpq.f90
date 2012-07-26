@@ -30,7 +30,6 @@ contains
 
     ! Arguments: 
     ! airephy-------input-R- grid area
-    ! tit-----imput-A15- Comment added in PRINT (CHARACTER*15)
     ! iprt----input-I- PRINT level ( <=1 : no PRINT)
     ! idiag---input-I- indice dans lequel sera range les nouveaux
     ! bilans d' entalpie et de masse
@@ -65,7 +64,7 @@ contains
 
     ! Input variables
     real airephy(klon)
-    CHARACTER(len=15) tit
+    CHARACTER(len=*), intent(in):: tit ! comment added in PRINT
     INTEGER iprt, idiag, idiag2
     REAL, intent(in):: dtime
     REAL, intent(in):: t(klon, klev)

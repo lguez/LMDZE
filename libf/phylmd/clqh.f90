@@ -13,7 +13,7 @@ contains
        z0_new, flux_t, flux_q, dflux_s, dflux_l, fqcalving, ffonte, &
        run_off_lic_0, flux_o, flux_g, tslab, seaice)
 
-    ! Author: Z.X. Li (LMD/CNRS)!
+    ! Author: Z. X. Li (LMD/CNRS)
     ! Date: 1993/08/18
     ! Objet : diffusion verticale de "q" et de "h"
 
@@ -28,7 +28,7 @@ contains
     ! Arguments:
     INTEGER knon
     REAL, intent(in):: dtime              ! intervalle du temps (s)
-    real date0
+    real, intent(in):: date0
     REAL u1lay(klon)        ! vitesse u de la 1ere couche (m/s)
     REAL v1lay(klon)        ! vitesse v de la 1ere couche (m/s)
     REAL coef(klon, klev)    ! le coefficient d'echange (m**2/s)
@@ -51,11 +51,11 @@ contains
     REAL agesno(klon)
     REAL rugoro(klon)
     REAL run_off_lic_0(klon)! runof glacier au pas de temps precedent
-    integer jour            ! jour de l'annee en cours
-    real rmu0(klon)         ! cosinus de l'angle solaire zenithal
+    integer, intent(in):: jour            ! jour de l'annee en cours
+    real, intent(in):: rmu0(klon)         ! cosinus de l'angle solaire zenithal
     real rugos(klon)        ! rugosite
     integer knindex(klon)
-    real pctsrf(klon, nbsrf)
+    real, intent(in):: pctsrf(klon, nbsrf)
     real, intent(in):: rlon(klon), rlat(klon)
     real cufi(klon), cvfi(klon)
     logical ok_veget 

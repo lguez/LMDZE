@@ -24,8 +24,8 @@ contains
     ! liquide) dans "phytrac".
 
     ! Modifications pour les traceurs :
-    ! - uniformisation des parametrisations ds phytrac
-    ! - stockage des moyennes des champs necessaires en mode traceur off-line 
+    ! - uniformisation des parametrisations dans phytrac
+    ! - stockage des moyennes des champs nécessaires en mode traceur off-line 
 
     use dimens_m, only: llm
     use indicesol, only: nbsrf
@@ -84,7 +84,7 @@ contains
     REAL prfl(klon, llm+1),   psfl(klon, llm+1)     !--lessivage large-scale
 
     !   convection:
-    REAL pmfu(klon, llm)  ! flux de masse dans le panache montant
+    REAL, intent(in):: pmfu(klon, llm) ! flux de masse dans le panache montant
     REAL pmfd(klon, llm)  ! flux de masse dans le panache descendant
     REAL pen_u(klon, llm) ! flux entraine dans le panache montant
 
@@ -95,10 +95,10 @@ contains
     REAL pde_u(klon, llm) ! flux detraine dans le panache montant
     REAL pen_d(klon, llm) ! flux entraine dans le panache descendant
     REAL pde_d(klon, llm) ! flux detraine dans le panache descendant
-    ! KE
+    ! Kerry Emanuel
     real da(klon, llm), phi(klon, llm, llm), mp(klon, llm)
-    REAL upwd(klon, llm)      ! saturated updraft mass flux
-    REAL dnwd(klon, llm)      ! saturated downdraft mass flux
+    REAL, intent(in):: upwd(klon, llm) ! saturated updraft mass flux
+    REAL, intent(in):: dnwd(klon, llm) ! saturated downdraft mass flux
 
     !   Couche limite:
 
@@ -236,32 +236,29 @@ contains
        end if
     ENDIF
 
-    ! Initialisation du traceur dans le sol (couche limite radonique)
     if (inirnpb) THEN
-
+       ! Initialisation du traceur dans le sol (couche limite radonique)
        radio(1)= .true.
        radio(2)= .true.
        clsol(1)= .true.
        clsol(2)= .true.
        aerosol(2) = .TRUE. ! le Pb est un aerosol 
-
        call initrrnpb(ftsol, pctsrf, masktr, fshtr, hsoltr, tautr, vdeptr, &
             scavtr)
        inirnpb=.false.
     endif
 
-    ! Calcul de l'effet de la convection
-
     if (convection) then
+       ! Calcul de l'effet de la convection
        DO it=1, nq_phys
-          if (iflag_con.eq.2) then
-             ! tiedke
+          if (iflag_con == 2) then
+             ! Tiedke
              CALL nflxtr(pdtphys, pmfu, pmfd, pen_u, pde_u, pen_d, pde_d, &
                   paprs, tr_seri(1, 1, it), d_tr_cv(1, 1, it))
-          else if (iflag_con.eq.3) then
-             ! KE
-             call cvltr(pdtphys, da, phi, mp, paprs, &
-                  tr_seri(1, 1, it), upwd, dnwd, d_tr_cv(1, 1, it))
+          else if (iflag_con == 3) then
+             ! Emanuel
+             call cvltr(pdtphys, da, phi, mp, paprs, tr_seri(1, 1, it), upwd, &
+                  dnwd, d_tr_cv(1, 1, it))
           endif
 
           DO k = 1, llm

@@ -11,13 +11,12 @@ contains
 
     ! From LMDZ4/libf/phylmd/cv_driver.F, version 1.3 2005/04/15 12:36:17
 
-    use dimens_m
-    use dimphy
-    !
+    USE dimphy, ONLY: klev, klon
+
     ! PARAMETERS:
     !      Name            Type         Usage            Description
     !   ----------      ----------     -------  ----------------------------
-    !
+
     !      len           Integer        Input        first (i) dimension
     !      nd            Integer        Input        vertical (k) dimension
     !      ndp1          Integer        Input        nd + 1
@@ -44,13 +43,10 @@ contains
     !      w01           Real           In/Out       vertical velocity within adiab updraft
     !      delt          Real           Input        time step
     !      Ma1           Real           Output       mass flux adiabatic updraft
-    !      upwd1         Real           Output       total upward mass flux (adiab+mixed)
-    !      dnwd1         Real           Output       saturated downward mass flux (mixed)
-    !      dnwd01        Real           Output       unsaturated downward mass flux
     !      qcondc1       Real           Output       in-cld mixing ratio of condensed water
     !      wd1           Real           Output       downdraft velocity scale for sfc fluxes
     !      cape1         Real           Output       CAPE
-    !
+
     ! S. Bony, Mar 2002:
     !     * Several modules corresponding to different physical processes
     !     * Several versions of convect may be used:
@@ -59,10 +55,6 @@ contains
     !   + tard:    - iflag_con=5: version lmd with ice (previously named convectg)
     ! S. Bony, Oct 2002:
     !     * Vectorization of convect3 (ie version lmd)
-    !
-    !..............................END PROLOGUE.............................
-    !
-    !
 
     integer len
     integer nd
@@ -86,9 +78,9 @@ contains
     real cbmf1(len)
     real VPrecip1(len, nd+1)
     real Ma1(len, nd)
-    real upwd1(len, nd)
-    real dnwd1(len, nd)
-    real dnwd01(len, nd)
+    real, intent(out):: upwd1(len, nd) ! total upward mass flux (adiab+mixed)
+    real, intent(out):: dnwd1(len, nd) ! saturated downward mass flux (mixed)
+    real, intent(out):: dnwd01(len, nd) ! unsaturated downward mass flux
 
     real qcondc1(len, nd)     ! cld
     real wd1(len)            ! gust
@@ -105,54 +97,54 @@ contains
     ! --- ARGUMENTS
     !-------------------------------------------------------------------
     ! --- On input:
-    !
+
     !  t:   Array of absolute temperature (K) of dimension ND, with first
     !       index corresponding to lowest model level. Note that this array
     !       will be altered by the subroutine if dry convective adjustment
     !       occurs and if IPBL is not equal to 0.
-    !
+
     !  q:   Array of specific humidity (gm/gm) of dimension ND, with first
     !       index corresponding to lowest model level. Must be defined
     !       at same grid levels as T. Note that this array will be altered
     !       if dry convective adjustment occurs and if IPBL is not equal to 0.
-    !
+
     !  qs:  Array of saturation specific humidity of dimension ND, with first
     !       index corresponding to lowest model level. Must be defined
     !       at same grid levels as T. Note that this array will be altered
     !       if dry convective adjustment occurs and if IPBL is not equal to 0.
-    !
+
     !  u:   Array of zonal wind velocity (m/s) of dimension ND, witth first
     !       index corresponding with the lowest model level. Defined at
     !       same levels as T. Note that this array will be altered if
     !       dry convective adjustment occurs and if IPBL is not equal to 0.
-    !
+
     !  v:   Same as u but for meridional velocity.
-    !
+
     !  tra: Array of passive tracer mixing ratio, of dimensions (ND, NTRA),
     !       where NTRA is the number of different tracers. If no
     !       convective tracer transport is needed, define a dummy
     !       input array of dimension (ND, 1). Tracers are defined at
     !       same vertical levels as T. Note that this array will be altered
     !       if dry convective adjustment occurs and if IPBL is not equal to 0.
-    !
+
     !  p:   Array of pressure (mb) of dimension ND, with first
     !       index corresponding to lowest model level. Must be defined
     !       at same grid levels as T.
-    !
+
     !  ph:  Array of pressure (mb) of dimension ND+1, with first index
     !       corresponding to lowest level. These pressures are defined at
     !       levels intermediate between those of P, T, Q and QS. The first
     !       value of PH should be greater than (i.e. at a lower level than)
     !       the first value of the array P.
-    !
+
     !  nl:  The maximum number of levels to which convection can penetrate, plus 1.
     !       NL MUST be less than or equal to ND-1.
-    !
+
     !  delt: The model time step (sec) between calls to CONVECT
-    !
+
     !----------------------------------------------------------------------------
     ! ---   On Output:
-    !
+
     !  iflag: An output integer whose value denotes the following:
     !       VALUE   INTERPRETATION
     !       -----   --------------
@@ -171,48 +163,47 @@ contains
     !               level is above the 200 mb level.
     !         9     No moist convection: cloud base is higher
     !               then the level NL-1.
-    !
+
     !  ft:   Array of temperature tendency (K/s) of dimension ND, defined at same
     !        grid levels as T, Q, QS and P.
-    !
+
     !  fq:   Array of specific humidity tendencies ((gm/gm)/s) of dimension ND,
     !        defined at same grid levels as T, Q, QS and P.
-    !
+
     !  fu:   Array of forcing of zonal velocity (m/s^2) of dimension ND,
     !        defined at same grid levels as T.
-    !
+
     !  fv:   Same as FU, but for forcing of meridional velocity.
-    !
+
     !  ftra: Array of forcing of tracer content, in tracer mixing ratio per
     !        second, defined at same levels as T. Dimensioned (ND, NTRA).
-    !
+
     !  precip: Scalar convective precipitation rate (mm/day).
-    !
+
     !  VPrecip: Vertical profile of convective precipitation (kg/m2/s).
-    !
+
     !  wd:   A convective downdraft velocity scale. For use in surface
     !        flux parameterizations. See convect.ps file for details.
-    !
+
     !  tprime: A convective downdraft temperature perturbation scale (K).
     !          For use in surface flux parameterizations. See convect.ps
     !          file for details.
-    !
+
     !  qprime: A convective downdraft specific humidity
     !          perturbation scale (gm/gm).
     !          For use in surface flux parameterizations. See convect.ps
     !          file for details.
-    !
+
     !  cbmf: The cloud base mass flux ((kg/m**2)/s). THIS SCALAR VALUE MUST
     !        BE STORED BY THE CALLING PROGRAM AND RETURNED TO CONVECT AT
     !        ITS NEXT CALL. That is, the value of CBMF must be "remembered"
     !        by the calling program between calls to CONVECT.
-    !
+
     !  det:   Array of detrainment mass flux of dimension ND.
-    !
+
     !-------------------------------------------------------------------
-    !
+
     !  Local arrays
-    !
 
     integer i, k, n, il, j
     integer icbmax
@@ -242,11 +233,11 @@ contains
     real sig1(klon, klev)
     real w01(klon, klev)
     real th1(klon, klev)
-    !
+
     integer ncum
-    !
+
     ! (local) compressed fields:
-    !
+
     integer nloc
     parameter (nloc=klon) ! pour l'instant
 
@@ -302,7 +293,7 @@ contains
     CALL cv_thermo(iflag_con)
 
     ! -- set convect parameters
-    !
+
     !     includes microphysical parameters and parameters that
     !     control the rate of approach to quasi-equilibrium)
     !     (common cvparam)
@@ -591,7 +582,7 @@ contains
        do  i=1, len
           iflag1(i)=42
        end do
-       !
+
        if (iflag_con.eq.3) then
           CALL cv3_uncompress(nloc, len, ncum, nd, ntra, idcum &
                , iflag &

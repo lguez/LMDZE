@@ -106,7 +106,7 @@ contains
     call assert(shape(ucov) == (/iim + 1, jjm + 1, llm/), "leapfrog")
 
     itaufin = nday * day_step
-    ! "day_step" is a multiple of "iperiod", therefore "itaufin" is one too
+    ! "day_step" is a multiple of "iperiod", therefore so is "itaufin".
 
     dq = 0.
 

@@ -33,7 +33,7 @@ contains
     ! température potentielle au centre de chaque couche (en entrée :
     ! la valeur au début du pas de temps)
 
-    REAL cd(klon) ! cdrag (en entrée : la valeur au début du pas de temps)
+    REAL, intent(in):: cd(:) ! (ngrid) cdrag, valeur au début du pas de temps
 
     REAL, intent(inout):: q2(klon, klev+1)
     ! $q^2$ au bas de chaque couche 
@@ -343,9 +343,8 @@ contains
 
   !*******************************************************************
 
-  function frif(ri)
+  real function frif(ri)
 
-    real frif
     real, intent(in):: ri
 
     frif = 0.6588*(ri+0.1776-sqrt(ri*ri-0.3221*ri+0.03156))
@@ -354,9 +353,8 @@ contains
 
   !*******************************************************************
 
-  function falpha(ri)
+  real function falpha(ri)
 
-    real falpha
     real, intent(in):: ri
 
     falpha = 1.318*(0.2231-ri)/(0.2341-ri)
@@ -365,9 +363,8 @@ contains
 
   !*******************************************************************
 
-  function fsm(ri)
+  real function fsm(ri)
 
-    real fsm
     real, intent(in):: ri
 
     fsm = 1.96*(0.1912-ri)*(0.2341-ri)/((1.-ri)*(0.2231-ri))
@@ -376,9 +373,8 @@ contains
 
   !*******************************************************************
 
-  function fl(zzz, zl0, zq2, zn2)
+  real function fl(zzz, zl0, zq2, zn2)
 
-    real fl
     real, intent(in):: zzz, zl0, zq2, zn2
 
     fl = max(min(zl0 * kap * zzz / (kap * zzz + zl0), &

@@ -41,7 +41,7 @@ contains
     REAL alblw(klon, nbsrf)
     REAL evap(klon, nbsrf)
     REAL radsol(klon)
-    REAL rain_fall(klon)
+    REAL, intent(out):: rain_fall(klon)
     REAL snow_fall(klon)
     REAL sollw(klon)
     real solsw(klon)

@@ -3,8 +3,6 @@
 
 # For IBM XL Fortran
 
-FC = xlf95
-
 numer_rec_dir =  ${workdir}/lib/Numer_Rec_Lionel_v
 netcdf95_dir = ${workdir}/lib/NetCDF95
 IOIPSL_dir = ${workdir}/lib/IOIPSL_Lionel_ar

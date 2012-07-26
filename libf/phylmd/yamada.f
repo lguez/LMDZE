@@ -2,7 +2,7 @@
 ! $Header: /home/cvsroot/LMDZ4/libf/phylmd/yamada.F,v 1.1 2004/06/22 11:45:36 lmdzadmin Exp $
 !
       SUBROUTINE yamada(ngrid,g,rconst,plev,temp
-     s   ,zlev,zlay,u,v,teta,cd,q2,km,kn,ustar
+     s   ,zlev,zlay,u,v,teta,q2,km,kn,ustar
      s   ,l_mix)
       use dimens_m
       use dimphy
@@ -18,8 +18,6 @@ c u,v : vitesse au centre de chaque couche
 c       (en entree : la valeur au debut du pas de temps)
 c teta : temperature potentielle au centre de chaque couche
 c        (en entree : la valeur au debut du pas de temps)
-c cd : cdrag
-c      (en entree : la valeur au debut du pas de temps)
 c q2 : $q^2$ au bas de chaque couche
 c      (en entree : la valeur au debut du pas de temps)
 c      (en sortie : la valeur a la fin du pas de temps)
@@ -39,7 +37,6 @@ c.......................................................................
       REAL u(klon,klev)
       REAL v(klon,klev)
       REAL teta(klon,klev)
-      REAL cd(klon)
       REAL q2(klon,klev+1)
       REAL km(klon,klev+1)
       REAL kn(klon,klev+1)

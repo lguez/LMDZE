@@ -7,7 +7,7 @@ module raddim
 
   implicit none
 
-  INTEGER, PARAMETER:: kdlon=klon, kflev=llm
+  INTEGER, PARAMETER:: kdlon = klon, kflev = llm
 
   private llm, klon
 

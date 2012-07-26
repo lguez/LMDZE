@@ -3,8 +3,6 @@
 
 # For the MIPSpro 7 Fortran 90 compiler
 
-FC = f90
-
 # Include flags:
 inc_flags = -I${libf_dir} -I${libf_dir}/phylmd -I/usr/local/pub/include -I${workdir}/IOIPSL_k
 

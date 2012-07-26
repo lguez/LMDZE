@@ -20,7 +20,7 @@ contains
     ! 3. COMPUTES FLUXES IN 2ND SPECTRAL INTERVAL (SW2S)
 
     ! REFERENCE.
-    ! SEE RADIATION'S PART OF THE ECMWF RESEARCH DEPARTMENT
+    ! SEE RADIATION PART OF THE ECMWF RESEARCH DEPARTMENT
     ! DOCUMENTATION, AND FOUQUART AND BONNEL (1980)
 
     ! AUTHOR.
@@ -101,7 +101,7 @@ contains
     DATA appel1er /.TRUE./
     !jq-Introduced for aerosol forcings
     double precision flag_aer
-    logical ok_ade, ok_aie ! use aerosol forcings or not?
+    logical, intent(in):: ok_ade, ok_aie ! use aerosol forcings or not?
     double precision tauae(kdlon, kflev, 2) ! aerosol optical properties
     double precision pizae(kdlon, kflev, 2) 
     ! aerosol optical properties(see aeropt.F)
@@ -186,7 +186,7 @@ contains
           ENDDO
        ENDDO
 
-       flag_aer=0.0
+       flag_aer=0.
        CALL SWU(PSCT, PCLDSW, PPMB, PPSOL, &
             PRMU0, PFRAC, PTAVE, PWV, &
             ZAKI, ZCLD, ZCLEAR, ZDSIG, ZFACT, ZRMU, ZSEC, ZUD)
@@ -215,7 +215,7 @@ contains
 
        IF (ok_ade) THEN
           ! cloudy-sky + aerosol dir OB
-          flag_aer=1.0
+          flag_aer=1.
           CALL SWU(PSCT, PCLDSW, PPMB, PPSOL, &
                PRMU0, PFRAC, PTAVE, PWV, &
                ZAKI, ZCLD, ZCLEAR, ZDSIG, ZFACT, ZRMU, ZSEC, ZUD)

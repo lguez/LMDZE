@@ -5,10 +5,10 @@ module phyredem_m
 contains
 
   SUBROUTINE phyredem(fichnom, rlat, rlon, pctsrf, tsol, tsoil, tslab, &
-       seaice, qsurf, qsol, snow, albedo, alblw, evap, rain_fall,&
-       snow_fall, solsw, sollw, fder, radsol, frugs, agesno, zmea,&
-       zstd, zsig, zgam, zthe, zpic, zval, t_ancien, q_ancien,&
-       rnebcon, ratqs, clwcon, run_off_lic_0)
+       seaice, qsurf, qsol, snow, albedo, alblw, evap, rain_fall, snow_fall, &
+       solsw, sollw, fder, radsol, frugs, agesno, zmea, zstd, zsig, zgam, &
+       zthe, zpic, zval, t_ancien, q_ancien, rnebcon, ratqs, clwcon, &
+       run_off_lic_0)
 
     ! From phylmd/phyredem.F, v 1.3 2005/05/25 13:10:09
     ! Auteur(s) Z.X. Li (LMD/CNRS) date: 19930818
@@ -23,7 +23,7 @@ contains
     USE netcdf, ONLY : nf90_clobber, nf90_global, nf90_float
 
     CHARACTER(len=*) fichnom
-    REAL, INTENT (IN) :: rlat(klon), rlon(klon)
+    REAL, INTENT(IN):: rlat(klon), rlon(klon)
     REAL :: tsol(klon, nbsrf)
     REAL :: tsoil(klon, nsoilmx, nbsrf)
 
@@ -36,7 +36,7 @@ contains
     REAL :: alblw(klon, nbsrf)
 
     REAL :: evap(klon, nbsrf)
-    REAL :: rain_fall(klon)
+    REAL, INTENT(IN):: rain_fall(klon)
     REAL :: snow_fall(klon)
     REAL :: solsw(klon)
     REAL :: sollw(klon)

@@ -7,19 +7,10 @@ contains
   subroutine writedynav(vcov, ucov, teta, ppk, phi, q, masse, ps, phis, time)
 
     ! From LMDZ4/libf/bibio/writedynav.F, version 1.1.1.1 2004/05/19 12:53:05
-    ! Ecriture du fichier histoire au format IOIPSL
+    ! Écriture du fichier histoire au format IOIPSL
+    ! L. Fairhead, LMD, 03/99
 
     ! Appels successifs des routines histwrite
-
-    ! Entree:
-    ! vcov: vents v covariants
-    ! ucov: vents u covariants
-    ! phi : geopotentiel instantane
-    ! q : traceurs
-    ! ps :pression au sol
-    ! phis : geopotentiel au sol
-
-    ! L. Fairhead, LMD, 03/99
 
     use covnat_m, only: covnat
     USE histwrite_m, ONLY: histwrite
@@ -31,13 +22,14 @@ contains
     USE iniadvtrac_m, ONLY: ttext
     use initdynav_m, only: histaveid
 
-    REAL vcov(ip1jm, llm), ucov(ip1jmp1, llm) 
+    REAL, intent(in):: vcov(ip1jm, llm), ucov(ip1jmp1, llm) ! vents covariants
     REAL, intent(in):: teta(ip1jmp1*llm) ! temperature potentielle
-    real phi(ip1jmp1, llm), ppk(ip1jmp1*llm) 
-    REAL ps(ip1jmp1)
+    real, intent(in):: phi(ip1jmp1, llm) ! geopotentiel instantane
+    real, intent(in):: ppk(ip1jmp1*llm) 
+    REAL, intent(in):: ps(ip1jmp1) ! pression au sol
     real, intent(in):: masse(ip1jmp1, llm) 
-    REAL phis(ip1jmp1) 
-    REAL, intent(in):: q(:, :, :, :) ! (iim + 1, jjm + 1, llm, nqmx)
+    REAL, intent(in):: phis(ip1jmp1) ! geopotentiel au sol
+    REAL, intent(in):: q(:, :, :, :) ! (iim + 1, jjm + 1, llm, nqmx) traceurs
     integer, intent(in):: time ! temps de l'ecriture
 
     ! Variables locales

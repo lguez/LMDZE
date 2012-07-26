@@ -10,7 +10,7 @@ contains
 
     ! From phylmd/phystokenc.F, version 1.2 2004/06/22 11:45:35
     ! Author: Frédéric Hourdin
-    ! Objet: moniteur général des tendances traceurs                        
+    ! Objet : moniteur général des tendances traceurs                        
 
     USE histwrite_m, ONLY : histwrite
     USE histsync_m, ONLY : histsync
@@ -25,12 +25,12 @@ contains
 
     !   divers:                                                             
 
-    REAL, INTENT (IN) :: pdtphys ! pas d'integration pour la physique (seconde)
-    INTEGER, INTENT (IN) :: itap
+    REAL, INTENT (IN):: pdtphys ! pas d'integration pour la physique (seconde)
+    INTEGER, INTENT (IN):: itap
 
     !   convection:                                                         
 
-    REAL pmfu(klon, klev) ! flux de masse dans le panache montant
+    REAL, INTENT (IN):: pmfu(klon, klev) ! flux de masse dans le panache montant
     REAL pmfd(klon, klev) ! flux de masse dans le panache descendant
     REAL pen_u(klon, klev) ! flux entraine dans le panache montant
     REAL pde_u(klon, klev) ! flux detraine dans le panache montant
@@ -76,7 +76,7 @@ contains
 
     INTEGER i, k
 
-    REAL mfu(klon, klev) ! flux de masse dans le panache montant
+    REAL, save:: mfu(klon, klev) ! flux de masse dans le panache montant
     REAL mfd(klon, klev) ! flux de masse dans le panache descendant
     REAL en_u(klon, klev) ! flux entraine dans le panache montant
     REAL de_u(klon, klev) ! flux detraine dans le panache montant
@@ -91,16 +91,13 @@ contains
 
     REAL dtcum
 
-    INTEGER iadvtr, irec
+    INTEGER:: iadvtr = 0, irec = 1
     REAL zmin, zmax
     LOGICAL ok_sync
 
-    SAVE t, mfu, mfd, en_u, de_u, en_d, de_d, coefh, dtcum
+    SAVE t, mfd, en_u, de_u, en_d, de_d, coefh, dtcum
     SAVE fm_therm, entr_therm
-    SAVE iadvtr, irec
     SAVE pyu1, pyv1, pftsol, ppsrf
-
-    DATA iadvtr, irec/0, 1/
 
     !------------------------------------------------------
 
@@ -123,8 +120,8 @@ contains
 
     iadvtr = iadvtr + 1
 
-    IF (mod(iadvtr, istphy)==1 .OR. istphy==1) THEN
-       PRINT *, 'reinitialisation des champs cumules a iadvtr=', iadvtr
+    IF (mod(iadvtr, istphy) == 1 .OR. istphy == 1) THEN
+       PRINT *, 'reinitialisation des champs cumules a iadvtr =', iadvtr
        DO k = 1, klev
           DO i = 1, klon
              mfu(i, k) = 0.
@@ -181,7 +178,7 @@ contains
     dtcum = dtcum + pdtphys
 
     IF (mod(iadvtr, istphy)==0) THEN
-       !   normalisation par le temps cumule                                   
+       ! normalisation par le temps cumule                                   
        DO k = 1, klev
           DO i = 1, klon
              mfu(i, k) = mfu(i, k)/dtcum
@@ -214,7 +211,6 @@ contains
              ppsrf2(i) = ppsrf(i, 2)
              ppsrf3(i) = ppsrf(i, 3)
              ppsrf4(i) = ppsrf(i, 4)
-
           END DO
        END DO
 
@@ -222,7 +218,6 @@ contains
 
        irec = irec + 1
 
-       !cccc                                                                   
        CALL gr_fi_ecrit(klev, klon, iim, jjm+1, t, zx_tmp_3d)
        CALL histwrite(physid, 't', itap, zx_tmp_3d)
 
@@ -241,7 +236,6 @@ contains
        CALL gr_fi_ecrit(klev, klon, iim, jjm+1, coefh, zx_tmp_3d)
        CALL histwrite(physid, 'coefh', itap, zx_tmp_3d)
 
-       ! ajou...                                                               
        DO k = 1, klev
           DO i = 1, klon
              fm_therm1(i, k) = fm_therm(i, k)
@@ -285,8 +279,6 @@ contains
        CALL histwrite(physid, 'psrf4', itap, zx_tmp_2d)
 
        IF (ok_sync) CALL histsync(physid)
-       !     if (ok_sync) call histsync                                        
-
 
        !AA Test sur la valeur des coefficients de lessivage                    
 
@@ -298,7 +290,7 @@ contains
              zmin = min(zmin, frac_nucl(i, k))
           END DO
        END DO
-       PRINT *, '------ coefs de lessivage (min et max) --------'
+       PRINT *, 'coefs de lessivage (min et max)'
        PRINT *, 'facteur de nucleation ', zmin, zmax
        zmin = 1E33
        zmax = -1E33
@@ -309,7 +301,6 @@ contains
           END DO
        END DO
        PRINT *, 'facteur d impaction ', zmin, zmax
-
     END IF
 
   END SUBROUTINE phystokenc

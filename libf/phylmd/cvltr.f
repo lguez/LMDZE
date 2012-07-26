@@ -18,8 +18,8 @@ c
       REAL, intent(in):: x(klon,klev)        ! q de traceur (bas en haut) 
       REAL dx(klon,klev)     ! tendance de traceur  (bas en haut)
       real da(klon,klev),phi(klon,klev,klev),mp(klon,klev)
-      REAL upd(klon,klev)      ! saturated updraft mass flux
-      REAL dnd(klon,klev)      ! saturated downdraft mass flux
+      REAL, intent(in):: upd(klon,klev)      ! saturated updraft mass flux
+      REAL, intent(in):: dnd(klon,klev)      ! saturated downdraft mass flux
 c
 c--variables locales      
       real zed(klon,klev),zmd(klon,klev,klev)

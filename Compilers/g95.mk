@@ -1,10 +1,6 @@
 # These are compiler dependent macros, meant to be included in the
 # makefile for LMDZE.
 
-# For G95
-
-FC = g95
-
 netcdf_inc_dir = /home/guez_local/include/NetCDF_g95 /home/guez_local/include
 netcdf_lib_dir = /home/guez_local/lib/NetCDF_g95 /home/guez_local/lib
 

@@ -15,10 +15,7 @@ module dimphy
   ! klon pour le pole sud)
 
   INTEGER, PARAMETER:: KLEV = llm
-
-  INTEGER, PARAMETER:: nbtr = max(1, nqmx - 2)
-  ! (nombre de vrais traceurs)
-
+  INTEGER, PARAMETER:: nbtr = max(1, nqmx - 2) ! nombre de vrais traceurs
   REAL,save:: zmasq(KLON) ! fraction of land
 
 end module dimphy

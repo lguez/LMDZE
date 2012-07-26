@@ -3,8 +3,6 @@
 
 # For "sxf90" 2.0
 
-FC = sxf90
-
 netcdf_inc_dir = /SXlocal/pub/netCDF/3.6.1/include
 netcdf_lib_dir = /SXlocal/pub/netCDF/3.6.1/lib
 

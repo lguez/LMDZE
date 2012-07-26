@@ -7,26 +7,10 @@ contains
   SUBROUTINE histvert(pfileid, pzaxname, pzaxtitle, pzaxunit, pzsize, &
        pzvalues, pzaxid, pdirect)
 
-    ! This subroutine defines a vertical axis and returns it s id.
-    ! It gives the user the possibility to the user to define many
-    ! different vertical axes. For each variable defined with histdef a
-    ! vertical axis can be specified with by it s ID.
-
-    ! INPUT
-
-    ! pfileid: ID of the file the variable should be archived in
-    ! pzaxname: Name of the vertical axis
-    ! pzaxtitle: title of the vertical axis
-    ! pzaxunit: Units of the vertical axis
-    ! pzsize: size of the vertical axis
-    ! pzvalues: Coordinate values of the vetical axis
-
-    ! pdirect: is an optional argument which allows to specify the
-    !            the positive direction of the axis: up or down.
-    ! OUTPUT
-
-    ! pzaxid: Returns the ID of the axis.
-    !            Note that this is not the netCDF ID !
+    ! This subroutine defines a vertical axis and returns its id.  It
+    ! gives the user the possibility to define many different vertical
+    ! axes. For each variable defined with histdef a vertical axis can
+    ! be specified by its ID.
 
     USE find_str_m, ONLY: find_str
     USE strlowercase_m, ONLY: strlowercase
@@ -36,18 +20,26 @@ contains
     USE netcdf, ONLY: nf90_def_dim, nf90_def_var, nf90_enddef, &
          nf90_float, nf90_put_att, nf90_put_var, nf90_redef
 
-    INTEGER, INTENT (IN):: pfileid, pzsize
-    CHARACTER (len=*), INTENT (IN):: pzaxname, pzaxunit, pzaxtitle
-    REAL, INTENT (IN):: pzvalues(pzsize)
-    INTEGER, INTENT (OUT):: pzaxid
-    CHARACTER (len=*), INTENT (IN), OPTIONAL:: pdirect
+    INTEGER, INTENT(IN):: pfileid 
+    ! ID of the file the variable should be archived in
 
+    INTEGER, INTENT(IN):: pzsize ! size of the vertical axis
+    CHARACTER(len=*), INTENT(IN):: pzaxname ! name of the vertical axis
+    CHARACTER(len=*), INTENT(IN):: pzaxunit ! units of the vertical axis
+    CHARACTER(len=*), INTENT(IN):: pzaxtitle ! title of the vertical axis
+    REAL, INTENT(IN):: pzvalues(pzsize) ! coordinate values of the vetical axis
+    INTEGER, INTENT(OUT):: pzaxid ! ID of the axis (not the netCDF ID)
+
+    CHARACTER(len=*), INTENT(IN), OPTIONAL:: pdirect
+    ! positive direction of the axis: up or down
+
+    ! Local:
     INTEGER:: pos, iv, nb, zdimid, zaxid_tmp
-    CHARACTER (len=20):: str20, tab_str20(nb_zax_max)
+    CHARACTER(len=20):: str20, tab_str20(nb_zax_max)
     INTEGER:: tab_str20_length(nb_zax_max)
-    CHARACTER (len=70):: str70, str71, str72
-    CHARACTER (len=80):: str80
-    CHARACTER (len=20):: direction
+    CHARACTER(len=70):: str70, str71, str72
+    CHARACTER(len=80):: str80
+    CHARACTER(len=20):: direction
     INTEGER:: iret, leng, ncid
 
     !---------------------------------------------------------------------
@@ -97,7 +89,7 @@ contains
 
     IF (pos>0) THEN
        str70 = 'Vertical axis already exists'
-       WRITE (str71, '("Check variable ", a, " in file", I3)') str20, &
+       WRITE(str71, '("Check variable ", a, " in file", I3)') str20, &
             pfileid
        str72 = 'Can also be a wrong file ID in another declaration'
        CALL histerr(3, 'histvert', str70, str71, str72)
