@@ -14,3 +14,5 @@ F90FLAGS = ${FFLAGS}
 
 nag_fcalls_options = -calledby -lines -locate -class ${nag_gl_options}
 nag_cross_options = -key ${nag_gl_options}
+
+version_flag = -v

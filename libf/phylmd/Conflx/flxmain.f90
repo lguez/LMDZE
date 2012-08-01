@@ -12,6 +12,7 @@ contains
     USE suphec_m, ONLY: rcpd, retv, rg, rlvtt
     USE yoethf_m, ONLY: r4les, r5les
     USE yoecumf, ONLY: cmfdeps, entrpen, entrscv, lmfdd
+    use flxsetup_m, only: flxsetup
 
     REAL pten(klon,klev), pqen(klon,klev), pqsen(klon,klev)
     REAL ptte(klon,klev)

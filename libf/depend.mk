@@ -86,7 +86,7 @@ cv_undilute1.o : cvparam.o cvthermo.o
 cv_undilute2.o : cvparam.o cvthermo.o 
 cv_unsat.o : cvparam.o cvthermo.o 
 cv_yield.o : cvparam.o cvthermo.o 
-cvltr.o : YOECUMF.o suphec.o dimphy.o dimens_m.o 
+cvltr.o : suphec.o dimphy.o 
 diagcld1.o : suphec.o dimphy.o dimens_m.o 
 diagcld2.o : FCTTRE.o yoethf.o suphec.o dimphy.o 
 diagetpq.o : suphec.o dimphy.o 
@@ -126,7 +126,7 @@ flxdlfs.o : YOECUMF.o yoethf.o suphec.o dimphy.o dimens_m.o
 flxdtdq.o : YOECUMF.o yoethf.o suphec.o dimphy.o dimens_m.o 
 flxflux.o : YOECUMF.o FCTTRE.o yoethf.o suphec.o dimphy.o dimens_m.o 
 flxini.o : yoethf.o suphec.o dimphy.o dimens_m.o 
-flxmain.o : YOECUMF.o yoethf.o suphec.o dimphy.o 
+flxmain.o : flxsetup.o YOECUMF.o yoethf.o suphec.o dimphy.o 
 flxsetup.o : YOECUMF.o 
 fonte_neige.o : interface_surf.o FCTTRE.o yoethf.o suphec.o indicesol.o 
 fxhyp.o : paramet_m.o dimens_m.o 
@@ -221,7 +221,7 @@ mathop.o : mathop2.o errioipsl.o
 minmaxqfi.o : dimphy.o dimens_m.o 
 nat2gcm.o : guide.o q_sat.o comgeom.o comvert.o comconst.o paramet_m.o dimens_m.o 
 newmicro.o : nuagecom.o suphec.o dimphy.o dimens_m.o 
-nflxtr.o : YOECUMF.o suphec.o dimphy.o dimens_m.o 
+nflxtr.o : suphec.o dimphy.o 
 nuage.o : suphec.o dimphy.o dimens_m.o 
 nxgrad.o : comgeom.o paramet_m.o dimens_m.o 
 nxgrad_gam.o : comgeom.o paramet_m.o dimens_m.o 
