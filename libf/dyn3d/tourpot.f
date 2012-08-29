@@ -61,7 +61,7 @@ CDIR$ IVDEP
    5  CONTINUE
 
 
-      CALL  filtreg( rot, jjm, llm, 2, 1, .FALSE., 1 )
+      CALL  filtreg( rot, jjm, llm, 2, 1, .FALSE.)
 
 
       DO 10 l = 1, llm

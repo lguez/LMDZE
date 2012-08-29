@@ -12,7 +12,7 @@ contains
     ! Avec opérateurs star : gradiv2, divgrad2, nxgraro2
 
     USE dimens_m, ONLY: iim, jjm, llm
-    USE comdissnew, ONLY: lstardis, nitergdiv, nitergrot, niterh
+    USE comdissnew, ONLY: nitergdiv, nitergrot, niterh
     USE inidissip_m, ONLY: dtdiss, tetah, tetaudiv, tetaurot, cdivu, crot, cdivh
     use gradiv2_m, only: gradiv2
     use nr_util, only: assert
@@ -47,12 +47,7 @@ contains
 
     ! Calcul de la partie grad (div) :
 
-    IF (lstardis) THEN
-       CALL gradiv2(ucov, vcov, nitergdiv, gdx, gdy, cdivu)
-    ELSE
-       CALL gradiv(llm, ucov, vcov, nitergdiv, gdx, gdy, cdivu)
-    END IF
-
+    CALL gradiv2(ucov, vcov, nitergdiv, gdx, gdy, cdivu)
     tedt = tetaudiv * dtdiss
     forall (l = 1: llm)
        du(:, 2: jjm, l) = - tedt(l) * gdx(:, 2: jjm, l)
@@ -61,12 +56,7 @@ contains
 
     ! Calcul de la partie n X grad (rot) :
 
-    IF (lstardis) THEN
-       CALL nxgraro2(llm, ucov, vcov, nitergrot, grx, gry, crot)
-    ELSE
-       CALL nxgrarot(llm, ucov, vcov, nitergrot, grx, gry, crot)
-    END IF
-
+    CALL nxgraro2(llm, ucov, vcov, nitergrot, grx, gry, crot)
     tedt = tetaurot * dtdiss
     forall (l = 1: llm)
        du(:, 2: jjm, l) = du(:, 2: jjm, l) - tedt(l) * grx(:, 2: jjm, l)
@@ -75,14 +65,9 @@ contains
 
     ! calcul de la partie div (grad) :
 
-    IF (lstardis) THEN
-       forall (l = 1: llm) &
-            deltapres(:, :, l) = max(0., p(:, :, l) - p(:, :, l + 1))
-       CALL divgrad2(llm, teta, deltapres, niterh, gdx, cdivh)
-    ELSE
-       CALL divgrad(llm, teta, niterh, gdx, cdivh)
-    END IF
-
+    forall (l = 1: llm) &
+         deltapres(:, :, l) = max(0., p(:, :, l) - p(:, :, l + 1))
+    CALL divgrad2(llm, teta, deltapres, niterh, gdx, cdivh)
     forall (l = 1: llm) dh(:, :, l) = - tetah(l) * dtdiss * gdx(:, :, l)
 
   END SUBROUTINE dissip

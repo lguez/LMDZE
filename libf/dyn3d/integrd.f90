@@ -100,7 +100,7 @@ contains
     CALL massdair(p, masse)
 
     finvmasse = masse
-    CALL filtreg(finvmasse, jjp1, llm, -2, 2, .TRUE., 1)
+    CALL filtreg(finvmasse, jjp1, llm, -2, 2, .TRUE.)
 
     ! integration de ucov, vcov, h
 

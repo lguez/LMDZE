@@ -68,7 +68,7 @@ contains
 
     if (present(pkf)) then
        pkf = pk
-       CALL filtreg(pkf, jjm + 1, llm, 2, 1, .TRUE., 1)
+       CALL filtreg(pkf, jjm + 1, llm, 2, 1, .TRUE.)
     end if
 
   END SUBROUTINE exner_hyb

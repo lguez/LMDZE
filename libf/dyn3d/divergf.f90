@@ -55,7 +55,7 @@ contains
        ENDDO
     end DO
 
-    CALL filtreg(div, jjp1, klevel, 2, 2, .TRUE., 1)
+    CALL filtreg(div, jjp1, klevel, 2, 2, .TRUE.)
 
     DO l = 1, klevel
        DO ij = iip2, ip1jm

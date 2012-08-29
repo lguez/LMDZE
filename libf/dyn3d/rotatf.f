@@ -46,7 +46,7 @@ CDIR$ IVDEP
 c
   10  CONTINUE
 
-        CALL filtreg( rot, jjm, klevel, 2, 2, .FALSE., 1 )
+        CALL filtreg( rot, jjm, klevel, 2, 2, .FALSE.)
       
         DO l = 1, klevel
           DO ij = 1, ip1jm

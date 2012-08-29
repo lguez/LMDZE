@@ -2,8 +2,6 @@ module comdissnew
 
   implicit none
 
-  LOGICAL:: lstardis = .TRUE. ! choix de l'opérateur de dissipation star
-
   INTEGER:: nitergdiv = 1
   ! nombre d'itérations de l'opérateur de dissipation gradiv
 
@@ -31,8 +29,8 @@ contains
 
     use unit_nml_m, only: unit_nml
     
-    namelist /comdissnew_nml/lstardis, nitergdiv, nitergrot, niterh, &
-         tetagdiv, tetagrot, tetatemp, coefdis
+    namelist /comdissnew_nml/nitergdiv, nitergrot, niterh, tetagdiv, &
+         tetagrot, tetatemp, coefdis
 
     !-------------------------------------------------
 

@@ -51,7 +51,7 @@ contains
        CALL qminimum(q, 2, finmasse)
 
        finmasse = masse
-       CALL filtreg(finmasse, jjm + 1, llm, -2, 2, .TRUE., 1)
+       CALL filtreg(finmasse, jjm + 1, llm, -2, 2, .TRUE.)
 
        ! Calcul de "dq" pour l'eau, pour le passer à la physique
        dtvrtrac = iapp_tracvl * dtvr

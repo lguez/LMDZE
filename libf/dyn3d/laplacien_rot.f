@@ -31,7 +31,7 @@ c
 c   ........................................................
 c
 c
-      CALL  filtreg ( rotin ,   jjm, klevel,   2, 1, .FALSE., 1 )
+      CALL  filtreg ( rotin ,   jjm, klevel,   2, 1, .FALSE.)
 
       CALL   nxgrad ( klevel, rotin,   ghx ,  ghy               )
       CALL   rotatf  ( klevel, ghx  ,   ghy , rotout             )

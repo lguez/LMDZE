@@ -20,16 +20,16 @@ contains
     ! Initialisation de la dissipation horizontale. Calcul des valeurs
     ! propres des opérateurs par méthode itérative.
 
-    USE comconst, ONLY : dtvr
-    use comdissnew, only: lstardis, nitergdiv, nitergrot, niterh, tetagdiv, &
-         tetagrot, tetatemp
-    USE comvert, ONLY : preff, presnivs
-    USE conf_gcm_m, ONLY : iperiod
-    USE dimens_m, ONLY : iim, jjm, llm
+    USE comconst, ONLY: dtvr
+    use comdissnew, only: nitergdiv, nitergrot, niterh, tetagdiv, tetagrot, &
+         tetatemp
+    USE comvert, ONLY: preff, presnivs
+    USE conf_gcm_m, ONLY: iperiod
+    USE dimens_m, ONLY: iim, jjm
     use filtreg_m, only: filtreg
     use gradiv2_m, only: gradiv2
     use jumble, only: new_unit
-    USE paramet_m, ONLY : jjp1
+    USE paramet_m, ONLY: jjp1
 
     ! Variables local to the procedure:
     REAL zvert(llm), max_zvert ! no dimension
@@ -49,78 +49,51 @@ contains
     deltap = 1.
     call random_number(zh)
     zh = zh - 0.5
-    CALL filtreg(zh, jjp1, 1, 2, 1, .TRUE., 1)
+    CALL filtreg(zh, jjp1, 1, 2, 1, .TRUE.)
 
     DO l = 1, 50
-       IF (lstardis) THEN
-          CALL divgrad2(1, zh, deltap, niterh, divgra, -1.)
-       ELSE
-          CALL divgrad(1, zh, niterh, divgra, -1.)
-       END IF
-
+       CALL divgrad2(1, zh, deltap, niterh, divgra, -1.)
        zllm = abs(maxval(divgra))
        zh = divgra / zllm
     END DO
 
-    IF (lstardis) THEN
-       cdivh = 1. / zllm
-    ELSE
-       cdivh = zllm**(- 1. / niterh)
-    END IF
+    cdivh = 1. / zllm
     PRINT *, 'cdivh = ', cdivh
 
     PRINT *, 'Calcul des valeurs propres de gradiv'
     call random_number(zu)
     zu = zu - 0.5
-    CALL filtreg(zu, jjp1, 1, 2, 1, .TRUE., 1)
+    CALL filtreg(zu, jjp1, 1, 2, 1, .TRUE.)
     call random_number(zv)
     zv = zv - 0.5
-    CALL filtreg(zv, jjm, 1, 2, 1, .FALSE., 1)
+    CALL filtreg(zv, jjm, 1, 2, 1, .FALSE.)
 
     DO l = 1, 50
-       IF (lstardis) THEN
-          CALL gradiv2(zu, zv, nitergdiv, gx, gy, -1.)
-       ELSE
-          CALL gradiv(1, zu, zv, nitergdiv, gx, gy, -1.)
-       END IF
-
+       CALL gradiv2(zu, zv, nitergdiv, gx, gy, -1.)
        zllm = max(abs(maxval(gx)), abs(maxval(gy)))
        zu = gx / zllm
        zv = gy / zllm
     end DO
 
-    IF (lstardis) THEN
-       cdivu = 1. / zllm
-    ELSE
-       cdivu = zllm**(- 1. / nitergdiv)
-    END IF
+    cdivu = 1. / zllm
     PRINT *, 'cdivu = ', cdivu
 
     PRINT *, 'Calcul des valeurs propres de nxgrarot'
     call random_number(zu)
     zu = zu - 0.5
-    CALL filtreg(zu, jjp1, 1, 2, 1, .TRUE., 1)
+    CALL filtreg(zu, jjp1, 1, 2, 1, .TRUE.)
     call random_number(zv)
     zv = zv - 0.5
-    CALL filtreg(zv, jjm, 1, 2, 1, .FALSE., 1)
+    CALL filtreg(zv, jjm, 1, 2, 1, .FALSE.)
 
     DO l = 1, 50
-       IF (lstardis) THEN
-          CALL nxgraro2(1, zu, zv, nitergrot, gx, gy, -1.)
-       ELSE
-          CALL nxgrarot(1, zu, zv, nitergrot, gx, gy, -1.)
-       END IF
-
+       CALL nxgraro2(1, zu, zv, nitergrot, gx, gy, -1.)
        zllm = max(abs(maxval(gx)), abs(maxval(gy)))
        zu = gx / zllm
        zv = gy / zllm
     end DO
 
-    IF (lstardis) THEN
-       crot = 1. / zllm
-    ELSE
-       crot = zllm**(- 1. / nitergrot)
-    END IF
+    crot = 1. / zllm
     PRINT *, 'crot = ', crot
 
     ! Variation verticale du coefficient de dissipation :

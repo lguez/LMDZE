@@ -42,12 +42,12 @@ c
 c
       DO 10 iter = 1,lh
 
-      CALL filtreg ( divgra,jjp1,klevel,2,1,.true.,1  )
+      CALL filtreg ( divgra,jjp1,klevel,2,1,.true.)
 
       CALL    grad (klevel,divgra, ghx  , ghy          )
       CALL  diverg (klevel,  ghx , ghy  , divgra       )
 
-      CALL filtreg ( divgra,jjp1,klevel,2,1,.true.,1)
+      CALL filtreg ( divgra,jjp1,klevel,2,1,.true.)
 
       DO 5 l = 1,klevel
       DO 4  ij = 1, ip1jmp1

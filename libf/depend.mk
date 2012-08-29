@@ -126,8 +126,7 @@ flxdlfs.o : YOECUMF.o yoethf.o suphec.o dimphy.o dimens_m.o
 flxdtdq.o : YOECUMF.o yoethf.o suphec.o dimphy.o dimens_m.o 
 flxflux.o : YOECUMF.o FCTTRE.o yoethf.o suphec.o dimphy.o dimens_m.o 
 flxini.o : yoethf.o suphec.o dimphy.o dimens_m.o 
-flxmain.o : flxsetup.o YOECUMF.o yoethf.o suphec.o dimphy.o 
-flxsetup.o : YOECUMF.o 
+flxmain.o : YOECUMF.o yoethf.o suphec.o dimphy.o 
 fonte_neige.o : interface_surf.o FCTTRE.o yoethf.o suphec.o indicesol.o 
 fxhyp.o : paramet_m.o dimens_m.o 
 fxy.o : serre.o dimens_m.o 
@@ -143,7 +142,6 @@ gr_phy_write_3d.o : grid_change.o dimphy.o dimens_m.o
 gr_u_scal.o : comgeom.o paramet_m.o dimens_m.o 
 gr_v_scal.o : comgeom.o paramet_m.o dimens_m.o 
 grad.o : paramet_m.o dimens_m.o 
-gradiv.o : filtreg.o conf_gcm.o paramet_m.o dimens_m.o grad.o 
 gradiv2.o : laplacien.o grad.o filtreg.o comgeom.o divergf.o dimens_m.o 
 grid_change.o : dimphy.o dimens_m.o 
 grid_noro_m.o : mva9.o dimens_m.o 
@@ -226,7 +224,6 @@ nuage.o : suphec.o dimphy.o dimens_m.o
 nxgrad.o : comgeom.o paramet_m.o dimens_m.o 
 nxgrad_gam.o : comgeom.o paramet_m.o dimens_m.o 
 nxgraro2.o : filtreg.o paramet_m.o dimens_m.o 
-nxgrarot.o : filtreg.o conf_gcm.o paramet_m.o dimens_m.o 
 o3_chem.o : orbite.o regr_pr_comb_coefoz.o dimens_m.o dimphy.o 
 orbite.o : phyetat0.o dimphy.o YOMCST.o 
 orodrag.o : gwprofil.o YOEGWD.o suphec.o dimphy.o dimens_m.o 

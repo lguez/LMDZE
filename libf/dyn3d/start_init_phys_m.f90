@@ -16,7 +16,7 @@ CONTAINS
     use inter_barxy_m, only: inter_barxy
     use netcdf, only: nf90_nowrite
     use netcdf95, only: nf95_open, nf95_close, nf95_get_var, nf95_inq_varid, &
-         nf95_gw_var, find_longitude, find_latitude
+         nf95_gw_var, find_coord
     use nr_util, only: assert, pi
 
     REAL, intent(out):: tsol_2d(:, :), qsol_2d(:, :) ! (iim + 1, jjm + 1)
@@ -40,12 +40,12 @@ CONTAINS
 
     call nf95_open('ECPHY.nc', nf90_nowrite, ncid)
 
-    call find_longitude(ncid, varid=varid)
+    call find_coord(ncid, varid=varid, std_name="longitude")
     call nf95_gw_var(ncid, varid, lon_ini)
     lon_ini = lon_ini * pi / 180. ! convert to rad
     iml_phys = size(lon_ini)
 
-    call find_latitude(ncid, varid=varid)
+    call find_coord(ncid, varid=varid, std_name="latitude")
     call nf95_gw_var(ncid, varid, lat_ini)
     lat_ini = lat_ini * pi / 180. ! convert to rad
     jml_phys = size(lat_ini)

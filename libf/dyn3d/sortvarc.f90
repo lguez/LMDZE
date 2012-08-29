@@ -60,7 +60,7 @@ contains
     rmsdpdt = ssum(ip1jmp1, ge, 1) - ssum(jjp1, ge, iip1)
     rmsdpdt = daysec*1.E-2*sqrt(rmsdpdt/imjmp1)
     CALL scopy(ijp1llm, bern, 1, bernf, 1)
-    CALL filtreg(bernf, jjp1, llm, -2, 2, .TRUE., 1)
+    CALL filtreg(bernf, jjp1, llm, -2, 2, .TRUE.)
 
     ! Calcul du moment  angulaire
     radsg = rad/g

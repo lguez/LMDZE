@@ -11,9 +11,9 @@ contains
     USE dimphy, ONLY: klev, klon
     USE suphec_m, ONLY: rcpd, retv, rg, rlvtt
     USE yoethf_m, ONLY: r4les, r5les
-    USE yoecumf, ONLY: cmfdeps, entrpen, entrscv, lmfdd
-    use flxsetup_m, only: flxsetup
+    USE yoecumf, ONLY: flxsetup, cmfdeps, entrpen, entrscv, lmfdd
 
+    REAL, intent(in):: pdtime
     REAL pten(klon,klev), pqen(klon,klev), pqsen(klon,klev)
     REAL ptte(klon,klev)
     REAL pqte(klon,klev)
@@ -25,8 +25,8 @@ contains
     REAL plude(klon,klev)
     REAL pmfu(klon,klev)
     REAL prsfc(klon), pssfc(klon)
-    INTEGER  kcbot(klon), kctop(klon), ktype(klon)
-    LOGICAL  ldland(klon), ldcum(klon)
+    INTEGER kcbot(klon), kctop(klon), ktype(klon)
+    LOGICAL ldland(klon), ldcum(klon)
 
     REAL ztenh(klon,klev), zqenh(klon,klev), zqsenh(klon,klev)
     REAL zgeoh(klon,klev)
@@ -38,11 +38,10 @@ contains
     REAL zrfl(klon)
     REAL pmflxr(klon,klev+1)
     REAL pmflxs(klon,klev+1)
-    INTEGER  ilab(klon,klev), ictop0(klon)
-    LOGICAL  llo1
+    INTEGER ilab(klon,klev), ictop0(klon)
+    LOGICAL llo1
     REAL dt_con(klon,klev), dq_con(klon,klev)
     REAL zmfmax, zdh
-    REAL, intent(in):: pdtime
     real zqumqe, zdqmin, zalvdcp, zhsat, zzz
     REAL zhhat, zpbmpt, zgam, zeps, zfac
     INTEGER i, k, ikb, itopm2, kcum
@@ -114,7 +113,7 @@ contains
     DO i = 1, klon
        ktype(i) = 2
        if (zdqcv(i).GT.MAX(0.,-1.5*pqhfl(i)*RG)) ktype(i) = 1
-       !cc         if (zdqcv(i).GT.MAX(0.,-1.1*pqhfl(i)*RG)) ktype(i) = 1
+       !cc if (zdqcv(i).GT.MAX(0.,-1.1*pqhfl(i)*RG)) ktype(i) = 1
     ENDDO
 
     ! determiner le flux de masse entrant a travers la base.
@@ -144,8 +143,8 @@ contains
     ! DETERMINE CLOUD ASCENT FOR ENTRAINING PLUME
 
     ! (A) calculer d'abord la hauteur "theorique" de la tour convective sans
-    !     considerer l'entrainement ni le detrainement du panache, sachant
-    !     ces derniers peuvent abaisser la hauteur theorique.
+    ! considerer l'entrainement ni le detrainement du panache, sachant
+    ! ces derniers peuvent abaisser la hauteur theorique.
 
     DO i = 1, klon
        ikb=kcbot(i)
@@ -158,7 +157,7 @@ contains
        DO i = 1, klon
           zhsat=RCPD*ztenh(i,k)+zgeoh(i,k)+RLVTT*zqsenh(i,k)
           zgam=R5LES*zalvdcp*zqsenh(i,k)/ &
-               ((1.-RETV  *zqsenh(i,k))*(ztenh(i,k)-R4LES)**2)
+               ((1.-RETV *zqsenh(i,k))*(ztenh(i,k)-R4LES)**2)
           zzz=RCPD*ztenh(i,k)*0.608
           zhhat=zhsat-(zzz+zgam*zzz)/(1.+zgam*zzz/RLVTT)* &
                MAX(zqsenh(i,k)-zqenh(i,k),0.)
@@ -186,7 +185,7 @@ contains
           IF(ktype(i).EQ.2) zentr(i)=ENTRSCV
        ENDDO
 
-       IF (lmfdd) THEN  ! si l'on considere le panache descendant
+       IF (lmfdd) THEN ! si l'on considere le panache descendant
           ! calculer la precipitation issue du panache ascendant pour
           ! determiner l'existence du panache descendant dans la convection
           DO i = 1, klon
@@ -200,16 +199,16 @@ contains
 
           ! determiner le LFS (level of free sinking: niveau de plonge libre)
           CALL flxdlfs(ztenh, zqenh, zgeoh, paph, ptu, pqu, &
-               ldcum,    kcbot,    kctop,    zmfub,    zrfl, &
-               ptd,      pqd, &
-               pmfd,     zmfds,    zmfdq,    zdmfdp, &
-               kdtop,    lddraf)
+               ldcum, kcbot, kctop, zmfub, zrfl, &
+               ptd, pqd, &
+               pmfd, zmfds, zmfdq, zdmfdp, &
+               kdtop, lddraf)
 
           ! calculer le panache descendant
-          CALL flxddraf(ztenh,    zqenh, &
-               zgeoh,    paph,     zrfl, &
-               ptd,      pqd, &
-               pmfd,     zmfds,    zmfdq,    zdmfdp, &
+          CALL flxddraf(ztenh, zqenh, &
+               zgeoh, paph, zrfl, &
+               ptd, pqd, &
+               pmfd, zmfds, zmfdq, zdmfdp, &
                lddraf, pen_d, pde_d)
 
           ! calculer de nouveau le flux de masse entrant a travers la base
@@ -258,7 +257,7 @@ contains
           DO i = 1, klon
              IF (lddraf(i)) zmfub(i)=zmfub1(i)
           ENDDO
-       ENDIF   ! fin de test sur lmfdd
+       ENDIF ! fin de test sur lmfdd
 
        ! calculer de nouveau le panache ascendant
 
@@ -272,7 +271,7 @@ contains
        ! determiner les flux convectifs en forme finale, ainsi que
        ! la quantite des precipitations
 
-       CALL flxflux(pdtime, pqen, pqsen, ztenh, zqenh, pap, paph,  &
+       CALL flxflux(pdtime, pqen, pqsen, ztenh, zqenh, pap, paph, &
             ldland, zgeoh, kcbot, kctop, lddraf, kdtop, ktype, ldcum, &
             pmfu, pmfd, zmfus, zmfds, zmfuq, zmfdq, zmful, plude, &
             zdmfup, zdmfdp, pten, prsfc, pssfc, zdpmel, itopm2, &

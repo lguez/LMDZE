@@ -51,7 +51,7 @@ c-----------------------------------------------------------------------
 c   filtrage:
 c   ---------
 
-       CALL filtreg( convm, jjp1, llm, 2, 2, .true., 1 )
+       CALL filtreg( convm, jjp1, llm, 2, 2, .true.)
 
 c    integration de la convergence de masse de haut  en bas ......
 

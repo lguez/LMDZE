@@ -41,6 +41,6 @@ SUBROUTINE dteta1(teta, pbaru, pbarv, dteta)
 
   ! stockage dans dh de la convergence horizont. filtree' du flux
   ! d'enthalpie potentielle
-  CALL filtreg(dteta, jjp1, llm, 2, 2, .true., 1)
+  CALL filtreg(dteta, jjp1, llm, 2, 2, .true.)
 
 END SUBROUTINE dteta1

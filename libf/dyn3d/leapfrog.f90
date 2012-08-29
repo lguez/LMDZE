@@ -129,7 +129,7 @@ contains
           massem1 = masse
           psm1 = ps
           finvmaold = masse
-          CALL filtreg(finvmaold, jjm + 1, llm, - 2, 2, .TRUE., 1)
+          CALL filtreg(finvmaold, jjm + 1, llm, - 2, 2, .TRUE.)
        end if
 
        ! Calcul des tendances dynamiques:

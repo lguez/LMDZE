@@ -54,7 +54,7 @@ c
       ENDDO
 c
 c
-      CALL filtreg( rot, jjm, klevel, 2,1, .FALSE.,1)
+      CALL filtreg( rot, jjm, klevel, 2,1, .FALSE.)
       CALL nxgrad ( klevel, rot, grx, gry )
 c
       DO    l = 1, klevel

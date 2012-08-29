@@ -4,15 +4,15 @@ module filtreg_m
 
 contains
 
-  SUBROUTINE filtreg(champ, nlat, nbniv, ifiltre, iaire, griscal, iter)
+  SUBROUTINE filtreg(champ, nlat, nbniv, ifiltre, iaire, griscal)
 
     ! From filtrez/filtreg.F, version 1.1.1.1, 2004/05/19 12:53:09
     ! Author: P. Le Van
     ! Objet : filtre matriciel longitudinal, avec les matrices précalculées
     ! pour l'opérateur filtre. 
 
-    USE dimens_m, ONLY : iim, jjm
-    USE coefils, ONLY : sddu, sddv, unsddu, unsddv
+    USE dimens_m, ONLY: iim, jjm
+    USE coefils, ONLY: sddu, sddv, unsddu, unsddv
     use inifilr_m, only: jfiltnu, jfiltnv, jfiltsu, jfiltsv, matriceun, &
          matriceus, matricevn, matricevs, matrinvn, matrinvs
 
@@ -38,9 +38,6 @@ contains
     !  1 si champ intensif 
     ! 2 si champ extensif (pondere par les aires)
 
-    integer, intent(in):: iter
-    !  1 filtre simple 
-
     LOGICAL, intent(in):: griscal
 
     ! Variables local to the procedure:
@@ -56,12 +53,6 @@ contains
        print *, 'Pas de transformee simple dans cette version'
        STOP 1
     end IF
-
-    IF (iter==2) THEN
-       PRINT *, ' Pas d iteration du filtre dans cette version !', &
-            ' Utiliser old_filtreg et repasser !'
-       STOP 1
-    END IF
 
     IF (ifiltre==-2 .AND. .NOT. griscal) THEN
        PRINT *, ' Cette routine ne calcule le filtre inverse que ', &
