@@ -8,7 +8,7 @@ module inidissip_m
 
   REAL dtdiss ! in s
   integer idissip ! période de la dissipation (en pas de temps)
-  real tetaudiv(llm), tetaurot(llm), tetah(llm) ! in s
+  real tetaudiv(llm), tetaurot(llm), tetah(llm) ! in s-1
   real cdivu, crot, cdivh
 
 contains
@@ -26,9 +26,11 @@ contains
     USE comvert, ONLY: preff, presnivs
     USE conf_gcm_m, ONLY: iperiod
     USE dimens_m, ONLY: iim, jjm
+    use divgrad2_m, only: divgrad2
     use filtreg_m, only: filtreg
     use gradiv2_m, only: gradiv2
     use jumble, only: new_unit
+    use nxgraro2_m, only: nxgraro2
     USE paramet_m, ONLY: jjp1
 
     ! Variables local to the procedure:
@@ -87,7 +89,7 @@ contains
     CALL filtreg(zv, jjm, 1, 2, 1, .FALSE.)
 
     DO l = 1, 50
-       CALL nxgraro2(1, zu, zv, nitergrot, gx, gy, -1.)
+       CALL nxgraro2(zu, zv, nitergrot, gx, gy, -1.)
        zllm = max(abs(maxval(gx)), abs(maxval(gy)))
        zu = gx / zllm
        zv = gy / zllm
@@ -104,15 +106,6 @@ contains
     tetaurot = zvert / tetagrot
     tetah = zvert / tetatemp
 
-    call new_unit(unit)
-    open(unit, file="inidissip.csv", status="replace", action="write")
-    write(unit, fmt=*) '"tetaudiv (s)" "tetaurot (s)" "tetah (s)"' ! title line
-    do l = 1, llm
-       write(unit, fmt=*) tetaudiv(l), tetaurot(l), tetah(l)
-    end do
-    close(unit)
-    print *, 'Created file "inidissip.csv".'
-
     max_zvert = maxval(zvert)
     tetamin = min(1e6, tetagdiv / max_zvert, tetagrot / max_zvert, &
          tetatemp / max_zvert)
@@ -121,6 +114,20 @@ contains
     PRINT *, 'idissip = ', idissip
     dtdiss = idissip * dtvr
     PRINT *, 'dtdiss = ', dtdiss, "s"
+
+    call new_unit(unit)
+    open(unit, file="inidissip.csv", status="replace", action="write")
+
+    ! Title line:
+    write(unit, fmt=*) '"presnivs (hPa)" "dtdiss * tetaudiv" ' &
+         // '"dtdiss * tetaurot" "dtdiss * tetah"'
+
+    do l = 1, llm
+       write(unit, fmt=*) presnivs(l) / 100., dtdiss * tetaudiv(l), &
+            dtdiss * tetaurot(l), dtdiss * tetah(l)
+    end do
+    close(unit)
+    print *, 'Created file "inidissip.csv".'
 
   END SUBROUTINE inidissip
 

@@ -10,10 +10,10 @@ contains
     ! P. Le Van
     ! Calcul de div(grad) de teta.
 
-    use grad_m, only: grad
-    use filtreg_m, only: filtreg
-    use divergf_m, only: divergf
     USE dimens_m, ONLY: llm
+    use divergf_m, only: divergf
+    use filtreg_m, only: filtreg
+    use grad_m, only: grad
     USE paramet_m, ONLY: ip1jm, ip1jmp1, jjp1
 
     INTEGER, intent(in):: klevel

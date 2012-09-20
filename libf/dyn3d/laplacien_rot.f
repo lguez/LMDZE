@@ -22,7 +22,7 @@ c
 c 
 c   ..........    variables  en  arguments     .............
 c
-      INTEGER klevel
+      INTEGER, intent(in):: klevel
       REAL rotin( ip1jm,klevel ), rotout( ip1jm,klevel )
 c
 c   ..........    variables   locales       ................

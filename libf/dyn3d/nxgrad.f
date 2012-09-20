@@ -16,7 +16,7 @@ c
       use comgeom
       IMPLICIT NONE
 c
-      INTEGER klevel
+      INTEGER, intent(in):: klevel
       REAL rot( ip1jm,klevel ),x( ip1jmp1,klevel ),y(ip1jm,klevel )
       INTEGER   l,ij
 c

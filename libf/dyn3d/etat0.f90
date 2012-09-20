@@ -61,8 +61,8 @@ contains
     ! (latitude and longitude of a point of the scalar grid identified
     ! by a simple index, in °)
 
-    REAL, dimension(iim + 1, jjm + 1, llm):: uvent, t3d, tpot
-    REAL vvent(iim + 1, jjm, llm)
+    REAL, dimension(iim + 1, jjm + 1, llm):: ucov, t3d, tpot
+    REAL vcov(iim + 1, jjm, llm)
 
     REAL q3d(iim + 1, jjm + 1, llm, nqmx)
     ! (mass fractions of trace species
@@ -158,13 +158,13 @@ contains
     PRINT *, "minval(pls) = ", minval(pls)
     print *, "maxval(pls) = ", maxval(pls)
 
-    call start_inter_3d('U', rlonv, rlatv, pls, uvent)
-    forall (l = 1: llm) uvent(:iim, :, l) = uvent(:iim, :, l) * cu_2d(:iim, :)
-    uvent(iim+1, :, :) = uvent(1, :, :)
+    call start_inter_3d('U', rlonv, rlatv, pls, ucov)
+    forall (l = 1: llm) ucov(:iim, :, l) = ucov(:iim, :, l) * cu_2d(:iim, :)
+    ucov(iim+1, :, :) = ucov(1, :, :)
 
-    call start_inter_3d('V', rlonu, rlatu(:jjm), pls(:, :jjm, :), vvent)
-    forall (l = 1: llm) vvent(:iim, :, l) = vvent(:iim, :, l) * cv_2d(:iim, :)
-    vvent(iim + 1, :, :) = vvent(1, :, :)
+    call start_inter_3d('V', rlonu, rlatu(:jjm), pls(:, :jjm, :), vcov)
+    forall (l = 1: llm) vcov(:iim, :, l) = vcov(:iim, :, l) * cv_2d(:iim, :)
+    vcov(iim + 1, :, :) = vcov(1, :, :)
 
     call start_inter_3d('TEMP', rlonu, rlatv, pls, t3d)
     PRINT *,  'minval(t3d) = ', minval(t3d)
@@ -308,10 +308,10 @@ contains
     annee_ref = anneeref
 
     CALL geopot(ip1jmp1, tpot, pk , pks,  phis, phi)
-    CALL caldyn0(uvent, vvent, tpot, psol, masse, pk, phis, phi, w, pbaru, &
+    CALL caldyn0(ucov, vcov, tpot, psol, masse, pk, phis, phi, w, pbaru, &
          pbarv)
     CALL dynredem0("start.nc", dayref, phis)
-    CALL dynredem1("start.nc", vvent, uvent, tpot, q3d, masse, psol, itau=0)
+    CALL dynredem1("start.nc", vcov, ucov, tpot, q3d, masse, psol, itau=0)
 
     ! Ecriture état initial physique:
     print *, "iphysiq = ", iphysiq

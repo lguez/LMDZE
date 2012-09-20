@@ -4,19 +4,19 @@ module grad_m
 
 contains
 
-  SUBROUTINE grad(klevel, pg, pgx, pgy)
+  SUBROUTINE grad(klevel, g, gx, gy)
 
     ! From LMDZ4/libf/dyn3d/grad.F, version 1.1.1.1 2004/05/19 12:53:05
     ! P. Le Van
 
     ! Calcul des composantes covariantes en x et y du gradient de g.
 
-    USE dimens_m, ONLY : iim
-    USE paramet_m, ONLY : iip1, ip1jm, ip1jmp1
+    USE dimens_m, ONLY: iim
+    USE paramet_m, ONLY: iip1, ip1jm, ip1jmp1
 
     INTEGER, intent(in):: klevel
-    REAL, intent(in):: pg(ip1jmp1, klevel)
-    REAL, intent(out):: pgx(ip1jmp1, klevel) , pgy(ip1jm, klevel)
+    REAL, intent(in):: g(ip1jmp1, klevel)
+    REAL, intent(out):: gx(ip1jmp1, klevel) , gy(ip1jm, klevel)
 
     ! Local:
     INTEGER l, ij
@@ -25,17 +25,17 @@ contains
 
     DO l = 1, klevel
        DO ij = 1, ip1jmp1 - 1
-          pgx(ij, l) = pg(ij +1, l) - pg(ij, l)
+          gx(ij, l) = g(ij +1, l) - g(ij, l)
        end DO
 
-       ! correction pour pgx(ip1, j, l)
-       ! pgx(iip1, j, l)= pgx(1, j, l)
+       ! correction pour gx(ip1, j, l)
+       ! gx(iip1, j, l)= gx(1, j, l)
        DO ij = iip1, ip1jmp1, iip1
-          pgx(ij, l) = pgx(ij -iim, l)
+          gx(ij, l) = gx(ij -iim, l)
        end DO
 
        DO ij = 1, ip1jm
-          pgy(ij, l) = pg(ij, l) - pg(ij +iip1, l)
+          gy(ij, l) = g(ij, l) - g(ij +iip1, l)
        end DO
     end DO
 

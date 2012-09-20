@@ -11,11 +11,13 @@ contains
     ! Objet : calcul de la dissipation horizontale
     ! Avec opérateurs star : gradiv2, divgrad2, nxgraro2
 
-    USE dimens_m, ONLY: iim, jjm, llm
     USE comdissnew, ONLY: nitergdiv, nitergrot, niterh
-    USE inidissip_m, ONLY: dtdiss, tetah, tetaudiv, tetaurot, cdivu, crot, cdivh
+    USE dimens_m, ONLY: iim, jjm, llm
+    use divgrad2_m, only: divgrad2
     use gradiv2_m, only: gradiv2
+    USE inidissip_m, ONLY: dtdiss, tetah, tetaudiv, tetaurot, cdivu, crot, cdivh
     use nr_util, only: assert
+    use nxgraro2_m, only: nxgraro2
 
     REAL, intent(in):: vcov(:, :, :) ! (iim + 1, jjm, llm)
     REAL, intent(in):: ucov(:, :, :) ! (iim + 1, jjm + 1, llm)
@@ -27,7 +29,6 @@ contains
 
     ! Local:
     REAL gdx(iim + 1, jjm + 1, llm), gdy(iim + 1, jjm, llm)
-    REAL grx(iim + 1, jjm + 1, llm), gry(iim + 1, jjm, llm)
     REAL tedt(llm)
     REAL deltapres(iim + 1, jjm + 1, llm)
     INTEGER l
@@ -45,8 +46,7 @@ contains
     du(:, 1, :) = 0.
     du(:, jjm + 1, :) = 0.
 
-    ! Calcul de la partie grad (div) :
-
+    ! Calcul de la partie grad(div) :
     CALL gradiv2(ucov, vcov, nitergdiv, gdx, gdy, cdivu)
     tedt = tetaudiv * dtdiss
     forall (l = 1: llm)
@@ -54,17 +54,15 @@ contains
        dv(:, :, l) = - tedt(l) * gdy(:, :, l)
     END forall
 
-    ! Calcul de la partie n X grad (rot) :
-
-    CALL nxgraro2(llm, ucov, vcov, nitergrot, grx, gry, crot)
+    ! Calcul de la partie n X grad(rot) :
+    CALL nxgraro2(ucov, vcov, nitergrot, gdx, gdy, crot)
     tedt = tetaurot * dtdiss
     forall (l = 1: llm)
-       du(:, 2: jjm, l) = du(:, 2: jjm, l) - tedt(l) * grx(:, 2: jjm, l)
-       dv(:, :, l) = dv(:, :, l) - tedt(l) * gry(:, :, l)
+       du(:, 2: jjm, l) = du(:, 2: jjm, l) - tedt(l) * gdx(:, 2: jjm, l)
+       dv(:, :, l) = dv(:, :, l) - tedt(l) * gdy(:, :, l)
     END forall
 
-    ! calcul de la partie div (grad) :
-
+    ! calcul de la partie div(grad) :
     forall (l = 1: llm) &
          deltapres(:, :, l) = max(0., p(:, :, l) - p(:, :, l + 1))
     CALL divgrad2(llm, teta, deltapres, niterh, gdx, cdivh)

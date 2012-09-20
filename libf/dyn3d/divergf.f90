@@ -12,10 +12,10 @@ contains
     ! Calcule la divergence à tous les niveaux d'un vecteur de
     ! composantes x et y. x et y sont des composantes covariantes.
 
-    USE dimens_m, ONLY: iim
-    USE paramet_m, ONLY: iip1, iip2, ip1jm, ip1jmi1, ip1jmp1, jjp1
     USE comgeom, ONLY: apoln, apols, cuvsurcv, cvusurcu, unsaire
+    USE dimens_m, ONLY: iim
     USE filtreg_m, ONLY: filtreg
+    USE paramet_m, ONLY: iip1, iip2, ip1jm, ip1jmi1, ip1jmp1, jjp1
 
     INTEGER, intent(in):: klevel
     REAL, intent(in):: x(ip1jmp1, klevel), y(ip1jm, klevel)

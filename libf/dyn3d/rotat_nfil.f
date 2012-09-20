@@ -20,7 +20,7 @@ c
 c
 c   .....  variables en arguments  ......
 c
-      INTEGER klevel
+      INTEGER, intent(in):: klevel
       REAL rot( ip1jm,klevel )
       REAL x( ip1jmp1,klevel ), y( ip1jm,klevel )
 c

@@ -10,14 +10,14 @@ contains
     ! P. Le Van
     ! Calcul du gradient de la divergence du vecteur v.
 
-    USE dimens_m, ONLY : iim, jjm, llm
-    use divergf_m, only: divergf
-    USE comgeom, ONLY : cuvscvgam1, cvuscugam1, unsair_gam1, unsapolnga1, &
+    USE comgeom, ONLY: cuvscvgam1, cvuscugam1, unsair_gam1, unsapolnga1, &
          unsapolsga1
-    USE filtreg_m, ONLY : filtreg
+    USE dimens_m, ONLY: iim, jjm, llm
+    use divergf_m, only: divergf
+    USE filtreg_m, ONLY: filtreg
     use grad_m, only: grad
-    use nr_util, only: assert_eq, assert
     use laplacien_m, only: laplacien
+    use nr_util, only: assert_eq, assert
 
     ! Composantes covariantes de v :
     REAL, intent(in):: xcov(:, :, :) ! (iim + 1, jjm + 1, klevel)

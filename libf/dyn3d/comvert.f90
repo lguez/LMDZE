@@ -40,8 +40,8 @@ contains
     INTEGER l, unit
     REAL alpha, x(llm)
 
-    character(len=7):: s_sampling = "LMD5"
-    ! (other allowed values are "param", "strato1", "strato2" and "read")
+    character(len=7):: s_sampling = "tropo"
+    ! (other allowed values are "param", "strato1", "strato" and "read")
 
     real:: h = 7. ! scale height, in km
     ! (used only if "s_sampling" == "param" or "strato1")
@@ -78,8 +78,7 @@ contains
             = cosh((l - 1) / k0) **(- alpha * k0 / h) &
             * exp(- alpha / h * tanh((llm - k1) / k0) &
             * beta **(l - 1 - (llm - k1)) / log(beta))
-    case ("LMD5")
-       ! Ancienne discrétisation
+    case ("tropo")
        s(1) = 1.
        s(llm+1) = 0.
        forall (l = 1: llm) ds(l) &
@@ -103,7 +102,7 @@ contains
 
        s(2:llm) = (exp(- zz(2:llm) / h) - exp(- zz(llm + 1) / h)) &
             / (1. - exp(- zz(llm + 1) / h))
-    case ("strato2")
+    case ("strato")
        ! Recommended by F. Lott for a domain including the stratosphere
        s(1) = 1.
        s(llm+1) = 0.

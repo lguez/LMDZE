@@ -57,7 +57,7 @@ contains
 
     REAL pks((iim + 1) * (jjm + 1)) ! exner au sol
     REAL pk(iim + 1, jjm + 1, llm) ! exner au milieu des couches
-    REAL pkf((iim + 1) * (jjm + 1), llm) ! exner filt.au milieu des couches
+    REAL pkf(iim + 1, jjm + 1, llm) ! exner filtré au milieu des couches
     REAL phi(iim + 1, jjm + 1, llm) ! geopotential
     REAL w((iim + 1) * (jjm + 1), llm) ! vitesse verticale
 
