@@ -33,7 +33,7 @@ SUBROUTINE initfluxsto(tstep, t_ops, t_wrt, nq, fileid, filevid, filedid)
   USE dimens_m
   USE paramet_m
   USE comconst
-  USE comvert
+  USE disvert_m
   use conf_gcm_m
   USE comgeom
   USE serre

@@ -20,7 +20,7 @@ contains
     USE histvert_m, ONLY : histvert
     USE dimens_m, ONLY: jjm, llm
     USE paramet_m, ONLY: iip1, jjp1
-    USE comvert, ONLY: presnivs
+    USE disvert_m, ONLY: presnivs
     USE comgeom, ONLY: rlatu, rlatv, rlonu, rlonv
     USE temps, ONLY: itau_dyn
     USE iniadvtrac_m, ONLY: ttext

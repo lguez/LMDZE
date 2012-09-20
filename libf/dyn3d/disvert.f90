@@ -1,4 +1,4 @@
-module comvert
+module disvert_m
 
   use dimens_m, only: llm
 
@@ -19,16 +19,17 @@ contains
   SUBROUTINE disvert
 
     ! From dyn3d/disvert.F, v 1.1.1.1 2004/05/19 12:53:05
-    ! Auteur : P. Le Van
+    ! Author: P. Le Van
 
-    ! This procedure sets the vertical grid.
-    ! It defines the host variables "ap", "bp", "presnivs", "nivsigs"
-    ! and "nivsig".
-    ! "pa" should be defined before this procedure is called.
+    ! This procedure sets the vertical grid. It defines the host
+    ! variables "ap", "bp", "presnivs", "nivsigs" and "nivsig". "pa"
+    ! should be defined before this procedure is called.
 
-    use nr_util, only: pi
     use jumble, only: new_unit
+    use nr_util, only: pi
     use unit_nml_m, only: unit_nml
+
+    ! Local:
 
     REAL s(llm+1)
     ! "s(l)" is the atmospheric hybrid sigma-pressure coordinate at
@@ -82,7 +83,7 @@ contains
        s(1) = 1.
        s(llm+1) = 0.
        forall (l = 1: llm) ds(l) &
-            = 1. + 7. * SIN(pi * (REAL(l)-0.5) / real(llm+1))**2
+            = 1. + 7. * SIN(pi * (REAL(l) - 0.5) / real(llm + 1))**2
        ds = ds / sum(ds)
 
        DO l = llm, 2, -1
@@ -108,7 +109,7 @@ contains
        s(llm+1) = 0.
        forall (l = 1: llm) x(l) = pi * (l - 0.5) / (llm + 1)
 
-       ds = (1. + 7. * SIN(x)**2) * (1. - tanh(2 * x / pi - 1.))**2 / 4.
+       ds = (0.3 + 7. * SIN(x)**2) * (1. - tanh(2 * x / pi - 1.))**2 / 4.
        ds = ds / sum(ds)
 
        DO l = llm, 2, -1
@@ -143,4 +144,4 @@ contains
 
   END SUBROUTINE disvert
 
-end module comvert
+end module disvert_m

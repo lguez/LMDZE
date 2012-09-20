@@ -6,7 +6,7 @@ SUBROUTINE qminimum(q, nq, deltap)
 
   use dimens_m
   use paramet_m
-  use comvert
+  use disvert_m
 
   IMPLICIT none
 

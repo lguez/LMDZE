@@ -13,7 +13,7 @@ contains
     ! This procedure reads the initial state of the atmosphere.
 
     use comconst, only: im, dtvr, jm, lllm
-    use comvert, only: pa
+    use disvert_m, only: pa
     use comgeom, only: rlonu, rlatu, rlonv, rlatv, cu_2d, cv_2d, aire_2d
     use dimens_m, only: iim, jjm, llm, nqmx
     use ener, only: etot0, ang0, ptot0, stot0, ztot0

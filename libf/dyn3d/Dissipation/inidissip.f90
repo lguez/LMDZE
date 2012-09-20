@@ -23,7 +23,7 @@ contains
     USE comconst, ONLY: dtvr
     use comdissnew, only: nitergdiv, nitergrot, niterh, tetagdiv, tetagrot, &
          tetatemp
-    USE comvert, ONLY: preff, presnivs
+    USE disvert_m, ONLY: preff, presnivs
     USE conf_gcm_m, ONLY: iperiod
     USE dimens_m, ONLY: iim, jjm
     use divgrad2_m, only: divgrad2

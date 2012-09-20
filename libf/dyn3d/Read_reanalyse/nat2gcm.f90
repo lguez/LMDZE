@@ -6,7 +6,7 @@
       use dimens_m
       use paramet_m
       use comconst
-      use comvert
+      use disvert_m
       use comgeom
       use q_sat_m, only: q_sat
       use guide_m

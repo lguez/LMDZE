@@ -20,7 +20,7 @@ contains
     USE histdef_m, ONLY : histdef
     USE histend_m, ONLY : histend
     USE histvert_m, ONLY : histvert
-    use comvert, only: presnivs
+    use disvert_m, only: presnivs
 
     REAL, intent(in):: dtime ! pas temporel de la physique (s)
     integer, intent(out):: nid_hf3d

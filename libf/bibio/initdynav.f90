@@ -14,7 +14,7 @@ contains
     ! au format IOIPSL. Initialisation du fichier histoire moyenne.
 
     use calendar, ONLY: ymds2ju
-    USE comvert, ONLY: nivsigs
+    USE disvert_m, ONLY: nivsigs
     USE comgeom, ONLY: rlatu, rlonv
     USE dimens_m, ONLY: llm
     USE histbeg_totreg_m, ONLY: histbeg_totreg

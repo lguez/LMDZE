@@ -21,7 +21,7 @@ contains
     use clesphys, only: ecrit_tra
     use grid_change, only: gr_phy_write_2d
     use phyetat0_m, only: rlon, rlat
-    use comvert, only: presnivs
+    use disvert_m, only: presnivs
 
     INTEGER, intent(out):: nid_tra
     real, intent(in):: pdtphys  ! pas d'integration pour la physique (s)

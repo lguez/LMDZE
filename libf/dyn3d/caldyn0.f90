@@ -14,7 +14,7 @@ contains
 
     USE dimens_m, ONLY : llm
     USE paramet_m, ONLY : iip1, ip1jm, ip1jmp1, jjp1, llmp1
-    USE comvert, ONLY : ap, bp
+    USE disvert_m, ONLY : ap, bp
     USE comgeom, ONLY : airesurg
 
     !   Arguments:

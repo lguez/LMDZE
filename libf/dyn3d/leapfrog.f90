@@ -17,7 +17,7 @@ contains
     USE calfis_m, ONLY: calfis
     USE comconst, ONLY: daysec, dtphys, dtvr
     USE comgeom, ONLY: aire_2d, apoln, apols
-    USE comvert, ONLY: ap, bp
+    USE disvert_m, ONLY: ap, bp
     USE conf_gcm_m, ONLY: day_step, iconser, iperiod, iphysiq, nday, offline, &
          iflag_phys, ok_guide
     USE dimens_m, ONLY: iim, jjm, llm, nqmx

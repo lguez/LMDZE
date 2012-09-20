@@ -13,7 +13,7 @@
       use dimens_m
       use paramet_m
       use comconst
-      use comvert
+      use disvert_m
       use conf_gcm_m
       IMPLICIT NONE
 !

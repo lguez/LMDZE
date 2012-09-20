@@ -14,7 +14,7 @@
       use dimens_m
       use paramet_m
       use comconst
-      use comvert
+      use disvert_m
       use comgeom
       use exner_hyb_m, only: exner_hyb
       use conf_guide_m

@@ -15,7 +15,7 @@ CONTAINS
 
     USE comconst, ONLY : cpp, daysec, dtvr, kappa
     USE comgeom, ONLY : aire, rlatu, rlonv
-    USE comvert, ONLY : ap, bp, preff, presnivs
+    USE disvert_m, ONLY : ap, bp, preff, presnivs
     USE conf_gcm_m, ONLY : day_step, iperiod
     use conf_guide_m, only: conf_guide, guide_u, guide_v, guide_t, guide_q, &
          guide_p, ncep, ini_anal, tau_min_u, tau_max_u, tau_min_v, tau_max_v, &

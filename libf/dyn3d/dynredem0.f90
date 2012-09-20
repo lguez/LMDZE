@@ -10,7 +10,7 @@ CONTAINS
     ! Ecriture du fichier de redémarrage au format NetCDF (initialisation)
 
     USE comconst, ONLY: cpp, daysec, dtvr, g, kappa, omeg, rad
-    USE comvert, ONLY: ap, bp, nivsig, nivsigs, pa, preff, presnivs
+    USE disvert_m, ONLY: ap, bp, nivsig, nivsigs, pa, preff, presnivs
     USE comgeom, ONLY: aire_2d, cu_2d, cv_2d, rlatu, rlatv, rlonu, rlonv
     USE dimens_m, ONLY: iim, jjm, llm, nqmx
     USE ener, ONLY: ang0, etot0, ptot0, stot0, ztot0

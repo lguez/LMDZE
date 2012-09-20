@@ -11,7 +11,7 @@ contains
     ! Author: P. Le Van 
     ! Objet: incrémentation des tendances dynamiques
 
-    USE comvert, ONLY : ap, bp
+    USE disvert_m, ONLY : ap, bp
     USE comgeom, ONLY : aire, apoln, apols
     USE dimens_m, ONLY : iim, jjm, llm
     USE filtreg_m, ONLY : filtreg

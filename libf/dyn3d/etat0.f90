@@ -21,7 +21,7 @@ contains
     use comconst, only: dtvr, daysec, cpp, kappa
     use comgeom, only: rlatu, rlonv, rlonu, rlatv, aire_2d, apoln, apols, &
          cu_2d, cv_2d
-    use comvert, only: ap, bp, preff, pa
+    use disvert_m, only: ap, bp, preff, pa
     use conf_gcm_m, only: day_step, iphysiq, dayref, anneeref
     use dimens_m, only: iim, jjm, llm, nqmx
     use dimphy, only: zmasq

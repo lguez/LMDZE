@@ -15,7 +15,7 @@ SUBROUTINE groupe(pext, pbaru, pbarv, pbarum, pbarvm, wm)
   USE dimens_m
   USE paramet_m
   USE comconst
-  USE comvert
+  USE disvert_m
   USE comgeom
 
   IMPLICIT NONE

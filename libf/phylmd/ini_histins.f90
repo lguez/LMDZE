@@ -19,7 +19,7 @@ contains
     USE histend_m, ONLY : histend
     USE histvert_m, ONLY : histvert
     use phyetat0_m, only: rlon, rlat
-    use comvert, only: presnivs
+    use disvert_m, only: presnivs
 
     REAL, intent(in):: dtime ! pas temporel de la physique (s)
     logical, intent(in):: ok_instan

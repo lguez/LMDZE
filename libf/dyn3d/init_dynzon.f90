@@ -22,7 +22,7 @@ contains
     USE histvert_m, ONLY: histvert
     USE calendar, ONLY: ymds2ju
     USE dimens_m, ONLY: jjm, llm
-    USE comvert, ONLY: presnivs
+    USE disvert_m, ONLY: presnivs
     USE comgeom, ONLY: rlatv
     USE temps, ONLY: annee_ref, day_ref, itau_dyn
     USE nr_util, ONLY: pi

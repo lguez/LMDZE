@@ -6,7 +6,7 @@
       use dimens_m
       use comconst
       use paramet_m
-      use comvert
+      use disvert_m
       use comgeom
       IMPLICIT NONE
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC

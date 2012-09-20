@@ -30,7 +30,7 @@ contains
 
     use dimens_m, only: iim, jjm, llm
     use comconst, only: kappa, cpp
-    use comvert, only: preff
+    use disvert_m, only: preff
     use comgeom, only: aire_2d, apoln, apols
     use filtreg_m, only: filtreg
 

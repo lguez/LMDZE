@@ -48,7 +48,7 @@ contains
     ! pfluxrad radiative fluxes / input and output
 
     use comconst, only: kappa, cpp, dtphys, g
-    use comvert, only: preff
+    use disvert_m, only: preff
     use comgeom, only: apoln, cu_2d, cv_2d, unsaire_2d, apols, rlonu, rlonv
     use dimens_m, only: iim, jjm, llm, nqmx
     use dimphy, only: klon

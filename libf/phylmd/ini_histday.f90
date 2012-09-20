@@ -18,7 +18,7 @@ contains
     use phyetat0_m, only: rlon, rlat
     use clesphys, only: ecrit_day
     use grid_change, only: gr_phy_write_2d
-    use comvert, only: presnivs
+    use disvert_m, only: presnivs
 
     REAL, intent(in):: dtime ! pas temporel de la physique (s)
     logical, intent(in):: ok_journe

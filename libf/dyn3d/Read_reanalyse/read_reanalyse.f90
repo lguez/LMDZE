@@ -14,7 +14,7 @@
 ! -----------------------------------------------------------------
       use dimens_m
       use paramet_m
-      use comvert
+      use disvert_m
       use comgeom
       use conf_guide_m
       use netcdf

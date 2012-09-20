@@ -12,7 +12,7 @@ SUBROUTINE vitvert(convm , w)
 
   USE dimens_m, ONLY : llm
   USE paramet_m, ONLY : ip1jmp1
-  USE comvert, ONLY : bp
+  USE disvert_m, ONLY : bp
 
   IMPLICIT NONE
 
