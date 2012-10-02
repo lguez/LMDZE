@@ -45,8 +45,7 @@ contains
     zx_lat(:, :) = gr_phy_write_2d(rlat)
     CALL histbeg_totreg("histrac", rlon(2:iim+1), zx_lat(1, :), &
          1, iim, 1, jjm+1, itau_phy, zjulian, pdtphys, nhori, nid_tra)
-    CALL histvert(nid_tra, "presnivs", "Vertical levels", "mb", llm, &
-         presnivs, nvert)
+    CALL histvert(nid_tra, "presnivs", "Vertical levels", "mb", presnivs, nvert)
 
     zsto = pdtphys
     zout = pdtphys * REAL(ecrit_tra)

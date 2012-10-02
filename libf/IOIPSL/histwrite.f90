@@ -29,7 +29,7 @@ MODULE histwrite_m
      ! The difference between the procedures is the rank of "pdata".
 
      MODULE PROCEDURE histwrite_r1d, histwrite_r2d, histwrite_r3d
-  END INTERFACE
+  END INTERFACE histwrite
 
   PRIVATE histwrite_r1d, histwrite_r2d, histwrite_r3d
 
@@ -66,14 +66,14 @@ CONTAINS
 
     ! 1.0 Try to catch errors like specifying the wrong file ID.
 
-    IF ( (fileid < 1).OR.(fileid > nb_files) ) THEN
-       CALL histerr (3, "histwrite", &
-            &    'Illegal file ID in the histwrite of variable', varname, ' ')
+    IF ((fileid < 1) .OR. (fileid > nb_files)) THEN
+       CALL histerr(3, "histwrite", &
+            'Illegal file ID in the histwrite of variable', varname, ' ')
     ENDIF
 
     ! 1.1 Find the id of the variable to be written and the real time
 
-    CALL histvar_seq (fileid, varname, varid)
+    CALL histvar_seq(fileid, varname, varid)
 
     ! 2.0 do nothing for never operation
 
@@ -87,9 +87,9 @@ CONTAINS
     ! 3.0 We check if we need to do an operation
 
     IF (last_opp_chk(fileid, varid) == itau) THEN
-       CALL histerr (3, "histwrite", &
-            &    'This variable as already been analysed at the present', &
-            &    'time step', ' ')
+       CALL histerr(3, "histwrite", &
+            'This variable as already been analysed at the present', &
+            'time step', ' ')
     ENDIF
 
     CALL isittime(itau, date0(fileid), deltat(fileid), &
@@ -99,32 +99,31 @@ CONTAINS
     ! 4.0 We check if we need to write the data
 
     IF (last_wrt_chk(fileid, varid) == itau) THEN
-       CALL histerr (3, "histwrite", &
-            &    'This variable as already been written for the present', &
-            &    'time step', ' ')
+       CALL histerr(3, "histwrite", &
+            'This variable as already been written for the present', &
+            'time step', ' ')
     ENDIF
 
-    CALL isittime &
-         &  (itau, date0(fileid), deltat(fileid), freq_wrt(fileid, varid), &
-         &   last_wrt(fileid, varid), last_wrt_chk(fileid, varid), do_write)
+    CALL isittime(itau, date0(fileid), deltat(fileid), &
+         freq_wrt(fileid, varid), last_wrt(fileid, varid), &
+         last_wrt_chk(fileid, varid), do_write)
 
     ! 5.0 histwrite called
 
-    IF (do_oper.OR.do_write) THEN
-
-       !- 5.1 Get the sizes of the data we will handle
+    IF (do_oper .OR. do_write) THEN
+       ! 5.1 Get the sizes of the data we will handle
 
        IF (datasz_in(fileid, varid, 1) <= 0) THEN
-          !--- There is the risk here that the user has over-sized the array.
-          !--- But how can we catch this ?
-          !--- In the worst case we will do impossible operations
-          !--- on part of the data !
+          ! There is the risk here that the user has over-sized the array.
+          ! But how can we catch this ?
+          ! In the worst case we will do impossible operations
+          ! on part of the data !
           datasz_in(fileid, varid, 1) = SIZE(pdata)
           datasz_in(fileid, varid, 2) = -1
           datasz_in(fileid, varid, 3) = -1
        ENDIF
 
-       !- 5.2 The maximum size of the data will give the size of the buffer
+       ! 5.2 The maximum size of the data will give the size of the buffer
 
        IF (datasz_max(fileid, varid) <= 0) THEN
           largebuf = .FALSE.
@@ -134,41 +133,37 @@ CONTAINS
              ENDIF
           ENDDO
           IF (largebuf) THEN
-             datasz_max(fileid, varid) = &
-                  &        scsize(fileid, varid, 1) &
-                  &       *scsize(fileid, varid, 2) &
-                  &       *scsize(fileid, varid, 3)
+             datasz_max(fileid, varid) = scsize(fileid, varid, 1) &
+                  * scsize(fileid, varid, 2) *scsize(fileid, varid, 3)
           ELSE
-             datasz_max(fileid, varid) = &
-                  &        datasz_in(fileid, varid, 1)
+             datasz_max(fileid, varid) = datasz_in(fileid, varid, 1)
           ENDIF
        ENDIF
 
        IF (.NOT.ALLOCATED(buff_tmp)) THEN
-          ALLOCATE (buff_tmp(datasz_max(fileid, varid)))
+          ALLOCATE(buff_tmp(datasz_max(fileid, varid)))
           buff_tmp_sz = datasz_max(fileid, varid)
        ELSE IF (datasz_max(fileid, varid) > buff_tmp_sz) THEN
-          DEALLOCATE (buff_tmp)
-          ALLOCATE (buff_tmp(datasz_max(fileid, varid)))
+          DEALLOCATE(buff_tmp)
+          ALLOCATE(buff_tmp(datasz_max(fileid, varid)))
           buff_tmp_sz = datasz_max(fileid, varid)
        ENDIF
 
-       !- We have to do the first operation anyway.
-       !- Thus we do it here and change the ranke
-       !- of the data at the same time. This should speed up things.
+       ! We have to do the first operation anyway. Thus we do it here
+       ! and change the ranke of the data at the same time. This
+       ! should speed up things.
 
        nbpt_in = datasz_in(fileid, varid, 1)
        nbpt_out = datasz_max(fileid, varid)
-       CALL mathop (sopps(fileid, varid, 1), nbpt_in, pdata, &
-            &               missing_val, nbindex, nindex, &
-            &               scal(fileid, varid, 1), nbpt_out, buff_tmp)
-       CALL histwrite_real (fileid, varid, itau, nbpt_out, &
-            &            buff_tmp, nbindex, nindex, do_oper, do_write)
+       CALL mathop(sopps(fileid, varid, 1), nbpt_in, pdata, missing_val, &
+            nbindex, nindex, scal(fileid, varid, 1), nbpt_out, buff_tmp)
+       CALL histwrite_real(fileid, varid, itau, nbpt_out, buff_tmp, nbindex, &
+            nindex, do_oper, do_write)
     ENDIF
 
     ! 6.0 Manage time steps
 
-    IF ((TRIM(tmp_opp) /= "once").AND.(TRIM(tmp_opp) /= "never")) THEN
+    IF ((TRIM(tmp_opp) /= "once") .AND. (TRIM(tmp_opp) /= "never")) THEN
        last_opp_chk(fileid, varid) = itau
        last_wrt_chk(fileid, varid) = itau
     ELSE
@@ -212,7 +207,7 @@ CONTAINS
 
     IF ( (fileid < 1).OR.(fileid > nb_files) ) THEN
        CALL histerr (3, "histwrite", &
-            &    'Illegal file ID in the histwrite of variable', varname, ' ')
+            'Illegal file ID in the histwrite of variable', varname, ' ')
     ENDIF
 
     ! 1.1 Find the id of the variable to be written and the real time
@@ -232,25 +227,25 @@ CONTAINS
 
     IF (last_opp_chk(fileid, varid) == itau) THEN
        CALL histerr (3, "histwrite", &
-            &    'This variable as already been analysed at the present', &
-            &    'time step', ' ')
+            'This variable as already been analysed at the present', &
+            'time step', ' ')
     ENDIF
 
     CALL isittime &
-         &  (itau, date0(fileid), deltat(fileid), freq_opp(fileid, varid), &
-         &   last_opp(fileid, varid), last_opp_chk(fileid, varid), do_oper)
+         (itau, date0(fileid), deltat(fileid), freq_opp(fileid, varid), &
+         last_opp(fileid, varid), last_opp_chk(fileid, varid), do_oper)
 
     ! 4.0 We check if we need to write the data
 
     IF (last_wrt_chk(fileid, varid) == itau) THEN
        CALL histerr (3, "histwrite", &
-            &    'This variable as already been written for the present', &
-            &    'time step', ' ')
+            'This variable as already been written for the present', &
+            'time step', ' ')
     ENDIF
 
     CALL isittime &
-         &  (itau, date0(fileid), deltat(fileid), freq_wrt(fileid, varid), &
-         &   last_wrt(fileid, varid), last_wrt_chk(fileid, varid), do_write)
+         (itau, date0(fileid), deltat(fileid), freq_wrt(fileid, varid), &
+         last_wrt(fileid, varid), last_wrt_chk(fileid, varid), do_write)
 
     ! 5.0 histwrite called
 
@@ -279,13 +274,13 @@ CONTAINS
           ENDDO
           IF (largebuf) THEN
              datasz_max(fileid, varid) = &
-                  &        scsize(fileid, varid, 1) &
-                  &       *scsize(fileid, varid, 2) &
-                  &       *scsize(fileid, varid, 3)
+                  scsize(fileid, varid, 1) &
+                  *scsize(fileid, varid, 2) &
+                  *scsize(fileid, varid, 3)
           ELSE
              datasz_max(fileid, varid) = &
-                  &        datasz_in(fileid, varid, 1) &
-                  &       *datasz_in(fileid, varid, 2)
+                  datasz_in(fileid, varid, 1) &
+                  *datasz_in(fileid, varid, 2)
           ENDIF
        ENDIF
 
@@ -305,10 +300,10 @@ CONTAINS
        nbpt_in(1:2) = datasz_in(fileid, varid, 1:2)
        nbpt_out = datasz_max(fileid, varid)
        CALL mathop (sopps(fileid, varid, 1), nbpt_in, pdata, &
-            &               missing_val, nbindex, nindex, &
-            &               scal(fileid, varid, 1), nbpt_out, buff_tmp)
+            missing_val, nbindex, nindex, &
+            scal(fileid, varid, 1), nbpt_out, buff_tmp)
        CALL histwrite_real (fileid, varid, itau, nbpt_out, &
-            &            buff_tmp, nbindex, nindex, do_oper, do_write)
+            buff_tmp, nbindex, nindex, do_oper, do_write)
     ENDIF
 
     ! 6.0 Manage time steps
@@ -358,7 +353,7 @@ CONTAINS
 
     IF ( (fileid < 1).OR.(fileid > nb_files) ) THEN
        CALL histerr (3, "histwrite", &
-            &    'Illegal file ID in the histwrite of variable', varname, ' ')
+            'Illegal file ID in the histwrite of variable', varname, ' ')
     ENDIF
 
     ! 1.1 Find the id of the variable to be written and the real time
@@ -378,25 +373,25 @@ CONTAINS
 
     IF (last_opp_chk(fileid, varid) == itau) THEN
        CALL histerr (3, "histwrite", &
-            &    'This variable as already been analysed at the present', &
-            &    'time step', ' ')
+            'This variable as already been analysed at the present', &
+            'time step', ' ')
     ENDIF
 
     CALL isittime &
-         &  (itau, date0(fileid), deltat(fileid), freq_opp(fileid, varid), &
-         &   last_opp(fileid, varid), last_opp_chk(fileid, varid), do_oper)
+         (itau, date0(fileid), deltat(fileid), freq_opp(fileid, varid), &
+         last_opp(fileid, varid), last_opp_chk(fileid, varid), do_oper)
 
     ! 4.0 We check if we need to write the data
 
     IF (last_wrt_chk(fileid, varid) == itau) THEN
        CALL histerr (3, "histwrite", &
-            &    'This variable as already been written for the present', &
-            &    'time step', ' ')
+            'This variable as already been written for the present', &
+            'time step', ' ')
     ENDIF
 
     CALL isittime &
-         &  (itau, date0(fileid), deltat(fileid), freq_wrt(fileid, varid), &
-         &   last_wrt(fileid, varid), last_wrt_chk(fileid, varid), do_write)
+         (itau, date0(fileid), deltat(fileid), freq_wrt(fileid, varid), &
+         last_wrt(fileid, varid), last_wrt_chk(fileid, varid), do_write)
 
     ! 5.0 histwrite called
 
@@ -425,14 +420,14 @@ CONTAINS
           ENDDO
           IF (largebuf) THEN
              datasz_max(fileid, varid) = &
-                  &        scsize(fileid, varid, 1) &
-                  &       *scsize(fileid, varid, 2) &
-                  &       *scsize(fileid, varid, 3)
+                  scsize(fileid, varid, 1) &
+                  *scsize(fileid, varid, 2) &
+                  *scsize(fileid, varid, 3)
           ELSE
              datasz_max(fileid, varid) = &
-                  &        datasz_in(fileid, varid, 1) &
-                  &       *datasz_in(fileid, varid, 2) &
-                  &       *datasz_in(fileid, varid, 3)
+                  datasz_in(fileid, varid, 1) &
+                  *datasz_in(fileid, varid, 2) &
+                  *datasz_in(fileid, varid, 3)
           ENDIF
        ENDIF
 
@@ -452,10 +447,10 @@ CONTAINS
        nbpt_in(1:3) = datasz_in(fileid, varid, 1:3)
        nbpt_out = datasz_max(fileid, varid)
        CALL mathop (sopps(fileid, varid, 1), nbpt_in, pdata, &
-            &               missing_val, nbindex, nindex, &
-            &               scal(fileid, varid, 1), nbpt_out, buff_tmp)
+            missing_val, nbindex, nindex, &
+            scal(fileid, varid, 1), nbpt_out, buff_tmp)
        CALL histwrite_real (fileid, varid, itau, nbpt_out, &
-            &            buff_tmp, nbindex, nindex, do_oper, do_write)
+            buff_tmp, nbindex, nindex, do_oper, do_write)
     ENDIF
 
     ! 6.0 Manage time steps

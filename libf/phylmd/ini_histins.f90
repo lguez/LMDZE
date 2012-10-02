@@ -49,7 +49,7 @@ contains
             jjm + 1, itau_phy, zjulian, dtime, nhori, nid_ins)
        write(*, *)'Inst ', itau_phy, zjulian
        CALL histvert(nid_ins, "presnivs", "Vertical levels", "mb", &
-            llm, presnivs/100., nvert)
+            presnivs/100., nvert)
 
        CALL histdef(nid_ins, "phis", "Surface geop. height", "-", &
             iim, (jjm + 1), nhori, 1, 1, 1, -99, &

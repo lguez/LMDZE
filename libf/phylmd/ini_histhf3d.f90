@@ -49,7 +49,7 @@ contains
          (jjm + 1), itau_phy, zjulian, dtime, nhori, nid_hf3d)
 
     CALL histvert(nid_hf3d, "presnivs", "Vertical levels", "mb", &
-         llm, presnivs/100., nvert)
+         presnivs/100., nvert)
 
     ! Champs 3D:
 

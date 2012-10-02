@@ -6,7 +6,7 @@ contains
 
   SUBROUTINE leapfrog(ucov, vcov, teta, ps, masse, phis, q, time_0)
 
-    ! From dyn3d/leapfrog.F, version 1.6, 2005/04/13 08:58:34
+    ! From dyn3d/leapfrog.F, version 1.6, 2005/04/13 08:58:34 revision 616
     ! Authors: P. Le Van, L. Fairhead, F. Hourdin
     ! Matsuno-leapfrog scheme.
 
@@ -43,8 +43,8 @@ contains
     ! potential temperature
 
     REAL, intent(inout):: ps(:, :) ! (iim + 1, jjm + 1) pression au sol, en Pa
-    REAL masse((iim + 1) * (jjm + 1), llm) ! masse d'air
-    REAL phis((iim + 1) * (jjm + 1)) ! geopotentiel au sol
+    REAL masse(:, :, :) ! (iim + 1, jjm + 1, llm) masse d'air
+    REAL phis(:, :) ! (iim + 1, jjm + 1) geopotentiel au sol
 
     REAL, intent(inout):: q(:, :, :, :) ! (iim + 1, jjm + 1, llm, nqmx)
     ! mass fractions of advected fields
@@ -68,7 +68,7 @@ contains
     ! Variables dynamiques au pas - 1
     REAL vcovm1(iim + 1, jjm, llm), ucovm1(iim + 1, jjm + 1, llm)
     REAL tetam1(iim + 1, jjm + 1, llm), psm1(iim + 1, jjm + 1)
-    REAL massem1((iim + 1) * (jjm + 1), llm)
+    REAL massem1(iim + 1, jjm + 1, llm)
 
     ! Tendances dynamiques
     REAL dv((iim + 1) * jjm, llm), dudyn((iim + 1) * (jjm + 1), llm)
@@ -89,7 +89,7 @@ contains
     INTEGER itau ! index of the time step of the dynamics, starts at 0
     INTEGER itaufin
     REAL time ! time of day, as a fraction of day length
-    real finvmaold((iim + 1) * (jjm + 1), llm)
+    real finvmaold(iim + 1, jjm + 1, llm)
     INTEGER l
     REAL rdayvrai, rdaym_ini
 
@@ -180,7 +180,7 @@ contains
 
           CALL calfis(rdayvrai, time, ucov, vcov, teta, q, masse, ps, pk, &
                phis, phi, dudyn, dv, dq, w, dufi, dvfi, dtetafi, dqfi, dpfi, &
-               lafin=itau+1==itaufin)
+               lafin = itau + 1 == itaufin)
 
           ! ajout des tendances physiques:
           CALL addfi(nqmx, dtphys, ucov, vcov, teta, q, ps, dufi, dvfi, &
@@ -232,13 +232,13 @@ contains
     end do time_integration
 
     CALL dynredem1("restart.nc", vcov, ucov, teta, q, masse, ps, &
-         itau=itau_dyn+itaufin)
+         itau = itau_dyn + itaufin)
 
     ! Calcul des tendances dynamiques:
     CALL geopot((iim + 1) * (jjm + 1), teta, pk, pks, phis, phi)
     CALL caldyn(itaufin, ucov, vcov, teta, ps, masse, pk, pkf, phis, phi, &
          dudyn, dv, dteta, dp, w, pbaru, pbarv, time_0, &
-         conser=MOD(itaufin, iconser)==0)
+         conser = MOD(itaufin, iconser) == 0)
 
   END SUBROUTINE leapfrog
 

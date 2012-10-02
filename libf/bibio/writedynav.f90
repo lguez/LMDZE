@@ -4,7 +4,7 @@ module writedynav_m
 
 contains
 
-  subroutine writedynav(vcov, ucov, teta, ppk, phi, q, masse, ps, phis, time)
+  subroutine writedynav(vcov, ucov, teta, pk, phi, q, masse, ps, phis, time)
 
     ! From LMDZ4/libf/bibio/writedynav.F, version 1.1.1.1 2004/05/19 12:53:05
     ! Écriture du fichier histoire au format IOIPSL
@@ -12,43 +12,55 @@ contains
 
     ! Appels successifs des routines histwrite
 
-    use covnat_m, only: covnat
-    USE histwrite_m, ONLY: histwrite
-    USE histsync_m, ONLY: histsync
-    USE dimens_m, ONLY: llm
-    USE paramet_m, ONLY: iip1, ijp1llm, ip1jm, ip1jmp1, jjp1
     USE comconst, ONLY: cpp
-    USE temps, ONLY: itau_dyn
+    use covnat_m, only: covnat
+    USE dimens_m, ONLY: iim, jjm, llm, nqmx
+    USE histsync_m, ONLY: histsync
+    USE histwrite_m, ONLY: histwrite
     USE iniadvtrac_m, ONLY: ttext
     use initdynav_m, only: histaveid
+    use nr_util, only: assert
+    USE paramet_m, ONLY: iip1, ip1jm, ip1jmp1, jjp1
+    USE temps, ONLY: itau_dyn
 
-    REAL, intent(in):: vcov(ip1jm, llm), ucov(ip1jmp1, llm) ! vents covariants
-    REAL, intent(in):: teta(ip1jmp1*llm) ! temperature potentielle
-    real, intent(in):: phi(ip1jmp1, llm) ! geopotentiel instantane
-    real, intent(in):: ppk(ip1jmp1*llm) 
-    REAL, intent(in):: ps(ip1jmp1) ! pression au sol
-    real, intent(in):: masse(ip1jmp1, llm) 
-    REAL, intent(in):: phis(ip1jmp1) ! geopotentiel au sol
+    ! Vents covariants :
+    REAL, intent(in):: vcov(:, :, :) ! (iim + 1, jjm, llm)
+    REAL, intent(in):: ucov(:, :, :) ! (iim + 1, jjm + 1, llm)
+
+    REAL, intent(in):: teta(:, :, :) ! (iim + 1, jjm + 1, llm)
+    ! temperature potentielle
+
+    real, intent(in):: phi(:, :, :) ! (iim + 1, jjm + 1, llm)
+    ! geopotentiel instantane
+
+    real, intent(in):: pk(:, :, :) ! (iim + 1, jjm + 1, llm)
+    REAL, intent(in):: ps(:, :) ! (iim + 1, jjm + 1) pression au sol
+    real, intent(in):: masse(:, :, :) ! (iim + 1, jjm + 1, llm)
+    REAL, intent(in):: phis(:, :) ! (iim + 1, jjm + 1) geopotentiel au sol
     REAL, intent(in):: q(:, :, :, :) ! (iim + 1, jjm + 1, llm, nqmx) traceurs
     integer, intent(in):: time ! temps de l'ecriture
 
     ! Variables locales
-    integer ndex2d(iip1*jjp1), ndex3d(iip1*jjp1*llm), iq, ii, ll
+    integer iq
     real us(ip1jmp1*llm), vs(ip1jmp1*llm)
-    real tm(ip1jmp1*llm)
     REAL vnat(ip1jm, llm), unat(ip1jmp1, llm) 
-    logical ok_sync
     integer itau_w
 
     !---------------------------------------------------------------
 
+    call assert((/size(vcov, 1), size(ucov, 1), size(teta, 1), size(phi, 1), &
+         size(pk, 1), size(ps, 1), size(masse, 1), size(phis, 1), &
+         size(q, 1)/) == iim + 1, "writedynav iim")
+    call assert((/size(vcov, 2) + 1, size(ucov, 2), size(teta, 2), &
+         size(phi, 2), size(pk, 2), size(ps, 2), size(masse, 2), &
+         size(phis, 2), size(q, 2)/) == jjm + 1, "writedynav jjm")
+    call assert((/size(vcov, 3), size(ucov, 3), size(teta, 3), size(phi, 3), &
+         size(pk, 3), size(masse, 3), size(q, 3)/) == llm, "writedynav llm")
+    call assert(size(q, 4) == nqmx, "writedynav nqmx")
+
     ! Initialisations
-    ndex3d = 0
-    ndex2d = 0
-    ok_sync = .TRUE.
     us = 999.999
     vs = 999.999
-    tm = 999.999
     vnat = 999.999
     unat = 999.999
     itau_w = itau_dyn + time
@@ -70,12 +82,8 @@ contains
     call histwrite(histaveid, 'theta', itau_w, teta)
 
     ! Temperature moyennee
-    do ii = 1, ijp1llm
-       tm(ii) = teta(ii) * ppk(ii)/cpp
-    enddo
-    call histwrite(histaveid, 'temp', itau_w, tm)
+    call histwrite(histaveid, 'temp', itau_w, teta * pk / cpp)
 
-    ! Geopotentiel
     call histwrite(histaveid, 'phi', itau_w, phi)
 
     ! Traceurs
@@ -83,16 +91,11 @@ contains
        call histwrite(histaveid, ttext(iq), itau_w, q(:, :, :, iq))
     enddo
 
-    ! Masse
     call histwrite(histaveid, 'masse', itau_w, masse)
-
-    ! Pression au sol
     call histwrite(histaveid, 'ps', itau_w, ps)
-
-    ! Geopotentiel au sol
     call histwrite(histaveid, 'phis', itau_w, phis)
 
-    if (ok_sync) call histsync(histaveid)
+    call histsync(histaveid)
 
   end subroutine writedynav
 

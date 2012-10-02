@@ -4,36 +4,39 @@ module histvert_m
 
 contains
 
-  SUBROUTINE histvert(pfileid, pzaxname, pzaxtitle, pzaxunit, pzsize, &
-       pzvalues, pzaxid, pdirect)
+  SUBROUTINE histvert(pfileid, pzaxname, pzaxtitle, pzaxunit, pzvalues, &
+       pzaxid, pdirect)
 
-    ! This subroutine defines a vertical axis and returns its id.  It
-    ! gives the user the possibility to define many different vertical
+    ! This subroutine defines a vertical axis and returns its id. It
+    ! gives the user the possibility to define different vertical
     ! axes. For each variable defined with histdef a vertical axis can
     ! be specified by its ID.
 
-    USE find_str_m, ONLY: find_str
-    USE strlowercase_m, ONLY: strlowercase
     USE errioipsl, ONLY: histerr
+    USE find_str_m, ONLY: find_str
     USE histcom_var, ONLY: nb_zax, nb_zax_max, ncdf_ids, zax_ids, &
          zax_name, zax_name_length, zax_size
     USE netcdf, ONLY: nf90_def_dim, nf90_def_var, nf90_enddef, &
          nf90_float, nf90_put_att, nf90_put_var, nf90_redef
+    USE strlowercase_m, ONLY: strlowercase
 
     INTEGER, INTENT(IN):: pfileid 
     ! ID of the file the variable should be archived in
 
-    INTEGER, INTENT(IN):: pzsize ! size of the vertical axis
     CHARACTER(len=*), INTENT(IN):: pzaxname ! name of the vertical axis
-    CHARACTER(len=*), INTENT(IN):: pzaxunit ! units of the vertical axis
     CHARACTER(len=*), INTENT(IN):: pzaxtitle ! title of the vertical axis
-    REAL, INTENT(IN):: pzvalues(pzsize) ! coordinate values of the vetical axis
+    CHARACTER(len=*), INTENT(IN):: pzaxunit ! units of the vertical axis
+
+    REAL, INTENT(IN):: pzvalues(:) ! (pzsize) 
+    ! coordinate values of the vertical axis
+
     INTEGER, INTENT(OUT):: pzaxid ! ID of the axis (not the netCDF ID)
 
     CHARACTER(len=*), INTENT(IN), OPTIONAL:: pdirect
     ! positive direction of the axis: up or down
 
     ! Local:
+    INTEGER pzsize ! size of the vertical axis
     INTEGER:: pos, iv, nb, zdimid, zaxid_tmp
     CHARACTER(len=20):: str20, tab_str20(nb_zax_max)
     INTEGER:: tab_str20_length(nb_zax_max)
@@ -44,12 +47,14 @@ contains
 
     !---------------------------------------------------------------------
 
+    pzsize = size(pzvalues)
+
     ! 1.0 Verifications:
-    !    Do we have enough space for an extra axis ?
-    !    Is the name already in use ?
+    ! Do we have enough space for an extra axis ?
+    ! Is the name already in use ?
 
     ! - Direction of axis. Can we get if from the user.
-    !   If not we put unknown.
+    ! If not we put unknown.
 
     IF (present(pdirect)) THEN
        direction = trim(pdirect)

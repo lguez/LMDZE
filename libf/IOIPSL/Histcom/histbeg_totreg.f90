@@ -4,15 +4,15 @@ MODULE histbeg_totreg_m
 
   ! Some confusing vocabulary in this code!
 
-  ! A regular grid is a grid which is i, j indices and thus it is
+  ! A regular grid is a grid with i, j indices and thus it is
   ! stored in a 2D matrix. This is opposed to an irregular grid which
-  ! is only in a vector and where we do not know which neighbors we
+  ! is in a vector and where we do not know which neighbours we
   ! have. As a consequence we need the bounds for each grid-cell.
 
   ! A rectilinear grid is a special case of a regular grid in which
   ! all longitudes for i constant are equal and all latitudes for j
-  ! constant.  In other words we do not need the full 2D matrix to
-  ! describe the grid, just two vectors.
+  ! constant are equal. In other words we do not need the full 2D
+  ! matrix to describe the grid, just two vectors.
 
   IMPLICIT NONE
 

@@ -39,6 +39,7 @@ contains
     use inidissip_m, only: inidissip
     use inifilr_m, only: inifilr
     use inigeom_m, only: inigeom
+    use massdair_m, only: massdair
     use netcdf, only: nf90_nowrite
     use netcdf95, only: nf95_open, nf95_close, nf95_get_var, nf95_inq_varid
     use nr_util, only: pi

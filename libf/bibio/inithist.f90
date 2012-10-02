@@ -82,11 +82,11 @@ contains
 
     ! Appel a histvert pour la grille verticale
 
-    call histvert(histid, 'presnivs', 'Niveaux pression','mb', llm, &
+    call histvert(histid, 'presnivs', 'Niveaux pression','mb', presnivs/100., &
+         zvertiid,'down')
+    call histvert(histvid, 'presnivs', 'Niveaux pression','mb', &
          presnivs/100., zvertiid,'down')
-    call histvert(histvid, 'presnivs', 'Niveaux pression','mb', llm, &
-         presnivs/100., zvertiid,'down')
-    call histvert(histuid, 'presnivs', 'Niveaux pression','mb', llm, &
+    call histvert(histuid, 'presnivs', 'Niveaux pression','mb', &
          presnivs/100., zvertiid,'down')
 
     ! Appels a histdef pour la definition des variables a sauvegarder

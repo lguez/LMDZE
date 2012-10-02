@@ -101,7 +101,7 @@ SUBROUTINE initphysto(infile,rlon,rlat,tstep,t_ops,t_wrt,nq,fileid)
      nivsigs(l) = float(l)
   END DO
 
-  CALL histvert(fileid,'sig_s','Niveaux sigma','sigma_level',llm,nivsigs, &
+  CALL histvert(fileid,'sig_s','Niveaux sigma','sigma_level',nivsigs, &
        zvertiid)
 
   !  Appels a histdef pour la definition des variables a sauvegarder

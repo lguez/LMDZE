@@ -6,20 +6,23 @@ contains
 
   SUBROUTINE dynredem1(fichnom, vcov, ucov, teta, q, masse, ps, itau)
 
-    ! From dyn3d/dynredem.F, v 1.2 2004/06/22 11:45:30
+    ! From dyn3d/dynredem.F, version 1.2 2004/06/22 11:45:30
     ! Ecriture du fichier de redémarrage au format NetCDF
 
-    USE dimens_m, ONLY : iim, jjm, llm, nqmx
-    USE iniadvtrac_m, ONLY : tname
+    USE dimens_m, ONLY: iim, jjm, llm, nqmx
+    USE iniadvtrac_m, ONLY: tname
     use netcdf, only: nf90_write
     use netcdf95, only: nf95_close, nf95_inq_varid, nf95_open, nf95_put_var
+    use nr_util, only: assert
 
-    CHARACTER(len=*), INTENT (IN) :: fichnom
-    REAL, INTENT (IN) :: vcov(iim + 1, jjm, llm), ucov(iim+1, jjm+1, llm)
-    REAL, INTENT (IN) :: teta(iim+1, jjm+1, llm)
-    REAL, INTENT (IN) :: q(iim+1, jjm+1, llm, nqmx)
-    REAL, INTENT (IN) :: ps(iim+1, jjm+1), masse(iim+1, jjm+1, llm)
-    INTEGER, INTENT (IN) :: itau
+    CHARACTER(len=*), INTENT (IN):: fichnom
+    REAL, INTENT (IN):: vcov(:, :, :) ! (iim + 1, jjm, llm)
+    REAL, INTENT (IN):: ucov(:, :, :) ! (iim + 1, jjm + 1, llm)
+    REAL, INTENT (IN):: teta(:, :, :) ! (iim + 1, jjm + 1, llm)
+    REAL, INTENT (IN):: q(:, :, :, :) ! (iim + 1, jjm + 1, llm, nqmx)
+    REAL, INTENT (IN):: masse(:, :, :) ! (iim + 1, jjm + 1, llm)
+    REAL, INTENT (IN):: ps(:, :) ! (iim + 1, jjm + 1)
+    INTEGER, INTENT (IN):: itau
 
     ! Variables local to the procedure:
     INTEGER ncid, varid
@@ -29,6 +32,14 @@ contains
     !---------------------------------------------------------
 
     PRINT *, 'Call sequence information: dynredem1'
+
+    call assert((/size(vcov, 1), size(ucov, 1), size(teta, 1), size(q, 1), &
+         size(masse, 1), size(ps, 1)/) == iim + 1, "dynredem1 iim")
+    call assert((/size(vcov, 2) + 1, size(ucov, 2), size(teta, 2), size(q, 2), &
+         size(masse, 2), size(ps, 2)/) == jjm + 1, "dynredem1 jjm")
+    call assert((/size(vcov, 3), size(ucov, 3), size(teta, 3), size(q, 3), &
+         size(masse, 3)/) == llm, "dynredem1 llm")
+    call assert(size(q, 4) == nqmx, "dynredem1 nqmx")
 
     call nf95_open(fichnom, nf90_write, ncid)
 

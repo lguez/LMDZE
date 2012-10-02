@@ -12,10 +12,11 @@ contains
     ! Objet : calcul des tendances dynamiques
 
     use advect_m, only: advect
-    USE dimens_m, ONLY : iim, llm
-    USE paramet_m, ONLY : iip1, ip1jm, ip1jmp1, jjp1, llmp1
-    USE disvert_m, ONLY : ap, bp
     USE comgeom, ONLY : airesurg, constang
+    USE dimens_m, ONLY : iim, llm
+    USE disvert_m, ONLY : ap, bp
+    use massdair_m, only: massdair
+    USE paramet_m, ONLY : iip1, ip1jm, ip1jmp1, jjp1, llmp1
     use sortvarc_m, only: sortvarc
 
     ! Arguments:

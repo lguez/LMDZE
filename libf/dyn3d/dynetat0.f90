@@ -13,17 +13,17 @@ contains
     ! This procedure reads the initial state of the atmosphere.
 
     use comconst, only: im, dtvr, jm, lllm
-    use disvert_m, only: pa
     use comgeom, only: rlonu, rlatu, rlonv, rlatv, cu_2d, cv_2d, aire_2d
+    use conf_gcm_m, only: fxyhypb, ysinus
     use dimens_m, only: iim, jjm, llm, nqmx
+    use disvert_m, only: pa
     use ener, only: etot0, ang0, ptot0, stot0, ztot0
     use iniadvtrac_m, only: tname
-    use conf_gcm_m, only: fxyhypb, ysinus
-    use serre, only: clon, clat, grossismy, grossismx
+    use netcdf, only: NF90_NOWRITE, NF90_NOERR
     use netcdf95, only: NF95_GET_VAR, nf95_open, nf95_inq_varid, NF95_CLOSE, &
          NF95_Gw_VAR
-    use netcdf, only: NF90_NOWRITE, NF90_NOERR
     use nr_util, only: assert
+    use serre, only: clon, clat, grossismy, grossismx
     use temps, only: day_ref, itau_dyn, annee_ref
 
     REAL, intent(out):: vcov(: , :, :) ! (iim + 1, jjm, llm)

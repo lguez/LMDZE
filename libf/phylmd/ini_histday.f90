@@ -38,12 +38,12 @@ contains
        CALL histbeg_totreg("histday", rlon(2: iim+1), zx_lat(1, :), 1, iim, &
             1, jjm + 1, itau_phy, zjulian, dtime, nhori, nid_day)
        CALL histvert(nid_day, "presnivs", "Vertical levels", "mb", &
-            llm, presnivs/100., nvert)
+            presnivs/100., nvert)
        if (nq <= 4) then
           call histdef(nid_day, "Sigma_O3_Royer", &
                "column-density of ozone, in a cell, from Royer", "DU", &
-               xsize=iim, ysize=jjm+1, horiid=nhori, pzsize=llm, par_oriz=1, &
-               par_szz=llm, pzid=nvert, popp="ave(X)", pfreq_opp=dtime, &
+               xsize=iim, ysize=jjm+1, horiid=nhori, pzsize=llm, oriz=1, &
+               szz=llm, zid=nvert, opp="ave(X)", pfreq_opp=dtime, &
                pfreq_wrt=real(ecrit_day))
        end if
        CALL histend(nid_day)

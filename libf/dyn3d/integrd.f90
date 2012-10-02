@@ -11,10 +11,11 @@ contains
     ! Author: P. Le Van 
     ! Objet: incrémentation des tendances dynamiques
 
-    USE disvert_m, ONLY : ap, bp
     USE comgeom, ONLY : aire, apoln, apols
     USE dimens_m, ONLY : iim, jjm, llm
+    USE disvert_m, ONLY : ap, bp
     USE filtreg_m, ONLY : filtreg
+    use massdair_m, only: massdair
     use nr_util, only: assert
     USE paramet_m, ONLY : iip1, iip2, ip1jm, ip1jmp1, jjp1, llmp1
 

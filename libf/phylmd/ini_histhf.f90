@@ -42,8 +42,8 @@ contains
     CALL histbeg_totreg("histhf", zx_lon(:, 1), zx_lat(1, :), 1, iim, 1, &
          (jjm + 1), itau_phy, zjulian, dtime, nhori, nid_hf)
 
-    CALL histvert(nid_hf, "presnivs", "Vertical levels", "mb", &
-         llm, presnivs/100., nvert)
+    CALL histvert(nid_hf, "presnivs", "Vertical levels", "mb", presnivs/100., &
+         nvert)
 
     call ini_histhf3d(dtime, nid_hf3d)
     CALL histend(nid_hf)

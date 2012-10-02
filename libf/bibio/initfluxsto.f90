@@ -116,14 +116,14 @@ SUBROUTINE initfluxsto(tstep, t_ops, t_wrt, nq, fileid, filevid, filedid)
 
   !  Appel a histvert pour la grille verticale                            
 
-  CALL histvert(fileid, 'sig_s', 'Niveaux sigma', 'sigma_level', llm, &
-       nivsigs, zvertiid)
+  CALL histvert(fileid, 'sig_s', 'Niveaux sigma', 'sigma_level', nivsigs, &
+       zvertiid)
   ! Pour le fichier V                                                     
-  CALL histvert(filevid, 'sig_s', 'Niveaux sigma', 'sigma_level', llm, &
-       nivsigs, zvertiid)
+  CALL histvert(filevid, 'sig_s', 'Niveaux sigma', 'sigma_level', nivsigs, &
+       zvertiid)
   ! pour le fichier def                                                   
   nivd(1) = 1
-  CALL histvert(filedid, 'sig_s', 'Niveaux sigma', 'sigma_level', 1, nivd, &
+  CALL histvert(filedid, 'sig_s', 'Niveaux sigma', 'sigma_level', nivd, &
        dvertiid)
 
   !  Appels a histdef pour la definition des variables a sauvegarder      

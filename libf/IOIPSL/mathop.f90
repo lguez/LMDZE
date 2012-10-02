@@ -5,7 +5,7 @@ MODULE mathop_m
   implicit none
 
   PRIVATE
-  PUBLIC :: mathop
+  PUBLIC mathop
 
   INTERFACE mathop
      MODULE PROCEDURE mathop_r11, mathop_r21, mathop_r31

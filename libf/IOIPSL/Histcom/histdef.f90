@@ -5,16 +5,15 @@ module histdef_m
 contains
 
   SUBROUTINE histdef(fileid, varname, ptitle, unit, xsize, ysize, &
-       horiid, pzsize, par_oriz, par_szz, pzid, popp, pfreq_opp, pfreq_wrt)
+       horiid, pzsize, oriz, szz, zid, opp, pfreq_opp, pfreq_wrt)
 
     ! With this subroutine each variable to be archived on the history
-    ! tape should be declared. It gives the user the choise of
-    ! operation to be performed on the variables, the frequency of
+    ! tape should be declared. It gives the user the choice of
+    ! operation to be performed on the variable, the frequency of
     ! this operation and the frequency of the archiving.
 
-    USE find_str_m, ONLY: find_str
-    USE mathelp, ONLY: buildop
     USE errioipsl, ONLY: histerr
+    USE find_str_m, ONLY: find_str
     USE histcom_var, ONLY: buff_pos, deltat, freq_opp, freq_wrt, fullop, &
          full_size, itau0, last_opp, last_opp_chk, last_wrt, last_wrt_chk, &
          missing_val, name, name_length, nbopp, nbopp_max, nb_hax, nb_opp, &
@@ -23,6 +22,7 @@ contains
          title, topp, unit_name, var_axid, var_haxid, var_zaxid, zax_name, &
          zax_size, zorig, zsize
     USE ioget_calendar_m, ONLY: ioget_calendar
+    USE mathelp, ONLY: buildop
 
     INTEGER, INTENT(IN):: fileid
     ! (ID of the file the variable should be archived in)
@@ -44,15 +44,15 @@ contains
 
     INTEGER, INTENT(IN):: pzsize
     ! (Size in Z direction (If 1 then no axis is declared for this
-    ! variable and pzid is not used)
+    ! variable and zid is not used)
 
-    INTEGER, INTENT(IN):: par_oriz ! Off set of the zoom
-    INTEGER, INTENT(IN):: par_szz ! Size of the zoom
+    INTEGER, INTENT(IN):: oriz ! Off set of the zoom
+    INTEGER, INTENT(IN):: szz ! Size of the zoom
 
-    INTEGER, INTENT(IN):: pzid
+    INTEGER, INTENT(IN):: zid
     ! (ID of the vertical axis to use. It has to have the size of the zoom.)
 
-    CHARACTER(len=*), INTENT(IN):: popp
+    CHARACTER(len=*), INTENT(IN):: opp
     ! Operation to be performed. The following options exist today:
     ! inst: keeps instantaneous values for writting
     ! ave: Computes the average from call between writes
@@ -120,8 +120,8 @@ contains
 
     ! 1.1 decode the operations
 
-    fullop(fileid, iv) = popp
-    tmp_str80 = popp
+    fullop(fileid, iv) = opp
+    tmp_str80 = opp
     CALL buildop(tmp_str80, ex_topps, tmp_topp, nbopp_max, missing_val, &
          tmp_sopp, tmp_scal, nbopp(fileid, iv))
 
@@ -145,10 +145,10 @@ contains
     scsize(fileid, iv, :) = (/ xsize, ysize, pzsize/)
 
     zorig(fileid, iv, 1:3) = (/ slab_ori(fileid, 1), slab_ori(fileid, 2), &
-         par_oriz/)
+         oriz/)
 
     zsize(fileid, iv, 1:3) = (/ slab_sz(fileid, 1), slab_sz(fileid, 2), &
-         par_szz/)
+         szz/)
 
     ! Is the size of the full array the same as that of the coordinates  ?
 
@@ -191,11 +191,11 @@ contains
 
     ! 2.2 Check the vertical coordinates if needed
 
-    IF (par_szz>1) THEN
+    IF (szz>1) THEN
 
        ! Does the vertical coordinate exist ?
 
-       IF (pzid>nb_zax(fileid)) THEN
+       IF (zid>nb_zax(fileid)) THEN
           WRITE (str70, '("The vertical coordinate chosen for variable ", a)' &
                ) trim(tmp_name)
           str71 = ' Does not exist.'
@@ -204,28 +204,28 @@ contains
 
        ! Is the vertical size of the variable equal to that of the axis ?
 
-       IF (par_szz/=zax_size(fileid, pzid)) THEN
-          str20 = zax_name(fileid, pzid)
+       IF (szz/=zax_size(fileid, zid)) THEN
+          str20 = zax_name(fileid, zid)
           str70 = 'The size of the zoom does not correspond ' // &
                'to the size of the chosen vertical axis'
-          WRITE (str71, '("Size of zoom in z:", I4)') par_szz
+          WRITE (str71, '("Size of zoom in z:", I4)') szz
           WRITE (str72, '("Size declared for axis ", a, ":", I4)') &
-               trim(str20), zax_size(fileid, pzid)
+               trim(str20), zax_size(fileid, zid)
           CALL histerr(3, 'histdef', str70, str71, str72)
        END IF
 
        ! Is the zoom smaler that the total size of the variable ?
 
-       IF (pzsize<par_szz) THEN
-          str20 = zax_name(fileid, pzid)
+       IF (pzsize<szz) THEN
+          str20 = zax_name(fileid, zid)
           str70 = 'The vertical size of variable ' // &
                'is smaller than that of the zoom.'
           WRITE (str71, '("Declared vertical size of data:", I5)') pzsize
           WRITE (str72, '("Size of zoom for variable ", a, " = ", I5)') &
-               trim(tmp_name), par_szz
+               trim(tmp_name), szz
           CALL histerr(3, 'histdef', str70, str71, str72)
        END IF
-       var_zaxid(fileid, iv) = pzid
+       var_zaxid(fileid, iv) = zid
     ELSE
        var_zaxid(fileid, iv) = -99
     END IF

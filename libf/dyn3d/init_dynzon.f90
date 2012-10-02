@@ -73,8 +73,7 @@ contains
 
     ! Appel à histvert pour la grille verticale
 
-    call histvert(fileid, 'presnivs', 'Niveaux sigma', 'mb', llm, presnivs, &
-         vertiid)
+    call histvert(fileid, 'presnivs', 'Niveaux sigma', 'mb', presnivs, vertiid)
 
     ! Appels à histdef pour la définition des variables à sauvegarder
     do iQ = 1, nQ

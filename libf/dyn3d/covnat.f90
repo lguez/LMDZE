@@ -8,8 +8,8 @@ contains
 
     ! From LMDZ4/libf/dyn3d/covnat.F, version 1.1.1.1 2004/05/19 12:53:07
 
-    USE paramet_m, ONLY: iip1, iip2, ip1jm, ip1jmp1
     USE comgeom, ONLY: cu, cv
+    USE paramet_m, ONLY: iip1, iip2, ip1jm, ip1jmp1
 
     ! Authors: F. Hourdin, Phu Le Van
 

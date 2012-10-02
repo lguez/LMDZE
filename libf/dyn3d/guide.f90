@@ -15,15 +15,16 @@ CONTAINS
 
     USE comconst, ONLY : cpp, daysec, dtvr, kappa
     USE comgeom, ONLY : aire, rlatu, rlonv
-    USE disvert_m, ONLY : ap, bp, preff, presnivs
     USE conf_gcm_m, ONLY : day_step, iperiod
     use conf_guide_m, only: conf_guide, guide_u, guide_v, guide_t, guide_q, &
          guide_p, ncep, ini_anal, tau_min_u, tau_max_u, tau_min_v, tau_max_v, &
          tau_min_t, tau_max_t, tau_min_q, tau_max_q, tau_min_p, tau_max_p, &
          online
     USE dimens_m, ONLY : jjm, llm
+    USE disvert_m, ONLY : ap, bp, preff, presnivs
     USE exner_hyb_m, ONLY : exner_hyb
     USE inigrads_m, ONLY : inigrads
+    use massdair_m, only: massdair
     use netcdf, only: nf90_nowrite, nf90_open, nf90_close, nf90_inq_dimid, &
          nf90_inquire_dimension
     use nr_util, only: pi
