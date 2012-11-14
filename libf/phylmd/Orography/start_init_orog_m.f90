@@ -91,7 +91,7 @@ CONTAINS
 
     print *, 'Compute all the parameters needed for the gravity wave drag code'
 
-    ! Allocate the data we need to put in the interpolated fields:
+    ! Interpolated fields:
     ALLOCATE(phis(iim + 1, jjm + 1))
     ALLOCATE(mask(iim + 1, jjm + 1))
 

@@ -1,4 +1,4 @@
-PROGRAM etat0_lim
+PROGRAM ce0l
 
   ! This program sets the initial and boundary values.
 
@@ -19,4 +19,4 @@ PROGRAM etat0_lim
   CALL limit
   close(unit_nml)
 
-END PROGRAM etat0_lim
+END PROGRAM ce0l

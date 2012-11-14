@@ -225,15 +225,13 @@ CONTAINS
 
     ! 3.0 We check if we need to do an operation
 
-    IF (last_opp_chk(fileid, varid) == itau) THEN
-       CALL histerr (3, "histwrite", &
-            'This variable as already been analysed at the present', &
-            'time step', ' ')
-    ENDIF
+    IF (last_opp_chk(fileid, varid) == itau) CALL histerr (3, "histwrite", &
+         'This variable as already been analysed at the present', &
+         'time step', ' ')
 
-    CALL isittime &
-         (itau, date0(fileid), deltat(fileid), freq_opp(fileid, varid), &
-         last_opp(fileid, varid), last_opp_chk(fileid, varid), do_oper)
+    CALL isittime(itau, date0(fileid), deltat(fileid), &
+         freq_opp(fileid, varid), last_opp(fileid, varid), &
+         last_opp_chk(fileid, varid), do_oper)
 
     ! 4.0 We check if we need to write the data
 

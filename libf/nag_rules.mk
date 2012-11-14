@@ -5,18 +5,18 @@
 
 .PHONY: all_nag objects
 
-all_nag: objects CG_etat0_lim CG_gcm CR_etat0_lim CR_gcm
+all_nag: objects CG_ce0l CG_gcm CR_ce0l CR_gcm
 objects: ${objects}
 
 # Call graphs:
-CG_etat0_lim: ${sources_etat0_lim}
+CG_ce0l: ${sources_ce0l}
 	nag_fcalls95 ${nag_fcalls_options} -listing $@ $^
 
 CG_gcm: ${sources_gcm}
 	nag_fcalls95 ${nag_fcalls_options} -listing $@ $^
 
 # Cross references:
-CR_etat0_lim: ${sources_etat0_lim}
+CR_ce0l: ${sources_ce0l}
 	nag_xref95 ${nag_cross_options} -listing $@ $^
 
 CR_gcm: ${sources_gcm}
@@ -24,4 +24,4 @@ CR_gcm: ${sources_gcm}
 
 .PHONY: clean_nag
 clean_nag:
-	rm -f CG_etat0_lim CG_gcm CR_etat0_lim CR_gcm
+	rm -f CG_ce0l CG_gcm CR_ce0l CR_gcm

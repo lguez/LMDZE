@@ -14,6 +14,7 @@ contains
 
     use aaam_bud_m, only: aaam_bud
     USE abort_gcm_m, ONLY: abort_gcm
+    use aeropt_m, only: aeropt
     use ajsec_m, only: ajsec
     USE calendar, ONLY: ymds2ju
     use calltherm_m, only: calltherm
@@ -36,6 +37,7 @@ contains
     USE dimsoil, ONLY: nsoilmx
     use drag_noro_m, only: drag_noro
     USE fcttre, ONLY: foeew, qsatl, qsats, thermcep
+    use fisrtilp_m, only: fisrtilp
     USE hgardfou_m, ONLY: hgardfou
     USE histsync_m, ONLY: histsync
     USE histwrite_m, ONLY: histwrite
@@ -44,6 +46,7 @@ contains
     USE ini_histhf_m, ONLY: ini_histhf
     USE ini_histday_m, ONLY: ini_histday
     USE ini_histins_m, ONLY: ini_histins
+    use newmicro_m, only: newmicro
     USE oasis_m, ONLY: ok_oasis
     USE orbite_m, ONLY: orbite, zenang
     USE ozonecm_m, ONLY: ozonecm
@@ -56,6 +59,7 @@ contains
     use sugwd_m, only: sugwd
     USE suphec_m, ONLY: ra, rcpd, retv, rg, rlvtt, romega, rsigma, rtt
     USE temps, ONLY: annee_ref, day_ref, itau_phy
+    use unit_nml_m, only: unit_nml
     USE yoethf_m, ONLY: r2es, rvtmp2
 
     ! Arguments:
@@ -116,7 +120,7 @@ contains
     logical rnpb
     parameter(rnpb = .true.)
 
-    character(len = 6), save:: ocean
+    character(len = 6):: ocean = 'force '
     ! (type de modèle océan à utiliser: "force" ou "slab" mais pas "couple")
 
     logical ok_ocean
@@ -129,13 +133,11 @@ contains
     REAL fluxg(klon) ! flux turbulents ocean-atmosphere
 
     ! Modele thermique du sol, a activer pour le cycle diurne:
-    logical, save:: ok_veget
-    LOGICAL, save:: ok_journe ! sortir le fichier journalier
+    logical:: ok_veget = .false. ! type de modele de vegetation utilise
 
-    LOGICAL ok_mensuel ! sortir le fichier mensuel
-
-    LOGICAL ok_instan ! sortir le fichier instantane
-    save ok_instan
+    logical:: ok_journe = .false., ok_mensuel = .true., ok_instan = .false.
+    ! sorties journalieres, mensuelles et instantanees dans les
+    ! fichiers histday, histmth et histins
 
     LOGICAL ok_region ! sortir le fichier regional
     PARAMETER (ok_region = .FALSE.)
@@ -391,7 +393,6 @@ contains
     EXTERNAL alboc ! calculer l'albedo sur ocean
     !KE43
     EXTERNAL conema3 ! convect4.3
-    EXTERNAL fisrtilp ! schema de condensation a grande echelle (pluie)
     EXTERNAL nuage ! calculer les proprietes radiatives
     EXTERNAL transp ! transport total de l'eau et de l'energie
 
@@ -535,20 +536,17 @@ contains
     REAL d_u_lif(klon, llm), d_v_lif(klon, llm)
     REAL d_t_lif(klon, llm)
 
-    REAL ratqs(klon, llm), ratqss(klon, llm), ratqsc(klon, llm)
-    real ratqsbas, ratqshaut
-    save ratqsbas, ratqshaut, ratqs
+    REAL, save:: ratqs(klon, llm)
+    real ratqss(klon, llm), ratqsc(klon, llm)
+    real:: ratqsbas = 0.01, ratqshaut = 0.3
 
     ! Parametres lies au nouveau schema de nuages (SB, PDF)
-    real, save:: fact_cldcon
-    real, save:: facttemps
-    logical ok_newmicro
-    save ok_newmicro
+    real:: fact_cldcon = 0.375
+    real:: facttemps = 1.e-4
+    logical:: ok_newmicro = .true.
     real facteur
 
-    integer iflag_cldcon
-    save iflag_cldcon
-
+    integer:: iflag_cldcon = 1
     logical ptconv(klon, llm)
 
     ! Variables locales pour effectuer les appels en série :
@@ -594,7 +592,7 @@ contains
     REAL zero_v(klon)
     CHARACTER(LEN = 15) tit
     INTEGER:: ip_ebil = 0 ! print level for energy conservation diagnostics
-    INTEGER, SAVE:: if_ebil ! level for energy conservation diagnostics
+    INTEGER:: if_ebil = 0 ! verbosity for diagnostics of energy conservation 
 
     REAL d_t_ec(klon, llm) ! tendance due à la conversion Ec -> E thermique
     REAL ZRCPD
@@ -616,34 +614,31 @@ contains
     REAL fl(klon, llm) ! denominator of re
 
     ! Aerosol optical properties
-    REAL tau_ae(klon, llm, 2), piz_ae(klon, llm, 2)
-    REAL cg_ae(klon, llm, 2)
+    REAL, save:: tau_ae(klon, llm, 2), piz_ae(klon, llm, 2)
+    REAL, save:: cg_ae(klon, llm, 2)
 
-    REAL topswad(klon), solswad(klon) ! Aerosol direct effect.
-    ! ok_ade = True -ADE = topswad-topsw
+    REAL topswad(klon), solswad(klon) ! aerosol direct effect
+    ! ok_ade --> ADE = topswad - topsw
 
     REAL topswai(klon), solswai(klon) ! aerosol indirect effect
-    ! ok_aie = True ->
-    ! ok_ade = True -AIE = topswai-topswad
-    ! ok_ade = F -AIE = topswai-topsw
+    ! ok_aie .and. ok_ade --> AIE = topswai - topswad
+    ! ok_aie .and. .not. ok_ade --> AIE = topswai - topsw
 
     REAL aerindex(klon) ! POLDER aerosol index
 
-    ! Parameters
-    LOGICAL, save:: ok_ade ! apply aerosol direct effect
-    LOGICAL, save:: ok_aie ! Apply aerosol indirect effect
-    REAL bl95_b0, bl95_b1 ! Parameter in Boucher and Lohmann (1995)
+    LOGICAL:: ok_ade = .false. ! apply aerosol direct effect
+    LOGICAL:: ok_aie = .false. ! apply aerosol indirect effect
 
-    SAVE bl95_b0, bl95_b1
+    REAL:: bl95_b0 = 2., bl95_b1 = 0.2
+    ! Parameters in the formula to link CDNC to aerosol mass conc
+    ! (Boucher and Lohmann, 1995), used in nuage.F
+
     SAVE u10m
     SAVE v10m
     SAVE t2m
     SAVE q2m
     SAVE ffonte
     SAVE fqcalving
-    SAVE piz_ae
-    SAVE tau_ae
-    SAVE cg_ae
     SAVE rain_con
     SAVE snow_con
     SAVE topswai
@@ -659,6 +654,11 @@ contains
     ! (column-density of mass of air in a cell, in kg m-2)
 
     real, parameter:: dobson_u = 2.1415e-05 ! Dobson unit, in kg m-2
+
+    namelist /physiq_nml/ ocean, ok_veget, ok_journe, ok_mensuel, ok_instan, &
+         fact_cldcon, facttemps, ok_newmicro, iflag_cldcon, ratqsbas, &
+         ratqshaut, if_ebil, ok_ade, ok_aie, bl95_b0, bl95_b1, iflag_thermals, &
+         nsplit_thermals
 
     !----------------------------------------------------------------
 
@@ -714,11 +714,14 @@ contains
 
        IF (if_ebil >= 1) d_h_vcol_phy = 0.
 
+       iflag_thermals = 0
+       nsplit_thermals = 1
+       print *, "Enter namelist 'physiq_nml'."
+       read(unit=*, nml=physiq_nml)
+       write(unit_nml, nml=physiq_nml)
+
        ! Appel à la lecture du run.def physique
-       call conf_phys(ocean, ok_veget, ok_journe, ok_mensuel, ok_instan, &
-            fact_cldcon, facttemps, ok_newmicro, iflag_cldcon, ratqsbas, &
-            ratqshaut, if_ebil, ok_ade, ok_aie, bl95_b0, bl95_b1, &
-            iflag_thermals, nsplit_thermals)
+       call conf_phys
 
        ! Initialiser les compteurs:
 
@@ -1472,13 +1475,11 @@ contains
     ENDDO
 
     ! Introduce the aerosol direct and first indirect radiative forcings:
-    ! Johannes Quaas, 27/11/2003
     IF (ok_ade .OR. ok_aie) THEN
-       ! Get sulfate aerosol distribution
+       ! Get sulfate aerosol distribution :
        CALL readsulfate(rdayvrai, firstcal, sulfate)
        CALL readsulfate_preind(rdayvrai, firstcal, sulfate_pi)
 
-       ! Calculate aerosol optical properties (Olivier Boucher)
        CALL aeropt(play, paprs, t_seri, sulfate, rhcl, tau_ae, piz_ae, cg_ae, &
             aerindex)
     ELSE

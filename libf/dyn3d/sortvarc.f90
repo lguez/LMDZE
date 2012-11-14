@@ -27,7 +27,8 @@ contains
     real, intent(in):: teta(ip1jmp1, llm)
     REAL, INTENT(IN):: ps(ip1jmp1), phis(ip1jmp1)
     REAL :: vorpot(ip1jm, llm)
-    REAL :: phi(ip1jmp1, llm), bern(ip1jmp1, llm)
+    REAL, intent(in):: phi(ip1jmp1, llm)
+    real bern(ip1jmp1, llm)
     REAL :: dp(ip1jmp1)
     REAL, INTENT (IN):: time_0
     REAL, INTENT (IN):: pk(ip1jmp1, llm)

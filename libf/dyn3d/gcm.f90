@@ -118,7 +118,6 @@ PROGRAM gcm
   ENDIF
 
   CALL iniconst 
-  close(unit_nml)
   CALL inigeom ! initialisation de la géometrie
   CALL inifilr ! initialisation du filtre
   CALL inidissip
@@ -169,6 +168,7 @@ PROGRAM gcm
   ! Intégration temporelle du modèle :
   CALL leapfrog(ucov, vcov, teta, ps, masse, phis, q, time_0)
 
+  close(unit_nml)
   call histclo
   print *, 'Simulation finished'
   print *, 'Everything is cool'

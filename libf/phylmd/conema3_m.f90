@@ -4,7 +4,7 @@ module conema3_m
 
   implicit none
 
-  real epmax             ! 0.993
+  real epmax             ! Efficacite precip
   logical ok_adj_ema      ! F
   integer iflag_clw      ! 0
 

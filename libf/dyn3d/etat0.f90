@@ -21,15 +21,14 @@ contains
     use comconst, only: dtvr, daysec, cpp, kappa
     use comgeom, only: rlatu, rlonv, rlonu, rlatv, aire_2d, apoln, apols, &
          cu_2d, cv_2d
-    use disvert_m, only: ap, bp, preff, pa
     use conf_gcm_m, only: day_step, iphysiq, dayref, anneeref
     use dimens_m, only: iim, jjm, llm, nqmx
     use dimphy, only: zmasq
     use dimsoil, only: nsoilmx
+    use disvert_m, only: ap, bp, preff, pa
     use dynredem0_m, only: dynredem0
     use dynredem1_m, only: dynredem1
     use exner_hyb_m, only: exner_hyb
-    USE flincom, only: flinclo, flinopen_nozoom, flininfo
     use geopot_m, only: geopot
     use grid_atob, only: grille_m
     use grid_change, only: init_dyn_phy, dyn_phy
@@ -41,7 +40,8 @@ contains
     use inigeom_m, only: inigeom
     use massdair_m, only: massdair
     use netcdf, only: nf90_nowrite
-    use netcdf95, only: nf95_open, nf95_close, nf95_get_var, nf95_inq_varid
+    use netcdf95, only: nf95_close, nf95_get_var, nf95_gw_var, &
+         nf95_inq_varid, nf95_open
     use nr_util, only: pi
     use paramet_m, only: ip1jm, ip1jmp1
     use phyredem_m, only: phyredem
@@ -50,9 +50,9 @@ contains
     use regr_lat_time_coefoz_m, only: regr_lat_time_coefoz
     use regr_pr_o3_m, only: regr_pr_o3
     use serre, only: alphax
+    use startdyn, only: start_init_dyn
     USE start_init_orog_m, only: start_init_orog, mask, phis
     use start_init_phys_m, only: start_init_phys
-    use startdyn, only: start_init_dyn
     use start_inter_3d_m, only: start_inter_3d
     use temps, only: itau_phy, annee_ref, day_ref
 
@@ -65,9 +65,9 @@ contains
     REAL, dimension(iim + 1, jjm + 1, llm):: ucov, t3d, tpot
     REAL vcov(iim + 1, jjm, llm)
 
-    REAL q3d(iim + 1, jjm + 1, llm, nqmx)
+    REAL q(iim + 1, jjm + 1, llm, nqmx)
     ! (mass fractions of trace species
-    ! "q3d(i, j, l)" is at longitude "rlonv(i)", latitude "rlatu(j)"
+    ! "q(i, j, l)" is at longitude "rlonv(i)", latitude "rlatu(j)"
     ! and pressure level "pls(i, j, l)".)
 
     real qsat(iim + 1, jjm + 1, llm) ! mass fraction of saturating water vapor
@@ -93,14 +93,13 @@ contains
     REAL t_ancien(klon, llm), q_ancien(klon, llm)      !
     REAL run_off_lic_0(klon)
     real clwcon(klon, llm), rnebcon(klon, llm), ratqs(klon, llm)
-    ! déclarations pour lecture glace de mer
-    INTEGER iml_lic, jml_lic, llm_tmp, ttm_tmp
-    INTEGER itaul(1), fid, ncid, varid
-    REAL lev(1), date
-    REAL, ALLOCATABLE:: lon_lic(:, :), lat_lic(:, :)
-    REAL, ALLOCATABLE:: dlon_lic(:), dlat_lic(:)
+
+    ! Déclarations pour lecture glace de mer :
+    INTEGER iml_lic, jml_lic
+    INTEGER ncid, varid
+    REAL, pointer:: dlon_lic(:), dlat_lic(:)
     REAL, ALLOCATABLE:: fraclic(:, :) ! fraction land ice
-    REAL flic_tmp(iim + 1, jjm + 1) !fraction land ice temporary
+    REAL flic_tmp(iim + 1, jjm + 1) ! fraction land ice temporary
 
     INTEGER l, ji
 
@@ -112,7 +111,6 @@ contains
     REAL pbaru(ip1jmp1, llm), pbarv(ip1jm, llm)
     REAL w(ip1jmp1, llm)
     REAL phystep
-    real trash
 
     !---------------------------------
 
@@ -186,23 +184,23 @@ contains
     IF (MINVAL(qsat) == MAXVAL(qsat)) stop '"qsat" should not be constant'
 
     ! Water vapor:
-    call start_inter_3d('R', rlonu, rlatv, pls, q3d(:, :, :, 1))
-    q3d(:, :, :, 1) = 0.01 * q3d(:, :, :, 1) * qsat
-    WHERE (q3d(:, :, :, 1) < 0.) q3d(:, :, :, 1) = 1E-10
+    call start_inter_3d('R', rlonu, rlatv, pls, q(:, :, :, 1))
+    q(:, :, :, 1) = 0.01 * q(:, :, :, 1) * qsat
+    WHERE (q(:, :, :, 1) < 0.) q(:, :, :, 1) = 1E-10
     DO l = 1, llm
-       q3d(:, 1, l, 1) = SUM(aire_2d(:, 1) * q3d(:, 1, l, 1)) / apoln
-       q3d(:, jjm + 1, l, 1) &
-            = SUM(aire_2d(:, jjm + 1) * q3d(:, jjm + 1, l, 1)) / apols
+       q(:, 1, l, 1) = SUM(aire_2d(:, 1) * q(:, 1, l, 1)) / apoln
+       q(:, jjm + 1, l, 1) &
+            = SUM(aire_2d(:, jjm + 1) * q(:, jjm + 1, l, 1)) / apols
     ENDDO
 
-    q3d(:, :, :, 2:4) = 0. ! liquid water, radon and lead
+    q(:, :, :, 2:4) = 0. ! liquid water, radon and lead
 
     if (nqmx >= 5) then
        ! Ozone:
        call regr_lat_time_coefoz
-       call regr_pr_o3(q3d(:, :, :, 5))
+       call regr_pr_o3(q(:, :, :, 5))
        ! Convert from mole fraction to mass fraction:
-       q3d(:, :, :, 5) = q3d(:, :, :, 5)  * 48. / 29.
+       q(:, :, :, 5) = q(:, :, :, 5)  * 48. / 29.
     end if
 
     tsol = pack(tsol_2d, dyn_phy)
@@ -223,41 +221,41 @@ contains
     ! On initialise les sous-surfaces.
     ! Lecture du fichier glace de terre pour fixer la fraction de terre 
     ! et de glace de terre :
-    CALL flininfo("landiceref.nc", iml_lic, jml_lic, llm_tmp, &
-         ttm_tmp, fid)
-    ALLOCATE(lat_lic(iml_lic, jml_lic))
-    ALLOCATE(lon_lic(iml_lic, jml_lic))
-    ALLOCATE(dlon_lic(iml_lic))
-    ALLOCATE(dlat_lic(jml_lic))
-    ALLOCATE(fraclic(iml_lic, jml_lic))
-    CALL flinopen_nozoom(iml_lic, jml_lic, &
-         llm_tmp, lon_lic, lat_lic, lev, ttm_tmp, itaul, date, trash,  &
-         fid)
-    CALL flinclo(fid)
+
     call nf95_open("landiceref.nc", nf90_nowrite, ncid)
+
+    call nf95_inq_varid(ncid, 'longitude', varid)
+    call nf95_gw_var(ncid, varid, dlon_lic)
+    iml_lic = size(dlon_lic)
+
+    call nf95_inq_varid(ncid, 'latitude', varid)
+    call nf95_gw_var(ncid, varid, dlat_lic)
+    jml_lic = size(dlat_lic)
+
     call nf95_inq_varid(ncid, 'landice', varid)
+    ALLOCATE(fraclic(iml_lic, jml_lic))
     call nf95_get_var(ncid, varid, fraclic)
+
     call nf95_close(ncid)
 
     ! Interpolation sur la grille T du modèle :
-    PRINT *, 'Dimensions de "landice"'
+    PRINT *, 'Dimensions de "landiceref.nc"'
     print *, "iml_lic = ", iml_lic
     print *, "jml_lic = ", jml_lic
 
     ! Si les coordonnées sont en degrés, on les transforme :
-    IF (MAXVAL( lon_lic ) > pi)  THEN
-       lon_lic = lon_lic * pi / 180.
+    IF (MAXVAL( dlon_lic ) > pi)  THEN
+       dlon_lic = dlon_lic * pi / 180.
     ENDIF
-    IF (maxval( lat_lic ) > pi) THEN 
-       lat_lic = lat_lic * pi/ 180.
+    IF (maxval( dlat_lic ) > pi) THEN 
+       dlat_lic = dlat_lic * pi/ 180.
     ENDIF
-
-    dlon_lic = lon_lic(:, 1)
-    dlat_lic = lat_lic(1, :) 
 
     flic_tmp(:iim, :) = grille_m(dlon_lic, dlat_lic, fraclic, rlonv(:iim), &
          rlatu)
     flic_tmp(iim + 1, :) = flic_tmp(1, :)
+
+    deallocate(dlon_lic, dlat_lic) ! pointers
 
     ! Passage sur la grille physique
     pctsrf = 0.
@@ -312,7 +310,7 @@ contains
     CALL caldyn0(ucov, vcov, tpot, psol, masse, pk, phis, phi, w, pbaru, &
          pbarv)
     CALL dynredem0("start.nc", dayref, phis)
-    CALL dynredem1("start.nc", vcov, ucov, tpot, q3d, masse, psol, itau=0)
+    CALL dynredem1("start.nc", vcov, ucov, tpot, q, masse, psol, itau=0)
 
     ! Ecriture état initial physique:
     print *, "iphysiq = ", iphysiq

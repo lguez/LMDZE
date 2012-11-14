@@ -33,7 +33,8 @@ c   Arguments:
 c   ----------
 c
       INTEGER nlay,ngrid
-      REAL pphi(ngrid*nlay),pecin(ngrid*nlay),pbern(ngrid*nlay)
+      REAL, intent(in):: pphi(ngrid*nlay),pecin(ngrid*nlay)
+      real pbern(ngrid*nlay)
 c
 c   Local:
 c   ------

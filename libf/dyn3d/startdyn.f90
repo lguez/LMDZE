@@ -14,7 +14,8 @@ CONTAINS
 
   SUBROUTINE start_init_dyn(tsol_2d, psol)
 
-    USE flincom, only: flininfo, flinopen_nozoom
+    USE flininfo_m, only: flininfo
+    USE flinopen_nozoom_m, only: flinopen_nozoom
     use comgeom, only: aire_2d, apoln, apols
     use conf_dat2d_m, only: conf_dat2d
     use inter_barxy_m, only: inter_barxy

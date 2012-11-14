@@ -82,9 +82,8 @@ contains
     read (unit=*, nml=limit_nml)
     write(unit_nml, nml=limit_nml)
 
-    ! Process rugosity:
-
     PRINT *, 'Processing rugosity...'
+
     call NF95_OPEN('Rugos.nc', NF90_NOWRITE, ncid)
 
     ! Read coordinate variables:
@@ -126,7 +125,7 @@ contains
     ! Interpolate monthly values to daily values, at each horizontal position:
     DO j = 1, jjm + 1
        DO i = 1, iim
-          yder(:) = SPLINE(timeyear, champtime(i, j, :))
+          yder = SPLINE(timeyear, champtime(i, j, :))
           DO k = 1, 360
              champan(i, j, k) = SPLINT(timeyear, champtime(i, j, :), yder, &
                   real(k-1))
@@ -154,10 +153,12 @@ contains
     call nf95_inq_dimid(ncid, "time", dimid)
     call NF95_INQuire_DIMension(ncid, dimid, nclen=lmdep)
     print *, 'lmdep = ', lmdep
-    ! PM 28/02/2002 : nouvelle coordonnée temporelle, fichiers AMIP
-    ! pas en jours
-    ! Ici on suppose qu'on a 12 mois (de 30 jours).
-    IF (lmdep /= 12) STOP 'Unknown AMIP file: not 12 months?'
+    ! Coordonnée temporelle fichiers AMIP pas en jours. Ici on suppose
+    ! qu'on a 12 mois (de 30 jours).
+    IF (lmdep /= 12) then
+       print *, 'Unknown AMIP file: not 12 months?'
+       STOP 1
+    end IF
 
     ALLOCATE(champ(imdep, jmdep), champtime(iim, jjm + 1, lmdep))
     ALLOCATE (dlon(imdep), dlat(jmdep))
@@ -179,7 +180,7 @@ contains
 
     DO j = 1, jjm + 1
        DO i = 1, iim
-          yder(:) = SPLINE(tmidmonth, champtime(i, j, :))
+          yder = SPLINE(tmidmonth, champtime(i, j, :))
           DO k = 1, 360
              champan(i, j, k) = SPLINT(tmidmonth, champtime(i, j, :), yder, &
                   real(k-1))
@@ -195,30 +196,30 @@ contains
     champan(iim + 1, :, :) = champan(1, :, :)
 
     DO k = 1, 360
-       phy_ice(:) = pack(champan(:, :, k), dyn_phy)
+       phy_ice = pack(champan(:, :, k), dyn_phy)
 
        ! (utilisation de la sous-maille fractionnelle tandis que l'ancien
        ! codage utilisait l'indicateur du sol (0, 1, 2, 3))
        ! PB en attendant de mettre fraction de terre
-       WHERE(phy_ice(:) < EPSFRA) phy_ice(:) = 0.
+       WHERE (phy_ice < EPSFRA) phy_ice = 0.
 
        pctsrf_t(:, is_ter, k) = pctsrf(:, is_ter)
        pctsrf_t(:, is_lic, k) = pctsrf(:, is_lic)
-       pctsrf_t(:, is_sic, k) = max(phy_ice(:) - pctsrf_t(:, is_lic, k), 0.)
+       pctsrf_t(:, is_sic, k) = max(phy_ice - pctsrf_t(:, is_lic, k), 0.)
        ! Il y a des cas où il y a de la glace dans landiceref et
        ! pas dans AMIP
-       WHERE( 1. - zmasq(:) < EPSFRA)
+       WHERE (1. - zmasq < EPSFRA)
           pctsrf_t(:, is_sic, k) = 0.
           pctsrf_t(:, is_oce, k) = 0.
        elsewhere
-          where (pctsrf_t(:, is_sic, k) >= 1 - zmasq(:))
-             pctsrf_t(:, is_sic, k) = 1. - zmasq(:)
+          where (pctsrf_t(:, is_sic, k) >= 1 - zmasq)
+             pctsrf_t(:, is_sic, k) = 1. - zmasq
              pctsrf_t(:, is_oce, k) = 0.
           ELSEwhere
-             pctsrf_t(:, is_oce, k) = 1. - zmasq(:) - pctsrf_t(:, is_sic, k)
+             pctsrf_t(:, is_oce, k) = 1. - zmasq - pctsrf_t(:, is_sic, k)
              where (pctsrf_t(:, is_oce, k) < EPSFRA)
                 pctsrf_t(:, is_oce, k) = 0.
-                pctsrf_t(:, is_sic, k) = 1 - zmasq(:)
+                pctsrf_t(:, is_sic, k) = 1 - zmasq
              end where
           end where
        end where
@@ -257,11 +258,11 @@ contains
     !        Ici on suppose qu'on a 12 mois (de 30 jours).
     IF (lmdep /= 12) stop 'Unknown AMIP file: not 12 months?'
 
-    ALLOCATE( champ(imdep, jmdep), champtime(iim, jjm + 1, lmdep))
-    IF( extrap )  THEN
-       ALLOCATE ( work(imdep, jmdep) )
+    ALLOCATE(champ(imdep, jmdep), champtime(iim, jjm + 1, lmdep))
+    IF(extrap)  THEN
+       ALLOCATE (work(imdep, jmdep))
     ENDIF
-    ALLOCATE(   dlon(imdep), dlat(jmdep) )
+    ALLOCATE(dlon(imdep), dlat(jmdep))
     call NF95_INQ_VARID(ncid, 'tosbcs', varid)
 
     DO l = 1, lmdep
@@ -269,12 +270,12 @@ contains
        call handle_err("NF90_GET_VAR", ierr)
 
        CALL conf_dat2d(dlon_ini, dlat_ini, dlon, dlat, champ)
-       IF ( extrap ) THEN
+       IF (extrap) THEN
           CALL extrapol(champ, imdep, jmdep, 999999., .TRUE., .TRUE., 2, work)
        ENDIF
 
        CALL inter_barxy (dlon, dlat(:jmdep -1), champ, rlonu(:iim), rlatv, &
-            champtime(:, :, l) )
+            champtime(:, :, l))
     ENDDO
 
     call NF95_CLOSE(ncid)
@@ -285,7 +286,7 @@ contains
     ! interpolation temporelle
     DO j = 1, jjm + 1
        DO i = 1, iim
-          yder(:) = SPLINE(tmidmonth, champtime(i, j, :))
+          yder = SPLINE(tmidmonth, champtime(i, j, :))
           DO k = 1, 360
              champan(i, j, k) = SPLINT(tmidmonth, champtime(i, j, :), yder, &
                   real(k-1))
@@ -308,8 +309,6 @@ contains
     ENDDO
     forall (k = 1:360) phy_sst(:, k) = pack(champan(:, :, k), dyn_phy)
 
-    ! Traitement de l'albedo
-
     PRINT *, 'Traitement de l albedo'
     call NF95_OPEN('Albedo.nc', NF90_NOWRITE, ncid)
 
@@ -325,8 +324,8 @@ contains
     call nf95_gw_var(ncid, varid, timeyear)
     lmdep = size(timeyear)
 
-    ALLOCATE ( champ(imdep, jmdep), champtime(iim, jjm + 1, lmdep))
-    ALLOCATE (   dlon(imdep), dlat(jmdep) )
+    ALLOCATE (champ(imdep, jmdep), champtime(iim, jjm + 1, lmdep))
+    ALLOCATE (dlon(imdep), dlat(jmdep))
     call NF95_INQ_VARID(ncid, 'ALBEDO', varid)
 
     DO l = 1, lmdep
@@ -336,7 +335,7 @@ contains
 
        CALL conf_dat2d(dlon_ini, dlat_ini, dlon, dlat, champ)
        CALL inter_barxy(dlon, dlat(:jmdep-1), champ, rlonu(:iim), rlatv, &
-            champtime(:, :, l) )
+            champtime(:, :, l))
     ENDDO
 
     call NF95_CLOSE(ncid)
@@ -347,7 +346,7 @@ contains
     ! interpolation temporelle
     DO j = 1, jjm + 1
        DO i = 1, iim
-          yder(:) = SPLINE(timeyear, champtime(i, j, :))
+          yder = SPLINE(timeyear, champtime(i, j, :))
           DO k = 1, 360
              champan(i, j, k) = SPLINT(timeyear, champtime(i, j, :), yder, &
                   real(k-1))
@@ -378,23 +377,18 @@ contains
     dims(2) = ntim
 
     ierr = NF90_DEF_VAR (nid, "TEMPS", NF90_FLOAT, ntim, id_tim)
-    ierr = NF90_PUT_ATT (nid, id_tim, "title",  &
-         "Jour dans l annee")
+    ierr = NF90_PUT_ATT (nid, id_tim, "title", "Jour dans l annee")
     ierr = NF90_DEF_VAR (nid, "FOCE", NF90_FLOAT, dims, id_FOCE)
-    ierr = NF90_PUT_ATT (nid, id_FOCE, "title", &
-         "Fraction ocean")
+    ierr = NF90_PUT_ATT (nid, id_FOCE, "title", "Fraction ocean")
 
     ierr = NF90_DEF_VAR (nid, "FSIC", NF90_FLOAT, dims, id_FSIC)
-    ierr = NF90_PUT_ATT (nid, id_FSIC, "title", &
-         "Fraction glace de mer")
+    ierr = NF90_PUT_ATT (nid, id_FSIC, "title", "Fraction glace de mer")
 
     ierr = NF90_DEF_VAR (nid, "FTER", NF90_FLOAT, dims, id_FTER)
-    ierr = NF90_PUT_ATT (nid, id_FTER, "title", &
-         "Fraction terre")
+    ierr = NF90_PUT_ATT (nid, id_FTER, "title", "Fraction terre")
 
     ierr = NF90_DEF_VAR (nid, "FLIC", NF90_FLOAT, dims, id_FLIC)
-    ierr = NF90_PUT_ATT (nid, id_FLIC, "title", &
-         "Fraction land ice")
+    ierr = NF90_PUT_ATT (nid, id_FLIC, "title", "Fraction land ice")
 
     ierr = NF90_DEF_VAR (nid, "SST", NF90_FLOAT, dims, id_SST)
     ierr = NF90_PUT_ATT (nid, id_SST, "title",  &
@@ -403,11 +397,9 @@ contains
     ierr = NF90_PUT_ATT (nid, id_BILS, "title", &
          "Reference flux de chaleur au sol")
     ierr = NF90_DEF_VAR (nid, "ALB", NF90_FLOAT, dims, id_ALB)
-    ierr = NF90_PUT_ATT (nid, id_ALB, "title", &
-         "Albedo a la surface")
+    ierr = NF90_PUT_ATT (nid, id_ALB, "title", "Albedo a la surface")
     ierr = NF90_DEF_VAR (nid, "RUG", NF90_FLOAT, dims, id_RUG)
-    ierr = NF90_PUT_ATT (nid, id_RUG, "title", &
-         "Rugosite")
+    ierr = NF90_PUT_ATT (nid, id_RUG, "title", "Rugosite")
 
     call NF95_ENDDEF(nid)
 
@@ -415,7 +407,7 @@ contains
        debut(1) = 1
        debut(2) = k
 
-       ierr = NF90_PUT_VAR(nid, id_tim, FLOAT(k), (/k/))
+       ierr = NF90_PUT_VAR(nid, id_tim, REAL(k), (/k/))
        ierr = NF90_PUT_VAR(nid, id_FOCE, pctsrf_t(:, is_oce, k), debut)
        ierr = NF90_PUT_VAR (nid, id_FSIC, pctsrf_t(:, is_sic, k), debut)
        ierr = NF90_PUT_VAR (nid, id_FTER, pctsrf_t(:, is_ter, k), debut)

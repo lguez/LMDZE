@@ -1,14 +1,13 @@
 module conf_dat2d_m
 
-  ! From conf_dat2d.F, version 1.2 2006/01/27 15:14:22
-
   IMPLICIT NONE
 
 contains
 
   SUBROUTINE conf_dat2d(xd, yd, xf, yf, champd, interbar)
 
-    ! Auteur : P. Le Van
+    ! From conf_dat2d.F, version 1.2 2006/01/27 15:14:22
+    ! Author : P. Le Van
 
     ! Ce sous-programme configure le champ de données 2D 'champd' et
     ! les longitudes et latitudes de telle façon qu'on ait - pi à pi

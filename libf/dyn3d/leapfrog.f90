@@ -19,7 +19,7 @@ contains
     USE comgeom, ONLY: aire_2d, apoln, apols
     USE disvert_m, ONLY: ap, bp
     USE conf_gcm_m, ONLY: day_step, iconser, iperiod, iphysiq, nday, offline, &
-         iflag_phys, ok_guide
+         iflag_phys, ok_guide, iecri
     USE dimens_m, ONLY: iim, jjm, llm, nqmx
     use dissip_m, only: dissip
     USE dynetat0_m, ONLY: day_ini
@@ -229,6 +229,11 @@ contains
           call bilan_dyn(ps, masse, pk, pbaru, pbarv, teta, phi, ucov, vcov, &
                q(:, :, :, 1))
        ENDIF
+
+       IF (MOD(itau + 1, iecri * day_step) == 0) THEN
+          CALL geopot((iim + 1) * (jjm + 1), teta, pk, pks, phis, phi)
+          CALL writehist(itau, vcov, ucov, teta, phi, q, masse, ps, phis)
+       END IF
     end do time_integration
 
     CALL dynredem1("restart.nc", vcov, ucov, teta, q, masse, ps, &
