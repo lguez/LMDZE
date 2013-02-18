@@ -2,7 +2,8 @@ module conf_phys_m
 
   implicit none
 
-  integer iflag_pbl ! parameter for the planetary boundary layer
+  integer:: iflag_pbl = 1 ! for the planetary boundary layer
+  REAL:: rad_chau1 = 13., rad_chau2 = 9.
 
 contains
 
@@ -18,10 +19,10 @@ contains
          latmin_ins, lev_histday, lev_histhf, lev_histmth, lonmax_ins, &
          lonmin_ins, n2o_ppb, ok_isccp, ok_kzmin, ok_regdyn, overlap, rcfc11, &
          rcfc12, rch4, rco2, rn2o, solaire, top_height, type_run
+    use clesphys2, only: read_clesphys2
     USE comfisrtilp, ONLY: cld_lc_con, cld_lc_lsc, cld_tau_con, &
          cld_tau_lsc, coef_eva, ffallv_con, ffallv_lsc, iflag_pdf, reevap_ice
     USE conema3_m, ONLY: epmax, iflag_clw, ok_adj_ema
-    USE nuagecom, ONLY: rad_chau1, rad_chau2, rad_froid
     use unit_nml_m, only: unit_nml
     USE yomcst, ONLY: r_ecc, r_incl, r_peri
 
@@ -29,16 +30,18 @@ contains
          CH4_ppb, N2O_ppb, CFC11_ppt, CFC12_ppt, epmax, ok_adj_ema, &
          iflag_clw, cld_lc_lsc, cld_lc_con, cld_tau_lsc, cld_tau_con, &
          ffallv_lsc, ffallv_con, coef_eva, reevap_ice, iflag_pdf, &
-         rad_froid, rad_chau1, rad_chau2, top_height, overlap, cdmmax, &
-         cdhmax, ksta, ksta_ter, ok_kzmin, iflag_pbl, lev_histhf, &
-         lev_histday, lev_histmth, type_run, ok_isccp, ok_regdyn, &
-         lonmin_ins, lonmax_ins, latmin_ins, latmax_ins, ecrit_ins, &
-         ecrit_hf, ecrit_hf2mth, ecrit_day, ecrit_mth, ecrit_tra, &
-         ecrit_reg, bug_ozone
+         top_height, overlap, cdmmax, cdhmax, ksta, ksta_ter, &
+         ok_kzmin, iflag_pbl, lev_histhf, lev_histday, lev_histmth, &
+         type_run, ok_isccp, ok_regdyn, lonmin_ins, lonmax_ins, &
+         latmin_ins, latmax_ins, ecrit_ins, ecrit_hf, ecrit_hf2mth, &
+         ecrit_day, ecrit_mth, ecrit_tra, ecrit_reg, bug_ozone
+
+    namelist /nuagecom/ rad_chau1, rad_chau2
 
     !-----------------------------------------------------------
 
     print *, "Call sequence information: conf_phys"
+    call read_clesphys2
 
     R_ecc = 0.016715 ! AMIP II
     R_peri = 102.7 ! AMIP II
@@ -61,9 +64,6 @@ contains
     coef_eva = 2.e-5
     reevap_ice = .false.
     iflag_pdf = 0
-    rad_froid = 35.0
-    rad_chau1 = 13.0
-    rad_chau2 = 9.0
     top_height = 3
     overlap = 3
     cdmmax = 1.3E-3
@@ -71,7 +71,6 @@ contains
     ksta = 1.0e-10
     ksta_ter = 1.0e-10
     ok_kzmin = .true.
-    iflag_pbl = 1
     lev_histhf = 0
     lev_histday = 1
     lev_histmth = 2
@@ -106,6 +105,10 @@ contains
     print *, ' RN2O = ', RN2O
     print *, ' RCFC11 = ', RCFC11
     print *, ' RCFC12 = ', RCFC12
+
+    print *, "Enter namelist 'nuagecom'."
+    read(unit=*, nml=nuagecom)
+    write(unit_nml, nml=nuagecom)
 
   end subroutine conf_phys
 

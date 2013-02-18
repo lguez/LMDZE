@@ -1,13 +1,12 @@
-SUBROUTINE cv_thermo(iflag_con)
+SUBROUTINE cv_thermo
 
   ! Set thermodynamical constants for convectL
 
+  use clesphys2, only: iflag_con
   use SUPHEC_M
   use cvthermo
 
   implicit none
-
-  integer, intent(in):: iflag_con
 
   !-----------------------------------------------------
 

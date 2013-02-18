@@ -4,12 +4,12 @@ SUBROUTINE cv3_uncompress(nloc, len, ncum, nd, ntra, idcum, iflag, precip, &
      ft1, fq1, fu1, fv1, ftra1, inb1, Ma1, upwd1, dnwd1, dnwd01, qcondc1, &
      wd1, cape1, da1, phi1, mp1)
 
-  use cvparam3
+  use cv3_param_m
 
   implicit none
 
   ! inputs:
-  integer len, ncum, nd, ntra, nloc
+  integer, intent(in):: len, ncum, nd, ntra, nloc
   integer idcum(nloc)
   integer iflag(nloc)
   integer inb(nloc)

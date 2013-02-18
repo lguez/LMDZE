@@ -11,36 +11,37 @@ contains
     ! Author: P. Le Van
     ! Objet : sortie des variables de contrôle
 
+    USE comconst, ONLY: daysec, dtvr, g, omeg, rad
+    USE comgeom, ONLY: aire, cu, rlatu
     USE conf_gcm_m, ONLY: day_step
-    USE dimens_m, ONLY : iim, jjm, llm
-    USE paramet_m, ONLY : iip1, iip2, ijp1llm, ip1jm, ip1jmp1, jjp1
-    USE comconst, ONLY : daysec, dtvr, g, omeg, rad
-    USE comgeom, ONLY : aire, cu, rlatu
-    USE dynetat0_m, ONLY : day_ini
-    USE ener, ONLY : ang, ang0, etot, etot0, ptot, ptot0, rmsdpdt, rmsv, &
+    USE dimens_m, ONLY: iim, jjm, llm
+    USE dynetat0_m, ONLY: day_ini
+    USE ener, ONLY: ang, ang0, etot, etot0, ptot, ptot0, rmsdpdt, rmsv, &
          stot, stot0, ztot, ztot0
     use filtreg_m, only: filtreg
+    USE paramet_m, ONLY: iip1, iip2, ijp1llm, ip1jm, ip1jmp1, jjp1
 
-    ! Arguments:
-    INTEGER, INTENT(IN) :: itau
-    REAL :: ucov(ip1jmp1, llm), masse(ip1jmp1, llm)
+    INTEGER, INTENT(IN):: itau
+    REAL, INTENT(IN):: ucov(ip1jmp1, llm)
     real, intent(in):: teta(ip1jmp1, llm)
-    REAL, INTENT(IN):: ps(ip1jmp1), phis(ip1jmp1)
-    REAL :: vorpot(ip1jm, llm)
-    REAL, intent(in):: phi(ip1jmp1, llm)
-    real bern(ip1jmp1, llm)
-    REAL :: dp(ip1jmp1)
-    REAL, INTENT (IN):: time_0
+    REAL, INTENT(IN):: ps(ip1jmp1)
+    REAL, INTENT(IN):: masse(ip1jmp1, llm)
     REAL, INTENT (IN):: pk(ip1jmp1, llm)
+    REAL, INTENT(IN):: phis(ip1jmp1)
+    REAL, INTENT(IN):: vorpot(ip1jm, llm)
+    REAL, intent(in):: phi(ip1jmp1, llm)
+    real, intent(in):: bern(ip1jmp1, llm)
+    REAL, intent(in):: dp(ip1jmp1)
+    REAL, INTENT (IN):: time_0
 
     ! Local:
-    REAL :: vor(ip1jm), bernf(ip1jmp1, llm), ztotl(llm)
-    REAL :: etotl(llm), stotl(llm), rmsvl(llm), angl(llm), ge(ip1jmp1)
-    REAL :: cosphi(ip1jm), omegcosp(ip1jm)
-    REAL :: dtvrs1j, rjour, heure, radsg, radomeg
+    REAL:: vor(ip1jm), bernf(ip1jmp1, llm), ztotl(llm)
+    REAL:: etotl(llm), stotl(llm), rmsvl(llm), angl(llm), ge(ip1jmp1)
+    REAL:: cosphi(ip1jm), omegcosp(ip1jm)
+    REAL:: dtvrs1j, rjour, heure, radsg, radomeg
     real massebxy(ip1jm, llm)
-    INTEGER :: l, ij, imjmp1
-    REAL :: ssum
+    INTEGER:: l, ij, imjmp1
+    REAL:: ssum
     real time
 
     !-----------------------------------------------------------------------
@@ -60,7 +61,7 @@ contains
     ge(:) = dp(:)*dp(:)
     rmsdpdt = ssum(ip1jmp1, ge, 1) - ssum(jjp1, ge, iip1)
     rmsdpdt = daysec*1.E-2*sqrt(rmsdpdt/imjmp1)
-    CALL scopy(ijp1llm, bern, 1, bernf, 1)
+    bernf = bern
     CALL filtreg(bernf, jjp1, llm, -2, 2, .TRUE.)
 
     ! Calcul du moment  angulaire

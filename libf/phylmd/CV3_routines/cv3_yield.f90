@@ -9,14 +9,14 @@
                           ,iflag,precip,VPrecip,ft,fr,fu,fv,ftra &
                           ,upwd,dnwd,dnwd0,ma,mike,tls,tps,qcondc,wd)
       use conema3_m
-            use cvparam3
+            use cv3_param_m
             use cvthermo
             use cvflag
       implicit none
 
 
 ! inputs:
-      integer ncum,nd,na,ntra,nloc
+      integer, intent(in):: ncum,nd,na,ntra,nloc
       integer icb(nloc), inb(nloc)
       real, intent(in):: delt
       real t(nloc,nd), rr(nloc,nd), u(nloc,nd), v(nloc,nd)
@@ -87,13 +87,6 @@
        enddo
       enddo
 
-!      do j=1,ntra
-!       do i=1,nd
-!        do il=1,ncum
-!          ftra(il,i,j)=0.0
-!        enddo
-!       enddo
-!      enddo
 
       do i=1,nl
        do il=1,ncum
@@ -131,14 +124,6 @@
        end do
 !
 !
-!   ***  Calculate downdraft velocity scale    ***
-!   ***  NE PAS UTILISER POUR L'INSTANT ***
-!
-!!      do il=1,ncum
-!!        wd(il)=betad*abs(mp(il,icb(il)))*0.01*rrd*t(il,icb(il))
-!!     :                                  /(sigd*p(il,icb(il)))
-!!      enddo
-
 !
 !   ***  calculate tendencies of lowest level potential temperature  ***
 !   ***                      and mixing ratio                        ***
@@ -206,20 +191,6 @@
 
       enddo ! il
 
-!      do j=1,ntra
-!       do il=1,ncum
-!        if (cvflag_grav) then
-!         ftra(il,1,j)=ftra(il,1,j)+0.01*grav*work(il)
-!     :                     *(mp(il,2)*(trap(il,2,j)-tra(il,1,j))
-!     :             +am(il)*(tra(il,2,j)-tra(il,1,j)))
-!        else
-!         ftra(il,1,j)=ftra(il,1,j)+0.1*work(il)
-!     :                     *(mp(il,2)*(trap(il,2,j)-tra(il,1,j))
-!     :             +am(il)*(tra(il,2,j)-tra(il,1,j)))
-!        endif
-!       enddo
-!      enddo
-
       do j=2,nl
        do il=1,ncum
         if (j.le.inb(il)) then
@@ -241,24 +212,6 @@
         endif ! j
        enddo
       enddo
-
-!      do k=1,ntra
-!       do j=2,nl
-!        do il=1,ncum
-!         if (j.le.inb(il)) then
-
-!          if (cvflag_grav) then
-!           ftra(il,1,k)=ftra(il,1,k)+0.01*grav*work(il)*ment(il,j,1)
-!     :                *(traent(il,j,1,k)-tra(il,1,k))
-!          else
-!           ftra(il,1,k)=ftra(il,1,k)+0.1*work(il)*ment(il,j,1)
-!     :                *(traent(il,j,1,k)-tra(il,1,k))
-!          endif
-
-!         endif
-!        enddo
-!       enddo
-!      enddo
 
 !
 !   ***  calculate tendencies of potential temperature and mixing ratio  ***
@@ -364,24 +317,6 @@
       endif ! i
 1350  continue
 
-!      do k=1,ntra
-!       do il=1,ncum
-!        if (i.le.inb(il)) then
-!         dpinv=1.0/(ph(il,i)-ph(il,i+1))
-!         cpinv=1.0/cpn(il,i)
-!         if (cvflag_grav) then
-!           ftra(il,i,k)=ftra(il,i,k)+0.01*grav*dpinv
-!     :         *(amp1(il)*(tra(il,i+1,k)-tra(il,i,k))
-!     :           -ad(il)*(tra(il,i,k)-tra(il,i-1,k)))
-!         else
-!           ftra(il,i,k)=ftra(il,i,k)+0.1*dpinv
-!     :         *(amp1(il)*(tra(il,i+1,k)-tra(il,i,k))
-!     :           -ad(il)*(tra(il,i,k)-tra(il,i-1,k)))
-!         endif
-!        endif
-!       enddo
-!      enddo
-
       do 480 k=1,i-1
        do 1370 il=1,ncum
         if (i.le.inb(il)) then
@@ -414,24 +349,6 @@
 1370  continue
 480   continue
 
-!      do j=1,ntra
-!       do k=1,i-1
-!        do il=1,ncum
-!         if (i.le.inb(il)) then
-!          dpinv=1.0/(ph(il,i)-ph(il,i+1))
-!          cpinv=1.0/cpn(il,i)
-!          if (cvflag_grav) then
-!           ftra(il,i,j)=ftra(il,i,j)+0.01*grav*dpinv*ment(il,k,i)
-!     :        *(traent(il,k,i,j)-tra(il,i,j))
-!          else
-!           ftra(il,i,j)=ftra(il,i,j)+0.1*dpinv*ment(il,k,i)
-!     :        *(traent(il,k,i,j)-tra(il,i,j))
-!          endif
-!         endif
-!        enddo
-!       enddo
-!      enddo
-
       do 490 k=i,nl+1
        do 1380 il=1,ncum
         if (i.le.inb(il) .and. k.le.inb(il)) then
@@ -456,24 +373,6 @@
         endif ! i and k
 1380   continue
 490   continue
-
-!      do j=1,ntra
-!       do k=i,nl+1
-!        do il=1,ncum
-!         if (i.le.inb(il) .and. k.le.inb(il)) then
-!          dpinv=1.0/(ph(il,i)-ph(il,i+1))
-!          cpinv=1.0/cpn(il,i)
-!          if (cvflag_grav) then
-!           ftra(il,i,j)=ftra(il,i,j)+0.01*grav*dpinv*ment(il,k,i)
-!     :         *(traent(il,k,i,j)-tra(il,i,j))
-!          else
-!           ftra(il,i,j)=ftra(il,i,j)+0.1*dpinv*ment(il,k,i)
-!     :             *(traent(il,k,i,j)-tra(il,i,j))
-!          endif
-!         endif ! i and k
-!        enddo
-!       enddo
-!      enddo
 
       do 1400 il=1,ncum
        if (i.le.inb(il)) then
@@ -530,25 +429,6 @@
        endif                                              ! cld
       enddo
 
-!      do j=1,ntra
-!       do il=1,ncum
-!        if (i.le.inb(il)) then
-!         dpinv=1.0/(ph(il,i)-ph(il,i+1))
-!         cpinv=1.0/cpn(il,i)
-
-!         if (cvflag_grav) then
-!          ftra(il,i,j)=ftra(il,i,j)+0.01*grav*dpinv
-!     :     *(mp(il,i+1)*(trap(il,i+1,j)-tra(il,i,j))
-!     :     -mp(il,i)*(trap(il,i,j)-tra(il,i-1,j)))
-!         else
-!          ftra(il,i,j)=ftra(il,i,j)+0.1*dpinv
-!     :     *(mp(il,i+1)*(trap(il,i+1,j)-tra(il,i,j))
-!     :     -mp(il,i)*(trap(il,i,j)-tra(il,i-1,j)))
-!         endif
-!        endif ! i
-!       enddo
-!      enddo
-
 500   continue
 
 
@@ -589,18 +469,6 @@
              /(ph(il,inb(il)-1)-ph(il,inb(il)))
 
 503   continue
-
-!      do j=1,ntra
-!       do il=1,ncum
-!        ex=0.1*ment(il,inb(il),inb(il))
-!     :      *(traent(il,inb(il),inb(il),j)-tra(il,inb(il),j))
-!     :      /(ph(il,inb(il))-ph(il,inb(il)+1))
-!        ftra(il,inb(il),j)=ftra(il,inb(il),j)-ex
-!        ftra(il,inb(il)-1,j)=ftra(il,inb(il)-1,j)
-!     :       +ex*(ph(il,inb(il))-ph(il,inb(il)+1))
-!     :          /(ph(il,inb(il)-1)-ph(il,inb(il)))
-!       enddo
-!      enddo
 
 !
 !   ***    homoginize tendencies below cloud base    ***
@@ -706,25 +574,6 @@
        enddo
       enddo
 
-
-!!!!      DO il=1,ncum
-!!!!      do i=icb(il),inb(il)
-!!!!
-!!!!      upwd(il,i)=0.0
-!!!!      dnwd(il,i)=0.0
-!!!!      do k=i,inb(il)
-!!!!      up1=0.0
-!!!!      dn1=0.0
-!!!!      do n=1,i-1
-!!!!      up1=up1+ment(il,n,k)
-!!!!      dn1=dn1-ment(il,k,n)
-!!!!      enddo
-!!!!      upwd(il,i)=upwd(il,i)+m(il,k)+up1
-!!!!      dnwd(il,i)=dnwd(il,i)+dn1
-!!!!      enddo
-!!!!      enddo
-!!!!
-!!!!      ENDDO
 
 !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 !        determination de la variation de flux ascendant entre

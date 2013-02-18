@@ -71,7 +71,7 @@ contains
     REAL, intent(in):: q(iim + 1, jjm + 1, llm, nqmx)
     ! (mass fractions of advected fields)
 
-    REAL phis(iim + 1, jjm + 1)
+    REAL, intent(in):: phis(iim + 1, jjm + 1)
     REAL, intent(in):: phi(iim + 1, jjm + 1, llm)
 
     REAL dv(iim + 1, jjm, llm)

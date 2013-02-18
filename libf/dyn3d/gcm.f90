@@ -9,7 +9,6 @@ PROGRAM gcm
   ! l'advection de "q", en modifiant "iadv" dans "traceur.def".
 
   USE calendar, only: ioconf_calendar
-  use clesphys2, only: read_clesphys2
   use comconst, only: daysec, cpp, dtvr, g, rad, r
   use comgeom, only: rlatu, aire_2d, cu_2d, cv_2d, rlonv
   use comgeomphy, only: airephy, cuphy, cvphy, rlatd, rlond
@@ -77,9 +76,6 @@ PROGRAM gcm
   else
      call ioconf_calendar('360d')
   endif
-
-  ! Lecture des fichiers "gcm.def" ou "run.def" :
-  call read_clesphys2
 
   ! Initialisation des traceurs
   ! Choix du schéma pour l'advection dans le fichier "traceur.def" ou via INCA

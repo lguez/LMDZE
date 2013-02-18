@@ -4,35 +4,35 @@ module concvl_m
 
 contains
 
-  SUBROUTINE concvl(iflag_con, dtime, paprs, pplay, t, q, u, v, tra, &
-       ntra, work1, work2, d_t, d_q, d_u, d_v, d_tra, rain, snow, kbas, &
-       ktop, upwd, dnwd, dnwd0, ma, cape, tvp, iflag, pbase, bbase, &
-       dtvpdt1, dtvpdq1, dplcldt, dplcldr, qcondc, wd, pmflxr, pmflxs, &
-       da, phi, mp)
+  SUBROUTINE concvl(dtime, paprs, pplay, t, q, u, v, tra, work1, work2, &
+       d_t, d_q, d_u, d_v, d_tra, rain, snow, kbas, ktop, upwd, dnwd, dnwd0, &
+       ma, cape, tvp, iflag, pbase, bbase, dtvpdt1, dtvpdq1, dplcldt, &
+       dplcldr, qcondc, wd, pmflxr, pmflxs, da, phi, mp, ntra)
 
     ! From phylmd/concvl.F, version 1.3 2005/04/15 12:36:17
     ! Author: Z. X. Li (LMD/CNRS)
-    ! date: 1993/08/18
+    ! Date: 1993/08/18
     ! Objet : schéma de convection d'Emanuel (1991), interface
+    ! (driver commun aux versions 3 et 4)
 
-    USE dimens_m, ONLY : nqmx
-    USE dimphy, ONLY : klev, klon
-    USE suphec_m, ONLY : retv, rtt
-    USE yoethf_m, ONLY : r2es
-    USE fcttre, ONLY : foeew
+    use clesphys2, only: iflag_con
     use cv_driver_m, only: cv_driver
+    USE dimens_m, ONLY: nqmx
+    USE dimphy, ONLY: klev, klon
+    USE fcttre, ONLY: foeew
+    USE suphec_m, ONLY: retv, rtt
+    USE yoethf_m, ONLY: r2es
 
     INTEGER, PARAMETER:: ntrac = nqmx - 2
 
-    INTEGER, INTENT (IN) :: iflag_con
-    REAL, INTENT (IN) :: dtime ! pas d'integration (s)
-    REAL, INTENT (IN) :: paprs(klon, klev+1)
-    REAL, INTENT (IN) :: pplay(klon, klev)
+    REAL, INTENT (IN):: dtime ! pas d'integration (s)
+    REAL, INTENT (IN):: paprs(klon, klev+1)
+    REAL, INTENT (IN):: pplay(klon, klev)
     REAL, intent(in):: t(klon, klev)
-    real q(klon, klev), u(klon, klev), v(klon, klev)
-    ! q-------input-R-vapeur d'eau (en kg/kg)
+    real q(klon, klev) ! input vapeur d'eau (en kg/kg)
+    real u(klon, klev), v(klon, klev)
     REAL, INTENT (IN):: tra(klon, klev, ntrac)
-    INTEGER ntra
+    INTEGER, intent(in):: ntra ! number of tracers
     REAL work1(klon, klev), work2(klon, klev)
     ! work*: input et output: deux variables de travail,
     !                            on peut les mettre a 0 au debut
@@ -128,14 +128,10 @@ contains
        END DO
     END IF
 
-    ! Main driver for convection:
-    !		iflag_con = 3  -> equivalent to convect3
-    !		iflag_con = 4  -> equivalent to convect1/2
-
-    CALL cv_driver(klon, klev, klev+1, ntra, iflag_con, t, q, qs, u, v, tra, &
-         em_p, em_ph, iflag, d_t, d_q, d_u, d_v, d_tra, rain, pmflxr, cbmf, &
-         work1, work2, kbas, ktop, dtime, ma, upwd, dnwd, dnwd0, qcondc, &
-         wd, cape, da, phi, mp)
+    CALL cv_driver(klon, klev, klev+1, ntra, t, q, qs, u, v, tra, em_p, &
+         em_ph, iflag, d_t, d_q, d_u, d_v, d_tra, rain, pmflxr, cbmf, work1, &
+         work2, kbas, ktop, dtime, ma, upwd, dnwd, dnwd0, qcondc, wd, cape, &
+         da, phi, mp)
 
     DO i = 1, klon
        rain(i) = rain(i)/86400.

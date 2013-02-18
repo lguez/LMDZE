@@ -56,6 +56,7 @@ contains
     USE phytrac_m, ONLY: phytrac
     USE qcheck_m, ONLY: qcheck
     use radlwsw_m, only: radlwsw
+    use readsulfate_m, only: readsulfate
     use sugwd_m, only: sugwd
     USE suphec_m, ONLY: ra, rcpd, retv, rg, rlvtt, romega, rsigma, rtt
     USE temps, ONLY: annee_ref, day_ref, itau_phy
@@ -122,9 +123,6 @@ contains
 
     character(len = 6):: ocean = 'force '
     ! (type de modèle océan à utiliser: "force" ou "slab" mais pas "couple")
-
-    logical ok_ocean
-    SAVE ok_ocean
 
     ! "slab" ocean
     REAL, save:: tslab(klon) ! temperature of ocean slab
@@ -320,9 +318,7 @@ contains
     SAVE qcondc 
     REAL ema_work1(klon, llm), ema_work2(klon, llm)
     SAVE ema_work1, ema_work2
-
-    REAL wd(klon) ! sb
-    SAVE wd ! sb
+    REAL, save:: wd(klon)
 
     ! Variables locales pour la couche limite (al1):
 
@@ -331,7 +327,7 @@ contains
     REAL cdragh(klon) ! drag coefficient pour T and Q
     REAL cdragm(klon) ! drag coefficient pour vent
 
-    !AA Pour phytrac 
+    ! Pour phytrac :
     REAL ycoefh(klon, llm) ! coef d'echange pour phytrac
     REAL yu1(klon) ! vents dans la premiere couche U
     REAL yv1(klon) ! vents dans la premiere couche V
@@ -450,17 +446,12 @@ contains
     REAL dist, rmu0(klon), fract(klon)
     REAL zdtime ! pas de temps du rayonnement (s)
     real zlongi
-
     REAL z_avant(klon), z_apres(klon), z_factor(klon)
-    LOGICAL zx_ajustq
-
     REAL za, zb
     REAL zx_t, zx_qs, zdelta, zcor
     real zqsat(klon, llm)
     INTEGER i, k, iq, nsrf
-    REAL t_coup
-    PARAMETER (t_coup = 234.0)
-
+    REAL, PARAMETER:: t_coup = 234.
     REAL zphi(klon, llm)
 
     !IM cf. AM Variables locales pour la CLA (hbtm2)
@@ -497,7 +488,6 @@ contains
     REAL rflag(klon) ! flag fonctionnement de convect
     INTEGER iflagctrl(klon) ! flag fonctionnement de convect
     ! -- convect43:
-    INTEGER ntra ! nb traceurs pour convect4.3
     REAL dtvpdt1(klon, llm), dtvpdq1(klon, llm)
     REAL dplcldt(klon), dplcldr(klon)
 
@@ -579,8 +569,6 @@ contains
 
     REAL zsto
 
-    character(len = 20) modname
-    character(len = 80) abort_message
     logical ok_sync
     real date0
 
@@ -598,17 +586,19 @@ contains
     REAL ZRCPD
 
     REAL t2m(klon, nbsrf), q2m(klon, nbsrf) ! temperature and humidity at 2 m
-    REAL u10m(klon, nbsrf), v10m(klon, nbsrf) !vents a 10m
-    REAL zt2m(klon), zq2m(klon) !temp., hum. 2m moyenne s/ 1 maille
-    REAL zu10m(klon), zv10m(klon) !vents a 10m moyennes s/1 maille
-    !jq Aerosol effects (Johannes Quaas, 27/11/2003)
-    REAL sulfate(klon, llm) ! SO4 aerosol concentration [ug/m3]
+    REAL u10m(klon, nbsrf), v10m(klon, nbsrf) ! vents a 10 m
+    REAL zt2m(klon), zq2m(klon) ! temp., hum. 2 m moyenne s/ 1 maille
+    REAL zu10m(klon), zv10m(klon) ! vents a 10 m moyennes s/1 maille
+
+    ! Aerosol effects:
+
+    REAL sulfate(klon, llm) ! SO4 aerosol concentration (micro g/m3)
 
     REAL, save:: sulfate_pi(klon, llm)
-    ! (SO4 aerosol concentration, in ug/m3, pre-industrial value)
+    ! SO4 aerosol concentration, in micro g/m3, pre-industrial value
 
     REAL cldtaupi(klon, llm)
-    ! (Cloud optical thickness for pre-industrial (pi) aerosols)
+    ! cloud optical thickness for pre-industrial (pi) aerosols
 
     REAL re(klon, llm) ! Cloud droplet effective radius
     REAL fl(klon, llm) ! denominator of re
@@ -618,11 +608,7 @@ contains
     REAL, save:: cg_ae(klon, llm, 2)
 
     REAL topswad(klon), solswad(klon) ! aerosol direct effect
-    ! ok_ade --> ADE = topswad - topsw
-
     REAL topswai(klon), solswai(klon) ! aerosol indirect effect
-    ! ok_aie .and. ok_ade --> AIE = topswai - topswad
-    ! ok_aie .and. .not. ok_ade --> AIE = topswai - topsw
 
     REAL aerindex(klon) ! POLDER aerosol index
 
@@ -630,8 +616,9 @@ contains
     LOGICAL:: ok_aie = .false. ! apply aerosol indirect effect
 
     REAL:: bl95_b0 = 2., bl95_b1 = 0.2
-    ! Parameters in the formula to link CDNC to aerosol mass conc
-    ! (Boucher and Lohmann, 1995), used in nuage.F
+    ! Parameters in equation (D) of Boucher and Lohmann (1995, Tellus
+    ! B). They link cloud droplet number concentration to aerosol mass
+    ! concentration.
 
     SAVE u10m
     SAVE v10m
@@ -662,17 +649,10 @@ contains
 
     !----------------------------------------------------------------
 
-    modname = 'physiq'
-    IF (if_ebil >= 1) THEN
-       DO i = 1, klon
-          zero_v(i) = 0.
-       END DO
-    END IF
+    IF (if_ebil >= 1) zero_v = 0.
     ok_sync = .TRUE.
-    IF (nqmx < 2) THEN
-       abort_message = 'eaux vapeur et liquide sont indispensables'
-       CALL abort_gcm(modname, abort_message, 1)
-    ENDIF
+    IF (nqmx < 2) CALL abort_gcm('physiq', &
+         'eaux vapeur et liquide sont indispensables', 1)
 
     test_firstcal: IF (firstcal) THEN
        ! initialiser
@@ -687,8 +667,6 @@ contains
        cg_ae = 0.
        rain_con(:) = 0.
        snow_con(:) = 0.
-       bl95_b0 = 0.
-       bl95_b1 = 0.
        topswai(:) = 0.
        topswad(:) = 0.
        solswai(:) = 0.
@@ -720,7 +698,6 @@ contains
        read(unit=*, nml=physiq_nml)
        write(unit_nml, nml=physiq_nml)
 
-       ! Appel à la lecture du run.def physique
        call conf_phys
 
        ! Initialiser les compteurs:
@@ -735,7 +712,7 @@ contains
             ancien_ok, rnebcon, ratqs, clwcon, run_off_lic_0)
 
        ! ATTENTION : il faudra a terme relire q2 dans l'etat initial
-       q2 = 1.e-8
+       q2 = 1e-8
 
        radpas = NINT(86400. / dtphys / nbapp_rad)
 
@@ -743,30 +720,19 @@ contains
        IF (raz_date) itau_phy = 0
 
        PRINT *, 'cycle_diurne = ', cycle_diurne
+       CALL printflag(radpas, ocean /= 'force', ok_oasis, ok_journe, &
+            ok_instan, ok_region)
 
-       IF(ocean.NE.'force ') THEN
-          ok_ocean = .TRUE.
-       ENDIF
-
-       CALL printflag(radpas, ok_ocean, ok_oasis, ok_journe, ok_instan, &
-            ok_region)
-
-       IF (dtphys*REAL(radpas) > 21600..AND.cycle_diurne) THEN 
-          print *, 'Nbre d appels au rayonnement insuffisant'
+       IF (dtphys * REAL(radpas) > 21600. .AND. cycle_diurne) THEN 
           print *, "Au minimum 4 appels par jour si cycle diurne"
-          abort_message = 'Nbre d appels au rayonnement insuffisant'
-          call abort_gcm(modname, abort_message, 1)
+          call abort_gcm('physiq', &
+               "Nombre d'appels au rayonnement insuffisant", 1)
        ENDIF
-       print *, "Clef pour la convection, iflag_con = ", iflag_con
 
-       ! Initialisation pour la convection de K.E. (sb):
+       ! Initialisation pour le schéma de convection d'Emanuel :
        IF (iflag_con >= 3) THEN
-          print *, "Convection de Kerry Emanuel 4.3"
-
-          DO i = 1, klon
-             ibas_con(i) = 1
-             itop_con(i) = 1
-          ENDDO
+          ibas_con = 1
+          itop_con = 1
        ENDIF
 
        IF (ok_orodr) THEN
@@ -796,19 +762,19 @@ contains
        call ini_histday(dtphys, ok_journe, nid_day, nqmx)
        call ini_histins(dtphys, ok_instan, nid_ins)
        CALL ymds2ju(annee_ref, 1, int(day_ref), 0., date0)
-       !XXXPB Positionner date0 pour initialisation de ORCHIDEE
-       WRITE(*, *) 'physiq date0: ', date0
+       ! Positionner date0 pour initialisation de ORCHIDEE
+       print *, 'physiq date0: ', date0
     ENDIF test_firstcal
 
     ! Mettre a zero des variables de sortie (pour securite)
 
     DO i = 1, klon
-       d_ps(i) = 0.0
+       d_ps(i) = 0.
     ENDDO
     DO iq = 1, nqmx
        DO k = 1, llm
           DO i = 1, klon
-             d_qx(i, k, iq) = 0.0
+             d_qx(i, k, iq) = 0.
           ENDDO
        ENDDO
     ENDDO
@@ -893,7 +859,7 @@ contains
 
     forall (k = 1: llm) zmasse(:, k) = (paprs(:, k)-paprs(:, k + 1)) / rg
 
-    ! Mettre en action les conditions aux limites (albedo, sst, etc.).
+    ! Mettre en action les conditions aux limites (albedo, sst etc.).
 
     ! Prescrire l'ozone et calculer l'albedo sur l'ocean.
     wo = ozonecm(REAL(julien), paprs)
@@ -962,8 +928,8 @@ contains
     DO nsrf = 1, nbsrf
        DO i = 1, klon
           fsollw(i, nsrf) = sollw(i) &
-               + 4.0*RSIGMA*ztsol(i)**3 * (ztsol(i)-ftsol(i, nsrf))
-          fsolsw(i, nsrf) = solsw(i)*(1.-falbe(i, nsrf))/(1.-albsol(i))
+               + 4. * RSIGMA * ztsol(i)**3 * (ztsol(i) - ftsol(i, nsrf))
+          fsolsw(i, nsrf) = solsw(i) * (1. - falbe(i, nsrf)) / (1. - albsol(i))
        ENDDO
     ENDDO
 
@@ -1004,7 +970,7 @@ contains
     END DO
     DO i = 1, klon
        sens(i) = - zxfluxt(i, 1) ! flux de chaleur sensible au sol
-       evap(i) = - zxfluxq(i, 1) ! flux d'evaporation au sol
+       evap(i) = - zxfluxq(i, 1) ! flux d'évaporation au sol
        fder(i) = dlw(i) + dsens(i) + devap(i)
     ENDDO
 
@@ -1051,12 +1017,9 @@ contains
        s_trmb2(i) = 0.0
        s_trmb3(i) = 0.0
 
-       IF (abs(pctsrf(i, is_ter) + pctsrf(i, is_lic) + &
-            pctsrf(i, is_oce) + pctsrf(i, is_sic) - 1.)  >  EPSFRA) &
-            THEN 
-          WRITE(*, *) 'physiq : pb sous surface au point ', i, &
-               pctsrf(i, 1 : nbsrf)
-       ENDIF
+       IF (abs(pctsrf(i, is_ter) + pctsrf(i, is_lic) + pctsrf(i, is_oce) &
+            + pctsrf(i, is_sic) - 1.)  >  EPSFRA) print *, &
+            'physiq : problème sous surface au point ', i, pctsrf(i, 1 : nbsrf)
     ENDDO
     DO nsrf = 1, nbsrf
        DO i = 1, klon
@@ -1113,38 +1076,25 @@ contains
     ! Calculer la derive du flux infrarouge
 
     DO i = 1, klon
-       dlw(i) = - 4.0*RSIGMA*zxtsol(i)**3 
+       dlw(i) = - 4. * RSIGMA * zxtsol(i)**3 
     ENDDO
 
     ! Appeler la convection (au choix)
 
     DO k = 1, llm
        DO i = 1, klon
-          conv_q(i, k) = d_q_dyn(i, k) &
-               + d_q_vdf(i, k)/dtphys
-          conv_t(i, k) = d_t_dyn(i, k) &
-               + d_t_vdf(i, k)/dtphys
+          conv_q(i, k) = d_q_dyn(i, k) + d_q_vdf(i, k)/dtphys
+          conv_t(i, k) = d_t_dyn(i, k) + d_t_vdf(i, k)/dtphys
        ENDDO
     ENDDO
+
     IF (check) THEN
        za = qcheck(klon, llm, paprs, q_seri, ql_seri, airephy)
        print *, "avantcon = ", za
     ENDIF
-    zx_ajustq = iflag_con == 2
-    IF (zx_ajustq) THEN
-       DO i = 1, klon
-          z_avant(i) = 0.0
-       ENDDO
-       DO k = 1, llm
-          DO i = 1, klon
-             z_avant(i) = z_avant(i) + (q_seri(i, k) + ql_seri(i, k)) &
-                  *zmasse(i, k)
-          ENDDO
-       ENDDO
-    ENDIF
 
-    select case (iflag_con)
-    case (2)
+    if (iflag_con == 2) then
+       z_avant = sum((q_seri + ql_seri) * zmasse, dim=2)
        CALL conflx(dtphys, paprs, play, t_seri, q_seri, conv_t, conv_q, &
             zxfluxq(1, 1), omega, d_t_con, d_q_con, rain_con, snow_con, pmfu, &
             pmfd, pen_u, pde_u, pen_d, pde_d, kcbot, kctop, kdtop, pmflxr, &
@@ -1155,29 +1105,22 @@ contains
           ibas_con(i) = llm + 1 - kcbot(i)
           itop_con(i) = llm + 1 - kctop(i)
        ENDDO
-    case (3:)
-       ! number of tracers for the convection scheme of Kerry Emanuel:
+    else
+       ! iflag_con >= 3
+       CALL concvl(dtphys, paprs, play, t_seri, q_seri, u_seri, &
+            v_seri, tr_seri, ema_work1, ema_work2, d_t_con, d_q_con, &
+            d_u_con, d_v_con, d_tr, rain_con, snow_con, ibas_con, &
+            itop_con, upwd, dnwd, dnwd0, Ma, cape, tvp, iflagctrl, &
+            pbase, bbase, dtvpdt1, dtvpdq1, dplcldt, dplcldr, qcondc, &
+            wd, pmflxr, pmflxs, da, phi, mp, ntra=1)
+       ! (number of tracers for the convection scheme of Kerry Emanuel:
        ! la partie traceurs est faite dans phytrac
        ! on met ntra = 1 pour limiter les appels mais on peut
-       ! supprimer les calculs / ftra.
-       ntra = 1
-       ! Schéma de convection modularisé et vectorisé :
-       ! (driver commun aux versions 3 et 4)
+       ! supprimer les calculs / ftra.)
 
-       CALL concvl(iflag_con, dtphys, paprs, play, t_seri, q_seri, u_seri, &
-            v_seri, tr_seri, ntra, ema_work1, ema_work2, d_t_con, d_q_con, &
-            d_u_con, d_v_con, d_tr, rain_con, snow_con, ibas_con, itop_con, &
-            upwd, dnwd, dnwd0, Ma, cape, tvp, iflagctrl, pbase, bbase, &
-            dtvpdt1, dtvpdq1, dplcldt, dplcldr, qcondc, wd, pmflxr, pmflxs, &
-            da, phi, mp)
        clwcon0 = qcondc
        pmfu = upwd + dnwd
-
-       IF (.NOT. ok_gust) THEN
-          do i = 1, klon
-             wd(i) = 0.0
-          enddo
-       ENDIF
+       IF (.NOT. ok_gust) wd = 0.
 
        ! Calcul des propriétés des nuages convectifs
 
@@ -1205,10 +1148,7 @@ contains
        clwcon0 = fact_cldcon*clwcon0
        call clouds_gno(klon, llm, q_seri, zqsat, clwcon0, ptconv, ratqsc, &
             rnebcon0)
-    case default
-       print *, "iflag_con non-prevu", iflag_con
-       stop 1
-    END select
+    END if
 
     DO k = 1, llm
        DO i = 1, klon
@@ -1242,20 +1182,10 @@ contains
        zx_t = zx_t/za*dtphys
        print *, "Precip = ", zx_t
     ENDIF
-    IF (zx_ajustq) THEN
-       DO i = 1, klon
-          z_apres(i) = 0.0
-       ENDDO
-       DO k = 1, llm
-          DO i = 1, klon
-             z_apres(i) = z_apres(i) + (q_seri(i, k) + ql_seri(i, k)) &
-                  *zmasse(i, k)
-          ENDDO
-       ENDDO
-       DO i = 1, klon
-          z_factor(i) = (z_avant(i)-(rain_con(i) + snow_con(i))*dtphys) &
-               /z_apres(i)
-       ENDDO
+
+    IF (iflag_con == 2) THEN
+       z_apres = sum((q_seri + ql_seri) * zmasse, dim=2)
+       z_factor = (z_avant - (rain_con + snow_con) * dtphys) / z_apres
        DO k = 1, llm
           DO i = 1, klon
              IF (z_factor(i) > 1. + 1E-8 .OR. z_factor(i) < 1. - 1E-8) THEN
@@ -1264,7 +1194,6 @@ contains
           ENDDO
        ENDDO
     ENDIF
-    zx_ajustq = .FALSE.
 
     ! Convection sèche (thermiques ou ajustement)
 
@@ -1319,7 +1248,7 @@ contains
     enddo
 
     ! ratqs final
-    if (iflag_cldcon == 1 .or.iflag_cldcon == 2) then
+    if (iflag_cldcon == 1 .or. iflag_cldcon == 2) then
        ! les ratqs sont une conbinaison de ratqss et ratqsc
        ! ratqs final
        ! 1e4 (en gros 3 heures), en dur pour le moment, est le temps de
@@ -1396,9 +1325,8 @@ contains
        endif
 
        ! Nuages diagnostiques pour Tiedtke
-       CALL diagcld1(paprs, play, &
-            rain_tiedtke, snow_tiedtke, ibas_con, itop_con, &
-            diafra, dialiq)
+       CALL diagcld1(paprs, play, rain_tiedtke, snow_tiedtke, ibas_con, &
+            itop_con, diafra, dialiq)
        DO k = 1, llm
           DO i = 1, klon
              IF (diafra(i, k) > cldfra(i, k)) THEN
@@ -1490,10 +1418,9 @@ contains
 
     ! Paramètres optiques des nuages et quelques paramètres pour diagnostics :
     if (ok_newmicro) then
-       CALL newmicro(paprs, play, ok_newmicro, t_seri, cldliq, cldfra, &
-            cldtau, cldemi, cldh, cldl, cldm, cldt, cldq, flwp, fiwp, flwc, &
-            fiwc, ok_aie, sulfate, sulfate_pi, bl95_b0, bl95_b1, cldtaupi, &
-            re, fl)
+       CALL newmicro(paprs, play, t_seri, cldliq, cldfra, cldtau, cldemi, &
+            cldh, cldl, cldm, cldt, cldq, flwp, fiwp, flwc, fiwc, ok_aie, &
+            sulfate, sulfate_pi, bl95_b0, bl95_b1, cldtaupi, re, fl)
     else
        CALL nuage(paprs, play, t_seri, cldliq, cldfra, cldtau, cldemi, cldh, &
             cldl, cldm, cldt, cldq, ok_aie, sulfate, sulfate_pi, bl95_b0, &
@@ -1689,7 +1616,7 @@ contains
 
     ! SORTIES
 
-    !cc prw = eau precipitable
+    ! prw = eau precipitable
     DO i = 1, klon
        prw(i) = 0.
        DO k = 1, llm

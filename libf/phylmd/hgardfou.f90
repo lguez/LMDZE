@@ -10,10 +10,8 @@ contains
 
     ! This procedure aborts the program if the temperature gets out of range.
 
-    use dimens_m
-    use indicesol
-    use dimphy
-    use SUPHEC_M
+    USE indicesol, ONLY: nbsrf
+    USE dimphy, ONLY: klev, klon
 
     REAL, intent(in):: t(klon, klev), tsol(klon, nbsrf)
 
@@ -41,6 +39,7 @@ contains
              print *, "t(", jadrs(i), ", ", k, ") = ", t(jadrs(i), k)
           ENDDO
        ENDIF
+
        jbad = 0
        DO i = 1, klon
           IF (t(i, k) < temp_min) THEN

@@ -1,7 +1,7 @@
 
       SUBROUTINE cv3_feed(len,nd,t,q,qs,p,ph,hm,gz &
                         ,nk,icb,icbmax,iflag,tnk,qnk,gznk,plcl)
-            use cvparam3
+            use cv3_param_m
       implicit none
 
 !================================================================

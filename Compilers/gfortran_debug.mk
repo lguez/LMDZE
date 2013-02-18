@@ -5,7 +5,7 @@ netcdf_inc_dir = /usr/include
 netcdf_lib_dir = 
 
 numer_rec_95_dir = /user/guez_local/lib/Numer_Rec_95_gfortran_debug
-nr_util_dir = /user/guez_local/lib/NR_util_j
+nr_util_dir = /user/guez_local/lib/NR_util_gfortran_debug
 netcdf95_dir = /user/guez_local/lib/NetCDF95_gfortran
 jumble_dir = /user/guez_local/lib/Jumble_debug
 
@@ -22,3 +22,5 @@ FFLAGS = ${inc_flags} ${perf_flags}
 F90FLAGS = ${inc_flags} ${lang_flags} ${perf_flags}
 
 LDLIBS = $(addprefix -L, ${netcdf_lib_dir} ${numer_rec_95_dir} ${netcdf95_dir} ${nr_util_dir} ${jumble_dir}) -ljumble -lnetcdf95 -lnetcdff -lnetcdf -lnumer_rec_95 -lnr_util
+
+version_flag = --version

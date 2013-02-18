@@ -2,7 +2,7 @@
       SUBROUTINE cv3_closure(nloc,ncum,nd,icb,inb &
                             ,pbase,p,ph,tv,buoy &
                             ,sig,w0,cape,m)
-            use cvparam3
+            use cv3_param_m
             use cvthermo
       implicit none
 

@@ -7,6 +7,7 @@ SUBROUTINE readsulfate_preind (r_day, first, pi_sulfate)
   use temps
   use SUPHEC_M
   use chem
+  use getso4fromfile_m, only: getso4fromfile
   IMPLICIT none
 
   ! Content:

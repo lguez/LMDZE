@@ -19,16 +19,16 @@ contains
     ! From phylmd/phyetat0.F, version 1.4 2005/06/03 10:03:07
     ! Author: Z.X. Li (LMD/CNRS)
     ! Date: 1993/08/18
-    ! Objet : Lecture de l'état initial pour la physique
+    ! Objet : lecture de l'état initial pour la physique
 
-    USE indicesol, ONLY : epsfra, is_lic, is_oce, is_sic, is_ter, nbsrf
+    use dimphy, only: zmasq, klev
     USE dimsoil, ONLY : nsoilmx
-    USE temps, ONLY : itau_phy
+    USE indicesol, ONLY : epsfra, is_lic, is_oce, is_sic, is_ter, nbsrf
     use netcdf, only: nf90_get_att, nf90_global, nf90_inq_varid, NF90_NOERR, &
          NF90_NOWRITE
     use netcdf95, only: handle_err, nf95_get_var, nf95_close, NF95_OPEN, &
          nf95_inq_varid
-    use dimphy, only: zmasq, klev
+    USE temps, ONLY : itau_phy
 
     CHARACTER(len=*), intent(in):: fichnom
     REAL tsol(klon, nbsrf)

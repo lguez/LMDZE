@@ -21,7 +21,8 @@ c
       use comconst
       use comgeom
 c
-       REAL  masse( ip1jmp1,llm ), massebxy( ip1jm,llm )
+       REAL, intent(in)::  masse( ip1jmp1,llm )
+       real massebxy( ip1jm,llm )
 c
 
       DO   100    l = 1 , llm

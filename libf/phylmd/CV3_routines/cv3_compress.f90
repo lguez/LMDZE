@@ -12,12 +12,12 @@
           ,tra &
           ,h,lv,cpn,p,ph,tv,tp,tvp,clw  &
           ,sig,w0  )
-            use cvparam3
+            use cv3_param_m
       implicit none
 
 
 ! inputs:
-      integer len,ncum,nd,ntra,nloc
+      integer, intent(in):: len,ncum,nd,ntra,nloc
       integer iflag1(len),nk1(len),icb1(len),icbs1(len)
       real plcl1(len),tnk1(len),qnk1(len),gznk1(len)
       real pbase1(len),buoybase1(len)
@@ -73,18 +73,6 @@
       endif
  100    continue
  110  continue
-
-!      do 121 j=1,ntra
-!      do 111 k=1,nd
-!       nn=0
-!      do 101 i=1,len
-!      if(iflag1(i).eq.0)then
-!       nn=nn+1
-!       tra(nn,k,j)=tra1(i,k,j)
-!      endif
-! 101  continue
-! 111  continue
-! 121  continue
 
       if (nn.ne.ncum) then
          print*,'strange! nn not equal to ncum: ',nn,ncum

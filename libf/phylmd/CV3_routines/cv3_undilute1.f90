@@ -1,7 +1,7 @@
 
       SUBROUTINE cv3_undilute1(len,nd,t,q,qs,gz,plcl,p,nk,icb &
                              ,tp,tvp,clw,icbs)
-            use cvparam3
+            use cv3_param_m
             use cvthermo
       implicit none
 

@@ -10,30 +10,26 @@ module clesphys2
 
   LOGICAL:: soil_model = .TRUE.
   ! Choix du modele de sol (Thermique ?)
-  ! Option qui pourait un string afin de pouvoir
-  ! plus de choix ! Ou meme une liste d'options
 
   LOGICAL:: new_oliq = .TRUE.
   ! Permet de mettre en route la nouvelle parametrisation de l'eau liquide
 
-  LOGICAL:: ok_orodr = .TRUE. ! pour l'orographie
-  LOGICAL:: ok_orolf = .TRUE. ! pour l'orographie
+  ! Pour l'orographie:
+  LOGICAL:: ok_orodr = .TRUE.
+  LOGICAL:: ok_orolf = .TRUE.
 
   LOGICAL:: ok_limitvrai = .FALSE.
   ! On peut forcer le modele a lire le fichier SST de la bonne
-  ! annee. C'est une tres bonne idee, pourquoi ne pas mettre toujours
-  ! a y ?
+  ! annee.
 
   INTEGER:: nbapp_rad = 12
-  ! (nombre d'appels des routines de rayonnements par jour)
+  ! nombre d'appels des routines de rayonnements par jour
 
   INTEGER:: iflag_con = 2
-  ! Flag pour la convection :
-  ! 1 LMD,
-  ! 2 Tiedtke,
-  ! 3 CCM(NCAR)  
-  ! 3 KE
-  ! 4 KE vect
+  ! Convection scheme:
+  ! 2 Tiedtke
+  ! 3 Emanuel
+  ! 4 Emanuel vect
 
 contains
 
@@ -50,14 +46,10 @@ contains
     read(unit=*, nml=clesphys2_nml)
     write(unit_nml, nml=clesphys2_nml)
 
-    select case (iflag_con)
-    case (1)
-       PRINT *, 'Schéma convection LMD'
-    case (2)
-       PRINT *, 'Schéma convection Tiedtke'
-    case (3)
-       PRINT *, 'Schéma convection CCM'
-    END select
+    if (iflag_con <= 1) then
+       print *, "bad value for iflag_con"
+       stop 1
+    end if
 
   end subroutine read_clesphys2
 

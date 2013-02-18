@@ -3,7 +3,7 @@
                           ,ph,t,rr,rs,u,v,tra,h,lv,qnk &
                           ,hp,tv,tvp,ep,clw,m,sig &
          ,ment,qent,uent,vent, nent, sij,elij,ments,qents,traent)
-            use cvparam3
+            use cv3_param_m
             use cvthermo
       implicit none
 
@@ -15,7 +15,7 @@
 
 
 ! inputs:
-      integer ncum, nd, na, ntra, nloc
+      integer, intent(in):: ncum, nd, na, ntra, nloc
       integer icb(nloc), inb(nloc), nk(nloc)
       real sig(nloc,nd)
       real qnk(nloc)
@@ -51,7 +51,6 @@
 ! --- INITIALIZE VARIOUS ARRAYS USED IN THE COMPUTATIONS
 !=====================================================================
 
-! ori        do 360 i=1,ncum*nlp
         do 361 j=1,nl
         do 360 i=1,ncum
           nent(i,j)=0
@@ -79,15 +78,6 @@
       ment(1:ncum,1:nd,1:nd)=0.0
       sij(1:ncum,1:nd,1:nd)=0.0
 
-!      do k=1,ntra
-!       do j=1,nd  ! instead nlp
-!        do i=1,nd ! instead nlp
-!         do il=1,ncum
-!            traent(il,i,j,k)=tra(il,j,k)
-!         enddo
-!        enddo
-!       enddo
-!      enddo
       zm(:,:)=0.
 
 !=====================================================================
@@ -143,18 +133,6 @@
  700   continue
  710  continue
 
-!       do k=1,ntra
-!        do j=minorig,nl
-!         do il=1,ncum
-!          if( (i.ge.icb(il)).and.(i.le.inb(il)).and.
-!     :       (j.ge.(icb(il)-1)).and.(j.le.inb(il)))then
-!            traent(il,i,j,k)=sij(il,i,j)*tra(il,i,k)
-!     :            +(1.-sij(il,i,j))*tra(il,nk(il),k)
-!          endif
-!         enddo
-!        enddo
-!       enddo
-
 !
 !   ***   if no air can entrain at level i assume that updraft detrains  ***
 !   ***   at that level and calculate detrained air flux and properties  ***
@@ -176,16 +154,6 @@
  740  continue
  750  continue
 
-!      do j=1,ntra
-!       do i=minorig+1,nl
-!        do il=1,ncum
-!         if (i.ge.icb(il) .and. i.le.inb(il) .and. nent(il,i).eq.0) then
-!          traent(il,i,i,j)=tra(il,nk(il),j)
-!         endif
-!        enddo
-!       enddo
-!      enddo
-
       do 100 j=minorig,nl
       do 101 i=minorig,nl
       do 102 il=1,ncum
@@ -205,9 +173,6 @@
 !   ---  TO REPRESENT EQUAL PROBABILITIES OF MIXING
 !=====================================================================
 
-!ym      call zilch(asum,ncum*nd)
-!ym      call zilch(bsum,ncum*nd)
-!ym      call zilch(csum,ncum*nd)
       call zilch(asum,nloc*nd)
       call zilch(csum,nloc*nd)
       call zilch(csum,nloc*nd)
@@ -353,14 +318,6 @@
        endif
       enddo ! il
 
-!      do j=1,ntra
-!       do il=1,ncum
-!        if ( i.ge.icb(il) .and. i.le.inb(il) .and. lwork(il)
-!     :     .and. csum(il,i).lt.m(il,i) ) then
-!         traent(il,i,i,j)=tra(il,nk(il),j)
-!        endif
-!       enddo
-!      enddo
 789   continue
 !
 ! MAF: renormalisation de MENT

@@ -4,13 +4,17 @@ module cv_driver_m
 
 contains
 
-  SUBROUTINE cv_driver(len, nd, ndp1, ntra, iflag_con, t1, q1, qs1, u1, v1, &
-       tra1, p1, ph1, iflag1, ft1, fq1, fu1, fv1, ftra1, precip1, VPrecip1, &
-       cbmf1, sig1, w01, icb1, inb1, delt, Ma1, upwd1, dnwd1, dnwd01, &
-       qcondc1, wd1, cape1, da1, phi1, mp1)
+  SUBROUTINE cv_driver(len, nd, ndp1, ntra, t1, q1, qs1, u1, v1, tra1, p1, &
+       ph1, iflag1, ft1, fq1, fu1, fv1, ftra1, precip1, VPrecip1, cbmf1, &
+       sig1, w01, icb1, inb1, delt, Ma1, upwd1, dnwd1, dnwd01, qcondc1, wd1, &
+       cape1, da1, phi1, mp1)
 
     ! From LMDZ4/libf/phylmd/cv_driver.F, version 1.3 2005/04/15 12:36:17
 
+    ! Main driver for convection
+
+    use clesphys2, only: iflag_con
+    use cv3_param_m, only: cv3_param
     USE dimphy, ONLY: klev, klon
 
     ! PARAMETERS:
@@ -21,7 +25,6 @@ contains
     !      nd            Integer        Input        vertical (k) dimension
     !      ndp1          Integer        Input        nd + 1
     !      ntra          Integer        Input        number of tracors
-    !      iflag_con     Integer        Input        version of convect (3/4)
     !      t1            Real           Input        temperature
     !      q1            Real           Input        specific hum
     !      qs1           Real           Input        sat specific hum
@@ -60,8 +63,7 @@ contains
     integer nd
     integer ndp1
     integer noff
-    integer, intent(in):: iflag_con
-    integer ntra
+    integer, intent(in):: ntra
     real, intent(in):: t1(len, nd)
     real q1(len, nd)
     real qs1(len, nd)
@@ -290,7 +292,7 @@ contains
     ! -- set thermodynamical constants:
     !     (common cvthermo)
 
-    CALL cv_thermo(iflag_con)
+    CALL cv_thermo
 
     ! -- set convect parameters
 

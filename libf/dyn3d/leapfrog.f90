@@ -26,6 +26,7 @@ contains
     use dynredem1_m, only: dynredem1
     USE exner_hyb_m, ONLY: exner_hyb
     use filtreg_m, only: filtreg
+    use fluxstokenc_m, only: fluxstokenc
     use geopot_m, only: geopot
     USE guide_m, ONLY: guide
     use inidissip_m, only: idissip
@@ -34,6 +35,7 @@ contains
     USE pressure_var, ONLY: p3d
     USE temps, ONLY: itau_dyn
     use writedynav_m, only: writedynav
+    use writehist_m, only: writehist
 
     ! Variables dynamiques:
     REAL, intent(inout):: ucov(:, :, :) ! (iim + 1, jjm + 1, llm) vent covariant
@@ -44,7 +46,7 @@ contains
 
     REAL, intent(inout):: ps(:, :) ! (iim + 1, jjm + 1) pression au sol, en Pa
     REAL masse(:, :, :) ! (iim + 1, jjm + 1, llm) masse d'air
-    REAL phis(:, :) ! (iim + 1, jjm + 1) geopotentiel au sol
+    REAL, intent(in):: phis(:, :) ! (iim + 1, jjm + 1) surface geopotential
 
     REAL, intent(inout):: q(:, :, :, :) ! (iim + 1, jjm + 1, llm, nqmx)
     ! mass fractions of advected fields
@@ -168,7 +170,7 @@ contains
        end if
 
        IF (MOD(itau + 1, iphysiq) == 0 .AND. iflag_phys /= 0) THEN
-          ! calcul des tendances physiques:
+          ! Calcul des tendances physiques:
 
           forall (l = 1: llm + 1) p3d(:, :, l) = ap(l) + bp(l) * ps
           CALL exner_hyb(ps, p3d, pks, pk, pkf)
@@ -182,7 +184,7 @@ contains
                phis, phi, dudyn, dv, dq, w, dufi, dvfi, dtetafi, dqfi, dpfi, &
                lafin = itau + 1 == itaufin)
 
-          ! ajout des tendances physiques:
+          ! Ajout des tendances physiques:
           CALL addfi(nqmx, dtphys, ucov, vcov, teta, q, ps, dufi, dvfi, &
                dtetafi, dqfi, dpfi)
        ENDIF
@@ -232,7 +234,7 @@ contains
 
        IF (MOD(itau + 1, iecri * day_step) == 0) THEN
           CALL geopot((iim + 1) * (jjm + 1), teta, pk, pks, phis, phi)
-          CALL writehist(itau, vcov, ucov, teta, phi, q, masse, ps, phis)
+          CALL writehist(itau, vcov, ucov, teta, phi, q, masse, ps)
        END IF
     end do time_integration
 

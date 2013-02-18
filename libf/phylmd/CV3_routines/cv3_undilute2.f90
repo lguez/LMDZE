@@ -4,7 +4,7 @@
                              ,p,h,tv,lv,pbase,buoybase,plcl &
                              ,inb,tp,tvp,clw,hp,ep,sigp,buoy)
       use conema3_m
-            use cvparam3
+            use cv3_param_m
             use cvthermo
       implicit none
 

@@ -12,9 +12,28 @@ contains
        solswai)
 
     ! From LMDZ4/libf/phylmd/radlwsw.F, version 1.4 2005/06/06 13:16:33
-    ! Author: Z. X. Li (LMD/CNRS) date: 1996/07/19
-    ! Objet : interface entre le modèle et les rayonnements
-    ! Rayonnements solaire et infrarouge
+    ! Author: Z. X. Li (LMD/CNRS) 
+    ! Date: 1996/07/19
+
+    ! Objet : interface entre le modèle et les rayonnements solaire et
+    ! infrarouge
+
+    ! ATTENTION: swai and swad have to be interpreted in the following manner:
+
+    ! not ok_ade and not ok_aie
+    ! both are zero
+
+    ! ok_ade and not ok_aie
+    ! aerosol direct forcing is F_{AD} = topsw - topswad
+    ! indirect is zero
+
+    ! not ok_ade and ok_aie
+    ! aerosol indirect forcing is F_{AI} = topsw - topswai
+    ! direct is zero
+
+    ! ok_ade and ok_aie
+    ! aerosol indirect forcing is F_{AI} = topsw - topswai
+    ! aerosol direct forcing is F_{AD} = topswai - topswad
 
     USE dimphy, ONLY: klev, klon
     USE clesphys, ONLY: bug_ozone, solaire
@@ -24,68 +43,49 @@ contains
     use sw_m, only: sw
         
     ! Arguments:
+
+    real rmu0(klon), fract(klon), dist
     ! dist-----input-R- distance astronomique terre-soleil
     ! rmu0-----input-R- cosinus de l'angle zenithal
     ! fract----input-R- duree d'ensoleillement normalisee
-    ! co2_ppm--input-R- concentration du gaz carbonique (en ppm)
-    ! solaire--input-R- constante solaire (W/m**2)
-    ! paprs----input-R- pression a inter-couche (Pa)
-    ! pplay----input-R- pression au milieu de couche (Pa)
-    ! tsol-----input-R- temperature du sol (en K)
-    ! albedo---input-R- albedo du sol (entre 0 et 1)
-    ! t--------input-R- temperature (K)
-    ! q--------input-R- vapeur d'eau (en kg/kg)
-    ! wo-------input-R- contenu en ozone (en kg/kg) correction MPL 100505
-    ! cldfra---input-R- fraction nuageuse (entre 0 et 1)
-    ! cldtaupd---input-R- epaisseur optique des nuages dans le visible (present-day value)
-    ! cldemi---input-R- emissivite des nuages dans l'IR (entre 0 et 1)
-    ! tau_ae, piz_ae, cg_ae-input-R- aerosol optical properties (calculated in aeropt.F)
-    ! cldtaupi-input-R- epaisseur optique des nuages dans le visible
-    !                   calculated for pre-industrial (pi) aerosol concentrations, i.e. with smaller
-    !                   droplet concentration, thus larger droplets, thus generally cdltaupi cldtaupd
-    !                   it is needed for the diagnostics of the aerosol indirect radiative forcing      
-
-    ! cool-----output-R- refroidissement dans l'IR (K/jour)
-    ! radsol---output-R- bilan radiatif net au sol (W/m**2) (+ vers le bas)
-    ! albpla---output-R- albedo planetaire (entre 0 et 1)
-    ! topsw----output-R- flux solaire net au sommet de l'atm.
-    ! solsw----output-R- flux solaire net a la surface
-    ! sollw----output-R- ray. IR montant a la surface
-    ! solswad---output-R- ray. solaire net absorbe a la surface (aerosol dir)
-    ! topswad---output-R- ray. solaire absorbe au sommet de l'atm. (aerosol dir)
-    ! solswai---output-R- ray. solaire net absorbe a la surface (aerosol ind)
-    ! topswai---output-R- ray. solaire absorbe au sommet de l'atm. (aerosol ind)
-
-    ! ATTENTION: swai and swad have to be interpreted in the following manner:
-    ! ok_ade = F & ok_aie = F -both are zero
-    ! ok_ade = T & ok_aie = F -aerosol direct forcing is F_{AD} = topsw-topswad
-    !                        indirect is zero
-    ! ok_ade = F & ok_aie = T -aerosol indirect forcing is F_{AI} = topsw-topswai
-    !                        direct is zero
-    ! ok_ade = T & ok_aie = T -aerosol indirect forcing is F_{AI} = topsw-topswai
-    !                        aerosol direct forcing is F_{AD} = topswai-topswad
-
-    real rmu0(klon), fract(klon), dist
 
     real, intent(in):: paprs(klon, klev+1)
+    ! paprs----input-R- pression a inter-couche (Pa)
     real, intent(in):: pplay(klon, klev)
+    ! pplay----input-R- pression au milieu de couche (Pa)
     real albedo(klon), alblw(klon), tsol(klon)
+    ! albedo---input-R- albedo du sol (entre 0 et 1)
+    ! tsol-----input-R- temperature du sol (en K)
     real, intent(in):: t(klon, klev)
+    ! t--------input-R- temperature (K)
     real q(klon, klev)
+    ! q--------input-R- vapeur d'eau (en kg/kg)
     real, intent(in):: wo(klon, klev)
-    real cldfra(klon, klev), cldemi(klon, klev), cldtaupd(klon, klev)
+    ! wo-------input-R- contenu en ozone (en kg/kg) correction MPL 100505
+    real cldfra(klon, klev), cldemi(klon, klev)
+    ! cldfra---input-R- fraction nuageuse (entre 0 et 1)
+    ! cldemi---input-R- emissivite des nuages dans l'IR (entre 0 et 1)
+
+    real cldtaupd(klon, klev)
+    ! input-R- epaisseur optique des nuages dans le visible (present-day value)
 
     real, intent(out):: heat(klon, klev)
     ! échauffement atmosphérique (visible) (K/jour)
 
     real cool(klon, klev)
+    ! cool-----output-R- refroidissement dans l'IR (K/jour)
     real heat0(klon, klev), cool0(klon, klev)
     real radsol(klon), topsw(klon)
+    ! radsol---output-R- bilan radiatif net au sol (W/m**2) (+ vers le bas)
+    ! topsw----output-R- flux solaire net au sommet de l'atm.
 
     real, intent(out):: toplw(klon)
     ! rayonnement infrarouge montant au sommet de l'atmosphère
 
     real solsw(klon), sollw(klon), albpla(klon)
+    ! solsw----output-R- flux solaire net a la surface
+    ! sollw----output-R- ray. IR montant a la surface
+    ! albpla---output-R- albedo planetaire (entre 0 et 1)
     real topsw0(klon), solsw0(klon), sollw0(klon)
     real, intent(out):: toplw0(klon)
     real sollwdown(klon)
@@ -142,16 +142,25 @@ contains
 
     real topswad(klon), solswad(klon)
     ! output: aerosol direct forcing at TOA and surface
+    ! topswad---output-R- ray. solaire absorbe au sommet de l'atm. (aerosol dir)
+    ! solswad---output-R- ray. solaire net absorbe a la surface (aerosol dir)
 
     real topswai(klon), solswai(klon)
     ! output: aerosol indirect forcing atTOA and surface
+    ! topswai---output-R- ray. solaire absorbe au sommet de l'atm. (aerosol ind)
+    ! solswai---output-R- ray. solaire net absorbe a la surface (aerosol ind)
 
     real tau_ae(klon, klev, 2), piz_ae(klon, klev, 2), cg_ae(klon, klev, 2)
-    ! aerosol optical properties (see aeropt.F)
+    ! input-R- aerosol optical properties (calculated in aeropt.F)
 
     real cldtaupi(klon, klev)
     ! cloud optical thickness for pre-industrial aerosol concentrations
-    ! (i.e., with a smaller droplet concentrationand thus larger droplet radii)
+    ! (i.e. with a smaller droplet concentration and thus larger droplet radii)
+    ! -input-R- epaisseur optique des nuages dans le visible
+    ! calculated for pre-industrial (pi) aerosol concentrations,
+    ! i.e. with smaller droplet concentration, thus larger droplets,
+    ! thus generally cdltaupi cldtaupd it is needed for the
+    ! diagnostics of the aerosol indirect radiative forcing
 
     logical ok_ade, ok_aie 
     ! switches whether to use aerosol direct (indirect) effects or not

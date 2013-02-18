@@ -5,7 +5,7 @@
                     ,th,tv,lv,cpn,ep,sigp,clw &
                     ,m,ment,elij,delt,plcl &
                     ,mp,rp,up,vp,trap,wt,water,evap,b)
-            use cvparam3
+            use cv3_param_m
             use cvthermo
             use cvflag
       implicit none
@@ -13,7 +13,7 @@
 
 
 ! inputs:
-      integer ncum, nd, na, ntra, nloc
+      integer, intent(in):: ncum, nd, na, ntra, nloc
       integer icb(nloc), inb(nloc)
       real, intent(in):: delt
       real plcl(nloc)
@@ -64,14 +64,6 @@
           lvcp(il,i)=lv(il,i)/cpn(il,i)
          enddo
         enddo
-
-!        do k=1,ntra
-!         do i=1,nd
-!          do il=1,ncum
-!           trap(il,i,k)=tra(il,i,k)
-!          enddo
-!         enddo
-!        enddo
 
 !
 !   ***  check whether ep(inb)=0, if so, skip precipitating    ***
@@ -299,13 +291,6 @@
       vp(il,i)=vp(il,i+1)*mp(il,i+1)+v(il,i)*(mp(il,i)-mp(il,i+1))
       vp(il,i)=vp(il,i)/mp(il,i)
 
-!      do j=1,ntra
-!      trap(il,i,j)=trap(il,i+1,j)*mp(il,i+1)
-!testmaf     :            +trap(il,i,j)*(mp(il,i)-mp(il,i+1))
-!     :            +tra(il,i,j)*(mp(il,i)-mp(il,i+1))
-!      trap(il,i,j)=trap(il,i,j)/mp(il,i)
-!      end do
-
       else
 
        if(mp(il,i+1).gt.1.0e-16)then
@@ -320,10 +305,6 @@
         endif
        up(il,i)=up(il,i+1)
        vp(il,i)=vp(il,i+1)
-
-!       do j=1,ntra
-!       trap(il,i,j)=trap(il,i+1,j)
-!       end do
 
        endif
       endif

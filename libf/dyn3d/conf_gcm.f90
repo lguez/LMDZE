@@ -108,7 +108,7 @@ contains
          'Il faut choisir un nombre de pas par jour multiple de "iperiod".', &
          ierr = 1)
 
-    IF (MOD(day_step,iphysiq)/= 0) call abort_gcm(modname = "conf_gcm", &
+    IF (MOD(day_step, iphysiq)/= 0) call abort_gcm(modname = "conf_gcm", &
          message = &
          'Il faut choisir un nombre de pas par jour multiple de "iphysiq".', &
          ierr = 1)

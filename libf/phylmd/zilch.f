@@ -7,7 +7,8 @@ c Zero the real array x dimensioned m.
 c
       implicit none
 c
-      integer m,i
+      integer, intent(in):: m
+      integer i
       real x(m)
       do 1 i=1,m
       x(i)= 0.0  
