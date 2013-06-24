@@ -6,8 +6,8 @@ module suphec_m
   REAL RPI
   real, parameter:: RCLUM = 299792458.
   real, parameter:: RHPLA = 6.6260755E-34
-  real, parameter:: RKBOL = 1.380658E-23 ! Boltzmann constant, in J K-1
-  real, parameter:: RNAVO = 6.0221367E+23 ! Avogadro number, in mol-1
+  real, parameter:: KBOL = 1.380658E-23 ! Boltzmann constant, in J K-1
+  real, parameter:: NAVO = 6.0221367E23 ! Avogadro number, in mol-1
 
   ! A1.1 Astronomical constants
   REAL RSIYEA, RSIDAY, ROMEGA
@@ -23,19 +23,25 @@ module suphec_m
   REAL RSIGMA
 
   ! A1.4 Thermodynamic gas phase
-  REAL, parameter:: R = RNAVO * RKBOL ! ideal gas constant, in J K-1 mol-1
-  real RV, RCPV, RCVD, RCVV
-  real, parameter:: RMD = 28.9644 ! molar mass of dry air, in g mol-1
+  REAL, parameter:: R = NAVO * KBOL ! ideal gas constant, in J K-1 mol-1
+  real, parameter:: MV = 18.0153 ! molar mass of water, in g mol-1
 
-  real, parameter:: RD = 1000. * R / RMD
+  real, parameter:: RV = 1e3 * R / MV
+  ! specific ideal gas constant for water vapor, in J K-1 kg-1
+  ! (factor 1e3: conversion from g to kg)
+
+  real, parameter:: MD = 28.9644 ! molar mass of dry air, in g mol-1
+
+  real, parameter:: RD = 1e3 * R / MD
   ! specific ideal gas constant for dry air, in J K-1 kg-1
-  ! (factor 1000: conversion from g to kg)
+  ! (factor 1e3: conversion from g to kg)
+
+  real RCPV, RCVD, RCVV
 
   real, parameter:: RCPD = 7. / 2 * RD 
   ! specific heat capacity for dry air, in J K-1 kg-1
 
   real, parameter:: RMO3 = 47.9942
-  real, parameter:: RMV = 18.0153
   REAL, parameter:: RKAPPA = RD/RCPD
   real RETV
 
@@ -75,8 +81,6 @@ contains
     print '('' PI = '', E13.7, '' -'')', RPI
     print '('' c = '', E13.7, ''m s-1'')', RCLUM
     print '('' h = '', E13.7, ''J s'')', RHPLA
-    print '('' K = '', E13.7, ''J K-1'')', RKBOL
-    print '('' N = '', E13.7, ''mol-1'')', RNAVO
 
     ! 2. DEFINE ASTRONOMICAL CONSTANTS
 
@@ -100,29 +104,26 @@ contains
 
     ! 4. DEFINE RADIATION CONSTANTS.
 
-    rsigma = 2.*rpi**5 * (rkbol/rhpla)**3 * rkbol/rclum/rclum/15.
+    rsigma = 2.*rpi**5 * (kbol/rhpla)**3 * kbol/rclum/rclum/15.
     print *, ' Radiation '
     print '('' Stefan-Bol. = '', E13.7, '' W m-2 K-4'')', RSIGMA
 
     ! 5. DEFINE THERMODYNAMIC CONSTANTS, GAS PHASE.
 
-    RV = 1000.*R/RMV
     RCVD = RCPD-RD
-    RCPV = 4. *RV
+    RCPV = 4. * RV
     RCVV = RCPV-RV
-    RETV = RV/RD-1.
-    print *, 'Thermodynamic, gas '
-    print '('' Perfect gas = '', e13.7)', R
+    RETV = RV / RD - 1.
+    print *, 'Thermodynamics, gas'
     print '('' Ozone mass = '', e13.7)', RMO3
-    print '('' Vapour mass = '', e13.7)', RMV
-    print '('' Dry air constant = '', e13.7)', RD
-    print '('' Vapour constant = '', e13.7)', RV
+    print *, "rd = ", RD, "J K-1 kg-1"
+    print *, "rv = ", RV, "J K-1 kg-1"
     print '('' Cpd = '', e13.7)', RCPD
     print '('' Cvd = '', e13.7)', RCVD
     print '('' Cpv = '', e13.7)', RCPV
     print '('' Cvv = '', e13.7)', RCVV
     print '('' Rd/Cpd = '', e13.7)', RKAPPA
-    print '('' Rv/Rd-1 = '', e13.7)', RETV
+    print '('' Rv / Rd - 1 = '', e13.7)', RETV
 
     ! 6. DEFINE THERMODYNAMIC CONSTANTS, LIQUID PHASE.
 

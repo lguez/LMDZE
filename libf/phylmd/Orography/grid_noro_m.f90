@@ -9,10 +9,12 @@ contains
 
     ! From dyn3d/grid_noro.F, version 1.1.1.1 2004/05/19 12:53:06
 
-    ! Authors: F. Lott, Z. X. Li, A. Harzallah and L. Fairhead
+    ! Authors: François Lott, Laurent Li, A. Harzallah and Laurent
+    ! Fairhead
 
-    ! Compute the parameters of the SSO scheme as described in
-    ! Lott and Miller (1997) and Lott (1999).
+    ! Compute the parameters of the sub-grid scale orography scheme as
+    ! described in Lott and Miller (1997) and Lott (1999).
+
     ! Target points are on a rectangular grid:
     ! jjm + 1 latitudes including North and South Poles;
     ! iim + 1 longitudes, with periodicity: longitude(iim + 1) = longitude(1)
@@ -20,10 +22,10 @@ contains
 
     ! The parameters a, b, c, d represent the limite of the target
     ! gridpoint region. The means over this region are calculated from
-    ! USN data, ponderated by a weight proportional to the surface
+    ! US Navy data, ponderated by a weight proportional to the surface
     ! occupied by the data inside the model gridpoint area. In most
     ! circumstances, this weight is the ratio between the surface of
-    ! the USN gridpoint area and the surface of the model gridpoint
+    ! the US Navy gridpoint area and the surface of the model gridpoint
     ! area. See "grid_noto.txt".
 
     use dimens_m, only: iim, jjm
@@ -34,14 +36,13 @@ contains
     REAL, intent(in):: zdata(:, :) ! input field
     REAL, intent(in):: x(:), y(:) ! ccordinates output field
 
-    ! Correlations of USN orography gradients:
-
+    ! Correlations of US Navy orography gradients:
     REAL, intent(out):: zphi(:, :)
     real, intent(out):: zmea(:, :) ! Mean orography
     real, intent(out):: zstd(:, :) ! Standard deviation
-    REAL zsig(:, :) ! Slope
-    real zgam(:, :) ! Anisotropy
-    real zthe(:, :) ! Orientation of the small axis
+    REAL, intent(out):: zsig(:, :) ! Slope
+    real, intent(out):: zgam(:, :) ! Anisotropy
+    real, intent(out):: zthe(:, :) ! Orientation of the small axis
     REAL, intent(out):: zpic(:, :) ! Maximum altitude
     real, intent(out):: zval(:, :) ! Minimum altitude
 
@@ -62,19 +63,20 @@ contains
     REAL zytzy(iim + 1, jjm + 1), zxtzy(iim + 1, jjm + 1)
     REAL weight(iim + 1, jjm + 1)
 
-    ! Correlations of USN orography gradients:
+    ! Correlations of US Navy orography gradients:
     REAL, dimension(iusn + 2 * iext, jusn + 2):: zxtzxusn, zytzyusn, zxtzyusn
 
     real mask_tmp(size(x), size(y))
     real num_tot(iim + 1, jjm + 1), num_lan(iim + 1, jjm + 1)
 
     REAL a(iim + 1), b(iim + 1), c(jjm + 1), d(jjm + 1)
-    real rad, weighx, weighy, xincr, xk, xp, xm, xw, xq, xl
+    real weighx, weighy, xincr, xk, xp, xm, xw, xq, xl
     real zbordnor, zdeltax, zbordsud, zdeltay, zbordoue, zlenx, zleny, zmeasud
     real zllmpic, zllmmea, zllmgam, zllmthe, zllmstd, zllmsig, zllmval
     real zpicnor, zminthe, zsigsud, zstdnor, zstdsud, zvalsud, zvalnor
     real zweinor, zweisud, zsignor, zpicsud, zmeanor, zbordest
     integer ii, i, jj, j
+    real, parameter:: rad = 6371229.
 
     !-------------------------------
 
@@ -92,10 +94,9 @@ contains
          size(zval, 2), size(mask, 2)/) == jjm + 1, "grid_noro jjm")
 
     print *, "Paramètres de l'orographie à l'échelle sous-maille" 
-    rad = 6371229.
     zdeltay = 2. * pi / real(jusn) * rad
 
-    ! Extension of the USN database to POCEED computations at boundaries:
+    ! Extension of the US Navy database for computations at boundaries:
 
     DO j = 1, jusn
        yusn(j + 1) = ydata(j)
@@ -150,7 +151,7 @@ contains
     zpic = - 1E10
     zval = 1E10
 
-    ! COMPUTE SLOPES CORRELATIONS ON USN GRID
+    ! Compute slopes correlations on US Navy grid
 
     zytzyusn = 0.
     zxtzxusn = 0.
@@ -179,12 +180,12 @@ contains
              zdeltax = zdeltay * cos(yusn(j))
              zbordnor = (c(jj) - yusn(j) + xincr) * rad
              zbordsud = (yusn(j) - d(jj) + xincr) * rad
-             weighy = AMAX1(0., amin1(zbordnor, zbordsud, zleny))
+             weighy = MAX(0., min(zbordnor, zbordsud, zleny))
              IF (weighy /= 0) THEN
                 DO i = 2, iusn + 2 * iext - 1
                    zbordest = (xusn(i) - a(ii) + xincr) * rad * cos(yusn(j))
                    zbordoue = (b(ii) + xincr - xusn(i)) * rad * cos(yusn(j))
-                   weighx = AMAX1(0., amin1(zbordest, zbordoue, zlenx))
+                   weighx = MAX(0., min(zbordest, zbordoue, zlenx))
                    IF (weighx /= 0) THEN
                       num_tot(ii, jj) = num_tot(ii, jj) + 1.
                       if (zusn(i, j) >= 1.) then
@@ -202,9 +203,9 @@ contains
                       ! mean
                       zmea(ii, jj) = zmea(ii, jj) + zusn(i, j) * weighx * weighy
                       ! peacks
-                      zpic(ii, jj) = amax1(zpic(ii, jj), zusn(i, j))
+                      zpic(ii, jj) = max(zpic(ii, jj), zusn(i, j))
                       ! valleys
-                      zval(ii, jj) = amin1(zval(ii, jj), zusn(i, j))
+                      zval(ii, jj) = min(zval(ii, jj), zusn(i, j))
                    ENDIF
                 ENDDO
              ENDIF
@@ -212,7 +213,10 @@ contains
        ENDDO
     ENDDO
 
-    if (any(weight == 0.)) stop "zero weight in grid_noro"
+    if (any(weight == 0.)) then
+       print *, "zero weight in grid_noro"
+       stop 1
+    end if
 
     ! COMPUTE PARAMETERS NEEDED BY THE LOTT & MILLER (1997) AND
     ! LOTT (1999) SSO SCHEME.
@@ -260,8 +264,8 @@ contains
     CALL MVA9(zxtzy) 
     CALL MVA9(zytzy)
 
-    ! Masque prenant en compte maximum de terre. On seuille à 10 % de
-    ! terre car en dessous les paramètres de surface n'ont pas de
+    ! Masque prenant en compte maximum de terre. On met un seuil à 10
+    ! % de terre car en dessous les paramètres de surface n'ont pas de
     ! sens.
     mask_tmp = 0.
     WHERE (mask >= 0.1) mask_tmp = 1.
@@ -290,14 +294,14 @@ contains
           zpic(ii, jj) = zpic(ii, jj) * mask_tmp(ii, jj)
           zval(ii, jj) = zval(ii, jj) * mask_tmp(ii, jj)
           zstd(ii, jj) = zstd(ii, jj) * mask_tmp(ii, jj)
-          zllmmea = AMAX1(zmea(ii, jj), zllmmea)
-          zllmstd = AMAX1(zstd(ii, jj), zllmstd)
-          zllmsig = AMAX1(zsig(ii, jj), zllmsig)
-          zllmgam = AMAX1(zgam(ii, jj), zllmgam)
-          zllmthe = AMAX1(zthe(ii, jj), zllmthe)
-          zminthe = amin1(zthe(ii, jj), zminthe)
-          zllmpic = AMAX1(zpic(ii, jj), zllmpic)
-          zllmval = AMAX1(zval(ii, jj), zllmval)
+          zllmmea = MAX(zmea(ii, jj), zllmmea)
+          zllmstd = MAX(zstd(ii, jj), zllmstd)
+          zllmsig = MAX(zsig(ii, jj), zllmsig)
+          zllmgam = MAX(zgam(ii, jj), zllmgam)
+          zllmthe = MAX(zthe(ii, jj), zllmthe)
+          zminthe = min(zthe(ii, jj), zminthe)
+          zllmpic = MAX(zpic(ii, jj), zllmpic)
+          zllmval = MAX(zval(ii, jj), zllmval)
        ENDDO
     ENDDO
 

@@ -32,7 +32,7 @@ contains
     ! 03-11-27 J. QUAAS Introduce aerosol forcings (based on BOUCHER)
 
     USE clesphys, ONLY: bug_ozone
-    USE suphec_m, ONLY: rcpd, rday, rg, rmd, rmo3
+    USE suphec_m, ONLY: rcpd, rday, rg, md, rmo3
     USE raddim, ONLY: kdlon, kflev
 
     ! ARGUMENTS:
@@ -157,7 +157,7 @@ contains
                      *PDP(JL, JK)*(101325.0/PPSOL(JL))
              ELSE
                 ! Correction MPL 100505
-                ZOZ(JL, JK) = POZON(JL, JK)*RMD/RMO3*46.6968/RG*PDP(JL, JK)
+                ZOZ(JL, JK) = POZON(JL, JK)*MD/RMO3*46.6968/RG*PDP(JL, JK)
              ENDIF
           ENDDO
        ENDDO

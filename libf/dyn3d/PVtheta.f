@@ -53,7 +53,7 @@ c
       INTEGER ilon
       integer, intent(in):: ilev
       REAL pvcov(iip1,jjm,ilev)
-      REAL pucov(iip1,jjp1,ilev)
+      REAL, intent(in):: pucov(iip1,jjp1,ilev)
       REAL, intent(in):: pteta(iip1,jjp1,ilev)
       REAL ztfi(ilon,ilev)
       REAL, intent(in):: zplay(ilon,ilev), zplev(ilon,ilev+1)

@@ -12,84 +12,34 @@ contains
 
     USE indicesol, ONLY: nbsrf
     USE dimphy, ONLY: klev, klon
+    use nr_util, only: ifirstloc
 
     REAL, intent(in):: t(klon, klev), tsol(klon, nbsrf)
 
     ! Variables local to the procedure:
 
     real, parameter:: temp_min = 50., temp_max = 370. ! temperature range, in K
-    INTEGER i, k, nsrf
-    INTEGER jadrs(klon), jbad
-    LOGICAL ok
+    INTEGER k, nsrf, jbad
 
     !----------------------------------------------------------
 
-    ok = .TRUE.
     DO k = 1, klev
-       jbad = 0
-       DO i = 1, klon
-          IF (t(i, k) > temp_max) THEN
-             jbad = jbad + 1
-             jadrs(jbad) = i
-          ENDIF
-       ENDDO
-       IF (jbad  >  0) THEN
-          ok = .FALSE.
-          DO i = 1, jbad
-             print *, "t(", jadrs(i), ", ", k, ") = ", t(jadrs(i), k)
-          ENDDO
-       ENDIF
-
-       jbad = 0
-       DO i = 1, klon
-          IF (t(i, k) < temp_min) THEN
-             jbad = jbad + 1
-             jadrs(jbad) = i
-          ENDIF
-       ENDDO
-       IF (jbad  >  0) THEN
-          ok = .FALSE.
-          DO i = 1, jbad
-             print *, "t(", jadrs(i), ", ", k, ") = ", t(jadrs(i), k)
-          ENDDO
-       ENDIF
+       jbad = ifirstloc(t(:, k) > temp_max .or. t(:, k) < temp_min)
+       if (jbad <= klon) then
+          PRINT *, 'hgardfou: temperature out of range'
+          print *, "t(", jbad, ", ", k, ") = ", t(jbad, k)
+          stop 1
+       end if
     ENDDO
 
     DO nsrf = 1, nbsrf
-       jbad = 0
-       DO i = 1, klon
-          IF (tsol(i, nsrf) > temp_max) THEN
-             jbad = jbad + 1
-             jadrs(jbad) = i
-          ENDIF
-       ENDDO
-       IF (jbad  >  0) THEN
-          ok = .FALSE.
-          DO i = 1, jbad
-              print *, "tsol(", jadrs(i), ", ", nsrf, ") = ", &
-                  tsol(jadrs(i), nsrf)
-          ENDDO
-       ENDIF
-       jbad = 0
-       DO i = 1, klon
-          IF (tsol(i, nsrf) < temp_min) THEN
-             jbad = jbad + 1
-             jadrs(jbad) = i
-          ENDIF
-       ENDDO
-       IF (jbad  >  0) THEN
-          ok = .FALSE.
-          DO i = 1, jbad
-              print *, "tsol(", jadrs(i), ", ", nsrf, ") = ", &
-                  tsol(jadrs(i), nsrf)
-          ENDDO
+       jbad = ifirstloc(tsol(:, nsrf) > temp_max .or. tsol(:, nsrf) < temp_min)
+       if (jbad <= klon) then
+          PRINT *, 'hgardfou: temperature out of range'
+          print *, "tsol(", jbad, ", ", nsrf, ") = ", tsol(jbad, nsrf)
+          stop 1
        ENDIF
     ENDDO
-
-    IF (.NOT. ok) THEN
-       PRINT *, 'hgardfou: temperature out of range'
-       stop 1
-    ENDIF
 
   END SUBROUTINE hgardfou
 

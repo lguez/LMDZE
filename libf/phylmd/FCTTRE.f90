@@ -8,8 +8,8 @@ module FCTTRE
   ! is given by a first order Taylor expansion of "Qs(T)" with respect
   ! to temperature, using constants in "yoethf_m".
 
-  ! Probably from Buck, 1981, Journal of Applied Meteorology, 20(12),
-  ! 1527.
+  ! Probably from Buck, 1981, Journal of Applied Meteorology, volume
+  ! 20, number 12, page 1527.
 
   implicit none
 
@@ -22,7 +22,8 @@ contains
     use yoethf_m, only: R3LES, R3IES, R4LES, R4IES
     use SUPHEC_M, only: rtt
 
-    REAL, intent(in):: T, DEL
+    REAL, intent(in):: T
+    REAL, intent(in):: DEL ! 1 for ice, 0 for liquid
 
     !-----------------------
 

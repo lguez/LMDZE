@@ -7,39 +7,40 @@ contains
   SUBROUTINE caldyn(itau, ucov, vcov, teta, ps, masse, pk, pkf, phis, phi, &
        dudyn, dv, dteta, dp, w, pbaru, pbarv, time_0, conser)
 
-    ! From dyn3d/caldyn.F, v 1.1.1.1 2004/05/19 12:53:06
+    ! From dyn3d/caldyn.F, version 1.1.1.1 2004/05/19 12:53:06
     ! Auteur : P. Le Van
     ! Objet : calcul des tendances dynamiques
 
     use advect_m, only: advect
-    USE comgeom, ONLY : airesurg, constang
-    USE dimens_m, ONLY : iim, llm
-    USE disvert_m, ONLY : ap, bp
+    USE comgeom, ONLY: airesurg, constang
+    USE dimens_m, ONLY: iim, llm
+    USE disvert_m, ONLY: ap, bp
     use massdair_m, only: massdair
-    USE paramet_m, ONLY : iip1, ip1jm, ip1jmp1, jjp1, llmp1
+    USE paramet_m, ONLY: iip1, ip1jm, ip1jmp1, jjp1, llmp1
     use sortvarc_m, only: sortvarc
 
     ! Arguments:
 
-    LOGICAL, INTENT(IN):: conser
     INTEGER, INTENT(IN):: itau
-    REAL vcov(ip1jm, llm), ucov(ip1jmp1, llm)
+    REAL ucov(ip1jmp1, llm), vcov(ip1jm, llm)
     real, intent(in):: teta(ip1jmp1, llm)
-    REAL, INTENT(IN):: ps(ip1jmp1), phis(ip1jmp1)
+    REAL, INTENT(IN):: ps(ip1jmp1)
+    real, intent(out):: masse(ip1jmp1, llm)
     REAL, INTENT(IN):: pk(iip1, jjp1, llm)
     REAL pkf(ip1jmp1, llm)
-    REAL vcont(ip1jm, llm), ucont(ip1jmp1, llm)
+    REAL, INTENT(IN):: phis(ip1jmp1)
     REAL, INTENT(IN):: phi(ip1jmp1, llm)
-    real masse(ip1jmp1, llm)
     REAL dv(ip1jm, llm), dudyn(ip1jmp1, llm)
     REAL dteta(ip1jmp1, llm)
     real, INTENT(out):: dp(ip1jmp1)
+    REAL, INTENT(out):: w(ip1jmp1, llm)
     REAL pbaru(ip1jmp1, llm), pbarv(ip1jm, llm)
     REAL, intent(in):: time_0
-    REAL, INTENT(out):: w(ip1jmp1, llm)
+    LOGICAL, INTENT(IN):: conser
 
     ! Local:
 
+    REAL vcont(ip1jm, llm), ucont(ip1jmp1, llm)
     REAL ang(ip1jmp1, llm), p(ip1jmp1, llmp1)
     REAL massebx(ip1jmp1, llm), masseby(ip1jm, llm)
     REAL vorpot(ip1jm, llm)

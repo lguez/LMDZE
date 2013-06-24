@@ -107,7 +107,7 @@ contains
     real pks(iim + 1, jjm + 1)
 
     REAL masse(iim + 1, jjm + 1, llm)
-    REAL phi(ip1jmp1, llm)
+    REAL phi(iim + 1, jjm + 1, llm)
     REAL pbaru(ip1jmp1, llm), pbarv(ip1jm, llm)
     REAL w(ip1jmp1, llm)
     REAL phystep
@@ -306,7 +306,7 @@ contains
     day_ref = dayref
     annee_ref = anneeref
 
-    CALL geopot(ip1jmp1, tpot, pk , pks,  phis, phi)
+    CALL geopot(tpot, pk , pks,  phis, phi)
     CALL caldyn0(ucov, vcov, tpot, psol, masse, pk, phis, phi, w, pbaru, &
          pbarv)
     CALL dynredem0("start.nc", dayref, phis)

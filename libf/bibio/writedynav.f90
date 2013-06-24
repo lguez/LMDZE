@@ -30,14 +30,15 @@ contains
     REAL, intent(in):: teta(:, :, :) ! (iim + 1, jjm + 1, llm)
     ! temperature potentielle
 
+    real, intent(in):: pk(:, :, :) ! (iim + 1, jjm + 1, llm)
+
     real, intent(in):: phi(:, :, :) ! (iim + 1, jjm + 1, llm)
     ! geopotentiel instantane
 
-    real, intent(in):: pk(:, :, :) ! (iim + 1, jjm + 1, llm)
-    REAL, intent(in):: ps(:, :) ! (iim + 1, jjm + 1) pression au sol
-    real, intent(in):: masse(:, :, :) ! (iim + 1, jjm + 1, llm)
-    REAL, intent(in):: phis(:, :) ! (iim + 1, jjm + 1) geopotentiel au sol
     REAL, intent(in):: q(:, :, :, :) ! (iim + 1, jjm + 1, llm, nqmx) traceurs
+    real, intent(in):: masse(:, :, :) ! (iim + 1, jjm + 1, llm)
+    REAL, intent(in):: ps(:, :) ! (iim + 1, jjm + 1) pression au sol
+    REAL, intent(in):: phis(:, :) ! (iim + 1, jjm + 1) geopotentiel au sol
     integer, intent(in):: time ! temps de l'ecriture
 
     ! Variables locales

@@ -3,6 +3,7 @@
            pmfd, pmfds, pmfdq, pdmfdp, kdtop, lddraf)
       use dimens_m
       use dimphy
+      use flxadjtq_m, only: flxadjtq
       use SUPHEC_M
       use yoethf_m
             use yoecumf

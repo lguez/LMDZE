@@ -167,15 +167,12 @@ contains
 
     !MI Amip2 PV a theta constante
 
-    INTEGER klevp1
-    PARAMETER(klevp1 = llm + 1)
-
-    REAL swdn0(klon, klevp1), swdn(klon, klevp1)
-    REAL swup0(klon, klevp1), swup(klon, klevp1)
+    REAL swdn0(klon, llm + 1), swdn(klon, llm + 1)
+    REAL swup0(klon, llm + 1), swup(klon, llm + 1)
     SAVE swdn0, swdn, swup0, swup
 
-    REAL lwdn0(klon, klevp1), lwdn(klon, klevp1)
-    REAL lwup0(klon, klevp1), lwup(klon, klevp1)
+    REAL lwdn0(klon, llm + 1), lwdn(klon, llm + 1)
+    REAL lwup0(klon, llm + 1), lwup(klon, llm + 1)
     SAVE lwdn0, lwdn, lwup0, lwup 
 
     !IM Amip2
@@ -372,11 +369,9 @@ contains
     INTEGER julien
 
     INTEGER, SAVE:: lmt_pas ! number of time steps of "physics" per day
-    REAL pctsrf(klon, nbsrf)
-    !IM
-    REAL pctsrf_new(klon, nbsrf) !pourcentage surfaces issus d'ORCHIDEE
+    REAL, save:: pctsrf(klon, nbsrf) ! percentage of surface
+    REAL pctsrf_new(klon, nbsrf) ! pourcentage surfaces issus d'ORCHIDEE
 
-    SAVE pctsrf ! sous-fraction du sol
     REAL albsol(klon)
     SAVE albsol ! albedo du sol total
     REAL albsollw(klon)
@@ -957,14 +952,10 @@ contains
     DO nsrf = 1, nbsrf
        DO k = 1, llm
           DO i = 1, klon
-             zxfluxt(i, k) = zxfluxt(i, k) + &
-                  fluxt(i, k, nsrf) * pctsrf(i, nsrf)
-             zxfluxq(i, k) = zxfluxq(i, k) + &
-                  fluxq(i, k, nsrf) * pctsrf(i, nsrf)
-             zxfluxu(i, k) = zxfluxu(i, k) + &
-                  fluxu(i, k, nsrf) * pctsrf(i, nsrf)
-             zxfluxv(i, k) = zxfluxv(i, k) + &
-                  fluxv(i, k, nsrf) * pctsrf(i, nsrf)
+             zxfluxt(i, k) = zxfluxt(i, k) + fluxt(i, k, nsrf) * pctsrf(i, nsrf)
+             zxfluxq(i, k) = zxfluxq(i, k) + fluxq(i, k, nsrf) * pctsrf(i, nsrf)
+             zxfluxu(i, k) = zxfluxu(i, k) + fluxu(i, k, nsrf) * pctsrf(i, nsrf)
+             zxfluxv(i, k) = zxfluxv(i, k) + fluxv(i, k, nsrf) * pctsrf(i, nsrf)
           END DO
        END DO
     END DO
@@ -1095,10 +1086,10 @@ contains
 
     if (iflag_con == 2) then
        z_avant = sum((q_seri + ql_seri) * zmasse, dim=2)
-       CALL conflx(dtphys, paprs, play, t_seri, q_seri, conv_t, conv_q, &
-            zxfluxq(1, 1), omega, d_t_con, d_q_con, rain_con, snow_con, pmfu, &
-            pmfd, pen_u, pde_u, pen_d, pde_d, kcbot, kctop, kdtop, pmflxr, &
-            pmflxs)
+       CALL conflx(dtphys, paprs, play, t_seri(:, llm:1:-1), q_seri, &
+            conv_t, conv_q, zxfluxq(:, 1), omega, d_t_con, d_q_con, &
+            rain_con, snow_con, pmfu, pmfd, pen_u, pde_u, pen_d, &
+            pde_d, kcbot, kctop, kdtop, pmflxr, pmflxs)
        WHERE (rain_con < 0.) rain_con = 0.
        WHERE (snow_con < 0.) snow_con = 0.
        DO i = 1, klon
@@ -1224,14 +1215,14 @@ contains
 
     ! Caclul des ratqs
 
-    ! ratqs convectifs a l'ancienne en fonction de q(z = 0)-q / q
-    ! on ecrase le tableau ratqsc calcule par clouds_gno
+    ! ratqs convectifs à l'ancienne en fonction de (q(z = 0) - q) / q
+    ! on écrase le tableau ratqsc calculé par clouds_gno
     if (iflag_cldcon == 1) then
        do k = 1, llm
           do i = 1, klon
              if(ptconv(i, k)) then
-                ratqsc(i, k) = ratqsbas &
-                     +fact_cldcon*(q_seri(i, 1)-q_seri(i, k))/q_seri(i, k)
+                ratqsc(i, k) = ratqsbas + fact_cldcon &
+                     * (q_seri(i, 1) - q_seri(i, k)) / q_seri(i, k)
              else
                 ratqsc(i, k) = 0.
              endif
@@ -1242,8 +1233,8 @@ contains
     ! ratqs stables
     do k = 1, llm
        do i = 1, klon
-          ratqss(i, k) = ratqsbas + (ratqshaut-ratqsbas)* &
-               min((paprs(i, 1)-play(i, k))/(paprs(i, 1)-30000.), 1.) 
+          ratqss(i, k) = ratqsbas + (ratqshaut - ratqsbas) &
+               * min((paprs(i, 1) - play(i, k)) / (paprs(i, 1) - 3e4), 1.) 
        enddo
     enddo
 
@@ -1253,8 +1244,7 @@ contains
        ! ratqs final
        ! 1e4 (en gros 3 heures), en dur pour le moment, est le temps de
        ! relaxation des ratqs
-       facteur = exp(-dtphys*facttemps)
-       ratqs = max(ratqs*facteur, ratqss)
+       ratqs = max(ratqs * exp(- dtphys * facttemps), ratqss)
        ratqs = max(ratqs, ratqsc)
     else
        ! on ne prend que le ratqs stable pour fisrtilp
@@ -1342,7 +1332,7 @@ contains
        facteur = dtphys *facttemps
        do k = 1, llm
           do i = 1, klon
-             rnebcon(i, k) = rnebcon(i, k)*facteur
+             rnebcon(i, k) = rnebcon(i, k) * facteur
              if (rnebcon0(i, k)*clwcon0(i, k) > rnebcon(i, k)*clwcon(i, k)) &
                   then
                 rnebcon(i, k) = rnebcon0(i, k)

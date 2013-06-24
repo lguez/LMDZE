@@ -13,7 +13,7 @@
 !     -----------------------------------------------------------------
       LOGICAL  llo1
 !
-      REAL pten(klon,klev), paph(klon,klev+1)
+      REAL, intent(in):: pten(klon,klev), paph(klon,klev+1)
       REAL pmfus(klon,klev), pmfuq(klon,klev), pmful(klon,klev)
       REAL pmfds(klon,klev), pmfdq(klon,klev)
       REAL pdmfup(klon,klev)

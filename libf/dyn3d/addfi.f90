@@ -4,144 +4,114 @@ module addfi_m
 
 contains
 
-  SUBROUTINE addfi(nq, pdt, pucov, pvcov, teta, pq, pps, pdufi, pdvfi, pdhfi,&
+  SUBROUTINE addfi(nq, ucov, vcov, teta, pq, pps, dufi, dvfi, pdhfi, &
        pdqfi, pdpfi)
 
-    ! From dyn3d/addfi.F,v 1.1.1.1 2004/05/19 12:53:06
+    ! From dyn3d/addfi.F, v 1.1.1.1 2004/05/19 12:53:06
 
-    !    Addition of the physical tendencies
+    ! Addition of the physical tendencies
 
-    !    Interface :
+    USE comconst, ONLY: dtphys
+    USE comgeom, ONLY: aire, apoln, apols
+    USE dimens_m, ONLY: iim, llm
+    USE paramet_m, ONLY: iip1, iip2, ip1jm, ip1jmp1
 
-    !      Input :
+    INTEGER, intent(in):: nq
 
-    !      pdt                    time step of integration
-    !      pucov(ip1jmp1,llm)     first component of the covariant velocity
-    !      pvcov(ip1ip1jm,llm)    second component of the covariant velocity
-    !      teta(ip1jmp1,llm)     potential temperature
-    !      pts(ip1jmp1,llm)       surface temperature
-    !      pdufi(ip1jmp1,llm)     |
-    !      pdvfi(ip1jm,llm)       |   respective
-    !      pdhfi(ip1jmp1)         |      tendencies
-    !      pdtsfi(ip1jmp1)        |
+    REAL, intent(inout):: ucov(ip1jmp1, llm), vcov(ip1jm, llm)
+    ! first and second components of the covariant velocity
 
-    !      Output :
+    REAL, intent(inout):: teta(ip1jmp1, llm) ! potential temperature
+    real, intent(inout):: pq(ip1jmp1, llm, nq), pps(ip1jmp1)
+    REAL, intent(in):: dufi(ip1jmp1, llm), dvfi(ip1jm, llm) ! tendencies
+    real, intent(in):: pdhfi(ip1jmp1, llm) ! tendency
+    REAL, intent(in):: pdqfi(ip1jmp1, llm, nq), pdpfi(ip1jmp1)
 
-    !      pucov
-    !      pvcov
-    !      ph
-    !      pts
-
-    use dimens_m
-    use paramet_m
-    use comconst
-    use comgeom
-    use serre
-
-    !    Arguments :
-
-    INTEGER nq
-
-    REAL pdt
-
-    REAL pvcov(ip1jm,llm),pucov(ip1jmp1,llm)
-    REAL, intent(inout):: teta(ip1jmp1,llm)
-    real pq(ip1jmp1,llm,nq),pps(ip1jmp1)
-
-    REAL pdvfi(ip1jm,llm),pdufi(ip1jmp1,llm)
-    REAL pdqfi(ip1jmp1,llm,nq), pdpfi(ip1jmp1)
-    real, intent(in):: pdhfi(ip1jmp1,llm)
-
-    !    Local variables :
-
-    REAL xpn(iim),xps(iim),tpn,tps
-    INTEGER j,k,iq,ij
-    REAL qtestw, qtestt
-    PARAMETER ( qtestw = 1.0e-15 )
-    PARAMETER ( qtestt = 1.0e-40 )
-
-    REAL SSUM
+    ! Local variables :
+    REAL xpn(iim), xps(iim), tpn, tps
+    INTEGER j, k, iq, ij
+    REAL, PARAMETER:: qtestw = 1e-15, qtestt = 1e-40
 
     !-----------------------------------------------------------------------
 
-    DO k = 1,llm
-       DO j = 1,ip1jmp1
-          teta(j,k)= teta(j,k) + pdhfi(j,k) * pdt
+    DO k = 1, llm
+       DO j = 1, ip1jmp1
+          teta(j, k)= teta(j, k) + pdhfi(j, k) * dtphys
        ENDDO
     ENDDO
 
-    DO  k    = 1, llm
-       DO  ij   = 1, iim
-          xpn(ij) = aire(   ij   ) * teta(  ij    ,k)
-          xps(ij) = aire(ij+ip1jm) * teta(ij+ip1jm,k)
+    DO k = 1, llm
+       DO ij = 1, iim
+          xpn(ij) = aire(ij) * teta(ij , k)
+          xps(ij) = aire(ij+ip1jm) * teta(ij+ip1jm, k)
        ENDDO
-       tpn      = SSUM(iim,xpn,1)/ apoln
-       tps      = SSUM(iim,xps,1)/ apols
+       tpn = SUM(xpn)/ apoln
+       tps = SUM(xps)/ apols
 
-       DO ij   = 1, iip1
-          teta(   ij   ,k)  = tpn
-          teta(ij+ip1jm,k)  = tps
-       ENDDO
-    ENDDO
-
-    DO k = 1,llm
-       DO j = iip2,ip1jm
-          pucov(j,k)= pucov(j,k) + pdufi(j,k) * pdt
+       DO ij = 1, iip1
+          teta(ij , k) = tpn
+          teta(ij+ip1jm, k) = tps
        ENDDO
     ENDDO
 
-    DO k = 1,llm
-       DO j = 1,ip1jm
-          pvcov(j,k)= pvcov(j,k) + pdvfi(j,k) * pdt
+    DO k = 1, llm
+       DO j = iip2, ip1jm
+          ucov(j, k)= ucov(j, k) + dufi(j, k) * dtphys
        ENDDO
     ENDDO
 
-    DO j = 1,ip1jmp1
-       pps(j) = pps(j) + pdpfi(j) * pdt
+    DO k = 1, llm
+       DO j = 1, ip1jm
+          vcov(j, k)= vcov(j, k) + dvfi(j, k) * dtphys
+       ENDDO
+    ENDDO
+
+    DO j = 1, ip1jmp1
+       pps(j) = pps(j) + pdpfi(j) * dtphys
     ENDDO
 
     DO iq = 1, 2
-       DO k = 1,llm
-          DO j = 1,ip1jmp1
-             pq(j,k,iq)= pq(j,k,iq) + pdqfi(j,k,iq) * pdt
-             pq(j,k,iq)= AMAX1( pq(j,k,iq), qtestw )
+       DO k = 1, llm
+          DO j = 1, ip1jmp1
+             pq(j, k, iq)= pq(j, k, iq) + pdqfi(j, k, iq) * dtphys
+             pq(j, k, iq)= MAX(pq(j, k, iq), qtestw)
           ENDDO
        ENDDO
     ENDDO
 
     DO iq = 3, nq
-       DO k = 1,llm
-          DO j = 1,ip1jmp1
-             pq(j,k,iq)= pq(j,k,iq) + pdqfi(j,k,iq) * pdt
-             pq(j,k,iq)= AMAX1( pq(j,k,iq), qtestt )
+       DO k = 1, llm
+          DO j = 1, ip1jmp1
+             pq(j, k, iq)= pq(j, k, iq) + pdqfi(j, k, iq) * dtphys
+             pq(j, k, iq)= MAX(pq(j, k, iq), qtestt)
           ENDDO
        ENDDO
     ENDDO
 
-    DO  ij   = 1, iim
-       xpn(ij) = aire(   ij   ) * pps(  ij     )
-       xps(ij) = aire(ij+ip1jm) * pps(ij+ip1jm )
+    DO ij = 1, iim
+       xpn(ij) = aire(ij) * pps(ij)
+       xps(ij) = aire(ij+ip1jm) * pps(ij+ip1jm)
     ENDDO
-    tpn      = SSUM(iim,xpn,1)/apoln
-    tps      = SSUM(iim,xps,1)/apols
+    tpn = SUM(xpn)/apoln
+    tps = SUM(xps)/apols
 
-    DO ij   = 1, iip1
-       pps (   ij     )  = tpn
-       pps ( ij+ip1jm )  = tps
+    DO ij = 1, iip1
+       pps (ij) = tpn
+       pps (ij+ip1jm) = tps
     ENDDO
 
     DO iq = 1, nq
-       DO  k    = 1, llm
-          DO  ij   = 1, iim
-             xpn(ij) = aire(   ij   ) * pq(  ij    ,k,iq)
-             xps(ij) = aire(ij+ip1jm) * pq(ij+ip1jm,k,iq)
+       DO k = 1, llm
+          DO ij = 1, iim
+             xpn(ij) = aire(ij) * pq(ij , k, iq)
+             xps(ij) = aire(ij+ip1jm) * pq(ij+ip1jm, k, iq)
           ENDDO
-          tpn      = SSUM(iim,xpn,1)/apoln
-          tps      = SSUM(iim,xps,1)/apols
+          tpn = SUM(xpn)/apoln
+          tps = SUM(xps)/apols
 
-          DO ij   = 1, iip1
-             pq (   ij   ,k,iq)  = tpn
-             pq (ij+ip1jm,k,iq)  = tps
+          DO ij = 1, iip1
+             pq (ij , k, iq) = tpn
+             pq (ij+ip1jm, k, iq) = tps
           ENDDO
        ENDDO
     ENDDO

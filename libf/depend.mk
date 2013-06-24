@@ -4,7 +4,7 @@ aaam_bud.o : dimens_m.o
 abort_gcm.o : histclo.o 
 academic.o : dimens_m.o 
 adaptdt.o : ener.o temps.o comgeom.o conf_gcm.o disvert.o comconst.o paramet_m.o dimens_m.o 
-addfi.o : serre.o comgeom.o comconst.o paramet_m.o dimens_m.o 
+addfi.o : paramet_m.o dimens_m.o comgeom.o comconst.o 
 advect.o : comgeom.o comconst.o paramet_m.o dimens_m.o 
 advn.o : comgeom.o conf_gcm.o disvert.o comconst.o paramet_m.o dimens_m.o 
 advtrac.o : iniadvtrac.o conf_gcm.o comconst.o paramet_m.o dimens_m.o 
@@ -25,7 +25,7 @@ calcul_fluxs.o : interface_surf.o suphec.o FCTTRE.o yoethf.o abort_gcm.o indices
 caldyn.o : sortvarc.o paramet_m.o massdair.o disvert.o dimens_m.o comgeom.o advect.o 
 caldyn0.o : paramet_m.o massdair.o disvert.o dimens_m.o comgeom.o 
 calendar.o : errioipsl.o strlowercase.o 
-calfis.o : pressure_var.o physiq.o iniadvtrac.o grid_change.o dimphy.o dimens_m.o comgeom.o disvert.o comconst.o 
+calfis.o : pressure_var.o physiq.o iniadvtrac.o grid_change.o disvert.o dimphy.o dimens_m.o comgeom.o comconst.o 
 calltherm.o : thermcell.o ctherm.o dimphy.o 
 ce0l.o : unit_nml_m.o limit.o etat0.o conf_gcm.o 
 clcdrag.o : yoethf.o suphec.o indicesol.o 
@@ -119,15 +119,15 @@ flininfo.o : strlowercase.o errioipsl.o
 flinopen_nozoom.o : flininfo.o flinfindcood.o errioipsl.o calendar.o 
 flumass.o : comgeom.o paramet_m.o dimens_m.o 
 fluxstokenc.o : tracstoke.o comgeom.o paramet_m.o dimens_m.o histwrite.o 
-flxadjtq.o : FCTTRE.o yoethf.o suphec.o dimphy.o dimens_m.o 
-flxasc.o : YOECUMF.o yoethf.o suphec.o dimphy.o dimens_m.o 
-flxbase.o : yoethf.o suphec.o dimphy.o dimens_m.o 
-flxddraf.o : YOECUMF.o yoethf.o suphec.o dimphy.o dimens_m.o 
-flxdlfs.o : YOECUMF.o yoethf.o suphec.o dimphy.o dimens_m.o 
+flxadjtq.o : FCTTRE.o yoethf.o suphec.o dimphy.o 
+flxasc.o : YOECUMF.o suphec.o flxadjtq.o dimphy.o 
+flxbase.o : yoethf.o suphec.o flxadjtq.o dimphy.o dimens_m.o 
+flxddraf.o : YOECUMF.o yoethf.o suphec.o flxadjtq.o dimphy.o dimens_m.o 
+flxdlfs.o : YOECUMF.o yoethf.o suphec.o flxadjtq.o dimphy.o dimens_m.o 
 flxdtdq.o : YOECUMF.o yoethf.o suphec.o dimphy.o dimens_m.o 
-flxflux.o : YOECUMF.o FCTTRE.o yoethf.o suphec.o dimphy.o dimens_m.o 
-flxini.o : yoethf.o suphec.o dimphy.o dimens_m.o 
-flxmain.o : YOECUMF.o yoethf.o suphec.o dimphy.o 
+flxflux.o : FCTTRE.o yoethf.o suphec.o dimphy.o 
+flxini.o : suphec.o flxadjtq.o dimphy.o 
+flxmain.o : yoethf.o YOECUMF.o suphec.o flxini.o flxflux.o flxasc.o dimphy.o 
 fonte_neige.o : interface_surf.o FCTTRE.o yoethf.o suphec.o indicesol.o 
 fxhyp.o : paramet_m.o dimens_m.o 
 fxy.o : serre.o dimens_m.o 
@@ -174,7 +174,7 @@ iniconst.o : conf_gcm.o disvert.o comconst.o dimens_m.o
 inidissip.o : paramet_m.o nxgraro2.o gradiv2.o filtreg.o divgrad2.o conf_gcm.o disvert.o comdissnew.o comconst.o dimens_m.o 
 inifgn.o : coefils.o serre.o comgeom.o paramet_m.o dimens_m.o 
 inifilr.o : coefils.o serre.o comgeom.o conf_gcm.o dimens_m.o 
-inigeom.o : serre.o paramet_m.o fxy.o dimens_m.o conf_gcm.o comdissnew.o comgeom.o comconst.o 
+inigeom.o : serre.o paramet_m.o fxyhyper.o fxy.o dimens_m.o conf_gcm.o comdissnew.o comgeom.o comconst.o 
 inigrads.o : gradsdef.o 
 init_dynzon.o : temps.o comgeom.o disvert.o dimens_m.o calendar.o histvert.o histend.o histdef.o histbeg_totreg.o conf_gcm.o 
 initdynav.o : temps.o paramet_m.o iniadvtrac.o histvert.o histend.o histdef.o histbeg_totreg.o disvert.o dimens_m.o comgeom.o calendar.o 

@@ -3,6 +3,7 @@
                  lddraf, pen_d, pde_d)
       use dimens_m
       use dimphy
+      use flxadjtq_m, only: flxadjtq
       use SUPHEC_M
       use yoethf_m
             use yoecumf

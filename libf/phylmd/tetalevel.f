@@ -32,7 +32,7 @@ c   -----------
       logical lnew
 
       REAL pgcm(ilon,ilev)
-      REAL Qgcm(ilon,ilev)
+      REAL, intent(in):: Qgcm(ilon,ilev)
       real pres
       REAL Qpres(ilon)
 
@@ -111,8 +111,6 @@ c======================================================================
 
       do i=1,ilon
          Qpres(i)= Qgcm(i,lb(i))*aisb(i)+Qgcm(i,lt(i))*aist(i)
-cIM      PRINT*,'i,Qgcm,Qpres',i,Qgcm(i,lb(i)),aisb(i),
-cIM  $   Qgcm(i,lt(i)),aist(i),Qpres(i)
       enddo
 c
 c Je mets les vents a zero quand je rencontre une montagne

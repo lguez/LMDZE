@@ -2,7 +2,7 @@ module yoecumf
 
   ! From phylmd/YOECUMF.h, version 1.1.1.1 2004/05/19 12:53:07
 
-  ! M. Tiedtke, E. C. M. W. F., 18th Jan. 1989
+  ! M. Tiedtke, ECMWF, 18th Jan. 1989
   ! Parameters for cumulus massflux scheme
 
   implicit none
@@ -42,8 +42,8 @@ contains
     CPRCON = 2E-4 ! CONVERSION FROM CLOUD WATER TO RAIN
 
     RHCDD = 1.
-    ! RELATIVE SATURATION IN DOWNDRAFtS (NO LONGER USED) (FORMULATION
-    ! IMPLIES SATURATION)
+    ! relative saturation in downdrafts (no longer used) (formulation
+    ! implies saturation)
 
     LMFPEN = .TRUE.
     LMFSCV = .TRUE.

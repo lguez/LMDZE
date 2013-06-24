@@ -2,6 +2,7 @@
            ptu, pqu, plu, ldcum, kcbot, klab)
       use dimens_m
       use dimphy
+      use flxadjtq_m, only: flxadjtq
       use SUPHEC_M
       use yoethf_m
       IMPLICIT none

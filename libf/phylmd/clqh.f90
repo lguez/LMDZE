@@ -26,15 +26,17 @@ contains
     USE suphec_m, ONLY : rcpd, rd, rg, rkappa
 
     ! Arguments:
-    INTEGER knon
+    INTEGER, intent(in):: knon
     REAL, intent(in):: dtime              ! intervalle du temps (s)
     real, intent(in):: date0
     REAL u1lay(klon)        ! vitesse u de la 1ere couche (m/s)
     REAL v1lay(klon)        ! vitesse v de la 1ere couche (m/s)
-    REAL coef(klon, klev)    ! le coefficient d'echange (m**2/s)
-    !                               multiplie par le cisaillement du 
-    !                               vent (dV/dz); la premiere valeur
-    !                               indique la valeur de Cdrag (sans unite)
+
+    REAL, intent(in):: coef(:, :) ! (knon, klev)
+    ! Le coefficient d'echange (m**2/s) multiplie par le cisaillement
+    ! du vent (dV/dz). La premiere valeur indique la valeur de Cdrag
+    ! (sans unite).
+
     REAL t(klon, klev)       ! temperature (K)
     REAL q(klon, klev)       ! humidite specifique (kg/kg)
     REAL ts(klon)           ! temperature du sol (K)
@@ -268,28 +270,22 @@ contains
     peqBcoef = 0.
     p1lay =0.
 
-    !      do i = 1, knon
     petAcoef(1:knon) = zx_ch(1:knon, 1)
     peqAcoef(1:knon) = zx_cq(1:knon, 1)
     petBcoef(1:knon) =  zx_dh(1:knon, 1)
     peqBcoef(1:knon) = zx_dq(1:knon, 1)
-    tq_cdrag(1:knon) =coef(1:knon, 1)
+    tq_cdrag(1:knon) =coef(:knon, 1)
     temp_air(1:knon) =t(1:knon, 1)
     epot_air(1:knon) =local_h(1:knon, 1)
     spechum(1:knon)=q(1:knon, 1)
     p1lay(1:knon) = pplay(1:knon, 1)
     zlev1(1:knon) = delp(1:knon, 1)
-    !        swnet = swdown * (1. - albedo)
 
-    !IM swdown=flux SW incident sur terres
-    !IM swdown=flux SW net sur les autres surfaces 
-    !IM     swdown(1:knon) = swnet(1:knon)
     if(nisurf.eq.is_ter) THEN 
        swdown(1:knon) = swnet(1:knon)/(1-albedo(1:knon)) 
     else 
        swdown(1:knon) = swnet(1:knon)
     endif
-    !      enddo
     ccanopy = co2_ppm
 
     CALL interfsurf_hq(itime, dtime, date0, jour, rmu0, &

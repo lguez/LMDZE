@@ -6,7 +6,7 @@ netcdf_lib_dir =
 
 numer_rec_95_dir = /user/guez_local/lib/Numer_Rec_95_gfortran_debug
 nr_util_dir = /user/guez_local/lib/NR_util_gfortran_debug
-netcdf95_dir = /user/guez_local/lib/NetCDF95_gfortran
+netcdf95_dir = /user/guez_local/lib/NetCDF95_gfortran_debug
 jumble_dir = /user/guez_local/lib/Jumble_debug
 
 # Include flags:

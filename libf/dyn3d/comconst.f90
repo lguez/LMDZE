@@ -10,7 +10,7 @@ module comconst
   integer lllmm1, lllmp1, lcl
   REAL dtvr ! time step for dynamics (in s)
   real, parameter:: daysec = 86400. ! number of seconds per day
-  REAL dtphys
+  REAL dtphys ! time step of integration
   real, parameter:: rad = 6371229. ! radius of the Earth (in m)
   real r
   real, parameter:: cpp = 1004.70885 ! J K-1 kg-1

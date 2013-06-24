@@ -38,7 +38,7 @@ CONTAINS
     REAL, intent(inout):: teta(ip1jmp1, llm) ! temperature potentielle 
     REAL q(ip1jmp1, llm) ! temperature potentielle 
     REAL ps(ip1jmp1) ! pression au sol
-    REAL masse(ip1jmp1, llm) ! masse d'air
+    REAL, intent(out):: masse(ip1jmp1, llm) ! masse d'air
 
     ! variables dynamiques pour les reanalyses.
     REAL, save:: ucovrea1(ip1jmp1, llm), vcovrea1(ip1jm, llm) !vts cov reas

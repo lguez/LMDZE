@@ -19,8 +19,7 @@ contains
     REAL, intent(in):: yu(klon, klev), yv(klon, klev) ! wind, in m s-1
     REAL, intent(in):: yt(klon, klev) ! temperature, in K
     REAL, intent(in):: yq(klon, klev)
-
-    REAL, intent(in):: ycoefm(klon) ! drag coefficient
+    REAL, intent(in):: ycoefm(:) ! (ngrid) drag coefficient
 
     REAL, intent(inout):: km(klon, klev)
     ! coefficient de diffusion turbulente de quantité de mouvement (au
@@ -74,7 +73,7 @@ contains
     enddo
 
     forall (k = 2: klev) zlev(:, k) = 0.5 * (zlay(:, k) + zlay(:, k-1))
-    ustar = SQRT(ycoefm(:ngrid) * (yu(:ngrid, 1)**2 + yv(:ngrid, 1)**2))
+    ustar = SQRT(ycoefm * (yu(:ngrid, 1)**2 + yv(:ngrid, 1)**2))
 
     ! Fin de la partie qui doit être incluse à terme dans clmain
 

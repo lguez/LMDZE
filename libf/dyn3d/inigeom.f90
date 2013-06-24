@@ -62,6 +62,7 @@ contains
     use conf_gcm_m, ONLY : fxyhypb, ysinus
     USE dimens_m, ONLY : iim, jjm
     use fxy_m, only: fxy
+    use fxyhyper_m, only: fxyhyper
     use jumble, only: new_unit
     use nr_util, only: pi
     USE paramet_m, ONLY : iip1, jjp1

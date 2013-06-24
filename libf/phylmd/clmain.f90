@@ -11,7 +11,7 @@ contains
        rain_fall, snow_f, solsw, sollw, sollwdown, fder, rlon, rlat, cufi, &
        cvfi, rugos, debut, lafin, agesno, rugoro, d_t, d_q, d_u, d_v, &
        d_ts, flux_t, flux_q, flux_u, flux_v, cdragh, cdragm, q2, &
-       dflux_t, dflux_q, zcoefh, zu1, zv1, t2m, q2m, u10m, v10m, pblh, &
+       dflux_t, dflux_q, ycoefh, zu1, zv1, t2m, q2m, u10m, v10m, pblh, &
        capcl, oliqcl, cteicl, pblt, therm, trmb1, trmb2, trmb3, plcl, &
        fqcalving, ffonte, run_off_lic_0, flux_o, flux_g, tslab, seaice)
 
@@ -25,7 +25,7 @@ contains
     ! sol.
 
     ! Pour pouvoir extraire les coefficients d'échanges et le vent
-    ! dans la première couche, trois champs ont été créés : "zcoefh",
+    ! dans la première couche, trois champs ont été créés : "ycoefh",
     ! "zu1" et "zv1". Nous avons moyenné les valeurs de ces trois
     ! champs sur les quatre sous-surfaces du modèle.
 
@@ -69,63 +69,19 @@ contains
     REAL, INTENT(IN):: u(klon, klev), v(klon, klev) ! vitesse
     INTEGER, INTENT(IN):: jour ! jour de l'annee en cours
     REAL, intent(in):: rmu0(klon) ! cosinus de l'angle solaire zenithal     
-    REAL, INTENT(IN):: paprs(klon, klev+1) ! pression a intercouche (Pa)
-    REAL, INTENT(IN):: pplay(klon, klev) ! pression au milieu de couche (Pa)
-    REAL, INTENT(IN):: rlon(klon)
-    REAL, INTENT(IN):: rlat(klon) ! latitude en degrés
-    REAL cufi(klon), cvfi(klon)
-    ! cufi-----input-R- resolution des mailles en x (m)
-    ! cvfi-----input-R- resolution des mailles en y (m)
-    REAL d_t(klon, klev), d_q(klon, klev)
-    ! d_t------output-R- le changement pour "t"
-    ! d_q------output-R- le changement pour "q"
-
-    REAL, intent(out):: d_u(klon, klev), d_v(klon, klev)
-    ! changement pour "u" et "v"
-
-    REAL flux_t(klon, klev, nbsrf), flux_q(klon, klev, nbsrf)
-    ! flux_t---output-R- flux de chaleur sensible (CpT) J/m**2/s (W/m**2)
-    !                    (orientation positive vers le bas)
-    ! flux_q---output-R- flux de vapeur d'eau (kg/m**2/s)
-    REAL dflux_t(klon), dflux_q(klon)
-    ! dflux_t derive du flux sensible
-    ! dflux_q derive du flux latent
-    !IM "slab" ocean
-    REAL flux_o(klon), flux_g(klon)
-    !IM "slab" ocean
-    ! flux_g---output-R-  flux glace (pour OCEAN='slab  ')
-    ! flux_o---output-R-  flux ocean (pour OCEAN='slab  ')
-    REAL y_flux_o(klon), y_flux_g(klon)
-    REAL tslab(klon), ytslab(klon)
-    ! tslab-in/output-R temperature du slab ocean (en Kelvin) 
-    ! uniqmnt pour slab
-    REAL seaice(klon), y_seaice(klon)
-    ! seaice---output-R-  glace de mer (kg/m2) (pour OCEAN='slab  ')
-    REAL y_fqcalving(klon), y_ffonte(klon)
-    REAL fqcalving(klon, nbsrf), ffonte(klon, nbsrf)
-    ! ffonte----Flux thermique utilise pour fondre la neige
-    ! fqcalving-Flux d'eau "perdue" par la surface et necessaire pour limiter la
-    !           hauteur de neige, en kg/m2/s
-    REAL run_off_lic_0(klon), y_run_off_lic_0(klon)
-
-    REAL flux_u(klon, klev, nbsrf), flux_v(klon, klev, nbsrf)
-    ! flux_u---output-R- tension du vent X: (kg m/s)/(m**2 s) ou Pascal
-    ! flux_v---output-R- tension du vent Y: (kg m/s)/(m**2 s) ou Pascal
-    REAL rugmer(klon), agesno(klon, nbsrf)
-    REAL, INTENT(IN):: rugoro(klon)
-    REAL, INTENT(out):: cdragh(klon), cdragm(klon)
-    ! taux CO2 atmosphere                     
-    REAL co2_ppm
-    LOGICAL, INTENT(IN):: debut
-    LOGICAL, INTENT(IN):: lafin
+    REAL co2_ppm ! taux CO2 atmosphere
     LOGICAL ok_veget
     CHARACTER(len=*), INTENT(IN):: ocean
     INTEGER npas, nexca
-
-    REAL ts(klon, nbsrf)
-    ! ts-------input-R- temperature du sol (en Kelvin)
-    REAL d_ts(klon, nbsrf)
-    ! d_ts-----output-R- le changement pour "ts"
+    REAL ts(klon, nbsrf) ! input-R- temperature du sol (en Kelvin)
+    LOGICAL, INTENT(IN):: soil_model
+    REAL cdmmax, cdhmax ! seuils cdrm, cdrh
+    REAL ksta, ksta_ter
+    LOGICAL ok_kzmin
+    REAL ftsoil(klon, nsoilmx, nbsrf)
+    REAL qsol(klon)
+    REAL, INTENT(IN):: paprs(klon, klev+1) ! pression a intercouche (Pa)
+    REAL, INTENT(IN):: pplay(klon, klev) ! pression au milieu de couche (Pa)
     REAL snow(klon, nbsrf)
     REAL qsurf(klon, nbsrf)
     REAL evap(klon, nbsrf)
@@ -135,27 +91,102 @@ contains
     REAL fluxlat(klon, nbsrf)
 
     REAL, intent(in):: rain_fall(klon), snow_f(klon)
+    REAL solsw(klon, nbsrf), sollw(klon, nbsrf), sollwdown(klon)
     REAL fder(klon)
+    REAL, INTENT(IN):: rlon(klon)
+    REAL, INTENT(IN):: rlat(klon) ! latitude en degrés
 
-    REAL sollw(klon, nbsrf), solsw(klon, nbsrf), sollwdown(klon)
+    REAL cufi(klon), cvfi(klon)
+    ! cufi-----input-R- resolution des mailles en x (m)
+    ! cvfi-----input-R- resolution des mailles en y (m)
+
     REAL rugos(klon, nbsrf)
     ! rugos----input-R- longeur de rugosite (en m)
 
-    REAL zcoefh(klon, klev)
-    REAL zu1(klon)
+    LOGICAL, INTENT(IN):: debut
+    LOGICAL, INTENT(IN):: lafin
+    real agesno(klon, nbsrf)
+    REAL, INTENT(IN):: rugoro(klon)
+
+    REAL d_t(klon, klev), d_q(klon, klev)
+    ! d_t------output-R- le changement pour "t"
+    ! d_q------output-R- le changement pour "q"
+
+    REAL, intent(out):: d_u(klon, klev), d_v(klon, klev)
+    ! changement pour "u" et "v"
+
+    REAL d_ts(klon, nbsrf)
+    ! d_ts-----output-R- le changement pour "ts"
+
+    REAL flux_t(klon, klev, nbsrf), flux_q(klon, klev, nbsrf)
+    ! flux_t---output-R- flux de chaleur sensible (CpT) J/m**2/s (W/m**2)
+    !                    (orientation positive vers le bas)
+    ! flux_q---output-R- flux de vapeur d'eau (kg/m**2/s)
+
+    REAL flux_u(klon, klev, nbsrf), flux_v(klon, klev, nbsrf)
+    ! flux_u---output-R- tension du vent X: (kg m/s)/(m**2 s) ou Pascal
+    ! flux_v---output-R- tension du vent Y: (kg m/s)/(m**2 s) ou Pascal
+
+    REAL, INTENT(out):: cdragh(klon), cdragm(klon)
+    real q2(klon, klev+1, nbsrf)
+
+    REAL dflux_t(klon), dflux_q(klon)
+    ! dflux_t derive du flux sensible
+    ! dflux_q derive du flux latent
+    !IM "slab" ocean
+
+    REAL, intent(out):: ycoefh(klon, klev)
+    REAL, intent(out):: zu1(klon)
     REAL zv1(klon)
+    REAL t2m(klon, nbsrf), q2m(klon, nbsrf)
+    REAL u10m(klon, nbsrf), v10m(klon, nbsrf)
 
-    !$$$ PB ajout pour soil
-    LOGICAL, INTENT(IN):: soil_model
-    !IM ajout seuils cdrm, cdrh
-    REAL cdmmax, cdhmax
+    !IM cf. AM : pbl, hbtm (Comme les autres diagnostics on cumule ds
+    ! physiq ce qui permet de sortir les grdeurs par sous surface)
+    REAL pblh(klon, nbsrf)
+    ! pblh------- HCL
+    REAL capcl(klon, nbsrf)
+    REAL oliqcl(klon, nbsrf)
+    REAL cteicl(klon, nbsrf)
+    REAL pblt(klon, nbsrf)
+    ! pblT------- T au nveau HCL
+    REAL therm(klon, nbsrf)
+    REAL trmb1(klon, nbsrf)
+    ! trmb1-------deep_cape
+    REAL trmb2(klon, nbsrf)
+    ! trmb2--------inhibition
+    REAL trmb3(klon, nbsrf)
+    ! trmb3-------Point Omega
+    REAL plcl(klon, nbsrf)
+    REAL fqcalving(klon, nbsrf), ffonte(klon, nbsrf)
+    ! ffonte----Flux thermique utilise pour fondre la neige
+    ! fqcalving-Flux d'eau "perdue" par la surface et necessaire pour limiter la
+    !           hauteur de neige, en kg/m2/s
+    REAL run_off_lic_0(klon)
 
-    REAL ksta, ksta_ter
-    LOGICAL ok_kzmin
+    REAL flux_o(klon), flux_g(klon)
+    !IM "slab" ocean
+    ! flux_g---output-R-  flux glace (pour OCEAN='slab  ')
+    ! flux_o---output-R-  flux ocean (pour OCEAN='slab  ')
 
-    REAL ftsoil(klon, nsoilmx, nbsrf)
+    REAL tslab(klon)
+    ! tslab-in/output-R temperature du slab ocean (en Kelvin) 
+    ! uniqmnt pour slab
+
+    REAL seaice(klon)
+    ! seaice---output-R-  glace de mer (kg/m2) (pour OCEAN='slab  ')
+
+    ! Local:
+
+    REAL y_flux_o(klon), y_flux_g(klon)
+    real ytslab(klon)
+    real y_seaice(klon)
+    REAL y_fqcalving(klon), y_ffonte(klon)
+    real y_run_off_lic_0(klon)
+
+    REAL rugmer(klon)
+
     REAL ytsoil(klon, nsoilmx)
-    REAL qsol(klon)
 
     REAL yts(klon), yrugos(klon), ypct(klon), yz0_new(klon)
     REAL yalb(klon)
@@ -189,7 +220,7 @@ contains
     REAL yzlay(klon, klev), yzlev(klon, klev+1), yteta(klon, klev)
     REAL ykmm(klon, klev+1), ykmn(klon, klev+1)
     REAL ykmq(klon, klev+1)
-    REAL yq2(klon, klev+1), q2(klon, klev+1, nbsrf)
+    REAL yq2(klon, klev+1)
     REAL q2diag(klon, klev+1)
 
     REAL u1lay(klon), v1lay(klon)
@@ -221,8 +252,6 @@ contains
     DATA first_appel/ .TRUE./
     LOGICAL:: debugindex = .FALSE.
     INTEGER idayref
-    REAL t2m(klon, nbsrf), q2m(klon, nbsrf)
-    REAL u10m(klon, nbsrf), v10m(klon, nbsrf)
 
     REAL yt2m(klon), yq2m(klon), yu10m(klon)
     REAL yustar(klon)
@@ -233,23 +262,6 @@ contains
     ! -- LOOP
 
     REAL yt10m(klon), yq10m(klon)
-    !IM cf. AM : pbl, hbtm (Comme les autres diagnostics on cumule ds
-    ! physiq ce qui permet de sortir les grdeurs par sous surface)
-    REAL pblh(klon, nbsrf)
-    ! pblh------- HCL
-    REAL plcl(klon, nbsrf)
-    REAL capcl(klon, nbsrf)
-    REAL oliqcl(klon, nbsrf)
-    REAL cteicl(klon, nbsrf)
-    REAL pblt(klon, nbsrf)
-    ! pblT------- T au nveau HCL
-    REAL therm(klon, nbsrf)
-    REAL trmb1(klon, nbsrf)
-    ! trmb1-------deep_cape
-    REAL trmb2(klon, nbsrf)
-    ! trmb2--------inhibition
-    REAL trmb3(klon, nbsrf)
-    ! trmb3-------Point Omega
     REAL ypblh(klon)
     REAL ylcl(klon)
     REAL ycapcl(klon)
@@ -379,7 +391,7 @@ contains
     d_q = 0.
     d_u = 0.
     d_v = 0.
-    zcoefh = 0.
+    ycoefh = 0.
 
     ! Boucler sur toutes les sous-fractions du sol:
 
@@ -486,7 +498,7 @@ contains
              coefh(:knon, :) = max(coefh(:knon, :), ycoefh0(:knon, :))
           END IF
 
-          ! on seuille coefm et coefh
+          ! on met un seuil pour coefm et coefh
           IF (nsrf == is_oce) THEN
              coefm(:knon, 1) = min(coefm(:knon, 1), cdmmax)
              coefh(:knon, 1) = min(coefh(:knon, 1), cdhmax)
@@ -495,7 +507,7 @@ contains
           IF (ok_kzmin) THEN
              ! Calcul d'une diffusion minimale pour les conditions tres stables
              CALL coefkzmin(knon, ypaprs, ypplay, yu, yv, yt, yq, &
-                  coefm(:, 1), ycoefm0, ycoefh0)
+                  coefm(:knon, 1), ycoefm0, ycoefh0)
              coefm(:knon, :) = max(coefm(:knon, :), ycoefm0(:knon, :))
              coefh(:knon, :) = max(coefh(:knon, :), ycoefh0(:knon, :))
            END IF
@@ -551,26 +563,27 @@ contains
           END IF
 
           ! calculer la diffusion des vitesses "u" et "v"
-          CALL clvent(knon, dtime, yu1, yv1, coefm, yt, yu, ypaprs, ypplay, &
-               ydelp, y_d_u, y_flux_u)
-          CALL clvent(knon, dtime, yu1, yv1, coefm, yt, yv, ypaprs, ypplay, &
-               ydelp, y_d_v, y_flux_v)
+          CALL clvent(knon, dtime, yu1, yv1, coefm(:knon, :), yt, yu, ypaprs, &
+               ypplay, ydelp, y_d_u, y_flux_u)
+          CALL clvent(knon, dtime, yu1, yv1, coefm(:knon, :), yt, yv, ypaprs, &
+               ypplay, ydelp, y_d_v, y_flux_v)
 
           ! pour le couplage
           ytaux = y_flux_u(:, 1)
           ytauy = y_flux_v(:, 1)
 
           ! calculer la diffusion de "q" et de "h"
-          CALL clqh(dtime, itap, date0, jour, debut, lafin, rlon, rlat, &
-               cufi, cvfi, knon, nsrf, ni, pctsrf, soil_model, ytsoil, &
-               yqsol, ok_veget, ocean, npas, nexca, rmu0, co2_ppm, yrugos, &
-               yrugoro, yu1, yv1, coefh, yt, yq, yts, ypaprs, ypplay, &
-               ydelp, yrads, yalb, yalblw, ysnow, yqsurf, yrain_f, ysnow_f, &
-               yfder, ytaux, ytauy, ywindsp, ysollw, ysollwdown, ysolsw, &
-               yfluxlat, pctsrf_new, yagesno, y_d_t, y_d_q, y_d_ts, &
-               yz0_new, y_flux_t, y_flux_q, y_dflux_t, y_dflux_q, &
-               y_fqcalving, y_ffonte, y_run_off_lic_0, y_flux_o, y_flux_g, &
-               ytslab, y_seaice)
+          CALL clqh(dtime, itap, date0, jour, debut, lafin, rlon, &
+               rlat, cufi, cvfi, knon, nsrf, ni, pctsrf, soil_model, &
+               ytsoil, yqsol, ok_veget, ocean, npas, nexca, rmu0, &
+               co2_ppm, yrugos, yrugoro, yu1, yv1, coefh(:knon, :), &
+               yt, yq, yts, ypaprs, ypplay, ydelp, yrads, yalb, &
+               yalblw, ysnow, yqsurf, yrain_f, ysnow_f, yfder, ytaux, &
+               ytauy, ywindsp, ysollw, ysollwdown, ysolsw, yfluxlat, &
+               pctsrf_new, yagesno, y_d_t, y_d_q, y_d_ts, yz0_new, &
+               y_flux_t, y_flux_q, y_dflux_t, y_dflux_q, y_fqcalving, &
+               y_ffonte, y_run_off_lic_0, y_flux_o, y_flux_g, ytslab, &
+               y_seaice)
 
           ! calculer la longueur de rugosite sur ocean
           yrugm = 0.
@@ -663,7 +676,7 @@ contains
                 d_q(i, k) = d_q(i, k) + y_d_q(j, k)
                 d_u(i, k) = d_u(i, k) + y_d_u(j, k)
                 d_v(i, k) = d_v(i, k) + y_d_v(j, k)
-                zcoefh(i, k) = zcoefh(i, k) + coefh(j, k)
+                ycoefh(i, k) = ycoefh(i, k) + coefh(j, k)
              END DO
           END DO
 

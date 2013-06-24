@@ -4,20 +4,20 @@ module conflx_m
 
 contains
 
-  SUBROUTINE conflx (dtime, pres_h, pres_f, t, q, con_t, con_q, pqhfl, w, &
+  SUBROUTINE conflx (dtime, pres_h, pres_f, t, q, con_t, con_q, qhfl, w, &
        d_t, d_q, rain, snow, pmfu, pmfd, pen_u, pde_u, pen_d, pde_d, kcbot, &
        kctop, kdtop, pmflxr, pmflxs)
 
     ! From LMDZ4/libf/phylmd/conflx.F, version 1.1.1.1 2004/05/19 12:53:08
 
     ! Author: Z. X. Li (LMD/CNRS)
-    ! date: 1994/10/14
+    ! Date: 1994/10/14
 
-    ! Objet: schéma flux de masse pour la convection (schéma de
+    ! Objet: schéma en flux de masse pour la convection (schéma de
     ! Tiedtke avec quelques modifications mineures)
 
     ! Décembre 1997 : prise en compte des modifications introduites
-    ! par Olivier Boucher et Alexandre Armengaud pour mélange et
+    ! par Olivier Boucher et Alexandre Armengaud pour le mélange et le
     ! lessivage des traceurs passifs.
 
     use flxmain_m, only: flxmain
@@ -26,42 +26,44 @@ contains
     USE yoethf_m, ONLY: r2es
     USE fcttre, ONLY: foeew
 
-    ! Entree:
-    REAL, intent(in):: dtime            ! pas d'integration (s)
-    REAL, intent(in):: pres_h(klon, klev+1) ! pression half-level (Pa)
-    REAL, intent(in):: pres_f(klon, klev)! pression full-level (Pa)
-    REAL, intent(in):: t(klon, klev)     ! temperature (K)
-    REAL q(klon, klev)     ! humidite specifique (g/g)
-    REAL w(klon, klev)     ! vitesse verticale (Pa/s)
-    REAL con_t(klon, klev) ! convergence de temperature (K/s)
-    REAL con_q(klon, klev) ! convergence de l'eau vapeur (g/g/s)
-    REAL pqhfl(klon)      ! evaporation (negative vers haut) mm/s
+    REAL, intent(in):: dtime ! pas d'integration (s)
+    REAL, intent(in):: pres_h(:, :) ! (klon, klev+1) pression half-level (Pa)
+    REAL, intent(in):: pres_f(:, :) ! (klon, klev) pression full-level (Pa)
+    REAL, intent(in):: t(:, :) ! (klon, klev) temperature (K)
+    REAL, intent(in):: q(:, :) ! (klon, klev) humidité spécifique (g/g)
 
-    ! Sortie:
-    REAL d_t(klon, klev)   ! incrementation de temperature
-    REAL d_q(klon, klev)   ! incrementation d'humidite
+    REAL, intent(in):: con_t(:, :)
+    ! (klon, klev) convergence de temperature (K/s)
+
+    REAL, intent(in):: con_q(:, :) 
+    ! (klon, klev) convergence de l'eau vapeur (g/g/s)
+
+    REAL, intent(in):: qhfl(:) ! (klon) evaporation (negative vers haut) mm/s
+    REAL, intent(in):: w(:, :) ! (klon, klev) vitesse verticale (Pa/s)
+
+    REAL, intent(out):: d_t(:, :) ! (klon, klev) incrementation de temperature
+    REAL, intent(out):: d_q(:, :) ! (klon, klev) incrementation d'humidite
+    REAL, intent(out):: rain(:) ! (klon) pluie (mm/s)
+    REAL, intent(out):: snow(:) ! (klon) neige (mm/s)
 
     REAL, intent(out):: pmfu(:, :) ! (klon, klev)
     ! flux masse (kg/m2/s) panache ascendant
-    
+
     REAL, intent(out):: pmfd(:, :) ! (klon, klev)
     ! flux masse (kg/m2/s) panache descendant
 
-    REAL pen_u(klon, klev)
-    REAL pen_d(klon, klev)
-    REAL pde_u(klon, klev)
-    REAL pde_d(klon, klev)
-    REAL rain(klon)       ! pluie (mm/s)
-    REAL snow(klon)       ! neige (mm/s)
-    REAL pmflxr(klon, klev+1)
-    REAL pmflxs(klon, klev+1)
-    INTEGER kcbot(klon)  ! niveau du bas de la convection
-    INTEGER kctop(klon)  ! niveau du haut de la convection
-    INTEGER kdtop(klon)  ! niveau du haut des downdrafts
+    REAL, intent(out):: pen_u(:, :) ! (klon, klev)
+    REAL, intent(out):: pde_u(:, :) ! (klon, klev)
+    REAL, intent(out):: pen_d(:, :) ! (klon, klev)
+    REAL, intent(out):: pde_d(:, :) ! (klon, klev)
+    INTEGER, intent(out):: kcbot(:) ! (klon) niveau du bas de la convection
+    INTEGER, intent(out):: kctop(:) ! (klon) niveau du haut de la convection
+    INTEGER, intent(out):: kdtop(:) ! (klon) niveau du haut des downdrafts
+    REAL, intent(out):: pmflxr(:, :) ! (klon, klev+1)
+    REAL, intent(out):: pmflxs(:, :) ! (klon, klev+1)
 
     ! Local:
 
-    REAL pt(klon, klev)
     REAL pq(klon, klev)
     REAL pqs(klon, klev)
     REAL pvervel(klon, klev)
@@ -85,7 +87,7 @@ contains
     REAL zmflxs(klon, klev+1)
 
     INTEGER i, k
-    REAL zdelta, zqsat
+    REAL zqsat
 
     !--------------------------------------------------------------------
 
@@ -131,7 +133,6 @@ contains
     ! verticaux augmente du haut vers le bas)
     DO k = 1, klev
        DO i = 1, klon
-          pt(i, k) = t(i, klev-k+1)
           pq(i, k) = q(i, klev-k+1)
           paprsf(i, k) = pres_f(i, klev-k+1)
           paprs(i, k) = pres_h(i, klev+1-k+1)
@@ -139,30 +140,27 @@ contains
           zcvgt(i, k) = con_t(i, klev-k+1)
           zcvgq(i, k) = con_q(i, klev-k+1)
 
-          zdelta=MAX(0., SIGN(1., RTT-pt(i, k)))
-          zqsat=R2ES*FOEEW ( pt(i, k), zdelta ) / paprsf(i, k)
-          zqsat=MIN(0.5, zqsat)
-          zqsat=zqsat/(1.-RETV  *zqsat)
-          pqs(i, k) = zqsat
+          zqsat = MIN(0.5, R2ES * FOEEW(t(i, k), &
+               merge(0., 1., rtt < t(i, k))) / paprsf(i, k))
+          pqs(i, k) = zqsat / (1. - RETV * zqsat)
        ENDDO
     ENDDO
     DO i = 1, klon
        paprs(i, klev+1) = pres_h(i, 1)
-       zgeom(i, klev) = RD * pt(i, klev) &
+       zgeom(i, klev) = RD * t(i, klev) &
             / (0.5*(paprs(i, klev+1)+paprsf(i, klev))) &
             * (paprs(i, klev+1)-paprsf(i, klev))
     ENDDO
     DO k = klev-1, 1, -1
        DO i = 1, klon
           zgeom(i, k) = zgeom(i, k+1) &
-               + RD * 0.5*(pt(i, k+1)+pt(i, k)) / paprs(i, k+1) &
+               + RD * 0.5*(t(i, k+1)+t(i, k)) / paprs(i, k+1) &
                * (paprsf(i, k+1)-paprsf(i, k))
        ENDDO
     ENDDO
 
-    ! appeler la routine principale
-
-    CALL flxmain(dtime, pt, pq, pqs, pqhfl, paprsf, paprs, zgeom, land, &
+    ! Appeler la routine principale :
+    CALL flxmain(dtime, t, pq, pqs, qhfl, paprsf, paprs, zgeom, land, &
          zcvgt, zcvgq, pvervel, rain, snow, kcbot, kctop, kdtop, zmfu, zmfd, &
          zen_u, zde_u, zen_d, zde_d, d_t_bis, d_q_bis, zmflxr, zmflxs)
 
@@ -192,8 +190,8 @@ contains
 
     DO k = 1, klev
        DO i = 1, klon
-          pen_u(i, klev+1-k)=  zen_u(i, k)
-          pde_u(i, klev+1-k)=  zde_u(i, k)
+          pen_u(i, klev+1-k)= zen_u(i, k)
+          pde_u(i, klev+1-k)= zde_u(i, k)
        ENDDO
     ENDDO
 

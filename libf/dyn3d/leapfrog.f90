@@ -45,7 +45,7 @@ contains
     ! potential temperature
 
     REAL, intent(inout):: ps(:, :) ! (iim + 1, jjm + 1) pression au sol, en Pa
-    REAL masse(:, :, :) ! (iim + 1, jjm + 1, llm) masse d'air
+    REAL, intent(inout):: masse(:, :, :) ! (iim + 1, jjm + 1, llm) masse d'air
     REAL, intent(in):: phis(:, :) ! (iim + 1, jjm + 1) surface geopotential
 
     REAL, intent(inout):: q(:, :, :, :) ! (iim + 1, jjm + 1, llm, nqmx)
@@ -57,7 +57,7 @@ contains
 
     ! Variables dynamiques:
 
-    REAL pks((iim + 1) * (jjm + 1)) ! exner au sol
+    REAL pks(iim + 1, jjm + 1) ! exner au sol
     REAL pk(iim + 1, jjm + 1, llm) ! exner au milieu des couches
     REAL pkf(iim + 1, jjm + 1, llm) ! exner filtré au milieu des couches
     REAL phi(iim + 1, jjm + 1, llm) ! geopotential
@@ -135,7 +135,7 @@ contains
        end if
 
        ! Calcul des tendances dynamiques:
-       CALL geopot((iim + 1) * (jjm + 1), teta, pk, pks, phis, phi)
+       CALL geopot(teta, pk, pks, phis, phi)
        CALL caldyn(itau, ucov, vcov, teta, ps, masse, pk, pkf, phis, phi, &
             dudyn, dv, dteta, dp, w, pbaru, pbarv, time_0, &
             conser=MOD(itau, iconser)==0)
@@ -147,7 +147,7 @@ contains
        IF (offline) CALL fluxstokenc(pbaru, pbarv, masse, teta, phi, phis, &
             dtvr, itau)
 
-       ! Integrations dynamique et traceurs:
+       ! Intégrations dynamique et traceurs:
        CALL integrd(vcovm1, ucovm1, tetam1, psm1, massem1, dv, dudyn, dteta, &
             dp, vcov, ucov, teta, q(:, :, :, :2), ps, masse, finvmaold, dt, &
             leapf)
@@ -158,7 +158,7 @@ contains
           CALL exner_hyb(ps, p3d, pks, pk, pkf)
 
           ! Calcul des tendances dynamiques:
-          CALL geopot((iim + 1) * (jjm + 1), teta, pk, pks, phis, phi)
+          CALL geopot(teta, pk, pks, phis, phi)
           CALL caldyn(itau + 1, ucov, vcov, teta, ps, masse, pk, pkf, phis, &
                phi, dudyn, dv, dteta, dp, w, pbaru, pbarv, time_0, &
                conser=.false.)
@@ -185,8 +185,8 @@ contains
                lafin = itau + 1 == itaufin)
 
           ! Ajout des tendances physiques:
-          CALL addfi(nqmx, dtphys, ucov, vcov, teta, q, ps, dufi, dvfi, &
-               dtetafi, dqfi, dpfi)
+          CALL addfi(nqmx, ucov, vcov, teta, q, ps, dufi, dvfi, dtetafi, &
+               dqfi, dpfi)
        ENDIF
 
        forall (l = 1: llm + 1) p3d(:, :, l) = ap(l) + bp(l) * ps
@@ -233,7 +233,7 @@ contains
        ENDIF
 
        IF (MOD(itau + 1, iecri * day_step) == 0) THEN
-          CALL geopot((iim + 1) * (jjm + 1), teta, pk, pks, phis, phi)
+          CALL geopot(teta, pk, pks, phis, phi)
           CALL writehist(itau, vcov, ucov, teta, phi, q, masse, ps)
        END IF
     end do time_integration
@@ -242,7 +242,7 @@ contains
          itau = itau_dyn + itaufin)
 
     ! Calcul des tendances dynamiques:
-    CALL geopot((iim + 1) * (jjm + 1), teta, pk, pks, phis, phi)
+    CALL geopot(teta, pk, pks, phis, phi)
     CALL caldyn(itaufin, ucov, vcov, teta, ps, masse, pk, pkf, phis, phi, &
          dudyn, dv, dteta, dp, w, pbaru, pbarv, time_0, &
          conser = MOD(itaufin, iconser) == 0)

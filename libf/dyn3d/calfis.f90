@@ -10,8 +10,9 @@ contains
     ! From dyn3d/calfis.F, version 1.3 2005/05/25 13:10:09
     ! Authors: P. Le Van, F. Hourdin
 
-    ! 1. Réarrangement des tableaux et transformation variables
+    ! 1. Réarrangement des tableaux et transformation des variables
     ! dynamiques en variables physiques
+
     ! 2. Calcul des termes physiques
     ! 3. Retransformation des tendances physiques en tendances dynamiques
 
@@ -22,12 +23,25 @@ contains
 
     ! - La variable thermodynamique de la physique est une variable
     ! intensive : T.
-    ! Pour la dynamique on prend T * (preff / p(l)) **kappa
+    ! Pour la dynamique on prend T * (preff / p(l))**kappa
 
     ! - Les deux seules variables dépendant de la géométrie
     ! nécessaires pour la physique sont la latitude pour le
     ! rayonnement et l'aire de la maille quand on veut intégrer une
     ! grandeur horizontalement.
+
+    use comconst, only: kappa, cpp, dtphys, g
+    use comgeom, only: apoln, cu_2d, cv_2d, unsaire_2d, apols, rlonu, rlonv
+    use dimens_m, only: iim, jjm, llm, nqmx
+    use dimphy, only: klon
+    use disvert_m, only: preff
+    use grid_change, only: dyn_phy, gr_fi_dyn
+    use iniadvtrac_m, only: niadv
+    use nr_util, only: pi
+    use physiq_m, only: physiq
+    use pressure_var, only: p3d, pls
+
+    ! Arguments :
 
     ! Input :
     ! ucov covariant zonal velocity
@@ -47,47 +61,30 @@ contains
     ! pdtrad radiative tendencies \ input and output
     ! pfluxrad radiative fluxes / input and output
 
-    use comconst, only: kappa, cpp, dtphys, g
-    use disvert_m, only: preff
-    use comgeom, only: apoln, cu_2d, cv_2d, unsaire_2d, apols, rlonu, rlonv
-    use dimens_m, only: iim, jjm, llm, nqmx
-    use dimphy, only: klon
-    use grid_change, only: dyn_phy, gr_fi_dyn
-    use iniadvtrac_m, only: niadv
-    use nr_util, only: pi
-    use physiq_m, only: physiq
-    use pressure_var, only: p3d, pls
-
-    ! Arguments :
-
-    LOGICAL, intent(in):: lafin
+    REAL, intent(in):: rdayvrai
     REAL, intent(in):: time ! heure de la journée en fraction de jour
-
+    REAL, intent(in):: ucov(iim + 1, jjm + 1, llm)
     REAL vcov(iim + 1, jjm, llm)
-    REAL ucov(iim + 1, jjm + 1, llm)
     REAL, intent(in):: teta(iim + 1, jjm + 1, llm)
-    REAL masse(iim + 1, jjm + 1, llm)
 
     REAL, intent(in):: q(iim + 1, jjm + 1, llm, nqmx)
     ! (mass fractions of advected fields)
 
-    REAL, intent(in):: phis(iim + 1, jjm + 1)
-    REAL, intent(in):: phi(iim + 1, jjm + 1, llm)
-
-    REAL dv(iim + 1, jjm, llm)
-    REAL dudyn(iim + 1, jjm + 1, llm)
-    REAL dq(iim + 1, jjm + 1, llm, nqmx)
-
-    REAL, intent(in):: w(iim + 1, jjm + 1, llm)
-
+    REAL masse(iim + 1, jjm + 1, llm)
     REAL ps(iim + 1, jjm + 1)
     REAL, intent(in):: pk(iim + 1, jjm + 1, llm)
-
-    REAL dvfi(iim + 1, jjm, llm)
+    REAL, intent(in):: phis(iim + 1, jjm + 1)
+    REAL, intent(in):: phi(iim + 1, jjm + 1, llm)
+    REAL dudyn(iim + 1, jjm + 1, llm)
+    REAL dv(iim + 1, jjm, llm)
+    REAL dq(iim + 1, jjm + 1, llm, nqmx)
+    REAL, intent(in):: w(iim + 1, jjm + 1, llm)
     REAL dufi(iim + 1, jjm + 1, llm)
+    REAL dvfi(iim + 1, jjm, llm)
     REAL, intent(out):: dtetafi(iim + 1, jjm + 1, llm)
     REAL dqfi(iim + 1, jjm + 1, llm, nqmx)
     REAL dpfi(iim + 1, jjm + 1)
+    LOGICAL, intent(in):: lafin
 
     ! Local variables :
 
@@ -113,8 +110,6 @@ contains
     INTEGER, PARAMETER:: ntetaSTD=3
     REAL:: rtetaSTD(ntetaSTD) = (/350., 380., 405./)
     REAL PVteta(klon, ntetaSTD)
-
-    REAL, intent(in):: rdayvrai
 
     !-----------------------------------------------------------------------
 

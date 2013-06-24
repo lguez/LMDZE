@@ -115,7 +115,7 @@ C
       DO k = 1, KFLEV  ! convertir ozone de kg/kg en pa/pa
       DO i = 1, KDLON
 c convertir ozone de kg/kg en pa (modif MPL 100505)
-         ZOZ(i,k) = POZON(i,k)*PDP(i,k) * RMD/RMO3
+         ZOZ(i,k) = POZON(i,k)*PDP(i,k) * MD/RMO3
 c        print *,'LW: ZOZ*10**6=',ZOZ(i,k)*1000000.
       ENDDO
       ENDDO
