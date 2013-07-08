@@ -74,7 +74,7 @@ contains
 
     ! Tendances dynamiques
     REAL dv((iim + 1) * jjm, llm), dudyn((iim + 1) * (jjm + 1), llm)
-    REAL dteta(iim + 1, jjm + 1, llm), dq((iim + 1) * (jjm + 1), llm, nqmx)
+    REAL dteta(iim + 1, jjm + 1, llm)
     real dp((iim + 1) * (jjm + 1))
 
     ! Tendances de la dissipation :
@@ -95,7 +95,7 @@ contains
     INTEGER l
     REAL rdayvrai, rdaym_ini
 
-    ! Variables test conservation energie
+    ! Variables test conservation énergie
     REAL ecin(iim + 1, jjm + 1, llm), ecin0(iim + 1, jjm + 1, llm)
 
     REAL vcont((iim + 1) * jjm, llm), ucont((iim + 1) * (jjm + 1), llm)
@@ -109,8 +109,6 @@ contains
 
     itaufin = nday * day_step
     ! "day_step" is a multiple of "iperiod", therefore so is "itaufin".
-
-    dq = 0.
 
     ! On initialise la pression et la fonction d'Exner :
     forall (l = 1: llm + 1) p3d(:, :, l) = ap(l) + bp(l) * ps
@@ -140,8 +138,7 @@ contains
             dudyn, dv, dteta, dp, w, pbaru, pbarv, time_0, &
             conser=MOD(itau, iconser)==0)
 
-       ! Calcul des tendances advection des traceurs (dont l'humidité)
-       CALL caladvtrac(q, pbaru, pbarv, p3d, masse, dq, teta, pk)
+       CALL caladvtrac(q, pbaru, pbarv, p3d, masse, teta, pk)
 
        ! Stokage du flux de masse pour traceurs offline:
        IF (offline) CALL fluxstokenc(pbaru, pbarv, masse, teta, phi, phis, &
@@ -180,13 +177,12 @@ contains
           time = REAL(mod(itau, day_step)) / day_step + time_0
           IF (time > 1.) time = time - 1.
 
-          CALL calfis(rdayvrai, time, ucov, vcov, teta, q, masse, ps, pk, &
-               phis, phi, dudyn, dv, dq, w, dufi, dvfi, dtetafi, dqfi, dpfi, &
+          CALL calfis(rdayvrai, time, ucov, vcov, teta, q, ps, pk, phis, phi, &
+               dudyn, dv, w, dufi, dvfi, dtetafi, dqfi, dpfi, &
                lafin = itau + 1 == itaufin)
 
           ! Ajout des tendances physiques:
-          CALL addfi(nqmx, ucov, vcov, teta, q, ps, dufi, dvfi, dtetafi, &
-               dqfi, dpfi)
+          CALL addfi(ucov, vcov, teta, q, ps, dufi, dvfi, dtetafi, dqfi, dpfi)
        ENDIF
 
        forall (l = 1: llm + 1) p3d(:, :, l) = ap(l) + bp(l) * ps

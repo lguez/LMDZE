@@ -11,8 +11,8 @@ contains
     ! Objet : filtre matriciel longitudinal, avec les matrices précalculées
     ! pour l'opérateur filtre. 
 
-    USE dimens_m, ONLY: iim, jjm
     USE coefils, ONLY: sddu, sddv, unsddu, unsddv
+    USE dimens_m, ONLY: iim, jjm
     use inifilr_m, only: jfiltnu, jfiltnv, jfiltsu, jfiltsv, matriceun, &
          matriceus, matricevn, matricevs, matrinvn, matrinvs
 

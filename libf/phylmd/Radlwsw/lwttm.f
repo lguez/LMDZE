@@ -36,31 +36,32 @@ C     --------------
 C        ORIGINAL : 88-12-15
 C
 C-----------------------------------------------------------------------
-      REAL*8 O1H, O2H
+      DOUBLE PRECISION O1H, O2H
       PARAMETER (O1H=2230.)
       PARAMETER (O2H=100.)
-      REAL*8 RPIALF0
+      DOUBLE PRECISION RPIALF0
       PARAMETER (RPIALF0=2.0)
 C
 C* ARGUMENTS:
 C
-      REAL*8 PGA(KDLON,8,2) ! PADE APPROXIMANTS
-      REAL*8 PGB(KDLON,8,2) ! PADE APPROXIMANTS
-      REAL*8 PUU1(KDLON,NUA) ! ABSORBER AMOUNTS FROM TOP TO LEVEL 1
-      REAL*8 PUU2(KDLON,NUA) ! ABSORBER AMOUNTS FROM TOP TO LEVEL 2
-      REAL*8 PTT(KDLON,NTRA) ! TRANSMISSION FUNCTIONS
+      DOUBLE PRECISION PGA(KDLON,8,2) ! PADE APPROXIMANTS
+      DOUBLE PRECISION PGB(KDLON,8,2) ! PADE APPROXIMANTS
+      DOUBLE PRECISION PUU1(KDLON,NUA) ! ABSORBER AMOUNTS FROM TOP TO LEVEL 1
+      DOUBLE PRECISION PUU2(KDLON,NUA) ! ABSORBER AMOUNTS FROM TOP TO LEVEL 2
+      DOUBLE PRECISION PTT(KDLON,NTRA) ! TRANSMISSION FUNCTIONS
 C
 C* LOCAL VARIABLES:
 C
       INTEGER ja, jl
-      REAL*8 zz, zxd, zxn
-      REAL*8 zpu, zpu10, zpu11, zpu12, zpu13
-      REAL*8 zeu, zeu10, zeu11, zeu12, zeu13
-      REAL*8 zx, zy, zuxy, zsq1, zsq2, zvxy, zaercn, zto1, zto2
-      REAL*8 zxch4, zych4, zsqh41, zodh41
-      REAL*8 zxn2o, zyn2o, zsqn21, zodn21, zsqh42, zodh42
-      REAL*8 zsqn22, zodn22, za11, zttf11, za12, zttf12
-      REAL*8 zuu11, zuu12
+      DOUBLE PRECISION zz, zxd, zxn
+      DOUBLE PRECISION zpu, zpu10, zpu11, zpu12, zpu13
+      DOUBLE PRECISION zeu, zeu10, zeu11, zeu12, zeu13
+      DOUBLE PRECISION zx, zy, zuxy, zsq1, zsq2, zvxy, zaercn, zto1
+      DOUBLE PRECISION zto2
+      DOUBLE PRECISION zxch4, zych4, zsqh41, zodh41
+      DOUBLE PRECISION zxn2o, zyn2o, zsqn21, zodn21, zsqh42, zodh42
+      DOUBLE PRECISION zsqn22, zodn22, za11, zttf11, za12, zttf12
+      DOUBLE PRECISION zuu11, zuu12
 C     ------------------------------------------------------------------
 C
 C*         1.     HORNER'S ALGORITHM FOR H2O AND CO2 TRANSMISSION

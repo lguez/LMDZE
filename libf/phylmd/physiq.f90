@@ -265,8 +265,7 @@ contains
     REAL, save:: ftsoil(klon, nsoilmx, nbsrf)
     ! soil temperature of surface fraction
 
-    REAL fevap(klon, nbsrf)
-    SAVE fevap ! evaporation
+    REAL, save:: fevap(klon, nbsrf) ! evaporation
     REAL fluxlat(klon, nbsrf)
     SAVE fluxlat
 
@@ -348,7 +347,7 @@ contains
 
     REAL rain_tiedtke(klon), snow_tiedtke(klon)
 
-    REAL evap(klon), devap(klon) ! evaporation et sa derivee
+    REAL evap(klon), devap(klon) ! evaporation and its derivative
     REAL sens(klon), dsens(klon) ! chaleur sensible et sa derivee
     REAL dlw(klon) ! derivee infra rouge
     SAVE dlw
@@ -500,7 +499,7 @@ contains
     REAL d_u_ajs(klon, llm), d_v_ajs(klon, llm)
     REAL rneb(klon, llm)
 
-    REAL pmfu(klon, llm), pmfd(klon, llm)
+    REAL mfu(klon, llm), mfd(klon, llm)
     REAL pen_u(klon, llm), pen_d(klon, llm)
     REAL pde_u(klon, llm), pde_d(klon, llm)
     INTEGER kcbot(klon), kctop(klon), kdtop(klon)
@@ -1086,16 +1085,15 @@ contains
 
     if (iflag_con == 2) then
        z_avant = sum((q_seri + ql_seri) * zmasse, dim=2)
-       CALL conflx(dtphys, paprs, play, t_seri(:, llm:1:-1), q_seri, &
-            conv_t, conv_q, zxfluxq(:, 1), omega, d_t_con, d_q_con, &
-            rain_con, snow_con, pmfu, pmfd, pen_u, pde_u, pen_d, &
-            pde_d, kcbot, kctop, kdtop, pmflxr, pmflxs)
+       CALL conflx(dtphys, paprs, play, t_seri(:, llm:1:-1), &
+            q_seri(:, llm:1:-1), conv_t, conv_q, zxfluxq(:, 1), omega, &
+            d_t_con, d_q_con, rain_con, snow_con, mfu(:, llm:1:-1), &
+            mfd(:, llm:1:-1), pen_u, pde_u, pen_d, pde_d, kcbot, kctop, &
+            kdtop, pmflxr, pmflxs)
        WHERE (rain_con < 0.) rain_con = 0.
        WHERE (snow_con < 0.) snow_con = 0.
-       DO i = 1, klon
-          ibas_con(i) = llm + 1 - kcbot(i)
-          itop_con(i) = llm + 1 - kctop(i)
-       ENDDO
+       ibas_con = llm + 1 - kcbot
+       itop_con = llm + 1 - kctop
     else
        ! iflag_con >= 3
        CALL concvl(dtphys, paprs, play, t_seri, q_seri, u_seri, &
@@ -1110,7 +1108,7 @@ contains
        ! supprimer les calculs / ftra.)
 
        clwcon0 = qcondc
-       pmfu = upwd + dnwd
+       mfu = upwd + dnwd
        IF (.NOT. ok_gust) wd = 0.
 
        ! Calcul des propriétés des nuages convectifs
@@ -1120,7 +1118,7 @@ contains
              zx_t = t_seri(i, k)
              IF (thermcep) THEN
                 zdelta = MAX(0., SIGN(1., rtt-zx_t))
-                zx_qs = r2es * FOEEW(zx_t, zdelta)/play(i, k)
+                zx_qs = r2es * FOEEW(zx_t, zdelta) / play(i, k)
                 zx_qs = MIN(0.5, zx_qs)
                 zcor = 1./(1.-retv*zx_qs)
                 zx_qs = zx_qs*zcor
@@ -1136,7 +1134,7 @@ contains
        ENDDO
 
        ! calcul des proprietes des nuages convectifs
-       clwcon0 = fact_cldcon*clwcon0
+       clwcon0 = fact_cldcon * clwcon0
        call clouds_gno(klon, llm, q_seri, zqsat, clwcon0, ptconv, ratqsc, &
             rnebcon0)
     END if
@@ -1554,13 +1552,13 @@ contains
 
     ! Calcul des tendances traceurs
     call phytrac(rnpb, itap, lmt_pas, julien, time, firstcal, lafin, nqmx-2, &
-         dtphys, u, t, paprs, play, pmfu, pmfd, pen_u, pde_u, pen_d, pde_d, &
+         dtphys, u, t, paprs, play, mfu, mfd, pen_u, pde_u, pen_d, pde_d, &
          ycoefh, fm_therm, entr_therm, yu1, yv1, ftsol, pctsrf, frac_impa, &
          frac_nucl, pphis, albsol, rhcl, cldfra, rneb, diafra, cldliq, &
          pmflxr, pmflxs, prfl, psfl, da, phi, mp, upwd, dnwd, tr_seri, zmasse)
 
     IF (offline) THEN
-       call phystokenc(dtphys, rlon, rlat, t, pmfu, pmfd, pen_u, pde_u, &
+       call phystokenc(dtphys, rlon, rlat, t, mfu, mfd, pen_u, pde_u, &
             pen_d, pde_d, fm_therm, entr_therm, ycoefh, yu1, yv1, ftsol, &
             pctsrf, frac_impa, frac_nucl, pphis, airephy, dtphys, itap)
     ENDIF

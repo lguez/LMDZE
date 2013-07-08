@@ -29,7 +29,7 @@ contains
     ! mais on garde la possibilité de changer si besoin est (jusqu'à présent
     ! la forme de HB avec le 1er niveau modele etait conservee)
 
-    USE dimphy, ONLY: klev, klon, max
+    USE dimphy, ONLY: klev, klon
     USE suphec_m, ONLY: rcpd, rd, retv, rg, rkappa, rlvtt, rtt, rv
     USE yoethf_m, ONLY: r2es, rvtmp2
     USE fcttre, ONLY: foeew

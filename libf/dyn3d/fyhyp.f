@@ -49,27 +49,27 @@ c     .....     champs  locaux    .....
 c
      
        REAL   dzoom
-       REAL*8 ylat(jjp1), yprim(jjp1)
-       REAL*8 yuv
-       REAL*8 yt(0:nmax2)
-       REAL*8 fhyp(0:nmax2),beta,Ytprim(0:nmax2),fxm(0:nmax2)
+       DOUBLE PRECISION ylat(jjp1), yprim(jjp1)
+       DOUBLE PRECISION yuv
+       DOUBLE PRECISION yt(0:nmax2)
+       DOUBLE PRECISION fhyp(0:nmax2),beta,Ytprim(0:nmax2),fxm(0:nmax2)
        SAVE Ytprim, yt,Yf
-       REAL*8 Yf(0:nmax2),yypr(0:nmax2)
-       REAL*8 yvrai(jjp1), yprimm(jjp1),ylatt(jjp1)
-       REAL*8 pi,depi,pis2,epsilon,y0,pisjm
-       REAL*8 yo1,yi,ylon2,ymoy,Yprimin,champmin,champmax
-       REAL*8 yfi,Yf1,ffdy
-       REAL*8 ypn,deply,y00
+       DOUBLE PRECISION Yf(0:nmax2),yypr(0:nmax2)
+       DOUBLE PRECISION yvrai(jjp1), yprimm(jjp1),ylatt(jjp1)
+       DOUBLE PRECISION pi,depi,pis2,epsilon,y0,pisjm
+       DOUBLE PRECISION yo1,yi,ylon2,ymoy,Yprimin,champmin,champmax
+       DOUBLE PRECISION yfi,Yf1,ffdy
+       DOUBLE PRECISION ypn,deply,y00
        SAVE y00, deply
 
        INTEGER i,j,it,ik,iter,jlat
        INTEGER jpn,jjpn
        SAVE jpn
-       REAL*8 a0,a1,a2,a3,yi2,heavyy0,heavyy0m
-       REAL*8 fa(0:nmax2),fb(0:nmax2)
+       DOUBLE PRECISION a0,a1,a2,a3,yi2,heavyy0,heavyy0m
+       DOUBLE PRECISION fa(0:nmax2),fb(0:nmax2)
        REAL y0min,y0max
 
-       REAL*8     heavyside
+       DOUBLE PRECISION     heavyside
 
        pi       = 2. * ASIN(1.)
        depi     = 2. * pi

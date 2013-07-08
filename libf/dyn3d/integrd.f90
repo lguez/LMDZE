@@ -18,6 +18,7 @@ contains
     use massdair_m, only: massdair
     use nr_util, only: assert
     USE paramet_m, ONLY : iip1, iip2, ip1jm, ip1jmp1, jjp1, llmp1
+    use qminimum_m, only: qminimum
 
     ! Arguments: 
 

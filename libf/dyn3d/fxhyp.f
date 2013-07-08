@@ -47,20 +47,20 @@ c    ......   arguments  de  sortie  ......
 c     .... variables locales  ....
 c
        REAL   dzoom
-       REAL*8 xlon(iip1),xprimm(iip1),xuv
-       REAL*8 xtild(0:nmax2)
-       REAL*8 fhyp(0:nmax2),ffdx,beta,Xprimt(0:nmax2)
-       REAL*8 Xf(0:nmax2),xxpr(0:nmax2)
-       REAL*8 xvrai(iip1),xxprim(iip1) 
-       REAL*8 pi,depi,epsilon,xzoom,fa,fb
-       REAL*8 Xf1, Xfi , a0,a1,a2,a3,xi2
+       DOUBLE PRECISION xlon(iip1),xprimm(iip1),xuv
+       DOUBLE PRECISION xtild(0:nmax2)
+       DOUBLE PRECISION fhyp(0:nmax2),ffdx,beta,Xprimt(0:nmax2)
+       DOUBLE PRECISION Xf(0:nmax2),xxpr(0:nmax2)
+       DOUBLE PRECISION xvrai(iip1),xxprim(iip1) 
+       DOUBLE PRECISION pi,depi,epsilon,xzoom,fa,fb
+       DOUBLE PRECISION Xf1, Xfi , a0,a1,a2,a3,xi2
        INTEGER i,it,ik,iter,ii,idif,ii1,ii2
-       REAL*8 xi,xo1,xmoy,xlon2,fxm,Xprimin
-       REAL*8 champmin,champmax,decalx
+       DOUBLE PRECISION xi,xo1,xmoy,xlon2,fxm,Xprimin
+       DOUBLE PRECISION champmin,champmax,decalx
        INTEGER is2
        SAVE is2
 
-       REAL*8 heavyside
+       DOUBLE PRECISION heavyside
 
        pi       = 2. * ASIN(1.)
        depi     = 2. * pi

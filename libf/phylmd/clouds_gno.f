@@ -5,6 +5,7 @@ C
 C================================================================================
 C
       SUBROUTINE CLOUDS_GNO(klon,ND,R,RS,QSUB,PTCONV,RATQSC,CLDF)
+      use numer_rec_95, only: nr_erf
       IMPLICIT NONE
 C     
 C--------------------------------------------------------------------------------
@@ -52,7 +53,7 @@ c --    vmax    : v-value above which we use an asymptotic expression for ERF(v)
       REAL  dist(klon), fprime(klon), det(klon)
       REAL pi, u(klon), v(klon), erfcu(klon), erfcv(klon)
       REAL  xx1(klon), xx2(klon)
-      real erf,kkk
+      real kkk
       real sqrtpi,sqrt2,zx1,zx2,exdel
 c lconv = true si le calcul a converge (entre autre si qsub < min_q)
        LOGICAL lconv(klon)
@@ -178,7 +179,7 @@ c                print*,'AUX(',i,',',k,')<0',aux(i),delta(i),beta(i)
 
 c -- erfv -> 1.0, use an asymptotic expression of erfv for v large:
 
-             erfcu(i) = 1.0-ERF(u(i))
+             erfcu(i) = 1.0-NR_ERF(u(i))
 c  !!! ATTENTION : rajout d'un seuil pour l'exponentiel
              aux(i) = sqrtpi*erfcu(i)*EXP(min(v(i)*v(i),100.))
              coeff(i) = 1.0 - 1./2./(v(i)**2.) + 3./4./(v(i)**4.)
@@ -194,8 +195,8 @@ c  !!! ATTENTION : rajout d'un seuil pour l'exponentiel
 
 c -- general case:
 
-           erfcu(i) = 1.0-ERF(u(i))
-           erfcv(i) = 1.0-ERF(v(i))
+           erfcu(i) = 1.0-NR_ERF(u(i))
+           erfcv(i) = 1.0-NR_ERF(v(i))
            block(i) = erfcv(i)
            dist(i) = erfcu(i) / erfcv(i) - beta(i)
            zu2(i)=u(i)*u(i)

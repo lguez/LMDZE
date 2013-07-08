@@ -4,8 +4,7 @@ module addfi_m
 
 contains
 
-  SUBROUTINE addfi(nq, ucov, vcov, teta, pq, pps, dufi, dvfi, pdhfi, &
-       pdqfi, pdpfi)
+  SUBROUTINE addfi(ucov, vcov, teta, q, ps, dufi, dvfi, dtetafi, dqfi, dpfi)
 
     ! From dyn3d/addfi.F, v 1.1.1.1 2004/05/19 12:53:06
 
@@ -13,19 +12,24 @@ contains
 
     USE comconst, ONLY: dtphys
     USE comgeom, ONLY: aire, apoln, apols
-    USE dimens_m, ONLY: iim, llm
-    USE paramet_m, ONLY: iip1, iip2, ip1jm, ip1jmp1
+    USE dimens_m, ONLY: iim, jjm, llm, nqmx
 
-    INTEGER, intent(in):: nq
+    ! First and second components of the covariant velocity:
+    REAL, intent(inout):: ucov((iim + 1) * (jjm + 1), llm)
+    REAL, intent(inout):: vcov((iim + 1) * jjm, llm)
 
-    REAL, intent(inout):: ucov(ip1jmp1, llm), vcov(ip1jm, llm)
-    ! first and second components of the covariant velocity
+    REAL, intent(inout):: teta((iim + 1) * (jjm + 1), llm)
+    ! potential temperature
 
-    REAL, intent(inout):: teta(ip1jmp1, llm) ! potential temperature
-    real, intent(inout):: pq(ip1jmp1, llm, nq), pps(ip1jmp1)
-    REAL, intent(in):: dufi(ip1jmp1, llm), dvfi(ip1jm, llm) ! tendencies
-    real, intent(in):: pdhfi(ip1jmp1, llm) ! tendency
-    REAL, intent(in):: pdqfi(ip1jmp1, llm, nq), pdpfi(ip1jmp1)
+    real, intent(inout):: q((iim + 1) * (jjm + 1), llm, nqmx)
+    real, intent(inout):: ps((iim + 1) * (jjm + 1))
+
+    ! Tendencies:
+    REAL, intent(in):: dufi((iim + 1) * (jjm + 1), llm)
+    REAL, intent(in):: dvfi((iim + 1) * jjm, llm)
+    real, intent(in):: dtetafi((iim + 1) * (jjm + 1), llm)
+    REAL, intent(in):: dqfi((iim + 1) * (jjm + 1), llm, nqmx)
+    REAL, intent(in):: dpfi((iim + 1) * (jjm + 1))
 
     ! Local variables :
     REAL xpn(iim), xps(iim), tpn, tps
@@ -34,84 +38,73 @@ contains
 
     !-----------------------------------------------------------------------
 
-    DO k = 1, llm
-       DO j = 1, ip1jmp1
-          teta(j, k)= teta(j, k) + pdhfi(j, k) * dtphys
-       ENDDO
-    ENDDO
+    teta = teta + dtetafi * dtphys
 
     DO k = 1, llm
        DO ij = 1, iim
           xpn(ij) = aire(ij) * teta(ij , k)
-          xps(ij) = aire(ij+ip1jm) * teta(ij+ip1jm, k)
+          xps(ij) = aire(ij+(iim + 1) * jjm) * teta(ij+(iim + 1) * jjm, k)
        ENDDO
        tpn = SUM(xpn)/ apoln
        tps = SUM(xps)/ apols
 
-       DO ij = 1, iip1
+       DO ij = 1, iim + 1
           teta(ij , k) = tpn
-          teta(ij+ip1jm, k) = tps
+          teta(ij+(iim + 1) * jjm, k) = tps
        ENDDO
     ENDDO
 
     DO k = 1, llm
-       DO j = iip2, ip1jm
+       DO j = iim + 2, (iim + 1) * jjm
           ucov(j, k)= ucov(j, k) + dufi(j, k) * dtphys
        ENDDO
     ENDDO
 
-    DO k = 1, llm
-       DO j = 1, ip1jm
-          vcov(j, k)= vcov(j, k) + dvfi(j, k) * dtphys
-       ENDDO
-    ENDDO
-
-    DO j = 1, ip1jmp1
-       pps(j) = pps(j) + pdpfi(j) * dtphys
-    ENDDO
+    vcov = vcov + dvfi * dtphys
+    ps = ps + dpfi * dtphys
 
     DO iq = 1, 2
        DO k = 1, llm
-          DO j = 1, ip1jmp1
-             pq(j, k, iq)= pq(j, k, iq) + pdqfi(j, k, iq) * dtphys
-             pq(j, k, iq)= MAX(pq(j, k, iq), qtestw)
+          DO j = 1, (iim + 1) * (jjm + 1)
+             q(j, k, iq)= q(j, k, iq) + dqfi(j, k, iq) * dtphys
+             q(j, k, iq)= MAX(q(j, k, iq), qtestw)
           ENDDO
        ENDDO
     ENDDO
 
-    DO iq = 3, nq
+    DO iq = 3, nqmx
        DO k = 1, llm
-          DO j = 1, ip1jmp1
-             pq(j, k, iq)= pq(j, k, iq) + pdqfi(j, k, iq) * dtphys
-             pq(j, k, iq)= MAX(pq(j, k, iq), qtestt)
+          DO j = 1, (iim + 1) * (jjm + 1)
+             q(j, k, iq)= q(j, k, iq) + dqfi(j, k, iq) * dtphys
+             q(j, k, iq)= MAX(q(j, k, iq), qtestt)
           ENDDO
        ENDDO
     ENDDO
 
     DO ij = 1, iim
-       xpn(ij) = aire(ij) * pps(ij)
-       xps(ij) = aire(ij+ip1jm) * pps(ij+ip1jm)
+       xpn(ij) = aire(ij) * ps(ij)
+       xps(ij) = aire(ij+(iim + 1) * jjm) * ps(ij+(iim + 1) * jjm)
     ENDDO
     tpn = SUM(xpn)/apoln
     tps = SUM(xps)/apols
 
-    DO ij = 1, iip1
-       pps (ij) = tpn
-       pps (ij+ip1jm) = tps
+    DO ij = 1, iim + 1
+       ps(ij) = tpn
+       ps(ij+(iim + 1) * jjm) = tps
     ENDDO
 
-    DO iq = 1, nq
+    DO iq = 1, nqmx
        DO k = 1, llm
           DO ij = 1, iim
-             xpn(ij) = aire(ij) * pq(ij , k, iq)
-             xps(ij) = aire(ij+ip1jm) * pq(ij+ip1jm, k, iq)
+             xpn(ij) = aire(ij) * q(ij , k, iq)
+             xps(ij) = aire(ij+(iim + 1) * jjm) * q(ij+(iim + 1) * jjm, k, iq)
           ENDDO
           tpn = SUM(xpn)/apoln
           tps = SUM(xps)/apols
 
-          DO ij = 1, iip1
-             pq (ij , k, iq) = tpn
-             pq (ij+ip1jm, k, iq) = tps
+          DO ij = 1, iim + 1
+             q(ij , k, iq) = tpn
+             q(ij+(iim + 1) * jjm, k, iq) = tps
           ENDDO
        ENDDO
     ENDDO

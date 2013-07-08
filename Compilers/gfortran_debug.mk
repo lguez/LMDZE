@@ -10,16 +10,24 @@ netcdf95_dir = /user/guez_local/lib/NetCDF95_gfortran_debug
 jumble_dir = /user/guez_local/lib/Jumble_debug
 
 # Include flags:
-inc_flags = $(addprefix -I, ${netcdf_inc_dir} ${numer_rec_95_dir} ${netcdf95_dir} ${nr_util_dir} ${jumble_dir})
+FFLAGS = $(addprefix -I, ${netcdf_inc_dir} ${numer_rec_95_dir} ${netcdf95_dir} ${nr_util_dir} ${jumble_dir})
 
-# Other flags which do not affect run time performance:
-lang_flags = -ffree-form -frange-check -std=f95 -pedantic-errors -Wall -Wunderflow -Wextra
+# Fortran language options:
+FFLAGS += -std=f95
 
-# Flags which affect run time performance:
-perf_flags = -fbacktrace -ffpe-trap=invalid,zero,overflow -fbounds-check -g3 -O0 -fstack-protector-all
+# Error and warning options:
+FFLAGS += -fmax-errors=1 -pedantic-errors -Wall -Wcharacter-truncation -Wconversion -Wimplicit-interface -Wunderflow -Wextra -Wunreachable-code
 
-FFLAGS = ${inc_flags} ${perf_flags}
-F90FLAGS = ${inc_flags} ${lang_flags} ${perf_flags}
+# Debugging options:
+FFLAGS += -ffpe-trap=invalid,zero,overflow -fbacktrace -fdump-core -g3
+
+# Code generation options:
+FFLAGS += -fbounds-check -finit-real=nan
+
+# Optimization options:
+FFLAGS += -O0 -fstack-protector-all
+
+F90FLAGS = ${FFLAGS}
 
 LDLIBS = $(addprefix -L, ${netcdf_lib_dir} ${numer_rec_95_dir} ${netcdf95_dir} ${nr_util_dir} ${jumble_dir}) -ljumble -lnetcdf95 -lnetcdff -lnetcdf -lnumer_rec_95 -lnr_util
 

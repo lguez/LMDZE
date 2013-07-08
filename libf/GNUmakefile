@@ -13,17 +13,18 @@ src_root = .
 VPATH = ${src_root}:${src_root}/dyn3d:${src_root}/dyn3d/Vlsplt:${src_root}/filtrez:${src_root}/phylmd:${src_root}/bibio:${src_root}/phylmd/Mobidic:${src_root}/phylmd/Orography:${src_root}/phylmd/Radlwsw:${src_root}/IOIPSL:${src_root}/IOIPSL/Stringop:${src_root}/dyn3d/Read_reanalyse:${src_root}/phylmd/Thermcell:${src_root}/phylmd/CV3_routines:${src_root}/phylmd/Conflx:${src_root}/phylmd/CV_routines:${src_root}/phylmd/Interface_surf:${src_root}/dyn3d/Dissipation:${src_root}/IOIPSL/Histcom:${src_root}/IOIPSL/Flincom
 
 common_sources := $(shell cat ${src_root}/common_sources)
-sources_ce0l := ${common_sources} $(shell cat ${src_root}/sources_ce0l_only)
-sources_gcm := ${common_sources} $(shell cat ${src_root}/sources_gcm_only)
+
+sources_ce0l := $(sort ${common_sources} $(shell cat ${src_root}/sources_ce0l_only))
+
+sources_gcm := $(sort ${common_sources} $(shell cat ${src_root}/sources_gcm_only))
 
 sources := $(sort ${sources_ce0l} ${sources_gcm})
-# (sort so that each filename appears only once)
 
 # 2. Objects and executable files
 
 # Object files:
-obj_ce0l := $(addsuffix .o, $(sort $(basename ${sources_ce0l})))
-obj_gcm := $(addsuffix .o, $(sort $(basename ${sources_gcm})))
+obj_ce0l := $(addsuffix .o, $(basename ${sources_ce0l}))
+obj_gcm := $(addsuffix .o, $(basename ${sources_gcm}))
 objects := $(addsuffix .o, $(basename ${sources}))
 
 # Executable files:
@@ -56,8 +57,8 @@ gcm: ${obj_gcm}
 depend ${src_root}/depend.mk:
 	makedepf90 -Wmissing -Wconfused -I${VPATH} -nosrc $(addprefix -u, netcdf numer_rec_95 netcdf95 nr_util jumble) ${sources} >${src_root}/depend.mk
 
-${src_root}/TAGS: ${sources}
-	ctags -e --language-force=fortran -f $@ $^
+TAGS: ${sources}
+	ctags -e --language-force=fortran $^
 
 clean:
 	rm -f ${objects}

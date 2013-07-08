@@ -20,7 +20,7 @@ contains
     ! 3. un entraînement
     ! 4. un détraînement
 
-    USE dimphy, ONLY : klev, klon, max
+    USE dimphy, ONLY : klev, klon
     USE suphec_m, ONLY : rd, rg, rkappa
 
     ! arguments:

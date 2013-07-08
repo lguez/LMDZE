@@ -4,8 +4,8 @@ module calfis_m
 
 contains
 
-  SUBROUTINE calfis(rdayvrai, time, ucov, vcov, teta, q, masse, ps, pk, phis, &
-       phi, dudyn, dv, dq, w, dufi, dvfi, dtetafi, dqfi, dpfi, lafin)
+  SUBROUTINE calfis(rdayvrai, time, ucov, vcov, teta, q, ps, pk, phis, phi, &
+       dudyn, dv, w, dufi, dvfi, dtetafi, dqfi, dpfi, lafin)
 
     ! From dyn3d/calfis.F, version 1.3 2005/05/25 13:10:09
     ! Authors: P. Le Van, F. Hourdin
@@ -43,17 +43,7 @@ contains
 
     ! Arguments :
 
-    ! Input :
-    ! ucov covariant zonal velocity
-    ! vcov covariant meridional velocity 
-    ! teta potential temperature
-    ! ps surface pressure
-    ! masse masse d'air dans chaque maille
-    ! pts surface temperature (K)
-    ! callrad clef d'appel au rayonnement
-
     ! Output :
-    ! dufi tendency for the natural zonal velocity (ms-1)
     ! dvfi tendency for the natural meridional velocity 
     ! dtetafi tendency for the potential temperature
     ! pdtsfi tendency for the surface temperature
@@ -64,22 +54,27 @@ contains
     REAL, intent(in):: rdayvrai
     REAL, intent(in):: time ! heure de la journée en fraction de jour
     REAL, intent(in):: ucov(iim + 1, jjm + 1, llm)
-    REAL vcov(iim + 1, jjm, llm)
+    ! ucov covariant zonal velocity
+    REAL, intent(in):: vcov(iim + 1, jjm, llm)
+    ! vcov covariant meridional velocity 
     REAL, intent(in):: teta(iim + 1, jjm + 1, llm)
+    ! teta potential temperature
 
     REAL, intent(in):: q(iim + 1, jjm + 1, llm, nqmx)
     ! (mass fractions of advected fields)
 
-    REAL masse(iim + 1, jjm + 1, llm)
-    REAL ps(iim + 1, jjm + 1)
+    REAL, intent(in):: ps(iim + 1, jjm + 1)
+    ! ps surface pressure
     REAL, intent(in):: pk(iim + 1, jjm + 1, llm)
     REAL, intent(in):: phis(iim + 1, jjm + 1)
     REAL, intent(in):: phi(iim + 1, jjm + 1, llm)
     REAL dudyn(iim + 1, jjm + 1, llm)
     REAL dv(iim + 1, jjm, llm)
-    REAL dq(iim + 1, jjm + 1, llm, nqmx)
     REAL, intent(in):: w(iim + 1, jjm + 1, llm)
-    REAL dufi(iim + 1, jjm + 1, llm)
+
+    REAL, intent(out):: dufi(iim + 1, jjm + 1, llm)
+    ! tendency for the covariant zonal velocity (m2 s-2)
+
     REAL dvfi(iim + 1, jjm, llm)
     REAL, intent(out):: dtetafi(iim + 1, jjm + 1, llm)
     REAL dqfi(iim + 1, jjm + 1, llm, nqmx)
@@ -99,7 +94,7 @@ contains
     real qx(klon, llm, nqmx) ! mass fractions of advected fields
     REAL omega(klon, llm)
 
-    REAL d_u(klon, llm), d_v(klon, llm)
+    REAL d_u(klon, llm), d_v(klon, llm) ! tendances physiques du vent (m s-2)
     REAL d_t(klon, llm), d_qx(klon, llm, nqmx)
     REAL d_ps(klon)
 
@@ -187,11 +182,10 @@ contains
     DO l=1, llm
        DO j=2, jjm
           ig0 = 1+(j-2)*iim
-          u(ig0+1, l)= 0.5 * &
-               (ucov(iim, j, l)/cu_2d(iim, j) + ucov(1, j, l)/cu_2d(1, j))
+          u(ig0+1, l)= 0.5 &
+               * (ucov(iim, j, l) / cu_2d(iim, j) + ucov(1, j, l) / cu_2d(1, j))
           DO i=2, iim
-             u(ig0+i, l)= 0.5 * &
-                  (ucov(i-1, j, l)/cu_2d(i-1, j) &
+             u(ig0+i, l)= 0.5 * (ucov(i-1, j, l)/cu_2d(i-1, j) &
                   + ucov(i, j, l)/cu_2d(i, j))
           end DO
        end DO
@@ -236,8 +230,8 @@ contains
     forall(l= 1: llm) v(:, l) = pack(zvfi(:, :, l), dyn_phy)
 
     !IM calcul PV a teta=350, 380, 405K
-    CALL PVtheta(klon, llm, ucov, vcov, teta, t, play, paprs, &
-         ntetaSTD, rtetaSTD, PVteta)
+    CALL PVtheta(klon, llm, ucov, vcov, teta, t, play, paprs, ntetaSTD, &
+         rtetaSTD, PVteta)
 
     ! Appel de la physique :
     CALL physiq(lafin, rdayvrai, time, dtphys, paprs, play, pphi, pphis, u, &
@@ -297,7 +291,6 @@ contains
     ! 65. champ u:
 
     DO l=1, llm
-
        DO i=1, iim + 1
           dufi(i, 1, l) = 0.
           dufi(i, jjm + 1, l) = 0.
@@ -306,43 +299,35 @@ contains
        DO j=2, jjm
           ig0=1+(j-2)*iim
           DO i=1, iim-1
-             dufi(i, j, l)= &
-                  0.5*(d_u(ig0+i, l)+d_u(ig0+i+1, l))*cu_2d(i, j)
+             dufi(i, j, l)= 0.5*(d_u(ig0+i, l)+d_u(ig0+i+1, l))*cu_2d(i, j)
           ENDDO
-          dufi(iim, j, l)= &
-               0.5*(d_u(ig0+1, l)+d_u(ig0+iim, l))*cu_2d(iim, j)
+          dufi(iim, j, l)= 0.5*(d_u(ig0+1, l)+d_u(ig0+iim, l))*cu_2d(iim, j)
           dufi(iim + 1, j, l)=dufi(1, j, l)
        ENDDO
-
     ENDDO
 
     ! 67. champ v:
 
     DO l=1, llm
-
        DO j=2, jjm-1
           ig0=1+(j-2)*iim
           DO i=1, iim
-             dvfi(i, j, l)= &
-                  0.5*(d_v(ig0+i, l)+d_v(ig0+i+iim, l))*cv_2d(i, j)
+             dvfi(i, j, l)= 0.5*(d_v(ig0+i, l)+d_v(ig0+i+iim, l))*cv_2d(i, j)
           ENDDO
           dvfi(iim + 1, j, l) = dvfi(1, j, l)
        ENDDO
     ENDDO
 
-    ! 68. champ v pres des poles:
+    ! 68. champ v près des pôles:
     ! v = U * cos(long) + V * SIN(long)
 
     DO l=1, llm
        DO i=1, iim
-          dvfi(i, 1, l)= &
-               d_u(1, l)*COS(rlonv(i))+d_v(1, l)*SIN(rlonv(i))
-          dvfi(i, jjm, l)=d_u(klon, l)*COS(rlonv(i)) &
-               +d_v(klon, l)*SIN(rlonv(i))
-          dvfi(i, 1, l)= &
-               0.5*(dvfi(i, 1, l)+d_v(i+1, l))*cv_2d(i, 1)
-          dvfi(i, jjm, l)= &
-               0.5*(dvfi(i, jjm, l)+d_v(klon-iim-1+i, l))*cv_2d(i, jjm)
+          dvfi(i, 1, l)= d_u(1, l)*COS(rlonv(i))+d_v(1, l)*SIN(rlonv(i))
+          dvfi(i, jjm, l)=d_u(klon, l)*COS(rlonv(i)) +d_v(klon, l)*SIN(rlonv(i))
+          dvfi(i, 1, l)= 0.5*(dvfi(i, 1, l)+d_v(i+1, l))*cv_2d(i, 1)
+          dvfi(i, jjm, l)= 0.5 &
+               * (dvfi(i, jjm, l) + d_v(klon - iim - 1 + i, l)) * cv_2d(i, jjm)
        ENDDO
 
        dvfi(iim + 1, 1, l) = dvfi(1, 1, l)

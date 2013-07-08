@@ -45,7 +45,7 @@ contains
 
     PRINT *, 'Call sequence information: inidissip'
     call random_seed(size=seed_size)
-    call random_seed(put=(/(0, ii = 1, seed_size)/))
+    call random_seed(put=(/(1, ii = 1, seed_size)/))
 
     PRINT *, 'Calcul des valeurs propres de divgrad'
     deltap = 1.

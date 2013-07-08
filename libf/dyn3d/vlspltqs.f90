@@ -33,7 +33,7 @@ SUBROUTINE vlspltqs(q, pente_max, masse, w, pbaru, pbarv, pdt, p, pk, teta)
   real, intent(in):: pdt
   REAL, intent(in):: p(ip1jmp1, llmp1)
   real, intent(in):: teta(ip1jmp1, llm)
-  real pk(ip1jmp1, llm)
+  real, intent(in):: pk(ip1jmp1, llm)
 
   ! Local
 

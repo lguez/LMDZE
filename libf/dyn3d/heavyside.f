@@ -9,7 +9,7 @@ c      ...   P. Le Van  ....
 c
        IMPLICIT NONE
 
-       REAL*8 heavyside , a
+       DOUBLE PRECISION heavyside , a
 
        IF ( a.LE.0. )  THEN
          heavyside = 0.

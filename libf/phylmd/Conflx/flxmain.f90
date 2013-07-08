@@ -4,12 +4,13 @@ module flxmain_m
 
 contains
 
-  SUBROUTINE flxmain(dtime, pt, pqen, pqsen, pqhfl, pap, paph, pgeo, ldland, &
-       ptte, pqte, pvervel, prsfc, pssfc, kcbot, kctop, kdtop, pmfu, pmfd, &
+  SUBROUTINE flxmain(dtime, ten, qen, qsen, pqhfl, pap, paph, pgeo, ldland, &
+       ptte, pqte, pvervel, prsfc, pssfc, kcbot, kctop, kdtop, mfu, mfd, &
        pen_u, pde_u, pen_d, pde_d, dt_con, dq_con, pmflxr, pmflxs)
 
     USE dimphy, ONLY: klev, klon
     use flxasc_m, only: flxasc
+    use flxdtdq_m, only: flxdtdq
     use flxflux_m, only: flxflux
     use flxini_m, only: flxini
     USE suphec_m, ONLY: rcpd, retv, rg, rlvtt
@@ -17,9 +18,9 @@ contains
     USE yoethf_m, ONLY: r4les, r5les
 
     REAL, intent(in):: dtime
-    REAL, intent(in):: pt(klon, klev)
-    real pqen(klon, klev)
-    real, intent(inout):: pqsen(klon, klev)
+    REAL, intent(in):: ten(klon, klev)
+    real, intent(in):: qen(klon, klev)
+    real, intent(inout):: qsen(klon, klev)
     REAL, intent(in):: pqhfl(klon)
     real pap(klon, klev), paph(klon, klev+1)
     REAL, intent(in):: pgeo(klon, klev)
@@ -30,8 +31,8 @@ contains
     REAL prsfc(klon), pssfc(klon)
     INTEGER kcbot(klon), kctop(klon)
     INTEGER kdtop(klon)
-    REAL pmfu(klon, klev)
-    real pmfd(klon, klev)
+    REAL, intent(out):: mfu(klon, klev)
+    real, intent(out):: mfd(klon, klev)
     REAL pen_u(klon, klev), pde_u(klon, klev)
     REAL pen_d(klon, klev), pde_d(klon, klev)
     REAL dt_con(klon, klev), dq_con(klon, klev)
@@ -46,8 +47,8 @@ contains
 
     REAL ztenh(klon, klev), zqenh(klon, klev), zqsenh(klon, klev)
     REAL zgeoh(klon, klev)
-    REAL zmfub(klon), zmfub1(klon)
-    REAL zmfus(klon, klev), zmfuq(klon, klev), zmful(klon, klev)
+    REAL mfub(klon), mfub1(klon)
+    REAL mfus(klon, klev), mfuq(klon, klev), mful(klon, klev)
     REAL zdmfup(klon, klev), zdpmel(klon, klev)
     REAL zentr(klon), zhcbase(klon)
     REAL zdqpbl(klon), zdqcv(klon), zdhpbl(klon)
@@ -85,8 +86,8 @@ contains
 
     ! initialiser les variables et faire l'interpolation verticale
 
-    CALL flxini(pt, pqen, pqsen, pgeo, paph, zgeoh, ztenh, zqenh, zqsenh, &
-         ptu, pqu, ptd, pqd, pmfd, zmfds, zmfdq, zdmfdp, pmfu, zmfus, zmfuq, &
+    CALL flxini(ten, qen, qsen, pgeo, paph, zgeoh, ztenh, zqenh, zqsenh, &
+         ptu, pqu, ptd, pqd, mfd, zmfds, zmfdq, zdmfdp, mfu, mfus, mfuq, &
          zdmfup, zdpmel, plu, plude, ilab, pen_u, pde_u, pen_d, pde_d)
 
     ! determiner les valeurs au niveau de base de la tour convective
@@ -134,18 +135,18 @@ contains
        zqumqe=pqu(i, ikb)+plu(i, ikb)-zqenh(i, ikb)
        zdqmin=MAX(0.01*zqenh(i, ikb), 1.E-10)
        IF (zdqpbl(i) > 0..AND.zqumqe > zdqmin.AND.ldcum(i)) THEN
-          zmfub(i) = zdqpbl(i)/(RG*MAX(zqumqe, zdqmin))
+          mfub(i) = zdqpbl(i)/(RG*MAX(zqumqe, zdqmin))
        ELSE
-          zmfub(i) = 0.01
+          mfub(i) = 0.01
           ldcum(i)=.FALSE.
        ENDIF
        IF (ktype(i) == 2) THEN
           zdh = RCPD*(ptu(i, ikb)-ztenh(i, ikb)) + RLVTT*zqumqe
           zdh = RG * MAX(zdh, 1.0E5*zdqmin)
-          IF (zdhpbl(i) > 0..AND.ldcum(i))zmfub(i)=zdhpbl(i)/zdh
+          IF (zdhpbl(i) > 0..AND.ldcum(i))mfub(i)=zdhpbl(i)/zdh
        ENDIF
        zmfmax = (paph(i, ikb)-paph(i, ikb-1)) / (RG*dtime)
-       zmfub(i) = MIN(zmfub(i), zmfmax)
+       mfub(i) = MIN(mfub(i), zmfmax)
        zentr(i) = ENTRSCV
        IF (ktype(i) == 1) zentr(i) = ENTRPEN
     ENDDO
@@ -177,12 +178,12 @@ contains
 
     ! (B) calculer le panache ascendant
 
-    CALL flxasc(dtime, ztenh, zqenh, pt, pqen, pqsen, pgeo, zgeoh, pap, &
+    CALL flxasc(dtime, ztenh, zqenh, ten, qen, qsen, pgeo, zgeoh, pap, &
          paph, pqte, pvervel, ldland, ldcum, ktype, ilab, ptu, pqu, plu, &
-         pmfu, zmfub, zentr, zmfus, zmfuq, zmful, plude, zdmfup, kcbot, &
+         mfu, mfub, zentr, mfus, mfuq, mful, plude, zdmfup, kcbot, &
          kctop, ictop0, kcum, pen_u, pde_u)
 
-    IF (kcum /= 0) then
+    kcum_not_zero: IF (kcum /= 0) then
        ! verifier l'epaisseur de la convection et changer eventuellement
        ! le taux d'entrainement/detrainement
 
@@ -207,16 +208,16 @@ contains
 
           ! determiner le LFS (level of free sinking: niveau de plonge libre)
           CALL flxdlfs(ztenh, zqenh, zgeoh, paph, ptu, pqu, &
-               ldcum, kcbot, kctop, zmfub, zrfl, &
+               ldcum, kcbot, kctop, mfub, zrfl, &
                ptd, pqd, &
-               pmfd, zmfds, zmfdq, zdmfdp, &
+               mfd, zmfds, zmfdq, zdmfdp, &
                kdtop, lddraf)
 
           ! calculer le panache descendant
           CALL flxddraf(ztenh, zqenh, &
                zgeoh, paph, zrfl, &
                ptd, pqd, &
-               pmfd, zmfds, zmfdq, zdmfdp, &
+               mfd, zmfds, zmfdq, zdmfdp, &
                lddraf, pen_d, pde_d)
 
           ! calculer de nouveau le flux de masse entrant a travers la base
@@ -225,7 +226,7 @@ contains
           DO i = 1, klon
              IF (lddraf(i)) THEN
                 ikb = kcbot(i)
-                llo1 = PMFD(i, ikb) < 0.
+                llo1 = MFD(i, ikb) < 0.
                 zeps = 0.
                 IF (llo1) zeps = CMFDEPS
                 zqumqe = pqu(i, ikb)+plu(i, ikb)- &
@@ -233,27 +234,27 @@ contains
                 zdqmin = MAX(0.01*zqenh(i, ikb), 1.E-10)
                 zmfmax = (paph(i, ikb)-paph(i, ikb-1)) / (RG*dtime)
                 IF (zdqpbl(i) > 0..AND.zqumqe > zdqmin.AND.ldcum(i) &
-                     .AND.zmfub(i) < zmfmax) THEN
-                   zmfub1(i) = zdqpbl(i) / (RG*MAX(zqumqe, zdqmin))
+                     .AND.mfub(i) < zmfmax) THEN
+                   mfub1(i) = zdqpbl(i) / (RG*MAX(zqumqe, zdqmin))
                 ELSE
-                   zmfub1(i) = zmfub(i)
+                   mfub1(i) = mfub(i)
                 ENDIF
                 IF (ktype(i) == 2) THEN
                    zdh = RCPD*(ptu(i, ikb)-zeps*ptd(i, ikb)- &
                         (1.-zeps)*ztenh(i, ikb))+RLVTT*zqumqe
                    zdh = RG * MAX(zdh, 1.0E5*zdqmin)
-                   IF (zdhpbl(i) > 0..AND.ldcum(i))zmfub1(i)=zdhpbl(i)/zdh
+                   IF (zdhpbl(i) > 0..AND.ldcum(i))mfub1(i)=zdhpbl(i)/zdh
                 ENDIF
                 IF (.NOT. ((ktype(i) == 1 .OR. ktype(i) == 2) .AND. &
-                     ABS(zmfub1(i)-zmfub(i)) < 0.2*zmfub(i))) &
-                     zmfub1(i) = zmfub(i)
+                     ABS(mfub1(i)-mfub(i)) < 0.2*mfub(i))) &
+                     mfub1(i) = mfub(i)
              ENDIF
           ENDDO
           DO k = 1, klev
              DO i = 1, klon
                 IF (lddraf(i)) THEN
-                   zfac = zmfub1(i)/MAX(zmfub(i), 1.E-10)
-                   pmfd(i, k) = pmfd(i, k)*zfac
+                   zfac = mfub1(i)/MAX(mfub(i), 1.E-10)
+                   mfd(i, k) = mfd(i, k)*zfac
                    zmfds(i, k) = zmfds(i, k)*zfac
                    zmfdq(i, k) = zmfdq(i, k)*zfac
                    zdmfdp(i, k) = zdmfdp(i, k)*zfac
@@ -263,31 +264,31 @@ contains
              ENDDO
           ENDDO
           DO i = 1, klon
-             IF (lddraf(i)) zmfub(i)=zmfub1(i)
+             IF (lddraf(i)) mfub(i)=mfub1(i)
           ENDDO
        ENDIF ! fin de test sur lmfdd
 
        ! calculer de nouveau le panache ascendant
 
-       CALL flxasc(dtime, ztenh, zqenh, pt, pqen, pqsen, pgeo, zgeoh, pap, &
+       CALL flxasc(dtime, ztenh, zqenh, ten, qen, qsen, pgeo, zgeoh, pap, &
             paph, pqte, pvervel, ldland, ldcum, ktype, ilab, ptu, pqu, plu, &
-            pmfu, zmfub, zentr, zmfus, zmfuq, zmful, plude, zdmfup, kcbot, &
+            mfu, mfub, zentr, mfus, mfuq, mful, plude, zdmfup, kcbot, &
             kctop, ictop0, kcum, pen_u, pde_u)
 
        ! Déterminer les flux convectifs en forme finale, ainsi que la
        ! quantité des précipitations
 
-       CALL flxflux(dtime, pqen, pqsen, ztenh, zqenh, pap, paph, &
+       CALL flxflux(dtime, qen, qsen, ztenh, zqenh, pap, paph, &
             ldland, zgeoh, kcbot, kctop, lddraf, kdtop, ktype, ldcum, &
-            pmfu, pmfd, zmfus, zmfds, zmfuq, zmfdq, zmful, plude, &
-            zdmfup, zdmfdp, pt, prsfc, pssfc, zdpmel, itopm2, &
+            mfu, mfd, mfus, zmfds, mfuq, zmfdq, mful, plude, &
+            zdmfup, zdmfdp, ten, prsfc, pssfc, zdpmel, itopm2, &
             pmflxr, pmflxs)
 
        ! calculer les tendances pour T et Q
 
-       CALL flxdtdq(itopm2, paph, ldcum, pt, zmfus, zmfds, zmfuq, zmfdq, &
-            zmful, zdmfup, zdmfdp, zdpmel, dt_con, dq_con)
-    end IF
+       CALL flxdtdq(itopm2, paph, ldcum, ten, mfus, zmfds, mfuq, zmfdq, &
+            mful, zdmfup, zdmfdp, zdpmel, dt_con, dq_con)
+    end IF kcum_not_zero
 
   END SUBROUTINE flxmain
 

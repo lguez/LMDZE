@@ -35,7 +35,6 @@ contains
     use histclo_m, only: histclo
     use indicesol, only: is_oce, is_sic, is_ter, is_lic, epsfra
     use iniadvtrac_m, only: iniadvtrac
-    use inidissip_m, only: inidissip
     use inifilr_m, only: inifilr
     use inigeom_m, only: inigeom
     use massdair_m, only: massdair
@@ -301,7 +300,6 @@ contains
 
     ! Initialisation pour traceurs:
     call iniadvtrac
-    CALL inidissip
     itau_phy = 0
     day_ref = dayref
     annee_ref = anneeref

@@ -5,7 +5,7 @@ module conflx_m
 contains
 
   SUBROUTINE conflx (dtime, pres_h, pres_f, t, q, con_t, con_q, qhfl, w, &
-       d_t, d_q, rain, snow, pmfu, pmfd, pen_u, pde_u, pen_d, pde_d, kcbot, &
+       d_t, d_q, rain, snow, mfu, mfd, pen_u, pde_u, pen_d, pde_d, kcbot, &
        kctop, kdtop, pmflxr, pmflxs)
 
     ! From LMDZ4/libf/phylmd/conflx.F, version 1.1.1.1 2004/05/19 12:53:08
@@ -30,7 +30,7 @@ contains
     REAL, intent(in):: pres_h(:, :) ! (klon, klev+1) pression half-level (Pa)
     REAL, intent(in):: pres_f(:, :) ! (klon, klev) pression full-level (Pa)
     REAL, intent(in):: t(:, :) ! (klon, klev) temperature (K)
-    REAL, intent(in):: q(:, :) ! (klon, klev) humidité spécifique (g/g)
+    REAL, intent(in):: q(:, :) ! (klon, klev) humidité spécifique (no dimension)
 
     REAL, intent(in):: con_t(:, :)
     ! (klon, klev) convergence de temperature (K/s)
@@ -46,11 +46,11 @@ contains
     REAL, intent(out):: rain(:) ! (klon) pluie (mm/s)
     REAL, intent(out):: snow(:) ! (klon) neige (mm/s)
 
-    REAL, intent(out):: pmfu(:, :) ! (klon, klev)
-    ! flux masse (kg/m2/s) panache ascendant
+    REAL, intent(out):: mfu(:, :) ! (klon, klev)
+    ! flux de masse (kg/m2/s) panache ascendant
 
-    REAL, intent(out):: pmfd(:, :) ! (klon, klev)
-    ! flux masse (kg/m2/s) panache descendant
+    REAL, intent(out):: mfd(:, :) ! (klon, klev)
+    ! flux de masse (kg/m2/s) panache descendant
 
     REAL, intent(out):: pen_u(:, :) ! (klon, klev)
     REAL, intent(out):: pde_u(:, :) ! (klon, klev)
@@ -64,8 +64,7 @@ contains
 
     ! Local:
 
-    REAL pq(klon, klev)
-    REAL pqs(klon, klev)
+    REAL qsen(klon, klev)
     REAL pvervel(klon, klev)
     LOGICAL land(klon)
 
@@ -77,8 +76,6 @@ contains
     REAL zcvgq(klon, klev)
     REAL zcvgt(klon, klev)
 
-    REAL zmfu(klon, klev)
-    REAL zmfd(klon, klev)
     REAL zen_u(klon, klev)
     REAL zen_d(klon, klev)
     REAL zde_u(klon, klev)
@@ -103,14 +100,10 @@ contains
        DO i = 1, klon
           d_t(i, k) = 0.0
           d_q(i, k) = 0.0
-          pmfu(i, k) = 0.0
-          pmfd(i, k) = 0.0
           pen_u(i, k) = 0.0
           pde_u(i, k) = 0.0
           pen_d(i, k) = 0.0
           pde_d(i, k) = 0.0
-          zmfu(i, k) = 0.0
-          zmfd(i, k) = 0.0
           zen_u(i, k) = 0.0
           zde_u(i, k) = 0.0
           zen_d(i, k) = 0.0
@@ -133,7 +126,6 @@ contains
     ! verticaux augmente du haut vers le bas)
     DO k = 1, klev
        DO i = 1, klon
-          pq(i, k) = q(i, klev-k+1)
           paprsf(i, k) = pres_f(i, klev-k+1)
           paprs(i, k) = pres_h(i, klev+1-k+1)
           pvervel(i, k) = w(i, klev+1-k)
@@ -142,7 +134,7 @@ contains
 
           zqsat = MIN(0.5, R2ES * FOEEW(t(i, k), &
                merge(0., 1., rtt < t(i, k))) / paprsf(i, k))
-          pqs(i, k) = zqsat / (1. - RETV * zqsat)
+          qsen(i, k) = zqsat / (1. - RETV * zqsat)
        ENDDO
     ENDDO
     DO i = 1, klon
@@ -160,8 +152,8 @@ contains
     ENDDO
 
     ! Appeler la routine principale :
-    CALL flxmain(dtime, t, pq, pqs, qhfl, paprsf, paprs, zgeom, land, &
-         zcvgt, zcvgq, pvervel, rain, snow, kcbot, kctop, kdtop, zmfu, zmfd, &
+    CALL flxmain(dtime, t, q, qsen, qhfl, paprsf, paprs, zgeom, land, &
+         zcvgt, zcvgq, pvervel, rain, snow, kcbot, kctop, kdtop, mfu, mfd, &
          zen_u, zde_u, zen_d, zde_d, d_t_bis, d_q_bis, zmflxr, zmflxs)
 
     ! De la même façon que l'on effectue le réindiçage pour la
@@ -174,19 +166,10 @@ contains
        ENDDO
     ENDDO
 
-    DO i = 1, klon
-       pmfu(i, 1)= 0.
-       pmfd(i, 1)= 0.
-       pen_d(i, 1)= 0.
-       pde_d(i, 1)= 0.
-    ENDDO
-
-    DO k = 2, klev
-       DO i = 1, klon
-          pmfu(i, klev+2-k)= zmfu(i, k)
-          pmfd(i, klev+2-k)= zmfd(i, k)
-       ENDDO
-    ENDDO
+    mfu = eoshift(mfu, shift=1, dim=2)
+    mfd = eoshift(mfd, shift=1, dim=2)
+    pen_d(:, 1)= 0.
+    pde_d(:, 1)= 0.
 
     DO k = 1, klev
        DO i = 1, klon

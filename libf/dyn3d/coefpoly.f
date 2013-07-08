@@ -18,9 +18,9 @@ c               a1  +     2.*a2*xtild2 +     3.*a3*xtild2*xtild2 = Xprim2
 
 c  On en revient a resoudre un systeme de 4 equat.a 4 inconnues a0,a1,a2,a3
 
-      REAL*8 Xf1, Xf2,Xprim1,Xprim2, xtild1,xtild2, xi 
-      REAL*8 Xfout, Xprim
-      REAL*8 a1,a2,a3,a0, xtil1car, xtil2car,derr,x1x2car
+      DOUBLE PRECISION Xf1, Xf2,Xprim1,Xprim2, xtild1,xtild2, xi 
+      DOUBLE PRECISION Xfout, Xprim
+      DOUBLE PRECISION a1,a2,a3,a0, xtil1car, xtil2car,derr,x1x2car
 
       xtil1car = xtild1 * xtild1
       xtil2car = xtild2 * xtild2 

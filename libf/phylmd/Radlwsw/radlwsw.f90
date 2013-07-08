@@ -35,12 +35,13 @@ contains
     ! aerosol indirect forcing is F_{AI} = topsw - topswai
     ! aerosol direct forcing is F_{AD} = topswai - topswad
 
-    USE dimphy, ONLY: klev, klon
     USE clesphys, ONLY: bug_ozone, solaire
-    USE suphec_m, ONLY: rg
+    USE dimphy, ONLY: klev, klon
+    use lw_m, only: lw
     USE raddim, ONLY: kdlon
-    USE yoethf_m, ONLY: rvtmp2
+    USE suphec_m, ONLY: rg
     use sw_m, only: sw
+    USE yoethf_m, ONLY: rvtmp2
         
     ! Arguments:
 
@@ -101,10 +102,7 @@ contains
     DOUBLE PRECISION ZFLDN0(KDLON, KLEV+1)
 
     DOUBLE PRECISION zx_alpha1, zx_alpha2
-
     INTEGER k, kk, i, iof, nb_gr
-    EXTERNAL lw
-
     DOUBLE PRECISION PSCT
 
     DOUBLE PRECISION PALBD(kdlon, 2), PALBP(kdlon, 2)

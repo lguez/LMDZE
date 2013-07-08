@@ -9,39 +9,47 @@ contains
        pmfu, pmfub, pentr, pmfus, pmfuq, pmful, plude, pdmfup, kcbot, kctop, &
        kctop0, kcum, pen_u, pde_u)
 
-    USE dimphy, ONLY: klev, klon, max
+    ! This routine does the calculations for cloud ascents for cumulus
+    ! parameterization.
+
+    USE dimphy, ONLY: klev, klon
     use flxadjtq_m, only: flxadjtq
     USE suphec_m, ONLY: rcpd, rd, retv, rg, rtt
     USE yoecumf, ONLY: cmfcmin, cmfctop, cprcon, entrmid, lmfmid
 
-    ! This routine does the calculations for cloud ascents for cumulus
-    ! parameterization.
-
     REAL, intent(in):: pdtime
-    REAL, intent(in):: pten(klon, klev), ptenh(klon, klev)
-    REAL, intent(in):: pqen(klon, klev), pqenh(klon, klev), pqsen(klon, klev)
+    REAL, intent(in):: ptenh(klon, klev)
+    REAL, intent(in):: pqenh(klon, klev)
+    REAL, intent(in):: pten(klon, klev)
+    REAL, intent(in):: pqen(klon, klev)
+    REAL, intent(in):: pqsen(klon, klev)
     REAL, intent(in):: pgeo(klon, klev), pgeoh(klon, klev)
     REAL pap(klon, klev), paph(klon, klev+1)
     REAL pqte(klon, klev)
     REAL pvervel(klon, klev) ! vitesse verticale en Pa/s
-
-    REAL pmfub(klon), pentr(klon)
-    REAL ptu(klon, klev), pqu(klon, klev), plu(klon, klev)
-    REAL plude(klon, klev)
-    REAL pmfu(klon, klev), pmfus(klon, klev)
-    REAL pmfuq(klon, klev), pmful(klon, klev)
-    REAL pdmfup(klon, klev)
-    INTEGER, intent(inout):: ktype(klon)
-    integer klab(klon, klev), kcbot(klon), kctop(klon)
-    INTEGER kctop0(klon)
     LOGICAL ldland(klon)
     LOGICAL, intent(inout):: ldcum(klon)
-
+    INTEGER, intent(inout):: ktype(klon)
+    integer klab(klon, klev)
+    REAL ptu(klon, klev), pqu(klon, klev), plu(klon, klev)
+    REAL pmfu(klon, klev)
+    REAL, intent(inout):: pmfub(klon)
+    real pentr(klon)
+    real pmfus(klon, klev)
+    REAL pmfuq(klon, klev), pmful(klon, klev)
+    REAL plude(klon, klev)
+    REAL pdmfup(klon, klev)
+    integer kcbot(klon), kctop(klon)
+    INTEGER kctop0(klon)
+    integer, intent(out):: kcum
     REAL pen_u(klon, klev), pde_u(klon, klev)
+
+    ! Local:
+
     REAL zqold(klon)
     REAL zdland(klon)
     LOGICAL llflag(klon)
-    INTEGER k, i, is, icall, kcum
+    INTEGER k, i, is, icall
     REAL ztglace, zdphi, zqeen, zseen, zscde, zqude
     REAL zmfusk, zmfuqk, zmfulk, zbuo, zdnoprc, zprcon, zlnew
 
@@ -96,7 +104,7 @@ contains
        IF (ldland(i)) THEN
           zdland(i)=3.0E4
           zdphi=pgeoh(i, kctop0(i))-pgeoh(i, kcbot(i))
-          IF (ptu(i, kctop0(i)).GE.ztglace) zdland(i)=zdphi
+          IF (ptu(i, kctop0(i)) >= ztglace) zdland(i)=zdphi
           zdland(i)=MAX(3.0E4, zdland(i))
           zdland(i)=MIN(5.0E4, zdland(i))
        ENDIF
@@ -112,8 +120,8 @@ contains
           pqu(i, klev) = 0.
        ENDIF
        pmfu(i, klev) = pmfub(i)
-       pmfus(i, klev) = pmfub(i)*(RCPD*ptu(i, klev)+pgeoh(i, klev))
-       pmfuq(i, klev) = pmfub(i)*pqu(i, klev)
+       pmfus(i, klev) = pmfub(i) * (RCPD * ptu(i, klev)+pgeoh(i, klev))
+       pmfuq(i, klev) = pmfub(i) * pqu(i, klev)
     ENDDO
 
     DO i = 1, klon
@@ -134,11 +142,11 @@ contains
                 pqu(i, k+1) = pqen(i, k)
                 plu(i, k+1) = 0.0
                 zzzmb = MAX(CMFCMIN, -pvervel(i, k)/RG)
-                zmfmax = (paph(i, k)-paph(i, k-1))/(RG*pdtime)
+                zmfmax = (paph(i, k)-paph(i, k-1))/(RG * pdtime)
                 pmfub(i) = MIN(zzzmb, zmfmax)
                 pmfu(i, k+1) = pmfub(i)
-                pmfus(i, k+1) = pmfub(i)*(RCPD*ptu(i, k+1)+pgeoh(i, k+1))
-                pmfuq(i, k+1) = pmfub(i)*pqu(i, k+1)
+                pmfus(i, k+1) = pmfub(i) * (RCPD * ptu(i, k+1)+pgeoh(i, k+1))
+                pmfuq(i, k+1) = pmfub(i) * pqu(i, k+1)
                 pmful(i, k+1) = 0.0
                 pdmfup(i, k+1) = 0.0
                 kcbot(i) = k
@@ -163,36 +171,36 @@ contains
        DO i = 1, klon
           pen_u(i, k) = 0.0
           pde_u(i, k) = 0.0
-          zrho(i)=paph(i, k+1)/(RD*ptenh(i, k+1))
+          zrho(i)=paph(i, k+1)/(RD * ptenh(i, k+1))
           zpbot(i)=paph(i, kcbot(i))
           zptop(i)=paph(i, kctop0(i))
        ENDDO
 
        DO i = 1, klon
           IF(ldcum(i)) THEN
-             zdprho=(paph(i, k+1)-paph(i, k))/(RG*zrho(i))
-             zentr=pentr(i)*pmfu(i, k+1)*zdprho
+             zdprho=(paph(i, k+1)-paph(i, k))/(RG * zrho(i))
+             zentr=pentr(i) * pmfu(i, k+1) * zdprho
              llo1=k < kcbot(i)
              IF(llo1) pde_u(i, k)=zentr
-             zpmid=0.5*(zpbot(i)+zptop(i))
+             zpmid=0.5 * (zpbot(i)+zptop(i))
              llo2=llo1.AND.ktype(i) == 2.AND. &
                   (zpbot(i)-paph(i, k) < 0.2E5.OR. &
                   paph(i, k) > zpmid)
              IF(llo2) pen_u(i, k)=zentr
              llo2=llo1.AND.(ktype(i) == 1.OR.ktype(i) == 3).AND. &
-                  (k.GE.MAX(klwmin(i), kctop0(i)+2).OR.pap(i, k) > zpmid)
+                  (k >= MAX(klwmin(i), kctop0(i)+2).OR.pap(i, k) > zpmid)
              IF(llo2) pen_u(i, k)=zentr
              llo1=pen_u(i, k) > 0..AND.(ktype(i) == 1.OR.ktype(i) == 2)
              IF(llo1) THEN
-                zentr=zentr*(1.+3.*(1.-MIN(1., (zpbot(i)-pap(i, k))/1.5E4)))
-                pen_u(i, k)=pen_u(i, k)*(1.+3.*(1.-MIN(1., &
+                zentr=zentr * (1.+3. * (1.-MIN(1., (zpbot(i)-pap(i, k))/1.5E4)))
+                pen_u(i, k)=pen_u(i, k) * (1.+3. * (1.-MIN(1., &
                      (zpbot(i)-pap(i, k))/1.5E4)))
-                pde_u(i, k)=pde_u(i, k)*(1.+3.*(1.-MIN(1., &
+                pde_u(i, k)=pde_u(i, k) * (1.+3. * (1.-MIN(1., &
                      (zpbot(i)-pap(i, k))/1.5E4)))
              ENDIF
              IF(llo2.AND.pqenh(i, k+1) > 1.E-5) &
-                  pen_u(i, k)=zentr+MAX(pqte(i, k), 0.)/pqenh(i, k+1)* &
-                  zrho(i)*zdprho
+                  pen_u(i, k)=zentr+MAX(pqte(i, k), 0.)/pqenh(i, k+1) * &
+                  zrho(i) * zdprho
           ENDIF
        end DO
 
@@ -202,25 +210,25 @@ contains
           IF (llflag(i)) THEN
              IF (k < kcbot(i)) THEN
                 zmftest = pmfu(i, k+1)+pen_u(i, k)-pde_u(i, k)
-                zmfmax = MIN(zmftest, (paph(i, k)-paph(i, k-1))/(RG*pdtime))
+                zmfmax = MIN(zmftest, (paph(i, k)-paph(i, k-1))/(RG * pdtime))
                 pen_u(i, k)=MAX(pen_u(i, k)-MAX(0.0, zmftest-zmfmax), 0.0)
              ENDIF
-             pde_u(i, k)=MIN(pde_u(i, k), 0.75*pmfu(i, k+1))
+             pde_u(i, k)=MIN(pde_u(i, k), 0.75 * pmfu(i, k+1))
              ! calculer le flux de masse du niveau k a partir de celui du k+1
              pmfu(i, k)=pmfu(i, k+1)+pen_u(i, k)-pde_u(i, k)
              ! calculer les valeurs Su, Qu et l du niveau k dans le
              ! panache montant
-             zqeen=pqenh(i, k+1)*pen_u(i, k)
-             zseen=(RCPD*ptenh(i, k+1)+pgeoh(i, k+1))*pen_u(i, k)
-             zscde=(RCPD*ptu(i, k+1)+pgeoh(i, k+1))*pde_u(i, k)
-             zqude=pqu(i, k+1)*pde_u(i, k)
-             plude(i, k)=plu(i, k+1)*pde_u(i, k)
+             zqeen=pqenh(i, k+1) * pen_u(i, k)
+             zseen=(RCPD * ptenh(i, k+1)+pgeoh(i, k+1)) * pen_u(i, k)
+             zscde=(RCPD * ptu(i, k+1)+pgeoh(i, k+1)) * pde_u(i, k)
+             zqude=pqu(i, k+1) * pde_u(i, k)
+             plude(i, k)=plu(i, k+1) * pde_u(i, k)
              zmfusk=pmfus(i, k+1)+zseen-zscde
              zmfuqk=pmfuq(i, k+1)+zqeen-zqude
              zmfulk=pmful(i, k+1) -plude(i, k)
-             plu(i, k)=zmfulk*(1./MAX(CMFCMIN, pmfu(i, k)))
-             pqu(i, k)=zmfuqk*(1./MAX(CMFCMIN, pmfu(i, k)))
-             ptu(i, k)=(zmfusk*(1./MAX(CMFCMIN, pmfu(i, k)))- &
+             plu(i, k)=zmfulk * (1./MAX(CMFCMIN, pmfu(i, k)))
+             pqu(i, k)=zmfuqk * (1./MAX(CMFCMIN, pmfu(i, k)))
+             ptu(i, k)=(zmfusk * (1./MAX(CMFCMIN, pmfu(i, k)))- &
                   pgeoh(i, k))/RCPD
              ptu(i, k)=MAX(100., ptu(i, k))
              ptu(i, k)=MIN(400., ptu(i, k))
@@ -239,18 +247,18 @@ contains
           IF(llflag(i).AND.pqu(i, k).NE.zqold(i)) THEN
              klab(i, k) = 2
              plu(i, k) = plu(i, k)+zqold(i)-pqu(i, k)
-             zbuo = ptu(i, k)*(1.+RETV*pqu(i, k))- &
-                  ptenh(i, k)*(1.+RETV*pqenh(i, k))
+             zbuo = ptu(i, k) * (1.+RETV * pqu(i, k))- &
+                  ptenh(i, k) * (1.+RETV * pqenh(i, k))
              IF (klab(i, k+1) == 1) zbuo=zbuo+0.5
-             IF (zbuo > 0..AND.pmfu(i, k).GE.0.1*pmfub(i)) THEN
+             IF (zbuo > 0. .AND. pmfu(i, k) >= 0.1 * pmfub(i)) THEN
                 kctop(i) = k
                 ldcum(i) = .TRUE.
                 zdnoprc = 1.5E4
                 IF (ldland(i)) zdnoprc = zdland(i)
                 zprcon = CPRCON
                 IF ((zpbot(i)-paph(i, k)) < zdnoprc) zprcon = 0.0
-                zlnew=plu(i, k)/(1.+zprcon*(pgeoh(i, k)-pgeoh(i, k+1)))
-                pdmfup(i, k)=MAX(0., (plu(i, k)-zlnew)*pmfu(i, k))
+                zlnew=plu(i, k)/(1.+zprcon * (pgeoh(i, k)-pgeoh(i, k+1)))
+                pdmfup(i, k)=MAX(0., (plu(i, k)-zlnew) * pmfu(i, k))
                 plu(i, k)=zlnew
              ELSE
                 klab(i, k)=0
@@ -260,9 +268,9 @@ contains
        end DO
        DO i = 1, klon
           IF (llflag(i)) THEN
-             pmful(i, k)=plu(i, k)*pmfu(i, k)
-             pmfus(i, k)=(RCPD*ptu(i, k)+pgeoh(i, k))*pmfu(i, k)
-             pmfuq(i, k)=pqu(i, k)*pmfu(i, k)
+             pmful(i, k)=plu(i, k) * pmfu(i, k)
+             pmfus(i, k)=(RCPD * ptu(i, k)+pgeoh(i, k)) * pmfu(i, k)
+             pmfuq(i, k)=pqu(i, k) * pmfu(i, k)
           ENDIF
        end DO
 
@@ -288,15 +296,15 @@ contains
        DO i = 1, klon
           IF (ldcum(i)) THEN
              k=kctop(i)-1
-             pde_u(i, k)=(1.-CMFCTOP)*pmfu(i, k+1)
-             plude(i, k)=pde_u(i, k)*plu(i, k+1)
+             pde_u(i, k)=(1.-CMFCTOP) * pmfu(i, k+1)
+             plude(i, k)=pde_u(i, k) * plu(i, k+1)
              pmfu(i, k)=pmfu(i, k+1)-pde_u(i, k)
              zlnew=plu(i, k)
-             pdmfup(i, k)=MAX(0., (plu(i, k)-zlnew)*pmfu(i, k))
+             pdmfup(i, k)=MAX(0., (plu(i, k)-zlnew) * pmfu(i, k))
              plu(i, k)=zlnew
-             pmfus(i, k)=(RCPD*ptu(i, k)+pgeoh(i, k))*pmfu(i, k)
-             pmfuq(i, k)=pqu(i, k)*pmfu(i, k)
-             pmful(i, k)=plu(i, k)*pmfu(i, k)
+             pmfus(i, k)=(RCPD * ptu(i, k)+pgeoh(i, k)) * pmfu(i, k)
+             pmfuq(i, k)=pqu(i, k) * pmfu(i, k)
+             pmful(i, k)=plu(i, k) * pmfu(i, k)
              plude(i, k-1)=pmful(i, k)
           ENDIF
        end DO

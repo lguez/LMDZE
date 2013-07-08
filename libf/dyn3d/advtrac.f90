@@ -9,22 +9,20 @@ contains
     ! From dyn3d/advtrac.F, version 1.4 2005/04/13 08:58:34
     ! Author: F. Hourdin
 
-    USE dimens_m, ONLY : iim, jjm, llm, nqmx
-    USE paramet_m, ONLY : iip1, iip2, ijmllm, ijp1llm, ip1jm, ip1jmp1, jjp1, &
-         llmp1
     USE comconst, ONLY : dtvr
     USE conf_gcm_m, ONLY : iapp_tracvl
+    USE dimens_m, ONLY : iim, jjm, llm, nqmx
     USE iniadvtrac_m, ONLY : iadv
+    USE paramet_m, ONLY : iip1, iip2, ijmllm, ijp1llm, ip1jm, ip1jmp1, jjp1, &
+         llmp1
 
-    ! Arguments
-
-    INTEGER iapptrac
-    REAL pbaru(ip1jmp1, llm), pbarv(ip1jm, llm)
-    REAL, intent(inout):: q(ip1jmp1, llm, nqmx)
-    real masse(ip1jmp1, llm)
+    REAL, intent(in):: pbaru(ip1jmp1, llm), pbarv(ip1jm, llm)
     REAL, intent(in):: p(ip1jmp1, llmp1)
+    real, intent(in):: masse(ip1jmp1, llm)
+    REAL, intent(inout):: q(ip1jmp1, llm, nqmx)
+    INTEGER, intent(out):: iapptrac
     real, intent(in):: teta(ip1jmp1, llm)
-    REAL pk(ip1jmp1, llm)
+    REAL, intent(in):: pk(ip1jmp1, llm)
 
     ! Variables locales
 
@@ -72,15 +70,13 @@ contains
     END DO
 
     ! selection de la masse instantannee des mailles avant le transport.
-    IF (iadvtr==0) THEN
-       CALL scopy(ip1jmp1*llm, masse, 1, massem, 1)
-    END IF
+    IF (iadvtr==0) massem = masse
 
     iadvtr = iadvtr + 1
     iapptrac = iadvtr
 
     ! Test pour savoir si on advecte a ce pas de temps
-    IF (iadvtr==iapp_tracvl) THEN
+    IF (iadvtr == iapp_tracvl) THEN
        ! traitement des flux de masse avant advection.
        ! 1. calcul de w
        ! 2. groupement des mailles pres du pole.

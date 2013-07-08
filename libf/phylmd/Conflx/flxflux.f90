@@ -5,8 +5,8 @@ module flxflux_m
 contains
 
   SUBROUTINE flxflux(pdtime, pqen, pqsen, ptenh, pqenh, pap, paph, ldland, &
-       pgeoh, kcbot, kctop, lddraf, kdtop, ktype, ldcum, pmfu, pmfd, pmfus, &
-       pmfds, pmfuq, pmfdq, pmful, plude, pdmfup, pdmfdp, pten, prfl, psfl, &
+       pgeoh, kcbot, kctop, lddraf, kdtop, ktype, ldcum, mfu, pmfd, mfus, &
+       pmfds, mfuq, pmfdq, mful, plude, pdmfup, pdmfdp, pten, prfl, psfl, &
        pdpmel, ktopm2, pmflxr, pmflxs)
 
     ! This routine does the final calculation of convective fluxes in
@@ -31,13 +31,13 @@ contains
     INTEGER kdtop(klon)
     INTEGER, intent(inout):: ktype(klon)
     LOGICAL, intent(in):: ldcum(klon)
-    REAL pmfu(klon, klev)
+    REAL mfu(klon, klev)
     REAL pmfd(klon, klev)
-    real pmfus(klon, klev)
+    real, intent(inout):: mfus(klon, klev)
     real pmfds(klon, klev)
-    REAL pmfuq(klon, klev)
+    REAL mfuq(klon, klev)
     REAL pmfdq(klon, klev)
-    real pmful(klon, klev)
+    real mful(klon, klev)
     REAL plude(klon, klev)
     REAL pdmfup(klon, klev)
     REAL pdmfdp(klon, klev)
@@ -88,9 +88,9 @@ contains
     DO k = ktopm2, klev
        DO i = 1, klon
           IF (ldcum(i) .AND. k >= kctop(i) - 1) THEN
-             pmfus(i, k) = pmfus(i, k) &
-                  - pmfu(i, k) * (RCPD * ptenh(i, k) + pgeoh(i, k))
-             pmfuq(i, k)=pmfuq(i, k)-pmfu(i, k)*pqenh(i, k)
+             mfus(i, k) = mfus(i, k) &
+                  - mfu(i, k) * (RCPD * ptenh(i, k) + pgeoh(i, k))
+             mfuq(i, k)=mfuq(i, k)-mfu(i, k)*pqenh(i, k)
              zdp = 1.5E4
              IF (ldland(i)) zdp = 3.E4
 
@@ -113,10 +113,10 @@ contains
                 pdmfdp(i, k-1)=0.
              END IF
           ELSE
-             pmfu(i, k)=0.
-             pmfus(i, k)=0.
-             pmfuq(i, k)=0.
-             pmful(i, k)=0.
+             mfu(i, k)=0.
+             mfus(i, k)=0.
+             mfuq(i, k)=0.
+             mful(i, k)=0.
              pdmfup(i, k-1)=0.
              plude(i, k-1)=0.
              pmfd(i, k)=0.
@@ -134,10 +134,10 @@ contains
              zzp = ((paph(i, klev + 1) - paph(i, k)) &
                   / (paph(i, klev + 1) - paph(i, ikb)))
              IF (ktype(i) == 3) zzp = zzp**2
-             pmfu(i, k)=pmfu(i, ikb)*zzp
-             pmfus(i, k)=pmfus(i, ikb)*zzp
-             pmfuq(i, k)=pmfuq(i, ikb)*zzp
-             pmful(i, k)=pmful(i, ikb)*zzp
+             mfu(i, k)=mfu(i, ikb)*zzp
+             mfus(i, k)=mfus(i, ikb)*zzp
+             mfuq(i, k)=mfuq(i, ikb)*zzp
+             mful(i, k)=mful(i, ikb)*zzp
           ENDIF
        end DO
     end DO

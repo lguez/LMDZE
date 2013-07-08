@@ -68,7 +68,7 @@ c             PRINT *,' Fichier  Limite ',fich
          PRINT *,' PBS ! Le jour a lire sur le fichier limit ne se '
          PRINT *,' trouve pas sur les ',nannemax,' annees a partir de '
          PRINT *,' l annee de debut', annee_ref
-         CALL EXIT(1)
+         stop 1
 c
 100     CONTINUE
 c
@@ -86,7 +86,7 @@ c
         WRITE(6,*)' Le fichier limit ',fich,' (avec 4 chiffres , pour' 
         WRITE(6,*)'       l an 2000 )  ,  n existe  pas !  ' 
         WRITE(6,*)' ierr = ', ierr
-        CALL EXIT(1)
+        stop 1
       ENDIF
 c     DO k = 1, jour
 c La tranche de donnees a lire:

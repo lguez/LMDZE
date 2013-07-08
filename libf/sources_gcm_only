@@ -174,10 +174,10 @@ lnblnk.f
 lwb.f
 lwbv.f
 lwc.f
-lw.f
+lw.f90
 lwtt.f
 lwttm.f
-lwu.f
+lwu.f90
 lwvb.f
 lwvd.f
 lwv.f
@@ -266,3 +266,7 @@ yoethf.f90
 YOMCST.f90
 zilch.f
 mathop2.f90
+divgrad2.f90
+gradiv2.f90
+inidissip.f90
+nxgraro2.f90

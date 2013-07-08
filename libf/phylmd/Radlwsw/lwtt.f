@@ -36,29 +36,29 @@ C     --------------
 C        ORIGINAL : 88-12-15
 C
 C-----------------------------------------------------------------------
-      REAL*8 O1H, O2H
+      DOUBLE PRECISION O1H, O2H
       PARAMETER (O1H=2230.)
       PARAMETER (O2H=100.)
-      REAL*8 RPIALF0
+      DOUBLE PRECISION RPIALF0
       PARAMETER (RPIALF0=2.0)
 C
 C* ARGUMENTS:
 C
-      REAL*8 PUU(KDLON,NUA)
-      REAL*8 PTT(KDLON,NTRA)
-      REAL*8 PGA(KDLON,8,2)
-      REAL*8 PGB(KDLON,8,2)
+      DOUBLE PRECISION PUU(KDLON,NUA)
+      DOUBLE PRECISION PTT(KDLON,NTRA)
+      DOUBLE PRECISION PGA(KDLON,8,2)
+      DOUBLE PRECISION PGB(KDLON,8,2)
 C
 C* LOCAL VARIABLES:
 C
-      REAL*8 zz, zxd, zxn
-      REAL*8 zpu, zpu10, zpu11, zpu12, zpu13
-      REAL*8 zeu, zeu10, zeu11, zeu12, zeu13
-      REAL*8 zx, zy, zsq1, zsq2, zvxy, zuxy
-      REAL*8 zaercn, zto1, zto2, zxch4, zych4, zxn2o, zyn2o
-      REAL*8 zsqn21, zodn21, zsqh42, zodh42
-      REAL*8 zsqh41, zodh41, zsqn22, zodn22, zttf11, zttf12
-      REAL*8 zuu11, zuu12, za11, za12
+      DOUBLE PRECISION zz, zxd, zxn
+      DOUBLE PRECISION zpu, zpu10, zpu11, zpu12, zpu13
+      DOUBLE PRECISION zeu, zeu10, zeu11, zeu12, zeu13
+      DOUBLE PRECISION zx, zy, zsq1, zsq2, zvxy, zuxy
+      DOUBLE PRECISION zaercn, zto1, zto2, zxch4, zych4, zxn2o, zyn2o
+      DOUBLE PRECISION zsqn21, zodn21, zsqh42, zodh42
+      DOUBLE PRECISION zsqh41, zodh41, zsqn22, zodn22, zttf11, zttf12
+      DOUBLE PRECISION zuu11, zuu12, za11, za12
       INTEGER jl, ja
 C     ------------------------------------------------------------------
 C

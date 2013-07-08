@@ -75,7 +75,7 @@ contains
     INTEGER npas, nexca
     REAL ts(klon, nbsrf) ! input-R- temperature du sol (en Kelvin)
     LOGICAL, INTENT(IN):: soil_model
-    REAL cdmmax, cdhmax ! seuils cdrm, cdrh
+    REAL, INTENT(IN):: cdmmax, cdhmax ! seuils cdrm, cdrh
     REAL ksta, ksta_ter
     LOGICAL ok_kzmin
     REAL ftsoil(klon, nsoilmx, nbsrf)
