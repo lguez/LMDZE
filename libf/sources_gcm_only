@@ -34,7 +34,7 @@ clcdrag.f90
 clesphys2.f90
 clift.f
 clmain.f90
-clouds_gno.f
+clouds_gno.f90
 clqh.f90
 cltrac.f
 cltracrn.f90
@@ -52,7 +52,6 @@ condsurf.f
 conema3.f90
 conema3_m.f90
 conf_guide.f90
-conf_interface.f90
 conflx.f90
 conf_phys.f90
 convect3.f
@@ -171,7 +170,7 @@ limx.f
 limy.f
 limz.f
 lnblnk.f
-lwb.f
+lwb.f90
 lwbv.f
 lwc.f
 lw.f90

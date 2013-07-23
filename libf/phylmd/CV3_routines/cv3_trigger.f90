@@ -31,7 +31,7 @@
 
 ! input AND output:
       integer iflag(len)
-      real sig(len,nd), w0(len,nd)
+      real, intent(inout):: sig(len,nd), w0(len,nd)
 
 ! local variables:
       integer i,k
@@ -60,27 +60,6 @@
 !   ***       if not, return to calling program after resetting       ***
 !   ***                        sig(i) and w0(i)                       ***
 !
-
-! oct3      do 200 i=1,len
-! oct3
-! oct3       tdif = buoybase(i)
-! oct3       ath1 = th(i,1)
-! oct3       ath  = th(i,icb(i)-1) - dttrig
-! oct3
-! oct3       if (tdif.lt.dtcrit .or. ath.gt.ath1) then
-! oct3         do 60 k=1,nl
-! oct3            sig(i,k) = beta*sig(i,k) - 2.*alpha*tdif*tdif
-! oct3            sig(i,k) = AMAX1(sig(i,k),0.0)
-! oct3            w0(i,k)  = beta*w0(i,k)
-! oct3   60    continue
-! oct3         iflag(i)=4 ! pour version vectorisee
-! oct3c convect3         iflag(i)=0
-! oct3cccc         return
-! oct3       endif
-! oct3
-! oct3200   continue
-
-! -- oct3: on reecrit la boucle 200 (pour la vectorisation)
 
       do  60 k=1,nl
       do 200 i=1,len

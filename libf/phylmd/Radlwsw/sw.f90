@@ -10,30 +10,30 @@ contains
        ZFSDN0, tauae, pizae, cgae, PTAUA, POMEGAA, PTOPSWAD, PSOLSWAD, &
        PTOPSWAI, PSOLSWAI, ok_ade, ok_aie)
 
-    ! PURPOSE.
-    ! THIS ROUTINE COMPUTES THE SHORTWAVE RADIATION FLUXES IN TWO
-    ! SPECTRAL INTERVALS FOLLOWING FOUQUART AND BONNEL (1980).
+    ! Purpose.
+    ! This routine computes the shortwave radiation fluxes in two
+    ! spectral intervals following Fouquart and Bonnel (1980).
 
-    ! METHOD.
-    ! 1. COMPUTES ABSORBER AMOUNTS (SWU)
-    ! 2. COMPUTES FLUXES IN 1ST SPECTRAL INTERVAL (SW1S)
-    ! 3. COMPUTES FLUXES IN 2ND SPECTRAL INTERVAL (SW2S)
+    ! Method.
+    ! 1. Computes absorber amounts (swu)
+    ! 2. Computes fluxes in 1st spectral interval (SW1S)
+    ! 3. Computes fluxes in 2nd spectral interval (SW2S)
 
-    ! REFERENCE.
-    ! SEE RADIATION PART OF THE ECMWF RESEARCH DEPARTMENT
-    ! DOCUMENTATION, AND FOUQUART AND BONNEL (1980)
+    ! Reference.
+    ! See radiation part of the ECMWF research department
+    ! documentation, and Fouquart and Bonnel (1980)
 
-    ! AUTHOR.
-    ! JEAN-JACQUES MORCRETTE *ECMWF*
+    ! Author.
+    ! Jean-Jacques Morcrette *ecmwf*
 
-    ! MODIFICATIONS.
-    ! ORIGINAL: 89-07-14
-    ! 95-01-01 J.-J. MORCRETTE Direct/Diffuse Albedo
-    ! 03-11-27 J. QUAAS Introduce aerosol forcings (based on BOUCHER)
+    ! Modifications.
+    ! Original: 89-07-14
+    ! 95-01-01 J.-J. Morcrette direct/diffuse albedo
+    ! 03-11-27 J. Quaas Introduce aerosol forcings (based on Boucher)
 
     USE clesphys, ONLY: bug_ozone
-    USE suphec_m, ONLY: rcpd, rday, rg, md, rmo3
     USE raddim, ONLY: kdlon, kflev
+    USE suphec_m, ONLY: rcpd, rday, rg, md, rmo3
 
     ! ARGUMENTS:
 
@@ -92,15 +92,12 @@ contains
 
     INTEGER inu, jl, jk, i, k, kpl1
 
-    INTEGER swpas ! Every swpas steps, sw is calculated
-    PARAMETER(swpas=1)
+    INTEGER, PARAMETER:: swpas = 1 ! Every swpas steps, sw is calculated
 
-    INTEGER itapsw
-    LOGICAL appel1er
-    DATA itapsw /0/
-    DATA appel1er /.TRUE./
+    INTEGER:: itapsw = 0
+    LOGICAL:: appel1er = .TRUE.
     !jq-Introduced for aerosol forcings
-    double precision flag_aer
+    double precision, save:: flag_aer
     logical, intent(in):: ok_ade, ok_aie ! use aerosol forcings or not?
     double precision tauae(kdlon, kflev, 2) ! aerosol optical properties
     double precision pizae(kdlon, kflev, 2) 
@@ -124,21 +121,22 @@ contains
     ! (diagnosed aerosol forcing)SHORTWAVE FLUX AT SURFACE(+AEROSOL IND)
 
     !jq - Fluxes including aerosol effects
-    DOUBLE PRECISION ZFSUPAD(KDLON, KFLEV+1)
-    DOUBLE PRECISION ZFSDNAD(KDLON, KFLEV+1)
-    DOUBLE PRECISION ZFSUPAI(KDLON, KFLEV+1)
-    DOUBLE PRECISION ZFSDNAI(KDLON, KFLEV+1)
-    logical initialized
-    SAVE ZFSUPAD, ZFSDNAD, ZFSUPAI, ZFSDNAI ! aerosol fluxes
-    !rv
-    save flag_aer
-    data initialized/.false./
+    DOUBLE PRECISION, save:: ZFSUPAD(KDLON, KFLEV+1)
+    DOUBLE PRECISION, save:: ZFSDNAD(KDLON, KFLEV+1)
+    DOUBLE PRECISION, save:: ZFSUPAI(KDLON, KFLEV+1)
+    DOUBLE PRECISION, save:: ZFSDNAI(KDLON, KFLEV+1)
+
+    logical:: initialized = .false.
 
     !-------------------------------------------------------------------
 
     if(.not.initialized) then
        flag_aer=0.
        initialized=.TRUE.
+       ZFSUPAD = 0.
+       ZFSDNAD = 0.
+       ZFSUPAI = 0.
+       ZFSDNAI = 0.
     endif
     !rv
 

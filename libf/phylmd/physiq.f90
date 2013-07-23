@@ -7,7 +7,9 @@ contains
   SUBROUTINE physiq(lafin, rdayvrai, time, dtphys, paprs, play, pphi, pphis, &
        u, v, t, qx, omega, d_u, d_v, d_t, d_qx, d_ps, dudyn, PVteta)
 
-    ! From phylmd/physiq.F, version 1.22 2006/02/20 09:38:28 (SVN revision 678)
+    ! From phylmd/physiq.F, version 1.22 2006/02/20 09:38:28
+    ! (subversion revision 678)
+
     ! Author: Z.X. Li (LMD/CNRS) 1993
 
     ! This is the main procedure for the "physics" part of the program.
@@ -23,6 +25,7 @@ contains
     USE clesphys2, ONLY: cycle_diurne, iflag_con, nbapp_rad, new_oliq, &
          ok_orodr, ok_orolf, soil_model
     USE clmain_m, ONLY: clmain
+    use clouds_gno_m, only: clouds_gno
     USE comgeomphy, ONLY: airephy, cuphy, cvphy
     USE concvl_m, ONLY: concvl
     USE conf_gcm_m, ONLY: offline, raz_date
@@ -203,7 +206,7 @@ contains
     PARAMETER(kmaxm1 = kmax-1, lmaxm1 = lmax-1)
 
     REAL zx_tau(kmaxm1), zx_pc(lmaxm1)
-    DATA zx_tau/0.0, 0.3, 1.3, 3.6, 9.4, 23., 60./
+    DATA zx_tau/0., 0.3, 1.3, 3.6, 9.4, 23., 60./
     DATA zx_pc/50., 180., 310., 440., 560., 680., 800./
 
     ! cldtopres pression au sommet des nuages
@@ -312,8 +315,7 @@ contains
     SAVE Ma
     REAL qcondc(klon, llm) ! in-cld water content from convect
     SAVE qcondc 
-    REAL ema_work1(klon, llm), ema_work2(klon, llm)
-    SAVE ema_work1, ema_work2
+    REAL, save:: sig1(klon, llm), w01(klon, llm)
     REAL, save:: wd(klon)
 
     ! Variables locales pour la couche limite (al1):
@@ -388,10 +390,8 @@ contains
 
     ! Variables locales
 
-    real clwcon(klon, llm), rnebcon(klon, llm)
-    real clwcon0(klon, llm), rnebcon0(klon, llm)
-
-    save rnebcon, clwcon
+    real, save:: clwcon(klon, llm), rnebcon(klon, llm)
+    real, save:: clwcon0(klon, llm), rnebcon0(klon, llm)
 
     REAL rhcl(klon, llm) ! humiditi relative ciel clair
     REAL dialiq(klon, llm) ! eau liquide nuageuse
@@ -417,13 +417,14 @@ contains
     REAL heat0(klon, llm) ! chauffage solaire ciel clair
     REAL, save:: cool(klon, llm) ! refroidissement infrarouge
     REAL cool0(klon, llm) ! refroidissement infrarouge ciel clair
-    REAL, save:: topsw(klon), toplw(klon), solsw(klon), sollw(klon)
-    real sollwdown(klon) ! downward LW flux at surface
+    REAL, save:: topsw(klon), toplw(klon), solsw(klon)
+    REAL, save:: sollw(klon) ! rayonnement infrarouge montant à la surface
+    real, save:: sollwdown(klon) ! downward LW flux at surface
     REAL, save:: topsw0(klon), toplw0(klon), solsw0(klon), sollw0(klon)
     REAL albpla(klon)
     REAL fsollw(klon, nbsrf) ! bilan flux IR pour chaque sous surface
     REAL fsolsw(klon, nbsrf) ! flux solaire absorb. pour chaque sous surface
-    SAVE albpla, sollwdown
+    SAVE albpla
     SAVE heat0, cool0
 
     INTEGER itaprad
@@ -628,8 +629,6 @@ contains
     SAVE solswad
     SAVE d_u_con
     SAVE d_v_con
-    SAVE rnebcon0
-    SAVE clwcon0
 
     real zmasse(klon, llm) 
     ! (column-density of mass of air in a cell, in kg m-2)
@@ -666,12 +665,12 @@ contains
        solswai(:) = 0.
        solswad(:) = 0.
 
-       d_u_con = 0.0
-       d_v_con = 0.0
-       rnebcon0 = 0.0
-       clwcon0 = 0.0
-       rnebcon = 0.0
-       clwcon = 0.0
+       d_u_con = 0.
+       d_v_con = 0.
+       rnebcon0 = 0.
+       clwcon0 = 0.
+       rnebcon = 0.
+       clwcon = 0.
 
        pblh =0. ! Hauteur de couche limite
        plcl =0. ! Niveau de condensation de la CLA
@@ -701,9 +700,9 @@ contains
        itaprad = 0
        CALL phyetat0("startphy.nc", pctsrf, ftsol, ftsoil, ocean, tslab, &
             seaice, fqsurf, qsol, fsnow, falbe, falblw, fevap, rain_fall, &
-            snow_fall, solsw, sollwdown, dlw, radsol, frugs, agesno, zmea, &
+            snow_fall, solsw, sollw, dlw, radsol, frugs, agesno, zmea, &
             zstd, zsig, zgam, zthe, zpic, zval, t_ancien, q_ancien, &
-            ancien_ok, rnebcon, ratqs, clwcon, run_off_lic_0)
+            ancien_ok, rnebcon, ratqs, clwcon, run_off_lic_0, sig1, w01)
 
        ! ATTENTION : il faudra a terme relire q2 dans l'etat initial
        q2 = 1e-8
@@ -829,8 +828,8 @@ contains
     ELSE
        DO k = 1, llm
           DO i = 1, klon
-             d_t_dyn(i, k) = 0.0
-             d_q_dyn(i, k) = 0.0
+             d_t_dyn(i, k) = 0.
+             d_q_dyn(i, k) = 0.
           ENDDO
        ENDDO
        ancien_ok = .TRUE.
@@ -883,7 +882,7 @@ contains
     ! Appeler la diffusion verticale (programme de couche limite)
 
     DO i = 1, klon
-       zxrugs(i) = 0.0
+       zxrugs(i) = 0.
     ENDDO
     DO nsrf = 1, nbsrf
        DO i = 1, klon
@@ -916,8 +915,8 @@ contains
        ENDDO
     ENDDO
 
-    ! Repartition sous maille des flux LW et SW
-    ! Repartition du longwave par sous-surface linearisee
+    ! Répartition sous maille des flux longwave et shortwave
+    ! Répartition du longwave par sous-surface linéarisée
 
     DO nsrf = 1, nbsrf
        DO i = 1, klon
@@ -931,12 +930,12 @@ contains
 
     ! Couche limite:
 
-    CALL clmain(dtphys, itap, date0, pctsrf, pctsrf_new, t_seri, q_seri, &
-         u_seri, v_seri, julien, rmu0, co2_ppm, ok_veget, ocean, npas, nexca, &
+    CALL clmain(dtphys, itap, pctsrf, pctsrf_new, t_seri, q_seri, &
+         u_seri, v_seri, julien, rmu0, co2_ppm, ok_veget, ocean, &
          ftsol, soil_model, cdmmax, cdhmax, ksta, ksta_ter, ok_kzmin, ftsoil, &
          qsol, paprs, play, fsnow, fqsurf, fevap, falbe, falblw, fluxlat, &
-         rain_fall, snow_fall, fsolsw, fsollw, sollwdown, fder, rlon, rlat, &
-         cuphy, cvphy, frugs, firstcal, lafin, agesno, rugoro, d_t_vdf, &
+         rain_fall, snow_fall, fsolsw, fsollw, fder, rlon, rlat, &
+         frugs, firstcal, agesno, rugoro, d_t_vdf, &
          d_q_vdf, d_u_vdf, d_v_vdf, d_ts, fluxt, fluxq, fluxu, fluxv, cdragh, &
          cdragm, q2, dsens, devap, ycoefh, yu1, yv1, t2m, q2m, u10m, v10m, &
          pblh, capCL, oliqCL, cteiCL, pblT, therm, trmb1, trmb2, trmb3, plcl, &
@@ -986,26 +985,26 @@ contains
     ! Update surface temperature:
 
     DO i = 1, klon
-       zxtsol(i) = 0.0
-       zxfluxlat(i) = 0.0
+       zxtsol(i) = 0.
+       zxfluxlat(i) = 0.
 
-       zt2m(i) = 0.0
-       zq2m(i) = 0.0
-       zu10m(i) = 0.0
-       zv10m(i) = 0.0
-       zxffonte(i) = 0.0
-       zxfqcalving(i) = 0.0
+       zt2m(i) = 0.
+       zq2m(i) = 0.
+       zu10m(i) = 0.
+       zv10m(i) = 0.
+       zxffonte(i) = 0.
+       zxfqcalving(i) = 0.
 
-       s_pblh(i) = 0.0 
-       s_lcl(i) = 0.0 
-       s_capCL(i) = 0.0
-       s_oliqCL(i) = 0.0
-       s_cteiCL(i) = 0.0
-       s_pblT(i) = 0.0
-       s_therm(i) = 0.0
-       s_trmb1(i) = 0.0
-       s_trmb2(i) = 0.0
-       s_trmb3(i) = 0.0
+       s_pblh(i) = 0. 
+       s_lcl(i) = 0. 
+       s_capCL(i) = 0.
+       s_oliqCL(i) = 0.
+       s_cteiCL(i) = 0.
+       s_pblT(i) = 0.
+       s_therm(i) = 0.
+       s_trmb1(i) = 0.
+       s_trmb2(i) = 0.
+       s_trmb3(i) = 0.
 
        IF (abs(pctsrf(i, is_ter) + pctsrf(i, is_lic) + pctsrf(i, is_oce) &
             + pctsrf(i, is_sic) - 1.)  >  EPSFRA) print *, &
@@ -1096,8 +1095,9 @@ contains
        itop_con = llm + 1 - kctop
     else
        ! iflag_con >= 3
+
        CALL concvl(dtphys, paprs, play, t_seri, q_seri, u_seri, &
-            v_seri, tr_seri, ema_work1, ema_work2, d_t_con, d_q_con, &
+            v_seri, tr_seri, sig1, w01, d_t_con, d_q_con, &
             d_u_con, d_v_con, d_tr, rain_con, snow_con, ibas_con, &
             itop_con, upwd, dnwd, dnwd0, Ma, cape, tvp, iflagctrl, &
             pbase, bbase, dtvpdt1, dtvpdq1, dplcldt, dplcldr, qcondc, &
@@ -1137,6 +1137,12 @@ contains
        clwcon0 = fact_cldcon * clwcon0
        call clouds_gno(klon, llm, q_seri, zqsat, clwcon0, ptconv, ratqsc, &
             rnebcon0)
+
+       mfd = 0.
+       pen_u = 0.
+       pen_d = 0.
+       pde_d = 0.
+       pde_u = 0.
     END if
 
     DO k = 1, llm
@@ -1161,8 +1167,8 @@ contains
     IF (check) THEN
        za = qcheck(klon, llm, paprs, q_seri, ql_seri, airephy)
        print *, "aprescon = ", za
-       zx_t = 0.0
-       za = 0.0
+       zx_t = 0.
+       za = 0.
        DO i = 1, klon
           za = za + airephy(i)/REAL(klon)
           zx_t = zx_t + (rain_con(i)+ &
@@ -1270,8 +1276,8 @@ contains
     IF (check) THEN
        za = qcheck(klon, llm, paprs, q_seri, ql_seri, airephy)
        print *, "apresilp = ", za
-       zx_t = 0.0
-       za = 0.0
+       zx_t = 0.
+       za = 0.
        DO i = 1, klon
           za = za + airephy(i)/REAL(klon)
           zx_t = zx_t + (rain_lsc(i) &
@@ -1324,15 +1330,15 @@ contains
           ENDDO
        ENDDO
     ELSE IF (iflag_cldcon == 3) THEN
-       ! On prend pour les nuages convectifs le max du calcul de la
-       ! convection et du calcul du pas de temps précédent diminué d'un facteur
-       ! facttemps
-       facteur = dtphys *facttemps
+       ! On prend pour les nuages convectifs le maximum du calcul de
+       ! la convection et du calcul du pas de temps précédent diminué
+       ! d'un facteur facttemps.
+       facteur = dtphys * facttemps
        do k = 1, llm
           do i = 1, klon
              rnebcon(i, k) = rnebcon(i, k) * facteur
-             if (rnebcon0(i, k)*clwcon0(i, k) > rnebcon(i, k)*clwcon(i, k)) &
-                  then
+             if (rnebcon0(i, k) * clwcon0(i, k) &
+                  > rnebcon(i, k) * clwcon(i, k)) then
                 rnebcon(i, k) = rnebcon0(i, k)
                 clwcon(i, k) = clwcon0(i, k)
              endif
@@ -1458,8 +1464,8 @@ contains
 
     ! Calculer l'hydrologie de la surface
     DO i = 1, klon
-       zxqsurf(i) = 0.0
-       zxsnow(i) = 0.0
+       zxqsurf(i) = 0.
+       zxsnow(i) = 0.
     ENDDO
     DO nsrf = 1, nbsrf
        DO i = 1, klon
@@ -1481,7 +1487,7 @@ contains
        igwd = 0
        DO i = 1, klon
           itest(i) = 0
-          IF (((zpic(i)-zmea(i)) > 100.).AND.(zstd(i) > 10.0)) THEN
+          IF (((zpic(i)-zmea(i)) > 100.).AND.(zstd(i) > 10.)) THEN
              itest(i) = 1
              igwd = igwd + 1
              idx(igwd) = i
@@ -1652,9 +1658,9 @@ contains
        itau_phy = itau_phy + itap
        CALL phyredem("restartphy.nc", rlat, rlon, pctsrf, ftsol, ftsoil, &
             tslab, seaice, fqsurf, qsol, fsnow, falbe, falblw, fevap, &
-            rain_fall, snow_fall, solsw, sollwdown, dlw, radsol, frugs, &
+            rain_fall, snow_fall, solsw, sollw, dlw, radsol, frugs, &
             agesno, zmea, zstd, zsig, zgam, zthe, zpic, zval, t_ancien, &
-            q_ancien, rnebcon, ratqs, clwcon, run_off_lic_0)
+            q_ancien, rnebcon, ratqs, clwcon, run_off_lic_0, sig1, w01)
     ENDIF
 
     firstcal = .FALSE.

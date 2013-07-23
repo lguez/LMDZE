@@ -16,16 +16,16 @@ FFLAGS = $(addprefix -I, ${netcdf_inc_dir} ${numer_rec_95_dir} ${netcdf95_dir} $
 FFLAGS += -std=f95
 
 # Error and warning options:
-FFLAGS += -fmax-errors=1 -pedantic-errors -Wall -Wcharacter-truncation -Wconversion -Wimplicit-interface -Wunderflow -Wextra -Wunreachable-code
+FFLAGS += -fmax-errors=1 -pedantic-errors -Wall -Wcharacter-truncation -Wimplicit-interface -Wunderflow -Wextra -Wunreachable-code
 
 # Debugging options:
-FFLAGS += -ffpe-trap=invalid,zero,overflow -fbacktrace -fdump-core -g3
+FFLAGS += -ffpe-trap=invalid,zero,overflow -fbacktrace -fdump-core -g
 
 # Code generation options:
-FFLAGS += -fbounds-check -finit-real=nan
+FFLAGS += -fcheck=all -finit-real=SNAN
 
 # Optimization options:
-FFLAGS += -O0 -fstack-protector-all
+FFLAGS += -O0
 
 F90FLAGS = ${FFLAGS}
 

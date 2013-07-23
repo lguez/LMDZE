@@ -4,7 +4,7 @@ module concvl_m
 
 contains
 
-  SUBROUTINE concvl(dtime, paprs, pplay, t, q, u, v, tra, work1, work2, &
+  SUBROUTINE concvl(dtime, paprs, play, t, q, u, v, tra, sig1, w01, &
        d_t, d_q, d_u, d_v, d_tra, rain, snow, kbas, ktop, upwd, dnwd, dnwd0, &
        ma, cape, tvp, iflag, pbase, bbase, dtvpdt1, dtvpdq1, dplcldt, &
        dplcldr, qcondc, wd, pmflxr, pmflxs, da, phi, mp, ntra)
@@ -27,15 +27,13 @@ contains
 
     REAL, INTENT (IN):: dtime ! pas d'integration (s)
     REAL, INTENT (IN):: paprs(klon, klev+1)
-    REAL, INTENT (IN):: pplay(klon, klev)
+    REAL, INTENT (IN):: play(klon, klev)
     REAL, intent(in):: t(klon, klev)
     real q(klon, klev) ! input vapeur d'eau (en kg/kg)
     real u(klon, klev), v(klon, klev)
     REAL, INTENT (IN):: tra(klon, klev, ntrac)
     INTEGER, intent(in):: ntra ! number of tracers
-    REAL work1(klon, klev), work2(klon, klev)
-    ! work*: input et output: deux variables de travail,
-    !                            on peut les mettre a 0 au debut
+    REAL, intent(inout):: sig1(klon, klev), w01(klon, klev)
     REAL pmflxr(klon, klev+1), pmflxs(klon, klev+1)
 
     REAL d_t(klon, klev), d_q(klon, klev), d_u(klon, klev), d_v(klon, &
@@ -97,7 +95,7 @@ contains
 
     DO k = 1, klev
        DO i = 1, klon
-          em_p(i, k) = pplay(i, k)/100.0
+          em_p(i, k) = play(i, k)/100.0
        END DO
     END DO
 
@@ -129,8 +127,8 @@ contains
     END IF
 
     CALL cv_driver(klon, klev, klev+1, ntra, t, q, qs, u, v, tra, em_p, &
-         em_ph, iflag, d_t, d_q, d_u, d_v, d_tra, rain, pmflxr, cbmf, work1, &
-         work2, kbas, ktop, dtime, ma, upwd, dnwd, dnwd0, qcondc, wd, cape, &
+         em_ph, iflag, d_t, d_q, d_u, d_v, d_tra, rain, pmflxr, cbmf, sig1, &
+         w01, kbas, ktop, dtime, ma, upwd, dnwd, dnwd0, qcondc, wd, cape, &
          da, phi, mp)
 
     DO i = 1, klon

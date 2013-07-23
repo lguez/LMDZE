@@ -84,8 +84,12 @@ contains
     REAL prfl(klon, llm+1),   psfl(klon, llm+1)     !--lessivage large-scale
 
     !   convection:
+
     REAL, intent(in):: pmfu(klon, llm) ! flux de masse dans le panache montant
-    REAL pmfd(klon, llm)  ! flux de masse dans le panache descendant
+
+    REAL, intent(in):: pmfd(klon, llm)
+    ! flux de masse dans le panache descendant
+
     REAL pen_u(klon, llm) ! flux entraine dans le panache montant
 
     !   thermiques:

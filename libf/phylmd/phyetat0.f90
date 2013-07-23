@@ -14,7 +14,7 @@ contains
        qsurf, qsol, snow, albe, alblw, evap, rain_fall, snow_fall, solsw, &
        sollw, fder, radsol, frugs, agesno, zmea, zstd, zsig, zgam, zthe, &
        zpic, zval, t_ancien, q_ancien, ancien_ok, rnebcon, ratqs, clwcon, &
-       run_off_lic_0)
+       run_off_lic_0, sig1, w01)
 
     ! From phylmd/phyetat0.F, version 1.4 2005/06/03 10:03:07
     ! Author: Z.X. Li (LMD/CNRS)
@@ -31,8 +31,10 @@ contains
     USE temps, ONLY : itau_phy
 
     CHARACTER(len=*), intent(in):: fichnom
+    REAL pctsrf(klon, nbsrf)
     REAL tsol(klon, nbsrf)
     REAL tsoil(klon, nsoilmx, nbsrf)
+    CHARACTER(len=*), intent(in):: ocean
     REAL tslab(klon), seaice(klon)
     REAL qsurf(klon, nbsrf)
     REAL qsol(klon)
@@ -40,12 +42,12 @@ contains
     REAL albe(klon, nbsrf)
     REAL alblw(klon, nbsrf)
     REAL evap(klon, nbsrf)
-    REAL radsol(klon)
     REAL, intent(out):: rain_fall(klon)
     REAL snow_fall(klon)
-    REAL sollw(klon)
     real solsw(klon)
+    REAL, intent(out):: sollw(klon)
     real fder(klon)
+    REAL radsol(klon)
     REAL frugs(klon, nbsrf)
     REAL agesno(klon, nbsrf)
     REAL zmea(klon)
@@ -55,28 +57,28 @@ contains
     REAL zthe(klon)
     REAL zpic(klon)
     REAL zval(klon)
-    REAL pctsrf(klon, nbsrf)
-    REAL fractint(klon)
-    REAL run_off_lic_0(klon)
-
     REAL t_ancien(klon, klev), q_ancien(klon, klev)
-    real rnebcon(klon, klev), clwcon(klon, klev), ratqs(klon, klev)
     LOGICAL, intent(out):: ancien_ok
+    real rnebcon(klon, klev), ratqs(klon, klev), clwcon(klon, klev)
+    REAL run_off_lic_0(klon)
+    real, intent(out):: sig1(klon, klev) ! section adiabatic updraft
 
-    CHARACTER(len=*), intent(in):: ocean
+    real, intent(out):: w01(klon, klev) 
+    ! vertical velocity within adiabatic updraft
 
+    ! Local:
+    REAL fractint(klon)
     REAL xmin, xmax
-
     INTEGER ncid, varid
     INTEGER ierr, i, nsrf, isoil 
-    CHARACTER*7 str7
-    CHARACTER*2 str2
+    CHARACTER(len=7) str7
+    CHARACTER(len=2) str2
 
     !---------------------------------------------------------------
 
     print *, "Call sequence information: phyetat0"
 
-    ! Ouvrir le fichier contenant l'etat initial:
+    ! Fichier contenant l'état initial :
     print *, 'fichnom = ', fichnom
     call NF95_OPEN(fichnom, NF90_NOWRITE, ncid)
 
@@ -516,13 +518,7 @@ contains
     ELSE
        call nf95_get_var(ncid, varid, sollw)
     ENDIF
-    xmin = 1.0E+20
-    xmax = -1.0E+20
-    DO i = 1, klon
-       xmin = MIN(sollw(i), xmin)
-       xmax = MAX(sollw(i), xmax)
-    ENDDO
-    PRINT *, 'Rayonnement IF au sol sollw:', xmin, xmax
+    PRINT *, 'Rayonnement IF au sol sollw:', minval(sollw), maxval(sollw)
 
     ! Lecture derive des flux:
 
@@ -734,7 +730,8 @@ contains
        PRINT *, "Depart legerement fausse. Mais je continue"
        clwcon = 0.
     ELSE
-       call nf95_get_var(ncid, varid, clwcon)
+       call nf95_get_var(ncid, varid, clwcon(:, 1))
+       clwcon(:, 2:) = 0.
     ENDIF
     xmin = 1.0E+20
     xmax = -1.0E+20
@@ -748,7 +745,8 @@ contains
        PRINT *, "Depart legerement fausse. Mais je continue"
        rnebcon = 0.
     ELSE
-       call nf95_get_var(ncid, varid, rnebcon)
+       call nf95_get_var(ncid, varid, rnebcon(:, 1))
+       rnebcon(:, 2:) = 0.
     ENDIF
     xmin = 1.0E+20
     xmax = -1.0E+20
@@ -764,7 +762,8 @@ contains
        PRINT *, "Depart legerement fausse. Mais je continue"
        ratqs = 0.
     ELSE
-       call nf95_get_var(ncid, varid, ratqs)
+       call nf95_get_var(ncid, varid, ratqs(:, 1))
+       ratqs(:, 2:) = 0.
     ENDIF
     xmin = 1.0E+20
     xmax = -1.0E+20
@@ -787,6 +786,12 @@ contains
     xmin = MINval(run_off_lic_0)
     xmax = MAXval(run_off_lic_0)
     PRINT *, '(ecart-type) run_off_lic_0:', xmin, xmax
+
+    call nf95_inq_varid(ncid, "sig1", varid)
+    call nf95_get_var(ncid, varid, sig1)
+
+    call nf95_inq_varid(ncid, "w01", varid)
+    call nf95_get_var(ncid, varid, w01)
 
     call NF95_CLOSE(ncid)
 

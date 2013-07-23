@@ -111,6 +111,9 @@ contains
     REAL w(ip1jmp1, llm)
     REAL phystep
 
+    real sig1(klon, llm) ! section adiabatic updraft
+    real w01(klon, llm) ! vertical velocity within adiabatic updraft
+
     !---------------------------------
 
     print *, "Call sequence information: etat0"
@@ -355,12 +358,14 @@ contains
     rnebcon = 0.
     ratqs = 0.
     run_off_lic_0 = 0.
+    sig1 = 0.
+    w01 = 0.
 
     call phyredem("startphy.nc", latfi, lonfi, pctsrf, &
          tsolsrf, tsoil, tslab, seaice, qsolsrf, qsol, snsrf, albe, alblw, &
          evap, rain_fall, snow_fall, solsw, sollw, fder, radsol, frugs, &
          agesno, zmea, zstd, zsig, zgam, zthe, zpic, zval, &
-         t_ancien, q_ancien, rnebcon, ratqs, clwcon, run_off_lic_0)
+         t_ancien, q_ancien, rnebcon, ratqs, clwcon, run_off_lic_0, sig1, w01)
     CALL histclo
 
   END SUBROUTINE etat0

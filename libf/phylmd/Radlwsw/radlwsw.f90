@@ -4,7 +4,7 @@ module radlwsw_m
 
 contains
 
-  SUBROUTINE radlwsw(dist, rmu0, fract, paprs, pplay, tsol, albedo, alblw, &
+  SUBROUTINE radlwsw(dist, rmu0, fract, paprs, play, tsol, albedo, alblw, &
        t, q, wo, cldfra, cldemi, cldtaupd, heat, heat0, cool, cool0, radsol, &
        albpla, topsw, toplw, solsw, sollw, sollwdown, topsw0, toplw0, solsw0, &
        sollw0, lwdn0, lwdn, lwup0, lwup, swdn0, swdn, swup0, swup, ok_ade, &
@@ -45,16 +45,16 @@ contains
         
     ! Arguments:
 
-    real rmu0(klon), fract(klon), dist
+    real dist, rmu0(klon), fract(klon)
     ! dist-----input-R- distance astronomique terre-soleil
     ! rmu0-----input-R- cosinus de l'angle zenithal
     ! fract----input-R- duree d'ensoleillement normalisee
 
     real, intent(in):: paprs(klon, klev+1)
     ! paprs----input-R- pression a inter-couche (Pa)
-    real, intent(in):: pplay(klon, klev)
-    ! pplay----input-R- pression au milieu de couche (Pa)
-    real albedo(klon), alblw(klon), tsol(klon)
+    real, intent(in):: play(klon, klev)
+    ! play----input-R- pression au milieu de couche (Pa)
+    real tsol(klon), albedo(klon), alblw(klon)
     ! albedo---input-R- albedo du sol (entre 0 et 1)
     ! tsol-----input-R- temperature du sol (en K)
     real, intent(in):: t(klon, klev)
@@ -73,23 +73,68 @@ contains
     real, intent(out):: heat(klon, klev)
     ! échauffement atmosphérique (visible) (K/jour)
 
+    real heat0(klon, klev)
     real cool(klon, klev)
     ! cool-----output-R- refroidissement dans l'IR (K/jour)
-    real heat0(klon, klev), cool0(klon, klev)
-    real radsol(klon), topsw(klon)
+    real cool0(klon, klev)
+    real radsol(klon)
     ! radsol---output-R- bilan radiatif net au sol (W/m**2) (+ vers le bas)
+    real albpla(klon)
+    ! albpla---output-R- albedo planetaire (entre 0 et 1)
+    real topsw(klon)
     ! topsw----output-R- flux solaire net au sommet de l'atm.
 
     real, intent(out):: toplw(klon)
     ! rayonnement infrarouge montant au sommet de l'atmosphère
 
-    real solsw(klon), sollw(klon), albpla(klon)
-    ! solsw----output-R- flux solaire net a la surface
-    ! sollw----output-R- ray. IR montant a la surface
-    ! albpla---output-R- albedo planetaire (entre 0 et 1)
-    real topsw0(klon), solsw0(klon), sollw0(klon)
+    real, intent(out):: solsw(klon) ! flux solaire net à la surface
+
+    real, intent(out):: sollw(klon)
+    ! rayonnement infrarouge montant à la surface
+
+    real, intent(out):: sollwdown(klon)
+    real topsw0(klon)
     real, intent(out):: toplw0(klon)
-    real sollwdown(klon)
+    real solsw0(klon), sollw0(klon)
+    !IM output 3D: SWup, SWdn, LWup, LWdn
+    REAL lwdn0(klon, klev+1), lwdn(klon, klev+1)
+    REAL lwup0(klon, klev+1), lwup(klon, klev+1)
+    REAL swdn0(klon, klev+1), swdn(klon, klev+1)
+    REAL swup0(klon, klev+1), swup(klon, klev+1)
+
+    logical ok_ade, ok_aie 
+    ! switches whether to use aerosol direct (indirect) effects or not
+    ! ok_ade---input-L- apply the Aerosol Direct Effect or not?
+    ! ok_aie---input-L- apply the Aerosol Indirect Effect or not?
+
+    real tau_ae(klon, klev, 2), piz_ae(klon, klev, 2), cg_ae(klon, klev, 2)
+    ! input-R- aerosol optical properties (calculated in aeropt.F)
+
+    real topswad(klon), solswad(klon)
+    ! output: aerosol direct forcing at TOA and surface
+    ! topswad---output-R- ray. solaire absorbe au sommet de l'atm. (aerosol dir)
+    ! solswad---output-R- ray. solaire net absorbe a la surface (aerosol dir)
+
+    real cldtaupi(klon, klev)
+    ! cloud optical thickness for pre-industrial aerosol concentrations
+    ! (i.e. with a smaller droplet concentration and thus larger droplet radii)
+    ! -input-R- epaisseur optique des nuages dans le visible
+    ! calculated for pre-industrial (pi) aerosol concentrations,
+    ! i.e. with smaller droplet concentration, thus larger droplets,
+    ! thus generally cdltaupi cldtaupd it is needed for the
+    ! diagnostics of the aerosol indirect radiative forcing
+
+    real topswai(klon), solswai(klon)
+    ! output: aerosol indirect forcing atTOA and surface
+    ! topswai---output-R- ray. solaire absorbe au sommet de l'atm. (aerosol ind)
+    ! solswai---output-R- ray. solaire net absorbe a la surface (aerosol ind)
+
+    ! Local:
+
+    double precision tauae(kdlon, klev, 2) ! aer opt properties
+    double precision pizae(kdlon, klev, 2)
+    double precision cgae(kdlon, klev, 2)
+
     !IM output 3D 
     DOUBLE PRECISION ZFSUP(KDLON, KLEV+1)
     DOUBLE PRECISION ZFSDN(KDLON, KLEV+1)
@@ -130,44 +175,8 @@ contains
     DOUBLE PRECISION ztopsw0(kdlon), ztoplw0(kdlon)
     DOUBLE PRECISION zsolsw0(kdlon), zsollw0(kdlon)
     DOUBLE PRECISION zznormcp
-    !IM output 3D: SWup, SWdn, LWup, LWdn
-    REAL swdn(klon, klev+1), swdn0(klon, klev+1)
-    REAL swup(klon, klev+1), swup0(klon, klev+1)
-    REAL lwdn(klon, klev+1), lwdn0(klon, klev+1)
-    REAL lwup(klon, klev+1), lwup0(klon, klev+1)
 
     !jq the following quantities are needed for the aerosol radiative forcings
-
-    real topswad(klon), solswad(klon)
-    ! output: aerosol direct forcing at TOA and surface
-    ! topswad---output-R- ray. solaire absorbe au sommet de l'atm. (aerosol dir)
-    ! solswad---output-R- ray. solaire net absorbe a la surface (aerosol dir)
-
-    real topswai(klon), solswai(klon)
-    ! output: aerosol indirect forcing atTOA and surface
-    ! topswai---output-R- ray. solaire absorbe au sommet de l'atm. (aerosol ind)
-    ! solswai---output-R- ray. solaire net absorbe a la surface (aerosol ind)
-
-    real tau_ae(klon, klev, 2), piz_ae(klon, klev, 2), cg_ae(klon, klev, 2)
-    ! input-R- aerosol optical properties (calculated in aeropt.F)
-
-    real cldtaupi(klon, klev)
-    ! cloud optical thickness for pre-industrial aerosol concentrations
-    ! (i.e. with a smaller droplet concentration and thus larger droplet radii)
-    ! -input-R- epaisseur optique des nuages dans le visible
-    ! calculated for pre-industrial (pi) aerosol concentrations,
-    ! i.e. with smaller droplet concentration, thus larger droplets,
-    ! thus generally cdltaupi cldtaupd it is needed for the
-    ! diagnostics of the aerosol indirect radiative forcing
-
-    logical ok_ade, ok_aie 
-    ! switches whether to use aerosol direct (indirect) effects or not
-    ! ok_ade---input-L- apply the Aerosol Direct Effect or not?
-    ! ok_aie---input-L- apply the Aerosol Indirect Effect or not?
-
-    double precision tauae(kdlon, klev, 2) ! aer opt properties
-    double precision pizae(kdlon, klev, 2)
-    double precision cgae(kdlon, klev, 2)
 
     DOUBLE PRECISION PTAUA(kdlon, 2, klev)
     ! present-day value of cloud opt thickness (PTAU is pre-industrial
@@ -212,8 +221,8 @@ contains
           PEMIS(i) = 1.0 
           PVIEW(i) = 1.66
           PPSOL(i) = paprs(iof+i, 1)
-          zx_alpha1 = (paprs(iof+i, 1)-pplay(iof+i, 2))  &
-               / (pplay(iof+i, 1)-pplay(iof+i, 2))
+          zx_alpha1 = (paprs(iof+i, 1)-play(iof+i, 2))  &
+               / (play(iof+i, 1)-play(iof+i, 2))
           zx_alpha2 = 1.0 - zx_alpha1
           PTL(i, 1) = t(iof+i, 1) * zx_alpha1 + t(iof+i, 2) * zx_alpha2
           PTL(i, klev+1) = t(iof+i, klev)

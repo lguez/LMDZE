@@ -31,7 +31,10 @@ contains
     !   convection:                                                         
 
     REAL, INTENT (IN):: pmfu(klon, klev) ! flux de masse dans le panache montant
-    REAL pmfd(klon, klev) ! flux de masse dans le panache descendant
+
+    REAL, intent(in):: pmfd(klon, klev)
+    ! flux de masse dans le panache descendant
+
     REAL pen_u(klon, klev) ! flux entraine dans le panache montant
     REAL pde_u(klon, klev) ! flux detraine dans le panache montant
     REAL pen_d(klon, klev) ! flux entraine dans le panache descendant

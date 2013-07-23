@@ -20,29 +20,23 @@ contains
     USE suphec_m, ONLY: rcpd, rcpv, rcs, rcw, rlstt, rlvtt
 
     ! Arguments: 
+
+    ! Input variables
+    real airephy(klon)
     ! airephy-------input-R- grid area
+    CHARACTER(len=15) tit
     ! tit---------input-A15- Comment to be added in PRINT (CHARACTER*15)
+    INTEGER iprt
     ! iprt--------input-I- PRINT level (<=0 : no PRINT)
+    real tops(klon), sols(klon)
     ! tops(klon)--input-R- SW rad. at TOA (W/m2), positive up.
     ! sols(klon)--input-R- Net SW flux above surface (W/m2), positive up 
     ! (i.e. -1 * flux absorbed by the surface)
-    ! soll(klon)--input-R- Net LW flux above surface (W/m2), positive up 
-    ! (i.e. flux emited - flux absorbed by the surface)
-    ! ts(klon)----input-R- Surface temperature (K)
-    ! d_etp_tot---input-R- Heat flux equivalent to atmospheric enthalpy 
-    ! change (W/m2)
-    ! d_qt_tot----input-R- Mass flux equivalent to atmospheric water mass 
-    ! change (kg/m2/s)
-    ! d_ec_tot----input-R- Flux equivalent to atmospheric cinetic energy
-    ! change (W/m2)
 
-    ! fs_bound---output-R- Thermal flux at the atmosphere boundaries (W/m2)
-    ! fq_bound---output-R- Water mass flux at the atmosphere boundaries (kg/m2/s)
-    ! Input variables
-    real airephy(klon)
-    CHARACTER*15 tit
-    INTEGER iprt
-    real tops(klon), sols(klon), soll(klon)
+    real, intent(in):: soll(klon)
+    ! net longwave flux above surface (W/m2), positive up (i. e. flux emited
+    ! - flux absorbed by the surface)
+
     real, intent(in):: topl(klon) !LW rad. at TOA (W/m2), positive down
     real sens(klon)
     ! sens(klon)--input-R- Sensible Flux at surface (W/m2), positive down
@@ -57,11 +51,24 @@ contains
     ! snow_fall(klon)
     ! --input-R- Solid water mass flux (kg/m2/s), positive down
     REAL ts(klon)
+    ! ts(klon)----input-R- Surface temperature (K)
     REAL d_etp_tot, d_qt_tot, d_ec_tot
-    ! Output variables
-    REAL fs_bound, fq_bound
+    ! d_etp_tot---input-R- Heat flux equivalent to atmospheric enthalpy 
+    ! change (W/m2)
+    ! d_qt_tot----input-R- Mass flux equivalent to atmospheric water mass 
+    ! change (kg/m2/s)
+    ! d_ec_tot----input-R- Flux equivalent to atmospheric cinetic energy
+    ! change (W/m2)
 
-    ! Local variables
+    ! Output variables
+    REAL fs_bound
+    ! fs_bound---output-R- Thermal flux at the atmosphere boundaries (W/m2)
+    real fq_bound
+    ! fq_bound---output-R- Water mass flux at the atmosphere
+    ! boundaries (kg/m2/s)
+
+    ! Local variables:
+
     real stops, stopl, ssols, ssoll
     real ssens, sfront, slat
     real airetot, zcpvap, zcwat, zcice

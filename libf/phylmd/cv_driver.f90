@@ -13,6 +13,20 @@ contains
 
     ! Main driver for convection
 
+    ! S. Bony, Mar 2002:
+
+    ! Several modules corresponding to different physical processes
+
+    ! Several versions of convect may be used:
+    ! - iflag_con=3: version lmd  (previously named convect3)
+    ! - iflag_con=4: version 4.3b (vect. version, previously convect1/2)
+
+    ! Plus tard :
+    ! - iflag_con=5: version lmd with ice (previously named convectg)
+
+    ! S. Bony, Oct 2002:
+    ! Vectorization of convect3 (ie version lmd)
+
     use clesphys2, only: iflag_con
     use cv3_param_m, only: cv3_param
     USE dimphy, ONLY: klev, klon
@@ -42,33 +56,22 @@ contains
     !      precip1       Real           Output       precipitation
     !      VPrecip1      Real           Output       vertical profile of precipitations
     !      cbmf1         Real           Output       cloud base mass flux
-    !      sig1          Real           In/Out       section adiabatic updraft
-    !      w01           Real           In/Out       vertical velocity within adiab updraft
     !      delt          Real           Input        time step
     !      Ma1           Real           Output       mass flux adiabatic updraft
     !      qcondc1       Real           Output       in-cld mixing ratio of condensed water
     !      wd1           Real           Output       downdraft velocity scale for sfc fluxes
     !      cape1         Real           Output       CAPE
 
-    ! S. Bony, Mar 2002:
-    !     * Several modules corresponding to different physical processes
-    !     * Several versions of convect may be used:
-    !        - iflag_con=3: version lmd  (previously named convect3)
-    !        - iflag_con=4: version 4.3b (vect. version, previously convect1/2)
-    !   + tard:    - iflag_con=5: version lmd with ice (previously named convectg)
-    ! S. Bony, Oct 2002:
-    !     * Vectorization of convect3 (ie version lmd)
-
     integer len
     integer nd
     integer ndp1
-    integer noff
     integer, intent(in):: ntra
     real, intent(in):: t1(len, nd)
     real q1(len, nd)
     real qs1(len, nd)
     real u1(len, nd)
     real v1(len, nd)
+    real, intent(in):: tra1(len, nd, ntra)
     real p1(len, nd)
     real ph1(len, ndp1)
     integer iflag1(len)
@@ -76,9 +79,18 @@ contains
     real fq1(len, nd)
     real fu1(len, nd)
     real fv1(len, nd)
+    real ftra1(len, nd, ntra)
     real precip1(len)
-    real cbmf1(len)
     real VPrecip1(len, nd+1)
+    real cbmf1(len)
+    real, intent(inout):: sig1(klon, klev) ! section adiabatic updraft
+
+    real, intent(inout):: w01(klon, klev) 
+    ! vertical velocity within adiabatic updraft
+
+    integer icb1(klon)
+    integer inb1(klon)
+    real, intent(in):: delt
     real Ma1(len, nd)
     real, intent(out):: upwd1(len, nd) ! total upward mass flux (adiab+mixed)
     real, intent(out):: dnwd1(len, nd) ! saturated downward mass flux (mixed)
@@ -89,11 +101,6 @@ contains
     real cape1(len)
 
     real da1(len, nd), phi1(len, nd, nd), mp1(len, nd)
-    real da(len, nd), phi(len, nd, nd), mp(len, nd)
-    real, intent(in):: tra1(len, nd, ntra)
-    real ftra1(len, nd, ntra)
-
-    real, intent(in):: delt
 
     !-------------------------------------------------------------------
     ! --- ARGUMENTS
@@ -207,11 +214,12 @@ contains
 
     !  Local arrays
 
+    integer noff
+    real da(len, nd), phi(len, nd, nd), mp(len, nd)
+
     integer i, k, n, il, j
     integer icbmax
     integer nk1(klon)
-    integer icb1(klon)
-    integer inb1(klon)
     integer icbs1(klon)
 
     real plcl1(klon)
@@ -232,8 +240,6 @@ contains
     real tp1(klon, klev)
     real tvp1(klon, klev)
     real clw1(klon, klev)
-    real sig1(klon, klev)
-    real w01(klon, klev)
     real th1(klon, klev)
 
     integer ncum
@@ -351,8 +357,8 @@ contains
 
     if (iflag_con.eq.3) then
        do il=1, len
-          sig1(il, nd)=sig1(il, nd)+1.
-          sig1(il, nd)=amin1(sig1(il, nd), 12.1)
+          sig1(il, nd)=sig1(il, nd) + 1.
+          sig1(il, nd) = min(sig1(il, nd), 12.1)
        enddo
     endif
 
@@ -406,8 +412,8 @@ contains
     !-------------------------------------------------------------------
 
     if (iflag_con.eq.3) then
-       CALL cv3_trigger(len, nd, icb1, plcl1, p1, th1, tv1, tvp1       &
-            , pbase1, buoybase1, iflag1, sig1, w01) ! nd->na
+       CALL cv3_trigger(len, nd, icb1, plcl1, p1, th1, tv1, tvp1, pbase1, &
+            buoybase1, iflag1, sig1, w01) ! nd->na
     endif
 
     if (iflag_con.eq.4) then
@@ -436,19 +442,12 @@ contains
        !^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
        if (iflag_con.eq.3) then
-          CALL cv3_compress( len, nloc, ncum, nd, ntra &
-               , iflag1, nk1, icb1, icbs1 &
-               , plcl1, tnk1, qnk1, gznk1, pbase1, buoybase1 &
-               , t1, q1, qs1, u1, v1, gz1, th1 &
-               , tra1 &
-               , h1, lv1, cpn1, p1, ph1, tv1, tp1, tvp1, clw1  &
-               , sig1, w01 &
-               , iflag, nk, icb, icbs &
-               , plcl, tnk, qnk, gznk, pbase, buoybase &
-               , t, q, qs, u, v, gz, th &
-               , tra &
-               , h, lv, cpn, p, ph, tv, tp, tvp, clw  &
-               , sig, w0  )
+          CALL cv3_compress(len, nloc, ncum, nd, ntra, iflag1, nk1, icb1, &
+               icbs1, plcl1, tnk1, qnk1, gznk1, pbase1, buoybase1, t1, q1, &
+               qs1, u1, v1, gz1, th1, tra1, h1, lv1, cpn1, p1, ph1, tv1, tp1, &
+               tvp1, clw1, sig1, w01, iflag, nk, icb, icbs, plcl, tnk, qnk, &
+               gznk, pbase, buoybase, t, q, qs, u, v, gz, th, tra, h, lv, &
+               cpn, p, ph, tv, tp, tvp, clw, sig, w0)
        endif
 
        if (iflag_con.eq.4) then

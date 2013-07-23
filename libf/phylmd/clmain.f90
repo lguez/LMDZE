@@ -4,12 +4,12 @@ module clmain_m
 
 contains
 
-  SUBROUTINE clmain(dtime, itap, date0, pctsrf, pctsrf_new, t, q, u, v, &
-       jour, rmu0, co2_ppm, ok_veget, ocean, npas, nexca, ts, &
+  SUBROUTINE clmain(dtime, itap, pctsrf, pctsrf_new, t, q, u, v, &
+       jour, rmu0, co2_ppm, ok_veget, ocean, ts, &
        soil_model, cdmmax, cdhmax, ksta, ksta_ter, ok_kzmin, ftsoil, &
        qsol, paprs, pplay, snow, qsurf, evap, albe, alblw, fluxlat, &
-       rain_fall, snow_f, solsw, sollw, sollwdown, fder, rlon, rlat, cufi, &
-       cvfi, rugos, debut, lafin, agesno, rugoro, d_t, d_q, d_u, d_v, &
+       rain_fall, snow_f, solsw, sollw, fder, rlon, rlat, &
+       rugos, debut, agesno, rugoro, d_t, d_q, d_u, d_v, &
        d_ts, flux_t, flux_q, flux_u, flux_v, cdragh, cdragm, q2, &
        dflux_t, dflux_q, ycoefh, zu1, zv1, t2m, q2m, u10m, v10m, pblh, &
        capcl, oliqcl, cteicl, pblt, therm, trmb1, trmb2, trmb3, plcl, &
@@ -58,7 +58,6 @@ contains
 
     REAL, INTENT(IN):: dtime ! interval du temps (secondes)
     INTEGER, INTENT(IN):: itap ! numero du pas de temps
-    REAL, INTENT(IN):: date0 ! jour initial
     REAL, INTENT(inout):: pctsrf(klon, nbsrf)
 
     ! la nouvelle repartition des surfaces sortie de l'interface
@@ -72,7 +71,6 @@ contains
     REAL co2_ppm ! taux CO2 atmosphere
     LOGICAL ok_veget
     CHARACTER(len=*), INTENT(IN):: ocean
-    INTEGER npas, nexca
     REAL ts(klon, nbsrf) ! input-R- temperature du sol (en Kelvin)
     LOGICAL, INTENT(IN):: soil_model
     REAL, INTENT(IN):: cdmmax, cdhmax ! seuils cdrm, cdrh
@@ -91,20 +89,15 @@ contains
     REAL fluxlat(klon, nbsrf)
 
     REAL, intent(in):: rain_fall(klon), snow_f(klon)
-    REAL solsw(klon, nbsrf), sollw(klon, nbsrf), sollwdown(klon)
+    REAL, INTENT(IN):: solsw(klon, nbsrf), sollw(klon, nbsrf)
     REAL fder(klon)
     REAL, INTENT(IN):: rlon(klon)
     REAL, INTENT(IN):: rlat(klon) ! latitude en degrés
-
-    REAL cufi(klon), cvfi(klon)
-    ! cufi-----input-R- resolution des mailles en x (m)
-    ! cvfi-----input-R- resolution des mailles en y (m)
 
     REAL rugos(klon, nbsrf)
     ! rugos----input-R- longeur de rugosite (en m)
 
     LOGICAL, INTENT(IN):: debut
-    LOGICAL, INTENT(IN):: lafin
     real agesno(klon, nbsrf)
     REAL, INTENT(IN):: rugoro(klon)
 
@@ -196,7 +189,7 @@ contains
     ! la premiere couche
     REAL ysnow(klon), yqsurf(klon), yagesno(klon), yqsol(klon)
     REAL yrain_f(klon), ysnow_f(klon)
-    REAL ysollw(klon), ysolsw(klon), ysollwdown(klon)
+    REAL ysollw(klon), ysolsw(klon)
     REAL yfder(klon), ytaux(klon), ytauy(klon)
     REAL yrugm(klon), yrads(klon), yrugoro(klon)
 
@@ -213,8 +206,6 @@ contains
     REAL yt(klon, klev), yq(klon, klev)
     REAL ypaprs(klon, klev+1), ypplay(klon, klev), ydelp(klon, klev)
 
-    LOGICAL ok_nonloc
-    PARAMETER (ok_nonloc=.FALSE.)
     REAL ycoefm0(klon, klev), ycoefh0(klon, klev)
 
     REAL yzlay(klon, klev), yzlev(klon, klev+1), yteta(klon, klev)
@@ -283,12 +274,6 @@ contains
     LOGICAL zxli
     PARAMETER (zxli=.FALSE.)
 
-    REAL zt, zqs, zdelta, zcor
-    REAL t_coup
-    PARAMETER (t_coup=273.15)
-
-    CHARACTER(len=20):: modname = 'clmain'
-
     !------------------------------------------------------------
 
     ytherm = 0.
@@ -355,7 +340,6 @@ contains
     ytauy = 0.
     ysolsw = 0.
     ysollw = 0.
-    ysollwdown = 0.
     yrugos = 0.
     yu1 = 0.
     yv1 = 0.
@@ -446,7 +430,6 @@ contains
              ytauy(j) = flux_v(i, 1, nsrf)
              ysolsw(j) = solsw(i, nsrf)
              ysollw(j) = sollw(i, nsrf)
-             ysollwdown(j) = sollwdown(i)
              yrugos(j) = rugos(i, nsrf)
              yrugoro(j) = rugoro(i)
              yu1(j) = u1lay(i)
@@ -573,17 +556,14 @@ contains
           ytauy = y_flux_v(:, 1)
 
           ! calculer la diffusion de "q" et de "h"
-          CALL clqh(dtime, itap, date0, jour, debut, lafin, rlon, &
-               rlat, cufi, cvfi, knon, nsrf, ni, pctsrf, soil_model, &
-               ytsoil, yqsol, ok_veget, ocean, npas, nexca, rmu0, &
-               co2_ppm, yrugos, yrugoro, yu1, yv1, coefh(:knon, :), &
-               yt, yq, yts, ypaprs, ypplay, ydelp, yrads, yalb, &
-               yalblw, ysnow, yqsurf, yrain_f, ysnow_f, yfder, ytaux, &
-               ytauy, ywindsp, ysollw, ysollwdown, ysolsw, yfluxlat, &
-               pctsrf_new, yagesno, y_d_t, y_d_q, y_d_ts, yz0_new, &
-               y_flux_t, y_flux_q, y_dflux_t, y_dflux_q, y_fqcalving, &
-               y_ffonte, y_run_off_lic_0, y_flux_o, y_flux_g, ytslab, &
-               y_seaice)
+          CALL clqh(dtime, itap, jour, debut, rlat, knon, nsrf, ni, pctsrf, &
+               soil_model, ytsoil, yqsol, ok_veget, ocean, rmu0, co2_ppm, &
+               yrugos, yrugoro, yu1, yv1, coefh(:knon, :), yt, yq, yts, &
+               ypaprs, ypplay, ydelp, yrads, yalb, yalblw, ysnow, yqsurf, &
+               yrain_f, ysnow_f, yfder, ysolsw, yfluxlat, pctsrf_new, &
+               yagesno, y_d_t, y_d_q, y_d_ts, yz0_new, y_flux_t, y_flux_q, &
+               y_dflux_t, y_dflux_q, y_fqcalving, y_ffonte, y_run_off_lic_0, &
+               y_flux_o, y_flux_g, ytslab, y_seaice)
 
           ! calculer la longueur de rugosite sur ocean
           yrugm = 0.

@@ -4,65 +4,57 @@ module interfsurf_hq_m
 
 contains
 
-  SUBROUTINE interfsurf_hq(itime, dtime, date0, jour, rmu0, klon, iim, jjm, &
-       nisurf, knon, knindex, pctsrf, rlon, rlat, cufi, cvfi, debut, lafin, &
-       ok_veget, soil_model, nsoilmx, tsoil, qsol, zlev, u1_lay, v1_lay, &
-       temp_air, spechum, epot_air, ccanopy, tq_cdrag, petAcoef, peqAcoef, &
-       petBcoef, peqBcoef, precip_rain, precip_snow, sollw, sollwdown, swnet, &
-       swdown, fder, taux, tauy, windsp, rugos, rugoro, albedo, snow, qsurf, &
-       tsurf, p1lay, ps, radsol, ocean, npas, nexca, zmasq, evap, fluxsens, &
-       fluxlat, dflux_l, dflux_s, tsol_rad, tsurf_new, alb_new, alblw, &
-       emis_new, z0_new, pctsrf_new, agesno, fqcalving, ffonte, &
+  SUBROUTINE interfsurf_hq(itime, dtime, jour, rmu0, klon, iim, jjm, &
+       nisurf, knon, knindex, pctsrf, rlat, debut, &
+       ok_veget, soil_model, nsoilmx, tsoil, qsol, u1_lay, v1_lay, &
+       temp_air, spechum, tq_cdrag, petAcoef, peqAcoef, &
+       petBcoef, peqBcoef, precip_rain, precip_snow, &
+       fder, rugos, rugoro, snow, qsurf, &
+       tsurf, p1lay, ps, radsol, ocean, evap, fluxsens, &
+       fluxlat, dflux_l, dflux_s, tsurf_new, alb_new, alblw, &
+       z0_new, pctsrf_new, agesno, fqcalving, ffonte, &
        run_off_lic_0, flux_o, flux_g, tslab, seaice)
 
     ! Cette routine sert d'aiguillage entre l'atmosphère et la surface
     ! en général (sols continentaux, océans, glaces) pour les flux de
-    ! chaleur et d'humidité.
-    ! En pratique l'interface se fait entre la couche limite du modèle
-    ! atmosphérique ("clmain.F") et les routines de surface
-    ! ("sechiba", "oasis"...).
+    ! chaleur et d'humidité. En pratique l'interface se fait entre la
+    ! couche limite du modèle atmosphérique ("clmain.F") et les
+    ! routines de surface ("sechiba", "oasis"...).
 
-    ! L.Fairhead 02/2000
+    ! Laurent Fairhead 02/2000
 
-    use abort_gcm_m, only: abort_gcm
-    use gath_cpl, only: gath2cpl
-    use indicesol
-    use SUPHEC_M
-    use albsno_m, only: albsno
-    use interface_surf
-    use interfsur_lim_m, only: interfsur_lim
-    use calcul_fluxs_m, only: calcul_fluxs
-    use fonte_neige_m, only: fonte_neige
-    use interfoce_lim_m, only: interfoce_lim
-    use interfoce_slab_m, only: interfoce_slab
+    USE abort_gcm_m, ONLY: abort_gcm
+    USE albsno_m, ONLY: albsno
+    USE calcul_fluxs_m, ONLY: calcul_fluxs
+    USE fonte_neige_m, ONLY: fonte_neige
+    USE gath_cpl, ONLY: gath2cpl
+    USE indicesol, ONLY: epsfra, is_lic, is_oce, is_sic, is_ter, nbsrf
+    USE interface_surf, ONLY: coastalflow, riverflow, run_off, &
+         run_off_lic, conf_interface, tmp_rcoa, tmp_rlic, tmp_rriv
+    USE interfoce_lim_m, ONLY: interfoce_lim
+    USE interfoce_slab_m, ONLY: interfoce_slab
+    USE interfsur_lim_m, ONLY: interfsur_lim
+    USE suphec_m, ONLY: rcpd, rlstt, rlvtt, rtt
 
     ! Parametres d'entree
     ! input:
     ! klon nombre total de points de grille
     ! iim, jjm nbres de pts de grille
     ! dtime pas de temps de la physique (en s)
-    ! date0 jour initial
     ! jour jour dans l'annee en cours,
     ! rmu0 cosinus de l'angle solaire zenithal
-    ! nexca pas de temps couplage
     ! nisurf index de la surface a traiter (1 = sol continental)
     ! knon nombre de points de la surface a traiter
     ! knindex index des points de la surface a traiter
     ! pctsrf tableau des pourcentages de surface de chaque maille
-    ! rlon longitudes
     ! rlat latitudes
-    ! cufi, cvfi resolution des mailles en x et y (m)
     ! debut logical: 1er appel a la physique
-    ! lafin logical: dernier appel a la physique
     ! ok_veget logical: appel ou non au schema de surface continental
     ! (si false calcul simplifie des fluxs sur les continents)
-    ! zlev hauteur de la premiere couche
     ! u1_lay vitesse u 1ere couche
     ! v1_lay vitesse v 1ere couche
     ! temp_air temperature de l'air 1ere couche
     ! spechum humidite specifique 1ere couche
-    ! epot_air temp potentielle de l'air
-    ! ccanopy concentration CO2 canopee
     ! tq_cdrag cdrag
     ! petAcoef coeff. A de la resolution de la CL pour t
     ! peqAcoef coeff. A de la resolution de la CL pour q
@@ -70,11 +62,6 @@ contains
     ! peqBcoef coeff. B de la resolution de la CL pour q
     ! precip_rain precipitation liquide
     ! precip_snow precipitation solide
-    ! sollw flux IR net a la surface
-    ! sollwdown flux IR descendant a la surface
-    ! swnet flux solaire net
-    ! swdown flux solaire entrant a la surface
-    ! albedo albedo de la surface
     ! tsurf temperature de surface
     ! tslab temperature slab ocean
     ! pctsrf_slab pourcentages (0-1) des sous-surfaces dans le slab
@@ -84,74 +71,61 @@ contains
     ! radsol rayonnement net aus sol (LW + SW)
     ! ocean type d'ocean utilise ("force" ou "slab" mais pas "couple")
     ! fder derivee des flux (pour le couplage)
-    ! taux, tauy tension de vents
-    ! windsp module du vent a 10m
     ! rugos rugosite
-    ! zmasq masque terre/ocean
     ! rugoro rugosite orographique
     ! run_off_lic_0 runoff glacier du pas de temps precedent
-    integer, intent(IN) :: itime ! numero du pas de temps
-    integer, intent(IN) :: iim, jjm
-    integer, intent(IN) :: klon
-    real, intent(IN) :: dtime
-    real, intent(IN) :: date0
-    integer, intent(IN) :: jour
-    real, intent(IN) :: rmu0(klon)
-    integer, intent(IN) :: nisurf
-    integer, intent(IN) :: knon
-    integer, dimension(klon), intent(in) :: knindex
+    integer, intent(IN):: itime ! numero du pas de temps
+    integer, intent(IN):: iim, jjm
+    integer, intent(IN):: klon
+    real, intent(IN):: dtime
+    integer, intent(IN):: jour
+    real, intent(IN):: rmu0(klon)
+    integer, intent(IN):: nisurf
+    integer, intent(IN):: knon
+    integer, dimension(klon), intent(in):: knindex
     real, intent(IN):: pctsrf(klon, nbsrf)
-    logical, intent(IN) :: debut, lafin, ok_veget
-    real, dimension(klon), intent(IN) :: rlon, rlat
-    real, dimension(klon), intent(IN) :: cufi, cvfi
-    real, dimension(klon), intent(INOUT) :: tq_cdrag
-    real, dimension(klon), intent(IN) :: zlev
-    real, dimension(klon), intent(IN) :: u1_lay, v1_lay
-    real, dimension(klon), intent(IN) :: temp_air, spechum
-    real, dimension(klon), intent(IN) :: epot_air, ccanopy
-    real, dimension(klon), intent(IN) :: petAcoef, peqAcoef
-    real, dimension(klon), intent(IN) :: petBcoef, peqBcoef
-    real, dimension(klon), intent(IN) :: precip_rain, precip_snow
-    real, dimension(klon), intent(IN) :: sollw, sollwdown, swnet, swdown
-    real, dimension(klon), intent(IN) :: ps, albedo
-    real, dimension(klon), intent(IN) :: tsurf, p1lay
+    logical, intent(IN):: debut, ok_veget
+    real, dimension(klon), intent(IN):: rlat
+    real, dimension(klon), intent(INOUT):: tq_cdrag
+    real, dimension(klon), intent(IN):: u1_lay, v1_lay
+    real, dimension(klon), intent(IN):: temp_air, spechum
+    real, dimension(klon), intent(IN):: petAcoef, peqAcoef
+    real, dimension(klon), intent(IN):: petBcoef, peqBcoef
+    real, dimension(klon), intent(IN):: precip_rain, precip_snow
+    real, dimension(klon), intent(IN):: ps
+    real, dimension(klon), intent(IN):: tsurf, p1lay
     !IM: "slab" ocean
-    real, dimension(klon), intent(INOUT) :: tslab
-    real, allocatable, dimension(:), save :: tmp_tslab
-    real, dimension(klon), intent(OUT) :: flux_o, flux_g
-    real, dimension(klon), intent(INOUT) :: seaice ! glace de mer (kg/m2)
-    REAL, DIMENSION(klon), INTENT(INOUT) :: radsol, fder
-    real, dimension(klon), intent(IN) :: zmasq
-    real, dimension(klon), intent(IN) :: taux, tauy, rugos, rugoro
-    real, dimension(klon), intent(IN) :: windsp
+    real, dimension(klon), intent(INOUT):: tslab
+    real, allocatable, dimension(:), save:: tmp_tslab
+    real, dimension(klon), intent(OUT):: flux_o, flux_g
+    real, dimension(klon), intent(INOUT):: seaice ! glace de mer (kg/m2)
+    REAL, DIMENSION(klon), INTENT(INOUT):: radsol, fder
+    real, dimension(klon), intent(IN):: rugos, rugoro
     character(len=*), intent(IN):: ocean
-    integer :: npas, nexca ! nombre et pas de temps couplage
-    real, dimension(klon), intent(INOUT) :: evap, snow, qsurf
+    real, dimension(klon), intent(INOUT):: evap, snow, qsurf
     !! PB ajout pour soil
     logical, intent(in):: soil_model
-    integer :: nsoilmx
-    REAL, DIMENSION(klon, nsoilmx) :: tsoil
-    REAL, dimension(klon), intent(INOUT) :: qsol
-    REAL, dimension(klon) :: soilcap
-    REAL, dimension(klon) :: soilflux
+    integer:: nsoilmx
+    REAL, DIMENSION(klon, nsoilmx):: tsoil
+    REAL, dimension(klon), intent(INOUT):: qsol
+    REAL, dimension(klon):: soilcap
+    REAL, dimension(klon):: soilflux
 
     ! Parametres de sortie
     ! output:
     ! evap evaporation totale
     ! fluxsens flux de chaleur sensible
     ! fluxlat flux de chaleur latente
-    ! tsol_rad
     ! tsurf_new temperature au sol
     ! alb_new albedo
-    ! emis_new emissivite
     ! z0_new surface roughness
     ! pctsrf_new nouvelle repartition des surfaces
     real, dimension(klon), intent(OUT):: fluxsens, fluxlat
-    real, dimension(klon), intent(OUT):: tsol_rad, tsurf_new, alb_new
+    real, dimension(klon), intent(OUT):: tsurf_new, alb_new
     real, dimension(klon), intent(OUT):: alblw
-    real, dimension(klon), intent(OUT):: emis_new, z0_new
+    real, dimension(klon), intent(OUT):: z0_new
     real, dimension(klon), intent(OUT):: dflux_l, dflux_s
-    real, dimension(klon, nbsrf), intent(OUT) :: pctsrf_new
+    real, dimension(klon, nbsrf), intent(OUT):: pctsrf_new
     real, dimension(klon), intent(INOUT):: agesno
     real, dimension(klon), intent(INOUT):: run_off_lic_0
 
@@ -163,31 +137,31 @@ contains
     !jld a rajouter real, dimension(klon), intent(INOUT):: fqcalving
     real, dimension(klon), intent(INOUT):: fqcalving
     !IM: "slab" ocean - Local
-    real, parameter :: t_grnd=271.35
-    real, dimension(klon) :: zx_sl
+    real, parameter:: t_grnd=271.35
+    real, dimension(klon):: zx_sl
     integer i
-    real, allocatable, dimension(:), save :: tmp_flux_o, tmp_flux_g
-    real, allocatable, dimension(:), save :: tmp_radsol
-    real, allocatable, dimension(:, :), save :: tmp_pctsrf_slab
-    real, allocatable, dimension(:), save :: tmp_seaice
+    real, allocatable, dimension(:), save:: tmp_flux_o, tmp_flux_g
+    real, allocatable, dimension(:), save:: tmp_radsol
+    real, allocatable, dimension(:, :), save:: tmp_pctsrf_slab
+    real, allocatable, dimension(:), save:: tmp_seaice
 
     ! Local
-    character (len = 20), save :: modname = 'interfsurf_hq'
-    character (len = 80) :: abort_message
-    logical, save :: first_call = .true.
-    integer, save :: error
-    integer :: ii
-    logical, save :: check = .false.
+    character (len = 20), save:: modname = 'interfsurf_hq'
+    character (len = 80):: abort_message
+    logical, save:: first_call = .true.
+    integer, save:: error
+    integer:: ii
+    logical, save:: check = .false.
     real, dimension(klon):: cal, beta, dif_grnd, capsol
-    real, parameter :: calice=1.0/(5.1444e+06*0.15), tau_gl=86400.*5.
-    real, parameter :: calsno=1./(2.3867e+06*.15)
+    real, parameter:: calice=1.0/(5.1444e+06*0.15), tau_gl=86400.*5.
+    real, parameter:: calsno=1./(2.3867e+06*.15)
     real, dimension(klon):: tsurf_temp
     real, dimension(klon):: alb_neig, alb_eau
     real, DIMENSION(klon):: zfra
-    logical :: cumul = .false.
-    INTEGER, dimension(1) :: iloc
+    logical:: cumul = .false.
+    INTEGER, dimension(1):: iloc
     real, dimension(klon):: fder_prev
-    REAL, dimension(klon) :: bidule
+    REAL, dimension(klon):: bidule
 
     !-------------------------------------------------------------
 
@@ -197,7 +171,7 @@ contains
     ! car l'ocean a besoin du ruissellement qui est y calcule
 
     if (first_call) then
-       call conf_interface(tau_calv)
+       call conf_interface
        if (nisurf /= is_ter .and. klon > 1) then
           write(*, *)' *** Warning ***'
           write(*, *)' nisurf = ', nisurf, ' /= is_ter = ', is_ter
@@ -500,7 +474,8 @@ contains
           CALL calbeta(dtime, nisurf, knon, snow, qsol, beta, capsol, dif_grnd)
 
           IF (soil_model) THEN
-             CALL soil(dtime, nisurf, knon, snow, tsurf_new, tsoil, soilcap, soilflux)
+             CALL soil(dtime, nisurf, knon, snow, tsurf_new, tsoil, soilcap, &
+                  soilflux)
              cal(1:knon) = RCPD / soilcap(1:knon)
              radsol(1:knon) = radsol(1:knon) + soilflux(1:knon)
           ELSE
@@ -533,8 +508,8 @@ contains
           CALL calbeta(dtime, nisurf, knon, snow, qsol, beta, capsol, dif_grnd)
 
           IF (soil_model) THEN
-             !IM cf LF/JLD CALL soil(dtime, nisurf, knon, snow, tsurf, tsoil, soilcap, soilflux)
-             CALL soil(dtime, nisurf, knon, snow, tsurf_new, tsoil, soilcap, soilflux)
+             CALL soil(dtime, nisurf, knon, snow, tsurf_new, tsoil, soilcap, &
+                  soilflux)
              cal(1:knon) = RCPD / soilcap(1:knon)
              radsol(1:knon) = radsol(1:knon) + soilflux(1:knon)
              dif_grnd = 0.
