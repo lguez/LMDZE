@@ -17,7 +17,3 @@ startdyn.f90
 start_init_orog_m.f90
 start_init_phys_m.f90
 start_inter_3d.f90
-flinclo.f90
-flinfindcood.f90
-flininfo.f90
-flinopen_nozoom.f90

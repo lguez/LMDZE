@@ -112,10 +112,6 @@ etat0.o : temps.o start_inter_3d.o start_init_phys_m.o start_init_orog_m.o start
 exner_hyb.o : filtreg.o comgeom.o disvert.o comconst.o dimens_m.o 
 filtreg.o : inifilr.o dimens_m.o coefils.o 
 fisrtilp.o : comfisrtilp.o FCTTRE.o yoethf.o suphec.o dimphy.o 
-flinclo.o : flininfo.o 
-flinfindcood.o : strlowercase.o flininfo.o errioipsl.o 
-flininfo.o : strlowercase.o errioipsl.o 
-flinopen_nozoom.o : flininfo.o flinfindcood.o errioipsl.o calendar.o 
 flumass.o : comgeom.o paramet_m.o dimens_m.o 
 fluxstokenc.o : tracstoke.o comgeom.o paramet_m.o dimens_m.o histwrite.o 
 flxadjtq.o : FCTTRE.o yoethf.o suphec.o dimphy.o 

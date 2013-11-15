@@ -10,7 +10,7 @@
 
 src_root = .
 
-VPATH = ${src_root}:${src_root}/dyn3d:${src_root}/dyn3d/Vlsplt:${src_root}/filtrez:${src_root}/phylmd:${src_root}/bibio:${src_root}/phylmd/Mobidic:${src_root}/phylmd/Orography:${src_root}/phylmd/Radlwsw:${src_root}/IOIPSL:${src_root}/IOIPSL/Stringop:${src_root}/dyn3d/Read_reanalyse:${src_root}/phylmd/Thermcell:${src_root}/phylmd/CV3_routines:${src_root}/phylmd/Conflx:${src_root}/phylmd/CV_routines:${src_root}/phylmd/Interface_surf:${src_root}/dyn3d/Dissipation:${src_root}/IOIPSL/Histcom:${src_root}/IOIPSL/Flincom
+VPATH = ${src_root}:${src_root}/dyn3d:${src_root}/dyn3d/Vlsplt:${src_root}/filtrez:${src_root}/phylmd:${src_root}/bibio:${src_root}/phylmd/Mobidic:${src_root}/phylmd/Orography:${src_root}/phylmd/Radlwsw:${src_root}/IOIPSL:${src_root}/IOIPSL/Stringop:${src_root}/dyn3d/Read_reanalyse:${src_root}/phylmd/Thermcell:${src_root}/phylmd/CV3_routines:${src_root}/phylmd/Conflx:${src_root}/phylmd/CV_routines:${src_root}/phylmd/Interface_surf:${src_root}/dyn3d/Dissipation:${src_root}/IOIPSL/Histcom
 
 common_sources := $(shell cat ${src_root}/common_sources)
 
