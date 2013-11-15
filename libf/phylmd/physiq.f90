@@ -1255,8 +1255,6 @@ contains
        ratqs = ratqss
     endif
 
-    ! Processus de condensation à grande echelle et processus de
-    ! précipitation :
     CALL fisrtilp(dtphys, paprs, play, t_seri, q_seri, ptconv, ratqs, &
          d_t_lsc, d_q_lsc, d_ql_lsc, rneb, cldliq, rain_lsc, snow_lsc, &
          pfrac_impa, pfrac_nucl, pfrac_1nucl, frac_impa, frac_nucl, prfl, &

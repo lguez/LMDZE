@@ -55,18 +55,25 @@ contains
 
     ! Check decreasing order for "rlatimod":
     DO i = 2, jjm
-       IF (rlatimod(i) >= rlatimod(i-1)) stop &
-            '"inter_barxy": "rlatimod" should be strictly decreasing'
+       IF (rlatimod(i) >= rlatimod(i-1)) then
+          print *, '"inter_barxy": "rlatimod" should be strictly decreasing'
+          stop 1
+       end IF
     ENDDO
 
     yjmod(:jjm) = ord_coordm(rlatimod)
     IF (jmods == jjm + 1) THEN
-       IF (90. - yjmod(jjm) < 0.01) stop &
-            '"inter_barxy": with jmods = jjm + 1, yjmod(jjm) should be < 90.'
+       IF (90. - yjmod(jjm) < 0.01) then
+          print *, '"inter_barxy": with jmods = jjm + 1, ' &
+               // 'yjmod(jjm) should be < 90.'
+          stop 1
+       end IF
     ELSE
        ! jmods = jjm
-       IF (ABS(yjmod(jjm) - 90.) > 0.01) stop &
-            '"inter_barxy": with jmods = jjm, yjmod(jjm) should be 90.'
+       IF (ABS(yjmod(jjm) - 90.) > 0.01) then
+          print *, '"inter_barxy": with jmods = jjm, yjmod(jjm) should be 90.'
+          stop 1
+       end IF
     ENDIF
 
     if (jmods == jjm + 1) yjmod(jjm + 1) = 90.
@@ -397,8 +404,10 @@ contains
     ! Check monotonicity:
     decrois = xi(2) < xi(1)
     DO i = 3, nmax
-       IF (decrois .neqv. xi(i) < xi(i-1)) stop &
-            '"ord_coord":  latitudes are not monotonic'
+       IF (decrois .neqv. xi(i) < xi(i-1)) then
+          print *, '"ord_coord":  latitudes are not monotonic'
+          stop 1
+       end IF
     ENDDO
 
     IF (abs(xi(1)) < pi) then
@@ -413,7 +422,7 @@ contains
        print *, "ord_coord"
        PRINT *, '"xi" should contain the latitudes of the boundaries of ' &
             // 'grid cells, not the centers of grid cells.'
-       STOP
+       STOP 1
     ENDIF
 
     IF (decrois) xo(:nmax) = xo(nmax:1:- 1)

@@ -16,7 +16,8 @@ SUBROUTINE sortvarc0(ucov, teta, ps, masse, pk, phis, vorpot, phi, bern, dp)
   !   Arguments:
 
   REAL, INTENT (IN) :: ucov(ip1jmp1, llm)
-  REAL :: teta(ip1jmp1, llm), masse(ip1jmp1, llm)
+  REAL, INTENT(IN):: teta(ip1jmp1, llm)
+  real masse(ip1jmp1, llm)
   REAL, INTENT (IN) :: ps(ip1jmp1)
   REAL, INTENT (IN) :: phis(ip1jmp1)
   REAL :: vorpot(ip1jm, llm)

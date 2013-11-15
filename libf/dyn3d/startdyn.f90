@@ -1,44 +1,37 @@
 MODULE startdyn
 
   ! From startvar.F, version 1.4
-  ! 2006/01/27 15:14:22 Fairhead
+  ! January 27th, 2006 15:14:22
 
   INTEGER iml_dyn, jml_dyn, llm_dyn
 
-  REAL, ALLOCATABLE:: lon_ini(:), lat_ini(:)
-  ! (longitude and latitude from the input file, converted to rad)
+  REAL, pointer:: lon_ini(:), lat_ini(:)
+  ! longitude and latitude from the input file, converted to rad
 
-  real, ALLOCATABLE:: levdyn_ini(:)
+  real, pointer:: levdyn_ini(:)
 
 CONTAINS
 
   SUBROUTINE start_init_dyn(tsol_2d, psol)
 
-    USE flininfo_m, only: flininfo
-    USE flinopen_nozoom_m, only: flinopen_nozoom
-    use comgeom, only: aire_2d, apoln, apols
+    use comgeom, only: rlonu, rlatv, aire_2d, apoln, apols
     use conf_dat2d_m, only: conf_dat2d
-    use inter_barxy_m, only: inter_barxy
-    use comgeom, only: rlonu, rlatv
     use dimens_m, only: iim, jjm
     use gr_int_dyn_m, only: gr_int_dyn
-    use start_init_orog_m, only: phis
-    use nr_util, only: assert, pi
+    use inter_barxy_m, only: inter_barxy
     use netcdf, only: nf90_nowrite
-    use netcdf95, only: nf95_open, nf95_close, nf95_get_var, nf95_inq_varid
+    use netcdf95, only: nf95_open, nf95_close, nf95_get_var, nf95_inq_varid, &
+         nf95_gw_var, find_coord
+    use nr_util, only: assert, pi
+    use start_init_orog_m, only: phis
 
     REAL, intent(in):: tsol_2d(:, :) ! (iim + 1, jjm + 1)
     REAL, intent(out):: psol(:, :) ! (iim + 1, jjm + 1) surface pressure, in Pa
 
     ! Local:
 
-    REAL date, dt
-    INTEGER itau(1), ncid, varid, fid_dyn, ttm_dyn
+    INTEGER ncid, varid
     REAL, ALLOCATABLE:: lon_rad(:), lat_rad(:)
-
-    REAL, ALLOCATABLE:: lon_dyn(:, :), lat_dyn(:, :)
-    ! (longitude and latitude from the input file, in rad or degrees)
-
     REAL, ALLOCATABLE:: var_ana(:, :)
     real z(iim + 1, jjm + 1)
     real tmp_var(iim, jjm + 1)
@@ -51,34 +44,26 @@ CONTAINS
     call assert((/size(tsol_2d, 2), size(psol, 2)/) == jjm + 1, &
          "start_init_dyn size 2")
 
-    CALL flininfo('ECDYN.nc', iml_dyn, jml_dyn, llm_dyn, ttm_dyn, fid_dyn)
-    print *, "iml_dyn = ", iml_dyn, ", jml_dyn = ", jml_dyn, &
-         ", llm_dyn = ", llm_dyn, ", ttm_dyn = ", ttm_dyn
-
-    ALLOCATE(lat_dyn(iml_dyn, jml_dyn))
-    allocate(lon_dyn(iml_dyn, jml_dyn), levdyn_ini(llm_dyn))
-
-    CALL flinopen_nozoom(iml_dyn, jml_dyn, llm_dyn, lon_dyn, lat_dyn, &
-         levdyn_ini, ttm_dyn, itau, date, dt, fid_dyn)
-
-    ALLOCATE(var_ana(iml_dyn, jml_dyn), lon_rad(iml_dyn), lon_ini(iml_dyn))
-
-    IF (MAXVAL(lon_dyn) > pi) THEN
-       ! Assume "lon_dyn" is in degrees 
-       lon_ini = lon_dyn(:, 1) * pi / 180.
-    ELSE
-       lon_ini = lon_dyn(:, 1) 
-    ENDIF
-
-    ALLOCATE(lat_rad(jml_dyn), lat_ini(jml_dyn))
-
-    IF (MAXVAL(lat_dyn) > pi) THEN
-       lat_ini = lat_dyn(1, :) * pi / 180.
-    ELSE
-       lat_ini = lat_dyn(1, :) 
-    ENDIF
-
     call nf95_open('ECDYN.nc', nf90_nowrite, ncid)
+
+    call find_coord(ncid, varid=varid, std_name="longitude")
+    call nf95_gw_var(ncid, varid, lon_ini)
+    lon_ini = lon_ini * pi / 180. ! convert to rad
+    iml_dyn = size(lon_ini)
+    print *, "iml_dyn = ", iml_dyn
+
+    call find_coord(ncid, varid=varid, std_name="latitude")
+    call nf95_gw_var(ncid, varid, lat_ini)
+    lat_ini = lat_ini * pi / 180. ! convert to rad
+    jml_dyn = size(lat_ini)
+    print *, "jml_dyn = ", jml_dyn
+
+    call nf95_inq_varid(ncid, "level", varid)
+    call nf95_gw_var(ncid, varid, levdyn_ini)
+    llm_dyn = size(levdyn_ini)
+    print *, "llm_dyn = ", llm_dyn
+
+    ALLOCATE(var_ana(iml_dyn, jml_dyn), lon_rad(iml_dyn), lat_rad(jml_dyn))
 
     ! 'Z': Surface geopotential
     call nf95_inq_varid(ncid, 'Z', varid)

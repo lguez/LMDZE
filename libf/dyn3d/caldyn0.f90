@@ -20,7 +20,7 @@ contains
 
     !   Arguments:
     REAL, INTENT (IN) :: vcov(ip1jm, llm), ucov(ip1jmp1, llm)
-    REAL :: teta(ip1jmp1, llm)
+    REAL, INTENT(IN):: teta(ip1jmp1, llm)
     REAL, INTENT (IN) :: ps(ip1jmp1)
     REAL, INTENT (IN) :: phis(ip1jmp1)
     REAL, INTENT (IN) :: pk(iip1, jjp1, llm)

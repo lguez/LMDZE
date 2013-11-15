@@ -74,39 +74,27 @@ contains
        firstcal = .FALSE.
     ENDIF
 
-    DO i = 1, klon
-       ldcum(i) = .FALSE.
-    ENDDO
-    DO k = 1, klev
-       DO i = 1, klon
-          dt_con(i, k) = 0.0
-          dq_con(i, k) = 0.0
-       ENDDO
-    ENDDO
+    ldcum = .FALSE.
+    dt_con = 0.
+    dq_con = 0.
 
-    ! initialiser les variables et faire l'interpolation verticale
-
+    ! Initialiser les variables et faire l'interpolation verticale :
     CALL flxini(ten, qen, qsen, pgeo, paph, zgeoh, ztenh, zqenh, zqsenh, &
          ptu, pqu, ptd, pqd, mfd, zmfds, zmfdq, zdmfdp, mfu, mfus, mfuq, &
          zdmfup, zdpmel, plu, plude, ilab, pen_u, pde_u, pen_d, pde_d)
 
-    ! determiner les valeurs au niveau de base de la tour convective
+    ! Déterminer les valeurs au niveau de base de la tour convective :
+    CALL flxbase(ztenh, zqenh, zgeoh, paph, ptu, pqu, plu, ldcum, kcbot, ilab)
 
-    CALL flxbase(ztenh, zqenh, zgeoh, paph, &
-         ptu, pqu, plu, ldcum, kcbot, ilab)
+    ! Calculer la convergence totale de l'humidité et celle en
+    ! provenance de la couche limite, plus précisément, la convergence
+    ! intégrée entre le sol et la base de la convection. Cette
+    ! dernière convergence est comparée avec l'&vaporation obtenue
+    ! dans la couche limite pour déterminer le type de la convection.
 
-    ! calculer la convergence totale de l'humidite et celle en provenance
-    ! de la couche limite, plus precisement, la convergence integree entre
-    ! le sol et la base de la convection. Cette derniere convergence est
-    ! comparee avec l'evaporation obtenue dans la couche limite pour
-    ! determiner le type de la convection
-
-    k=1
-    DO i = 1, klon
-       zdqcv(i) = pqte(i, k)*(paph(i, k+1)-paph(i, k))
-       zdhpbl(i) = 0.0
-       zdqpbl(i) = 0.0
-    ENDDO
+    zdqcv = pqte(:, 1) * (paph(:, 2) - paph(:, 1))
+    zdhpbl = 0.
+    zdqpbl = 0.
 
     DO k=2, klev
        DO i = 1, klon
@@ -194,7 +182,8 @@ contains
           IF(ktype(i) == 2) zentr(i)=ENTRSCV
        ENDDO
 
-       IF (lmfdd) THEN ! si l'on considere le panache descendant
+       downdraft: IF (lmfdd) THEN
+          ! si l'on considere le panache descendant
           ! calculer la precipitation issue du panache ascendant pour
           ! determiner l'existence du panache descendant dans la convection
           DO i = 1, klon
@@ -266,7 +255,7 @@ contains
           DO i = 1, klon
              IF (lddraf(i)) mfub(i)=mfub1(i)
           ENDDO
-       ENDIF ! fin de test sur lmfdd
+       ENDIF downdraft
 
        ! calculer de nouveau le panache ascendant
 

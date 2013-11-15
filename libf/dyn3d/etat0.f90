@@ -61,7 +61,7 @@ contains
     ! (latitude and longitude of a point of the scalar grid identified
     ! by a simple index, in °)
 
-    REAL, dimension(iim + 1, jjm + 1, llm):: ucov, t3d, tpot
+    REAL, dimension(iim + 1, jjm + 1, llm):: ucov, t3d, teta
     REAL vcov(iim + 1, jjm, llm)
 
     REAL q(iim + 1, jjm + 1, llm, nqmx)
@@ -84,7 +84,7 @@ contains
     REAL rugmer(klon)
     real, dimension(iim + 1, jjm + 1):: relief, zstd_2d, zsig_2d, zgam_2d
     real, dimension(iim + 1, jjm + 1):: zthe_2d, zpic_2d, zval_2d
-    real, dimension(iim + 1, jjm + 1):: tsol_2d, qsol_2d, psol
+    real, dimension(iim + 1, jjm + 1):: tsol_2d, qsol_2d, ps
     REAL zmea(klon), zstd(klon)
     REAL zsig(klon), zgam(klon)
     REAL zthe(klon)
@@ -145,11 +145,11 @@ contains
     PRINT *, 'Masque construit'
 
     call start_init_phys(tsol_2d, qsol_2d)
-    CALL start_init_dyn(tsol_2d, psol)
+    CALL start_init_dyn(tsol_2d, ps)
 
     ! Compute pressure on intermediate levels:
-    forall(l = 1: llm + 1) p3d(:, :, l) = ap(l) + bp(l) * psol
-    CALL exner_hyb(psol, p3d, pks, pk)
+    forall(l = 1: llm + 1) p3d(:, :, l) = ap(l) + bp(l) * ps
+    CALL exner_hyb(ps, p3d, pks, pk)
     IF (MINVAL(pk) == MAXVAL(pk)) then
        print *, '"pk" should not be constant'
        stop 1
@@ -171,11 +171,11 @@ contains
     PRINT *,  'minval(t3d) = ', minval(t3d)
     print *, "maxval(t3d) = ", maxval(t3d)
 
-    tpot(:iim, :, :) = t3d(:iim, :, :) * cpp / pk(:iim, :, :)
-    tpot(iim + 1, :, :) = tpot(1, :, :)
-    DO l=1, llm
-       tpot(:, 1, l) = SUM(aire_2d(:, 1) * tpot(:, 1, l)) / apoln
-       tpot(:, jjm + 1, l) = SUM(aire_2d(:, jjm + 1) * tpot(:, jjm + 1, l)) &
+    teta(:iim, :, :) = t3d(:iim, :, :) * cpp / pk(:iim, :, :)
+    teta(iim + 1, :, :) = teta(1, :, :)
+    DO l = 1, llm
+       teta(:, 1, l) = SUM(aire_2d(:, 1) * teta(:, 1, l)) / apoln
+       teta(:, jjm + 1, l) = SUM(aire_2d(:, jjm + 1) * teta(:, jjm + 1, l)) &
             / apols
     ENDDO
 
@@ -246,10 +246,10 @@ contains
     print *, "jml_lic = ", jml_lic
 
     ! Si les coordonnées sont en degrés, on les transforme :
-    IF (MAXVAL( dlon_lic ) > pi)  THEN
+    IF (MAXVAL(dlon_lic) > pi)  THEN
        dlon_lic = dlon_lic * pi / 180.
     ENDIF
-    IF (maxval( dlat_lic ) > pi) THEN 
+    IF (maxval(dlat_lic) > pi) THEN 
        dlat_lic = dlat_lic * pi/ 180.
     ENDIF
 
@@ -263,7 +263,7 @@ contains
     pctsrf = 0.
     pctsrf(:, is_lic) = pack(flic_tmp, dyn_phy)
     ! Adéquation avec le maque terre/mer
-    WHERE (pctsrf(:, is_lic) < EPSFRA ) pctsrf(:, is_lic) = 0.
+    WHERE (pctsrf(:, is_lic) < EPSFRA) pctsrf(:, is_lic) = 0.
     WHERE (zmasq < EPSFRA) pctsrf(:, is_lic) = 0.
     pctsrf(:, is_ter) = zmasq
     where (zmasq > EPSFRA)
@@ -284,13 +284,13 @@ contains
     pctsrf(:, is_oce) = 1. - zmasq
     WHERE (pctsrf(:, is_oce) < EPSFRA) pctsrf(:, is_oce) = 0.
 
-    ! Vérification que somme des sous-surfaces vaut 1:
+    ! Vérification que somme des sous-surfaces vaut 1 :
     ji = count(abs(sum(pctsrf, dim = 2) - 1.) > EPSFRA)
     IF (ji /= 0) then
        PRINT *, 'Problème répartition sous maille pour ', ji, 'points'
     end IF
 
-    ! Calcul intermédiaire:
+    ! Calcul intermédiaire :
     CALL massdair(p3d, masse)
 
     print *, 'ALPHAX = ', alphax
@@ -307,11 +307,11 @@ contains
     day_ref = dayref
     annee_ref = anneeref
 
-    CALL geopot(tpot, pk , pks,  phis, phi)
-    CALL caldyn0(ucov, vcov, tpot, psol, masse, pk, phis, phi, w, pbaru, &
+    CALL geopot(teta, pk , pks,  phis, phi)
+    CALL caldyn0(ucov, vcov, teta, ps, masse, pk, phis, phi, w, pbaru, &
          pbarv)
     CALL dynredem0("start.nc", dayref, phis)
-    CALL dynredem1("start.nc", vcov, ucov, tpot, q, masse, psol, itau=0)
+    CALL dynredem1("start.nc", vcov, ucov, teta, q, masse, ps, itau=0)
 
     ! Ecriture état initial physique:
     print *, "iphysiq = ", iphysiq

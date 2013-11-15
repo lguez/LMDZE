@@ -264,7 +264,7 @@ sortvarc0.o : filtreg.o ener.o comgeom.o comconst.o paramet_m.o dimens_m.o
 start_init_orog_m.o : indicesol.o grid_noro_m.o dimens_m.o comgeom.o conf_dat2d.o 
 start_init_phys_m.o : inter_barxy.o gr_int_dyn_m.o dimens_m.o conf_dat2d.o comgeom.o 
 start_inter_3d.o : startdyn.o conf_dat3d.o gr_int_dyn_m.o inter_barxy.o 
-startdyn.o : start_init_orog_m.o gr_int_dyn_m.o dimens_m.o inter_barxy.o conf_dat2d.o comgeom.o flinopen_nozoom.o flininfo.o 
+startdyn.o : start_init_orog_m.o inter_barxy.o gr_int_dyn_m.o dimens_m.o conf_dat2d.o comgeom.o 
 stdlevvar.o : yoethf.o suphec.o 
 sugwd.o : YOEGWD.o 
 sw.o : suphec.o raddim.o clesphys.o 

@@ -11,7 +11,7 @@ contains
     ! From phylmd/fisrtilp.F, version 1.2 2004/11/09 16:55:40
     ! Author: Z. X. Li (LMD/CNRS), 20 mars 1995
 
-    ! Objet: condensation et précipitation stratiforme, schéma de
+    ! Objet : condensation et précipitation stratiforme, schéma de
     ! nuage, schéma de condensation à grande échelle (pluie).
 
     USE dimphy, ONLY: klev, klon
@@ -28,28 +28,35 @@ contains
     REAL, INTENT (IN):: paprs(klon, klev+1) ! pression a inter-couche   
     REAL, INTENT (IN):: pplay(klon, klev) ! pression au milieu de couche
     REAL, INTENT (IN):: t(klon, klev) ! temperature (K)
-    REAL q(klon, klev) ! humidite specifique (kg/kg)                   
+    REAL, INTENT (IN):: q(klon, klev) ! humidite specifique (kg/kg)
+    LOGICAL ptconv(klon, klev) ! determine la largeur de distribution de vapeur
+    REAL ratqs(klon, klev) ! determine la largeur de distribution de vapeur
     REAL d_t(klon, klev) ! incrementation de la temperature (K)        
     REAL d_q(klon, klev) ! incrementation de la vapeur d'eau           
     REAL d_ql(klon, klev) ! incrementation de l'eau liquide            
     REAL rneb(klon, klev) ! fraction nuageuse                          
     REAL radliq(klon, klev) ! eau liquide utilisee dans rayonnements   
-    REAL rhcl(klon, klev) ! humidite relative en ciel clair            
     REAL rain(klon) ! pluies (mm/s)                                   
     REAL snow(klon) ! neige (mm/s)                                    
-    REAL prfl(klon, klev+1) ! flux d'eau precipitante aux interfaces (kg/m2/s)
-    REAL psfl(klon, klev+1) ! flux d'eau precipitante aux interfaces (kg/m2/s)
-    ! Coeffients de fraction lessivee : pour OFF-LINE
 
+    ! Coeffients de fraction lessivee : pour OFF-LINE
+    REAL pfrac_impa(klon, klev)
     REAL pfrac_nucl(klon, klev)
     REAL pfrac_1nucl(klon, klev)
-    REAL pfrac_impa(klon, klev)
 
     ! Fraction d'aerosols lessivee par impaction et par nucleation
     ! POur ON-LINE
-
-    REAL frac_impa(klon, klev)
     REAL frac_nucl(klon, klev)
+
+    REAL prfl(klon, klev+1) ! flux d'eau precipitante aux interfaces (kg/m2/s)
+    REAL psfl(klon, klev+1) ! flux d'eau precipitante aux interfaces (kg/m2/s)
+    REAL rhcl(klon, klev) ! humidite relative en ciel clair            
+
+    ! Local:
+
+    ! Fraction d'aerosols lessivee par impaction et par nucleation
+    ! POur ON-LINE
+    REAL frac_impa(klon, klev)
     REAL zct(klon), zcl(klon)
     !AA
 
@@ -62,8 +69,6 @@ contains
     PARAMETER (ninter=5)
     LOGICAL evap_prec ! evaporation de la pluie                       
     PARAMETER (evap_prec=.TRUE.)
-    REAL ratqs(klon, klev) ! determine la largeur de distribution de vapeur
-    LOGICAL ptconv(klon, klev) ! determine la largeur de distribution de vapeur
     REAL zpdf_sig(klon), zpdf_k(klon), zpdf_delta(klon)
     REAL zpdf_a(klon), zpdf_b(klon), zpdf_e1(klon), zpdf_e2(klon)
 

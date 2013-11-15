@@ -16,13 +16,13 @@ contains
     use nr_util, only: assert
 
     CHARACTER(len=*), INTENT (IN):: fichnom
-    REAL, INTENT (IN):: vcov(:, :, :) ! (iim + 1, jjm, llm)
-    REAL, INTENT (IN):: ucov(:, :, :) ! (iim + 1, jjm + 1, llm)
-    REAL, INTENT (IN):: teta(:, :, :) ! (iim + 1, jjm + 1, llm)
-    REAL, INTENT (IN):: q(:, :, :, :) ! (iim + 1, jjm + 1, llm, nqmx)
-    REAL, INTENT (IN):: masse(:, :, :) ! (iim + 1, jjm + 1, llm)
-    REAL, INTENT (IN):: ps(:, :) ! (iim + 1, jjm + 1)
-    INTEGER, INTENT (IN):: itau
+    REAL, INTENT(IN):: vcov(:, :, :) ! (iim + 1, jjm, llm)
+    REAL, INTENT(IN):: ucov(:, :, :) ! (iim + 1, jjm + 1, llm)
+    REAL, INTENT(IN):: teta(:, :, :) ! (iim + 1, jjm + 1, llm)
+    REAL, INTENT(IN):: q(:, :, :, :) ! (iim + 1, jjm + 1, llm, nqmx)
+    REAL, INTENT(IN):: masse(:, :, :) ! (iim + 1, jjm + 1, llm)
+    REAL, INTENT(IN):: ps(:, :) ! (iim + 1, jjm + 1)
+    INTEGER, INTENT(IN):: itau
 
     ! Variables local to the procedure:
     INTEGER ncid, varid

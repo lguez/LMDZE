@@ -7,21 +7,25 @@ module yoecumf
 
   implicit none
 
-  LOGICAL LMFPEN ! PENETRATIVE CONVECTION SWITCHED ON
-  logical LMFSCV ! SHALLOW CONVECTION SWITCHED ON
-  logical LMFMID ! MIDLEVEL CONVECTION SWITCHED ON
-  logical LMFDD ! CUMULUS DOWNDRAFT SWITCHED ON
-  logical LMFDUDV ! CUMULUS FRICTION SWITCHED ON
-  REAL ENTRPEN ! ENTRAINMENT RATE FOR PENETRATIVE CONVECTION
-  real ENTRSCV ! ENTRAINMENT RATE FOR SHALLOW CONVECTION
-  real ENTRMID ! ENTRAINMENT RATE FOR MIDLEVEL CONVECTION
-  real ENTRDD ! ENTRAINMENT RATE FOR CUMULUS DOWNDRAFTS
-  REAL CMFCTOP ! RELAT. CLOUD MASSFLUX AT LEVEL ABOVE NONBUOYANC
-  real CMFCMAX ! MAXIMUM MASSFLUX VALUE ALLOWED FOR
-  real CMFCMIN ! MINIMUM MASSFLUX VALUE (FOR SAFETY)
-  real CMFDEPS ! FRACTIONAL MASSFLUX FOR DOWNDRAFTS AT LFS
-  real RHCDD ! RELATIVE SATURATION IN DOWNDRAFTS
-  real CPRCON ! COEFFICIENTS FOR DETERMINING CONVERSION FROM CLOUD WATER TO RAIN
+  logical lmfpen ! penetrative convection switched on
+  logical lmfscv ! shallow convection switched on
+  logical lmfmid ! midlevel convection switched on
+  logical lmfdd ! cumulus downdraft switched on
+  logical lmfdudv ! cumulus friction switched on
+  real entrpen ! entrainment rate for penetrative convection
+  real entrscv ! entrainment rate for shallow convection
+  real entrmid ! entrainment rate for midlevel convection
+  real entrdd ! entrainment rate for cumulus downdrafts
+  real cmfctop ! relative cloud massflux at level above nonbuoyanc level
+  real cmfcmax ! maximum massflux value allowed for updrafts etc
+  real cmfcmin ! minimum massflux value (for safety)
+  real cmfdeps ! fractional massflux for downdrafts at lfs
+
+  real rhcdd
+  ! relative saturation in downdrafts (no longer used) (formulation
+  ! implies saturation)
+
+  real cprcon ! coefficients for determining conversion from cloud water to rain
 
 contains
 
@@ -31,20 +35,16 @@ contains
 
     !--------------------------------------------------------
 
-    ENTRPEN = 1E-4 ! ENTRAINMENT RATE FOR PENETRATIVE CONVECTION
-    ENTRSCV = 3E-4 ! ENTRAINMENT RATE FOR SHALLOW CONVECTION
-    ENTRMID = 1E-4 ! ENTRAINMENT RATE FOR MIDLEVEL CONVECTION
-    ENTRDD = 2E-4 ! ENTRAINMENT RATE FOR DOWNDRAFTS
-    CMFCTOP = 0.33 ! RELATIVE CLOUD MASSFLUX AT LEVEL ABOVE NONBUO LEVEL
-    CMFCMAX = 1. ! MAXIMUM MASSFLUX VALUE ALLOWED FOR UPDRAFTS ETC
-    CMFCMIN = 1E-10 ! MINIMUM MASSFLUX VALUE (FOR SAFETY)
-    CMFDEPS = 0.3 ! FRACTIONAL MASSFLUX FOR DOWNDRAFTS AT LFS
-    CPRCON = 2E-4 ! CONVERSION FROM CLOUD WATER TO RAIN
-
+    ENTRPEN = 1E-4
+    ENTRSCV = 3E-4
+    ENTRMID = 1E-4
+    ENTRDD = 2E-4 
+    CMFCTOP = 0.33
+    CMFCMAX = 1.
+    CMFCMIN = 1E-10
+    CMFDEPS = 0.3
+    CPRCON = 2E-4
     RHCDD = 1.
-    ! relative saturation in downdrafts (no longer used) (formulation
-    ! implies saturation)
-
     LMFPEN = .TRUE.
     LMFSCV = .TRUE.
     LMFMID = .TRUE.

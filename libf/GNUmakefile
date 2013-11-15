@@ -40,7 +40,9 @@ include ../Compilers/${FC}_${mode}.mk
 SHELL = bash
 
 # Extend known suffixes:
+
 COMPILE.f90 = $(FC) $(F90FLAGS) $(TARGET_ARCH) -c
+
 %.o: %.f90
 	$(COMPILE.f90) $(OUTPUT_OPTION) $<
 
@@ -74,6 +76,6 @@ trace:
 # Dependencies among object files:
 include ${src_root}/depend.mk
 
-# Other rules, optionnally:
+# Other rules, optionally:
 -include grep.mk
 -include nag_rules.mk

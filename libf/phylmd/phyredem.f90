@@ -12,7 +12,7 @@ contains
 
     ! From phylmd/phyredem.F, version 1.3 2005/05/25 13:10:09
     ! Author: Z. X. Li (LMD/CNRS)
-    ! Date: 19930818
+    ! Date: 1993/08/18
     ! Objet : écriture de l'état de démarrage ou redémarrage pour la physique
 
     USE dimphy, ONLY: klev, klon, zmasq
@@ -25,7 +25,7 @@ contains
 
     CHARACTER(len=*) fichnom
     REAL, INTENT(IN):: rlat(klon), rlon(klon)
-    REAL pctsrf(klon, nbsrf)
+    REAL, INTENT(IN):: pctsrf(klon, nbsrf)
     REAL tsol(klon, nbsrf)
     REAL tsoil(klon, nsoilmx, nbsrf)
     REAL tslab(klon), seaice(klon) !IM "slab" ocean
@@ -61,7 +61,9 @@ contains
     ! Local:
 
     INTEGER ncid, idim2, idim3
-    integer varid, varid_run_off_lic_0, varid_sig1, varid_w01
+    integer varid, varid_run_off_lic_0, varid_sig1, varid_w01, varid_rlon
+    integer varid_rlat, varid_zmasq, varid_fter, varid_flic, varid_foce
+    integer varid_fsic
     INTEGER isoil, nsrf
     CHARACTER(len=7) str7
     CHARACTER(len=2) str2
@@ -78,59 +80,35 @@ contains
     call nf95_def_dim(ncid, 'points_physiques', klon, idim2)
     call nf95_def_dim(ncid, 'klev', klev, idim3)
 
-    call nf95_def_var(ncid, 'longitude', nf90_float, idim2, varid)
-    call nf95_put_att(ncid, varid, 'title', &
-         'Longitudes de la grille physique')
+    call nf95_def_var(ncid, 'longitude', nf90_float, idim2, varid_rlon)
+    call nf95_def_var(ncid, 'latitude', nf90_float, idim2, varid_rlat)
+
+    call nf95_def_var(ncid, 'masque', nf90_float, idim2, varid_zmasq)
+    call nf95_put_att(ncid, varid_zmasq, 'title', 'masque terre mer')
+
+    ! Fractions de chaque sous-surface
+
+    call nf95_def_var(ncid, 'FTER', nf90_float, idim2, varid_fter)
+    call nf95_put_att(ncid, varid_fter, 'title', 'fraction de continent')
+
+    call nf95_def_var(ncid, 'FLIC', nf90_float, idim2, varid_flic)
+    call nf95_put_att(ncid, varid_flic, 'title', 'fraction glace de terre')
+
+    call nf95_def_var(ncid, 'FOCE', nf90_float, idim2, varid_foce)
+    call nf95_put_att(ncid, varid_foce, 'title', 'fraction ocean')
+
+    call nf95_def_var(ncid, 'FSIC', nf90_float, idim2, varid_fsic)
+    call nf95_put_att(ncid, varid_fsic, 'title', 'fraction glace mer')
+
     call nf95_enddef(ncid)
-    call nf95_put_var(ncid, varid, rlon)
 
-    call nf95_redef(ncid)
-    call nf95_def_var(ncid, 'latitude', nf90_float, idim2, varid)
-    call nf95_put_att(ncid, varid, 'title', &
-         'Latitudes de la grille physique')
-    call nf95_enddef(ncid)
-    call nf95_put_var(ncid, varid, rlat)
-
-    ! PB ajout du masque terre/mer
-
-    call nf95_redef(ncid)
-    call nf95_def_var(ncid, 'masque', nf90_float, idim2, varid)
-    call nf95_put_att(ncid, varid, 'title', 'masque terre mer')
-    call nf95_enddef(ncid)
-    call nf95_put_var(ncid, varid, zmasq)
-    ! BP ajout des fraction de chaque sous-surface
-
-    ! 1. fraction de terre
-
-    call nf95_redef(ncid)
-    call nf95_def_var(ncid, 'FTER', nf90_float, idim2, varid)
-    call nf95_put_att(ncid, varid, 'title', 'fraction de continent')
-    call nf95_enddef(ncid)
-    call nf95_put_var(ncid, varid, pctsrf(:, is_ter))
-
-    ! 2. Fraction de glace de terre
-
-    call nf95_redef(ncid)
-    call nf95_def_var(ncid, 'FLIC', nf90_float, idim2, varid)
-    call nf95_put_att(ncid, varid, 'title', 'fraction glace de terre')
-    call nf95_enddef(ncid)
-    call nf95_put_var(ncid, varid, pctsrf(:, is_lic))
-
-    ! 3. fraction ocean
-
-    call nf95_redef(ncid)
-    call nf95_def_var(ncid, 'FOCE', nf90_float, idim2, varid)
-    call nf95_put_att(ncid, varid, 'title', 'fraction ocean')
-    call nf95_enddef(ncid)
-    call nf95_put_var(ncid, varid, pctsrf(:, is_oce))
-
-    ! 4. Fraction glace de mer
-
-    call nf95_redef(ncid)
-    call nf95_def_var(ncid, 'FSIC', nf90_float, idim2, varid)
-    call nf95_put_att(ncid, varid, 'title', 'fraction glace mer')
-    call nf95_enddef(ncid)
-    call nf95_put_var(ncid, varid, pctsrf(:, is_sic))
+    call nf95_put_var(ncid, varid_rlon, rlon)
+    call nf95_put_var(ncid, varid_rlat, rlat)
+    call nf95_put_var(ncid, varid_zmasq, zmasq)
+    call nf95_put_var(ncid, varid_fter, pctsrf(:, is_ter))
+    call nf95_put_var(ncid, varid_flic, pctsrf(:, is_lic))
+    call nf95_put_var(ncid, varid_foce, pctsrf(:, is_oce))
+    call nf95_put_var(ncid, varid_fsic, pctsrf(:, is_sic))
 
     DO nsrf = 1, nbsrf
        IF (nsrf<=99) THEN
