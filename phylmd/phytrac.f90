@@ -8,67 +8,59 @@ module phytrac_m
 contains
 
   SUBROUTINE phytrac(rnpb, itap, lmt_pas, julien, gmtime, firstcal, lafin, &
-       nq_phys, pdtphys, u, t_seri, paprs, pplay, pmfu, pmfd, pen_u, pde_u, &
-       pen_d, pde_d, coefh, fm_therm, entr_therm, yu1, yv1, ftsol, pctsrf, &
-       frac_impa, frac_nucl, pphis, albsol, rh, cldfra, rneb, diafra, cldliq, &
-       pmflxr, pmflxs, prfl, psfl, da, phi, mp, upwd, dnwd, tr_seri, zmasse)
+       nq_phys, pdtphys, u, t_seri, paprs, pplay, pmfu, pmfd, pde_u, pen_d, &
+       coefh, fm_therm, entr_therm, yu1, yv1, ftsol, pctsrf, frac_impa, &
+       frac_nucl, pphis, albsol, rh, cldfra, rneb, diafra, cldliq, pmflxr, &
+       pmflxs, prfl, psfl, da, phi, mp, upwd, dnwd, tr_seri, zmasse)
 
     ! From phylmd/phytrac.F, version 1.15 2006/02/21 08:08:30 (SVN revision 679)
 
     ! Authors: Frédéric Hourdin, Abderrahmane Idelkadi, Marie-Alice
     ! Foujols, Olivia
+
     ! Objet : moniteur général des tendances des traceurs
 
-    ! L'appel de "phytrac" se fait avec "nqmx-2" donc nous avons bien
-    ! les vrais traceurs (en nombre "nbtr", sans la vapeur d'eau ni l'eau
-    ! liquide) dans "phytrac".
+    ! L'appel de "phytrac" se fait avec "nqmx - 2" donc nous avons
+    ! bien les vrais traceurs (en nombre "nbtr", sans la vapeur d'eau
+    ! ni l'eau liquide) dans "phytrac".
 
     ! Modifications pour les traceurs :
     ! - uniformisation des parametrisations dans phytrac
     ! - stockage des moyennes des champs nécessaires en mode traceur off-line 
 
-    use dimens_m, only: llm
-    use indicesol, only: nbsrf
-    use dimphy, only: klon, nbtr
+    use abort_gcm_m, only: abort_gcm
     use clesphys, only: ecrit_tra
     use clesphys2, only: iflag_con
-    use abort_gcm_m, only: abort_gcm
-    use SUPHEC_M, only: rg
+    use cltracrn_m, only: cltracrn
     use ctherm, only: iflag_thermals
-    use regr_pr_comb_coefoz_m, only: regr_pr_comb_coefoz
-    use phyetat0_m, only: rlat
-    use o3_chem_m, only: o3_chem
+    use dimens_m, only: llm
+    use dimphy, only: klon, nbtr
+    use indicesol, only: nbsrf
     use ini_histrac_m, only: ini_histrac
-    use radiornpb_m, only: radiornpb
     use minmaxqfi_m, only: minmaxqfi
+    use nflxtr_m, only: nflxtr
     use nr_util, only: assert
+    use o3_chem_m, only: o3_chem
+    use phyetat0_m, only: rlat
     use press_coefoz_m, only: press_coefoz
+    use radiornpb_m, only: radiornpb
+    use regr_pr_comb_coefoz_m, only: regr_pr_comb_coefoz
+    use SUPHEC_M, only: rg
 
     logical, intent(in):: rnpb
+    integer, intent(in):: itap ! number of calls to "physiq"
+    integer, intent(in):: lmt_pas ! number of time steps of "physics" per day
+    integer, intent(in):: julien !jour julien, 1 <= julien <= 360
+    real, intent(in):: gmtime ! heure de la journée en fraction de jour
+    logical, intent(in):: firstcal ! first call to "calfis"
+    logical, intent(in):: lafin ! fin de la physique
 
     integer, intent(in):: nq_phys
     ! (nombre de traceurs auxquels on applique la physique)
 
-    integer, intent(in):: itap  ! number of calls to "physiq"
-    integer, intent(in):: lmt_pas ! number of time steps of "physics" per day
-    integer, intent(in):: julien !jour julien, 1 <= julien <= 360
-    real, intent(in):: gmtime ! heure de la journée en fraction de jour
-    real, intent(in):: pdtphys  ! pas d'integration pour la physique (s)
-    real, intent(in):: t_seri(klon, llm) ! temperature, in K
-
-    real, intent(inout):: tr_seri(:, :, :) ! (klon, llm, nbtr)
-    ! (mass fractions of tracers, excluding water, at mid-layers)
-
+    real, intent(in):: pdtphys ! pas d'integration pour la physique (s)
     real, intent(in):: u(klon, llm)
-    real rh(klon, llm)     ! humidite relative
-    real cldliq(klon, llm) ! eau liquide nuageuse
-    real cldfra(klon, llm) ! fraction nuageuse (tous les nuages)
-
-    real diafra(klon, llm)
-    ! (fraction nuageuse (convection ou stratus artificiels))
-
-    real rneb(klon, llm)   ! fraction nuageuse (grande echelle)
-    real albsol(klon)  ! albedo surface
+    real, intent(in):: t_seri(klon, llm) ! temperature, in K
 
     real, intent(in):: paprs(klon, llm+1)
     ! (pression pour chaque inter-couche, en Pa)
@@ -76,84 +68,85 @@ contains
     real, intent(in):: pplay(klon, llm)
     ! (pression pour le mileu de chaque couche, en Pa)
 
-    real, intent(in):: pphis(klon)
-    logical, intent(in):: firstcal ! first call to "calfis"
-    logical, intent(in):: lafin ! fin de la physique
-
-    REAL pmflxr(klon, llm+1), pmflxs(klon, llm+1)   !--lessivage convection
-    REAL prfl(klon, llm+1),   psfl(klon, llm+1)     !--lessivage large-scale
-
-    !   convection:
+    ! convection:
 
     REAL, intent(in):: pmfu(klon, llm) ! flux de masse dans le panache montant
 
     REAL, intent(in):: pmfd(klon, llm)
     ! flux de masse dans le panache descendant
 
-    REAL pen_u(klon, llm) ! flux entraine dans le panache montant
-
-    !   thermiques:
-
-    real fm_therm(klon, llm+1), entr_therm(klon, llm)
-
     REAL pde_u(klon, llm) ! flux detraine dans le panache montant
     REAL pen_d(klon, llm) ! flux entraine dans le panache descendant
-    REAL pde_d(klon, llm) ! flux detraine dans le panache descendant
+    REAL coefh(klon, llm) ! coeff melange couche limite
+
+    ! thermiques:
+    real fm_therm(klon, llm+1), entr_therm(klon, llm)
+
+    ! Couche limite:
+    REAL yu1(klon) ! vents au premier niveau
+    REAL yv1(klon) ! vents au premier niveau
+
+    ! Arguments nécessaires pour les sources et puits de traceur :
+    real ftsol(klon, nbsrf) ! Temperature du sol (surf)(Kelvin)
+    real pctsrf(klon, nbsrf) ! Pourcentage de sol f(nature du sol)
+
+    ! Lessivage pour le on-line
+    REAL frac_impa(klon, llm) ! fraction d'aerosols impactes
+    REAL frac_nucl(klon, llm) ! fraction d'aerosols nuclees
+
+    real, intent(in):: pphis(klon)
+    real albsol(klon) ! albedo surface
+    real rh(klon, llm) ! humidite relative
+    real cldfra(klon, llm) ! fraction nuageuse (tous les nuages)
+    real rneb(klon, llm) ! fraction nuageuse (grande echelle)
+
+    real diafra(klon, llm)
+    ! (fraction nuageuse (convection ou stratus artificiels))
+
+    real cldliq(klon, llm) ! eau liquide nuageuse
+    REAL pmflxr(klon, llm+1), pmflxs(klon, llm+1) !--lessivage convection
+    REAL prfl(klon, llm+1), psfl(klon, llm+1) !--lessivage large-scale
+
     ! Kerry Emanuel
     real da(klon, llm), phi(klon, llm, llm), mp(klon, llm)
     REAL, intent(in):: upwd(klon, llm) ! saturated updraft mass flux
     REAL, intent(in):: dnwd(klon, llm) ! saturated downdraft mass flux
 
-    !   Couche limite:
+    real, intent(inout):: tr_seri(:, :, :) ! (klon, llm, nbtr)
+    ! (mass fractions of tracers, excluding water, at mid-layers)
 
-    REAL coefh(klon, llm) ! coeff melange CL
-    REAL yu1(klon)        ! vents au premier niveau
-    REAL yv1(klon)        ! vents au premier niveau
-
-    !   Lessivage:
-
-    ! pour le ON-LINE
-
-    REAL frac_impa(klon, llm)  ! fraction d'aerosols impactes
-    REAL frac_nucl(klon, llm)  ! fraction d'aerosols nuclees
-
-    ! Arguments necessaires pour les sources et puits de traceur:
-
-    real ftsol(klon, nbsrf)  ! Temperature du sol (surf)(Kelvin)
-    real pctsrf(klon, nbsrf) ! Pourcentage de sol f(nature du sol)
-
-    real, intent(in):: zmasse(:, :)  ! (klon, llm)
+    real, intent(in):: zmasse(:, :) ! (klon, llm)
     ! (column-density of mass of air in a cell, in kg m-2)
 
     ! Variables local to the procedure:
 
     integer nsplit
 
-    !  TRACEURS
+    ! TRACEURS
 
     ! Sources et puits des traceurs:
 
     ! Pour l'instant seuls les cas du rn et du pb ont ete envisages.
 
-    REAL source(klon)       ! a voir lorsque le flux est prescrit 
+    REAL source(klon) ! a voir lorsque le flux est prescrit 
     ! 
     ! Pour la source de radon et son reservoir de sol
 
-    REAL, save:: trs(klon, nbtr)    ! Concentration de radon dans le sol
+    REAL, save:: trs(klon, nbtr) ! Concentration de radon dans le sol
 
     REAL masktr(klon, nbtr) ! Masque reservoir de sol traceur
-    !                            Masque de l'echange avec la surface
-    !                           (1 = reservoir) ou (possible => 1 )
+    ! Masque de l'echange avec la surface
+    ! (1 = reservoir) ou (possible => 1)
     SAVE masktr
-    REAL fshtr(klon, nbtr)  ! Flux surfacique dans le reservoir de sol
+    REAL fshtr(klon, nbtr) ! Flux surfacique dans le reservoir de sol
     SAVE fshtr
-    REAL hsoltr(nbtr)      ! Epaisseur equivalente du reservoir de sol
+    REAL hsoltr(nbtr) ! Epaisseur equivalente du reservoir de sol
     SAVE hsoltr
-    REAL tautr(nbtr)       ! Constante de decroissance radioactive
+    REAL tautr(nbtr) ! Constante de decroissance radioactive
     SAVE tautr
-    REAL vdeptr(nbtr)      ! Vitesse de depot sec dans la couche Brownienne
+    REAL vdeptr(nbtr) ! Vitesse de depot sec dans la couche Brownienne
     SAVE vdeptr
-    REAL scavtr(nbtr)      ! Coefficient de lessivage
+    REAL scavtr(nbtr) ! Coefficient de lessivage
     SAVE scavtr
 
     CHARACTER itn
@@ -161,11 +154,11 @@ contains
 
     ! nature du traceur
 
-    logical aerosol(nbtr)  ! Nature du traceur
-    !                            ! aerosol(it) = true  => aerosol 
-    !                            ! aerosol(it) = false => gaz 
-    logical clsol(nbtr)    ! couche limite sol calculée
-    logical radio(nbtr)    ! décroisssance radioactive
+    logical aerosol(nbtr) ! Nature du traceur
+    ! ! aerosol(it) = true => aerosol 
+    ! ! aerosol(it) = false => gaz 
+    logical clsol(nbtr) ! couche limite sol calculée
+    logical radio(nbtr) ! décroisssance radioactive
     save aerosol, clsol, radio
 
     ! convection tiedtke
@@ -177,17 +170,17 @@ contains
     ! Variables locales pour effectuer les appels en serie
 
     REAL d_tr(klon, llm), d_trs(klon) ! tendances de traceurs 
-    REAL d_tr_cl(klon, llm, nbtr) ! tendance de traceurs  couche limite
-    REAL d_tr_cv(klon, llm, nbtr) ! tendance de traceurs  conv pour chq traceur
+    REAL d_tr_cl(klon, llm, nbtr) ! tendance de traceurs couche limite
+    REAL d_tr_cv(klon, llm, nbtr) ! tendance de traceurs conv pour chq traceur
     REAL d_tr_th(klon, llm, nbtr) ! la tendance des thermiques
     REAL d_tr_dec(klon, llm, 2) ! la tendance de la decroissance 
-    !                                   ! radioactive du rn - > pb 
+    ! ! radioactive du rn - > pb 
     REAL d_tr_lessi_impa(klon, llm, nbtr) ! la tendance du lessivage 
-    !                                          ! par impaction
+    ! ! par impaction
     REAL d_tr_lessi_nucl(klon, llm, nbtr) ! la tendance du lessivage 
-    !                                          ! par nucleation 
+    ! ! par nucleation 
     REAL flestottr(klon, llm, nbtr) ! flux de lessivage 
-    !                                    ! dans chaque couche 
+    ! ! dans chaque couche 
 
     real ztra_th(klon, llm)
     integer isplit
@@ -230,9 +223,9 @@ contains
        ! Initialisation de la nature des traceurs
 
        DO it = 1, nq_phys
-          aerosol(it) = .FALSE.  ! Tous les traceurs sont des gaz par defaut
+          aerosol(it) = .FALSE. ! Tous les traceurs sont des gaz par defaut
           radio(it) = .FALSE. ! par défaut pas de passage par "radiornpb"
-          clsol(it) = .FALSE.  ! Par defaut couche limite avec flux prescrit
+          clsol(it) = .FALSE. ! Par defaut couche limite avec flux prescrit
        ENDDO
 
        if (nq_phys >= 3) then
@@ -257,8 +250,8 @@ contains
        DO it=1, nq_phys
           if (iflag_con == 2) then
              ! Tiedke
-             CALL nflxtr(pdtphys, pmfu, pmfd, pen_u, pde_u, pen_d, pde_d, &
-                  paprs, tr_seri(1, 1, it), d_tr_cv(1, 1, it))
+             CALL nflxtr(pdtphys, pmfu, pmfd, pde_u, pen_d, paprs, &
+                  tr_seri(:, :, it), d_tr_cv(:, :, it))
           else if (iflag_con == 3) then
              ! Emanuel
              call cvltr(pdtphys, da, phi, mp, paprs, tr_seri(1, 1, it), upwd, &
@@ -271,7 +264,7 @@ contains
              ENDDO
           ENDDO
           WRITE(unit=itn, fmt='(i1)') it
-          CALL minmaxqfi(tr_seri(:, :, it), 0., 1.e33, &
+          CALL minmaxqfi(tr_seri(:, :, it), 0., 1e33, &
                'convection, tracer index = ' // itn)
        ENDDO
     endif
@@ -283,7 +276,7 @@ contains
           do i=1, klon
              d_tr_th(i, k, it)=0.
              tr_seri(i, k, it)=max(tr_seri(i, k, it), 0.)
-             tr_seri(i, k, it)=min(tr_seri(i, k, it), 1.e10)
+             tr_seri(i, k, it)=min(tr_seri(i, k, it), 1e10)
           enddo
        enddo
     enddo
@@ -308,7 +301,7 @@ contains
        ENDDO
     endif
 
-    !   Calcul de l'effet de la couche limite
+    ! Calcul de l'effet de la couche limite
 
     if (couchelimite) then
 
@@ -324,7 +317,7 @@ contains
              ! couche limite avec quantite dans le sol calculee
              CALL cltracrn(it, pdtphys, yu1, yv1, &
                   coefh, t_seri, ftsol, pctsrf, &
-                  tr_seri(1, 1, it), trs(1, it), &
+                  tr_seri(:, :, it), trs(1, it), &
                   paprs, pplay, delp, &
                   masktr(1, it), fshtr(1, it), hsoltr(it), &
                   tautr(it), vdeptr(it), &
@@ -361,7 +354,7 @@ contains
 
     endif ! couche limite
 
-    !   Calcul de l'effet du puits radioactif
+    ! Calcul de l'effet du puits radioactif
 
     ! MAF il faudrait faire une modification pour passer dans radiornpb 
     ! si radio=true mais pour l'instant radiornpb propre au cas rnpb
@@ -371,10 +364,10 @@ contains
           if (radio(it)) then
              tr_seri(:, :, it) = tr_seri(:, :, it) + d_tr_dec(:, :, it)
              WRITE(unit=itn, fmt='(i1)') it
-             CALL minmaxqfi(tr_seri(:, :, it), 0., 1.e33, 'puits rn it='//itn)
+             CALL minmaxqfi(tr_seri(:, :, it), 0., 1e33, 'puits rn it='//itn)
           endif
        ENDDO
-    endif ! rnpb decroissance  radioactive
+    endif
 
     if (nq_phys >= 3) then
        ! Ozone as a tracer:
@@ -399,9 +392,9 @@ contains
              DO k = 1, llm
                 DO i = 1, klon
                    d_tr_lessi_nucl(i, k, it) = d_tr_lessi_nucl(i, k, it) + &
-                        ( 1 - frac_nucl(i, k) )*tr_seri(i, k, it)
+                        (1 - frac_nucl(i, k))*tr_seri(i, k, it)
                    d_tr_lessi_impa(i, k, it) = d_tr_lessi_impa(i, k, it) + &
-                        ( 1 - frac_impa(i, k) )*tr_seri(i, k, it)
+                        (1 - frac_impa(i, k))*tr_seri(i, k, it)
                 ENDDO
              ENDDO
           ENDIF
@@ -414,8 +407,8 @@ contains
           IF (aerosol(it)) THEN
              DO k = 1, llm
                 DO i = 1, klon
-                   tr_seri(i, k, it)=tr_seri(i, k, it) &
-                        *frac_impa(i, k)*frac_nucl(i, k)
+                   tr_seri(i, k, it) = tr_seri(i, k, it) * frac_impa(i, k) &
+                        * frac_nucl(i, k)
                 ENDDO
              ENDDO
           ENDIF
@@ -426,27 +419,25 @@ contains
        DO it = 1, nq_phys
           DO k = 1, llm
              DO i = 1, klon
-                flestottr(i, k, it) = flestottr(i, k, it) - &
-                     ( d_tr_lessi_nucl(i, k, it)   + &
-                     d_tr_lessi_impa(i, k, it) ) * &
-                     ( paprs(i, k)-paprs(i, k+1) ) /  &
-                     (RG * pdtphys)
+                flestottr(i, k, it) = flestottr(i, k, it) &
+                     - (d_tr_lessi_nucl(i, k, it) + d_tr_lessi_impa(i, k, it)) &
+                     * (paprs(i, k)-paprs(i, k+1)) / (RG * pdtphys)
              ENDDO
           ENDDO
        ENDDO
     ENDIF
 
-    !   Ecriture des sorties
+    ! Ecriture des sorties
     call write_histrac(lessivage, nq_phys, itap, nid_tra)
 
     if (lafin) then
        print *, "C'est la fin de la physique."
-       open (unit=99, file='restarttrac',  form='formatted')
+       open(unit=99, file='restarttrac', form='formatted')
        do i=1, klon
           write(unit=99, fmt=*) trs(i, 1)
        enddo
        PRINT *, 'Ecriture du fichier restarttrac'
-       close(99)
+       close(unit=99)
     endif
 
   contains
@@ -470,12 +461,12 @@ contains
       integer, intent(in):: nq_phys
       ! (nombre de traceurs auxquels on applique la physique)
 
-      integer, intent(in):: itap  ! number of calls to "physiq"
+      integer, intent(in):: itap ! number of calls to "physiq"
       integer, intent(in):: nid_tra
 
       ! Variables local to the procedure:
       integer it
-      integer itau_w   ! pas de temps ecriture
+      integer itau_w ! pas de temps ecriture
       logical, parameter:: ok_sync = .true.
 
       !-----------------------------------------------------

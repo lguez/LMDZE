@@ -24,10 +24,10 @@ contains
     REAL, intent(in):: pqen(klon, klev)
     REAL, intent(in):: pqsen(klon, klev)
     REAL, intent(in):: pgeo(klon, klev), pgeoh(klon, klev)
-    REAL pap(klon, klev), paph(klon, klev+1)
-    REAL pqte(klon, klev)
-    REAL pvervel(klon, klev) ! vitesse verticale en Pa/s
-    LOGICAL ldland(klon)
+    REAL, intent(in):: pap(klon, klev), paph(klon, klev+1)
+    REAL, intent(in):: pqte(klon, klev)
+    REAL, intent(in):: pvervel(klon, klev) ! vitesse verticale en Pa/s
+    LOGICAL, intent(in):: ldland(klon)
     LOGICAL, intent(inout):: ldcum(klon)
     INTEGER, intent(inout):: ktype(klon)
     integer klab(klon, klev)
@@ -59,6 +59,7 @@ contains
 
     REAL zwmax(klon), zzzmb
     INTEGER klwmin(klon) ! level of maximum vertical velocity
+    real fact
 
     !----------------------------------------------------------------------
 
@@ -95,8 +96,8 @@ contains
           pmful(i, k)=0.
           plude(i, k)=0.
           pdmfup(i, k)=0.
-          IF(.NOT. ldcum(i).OR.ktype(i) == 3) klab(i, k)=0
-          IF(.NOT. ldcum(i).AND.paph(i, k) < 4.E4) kctop0(i)=k
+          IF (.NOT. ldcum(i) .OR. ktype(i) == 3) klab(i, k)=0
+          IF (.NOT. ldcum(i) .AND. paph(i, k) < 4e4) kctop0(i) = k
        ENDDO
     ENDDO
 
@@ -142,7 +143,7 @@ contains
                 pqu(i, k+1) = pqen(i, k)
                 plu(i, k+1) = 0.0
                 zzzmb = MAX(CMFCMIN, -pvervel(i, k)/RG)
-                zmfmax = (paph(i, k)-paph(i, k-1))/(RG * pdtime)
+                zmfmax = (paph(i, k) - paph(i, k-1)) / (RG * pdtime)
                 pmfub(i) = MIN(zzzmb, zmfmax)
                 pmfu(i, k+1) = pmfub(i)
                 pmfus(i, k+1) = pmfub(i) * (RCPD * ptu(i, k+1)+pgeoh(i, k+1))
@@ -171,34 +172,32 @@ contains
        DO i = 1, klon
           pen_u(i, k) = 0.0
           pde_u(i, k) = 0.0
-          zrho(i)=paph(i, k+1)/(RD * ptenh(i, k+1))
-          zpbot(i)=paph(i, kcbot(i))
-          zptop(i)=paph(i, kctop0(i))
+          zrho(i) = paph(i, k + 1) / (RD * ptenh(i, k + 1))
+          zpbot(i) = paph(i, kcbot(i))
+          zptop(i) = paph(i, kctop0(i))
        ENDDO
 
        DO i = 1, klon
-          IF(ldcum(i)) THEN
-             zdprho=(paph(i, k+1)-paph(i, k))/(RG * zrho(i))
+          IF (ldcum(i)) THEN
+             zdprho = (paph(i, k + 1) - paph(i, k)) / (RG * zrho(i))
              zentr=pentr(i) * pmfu(i, k+1) * zdprho
              llo1=k < kcbot(i)
-             IF(llo1) pde_u(i, k)=zentr
+             IF (llo1) pde_u(i, k)=zentr
              zpmid=0.5 * (zpbot(i)+zptop(i))
-             llo2=llo1.AND.ktype(i) == 2.AND. &
-                  (zpbot(i)-paph(i, k) < 0.2E5.OR. &
-                  paph(i, k) > zpmid)
-             IF(llo2) pen_u(i, k)=zentr
-             llo2=llo1.AND.(ktype(i) == 1.OR.ktype(i) == 3).AND. &
-                  (k >= MAX(klwmin(i), kctop0(i)+2).OR.pap(i, k) > zpmid)
-             IF(llo2) pen_u(i, k)=zentr
-             llo1=pen_u(i, k) > 0..AND.(ktype(i) == 1.OR.ktype(i) == 2)
-             IF(llo1) THEN
-                zentr=zentr * (1.+3. * (1.-MIN(1., (zpbot(i)-pap(i, k))/1.5E4)))
-                pen_u(i, k)=pen_u(i, k) * (1.+3. * (1.-MIN(1., &
-                     (zpbot(i)-pap(i, k))/1.5E4)))
-                pde_u(i, k)=pde_u(i, k) * (1.+3. * (1.-MIN(1., &
-                     (zpbot(i)-pap(i, k))/1.5E4)))
+             llo2 = llo1 .AND. ktype(i) == 2 &
+                  .AND. (zpbot(i) - paph(i, k) < 0.2E5 .OR. paph(i, k) > zpmid)
+             IF (llo2) pen_u(i, k)=zentr
+             llo2 = llo1 .AND. (ktype(i) == 1 .OR. ktype(i) == 3) .AND. &
+                  (k >= MAX(klwmin(i), kctop0(i) + 2) .OR. pap(i, k) > zpmid)
+             IF (llo2) pen_u(i, k)=zentr
+             llo1=pen_u(i, k) > 0. .AND. (ktype(i) == 1 .OR. ktype(i) == 2)
+             IF (llo1) THEN
+                fact = 1. + 3. * (1. - MIN(1., (zpbot(i) - pap(i, k)) / 1.5E4))
+                zentr = zentr * fact
+                pen_u(i, k)=pen_u(i, k) * fact
+                pde_u(i, k)=pde_u(i, k) * fact
              ENDIF
-             IF(llo2.AND.pqenh(i, k+1) > 1.E-5) &
+             IF (llo2 .AND. pqenh(i, k+1) > 1e-5) &
                   pen_u(i, k)=zentr+MAX(pqte(i, k), 0.)/pqenh(i, k+1) * &
                   zrho(i) * zdprho
           ENDIF
@@ -210,7 +209,8 @@ contains
           IF (llflag(i)) THEN
              IF (k < kcbot(i)) THEN
                 zmftest = pmfu(i, k+1)+pen_u(i, k)-pde_u(i, k)
-                zmfmax = MIN(zmftest, (paph(i, k)-paph(i, k-1))/(RG * pdtime))
+                zmfmax = MIN(zmftest, &
+                     (paph(i, k) - paph(i, k - 1)) / (RG * pdtime))
                 pen_u(i, k)=MAX(pen_u(i, k)-MAX(0.0, zmftest-zmfmax), 0.0)
              ENDIF
              pde_u(i, k)=MIN(pde_u(i, k), 0.75 * pmfu(i, k+1))
@@ -244,7 +244,7 @@ contains
        CALL flxadjtq(paph(1, k), ptu(1, k), pqu(1, k), llflag, icall)
 
        DO i = 1, klon
-          IF(llflag(i).AND.pqu(i, k).NE.zqold(i)) THEN
+          IF (llflag(i) .AND. pqu(i, k).NE.zqold(i)) THEN
              klab(i, k) = 2
              plu(i, k) = plu(i, k)+zqold(i)-pqu(i, k)
              zbuo = ptu(i, k) * (1.+RETV * pqu(i, k))- &
@@ -256,7 +256,7 @@ contains
                 zdnoprc = 1.5E4
                 IF (ldland(i)) zdnoprc = zdland(i)
                 zprcon = CPRCON
-                IF ((zpbot(i)-paph(i, k)) < zdnoprc) zprcon = 0.0
+                IF ((zpbot(i) - paph(i, k)) < zdnoprc) zprcon = 0.
                 zlnew=plu(i, k)/(1.+zprcon * (pgeoh(i, k)-pgeoh(i, k+1)))
                 pdmfup(i, k)=MAX(0., (plu(i, k)-zlnew) * pmfu(i, k))
                 plu(i, k)=zlnew
@@ -273,7 +273,6 @@ contains
              pmfuq(i, k)=pqu(i, k) * pmfu(i, k)
           ENDIF
        end DO
-
     end DO
 
     ! Determine convective fluxes above non-buoyancy level (note:

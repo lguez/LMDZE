@@ -43,7 +43,7 @@ contains
     REAL radsol(klon)
     REAL frugs(klon, nbsrf)
     REAL agesno(klon, nbsrf)
-    REAL zmea(klon)
+    REAL, INTENT(IN):: zmea(klon)
     REAL, intent(in):: zstd(klon)
     REAL, intent(in):: zsig(klon)
     REAL zgam(klon)

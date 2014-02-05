@@ -7,7 +7,7 @@ module etat0_mod
 
   REAL pctsrf(klon, nbsrf)
   ! ("pctsrf(i, :)" is the composition of the surface at horizontal
-  !  position "i")
+  ! position "i")
 
   private nbsrf, klon
 
@@ -20,7 +20,7 @@ contains
     use caldyn0_m, only: caldyn0
     use comconst, only: dtvr, daysec, cpp, kappa
     use comgeom, only: rlatu, rlonv, rlonu, rlatv, aire_2d, apoln, apols, &
-         cu_2d, cv_2d
+         cu_2d, cv_2d, inigeom
     use conf_gcm_m, only: day_step, iphysiq, dayref, anneeref
     use dimens_m, only: iim, jjm, llm, nqmx
     use dimphy, only: zmasq
@@ -36,7 +36,6 @@ contains
     use indicesol, only: is_oce, is_sic, is_ter, is_lic, epsfra
     use iniadvtrac_m, only: iniadvtrac
     use inifilr_m, only: inifilr
-    use inigeom_m, only: inigeom
     use massdair_m, only: massdair
     use netcdf, only: nf90_nowrite
     use netcdf95, only: nf95_close, nf95_get_var, nf95_gw_var, &
@@ -50,7 +49,7 @@ contains
     use regr_pr_o3_m, only: regr_pr_o3
     use serre, only: alphax
     use startdyn, only: start_init_dyn
-    USE start_init_orog_m, only: start_init_orog, mask, phis
+    USE start_init_orog_m, only: start_init_orog, mask
     use start_init_phys_m, only: start_init_phys
     use start_inter_3d_m, only: start_inter_3d
     use temps, only: itau_phy, annee_ref, day_ref
@@ -82,14 +81,15 @@ contains
     real seaice(klon) ! kg m-2
     REAL frugs(klon, nbsrf), agesno(klon, nbsrf)
     REAL rugmer(klon)
-    real, dimension(iim + 1, jjm + 1):: relief, zstd_2d, zsig_2d, zgam_2d
+    REAL phis(iim + 1, jjm + 1) ! surface geopotential, in m2 s-2
+    real, dimension(iim + 1, jjm + 1):: zmea_2d, zstd_2d, zsig_2d, zgam_2d
     real, dimension(iim + 1, jjm + 1):: zthe_2d, zpic_2d, zval_2d
     real, dimension(iim + 1, jjm + 1):: tsol_2d, qsol_2d, ps
     REAL zmea(klon), zstd(klon)
     REAL zsig(klon), zgam(klon)
     REAL zthe(klon)
     REAL zpic(klon), zval(klon)
-    REAL t_ancien(klon, llm), q_ancien(klon, llm)      !
+    REAL t_ancien(klon, llm), q_ancien(klon, llm)
     REAL run_off_lic_0(klon)
     real clwcon(klon, llm), rnebcon(klon, llm), ratqs(klon, llm)
 
@@ -138,14 +138,14 @@ contains
     ! (with conversion to degrees)
     lonfi(klon) = 0.
 
-    call start_init_orog(relief, zstd_2d, zsig_2d, zgam_2d, zthe_2d, zpic_2d, &
-         zval_2d) ! also compute "mask" and "phis"
+    call start_init_orog(phis, zmea_2d, zstd_2d, zsig_2d, zgam_2d, zthe_2d, &
+         zpic_2d, zval_2d) ! also compute "mask"
     call init_dyn_phy ! define the mask "dyn_phy" for distinct grid points
     zmasq = pack(mask, dyn_phy)
     PRINT *, 'Masque construit'
 
     call start_init_phys(tsol_2d, qsol_2d)
-    CALL start_init_dyn(tsol_2d, ps)
+    CALL start_init_dyn(tsol_2d, phis, ps)
 
     ! Compute pressure on intermediate levels:
     forall(l = 1: llm + 1) p3d(:, :, l) = ap(l) + bp(l) * ps
@@ -168,7 +168,7 @@ contains
     vcov(iim + 1, :, :) = vcov(1, :, :)
 
     call start_inter_3d('TEMP', rlonu, rlatv, pls, t3d)
-    PRINT *,  'minval(t3d) = ', minval(t3d)
+    PRINT *, 'minval(t3d) = ', minval(t3d)
     print *, "maxval(t3d) = ", maxval(t3d)
 
     teta(:iim, :, :) = t3d(:iim, :, :) * cpp / pk(:iim, :, :)
@@ -202,7 +202,7 @@ contains
        call regr_lat_time_coefoz
        call regr_pr_o3(q(:, :, :, 5))
        ! Convert from mole fraction to mass fraction:
-       q(:, :, :, 5) = q(:, :, :, 5)  * 48. / 29.
+       q(:, :, :, 5) = q(:, :, :, 5) * 48. / 29.
     end if
 
     tsol = pack(tsol_2d, dyn_phy)
@@ -212,7 +212,7 @@ contains
     tslab = 0. ! IM "slab" ocean
     seaice = 0.
     rugmer = 0.001
-    zmea = pack(relief, dyn_phy)
+    zmea = pack(zmea_2d, dyn_phy)
     zstd = pack(zstd_2d, dyn_phy)
     zsig = pack(zsig_2d, dyn_phy)
     zgam = pack(zgam_2d, dyn_phy)
@@ -246,7 +246,7 @@ contains
     print *, "jml_lic = ", jml_lic
 
     ! Si les coordonnées sont en degrés, on les transforme :
-    IF (MAXVAL(dlon_lic) > pi)  THEN
+    IF (MAXVAL(dlon_lic) > pi) THEN
        dlon_lic = dlon_lic * pi / 180.
     ENDIF
     IF (maxval(dlat_lic) > pi) THEN 
@@ -295,7 +295,7 @@ contains
 
     print *, 'ALPHAX = ', alphax
 
-    forall  (l = 1:llm)
+    forall (l = 1:llm)
        masse(:, 1, l) = SUM(aire_2d(:iim, 1) * masse(:iim, 1, l)) / apoln
        masse(:, jjm + 1, l) = &
             SUM(aire_2d(:iim, jjm + 1) * masse(:iim, jjm + 1, l)) / apols
@@ -307,7 +307,7 @@ contains
     day_ref = dayref
     annee_ref = anneeref
 
-    CALL geopot(teta, pk , pks,  phis, phi)
+    CALL geopot(teta, pk , pks, phis, phi)
     CALL caldyn0(ucov, vcov, teta, ps, masse, pk, phis, phi, w, pbaru, &
          pbarv)
     CALL dynredem0("start.nc", dayref, phis)
@@ -315,7 +315,7 @@ contains
 
     ! Ecriture état initial physique:
     print *, "iphysiq = ", iphysiq
-    phystep   = dtvr * REAL(iphysiq)
+    phystep = dtvr * REAL(iphysiq)
     print *, 'phystep = ', phystep
 
     ! Initialisations :
@@ -350,8 +350,8 @@ contains
     seaice = 0.
 
     frugs(:, is_oce) = rugmer
-    frugs(:, is_ter) = MAX(1.e-05, zstd * zsig / 2)
-    frugs(:, is_lic) = MAX(1.e-05, zstd * zsig / 2)
+    frugs(:, is_ter) = MAX(1e-5, zstd * zsig / 2)
+    frugs(:, is_lic) = MAX(1e-5, zstd * zsig / 2)
     frugs(:, is_sic) = 0.001
     fder = 0.
     clwcon = 0.

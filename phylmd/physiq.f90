@@ -1556,16 +1556,14 @@ contains
 
     ! Calcul des tendances traceurs
     call phytrac(rnpb, itap, lmt_pas, julien, time, firstcal, lafin, nqmx-2, &
-         dtphys, u, t, paprs, play, mfu, mfd, pen_u, pde_u, pen_d, pde_d, &
-         ycoefh, fm_therm, entr_therm, yu1, yv1, ftsol, pctsrf, frac_impa, &
-         frac_nucl, pphis, albsol, rhcl, cldfra, rneb, diafra, cldliq, &
-         pmflxr, pmflxs, prfl, psfl, da, phi, mp, upwd, dnwd, tr_seri, zmasse)
+         dtphys, u, t, paprs, play, mfu, mfd, pde_u, pen_d, ycoefh, fm_therm, &
+         entr_therm, yu1, yv1, ftsol, pctsrf, frac_impa, frac_nucl, pphis, &
+         albsol, rhcl, cldfra, rneb, diafra, cldliq, pmflxr, pmflxs, prfl, &
+         psfl, da, phi, mp, upwd, dnwd, tr_seri, zmasse)
 
-    IF (offline) THEN
-       call phystokenc(dtphys, rlon, rlat, t, mfu, mfd, pen_u, pde_u, &
-            pen_d, pde_d, fm_therm, entr_therm, ycoefh, yu1, yv1, ftsol, &
-            pctsrf, frac_impa, frac_nucl, pphis, airephy, dtphys, itap)
-    ENDIF
+    IF (offline) call phystokenc(dtphys, rlon, rlat, t, mfu, mfd, pen_u, &
+         pde_u, pen_d, pde_d, fm_therm, entr_therm, ycoefh, yu1, yv1, ftsol, &
+         pctsrf, frac_impa, frac_nucl, pphis, airephy, dtphys, itap)
 
     ! Calculer le transport de l'eau et de l'energie (diagnostique)
     CALL transp(paprs, zxtsol, t_seri, q_seri, u_seri, v_seri, zphi, ve, vq, &

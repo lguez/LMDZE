@@ -10,6 +10,9 @@ contains
 
     USE dimphy, ONLY: klev, klon
     use flxasc_m, only: flxasc
+    use flxbase_m, only: flxbase
+    use flxddraf_m, only: flxddraf
+    use flxdlfs_m, only: flxdlfs
     use flxdtdq_m, only: flxdtdq
     use flxflux_m, only: flxflux
     use flxini_m, only: flxini
@@ -22,7 +25,8 @@ contains
     real, intent(in):: qen(klon, klev)
     real, intent(inout):: qsen(klon, klev)
     REAL, intent(in):: pqhfl(klon)
-    real pap(klon, klev), paph(klon, klev+1)
+    real, intent(in):: pap(klon, klev)
+    real, intent(in):: paph(klon, klev + 1) ! pression aux demi-niveaux
     REAL, intent(in):: pgeo(klon, klev)
     LOGICAL ldland(klon)
     REAL ptte(klon, klev)
@@ -36,8 +40,8 @@ contains
     REAL pen_u(klon, klev), pde_u(klon, klev)
     REAL pen_d(klon, klev), pde_d(klon, klev)
     REAL dt_con(klon, klev), dq_con(klon, klev)
-    REAL pmflxr(klon, klev+1)
-    REAL pmflxs(klon, klev+1)
+    REAL pmflxr(klon, klev + 1)
+    REAL pmflxs(klon, klev + 1)
 
     ! Local:
     REAL ptu(klon, klev), pqu(klon, klev), plu(klon, klev)
@@ -98,11 +102,11 @@ contains
 
     DO k=2, klev
        DO i = 1, klon
-          zdqcv(i)=zdqcv(i)+pqte(i, k)*(paph(i, k+1)-paph(i, k))
+          zdqcv(i)=zdqcv(i) + pqte(i, k)*(paph(i, k + 1)-paph(i, k))
           IF (k.GE.kcbot(i)) THEN
-             zdqpbl(i)=zdqpbl(i)+pqte(i, k)*(paph(i, k+1)-paph(i, k))
-             zdhpbl(i)=zdhpbl(i)+(RCPD*ptte(i, k)+RLVTT*pqte(i, k)) &
-                  *(paph(i, k+1)-paph(i, k))
+             zdqpbl(i)=zdqpbl(i) + pqte(i, k)*(paph(i, k + 1)-paph(i, k))
+             zdhpbl(i)=zdhpbl(i) + (RCPD*ptte(i, k) + RLVTT*pqte(i, k)) &
+                  *(paph(i, k + 1)-paph(i, k))
           ENDIF
        ENDDO
     ENDDO
@@ -120,7 +124,7 @@ contains
 
     DO i = 1, klon
        ikb=kcbot(i)
-       zqumqe=pqu(i, ikb)+plu(i, ikb)-zqenh(i, ikb)
+       zqumqe=pqu(i, ikb) + plu(i, ikb)-zqenh(i, ikb)
        zdqmin=MAX(0.01*zqenh(i, ikb), 1.E-10)
        IF (zdqpbl(i) > 0..AND.zqumqe > zdqmin.AND.ldcum(i)) THEN
           mfub(i) = zdqpbl(i)/(RG*MAX(zqumqe, zdqmin))
@@ -147,18 +151,18 @@ contains
 
     DO i = 1, klon
        ikb=kcbot(i)
-       zhcbase(i)=RCPD*ptu(i, ikb)+zgeoh(i, ikb)+RLVTT*pqu(i, ikb)
+       zhcbase(i)=RCPD*ptu(i, ikb) + zgeoh(i, ikb) + RLVTT*pqu(i, ikb)
        ictop0(i)=kcbot(i)-1
     ENDDO
 
     zalvdcp=RLVTT/RCPD
     DO k=klev-1, 3, -1
        DO i = 1, klon
-          zhsat=RCPD*ztenh(i, k)+zgeoh(i, k)+RLVTT*zqsenh(i, k)
+          zhsat=RCPD*ztenh(i, k) + zgeoh(i, k) + RLVTT*zqsenh(i, k)
           zgam=R5LES*zalvdcp*zqsenh(i, k)/ &
                ((1.-RETV *zqsenh(i, k))*(ztenh(i, k)-R4LES)**2)
           zzz=RCPD*ztenh(i, k)*0.608
-          zhhat=zhsat-(zzz+zgam*zzz)/(1.+zgam*zzz/RLVTT)* &
+          zhhat=zhsat-(zzz + zgam*zzz)/(1. + zgam*zzz/RLVTT)* &
                MAX(zqsenh(i, k)-zqenh(i, k), 0.)
           IF(k < ictop0(i).AND.zhcbase(i) > zhhat) ictop0(i)=k
        ENDDO
@@ -191,23 +195,18 @@ contains
           ENDDO
           DO k=2, klev
              DO i = 1, klon
-                zrfl(i)=zrfl(i)+zdmfup(i, k)
+                zrfl(i)=zrfl(i) + zdmfup(i, k)
              ENDDO
           ENDDO
 
           ! determiner le LFS (level of free sinking: niveau de plonge libre)
-          CALL flxdlfs(ztenh, zqenh, zgeoh, paph, ptu, pqu, &
-               ldcum, kcbot, kctop, mfub, zrfl, &
-               ptd, pqd, &
-               mfd, zmfds, zmfdq, zdmfdp, &
-               kdtop, lddraf)
+          CALL flxdlfs(ztenh, zqenh, zgeoh, paph, ptu, pqu, ldcum, kcbot, &
+               kctop, mfub, zrfl, ptd, pqd, mfd, zmfds, zmfdq, zdmfdp, kdtop, &
+               lddraf)
 
           ! calculer le panache descendant
-          CALL flxddraf(ztenh, zqenh, &
-               zgeoh, paph, zrfl, &
-               ptd, pqd, &
-               mfd, zmfds, zmfdq, zdmfdp, &
-               lddraf, pen_d, pde_d)
+          CALL flxddraf(ztenh, zqenh, zgeoh, paph, zrfl, ptd, pqd, mfd, &
+               zmfds, zmfdq, zdmfdp, lddraf, pen_d, pde_d)
 
           ! calculer de nouveau le flux de masse entrant a travers la base
           ! de la convection, sachant qu'il a ete modifie par le panache
@@ -218,7 +217,7 @@ contains
                 llo1 = MFD(i, ikb) < 0.
                 zeps = 0.
                 IF (llo1) zeps = CMFDEPS
-                zqumqe = pqu(i, ikb)+plu(i, ikb)- &
+                zqumqe = pqu(i, ikb) + plu(i, ikb)- &
                      zeps*pqd(i, ikb)-(1.-zeps)*zqenh(i, ikb)
                 zdqmin = MAX(0.01*zqenh(i, ikb), 1.E-10)
                 zmfmax = (paph(i, ikb)-paph(i, ikb-1)) / (RG*dtime)
@@ -230,7 +229,7 @@ contains
                 ENDIF
                 IF (ktype(i) == 2) THEN
                    zdh = RCPD*(ptu(i, ikb)-zeps*ptd(i, ikb)- &
-                        (1.-zeps)*ztenh(i, ikb))+RLVTT*zqumqe
+                        (1.-zeps)*ztenh(i, ikb)) + RLVTT*zqumqe
                    zdh = RG * MAX(zdh, 1.0E5*zdqmin)
                    IF (zdhpbl(i) > 0..AND.ldcum(i))mfub1(i)=zdhpbl(i)/zdh
                 ENDIF

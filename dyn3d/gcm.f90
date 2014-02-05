@@ -10,7 +10,7 @@ PROGRAM gcm
 
   USE calendar, only: ioconf_calendar
   use comconst, only: daysec, cpp, dtvr, g, rad, r
-  use comgeom, only: rlatu, aire_2d, cu_2d, cv_2d, rlonv
+  use comgeom, only: rlatu, aire_2d, cu_2d, cv_2d, rlonv, inigeom
   use comgeomphy, only: airephy, cuphy, cvphy, rlatd, rlond
   use conf_gcm_m, only: day_step, iperiod, anneeref, dayref, iecri, iphysiq, &
        nday, raz_date, periodav, conf_gcm, iflag_phys
@@ -23,7 +23,6 @@ PROGRAM gcm
   use iniadvtrac_m, only: iniadvtrac
   use inidissip_m, only: inidissip
   use inifilr_m, only: inifilr
-  use inigeom_m, only: inigeom
   use initdynav_m, only: initdynav
   use inithist_m, only: inithist
   use init_dynzon_m, only: init_dynzon

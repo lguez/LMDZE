@@ -20,7 +20,7 @@ contains
     REAL, intent(in):: pqen(klon, klev) ! humidite (environnement)
     REAL, intent(in):: pqsen(klon, klev) ! humidite saturante (environnement)
     REAL, intent(in):: pgeo(klon, klev) ! geopotentiel (g * metre)
-    REAL paph(klon, klev+1) ! pression aux demi-niveaux
+    REAL, intent(in):: paph(klon, klev+1) ! pression aux demi-niveaux
     REAL pgeoh(klon, klev) ! geopotentiel aux demi-niveaux
     REAL ptenh(klon, klev) ! temperature aux demi-niveaux
     REAL pqenh(klon, klev) ! humidite aux demi-niveaux
@@ -72,7 +72,7 @@ contains
        ENDDO
 
        icall=0
-       CALL flxadjtq(paph(1, k), ptenh(1, k), pqsenh(1, k), llflag, icall)
+       CALL flxadjtq(paph(:, k), ptenh(1, k), pqsenh(1, k), llflag, icall)
 
        DO i = 1, klon
           pqenh(i, k)=MIN(pqen(i, k-1), pqsen(i, k-1)) &

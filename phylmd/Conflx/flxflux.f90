@@ -22,8 +22,8 @@ contains
     real, intent(inout):: pqsen(klon, klev)
     REAL, intent(in):: ptenh(klon, klev)
     REAL, intent(in):: pqenh(klon, klev)
-    REAL pap(klon, klev)
-    REAL paph(klon, klev+1)
+    REAL, intent(in):: pap(klon, klev)
+    REAL, intent(in):: paph(klon, klev + 1)
     LOGICAL ldland(klon)
     real pgeoh(klon, klev)
     INTEGER, intent(in):: kcbot(klon), kctop(klon)
@@ -45,7 +45,7 @@ contains
     REAL prfl(klon), psfl(klon)
     real pdpmel(klon, klev)
     INTEGER, intent(out):: ktopm2
-    REAL pmflxr(klon, klev+1), pmflxs(klon, klev+1)
+    REAL pmflxr(klon, klev + 1), pmflxs(klon, klev + 1)
 
     ! Local:
     REAL cevapcu(klev)
@@ -66,7 +66,7 @@ contains
 
     DO k=1, klev
        CEVAPCU(k)=1.93E-6*261.*SQRT(1.E3/(38.3*0.293) &
-            *SQRT(0.5*(paph(1, k)+paph(1, k+1))/paph(1, klev+1))) * 0.5/RG
+            *SQRT(0.5*(paph(1, k) + paph(1, k + 1))/paph(1, klev + 1))) * 0.5/RG
     end DO
 
     ! SPECIFY CONSTANTS
@@ -104,7 +104,7 @@ contains
 
              IF (lddraf(i).AND.k >= kdtop(i)) THEN
                 pmfds(i, k)=pmfds(i, k)-pmfd(i, k)* &
-                     (RCPD*ptenh(i, k)+pgeoh(i, k))
+                     (RCPD*ptenh(i, k) + pgeoh(i, k))
                 pmfdq(i, k)=pmfdq(i, k)-pmfd(i, k)*pqenh(i, k)
              ELSE
                 pmfd(i, k)=0.
@@ -146,7 +146,7 @@ contains
     ! CALCULATE MELTING OF SNOW
     ! CALCULATE EVAPORATION OF PRECIP
 
-    DO k = 1, klev+1
+    DO k = 1, klev + 1
        DO i = 1, klon
           pmflxr(i, k) = 0.0
           pmflxs(i, k) = 0.0
@@ -156,7 +156,7 @@ contains
        DO i = 1, klon
           IF (ldcum(i)) THEN
              IF (pmflxs(i, k) > 0.0 .AND. pten(i, k) > ztmelp2) THEN
-                zfac=zcons1*(paph(i, k+1)-paph(i, k))
+                zfac=zcons1*(paph(i, k + 1)-paph(i, k))
                 zsnmlt=MIN(pmflxs(i, k), zfac*(pten(i, k)-ztmelp2))
                 pdpmel(i, k)=zsnmlt
                 ztmsmlt=pten(i, k)-zsnmlt/zfac
@@ -169,17 +169,17 @@ contains
              IF (pten(i, k) > RTT) THEN
                 pmflxr(i, k + 1) = pmflxr(i, k) + pdmfup(i, k) + pdmfdp(i, k) &
                      + pdpmel(i, k)
-                pmflxs(i, k+1)=pmflxs(i, k)-pdpmel(i, k)
+                pmflxs(i, k + 1)=pmflxs(i, k)-pdpmel(i, k)
              ELSE
-                pmflxs(i, k+1)=pmflxs(i, k)+pdmfup(i, k)+pdmfdp(i, k)
-                pmflxr(i, k+1)=pmflxr(i, k)
+                pmflxs(i, k + 1)=pmflxs(i, k) + pdmfup(i, k) + pdmfdp(i, k)
+                pmflxr(i, k + 1)=pmflxr(i, k)
              ENDIF
              ! si la precipitation est negative, on ajuste le plux du
              ! panache descendant pour eliminer la negativite
-             IF ((pmflxr(i, k+1)+pmflxs(i, k+1)) < 0.0) THEN
+             IF ((pmflxr(i, k + 1) + pmflxs(i, k + 1)) < 0.0) THEN
                 pdmfdp(i, k) = -pmflxr(i, k)-pmflxs(i, k)-pdmfup(i, k)
-                pmflxr(i, k+1) = 0.0
-                pmflxs(i, k+1) = 0.0
+                pmflxr(i, k + 1) = 0.0
+                pmflxs(i, k + 1) = 0.0
                 pdpmel(i, k) = 0.0
              ENDIF
           ENDIF
@@ -201,7 +201,7 @@ contains
     DO k = 1, klev
        DO kp = k, klev
           DO i = 1, klon
-             maxpdmfdp(i, k)=maxpdmfdp(i, k)+pdmfdp(i, kp)
+             maxpdmfdp(i, k)=maxpdmfdp(i, k) + pdmfdp(i, kp)
           ENDDO
        ENDDO
     ENDDO
@@ -228,7 +228,7 @@ contains
                 zdrfl=MAX(zdrfl, &
                      MIN(-pmflxr(i, k)-pmflxs(i, k)-maxpdmfdp(i, k), 0.0))
 
-                zdenom=1.0/MAX(1.0E-20, pmflxr(i, k)+pmflxs(i, k))
+                zdenom=1.0/MAX(1.0E-20, pmflxr(i, k) + pmflxs(i, k))
                 IF (pten(i, k) > RTT) THEN
                    zpdr = pdmfdp(i, k)
                    zpds = 0.0
@@ -236,14 +236,14 @@ contains
                    zpdr = 0.0
                    zpds = pdmfdp(i, k)
                 ENDIF
-                pmflxr(i, k+1) = pmflxr(i, k) + zpdr + pdpmel(i, k) &
+                pmflxr(i, k + 1) = pmflxr(i, k) + zpdr + pdpmel(i, k) &
                      + zdrfl*pmflxr(i, k)*zdenom
-                pmflxs(i, k+1) = pmflxs(i, k) + zpds - pdpmel(i, k) &
+                pmflxs(i, k + 1) = pmflxs(i, k) + zpds - pdpmel(i, k) &
                      + zdrfl*pmflxs(i, k)*zdenom
                 pdmfup(i, k) = pdmfup(i, k) + zdrfl
              ELSE
-                pmflxr(i, k+1) = 0.0
-                pmflxs(i, k+1) = 0.0
+                pmflxr(i, k + 1) = 0.0
+                pmflxs(i, k + 1) = 0.0
                 pdmfdp(i, k) = 0.0
                 pdpmel(i, k) = 0.0
              ENDIF
@@ -254,8 +254,8 @@ contains
     ENDDO
 
     DO i = 1, klon
-       prfl(i) = pmflxr(i, klev+1)
-       psfl(i) = pmflxs(i, klev+1)
+       prfl(i) = pmflxr(i, klev + 1)
+       psfl(i) = pmflxs(i, klev + 1)
     end DO
 
     RETURN

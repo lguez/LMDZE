@@ -12,7 +12,7 @@ MODULE startdyn
 
 CONTAINS
 
-  SUBROUTINE start_init_dyn(tsol_2d, psol)
+  SUBROUTINE start_init_dyn(tsol_2d, phis, ps)
 
     use comgeom, only: rlonu, rlatv, aire_2d, apoln, apols
     use conf_dat2d_m, only: conf_dat2d
@@ -23,10 +23,13 @@ CONTAINS
     use netcdf95, only: nf95_open, nf95_close, nf95_get_var, nf95_inq_varid, &
          nf95_gw_var, find_coord
     use nr_util, only: assert, pi
-    use start_init_orog_m, only: phis
 
     REAL, intent(in):: tsol_2d(:, :) ! (iim + 1, jjm + 1)
-    REAL, intent(out):: psol(:, :) ! (iim + 1, jjm + 1) surface pressure, in Pa
+
+    REAL, intent(in):: phis(:, :) ! (iim + 1, jjm + 1)
+    ! surface geopotential, in m2 s-2
+
+    REAL, intent(out):: ps(:, :) ! (iim + 1, jjm + 1) surface pressure, in Pa
 
     ! Local:
 
@@ -39,9 +42,9 @@ CONTAINS
     !--------------------------
 
     print *, "Call sequence information: start_init_dyn"
-    call assert((/size(tsol_2d, 1), size(psol, 1)/) == iim + 1, &
+    call assert((/size(tsol_2d, 1), size(phis, 1), size(ps, 1)/) == iim + 1, &
          "start_init_dyn size 1")
-    call assert((/size(tsol_2d, 2), size(psol, 2)/) == jjm + 1, &
+    call assert((/size(tsol_2d, 2), size(phis, 2), size(ps, 2)/) == jjm + 1, &
          "start_init_dyn size 2")
 
     call nf95_open('ECDYN.nc', nf90_nowrite, ncid)
@@ -79,17 +82,17 @@ CONTAINS
     CALL conf_dat2d(lon_ini, lat_ini, lon_rad, lat_rad, var_ana)
     CALL inter_barxy(lon_rad, lat_rad(:jml_dyn -1), var_ana, rlonu(:iim), &
          rlatv, tmp_var) 
-    psol = gr_int_dyn(tmp_var)
+    ps = gr_int_dyn(tmp_var)
 
     call nf95_close(ncid)
 
-    psol(:iim, :) = psol(:iim, :) &
+    ! Adapt the surface pressure to "phis", with the hypsometric equation:
+    ps(:iim, :) = ps(:iim, :) &
          * (1. + (z(:iim, :) - phis(:iim, :)) / 287. / tsol_2d(:iim, :))
-    psol(iim + 1, :) = psol(1, :)
 
-    psol(:, 1) = SUM(aire_2d(:iim, 1) * psol(:iim, 1)) / apoln
-    psol(:, jjm + 1) = SUM(aire_2d(:iim, jjm + 1) * psol(:iim, jjm + 1)) &
-         / apols
+    ps(iim + 1, :) = ps(1, :)
+    ps(:, 1) = SUM(aire_2d(:iim, 1) * ps(:iim, 1)) / apoln
+    ps(:, jjm + 1) = SUM(aire_2d(:iim, jjm + 1) * ps(:iim, jjm + 1)) / apols
 
   END SUBROUTINE start_init_dyn
 

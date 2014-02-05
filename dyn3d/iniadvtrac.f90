@@ -4,7 +4,7 @@ module iniadvtrac_m
 
   ! iq = 1 pour l'eau vapeur
   ! iq = 2 pour l'eau liquide
-  ! Et éventuellement iq = 3, nqmx pour les autres traceurs
+  ! et éventuellement iq = 3, ..., nqmx pour les autres traceurs
 
   use dimens_m, only: nqmx
 
@@ -12,8 +12,8 @@ module iniadvtrac_m
 
   private nqmx
 
-  INTEGER iadv(nqmx) ! indice schéma d'advection pour l'eau et les traceurs
-  ! 11 means schema Van-Leer pour hadv et version PPM (Monotone) pour vadv
+  INTEGER iadv(nqmx) ! indice du schéma d'advection pour l'eau et les traceurs
+  ! 11 means Van-Leer scheme for hadv et monotonous PPM for vadv
 
   integer, parameter:: allowed_adv(10) = (/0, 1, 2, 10, 12, 13, 14, 16, 17, 18/)
   ! Allowed values for hadv and vadv:
@@ -41,7 +41,7 @@ contains
 
     ! From dyn3d/iniadvtrac.F, version 1.3 2005/04/13 08:58:34
 
-    ! Authors : P. Le Van, L. Fairhead, F. Hourdin, F. Codron,
+    ! Authors: P. Le Van, L. Fairhead, F. Hourdin, F. Codron,
     ! F. Forget, M.-A. Filiberti
 
     use nr_util, only: assert
@@ -50,7 +50,6 @@ contains
     ! Variables local to the procedure:
 
     character(len=3) descrq(18)
-
     integer iq, iostat, nq_local, unit
 
     !-----------------------------------------------------------------------
@@ -90,17 +89,11 @@ contains
        print *, 'Problème à l''ouverture de "traceur.def"'
        print *, 'Attention : on prend des valeurs par défaut.'
        call assert(nqmx == 4, "iniadvtrac nqmx")
-       hadv(1) = 14
-       vadv(1) = 14
+       hadv(:4) = (/14, 10, 10, 10/)
+       vadv(:4) = hadv(:4)
        tnom(1) = 'H2Ov'
-       hadv(2) = 10
-       vadv(2) = 10
        tnom(2) = 'H2Ol'
-       hadv(3) = 10
-       vadv(3) = 10
        tnom(3) = 'RN'
-       hadv(4) = 10
-       vadv(4) = 10
        tnom(4) = 'PB'
        do iq = 1, nqmx
           print *, hadv(iq), vadv(iq), tnom(iq)
@@ -111,16 +104,16 @@ contains
 
     ! À partir du nom court du traceur et du schéma d'advection, on
     ! détermine le nom long :
-    do iq=1, nqmx
+    do iq = 1, nqmx
        if (hadv(iq) /= vadv(iq)) then
           if (hadv(iq) == 10 .and. vadv(iq) == 16) then
-             iadv(iq)=11
+             iadv(iq) = 11
           else
              print *, "Bad combination for hozizontal and vertical schemes."
              stop 1
           endif
        else
-          iadv(iq)=hadv(iq)
+          iadv(iq) = hadv(iq)
        endif
 
        IF (iadv(iq) == 0) THEN

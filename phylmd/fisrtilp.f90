@@ -9,56 +9,65 @@ contains
        frac_impa, frac_nucl, prfl, psfl, rhcl)
 
     ! From phylmd/fisrtilp.F, version 1.2 2004/11/09 16:55:40
-    ! Author: Z. X. Li (LMD/CNRS), 20 mars 1995
+    ! First author: Z. X. Li (LMD/CNRS), 20 mars 1995
+    ! Other authors: Olivier, AA, IM, YM, MAF
 
     ! Objet : condensation et précipitation stratiforme, schéma de
     ! nuage, schéma de condensation à grande échelle (pluie).
 
-    USE dimphy, ONLY: klev, klon
-    USE suphec_m, ONLY: rcpd, rd, retv, rg, rlstt, rlvtt, rtt
-    USE yoethf_m, ONLY: r2es, r5ies, r5les, rvtmp2
-    USE fcttre, ONLY: dqsatl, dqsats, foede, foeew, qsatl, qsats, thermcep
     USE comfisrtilp, ONLY: cld_lc_con, cld_lc_lsc, cld_tau_con, &
          cld_tau_lsc, coef_eva, ffallv_con, ffallv_lsc, iflag_pdf, reevap_ice
+    USE dimphy, ONLY: klev, klon
+    USE fcttre, ONLY: dqsatl, dqsats, foede, foeew, qsatl, qsats, thermcep
     USE numer_rec_95, ONLY: nr_erf
+    USE suphec_m, ONLY: rcpd, rd, retv, rg, rlstt, rlvtt, rtt
+    USE yoethf_m, ONLY: r2es, r5ies, r5les, rvtmp2
 
     ! Arguments:
 
-    REAL, INTENT (IN):: dtime ! intervalle du temps (s)                
-    REAL, INTENT (IN):: paprs(klon, klev+1) ! pression a inter-couche   
+    REAL, INTENT (IN):: dtime ! intervalle du temps (s) 
+    REAL, INTENT (IN):: paprs(klon, klev+1) ! pression a inter-couche 
     REAL, INTENT (IN):: pplay(klon, klev) ! pression au milieu de couche
     REAL, INTENT (IN):: t(klon, klev) ! temperature (K)
     REAL, INTENT (IN):: q(klon, klev) ! humidite specifique (kg/kg)
-    LOGICAL ptconv(klon, klev) ! determine la largeur de distribution de vapeur
-    REAL ratqs(klon, klev) ! determine la largeur de distribution de vapeur
-    REAL d_t(klon, klev) ! incrementation de la temperature (K)        
-    REAL d_q(klon, klev) ! incrementation de la vapeur d'eau           
-    REAL d_ql(klon, klev) ! incrementation de l'eau liquide            
-    REAL rneb(klon, klev) ! fraction nuageuse                          
-    REAL radliq(klon, klev) ! eau liquide utilisee dans rayonnements   
-    REAL rain(klon) ! pluies (mm/s)                                   
-    REAL snow(klon) ! neige (mm/s)                                    
+    LOGICAL, INTENT (IN):: ptconv(klon, klev)
 
-    ! Coeffients de fraction lessivee : pour OFF-LINE
-    REAL pfrac_impa(klon, klev)
-    REAL pfrac_nucl(klon, klev)
-    REAL pfrac_1nucl(klon, klev)
+    REAL, INTENT (IN):: ratqs(klon, klev)
+    ! determine la largeur de distribution de vapeur
 
-    ! Fraction d'aerosols lessivee par impaction et par nucleation
-    ! POur ON-LINE
-    REAL frac_nucl(klon, klev)
+    REAL, INTENT (out):: d_t(klon, klev) ! incrementation de la temperature (K)
+    REAL, INTENT (out):: d_q(klon, klev) ! incrementation de la vapeur d'eau
+    REAL, INTENT (out):: d_ql(klon, klev) ! incrementation de l'eau liquide
+    REAL, INTENT (out):: rneb(klon, klev) ! fraction nuageuse
 
-    REAL prfl(klon, klev+1) ! flux d'eau precipitante aux interfaces (kg/m2/s)
-    REAL psfl(klon, klev+1) ! flux d'eau precipitante aux interfaces (kg/m2/s)
-    REAL rhcl(klon, klev) ! humidite relative en ciel clair            
+    REAL, INTENT (out):: radliq(klon, klev)
+    ! eau liquide utilisee dans rayonnement
+
+    REAL, INTENT (out):: rain(klon) ! pluies (mm/s)
+    REAL, INTENT (out):: snow(klon) ! neige (mm/s)
+
+    ! Coeffients de fraction lessivee :
+    REAL, INTENT (inout):: pfrac_impa(klon, klev)
+    REAL, INTENT (inout):: pfrac_nucl(klon, klev)
+    REAL, INTENT (inout):: pfrac_1nucl(klon, klev)
+
+    ! Fraction d'aerosols lessivee par impaction
+    REAL, INTENT (out):: frac_impa(klon, klev)
+
+    ! Fraction d'aerosols lessivee par nucleation
+    REAL, INTENT (out):: frac_nucl(klon, klev)
+
+    REAL, INTENT (out):: prfl(klon, klev+1)
+    ! flux d'eau precipitante aux interfaces (kg/m2/s)
+
+    REAL, INTENT (out):: psfl(klon, klev+1)
+    ! flux d'eau precipitante aux interfaces (kg/m2/s)
+
+    REAL, INTENT (out):: rhcl(klon, klev) ! humidite relative en ciel clair 
 
     ! Local:
 
-    ! Fraction d'aerosols lessivee par impaction et par nucleation
-    ! POur ON-LINE
-    REAL frac_impa(klon, klev)
     REAL zct(klon), zcl(klon)
-    !AA
 
     ! Options du programme:
 
@@ -67,66 +76,55 @@ contains
 
     INTEGER ninter ! sous-intervals pour la precipitation
     PARAMETER (ninter=5)
-    LOGICAL evap_prec ! evaporation de la pluie                       
+    LOGICAL evap_prec ! evaporation de la pluie 
     PARAMETER (evap_prec=.TRUE.)
     REAL zpdf_sig(klon), zpdf_k(klon), zpdf_delta(klon)
     REAL zpdf_a(klon), zpdf_b(klon), zpdf_e1(klon), zpdf_e2(klon)
 
-    LOGICAL cpartiel ! condensation partielle                         
+    LOGICAL cpartiel ! condensation partielle 
     PARAMETER (cpartiel=.TRUE.)
     REAL t_coup
     PARAMETER (t_coup=234.0)
-
-    ! Variables locales:
 
     INTEGER i, k, n, kk
     REAL zqs(klon), zdqs(klon), zdelta, zcor, zcvm5
     REAL zrfl(klon), zrfln(klon), zqev, zqevt
     REAL zoliq(klon), zcond(klon), zq(klon), zqn(klon), zdelq
     REAL ztglace, zt(klon)
-    INTEGER nexpo ! exponentiel pour glace/eau                        
+    INTEGER nexpo ! exponentiel pour glace/eau 
     REAL zdz(klon), zrho(klon), ztot(klon), zrhol(klon)
     REAL zchau(klon), zfroi(klon), zfice(klon), zneb(klon)
 
-    LOGICAL appel1er
-    SAVE appel1er
+    LOGICAL:: appel1er = .TRUE.
 
-    !---------------------------------------------------------------
+    ! Variables traceurs:
+    ! Provisoire !!! Parametres alpha du lessivage
+    ! A priori on a 4 scavenging numbers possibles
 
-    !AA Variables traceurs:
-    !AA  Provisoire !!! Parametres alpha du lessivage
-    !AA  A priori on a 4 scavenging numbers possibles
-
-    REAL a_tr_sca(4)
-    SAVE a_tr_sca
+    REAL, save:: a_tr_sca(4)
 
     ! Variables intermediaires
 
     REAL zalpha_tr
     REAL zfrac_lessi
     REAL zprec_cond(klon)
-    !AA
     REAL zmair, zcpair, zcpeau
-    !     Pour la conversion eau-neige
+    ! Pour la conversion eau-neige
     REAL zlh_solid(klon), zm_solid
-    !IM
-    INTEGER klevm1
-    !---------------------------------------------------------------
 
     ! Fonctions en ligne:
 
-    REAL fallvs, fallvc ! vitesse de chute pour crystaux de glace      
+    REAL fallvs, fallvc ! vitesse de chute pour crystaux de glace 
     REAL zzz
 
     fallvc(zzz) = 3.29/2.0*((zzz)**0.16)*ffallv_con
     fallvs(zzz) = 3.29/2.0*((zzz)**0.16)*ffallv_lsc
 
-    DATA appel1er/ .TRUE./
-    !ym
+    !---------------------------------------------------------------
+
     zdelq = 0.0
 
     IF (appel1er) THEN
-
        PRINT *, 'fisrtilp, ninter:', ninter
        PRINT *, 'fisrtilp, evap_prec:', evap_prec
        PRINT *, 'fisrtilp, cpartiel:', cpartiel
@@ -136,14 +134,13 @@ contains
        END IF
        appel1er = .FALSE.
 
-       !AA initialiation provisoire
+       ! initialiation provisoire
        a_tr_sca(1) = -0.5
        a_tr_sca(2) = -0.5
        a_tr_sca(3) = -0.5
        a_tr_sca(4) = -0.5
 
-       !AA Initialisation a 1 des coefs des fractions lessivees
-
+       ! Initialisation a 1 des coefs des fractions lessivees
        DO k = 1, klev
           DO i = 1, klon
              pfrac_nucl(i, k) = 1.
@@ -151,19 +148,17 @@ contains
              pfrac_impa(i, k) = 1.
           END DO
        END DO
+    END IF
 
-
-    END IF !  test sur appel1er
-    !MAf Initialisation a 0 de zoliq
+    ! Initialisation a 0 de zoliq
     DO i = 1, klon
        zoliq(i) = 0.
     END DO
     ! Determiner les nuages froids par leur temperature
-    !  nexpo regle la raideur de la transition eau liquide / eau glace.
+    ! nexpo regle la raideur de la transition eau liquide / eau glace.
 
     ztglace = rtt - 15.0
     nexpo = 6
-    !cc      nexpo = 1
 
     ! Initialiser les sorties:
 
@@ -197,22 +192,12 @@ contains
        zneb(i) = seuil_neb
     END DO
 
-
-    !AA Pour plus de securite
+    ! Pour plus de securite
 
     zalpha_tr = 0.
     zfrac_lessi = 0.
 
-    !AA----------------------------------------------------------
-
-    ! Boucle verticale (du haut vers le bas)
-
-    !IM : klevm1
-    klevm1 = klev - 1
-    DO  k = klev, 1, -1
-
-       !AA----------------------------------------------------------
-
+    loop_vertical: DO k = klev, 1, -1
        DO i = 1, klon
           zt(i) = t(i, k)
           zq(i) = q(i, k)
@@ -225,7 +210,7 @@ contains
        ! surface.
 
        DO i = 1, klon
-          IF (k<=klevm1) THEN
+          IF (k <= klev - 1) THEN
              zmair = (paprs(i, k)-paprs(i, k+1))/rg
              zcpair = rcpd*(1.0+rvtmp2*zq(i))
              zcpeau = rcpd*rvtmp2
@@ -235,11 +220,8 @@ contains
           END IF
        END DO
 
-       ! Calculer l'evaporation de la precipitation
-
-
-
        IF (evap_prec) THEN
+          ! Calculer l'evaporation de la precipitation
           DO i = 1, klon
              IF (zrfl(i)>0.) THEN
                 IF (thermcep) THEN
@@ -307,34 +289,28 @@ contains
        ! de l'eau condensee:
 
        IF (cpartiel) THEN
+          ! Calcul de l'eau condensee et de la fraction nuageuse et de l'eau
+          ! nuageuse a partir des PDF de Sandrine Bony.
+          ! rneb : fraction nuageuse
+          ! zqn : eau totale dans le nuage
+          ! zcond : eau condensee moyenne dans la maille.
 
-          !        print*, 'Dans partiel k=', k
+          ! on prend en compte le réchauffement qui diminue
+          ! la partie condensée
 
-          !   Calcul de l'eau condensee et de la fraction nuageuse et de l'eau
-          !   nuageuse a partir des PDF de Sandrine Bony.
-          !   rneb  : fraction nuageuse
-          !   zqn   : eau totale dans le nuage
-          !   zcond : eau condensee moyenne dans la maille.
-
-          !           on prend en compte le réchauffement qui diminue
-          !           la partie condensee
-
-          !   Version avec les raqts
+          ! Version avec les ratqs
 
           IF (iflag_pdf==0) THEN
-
              DO i = 1, klon
                 zdelq = min(ratqs(i, k), 0.99)*zq(i)
                 rneb(i, k) = (zq(i)+zdelq-zqs(i))/(2.0*zdelq)
                 zqn(i) = (zq(i)+zdelq+zqs(i))/2.0
              END DO
-
           ELSE
-
-             !   Version avec les nouvelles PDFs.
+             ! Version avec les nouvelles PDFs.
              DO i = 1, klon
-                IF (zq(i)<1.E-15) THEN
-                   zq(i) = 1.E-15
+                IF (zq(i) < 1E-15) THEN
+                   zq(i) = 1E-15
                 END IF
              END DO
              DO i = 1, klon
@@ -356,26 +332,20 @@ contains
                    rneb(i, k) = 0.5*zpdf_e1(i)
                    zqn(i) = zq(i)*zpdf_e2(i)/zpdf_e1(i)
                 END IF
-
              END DO
-
-
           END IF
-          ! iflag_pdf                                               
+
           DO i = 1, klon
              IF (rneb(i, k)<=0.0) zqn(i) = 0.0
              IF (rneb(i, k)>=1.0) zqn(i) = zq(i)
-             rneb(i, k) = max(0.0, min(1.0, rneb(i, k)))
-             !  On ne divise pas par 1+zdqs pour forcer a avoir l'eau
-             !  predite par la convection.  ATTENTION !!! Il va
-             !  falloir verifier tout ca.
-             zcond(i) = max(0.0, zqn(i)-zqs(i))*rneb(i, k)
-             !           print*, 'ZDQS ', zdqs(i)
-             !--Olivier
+             rneb(i, k) = max(0., min(1., rneb(i, k)))
+             ! On ne divise pas par 1 + zdqs pour forcer à avoir l'eau
+             ! prédite par la convection. Attention : il va falloir
+             ! verifier tout ca.
+             zcond(i) = max(0., zqn(i)-zqs(i))*rneb(i, k)
              rhcl(i, k) = (zqs(i)+zq(i)-zdelq)/2./zqs(i)
-             IF (rneb(i, k)<=0.0) rhcl(i, k) = zq(i)/zqs(i)
-             IF (rneb(i, k)>=1.0) rhcl(i, k) = 1.0
-             !--fin
+             IF (rneb(i, k) <= 0.) rhcl(i, k) = zq(i) / zqs(i)
+             IF (rneb(i, k) >= 1.) rhcl(i, k) = 1.
           END DO
        ELSE
           DO i = 1, klon
@@ -390,7 +360,6 @@ contains
 
        DO i = 1, klon
           zq(i) = zq(i) - zcond(i)
-          !         zt(i) = zt(i) + zcond(i) * RLVTT/RCPD
           zt(i) = zt(i) + zcond(i)*rlvtt/rcpd/(1.0+rvtmp2*zq(i))
        END DO
 
@@ -421,10 +390,10 @@ contains
                    zcl(i) = cld_lc_lsc
                    zct(i) = 1./cld_tau_lsc
                 END IF
-                !  quantité d'eau à élminier.
+                ! quantité d'eau à élminier.
                 zchau(i) = zct(i)*dtime/real(ninter)*zoliq(i)* &
                      (1.0-exp(-(zoliq(i)/zneb(i)/zcl(i))**2))*(1.-zfice(i))
-                !  meme chose pour la glace.
+                ! meme chose pour la glace.
                 IF (ptconv(i, k)) THEN
                    zfroi(i) = dtime/real(ninter)/zdz(i)*zoliq(i)* &
                         fallvc(zrhol(i))*zfice(i)
@@ -455,19 +424,17 @@ contains
        END DO
 
        ! Calculer les tendances de q et de t:
-
        DO i = 1, klon
           d_q(i, k) = zq(i) - q(i, k)
           d_t(i, k) = zt(i) - t(i, k)
        END DO
 
-       !AA--------------- Calcul du lessivage stratiforme  -------------
-
+       ! Calcul du lessivage stratiforme
        DO i = 1, klon
           zprec_cond(i) = max(zcond(i)-zoliq(i), 0.0)* &
                (paprs(i, k)-paprs(i, k+1))/rg
           IF (rneb(i, k)>0.0 .AND. zprec_cond(i)>0.) THEN
-             !AA lessivage nucleation LMD5 dans la couche elle-meme
+             ! lessivage nucleation LMD5 dans la couche elle-meme
              IF (t(i, k)>=ztglace) THEN
                 zalpha_tr = a_tr_sca(3)
              ELSE
@@ -481,14 +448,13 @@ contains
              zfrac_lessi = 1. - exp(-zprec_cond(i)/zneb(i))
              pfrac_1nucl(i, k) = pfrac_1nucl(i, k)*(1.-zneb(i)*zfrac_lessi)
           END IF
-
-
        END DO
-       !AA Lessivage par impaction dans les couches en-dessous
-       ! boucle sur i                                         
+
+       ! Lessivage par impaction dans les couches en-dessous
+       ! boucle sur i 
        DO kk = k - 1, 1, -1
           DO i = 1, klon
-             IF (rneb(i, k)>0.0 .AND. zprec_cond(i)>0.) THEN
+             IF (rneb(i, k)>0. .AND. zprec_cond(i)>0.) THEN
                 IF (t(i, kk)>=ztglace) THEN
                    zalpha_tr = a_tr_sca(1)
                 ELSE
@@ -500,12 +466,7 @@ contains
              END IF
           END DO
        END DO
-
-       !AA----------------------------------------------------------
-       !                     FIN DE BOUCLE SUR K
-    end DO
-
-    !AA-----------------------------------------------------------
+    end DO loop_vertical
 
     ! Pluie ou neige au sol selon la temperature de la 1ere couche
 

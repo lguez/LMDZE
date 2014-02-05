@@ -27,7 +27,7 @@ contains
     USE fcttre, ONLY: foeew
 
     REAL, intent(in):: dtime ! pas d'integration (s)
-    REAL, intent(in):: pres_h(:, :) ! (klon, klev+1) pression half-level (Pa)
+    REAL, intent(in):: pres_h(:, :) ! (klon, klev + 1) pression half-level (Pa)
     REAL, intent(in):: pres_f(:, :) ! (klon, klev) pression full-level (Pa)
     REAL, intent(in):: t(:, :) ! (klon, klev) temperature (K)
     REAL, intent(in):: q(:, :) ! (klon, klev) humidité spécifique (no dimension)
@@ -59,8 +59,8 @@ contains
     INTEGER, intent(out):: kcbot(:) ! (klon) niveau du bas de la convection
     INTEGER, intent(out):: kctop(:) ! (klon) niveau du haut de la convection
     INTEGER, intent(out):: kdtop(:) ! (klon) niveau du haut des downdrafts
-    REAL, intent(out):: pmflxr(:, :) ! (klon, klev+1)
-    REAL, intent(out):: pmflxs(:, :) ! (klon, klev+1)
+    REAL, intent(out):: pmflxr(:, :) ! (klon, klev + 1)
+    REAL, intent(out):: pmflxs(:, :) ! (klon, klev + 1)
 
     ! Local:
 
@@ -70,7 +70,7 @@ contains
 
     REAL d_t_bis(klon, klev)
     REAL d_q_bis(klon, klev)
-    REAL paprs(klon, klev+1)
+    REAL paprs(klon, klev + 1)
     REAL paprsf(klon, klev)
     REAL zgeom(klon, klev)
     REAL zcvgq(klon, klev)
@@ -80,57 +80,42 @@ contains
     REAL zen_d(klon, klev)
     REAL zde_u(klon, klev)
     REAL zde_d(klon, klev)
-    REAL zmflxr(klon, klev+1)
-    REAL zmflxs(klon, klev+1)
+    REAL zmflxr(klon, klev + 1)
+    REAL zmflxs(klon, klev + 1)
 
     INTEGER i, k
     REAL zqsat
 
     !--------------------------------------------------------------------
 
-    ! initialiser les variables de sortie (pour securite)
-    DO i = 1, klon
-       rain(i) = 0.0
-       snow(i) = 0.0
-       kcbot(i) = 0
-       kctop(i) = 0
-       kdtop(i) = 0
-    ENDDO
+    ! Initialiser les variables de sortie (pour securité):
+    rain = 0.
+    snow = 0.
+    kcbot = 0
+    kctop = 0
+    kdtop = 0
+    d_t = 0.
+    d_q = 0.
+
+    zen_u = 0.
+    zde_u = 0.
+    zen_d = 0.
+    zde_d = 0.
+    zmflxr = 0.
+    zmflxs = 0.
+
+    ! Calculer la nature du sol (pour l'instant, océan partout):
+    land = .FALSE.
+
+    ! Préparer les variables d'entrée (attention: l'indice des niveaux
+    ! verticaux augmente du haut vers le bas) :
     DO k = 1, klev
        DO i = 1, klon
-          d_t(i, k) = 0.0
-          d_q(i, k) = 0.0
-          pen_u(i, k) = 0.0
-          pde_u(i, k) = 0.0
-          pen_d(i, k) = 0.0
-          pde_d(i, k) = 0.0
-          zen_u(i, k) = 0.0
-          zde_u(i, k) = 0.0
-          zen_d(i, k) = 0.0
-          zde_d(i, k) = 0.0
-       ENDDO
-    ENDDO
-    DO k = 1, klev+1
-       DO i = 1, klon
-          zmflxr(i, k) = 0.0
-          zmflxs(i, k) = 0.0
-       ENDDO
-    ENDDO
-
-    ! calculer la nature du sol (pour l'instant, ocean partout)
-    DO i = 1, klon
-       land(i) = .FALSE.
-    ENDDO
-
-    ! preparer les variables d'entree (attention: l'ordre des niveaux
-    ! verticaux augmente du haut vers le bas)
-    DO k = 1, klev
-       DO i = 1, klon
-          paprsf(i, k) = pres_f(i, klev-k+1)
-          paprs(i, k) = pres_h(i, klev+1-k+1)
-          pvervel(i, k) = w(i, klev+1-k)
-          zcvgt(i, k) = con_t(i, klev-k+1)
-          zcvgq(i, k) = con_q(i, klev-k+1)
+          paprsf(i, k) = pres_f(i, klev-k + 1)
+          paprs(i, k) = pres_h(i, klev + 1-k + 1)
+          pvervel(i, k) = w(i, klev + 1-k)
+          zcvgt(i, k) = con_t(i, klev-k + 1)
+          zcvgq(i, k) = con_q(i, klev-k + 1)
 
           zqsat = MIN(0.5, R2ES * FOEEW(t(i, k), &
                merge(0., 1., rtt < t(i, k))) / paprsf(i, k))
@@ -138,16 +123,16 @@ contains
        ENDDO
     ENDDO
     DO i = 1, klon
-       paprs(i, klev+1) = pres_h(i, 1)
+       paprs(i, klev + 1) = pres_h(i, 1)
        zgeom(i, klev) = RD * t(i, klev) &
-            / (0.5*(paprs(i, klev+1)+paprsf(i, klev))) &
-            * (paprs(i, klev+1)-paprsf(i, klev))
+            / (0.5*(paprs(i, klev + 1) + paprsf(i, klev))) &
+            * (paprs(i, klev + 1)-paprsf(i, klev))
     ENDDO
     DO k = klev-1, 1, -1
        DO i = 1, klon
-          zgeom(i, k) = zgeom(i, k+1) &
-               + RD * 0.5*(t(i, k+1)+t(i, k)) / paprs(i, k+1) &
-               * (paprsf(i, k+1)-paprsf(i, k))
+          zgeom(i, k) = zgeom(i, k + 1) &
+               + RD * 0.5*(t(i, k + 1) + t(i, k)) / paprs(i, k + 1) &
+               * (paprsf(i, k + 1)-paprsf(i, k))
        ENDDO
     ENDDO
 
@@ -161,8 +146,8 @@ contains
     ! la convection des traceurs.
     DO k = 1, klev
        DO i = 1, klon
-          d_q(i, klev+1-k) = dtime*d_q_bis(i, k)
-          d_t(i, klev+1-k) = dtime*d_t_bis(i, k)
+          d_q(i, klev + 1-k) = dtime*d_q_bis(i, k)
+          d_t(i, klev + 1-k) = dtime*d_t_bis(i, k)
        ENDDO
     ENDDO
 
@@ -173,22 +158,22 @@ contains
 
     DO k = 1, klev
        DO i = 1, klon
-          pen_u(i, klev+1-k)= zen_u(i, k)
-          pde_u(i, klev+1-k)= zde_u(i, k)
+          pen_u(i, klev + 1-k)= zen_u(i, k)
+          pde_u(i, klev + 1-k)= zde_u(i, k)
        ENDDO
     ENDDO
 
     DO k = 1, klev-1
        DO i = 1, klon
-          pen_d(i, klev+1-k)= -zen_d(i, k+1)
-          pde_d(i, klev+1-k)= -zde_d(i, k+1)
+          pen_d(i, klev + 1-k)= -zen_d(i, k + 1)
+          pde_d(i, klev + 1-k)= -zde_d(i, k + 1)
        ENDDO
     ENDDO
 
-    DO k = 1, klev+1
+    DO k = 1, klev + 1
        DO i = 1, klon
-          pmflxr(i, klev+2-k)= zmflxr(i, k)
-          pmflxs(i, klev+2-k)= zmflxs(i, k)
+          pmflxr(i, klev + 2-k)= zmflxr(i, k)
+          pmflxs(i, klev + 2-k)= zmflxs(i, k)
        ENDDO
     ENDDO
 

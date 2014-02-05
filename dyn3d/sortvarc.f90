@@ -19,14 +19,15 @@ contains
     USE ener, ONLY: ang, ang0, etot, etot0, ptot, ptot0, rmsdpdt, rmsv, &
          stot, stot0, ztot, ztot0
     use filtreg_m, only: filtreg
+    use massbarxy_m, only: massbarxy
     USE paramet_m, ONLY: iip1, iip2, ijp1llm, ip1jm, ip1jmp1, jjp1
 
     INTEGER, INTENT(IN):: itau
     REAL, INTENT(IN):: ucov(ip1jmp1, llm)
-    real, intent(in):: teta(ip1jmp1, llm)
+    REAL, INTENT(IN):: teta(ip1jmp1, llm)
     REAL, INTENT(IN):: ps(ip1jmp1)
     REAL, INTENT(IN):: masse(ip1jmp1, llm)
-    REAL, INTENT (IN):: pk(ip1jmp1, llm)
+    REAL, INTENT(IN):: pk(ip1jmp1, llm)
     REAL, INTENT(IN):: phis(ip1jmp1)
     REAL, INTENT(IN):: vorpot(ip1jm, llm)
     REAL, intent(in):: phi(ip1jmp1, llm)
@@ -38,29 +39,28 @@ contains
     REAL:: vor(ip1jm), bernf(ip1jmp1, llm), ztotl(llm)
     REAL:: etotl(llm), stotl(llm), rmsvl(llm), angl(llm), ge(ip1jmp1)
     REAL:: cosphi(ip1jm), omegcosp(ip1jm)
-    REAL:: dtvrs1j, rjour, heure, radsg, radomeg
-    real massebxy(ip1jm, llm)
-    INTEGER:: l, ij, imjmp1
-    REAL:: ssum
+    REAL dtvrs1j, rjour, heure, radsg, radomeg
+    REAL massebxy(ip1jm, llm)
+    INTEGER l, ij
+    REAL ssum
     real time
 
     !-----------------------------------------------------------------------
 
-    print *, "Call sequence information: sortvarc"
+    PRINT *, "Call sequence information: sortvarc"
 
     time = real(itau) / day_step + time_0
     dtvrs1j = dtvr/daysec
     rjour = real(int(itau*dtvrs1j))
     heure = (itau*dtvrs1j-rjour)*24.
-    imjmp1 = iim*jjp1
     IF (abs(heure-24.)<=0.0001) heure = 0.
 
     CALL massbarxy(masse, massebxy)
 
     ! Calcul  de  rmsdpdt
-    ge(:) = dp(:)*dp(:)
+    ge = dp*dp
     rmsdpdt = ssum(ip1jmp1, ge, 1) - ssum(jjp1, ge, iip1)
-    rmsdpdt = daysec*1.E-2*sqrt(rmsdpdt/imjmp1)
+    rmsdpdt = daysec*1.E-2*sqrt(rmsdpdt / (iim * jjp1))
     bernf = bern
     CALL filtreg(bernf, jjp1, llm, -2, 2, .TRUE.)
 
@@ -73,6 +73,7 @@ contains
     END DO
 
     ! Calcul  de l'energie, de l'enstrophie, de l'entropie et de rmsv
+
     DO l = 1, llm
        DO ij = 1, ip1jm
           vor(ij) = vorpot(ij, l)*vorpot(ij, l)*massebxy(ij, l)

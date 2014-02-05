@@ -136,7 +136,7 @@ contains
        CALL geopot(teta, pk, pks, phis, phi)
        CALL caldyn(itau, ucov, vcov, teta, ps, masse, pk, pkf, phis, phi, &
             dudyn, dv, dteta, dp, w, pbaru, pbarv, time_0, &
-            conser=MOD(itau, iconser)==0)
+            conser = MOD(itau, iconser) == 0)
 
        CALL caladvtrac(q, pbaru, pbarv, p3d, masse, teta, pk)
 
@@ -158,7 +158,7 @@ contains
           CALL geopot(teta, pk, pks, phis, phi)
           CALL caldyn(itau + 1, ucov, vcov, teta, ps, masse, pk, pkf, phis, &
                phi, dudyn, dv, dteta, dp, w, pbaru, pbarv, time_0, &
-               conser=.false.)
+               conser = .false.)
 
           ! integrations dynamique et traceurs:
           CALL integrd(vcovm1, ucovm1, tetam1, psm1, massem1, dv, dudyn, &

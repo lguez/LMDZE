@@ -34,7 +34,7 @@ contains
 
     REAL, intent(in):: xdata(:), ydata(:) ! coordinates of input field
     REAL, intent(in):: zdata(:, :) ! input field
-    REAL, intent(in):: x(:), y(:) ! ccordinates output field
+    REAL, intent(in):: x(:), y(:) ! coordinates of output field
 
     ! Correlations of US Navy orography gradients:
     REAL, intent(out):: zphi(:, :)
@@ -58,17 +58,12 @@ contains
     REAL zusn(iusn + 2 * iext, jusn + 2)
 
     ! Intermediate fields (correlations of orography gradient)
-
-    REAL ztz(iim + 1, jjm + 1), zxtzx(iim + 1, jjm + 1)
-    REAL zytzy(iim + 1, jjm + 1), zxtzy(iim + 1, jjm + 1)
-    REAL weight(iim + 1, jjm + 1)
+    REAL, dimension(iim + 1, jjm + 1):: ztz, zxtzx, zytzy, zxtzy, weight
 
     ! Correlations of US Navy orography gradients:
     REAL, dimension(iusn + 2 * iext, jusn + 2):: zxtzxusn, zytzyusn, zxtzyusn
 
-    real mask_tmp(size(x), size(y))
-    real num_tot(iim + 1, jjm + 1), num_lan(iim + 1, jjm + 1)
-
+    real, dimension(iim + 1, jjm + 1):: mask_tmp, num_tot, num_lan, zmea0
     REAL a(iim + 1), b(iim + 1), c(jjm + 1), d(jjm + 1)
     real weighx, weighy, xincr, xk, xp, xm, xw, xq, xl
     real zbordnor, zdeltax, zbordsud, zdeltay, zbordoue, zlenx, zleny, zmeasud
@@ -121,7 +116,7 @@ contains
        zusn(i + iusn / 2 + iext, jusn + 2) = zusn(i, jusn + 1)
     ENDDO
 
-    ! COMPUTE LIMITS OF MODEL GRIDPOINT AREA (REGULAR GRID)
+    ! Compute limits of model gridpoint area (regular grid)
 
     a(1) = x(1) - (x(2) - x(1)) / 2.0
     b(1) = (x(1) + x(2)) / 2.0
@@ -167,7 +162,7 @@ contains
        ENDDO
     ENDDO
 
-    ! SUMMATION OVER GRIDPOINT AREA
+    ! Summation over gridpoint area
 
     zleny = pi / real(jusn) * rad
     xincr = pi / 2. / real(jusn)
@@ -218,8 +213,8 @@ contains
        stop 1
     end if
 
-    ! COMPUTE PARAMETERS NEEDED BY THE LOTT & MILLER (1997) AND
-    ! LOTT (1999) SSO SCHEME.
+    ! Compute parameters needed by the Lott & Miller (1997) and Lott
+    ! (1999) subgrid-scale orographic scheme.
 
     zllmmea = 0.
     zllmstd = 0.
@@ -232,7 +227,7 @@ contains
     DO ii = 1, iim + 1
        DO jj = 1, jjm + 1
           mask(ii, jj) = num_lan(ii, jj) / num_tot(ii, jj)
-          ! Mean Orography:
+          ! Mean orography:
           zmea (ii, jj) = zmea (ii, jj) / weight(ii, jj)
           zxtzx(ii, jj) = zxtzx(ii, jj) / weight(ii, jj)
           zytzy(ii, jj) = zytzy(ii, jj) / weight(ii, jj)
@@ -243,7 +238,7 @@ contains
        ENDDO
     ENDDO
 
-    ! CORRECT VALUES OF HORIZONTAL SLOPE NEAR THE POLES:
+    ! Correct values of horizontal slope near the poles:
     DO ii = 1, iim + 1
        zxtzx(ii, 1) = zxtzx(ii, 2)
        zxtzx(ii, jjm + 1) = zxtzx(ii, jjm)
@@ -253,9 +248,12 @@ contains
        zytzy(ii, jjm + 1) = zytzy(ii, jjm)
     ENDDO
 
-    ! FILTERS TO SMOOTH OUT FIELDS FOR INPUT INTO SSO SCHEME.
+    zmea0 = zmea ! not smoothed
 
-    ! FIRST FILTER, MOVING AVERAGE OVER 9 POINTS.
+    ! Filters to smooth out fields for input into subgrid-scale
+    ! orographic scheme.
+
+    ! First filter, moving average over 9 points.
     CALL MVA9(zmea)
     CALL MVA9(zstd)
     CALL MVA9(zpic)
@@ -267,8 +265,7 @@ contains
     ! Masque prenant en compte maximum de terre. On met un seuil à 10
     ! % de terre car en dessous les paramètres de surface n'ont pas de
     ! sens.
-    mask_tmp = 0.
-    WHERE (mask >= 0.1) mask_tmp = 1.
+    mask_tmp = merge(1., 0., mask >= 0.1)
 
     DO ii = 1, iim
        DO jj = 1, jjm + 1
@@ -289,7 +286,7 @@ contains
           zgam(ii, jj) = xp / xq * mask_tmp(ii, jj)
           ! angle theta:
           zthe(ii, jj) = 57.29577951 * atan2(xm, xl) / 2. * mask_tmp(ii, jj)
-          zphi(ii, jj) = zmea(ii, jj) * mask_tmp(ii, jj)
+          zphi(ii, jj) = zmea0(ii, jj) * mask_tmp(ii, jj)
           zmea(ii, jj) = zmea(ii, jj) * mask_tmp(ii, jj)
           zpic(ii, jj) = zpic(ii, jj) * mask_tmp(ii, jj)
           zval(ii, jj) = zval(ii, jj) * mask_tmp(ii, jj)

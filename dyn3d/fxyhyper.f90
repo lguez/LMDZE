@@ -11,6 +11,7 @@ contains
     ! From dyn3d/fxyhyper.F, version 1.1.1.1 2004/05/19 12:53:06
 
     USE dimens_m, ONLY: jjm
+    use fxhyp_m, only: fxhyp
     USE paramet_m, ONLY: iip1, jjp1
 
     ! Auteur : P. Le Van d'après formulations de R. Sadourny
@@ -18,27 +19,25 @@ contains
     ! Cette procédure calcule les latitudes (routine fyhyp) et
     ! longitudes (fxhyp) par des fonctions à tangente hyperbolique.
 
-    ! Il y a 3 paramètres, en plus des coordonnées du centre du zoom (xzoom
-    ! et yzoom) : 
+    ! Il y a trois paramètres, en plus des coordonnées du centre du
+    ! zoom (xzoom et yzoom) :
 
     ! a) le grossissement du zoom : grossy (en y) et grossx (en x)
     ! b) l' extension du zoom : dzoomy (en y) et dzoomx (en x)
     ! c) la raideur de la transition du zoom : taux et tauy 
 
-    ! N. B. : il vaut mieux avoir : grossx * dzoomx < pi (radians) et
-    ! grossy * dzoomy < pi/2 (radians)
+    ! Nota bene : il vaut mieux avoir : grossx * dzoomx < pi (radians)
+    ! et grossy * dzoomy < pi/2 (radians)
 
-    ! Arguments
-
-    REAL xzoom, yzoom, grossx, grossy, dzoomx, dzoomy, taux, tauy
+    REAL yzoom, grossy, dzoomy, tauy, xzoom, grossx, dzoomx, taux
     REAL rlatu(jjp1), yprimu(jjp1), rlatv(jjm), yprimv(jjm)
     real rlatu1(jjm), yprimu1(jjm), rlatu2(jjm), yprimu2(jjm)
     REAL rlonu(iip1), xprimu(iip1), rlonv(iip1), xprimv(iip1)
     REAL rlonm025(iip1), xprimm025(iip1), rlonp025(iip1), xprimp025(iip1)
+
+    ! Variables locales :
+
     double precision dxmin, dxmax, dymin, dymax
-
-    ! Variables locales
-
     INTEGER i, j
 
     !----------------------------------------------------------

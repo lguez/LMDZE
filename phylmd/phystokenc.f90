@@ -10,60 +10,59 @@ contains
 
     ! From phylmd/phystokenc.F, version 1.2 2004/06/22 11:45:35
     ! Author: Frédéric Hourdin
-    ! Objet : moniteur général des tendances traceurs                        
+    ! Objet : écriture des variables pour transport offline
 
-    USE histwrite_m, ONLY : histwrite
-    USE histsync_m, ONLY : histsync
-    USE dimens_m, ONLY : iim, jjm, nqmx
-    USE indicesol, ONLY : nbsrf
-    USE dimphy, ONLY : klev, klon
-    USE tracstoke, ONLY : istphy
-
-    ! Arguments:                                                            
-
-    !   EN ENTREE:                                                          
-
-    !   divers:                                                             
+    USE histwrite_m, ONLY: histwrite
+    USE histsync_m, ONLY: histsync
+    USE dimens_m, ONLY: iim, jjm, nqmx
+    USE indicesol, ONLY: nbsrf
+    USE dimphy, ONLY: klev, klon
+    USE tracstoke, ONLY: istphy
 
     REAL, INTENT (IN):: pdtphys ! pas d'integration pour la physique (seconde)
-    INTEGER, INTENT (IN):: itap
+    REAL, INTENT (IN):: rlon(klon), rlat(klon)
+    REAL, intent(in):: pt(klon, klev)
 
-    !   convection:                                                         
+    ! convection: 
 
     REAL, INTENT (IN):: pmfu(klon, klev) ! flux de masse dans le panache montant
 
     REAL, intent(in):: pmfd(klon, klev)
     ! flux de masse dans le panache descendant
 
-    REAL pen_u(klon, klev) ! flux entraine dans le panache montant
-    REAL pde_u(klon, klev) ! flux detraine dans le panache montant
-    REAL pen_d(klon, klev) ! flux entraine dans le panache descendant
-    REAL pde_d(klon, klev) ! flux detraine dans le panache descendant
-    REAL, intent(in):: pt(klon, klev)
+    REAL, intent(in):: pen_u(klon, klev) ! flux entraine dans le panache montant
+    REAL, intent(in):: pde_u(klon, klev) ! flux detraine dans le panache montant
 
-    REAL, INTENT (IN) :: rlon(klon), rlat(klon)
-    REAL, INTENT (IN) :: dtime
+    REAL, intent(in):: pen_d(klon, klev) 
+    ! flux entraine dans le panache descendant
 
-    !   Les Thermiques
+    REAL, intent(in):: pde_d(klon, klev) 
+    ! flux detraine dans le panache descendant
+
+    ! Les Thermiques
     REAL pfm_therm(klon, klev+1)
     REAL pentr_therm(klon, klev)
 
-    !   Couche limite:                                                      
+    ! Couche limite: 
 
-    REAL yv1(klon)
-    REAL yu1(klon), paire(klon)
-    REAL, INTENT(IN):: pphis(klon)
     REAL pcoefh(klon, klev) ! coeff melange Couche limite
+    REAL yu1(klon)
+    REAL yv1(klon)
 
-    ! Arguments necessaires pour les sources et puits de traceur            
+    ! Arguments necessaires pour les sources et puits de traceur 
 
     REAL ftsol(klon, nbsrf) ! Temperature du sol (surf)(Kelvin)
     REAL pctsrf(klon, nbsrf) ! Pourcentage de sol f(nature du sol)
 
-    !   Lessivage:                                                          
+    ! Lessivage: 
 
     REAL frac_impa(klon, klev)
     REAL frac_nucl(klon, klev)
+
+    REAL, INTENT(IN):: pphis(klon)
+    real paire(klon)
+    REAL, INTENT (IN):: dtime
+    INTEGER, INTENT (IN):: itap
 
     ! Variables local to the procedure:
 
@@ -71,7 +70,7 @@ contains
     INTEGER, SAVE:: physid
     REAL zx_tmp_3d(iim, jjm+1, klev), zx_tmp_2d(iim, jjm+1)
 
-    !   Les Thermiques
+    ! Les Thermiques
 
     REAL fm_therm1(klon, klev)
     REAL entr_therm(klon, klev)
@@ -104,7 +103,7 @@ contains
 
     !------------------------------------------------------
 
-    !   Couche limite:                                                      
+    ! Couche limite: 
 
     ok_sync = .TRUE.
 
@@ -180,8 +179,8 @@ contains
 
     dtcum = dtcum + pdtphys
 
-    IF (mod(iadvtr, istphy)==0) THEN
-       ! normalisation par le temps cumule                                   
+    IF (mod(iadvtr, istphy) == 0) THEN
+       ! normalisation par le temps cumule 
        DO k = 1, klev
           DO i = 1, klon
              mfu(i, k) = mfu(i, k)/dtcum
@@ -217,7 +216,7 @@ contains
           END DO
        END DO
 
-       !   ecriture des champs                                                 
+       ! ecriture des champs 
 
        irec = irec + 1
 
@@ -250,7 +249,7 @@ contains
 
        CALL gr_fi_ecrit(klev, klon, iim, jjm+1, entr_therm, zx_tmp_3d)
        CALL histwrite(physid, 'en_th', itap, zx_tmp_3d)
-       !ccc                                                                    
+       !ccc 
        CALL gr_fi_ecrit(klev, klon, iim, jjm+1, frac_impa, zx_tmp_3d)
        CALL histwrite(physid, 'frac_impa', itap, zx_tmp_3d)
 
@@ -283,7 +282,7 @@ contains
 
        IF (ok_sync) CALL histsync(physid)
 
-       !AA Test sur la valeur des coefficients de lessivage                    
+       ! Test sur la valeur des coefficients de lessivage 
 
        zmin = 1E33
        zmax = -1E33

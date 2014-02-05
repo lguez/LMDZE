@@ -10,61 +10,51 @@
 
 src_root = .
 
-VPATH = ${src_root}:${src_root}/dyn3d:${src_root}/dyn3d/Vlsplt:${src_root}/filtrez:${src_root}/phylmd:${src_root}/bibio:${src_root}/phylmd/Mobidic:${src_root}/phylmd/Orography:${src_root}/phylmd/Radlwsw:${src_root}/IOIPSL:${src_root}/IOIPSL/Stringop:${src_root}/dyn3d/Read_reanalyse:${src_root}/phylmd/Thermcell:${src_root}/phylmd/CV3_routines:${src_root}/phylmd/Conflx:${src_root}/phylmd/CV_routines:${src_root}/phylmd/Interface_surf:${src_root}/dyn3d/Dissipation:${src_root}/IOIPSL/Histcom
+VPATH := ${src_root} $(addprefix ${src_root}/, $(shell cat ${src_root}/directories))
 
 common_sources := $(shell cat ${src_root}/common_sources)
+src_no_main_ce0l_only := $(shell cat ${src_root}/src_no_main_ce0l_only)
+src_no_main_gcm_only := $(shell cat ${src_root}/src_no_main_gcm_only)
+src_no_main = ${src_no_main_ce0l_only} ${src_no_main_gcm_only} ${common_sources}
 
-sources_ce0l := $(sort ${common_sources} $(shell cat ${src_root}/sources_ce0l_only))
+# 2. Objects
 
-sources_gcm := $(sort ${common_sources} $(shell cat ${src_root}/sources_gcm_only))
+obj_ce0l := $(addsuffix .o, $(sort $(basename ${common_sources} ${src_no_main_ce0l_only})))
 
-sources := $(sort ${sources_ce0l} ${sources_gcm})
+obj_gcm := $(addsuffix .o, $(sort $(basename ${common_sources} ${src_no_main_gcm_only})))
 
-# 2. Objects and executable files
-
-# Object files:
-obj_ce0l := $(addsuffix .o, $(basename ${sources_ce0l}))
-obj_gcm := $(addsuffix .o, $(basename ${sources_gcm}))
-objects := $(addsuffix .o, $(basename ${sources}))
-
-# Executable files:
-execut = ce0l gcm
+objects := $(addsuffix .o, $(basename ${src_no_main}))
 
 # 3. Compiler-dependent part
 
 mode = debug
-include ../Compilers/${FC}_${mode}.mk
+include Compilers/${FC}_${mode}.mk
 
 # 4. Rules
 
 SHELL = bash
-
-# Extend known suffixes:
-
 COMPILE.f90 = $(FC) $(F90FLAGS) $(TARGET_ARCH) -c
 
 %.o: %.f90
 	$(COMPILE.f90) $(OUTPUT_OPTION) $<
 
+%: %.f90
+	$(LINK.f) $^ $(LOADLIBES) $(LDLIBS) -o $@
+
+.DELETE_ON_ERROR:
 .PHONY: all clean clobber depend
-
-all: ${execut} trace
-
-${execut}:
-	$(FC) $(LDFLAGS) $^ $(LDLIBS) -o $@
-
+all: ce0l gcm trace
 ce0l: ${obj_ce0l}
 gcm: ${obj_gcm}
 
 depend ${src_root}/depend.mk:
-	makedepf90 -Wmissing -Wconfused -I${VPATH} -nosrc $(addprefix -u, netcdf numer_rec_95 netcdf95 nr_util jumble) ${sources} >${src_root}/depend.mk
+	makedepf90 -Wmissing -Wconfused $(addprefix -I, ${VPATH}) -nosrc $(addprefix -u , netcdf numer_rec_95 netcdf95 nr_util jumble) ${src_no_main} >${src_root}/depend.mk
 
-TAGS: ${sources}
-	ctags -e --language-force=fortran $^
+${src_root}/TAGS: ${src_no_main} ce0l.f90 gcm.f90
+	ctags -e --language-force=fortran -f $@ $^
 
 clean:
-	rm -f ${objects}
-	rm -f ${execut} trace
+	rm -f ce0l gcm ${objects} trace
 
 clobber: clean
 	rm -f *.mod ${src_root}/depend.mk ${src_root}/TAGS
@@ -73,9 +63,9 @@ trace:
 	${FC} ${version_flag} >$@ 2>&1
 	echo -e "\nFC = ${FC}\n\nFFLAGS = ${FFLAGS}\n\nLDLIBS = ${LDLIBS}\n\nLDFLAGS = ${LDFLAGS}" >>$@
 
-# Dependencies among object files:
+ifneq ($(MAKECMDGOALS), clobber)
 include ${src_root}/depend.mk
+endif
 
-# Other rules, optionally:
 -include grep.mk
 -include nag_rules.mk

@@ -22,7 +22,7 @@ FFLAGS += -fmax-errors=1 -pedantic-errors -Wall -Wcharacter-truncation -Wimplici
 FFLAGS += -ffpe-trap=invalid,zero,overflow -fbacktrace -fdump-core -g
 
 # Code generation options:
-FFLAGS += -fcheck=all -finit-real=SNAN
+FFLAGS += -fcheck=bounds -fcheck=do -fcheck=mem -fcheck=pointer -fcheck=recursion -finit-real=SNAN
 
 # Optimization options:
 FFLAGS += -O0

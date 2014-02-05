@@ -87,12 +87,14 @@ contains
   !******************************************************
 
   REAL FUNCTION fx(ri)
+
     ! stretching in x
     USE nr_util, ONLY : pi
     USE serre, ONLY : alphax, pxo, transx
     REAL, INTENT (IN) :: ri
 
     fx = ripx(ri) + transx + alphax * SIN(ripx(ri) + transx - pxo) - pi
+
   end function fx
 
   !******************************************************
@@ -114,17 +116,20 @@ contains
   !******************************************************
 
   REAL FUNCTION bigy(rj)
+
     ! stretching in y
     USE nr_util, ONLY : pi
     USE dimens_m, ONLY : jjm
     REAL, INTENT (IN) :: rj
 
     bigy = 2 * (REAL(jjm + 1) - rj) * pi / jjm
+
   end function bigy
 
   !******************************************************
 
   REAL FUNCTION fy(rj)
+
     ! stretching in y
     USE nr_util, ONLY : pi
     USE serre, ONLY : alphay, pyo, transy
@@ -132,6 +137,7 @@ contains
 
     fy = (bigy(rj) + transy + alphay * SIN(bigy(rj) + transy - pyo)) / 2 &
          - pi / 2
+
   end function fy
 
   !******************************************************

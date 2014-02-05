@@ -12,17 +12,20 @@ contains
     ! Objet : calcul des tendances dynamiques
 
     use advect_m, only: advect
-    USE comgeom, ONLY: airesurg, constang
-    USE dimens_m, ONLY: iim, llm
+    USE comgeom, ONLY: airesurg, constang_2d
+    USE dimens_m, ONLY: iim, jjm, llm
     USE disvert_m, ONLY: ap, bp
+    use flumass_m, only: flumass
+    use massbarxy_m, only: massbarxy
     use massdair_m, only: massdair
     USE paramet_m, ONLY: iip1, ip1jm, ip1jmp1, jjp1, llmp1
     use sortvarc_m, only: sortvarc
+    use tourpot_m, only: tourpot
 
     ! Arguments:
-
     INTEGER, INTENT(IN):: itau
-    REAL ucov(ip1jmp1, llm), vcov(ip1jm, llm)
+    REAL, INTENT(IN):: ucov(:, :, :) ! (iim + 1, jjm + 1, llm) vent covariant
+    REAL, INTENT(IN):: vcov(:, :, :) ! (iim + 1, jjm, llm) ! vent covariant
     real, intent(in):: teta(ip1jmp1, llm)
     REAL, INTENT(IN):: ps(ip1jmp1)
     real, intent(out):: masse(ip1jmp1, llm)
@@ -30,7 +33,7 @@ contains
     REAL pkf(ip1jmp1, llm)
     REAL, INTENT(IN):: phis(ip1jmp1)
     REAL, INTENT(IN):: phi(ip1jmp1, llm)
-    REAL dv(ip1jm, llm), dudyn(ip1jmp1, llm)
+    REAL dudyn(ip1jmp1, llm), dv(ip1jm, llm)
     REAL dteta(ip1jmp1, llm)
     real, INTENT(out):: dp(ip1jmp1)
     REAL, INTENT(out):: w(ip1jmp1, llm)
@@ -41,7 +44,7 @@ contains
     ! Local:
 
     REAL vcont(ip1jm, llm), ucont(ip1jmp1, llm)
-    REAL ang(ip1jmp1, llm), p(ip1jmp1, llmp1)
+    REAL ang(iim + 1, jjm + 1, llm), p(ip1jmp1, llmp1)
     REAL massebx(ip1jmp1, llm), masseby(ip1jm, llm)
     REAL vorpot(ip1jm, llm)
     real ecin(ip1jmp1, llm), convm(ip1jmp1, llm)
@@ -68,12 +71,7 @@ contains
     CALL bernoui(ip1jmp1, llm, phi, ecin, bern)
     CALL dudv2(teta, pkf, bern, dudyn, dv)
 
-    DO l = 1, llm
-       DO ij = 1, ip1jmp1
-          ang(ij, l) = ucov(ij, l) + constang(ij)
-       END DO
-    END DO
-
+    forall (l = 1: llm) ang(:, :, l) = ucov(:, :, l) + constang_2d
     CALL advect(ang, vcov, teta, w, massebx, masseby, dudyn, dv, dteta)
 
     ! WARNING probleme de peridocite de dv sur les PC/linux. Pb d'arrondi

@@ -1,9 +1,9 @@
 module FCTTRE
 
-  ! From phylmd/FCTTRE.inc, version 1.2 2004/06/22 11:45:32
+  ! From phylmd/FCTTRE.inc, version 1.2, 2004/06/22 11:45:32
 
   ! This module includes the thermodynamical functions for the cycle
-  ! 39 ECMWF Physics package. Consistent with "SUPHEC_M" basic
+  ! 39 ECMWF physics package. Consistent with "SUPHEC_M" basic
   ! physical constants, assuming the partial pressure of water vapour
   ! is given by a first order Taylor expansion of "Qs(T)" with respect
   ! to temperature, using constants in "yoethf_m".
