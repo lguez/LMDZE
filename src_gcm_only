@@ -119,6 +119,7 @@ flxmain.f90
 fonte_neige.f90
 formcoord.f
 gath_cpl.f90
+gcm.f90
 gensig.f90
 getincom2.f90
 getincom.f90
@@ -241,6 +242,7 @@ regr_pr_comb_coefoz.f90
 rotat.f
 rotatf.f
 rotat_nfil.f
+scopy.f90
 screenc.f90
 screenp.f90
 soil.f
@@ -261,7 +263,7 @@ tau2alpha.f90
 tetalevel.f
 thermcell.f90
 tlift.f90
-tourabs.f
+tourabs.f90
 tracstoke.f90
 transp.f
 transp_lay.f

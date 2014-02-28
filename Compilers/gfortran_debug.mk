@@ -16,7 +16,7 @@ FFLAGS = $(addprefix -I, ${netcdf_inc_dir} ${numer_rec_95_dir} ${netcdf95_dir} $
 FFLAGS += -std=f95
 
 # Error and warning options:
-FFLAGS += -fmax-errors=1 -pedantic-errors -Wall -Wcharacter-truncation -Wimplicit-interface -Wunderflow -Wextra -Wunreachable-code
+FFLAGS += -fmax-errors=1 -pedantic-errors -Wall -Wcharacter-truncation -Wimplicit-interface -Wunderflow -Wunreachable-code
 
 # Debugging options:
 FFLAGS += -ffpe-trap=invalid,zero,overflow -fbacktrace -fdump-core -g

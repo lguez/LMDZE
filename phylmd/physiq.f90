@@ -5,7 +5,7 @@ module physiq_m
 contains
 
   SUBROUTINE physiq(lafin, rdayvrai, time, dtphys, paprs, play, pphi, pphis, &
-       u, v, t, qx, omega, d_u, d_v, d_t, d_qx, d_ps, dudyn, PVteta)
+       u, v, t, qx, omega, d_u, d_v, d_t, d_qx, d_ps, dudyn)
 
     ! From phylmd/physiq.F, version 1.22 2006/02/20 09:38:28
     ! (subversion revision 678)
@@ -106,9 +106,6 @@ contains
 
     INTEGER nbteta
     PARAMETER(nbteta = 3)
-
-    REAL PVteta(klon, nbteta) 
-    ! (output vorticite potentielle a des thetas constantes)
 
     LOGICAL ok_gust ! pour activer l'effet des gust sur flux surface
     PARAMETER (ok_gust = .FALSE.)

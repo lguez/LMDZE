@@ -12,7 +12,7 @@ contains
     ! Authors: P. Le Van, L. Fairhead
     ! This procedure reads the initial state of the atmosphere.
 
-    use comconst, only: im, dtvr, jm, lllm
+    use comconst, only: dtvr
     use comgeom, only: rlonu, rlatu, rlonv, rlatv, cu_2d, cv_2d, aire_2d
     use conf_gcm_m, only: fxyhypb, ysinus
     use dimens_m, only: iim, jjm, llm, nqmx
@@ -59,16 +59,21 @@ contains
     call nf95_inq_varid(ncid, "controle", varid)
     call NF95_Gw_VAR(ncid, varid, tab_cntrl)
 
-    im = int(tab_cntrl(1))
-    jm = int(tab_cntrl(2))
-    lllm = int(tab_cntrl(3))
-    call assert(im == iim, "dynetat0 im iim") 
-    call assert(jm == jjm, "dynetat0 jm jjm") 
-    call assert(lllm == llm, "dynetat0 lllm llm") 
+    call assert(int(tab_cntrl(1)) == iim, "dynetat0 tab_cntrl iim") 
+    call assert(int(tab_cntrl(2)) == jjm, "dynetat0 tab_cntrl jjm") 
+    call assert(int(tab_cntrl(3)) == llm, "dynetat0 tab_cntrl llm") 
 
     day_ref = int(tab_cntrl(4))
     annee_ref = int(tab_cntrl(5))
-    dtvr = tab_cntrl(12)
+
+    IF (dtvr /= tab_cntrl(12)) THEN
+       print *, 'Warning: the time steps from day_step and "start.nc" ' // &
+          'are different.'
+       print *, 'dtvr from day_step: ', dtvr
+       print *, 'dtvr from "start.nc": ', tab_cntrl(12)
+       print *, 'Using the value from day_step.'
+    ENDIF
+
     etot0 = tab_cntrl(13)
     ptot0 = tab_cntrl(14)
     ztot0 = tab_cntrl(15)

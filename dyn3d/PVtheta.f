@@ -6,6 +6,7 @@
       use comconst
       use disvert_m
       use comgeom
+      use tourabs_m, only: tourabs
       IMPLICIT none
 
 c=======================================================================

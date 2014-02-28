@@ -9,7 +9,7 @@ contains
     ! From LMDZ4/libf/dyn3d/massdair.F, version 1.1.1.1 2004/05/19 12:53:07
 
     ! Calcule la masse d'air dans chaque maille.
-    ! Auteurs : P. Le Van, F. Hourdin
+    ! Authors: P. Le Van, F. Hourdin
 
     USE comgeom, ONLY: airesurg
     USE dimens_m, ONLY: iim, llm

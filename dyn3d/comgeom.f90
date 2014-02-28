@@ -1,68 +1,67 @@
 module comgeom
 
   use dimens_m, only: iim, jjm
-  use paramet_m, only: ip1jmp1, ip1jm
 
   implicit none
 
-  private iim, jjm, ip1jmp1, ip1jm
+  private iim, jjm
 
   real cu_2d(iim + 1, jjm + 1), cv_2d(iim + 1, jjm) ! in m
-  real cu(ip1jmp1), cv(ip1jm) ! in m
+  real cu((iim + 1) * (jjm + 1)), cv((iim + 1) * jjm) ! in m
   equivalence (cu, cu_2d), (cv, cv_2d)
 
   real unscu2_2d(iim + 1, jjm + 1) ! in m-2
-  real unscu2(ip1jmp1) ! in m-2
+  real unscu2((iim + 1) * (jjm + 1)) ! in m-2
   equivalence (unscu2, unscu2_2d)
 
   real unscv2_2d(iim + 1, jjm) ! in m-2
-  real unscv2(ip1jm) ! in m-2
+  real unscv2((iim + 1) * jjm) ! in m-2
   equivalence (unscv2, unscv2_2d)
 
-  real aire(ip1jmp1), aire_2d(iim + 1, jjm + 1) ! in m2
-  real airesurg_2d(iim + 1, jjm + 1), airesurg(ip1jmp1)
+  real aire((iim + 1) * (jjm + 1)), aire_2d(iim + 1, jjm + 1) ! in m2
+  real airesurg_2d(iim + 1, jjm + 1), airesurg((iim + 1) * (jjm + 1))
   equivalence (aire, aire_2d), (airesurg, airesurg_2d)
 
   real aireu_2d(iim + 1, jjm + 1) ! in m2
-  real aireu(ip1jmp1) ! in m2
+  real aireu((iim + 1) * (jjm + 1)) ! in m2
   equivalence (aireu, aireu_2d)
 
-  real airev(ip1jm), airev_2d(iim + 1, jjm) ! in m2
-  real unsaire(ip1jmp1), unsaire_2d(iim + 1, jjm + 1) ! in m-2
+  real airev((iim + 1) * jjm), airev_2d(iim + 1, jjm) ! in m2
+  real unsaire((iim + 1) * (jjm + 1)), unsaire_2d(iim + 1, jjm + 1) ! in m-2
   equivalence (airev, airev_2d), (unsaire, unsaire_2d)
 
   real apoln, apols ! in m2
 
   real unsairez_2d(iim + 1, jjm)
-  real unsairez(ip1jm)
+  real unsairez((iim + 1) * jjm)
   equivalence (unsairez, unsairez_2d)
 
   real alpha1_2d(iim + 1, jjm + 1)
-  real alpha1(ip1jmp1)
+  real alpha1((iim + 1) * (jjm + 1))
   equivalence (alpha1, alpha1_2d)
 
   real alpha2_2d(iim + 1, jjm + 1)         
-  real alpha2(ip1jmp1)
+  real alpha2((iim + 1) * (jjm + 1))
   equivalence (alpha2, alpha2_2d)
 
   real alpha3_2d(iim + 1, jjm + 1), alpha4_2d(iim + 1, jjm + 1)
-  real alpha3(ip1jmp1), alpha4(ip1jmp1)
+  real alpha3((iim + 1) * (jjm + 1)), alpha4((iim + 1) * (jjm + 1))
   equivalence (alpha3, alpha3_2d), (alpha4, alpha4_2d)
 
   real alpha1p2_2d(iim + 1, jjm + 1)        
-  real alpha1p2(ip1jmp1)
+  real alpha1p2((iim + 1) * (jjm + 1))
   equivalence (alpha1p2, alpha1p2_2d)
 
   real alpha1p4_2d(iim + 1, jjm + 1), alpha2p3_2d(iim + 1, jjm + 1)
-  real alpha1p4(ip1jmp1), alpha2p3(ip1jmp1)
+  real alpha1p4((iim + 1) * (jjm + 1)), alpha2p3((iim + 1) * (jjm + 1))
   equivalence (alpha1p4, alpha1p4_2d), (alpha2p3, alpha2p3_2d)
 
-  real alpha3p4(ip1jmp1)
+  real alpha3p4((iim + 1) * (jjm + 1))
   real alpha3p4_2d(iim + 1, jjm + 1)    
   equivalence (alpha3p4, alpha3p4_2d)
 
   real fext_2d(iim + 1, jjm), constang_2d(iim + 1, jjm + 1)
-  real fext(ip1jm), constang(ip1jmp1)
+  real fext((iim + 1) * jjm), constang((iim + 1) * (jjm + 1))
   equivalence (fext, fext_2d), (constang, constang_2d)
 
   real rlatu(jjm + 1)
@@ -77,38 +76,39 @@ module comgeom
   ! (longitudes of points of the "scalar" and "v" grid, in rad)
 
   real cuvsurcv_2d(iim + 1, jjm), cvsurcuv_2d(iim + 1, jjm) ! no dimension
-  real cuvsurcv(ip1jm), cvsurcuv(ip1jm) ! no dimension
+  real cuvsurcv((iim + 1) * jjm), cvsurcuv((iim + 1) * jjm) ! no dimension
   equivalence (cuvsurcv, cuvsurcv_2d), (cvsurcuv, cvsurcuv_2d)
 
   real cvusurcu_2d(iim + 1, jjm + 1), cusurcvu_2d(iim + 1, jjm + 1)
   ! no dimension
-  real cvusurcu(ip1jmp1), cusurcvu(ip1jmp1) ! no dimension
+  real cvusurcu((iim + 1) * (jjm + 1)), cusurcvu((iim + 1) * (jjm + 1))
+  ! no dimension
   equivalence (cvusurcu, cvusurcu_2d), (cusurcvu, cusurcvu_2d)
 
   real cuvscvgam1_2d(iim + 1, jjm)
-  real cuvscvgam1(ip1jm)
+  real cuvscvgam1((iim + 1) * jjm)
   equivalence (cuvscvgam1, cuvscvgam1_2d)
 
   real cuvscvgam2_2d(iim + 1, jjm), cvuscugam1_2d(iim + 1, jjm + 1)
-  real cuvscvgam2(ip1jm), cvuscugam1(ip1jmp1)
+  real cuvscvgam2((iim + 1) * jjm), cvuscugam1((iim + 1) * (jjm + 1))
   equivalence (cuvscvgam2, cuvscvgam2_2d), (cvuscugam1, cvuscugam1_2d)
 
   real cvuscugam2_2d(iim + 1, jjm + 1), cvscuvgam_2d(iim + 1, jjm)
-  real cvuscugam2(ip1jmp1), cvscuvgam(ip1jm)
+  real cvuscugam2((iim + 1) * (jjm + 1)), cvscuvgam((iim + 1) * jjm)
   equivalence (cvuscugam2, cvuscugam2_2d), (cvscuvgam, cvscuvgam_2d)
 
-  real cuscvugam(ip1jmp1)
+  real cuscvugam((iim + 1) * (jjm + 1))
   real cuscvugam_2d(iim + 1, jjm + 1) 
   equivalence (cuscvugam, cuscvugam_2d)
 
   real unsapolnga1, unsapolnga2, unsapolsga1, unsapolsga2                
 
   real unsair_gam1_2d(iim + 1, jjm + 1), unsair_gam2_2d(iim + 1, jjm + 1)
-  real unsair_gam1(ip1jmp1), unsair_gam2(ip1jmp1)
+  real unsair_gam1((iim + 1) * (jjm + 1)), unsair_gam2((iim + 1) * (jjm + 1))
   equivalence (unsair_gam1, unsair_gam1_2d), (unsair_gam2, unsair_gam2_2d)
 
   real unsairz_gam_2d(iim + 1, jjm)
-  real unsairz_gam(ip1jm)
+  real unsairz_gam((iim + 1) * jjm)
   equivalence (unsairz_gam, unsairz_gam_2d)
 
   real xprimu(iim + 1), xprimv(iim + 1)
@@ -164,7 +164,6 @@ contains
     USE comconst, ONLY : g, omeg, rad
     USE comdissnew, ONLY : coefdis, nitergdiv, nitergrot, niterh
     use conf_gcm_m, ONLY : fxyhypb, ysinus
-    USE dimens_m, ONLY : iim, jjm
     use fxy_m, only: fxy
     use fxyhyper_m, only: fxyhyper
     use jumble, only: new_unit
@@ -532,10 +531,6 @@ contains
     END DO
 
     ! Périodicité en longitude
-
-    DO j = 1, jjm
-       fext_2d(iip1, j) = fext_2d(1, j)
-    END DO
     DO j = 1, jjp1
        constang_2d(iip1, j) = constang_2d(1, j)
     END DO

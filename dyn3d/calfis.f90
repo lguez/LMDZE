@@ -229,13 +229,13 @@ contains
 
     forall(l= 1: llm) v(:, l) = pack(zvfi(:, :, l), dyn_phy)
 
-    !IM calcul PV a teta=350, 380, 405K
+    ! Compute potential vorticity at theta = 350, 380 and 405 K:
     CALL PVtheta(klon, llm, ucov, vcov, teta, t, play, paprs, ntetaSTD, &
          rtetaSTD, PVteta)
 
     ! Appel de la physique :
     CALL physiq(lafin, rdayvrai, time, dtphys, paprs, play, pphi, pphis, u, &
-         v, t, qx, omega, d_u, d_v, d_t, d_qx, d_ps, dudyn, PVteta)
+         v, t, qx, omega, d_u, d_v, d_t, d_qx, d_ps, dudyn)
 
     ! transformation des tendances physiques en tendances dynamiques:
 

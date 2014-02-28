@@ -9,7 +9,7 @@ contains
     ! From LMDZ4/libf/dyn3d/massbarxy.F, version 1.1.1.1 2004/05/19 12:53:07
 
     ! Calcule les moyennes en x et y de la masse d'air dans chaque maille.
-    ! Auteurs : P. Le Van, F. Hourdin.
+    ! Authors: P. Le Van, F. Hourdin.
 
     USE dimens_m, ONLY: iim, llm
     USE paramet_m, ONLY: iip1, iip2, ip1jm, ip1jmp1

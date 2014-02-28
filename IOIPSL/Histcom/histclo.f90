@@ -17,7 +17,7 @@ contains
     INTEGER, INTENT (IN), OPTIONAL:: fid ! file id
 
     ! Variables local to the procedure:
-    INTEGER ifile, ncid, iret, iv, ncvarid
+    INTEGER ifile, ncid, iret
     INTEGER start_loop, end_loop
     CHARACTER(len=70) str70
 

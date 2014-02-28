@@ -18,14 +18,14 @@ contains
     ! From "etat0_netcdf.F", version 1.3 2005/05/25 13:10:09
 
     use caldyn0_m, only: caldyn0
-    use comconst, only: dtvr, daysec, cpp, kappa
+    use comconst, only: cpp, kappa, iniconst
     use comgeom, only: rlatu, rlonv, rlonu, rlatv, aire_2d, apoln, apols, &
          cu_2d, cv_2d, inigeom
-    use conf_gcm_m, only: day_step, iphysiq, dayref, anneeref
+    use conf_gcm_m, only: dayref, anneeref
     use dimens_m, only: iim, jjm, llm, nqmx
     use dimphy, only: zmasq
     use dimsoil, only: nsoilmx
-    use disvert_m, only: ap, bp, preff, pa
+    use disvert_m, only: ap, bp, preff, pa, disvert
     use dynredem0_m, only: dynredem0
     use dynredem1_m, only: dynredem1
     use exner_hyb_m, only: exner_hyb
@@ -109,7 +109,6 @@ contains
     REAL phi(iim + 1, jjm + 1, llm)
     REAL pbaru(ip1jmp1, llm), pbarv(ip1jm, llm)
     REAL w(ip1jmp1, llm)
-    REAL phystep
 
     real sig1(klon, llm) ! section adiabatic updraft
     real w01(klon, llm) ! vertical velocity within adiabatic updraft
@@ -118,13 +117,12 @@ contains
 
     print *, "Call sequence information: etat0"
 
-    dtvr = daysec / real(day_step)
-    print *, 'dtvr = ', dtvr
+    CALL iniconst
 
     ! Construct a grid:
 
     pa = 5e4
-    CALL iniconst
+    CALL disvert
     CALL inigeom
     CALL inifilr
 
@@ -312,11 +310,6 @@ contains
          pbarv)
     CALL dynredem0("start.nc", dayref, phis)
     CALL dynredem1("start.nc", vcov, ucov, teta, q, masse, ps, itau=0)
-
-    ! Ecriture état initial physique:
-    print *, "iphysiq = ", iphysiq
-    phystep = dtvr * REAL(iphysiq)
-    print *, 'phystep = ', phystep
 
     ! Initialisations :
     tsolsrf(:, is_ter) = tsol

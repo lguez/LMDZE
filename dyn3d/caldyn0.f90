@@ -8,42 +8,40 @@ contains
        pbaru, pbarv)
 
     ! From dyn3d/caldyn0.F, version 1.1.1.1 2004/05/19 12:53:07
-    ! Auteur :  P. Le Van
+    ! Authors:  P. Le Van, F. Forget
     ! Objet : calcul des tendances dynamiques
-    ! Modif 04/93 F.Forget
 
     USE comgeom, ONLY: airesurg
-    USE dimens_m, ONLY: llm
+    USE dimens_m, ONLY: iim, jjm, llm
     USE disvert_m, ONLY: ap, bp
     use flumass_m, only: flumass
     use massbarxy_m, only: massbarxy
     use massdair_m, only: massdair
-    USE paramet_m, ONLY: iip1, ip1jm, ip1jmp1, jjp1, llmp1
+    USE paramet_m, ONLY: iip1, ip1jmp1, jjp1, llmp1
     use sortvarc0_m, only: sortvarc0
     use tourpot_m, only: tourpot
 
     ! Arguments:
-    REAL, INTENT (IN):: ucov(ip1jmp1, llm), vcov(ip1jm, llm)
+    REAL, INTENT(IN):: ucov(:, :, :) ! (iim + 1, jjm + 1, llm) vent covariant
+    REAL, INTENT(IN):: vcov(:, :, :) ! (iim + 1, jjm, llm) ! vent covariant
     REAL, INTENT(IN):: teta(ip1jmp1, llm)
     REAL, INTENT (IN):: ps(ip1jmp1)
     real, intent(out):: masse(ip1jmp1, llm)
     REAL, INTENT (IN):: pk(iip1, jjp1, llm)
     REAL, INTENT (IN):: phis(ip1jmp1)
     REAL, INTENT (IN):: phi(ip1jmp1, llm)
-    REAL, intent(out):: w(ip1jmp1, llm)
-    REAL, intent(out):: pbaru(ip1jmp1, llm), pbarv(ip1jm, llm)
+    REAL, INTENT(out):: w(ip1jmp1, llm)
+    REAL, intent(out):: pbaru(ip1jmp1, llm), pbarv((iim + 1) * jjm, llm)
 
     ! Local:
-
-    REAL vcont(ip1jm, llm), ucont(ip1jmp1, llm)
+    REAL vcont((iim + 1) * jjm, llm), ucont(ip1jmp1, llm)
     REAL p(ip1jmp1, llmp1)
-    REAL massebx(ip1jmp1, llm), masseby(ip1jm, llm)
-    REAL vorpot(ip1jm, llm)
+    REAL massebx(ip1jmp1, llm), masseby((iim + 1) * jjm, llm)
+    REAL vorpot(iim + 1, jjm, llm)
     real ecin(ip1jmp1, llm), convm(ip1jmp1, llm)
     REAL bern(ip1jmp1, llm)
-    REAL massebxy(ip1jm, llm), dp(ip1jmp1)
-
-    INTEGER ij, l
+    REAL massebxy(iim + 1, jjm, llm), dp(ip1jmp1)
+    INTEGER l
 
     !-----------------------------------------------------------------------
 

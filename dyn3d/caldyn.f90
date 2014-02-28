@@ -18,7 +18,7 @@ contains
     use flumass_m, only: flumass
     use massbarxy_m, only: massbarxy
     use massdair_m, only: massdair
-    USE paramet_m, ONLY: iip1, ip1jm, ip1jmp1, jjp1, llmp1
+    USE paramet_m, ONLY: iip1, ip1jmp1, jjp1, llmp1
     use sortvarc_m, only: sortvarc
     use tourpot_m, only: tourpot
 
@@ -26,30 +26,30 @@ contains
     INTEGER, INTENT(IN):: itau
     REAL, INTENT(IN):: ucov(:, :, :) ! (iim + 1, jjm + 1, llm) vent covariant
     REAL, INTENT(IN):: vcov(:, :, :) ! (iim + 1, jjm, llm) ! vent covariant
-    real, intent(in):: teta(ip1jmp1, llm)
-    REAL, INTENT(IN):: ps(ip1jmp1)
+    REAL, INTENT(IN):: teta(ip1jmp1, llm)
+    REAL, INTENT (IN):: ps(ip1jmp1)
     real, intent(out):: masse(ip1jmp1, llm)
     REAL, INTENT(IN):: pk(iip1, jjp1, llm)
     REAL pkf(ip1jmp1, llm)
     REAL, INTENT(IN):: phis(ip1jmp1)
     REAL, INTENT(IN):: phi(ip1jmp1, llm)
-    REAL dudyn(ip1jmp1, llm), dv(ip1jm, llm)
+    REAL dudyn(ip1jmp1, llm), dv((iim + 1) * jjm, llm)
     REAL dteta(ip1jmp1, llm)
     real, INTENT(out):: dp(ip1jmp1)
     REAL, INTENT(out):: w(ip1jmp1, llm)
-    REAL pbaru(ip1jmp1, llm), pbarv(ip1jm, llm)
+    REAL, intent(out):: pbaru(ip1jmp1, llm), pbarv((iim + 1) * jjm, llm)
     REAL, intent(in):: time_0
     LOGICAL, INTENT(IN):: conser
 
     ! Local:
 
-    REAL vcont(ip1jm, llm), ucont(ip1jmp1, llm)
+    REAL vcont((iim + 1) * jjm, llm), ucont(ip1jmp1, llm)
     REAL ang(iim + 1, jjm + 1, llm), p(ip1jmp1, llmp1)
-    REAL massebx(ip1jmp1, llm), masseby(ip1jm, llm)
-    REAL vorpot(ip1jm, llm)
+    REAL massebx(ip1jmp1, llm), masseby((iim + 1) * jjm, llm)
+    REAL vorpot(iim + 1, jjm, llm)
     real ecin(ip1jmp1, llm), convm(ip1jmp1, llm)
     REAL bern(ip1jmp1, llm)
-    REAL massebxy(ip1jm, llm)
+    REAL massebxy(iim + 1, jjm, llm)
 
     INTEGER ij, l
 
@@ -77,7 +77,7 @@ contains
     ! WARNING probleme de peridocite de dv sur les PC/linux. Pb d'arrondi
     ! probablement. Observe sur le code compile avec pgf90 3.0-1
     DO l = 1, llm
-       DO ij = 1, ip1jm, iip1
+       DO ij = 1, (iim + 1) * jjm, iip1
           IF (dv(ij, l)/=dv(ij+iim, l)) THEN
              dv(ij+iim, l) = dv(ij, l)
           END IF

@@ -1,26 +1,53 @@
 module comconst
 
-  use dimens_m, only: jjm
   use nr_util, only: pi
 
   implicit none
 
-  INTEGER im, jm, lllm, imp1
-  integer, parameter:: jmp1 = jjm + 1
-  integer lllmm1, lllmp1, lcl
-  REAL dtvr ! time step for dynamics (in s)
   real, parameter:: daysec = 86400. ! number of seconds per day
-  REAL dtphys ! time step of integration
+
+  REAL dtvr ! time step for dynamics, in s
+  REAL dtphys ! time step for physics, in s
+
   real, parameter:: rad = 6371229. ! radius of the Earth (in m)
-  real r
-  real, parameter:: cpp = 1004.70885 ! J K-1 kg-1
-  real, parameter:: kappa = 0.2857143
-  REAL cotot, unsim
+
+  real, parameter:: cpp = 1004.70885
+  ! specific heat capacity at constant pressure of dry air, in J K-1 kg-1
+
+  real, parameter:: kappa = 0.2857143 ! r / cpp
+
+  real, parameter:: r = cpp * kappa
+  ! specific ideal gas constant for dry air, in J K-1 kg-1
+
   real, parameter:: g = 9.8 ! acceleration of gravity (in m s-2)
 
   real, parameter:: omeg = 2 * pi / daysec
   ! angular speed of rotation of the Earth (in rad s-1)
 
-  private jjm, pi
+  private pi
+
+contains
+
+  SUBROUTINE iniconst
+
+    ! From dyn3d/iniconst.F,v 1.1.1.1 2004/05/19 12:53:05
+    ! P. Le Van
+
+    USE conf_gcm_m, ONLY: day_step, iphysiq
+
+    IMPLICIT NONE
+
+    !-----------------------------------------------------------------------
+
+    dtvr = daysec / real(day_step)
+    dtphys  = iphysiq * dtvr
+
+    print *, 'dtvr = ', dtvr
+    print *, 'dtphys = ', dtphys
+    PRINT *, 'cpp = ', cpp
+    PRINT *, 'R = ', r
+    PRINT *, 'kappa = ', kappa
+
+  END SUBROUTINE iniconst
 
 end module comconst

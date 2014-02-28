@@ -8,54 +8,39 @@ contains
 
     ! From LMDZ4/libf/dyn3d/tourpot.F, version 1.1.1.1 2004/05/19 12:53:06
 
-    ! Auteur : P. Le Van
+    ! Author: P. Le Van
     ! Objet : calcul du tourbillon potentiel
 
     USE dimens_m, ONLY: iim, jjm, llm
-    USE paramet_m, ONLY: iip1, ip1jm, ip1jmp1
-    USE comgeom, ONLY: fext
+    USE comgeom, ONLY: fext_2d
     use filtreg_m, only: filtreg
 
-    REAL, intent(in):: vcov(ip1jm, llm), ucov(ip1jmp1, llm)
-    REAL, intent(in):: massebxy(ip1jm, llm)
+    REAL, intent(in):: vcov(:, :, :) ! (iim + 1, jjm, llm)
+    REAL, intent(in):: ucov(:, :, :) ! (iim + 1, jjm + 1, llm)
+    REAL, intent(in):: massebxy(:, :, :) ! (iim + 1, jjm, llm) mass of grid cell
 
-    real, intent(out):: vorpot(ip1jm, llm)
+    real, intent(out):: vorpot(:, :, :) ! (iim + 1, jjm, llm)
     ! = (Filtre(d(vcov)/dx - d(ucov)/dy) + fext) / massebxy
 
     ! Local:
-    REAL rot(ip1jm, llm)
-    INTEGER l, ij
+    REAL rot(iim + 1, jjm, llm)
+    ! relative vorticity multiplied by cell area, in m2 s-1
+
+    INTEGER l, i, j
 
     !---------------------------------------------------------------
 
     ! Calcul du rotationnel du vent puis filtrage
 
-    DO l = 1, llm
-       DO ij = 1, ip1jm - 1
-          rot(ij, l) = vcov(ij + 1, l) - vcov(ij, l) + ucov(ij + iip1, l) &
-               - ucov(ij, l)
-       end DO
-
-       ! correction pour rot(iip1, j, l)
-       ! rot(iip1, j, l) = rot(1, j, l)
-       DO ij = iip1, ip1jm, iip1
-          rot(ij, l) = rot(ij - iim, l)
-       end DO
-    end DO
+    forall (i = 1: iim, j = 1: jjm) rot(i, j, :) &
+         = vcov(i + 1, j, :) - vcov(i, j, :) + ucov(i, j + 1, :) - ucov(i, j, :)
+    rot(iim + 1, :, :) = rot(1, :, :)
 
     CALL filtreg(rot, jjm, llm, 2, 1, .FALSE.)
 
-    DO l = 1, llm
-       DO ij = 1, ip1jm - 1
-          vorpot(ij, l) = (rot(ij, l) + fext(ij)) / massebxy(ij, l)
-       end DO
-
-       ! correction pour vorpot(iip1, j, l)
-       ! vorpot(iip1, j, l)= vorpot(1, j, l)
-       DO ij = iip1, ip1jm, iip1
-          vorpot(ij, l) = vorpot(ij - iim, l)
-       end DO
-    end DO
+    forall (l = 1: llm) vorpot(:iim, :, l) &
+         = (rot(:iim, :, l) + fext_2d(:iim, :)) / massebxy(:iim, :, l)
+    vorpot(iim + 1, :, :)= vorpot(1, :, :)
 
   END SUBROUTINE tourpot
 

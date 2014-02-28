@@ -13,7 +13,7 @@ PROGRAM ce0l
   !-------------------------------------
 
   call new_unit(unit_nml)
-  open(unit_nml, file="used_namelists", status="replace", action="write")
+  open(unit_nml, file="used_namelists.txt", status="replace", action="write")
   CALL conf_gcm
   CALL etat0
   CALL limit

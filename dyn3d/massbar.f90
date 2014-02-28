@@ -21,8 +21,8 @@ SUBROUTINE massbar(  masse, massebx, masseby )
   use comconst
   use comgeom
   !
-  REAL    masse( ip1jmp1,llm ), massebx( ip1jmp1,llm )  , &
-       masseby(   ip1jm,llm )
+  REAL, intent(in):: masse( ip1jmp1,llm )
+  real massebx( ip1jmp1,llm )  , masseby(   ip1jm,llm )
   !
   !
   ! Méthode pour calculer massebx et masseby. A chaque point scalaire

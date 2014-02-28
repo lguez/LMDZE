@@ -9,13 +9,14 @@ PROGRAM gcm
   ! l'advection de "q", en modifiant "iadv" dans "traceur.def".
 
   USE calendar, only: ioconf_calendar
-  use comconst, only: daysec, cpp, dtvr, g, rad, r
+  use comconst, only: daysec, dtvr, iniconst
   use comgeom, only: rlatu, aire_2d, cu_2d, cv_2d, rlonv, inigeom
   use comgeomphy, only: airephy, cuphy, cvphy, rlatd, rlond
   use conf_gcm_m, only: day_step, iperiod, anneeref, dayref, iecri, iphysiq, &
        nday, raz_date, periodav, conf_gcm, iflag_phys
   use dimens_m, only: iim, jjm, llm, nqmx
   use dimphy, only: klon
+  USE disvert_m, ONLY : disvert
   use dynetat0_m, only: dynetat0, day_ini
   use dynredem0_m, only: dynredem0
   use grid_change, only: dyn_phy, init_dyn_phy
@@ -35,8 +36,6 @@ PROGRAM gcm
   use yoethf_m, only: yoethf
 
   IMPLICIT NONE
-
-  REAL zdtvr ! time step for dynamics, in s
 
   ! Variables dynamiques :
   REAL ucov(iim + 1, jjm + 1, llm), vcov(iim + 1, jjm, llm)  ! vent covariant
@@ -61,7 +60,7 @@ PROGRAM gcm
   !------------------------------------------------------------
 
   call new_unit(unit_nml)
-  open(unit_nml, file="used_namelists", status="replace", action="write")
+  open(unit_nml, file="used_namelists.txt", status="replace", action="write")
 
   CALL conf_gcm
 
@@ -79,6 +78,8 @@ PROGRAM gcm
   ! Initialisation des traceurs
   ! Choix du schéma pour l'advection dans le fichier "traceur.def" ou via INCA
   call iniadvtrac
+
+  CALL iniconst
 
   ! Lecture du fichier "start.nc" :
   CALL dynetat0(vcov, ucov, teta, q, masse, ps, phis, time_0)
@@ -101,18 +102,7 @@ PROGRAM gcm
      raz_date = .false.
   endif
 
-  ! On recalcule éventuellement le pas de temps :
-  zdtvr = daysec / REAL(day_step)
-  IF (dtvr /= zdtvr) THEN
-     print *, 'Warning: the time steps in the ".def" file and in ' // &
-          '"start.nc" are different'
-     print *, 'dtvr (from "start.nc") = ', dtvr
-     print *, 'zdtvr (from ".def") = ', zdtvr
-     print *, 'Using the value from the ".def" file.'
-     dtvr = zdtvr
-  ENDIF
-
-  CALL iniconst 
+  CALL disvert
   CALL inigeom ! initialisation de la géometrie
   CALL inifilr ! initialisation du filtre
   CALL inidissip
@@ -150,9 +140,9 @@ PROGRAM gcm
   print *, "day_end = ", day_end
 
   CALL dynredem0("restart.nc", day_end, phis)
-  CALL inithist(day_ref, annee_ref, zdtvr, nqmx, t_ops = iecri * daysec, &
+  CALL inithist(day_ref, annee_ref, dtvr, nqmx, t_ops = iecri * daysec, &
        t_wrt = iecri * daysec)
-  CALL initdynav(day_ref, annee_ref, zdtvr, nqmx, t_ops = iperiod * zdtvr, &
+  CALL initdynav(day_ref, annee_ref, dtvr, nqmx, t_ops = iperiod * dtvr, &
        t_wrt = periodav * daysec)
   call init_dynzon(dt_app = dtvr * iperiod)
 
