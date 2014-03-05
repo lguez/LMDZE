@@ -29,7 +29,7 @@ execut = ce0l gcm
 # 3. Compiler-dependent part
 
 mode = debug
-include Compilers/${FC}_${mode}.mk
+include Compiler_options/${FC}_${mode}.mk
 
 # 4. Rules
 

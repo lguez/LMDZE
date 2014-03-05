@@ -3,7 +3,7 @@ ce0l.f90
 conf_dat2d.f90
 conf_dat3d.f90
 etat0.f90
-extrapol.f
+extrapol.f90
 grid_atob.f90
 grid_noro_m.f90
 gr_int_dyn_m.f90

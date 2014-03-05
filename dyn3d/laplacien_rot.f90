@@ -1,0 +1,41 @@
+
+! $Header: /home/cvsroot/LMDZ4/libf/dyn3d/laplacien_rot.F,v 1.1.1.1
+! 2004/05/19 12:53:07 lmdzadmin Exp $
+
+SUBROUTINE laplacien_rot(klevel, rotin, rotout, ghx, ghy)
+
+  ! P. Le Van
+
+  ! ************************************************************
+  ! ...  calcul de  ( rotat x nxgrad )  du rotationnel rotin  .
+  ! ************************************************************
+
+  ! klevel et rotin  sont des arguments  d'entree pour le s-prog
+  ! rotout           est  un argument  de sortie pour le s-prog
+
+  USE dimens_m
+  USE paramet_m
+  USE comgeom
+  USE filtreg_m, ONLY: filtreg
+  IMPLICIT NONE
+
+
+
+  ! ..........    variables  en  arguments     .............
+
+  INTEGER, INTENT (IN) :: klevel
+  REAL rotin(ip1jm, klevel), rotout(ip1jm, klevel)
+
+  ! ..........    variables   locales       ................
+
+  REAL ghy(ip1jm, klevel), ghx(ip1jmp1, klevel)
+  ! ........................................................
+
+
+  CALL filtreg(rotin, jjm, klevel, 2, 1, .FALSE.)
+
+  CALL nxgrad(klevel, rotin, ghx, ghy)
+  CALL rotatf(klevel, ghx, ghy, rotout)
+
+  RETURN
+END SUBROUTINE laplacien_rot
