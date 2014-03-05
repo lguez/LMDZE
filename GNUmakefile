@@ -2,10 +2,6 @@
 
 # This makefile builds LMDZE.
 
-# Suffixes are:
-# "f90" for free format, no preprocessing
-# "f" for fixed format, no preprocessing
-
 # 1. Source files
 
 src_root = .
@@ -34,11 +30,6 @@ include Compiler_options/${FC}_${mode}.mk
 # 4. Rules
 
 SHELL = bash
-COMPILE.f90 = $(FC) $(F90FLAGS) $(TARGET_ARCH) -c
-
-%.o: %.f90
-	$(COMPILE.f90) $(OUTPUT_OPTION) $<
-
 .DELETE_ON_ERROR:
 .PHONY: all clean clobber depend
 all: ${execut} log
@@ -50,7 +41,7 @@ ce0l: ${obj_ce0l}
 gcm: ${obj_gcm}
 
 depend ${src_root}/depend.mk:
-	makedepf90 -Wmissing -Wconfused $(addprefix -I, ${VPATH}) -nosrc $(addprefix -u , netcdf numer_rec_95 netcdf95 nr_util jumble) ${sources} >${src_root}/depend.mk
+	makedepf90 -free -Wmissing -Wconfused $(addprefix -I, ${VPATH}) -nosrc $(addprefix -u , netcdf numer_rec_95 netcdf95 nr_util jumble) ${sources} >${src_root}/depend.mk
 
 ${src_root}/TAGS: ${sources}
 	ctags -e --language-force=fortran -f $@ $^

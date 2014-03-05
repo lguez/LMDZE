@@ -13,7 +13,7 @@ jumble_dir = /user/guez_local/lib/Jumble_debug
 FFLAGS = $(addprefix -I, ${netcdf_inc_dir} ${numer_rec_95_dir} ${netcdf95_dir} ${nr_util_dir} ${jumble_dir})
 
 # Fortran language options:
-FFLAGS += -std=f95
+FFLAGS += -ffree-form -std=f95
 
 # Error and warning options:
 FFLAGS += -fmax-errors=1 -pedantic-errors -Wall -Wcharacter-truncation -Wimplicit-interface -Wunderflow -Wunreachable-code
