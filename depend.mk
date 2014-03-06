@@ -269,7 +269,7 @@ dynredem0.o : temps.o serre.o paramet_m.o conf_gcm.o iniadvtrac.o calendar.o ene
 dynredem1.o : iniadvtrac.o dimens_m.o 
 enercin.o : comgeom.o paramet_m.o dimens_m.o 
 ener.o : dimens_m.o 
-exner_hyb.o : filtreg.o comgeom.o disvert.o comconst.o dimens_m.o 
+exner_hyb.o : filtreg.o disvert.o comconst.o dimens_m.o 
 filtreg.o : inifilr.o dimens_m.o coefils.o 
 flumass.o : comgeom.o paramet_m.o dimens_m.o 
 fxhyp.o : paramet_m.o dimens_m.o 

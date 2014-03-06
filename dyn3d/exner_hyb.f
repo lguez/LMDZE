@@ -31,7 +31,6 @@ contains
     use dimens_m, only: iim, jjm, llm
     use comconst, only: kappa, cpp
     use disvert_m, only: preff
-    use comgeom, only: aire_2d, apoln, apols
     use filtreg_m, only: filtreg
 
     REAL, intent(in):: ps(iim + 1, jjm + 1)
@@ -49,8 +48,6 @@ contains
     !-------------------------------------
 
     pks = cpp * (ps / preff)**kappa
-    pks(:, 1) = SUM(aire_2d(:iim, 1) * pks(:iim, 1)) / apoln
-    pks(:, jjm + 1) = SUM(aire_2d(:iim, jjm + 1) * pks(:iim, jjm + 1)) / apols
     unpl2k = 1. + 2 * kappa
 
     beta(:, :, llm) = 1. / unpl2k
