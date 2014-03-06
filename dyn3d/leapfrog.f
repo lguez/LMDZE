@@ -214,10 +214,6 @@ contains
              teta(:, jjm + 1, l) = SUM(aire_2d(:iim, jjm+1) &
                   * teta(:iim, jjm + 1, l)) / apols
           END forall
-
-          ps(:, 1) = SUM(aire_2d(:iim, 1) * ps(:iim, 1)) / apoln
-          ps(:, jjm + 1) = SUM(aire_2d(:iim, jjm+1) * ps(:iim, jjm + 1)) &
-               / apols
        END IF
 
        IF (MOD(itau + 1, iperiod) == 0) THEN
