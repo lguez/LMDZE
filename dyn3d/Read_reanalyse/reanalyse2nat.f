@@ -1,6 +1,4 @@
-subroutine reanalyse2nat(nlevnc,psi &
-     ,unc,vnc,tnc,qnc,psnc,pl,u,v,t,q &
-     ,ps,masse,pk)
+subroutine reanalyse2nat(nlevnc,psi,unc,vnc,tnc,qnc,psnc,pl,u,v,t,q ,masse,pk)
 
   !   Inversion Nord/sud de la grille + interpollation sur les niveaux
   !   verticaux du modele.
@@ -21,7 +19,7 @@ subroutine reanalyse2nat(nlevnc,psi &
   integer nlevnc
   real, intent(in):: psi(iip1,jjp1)
   real u(iip1,jjp1,llm),v(iip1,jjm,llm)
-  real t(iip1,jjp1,llm),ps(iip1,jjp1),q(iip1,jjp1,llm)
+  real t(iip1,jjp1,llm), q(iip1,jjp1,llm)
 
   real pl(nlevnc)
   real unc(iip1,jjp1,nlevnc),vnc(iip1,jjm,nlevnc)
@@ -96,25 +94,11 @@ subroutine reanalyse2nat(nlevnc,psi &
 
   ! -----------------------------------------------------------------
 
-  if (guide_P) then
-     do j=1,jjp1
-        do i=1,iim
-           ps(i,j)=psnc(i,jjp1+1-j)
-        enddo
-        ps(iip1,j)=ps(1,j)
-     enddo
-  endif
-
-
-  ! -----------------------------------------------------------------
   call pres2lev(unc,zu,nlevnc,llm,pl,plunc,iip1,jjp1)
   call pres2lev(vnc,zv,nlevnc,llm,pl,plvnc,iip1,jjm )
   call pres2lev(tnc,zt,nlevnc,llm,pl,plsnc,iip1,jjp1)
   call pres2lev(qnc,zq,nlevnc,llm,pl,plsnc,iip1,jjp1)
 
-  !     call dump2d(iip1,jjp1,ps,'PS    ')
-  !     call dump2d(iip1,jjp1,psu,'PS    ')
-  !     call dump2d(iip1,jjm,psv,'PS    ')
   !  Inversion Nord/Sud
   do l=1,llm
      do j=1,jjp1

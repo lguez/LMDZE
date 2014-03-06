@@ -17,7 +17,7 @@ CONTAINS
     USE comgeom, ONLY: aire, rlatu, rlonv
     USE conf_gcm_m, ONLY: day_step, iperiod
     use conf_guide_m, only: conf_guide, guide_u, guide_v, guide_t, guide_q, &
-         guide_p, ncep, ini_anal, tau_min_u, tau_max_u, tau_min_v, tau_max_v, &
+         ncep, ini_anal, tau_min_u, tau_max_u, tau_min_v, tau_max_v, &
          tau_min_t, tau_max_t, tau_min_q, tau_max_q, tau_min_p, tau_max_p, &
          online
     USE dimens_m, ONLY: jjm, llm
@@ -40,7 +40,7 @@ CONTAINS
     REAL, intent(inout):: teta(ip1jmp1, llm) ! temperature potentielle 
     REAL q(ip1jmp1, llm) ! temperature potentielle 
     REAL, intent(out):: masse(ip1jmp1, llm) ! masse d'air
-    REAL, intent(inout):: ps(ip1jmp1) ! pression au sol
+    REAL, intent(in):: ps(ip1jmp1) ! pression au sol
 
     ! Local:
 
@@ -48,12 +48,10 @@ CONTAINS
     REAL, save:: ucovrea1(ip1jmp1, llm), vcovrea1(ip1jm, llm) !vts cov reas
     REAL, save:: tetarea1(ip1jmp1, llm) ! temp pot reales
     REAL, save:: qrea1(ip1jmp1, llm) ! temp pot reales
-    REAL, save:: psrea1(ip1jmp1) ! ps
     REAL, save:: ucovrea2(ip1jmp1, llm), vcovrea2(ip1jm, llm) !vts cov reas
     REAL, save:: tetarea2(ip1jmp1, llm) ! temp pot reales
     REAL, save:: qrea2(ip1jmp1, llm) ! temp pot reales
     REAL, save:: masserea2(ip1jmp1, llm) ! masse
-    REAL, save:: psrea2(ip1jmp1) ! ps
 
     REAL, save:: alpha_q(ip1jmp1)
     REAL, save:: alpha_t(ip1jmp1), alpha_p(ip1jmp1)
@@ -185,7 +183,7 @@ CONTAINS
        rcod = nf90_close(ncidpl)
        ! Lecture du premier etat des reanalyses.
        CALL read_reanalyse(1, ps, ucovrea2, vcovrea2, tetarea2, qrea2, &
-            masserea2, psrea2, 1, nlev)
+            masserea2, 1, nlev)
        qrea2(:, :) = max(qrea2(:, :), 0.1)
 
        ! Debut de l'integration temporelle:
@@ -215,7 +213,7 @@ CONTAINS
           step_rea = step_rea + 1
           itau_test = itau
           CALL read_reanalyse(step_rea, ps, ucovrea2, vcovrea2, tetarea2, &
-               qrea2, masserea2, psrea2, 1, nlev)
+               qrea2, masserea2, 1, nlev)
           qrea2(:, :) = max(qrea2(:, :), 0.1)
           factt = dtvr*iperiod/daysec
           ztau(:) = factt/max(alpha_t(:), 1.E-10)
@@ -270,18 +268,6 @@ CONTAINS
        END DO
     END IF
 
-    ! P
-    IF (guide_p) THEN
-       DO ij = 1, ip1jmp1
-          a = (1.-tau)*psrea1(ij) + tau*psrea2(ij)
-          ps(ij) = (1.-alpha_p(ij))*ps(ij) + alpha_p(ij)*a
-          IF (first .AND. ini_anal) ps(ij) = a
-       END DO
-       forall (l = 1: llm + 1) p(:, l) = ap(l) + bp(l) * ps
-       CALL massdair(p, masse)
-    END IF
-
-    ! q
     IF (guide_q) THEN
        DO l = 1, llm
           DO ij = 1, ip1jmp1

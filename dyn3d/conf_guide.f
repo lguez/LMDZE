@@ -19,7 +19,6 @@ module conf_guide_m
   LOGICAL:: guide_u = .true. ! guidage de u
   LOGICAL:: guide_v = .true. ! gvidage de v
   LOGICAL:: guide_t = .true. ! guidage de T
-  LOGICAL:: guide_p = .true. ! guidage de p
   LOGICAL:: guide_q = .true. ! guidage de q
   INTEGER:: online = 1 ! Index de controle du guide
 
@@ -38,8 +37,8 @@ contains
     use unit_nml_m, only: unit_nml
 
     namelist /conf_guide_nml/ ncep, ini_anal, guide_u, guide_v, guide_t, &
-         guide_p, online, tau_min_u, tau_max_u, tau_min_v, tau_max_v, &
-         tau_min_t, tau_max_t, tau_min_q, tau_max_q, tau_min_p, tau_max_p, &
+         online, tau_min_u, tau_max_u, tau_min_v, tau_max_v, tau_min_t, &
+         tau_max_t, tau_min_q, tau_max_q, tau_min_p, tau_max_p, &
          lat_min_guide, lat_max_guide
 
     !-----------------------------------------------------------------------

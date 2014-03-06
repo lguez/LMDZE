@@ -1,5 +1,4 @@
-      subroutine read_reanalyse(timestep,psi &
-         ,u,v,t,q,masse,ps,mode,nlevnc)
+      subroutine read_reanalyse(timestep,psi,u,v,t,q,masse,mode,nlevnc)
 
 !
 ! $Header: /home/cvsroot/LMDZ4/libf/dyn3d/read_reanalyse.F,v 1.3 2005/04/15 12:31:21 lmdzadmin Exp $
@@ -31,7 +30,7 @@
 
       real, intent(in):: psi(iip1,jjp1)
       real u(iip1,jjp1,llm),v(iip1,jjm,llm)
-      real t(iip1,jjp1,llm),ps(iip1,jjp1),q(iip1,jjp1,llm)
+      real t(iip1,jjp1,llm),q(iip1,jjp1,llm)
       real masse(iip1,jjp1,llm),pk(iip1,jjp1,llm)
 
 
@@ -98,13 +97,6 @@
             if (ncidpl.eq.-99) ncidpl=ncidQ
             endif
 
-! Pression de surface
-            if (guide_P) then
-            rcode=nf90_open('ps.nc',nf90_nowrite,ncidps)
-            rcode = nf90_inq_varid(ncidps, 'SP', varidps)
-            print*,'ncidps,varidps',ncidps,varidps
-            endif
-
 ! Coordonnee verticale
             if (ncep) then
                print*,'Vous etes entrain de lire des donnees NCEP'
@@ -130,7 +122,7 @@
       endif
 
 ! -----------------------------------------------------------------
-!   lecture des champs u, v, T, ps
+!   lecture des champs u, v, T
 ! -----------------------------------------------------------------
 
 !  dimensions pour les champs scalaires et le vent zonal
@@ -204,22 +196,9 @@
       count(3)=1
       count(4)=0
 
-!  Pression de surface
-!  -------------------
-
-      if (guide_P) then
-      status=NF90_GET_VAR(ncidps,varidps,psnc,start,count)
-      call dump2d(iip1,jjp1,psnc,'PSNC COUCHE 1 ')
-      call correctbid(iim,jjp1,psnc)
-      endif
-
-
-
-! -----------------------------------------------------------------
 !  Interpollation verticale sur les niveaux modele
 ! -----------------------------------------------------------------
-      call reanalyse2nat(nlevnc,psi,unc,vnc,tnc,Qnc,psnc,pl,u,v,t,Q &
-          ,ps,masse,pk)
+      call reanalyse2nat(nlevnc,psi,unc,vnc,tnc,Qnc,psnc,pl,u,v,t,Q,masse,pk)
 
       call dump2d(iip1,jjm,v,'V COUCHE APRES ')
 

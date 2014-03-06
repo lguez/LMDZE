@@ -146,6 +146,9 @@ contains
 
     call NF95_INQ_VARID (ncid, "ps", varid)
     call NF95_GET_VAR(ncid, varid, ps)
+    ! Check that there is a single value at each pole:
+    call assert(ps(1, 1) == ps(2:, 1), "dynetat0 ps north pole")
+    call assert(ps(1, jjm + 1) == ps(2:, jjm + 1), "dynetat0 ps south pole")
 
     call NF95_CLOSE(ncid)
 
