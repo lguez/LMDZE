@@ -58,7 +58,7 @@ SUBROUTINE initfluxsto(tstep, t_ops, t_wrt, nq, fileid, filevid, filedid)
   INTEGER iq
   REAL rlong(iip1, jjp1), rlat(iip1, jjp1)
   INTEGER uhoriid, vhoriid, thoriid, zvertiid, dhoriid, dvertiid
-  INTEGER ii, jj
+  INTEGER ii, jj, l
   INTEGER zan, idayref
   LOGICAL ok_sync
 
@@ -116,11 +116,11 @@ SUBROUTINE initfluxsto(tstep, t_ops, t_wrt, nq, fileid, filevid, filedid)
 
   !  Appel a histvert pour la grille verticale                            
 
-  CALL histvert(fileid, 'sig_s', 'Niveaux sigma', 'sigma_level', nivsigs, &
-       zvertiid)
+  CALL histvert(fileid, 'sig_s', 'Niveaux sigma', 'sigma_level', &
+       (/(real(l), l = 1, llm)/), zvertiid)
   ! Pour le fichier V                                                     
-  CALL histvert(filevid, 'sig_s', 'Niveaux sigma', 'sigma_level', nivsigs, &
-       zvertiid)
+  CALL histvert(filevid, 'sig_s', 'Niveaux sigma', 'sigma_level', &
+       (/(real(l), l = 1, llm)/), zvertiid)
   ! pour le fichier def                                                   
   nivd(1) = 1
   CALL histvert(filedid, 'sig_s', 'Niveaux sigma', 'sigma_level', nivd, &

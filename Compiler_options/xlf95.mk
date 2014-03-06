@@ -24,8 +24,7 @@ perf_flags = -qdbg -qfloat=nans -qfloat=nomaf:rndsngl:nofold -qflttrap=overflow:
 # "-qcheck -qextchk" give an error in module "mathelp", procedure
 # "trans_buff", for a "gcm" run.
 
-FFLAGS = ${inc_flags} -qfixed ${perf_flags}
-F90FLAGS = ${inc_flags} ${lang_flags} ${perf_flags}
+FFLAGS = ${inc_flags} ${lang_flags} ${perf_flags}
 
 LDFLAGS = 
 ##-O3 -bnoquiet

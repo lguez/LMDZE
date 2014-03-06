@@ -34,7 +34,7 @@ contains
 
     REAL vcov(ip1jm, llm), ucov(ip1jmp1, llm) 
     REAL teta(ip1jmp1, llm), phi(ip1jmp1, llm) 
-    REAL ps(ip1jmp1), masse(ip1jmp1, llm) 
+    REAL, intent(in):: ps(ip1jmp1), masse(ip1jmp1, llm) 
     REAL q(ip1jmp1, llm, nqmx)
     integer time
 

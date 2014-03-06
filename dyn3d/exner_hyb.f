@@ -59,11 +59,10 @@ contains
             / (p(:, :, l) * unpl2k + p(:, :, l+1) * (beta(:, :, l+1) - unpl2k))
     ENDDO
 
-    pk(:, :, 1) = p(:, :, 1) * pks  &
-         / (p(:, :, 1) * (1. + kappa) &
-         + 0.5 * (beta(:, :, 2) - unpl2k) * p(:, :, 2))
+    pk(:, :, 1) = ps * pks &
+         / (ps * (1. + kappa) + 0.5 * (beta(:, :, 2) - unpl2k) * p(:, :, 2))
     DO l = 2, llm
-       pk(:, :, l) = beta(:, :, l) * pk(:, :, l-1)
+       pk(:, :, l) = beta(:, :, l) * pk(:, :, l - 1)
     ENDDO
 
     if (present(pkf)) then

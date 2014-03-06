@@ -20,7 +20,6 @@ lang_flags = -ffree-form -pedantic -std=f95 -Wall -Wextra -Wno=136,163,165
 # Flags which affect run time performance:
 perf_flags = -fbounds-check -freal=nan -ftrace=full -g -O0
 
-FFLAGS = ${inc_flags} ${perf_flags}
-F90FLAGS = ${inc_flags} ${lang_flags} ${perf_flags}
+FFLAGS = ${inc_flags} ${lang_flags} ${perf_flags}
 
 LDLIBS = $(addprefix -L, ${netcdf_lib_dir} ${numer_rec_dir} ${netcdf95_dir} ${nr_util_dir}) -lnetcdf95 -lnetcdff -lnetcdf -lnumer_rec -lnr_util

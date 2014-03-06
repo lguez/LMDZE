@@ -8,9 +8,8 @@
 FFLAGS = $(addprefix -I, ${HOME}/include ${HOME}/lib/Numer_Rec_95 ${HOME}/lib/NR_util ${HOME}/lib/NetCDF95 ${HOME}/lib/Jumble)
 
 # NAG general options:
-FFLAGS += -dusty -mismatch_all
+FFLAGS += -dusty -mismatch_all -free
 
-F90FLAGS = ${FFLAGS}
 nag_fcalls_options = -calledby -lines -locate -class ${FFLAGS}
 nag_cross_options = -key ${FFLAGS}
 version_flag = -v

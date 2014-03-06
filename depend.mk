@@ -50,7 +50,7 @@ comgeomphy.o : dimphy.o
 concvl.o : yoethf.o suphec.o FCTTRE.o dimphy.o dimens_m.o cv_driver.o clesphys2.o 
 condsurf.o : clesphys2.o temps.o dimphy.o indicesol.o dimens_m.o 
 conema3.o : FCTTRE.o yoethf.o conema3_m.o suphec.o dimphy.o dimens_m.o 
-conf_guide.o : tau2alpha.o getparam.o 
+conf_guide.o : unit_nml_m.o 
 conflx.o : FCTTRE.o yoethf.o suphec.o dimphy.o flxmain.o 
 conf_phys.o : YOMCST.o unit_nml_m.o conema3_m.o comfisrtilp.o clesphys2.o clesphys.o 
 convect3.o : suphec.o dimphy.o dimens_m.o 
@@ -114,9 +114,6 @@ flxini.o : suphec.o flxadjtq.o dimphy.o
 flxmain.o : yoethf.o YOECUMF.o suphec.o flxini.o flxflux.o flxdtdq.o flxdlfs.o flxddraf.o flxbase.o flxasc.o dimphy.o 
 fonte_neige.o : interface_surf.o FCTTRE.o yoethf.o suphec.o indicesol.o 
 gcm.o : yoethf.o unit_nml_m.o tracstoke.o temps.o suphec.o leapfrog.o init_dynzon.o inithist.o initdynav.o inifilr.o inidissip.o iniadvtrac.o histclo.o grid_change.o dynredem0.o dynetat0.o disvert.o dimphy.o dimens_m.o conf_gcm.o comgeomphy.o comgeom.o comconst.o calendar.o 
-getincom2.o : cmpblank.o nocomma.o strlowercase.o find_sig.o gensig.o 
-getincom.o : getincom2.o find_sig.o gensig.o 
-getparam.o : getincom.o 
 getso4fromfile.o : dimphy.o dimens_m.o 
 grad.o : paramet_m.o dimens_m.o 
 gradiv2.o : laplacien.o grad.o filtreg.o divergf.o dimens_m.o comgeom.o 
@@ -146,7 +143,7 @@ ini_histhf3d.o : disvert.o histvert.o histend.o histdef.o histbeg_totreg.o calen
 ini_histhf.o : ini_histhf3d.o disvert.o phyetat0.o histvert.o histend.o histbeg_totreg.o calendar.o dimphy.o temps.o dimens_m.o 
 ini_histins.o : disvert.o phyetat0.o histvert.o histend.o histdef.o histbeg_totreg.o calendar.o indicesol.o clesphys.o temps.o dimphy.o dimens_m.o 
 ini_histrac.o : disvert.o phyetat0.o grid_change.o clesphys.o dimphy.o iniadvtrac.o temps.o histvert.o histend.o histdef.o histbeg_totreg.o calendar.o dimens_m.o 
-initdynav.o : temps.o paramet_m.o iniadvtrac.o histvert.o histend.o histdef.o histbeg_totreg.o disvert.o dimens_m.o comgeom.o calendar.o 
+initdynav.o : temps.o paramet_m.o iniadvtrac.o histvert.o histend.o histdef.o histbeg_totreg.o dimens_m.o comgeom.o calendar.o 
 init_dynzon.o : temps.o comgeom.o disvert.o dimens_m.o calendar.o histvert.o histend.o histdef.o histbeg_totreg.o conf_gcm.o 
 initfluxsto.o : ener.o temps.o serre.o comgeom.o conf_gcm.o disvert.o comconst.o paramet_m.o dimens_m.o histvert.o histsync.o histhori_regular.o histend.o histdef.o histbeg_totreg.o calendar.o 
 inithist.o : iniadvtrac.o temps.o comgeom.o disvert.o paramet_m.o dimens_m.o histvert.o histend.o histdef.o histbeg_totreg.o com_io_dyn.o calendar.o 
@@ -233,7 +230,7 @@ swr.o : radopt.o radepsi.o raddim.o dimphy.o dimens_m.o
 swtt1.o : raddim.o dimphy.o dimens_m.o 
 swtt.o : raddim.o dimphy.o dimens_m.o 
 swu.o : radopt.o radepsi.o raddim.o suphec.o clesphys.o dimphy.o dimens_m.o 
-tau2alpha.o : serre.o comgeom.o dimens_m.o paramet_m.o 
+tau2alpha.o : serre.o comgeom.o conf_guide.o dimens_m.o paramet_m.o 
 tetalevel.o : dimphy.o paramet_m.o dimens_m.o 
 thermcell.o : suphec.o dimphy.o 
 tlift.o : suphec.o 

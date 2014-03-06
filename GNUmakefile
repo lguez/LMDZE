@@ -15,11 +15,9 @@ sources = ${src_ce0l_only} ${src_gcm_only} ${common_sources}
 
 # 2. Objects and executable files
 
-obj_ce0l := $(addsuffix .o, $(sort $(basename ${common_sources} ${src_ce0l_only})))
-
-obj_gcm := $(addsuffix .o, $(sort $(basename ${common_sources} ${src_gcm_only})))
-
-objects := $(addsuffix .o, $(basename ${sources}))
+obj_ce0l := $(sort ${common_sources:.f=.o} ${src_ce0l_only:.f=.o})
+obj_gcm := $(sort ${common_sources:.f=.o} ${src_gcm_only:.f=.o})
+objects := $(sources:.f=.o)
 execut = ce0l gcm
 
 # 3. Compiler-dependent part

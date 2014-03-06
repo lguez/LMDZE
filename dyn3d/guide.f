@@ -13,32 +13,36 @@ CONTAINS
 
     ! Author: F.Hourdin
 
-    USE comconst, ONLY : cpp, daysec, dtvr, kappa
-    USE comgeom, ONLY : aire, rlatu, rlonv
-    USE conf_gcm_m, ONLY : day_step, iperiod
+    USE comconst, ONLY: cpp, daysec, dtvr, kappa
+    USE comgeom, ONLY: aire, rlatu, rlonv
+    USE conf_gcm_m, ONLY: day_step, iperiod
     use conf_guide_m, only: conf_guide, guide_u, guide_v, guide_t, guide_q, &
          guide_p, ncep, ini_anal, tau_min_u, tau_max_u, tau_min_v, tau_max_v, &
          tau_min_t, tau_max_t, tau_min_q, tau_max_q, tau_min_p, tau_max_p, &
          online
-    USE dimens_m, ONLY : jjm, llm
-    USE disvert_m, ONLY : ap, bp, preff, presnivs
-    USE exner_hyb_m, ONLY : exner_hyb
-    USE inigrads_m, ONLY : inigrads
+    USE dimens_m, ONLY: jjm, llm
+    USE disvert_m, ONLY: ap, bp, preff, presnivs
+    USE exner_hyb_m, ONLY: exner_hyb
+    USE inigrads_m, ONLY: inigrads
     use massdair_m, only: massdair
     use netcdf, only: nf90_nowrite, nf90_open, nf90_close, nf90_inq_dimid, &
          nf90_inquire_dimension
     use nr_util, only: pi
-    USE paramet_m, ONLY : iip1, ip1jm, ip1jmp1, jjp1, llmp1
-    USE q_sat_m, ONLY : q_sat
-    USE serre, ONLY : clat, clon
+    USE paramet_m, ONLY: iip1, ip1jm, ip1jmp1, jjp1, llmp1
+    USE q_sat_m, ONLY: q_sat
+    USE serre, ONLY: clat, clon
     use tau2alpha_m, only: tau2alpha, dxdys
 
+    INTEGER, INTENT(IN):: itau
+
     ! variables dynamiques
-    REAL vcov(ip1jm, llm), ucov(ip1jmp1, llm) ! vents covariants
+    REAL ucov(ip1jmp1, llm), vcov(ip1jm, llm) ! vents covariants
     REAL, intent(inout):: teta(ip1jmp1, llm) ! temperature potentielle 
     REAL q(ip1jmp1, llm) ! temperature potentielle 
-    REAL ps(ip1jmp1) ! pression au sol
     REAL, intent(out):: masse(ip1jmp1, llm) ! masse d'air
+    REAL, intent(inout):: ps(ip1jmp1) ! pression au sol
+
+    ! Local:
 
     ! variables dynamiques pour les reanalyses.
     REAL, save:: ucovrea1(ip1jmp1, llm), vcovrea1(ip1jm, llm) !vts cov reas
@@ -61,7 +65,6 @@ CONTAINS
     INTEGER ilon, ilat
     REAL factt, ztau(ip1jmp1)
 
-    INTEGER, INTENT(IN):: itau
     INTEGER ij, l
     INTEGER ncidpl, varidpl, status
     INTEGER rcod, rid

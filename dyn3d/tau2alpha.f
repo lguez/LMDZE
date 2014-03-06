@@ -7,13 +7,13 @@ module tau2alpha_m
 
     private iip1, jjp1, jjm
 
-    REAL lat_min_guide, lat_max_guide
     REAL dxdys(iip1, jjp1), dxdyu(iip1, jjp1), dxdyv(iip1, jjm)
 
 contains
 
   SUBROUTINE tau2alpha(type, pim, pjm, factt, taumin, taumax, alpha)
 
+    use conf_guide_m, only: lat_min_guide, lat_max_guide
     USE dimens_m, ONLY : iim
     USE nr_util, ONLY : pi
     USE comgeom, ONLY : cu_2d, cv_2d, rlatu, rlatv

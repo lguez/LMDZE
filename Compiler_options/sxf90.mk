@@ -21,8 +21,7 @@ perf_flags = -Cdebug -eP -eR -Pstack -Wf "-init heap=nan -init stack=nan -K a -M
 
 # "-M flunf" produces an error in "jacobi"
 
-FFLAGS = ${inc_flags} ${perf_flags}
-F90FLAGS = ${inc_flags} ${lang_flags} ${perf_flags}
+FFLAGS = ${inc_flags} ${lang_flags} ${perf_flags}
 
 LDFLAGS = -Wl "-f nan"
 # "-Wl,-f nan" requires "-Wf,-K a"

@@ -32,7 +32,6 @@ clqh.f
 cltrac.f
 cltracrn.f
 clvent.f
-cmpblank.f
 coefcdrag.f
 coefkz2.f
 coefkz.f
@@ -103,7 +102,6 @@ dump2d.f
 dvthermcell2.f
 dynetat0.f
 FCTTRE.f
-find_sig.f
 find_str.f
 fisrtilp.f
 fluxstokenc.f
@@ -120,10 +118,6 @@ fonte_neige.f
 formcoord.f
 gath_cpl.f
 gcm.f
-gensig.f
-getincom2.f
-getincom.f
-getparam.f
 getso4fromfile.f
 grad.f
 gradiv2.f
@@ -202,7 +196,6 @@ minmaxqfi.f
 nat2gcm.f
 newmicro.f
 nflxtr.f
-nocomma.f
 nuage.f
 nxgrad.f
 nxgrad_gam.f

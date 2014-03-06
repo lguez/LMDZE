@@ -6,13 +6,13 @@ module disvert_m
 
   private llm
 
-  real ap(llm+1), pa ! in Pa
-  real bp(llm+1)
-  real presnivs(llm) ! pressions approximatives des milieux de couches, en Pa
-  real, parameter:: preff = 101325. ! in Pa
-  real nivsigs(llm), nivsig(llm+1)
+  real, save:: ap(llm+1), pa ! in Pa
+  real, save:: bp(llm+1)
 
-  save
+  real, save:: presnivs(llm)
+  ! pressions approximatives des milieux de couches, en Pa
+
+  real, parameter:: preff = 101325. ! in Pa
 
 contains
 
@@ -22,8 +22,8 @@ contains
     ! Author: P. Le Van
 
     ! This procedure sets the vertical grid. It defines the host
-    ! variables "ap", "bp", "presnivs", "nivsigs" and "nivsig". "pa"
-    ! should be defined before this procedure is called.
+    ! variables "ap", "bp", "presnivs". "pa" should be defined before
+    ! this procedure is called.
 
     use jumble, only: new_unit
     use nr_util, only: pi, assert
@@ -58,9 +58,6 @@ contains
     !-----------------------------------------------------------------------
 
     print *, "Call sequence information: disvert"
-
-    forall (l = 1: llm) nivsigs(l) = REAL(l)
-    forall (l = 1: llm + 1) nivsig(l) = REAL(l)
 
     print *, "Enter namelist 'disvert_nml'."
     read(unit=*, nml=disvert_nml)

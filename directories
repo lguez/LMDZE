@@ -6,7 +6,6 @@ dyn3d/Vlsplt
 filtrez
 IOIPSL
 IOIPSL/Histcom
-IOIPSL/Stringop
 phylmd
 phylmd/Conflx
 phylmd/CV3_routines

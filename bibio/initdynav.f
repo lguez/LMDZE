@@ -17,7 +17,6 @@ contains
     use calendar, ONLY: ymds2ju
     USE comgeom, ONLY: rlatu, rlonv
     USE dimens_m, ONLY: llm
-    USE disvert_m, ONLY: nivsigs
     USE histbeg_totreg_m, ONLY: histbeg_totreg
     USE histdef_m, ONLY: histdef
     USE histend_m, ONLY: histend
@@ -36,7 +35,7 @@ contains
     ! Variables locales
     integer horiid, zvertiid
     real julian
-    integer iq, ii, jj
+    integer iq, ii, jj, l
 
     !----------------------------------------------------
 
@@ -46,7 +45,8 @@ contains
     call histbeg_totreg('dyn_hist_ave.nc', rlonv * 180. / pi, &
          rlatu * 180. / pi, 1, iip1, 1, jjp1, itau_dyn, julian, tstep, &
          horiid, histaveid)
-    call histvert(histaveid, 'sigss', 'Niveaux sigma', 'Pa', nivsigs, zvertiid)
+    call histvert(histaveid, 'sigss', 'Niveaux sigma', '', &
+         (/(real(l), l = 1, llm)/), zvertiid)
 
     call histdef(histaveid, 'u', 'vents u scalaires moyennes', 'm/s', iip1, &
          jjp1, horiid, llm, 1, llm, zvertiid, 'ave(X)', t_ops, t_wrt)

@@ -29,7 +29,6 @@ FFLAGS += -Mstandard -Mallocatable=95 -Mbackslash -Mdefaultunit -Mrecursive
 # Target-specific Options:
 FFLAGS += -Kieee -Ktrap=fp
 
-F90FLAGS = ${FFLAGS}
 LDFLAGS = -g
 
 LDLIBS = $(addprefix -L, ${netcdf_lib_dir} ${numer_rec_95_dir} ${netcdf95_dir} ${nr_util_dir} ${jumble_dir}) -ljumble -lnetcdf95 -lnetcdf -lnumer_rec_95 -lnr_util

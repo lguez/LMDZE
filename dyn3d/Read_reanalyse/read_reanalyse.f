@@ -29,7 +29,7 @@
       integer nlevnc
       integer timestep,mode,l
 
-      real psi(iip1,jjp1)
+      real, intent(in):: psi(iip1,jjp1)
       real u(iip1,jjp1,llm),v(iip1,jjm,llm)
       real t(iip1,jjp1,llm),ps(iip1,jjp1),q(iip1,jjp1,llm)
       real masse(iip1,jjp1,llm),pk(iip1,jjp1,llm)

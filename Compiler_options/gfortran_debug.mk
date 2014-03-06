@@ -27,8 +27,6 @@ FFLAGS += -fcheck=bounds -fcheck=do -fcheck=mem -fcheck=pointer -fcheck=recursio
 # Optimization options:
 FFLAGS += -O0
 
-F90FLAGS = ${FFLAGS}
-
 LDLIBS = $(addprefix -L, ${netcdf_lib_dir} ${numer_rec_95_dir} ${netcdf95_dir} ${nr_util_dir} ${jumble_dir}) -ljumble -lnetcdf95 -lnetcdff -lnetcdf -lnumer_rec_95 -lnr_util
 
 version_flag = --version

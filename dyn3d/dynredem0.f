@@ -10,7 +10,7 @@ CONTAINS
     ! Ecriture du fichier de redémarrage au format NetCDF (initialisation)
 
     USE comconst, ONLY: cpp, daysec, dtvr, g, kappa, omeg, rad
-    USE disvert_m, ONLY: ap, bp, nivsig, nivsigs, pa, preff, presnivs
+    USE disvert_m, ONLY: ap, bp, pa, preff, presnivs
     USE comgeom, ONLY: aire_2d, cu_2d, cv_2d, rlatu, rlatv, rlonu, rlonv
     USE dimens_m, ONLY: iim, jjm, llm, nqmx
     USE ener, ONLY: ang0, etot0, ptot0, stot0, ztot0
@@ -135,13 +135,6 @@ CONTAINS
     CALL nf95_def_var(ncid, 'rlatv', nf90_float, idim_rlatv, varid)
     CALL nf95_put_att(ncid, varid, 'title', 'Latitudes des points V')
 
-    CALL nf95_def_var(ncid, 'nivsigs', nf90_float, idim_s, varid)
-    CALL nf95_put_att(ncid, varid, 'title', 'Numero naturel des couches s')
-
-    CALL nf95_def_var(ncid, 'nivsig', nf90_float, idim_sig, varid)
-    CALL nf95_put_att(ncid, varid, 'title', &
-         'Numero naturel des couches sigma')
-
     CALL nf95_def_var(ncid, 'ap', nf90_float, idim_sig, varid)
     CALL nf95_put_att(ncid, varid, 'title', 'Coefficient A pour hybride')
 
@@ -220,12 +213,6 @@ CONTAINS
 
     CALL nf95_inq_varid(ncid, 'rlatv', varid)
     CALL nf95_put_var(ncid, varid, rlatv)
-
-    CALL nf95_inq_varid(ncid, 'nivsigs', varid)
-    CALL nf95_put_var(ncid, varid, nivsigs)
-
-    CALL nf95_inq_varid(ncid, 'nivsig', varid)
-    CALL nf95_put_var(ncid, varid, nivsig)
 
     CALL nf95_inq_varid(ncid, 'ap', varid)
     CALL nf95_put_var(ncid, varid, ap)
