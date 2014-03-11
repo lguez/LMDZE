@@ -6,7 +6,7 @@ contains
 
   SUBROUTINE exner_hyb(ps, p, pks, pk, pkf)
 
-    ! From dyn3d/exner_hyb.F, version 1.1.1.1 2004/05/19 12:53:07
+    ! From dyn3d/exner_hyb.F, version 1.1.1.1, 2004/05/19 12:53:07
     ! Authors: P. Le Van, F. Hourdin
 
     ! Calcule la fonction d'Exner :

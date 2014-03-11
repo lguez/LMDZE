@@ -20,7 +20,7 @@ CONTAINS
          ncep, ini_anal, tau_min_u, tau_max_u, tau_min_v, tau_max_v, &
          tau_min_t, tau_max_t, tau_min_q, tau_max_q, tau_min_p, tau_max_p, &
          online
-    USE dimens_m, ONLY: jjm, llm
+    USE dimens_m, ONLY: iim, jjm, llm
     USE disvert_m, ONLY: ap, bp, preff, presnivs
     USE exner_hyb_m, ONLY: exner_hyb
     USE inigrads_m, ONLY: inigrads
@@ -30,6 +30,7 @@ CONTAINS
     use nr_util, only: pi
     USE paramet_m, ONLY: iip1, ip1jm, ip1jmp1, jjp1, llmp1
     USE q_sat_m, ONLY: q_sat
+    use read_reanalyse_m, only: read_reanalyse
     USE serre, ONLY: clat, clon
     use tau2alpha_m, only: tau2alpha, dxdys
 
@@ -40,7 +41,7 @@ CONTAINS
     REAL, intent(inout):: teta(ip1jmp1, llm) ! temperature potentielle 
     REAL q(ip1jmp1, llm) ! temperature potentielle 
     REAL, intent(out):: masse(ip1jmp1, llm) ! masse d'air
-    REAL, intent(in):: ps(ip1jmp1) ! pression au sol
+    REAL, intent(in):: ps(:, :) ! (iim + 1, jjm + 1) pression au sol
 
     ! Local:
 
@@ -70,7 +71,7 @@ CONTAINS
     INTEGER, SAVE:: nlev
 
     ! TEST SUR QSAT
-    REAL p(ip1jmp1, llmp1), pk(ip1jmp1, llm), pks(ip1jmp1)
+    REAL p(iim + 1, jjm + 1, llmp1), pk(ip1jmp1, llm), pks(ip1jmp1)
     REAL pkf(ip1jmp1, llm)
     REAL pres(ip1jmp1, llm)
 
@@ -89,7 +90,7 @@ CONTAINS
 
     ! calcul de l'humidite saturante
 
-    forall (l = 1: llm + 1) p(:, l) = ap(l) + bp(l) * ps
+    forall (l = 1: llm + 1) p(:, :, l) = ap(l) + bp(l) * ps
     CALL massdair(p, masse)
     CALL exner_hyb(ps, p, pks, pk, pkf)
     tnat(:, :) = pk(:, :)*teta(:, :)/cpp
@@ -183,7 +184,7 @@ CONTAINS
        rcod = nf90_close(ncidpl)
        ! Lecture du premier etat des reanalyses.
        CALL read_reanalyse(1, ps, ucovrea2, vcovrea2, tetarea2, qrea2, &
-            masserea2, 1, nlev)
+            masserea2, nlev)
        qrea2(:, :) = max(qrea2(:, :), 0.1)
 
        ! Debut de l'integration temporelle:
@@ -213,7 +214,7 @@ CONTAINS
           step_rea = step_rea + 1
           itau_test = itau
           CALL read_reanalyse(step_rea, ps, ucovrea2, vcovrea2, tetarea2, &
-               qrea2, masserea2, 1, nlev)
+               qrea2, masserea2, nlev)
           qrea2(:, :) = max(qrea2(:, :), 0.1)
           factt = dtvr*iperiod/daysec
           ztau(:) = factt/max(alpha_t(:), 1.E-10)

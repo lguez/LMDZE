@@ -6,7 +6,7 @@ contains
 
   SUBROUTINE advect(ucov, vcov, teta, w, massebx, masseby, du, dv, dteta)
 
-    ! From dyn3d/advect.F, version 1.1.1.1 2004/05/19 12:53:06
+    ! From dyn3d/advect.F, version 1.1.1.1, 2004/05/19 12:53:06
     ! Authors: P. Le Van , F. Hourdin
     ! Objet : calcul des termes d'advection verticale pour u, v, teta.
     ! Ces termes sont ajoutés à du, dv, dteta.
@@ -16,12 +16,11 @@ contains
     USE comconst, ONLY : daysec
     USE comgeom, ONLY : unsaire
 
-    ! Arguments:
-    REAL, intent(in):: vcov(ip1jm, llm), ucov(ip1jmp1, llm)
+    REAL, intent(in):: ucov(ip1jmp1, llm), vcov(ip1jm, llm)
     real, intent(in):: teta(ip1jmp1, llm)
-    REAL, intent(in):: massebx(ip1jmp1, llm), masseby(ip1jm, llm)
     real, INTENT (IN):: w(ip1jmp1, llm)
-    REAL, intent(inout):: dv(ip1jm, llm), du(ip1jmp1, llm), dteta(ip1jmp1, llm)
+    REAL, intent(in):: massebx(ip1jmp1, llm), masseby(ip1jm, llm)
+    REAL, intent(inout):: du(ip1jmp1, llm), dv(ip1jm, llm), dteta(ip1jmp1, llm)
 
     ! Local:
     REAL uav(ip1jmp1, llm), vav(ip1jm, llm), wsur2(ip1jmp1)
@@ -78,7 +77,6 @@ contains
 
        ! correction pour du(iip1, j, l)
        ! du(iip1, j, l)= du(1, j, l)
-
        DO ij = iip1 + iip1, ip1jm, iip1
           du(ij, l) = du(ij-iim, l)
           du(ij, l+1) = du(ij-iim, l+1)

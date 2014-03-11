@@ -40,6 +40,7 @@ contains
     use nr_util, only: pi
     use physiq_m, only: physiq
     use pressure_var, only: p3d, pls
+    use pvtheta_m, only: pvtheta
 
     ! Arguments :
 
@@ -101,8 +102,8 @@ contains
     REAL z1(iim)
     REAL pksurcp(iim + 1, jjm + 1)
 
-    ! I. Musat: diagnostic PVteta, Amip2
-    INTEGER, PARAMETER:: ntetaSTD=3
+    ! Diagnostic PVteta pour Amip2 :
+    INTEGER, PARAMETER:: ntetaSTD = 3
     REAL:: rtetaSTD(ntetaSTD) = (/350., 380., 405./)
     REAL PVteta(klon, ntetaSTD)
 

@@ -7,14 +7,17 @@ contains
   SUBROUTINE caldyn(itau, ucov, vcov, teta, ps, masse, pk, pkf, phis, phi, &
        dudyn, dv, dteta, dp, w, pbaru, pbarv, time_0, conser)
 
-    ! From dyn3d/caldyn.F, version 1.1.1.1 2004/05/19 12:53:06
-    ! Auteur : P. Le Van
+    ! From dyn3d/caldyn.F, version 1.1.1.1, 2004/05/19 12:53:06
+    ! Author: P. Le Van
     ! Objet : calcul des tendances dynamiques
 
     use advect_m, only: advect
     USE comgeom, ONLY: airesurg, constang_2d
     USE dimens_m, ONLY: iim, jjm, llm
     USE disvert_m, ONLY: ap, bp
+    use dteta1_m, only: dteta1
+    use dudv1_m, only: dudv1
+    use dudv2_m, only: dudv2
     use flumass_m, only: flumass
     use massbarxy_m, only: massbarxy
     use massdair_m, only: massdair
@@ -22,7 +25,6 @@ contains
     use sortvarc_m, only: sortvarc
     use tourpot_m, only: tourpot
 
-    ! Arguments:
     INTEGER, INTENT(IN):: itau
     REAL, INTENT(IN):: ucov(:, :, :) ! (iim + 1, jjm + 1, llm) vent covariant
     REAL, INTENT(IN):: vcov(:, :, :) ! (iim + 1, jjm, llm) ! vent covariant
@@ -30,11 +32,12 @@ contains
     REAL, INTENT (IN):: ps(ip1jmp1)
     real, intent(out):: masse(ip1jmp1, llm)
     REAL, INTENT(IN):: pk(iip1, jjp1, llm)
-    REAL pkf(ip1jmp1, llm)
+    REAL, INTENT(IN):: pkf(ip1jmp1, llm)
     REAL, INTENT(IN):: phis(ip1jmp1)
     REAL, INTENT(IN):: phi(ip1jmp1, llm)
-    REAL dudyn(ip1jmp1, llm), dv((iim + 1) * jjm, llm)
-    REAL dteta(ip1jmp1, llm)
+    REAL dudyn(:, :, :) ! (iim + 1, jjm + 1, llm)
+    real dv((iim + 1) * jjm, llm)
+    REAL, INTENT(out):: dteta(ip1jmp1, llm)
     real, INTENT(out):: dp(ip1jmp1)
     REAL, INTENT(out):: w(ip1jmp1, llm)
     REAL, intent(out):: pbaru(ip1jmp1, llm), pbarv((iim + 1) * jjm, llm)
@@ -42,7 +45,6 @@ contains
     LOGICAL, INTENT(IN):: conser
 
     ! Local:
-
     REAL vcont((iim + 1) * jjm, llm), ucont(ip1jmp1, llm)
     REAL ang(iim + 1, jjm + 1, llm), p(ip1jmp1, llmp1)
     REAL massebx(ip1jmp1, llm), masseby((iim + 1) * jjm, llm)
@@ -50,7 +52,6 @@ contains
     real ecin(ip1jmp1, llm), convm(ip1jmp1, llm)
     REAL bern(ip1jmp1, llm)
     REAL massebxy(iim + 1, jjm, llm)
-
     INTEGER ij, l
 
     !-----------------------------------------------------------------------
@@ -84,7 +85,7 @@ contains
        END DO
     END DO
 
-    ! Sorties eventuelles des variables de controle :
+    ! Sorties éventuelles des variables de contrôle :
     IF (conser) CALL sortvarc(itau, ucov, teta, ps, masse, pk, phis, vorpot, &
          phi, bern, dp, time_0)
 

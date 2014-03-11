@@ -53,7 +53,7 @@ module suphec_m
   real, parameter:: RTT = 273.16
   real, parameter:: RLVTT = 2.5008E+6
   real, parameter:: RLSTT = 2.8345E+6
-  real, parameter:: RATM = 100000.
+  real, parameter:: RATM = 1e5
 
   ! A1.8 Curve of saturation
   REAL RALPW, RBETW, RGAMW, RALPS, RBETS, RGAMS
@@ -140,12 +140,12 @@ contains
     ! 8. DEFINE THERMODYNAMIC CONSTANTS, TRANSITION OF PHASE.
 
     RLMLT = RLSTT-RLVTT
-    print *, 'Thermodynamic, trans. '
+    print *, 'Thermodynamic, transition of phase:'
     print '('' Fusion point = '', E13.7)', RTT
     print '('' RLvTt = '', E13.7)', RLVTT
     print '('' RLsTt = '', E13.7)', RLSTT
     print '('' RLMlt = '', E13.7)', RLMLT
-    print '('' Normal press. = '', E13.7)', RATM
+    print '('' Normal pressure = '', E13.7)', RATM
 
     ! 9. SATURATED VAPOUR PRESSURE.
 

@@ -1,12 +1,12 @@
 module yoethf_m
 
-  ! From phylmd/yoethf.inc,v 1.1.1.1 2004/05/19 12:53:09
+  ! From phylmd/yoethf.inc, version 1.1.1.1 2004/05/19 12:53:09
   ! Derived constants specific to ECMWF thermodynamics
 
   implicit none
 
   ! Constants used for computation of saturation mixing ratio over
-  ! liquid water (r_les) or ice (r_ies):
+  ! liquid water (r.les) or ice (r.ies):
   REAL R2ES, R5LES, R5IES
   real, parameter:: R3LES = 17.269, R3IES = 21.875, R4LES = 35.86, R4IES = 7.66
 

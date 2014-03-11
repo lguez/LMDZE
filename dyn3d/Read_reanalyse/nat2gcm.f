@@ -15,8 +15,6 @@
 
       real u(iip1,jjp1,llm),v(iip1,jjm,llm)
       real t(iip1,jjp1,llm),pk(iip1,jjp1,llm),rh(iip1,jjp1,llm)
-      real ps(iip1,jjp1)
-
       real ucov(iip1,jjp1,llm),vcov(iip1,jjm,llm)
       real teta(iip1,jjp1,llm),q(iip1,jjp1,llm)
 

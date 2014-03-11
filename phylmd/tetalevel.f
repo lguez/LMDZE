@@ -28,12 +28,12 @@ SUBROUTINE tetalevel(ilon, ilev, lnew, pgcm, pres, qgcm, qpres)
   ! arguments :
   ! -----------
 
-  INTEGER ilon, ilev
+  INTEGER, intent(in):: ilon, ilev
   LOGICAL lnew
 
   REAL pgcm(ilon, ilev)
   REAL, INTENT (IN) :: qgcm(ilon, ilev)
-  REAL pres
+  REAL, INTENT (IN) :: pres
   REAL qpres(ilon)
 
   ! local :
@@ -58,7 +58,6 @@ SUBROUTINE tetalevel(ilon, ilev, lnew, pgcm, pres, qgcm, qpres)
     ! Eventuellement, faire l'extrapolation a partir des deux couches
     ! les plus basses ou les deux couches les plus hautes:
     DO i = 1, ilon
-      ! IM      IF ( ABS(pres-pgcm(i,ilev) ) .LT.
       IF (abs(pres-pgcm(i,ilev))>abs(pres-pgcm(i,1))) THEN
         lt(i) = ilev ! 2
         lb(i) = ilev - 1 ! 1
@@ -66,8 +65,6 @@ SUBROUTINE tetalevel(ilon, ilev, lnew, pgcm, pres, qgcm, qpres)
         lt(i) = 2
         lb(i) = 1
       END IF
-      ! IM   PRINT*,'i, ABS(pres-pgcm),ABS(pres-pgcm)',
-      ! IM  .i, ABS(pres-pgcm(i,ilev)),ABS(pres-pgcm(i,1))
     END DO
     DO k = 1, ilev - 1
       DO i = 1, ilon
