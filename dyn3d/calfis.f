@@ -5,7 +5,7 @@ module calfis_m
 contains
 
   SUBROUTINE calfis(rdayvrai, time, ucov, vcov, teta, q, ps, pk, phis, phi, &
-       dudyn, dv, w, dufi, dvfi, dtetafi, dqfi, dpfi, lafin)
+       dudyn, w, dufi, dvfi, dtetafi, dqfi, dpfi, lafin)
 
     ! From dyn3d/calfis.F, version 1.3 2005/05/25 13:10:09
     ! Authors: P. Le Van, F. Hourdin
@@ -40,7 +40,6 @@ contains
     use nr_util, only: pi
     use physiq_m, only: physiq
     use pressure_var, only: p3d, pls
-    use pvtheta_m, only: pvtheta
 
     ! Arguments :
 
@@ -70,7 +69,6 @@ contains
     REAL, intent(in):: phis(iim + 1, jjm + 1)
     REAL, intent(in):: phi(iim + 1, jjm + 1, llm)
     REAL dudyn(iim + 1, jjm + 1, llm)
-    REAL dv(iim + 1, jjm, llm)
     REAL, intent(in):: w(iim + 1, jjm + 1, llm)
 
     REAL, intent(out):: dufi(iim + 1, jjm + 1, llm)
@@ -84,7 +82,7 @@ contains
 
     ! Local variables :
 
-    INTEGER i, j, l, ig0, ig, iq, iiq
+    INTEGER i, j, l, ig0, iq, iiq
     REAL zpsrf(klon)
     REAL paprs(klon, llm+1), play(klon, llm)
     REAL pphi(klon, llm), pphis(klon)
@@ -101,11 +99,6 @@ contains
 
     REAL z1(iim)
     REAL pksurcp(iim + 1, jjm + 1)
-
-    ! Diagnostic PVteta pour Amip2 :
-    INTEGER, PARAMETER:: ntetaSTD = 3
-    REAL:: rtetaSTD(ntetaSTD) = (/350., 380., 405./)
-    REAL PVteta(klon, ntetaSTD)
 
     !-----------------------------------------------------------------------
 
@@ -229,10 +222,6 @@ contains
     ENDDO
 
     forall(l= 1: llm) v(:, l) = pack(zvfi(:, :, l), dyn_phy)
-
-    ! Compute potential vorticity at theta = 350, 380 and 405 K:
-    CALL PVtheta(klon, llm, ucov, vcov, teta, t, play, paprs, ntetaSTD, &
-         rtetaSTD, PVteta)
 
     ! Appel de la physique :
     CALL physiq(lafin, rdayvrai, time, dtphys, paprs, play, pphi, pphis, u, &

@@ -178,7 +178,7 @@ contains
           IF (time > 1.) time = time - 1.
 
           CALL calfis(rdayvrai, time, ucov, vcov, teta, q, ps, pk, phis, phi, &
-               dudyn, dv, w, dufi, dvfi, dtetafi, dqfi, dpfi, &
+               dudyn, w, dufi, dvfi, dtetafi, dqfi, dpfi, &
                lafin = itau + 1 == itaufin)
 
           ! Ajout des tendances physiques:
