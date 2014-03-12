@@ -18,7 +18,7 @@ contains
 
   SUBROUTINE disvert
 
-    ! From dyn3d/disvert.F, v 1.1.1.1 2004/05/19 12:53:05
+    ! From dyn3d/disvert.F, version 1.1.1.1, 2004/05/19 12:53:05
     ! Author: P. Le Van
 
     ! This procedure sets the vertical grid. It defines the host
@@ -36,7 +36,7 @@ contains
     ! the interface between layers "l" and "l-1"
 
     real ds(llm)
-    ! "ds(l)" : épaisseur de la couche "l" dans la coordonnée "s"
+    ! "ds(l)" : \'epaisseur de la couche "l" dans la coordonn\'ee "s"
 
     INTEGER l, unit
     REAL alpha, x(llm)
@@ -48,7 +48,7 @@ contains
     ! used only if vert_sampling == "param"
 
     ! These variables are used only in the case vert_sampling == "param":
-    real:: deltaz = 0.04 ! épaisseur de la première couche
+    real:: deltaz = 0.04 ! \'epaisseur de la premi\`ere couche
     real:: beta = 1.3 ! facteur d'accroissement en haut
     real:: k0 = 20. ! nombre de couches dans la transition surface
     real:: k1 = 1.2 ! nombre de couches dans la transition haute

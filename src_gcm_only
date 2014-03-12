@@ -140,9 +140,6 @@ histwrite.f
 histwrite_real.f
 inidissip.f
 inigrads.f
-ini_histday.f
-ini_histhf3d.f
-ini_histhf.f
 ini_histins.f
 ini_histrac.f
 initdynav.f
@@ -225,8 +222,9 @@ read_reanalyse.f
 readsulfate.f
 readsulfate_preind.f
 reanalyse2nat.f
-regr_pr_coefoz.f
+regr_pr_av.f
 regr_pr_comb_coefoz.f
+regr_pr_int.f
 rotatf.f
 rotat_nfil.f
 scopy.f

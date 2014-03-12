@@ -59,7 +59,7 @@ contains
 
     REAL pks(iim + 1, jjm + 1) ! exner au sol
     REAL pk(iim + 1, jjm + 1, llm) ! exner au milieu des couches
-    REAL pkf(iim + 1, jjm + 1, llm) ! exner filtré au milieu des couches
+    REAL pkf(iim + 1, jjm + 1, llm) ! exner filtr\'e au milieu des couches
     REAL phi(iim + 1, jjm + 1, llm) ! geopotential
     REAL w((iim + 1) * (jjm + 1), llm) ! vitesse verticale
 
@@ -95,7 +95,7 @@ contains
     INTEGER l
     REAL rdayvrai, rdaym_ini
 
-    ! Variables test conservation énergie
+    ! Variables test conservation \'energie
     REAL ecin(iim + 1, jjm + 1, llm), ecin0(iim + 1, jjm + 1, llm)
 
     REAL vcont((iim + 1) * jjm, llm), ucont((iim + 1) * (jjm + 1), llm)
@@ -144,7 +144,7 @@ contains
        IF (offline) CALL fluxstokenc(pbaru, pbarv, masse, teta, phi, phis, &
             dtvr, itau)
 
-       ! Intégrations dynamique et traceurs:
+       ! Int\'egrations dynamique et traceurs:
        CALL integrd(vcovm1, ucovm1, tetam1, psm1, massem1, dv, dudyn, dteta, &
             dp, vcov, ucov, teta, q(:, :, :, :2), ps, masse, finvmaold, dt, &
             leapf)
@@ -178,8 +178,7 @@ contains
           IF (time > 1.) time = time - 1.
 
           CALL calfis(rdayvrai, time, ucov, vcov, teta, q, ps, pk, phis, phi, &
-               dudyn, w, dufi, dvfi, dtetafi, dqfi, dpfi, &
-               lafin = itau + 1 == itaufin)
+               w, dufi, dvfi, dtetafi, dqfi, dpfi, lafin = itau + 1 == itaufin)
 
           ! Ajout des tendances physiques:
           CALL addfi(ucov, vcov, teta, q, ps, dufi, dvfi, dtetafi, dqfi, dpfi)
@@ -189,9 +188,9 @@ contains
        CALL exner_hyb(ps, p3d, pks, pk, pkf)
 
        IF (MOD(itau + 1, idissip) == 0) THEN
-          ! Dissipation horizontale et verticale des petites échelles
+          ! Dissipation horizontale et verticale des petites \'echelles
 
-          ! calcul de l'énergie cinétique avant dissipation
+          ! calcul de l'\'energie cin\'etique avant dissipation
           call covcont(llm, ucov, vcov, ucont, vcont)
           call enercin(vcov, ucov, vcont, ucont, ecin0)
 
@@ -200,14 +199,14 @@ contains
           ucov = ucov + dudis
           vcov = vcov + dvdis
 
-          ! On ajoute la tendance due à la transformation énergie
-          ! cinétique en énergie thermique par la dissipation
+          ! On ajoute la tendance due \`a la transformation \'energie
+          ! cin\'etique en \'energie thermique par la dissipation
           call covcont(llm, ucov, vcov, ucont, vcont)
           call enercin(vcov, ucov, vcont, ucont, ecin)
           dtetadis = dtetadis + (ecin0 - ecin) / pk
           teta = teta + dtetadis
 
-          ! Calcul de la valeur moyenne aux pôles :
+          ! Calcul de la valeur moyenne aux p\^oles :
           forall (l = 1: llm)
              teta(:, 1, l) = SUM(aire_2d(:iim, 1) * teta(:iim, 1, l)) &
                   / apoln
@@ -217,7 +216,7 @@ contains
        END IF
 
        IF (MOD(itau + 1, iperiod) == 0) THEN
-          ! Écriture du fichier histoire moyenne:
+          ! \'Ecriture du fichier histoire moyenne:
           CALL writedynav(vcov, ucov, teta, pk, phi, q, masse, ps, phis, &
                time = itau + 1)
           call bilan_dyn(ps, masse, pk, pbaru, pbarv, teta, phi, ucov, vcov, &

@@ -46,10 +46,11 @@ contains
     ! -- packs the coefficients to the "physics" horizontal grid ;
     ! -- combines the eight coefficients to define the five module variables.
 
-    use netcdf95, only: nf95_open, nf95_close
     use netcdf, only: nf90_nowrite
-    use regr_pr_coefoz, only: regr_pr_av_coefoz, regr_pr_int_coefoz
+    use netcdf95, only: nf95_open, nf95_close
     use phyetat0_m, only: rlat
+    use regr_pr_av_m, only: regr_pr_av
+    use regr_pr_int_m, only: regr_pr_int
 
     integer, intent(in):: julien ! jour julien, 1 <= julien <= 360
 
@@ -83,12 +84,12 @@ contains
 
     call nf95_open("coefoz_LMDZ.nc", nf90_nowrite, ncid)
 
-    call regr_pr_av_coefoz(ncid, "a2", julien, a2)
+    call regr_pr_av(ncid, "a2", julien, a2)
 
-    call regr_pr_av_coefoz(ncid, "a4", julien, a4_mass)
+    call regr_pr_av(ncid, "a4", julien, a4_mass)
     a4_mass = a4_mass * 48. / 29.
 
-    call regr_pr_av_coefoz(ncid, "a6", julien, a6)
+    call regr_pr_av(ncid, "a6", julien, a6)
 
     ! Compute "a6_mass" avoiding underflow, do not divide by 1e4
     ! before dividing by molecular mass:
@@ -99,18 +100,18 @@ contains
     ! (We use as few local variables as possible, in order to spare
     ! main memory.)
 
-    call regr_pr_av_coefoz(ncid, "P_net_Mob", julien, c_Mob)
+    call regr_pr_av(ncid, "P_net_Mob", julien, c_Mob)
 
-    call regr_pr_av_coefoz(ncid, "r_Mob", julien, coefoz)
+    call regr_pr_av(ncid, "r_Mob", julien, coefoz)
     c_mob = c_mob - a2 * coefoz
 
-    call regr_pr_int_coefoz(ncid, "Sigma_Mob", julien, top_value=0., v3=coefoz)
+    call regr_pr_int(ncid, "Sigma_Mob", julien, top_value=0., v3=coefoz)
     c_mob = (c_mob - a6 * coefoz) * 48. / 29.
 
-    call regr_pr_av_coefoz(ncid, "temp_Mob", julien, coefoz)
+    call regr_pr_av(ncid, "temp_Mob", julien, coefoz)
     c_mob = c_mob - a4_mass * coefoz
 
-    call regr_pr_av_coefoz(ncid, "R_Het", julien, r_het_interm)
+    call regr_pr_av(ncid, "R_Het", julien, r_het_interm)
     ! Heterogeneous chemistry is only at high latitudes:
     forall (k = 1: llm)
        where (abs(rlat) <= 45.) r_het_interm(:, k) = 0.

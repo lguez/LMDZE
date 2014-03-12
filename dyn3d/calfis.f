@@ -5,12 +5,12 @@ module calfis_m
 contains
 
   SUBROUTINE calfis(rdayvrai, time, ucov, vcov, teta, q, ps, pk, phis, phi, &
-       dudyn, w, dufi, dvfi, dtetafi, dqfi, dpfi, lafin)
+       w, dufi, dvfi, dtetafi, dqfi, dpfi, lafin)
 
-    ! From dyn3d/calfis.F, version 1.3 2005/05/25 13:10:09
+    ! From dyn3d/calfis.F, version 1.3, 2005/05/25 13:10:09
     ! Authors: P. Le Van, F. Hourdin
 
-    ! 1. Réarrangement des tableaux et transformation des variables
+    ! 1. R\'earrangement des tableaux et transformation des variables
     ! dynamiques en variables physiques
 
     ! 2. Calcul des termes physiques
@@ -18,17 +18,17 @@ contains
 
     ! Remarques:
 
-    ! - Les vents sont donnés dans la physique par leurs composantes 
+    ! - Les vents sont donn\'es dans la physique par leurs composantes 
     ! naturelles.
 
     ! - La variable thermodynamique de la physique est une variable
     ! intensive : T.
     ! Pour la dynamique on prend T * (preff / p(l))**kappa
 
-    ! - Les deux seules variables dépendant de la géométrie
-    ! nécessaires pour la physique sont la latitude pour le
-    ! rayonnement et l'aire de la maille quand on veut intégrer une
-    ! grandeur horizontalement.
+    ! - Les deux seules variables d\'ependant de la g\'eom\'etrie
+    ! n\'ecessaires pour la physique sont la latitude (pour le
+    ! rayonnement) et l'aire de la maille (quand on veut int\'egrer une
+    ! grandeur horizontalement).
 
     use comconst, only: kappa, cpp, dtphys, g
     use comgeom, only: apoln, cu_2d, cv_2d, unsaire_2d, apols, rlonu, rlonv
@@ -41,50 +41,51 @@ contains
     use physiq_m, only: physiq
     use pressure_var, only: p3d, pls
 
-    ! Arguments :
-
-    ! Output :
-    ! dvfi tendency for the natural meridional velocity 
-    ! dtetafi tendency for the potential temperature
-    ! pdtsfi tendency for the surface temperature
-
-    ! pdtrad radiative tendencies \ input and output
-    ! pfluxrad radiative fluxes / input and output
-
     REAL, intent(in):: rdayvrai
-    REAL, intent(in):: time ! heure de la journée en fraction de jour
+    REAL, intent(in):: time ! heure de la journ\'ee en fraction de jour
+
     REAL, intent(in):: ucov(iim + 1, jjm + 1, llm)
     ! ucov covariant zonal velocity
+
     REAL, intent(in):: vcov(iim + 1, jjm, llm)
     ! vcov covariant meridional velocity 
-    REAL, intent(in):: teta(iim + 1, jjm + 1, llm)
-    ! teta potential temperature
+
+    REAL, intent(in):: teta(iim + 1, jjm + 1, llm) ! teta potential temperature
 
     REAL, intent(in):: q(iim + 1, jjm + 1, llm, nqmx)
-    ! (mass fractions of advected fields)
+    ! mass fractions of advected fields
 
-    REAL, intent(in):: ps(iim + 1, jjm + 1)
-    ! ps surface pressure
+    REAL, intent(in):: ps(iim + 1, jjm + 1) ! ps surface pressure
+
     REAL, intent(in):: pk(iim + 1, jjm + 1, llm)
+    ! Exner = cp * (p / preff)**kappa 
+
     REAL, intent(in):: phis(iim + 1, jjm + 1)
     REAL, intent(in):: phi(iim + 1, jjm + 1, llm)
-    REAL dudyn(iim + 1, jjm + 1, llm)
     REAL, intent(in):: w(iim + 1, jjm + 1, llm)
 
     REAL, intent(out):: dufi(iim + 1, jjm + 1, llm)
     ! tendency for the covariant zonal velocity (m2 s-2)
 
-    REAL dvfi(iim + 1, jjm, llm)
+    REAL, intent(out):: dvfi(iim + 1, jjm, llm)
+    ! tendency for the natural meridional velocity
+
     REAL, intent(out):: dtetafi(iim + 1, jjm + 1, llm)
-    REAL dqfi(iim + 1, jjm + 1, llm, nqmx)
-    REAL dpfi(iim + 1, jjm + 1)
+    ! tendency for the potential temperature
+
+    REAL, intent(out):: dqfi(iim + 1, jjm + 1, llm, nqmx)
+    REAL, intent(out):: dpfi(iim + 1, jjm + 1) ! tendance sur la pression
     LOGICAL, intent(in):: lafin
 
-    ! Local variables :
+    ! Local:
 
     INTEGER i, j, l, ig0, iq, iiq
     REAL zpsrf(klon)
+
     REAL paprs(klon, llm+1), play(klon, llm)
+    ! paprs defini aux (llm +1) interfaces des couches 
+    ! play defini aux (llm) milieux des couches  
+
     REAL pphi(klon, llm), pphis(klon)
 
     REAL u(klon, llm), v(klon, llm)
@@ -104,28 +105,9 @@ contains
 
     !!print *, "Call sequence information: calfis"
 
-    ! 1. Initialisations :
-    ! latitude, longitude et aires des mailles pour la physique:
-
     ! 40. transformation des variables dynamiques en variables physiques:
-    ! 41. pressions au sol (en Pascals)
-
-    zpsrf(1) = ps(1, 1)
-
-    ig0 = 2
-    DO j = 2, jjm
-       CALL SCOPY(iim, ps(1, j), 1, zpsrf(ig0), 1)
-       ig0 = ig0+iim
-    ENDDO
-
-    zpsrf(klon) = ps(1, jjm + 1)
 
     ! 42. pression intercouches :
-
-    ! paprs defini aux (llm +1) interfaces des couches 
-    ! play defini aux (llm) milieux des couches  
-
-    ! Exner = cp * (p(l) / preff) ** kappa 
 
     forall (l = 1: llm+1) paprs(:, l) = pack(p3d(:, :, l), dyn_phy)
 
@@ -192,7 +174,7 @@ contains
          + vcov(:iim, j, l) / cv_2d(:iim, j))
     zvfi(iim + 1, 2:jjm, :) = zvfi(1, 2:jjm, :)
 
-    ! 47. champs de vents au pôle nord 
+    ! 47. champs de vents au p\^ole nord 
     ! U = 1 / pi * integrale [ v * cos(long) * d long ]
     ! V = 1 / pi * integrale [ v * sin(long) * d long ]
 
@@ -206,7 +188,7 @@ contains
        zvfi(:, 1, l) = SUM(SIN(rlonv(:iim)) * z1) / pi
     ENDDO
 
-    ! 48. champs de vents au pôle sud:
+    ! 48. champs de vents au p\^ole sud:
     ! U = 1 / pi * integrale [ v * cos(long) * d long ]
     ! V = 1 / pi * integrale [ v * sin(long) * d long ]
 
@@ -225,11 +207,9 @@ contains
 
     ! Appel de la physique :
     CALL physiq(lafin, rdayvrai, time, dtphys, paprs, play, pphi, pphis, u, &
-         v, t, qx, omega, d_u, d_v, d_t, d_qx, d_ps, dudyn)
+         v, t, qx, omega, d_u, d_v, d_t, d_qx, d_ps)
 
     ! transformation des tendances physiques en tendances dynamiques:
-
-    ! tendance sur la pression :
 
     dpfi = gr_fi_dyn(d_ps)
 
@@ -237,24 +217,6 @@ contains
     do l=1, llm
        dtetafi(:, :, l) = cpp * gr_fi_dyn(d_t(:, l)) / pk(:, :, l)
     end do
-
-    ! 62. humidite specifique
-
-    DO iq=1, nqmx
-       DO l=1, llm
-          DO i=1, iim + 1
-             dqfi(i, 1, l, iq) = d_qx(1, l, iq)
-             dqfi(i, jjm + 1, l, iq) = d_qx(klon, l, iq)
-          ENDDO
-          DO j=2, jjm
-             ig0=1+(j-2)*iim
-             DO i=1, iim
-                dqfi(i, j, l, iq) = d_qx(ig0+i, l, iq)
-             ENDDO
-             dqfi(iim + 1, j, l, iq) = dqfi(1, j, l, iq)
-          ENDDO
-       ENDDO
-    ENDDO
 
     ! 63. traceurs
 
@@ -308,7 +270,7 @@ contains
        ENDDO
     ENDDO
 
-    ! 68. champ v près des pôles:
+    ! 68. champ v pr\`es des p\^oles:
     ! v = U * cos(long) + V * SIN(long)
 
     DO l=1, llm

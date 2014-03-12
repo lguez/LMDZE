@@ -5,7 +5,7 @@ module physiq_m
 contains
 
   SUBROUTINE physiq(lafin, rdayvrai, time, dtphys, paprs, play, pphi, pphis, &
-       u, v, t, qx, omega, d_u, d_v, d_t, d_qx, d_ps, dudyn)
+       u, v, t, qx, omega, d_u, d_v, d_t, d_qx, d_ps)
 
     ! From phylmd/physiq.F, version 1.22 2006/02/20 09:38:28
     ! (subversion revision 678)
@@ -35,19 +35,15 @@ contains
     use diagcld2_m, only: diagcld2
     use diagetpq_m, only: diagetpq
     use diagphy_m, only: diagphy
-    USE dimens_m, ONLY: iim, jjm, llm, nqmx
+    USE dimens_m, ONLY: llm, nqmx
     USE dimphy, ONLY: klon, nbtr
     USE dimsoil, ONLY: nsoilmx
     use drag_noro_m, only: drag_noro
     USE fcttre, ONLY: foeew, qsatl, qsats, thermcep
     use fisrtilp_m, only: fisrtilp
     USE hgardfou_m, ONLY: hgardfou
-    USE histsync_m, ONLY: histsync
-    USE histwrite_m, ONLY: histwrite
     USE indicesol, ONLY: clnsurf, epsfra, is_lic, is_oce, is_sic, is_ter, &
          nbsrf
-    USE ini_histhf_m, ONLY: ini_histhf
-    USE ini_histday_m, ONLY: ini_histday
     USE ini_histins_m, ONLY: ini_histins
     use newmicro_m, only: newmicro
     USE oasis_m, ONLY: ok_oasis
@@ -71,7 +67,7 @@ contains
     REAL, intent(in):: rdayvrai
     ! (elapsed time since January 1st 0h of the starting year, in days)
 
-    REAL, intent(in):: time ! heure de la journée en fraction de jour
+    REAL, intent(in):: time ! heure de la journ\'ee en fraction de jour
     REAL, intent(in):: dtphys ! pas d'integration pour la physique (seconde)
     logical, intent(in):: lafin ! dernier passage
 
@@ -93,7 +89,7 @@ contains
     REAL, intent(in):: t(klon, llm) ! input temperature (K)
 
     REAL, intent(in):: qx(klon, llm, nqmx)
-    ! (humidité spécifique et fractions massiques des autres traceurs)
+    ! (humidit\'e sp\'ecifique et fractions massiques des autres traceurs)
 
     REAL omega(klon, llm) ! input vitesse verticale en Pa/s
     REAL, intent(out):: d_u(klon, llm) ! tendance physique de "u" (m/s/s)
@@ -122,7 +118,7 @@ contains
     parameter(rnpb = .true.)
 
     character(len = 6):: ocean = 'force '
-    ! (type de modèle océan à utiliser: "force" ou "slab" mais pas "couple")
+    ! (type de mod\`ele oc\'ean \`a utiliser: "force" ou "slab" mais pas "couple")
 
     ! "slab" ocean
     REAL, save:: tslab(klon) ! temperature of ocean slab
@@ -282,7 +278,7 @@ contains
     REAL falblw(klon, nbsrf)
     SAVE falblw ! albedo par type de surface
 
-    ! Paramètres de l'orographie à l'échelle sous-maille (OESM) :
+    ! Param\`etres de l'orographie \`a l'\'echelle sous-maille (OESM) :
     REAL, save:: zmea(klon) ! orographie moyenne
     REAL, save:: zstd(klon) ! deviation standard de l'OESM
     REAL, save:: zsig(klon) ! pente de l'OESM
@@ -408,14 +404,14 @@ contains
     REAL zxfluxu(klon, llm)
     REAL zxfluxv(klon, llm)
 
-    ! Le rayonnement n'est pas calculé tous les pas, il faut donc que
-    ! les variables soient rémanentes.
+    ! Le rayonnement n'est pas calcul\'e tous les pas, il faut donc que
+    ! les variables soient r\'emanentes.
     REAL, save:: heat(klon, llm) ! chauffage solaire
     REAL heat0(klon, llm) ! chauffage solaire ciel clair
     REAL, save:: cool(klon, llm) ! refroidissement infrarouge
     REAL cool0(klon, llm) ! refroidissement infrarouge ciel clair
     REAL, save:: topsw(klon), toplw(klon), solsw(klon)
-    REAL, save:: sollw(klon) ! rayonnement infrarouge montant à la surface
+    REAL, save:: sollw(klon) ! rayonnement infrarouge montant \`a la surface
     real, save:: sollwdown(klon) ! downward LW flux at surface
     REAL, save:: topsw0(klon), toplw0(klon), solsw0(klon), sollw0(klon)
     REAL albpla(klon)
@@ -488,7 +484,7 @@ contains
     ! con: convection
     ! lsc: large scale condensation
     ! ajs: ajustement sec
-    ! eva: évaporation de l'eau liquide nuageuse
+    ! eva: \'evaporation de l'eau liquide nuageuse
     ! vdf: vertical diffusion in boundary layer
     REAL d_t_con(klon, llm), d_q_con(klon, llm)
     REAL d_u_con(klon, llm), d_v_con(klon, llm)
@@ -531,7 +527,7 @@ contains
     integer:: iflag_cldcon = 1
     logical ptconv(klon, llm)
 
-    ! Variables locales pour effectuer les appels en série :
+    ! Variables locales pour effectuer les appels en s\'erie :
 
     REAL t_seri(klon, llm), q_seri(klon, llm)
     REAL ql_seri(klon, llm), qs_seri(klon, llm)
@@ -547,10 +543,7 @@ contains
     REAL zustrph(klon), zvstrph(klon)
     REAL aam, torsfc
 
-    REAL dudyn(iim + 1, jjm + 1, llm)
-
     REAL zx_tmp_fi2d(klon) ! variable temporaire grille physique
-    REAL zx_tmp_2d(iim, jjm + 1), zx_tmp_3d(iim, jjm + 1, llm)
 
     INTEGER, SAVE:: nid_day, nid_ins
 
@@ -564,7 +557,7 @@ contains
     logical ok_sync
     real date0
 
-    ! Variables liées au bilan d'énergie et d'enthalpie :
+    ! Variables li\'ees au bilan d'\'energie et d'enthalpie :
     REAL ztsol(klon)
     REAL d_h_vcol, d_qt, d_qw, d_ql, d_qs, d_ec
     REAL, SAVE:: d_h_vcol_phy
@@ -574,7 +567,7 @@ contains
     INTEGER:: ip_ebil = 0 ! print level for energy conservation diagnostics
     INTEGER:: if_ebil = 0 ! verbosity for diagnostics of energy conservation 
 
-    REAL d_t_ec(klon, llm) ! tendance due à la conversion Ec -> E thermique
+    REAL d_t_ec(klon, llm) ! tendance due \`a la conversion Ec -> E thermique
     REAL ZRCPD
 
     REAL t2m(klon, nbsrf), q2m(klon, nbsrf) ! temperature and humidity at 2 m
@@ -719,7 +712,7 @@ contains
                "Nombre d'appels au rayonnement insuffisant", 1)
        ENDIF
 
-       ! Initialisation pour le schéma de convection d'Emanuel :
+       ! Initialisation pour le sch\'ema de convection d'Emanuel :
        IF (iflag_con >= 3) THEN
           ibas_con = 1
           itop_con = 1
@@ -748,8 +741,6 @@ contains
 
        ! Initialisation des sorties
 
-       call ini_histhf(dtphys, nid_hf, nid_hf3d)
-       call ini_histday(dtphys, ok_journe, nid_day, nqmx)
        call ini_histins(dtphys, ok_instan, nid_ins)
        CALL ymds2ju(annee_ref, 1, int(day_ref), 0., date0)
        ! Positionner date0 pour initialisation de ORCHIDEE
@@ -772,7 +763,7 @@ contains
     mp = 0.
     phi = 0.
 
-    ! Ne pas affecter les valeurs entrées de u, v, h, et q :
+    ! Ne pas affecter les valeurs entr\'ees de u, v, h, et q :
 
     DO k = 1, llm
        DO i = 1, klon
@@ -804,10 +795,10 @@ contains
        CALL diagetpq(airephy, tit, ip_ebil, 1, 1, dtphys, t_seri, q_seri, &
             ql_seri, qs_seri, u_seri, v_seri, paprs, d_h_vcol, d_qt, d_qw, &
             d_ql, d_qs, d_ec)
-       ! Comme les tendances de la physique sont ajoutés dans la
+       ! Comme les tendances de la physique sont ajout\'es dans la
        !  dynamique, la variation d'enthalpie par la dynamique devrait
-       !  être égale à la variation de la physique au pas de temps
-       !  précédent.  Donc la somme de ces 2 variations devrait être
+       !  \^etre \'egale \`a la variation de la physique au pas de temps
+       !  pr\'ec\'edent.  Donc la somme de ces 2 variations devrait \^etre
        !  nulle.
        call diagphy(airephy, tit, ip_ebil, zero_v, zero_v, zero_v, zero_v, &
             zero_v, zero_v, zero_v, zero_v, ztsol, d_h_vcol + d_h_vcol_phy, &
@@ -854,7 +845,7 @@ contains
     ! Prescrire l'ozone et calculer l'albedo sur l'ocean.
     wo = ozonecm(REAL(julien), paprs)
 
-    ! Évaporation de l'eau liquide nuageuse :
+    ! \'Evaporation de l'eau liquide nuageuse :
     DO k = 1, llm
        DO i = 1, klon
           zb = MAX(0., ql_seri(i, k))
@@ -912,8 +903,8 @@ contains
        ENDDO
     ENDDO
 
-    ! Répartition sous maille des flux longwave et shortwave
-    ! Répartition du longwave par sous-surface linéarisée
+    ! R\'epartition sous maille des flux longwave et shortwave
+    ! R\'epartition du longwave par sous-surface lin\'earis\'ee
 
     DO nsrf = 1, nbsrf
        DO i = 1, klon
@@ -938,7 +929,7 @@ contains
          pblh, capCL, oliqCL, cteiCL, pblT, therm, trmb1, trmb2, trmb3, plcl, &
          fqcalving, ffonte, run_off_lic_0, fluxo, fluxg, tslab, seaice)
 
-    ! Incrémentation des flux
+    ! Incr\'ementation des flux
 
     zxfluxt = 0.
     zxfluxq = 0.
@@ -956,7 +947,7 @@ contains
     END DO
     DO i = 1, klon
        sens(i) = - zxfluxt(i, 1) ! flux de chaleur sensible au sol
-       evap(i) = - zxfluxq(i, 1) ! flux d'évaporation au sol
+       evap(i) = - zxfluxq(i, 1) ! flux d'\'evaporation au sol
        fder(i) = dlw(i) + dsens(i) + devap(i)
     ENDDO
 
@@ -1005,7 +996,7 @@ contains
 
        IF (abs(pctsrf(i, is_ter) + pctsrf(i, is_lic) + pctsrf(i, is_oce) &
             + pctsrf(i, is_sic) - 1.)  >  EPSFRA) print *, &
-            'physiq : problème sous surface au point ', i, pctsrf(i, 1 : nbsrf)
+            'physiq : probl\`eme sous surface au point ', i, pctsrf(i, 1 : nbsrf)
     ENDDO
     DO nsrf = 1, nbsrf
        DO i = 1, klon
@@ -1108,7 +1099,7 @@ contains
        mfu = upwd + dnwd
        IF (.NOT. ok_gust) wd = 0.
 
-       ! Calcul des propriétés des nuages convectifs
+       ! Calcul des propri\'et\'es des nuages convectifs
 
        DO k = 1, llm
           DO i = 1, klon
@@ -1187,7 +1178,7 @@ contains
        ENDDO
     ENDIF
 
-    ! Convection sèche (thermiques ou ajustement)
+    ! Convection s\`eche (thermiques ou ajustement)
 
     d_t_ajs = 0.
     d_u_ajs = 0.
@@ -1216,8 +1207,8 @@ contains
 
     ! Caclul des ratqs
 
-    ! ratqs convectifs à l'ancienne en fonction de (q(z = 0) - q) / q
-    ! on écrase le tableau ratqsc calculé par clouds_gno
+    ! ratqs convectifs \`a l'ancienne en fonction de (q(z = 0) - q) / q
+    ! on \'ecrase le tableau ratqsc calcul\'e par clouds_gno
     if (iflag_cldcon == 1) then
        do k = 1, llm
           do i = 1, klon
@@ -1326,7 +1317,7 @@ contains
        ENDDO
     ELSE IF (iflag_cldcon == 3) THEN
        ! On prend pour les nuages convectifs le maximum du calcul de
-       ! la convection et du calcul du pas de temps précédent diminué
+       ! la convection et du calcul du pas de temps pr\'ec\'edent diminu\'e
        ! d'un facteur facttemps.
        facteur = dtphys * facttemps
        do k = 1, llm
@@ -1369,7 +1360,7 @@ contains
          dtphys, t_seri, q_seri, ql_seri, qs_seri, u_seri, v_seri, paprs, &
          d_h_vcol, d_qt, d_qw, d_ql, d_qs, d_ec)
 
-    ! Humidité relative pour diagnostic :
+    ! Humidit\'e relative pour diagnostic :
     DO k = 1, llm
        DO i = 1, klon
           zx_t = t_seri(i, k)
@@ -1405,7 +1396,7 @@ contains
        cg_ae = 0.
     ENDIF
 
-    ! Paramètres optiques des nuages et quelques paramètres pour diagnostics :
+    ! Param\`etres optiques des nuages et quelques param\`etres pour diagnostics :
     if (ok_newmicro) then
        CALL newmicro(paprs, play, t_seri, cldliq, cldfra, cldtau, cldemi, &
             cldh, cldl, cldm, cldt, cldq, flwp, fiwp, flwc, fiwc, ok_aie, &
@@ -1469,13 +1460,13 @@ contains
        ENDDO
     ENDDO
 
-    ! Calculer le bilan du sol et la dérive de température (couplage)
+    ! Calculer le bilan du sol et la d\'erive de temp\'erature (couplage)
 
     DO i = 1, klon
        bils(i) = radsol(i) - sens(i) + zxfluxlat(i)
     ENDDO
 
-    ! Paramétrisation de l'orographie à l'échelle sous-maille :
+    ! Param\'etrisation de l'orographie \`a l'\'echelle sous-maille :
 
     IF (ok_orodr) THEN
        ! selection des points pour lesquels le shema est actif:
@@ -1504,7 +1495,7 @@ contains
     ENDIF
 
     IF (ok_orolf) THEN
-       ! Sélection des points pour lesquels le schéma est actif :
+       ! S\'election des points pour lesquels le sch\'ema est actif :
        igwd = 0
        DO i = 1, klon
           itest(i) = 0
@@ -1529,7 +1520,7 @@ contains
        ENDDO
     ENDIF
 
-    ! Stress nécessaires : toute la physique
+    ! Stress n\'ecessaires : toute la physique
 
     DO i = 1, klon
        zustrph(i) = 0.
@@ -1642,8 +1633,6 @@ contains
     ENDDO
 
     ! Ecriture des sorties
-    call write_histhf
-    call write_histday
     call write_histins
 
     ! Si c'est la fin, il faut conserver l'etat de redemarrage
@@ -1660,51 +1649,17 @@ contains
 
   contains
 
-    subroutine write_histday
-
-      use gr_phy_write_3d_m, only: gr_phy_write_3d
-      integer itau_w ! pas de temps ecriture
-
-      !------------------------------------------------
-
-      if (ok_journe) THEN
-         itau_w = itau_phy + itap
-         if (nqmx <= 4) then
-            call histwrite(nid_day, "Sigma_O3_Royer", itau_w, &
-                 gr_phy_write_3d(wo) * 1e3)
-            ! (convert "wo" from kDU to DU)
-         end if
-         if (ok_sync) then
-            call histsync(nid_day)
-         endif
-      ENDIF
-
-    End subroutine write_histday
-
-    !****************************
-
-    subroutine write_histhf
-
-      ! From phylmd/write_histhf.h, version 1.5 2005/05/25 13:10:09
-
-      !------------------------------------------------
-
-      call write_histhf3d
-
-      IF (ok_sync) THEN
-         call histsync(nid_hf)
-      ENDIF
-
-    end subroutine write_histhf
-
-    !***************************************************************
-
     subroutine write_histins
 
       ! From phylmd/write_histins.h, version 1.2 2005/05/25 13:10:09
 
+      use dimens_m, only: iim, jjm
+      USE histsync_m, ONLY: histsync
+      USE histwrite_m, ONLY: histwrite
+
       real zout
       integer itau_w ! pas de temps ecriture
+      REAL zx_tmp_2d(iim, jjm + 1), zx_tmp_3d(iim, jjm + 1, llm)
 
       !--------------------------------------------------
 
@@ -1926,44 +1881,6 @@ contains
       ENDIF
 
     end subroutine write_histins
-
-    !****************************************************
-
-    subroutine write_histhf3d
-
-      ! From phylmd/write_histhf3d.h, version 1.2 2005/05/25 13:10:09
-
-      integer itau_w ! pas de temps ecriture
-
-      !-------------------------------------------------------
-
-      itau_w = itau_phy + itap
-
-      ! Champs 3D:
-
-      CALL gr_fi_ecrit(llm, klon, iim, jjm + 1, t_seri, zx_tmp_3d)
-      CALL histwrite(nid_hf3d, "temp", itau_w, zx_tmp_3d)
-
-      CALL gr_fi_ecrit(llm, klon, iim, jjm + 1, qx(1, 1, ivap), zx_tmp_3d)
-      CALL histwrite(nid_hf3d, "ovap", itau_w, zx_tmp_3d)
-
-      CALL gr_fi_ecrit(llm, klon, iim, jjm + 1, u_seri, zx_tmp_3d)
-      CALL histwrite(nid_hf3d, "vitu", itau_w, zx_tmp_3d)
-
-      CALL gr_fi_ecrit(llm, klon, iim, jjm + 1, v_seri, zx_tmp_3d)
-      CALL histwrite(nid_hf3d, "vitv", itau_w, zx_tmp_3d)
-
-      if (nbtr >= 3) then
-         CALL gr_fi_ecrit(llm, klon, iim, jjm + 1, tr_seri(1, 1, 3), &
-              zx_tmp_3d)
-         CALL histwrite(nid_hf3d, "O3", itau_w, zx_tmp_3d)
-      end if
-
-      if (ok_sync) then
-         call histsync(nid_hf3d)
-      endif
-
-    end subroutine write_histhf3d
 
   END SUBROUTINE physiq
 

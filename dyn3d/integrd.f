@@ -4,10 +4,10 @@ module integrd_m
 
 contains
 
-  SUBROUTINE integrd(vcovm1, ucovm1, tetam1, psm1, massem1, dv, dudyn, &
-       dteta, dp, vcov, ucov, teta, q, ps, masse, finvmaold, dt, leapf)
+  SUBROUTINE integrd(vcovm1, ucovm1, tetam1, psm1, massem1, dv, dudyn, dteta, &
+       dp, vcov, ucov, teta, q, ps, masse, finvmaold, dt, leapf)
 
-    ! From dyn3d/integrd.F, version 1.1.1.1 2004/05/19 12:53:05
+    ! From dyn3d/integrd.F, version 1.1.1.1, 2004/05/19 12:53:05
     ! Author: P. Le Van 
     ! Objet: incrémentation des tendances dynamiques
 
@@ -20,27 +20,22 @@ contains
     USE paramet_m, ONLY : iip1, iip2, ip1jm, ip1jmp1, jjp1, llmp1
     use qminimum_m, only: qminimum
 
-    ! Arguments: 
-
+    REAL vcovm1(ip1jm, llm), ucovm1((iim + 1) * (jjm + 1), llm)
+    REAL, intent(inout):: tetam1((iim + 1) * (jjm + 1), llm)
+    REAL, intent(inout):: psm1((iim + 1) * (jjm + 1))
+    real massem1((iim + 1) * (jjm + 1), llm)
+    REAL dv(ip1jm, llm), dudyn((iim + 1) * (jjm + 1), llm)
+    REAL dteta((iim + 1) * (jjm + 1), llm), dp((iim + 1) * (jjm + 1))
     REAL vcov(ip1jm, llm), ucov((iim + 1) * (jjm + 1), llm)
     real, intent(inout):: teta((iim + 1) * (jjm + 1), llm)
     REAL q(:, :, :, :) ! (iim + 1, jjm + 1, llm, nq)
     REAL, intent(inout):: ps((iim + 1) * (jjm + 1))
     REAL masse((iim + 1) * (jjm + 1), llm)
-
-    REAL vcovm1(ip1jm, llm), ucovm1((iim + 1) * (jjm + 1), llm)
-    REAL, intent(inout):: tetam1((iim + 1) * (jjm + 1), llm)
-    REAL, intent(inout):: psm1((iim + 1) * (jjm + 1))
-    real massem1((iim + 1) * (jjm + 1), llm)
-
-    REAL dv(ip1jm, llm), dudyn((iim + 1) * (jjm + 1), llm)
-    REAL dteta((iim + 1) * (jjm + 1), llm), dp((iim + 1) * (jjm + 1))
     REAL finvmaold((iim + 1) * (jjm + 1), llm)
-    LOGICAL, INTENT (IN) :: leapf
     real, intent(in):: dt
+    LOGICAL, INTENT (IN) :: leapf
 
-    ! Local variables: 
-
+    ! Local: 
     INTEGER nq
     REAL vscr(ip1jm), uscr((iim + 1) * (jjm + 1)), hscr((iim + 1) * (jjm + 1))
     real pscr((iim + 1) * (jjm + 1))
@@ -50,10 +45,7 @@ contains
     REAL tpn, tps, tppn(iim), tpps(iim)
     REAL qpn, qps, qppn(iim), qpps(iim)
     REAL deltap((iim + 1) * (jjm + 1), llm)
-
     INTEGER l, ij, iq
-
-    REAL ssum
 
     !-----------------------------------------------------------------------
 
@@ -89,8 +81,8 @@ contains
        tppn(ij) = aire(ij)*ps(ij)
        tpps(ij) = aire(ij+ip1jm) * ps(ij+ip1jm)
     END DO
-    tpn = ssum(iim, tppn, 1)/apoln
-    tps = ssum(iim, tpps, 1)/apols
+    tpn = sum(tppn)/apoln
+    tps = sum(tpps)/apols
     DO ij = 1, iip1
        ps(ij) = tpn
        ps(ij+ip1jm) = tps
@@ -127,8 +119,8 @@ contains
           tppn(ij) = aire(ij)*teta(ij, l)
           tpps(ij) = aire(ij+ip1jm)*teta(ij+ip1jm, l)
        END DO
-       tpn = ssum(iim, tppn, 1)/apoln
-       tps = ssum(iim, tpps, 1)/apols
+       tpn = sum(tppn)/apoln
+       tps = sum(tpps)/apols
 
        DO ij = 1, iip1
           teta(ij, l) = tpn
@@ -158,8 +150,8 @@ contains
              qppn(ij) = aire(ij)*q(ij, 1, l, iq)
              qpps(ij) = aire(ij+ip1jm)*q(ij, jjm + 1, l, iq)
           END DO
-          qpn = ssum(iim, qppn, 1)/apoln
-          qps = ssum(iim, qpps, 1)/apols
+          qpn = sum(qppn)/apoln
+          qps = sum(qpps)/apols
 
           DO ij = 1, iip1
              q(ij, 1, l, iq) = qpn

@@ -55,7 +55,7 @@ log:
 	${FC} ${version_flag} >>$@ 2>&1
 	echo -e "\nFC = ${FC}\n\nFFLAGS = ${FFLAGS}\n\nLDLIBS = ${LDLIBS}\n\nLDFLAGS = ${LDFLAGS}" >>$@
 
-ifneq ($(MAKECMDGOALS), clobber)
+ifeq ($(findstring $(MAKECMDGOALS), clobber depend),)
 include ${src_root}/depend.mk
 endif
 

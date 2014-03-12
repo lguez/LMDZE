@@ -15,7 +15,7 @@ contains
 
   SUBROUTINE etat0
 
-    ! From "etat0_netcdf.F", version 1.3 2005/05/25 13:10:09
+    ! From "etat0_netcdf.F", version 1.3, 2005/05/25 13:10:09
 
     use caldyn0_m, only: caldyn0
     use comconst, only: cpp, kappa, iniconst
@@ -40,7 +40,7 @@ contains
     use netcdf, only: nf90_nowrite
     use netcdf95, only: nf95_close, nf95_get_var, nf95_gw_var, &
          nf95_inq_varid, nf95_open
-    use nr_util, only: pi
+    use nr_util, only: pi, assert
     use paramet_m, only: ip1jm, ip1jmp1
     use phyredem_m, only: phyredem
     use pressure_var, only: pls, p3d
@@ -58,7 +58,7 @@ contains
 
     REAL latfi(klon), lonfi(klon)
     ! (latitude and longitude of a point of the scalar grid identified
-    ! by a simple index, in °)
+    ! by a simple index, in degrees)
 
     REAL, dimension(iim + 1, jjm + 1, llm):: ucov, t3d, teta
     REAL vcov(iim + 1, jjm, llm)
@@ -93,7 +93,7 @@ contains
     REAL run_off_lic_0(klon)
     real clwcon(klon, llm), rnebcon(klon, llm), ratqs(klon, llm)
 
-    ! Déclarations pour lecture glace de mer :
+    ! D\'eclarations pour lecture glace de mer :
     INTEGER iml_lic, jml_lic
     INTEGER ncid, varid
     REAL, pointer:: dlon_lic(:), dlat_lic(:)
@@ -148,10 +148,7 @@ contains
     ! Compute pressure on intermediate levels:
     forall(l = 1: llm + 1) p3d(:, :, l) = ap(l) + bp(l) * ps
     CALL exner_hyb(ps, p3d, pks, pk)
-    IF (MINVAL(pk) == MAXVAL(pk)) then
-       print *, '"pk" should not be constant'
-       stop 1
-    end IF
+    call assert(MINVAL(pk) /= MAXVAL(pk), '"pk" should not be constant')
 
     pls = preff * (pk / cpp)**(1. / kappa)
     PRINT *, "minval(pls) = ", minval(pls)
@@ -177,7 +174,7 @@ contains
             / apols
     ENDDO
 
-    ! Calcul de l'humidité à saturation :
+    ! Calcul de l'humidit\'e \`a saturation :
     qsat = q_sat(t3d, pls)
     PRINT *, "minval(qsat) = ", minval(qsat)
     print *, "maxval(qsat) = ", maxval(qsat)
@@ -238,12 +235,12 @@ contains
 
     call nf95_close(ncid)
 
-    ! Interpolation sur la grille T du modèle :
+    ! Interpolation sur la grille T du mod\`ele :
     PRINT *, 'Dimensions de "landiceref.nc"'
     print *, "iml_lic = ", iml_lic
     print *, "jml_lic = ", jml_lic
 
-    ! Si les coordonnées sont en degrés, on les transforme :
+    ! Si les coordonn\'ees sont en degr\'es, on les transforme :
     IF (MAXVAL(dlon_lic) > pi) THEN
        dlon_lic = dlon_lic * pi / 180.
     ENDIF
@@ -260,7 +257,7 @@ contains
     ! Passage sur la grille physique
     pctsrf = 0.
     pctsrf(:, is_lic) = pack(flic_tmp, dyn_phy)
-    ! Adéquation avec le maque terre/mer
+    ! Ad\'equation avec le maque terre/mer
     WHERE (pctsrf(:, is_lic) < EPSFRA) pctsrf(:, is_lic) = 0.
     WHERE (zmasq < EPSFRA) pctsrf(:, is_lic) = 0.
     pctsrf(:, is_ter) = zmasq
@@ -277,18 +274,18 @@ contains
        end where
     end where
 
-    ! Sous-surface océan et glace de mer (pour démarrer on met glace
-    ! de mer à 0) :
+    ! Sous-surface oc\'ean et glace de mer (pour d\'emarrer on met glace
+    ! de mer \`a 0) :
     pctsrf(:, is_oce) = 1. - zmasq
     WHERE (pctsrf(:, is_oce) < EPSFRA) pctsrf(:, is_oce) = 0.
 
-    ! Vérification que somme des sous-surfaces vaut 1 :
+    ! V\'erification que somme des sous-surfaces vaut 1 :
     ji = count(abs(sum(pctsrf, dim = 2) - 1.) > EPSFRA)
     IF (ji /= 0) then
-       PRINT *, 'Problème répartition sous maille pour ', ji, 'points'
+       PRINT *, 'Probl\`eme r\'epartition sous maille pour ', ji, 'points'
     end IF
 
-    ! Calcul intermédiaire :
+    ! Calcul interm\'ediaire :
     CALL massdair(p3d, masse)
 
     print *, 'ALPHAX = ', alphax

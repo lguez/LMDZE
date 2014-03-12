@@ -15,10 +15,10 @@ contains
 
     ! From phylmd/phytrac.F, version 1.15 2006/02/21 08:08:30 (SVN revision 679)
 
-    ! Authors: Frédéric Hourdin, Abderrahmane Idelkadi, Marie-Alice
+    ! Authors: Fr\'ed\'eric Hourdin, Abderrahmane Idelkadi, Marie-Alice
     ! Foujols, Olivia
 
-    ! Objet : moniteur général des tendances des traceurs
+    ! Objet : moniteur g\'en\'eral des tendances des traceurs
 
     ! L'appel de "phytrac" se fait avec "nqmx - 2" donc nous avons
     ! bien les vrais traceurs (en nombre "nbtr", sans la vapeur d'eau
@@ -26,7 +26,7 @@ contains
 
     ! Modifications pour les traceurs :
     ! - uniformisation des parametrisations dans phytrac
-    ! - stockage des moyennes des champs nécessaires en mode traceur off-line 
+    ! - stockage des moyennes des champs n\'ecessaires en mode traceur off-line 
 
     use abort_gcm_m, only: abort_gcm
     use clesphys, only: ecrit_tra
@@ -51,7 +51,7 @@ contains
     integer, intent(in):: itap ! number of calls to "physiq"
     integer, intent(in):: lmt_pas ! number of time steps of "physics" per day
     integer, intent(in):: julien !jour julien, 1 <= julien <= 360
-    real, intent(in):: gmtime ! heure de la journée en fraction de jour
+    real, intent(in):: gmtime ! heure de la journ\'ee en fraction de jour
     logical, intent(in):: firstcal ! first call to "calfis"
     logical, intent(in):: lafin ! fin de la physique
 
@@ -86,7 +86,7 @@ contains
     REAL yu1(klon) ! vents au premier niveau
     REAL yv1(klon) ! vents au premier niveau
 
-    ! Arguments nécessaires pour les sources et puits de traceur :
+    ! Arguments n\'ecessaires pour les sources et puits de traceur :
     real ftsol(klon, nbsrf) ! Temperature du sol (surf)(Kelvin)
     real pctsrf(klon, nbsrf) ! Pourcentage de sol f(nature du sol)
 
@@ -157,8 +157,8 @@ contains
     logical aerosol(nbtr) ! Nature du traceur
     ! ! aerosol(it) = true => aerosol 
     ! ! aerosol(it) = false => gaz 
-    logical clsol(nbtr) ! couche limite sol calculée
-    logical radio(nbtr) ! décroisssance radioactive
+    logical clsol(nbtr) ! couche limite sol calcul\'ee
+    logical radio(nbtr) ! d\'ecroisssance radioactive
     save aerosol, clsol, radio
 
     ! convection tiedtke
@@ -198,7 +198,7 @@ contains
 
     if (firstcal) then
        print *, 'phytrac: pdtphys = ', pdtphys
-       PRINT *, 'Fréquence de sortie des traceurs : ecrit_tra = ', ecrit_tra
+       PRINT *, 'Fr\'equence de sortie des traceurs : ecrit_tra = ', ecrit_tra
        if (nbtr < nq_phys) call abort_gcm('phytrac', 'nbtr < nq_phys', 1)
        inirnpb=rnpb
 
@@ -224,7 +224,7 @@ contains
 
        DO it = 1, nq_phys
           aerosol(it) = .FALSE. ! Tous les traceurs sont des gaz par defaut
-          radio(it) = .FALSE. ! par défaut pas de passage par "radiornpb"
+          radio(it) = .FALSE. ! par d\'efaut pas de passage par "radiornpb"
           clsol(it) = .FALSE. ! Par defaut couche limite avec flux prescrit
        ENDDO
 
