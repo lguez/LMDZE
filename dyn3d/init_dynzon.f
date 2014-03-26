@@ -15,17 +15,17 @@ contains
 
     ! From LMDZ4/libf/dyn3d/bilan_dyn.F, version 1.5 2005/03/16 10:12:17
 
+    USE comgeom, ONLY: rlatv
     USE conf_gcm_m, ONLY: day_step, iperiod, periodav
+    USE dimens_m, ONLY: jjm, llm
+    USE disvert_m, ONLY: presnivs
     USE histbeg_totreg_m, ONLY: histbeg_totreg
     USE histdef_m, ONLY: histdef
     USE histend_m, ONLY: histend
     USE histvert_m, ONLY: histvert
-    USE calendar, ONLY: ymds2ju
-    USE dimens_m, ONLY: jjm, llm
-    USE disvert_m, ONLY: presnivs
-    USE comgeom, ONLY: rlatv
-    USE temps, ONLY: annee_ref, day_ref, itau_dyn
     USE nr_util, ONLY: pi
+    USE temps, ONLY: annee_ref, day_ref, itau_dyn
+    USE ymds2ju_m, ONLY: ymds2ju
 
     real, intent(in):: dt_app
 

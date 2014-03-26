@@ -10,20 +10,21 @@ CONTAINS
     ! Ecriture du fichier de redémarrage au format NetCDF (initialisation)
 
     USE comconst, ONLY: cpp, daysec, dtvr, g, kappa, omeg, rad
-    USE disvert_m, ONLY: ap, bp, pa, preff, presnivs
     USE comgeom, ONLY: aire_2d, cu_2d, cv_2d, rlatu, rlatv, rlonu, rlonv
-    USE dimens_m, ONLY: iim, jjm, llm, nqmx
-    USE ener, ONLY: ang0, etot0, ptot0, stot0, ztot0
-    USE calendar, ONLY: ju2ymds, ymds2ju
-    USE iniadvtrac_m, ONLY: tname, ttext
     use conf_gcm_m, ONLY: fxyhypb, ysinus
+    USE dimens_m, ONLY: iim, jjm, llm, nqmx
+    USE disvert_m, ONLY: ap, bp, pa, preff, presnivs
+    USE ener, ONLY: ang0, etot0, ptot0, stot0, ztot0
+    USE iniadvtrac_m, ONLY: tname, ttext
+    USE ju2ymds_m, ONLY: ju2ymds
+    USE netcdf, ONLY: nf90_clobber, nf90_float, nf90_global, nf90_unlimited
     USE netcdf95, ONLY: nf95_close, nf95_create, nf95_def_dim, nf95_def_var, &
          nf95_enddef, nf95_inq_varid, nf95_put_att, nf95_put_var
-    USE netcdf, ONLY: nf90_clobber, nf90_float, nf90_global, nf90_unlimited
     USE paramet_m, ONLY: iip1, jjp1, llmp1
     USE serre, ONLY: clat, clon, dzoomx, dzoomy, grossismx, grossismy, taux, &
          tauy
     USE temps, ONLY: annee_ref, day_ref
+    use ymds2ju_m, only: ymds2ju
 
     CHARACTER(len=*), INTENT(IN):: fichnom
     INTEGER, INTENT(IN):: iday_end

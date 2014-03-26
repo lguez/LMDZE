@@ -29,7 +29,6 @@ contains
     ! "zu1" et "zv1". Nous avons moyenné les valeurs de ces trois
     ! champs sur les quatre sous-surfaces du modèle.
 
-    use calendar, ONLY: ymds2ju
     use clqh_m, only: clqh
     use clvent_m, only: clvent
     use coefkz_m, only: coefkz
@@ -53,6 +52,7 @@ contains
     use ustarhb_m, only: ustarhb
     use vdif_kcay_m, only: vdif_kcay
     use yamada4_m, only: yamada4
+    use ymds2ju_m, ONLY: ymds2ju
 
     ! Arguments:
 

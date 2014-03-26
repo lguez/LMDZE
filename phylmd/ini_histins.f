@@ -8,18 +8,18 @@ contains
 
     ! From phylmd/ini_histins.h, v 1.2 2005/05/25 13:10:09
 
+    use clesphys, only: ecrit_ins
     use dimens_m, only: iim, jjm, llm
     use dimphy, only: klon
-    use temps, only: itau_phy, day_ref, annee_ref
-    use clesphys, only: ecrit_ins
-    use indicesol, only: nbsrf, clnsurf
-    USE calendar, only: ymds2ju
+    use disvert_m, only: presnivs
     USE histbeg_totreg_m, ONLY : histbeg_totreg
     USE histdef_m, ONLY : histdef
     USE histend_m, ONLY : histend
     USE histvert_m, ONLY : histvert
+    use indicesol, only: nbsrf, clnsurf
     use phyetat0_m, only: rlon, rlat
-    use disvert_m, only: presnivs
+    use temps, only: itau_phy, day_ref, annee_ref
+    USE ymds2ju_m, only: ymds2ju
 
     REAL, intent(in):: dtime ! pas temporel de la physique (s)
     logical, intent(in):: ok_instan

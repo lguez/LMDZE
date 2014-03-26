@@ -14,7 +14,6 @@ contains
     ! Routine d'initialisation des écritures des fichiers histoires au
     ! format IOIPSL. Initialisation du fichier histoire moyenne.
 
-    use calendar, ONLY: ymds2ju
     USE comgeom, ONLY: rlatu, rlonv
     USE dimens_m, ONLY: llm
     USE histbeg_totreg_m, ONLY: histbeg_totreg
@@ -25,6 +24,7 @@ contains
     USE nr_util, ONLY: pi
     USE paramet_m, ONLY: iip1, jjp1
     USE temps, ONLY: itau_dyn
+    use ymds2ju_m, ONLY: ymds2ju
 
     integer, intent(in):: day0, anne0 ! date de référence
     real, intent(in):: tstep ! fréquence d'écriture

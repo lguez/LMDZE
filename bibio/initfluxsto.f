@@ -23,23 +23,23 @@ SUBROUTINE initfluxsto(tstep, t_ops, t_wrt, nq, fileid, filevid, filedid)
 
   !   L. Fairhead, 03/99                                             
 
-  USE calendar
+  USE comconst
+  USE comgeom
+  use conf_gcm_m
+  USE dimens_m
+  USE disvert_m
+  USE ener
   USE histbeg_totreg_m, ONLY : histbeg_totreg
   USE histdef_m, ONLY : histdef
   USE histend_m, ONLY : histend
   use histhori_regular_m, only: histhori_regular
   use histsync_m, only: histsync
   USE histvert_m, ONLY : histvert
-  USE dimens_m
+  USE nr_util, ONLY : pi
   USE paramet_m
-  USE comconst
-  USE disvert_m
-  use conf_gcm_m
-  USE comgeom
   USE serre
   USE temps, ONLY : annee_ref, day_ref, itau_dyn
-  USE ener
-  USE nr_util, ONLY : pi
+  use ymds2ju_m, only: ymds2ju
 
   IMPLICIT NONE
 

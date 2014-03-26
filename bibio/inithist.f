@@ -12,19 +12,19 @@ contains
     ! Routine d'initialisation des écritures des fichiers histoires
     ! LMDZ au format IOIPSL.
 
-    USE calendar, ONLY: ymds2ju
+    USE comgeom, ONLY: rlatu, rlatv, rlonu, rlonv
     USE com_io_dyn, ONLY: histid, histuid, histvid
+    USE dimens_m, ONLY: jjm, llm
+    USE disvert_m, ONLY: presnivs
     USE histbeg_totreg_m, ONLY : histbeg_totreg
     USE histdef_m, ONLY : histdef
     USE histend_m, ONLY : histend
     USE histvert_m, ONLY : histvert
-    USE dimens_m, ONLY: jjm, llm
-    USE paramet_m, ONLY: iip1, jjp1
-    USE disvert_m, ONLY: presnivs
-    USE comgeom, ONLY: rlatu, rlatv, rlonu, rlonv
-    USE temps, ONLY: itau_dyn
     USE iniadvtrac_m, ONLY: ttext
     USE nr_util, ONLY: pi
+    USE paramet_m, ONLY: iip1, jjp1
+    USE temps, ONLY: itau_dyn
+    USE ymds2ju_m, ONLY: ymds2ju
 
     integer, intent(in):: day0, anne0 ! date de référence
     real, intent(in):: tstep ! durée du pas de temps en secondes

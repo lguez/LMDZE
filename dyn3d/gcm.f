@@ -8,7 +8,6 @@ PROGRAM gcm
   ! "divgrad2", "nxgraro2"). Possibilité de choisir le schéma pour
   ! l'advection de "q", en modifiant "iadv" dans "traceur.def".
 
-  USE calendar, only: ioconf_calendar
   use comconst, only: daysec, dtvr, iniconst
   use comgeom, only: rlatu, aire_2d, cu_2d, cv_2d, rlonv, inigeom
   use comgeomphy, only: airephy, cuphy, cvphy, rlatd, rlond
@@ -27,6 +26,7 @@ PROGRAM gcm
   use initdynav_m, only: initdynav
   use inithist_m, only: inithist
   use init_dynzon_m, only: init_dynzon
+  USE ioconf_calendar_m, only: ioconf_calendar
   use jumble, only: new_unit
   use leapfrog_m, only: leapfrog
   use suphec_m, only: suphec

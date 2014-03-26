@@ -18,7 +18,6 @@ contains
     USE abort_gcm_m, ONLY: abort_gcm
     use aeropt_m, only: aeropt
     use ajsec_m, only: ajsec
-    USE calendar, ONLY: ymds2ju
     use calltherm_m, only: calltherm
     USE clesphys, ONLY: cdhmax, cdmmax, co2_ppm, ecrit_hf, ecrit_ins, &
          ecrit_mth, ecrit_reg, ecrit_tra, ksta, ksta_ter, ok_kzmin
@@ -60,6 +59,7 @@ contains
     USE suphec_m, ONLY: ra, rcpd, retv, rg, rlvtt, romega, rsigma, rtt
     USE temps, ONLY: annee_ref, day_ref, itau_phy
     use unit_nml_m, only: unit_nml
+    USE ymds2ju_m, ONLY: ymds2ju
     USE yoethf_m, ONLY: r2es, rvtmp2
 
     logical, intent(in):: lafin ! dernier passage

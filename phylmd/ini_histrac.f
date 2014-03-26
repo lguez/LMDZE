@@ -9,19 +9,19 @@ contains
 
     ! From phylmd/ini_histrac.h, version 1.10 2006/02/21 08:08:30
 
+    use clesphys, only: ecrit_tra
     use dimens_m, only: iim, jjm, llm
-    USE calendar, only: ymds2ju
+    use disvert_m, only: presnivs
+    use dimphy, only: klon
+    use grid_change, only: gr_phy_write_2d
     USE histbeg_totreg_m, ONLY: histbeg_totreg
     USE histdef_m, ONLY : histdef
     USE histend_m, ONLY : histend
     USE histvert_m, ONLY : histvert
-    use temps, only: annee_ref, day_ref, itau_phy
     use iniadvtrac_m, only: tnom, ttext
-    use dimphy, only: klon
-    use clesphys, only: ecrit_tra
-    use grid_change, only: gr_phy_write_2d
     use phyetat0_m, only: rlon, rlat
-    use disvert_m, only: presnivs
+    use temps, only: annee_ref, day_ref, itau_phy
+    USE ymds2ju_m, only: ymds2ju
 
     INTEGER, intent(out):: nid_tra
     real, intent(in):: pdtphys  ! pas d'integration pour la physique (s)

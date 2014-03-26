@@ -5,6 +5,7 @@ dyn3d/Read_reanalyse
 dyn3d/Vlsplt
 filtrez
 IOIPSL
+IOIPSL/Calendar
 IOIPSL/Histcom
 phylmd
 phylmd/Conflx
