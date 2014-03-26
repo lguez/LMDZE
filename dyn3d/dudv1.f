@@ -13,14 +13,12 @@ contains
     ! Objet: calcul du terme de rotation. Ce terme est ajouté à
     ! d(ucov)/dt et à d(vcov)/dt.
 
-    USE dimens_m, ONLY: iim, llm
+    USE dimens_m, ONLY: iim, jjm, llm
     USE paramet_m, ONLY: iip1, iip2, ip1jm, ip1jmp1
 
     REAL, intent(in):: vorpot(ip1jm, llm)
     REAL, intent(in):: pbaru(ip1jmp1, llm), pbarv(ip1jm, llm)
-
-    real du(ip1jmp1, llm), dv(ip1jm, llm)
-    ! du et dv sont des arguments de sortie pour le s-pg 
+    real, intent(out):: du(iim + 2: (iim + 1) * jjm, llm), dv(ip1jm, llm)
 
     ! Local:
     INTEGER l, ij

@@ -103,203 +103,200 @@ CONTAINS
     ! alpha=1 signifie pas d'injection
     ! alpha=0 signifie injection totale
 
-    IF (online== - 1) THEN
-       RETURN
-    END IF
+    IF (online /= - 1) THEN
+       IF (first) THEN
+          CALL conf_guide
+          file = 'guide'
+          CALL inigrads(igrads, rlonv, 180. / pi, -180., 180., rlatu, -90., 90., &
+               180. / pi, presnivs, 1., dtgrads, file, 'dyn_zon ')
+          PRINT *, '1: en-ligne, 0: hors-ligne (x=x_rea), -1: climat (x=x_gcm)'
 
-    IF (first) THEN
-       CALL conf_guide
-       file = 'guide'
-       CALL inigrads(igrads, rlonv, 180. / pi, -180., 180., rlatu, -90., 90., &
-            180. / pi, presnivs, 1., dtgrads, file, 'dyn_zon ')
-       PRINT *, '1: en-ligne, 0: hors-ligne (x=x_rea), -1: climat (x=x_gcm)'
-       IF (online== - 1) RETURN
+          IF (online==1) THEN
+             ! Constantes de temps de rappel en jour
+             ! 0.1 c'est en gros 2h30. 
+             ! 1e10 est une constante infinie donc en gros pas de guidage
 
-       IF (online==1) THEN
-          ! Constantes de temps de rappel en jour
-          ! 0.1 c'est en gros 2h30. 
-          ! 1e10 est une constante infinie donc en gros pas de guidage
+             ! coordonnees du centre du zoom
+             CALL coordij(clon, clat, ilon, ilat)
+             ! aire de la maille au centre du zoom
+             aire_min = aire(ilon+(ilat - 1) * iip1)
+             ! aire maximale de la maille
+             aire_max = 0.
+             DO ij = 1, ip1jmp1
+                aire_max = max(aire_max, aire(ij))
+             END DO
+             ! factt = pas de temps en fraction de jour
+             factt = dtvr * iperiod / daysec
 
-          ! coordonnees du centre du zoom
-          CALL coordij(clon, clat, ilon, ilat)
-          ! aire de la maille au centre du zoom
-          aire_min = aire(ilon+(ilat - 1) * iip1)
-          ! aire maximale de la maille
-          aire_max = 0.
-          DO ij = 1, ip1jmp1
-             aire_max = max(aire_max, aire(ij))
-          END DO
-          ! factt = pas de temps en fraction de jour
-          factt = dtvr * iperiod / daysec
+             CALL tau2alpha(3, iip1, jjm, factt, tau_min_v, tau_max_v, alpha_v)
+             CALL tau2alpha(2, iip1, jjp1, factt, tau_min_u, tau_max_u, alpha_u)
+             CALL tau2alpha(1, iip1, jjp1, factt, tau_min_t, tau_max_t, alpha_t)
+             CALL tau2alpha(1, iip1, jjp1, factt, tau_min_p, tau_max_p, alpha_p)
+             CALL tau2alpha(1, iip1, jjp1, factt, tau_min_q, tau_max_q, alpha_q)
 
-          CALL tau2alpha(3, iip1, jjm, factt, tau_min_v, tau_max_v, alpha_v)
-          CALL tau2alpha(2, iip1, jjp1, factt, tau_min_u, tau_max_u, alpha_u)
-          CALL tau2alpha(1, iip1, jjp1, factt, tau_min_t, tau_max_t, alpha_t)
-          CALL tau2alpha(1, iip1, jjp1, factt, tau_min_p, tau_max_p, alpha_p)
-          CALL tau2alpha(1, iip1, jjp1, factt, tau_min_q, tau_max_q, alpha_q)
+             CALL dump2d(iip1, jjp1, aire, 'AIRE MAILLe ')
+             CALL dump2d(iip1, jjp1, alpha_u, 'COEFF U ')
+             CALL dump2d(iip1, jjp1, alpha_t, 'COEFF T ')
 
-          CALL dump2d(iip1, jjp1, aire, 'AIRE MAILLe ')
-          CALL dump2d(iip1, jjp1, alpha_u, 'COEFF U ')
-          CALL dump2d(iip1, jjp1, alpha_t, 'COEFF T ')
+             ! Cas ou on force exactement par les variables analysees
+          ELSE
+             alpha_t = 0.
+             alpha_u = 0.
+             alpha_v = 0.
+             alpha_p = 0.
+             ! physic=.false.
+          END IF
 
-          ! Cas ou on force exactement par les variables analysees
-       ELSE
-          alpha_t = 0.
-          alpha_u = 0.
-          alpha_v = 0.
-          alpha_p = 0.
-          ! physic=.false.
-       END IF
+          itau_test = 1001
+          step_rea = 1
+          count_no_rea = 0
+          ncidpl = -99
 
-       itau_test = 1001
-       step_rea = 1
-       count_no_rea = 0
-       ncidpl = -99
+          ! itau_test montre si l'importation a deja ete faite au rang itau
+          ! lecture d'un fichier netcdf pour determiner le nombre de niveaux
+          if (guide_u) then
+             if (ncidpl.eq. - 99) rcod=nf90_open('u.nc',Nf90_NOWRITe,ncidpl)
+          endif
 
-       ! itau_test montre si l'importation a deja ete faite au rang itau
-       ! lecture d'un fichier netcdf pour determiner le nombre de niveaux
-       if (guide_u) then
-          if (ncidpl.eq. - 99) rcod=nf90_open('u.nc',Nf90_NOWRITe,ncidpl)
-       endif
+          if (guide_v) then
+             if (ncidpl.eq. - 99) rcod=nf90_open('v.nc',nf90_nowrite,ncidpl)
+          endif
 
-       if (guide_v) then
-          if (ncidpl.eq. - 99) rcod=nf90_open('v.nc',nf90_nowrite,ncidpl)
-       endif
+          if (guide_T) then
+             if (ncidpl.eq. - 99) rcod=nf90_open('T.nc',nf90_nowrite,ncidpl)
+          endif
 
-       if (guide_T) then
-          if (ncidpl.eq. - 99) rcod=nf90_open('T.nc',nf90_nowrite,ncidpl)
-       endif
+          if (guide_Q) then
+             if (ncidpl.eq. - 99) rcod=nf90_open('hur.nc',nf90_nowrite, ncidpl)
+          endif
 
-       if (guide_Q) then
-          if (ncidpl.eq. - 99) rcod=nf90_open('hur.nc',nf90_nowrite, ncidpl)
-       endif
-
-       IF (ncep) THEN
-          status = nf90_inq_dimid(ncidpl, 'LEVEL', rid)
-       ELSE
-          status = nf90_inq_dimid(ncidpl, 'PRESSURE', rid)
-       END IF
-       status = nf90_inquire_dimension(ncidpl, rid, len=nlev)
-       PRINT *, 'nlev', nlev
-       rcod = nf90_close(ncidpl)
-       ! Lecture du premier etat des reanalyses.
-       CALL read_reanalyse(1, ps, ucovrea2, vcovrea2, tetarea2, qrea2, &
-            masserea2, nlev)
-       qrea2 = max(qrea2, 0.1)
-
-       ! Debut de l'integration temporelle:
-    END IF ! first
-
-    ! IMPORTATION DES VENTS, PRESSION ET TEMPERATURE REELS:
-
-    ditau = real(itau)
-    dday_step = real(day_step)
-    WRITE (*, *) 'ditau, dday_step'
-    WRITE (*, *) ditau, dday_step
-    toto = 4 * ditau / dday_step
-    reste = toto - aint(toto)
-
-    IF (reste==0.) THEN
-       IF (itau_test==itau) THEN
-          WRITE (*, *) 'deuxieme passage de advreel a itau=', itau
-          STOP
-       ELSE
-          vcovrea1 = vcovrea2
-          ucovrea1 = ucovrea2
-          tetarea1 = tetarea2
-          qrea1 = qrea2
-
-          PRINT *, 'LECTURE REANALYSES, pas ', step_rea, 'apres ', &
-               count_no_rea, ' non lectures'
-          step_rea = step_rea + 1
-          itau_test = itau
-          CALL read_reanalyse(step_rea, ps, ucovrea2, vcovrea2, tetarea2, &
-               qrea2, masserea2, nlev)
+          IF (ncep) THEN
+             status = nf90_inq_dimid(ncidpl, 'LEVEL', rid)
+          ELSE
+             status = nf90_inq_dimid(ncidpl, 'PRESSURE', rid)
+          END IF
+          status = nf90_inquire_dimension(ncidpl, rid, len=nlev)
+          PRINT *, 'nlev', nlev
+          rcod = nf90_close(ncidpl)
+          ! Lecture du premier etat des reanalyses.
+          CALL read_reanalyse(1, ps, ucovrea2, vcovrea2, tetarea2, qrea2, &
+               masserea2, nlev)
           qrea2 = max(qrea2, 0.1)
-          factt = dtvr * iperiod / daysec
-          ztau = factt / max(alpha_t, 1E-10)
-          CALL wrgrads(igrads, 1, aire, 'aire ', 'aire ')
-          CALL wrgrads(igrads, 1, dxdys, 'dxdy ', 'dxdy ')
-          CALL wrgrads(igrads, 1, alpha_u, 'au ', 'au ')
-          CALL wrgrads(igrads, 1, alpha_t, 'at ', 'at ')
-          CALL wrgrads(igrads, 1, ztau, 'taut ', 'taut ')
-          CALL wrgrads(igrads, llm, ucov, 'u ', 'u ')
-          CALL wrgrads(igrads, llm, ucovrea2, 'ua ', 'ua ')
-          CALL wrgrads(igrads, llm, teta, 'T ', 'T ')
-          CALL wrgrads(igrads, llm, tetarea2, 'Ta ', 'Ta ')
-          CALL wrgrads(igrads, llm, qrea2, 'Qa ', 'Qa ')
-          CALL wrgrads(igrads, llm, q, 'Q ', 'Q ')
 
-          CALL wrgrads(igrads, llm, qsat, 'QSAT ', 'QSAT ')
+          ! Debut de l'integration temporelle:
+       END IF ! first
 
+       ! IMPORTATION DES VENTS, PRESSION ET TEMPERATURE REELS:
+
+       ditau = real(itau)
+       dday_step = real(day_step)
+       WRITE (*, *) 'ditau, dday_step'
+       WRITE (*, *) ditau, dday_step
+       toto = 4 * ditau / dday_step
+       reste = toto - aint(toto)
+
+       IF (reste==0.) THEN
+          IF (itau_test==itau) THEN
+             WRITE (*, *) 'deuxieme passage de advreel a itau=', itau
+             STOP
+          ELSE
+             vcovrea1 = vcovrea2
+             ucovrea1 = ucovrea2
+             tetarea1 = tetarea2
+             qrea1 = qrea2
+
+             PRINT *, 'LECTURE REANALYSES, pas ', step_rea, 'apres ', &
+                  count_no_rea, ' non lectures'
+             step_rea = step_rea + 1
+             itau_test = itau
+             CALL read_reanalyse(step_rea, ps, ucovrea2, vcovrea2, tetarea2, &
+                  qrea2, masserea2, nlev)
+             qrea2 = max(qrea2, 0.1)
+             factt = dtvr * iperiod / daysec
+             ztau = factt / max(alpha_t, 1E-10)
+             CALL wrgrads(igrads, 1, aire, 'aire ', 'aire ')
+             CALL wrgrads(igrads, 1, dxdys, 'dxdy ', 'dxdy ')
+             CALL wrgrads(igrads, 1, alpha_u, 'au ', 'au ')
+             CALL wrgrads(igrads, 1, alpha_t, 'at ', 'at ')
+             CALL wrgrads(igrads, 1, ztau, 'taut ', 'taut ')
+             CALL wrgrads(igrads, llm, ucov, 'u ', 'u ')
+             CALL wrgrads(igrads, llm, ucovrea2, 'ua ', 'ua ')
+             CALL wrgrads(igrads, llm, teta, 'T ', 'T ')
+             CALL wrgrads(igrads, llm, tetarea2, 'Ta ', 'Ta ')
+             CALL wrgrads(igrads, llm, qrea2, 'Qa ', 'Qa ')
+             CALL wrgrads(igrads, llm, q, 'Q ', 'Q ')
+
+             CALL wrgrads(igrads, llm, qsat, 'QSAT ', 'QSAT ')
+
+          END IF
+       ELSE
+          count_no_rea = count_no_rea + 1
        END IF
-    ELSE
-       count_no_rea = count_no_rea + 1
-    END IF
 
-    ! Guidage
-    ! x_gcm = a * x_gcm + (1 - a) * x_reanalyses
+       ! Guidage
+       ! x_gcm = a * x_gcm + (1 - a) * x_reanalyses
 
-    IF (ini_anal) PRINT *, 'ATTENTION !!! ON PART DU GUIDAGE'
+       IF (ini_anal) PRINT *, 'ATTENTION !!! ON PART DU GUIDAGE'
 
-    ditau = real(itau)
-    dday_step = real(day_step)
+       ditau = real(itau)
+       dday_step = real(day_step)
 
-    tau = 4 * ditau / dday_step
-    tau = tau - aint(tau)
+       tau = 4 * ditau / dday_step
+       tau = tau - aint(tau)
 
-    ! ucov
-    IF (guide_u) THEN
-       DO l = 1, llm
-          DO ij = 1, ip1jmp1
-             a = (1. - tau) * ucovrea1(ij, l) + tau * ucovrea2(ij, l)
-             ucov(ij, l) = (1. - alpha_u(ij)) * ucov(ij, l) + alpha_u(ij) * a
-             IF (first .AND. ini_anal) ucov(ij, l) = a
+       ! ucov
+       IF (guide_u) THEN
+          DO l = 1, llm
+             DO ij = 1, ip1jmp1
+                a = (1. - tau) * ucovrea1(ij, l) + tau * ucovrea2(ij, l)
+                ucov(ij, l) = (1. - alpha_u(ij)) * ucov(ij, l) + alpha_u(ij) * a
+                IF (first .AND. ini_anal) ucov(ij, l) = a
+             END DO
           END DO
-       END DO
-    END IF
+       END IF
 
-    IF (guide_t) THEN
-       DO l = 1, llm
-          do j = 1, jjm + 1
-             DO i = 1, iim + 1
-                a = (1. - tau) * tetarea1(i, j, l) + tau * tetarea2(i, j, l)
-                teta(i, j, l) = (1. - alpha_t(i, j)) * teta(i, j, l) &
-                     + alpha_t(i, j) * a
-                IF (first .AND. ini_anal) teta(i, j, l) = a
+       IF (guide_t) THEN
+          DO l = 1, llm
+             do j = 1, jjm + 1
+                DO i = 1, iim + 1
+                   a = (1. - tau) * tetarea1(i, j, l) + tau * tetarea2(i, j, l)
+                   teta(i, j, l) = (1. - alpha_t(i, j)) * teta(i, j, l) &
+                        + alpha_t(i, j) * a
+                   IF (first .AND. ini_anal) teta(i, j, l) = a
+                END DO
+             end do
+          END DO
+       END IF
+
+       IF (guide_q) THEN
+          DO l = 1, llm
+             do j = 1, jjm + 1
+                DO i = 1, iim + 1
+                   a = (1. - tau) * qrea1(i, j, l) + tau * qrea2(i, j, l)
+                   ! hum relative en % -> hum specif
+                   a = qsat(i, j, l) * a * 0.01
+                   q(i, j, l) = (1. - alpha_q(i, j)) * q(i, j, l) &
+                        + alpha_q(i, j) * a
+                   IF (first .AND. ini_anal) q(i, j, l) = a
+                END DO
+             end do
+          END DO
+       END IF
+
+       ! vcov
+       IF (guide_v) THEN
+          DO l = 1, llm
+             DO ij = 1, ip1jm
+                a = (1. - tau) * vcovrea1(ij, l) + tau * vcovrea2(ij, l)
+                vcov(ij, l) = (1. - alpha_v(ij)) * vcov(ij, l) + alpha_v(ij) * a
+                IF (first .AND. ini_anal) vcov(ij, l) = a
              END DO
-          end do
-       END DO
-    END IF
-
-    IF (guide_q) THEN
-       DO l = 1, llm
-          do j = 1, jjm + 1
-             DO i = 1, iim + 1
-                a = (1. - tau) * qrea1(i, j, l) + tau * qrea2(i, j, l)
-                ! hum relative en % -> hum specif
-                a = qsat(i, j, l) * a * 0.01
-                q(i, j, l) = (1. - alpha_q(i, j)) * q(i, j, l) &
-                     + alpha_q(i, j) * a
-                IF (first .AND. ini_anal) q(i, j, l) = a
-             END DO
-          end do
-       END DO
-    END IF
-
-    ! vcov
-    IF (guide_v) THEN
-       DO l = 1, llm
-          DO ij = 1, ip1jm
-             a = (1. - tau) * vcovrea1(ij, l) + tau * vcovrea2(ij, l)
-             vcov(ij, l) = (1. - alpha_v(ij)) * vcov(ij, l) + alpha_v(ij) * a
              IF (first .AND. ini_anal) vcov(ij, l) = a
           END DO
-          IF (first .AND. ini_anal) vcov(ij, l) = a
-       END DO
-    END IF
+       END IF
 
-    first = .FALSE.
+       first = .FALSE.
+    end IF
 
   END SUBROUTINE guide
 

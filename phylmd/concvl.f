@@ -30,7 +30,7 @@ contains
     REAL, INTENT (IN):: play(klon, klev)
     REAL, intent(in):: t(klon, klev)
     real q(klon, klev) ! input vapeur d'eau (en kg/kg)
-    real u(klon, klev), v(klon, klev)
+    real, INTENT (IN):: u(klon, klev), v(klon, klev)
     REAL, INTENT (IN):: tra(klon, klev, ntrac)
     INTEGER, intent(in):: ntra ! number of tracers
     REAL, intent(inout):: sig1(klon, klev), w01(klon, klev)

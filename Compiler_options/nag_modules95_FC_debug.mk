@@ -10,6 +10,6 @@ FFLAGS = $(addprefix -I, ${HOME}/include ${HOME}/lib/Numer_Rec_95 ${HOME}/lib/NR
 # NAG general options:
 FFLAGS += -dusty -mismatch_all -free
 
-nag_fcalls_options = -calledby -lines -locate -class ${FFLAGS}
+nag_fcalls_options = -calledby -lines ${FFLAGS}
 nag_cross_options = -key ${FFLAGS}
 version_flag = -v

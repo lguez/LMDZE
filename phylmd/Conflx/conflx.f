@@ -4,7 +4,7 @@ module conflx_m
 
 contains
 
-  SUBROUTINE conflx (dtime, pres_h, pres_f, t, q, con_t, con_q, qhfl, w, &
+  SUBROUTINE conflx(dtime, pres_h, pres_f, t, q, con_t, con_q, qhfl, w, &
        d_t, d_q, rain, snow, mfu, mfd, pen_u, pde_u, pen_d, pde_d, kcbot, &
        kctop, kdtop, pmflxr, pmflxs)
 

@@ -30,7 +30,6 @@ module iniadvtrac_m
 
   INTEGER hadv(nqmx) ! indice schéma transport horizontal 
   INTEGER vadv(nqmx) ! indice schéma transport vertical 
-  INTEGER niadv(nqmx) ! équivalent dynamique / physique
   character(len=8) tnom(nqmx) ! nom court du traceur
   character(len=10) tname(nqmx) ! nom du traceur pour restart
   character(len=13) ttext(nqmx) ! nom long du traceur pour sorties
@@ -122,8 +121,6 @@ contains
           ttext(iq)=trim(tnom(iq)) // descrq(iadv(iq))
        endif
     end do
-
-    forall (iq = 1: nqmx) niadv(iq)=iq
 
   END subroutine iniadvtrac
 

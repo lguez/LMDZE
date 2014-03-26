@@ -24,15 +24,15 @@ contains
     REAL, intent(inout):: tetam1((iim + 1) * (jjm + 1), llm)
     REAL, intent(inout):: psm1((iim + 1) * (jjm + 1))
     real massem1((iim + 1) * (jjm + 1), llm)
-    REAL dv(ip1jm, llm), dudyn((iim + 1) * (jjm + 1), llm)
+    REAL, intent(in):: dv(ip1jm, llm), dudyn((iim + 1) * (jjm + 1), llm)
     REAL dteta((iim + 1) * (jjm + 1), llm), dp((iim + 1) * (jjm + 1))
-    REAL vcov(ip1jm, llm), ucov((iim + 1) * (jjm + 1), llm)
+    REAL, intent(inout):: vcov(ip1jm, llm), ucov((iim + 1) * (jjm + 1), llm)
     real, intent(inout):: teta((iim + 1) * (jjm + 1), llm)
     REAL q(:, :, :, :) ! (iim + 1, jjm + 1, llm, nq)
     REAL, intent(inout):: ps((iim + 1) * (jjm + 1))
     REAL masse((iim + 1) * (jjm + 1), llm)
     REAL finvmaold((iim + 1) * (jjm + 1), llm)
-    real, intent(in):: dt
+    real, intent(in):: dt ! time step, in s
     LOGICAL, INTENT (IN) :: leapf
 
     ! Local: 
@@ -78,7 +78,7 @@ contains
     END DO
 
     DO ij = 1, iim
-       tppn(ij) = aire(ij)*ps(ij)
+       tppn(ij) = aire(ij) * ps(ij)
        tpps(ij) = aire(ij+ip1jm) * ps(ij+ip1jm)
     END DO
     tpn = sum(tppn)/apoln
@@ -101,12 +101,12 @@ contains
     DO l = 1, llm
        DO ij = iip2, ip1jm
           uscr(ij) = ucov(ij, l)
-          ucov(ij, l) = ucovm1(ij, l) + dt*dudyn(ij, l)
+          ucov(ij, l) = ucovm1(ij, l) + dt * dudyn(ij, l)
        END DO
 
        DO ij = 1, ip1jm
           vscr(ij) = vcov(ij, l)
-          vcov(ij, l) = vcovm1(ij, l) + dt*dv(ij, l)
+          vcov(ij, l) = vcovm1(ij, l) + dt * dv(ij, l)
        END DO
 
        hscr = teta(:, l)
@@ -116,8 +116,8 @@ contains
        ! Calcul de la valeur moyenne, unique aux poles pour teta
 
        DO ij = 1, iim
-          tppn(ij) = aire(ij)*teta(ij, l)
-          tpps(ij) = aire(ij+ip1jm)*teta(ij+ip1jm, l)
+          tppn(ij) = aire(ij) * teta(ij, l)
+          tpps(ij) = aire(ij+ip1jm) * teta(ij+ip1jm, l)
        END DO
        tpn = sum(tppn)/apoln
        tps = sum(tpps)/apols
@@ -147,8 +147,8 @@ contains
     DO iq = 1, nq
        DO l = 1, llm
           DO ij = 1, iim
-             qppn(ij) = aire(ij)*q(ij, 1, l, iq)
-             qpps(ij) = aire(ij+ip1jm)*q(ij, jjm + 1, l, iq)
+             qppn(ij) = aire(ij) * q(ij, 1, l, iq)
+             qpps(ij) = aire(ij+ip1jm) * q(ij, jjm + 1, l, iq)
           END DO
           qpn = sum(qppn)/apoln
           qps = sum(qpps)/apols

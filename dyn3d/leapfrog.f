@@ -53,7 +53,7 @@ contains
 
     REAL, intent(in):: time_0
 
-    ! Variables local to the procedure:
+    ! Local:
 
     ! Variables dynamiques:
 
@@ -61,11 +61,11 @@ contains
     REAL pk(iim + 1, jjm + 1, llm) ! exner au milieu des couches
     REAL pkf(iim + 1, jjm + 1, llm) ! exner filtr\'e au milieu des couches
     REAL phi(iim + 1, jjm + 1, llm) ! geopotential
-    REAL w((iim + 1) * (jjm + 1), llm) ! vitesse verticale
+    REAL w(iim + 1, jjm + 1, llm) ! vitesse verticale
 
     ! Variables dynamiques intermediaire pour le transport
     ! Flux de masse :
-    REAL pbaru((iim + 1) * (jjm + 1), llm), pbarv((iim + 1) * jjm, llm)
+    REAL pbaru(iim + 1, jjm + 1, llm), pbarv(iim + 1, jjm, llm)
 
     ! Variables dynamiques au pas - 1
     REAL vcovm1(iim + 1, jjm, llm), ucovm1(iim + 1, jjm + 1, llm)
@@ -82,9 +82,8 @@ contains
     REAL dtetadis(iim + 1, jjm + 1, llm)
 
     ! Tendances physiques
-    REAL dvfi((iim + 1) * jjm, llm), dufi((iim + 1) * (jjm + 1), llm)
-    REAL dtetafi(iim + 1, jjm + 1, llm), dqfi((iim + 1) * (jjm + 1), llm, nqmx)
-    real dpfi((iim + 1) * (jjm + 1))
+    REAL dvfi(iim + 1, jjm, llm), dufi(iim + 1, jjm + 1, llm)
+    REAL dtetafi(iim + 1, jjm + 1, llm), dqfi(iim + 1, jjm + 1, llm, nqmx)
 
     ! Variables pour le fichier histoire
 
@@ -100,7 +99,7 @@ contains
 
     REAL vcont((iim + 1) * jjm, llm), ucont((iim + 1) * (jjm + 1), llm)
     logical leapf
-    real dt
+    real dt ! time step, in s
 
     !---------------------------------------------------
 
@@ -178,10 +177,10 @@ contains
           IF (time > 1.) time = time - 1.
 
           CALL calfis(rdayvrai, time, ucov, vcov, teta, q, ps, pk, phis, phi, &
-               w, dufi, dvfi, dtetafi, dqfi, dpfi, lafin = itau + 1 == itaufin)
+               w, dufi, dvfi, dtetafi, dqfi, lafin = itau + 1 == itaufin)
 
           ! Ajout des tendances physiques:
-          CALL addfi(ucov, vcov, teta, q, ps, dufi, dvfi, dtetafi, dqfi, dpfi)
+          CALL addfi(ucov, vcov, teta, q, dufi, dvfi, dtetafi, dqfi)
        ENDIF
 
        forall (l = 1: llm + 1) p3d(:, :, l) = ap(l) + bp(l) * ps

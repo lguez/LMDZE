@@ -18,6 +18,7 @@ contains
     USE dimens_m, ONLY: iim, jjm, llm
     USE histwrite_m, ONLY: histwrite
     use init_dynzon_m, only: ncum, fileid, znom, ntr, nq, nom
+    use massbar_m, only: massbar
     USE paramet_m, ONLY: iip1, jjp1
 
     real, intent(in):: ps(iip1, jjp1)

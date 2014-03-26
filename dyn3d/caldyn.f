@@ -13,17 +13,20 @@ contains
 
     use advect_m, only: advect
     USE comgeom, ONLY: airesurg, constang_2d
+    use convmas_m, only: convmas
     USE dimens_m, ONLY: iim, jjm, llm
     USE disvert_m, ONLY: ap, bp
     use dteta1_m, only: dteta1
     use dudv1_m, only: dudv1
     use dudv2_m, only: dudv2
     use flumass_m, only: flumass
+    use massbar_m, only: massbar
     use massbarxy_m, only: massbarxy
     use massdair_m, only: massdair
     USE paramet_m, ONLY: iip1, ip1jmp1, jjp1, llmp1
     use sortvarc_m, only: sortvarc
     use tourpot_m, only: tourpot
+    use vitvert_m, only: vitvert
 
     INTEGER, INTENT(IN):: itau
     REAL, INTENT(IN):: ucov(:, :, :) ! (iim + 1, jjm + 1, llm) vent covariant
@@ -39,7 +42,7 @@ contains
     real dv((iim + 1) * jjm, llm)
     REAL, INTENT(out):: dteta(ip1jmp1, llm)
     real, INTENT(out):: dp(ip1jmp1)
-    REAL, INTENT(out):: w(ip1jmp1, llm)
+    REAL, INTENT(out):: w(:, :, :) ! (iim + 1, jjm + 1, llm)
     REAL, intent(out):: pbaru(ip1jmp1, llm), pbarv((iim + 1) * jjm, llm)
     REAL, intent(in):: time_0
     LOGICAL, INTENT(IN):: conser
@@ -67,7 +70,7 @@ contains
     dp = convm(:, 1) / airesurg
     CALL vitvert(convm, w)
     CALL tourpot(vcov, ucov, massebxy, vorpot)
-    CALL dudv1(vorpot, pbaru, pbarv, dudyn, dv)
+    CALL dudv1(vorpot, pbaru, pbarv, dudyn(:, 2: jjm, :), dv)
     CALL enercin(vcov, ucov, vcont, ucont, ecin)
     CALL bernoui(ip1jmp1, llm, phi, ecin, bern)
     CALL dudv2(teta, pkf, bern, dudyn, dv)
@@ -75,8 +78,9 @@ contains
     forall (l = 1: llm) ang(:, :, l) = ucov(:, :, l) + constang_2d
     CALL advect(ang, vcov, teta, w, massebx, masseby, dudyn, dv, dteta)
 
-    ! WARNING probleme de peridocite de dv sur les PC/linux. Pb d'arrondi
-    ! probablement. Observe sur le code compile avec pgf90 3.0-1
+    ! Warning problème de périodicité de dv sur les PC Linux. Problème
+    ! d'arrondi probablement. Observé sur le code compilé avec pgf90
+    ! 3.0-1.
     DO l = 1, llm
        DO ij = 1, (iim + 1) * jjm, iip1
           IF (dv(ij, l)/=dv(ij+iim, l)) THEN

@@ -9,14 +9,14 @@ contains
     ! This subroutine ends the declaration of variables, sets the time
     ! axes in the NetCDF file and puts it into write mode.
 
-    USE ioipslmpp, ONLY: ioipslmpp_addatt
+    USE calendar, ONLY: ju2ymds
     USE errioipsl, ONLY: histerr
     USE histcom_var, ONLY: date0, freq_opp, freq_wrt, fullop, &
          missing_val, name, nb_tax, nb_var, ncdf_ids, ncvar_ids, regular, &
          tax_name, tdimid, tid, title, topp, unit_name, var_axid, var_zaxid, &
          xid, yid, zax_ids, zax_name
     USE ioget_calendar_m, ONLY: ioget_calendar
-    USE calendar, ONLY: ju2ymds
+    USE ioipslmpp, ONLY: ioipslmpp_addatt
     USE netcdf, ONLY: nf90_float, nf90_unlimited
     use netcdf95, only: nf95_def_dim, nf95_def_var, nf95_put_att, nf95_enddef
 

@@ -9,25 +9,26 @@ contains
        sig1, w01, icb1, inb1, delt, Ma1, upwd1, dnwd1, dnwd01, qcondc1, wd1, &
        cape1, da1, phi1, mp1)
 
-    ! From LMDZ4/libf/phylmd/cv_driver.F, version 1.3 2005/04/15 12:36:17
+    ! From LMDZ4/libf/phylmd/cv_driver.F, version 1.3, 2005/04/15 12:36:17
 
     ! Main driver for convection
 
-    ! S. Bony, Mar 2002:
+    ! S. Bony, March 2002:
 
     ! Several modules corresponding to different physical processes
 
     ! Several versions of convect may be used:
-    ! - iflag_con=3: version lmd  (previously named convect3)
-    ! - iflag_con=4: version 4.3b (vect. version, previously convect1/2)
+    ! - iflag_con = 3: version lmd  (previously named convect3)
+    ! - iflag_con = 4: version 4.3b (vect. version, previously convect1/2)
 
     ! Plus tard :
-    ! - iflag_con=5: version lmd with ice (previously named convectg)
+    ! - iflag_con = 5: version lmd with ice (previously named convectg)
 
     ! S. Bony, Oct 2002:
     ! Vectorization of convect3 (ie version lmd)
 
     use clesphys2, only: iflag_con
+    use cv3_compress_m, only: cv3_compress
     use cv3_param_m, only: cv3_param
     USE dimphy, ONLY: klev, klon
 
@@ -69,8 +70,8 @@ contains
     real, intent(in):: t1(len, nd)
     real q1(len, nd)
     real qs1(len, nd)
-    real u1(len, nd)
-    real v1(len, nd)
+    real, intent(in):: u1(len, nd)
+    real, intent(in):: v1(len, nd)
     real, intent(in):: tra1(len, nd, ntra)
     real p1(len, nd)
     real ph1(len, ndp1)
@@ -247,7 +248,7 @@ contains
     ! (local) compressed fields:
 
     integer nloc
-    parameter (nloc=klon) ! pour l'instant
+    parameter (nloc = klon) ! pour l'instant
 
     integer idcum(nloc)
     integer iflag(nloc), nk(nloc), icb(nloc)
@@ -318,47 +319,47 @@ contains
     ! --- INITIALIZE OUTPUT ARRAYS AND PARAMETERS
     !---------------------------------------------------------------------
 
-    do k=1, nd
-       do  i=1, len
-          ft1(i, k)=0.0
-          fq1(i, k)=0.0
-          fu1(i, k)=0.0
-          fv1(i, k)=0.0
-          tvp1(i, k)=0.0
-          tp1(i, k)=0.0
-          clw1(i, k)=0.0
+    do k = 1, nd
+       do  i = 1, len
+          ft1(i, k) = 0.0
+          fq1(i, k) = 0.0
+          fu1(i, k) = 0.0
+          fv1(i, k) = 0.0
+          tvp1(i, k) = 0.0
+          tp1(i, k) = 0.0
+          clw1(i, k) = 0.0
           !ym
-          clw(i, k)=0.0
-          gz1(i, k) = 0.
+          clw(i, k) = 0.0
+          gz1(i, k)  =  0.
           VPrecip1(i, k) = 0.
-          Ma1(i, k)=0.0
-          upwd1(i, k)=0.0
-          dnwd1(i, k)=0.0
-          dnwd01(i, k)=0.0
-          qcondc1(i, k)=0.0
+          Ma1(i, k) = 0.0
+          upwd1(i, k) = 0.0
+          dnwd1(i, k) = 0.0
+          dnwd01(i, k) = 0.0
+          qcondc1(i, k) = 0.0
        end do
     end do
 
-    do  j=1, ntra
-       do  k=1, nd
-          do  i=1, len
-             ftra1(i, k, j)=0.0
+    do  j = 1, ntra
+       do  k = 1, nd
+          do  i = 1, len
+             ftra1(i, k, j) = 0.0
           end do
        end do
     end do
 
-    do  i=1, len
-       precip1(i)=0.0
-       iflag1(i)=0
-       wd1(i)=0.0
-       cape1(i)=0.0
-       VPrecip1(i, nd+1)=0.0
+    do  i = 1, len
+       precip1(i) = 0.0
+       iflag1(i) = 0
+       wd1(i) = 0.0
+       cape1(i) = 0.0
+       VPrecip1(i, nd+1) = 0.0
     end do
 
     if (iflag_con.eq.3) then
-       do il=1, len
-          sig1(il, nd)=sig1(il, nd) + 1.
-          sig1(il, nd) = min(sig1(il, nd), 12.1)
+       do il = 1, len
+          sig1(il, nd) = sig1(il, nd) + 1.
+          sig1(il, nd)  =  min(sig1(il, nd), 12.1)
        enddo
     endif
 
@@ -420,15 +421,13 @@ contains
        CALL cv_trigger(len, nd, icb1, cbmf1, tv1, tvp1, iflag1)
     endif
 
-    !=====================================================================
     ! --- IF THIS POINT IS REACHED, MOIST CONVECTIVE ADJUSTMENT IS NECESSARY
-    !=====================================================================
 
-    ncum=0
-    do  i=1, len
+    ncum = 0
+    do  i = 1, len
        if(iflag1(i).eq.0)then
-          ncum=ncum+1
-          idcum(ncum)=i
+          ncum = ncum+1
+          idcum(ncum) = i
        endif
     end do
 
@@ -579,9 +578,9 @@ contains
        !^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
        ! --- UNCOMPRESS THE FIELDS
        !^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-       ! set iflag1 =42 for non convective points
-       do  i=1, len
-          iflag1(i)=42
+       ! set iflag1  = 42 for non convective points
+       do  i = 1, len
+          iflag1(i) = 42
        end do
 
        if (iflag_con.eq.3) then

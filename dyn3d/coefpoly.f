@@ -18,8 +18,7 @@ SUBROUTINE coefpoly(xf1, xf2, xprim1, xprim2, xtild1, xtild2, a0, a1, a2, a3)
 
   ! On en revient a resoudre un systeme de 4 equat.a 4 inconnues a0,a1,a2,a3
 
-  DOUBLE PRECISION xf1, xf2, xprim1, xprim2, xtild1, xtild2, xi
-  DOUBLE PRECISION xfout, xprim
+  DOUBLE PRECISION xf1, xf2, xprim1, xprim2, xtild1, xtild2
   DOUBLE PRECISION a1, a2, a3, a0, xtil1car, xtil2car, derr, x1x2car
 
   xtil1car = xtild1*xtild1
@@ -35,5 +34,4 @@ SUBROUTINE coefpoly(xf1, xf2, xprim1, xprim2, xtild1, xtild2, a0, a1, a2, a3)
   a1 = xprim1 - 3.*a3*xtil1car - 2.*a2*xtild1
   a0 = xf1 - a3*xtild1*xtil1car - a2*xtil1car - a1*xtild1
 
-  RETURN
 END SUBROUTINE coefpoly

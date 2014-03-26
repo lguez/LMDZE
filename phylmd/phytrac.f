@@ -198,7 +198,7 @@ contains
 
     if (firstcal) then
        print *, 'phytrac: pdtphys = ', pdtphys
-       PRINT *, 'Fr\'equence de sortie des traceurs : ecrit_tra = ', ecrit_tra
+       PRINT *, 'Frequency of tracer output: ecrit_tra = ', ecrit_tra
        if (nbtr < nq_phys) call abort_gcm('phytrac', 'nbtr < nq_phys', 1)
        inirnpb=rnpb
 

@@ -11,12 +11,12 @@ contains
 
     use dimens_m, only: iim, jjm, llm
     USE calendar, only: ymds2ju
-    USE histbeg_totreg_m, ONLY : histbeg_totreg
+    USE histbeg_totreg_m, ONLY: histbeg_totreg
     USE histdef_m, ONLY : histdef
     USE histend_m, ONLY : histend
     USE histvert_m, ONLY : histvert
     use temps, only: annee_ref, day_ref, itau_phy
-    use iniadvtrac_m, only: niadv, tnom, ttext
+    use iniadvtrac_m, only: tnom, ttext
     use dimphy, only: klon
     use clesphys, only: ecrit_tra
     use grid_change, only: gr_phy_write_2d
@@ -37,7 +37,7 @@ contains
     REAL zx_lat(iim, jjm+1)
     INTEGER nhori, nvert
     REAL zsto, zout
-    integer it, iq, iiq
+    integer it, iq
 
     !---------------------------------------------------------
 
@@ -63,26 +63,25 @@ contains
     DO it = 1, nq_phys
        ! champ 2D
        iq=it+2
-       iiq=niadv(iq)
-       CALL histdef(nid_tra, tnom(iq), ttext(iiq), "U/kga", iim, jjm+1, &
+       CALL histdef(nid_tra, tnom(iq), ttext(iq), "U/kga", iim, jjm+1, &
             nhori, llm, 1, llm, nvert, "ave(X)", zsto, zout)
        if (lessivage) THEN
-          CALL histdef(nid_tra, "fl"//tnom(iq), "Flux "//ttext(iiq), &
+          CALL histdef(nid_tra, "fl"//tnom(iq), "Flux "//ttext(iq), &
                "U/m2/s", iim, jjm+1, nhori, llm, 1, llm, nvert, &
                "ave(X)", zsto, zout)
        endif
 
        !---Ajout Olivia
        CALL histdef(nid_tra, "d_tr_th_"//tnom(iq), &
-            "tendance thermique"// ttext(iiq), "?", &
+            "tendance thermique"// ttext(iq), "?", &
             iim, jjm+1, nhori, llm, 1, llm, nvert, &
             "ave(X)", zsto, zout)
        CALL histdef(nid_tra, "d_tr_cv_"//tnom(iq), &
-            "tendance convection"// ttext(iiq), "?", &
+            "tendance convection"// ttext(iq), "?", &
             iim, jjm+1, nhori, llm, 1, llm, nvert, &
             "ave(X)", zsto, zout)
        CALL histdef(nid_tra, "d_tr_cl_"//tnom(iq), &
-            "tendance couche limite"// ttext(iiq), "?", &
+            "tendance couche limite"// ttext(iq), "?", &
             iim, jjm+1, nhori, llm, 1, llm, nvert, &
             "ave(X)", zsto, zout)
        !---fin Olivia

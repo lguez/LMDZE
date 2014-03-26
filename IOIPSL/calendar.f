@@ -36,9 +36,6 @@ MODULE calendar
        calendar_used, un_an, un_jour
 
   REAL, PARAMETER:: un_jour = 86400. ! one day in seconds
-  LOGICAL:: lock_startdate = .FALSE.
-
-  CHARACTER(LEN=30):: time_stamp = 'XXXXXXXXXXXXXXXX'
 
   ! Description of calendar
 

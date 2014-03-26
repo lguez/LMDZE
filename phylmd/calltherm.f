@@ -16,7 +16,7 @@ contains
 
     REAL, intent(in):: dtime
 
-    REAL u_seri(klon, klev), v_seri(klon, klev)
+    REAL, intent(inout):: u_seri(klon, klev), v_seri(klon, klev)
     REAL, intent(inout):: t_seri(klon, klev)
     real q_seri(klon, klev)
     REAL, intent(in):: paprs(klon, klev+1)

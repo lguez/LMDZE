@@ -4,7 +4,7 @@ module addfi_m
 
 contains
 
-  SUBROUTINE addfi(ucov, vcov, teta, q, ps, dufi, dvfi, dtetafi, dqfi, dpfi)
+  SUBROUTINE addfi(ucov, vcov, teta, q, dufi, dvfi, dtetafi, dqfi)
 
     ! From dyn3d/addfi.F, v 1.1.1.1 2004/05/19 12:53:06
 
@@ -22,14 +22,12 @@ contains
     ! potential temperature
 
     real, intent(inout):: q((iim + 1) * (jjm + 1), llm, nqmx)
-    real, intent(inout):: ps((iim + 1) * (jjm + 1))
 
     ! Tendencies:
     REAL, intent(in):: dufi((iim + 1) * (jjm + 1), llm)
     REAL, intent(in):: dvfi((iim + 1) * jjm, llm)
     real, intent(in):: dtetafi((iim + 1) * (jjm + 1), llm)
     REAL, intent(in):: dqfi((iim + 1) * (jjm + 1), llm, nqmx)
-    REAL, intent(in):: dpfi((iim + 1) * (jjm + 1))
 
     ! Local variables :
     REAL xpn(iim), xps(iim), tpn, tps
@@ -61,7 +59,6 @@ contains
     ENDDO
 
     vcov = vcov + dvfi * dtphys
-    ps = ps + dpfi * dtphys
 
     DO iq = 1, 2
        DO k = 1, llm
@@ -79,18 +76,6 @@ contains
              q(j, k, iq)= MAX(q(j, k, iq), qtestt)
           ENDDO
        ENDDO
-    ENDDO
-
-    DO ij = 1, iim
-       xpn(ij) = aire(ij) * ps(ij)
-       xps(ij) = aire(ij+(iim + 1) * jjm) * ps(ij+(iim + 1) * jjm)
-    ENDDO
-    tpn = SUM(xpn)/apoln
-    tps = SUM(xps)/apols
-
-    DO ij = 1, iim + 1
-       ps(ij) = tpn
-       ps(ij+(iim + 1) * jjm) = tps
     ENDDO
 
     DO iq = 1, nqmx

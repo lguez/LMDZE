@@ -16,6 +16,7 @@ contains
     USE disvert_m, ONLY: ap, bp, preff
     USE comgeom, ONLY: aireu_2d, airev_2d, aire_2d
     USE exner_hyb_m, ONLY: exner_hyb
+    use massbar_m, only: massbar
     use massdair_m, only: massdair
 
     integer nlevnc

@@ -19,7 +19,7 @@ SUBROUTINE transp(paprs, tsol, t, q, u, v, geom, vtran_e, vtran_q, utran_e, &
   REAL, INTENT (IN) :: paprs(klon, klev+1)
   REAL tsol(klon)
   REAL, INTENT (IN) :: t(klon, klev)
-  REAL q(klon, klev), u(klon, klev), v(klon, klev)
+  REAL, INTENT (IN) :: q(klon, klev), u(klon, klev), v(klon, klev)
   REAL utran_e(klon), utran_q(klon), vtran_e(klon), vtran_q(klon)
 
   INTEGER i, l

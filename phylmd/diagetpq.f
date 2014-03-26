@@ -7,7 +7,7 @@ contains
   SUBROUTINE diagetpq(airephy, tit, iprt, idiag, idiag2, dtime, t, q, ql, qs, &
        u, v, paprs, d_h_vcol, d_qt, d_qw, d_ql, d_qs, d_ec)
 
-    ! From LMDZ4/libf/phylmd/diagphy.F, version 1.1.1.1 2004/05/19 12:53:08
+    ! From LMDZ4/libf/phylmd/diagphy.F, version 1.1.1.1, 2004/05/19 12:53:08
 
     ! Purpose:
 
@@ -29,7 +29,12 @@ contains
     USE suphec_m, ONLY: rcpd, rcpv, rcs, rcw, rg, rlstt, rlvtt
 
     ! Arguments: 
+
+    ! Input variables
+    real airephy(klon)
     ! airephy-------input-R- grid area
+    CHARACTER(len=*), intent(in):: tit ! comment added in PRINT
+    INTEGER iprt, idiag, idiag2
     ! iprt----input-I- PRINT level ( <=1 : no PRINT)
     ! idiag---input-I- indice dans lequel sera range les nouveaux
     ! bilans d' entalpie et de masse
@@ -38,16 +43,20 @@ contains
     ! l'indice numero idiag2 
     ! Cas particulier : si idiag2=0, pas de comparaison, on
     ! sort directement les bilans d'enthalpie et de masse 
+    REAL, intent(in):: dtime
     ! dtime----input-R- time step (s)
+    REAL, intent(in):: t(klon, klev)
     ! t--------input-R- temperature (K)
+    REAL, intent(in):: q(klon, klev), ql(klon, klev), qs(klon, klev)
     ! q--------input-R- vapeur d'eau (kg/kg)
     ! ql-------input-R- liquid water (kg/kg)
     ! qs-------input-R- solid water (kg/kg)
-    ! u--------input-R- vitesse u
-    ! v--------input-R- vitesse v
-    ! paprs----input-R- pression a intercouche (Pa)
+    REAL, intent(in):: u(klon, klev), v(klon, klev) ! vitesse
+    REAL, intent(in):: paprs(klon, klev+1) ! pression a intercouche (Pa)
 
+    ! Output variables
     ! the following total value are computed by UNIT of earth surface
+    REAL d_h_vcol, d_qt, d_qw, d_ql, d_qs, d_ec
 
     ! d_h_vcol--output-R- Heat flux (W/m2) define as the Enthalpy 
     ! change (J/m2) during one time step (dtime) for the whole 
@@ -58,21 +67,6 @@ contains
     ! d_ql------output-R- same, for the liquid water only (kg/m2/s)
     ! d_qs------output-R- same, for the solid water only (kg/m2/s)
     ! d_ec------output-R- Kinetic Energy Budget (W/m2) for vertical air column
-
-    ! other (COMMON...)
-    ! RCPD, RCPV, ....
-
-    ! Input variables
-    real airephy(klon)
-    CHARACTER(len=*), intent(in):: tit ! comment added in PRINT
-    INTEGER iprt, idiag, idiag2
-    REAL, intent(in):: dtime
-    REAL, intent(in):: t(klon, klev)
-    REAL, intent(in):: q(klon, klev), ql(klon, klev), qs(klon, klev)
-    REAL u(klon, klev), v(klon, klev)
-    REAL, intent(in):: paprs(klon, klev+1)
-    ! Output variables
-    REAL d_h_vcol, d_qt, d_qw, d_ql, d_qs, d_ec
 
     ! Local variables
 

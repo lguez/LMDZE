@@ -108,7 +108,7 @@ contains
     REAL masse(iim + 1, jjm + 1, llm)
     REAL phi(iim + 1, jjm + 1, llm)
     REAL pbaru(ip1jmp1, llm), pbarv(ip1jm, llm)
-    REAL w(ip1jmp1, llm)
+    REAL w(iim + 1, jjm + 1, llm)
 
     real sig1(klon, llm) ! section adiabatic updraft
     real w01(klon, llm) ! vertical velocity within adiabatic updraft
@@ -282,7 +282,7 @@ contains
     ! V\'erification que somme des sous-surfaces vaut 1 :
     ji = count(abs(sum(pctsrf, dim = 2) - 1.) > EPSFRA)
     IF (ji /= 0) then
-       PRINT *, 'Probl\`eme r\'epartition sous maille pour ', ji, 'points'
+       PRINT *, 'Bad surface percentages for ', ji, 'points'
     end IF
 
     ! Calcul interm\'ediaire :

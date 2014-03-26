@@ -28,20 +28,20 @@ contains
     ! haut des couches, "pk(:, :, l)" donné par la relation (2), pour
     ! l = 2 à l = llm.
 
-    use dimens_m, only: iim, jjm, llm
+    use dimens_m, only: llm
     use comconst, only: kappa, cpp
     use disvert_m, only: preff
     use filtreg_m, only: filtreg
 
-    REAL, intent(in):: ps(iim + 1, jjm + 1)
-    REAL, intent(in):: p(iim + 1, jjm + 1, llm + 1)
+    REAL, intent(in):: ps(:, :) ! (longitude, latitude)
+    REAL, intent(in):: p(:, :, :) ! (longitude, latitude, llm + 1)
 
-    real, intent(out):: pks(iim + 1, jjm + 1)
-    real, intent(out):: pk(iim + 1, jjm + 1, llm)
-    real, intent(out), optional:: pkf(iim + 1, jjm + 1, llm)
+    real, intent(out):: pks(:, :) ! (longitude, latitude)
+    real, intent(out):: pk(:, :, :) ! (longitude, latitude, llm)
+    real, intent(out), optional:: pkf(:, :, :) ! (longitude, latitude, llm)
 
     ! Variables locales :
-    real beta(iim + 1, jjm + 1, 2:llm)
+    real beta(size(ps, 1), size(ps, 2), 2:llm)
     INTEGER l
     REAL unpl2k
 
@@ -64,7 +64,7 @@ contains
 
     if (present(pkf)) then
        pkf = pk
-       CALL filtreg(pkf, jjm + 1, llm, 2, 1, .TRUE.)
+       CALL filtreg(pkf, size(pkf, 2), llm, 2, 1, .TRUE.)
     end if
 
   END SUBROUTINE exner_hyb

@@ -41,7 +41,7 @@ contains
     REAL ppic(nlon), pval(nlon)
     REAL pulow(nlon), pvlow(nlon), pustr(nlon), pvstr(nlon)
     REAL, INTENT (IN):: t(nlon, nlev)
-    real u(nlon, nlev), v(nlon, nlev)
+    real, INTENT (IN):: u(nlon, nlev), v(nlon, nlev)
     REAL d_t(nlon, nlev), d_u(nlon, nlev), d_v(nlon, nlev)
 
     INTEGER i, k, kgwd, kdx(nlon), ktest(nlon)

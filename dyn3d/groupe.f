@@ -17,6 +17,7 @@ SUBROUTINE groupe(pext, pbaru, pbarv, pbarum, pbarvm, wm)
   USE comconst
   USE disvert_m
   USE comgeom
+  use vitvert_m, only: vitvert
 
   IMPLICIT NONE
 

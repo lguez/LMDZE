@@ -30,8 +30,10 @@ contains
     real ptimestep, l_mix, r_aspect
     REAL, intent(in):: pt(ngrid, nlay)
     real pdtadj(ngrid, nlay)
-    REAL pu(ngrid, nlay), pduadj(ngrid, nlay)
-    REAL pv(ngrid, nlay), pdvadj(ngrid, nlay)
+    REAL, intent(in):: pu(ngrid, nlay)
+    real pduadj(ngrid, nlay)
+    REAL, intent(in):: pv(ngrid, nlay)
+    real pdvadj(ngrid, nlay)
     REAL po(ngrid, nlay), pdoadj(ngrid, nlay)
     REAL, intent(in):: pplay(ngrid, nlay)
     real, intent(in):: pplev(ngrid, nlay+1)

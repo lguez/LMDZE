@@ -5,7 +5,7 @@ module physiq_m
 contains
 
   SUBROUTINE physiq(lafin, rdayvrai, time, dtphys, paprs, play, pphi, pphis, &
-       u, v, t, qx, omega, d_u, d_v, d_t, d_qx, d_ps)
+       u, v, t, qx, omega, d_u, d_v, d_t, d_qx)
 
     ! From phylmd/physiq.F, version 1.22 2006/02/20 09:38:28
     ! (subversion revision 678)
@@ -62,14 +62,13 @@ contains
     use unit_nml_m, only: unit_nml
     USE yoethf_m, ONLY: r2es, rvtmp2
 
-    ! Arguments:
+    logical, intent(in):: lafin ! dernier passage
 
     REAL, intent(in):: rdayvrai
     ! (elapsed time since January 1st 0h of the starting year, in days)
 
     REAL, intent(in):: time ! heure de la journ\'ee en fraction de jour
     REAL, intent(in):: dtphys ! pas d'integration pour la physique (seconde)
-    logical, intent(in):: lafin ! dernier passage
 
     REAL, intent(in):: paprs(klon, llm + 1)
     ! (pression pour chaque inter-couche, en Pa)
@@ -91,12 +90,13 @@ contains
     REAL, intent(in):: qx(klon, llm, nqmx)
     ! (humidit\'e sp\'ecifique et fractions massiques des autres traceurs)
 
-    REAL omega(klon, llm) ! input vitesse verticale en Pa/s
-    REAL, intent(out):: d_u(klon, llm) ! tendance physique de "u" (m/s/s)
-    REAL, intent(out):: d_v(klon, llm) ! tendance physique de "v" (m/s/s)
+    REAL, intent(in):: omega(klon, llm) ! vitesse verticale en Pa/s
+    REAL, intent(out):: d_u(klon, llm) ! tendance physique de "u" (m s-2)
+    REAL, intent(out):: d_v(klon, llm) ! tendance physique de "v" (m s-2)
     REAL, intent(out):: d_t(klon, llm) ! tendance physique de "t" (K/s)
-    REAL d_qx(klon, llm, nqmx) ! output tendance physique de "qx" (kg/kg/s)
-    REAL d_ps(klon) ! output tendance physique de la pression au sol
+    REAL, intent(out):: d_qx(klon, llm, nqmx) ! tendance physique de "qx" (s-1)
+
+    ! Local:
 
     LOGICAL:: firstcal = .true.
 
@@ -118,7 +118,8 @@ contains
     parameter(rnpb = .true.)
 
     character(len = 6):: ocean = 'force '
-    ! (type de mod\`ele oc\'ean \`a utiliser: "force" ou "slab" mais pas "couple")
+    ! (type de mod\`ele oc\'ean \`a utiliser: "force" ou "slab" mais
+    ! pas "couple")
 
     ! "slab" ocean
     REAL, save:: tslab(klon) ! temperature of ocean slab
@@ -154,14 +155,14 @@ contains
 
     real da(klon, llm), phi(klon, llm, llm), mp(klon, llm)
 
-    !IM Amip2 PV a theta constante 
+    ! Amip2 PV a theta constante 
 
     CHARACTER(LEN = 3) ctetaSTD(nbteta)
     DATA ctetaSTD/'350', '380', '405'/
     REAL rtetaSTD(nbteta)
     DATA rtetaSTD/350., 380., 405./
 
-    !MI Amip2 PV a theta constante
+    ! Amip2 PV a theta constante
 
     REAL swdn0(klon, llm + 1), swdn(klon, llm + 1)
     REAL swup0(klon, llm + 1), swup(klon, llm + 1)
@@ -171,7 +172,7 @@ contains
     REAL lwup0(klon, llm + 1), lwup(klon, llm + 1)
     SAVE lwdn0, lwdn, lwup0, lwup 
 
-    !IM Amip2
+    ! Amip2
     ! variables a une pression donnee
 
     integer nlevSTD
@@ -240,7 +241,7 @@ contains
          'pc= 440-560hPa, tau> 60.', 'pc= 560-680hPa, tau> 60.', &
          'pc= 680-800hPa, tau> 60.'/
 
-    !IM ISCCP simulator v3.4
+    ! ISCCP simulator v3.4
 
     integer nid_hf, nid_hf3d
     save nid_hf, nid_hf3d
@@ -442,7 +443,7 @@ contains
     REAL, PARAMETER:: t_coup = 234.
     REAL zphi(klon, llm)
 
-    !IM cf. AM Variables locales pour la CLA (hbtm2)
+    ! cf. AM Variables locales pour la CLA (hbtm2)
 
     REAL, SAVE:: pblh(klon, nbsrf) ! Hauteur de couche limite
     REAL, SAVE:: plcl(klon, nbsrf) ! Niveau de condensation de la CLA
@@ -553,8 +554,6 @@ contains
     REAL uq_lay(klon, llm) ! transport zonal de l'eau a chaque niveau vert.
 
     REAL zsto
-
-    logical ok_sync
     real date0
 
     ! Variables li\'ees au bilan d'\'energie et d'enthalpie :
@@ -633,7 +632,6 @@ contains
     !----------------------------------------------------------------
 
     IF (if_ebil >= 1) zero_v = 0.
-    ok_sync = .TRUE.
     IF (nqmx < 2) CALL abort_gcm('physiq', &
          'eaux vapeur et liquide sont indispensables', 1)
 
@@ -748,23 +746,12 @@ contains
     ENDIF test_firstcal
 
     ! Mettre a zero des variables de sortie (pour securite)
-
-    DO i = 1, klon
-       d_ps(i) = 0.
-    ENDDO
-    DO iq = 1, nqmx
-       DO k = 1, llm
-          DO i = 1, klon
-             d_qx(i, k, iq) = 0.
-          ENDDO
-       ENDDO
-    ENDDO
     da = 0.
     mp = 0.
     phi = 0.
 
-    ! Ne pas affecter les valeurs entr\'ees de u, v, h, et q :
-
+    ! We will modify variables *_seri and we will not touch variables
+    ! u, v, h, q:
     DO k = 1, llm
        DO i = 1, klon
           t_seri(i, k) = t(i, k)
@@ -1875,9 +1862,7 @@ contains
          CALL gr_fi_ecrit(llm, klon, iim, jjm + 1, d_q_vdf, zx_tmp_3d)
          CALL histwrite(nid_ins, "dqvdf", itau_w, zx_tmp_3d)
 
-         if (ok_sync) then
-            call histsync(nid_ins)
-         endif
+         call histsync(nid_ins)
       ENDIF
 
     end subroutine write_histins

@@ -12,10 +12,10 @@ SUBROUTINE transp_lay(paprs, tsol, t, q, u, v, geom, vtran_e, vtran_q, &
   ! ======================================================================
 
 
-  REAL, INTENT (IN) :: paprs(klon, klev+1)
+  REAL, INTENT (IN):: paprs(klon, klev+1)
   REAL tsol(klon)
-  REAL, INTENT (IN) :: t(klon, klev)
-  REAL q(klon, klev), u(klon, klev), v(klon, klev)
+  REAL, INTENT (IN):: t(klon, klev)
+  REAL, INTENT (IN):: q(klon, klev), u(klon, klev), v(klon, klev)
   REAL utran_e(klon, klev), utran_q(klon, klev)
   REAL vtran_e(klon, klev), vtran_q(klon, klev)
 

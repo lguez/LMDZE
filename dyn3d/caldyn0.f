@@ -7,21 +7,23 @@ contains
   SUBROUTINE caldyn0(ucov, vcov, teta, ps, masse, pk, phis, phi, w, &
        pbaru, pbarv)
 
-    ! From dyn3d/caldyn0.F, version 1.1.1.1 2004/05/19 12:53:07
+    ! From dyn3d/caldyn0.F, version 1.1.1.1, 2004/05/19 12:53:07
     ! Authors:  P. Le Van, F. Forget
     ! Objet : calcul des tendances dynamiques
 
     USE comgeom, ONLY: airesurg
+    use convmas_m, only: convmas
     USE dimens_m, ONLY: iim, jjm, llm
     USE disvert_m, ONLY: ap, bp
     use flumass_m, only: flumass
+    use massbar_m, only: massbar
     use massbarxy_m, only: massbarxy
     use massdair_m, only: massdair
     USE paramet_m, ONLY: iip1, ip1jmp1, jjp1, llmp1
     use sortvarc0_m, only: sortvarc0
     use tourpot_m, only: tourpot
+    use vitvert_m, only: vitvert
 
-    ! Arguments:
     REAL, INTENT(IN):: ucov(:, :, :) ! (iim + 1, jjm + 1, llm) vent covariant
     REAL, INTENT(IN):: vcov(:, :, :) ! (iim + 1, jjm, llm) ! vent covariant
     REAL, INTENT(IN):: teta(ip1jmp1, llm)
@@ -30,7 +32,7 @@ contains
     REAL, INTENT (IN):: pk(iip1, jjp1, llm)
     REAL, INTENT (IN):: phis(ip1jmp1)
     REAL, INTENT (IN):: phi(ip1jmp1, llm)
-    REAL, INTENT(out):: w(ip1jmp1, llm)
+    REAL, INTENT(out):: w(:, :, :) ! (iim + 1, jjm + 1, llm)
     REAL, intent(out):: pbaru(ip1jmp1, llm), pbarv((iim + 1) * jjm, llm)
 
     ! Local:
