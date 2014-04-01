@@ -4,13 +4,13 @@
 
 # 1. Source files
 
-src_root = .
+compil_dir = .
 
-VPATH := ${src_root} $(addprefix ${src_root}/, $(shell cat ${src_root}/directories))
+VPATH := ${compil_dir}/.. $(addprefix ${compil_dir}/../, $(shell cat ${compil_dir}/directories))
 
-common_sources := $(shell cat ${src_root}/common_sources)
-src_ce0l_only := $(shell cat ${src_root}/src_ce0l_only)
-src_gcm_only := $(shell cat ${src_root}/src_gcm_only)
+common_sources := $(shell cat ${compil_dir}/common_sources)
+src_ce0l_only := $(shell cat ${compil_dir}/src_ce0l_only)
+src_gcm_only := $(shell cat ${compil_dir}/src_gcm_only)
 sources = ${src_ce0l_only} ${src_gcm_only} ${common_sources}
 
 # 2. Objects and executable files
@@ -38,17 +38,17 @@ ${execut}:
 ce0l: ${obj_ce0l}
 gcm: ${obj_gcm}
 
-depend ${src_root}/depend.mk:
-	makedepf90 -free -Wmissing -Wconfused $(addprefix -I, ${VPATH}) -nosrc $(addprefix -u , netcdf numer_rec_95 netcdf95 nr_util jumble) ${sources} >${src_root}/depend.mk
+depend ${compil_dir}/depend.mk:
+	makedepf90 -free -Wmissing -Wconfused $(addprefix -I, ${VPATH}) -nosrc $(addprefix -u , netcdf numer_rec_95 netcdf95 nr_util jumble) ${sources} >${compil_dir}/depend.mk
 
-${src_root}/TAGS: ${sources}
-	ctags -e --language-force=fortran -f $@ $^
+TAGS: ${sources}
+	ctags -e --language-force=fortran $^
 
 clean:
 	rm -f ${execut} ${objects} log
 
 clobber: clean
-	rm -f *.mod ${src_root}/depend.mk ${src_root}/TAGS
+	rm -f *.mod ${compil_dir}/depend.mk TAGS ${compil_dir}/TAGS
 
 log:
 	hostname >$@
@@ -56,7 +56,7 @@ log:
 	echo -e "\nFC = ${FC}\n\nFFLAGS = ${FFLAGS}\n\nLDLIBS = ${LDLIBS}\n\nLDFLAGS = ${LDFLAGS}" >>$@
 
 ifeq ($(findstring $(MAKECMDGOALS), clobber depend),)
-include ${src_root}/depend.mk
+include ${compil_dir}/depend.mk
 endif
 
 -include grep.mk
