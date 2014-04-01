@@ -40,11 +40,8 @@ iniadvtrac.f
 inifgn.f
 inifilr.f
 ioconf_calendar.f
-isittime.f
-itau2date.f
 jacobi.f
 ju2ymds.f
-ju2ymds_internal.f
 massbar.f
 massbarxy.f
 massdair.f
@@ -61,4 +58,3 @@ tourpot.f
 unit_nml_m.f
 vitvert.f
 ymds2ju.f
-ymds2ju_internal.f

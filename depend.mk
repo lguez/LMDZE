@@ -150,8 +150,11 @@ interfsurf_hq.o : suphec.o interfsur_lim.o interfoce_slab.o interfoce_lim.o inte
 interfsur_lim.o : abort_gcm.o 
 interpost.o : comgeom.o disvert.o comconst.o paramet_m.o dimens_m.o 
 interpre.o : ener.o temps.o comgeom.o conf_gcm.o disvert.o comconst.o paramet_m.o dimens_m.o 
-ioget_calendar.o : calendar.o 
+ioconf_calendar.o : errioipsl.o strlowercase.o calendar.o 
+ioget_calendar.o : ioconf_calendar.o calendar.o 
 ioipslmpp.o : errioipsl.o 
+isittime.o : ymds2ju.o ju2ymds.o itau2date.o calendar.o 
+itau2date.o : calendar.o 
 laplacien.o : paramet_m.o grad.o filtreg.o divergf.o dimens_m.o 
 laplacien_gam.o : comgeom.o paramet_m.o dimens_m.o grad.o 
 laplacien_rot.o : filtreg.o comgeom.o paramet_m.o dimens_m.o 
@@ -271,11 +274,7 @@ histclo.o : histcom_var.o errioipsl.o
 iniadvtrac.o : dimens_m.o 
 inifgn.o : coefils.o serre.o comgeom.o paramet_m.o dimens_m.o 
 inifilr.o : coefils.o serre.o comgeom.o conf_gcm.o dimens_m.o 
-ioconf_calendar.o : errioipsl.o strlowercase.o calendar.o 
-isittime.o : ymds2ju.o ju2ymds.o itau2date.o calendar.o 
-itau2date.o : calendar.o 
-ju2ymds.o : ju2ymds_internal.o calendar.o 
-ju2ymds_internal.o : calendar.o 
+ju2ymds.o : ioconf_calendar.o calendar.o 
 massbar.o : comgeom.o paramet_m.o dimens_m.o 
 massbarxy.o : comgeom.o paramet_m.o dimens_m.o 
 massdair.o : paramet_m.o dimens_m.o comgeom.o 
@@ -284,5 +283,4 @@ phyredem.o : temps.o indicesol.o dimsoil.o dimphy.o
 pressure_var.o : dimens_m.o 
 tourpot.o : filtreg.o comgeom.o dimens_m.o 
 vitvert.o : paramet_m.o disvert.o dimens_m.o 
-ymds2ju.o : ymds2ju_internal.o calendar.o 
-ymds2ju_internal.o : calendar.o 
+ymds2ju.o : ioconf_calendar.o calendar.o 

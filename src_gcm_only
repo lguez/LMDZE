@@ -159,8 +159,10 @@ interpost.f
 interpre.f
 ioget_calendar.f
 ioipslmpp.f
+isittime.f
 ismax.f
 ismin.f
+itau2date.f
 laplacien.f
 laplacien_gam.f
 laplacien_rot.f

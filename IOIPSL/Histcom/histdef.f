@@ -21,7 +21,7 @@ contains
          slab_ori, slab_sz, sopps, tax_last, tax_name, tax_name_length, &
          title, topp, unit_name, var_axid, var_haxid, var_zaxid, zax_name, &
          zax_size, zorig, zsize
-    USE ioget_calendar_m, ONLY: ioget_calendar
+    USE ioget_calendar_m, ONLY: ioget_calendar_real
     USE mathelp, ONLY: buildop
 
     INTEGER, INTENT(IN):: fileid
@@ -255,15 +255,15 @@ contains
     freq_opp(fileid, iv) = pfreq_opp
     freq_wrt(fileid, iv) = pfreq_wrt
 
-    CALL ioget_calendar(un_an, un_jour)
+    CALL ioget_calendar_real(un_an, un_jour)
     IF (pfreq_opp<0) THEN
-       CALL ioget_calendar(un_an)
+       CALL ioget_calendar_real(un_an)
        test_fopp = pfreq_opp*(-1.)*un_an/12.*un_jour
     ELSE
        test_fopp = pfreq_opp
     END IF
     IF (pfreq_wrt<0) THEN
-       CALL ioget_calendar(un_an)
+       CALL ioget_calendar_real(un_an)
        test_fwrt = pfreq_wrt*(-1.)*un_an/12.*un_jour
     ELSE
        test_fwrt = pfreq_wrt

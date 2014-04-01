@@ -1,6 +1,36 @@
 module ioconf_calendar_m
 
+  ! From IOIPSL/src/calendar.f90, version 2.0 2004/04/05 14:47:47
+
+  ! This is the calendar used to do all calculations on time. Three
+  ! types of calendars are possible:
+
+  ! - Gregorian:
+  ! The normal calendar. The time origin for the julian day in this
+  ! case is 24 Nov -4713.
+
+  ! - No leap:
+  ! A 365 day year without leap years. The origin for the julian days
+  ! is in this case 1 Jan 0.
+
+  ! - xxxd:
+  ! Year of xxx days with months of equal length. The origin for the
+  ! julian days is then also 1 Jan 0.
+
+  ! As one can see it is difficult to go from one calendar to the
+  ! other. All operations involving julian days will be wrong. This
+  ! calendar will lock as soon as possible the length of the year and
+  ! forbid any further modification.
+
+  ! For the non leap-year calendar the method is still brute force.
+  ! We need to find an integer series which takes care of the length
+  ! of the various month. (Jan)
+
   implicit none
+
+  INTEGER:: mon_len(12) = (/31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31/)
+  CHARACTER(LEN=20):: calendar_used = "gregorian"
+  REAL:: un_an = 365.2425 ! one year in days
 
 contains
 
@@ -15,7 +45,7 @@ contains
     !  - xxxd: A calendar of xxx days (has to be a modulo of 12)
     !                with 12 month of equal length
 
-    use calendar, only: mon_len, calendar_used, lock_unan, un_an
+    use calendar, only: lock_unan
     use strlowercase_m
     use errioipsl
 
@@ -80,21 +110,21 @@ contains
                 mon_len(:) = leng
              ELSE
                 CALL histerr (3, 'ioconf_calendar', &
-                     &         'The length of the year as to be a modulo of 12', &
-                     &         'so that it can be divided into 12 month of equal length', &
-                     &         str)
+                     'The length of the year has to be a modulo of 12', &
+                     'so that it can be divided into 12 month of equal ' &
+                     // 'length', str)
              ENDIF
           ELSE
              CALL histerr (3, 'ioconf_calendar', &
-                  &       'Unrecognized input, please ceck the man pages.', str, ' ')
+                  'Unrecognized input, please ceck the man pages.', str, ' ')
           ENDIF
        END SELECT
     ELSE
        WRITE(str10, '(f10.4)') un_an
        CALL histerr (2, 'ioconf_calendar', &
-            &   'The calendar was already used or configured. You are not', &
-            &   'allowed to change it again. '// &
-            &   'The following length of year is used:', str10)
+            'The calendar was already used or configured. You are not', &
+            'allowed to change it again. '// &
+            'The following length of year is used:', str10)
     ENDIF
 
   END SUBROUTINE ioconf_calendar

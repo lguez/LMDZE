@@ -14,7 +14,7 @@ contains
          missing_val, name, nb_tax, nb_var, ncdf_ids, ncvar_ids, regular, &
          tax_name, tdimid, tid, title, topp, unit_name, var_axid, var_zaxid, &
          xid, yid, zax_ids, zax_name
-    USE ioget_calendar_m, ONLY: ioget_calendar
+    USE ioget_calendar_m, ONLY: ioget_calendar_str
     USE ioipslmpp, ONLY: ioipslmpp_addatt
     USE ju2ymds_m, ONLY: ju2ymds
     USE netcdf, ONLY: nf90_float, nf90_unlimited
@@ -74,7 +74,7 @@ contains
        WRITE(str70, 7000) year, month, day, hours, minutes, int(sec)
        call nf95_put_att(ncid, tdimid(fileid, itx), 'units', trim(str70))
 
-       CALL ioget_calendar(str30)
+       CALL ioget_calendar_str(str30)
        call nf95_put_att(ncid, tdimid(fileid, itx), 'calendar', trim(str30))
 
        call nf95_put_att(ncid, tdimid(fileid, itx), 'title', 'Time')
