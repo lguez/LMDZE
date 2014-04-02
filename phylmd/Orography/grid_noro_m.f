@@ -29,16 +29,16 @@ contains
     ! area. See "grid_noto.txt".
 
     use dimens_m, only: iim, jjm
-    use nr_util, only: assert, pi
     use mva9_m, only: mva9
+    use nr_util, only: assert, pi
 
     REAL, intent(in):: xdata(:), ydata(:) ! coordinates of input field
     REAL, intent(in):: zdata(:, :) ! input field
     REAL, intent(in):: x(:), y(:) ! coordinates of output field
 
     ! Correlations of US Navy orography gradients:
-    REAL, intent(out):: zphi(:, :)
-    real, intent(out):: zmea(:, :) ! Mean orography
+    REAL, intent(out):: zphi(:, :) ! orography not smoothed
+    real, intent(out):: zmea(:, :) ! smoothed orography
     real, intent(out):: zstd(:, :) ! Standard deviation
     REAL, intent(out):: zsig(:, :) ! Slope
     real, intent(out):: zgam(:, :) ! Anisotropy

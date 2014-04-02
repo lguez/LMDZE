@@ -169,15 +169,15 @@ contains
           ! Calcul des tendances physiques:
 
           forall (l = 1: llm + 1) p3d(:, :, l) = ap(l) + bp(l) * ps
-          CALL exner_hyb(ps, p3d, pks, pk, pkf)
+          CALL exner_hyb(ps, p3d, pks, pk)
 
           rdaym_ini = itau * dtvr / daysec
           rdayvrai = rdaym_ini + day_ini
           time = REAL(mod(itau, day_step)) / day_step + time_0
           IF (time > 1.) time = time - 1.
 
-          CALL calfis(rdayvrai, time, ucov, vcov, teta, q, ps, pk, phis, phi, &
-               w, dufi, dvfi, dtetafi, dqfi, lafin = itau + 1 == itaufin)
+          CALL calfis(rdayvrai, time, ucov, vcov, teta, q, pk, phis, phi, w, &
+               dufi, dvfi, dtetafi, dqfi, lafin = itau + 1 == itaufin)
 
           ! Ajout des tendances physiques:
           CALL addfi(ucov, vcov, teta, q, dufi, dvfi, dtetafi, dqfi)

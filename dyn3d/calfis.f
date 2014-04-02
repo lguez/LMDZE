@@ -4,8 +4,8 @@ module calfis_m
 
 contains
 
-  SUBROUTINE calfis(rdayvrai, time, ucov, vcov, teta, q, ps, pk, phis, phi, &
-       w, dufi, dvfi, dtetafi, dqfi, lafin)
+  SUBROUTINE calfis(rdayvrai, time, ucov, vcov, teta, q, pk, phis, phi, w, &
+       dufi, dvfi, dtetafi, dqfi, lafin)
 
     ! From dyn3d/calfis.F, version 1.3, 2005/05/25 13:10:09
     ! Authors: P. Le Van, F. Hourdin
@@ -55,8 +55,6 @@ contains
     REAL, intent(in):: q(:, :, :, :) ! (iim + 1, jjm + 1, llm, nqmx)
     ! mass fractions of advected fields
 
-    REAL, intent(in):: ps(:, :) ! (iim + 1, jjm + 1) surface pressure
-
     REAL, intent(in):: pk(:, :, :) ! (iim + 1, jjm + 1, llm)
     ! Exner = cp * (p / preff)**kappa 
 
@@ -77,8 +75,7 @@ contains
     LOGICAL, intent(in):: lafin
 
     ! Local:
-    INTEGER i, j, l, ig0, iq, iiq
-    REAL zpsrf(klon)
+    INTEGER i, j, l, ig0, iq
     REAL paprs(klon, llm + 1) ! aux interfaces des couches 
     REAL play(klon, llm) ! aux milieux des couches 
     REAL pphi(klon, llm), pphis(klon)

@@ -10,17 +10,17 @@ contains
 
     ! Author: P. Le Van
 
-    ! Objet: calcul du terme de pression (gradient de p/densité) et du
-    ! terme de (- gradient de la fonction de Bernouilli). Ces termes
-    ! sont ajoutes a d(ucov)/dt et a d(vcov)/dt.
+    ! Objet : calcul du terme de pression (gradient de p / densité) et
+    ! du terme "- gradient de la fonction de Bernouilli". Ces termes
+    ! sont ajoutés à d(ucov)/dt et à d(vcov)/dt.
 
     USE dimens_m, ONLY: iim, llm
     USE paramet_m, ONLY: iip1, iip2, ip1jm, ip1jmp1
 
     REAL, INTENT(IN):: teta(ip1jmp1, llm)
     REAL, INTENT(IN):: pkf(ip1jmp1, llm)
-    real bern(ip1jmp1, llm), du(ip1jmp1, llm), dv(ip1jm, llm)
-    ! teta , pkf, bern sont des arguments d'entree pour le s-pg
+    real, INTENT(IN):: bern(ip1jmp1, llm)
+    real du(ip1jmp1, llm), dv(ip1jm, llm)
     ! du et dv sont des arguments de sortie pour le s-pg
 
     ! Local:
