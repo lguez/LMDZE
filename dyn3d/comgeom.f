@@ -171,10 +171,9 @@ contains
     USE paramet_m, ONLY : iip1, jjp1
     USE serre, ONLY : alphax, alphay, clat, clon, dzoomx, dzoomy, grossismx, &
          grossismy, pxo, pyo, taux, tauy, transx, transy
-    ! Modifies pxo, pyo, transx, transy
+    ! Modifiés pxo, pyo, transx, transy
 
-    ! Variables locales
-
+    ! Local:
     INTEGER i, j, itmax, itmay, iter, unit
     REAL cvu(iip1, jjp1), cuv(iip1, jjm)
     REAL ai14, ai23, airez, un4rad2

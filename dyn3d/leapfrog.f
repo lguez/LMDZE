@@ -165,11 +165,11 @@ contains
                finvmaold, dtvr, leapf=.false.)
        end if
 
+       forall (l = 1: llm + 1) p3d(:, :, l) = ap(l) + bp(l) * ps
+       CALL exner_hyb(ps, p3d, pks, pk, pkf)
+
        IF (MOD(itau + 1, iphysiq) == 0 .AND. iflag_phys /= 0) THEN
           ! Calcul des tendances physiques:
-
-          forall (l = 1: llm + 1) p3d(:, :, l) = ap(l) + bp(l) * ps
-          CALL exner_hyb(ps, p3d, pks, pk)
 
           rdaym_ini = itau * dtvr / daysec
           rdayvrai = rdaym_ini + day_ini
@@ -182,9 +182,6 @@ contains
           ! Ajout des tendances physiques:
           CALL addfi(ucov, vcov, teta, q, dufi, dvfi, dtetafi, dqfi)
        ENDIF
-
-       forall (l = 1: llm + 1) p3d(:, :, l) = ap(l) + bp(l) * ps
-       CALL exner_hyb(ps, p3d, pks, pk, pkf)
 
        IF (MOD(itau + 1, idissip) == 0) THEN
           ! Dissipation horizontale et verticale des petites \'echelles
