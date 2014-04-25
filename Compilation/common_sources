@@ -48,7 +48,6 @@ massdair.f
 minmax.f
 paramet_m.f
 phyredem.f
-pressure_var.f
 q_sat.f
 serre.f
 ssum.f

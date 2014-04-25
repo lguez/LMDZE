@@ -77,9 +77,9 @@ contains
     ! (input pression pour le mileu de chaque couche (en Pa))
 
     REAL, intent(in):: pphi(klon, llm) 
-    ! (input geopotentiel de chaque couche (g z) (reference sol))
+    ! géopotentiel de chaque couche (référence sol)
 
-    REAL, intent(in):: pphis(klon) ! input geopotentiel du sol
+    REAL, intent(in):: pphis(klon) ! géopotentiel du sol
 
     REAL, intent(in):: u(klon, llm)
     ! vitesse dans la direction X (de O a E) en m/s
@@ -243,9 +243,6 @@ contains
 
     ! ISCCP simulator v3.4
 
-    integer nid_hf, nid_hf3d
-    save nid_hf, nid_hf3d
-
     ! Variables propres a la physique
 
     INTEGER, save:: radpas
@@ -300,10 +297,6 @@ contains
     SAVE run_off_lic_0
     !KE43
     ! Variables liees a la convection de K. Emanuel (sb):
-
-    REAL bas, top ! cloud base and top levels
-    SAVE bas
-    SAVE top
 
     REAL Ma(klon, llm) ! undilute upward mass flux
     SAVE Ma
@@ -376,9 +369,6 @@ contains
 
     ! Declaration des procedures appelees
 
-    EXTERNAL alboc ! calculer l'albedo sur ocean
-    !KE43
-    EXTERNAL conema3 ! convect4.3
     EXTERNAL nuage ! calculer les proprietes radiatives
     EXTERNAL transp ! transport total de l'eau et de l'energie
 
@@ -466,19 +456,10 @@ contains
     REAL upwd(klon, llm) ! saturated updraft mass flux
     REAL dnwd(klon, llm) ! saturated downdraft mass flux
     REAL dnwd0(klon, llm) ! unsaturated downdraft mass flux
-    REAL tvp(klon, llm) ! virtual temp of lifted parcel
     REAL cape(klon) ! CAPE
     SAVE cape
 
-    REAL pbase(klon) ! cloud base pressure
-    SAVE pbase
-    REAL bbase(klon) ! cloud base buoyancy
-    SAVE bbase
-    REAL rflag(klon) ! flag fonctionnement de convect
     INTEGER iflagctrl(klon) ! flag fonctionnement de convect
-    ! -- convect43:
-    REAL dtvpdt1(klon, llm), dtvpdq1(klon, llm)
-    REAL dplcldt(klon), dplcldr(klon)
 
     ! Variables du changement
 
@@ -533,9 +514,7 @@ contains
     REAL t_seri(klon, llm), q_seri(klon, llm)
     REAL ql_seri(klon, llm), qs_seri(klon, llm)
     REAL u_seri(klon, llm), v_seri(klon, llm)
-
     REAL tr_seri(klon, llm, nbtr)
-    REAL d_tr(klon, llm, nbtr)
 
     REAL zx_rh(klon, llm)
 
@@ -546,7 +525,7 @@ contains
 
     REAL zx_tmp_fi2d(klon) ! variable temporaire grille physique
 
-    INTEGER, SAVE:: nid_day, nid_ins
+    INTEGER, SAVE:: nid_ins
 
     REAL ve_lay(klon, llm) ! transport meri. de l'energie a chaque niveau vert.
     REAL vq_lay(klon, llm) ! transport meri. de l'eau a chaque niveau vert.
@@ -562,7 +541,7 @@ contains
     REAL, SAVE:: d_h_vcol_phy
     REAL fs_bound, fq_bound
     REAL zero_v(klon)
-    CHARACTER(LEN = 15) tit
+    CHARACTER(LEN = 20) tit
     INTEGER:: ip_ebil = 0 ! print level for energy conservation diagnostics
     INTEGER:: if_ebil = 0 ! verbosity for diagnostics of energy conservation 
 
@@ -983,7 +962,8 @@ contains
 
        IF (abs(pctsrf(i, is_ter) + pctsrf(i, is_lic) + pctsrf(i, is_oce) &
             + pctsrf(i, is_sic) - 1.)  >  EPSFRA) print *, &
-            'physiq : probl\`eme sous surface au point ', i, pctsrf(i, 1 : nbsrf)
+            'physiq : probl\`eme sous surface au point ', i, &
+            pctsrf(i, 1 : nbsrf)
     ENDDO
     DO nsrf = 1, nbsrf
        DO i = 1, klon
@@ -1011,8 +991,7 @@ contains
        ENDDO
     ENDDO
 
-    ! Si une sous-fraction n'existe pas, elle prend la temp. moyenne
-
+    ! Si une sous-fraction n'existe pas, elle prend la température moyenne :
     DO nsrf = 1, nbsrf
        DO i = 1, klon
           IF (pctsrf(i, nsrf) < epsfra) ftsol(i, nsrf) = zxtsol(i)
@@ -1071,17 +1050,10 @@ contains
     else
        ! iflag_con >= 3
 
-       CALL concvl(dtphys, paprs, play, t_seri, q_seri, u_seri, &
-            v_seri, tr_seri, sig1, w01, d_t_con, d_q_con, &
-            d_u_con, d_v_con, d_tr, rain_con, snow_con, ibas_con, &
-            itop_con, upwd, dnwd, dnwd0, Ma, cape, tvp, iflagctrl, &
-            pbase, bbase, dtvpdt1, dtvpdq1, dplcldt, dplcldr, qcondc, &
-            wd, pmflxr, pmflxs, da, phi, mp, ntra=1)
-       ! (number of tracers for the convection scheme of Kerry Emanuel:
-       ! la partie traceurs est faite dans phytrac
-       ! on met ntra = 1 pour limiter les appels mais on peut
-       ! supprimer les calculs / ftra.)
-
+       CALL concvl(dtphys, paprs, play, t_seri, q_seri, u_seri, v_seri, sig1, &
+            w01, d_t_con, d_q_con, d_u_con, d_v_con, rain_con, snow_con, &
+            ibas_con, itop_con, upwd, dnwd, dnwd0, Ma, cape, iflagctrl, &
+            qcondc, wd, pmflxr, pmflxs, da, phi, mp)
        clwcon0 = qcondc
        mfu = upwd + dnwd
        IF (.NOT. ok_gust) wd = 0.
@@ -1090,21 +1062,18 @@ contains
 
        DO k = 1, llm
           DO i = 1, klon
-             zx_t = t_seri(i, k)
              IF (thermcep) THEN
-                zdelta = MAX(0., SIGN(1., rtt-zx_t))
-                zx_qs = r2es * FOEEW(zx_t, zdelta) / play(i, k)
-                zx_qs = MIN(0.5, zx_qs)
-                zcor = 1./(1.-retv*zx_qs)
-                zx_qs = zx_qs*zcor
+                zdelta = MAX(0., SIGN(1., rtt - t_seri(i, k)))
+                zqsat(i, k) = r2es * FOEEW(t_seri(i, k), zdelta) / play(i, k)
+                zqsat(i, k) = MIN(0.5, zqsat(i, k))
+                zqsat(i, k) = zqsat(i, k) / (1.-retv*zqsat(i, k))
              ELSE
-                IF (zx_t < t_coup) THEN
-                   zx_qs = qsats(zx_t)/play(i, k)
+                IF (t_seri(i, k) < t_coup) THEN
+                   zqsat(i, k) = qsats(t_seri(i, k))/play(i, k)
                 ELSE
-                   zx_qs = qsatl(zx_t)/play(i, k)
+                   zqsat(i, k) = qsatl(t_seri(i, k))/play(i, k)
                 ENDIF
              ENDIF
-             zqsat(i, k) = zx_qs
           ENDDO
        ENDDO
 
@@ -1383,7 +1352,8 @@ contains
        cg_ae = 0.
     ENDIF
 
-    ! Param\`etres optiques des nuages et quelques param\`etres pour diagnostics :
+    ! Param\`etres optiques des nuages et quelques param\`etres pour
+    ! diagnostics :
     if (ok_newmicro) then
        CALL newmicro(paprs, play, t_seri, cldliq, cldfra, cldtau, cldemi, &
             cldh, cldl, cldm, cldt, cldq, flwp, fiwp, flwc, fiwc, ok_aie, &

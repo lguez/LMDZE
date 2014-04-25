@@ -36,12 +36,11 @@ contains
     ! (latitudes, in degrees or radians, in increasing or decreasing
     ! order, from pole to pole)
 
-    LOGICAL, intent(in), optional:: interbar
     REAL, intent(out):: xf(:), yf(:) ! longitudes and latitudes, in rad
     REAL, intent(inout):: champd(:, :)
+    LOGICAL, intent(in), optional:: interbar
 
-    ! Variables locales:
-
+    ! Local:
     INTEGER  lons, lats
     LOGICAL radianlon ! "xd" is in degrees
     logical invlon ! "xd" contains longitudes between 0 and 2 pi

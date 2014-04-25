@@ -1,8 +1,8 @@
 module cv3_param_m
 
-  ! From LMDZ4/libf/phylmd/cvparam3.h, version 1.1.1.1 2004/05/19 12:53:09
+  ! From LMDZ4/libf/phylmd/cvparam3.h, version 1.1.1.1, 2004/05/19 12:53:09
 
-  ! Parameters for iflag_con=3:
+  ! Parameters for iflag_con = 3:
   ! - microphysical parameters
   ! - parameters that control the rate of approach to quasi-equilibrium
 
@@ -42,7 +42,7 @@ contains
 
   SUBROUTINE cv3_param(nd, delt)
 
-    ! From LMDZ4/libf/phylmd/cv3_routines.F, version 1.5 2005/07/11 15:20:02
+    ! From LMDZ4/libf/phylmd/cv3_routines.F, version 1.5, 2005/07/11 15:20:02
 
     ! Set parameters for iflag_con = 3
 
@@ -55,7 +55,7 @@ contains
 
     noff = 1
     minorig = 1
-    nl=nd-noff
+    nl = nd - noff
     nlp=nl+1
     nlm=nl-1
 

@@ -8,13 +8,14 @@ contains
        taux, rlatu, yprimu, rlatv, yprimv, rlatu1, yprimu1, rlatu2, yprimu2, &
        rlonu, xprimu, rlonv, xprimv, rlonm025, xprimm025, rlonp025, xprimp025)
 
-    ! From dyn3d/fxyhyper.F, version 1.1.1.1 2004/05/19 12:53:06
+    ! From dyn3d/fxyhyper.F, version 1.1.1.1, 2004/05/19 12:53:06
 
     USE dimens_m, ONLY: jjm
     use fxhyp_m, only: fxhyp
-    USE paramet_m, ONLY: iip1, jjp1
+    use fyhyp_m, only: fyhyp
+    USE paramet_m, ONLY: iip1
 
-    ! Auteur : P. Le Van d'après formulations de R. Sadourny
+    ! Auteur : P. Le Van d'après les formulations de R. Sadourny
 
     ! Cette procédure calcule les latitudes (routine fyhyp) et
     ! longitudes (fxhyp) par des fonctions à tangente hyperbolique.
@@ -30,12 +31,13 @@ contains
     ! et grossy * dzoomy < pi/2 (radians)
 
     REAL yzoom, grossy, dzoomy, tauy, xzoom, grossx, dzoomx, taux
-    REAL rlatu(jjp1), yprimu(jjp1), rlatv(jjm), yprimv(jjm)
-    real rlatu1(jjm), yprimu1(jjm), rlatu2(jjm), yprimu2(jjm)
-    REAL rlonu(iip1), xprimu(iip1), rlonv(iip1), xprimv(iip1)
-    REAL rlonm025(iip1), xprimm025(iip1), rlonp025(iip1), xprimp025(iip1)
+    REAL rlatu(:), yprimu(:) ! (jjm + 1)
+    real rlatv(:), yprimv(:) ! (jjm)
+    real rlatu1(:), yprimu1(:), rlatu2(:), yprimu2(:) ! (jjm)
+    REAL rlonu(:), xprimu(:), rlonv(:), xprimv(:) ! (iim + 1)
+    REAL rlonm025(:), xprimm025(:), rlonp025(:), xprimp025(:) ! (iim + 1)
 
-    ! Variables locales :
+    ! Local:
 
     double precision dxmin, dxmax, dymin, dymax
     INTEGER i, j

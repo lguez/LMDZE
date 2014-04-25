@@ -28,7 +28,7 @@
 
 
 ! inputs:
-      integer ncum, nd, nloc
+      integer, intent(in):: ncum, nd, nloc
       integer icb(nloc), icbs(nloc), nk(nloc)
       real t(nloc,nd), q(nloc,nd), qs(nloc,nd), gz(nloc,nd)
       real p(nloc,nd)

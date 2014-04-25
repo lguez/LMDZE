@@ -1,28 +1,36 @@
-SUBROUTINE cv3_tracer(nloc, len, ncum, nd, na, ment, sij, da, phi)
+module cv3_tracer_m
 
   implicit none
 
-  ! Inputs:
-  integer ncum, nd, na, nloc, len
-  real ment(nloc, na, na), sij(nloc, na, na)
+contains
 
-  ! Ouputs:
-  real da(nloc, na), phi(nloc, na, na)
+  SUBROUTINE cv3_tracer(nloc, len, ncum, nd, na, ment, sij, da, phi)
 
-  ! Local variables:
-  integer i, j, k
+    implicit none
 
-  !------------------------------------------------------------
+    ! Inputs:
+    integer, intent(in):: ncum, nd, na, nloc, len
+    real ment(nloc, na, na), sij(nloc, na, na)
 
-  da = 0.
+    ! Ouputs:
+    real da(nloc, na), phi(nloc, na, na)
 
-  do j = 1, na
-     do k = 1, na
-        do i = 1, ncum
-           da(i, j) = da(i, j)+(1.-sij(i, k, j))*ment(i, k, j)
-           phi(i, j, k) = sij(i, k, j) * ment(i, k, j)
-        end do
-     end do
-  end do
+    ! Local variables:
+    integer i, j, k
 
-end SUBROUTINE cv3_tracer
+    !------------------------------------------------------------
+
+    da = 0.
+
+    do j = 1, na
+       do k = 1, na
+          do i = 1, ncum
+             da(i, j) = da(i, j)+(1.-sij(i, k, j))*ment(i, k, j)
+             phi(i, j, k) = sij(i, k, j) * ment(i, k, j)
+          end do
+       end do
+    end do
+
+  end SUBROUTINE cv3_tracer
+
+end module cv3_tracer_m

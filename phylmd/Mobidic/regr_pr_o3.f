@@ -4,7 +4,7 @@ module regr_pr_o3_m
 
 contains
 
-  subroutine regr_pr_o3(o3_mob_regr)
+  subroutine regr_pr_o3(p3d, o3_mob_regr)
 
     ! "regr_pr_o3" stands for "regrid pressure ozone".
     ! This procedure reads Mobidic ozone mole fraction from
@@ -30,7 +30,11 @@ contains
     use nr_util, only: assert
     use grid_change, only: dyn_phy
     use numer_rec_95, only: regr1_step_av
-    use pressure_var, only: p3d
+
+    REAL, intent(in):: p3d(:, :, :) ! (iim + 1, jjm + 1, llm+1) 
+    ! pressure at layer interfaces, in Pa
+    ! ("p3d(i, j, l)" is at longitude "rlonv(i)", latitude "rlatu(j)",
+    ! for interface "l")
 
     real, intent(out):: o3_mob_regr(:, :, :) ! (iim + 1, jjm + 1, llm)
     ! (ozone mole fraction from Mobidic adapted to the LMDZ grid)
@@ -57,7 +61,11 @@ contains
     !------------------------------------------------------------
 
     print *, "Call sequence information: regr_pr_o3"
-    call assert(shape(o3_mob_regr) == (/iim + 1, jjm + 1, llm/), "regr_pr_o3")
+
+    call assert(shape(o3_mob_regr) == (/iim + 1, jjm + 1, llm/), &
+         "regr_pr_o3 o3_mob_regr")
+    call assert(shape(p3d) == (/iim + 1, jjm + 1, llm + 1/), &
+         "regr_pr_o3 p3d")
 
     call nf95_open("coefoz_LMDZ.nc", nf90_nowrite, ncid)
 

@@ -4,10 +4,9 @@ module concvl_m
 
 contains
 
-  SUBROUTINE concvl(dtime, paprs, play, t, q, u, v, tra, sig1, w01, &
-       d_t, d_q, d_u, d_v, d_tra, rain, snow, kbas, ktop, upwd, dnwd, dnwd0, &
-       ma, cape, tvp, iflag, pbase, bbase, dtvpdt1, dtvpdq1, dplcldt, &
-       dplcldr, qcondc, wd, pmflxr, pmflxs, da, phi, mp, ntra)
+  SUBROUTINE concvl(dtime, paprs, play, t, q, u, v, sig1, w01, d_t, d_q, d_u, &
+       d_v, rain, snow, kbas, ktop, upwd, dnwd, dnwd0, ma, cape, iflag, &
+       qcondc, wd, pmflxr, pmflxs, da, phi, mp)
 
     ! From phylmd/concvl.F, version 1.3 2005/04/15 12:36:17
     ! Author: Z. X. Li (LMD/CNRS)
@@ -23,29 +22,23 @@ contains
     USE suphec_m, ONLY: retv, rtt
     USE yoethf_m, ONLY: r2es
 
-    INTEGER, PARAMETER:: ntrac = nqmx - 2
-
     REAL, INTENT (IN):: dtime ! pas d'integration (s)
     REAL, INTENT (IN):: paprs(klon, klev+1)
     REAL, INTENT (IN):: play(klon, klev)
     REAL, intent(in):: t(klon, klev)
     real q(klon, klev) ! input vapeur d'eau (en kg/kg)
     real, INTENT (IN):: u(klon, klev), v(klon, klev)
-    REAL, INTENT (IN):: tra(klon, klev, ntrac)
-    INTEGER, intent(in):: ntra ! number of tracers
     REAL, intent(inout):: sig1(klon, klev), w01(klon, klev)
-    REAL pmflxr(klon, klev+1), pmflxs(klon, klev+1)
 
     REAL d_t(klon, klev), d_q(klon, klev), d_u(klon, klev), d_v(klon, &
          klev)
     ! d_q-----output-R-increment de la vapeur d'eau
-    REAL d_tra(klon, klev, ntrac)
+
     REAL rain(klon), snow(klon)
     ! rain----output-R-la pluie (mm/s)
     ! snow----output-R-la neige (mm/s)
 
     INTEGER kbas(klon), ktop(klon)
-    REAL em_ph(klon, klev+1), em_p(klon, klev)
 
     REAL, intent(out):: upwd(klon, klev)
     ! saturated updraft mass flux (kg/m**2/s)
@@ -56,21 +49,20 @@ contains
     real, intent(out):: dnwd0(klon, klev)
     ! unsaturated downdraft mass flux (kg/m**2/s)
 
-    REAL ma(klon, klev), cape(klon), tvp(klon, klev)
+    REAL ma(klon, klev), cape(klon)
     ! Cape----output-R-CAPE (J/kg)
-    ! Tvp-----output-R-Temperature virtuelle d'une parcelle soulevee
-    !                  adiabatiquement a partir du niveau 1 (K)
-    REAL da(klon, klev), phi(klon, klev, klev), mp(klon, klev)
+
     INTEGER iflag(klon)
-    REAL pbase(klon), bbase(klon)
-    REAL dtvpdt1(klon, klev), dtvpdq1(klon, klev)
-    REAL dplcldt(klon), dplcldr(klon)
     REAL qcondc(klon, klev)
     REAL wd(klon)
+    REAL pmflxr(klon, klev+1), pmflxs(klon, klev+1)
+    REAL da(klon, klev), phi(klon, klev, klev), mp(klon, klev)
 
+    ! Local:
+
+    REAL em_ph(klon, klev+1), em_p(klon, klev)
     REAL zx_t, zdelta, zx_qs, zcor
-
-    INTEGER i, k, itra
+    INTEGER i, k
     REAL qs(klon, klev)
     REAL, save:: cbmf(klon)
     INTEGER:: ifrst = 0
@@ -126,10 +118,9 @@ contains
        END DO
     END IF
 
-    CALL cv_driver(klon, klev, klev+1, ntra, t, q, qs, u, v, tra, em_p, &
-         em_ph, iflag, d_t, d_q, d_u, d_v, d_tra, rain, pmflxr, cbmf, sig1, &
-         w01, kbas, ktop, dtime, ma, upwd, dnwd, dnwd0, qcondc, wd, cape, &
-         da, phi, mp)
+    CALL cv_driver(klon, klev, t, q, qs, u, v, em_p, em_ph, iflag, d_t, d_q, &
+         d_u, d_v, rain, pmflxr, cbmf, sig1, w01, kbas, ktop, dtime, ma, &
+         upwd, dnwd, dnwd0, qcondc, wd, cape, da, phi, mp)
 
     DO i = 1, klon
        rain(i) = rain(i)/86400.
@@ -143,23 +134,6 @@ contains
           d_v(i, k) = dtime*d_v(i, k)
        END DO
     END DO
-    DO itra = 1, ntra
-       DO k = 1, klev
-          DO i = 1, klon
-             d_tra(i, k, itra) = dtime*d_tra(i, k, itra)
-          END DO
-       END DO
-    END DO
-    ! les traceurs ne sont pas mis dans cette version de convect4:
-    IF (iflag_con==4) THEN
-       DO itra = 1, ntra
-          DO k = 1, klev
-             DO i = 1, klon
-                d_tra(i, k, itra) = 0.
-             END DO
-          END DO
-       END DO
-    END IF
 
   END SUBROUTINE concvl
 

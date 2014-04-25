@@ -20,7 +20,7 @@
 
 
 ! inputs:
-        integer len, nd
+        integer, intent(in):: len, nd
       real, intent(in):: t(len,nd)
       real q(len,nd), qs(len,nd), p(len,nd)
       real hm(len,nd), gz(len,nd)

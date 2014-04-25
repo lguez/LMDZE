@@ -148,11 +148,11 @@ contains
             dp, vcov, ucov, teta, q(:, :, :, :2), ps, masse, finvmaold, dt, &
             leapf)
 
+       forall (l = 1: llm + 1) p3d(:, :, l) = ap(l) + bp(l) * ps
+       CALL exner_hyb(ps, p3d, pks, pk, pkf)
+
        if (.not. leapf) then
           ! Matsuno backward
-          forall (l = 1: llm + 1) p3d(:, :, l) = ap(l) + bp(l) * ps
-          CALL exner_hyb(ps, p3d, pks, pk, pkf)
-
           ! Calcul des tendances dynamiques:
           CALL geopot(teta, pk, pks, phis, phi)
           CALL caldyn(itau + 1, ucov, vcov, teta, ps, masse, pk, pkf, phis, &
@@ -163,10 +163,10 @@ contains
           CALL integrd(vcovm1, ucovm1, tetam1, psm1, massem1, dv, dudyn, &
                dteta, dp, vcov, ucov, teta, q(:, :, :, :2), ps, masse, &
                finvmaold, dtvr, leapf=.false.)
-       end if
 
-       forall (l = 1: llm + 1) p3d(:, :, l) = ap(l) + bp(l) * ps
-       CALL exner_hyb(ps, p3d, pks, pk, pkf)
+          forall (l = 1: llm + 1) p3d(:, :, l) = ap(l) + bp(l) * ps
+          CALL exner_hyb(ps, p3d, pks, pk, pkf)
+       end if
 
        IF (MOD(itau + 1, iphysiq) == 0 .AND. iflag_phys /= 0) THEN
           ! Calcul des tendances physiques:

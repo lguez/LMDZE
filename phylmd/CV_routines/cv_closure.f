@@ -7,7 +7,7 @@
       implicit none
 
 ! inputs:
-      integer ncum, nd, nloc
+      integer, intent(in):: ncum, nd, nloc
       integer nk(nloc), icb(nloc)
       real tv(nloc,nd), tvp(nloc,nd), p(nloc,nd), dph(nloc,nd)
       real ph(nloc,nd+1) ! caution nd instead ndp1 to be consistent...

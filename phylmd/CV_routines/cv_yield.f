@@ -1,4 +1,3 @@
-
       SUBROUTINE cv_yield(nloc,ncum,nd,nk,icb,inb,delt &
                    ,t,q,u,v,gz,p,ph,h,hp,lv,cpn &
                    ,ep,clw,frac,m,mp,qp,up,vp &
@@ -13,7 +12,7 @@
 
 
 ! inputs
-      integer ncum, nd, nloc
+      integer, intent(in):: ncum, nd, nloc
       integer nk(nloc), icb(nloc), inb(nloc)
       integer nent(nloc,nd)
       real, intent(in):: delt

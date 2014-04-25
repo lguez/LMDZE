@@ -13,7 +13,7 @@
 
 
 ! inputs:
-      integer len,ncum,nd,nloc
+      integer, intent(in):: len,ncum,nd,nloc
       integer iflag1(len),nk1(len),icb1(len)
       real cbmf1(len),plcl1(len),tnk1(len),qnk1(len),gznk1(len)
       real, intent(in):: t1(len,nd)

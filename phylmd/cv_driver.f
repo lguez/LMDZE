@@ -4,86 +4,62 @@ module cv_driver_m
 
 contains
 
-  SUBROUTINE cv_driver(len, nd, ndp1, ntra, t1, q1, qs1, u1, v1, tra1, p1, &
-       ph1, iflag1, ft1, fq1, fu1, fv1, ftra1, precip1, VPrecip1, cbmf1, &
-       sig1, w01, icb1, inb1, delt, Ma1, upwd1, dnwd1, dnwd01, qcondc1, wd1, &
-       cape1, da1, phi1, mp1)
+  SUBROUTINE cv_driver(len, nd, t1, q1, qs1, u1, v1, p1, ph1, iflag1, ft1, &
+       fq1, fu1, fv1, precip1, VPrecip1, cbmf1, sig1, w01, icb1, inb1, delt, &
+       Ma1, upwd1, dnwd1, dnwd01, qcondc1, wd1, cape1, da1, phi1, mp1)
 
     ! From LMDZ4/libf/phylmd/cv_driver.F, version 1.3, 2005/04/15 12:36:17
-
     ! Main driver for convection
-
-    ! S. Bony, March 2002:
+    ! Author: S. Bony, March 2002
 
     ! Several modules corresponding to different physical processes
 
     ! Several versions of convect may be used:
-    ! - iflag_con = 3: version lmd  (previously named convect3)
-    ! - iflag_con = 4: version 4.3b (vect. version, previously convect1/2)
-
-    ! Plus tard :
-    ! - iflag_con = 5: version lmd with ice (previously named convectg)
-
-    ! S. Bony, Oct 2002:
-    ! Vectorization of convect3 (ie version lmd)
+    ! - iflag_con = 3: version lmd
+    ! - iflag_con = 4: version 4.3b
 
     use clesphys2, only: iflag_con
     use cv3_compress_m, only: cv3_compress
+    use cv3_mixing_m, only: cv3_mixing
     use cv3_param_m, only: cv3_param
+    use cv3_prelim_m, only: cv3_prelim
+    use cv3_tracer_m, only: cv3_tracer
+    use cv3_uncompress_m, only: cv3_uncompress
+    use cv3_unsat_m, only: cv3_unsat
+    use cv3_yield_m, only: cv3_yield
+    use cv_uncompress_m, only: cv_uncompress
     USE dimphy, ONLY: klev, klon
 
-    ! PARAMETERS:
-    !      Name            Type         Usage            Description
-    !   ----------      ----------     -------  ----------------------------
-
-    !      len           Integer        Input        first (i) dimension
-    !      nd            Integer        Input        vertical (k) dimension
-    !      ndp1          Integer        Input        nd + 1
-    !      ntra          Integer        Input        number of tracors
-    !      t1            Real           Input        temperature
-    !      q1            Real           Input        specific hum
-    !      qs1           Real           Input        sat specific hum
-    !      u1            Real           Input        u-wind
-    !      v1            Real           Input        v-wind
-    !      tra1          Real           Input        tracors
-    !      p1            Real           Input        full level pressure
-    !      ph1           Real           Input        half level pressure
-    !      iflag1        Integer        Output       flag for Emanuel conditions
-    !      ft1           Real           Output       temp tend
-    !      fq1           Real           Output       spec hum tend
-    !      fu1           Real           Output       u-wind tend
-    !      fv1           Real           Output       v-wind tend
-    !      ftra1         Real           Output       tracor tend
-    !      precip1       Real           Output       precipitation
-    !      VPrecip1      Real           Output       vertical profile of precipitations
-    !      cbmf1         Real           Output       cloud base mass flux
-    !      delt          Real           Input        time step
-    !      Ma1           Real           Output       mass flux adiabatic updraft
-    !      qcondc1       Real           Output       in-cld mixing ratio of condensed water
-    !      wd1           Real           Output       downdraft velocity scale for sfc fluxes
-    !      cape1         Real           Output       CAPE
-
-    integer len
-    integer nd
-    integer ndp1
-    integer, intent(in):: ntra
-    real, intent(in):: t1(len, nd)
-    real q1(len, nd)
+    integer, intent(in):: len ! first dimension
+    integer, intent(in):: nd ! vertical dimension
+    real, intent(in):: t1(len, nd) ! temperature
+    real q1(len, nd) !           Input        specific hum
     real qs1(len, nd)
+    !      qs1           Real           Input        sat specific hum
     real, intent(in):: u1(len, nd)
+    !      u1            Real           Input        u-wind
     real, intent(in):: v1(len, nd)
-    real, intent(in):: tra1(len, nd, ntra)
+    !      v1            Real           Input        v-wind
     real p1(len, nd)
-    real ph1(len, ndp1)
+    !      p1            Real           Input        full level pressure
+    real ph1(len, nd + 1)
+    !      ph1           Real           Input        half level pressure
     integer iflag1(len)
+    !      iflag1        Integer        Output       flag for Emanuel conditions
     real ft1(len, nd)
+    !      ft1           Real           Output       temp tend
     real fq1(len, nd)
+    !      fq1           Real           Output       spec hum tend
     real fu1(len, nd)
+    !      fu1           Real           Output       u-wind tend
     real fv1(len, nd)
-    real ftra1(len, nd, ntra)
+    !      fv1           Real           Output       v-wind tend
     real precip1(len)
+    !      precip1       Real           Output       precipitation
     real VPrecip1(len, nd+1)
+    !      VPrecip1      Real           Output       vertical profile of precipitations
     real cbmf1(len)
+    !      cbmf1         Real           Output       cloud base mass flux
     real, intent(inout):: sig1(klon, klev) ! section adiabatic updraft
 
     real, intent(inout):: w01(klon, klev) 
@@ -92,14 +68,19 @@ contains
     integer icb1(klon)
     integer inb1(klon)
     real, intent(in):: delt
+    !      delt          Real           Input        time step
     real Ma1(len, nd)
+    !      Ma1           Real           Output       mass flux adiabatic updraft
     real, intent(out):: upwd1(len, nd) ! total upward mass flux (adiab+mixed)
     real, intent(out):: dnwd1(len, nd) ! saturated downward mass flux (mixed)
     real, intent(out):: dnwd01(len, nd) ! unsaturated downward mass flux
 
     real qcondc1(len, nd)     ! cld
+    !      qcondc1       Real           Output       in-cld mixing ratio of condensed water
     real wd1(len)            ! gust
+    !      wd1           Real           Output       downdraft velocity scale for sfc fluxes
     real cape1(len)
+    !      cape1         Real           Output       CAPE
 
     real da1(len, nd), phi1(len, nd, nd), mp1(len, nd)
 
@@ -129,13 +110,6 @@ contains
     !       dry convective adjustment occurs and if IPBL is not equal to 0.
 
     !  v:   Same as u but for meridional velocity.
-
-    !  tra: Array of passive tracer mixing ratio, of dimensions (ND, NTRA),
-    !       where NTRA is the number of different tracers. If no
-    !       convective tracer transport is needed, define a dummy
-    !       input array of dimension (ND, 1). Tracers are defined at
-    !       same vertical levels as T. Note that this array will be altered
-    !       if dry convective adjustment occurs and if IPBL is not equal to 0.
 
     !  p:   Array of pressure (mb) of dimension ND, with first
     !       index corresponding to lowest model level. Must be defined
@@ -185,9 +159,6 @@ contains
 
     !  fv:   Same as FU, but for forcing of meridional velocity.
 
-    !  ftra: Array of forcing of tracer content, in tracer mixing ratio per
-    !        second, defined at same levels as T. Dimensioned (ND, NTRA).
-
     !  precip: Scalar convective precipitation rate (mm/day).
 
     !  VPrecip: Vertical profile of convective precipitation (kg/m2/s).
@@ -215,10 +186,9 @@ contains
 
     !  Local arrays
 
-    integer noff
     real da(len, nd), phi(len, nd, nd), mp(len, nd)
 
-    integer i, k, n, il, j
+    integer i, k, il
     integer icbmax
     integer nk1(klon)
     integer icbs1(klon)
@@ -227,8 +197,6 @@ contains
     real tnk1(klon)
     real qnk1(klon)
     real gznk1(klon)
-    real pnk1(klon)
-    real qsnk1(klon)
     real pbase1(klon)
     real buoybase1(klon)
 
@@ -282,8 +250,6 @@ contains
     real tps(nloc, klev), qprime(nloc), tprime(nloc)
     real precip(nloc)
     real VPrecip(nloc, klev+1)
-    real tra(nloc, klev, ntra), trap(nloc, klev, ntra)
-    real ftra(nloc, klev, ntra), traent(nloc, klev, klev, ntra)
     real qcondc(nloc, klev)  ! cld
     real wd(nloc)           ! gust
 
@@ -340,14 +306,6 @@ contains
        end do
     end do
 
-    do  j = 1, ntra
-       do  k = 1, nd
-          do  i = 1, len
-             ftra1(i, k, j) = 0.0
-          end do
-       end do
-    end do
-
     do  i = 1, len
        precip1(i) = 0.0
        iflag1(i) = 0
@@ -368,12 +326,12 @@ contains
     !--------------------------------------------------------------------
 
     if (iflag_con.eq.3) then
-       CALL cv3_prelim(len, nd, ndp1, t1, q1, p1, ph1, lv1, cpn1, tv1, gz1, &
-            h1, hm1, th1)! nd->na
+       CALL cv3_prelim(len, nd, nd + 1, t1, q1, p1, ph1, lv1, cpn1, tv1, gz1, &
+            h1, hm1, th1)
     endif
 
     if (iflag_con.eq.4) then
-       CALL cv_prelim(len, nd, ndp1, t1, q1, p1, ph1 &
+       CALL cv_prelim(len, nd, nd + 1, t1, q1, p1, ph1 &
             , lv1, cpn1, tv1, gz1, h1, hm1)
     endif
 
@@ -441,12 +399,12 @@ contains
        !^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
        if (iflag_con.eq.3) then
-          CALL cv3_compress(len, nloc, ncum, nd, ntra, iflag1, nk1, icb1, &
-               icbs1, plcl1, tnk1, qnk1, gznk1, pbase1, buoybase1, t1, q1, &
-               qs1, u1, v1, gz1, th1, tra1, h1, lv1, cpn1, p1, ph1, tv1, tp1, &
-               tvp1, clw1, sig1, w01, iflag, nk, icb, icbs, plcl, tnk, qnk, &
-               gznk, pbase, buoybase, t, q, qs, u, v, gz, th, tra, h, lv, &
-               cpn, p, ph, tv, tp, tvp, clw, sig, w0)
+          CALL cv3_compress(len, nloc, ncum, nd, iflag1, nk1, icb1, icbs1, &
+               plcl1, tnk1, qnk1, gznk1, pbase1, buoybase1, t1, q1, qs1, u1, &
+               v1, gz1, th1, h1, lv1, cpn1, p1, ph1, tv1, tp1, tvp1, clw1, &
+               sig1, w01, iflag, nk, icb, icbs, plcl, tnk, qnk, gznk, pbase, &
+               buoybase, t, q, qs, u, v, gz, th, h, lv, cpn, p, ph, tv, tp, &
+               tvp, clw, sig, w0)
        endif
 
        if (iflag_con.eq.4) then
@@ -506,10 +464,9 @@ contains
        !-------------------------------------------------------------------
 
        if (iflag_con.eq.3) then
-          CALL cv3_mixing(nloc, ncum, nd, nd, ntra, icb, nk, inb     &
-               , ph, t, q, qs, u, v, tra, h, lv, qnk &
-               , hp, tv, tvp, ep, clw, m, sig &
-               , ment, qent, uent, vent, nent, sij, elij, ments, qents, traent)! na->nd
+          CALL cv3_mixing(nloc, ncum, nd, nd, icb, nk, inb, ph, t, q, &
+               qs, u, v, h, lv, qnk, hp, tv, tvp, ep, clw, m, sig, ment, &
+               qent, uent, vent, nent, sij, elij, ments, qents)
        endif
 
        if (iflag_con.eq.4) then
@@ -524,11 +481,11 @@ contains
        !-------------------------------------------------------------------
 
        if (iflag_con.eq.3) then
-          CALL cv3_unsat(nloc, ncum, nd, nd, ntra, icb, inb     &
-               , t, q, qs, gz, u, v, tra, p, ph &
+          CALL cv3_unsat(nloc, ncum, nd, nd, icb, inb     &
+               , t, q, qs, gz, u, v, p, ph &
                , th, tv, lv, cpn, ep, sigp, clw &
                , m, ment, elij, delt, plcl &
-               , mp, qp, up, vp, trap, wt, water, evap, b)! na->nd
+               , mp, qp, up, vp, wt, water, evap, b)! na->nd
        endif
 
        if (iflag_con.eq.4) then
@@ -544,14 +501,14 @@ contains
        !-------------------------------------------------------------------
 
        if (iflag_con.eq.3) then
-          CALL cv3_yield(nloc, ncum, nd, nd, ntra             &
+          CALL cv3_yield(nloc, ncum, nd, nd             &
                , icb, inb, delt &
-               , t, q, u, v, tra, gz, p, ph, h, hp, lv, cpn, th &
-               , ep, clw, m, tp, mp, qp, up, vp, trap &
+               , t, q, u, v, gz, p, ph, h, hp, lv, cpn, th &
+               , ep, clw, m, tp, mp, qp, up, vp &
                , wt, water, evap, b &
-               , ment, qent, uent, vent, nent, elij, traent, sig &
+               , ment, qent, uent, vent, nent, elij, sig &
                , tv, tvp &
-               , iflag, precip, VPrecip, ft, fq, fu, fv, ftra &
+               , iflag, precip, VPrecip, ft, fq, fu, fv &
                , upwd, dnwd, dnwd0, ma, mike, tls, tps, qcondc, wd)! na->nd
        endif
 
@@ -584,16 +541,16 @@ contains
        end do
 
        if (iflag_con.eq.3) then
-          CALL cv3_uncompress(nloc, len, ncum, nd, ntra, idcum &
+          CALL cv3_uncompress(nloc, len, ncum, nd, idcum &
                , iflag &
                , precip, VPrecip, sig, w0 &
-               , ft, fq, fu, fv, ftra &
+               , ft, fq, fu, fv &
                , inb  &
                , Ma, upwd, dnwd, dnwd0, qcondc, wd, cape &
                , da, phi, mp &
                , iflag1 &
                , precip1, VPrecip1, sig1, w01 &
-               , ft1, fq1, fu1, fv1, ftra1 &
+               , ft1, fq1, fu1, fv1 &
                , inb1 &
                , Ma1, upwd1, dnwd1, dnwd01, qcondc1, wd1, cape1  &
                , da1, phi1, mp1)

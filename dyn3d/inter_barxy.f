@@ -31,7 +31,7 @@ contains
     ! Si taille de la seconde dim = jjm, on veut interpoler sur les
     ! jjm latitudes rlatv du modèle (latitudes de V) 
 
-    ! Variables local to the procedure:
+    ! Local:
 
     REAL champy(iim, size(champ, 2))
     integer j, i, jnterfd, jmods

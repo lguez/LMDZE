@@ -4,18 +4,17 @@ module cv3_compress_m
 
 contains
 
-  SUBROUTINE cv3_compress(len, nloc, ncum, nd, ntra, iflag1, nk1, icb1, &
-       icbs1, plcl1, tnk1, qnk1, gznk1, pbase1, buoybase1, t1, q1, qs1, u1, &
-       v1, gz1, th1, tra1, h1, lv1, cpn1, p1, ph1, tv1, tp1, tvp1, clw1, &
-       sig1, w01, iflag, nk, icb, icbs, plcl, tnk, qnk, gznk, pbase, &
-       buoybase, t, q, qs, u, v, gz, th, tra, h, lv, cpn, p, ph, tv, tp, tvp, &
-       clw, sig, w0)
+  SUBROUTINE cv3_compress(len, nloc, ncum, nd, iflag1, nk1, icb1, icbs1, &
+       plcl1, tnk1, qnk1, gznk1, pbase1, buoybase1, t1, q1, qs1, u1, v1, gz1, &
+       th1, h1, lv1, cpn1, p1, ph1, tv1, tp1, tvp1, clw1, sig1, w01, iflag, &
+       nk, icb, icbs, plcl, tnk, qnk, gznk, pbase, buoybase, t, q, qs, u, v, &
+       gz, th, h, lv, cpn, p, ph, tv, tp, tvp, clw, sig, w0)
 
     use cv3_param_m
 
 
     ! inputs:
-    integer, intent(in):: len, ncum, nd, ntra, nloc
+    integer, intent(in):: len, ncum, nd, nloc
     integer iflag1(len), nk1(len), icb1(len), icbs1(len)
     real plcl1(len), tnk1(len), qnk1(len), gznk1(len)
     real pbase1(len), buoybase1(len)
@@ -26,7 +25,6 @@ contains
     real tvp1(len, nd), clw1(len, nd)
     real th1(len, nd)
     real sig1(len, nd), w01(len, nd)
-    real, intent(in):: tra1(len, nd, ntra)
 
     ! outputs:
     ! en fait, on a nloc=len pour l'instant (cf cv_driver)
@@ -39,7 +37,6 @@ contains
     real tvp(nloc, nd), clw(nloc, nd)
     real th(nloc, nd)
     real sig(nloc, nd), w0(nloc, nd)
-    real tra(nloc, nd, ntra)
 
     ! local variables:
     integer i, k, nn, j

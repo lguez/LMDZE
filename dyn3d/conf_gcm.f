@@ -43,8 +43,8 @@ module conf_gcm_m
   ! y = pure Matsuno sinon c'est du Matsuno-leapfrog
 
   logical:: fxyhypb = .TRUE.
-  ! (fonction f(y) à dérivée tangente hyperbolique, sinon à dérivée
-  ! sinusoïdale)
+  ! fonction f(y) à dérivée tangente hyperbolique, sinon à dérivée
+  ! sinusoïdale
 
   logical:: ysinus = .TRUE.
   ! (Fonction f(y) avec y = Sin(latit.) si = .true. sinon y = latit.)
@@ -64,11 +64,11 @@ contains
     ! Auteurs : L. Fairhead, P. Le Van
     ! Version du 29/04/97
 
-    ! On ne compare pas les valeurs des paramètres du zoom, grossismx, 
-    ! grossismy, clon, clat, fxyhypb lues sur le fichier start avec
-    ! celles passées par run.def, au début du gcm. 
-    ! Ces paramètres définissent entre autres la grille et doivent être
-    ! cohérents, sinon il y aura divergence du gcm.
+    ! On ne compare pas les paramètres du zoom (grossismx, grossismy,
+    ! clon, clat, fxyhypb) lus sur le fichier start avec ceux lus dans
+    ! une namelist, au début de gcm. Ces paramètres définissent entre
+    ! autres la grille et doivent être identiques, sinon il y aura
+    ! divergence du gcm.
 
     use abort_gcm_m, only: abort_gcm
     use comdissnew, only: read_comdissnew

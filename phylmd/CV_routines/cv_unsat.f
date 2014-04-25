@@ -9,7 +9,7 @@
 
 
 ! inputs:
-      integer ncum, nd, nloc
+      integer, intent(in):: ncum, nd, nloc
       integer inb(nloc)
       real t(nloc,nd), q(nloc,nd), qs(nloc,nd)
       real gz(nloc,nd), u(nloc,nd), v(nloc,nd)

@@ -10,7 +10,7 @@
 !=====================================================================
 
 ! inputs:
-      integer len, nd, ndp1
+      integer, intent(in):: len, nd, ndp1
       real, intent(in):: t(len,nd)
       real q(len,nd), p(len,nd), ph(len,ndp1)
 

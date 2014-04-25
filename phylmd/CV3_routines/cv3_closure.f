@@ -14,7 +14,7 @@
 
 
 ! input:
-      integer ncum, nd, nloc
+      integer, intent(in):: ncum, nd, nloc
       integer icb(nloc), inb(nloc)
       real pbase(nloc)
       real p(nloc,nd), ph(nloc,nd+1)

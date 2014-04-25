@@ -20,12 +20,11 @@ contains
     use grid_change, only: dyn_phy
     use indicesol, only: epsfra, nbsrf, is_ter, is_oce, is_lic, is_sic
     use inter_barxy_m, only: inter_barxy
-    use netcdf95, only: handle_err, nf95_gw_var, NF95_CLOSE, NF95_DEF_DIM, &
-         nf95_enddef, NF95_CREATE, nf95_inq_dimid, nf95_inquire_dimension, &
-         nf95_inq_varid, NF95_OPEN
-    use netcdf, only: NF90_CLOBBER, nf90_def_var, NF90_FLOAT, NF90_GET_VAR, &
-         NF90_GLOBAL, NF90_NOWRITE, NF90_PUT_ATT, NF90_PUT_VAR, &
-         NF90_UNLIMITED
+    use netcdf95, only: handle_err, NF95_CLOSE, NF95_CREATE, NF95_DEF_DIM, &
+         nf95_enddef, nf95_get_var, nf95_gw_var, nf95_inq_dimid, &
+         nf95_inq_varid, nf95_inquire_dimension, NF95_OPEN
+    use netcdf, only: NF90_CLOBBER, nf90_def_var, NF90_FLOAT, NF90_GLOBAL, &
+         NF90_NOWRITE, NF90_PUT_ATT, NF90_PUT_VAR, NF90_UNLIMITED
     use numer_rec_95, only: spline, splint
     use start_init_orog_m, only: mask
     use unit_nml_m, only: unit_nml
@@ -107,9 +106,7 @@ contains
     ! Read the primary variable day by day and regrid horizontally,
     ! result in "champtime":
     DO  l = 1, lmdep
-       ierr = NF90_GET_VAR(ncid, varid, champ, start=(/1, 1, l/))
-       call handle_err("NF90_GET_VAR", ierr)
-
+       call NF95_GET_VAR(ncid, varid, champ, start=(/1, 1, l/))
        CALL conf_dat2d(dlon_ini, dlat_ini, dlon, dlat, champ)
        CALL inter_barxy(dlon, dlat(:jmdep -1), LOG(champ), rlonu(:iim), &
             rlatv, champtime(:, :, l))
@@ -164,9 +161,7 @@ contains
     ALLOCATE (dlon(imdep), dlat(jmdep))
     call NF95_INQ_VARID(ncid, 'sicbcs', varid)
     DO l = 1, lmdep
-       ierr = NF90_GET_VAR(ncid, varid, champ, start=(/1, 1, l/))
-       call handle_err("NF90_GET_VAR", ierr)
-
+       call NF95_GET_VAR(ncid, varid, champ, start=(/1, 1, l/))
        CALL conf_dat2d(dlon_ini, dlat_ini, dlon, dlat, champ)
        CALL inter_barxy (dlon, dlat(:jmdep -1), champ, rlonu(:iim), rlatv, &
             champtime(:, :, l))
@@ -266,9 +261,7 @@ contains
     call NF95_INQ_VARID(ncid, 'tosbcs', varid)
 
     DO l = 1, lmdep
-       ierr = NF90_GET_VAR(ncid, varid, champ, start=(/1, 1, l/))
-       call handle_err("NF90_GET_VAR", ierr)
-
+       call NF95_GET_VAR(ncid, varid, champ, start=(/1, 1, l/))
        CALL conf_dat2d(dlon_ini, dlat_ini, dlon, dlat, champ)
        IF (extrap) THEN
           CALL extrapol(champ, imdep, jmdep, 999999., .TRUE., .TRUE., 2, work)
@@ -309,7 +302,7 @@ contains
     ENDDO
     forall (k = 1:360) phy_sst(:, k) = pack(champan(:, :, k), dyn_phy)
 
-    PRINT *, 'Traitement de l albedo'
+    PRINT *, "Traitement de l'albedo..."
     call NF95_OPEN('Albedo.nc', NF90_NOWRITE, ncid)
 
     call nf95_inq_varid(ncid, "longitude", varid)
@@ -329,10 +322,8 @@ contains
     call NF95_INQ_VARID(ncid, 'ALBEDO', varid)
 
     DO l = 1, lmdep
-       PRINT *, 'Lecture temporelle et int. horizontale ', l, timeyear(l)
-       ierr = NF90_GET_VAR(ncid, varid, champ, start=(/1, 1, l/))
-       call handle_err("NF90_GET_VAR", ierr)
-
+       PRINT *, "timeyear(", l, ") =", timeyear(l)
+       call NF95_GET_VAR(ncid, varid, champ, start=(/1, 1, l/))
        CALL conf_dat2d(dlon_ini, dlat_ini, dlon, dlat, champ)
        CALL inter_barxy(dlon, dlat(:jmdep-1), champ, rlonu(:iim), rlatv, &
             champtime(:, :, l))

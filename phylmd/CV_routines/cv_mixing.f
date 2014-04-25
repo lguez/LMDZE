@@ -9,7 +9,7 @@
 
 
 ! inputs:
-      integer ncum, nd, nloc
+      integer, intent(in):: ncum, nd, nloc
       integer icb(nloc), inb(nloc), inb1(nloc), nk(nloc)
       real cbmf(nloc), qnk(nloc)
       real ph(nloc,nd+1)

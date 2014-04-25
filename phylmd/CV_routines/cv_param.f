@@ -36,7 +36,7 @@
 !   ***   (THEIR STANDARD VALUES ARE  0.20 AND 0.1, RESPECTIVELY)    ***
 !   ***                   (DAMP MUST BE LESS THAN 1)                 ***
 
-      integer nd
+      integer, intent(in):: nd
 
 ! noff: integer limit for convection (nd-noff)
 ! minorig: First level of convection

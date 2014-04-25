@@ -6,7 +6,7 @@ contains
 
   SUBROUTINE CLOUDS_GNO(klon, ND, R, RS, QSUB, PTCONV, RATQSC, CLDF)
 
-    ! From LMDZ4/libf/phylmd/clouds_gno.F, version 1.2 2004/11/09 16:55:40
+    ! From LMDZ4/libf/phylmd/clouds_gno.F, version 1.2, 2004/11/09 16:55:40
 
     use numer_rec_95, only: nr_erf
 

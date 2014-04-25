@@ -7,7 +7,7 @@
 
 
 ! inputs:
-      integer len, nd
+      integer, intent(in):: len, nd
       integer nk(len), icb(len), icbmax
       real, intent(in):: t(len,nd)
       real q(len,nd), qs(len,nd), gz(len,nd)

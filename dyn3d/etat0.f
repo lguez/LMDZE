@@ -43,7 +43,6 @@ contains
     use nr_util, only: pi, assert
     use paramet_m, only: ip1jm, ip1jmp1
     use phyredem_m, only: phyredem
-    use pressure_var, only: pls, p3d
     use q_sat_m, only: q_sat
     use regr_lat_time_coefoz_m, only: regr_lat_time_coefoz
     use regr_pr_o3_m, only: regr_pr_o3
@@ -112,6 +111,15 @@ contains
 
     real sig1(klon, llm) ! section adiabatic updraft
     real w01(klon, llm) ! vertical velocity within adiabatic updraft
+
+    real pls(iim + 1, jjm + 1, llm)
+    ! (pressure at mid-layer of LMDZ grid, in Pa)
+    ! "pls(i, j, l)" is at longitude "rlonv(i)", latitude "rlatu(j)",
+    ! for layer "l")
+
+    REAL p3d(iim + 1, jjm + 1, llm+1) ! pressure at layer interfaces, in Pa
+    ! ("p3d(i, j, l)" is at longitude "rlonv(i)", latitude "rlatu(j)",
+    ! for interface "l")
 
     !---------------------------------
 
@@ -195,7 +203,7 @@ contains
     if (nqmx >= 5) then
        ! Ozone:
        call regr_lat_time_coefoz
-       call regr_pr_o3(q(:, :, :, 5))
+       call regr_pr_o3(p3d, q(:, :, :, 5))
        ! Convert from mole fraction to mass fraction:
        q(:, :, :, 5) = q(:, :, :, 5) * 48. / 29.
     end if

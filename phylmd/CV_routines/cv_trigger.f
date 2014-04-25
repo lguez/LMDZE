@@ -11,7 +11,7 @@
 
 
 ! inputs:
-       integer len, nd, icb(len)
+       integer, intent(in):: len, nd, icb(len)
        real cbmf(len), tv(len,nd), tvp(len,nd)
 
 ! outputs:

@@ -166,6 +166,7 @@ contains
     use conf_gcm_m, ONLY : fxyhypb, ysinus
     use fxy_m, only: fxy
     use fxyhyper_m, only: fxyhyper
+    use fxysinus_m, only: fxysinus
     use jumble, only: new_unit
     use nr_util, only: pi
     USE paramet_m, ONLY : iip1, jjp1
@@ -215,10 +216,17 @@ contains
     print *, "gamdi_grot = ", gamdi_grot
     print *, "gamdi_h = ", gamdi_h
 
-    IF (.NOT. fxyhypb) THEN
+    IF (fxyhypb) THEN
+       ! Utilisation de fxyhyper, f(x, y) à dérivée tangente hyperbolique
+       print *, 'inigeom: Y = latitude, dérivée tangente hyperbolique'
+       CALL fxyhyper(clat, grossismy, dzoomy, tauy, clon, grossismx, dzoomx, &
+            taux, rlatu, yprimu, rlatv, yprimv, rlatu1, yprimu1, rlatu2, &
+            yprimu2, rlonu, xprimu, rlonv, xprimv, rlonm025, xprimm025, &
+            rlonp025, xprimp025)
+    ELSE
        IF (ysinus) THEN
-          print *, ' Inigeom, Y = Sinus (Latitude) '
-          ! utilisation de f(x, y) avec y = sinus de la latitude 
+          print *, 'inigeom: Y = sin(latitude)'
+          ! Utilisation de f(x, y) avec y = sinus de la latitude 
           CALL fxysinus(rlatu, yprimu, rlatv, yprimv, rlatu1, yprimu1, &
                rlatu2, yprimu2, rlonu, xprimu, rlonv, xprimv, rlonm025, &
                xprimm025, rlonp025, xprimp025)
@@ -267,13 +275,6 @@ contains
                yprimu2, rlonu, xprimu, rlonv, xprimv, rlonm025, xprimm025, &
                rlonp025, xprimp025)
        END IF
-    ELSE
-       ! Utilisation de fxyhyper, f(x, y) à dérivée tangente hyperbolique
-       print *, 'Inigeom, Y = Latitude, dérivée tangente hyperbolique'
-       CALL fxyhyper(clat, grossismy, dzoomy, tauy, clon, grossismx, dzoomx, &
-            taux, rlatu, yprimu, rlatv, yprimv, rlatu1, yprimu1, rlatu2, &
-            yprimu2, rlonu, xprimu, rlonv, xprimv, rlonm025, xprimm025, &
-            rlonp025, xprimp025)
     END IF
 
     rlatu(1) = pi / 2.

@@ -21,7 +21,7 @@
 
 
 ! input:
-      integer len, nd
+      integer, intent(in):: len, nd
       integer icb(len)
       real plcl(len), p(len,nd)
       real th(len,nd), tv(len,nd), tvp(len,nd)
