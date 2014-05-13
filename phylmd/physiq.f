@@ -35,7 +35,7 @@ contains
     use diagetpq_m, only: diagetpq
     use diagphy_m, only: diagphy
     USE dimens_m, ONLY: llm, nqmx
-    USE dimphy, ONLY: klon, nbtr
+    USE dimphy, ONLY: klon
     USE dimsoil, ONLY: nsoilmx
     use drag_noro_m, only: drag_noro
     USE fcttre, ONLY: foeew, qsatl, qsats, thermcep
@@ -45,8 +45,7 @@ contains
          nbsrf
     USE ini_histins_m, ONLY: ini_histins
     use newmicro_m, only: newmicro
-    USE oasis_m, ONLY: ok_oasis
-    USE orbite_m, ONLY: orbite, zenang
+    USE orbite_m, ONLY: orbite
     USE ozonecm_m, ONLY: ozonecm
     USE phyetat0_m, ONLY: phyetat0, rlat, rlon
     USE phyredem_m, ONLY: phyredem
@@ -61,6 +60,7 @@ contains
     use unit_nml_m, only: unit_nml
     USE ymds2ju_m, ONLY: ymds2ju
     USE yoethf_m, ONLY: r2es, rvtmp2
+    use zenang_m, only: zenang
 
     logical, intent(in):: lafin ! dernier passage
 
@@ -70,52 +70,46 @@ contains
     REAL, intent(in):: time ! heure de la journ\'ee en fraction de jour
     REAL, intent(in):: dtphys ! pas d'integration pour la physique (seconde)
 
-    REAL, intent(in):: paprs(klon, llm + 1)
-    ! (pression pour chaque inter-couche, en Pa)
+    REAL, intent(in):: paprs(:, :) ! (klon, llm + 1)
+    ! pression pour chaque inter-couche, en Pa
 
-    REAL, intent(in):: play(klon, llm)
-    ! (input pression pour le mileu de chaque couche (en Pa))
+    REAL, intent(in):: play(:, :) ! (klon, llm)
+    ! pression pour le mileu de chaque couche (en Pa)
 
-    REAL, intent(in):: pphi(klon, llm) 
+    REAL, intent(in):: pphi(:, :) ! (klon, llm) 
     ! géopotentiel de chaque couche (référence sol)
 
-    REAL, intent(in):: pphis(klon) ! géopotentiel du sol
+    REAL, intent(in):: pphis(:) ! (klon) géopotentiel du sol
 
-    REAL, intent(in):: u(klon, llm)
+    REAL, intent(in):: u(:, :) ! (klon, llm)
     ! vitesse dans la direction X (de O a E) en m/s
 
-    REAL, intent(in):: v(klon, llm) ! vitesse Y (de S a N) en m/s
-    REAL, intent(in):: t(klon, llm) ! input temperature (K)
+    REAL, intent(in):: v(:, :) ! (klon, llm) vitesse Y (de S a N) en m/s
+    REAL, intent(in):: t(:, :) ! (klon, llm) temperature (K)
 
-    REAL, intent(in):: qx(klon, llm, nqmx)
+    REAL, intent(in):: qx(:, :, :) ! (klon, llm, nqmx)
     ! (humidit\'e sp\'ecifique et fractions massiques des autres traceurs)
 
-    REAL, intent(in):: omega(klon, llm) ! vitesse verticale en Pa/s
-    REAL, intent(out):: d_u(klon, llm) ! tendance physique de "u" (m s-2)
-    REAL, intent(out):: d_v(klon, llm) ! tendance physique de "v" (m s-2)
-    REAL, intent(out):: d_t(klon, llm) ! tendance physique de "t" (K/s)
-    REAL, intent(out):: d_qx(klon, llm, nqmx) ! tendance physique de "qx" (s-1)
+    REAL, intent(in):: omega(:, :) ! (klon, llm) vitesse verticale en Pa/s
+    REAL, intent(out):: d_u(:, :) ! (klon, llm) tendance physique de "u" (m s-2)
+    REAL, intent(out):: d_v(:, :) ! (klon, llm) tendance physique de "v" (m s-2)
+    REAL, intent(out):: d_t(:, :) ! (klon, llm) tendance physique de "t" (K/s)
+
+    REAL, intent(out):: d_qx(:, :, :) ! (klon, llm, nqmx)
+    ! tendance physique de "qx" (s-1)
 
     ! Local:
 
     LOGICAL:: firstcal = .true.
 
-    INTEGER nbteta
-    PARAMETER(nbteta = 3)
-
     LOGICAL ok_gust ! pour activer l'effet des gust sur flux surface
     PARAMETER (ok_gust = .FALSE.)
 
-    LOGICAL check ! Verifier la conservation du modele en eau
-    PARAMETER (check = .FALSE.)
+    LOGICAL, PARAMETER:: check = .FALSE. 
+    ! Verifier la conservation du modele en eau
 
     LOGICAL, PARAMETER:: ok_stratus = .FALSE.
     ! Ajouter artificiellement les stratus
-
-    ! Parametres lies au coupleur OASIS:
-    INTEGER, SAVE:: npas, nexca
-    logical rnpb
-    parameter(rnpb = .true.)
 
     character(len = 6):: ocean = 'force '
     ! (type de mod\`ele oc\'ean \`a utiliser: "force" ou "slab" mais
@@ -142,10 +136,8 @@ contains
     REAL entr_therm(klon, llm)
     real, save:: q2(klon, llm + 1, nbsrf)
 
-    INTEGER ivap ! indice de traceurs pour vapeur d'eau
-    PARAMETER (ivap = 1)
-    INTEGER iliq ! indice de traceurs pour eau liquide
-    PARAMETER (iliq = 2)
+    INTEGER, PARAMETER:: ivap = 1 ! indice de traceur pour vapeur d'eau
+    INTEGER, PARAMETER:: iliq = 2 ! indice de traceur pour eau liquide
 
     REAL, save:: t_ancien(klon, llm), q_ancien(klon, llm)
     LOGICAL, save:: ancien_ok
@@ -154,15 +146,6 @@ contains
     REAL d_q_dyn(klon, llm) ! tendance dynamique pour "q" (kg/kg/s)
 
     real da(klon, llm), phi(klon, llm, llm), mp(klon, llm)
-
-    ! Amip2 PV a theta constante 
-
-    CHARACTER(LEN = 3) ctetaSTD(nbteta)
-    DATA ctetaSTD/'350', '380', '405'/
-    REAL rtetaSTD(nbteta)
-    DATA rtetaSTD/350., 380., 405./
-
-    ! Amip2 PV a theta constante
 
     REAL swdn0(klon, llm + 1), swdn(klon, llm + 1)
     REAL swup0(klon, llm + 1), swup(klon, llm + 1)
@@ -263,18 +246,13 @@ contains
     REAL fluxlat(klon, nbsrf)
     SAVE fluxlat
 
-    REAL fqsurf(klon, nbsrf)
-    SAVE fqsurf ! humidite de l'air au contact de la surface
+    REAL, save:: fqsurf(klon, nbsrf)
+    ! humidite de l'air au contact de la surface
 
     REAL, save:: qsol(klon) ! hauteur d'eau dans le sol
-
-    REAL fsnow(klon, nbsrf)
-    SAVE fsnow ! epaisseur neigeuse
-
-    REAL falbe(klon, nbsrf)
-    SAVE falbe ! albedo par type de surface
-    REAL falblw(klon, nbsrf)
-    SAVE falblw ! albedo par type de surface
+    REAL, save:: fsnow(klon, nbsrf) ! epaisseur neigeuse
+    REAL, save:: falbe(klon, nbsrf) ! albedo par type de surface
+    REAL, save:: falblw(klon, nbsrf) ! albedo par type de surface
 
     ! Param\`etres de l'orographie \`a l'\'echelle sous-maille (OESM) :
     REAL, save:: zmea(klon) ! orographie moyenne
@@ -348,23 +326,17 @@ contains
     REAL ue(klon) ! integr. verticale du transport zonal de l'energie
     REAL uq(klon) ! integr. verticale du transport zonal de l'eau
 
-    REAL frugs(klon, nbsrf) ! longueur de rugosite
-    save frugs
+    REAL, save:: frugs(klon, nbsrf) ! longueur de rugosite
     REAL zxrugs(klon) ! longueur de rugosite
 
     ! Conditions aux limites
 
     INTEGER julien
-
     INTEGER, SAVE:: lmt_pas ! number of time steps of "physics" per day
     REAL, save:: pctsrf(klon, nbsrf) ! percentage of surface
     REAL pctsrf_new(klon, nbsrf) ! pourcentage surfaces issus d'ORCHIDEE
-
-    REAL albsol(klon)
-    SAVE albsol ! albedo du sol total
-    REAL albsollw(klon)
-    SAVE albsollw ! albedo du sol total
-
+    REAL, save:: albsol(klon) ! albedo du sol total
+    REAL, save:: albsollw(klon) ! albedo du sol total
     REAL, SAVE:: wo(klon, llm) ! column density of ozone in a cell, in kDU
 
     ! Declaration des procedures appelees
@@ -423,7 +395,6 @@ contains
     REAL zxtsol(klon), zxqsurf(klon), zxsnow(klon), zxfluxlat(klon)
 
     REAL dist, rmu0(klon), fract(klon)
-    REAL zdtime ! pas de temps du rayonnement (s)
     real zlongi
     REAL z_avant(klon), z_apres(klon), z_factor(klon)
     REAL za, zb
@@ -512,9 +483,9 @@ contains
     ! Variables locales pour effectuer les appels en s\'erie :
 
     REAL t_seri(klon, llm), q_seri(klon, llm)
-    REAL ql_seri(klon, llm), qs_seri(klon, llm)
+    REAL ql_seri(klon, llm)
     REAL u_seri(klon, llm), v_seri(klon, llm)
-    REAL tr_seri(klon, llm, nbtr)
+    REAL tr_seri(klon, llm, nqmx - 2)
 
     REAL zx_rh(klon, llm)
 
@@ -537,7 +508,7 @@ contains
 
     ! Variables li\'ees au bilan d'\'energie et d'enthalpie :
     REAL ztsol(klon)
-    REAL d_h_vcol, d_qt, d_qw, d_ql, d_qs, d_ec
+    REAL d_h_vcol, d_qt, d_ec
     REAL, SAVE:: d_h_vcol_phy
     REAL fs_bound, fq_bound
     REAL zero_v(klon)
@@ -625,12 +596,12 @@ contains
        piz_ae = 0.
        tau_ae = 0.
        cg_ae = 0.
-       rain_con(:) = 0.
-       snow_con(:) = 0.
-       topswai(:) = 0.
-       topswad(:) = 0.
-       solswai(:) = 0.
-       solswad(:) = 0.
+       rain_con = 0.
+       snow_con = 0.
+       topswai = 0.
+       topswad = 0.
+       solswai = 0.
+       solswad = 0.
 
        d_u_con = 0.
        d_v_con = 0.
@@ -680,8 +651,7 @@ contains
        IF (raz_date) itau_phy = 0
 
        PRINT *, 'cycle_diurne = ', cycle_diurne
-       CALL printflag(radpas, ocean /= 'force', ok_oasis, ok_journe, &
-            ok_instan, ok_region)
+       CALL printflag(radpas, ocean /= 'force', ok_journe, ok_instan, ok_region)
 
        IF (dtphys * REAL(radpas) > 21600. .AND. cycle_diurne) THEN 
           print *, "Au minimum 4 appels par jour si cycle diurne"
@@ -711,11 +681,6 @@ contains
        ecrit_tra = NINT(86400.*ecrit_tra/dtphys)
        ecrit_reg = NINT(ecrit_reg/dtphys)
 
-       ! Initialiser le couplage si necessaire
-
-       npas = 0
-       nexca = 0
-
        ! Initialisation des sorties
 
        call ini_histins(dtphys, ok_instan, nid_ins)
@@ -730,37 +695,20 @@ contains
     phi = 0.
 
     ! We will modify variables *_seri and we will not touch variables
-    ! u, v, h, q:
-    DO k = 1, llm
-       DO i = 1, klon
-          t_seri(i, k) = t(i, k)
-          u_seri(i, k) = u(i, k)
-          v_seri(i, k) = v(i, k)
-          q_seri(i, k) = qx(i, k, ivap)
-          ql_seri(i, k) = qx(i, k, iliq)
-          qs_seri(i, k) = 0.
-       ENDDO
-    ENDDO
-    IF (nqmx >= 3) THEN
-       tr_seri(:, :, :nqmx-2) = qx(:, :, 3:nqmx)
-    ELSE
-       tr_seri(:, :, 1) = 0.
-    ENDIF
+    ! u, v, t, qx:
+    t_seri = t
+    u_seri = u
+    v_seri = v
+    q_seri = qx(:, :, ivap)
+    ql_seri = qx(:, :, iliq)
+    tr_seri = qx(:, :, 3: nqmx)
 
-    DO i = 1, klon
-       ztsol(i) = 0.
-    ENDDO
-    DO nsrf = 1, nbsrf
-       DO i = 1, klon
-          ztsol(i) = ztsol(i) + ftsol(i, nsrf)*pctsrf(i, nsrf)
-       ENDDO
-    ENDDO
+    ztsol = sum(ftsol * pctsrf, dim = 2)
 
     IF (if_ebil >= 1) THEN 
        tit = 'after dynamics'
        CALL diagetpq(airephy, tit, ip_ebil, 1, 1, dtphys, t_seri, q_seri, &
-            ql_seri, qs_seri, u_seri, v_seri, paprs, d_h_vcol, d_qt, d_qw, &
-            d_ql, d_qs, d_ec)
+            ql_seri, u_seri, v_seri, paprs, d_h_vcol, d_qt, d_ec)
        ! Comme les tendances de la physique sont ajout\'es dans la
        !  dynamique, la variation d'enthalpie par la dynamique devrait
        !  \^etre \'egale \`a la variation de la physique au pas de temps
@@ -768,7 +716,7 @@ contains
        !  nulle.
        call diagphy(airephy, tit, ip_ebil, zero_v, zero_v, zero_v, zero_v, &
             zero_v, zero_v, zero_v, zero_v, ztsol, d_h_vcol + d_h_vcol_phy, &
-            d_qt, 0., fs_bound, fq_bound)
+            d_qt, 0.)
     END IF
 
     ! Diagnostic de la tendance dynamique :
@@ -799,16 +747,14 @@ contains
     ! Check temperatures:
     CALL hgardfou(t_seri, ftsol)
 
-    ! Incrementer le compteur de la physique
+    ! Incrémenter le compteur de la physique
     itap = itap + 1
     julien = MOD(NINT(rdayvrai), 360)
     if (julien == 0) julien = 360
 
     forall (k = 1: llm) zmasse(:, k) = (paprs(:, k)-paprs(:, k + 1)) / rg
 
-    ! Mettre en action les conditions aux limites (albedo, sst etc.).
-
-    ! Prescrire l'ozone et calculer l'albedo sur l'ocean.
+    ! Prescrire l'ozone :
     wo = ozonecm(REAL(julien), paprs)
 
     ! \'Evaporation de l'eau liquide nuageuse :
@@ -825,75 +771,50 @@ contains
     IF (if_ebil >= 2) THEN 
        tit = 'after reevap'
        CALL diagetpq(airephy, tit, ip_ebil, 2, 1, dtphys, t_seri, q_seri, &
-            ql_seri, qs_seri, u_seri, v_seri, paprs, d_h_vcol, d_qt, d_qw, &
-            d_ql, d_qs, d_ec)
+            ql_seri, u_seri, v_seri, paprs, d_h_vcol, d_qt, d_ec)
        call diagphy(airephy, tit, ip_ebil, zero_v, zero_v, zero_v, zero_v, &
-            zero_v, zero_v, zero_v, zero_v, ztsol, d_h_vcol, d_qt, d_ec, &
-            fs_bound, fq_bound)
-
+            zero_v, zero_v, zero_v, zero_v, ztsol, d_h_vcol, d_qt, d_ec)
     END IF
 
-    ! Appeler la diffusion verticale (programme de couche limite)
+    frugs = MAX(frugs, 0.000015)
+    zxrugs = sum(frugs * pctsrf, dim = 2)
 
-    DO i = 1, klon
-       zxrugs(i) = 0.
-    ENDDO
-    DO nsrf = 1, nbsrf
-       DO i = 1, klon
-          frugs(i, nsrf) = MAX(frugs(i, nsrf), 0.000015)
-       ENDDO
-    ENDDO
-    DO nsrf = 1, nbsrf
-       DO i = 1, klon
-          zxrugs(i) = zxrugs(i) + frugs(i, nsrf)*pctsrf(i, nsrf)
-       ENDDO
-    ENDDO
-
-    ! calculs necessaires au calcul de l'albedo dans l'interface
+    ! Calculs nécessaires au calcul de l'albedo dans l'interface
 
     CALL orbite(REAL(julien), zlongi, dist)
     IF (cycle_diurne) THEN
-       zdtime = dtphys * REAL(radpas)
-       CALL zenang(zlongi, time, zdtime, rmu0, fract)
+       CALL zenang(zlongi, time, dtphys * REAL(radpas), rmu0, fract)
     ELSE
        rmu0 = -999.999
     ENDIF
 
     ! Calcul de l'abedo moyen par maille
-    albsol(:) = 0.
-    albsollw(:) = 0.
-    DO nsrf = 1, nbsrf
-       DO i = 1, klon
-          albsol(i) = albsol(i) + falbe(i, nsrf) * pctsrf(i, nsrf)
-          albsollw(i) = albsollw(i) + falblw(i, nsrf) * pctsrf(i, nsrf)
-       ENDDO
-    ENDDO
+    albsol = sum(falbe * pctsrf, dim = 2)
+    albsollw = sum(falblw * pctsrf, dim = 2)
 
     ! R\'epartition sous maille des flux longwave et shortwave
     ! R\'epartition du longwave par sous-surface lin\'earis\'ee
 
-    DO nsrf = 1, nbsrf
-       DO i = 1, klon
-          fsollw(i, nsrf) = sollw(i) &
-               + 4. * RSIGMA * ztsol(i)**3 * (ztsol(i) - ftsol(i, nsrf))
-          fsolsw(i, nsrf) = solsw(i) * (1. - falbe(i, nsrf)) / (1. - albsol(i))
-       ENDDO
-    ENDDO
+    forall (nsrf = 1: nbsrf)
+       fsollw(:, nsrf) = sollw + 4. * RSIGMA * ztsol**3 &
+            * (ztsol - ftsol(:, nsrf))
+       fsolsw(:, nsrf) = solsw * (1. - falbe(:, nsrf)) / (1. - albsol)
+    END forall
 
     fder = dlw
 
     ! Couche limite:
 
-    CALL clmain(dtphys, itap, pctsrf, pctsrf_new, t_seri, q_seri, &
-         u_seri, v_seri, julien, rmu0, co2_ppm, ok_veget, ocean, &
-         ftsol, soil_model, cdmmax, cdhmax, ksta, ksta_ter, ok_kzmin, ftsoil, &
-         qsol, paprs, play, fsnow, fqsurf, fevap, falbe, falblw, fluxlat, &
-         rain_fall, snow_fall, fsolsw, fsollw, fder, rlon, rlat, &
-         frugs, firstcal, agesno, rugoro, d_t_vdf, &
-         d_q_vdf, d_u_vdf, d_v_vdf, d_ts, fluxt, fluxq, fluxu, fluxv, cdragh, &
-         cdragm, q2, dsens, devap, ycoefh, yu1, yv1, t2m, q2m, u10m, v10m, &
-         pblh, capCL, oliqCL, cteiCL, pblT, therm, trmb1, trmb2, trmb3, plcl, &
-         fqcalving, ffonte, run_off_lic_0, fluxo, fluxg, tslab, seaice)
+    CALL clmain(dtphys, itap, pctsrf, pctsrf_new, t_seri, q_seri, u_seri, &
+         v_seri, julien, rmu0, co2_ppm, ok_veget, ocean, ftsol, soil_model, &
+         cdmmax, cdhmax, ksta, ksta_ter, ok_kzmin, ftsoil, qsol, paprs, play, &
+         fsnow, fqsurf, fevap, falbe, falblw, fluxlat, rain_fall, snow_fall, &
+         fsolsw, fsollw, fder, rlon, rlat, frugs, firstcal, agesno, rugoro, &
+         d_t_vdf, d_q_vdf, d_u_vdf, d_v_vdf, d_ts, fluxt, fluxq, fluxu, &
+         fluxv, cdragh, cdragm, q2, dsens, devap, ycoefh, yu1, yv1, t2m, q2m, &
+         u10m, v10m, pblh, capCL, oliqCL, cteiCL, pblT, therm, trmb1, trmb2, &
+         trmb3, plcl, fqcalving, ffonte, run_off_lic_0, fluxo, fluxg, tslab, &
+         seaice)
 
     ! Incr\'ementation des flux
 
@@ -929,11 +850,9 @@ contains
     IF (if_ebil >= 2) THEN 
        tit = 'after clmain'
        CALL diagetpq(airephy, tit, ip_ebil, 2, 2, dtphys, t_seri, q_seri, &
-            ql_seri, qs_seri, u_seri, v_seri, paprs, d_h_vcol, d_qt, d_qw, &
-            d_ql, d_qs, d_ec)
+            ql_seri, u_seri, v_seri, paprs, d_h_vcol, d_qt, d_ec)
        call diagphy(airephy, tit, ip_ebil, zero_v, zero_v, zero_v, zero_v, &
-            sens, evap, zero_v, zero_v, ztsol, d_h_vcol, d_qt, d_ec, &
-            fs_bound, fq_bound)
+            sens, evap, zero_v, zero_v, ztsol, d_h_vcol, d_qt, d_ec)
     END IF
 
     ! Update surface temperature:
@@ -1016,7 +935,7 @@ contains
        ENDDO
     ENDDO
 
-    ! Calculer la derive du flux infrarouge
+    ! Calculer la dérive du flux infrarouge
 
     DO i = 1, klon
        dlw(i) = - 4. * RSIGMA * zxtsol(i)**3 
@@ -1026,15 +945,12 @@ contains
 
     DO k = 1, llm
        DO i = 1, klon
-          conv_q(i, k) = d_q_dyn(i, k) + d_q_vdf(i, k)/dtphys
-          conv_t(i, k) = d_t_dyn(i, k) + d_t_vdf(i, k)/dtphys
+          conv_q(i, k) = d_q_dyn(i, k) + d_q_vdf(i, k) / dtphys
+          conv_t(i, k) = d_t_dyn(i, k) + d_t_vdf(i, k) / dtphys
        ENDDO
     ENDDO
 
-    IF (check) THEN
-       za = qcheck(klon, llm, paprs, q_seri, ql_seri, airephy)
-       print *, "avantcon = ", za
-    ENDIF
+    IF (check) print *, "avantcon = ", qcheck(paprs, q_seri, ql_seri)
 
     if (iflag_con == 2) then
        z_avant = sum((q_seri + ql_seri) * zmasse, dim=2)
@@ -1101,15 +1017,13 @@ contains
     IF (if_ebil >= 2) THEN 
        tit = 'after convect'
        CALL diagetpq(airephy, tit, ip_ebil, 2, 2, dtphys, t_seri, q_seri, &
-            ql_seri, qs_seri, u_seri, v_seri, paprs, d_h_vcol, d_qt, d_qw, &
-            d_ql, d_qs, d_ec)
+            ql_seri, u_seri, v_seri, paprs, d_h_vcol, d_qt, d_ec)
        call diagphy(airephy, tit, ip_ebil, zero_v, zero_v, zero_v, zero_v, &
-            zero_v, zero_v, rain_con, snow_con, ztsol, d_h_vcol, d_qt, d_ec, &
-            fs_bound, fq_bound)
+            zero_v, zero_v, rain_con, snow_con, ztsol, d_h_vcol, d_qt, d_ec)
     END IF
 
     IF (check) THEN
-       za = qcheck(klon, llm, paprs, q_seri, ql_seri, airephy)
+       za = qcheck(paprs, q_seri, ql_seri)
        print *, "aprescon = ", za
        zx_t = 0.
        za = 0.
@@ -1157,8 +1071,7 @@ contains
     IF (if_ebil >= 2) THEN 
        tit = 'after dry_adjust'
        CALL diagetpq(airephy, tit, ip_ebil, 2, 2, dtphys, t_seri, q_seri, &
-            ql_seri, qs_seri, u_seri, v_seri, paprs, d_h_vcol, d_qt, d_qw, &
-            d_ql, d_qs, d_ec)
+            ql_seri, u_seri, v_seri, paprs, d_h_vcol, d_qt, d_ec)
     END IF
 
     ! Caclul des ratqs
@@ -1216,7 +1129,7 @@ contains
        ENDDO
     ENDDO
     IF (check) THEN
-       za = qcheck(klon, llm, paprs, q_seri, ql_seri, airephy)
+       za = qcheck(paprs, q_seri, ql_seri)
        print *, "apresilp = ", za
        zx_t = 0.
        za = 0.
@@ -1232,11 +1145,9 @@ contains
     IF (if_ebil >= 2) THEN 
        tit = 'after fisrt'
        CALL diagetpq(airephy, tit, ip_ebil, 2, 2, dtphys, t_seri, q_seri, &
-            ql_seri, qs_seri, u_seri, v_seri, paprs, d_h_vcol, d_qt, d_qw, &
-            d_ql, d_qs, d_ec)
+            ql_seri, u_seri, v_seri, paprs, d_h_vcol, d_qt, d_ec)
        call diagphy(airephy, tit, ip_ebil, zero_v, zero_v, zero_v, zero_v, &
-            zero_v, zero_v, rain_lsc, snow_lsc, ztsol, d_h_vcol, d_qt, d_ec, &
-            fs_bound, fq_bound)
+            zero_v, zero_v, rain_lsc, snow_lsc, ztsol, d_h_vcol, d_qt, d_ec)
     END IF
 
     ! PRESCRIPTION DES NUAGES POUR LE RAYONNEMENT
@@ -1313,8 +1224,8 @@ contains
     ENDDO
 
     IF (if_ebil >= 2) CALL diagetpq(airephy, "after diagcld", ip_ebil, 2, 2, &
-         dtphys, t_seri, q_seri, ql_seri, qs_seri, u_seri, v_seri, paprs, &
-         d_h_vcol, d_qt, d_qw, d_ql, d_qs, d_ec)
+         dtphys, t_seri, q_seri, ql_seri, u_seri, v_seri, paprs, d_h_vcol, &
+         d_qt, d_ec)
 
     ! Humidit\'e relative pour diagnostic :
     DO k = 1, llm
@@ -1398,11 +1309,9 @@ contains
     IF (if_ebil >= 2) THEN 
        tit = 'after rad'
        CALL diagetpq(airephy, tit, ip_ebil, 2, 2, dtphys, t_seri, q_seri, &
-            ql_seri, qs_seri, u_seri, v_seri, paprs, d_h_vcol, d_qt, d_qw, &
-            d_ql, d_qs, d_ec)
+            ql_seri, u_seri, v_seri, paprs, d_h_vcol, d_qt, d_ec)
        call diagphy(airephy, tit, ip_ebil, topsw, toplw, solsw, sollw, &
-            zero_v, zero_v, zero_v, zero_v, ztsol, d_h_vcol, d_qt, d_ec, &
-            fs_bound, fq_bound)
+            zero_v, zero_v, zero_v, zero_v, ztsol, d_h_vcol, d_qt, d_ec)
     END IF
 
     ! Calculer l'hydrologie de la surface
@@ -1496,15 +1405,15 @@ contains
          zustrph, zvstrdr, zvstrli, zvstrph, paprs, u, v, aam, torsfc)
 
     IF (if_ebil >= 2) CALL diagetpq(airephy, 'after orography', ip_ebil, 2, &
-         2, dtphys, t_seri, q_seri, ql_seri, qs_seri, u_seri, v_seri, paprs, &
-         d_h_vcol, d_qt, d_qw, d_ql, d_qs, d_ec)
+         2, dtphys, t_seri, q_seri, ql_seri, u_seri, v_seri, paprs, d_h_vcol, &
+         d_qt, d_ec)
 
     ! Calcul des tendances traceurs
-    call phytrac(rnpb, itap, lmt_pas, julien, time, firstcal, lafin, nqmx-2, &
-         dtphys, u, t, paprs, play, mfu, mfd, pde_u, pen_d, ycoefh, fm_therm, &
-         entr_therm, yu1, yv1, ftsol, pctsrf, frac_impa, frac_nucl, pphis, &
-         albsol, rhcl, cldfra, rneb, diafra, cldliq, pmflxr, pmflxs, prfl, &
-         psfl, da, phi, mp, upwd, dnwd, tr_seri, zmasse)
+    call phytrac(itap, lmt_pas, julien, time, firstcal, lafin, dtphys, u, t, &
+         paprs, play, mfu, mfd, pde_u, pen_d, ycoefh, fm_therm, entr_therm, &
+         yu1, yv1, ftsol, pctsrf, frac_impa, frac_nucl, pphis, albsol, rhcl, &
+         cldfra, rneb, diafra, cldliq, pmflxr, pmflxs, prfl, psfl, da, phi, &
+         mp, upwd, dnwd, tr_seri, zmasse)
 
     IF (offline) call phystokenc(dtphys, rlon, rlat, t, mfu, mfd, pen_u, &
          pde_u, pen_d, pde_d, fm_therm, entr_therm, ycoefh, yu1, yv1, ftsol, &
@@ -1535,18 +1444,14 @@ contains
     IF (if_ebil >= 1) THEN 
        tit = 'after physic'
        CALL diagetpq(airephy, tit, ip_ebil, 1, 1, dtphys, t_seri, q_seri, &
-            ql_seri, qs_seri, u_seri, v_seri, paprs, d_h_vcol, d_qt, d_qw, &
-            d_ql, d_qs, d_ec)
+            ql_seri, u_seri, v_seri, paprs, d_h_vcol, d_qt, d_ec)
        ! Comme les tendances de la physique sont ajoute dans la dynamique, 
        ! on devrait avoir que la variation d'entalpie par la dynamique
        ! est egale a la variation de la physique au pas de temps precedent.
        ! Donc la somme de ces 2 variations devrait etre nulle.
        call diagphy(airephy, tit, ip_ebil, topsw, toplw, solsw, sollw, sens, &
-            evap, rain_fall, snow_fall, ztsol, d_h_vcol, d_qt, d_ec, &
-            fs_bound, fq_bound)
-
+            evap, rain_fall, snow_fall, ztsol, d_h_vcol, d_qt, d_ec)
        d_h_vcol_phy = d_h_vcol
-
     END IF
 
     ! SORTIES
@@ -1571,15 +1476,13 @@ contains
        ENDDO
     ENDDO
 
-    IF (nqmx >= 3) THEN
-       DO iq = 3, nqmx
-          DO k = 1, llm
-             DO i = 1, klon
-                d_qx(i, k, iq) = (tr_seri(i, k, iq-2) - qx(i, k, iq)) / dtphys
-             ENDDO
+    DO iq = 3, nqmx
+       DO k = 1, llm
+          DO i = 1, klon
+             d_qx(i, k, iq) = (tr_seri(i, k, iq-2) - qx(i, k, iq)) / dtphys
           ENDDO
        ENDDO
-    ENDIF
+    ENDDO
 
     ! Sauvegarder les valeurs de t et q a la fin de la physique:
     DO k = 1, llm

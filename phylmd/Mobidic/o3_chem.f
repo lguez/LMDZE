@@ -19,7 +19,8 @@ contains
     use dimphy, only: klon
     use dimens_m, only: llm
     use regr_pr_comb_coefoz_m, only: c_Mob, a4_mass, a2, r_het_interm
-    use orbite_m, only: orbite, zenang
+    use orbite_m, only: orbite
+    use zenang_m, only: zenang
 
     integer, intent(in):: julien ! jour julien, 1 <= julien <= 360
     real, intent(in):: gmtime ! heure de la journée en fraction de jour

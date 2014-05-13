@@ -4,28 +4,24 @@ module interfsurf_hq_m
 
 contains
 
-  SUBROUTINE interfsurf_hq(itime, dtime, jour, rmu0, klon, iim, jjm, &
-       nisurf, knon, knindex, pctsrf, rlat, debut, &
-       ok_veget, soil_model, nsoilmx, tsoil, qsol, u1_lay, v1_lay, &
-       temp_air, spechum, tq_cdrag, petAcoef, peqAcoef, &
-       petBcoef, peqBcoef, precip_rain, precip_snow, &
-       fder, rugos, rugoro, snow, qsurf, &
-       tsurf, p1lay, ps, radsol, ocean, evap, fluxsens, &
-       fluxlat, dflux_l, dflux_s, tsurf_new, alb_new, alblw, &
-       z0_new, pctsrf_new, agesno, fqcalving, ffonte, &
-       run_off_lic_0, flux_o, flux_g, tslab, seaice)
+  SUBROUTINE interfsurf_hq(itime, dtime, jour, rmu0, iim, jjm, nisurf, knon, &
+       knindex, pctsrf, rlat, debut, ok_veget, soil_model, nsoilmx, tsoil, &
+       qsol, u1_lay, v1_lay, temp_air, spechum, tq_cdrag, petAcoef, peqAcoef, &
+       petBcoef, peqBcoef, precip_rain, precip_snow, fder, rugos, rugoro, &
+       snow, qsurf, tsurf, p1lay, ps, radsol, ocean, evap, fluxsens, fluxlat, &
+       dflux_l, dflux_s, tsurf_new, alb_new, alblw, z0_new, pctsrf_new, &
+       agesno, fqcalving, ffonte, run_off_lic_0, flux_o, flux_g, tslab, seaice)
 
     ! Cette routine sert d'aiguillage entre l'atmosphère et la surface
     ! en général (sols continentaux, océans, glaces) pour les flux de
-    ! chaleur et d'humidité. En pratique l'interface se fait entre la
-    ! couche limite du modèle atmosphérique ("clmain.F") et les
-    ! routines de surface ("sechiba", "oasis"...).
+    ! chaleur et d'humidité.
 
-    ! Laurent Fairhead 02/2000
+    ! Laurent Fairhead, 02/2000
 
     USE abort_gcm_m, ONLY: abort_gcm
     USE albsno_m, ONLY: albsno
     USE calcul_fluxs_m, ONLY: calcul_fluxs
+    USE dimphy, ONLY: klon
     USE fonte_neige_m, ONLY: fonte_neige
     USE gath_cpl, ONLY: gath2cpl
     USE indicesol, ONLY: epsfra, is_lic, is_oce, is_sic, is_ter, nbsrf
@@ -38,7 +34,6 @@ contains
 
     ! Parametres d'entree
     ! input:
-    ! klon nombre total de points de grille
     ! iim, jjm nbres de pts de grille
     ! dtime pas de temps de la physique (en s)
     ! jour jour dans l'annee en cours,
@@ -76,7 +71,6 @@ contains
     ! run_off_lic_0 runoff glacier du pas de temps precedent
     integer, intent(IN):: itime ! numero du pas de temps
     integer, intent(IN):: iim, jjm
-    integer, intent(IN):: klon
     real, intent(IN):: dtime
     integer, intent(IN):: jour
     real, intent(IN):: rmu0(klon)
@@ -281,7 +275,6 @@ contains
     ! Aiguillage vers les differents schemas de surface
 
     if (nisurf == is_ter) then
-
        ! Surface "terre" appel a l'interface avec les sols continentaux
 
        ! allocation du run-off
@@ -305,7 +298,6 @@ contains
           run_off=0.0
           !cym
 
-!!$PB
           ALLOCATE (tmp_rriv(iim, jjm+1), stat=error)
           if (error /= 0) then
              abort_message='Pb allocation tmp_rriv'
@@ -324,8 +316,6 @@ contains
           tmp_rriv = 0.0
           tmp_rcoa = 0.0
           tmp_rlic = 0.0
-
-!!$
        else if (size(coastalflow) /= knon) then
           write(*, *)'Bizarre, le nombre de points continentaux'
           write(*, *)'a change entre deux appels. J''arrete ...'
@@ -340,7 +330,7 @@ contains
        if (.not. ok_veget) then
           ! calcul albedo: lecture albedo fichier boundary conditions
           ! puis ajout albedo neige
-          call interfsur_lim(itime, dtime, jour, klon, nisurf, knon, knindex, &
+          call interfsur_lim(itime, dtime, jour, nisurf, knon, knindex, &
                debut, alb_new, z0_new)
 
           ! calcul snow et qsurf, hydrol adapté

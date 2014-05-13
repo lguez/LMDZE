@@ -1,10 +1,10 @@
 module dimphy
 
-  use dimens_m, only: iim, jjm, llm, nqmx
+  use dimens_m, only: iim, jjm, llm
 
   implicit none
 
-  private iim, jjm, llm, nqmx
+  private iim, jjm, llm
 
   INTEGER, PARAMETER:: klon = iim * (jjm - 1) + 2
   ! (number of distinct scalar grid points)
@@ -15,7 +15,6 @@ module dimphy
   ! klon pour le pole sud)
 
   INTEGER, PARAMETER:: KLEV = llm
-  INTEGER, PARAMETER:: nbtr = max(1, nqmx - 2) ! nombre de vrais traceurs
-  REAL,save:: zmasq(KLON) ! fraction of land
+  REAL, save:: zmasq(KLON) ! fraction of land
 
 end module dimphy

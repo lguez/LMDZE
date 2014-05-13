@@ -84,22 +84,16 @@ PROGRAM gcm
   ! Lecture du fichier "start.nc" :
   CALL dynetat0(vcov, ucov, teta, q, masse, ps, phis, time_0)
 
-  ! On remet le calendrier à zero si demandé :
-  if (annee_ref /= anneeref .or. day_ref /= dayref) then
-     print *, 'Attention : les dates initiales lues dans le fichier ' // &
-          '"start" ne correspondent pas à celles lues dans "gcm.def".'
-     if (raz_date) then
-        print *, 'On réinitialise à la date lue dans "gcm.def".'
-        annee_ref = anneeref
-        day_ref = dayref
-        day_ini = dayref
-        itau_dyn = 0
-        time_0 = 0.
-     else
-        print *, 'On garde les dates du fichier "start".'
-     endif
-  ELSE
-     raz_date = .false.
+  ! On remet le calendrier à zéro si demandé :
+  if (raz_date) then
+     print *, 'On réinitialise à la date lue dans la namelist.'
+     annee_ref = anneeref
+     day_ref = dayref
+     day_ini = dayref
+     itau_dyn = 0
+     time_0 = 0.
+  else
+     print *, 'On garde les dates du fichier "start".'
   endif
 
   CALL disvert

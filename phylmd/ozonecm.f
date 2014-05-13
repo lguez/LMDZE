@@ -33,7 +33,7 @@ contains
     ! "ozonecm(j, k)" is the column-density of ozone in cell "(j, k)", that is
     ! between interface "k" and interface "k + 1", in kDU.
 
-    ! Variables local to the procedure:
+    ! Local:
 
     REAL tozon, pl
     INTEGER i, k

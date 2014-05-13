@@ -493,7 +493,7 @@ contains
                   coefm(:knon, 1), ycoefm0, ycoefh0)
              coefm(:knon, :) = max(coefm(:knon, :), ycoefm0(:knon, :))
              coefh(:knon, :) = max(coefh(:knon, :), ycoefh0(:knon, :))
-           END IF
+          END IF
 
           IF (iflag_pbl >= 3) THEN
              ! MELLOR ET YAMADA adapté à Mars, Richard Fournier et

@@ -16,8 +16,8 @@ contains
     ! Le pas de temps "pdtphys" est supposé beaucoup plus petit que la
     ! constante de temps de décroissance.
 
-    use dimens_m, only: llm
-    use dimphy, only: klon, nbtr
+    use dimens_m, only: llm, nqmx
+    use dimphy, only: klon
     use nr_util, only: assert
 
     REAL, intent(in):: tr_seri(:, :, :), pdtphys, tautr(:)
@@ -28,8 +28,8 @@ contains
 
     !-----------------------------------------------
 
-    call assert(shape(tr_seri) == (/klon, llm, nbtr/), "radiornpb tr_seri")
-    call assert(size(tautr) == nbtr, "radiornpb tautr")
+    call assert(shape(tr_seri) == (/klon, llm, nqmx - 2/), "radiornpb tr_seri")
+    call assert(size(tautr) == nqmx - 2, "radiornpb tautr")
 
     DO it = 1, 2
        IF (tautr(it) > 0.) THEN

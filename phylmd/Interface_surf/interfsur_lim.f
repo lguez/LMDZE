@@ -4,10 +4,8 @@ module interfsur_lim_m
 
 contains
 
-  SUBROUTINE interfsur_lim(itime, dtime, jour,  &
-       klon, nisurf, knon, knindex,  &
-       debut,  &
-       lmt_alb, lmt_rug)
+  SUBROUTINE interfsur_lim(itime, dtime, jour, nisurf, knon, knindex, debut, &
+       alb_new, z0_new)
 
     ! Cette routine sert d'interface entre le modèle atmosphérique et
     ! un fichier de conditions aux limites.
@@ -15,55 +13,40 @@ contains
     ! L. Fairhead 02/2000
 
     use abort_gcm_m, only: abort_gcm
-    use netcdf
+    USE dimphy, ONLY: klon
+    use netcdf, only: NF90_NOWRITE
+    use netcdf95, only: NF95_close, NF95_GET_VAR, NF95_INQ_VARID, NF95_OPEN
 
-    ! Parametres d'entree
-    ! input:
-    ! itime numero du pas de temps courant
-    ! dtime pas de temps de la physique (en s)
-    ! jour jour a lire dans l'annee
-    ! nisurf index de la surface a traiter (1 = sol continental)
-    ! knon nombre de points dans le domaine a traiter
-    ! knindex index des points de la surface a traiter
-    ! klon taille de la grille
-    ! debut logical: 1er appel a la physique (initialisation)
-    integer, intent(IN) :: itime
-    real , intent(IN) :: dtime
-    integer, intent(IN) :: jour
-    integer, intent(IN) :: nisurf
-    integer, intent(IN) :: knon
-    integer, intent(IN) :: klon
-    integer, dimension(klon), intent(in) :: knindex
-    logical, intent(IN) :: debut
+    integer, intent(IN):: itime ! numero du pas de temps courant
+    real, intent(IN):: dtime ! pas de temps de la physique (en s)
+    integer, intent(IN):: jour ! jour a lire dans l'annee
 
-    ! Parametres de sortie
-    ! output:
-    ! lmt_sst SST lues dans le fichier de CL
-    ! lmt_alb Albedo lu
-    ! lmt_rug longueur de rugosité lue
-    ! pctsrf_new sous-maille fractionnelle
-    real, intent(out), dimension(klon) :: lmt_alb
-    real, intent(out), dimension(klon) :: lmt_rug
+    integer, intent(IN):: nisurf
+    ! index de la surface à traiter (1 = sol continental)
 
-    ! Variables locales
-    integer :: ii
-    integer, save :: lmt_pas ! frequence de lecture des conditions limites
+    integer, intent(IN):: knon ! nombre de points dans le domaine a traiter
+
+    integer, intent(in):: knindex(:) ! (klon)
+    ! index des points de la surface à traiter
+
+    logical, intent(IN):: debut ! premier appel à la physique (initialisation)
+    real, intent(out):: alb_new(:) ! (klon) albedo lu
+    real, intent(out):: z0_new(:) ! (klon) longueur de rugosité lue
+
+    ! Local:
+
+    integer, save:: lmt_pas ! frequence de lecture des conditions limites
     ! (en pas de physique)
-    logical, save :: deja_lu_sur! pour indiquer que le jour a lire a deja
-    ! lu pour une surface precedente
-    integer, save :: jour_lu_sur
-    integer :: ierr
-    character (len = 20) :: modname = 'interfsur_lim'
-    character (len = 80) :: abort_message
-    logical, save :: newlmt = .false.
-    logical, save :: check = .false.
-    ! Champs lus dans le fichier de CL
-    real, allocatable , save, dimension(:) :: alb_lu, rug_lu
 
-    ! quelques variables pour netcdf
+    logical, save:: deja_lu_sur
+    ! jour à lire déjà lu pour une surface précédente
 
-    integer , save :: nid, nvarid
-    integer, dimension(2), save :: start, epais
+    integer, save:: jour_lu_sur
+
+    ! Champs lus dans le fichier de conditions aux limites :
+    real, allocatable, save:: alb_lu(:), rug_lu(:)
+
+    integer ncid, varid
 
     !------------------------------------------------------------
 
@@ -74,75 +57,30 @@ contains
        allocate(rug_lu(klon))
     endif
 
-    if ((jour - jour_lu_sur) /= 0) deja_lu_sur = .false.
-
-    if (check) write(*, *)modname, ':: jour_lu_sur, deja_lu_sur', jour_lu_sur, &
-         deja_lu_sur
-    if (check) write(*, *)modname, ':: itime, lmt_pas', itime, lmt_pas
+    if (jour - jour_lu_sur /= 0) deja_lu_sur = .false.
 
     ! Tester d'abord si c'est le moment de lire le fichier
-    if (mod(itime-1, lmt_pas) == 0 .and. .not. deja_lu_sur) then
-
-       ! Ouverture du fichier
-
-       ierr = NF90_OPEN ('limit.nc', NF90_NOWRITE, nid)
-       if (ierr.NE.NF90_NOERR) then
-          abort_message &
-               = 'Pb d''ouverture du fichier de conditions aux limites'
-          call abort_gcm(modname, abort_message, 1)
-       endif
-
-       ! La tranche de donnees a lire:
-
-       start(1) = 1
-       start(2) = jour
-       epais(1) = klon
-       epais(2) = 1
+    if (mod(itime - 1, lmt_pas) == 0 .and. .not. deja_lu_sur) then
+       call NF95_OPEN('limit.nc', NF90_NOWRITE, ncid)
 
        ! Lecture Albedo
-
-       ierr = NF90_INQ_VARID(nid, 'ALB', nvarid)
-       if (ierr /= NF90_NOERR) then
-          abort_message = 'Le champ <ALB> est absent'
-          call abort_gcm(modname, abort_message, 1)
-       endif
-       ierr = NF90_GET_VAR(nid, nvarid, alb_lu, start, epais)
-       if (ierr /= NF90_NOERR) then
-          abort_message = 'Lecture echouee pour <ALB>'
-          call abort_gcm(modname, abort_message, 1)
-       endif
+       call NF95_INQ_VARID(ncid, 'ALB', varid)
+       call NF95_GET_VAR(ncid, varid, alb_lu, start=(/1, jour/))
 
        ! Lecture rugosité
+       call NF95_INQ_VARID(ncid, 'RUG', varid)
+       call NF95_GET_VAR(ncid, varid, rug_lu, start=(/1, jour/))
 
-       ierr = NF90_INQ_VARID(nid, 'RUG', nvarid)
-       if (ierr /= NF90_NOERR) then
-          abort_message = 'Le champ <RUG> est absent'
-          call abort_gcm(modname, abort_message, 1)
-       endif
-       ierr = NF90_GET_VAR(nid, nvarid, rug_lu, start, epais)
-       if (ierr /= NF90_NOERR) then
-          abort_message = 'Lecture echouee pour <RUG>'
-          call abort_gcm(modname, abort_message, 1)
-       endif
-
-
-       ! Fin de lecture
-
-       ierr = NF90_CLOSE(nid)
+       call NF95_CLOSE(ncid)
        deja_lu_sur = .true.
        jour_lu_sur = jour
     endif
 
     ! Recopie des variables dans les champs de sortie
-
-!!$ lmt_alb = 0.0
-!!$ lmt_rug = 0.0
-    lmt_alb = 999999.
-    lmt_rug = 999999.
-    DO ii = 1, knon
-       lmt_alb(ii) = alb_lu(knindex(ii))
-       lmt_rug(ii) = rug_lu(knindex(ii))
-    enddo
+    alb_new(:knon) = alb_lu(knindex(:knon))
+    z0_new(:knon) = rug_lu(knindex(:knon))
+    alb_new(knon + 1:) = 999999.
+    z0_new(knon + 1:) = 999999.
 
   END SUBROUTINE interfsur_lim
 

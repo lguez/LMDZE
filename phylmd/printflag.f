@@ -1,4 +1,4 @@
-SUBROUTINE printflag(radpas, ok_ocean, ok_oasis, ok_journe, ok_instan, &
+SUBROUTINE printflag(radpas, ok_ocean, ok_journe, ok_instan, &
      ok_region)
 
   ! From phylmd/printflag.F, v 1.1.1.1 2004/05/19 12:53:09
@@ -7,18 +7,17 @@ SUBROUTINE printflag(radpas, ok_ocean, ok_oasis, ok_journe, ok_instan, &
   IMPLICIT NONE
 
   INTEGER, INTENT (IN) :: radpas
-  LOGICAL, INTENT (IN) :: ok_ocean, ok_oasis, ok_journe, ok_instan, ok_region
+  LOGICAL, INTENT (IN) :: ok_ocean, ok_journe, ok_instan, ok_region
 
   !--------------------------------------------------
 
   PRINT *, 'Choix des principales clés de la physique'
 
   PRINT 8, radpas
-  PRINT 5, ok_ocean, ok_oasis
+  PRINT *, "ok_ocean = ", ok_ocean
   PRINT 4, ok_journe, ok_instan, ok_region
 
 4 FORMAT ('ok_journe= ', L3, ', ok_instan = ', L3, ', ok_region = ', L3)
-5 FORMAT ('ok_ocean = ', L3, ', ok_oasis = ', L3)
 8 FORMAT ('radpas = ', I4)
 
 END SUBROUTINE printflag

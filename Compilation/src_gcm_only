@@ -196,7 +196,6 @@ nxgrad.f
 nxgrad_gam.f
 nxgraro2.f
 o3_chem.f
-oasis_m.f
 orbite.f
 orodrag.f
 orolift.f
@@ -270,4 +269,5 @@ YOECUMF.f
 YOEGWD.f
 yoethf.f
 YOMCST.f
+zenang.f
 zilch.f

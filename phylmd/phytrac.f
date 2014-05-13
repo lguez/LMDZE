@@ -7,11 +7,11 @@ module phytrac_m
 
 contains
 
-  SUBROUTINE phytrac(rnpb, itap, lmt_pas, julien, gmtime, firstcal, lafin, &
-       nq_phys, pdtphys, u, t_seri, paprs, pplay, pmfu, pmfd, pde_u, pen_d, &
-       coefh, fm_therm, entr_therm, yu1, yv1, ftsol, pctsrf, frac_impa, &
-       frac_nucl, pphis, albsol, rh, cldfra, rneb, diafra, cldliq, pmflxr, &
-       pmflxs, prfl, psfl, da, phi, mp, upwd, dnwd, tr_seri, zmasse)
+  SUBROUTINE phytrac(itap, lmt_pas, julien, gmtime, firstcal, lafin, pdtphys, &
+       u, t_seri, paprs, pplay, pmfu, pmfd, pde_u, pen_d, coefh, fm_therm, &
+       entr_therm, yu1, yv1, ftsol, pctsrf, frac_impa, frac_nucl, pphis, &
+       albsol, rh, cldfra, rneb, diafra, cldliq, pmflxr, pmflxs, prfl, psfl, &
+       da, phi, mp, upwd, dnwd, tr_seri, zmasse)
 
     ! From phylmd/phytrac.F, version 1.15 2006/02/21 08:08:30 (SVN revision 679)
 
@@ -21,8 +21,7 @@ contains
     ! Objet : moniteur g\'en\'eral des tendances des traceurs
 
     ! L'appel de "phytrac" se fait avec "nqmx - 2" donc nous avons
-    ! bien les vrais traceurs (en nombre "nbtr", sans la vapeur d'eau
-    ! ni l'eau liquide) dans "phytrac".
+    ! bien les vrais traceurs, sans la vapeur d'eau ni l'eau liquide.
 
     ! Modifications pour les traceurs :
     ! - uniformisation des parametrisations dans phytrac
@@ -33,10 +32,11 @@ contains
     use clesphys2, only: iflag_con
     use cltracrn_m, only: cltracrn
     use ctherm, only: iflag_thermals
-    use dimens_m, only: llm
-    use dimphy, only: klon, nbtr
+    use dimens_m, only: llm, nqmx
+    use dimphy, only: klon
     use indicesol, only: nbsrf
     use ini_histrac_m, only: ini_histrac
+    use initrrnpb_m, only: initrrnpb
     use minmaxqfi_m, only: minmaxqfi
     use nflxtr_m, only: nflxtr
     use nr_util, only: assert
@@ -47,17 +47,12 @@ contains
     use regr_pr_comb_coefoz_m, only: regr_pr_comb_coefoz
     use SUPHEC_M, only: rg
 
-    logical, intent(in):: rnpb
     integer, intent(in):: itap ! number of calls to "physiq"
     integer, intent(in):: lmt_pas ! number of time steps of "physics" per day
     integer, intent(in):: julien !jour julien, 1 <= julien <= 360
     real, intent(in):: gmtime ! heure de la journ\'ee en fraction de jour
     logical, intent(in):: firstcal ! first call to "calfis"
     logical, intent(in):: lafin ! fin de la physique
-
-    integer, intent(in):: nq_phys
-    ! (nombre de traceurs auxquels on applique la physique)
-
     real, intent(in):: pdtphys ! pas d'integration pour la physique (s)
     real, intent(in):: u(klon, llm)
     real, intent(in):: t_seri(klon, llm) ! temperature, in K
@@ -112,7 +107,7 @@ contains
     REAL, intent(in):: upwd(klon, llm) ! saturated updraft mass flux
     REAL, intent(in):: dnwd(klon, llm) ! saturated downdraft mass flux
 
-    real, intent(inout):: tr_seri(:, :, :) ! (klon, llm, nbtr)
+    real, intent(inout):: tr_seri(:, :, :) ! (klon, llm, nqmx - 2)
     ! (mass fractions of tracers, excluding water, at mid-layers)
 
     real, intent(in):: zmasse(:, :) ! (klon, llm)
@@ -132,21 +127,21 @@ contains
     ! 
     ! Pour la source de radon et son reservoir de sol
 
-    REAL, save:: trs(klon, nbtr) ! Concentration de radon dans le sol
+    REAL, save:: trs(klon, nqmx - 2) ! Concentration de radon dans le sol
 
-    REAL masktr(klon, nbtr) ! Masque reservoir de sol traceur
+    REAL masktr(klon, nqmx - 2) ! Masque reservoir de sol traceur
     ! Masque de l'echange avec la surface
     ! (1 = reservoir) ou (possible => 1)
     SAVE masktr
-    REAL fshtr(klon, nbtr) ! Flux surfacique dans le reservoir de sol
+    REAL fshtr(klon, nqmx - 2) ! Flux surfacique dans le reservoir de sol
     SAVE fshtr
-    REAL hsoltr(nbtr) ! Epaisseur equivalente du reservoir de sol
+    REAL hsoltr(nqmx - 2) ! Epaisseur equivalente du reservoir de sol
     SAVE hsoltr
-    REAL tautr(nbtr) ! Constante de decroissance radioactive
+    REAL tautr(nqmx - 2) ! Constante de decroissance radioactive
     SAVE tautr
-    REAL vdeptr(nbtr) ! Vitesse de depot sec dans la couche Brownienne
+    REAL vdeptr(nqmx - 2) ! Vitesse de depot sec dans la couche Brownienne
     SAVE vdeptr
-    REAL scavtr(nbtr) ! Coefficient de lessivage
+    REAL scavtr(nqmx - 2) ! Coefficient de lessivage
     SAVE scavtr
 
     CHARACTER itn
@@ -154,11 +149,11 @@ contains
 
     ! nature du traceur
 
-    logical aerosol(nbtr) ! Nature du traceur
+    logical aerosol(nqmx - 2) ! Nature du traceur
     ! ! aerosol(it) = true => aerosol 
     ! ! aerosol(it) = false => gaz 
-    logical clsol(nbtr) ! couche limite sol calcul\'ee
-    logical radio(nbtr) ! d\'ecroisssance radioactive
+    logical clsol(nqmx - 2) ! couche limite sol calcul\'ee
+    logical radio(nqmx - 2) ! d\'ecroisssance radioactive
     save aerosol, clsol, radio
 
     ! convection tiedtke
@@ -170,16 +165,16 @@ contains
     ! Variables locales pour effectuer les appels en serie
 
     REAL d_tr(klon, llm), d_trs(klon) ! tendances de traceurs 
-    REAL d_tr_cl(klon, llm, nbtr) ! tendance de traceurs couche limite
-    REAL d_tr_cv(klon, llm, nbtr) ! tendance de traceurs conv pour chq traceur
-    REAL d_tr_th(klon, llm, nbtr) ! la tendance des thermiques
+    REAL d_tr_cl(klon, llm, nqmx - 2) ! tendance de traceurs couche limite
+    REAL d_tr_cv(klon, llm, nqmx - 2) ! tendance de traceurs conv pour chq traceur
+    REAL d_tr_th(klon, llm, nqmx - 2) ! la tendance des thermiques
     REAL d_tr_dec(klon, llm, 2) ! la tendance de la decroissance 
     ! ! radioactive du rn - > pb 
-    REAL d_tr_lessi_impa(klon, llm, nbtr) ! la tendance du lessivage 
+    REAL d_tr_lessi_impa(klon, llm, nqmx - 2) ! la tendance du lessivage 
     ! ! par impaction
-    REAL d_tr_lessi_nucl(klon, llm, nbtr) ! la tendance du lessivage 
+    REAL d_tr_lessi_nucl(klon, llm, nqmx - 2) ! la tendance du lessivage 
     ! ! par nucleation 
-    REAL flestottr(klon, llm, nbtr) ! flux de lessivage 
+    REAL flestottr(klon, llm, nqmx - 2) ! flux de lessivage 
     ! ! dans chaque couche 
 
     real ztra_th(klon, llm)
@@ -194,16 +189,15 @@ contains
     !--------------------------------------
 
     call assert(shape(zmasse) == (/klon, llm/), "phytrac zmasse")
-    call assert(shape(tr_seri) == (/klon, llm, nbtr/), "phytrac tr_seri")
+    call assert(shape(tr_seri) == (/klon, llm, nqmx - 2/), "phytrac tr_seri")
 
     if (firstcal) then
        print *, 'phytrac: pdtphys = ', pdtphys
        PRINT *, 'Frequency of tracer output: ecrit_tra = ', ecrit_tra
-       if (nbtr < nq_phys) call abort_gcm('phytrac', 'nbtr < nq_phys', 1)
-       inirnpb=rnpb
+       inirnpb = .true.
 
        ! Initialisation des sorties :
-       call ini_histrac(nid_tra, pdtphys, nq_phys, lessivage)
+       call ini_histrac(nid_tra, pdtphys, nqmx - 2, lessivage)
 
        ! Initialisation de certaines variables pour le radon et le plomb 
        ! Initialisation du traceur dans le sol (couche limite radonique)
@@ -217,18 +211,18 @@ contains
 
        ! Initialisation de la fraction d'aerosols lessivee
 
-       d_tr_lessi_impa(:, :, :) = 0.
-       d_tr_lessi_nucl(:, :, :) = 0. 
+       d_tr_lessi_impa = 0.
+       d_tr_lessi_nucl = 0. 
 
        ! Initialisation de la nature des traceurs
 
-       DO it = 1, nq_phys
+       DO it = 1, nqmx - 2
           aerosol(it) = .FALSE. ! Tous les traceurs sont des gaz par defaut
           radio(it) = .FALSE. ! par d\'efaut pas de passage par "radiornpb"
           clsol(it) = .FALSE. ! Par defaut couche limite avec flux prescrit
        ENDDO
 
-       if (nq_phys >= 3) then
+       if (nqmx >= 5) then
           call press_coefoz ! read input pressure levels for ozone coefficients
        end if
     ENDIF
@@ -240,14 +234,13 @@ contains
        clsol(1)= .true.
        clsol(2)= .true.
        aerosol(2) = .TRUE. ! le Pb est un aerosol 
-       call initrrnpb(ftsol, pctsrf, masktr, fshtr, hsoltr, tautr, vdeptr, &
-            scavtr)
+       call initrrnpb(pctsrf, masktr, fshtr, hsoltr, tautr, vdeptr, scavtr)
        inirnpb=.false.
     endif
 
     if (convection) then
        ! Calcul de l'effet de la convection
-       DO it=1, nq_phys
+       DO it=1, nqmx - 2
           if (iflag_con == 2) then
              ! Tiedke
              CALL nflxtr(pdtphys, pmfu, pmfd, pde_u, pen_d, paprs, &
@@ -271,7 +264,7 @@ contains
 
     ! Calcul de l'effet des thermiques
 
-    do it=1, nq_phys
+    do it=1, nqmx - 2
        do k=1, llm
           do i=1, klon
              d_tr_th(i, k, it)=0.
@@ -283,7 +276,7 @@ contains
 
     if (iflag_thermals > 0) then
        nsplit=10
-       DO it=1, nq_phys
+       DO it=1, nqmx - 2
           do isplit=1, nsplit
              ! Thermiques 
              call dqthermcell(klon, llm, pdtphys/nsplit &
@@ -304,15 +297,14 @@ contains
     ! Calcul de l'effet de la couche limite
 
     if (couchelimite) then
-
        DO k = 1, llm
           DO i = 1, klon
              delp(i, k) = paprs(i, k)-paprs(i, k+1)
           ENDDO
        ENDDO
 
-       ! MAF modif pour tenir compte du cas rnpb + traceur
-       DO it=1, nq_phys
+       ! MAF modif pour tenir compte du cas traceur
+       DO it=1, nqmx - 2
           if (clsol(it)) then 
              ! couche limite avec quantite dans le sol calculee
              CALL cltracrn(it, pdtphys, yu1, yv1, &
@@ -351,25 +343,22 @@ contains
              ENDDO
           endif
        ENDDO
-
-    endif ! couche limite
+    endif
 
     ! Calcul de l'effet du puits radioactif
 
     ! MAF il faudrait faire une modification pour passer dans radiornpb 
-    ! si radio=true mais pour l'instant radiornpb propre au cas rnpb
-    if (rnpb) then
-       d_tr_dec(:, :, :) = radiornpb(tr_seri, pdtphys, tautr)
-       DO it=1, nq_phys
-          if (radio(it)) then
-             tr_seri(:, :, it) = tr_seri(:, :, it) + d_tr_dec(:, :, it)
-             WRITE(unit=itn, fmt='(i1)') it
-             CALL minmaxqfi(tr_seri(:, :, it), 0., 1e33, 'puits rn it='//itn)
-          endif
-       ENDDO
-    endif
+    ! si radio=true
+    d_tr_dec = radiornpb(tr_seri, pdtphys, tautr)
+    DO it = 1, nqmx - 2
+       if (radio(it)) then
+          tr_seri(:, :, it) = tr_seri(:, :, it) + d_tr_dec(:, :, it)
+          WRITE(unit=itn, fmt='(i1)') it
+          CALL minmaxqfi(tr_seri(:, :, it), 0., 1e33, 'puits rn it='//itn)
+       endif
+    ENDDO
 
-    if (nq_phys >= 3) then
+    if (nqmx >= 5) then
        ! Ozone as a tracer:
        if (mod(itap - 1, lmt_pas) == 0) then
           ! Once per day, update the coefficients for ozone chemistry:
@@ -381,13 +370,13 @@ contains
     ! Calcul de l'effet de la precipitation
 
     IF (lessivage) THEN
-       d_tr_lessi_nucl(:, :, :) = 0. 
-       d_tr_lessi_impa(:, :, :) = 0. 
-       flestottr(:, :, :) = 0. 
+       d_tr_lessi_nucl = 0. 
+       d_tr_lessi_impa = 0. 
+       flestottr = 0. 
 
        ! tendance des aerosols nuclees et impactes 
 
-       DO it = 1, nq_phys
+       DO it = 1, nqmx - 2
           IF (aerosol(it)) THEN
              DO k = 1, llm
                 DO i = 1, klon
@@ -403,7 +392,7 @@ contains
        ! Mises a jour des traceurs + calcul des flux de lessivage 
        ! Mise a jour due a l'impaction et a la nucleation
 
-       DO it = 1, nq_phys
+       DO it = 1, nqmx - 2
           IF (aerosol(it)) THEN
              DO k = 1, llm
                 DO i = 1, klon
@@ -416,7 +405,7 @@ contains
 
        ! Flux lessivage total 
 
-       DO it = 1, nq_phys
+       DO it = 1, nqmx - 2
           DO k = 1, llm
              DO i = 1, klon
                 flestottr(i, k, it) = flestottr(i, k, it) &
@@ -428,7 +417,7 @@ contains
     ENDIF
 
     ! Ecriture des sorties
-    call write_histrac(lessivage, nq_phys, itap, nid_tra)
+    call write_histrac(lessivage, itap, nid_tra)
 
     if (lafin) then
        print *, "C'est la fin de la physique."
@@ -442,7 +431,7 @@ contains
 
   contains
 
-    subroutine write_histrac(lessivage, nq_phys, itap, nid_tra)
+    subroutine write_histrac(lessivage, itap, nid_tra)
 
       ! From phylmd/write_histrac.h, version 1.9 2006/02/21 08:08:30
 
@@ -457,10 +446,6 @@ contains
       use gr_phy_write_3d_m, only: gr_phy_write_3d
 
       logical, intent(in):: lessivage
-
-      integer, intent(in):: nq_phys
-      ! (nombre de traceurs auxquels on applique la physique)
-
       integer, intent(in):: itap ! number of calls to "physiq"
       integer, intent(in):: nid_tra
 
@@ -477,7 +462,7 @@ contains
       CALL histwrite(nid_tra, "aire", itau_w, gr_phy_write_2d(airephy))
       CALL histwrite(nid_tra, "zmasse", itau_w, gr_phy_write_3d(zmasse))
 
-      DO it=1, nq_phys
+      DO it=1, nqmx - 2
          CALL histwrite(nid_tra, tnom(it+2), itau_w, &
               gr_phy_write_3d(tr_seri(:, :, it)))
          if (lessivage) THEN

@@ -26,9 +26,9 @@ module conf_gcm_m
   integer:: anneeref = 1998 ! Annee de l'etat initial (avec 4 chiffres)
 
   logical:: raz_date = .false.
-  ! (remise a zero de la date initiale, prise en compte de la date de
-  ! gcm.def avec remise a zero des compteurs de pas de temps)
-  ! (pas de remise a zero: on garde la date du fichier restart)
+  ! prise en compte de la date initiale de la namelist et remise à
+  ! zéro des compteurs de pas de temps (sinon on garde la date du
+  ! fichier restart)
 
   integer:: periodav = 1 
   ! time interval between outputs in the dynamical part, in days

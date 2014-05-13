@@ -273,7 +273,7 @@ contains
     endif
     ccanopy = co2_ppm
 
-    CALL interfsurf_hq(itime, dtime, jour, rmu0, klon, iim, jjm, &
+    CALL interfsurf_hq(itime, dtime, jour, rmu0, iim, jjm, &
          nisurf, knon, knindex, pctsrf, rlat, debut, &
          ok_veget, soil_model, nsoilmx, tsoil, qsol,  u1lay, v1lay, &
          temp_air, spechum, tq_cdrag, petAcoef, peqAcoef, &

@@ -7,9 +7,13 @@ extrapol.f
 grid_atob.f
 grid_noro_m.f
 gr_int_dyn_m.f
+inter_barx.f
 inter_barxy.f
+inter_bary.f
 limit.f
 mva9.f
+ord_coord.f
+ord_coordm.f
 regr_lat_time_coefoz.f
 regr_pr_o3.f
 sortvarc0.f
