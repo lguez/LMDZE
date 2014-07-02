@@ -9,9 +9,6 @@ MODULE interface_surf
   REAL, ALLOCATABLE, DIMENSION(:), SAVE :: run_off, run_off_lic
   real, allocatable, dimension(:), save :: coastalflow, riverflow
 
-  REAL, ALLOCATABLE, DIMENSION(:, :), SAVE :: tmp_rlic
-  ! pour simuler la fonte des glaciers antarctiques
-
   REAL, save :: tau_calv 
   ! temps de relaxation pour la fonte des glaciers, en jours
 

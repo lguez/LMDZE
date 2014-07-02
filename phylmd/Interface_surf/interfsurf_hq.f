@@ -23,10 +23,9 @@ contains
     USE calcul_fluxs_m, ONLY: calcul_fluxs
     USE dimphy, ONLY: klon
     USE fonte_neige_m, ONLY: fonte_neige
-    USE gath2cpl_m, ONLY: gath2cpl
     USE indicesol, ONLY: epsfra, is_lic, is_oce, is_sic, is_ter, nbsrf
     USE interface_surf, ONLY: coastalflow, riverflow, run_off, &
-         run_off_lic, conf_interface, tmp_rlic
+         run_off_lic, conf_interface
     USE interfoce_lim_m, ONLY: interfoce_lim
     USE interfoce_slab_m, ONLY: interfoce_slab
     USE interfsur_lim_m, ONLY: interfsur_lim
@@ -284,12 +283,8 @@ contains
              abort_message='Pb allocation run_off'
              call abort_gcm(modname, abort_message, 1)
           endif
-          !cym
-          run_off=0.0
-          !cym
 
-          ALLOCATE (tmp_rlic(iim, jjm+1))
-          tmp_rlic = 0.0
+          run_off=0.0
        else if (size(coastalflow) /= knon) then
           write(*, *)'Bizarre, le nombre de points continentaux'
           write(*, *)'a change entre deux appels. J''arrete ...'
@@ -542,7 +537,6 @@ contains
        ! passage du run-off des glaciers calcule dans fonte_neige au coupleur
        bidule=0.
        bidule(1:knon)= run_off_lic(1:knon)
-       call gath2cpl(bidule, tmp_rlic, klon, knon, iim, jjm, knindex)
 
        ! calcul albedo
 

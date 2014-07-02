@@ -147,7 +147,7 @@ integrd.o : qminimum.o paramet_m.o massdair.o filtreg.o disvert.o dimens_m.o com
 interface_surf.o : unit_nml_m.o 
 interfoce_lim.o : indicesol.o abort_gcm.o 
 interfoce_slab.o : suphec.o abort_gcm.o clesphys.o indicesol.o 
-interfsurf_hq.o : suphec.o interfsur_lim.o interfoce_slab.o interfoce_lim.o interface_surf.o indicesol.o gath_cpl.o fonte_neige.o dimphy.o calcul_fluxs.o albsno.o abort_gcm.o 
+interfsurf_hq.o : suphec.o interfsur_lim.o interfoce_slab.o interfoce_lim.o interface_surf.o indicesol.o fonte_neige.o dimphy.o calcul_fluxs.o albsno.o abort_gcm.o 
 interfsur_lim.o : dimphy.o abort_gcm.o 
 interpost.o : comgeom.o disvert.o comconst.o paramet_m.o dimens_m.o 
 interpre.o : ener.o temps.o comgeom.o conf_gcm.o disvert.o comconst.o paramet_m.o dimens_m.o 
