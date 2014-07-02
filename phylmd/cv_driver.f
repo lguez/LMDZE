@@ -82,7 +82,7 @@ contains
     real cape1(len)
     !      cape1         Real           Output       CAPE
 
-    real da1(len, nd), phi1(len, nd, nd), mp1(len, nd)
+    real, intent(inout):: da1(len, nd), phi1(len, nd, nd), mp1(len, nd)
 
     !-------------------------------------------------------------------
     ! --- ARGUMENTS
@@ -389,8 +389,6 @@ contains
        endif
     end do
 
-    !       print*, 'klon, ncum = ', len, ncum
-
     IF (ncum.gt.0) THEN
 
        !^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -541,19 +539,11 @@ contains
        end do
 
        if (iflag_con.eq.3) then
-          CALL cv3_uncompress(nloc, len, ncum, nd, idcum &
-               , iflag &
-               , precip, VPrecip, sig, w0 &
-               , ft, fq, fu, fv &
-               , inb  &
-               , Ma, upwd, dnwd, dnwd0, qcondc, wd, cape &
-               , da, phi, mp &
-               , iflag1 &
-               , precip1, VPrecip1, sig1, w01 &
-               , ft1, fq1, fu1, fv1 &
-               , inb1 &
-               , Ma1, upwd1, dnwd1, dnwd01, qcondc1, wd1, cape1  &
-               , da1, phi1, mp1)
+          CALL cv3_uncompress(nloc, len, ncum, nd, idcum, iflag, precip, &
+               VPrecip, sig, w0, ft, fq, fu, fv, inb, Ma, upwd, dnwd, dnwd0, &
+               qcondc, wd, cape, da, phi, mp, iflag1, precip1, VPrecip1, &
+               sig1, w01, ft1, fq1, fu1, fv1, inb1, Ma1, upwd1, dnwd1, &
+               dnwd01, qcondc1, wd1, cape1, da1, phi1, mp1)
        endif
 
        if (iflag_con.eq.4) then

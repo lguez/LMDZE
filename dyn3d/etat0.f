@@ -52,6 +52,7 @@ contains
     use start_init_phys_m, only: start_init_phys
     use start_inter_3d_m, only: start_inter_3d
     use temps, only: itau_phy, annee_ref, day_ref
+    use test_disvert_m, only: test_disvert
 
     ! Variables local to the procedure:
 
@@ -68,15 +69,14 @@ contains
     ! and pressure level "pls(i, j, l)".)
 
     real qsat(iim + 1, jjm + 1, llm) ! mass fraction of saturating water vapor
-    REAL tsol(klon), qsol(klon), sn(klon)
-    REAL tsolsrf(klon, nbsrf), qsolsrf(klon, nbsrf), snsrf(klon, nbsrf) 
+    REAL sn(klon)
+    REAL qsolsrf(klon, nbsrf), snsrf(klon, nbsrf) 
     REAL albe(klon, nbsrf), evap(klon, nbsrf)
     REAL alblw(klon, nbsrf)
     REAL tsoil(klon, nsoilmx, nbsrf) 
     REAL radsol(klon), rain_fall(klon), snow_fall(klon)
     REAL solsw(klon), sollw(klon), fder(klon)
     !IM "slab" ocean
-    REAL tslab(klon)
     real seaice(klon) ! kg m-2
     REAL frugs(klon, nbsrf), agesno(klon, nbsrf)
     REAL rugmer(klon)
@@ -131,6 +131,7 @@ contains
 
     pa = 5e4
     CALL disvert
+    call test_disvert
     CALL inigeom
     CALL inifilr
 
@@ -208,11 +209,8 @@ contains
        q(:, :, :, 5) = q(:, :, :, 5) * 48. / 29.
     end if
 
-    tsol = pack(tsol_2d, dyn_phy)
-    qsol = pack(qsol_2d, dyn_phy)
     sn = 0. ! snow
     radsol = 0.
-    tslab = 0. ! IM "slab" ocean
     seaice = 0.
     rugmer = 0.001
     zmea = pack(zmea_2d, dyn_phy)
@@ -317,10 +315,6 @@ contains
     CALL dynredem1("start.nc", vcov, ucov, teta, q, masse, ps, itau=0)
 
     ! Initialisations :
-    tsolsrf(:, is_ter) = tsol
-    tsolsrf(:, is_lic) = tsol
-    tsolsrf(:, is_oce) = tsol
-    tsolsrf(:, is_sic) = tsol
     snsrf(:, is_ter) = sn
     snsrf(:, is_lic) = sn
     snsrf(:, is_oce) = sn
@@ -331,11 +325,8 @@ contains
     albe(:, is_sic) = 0.6
     alblw = albe
     evap = 0.
-    qsolsrf(:, is_ter) = 150.
-    qsolsrf(:, is_lic) = 150.
-    qsolsrf(:, is_oce) = 150.
-    qsolsrf(:, is_sic) = 150.
-    tsoil = spread(spread(tsol, 2, nsoilmx), 3, nbsrf)
+    qsolsrf = 150.
+    tsoil = spread(spread(pack(tsol_2d, dyn_phy), 2, nsoilmx), 3, nbsrf)
     rain_fall = 0.
     snow_fall = 0.
     solsw = 165.
@@ -343,8 +334,6 @@ contains
     t_ancien = 273.15
     q_ancien = 0.
     agesno = 0.
-    !IM "slab" ocean
-    tslab = tsolsrf(:, is_oce)
     seaice = 0.
 
     frugs(:, is_oce) = rugmer
@@ -359,11 +348,11 @@ contains
     sig1 = 0.
     w01 = 0.
 
-    call phyredem("startphy.nc", latfi, lonfi, pctsrf, &
-         tsolsrf, tsoil, tslab, seaice, qsolsrf, qsol, snsrf, albe, alblw, &
-         evap, rain_fall, snow_fall, solsw, sollw, fder, radsol, frugs, &
-         agesno, zmea, zstd, zsig, zgam, zthe, zpic, zval, &
-         t_ancien, q_ancien, rnebcon, ratqs, clwcon, run_off_lic_0, sig1, w01)
+    call phyredem("startphy.nc", latfi, lonfi, pctsrf, tsoil(:, 1, :), tsoil, &
+         tsoil(:, 1, is_oce), seaice, qsolsrf, pack(qsol_2d, dyn_phy), snsrf, &
+         albe, alblw, evap, rain_fall, snow_fall, solsw, sollw, fder, radsol, &
+         frugs, agesno, zmea, zstd, zsig, zgam, zthe, zpic, zval, t_ancien, &
+         q_ancien, rnebcon, ratqs, clwcon, run_off_lic_0, sig1, w01)
     CALL histclo
 
   END SUBROUTINE etat0

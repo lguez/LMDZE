@@ -1,6 +1,6 @@
-module gath_cpl
+module gath2cpl_m
 
-  ! From phylmd/interface_surf.F90,v 1.8 2005/05/25 13:10:09
+  ! From phylmd/interface_surf.F90, version 1.8, 2005/05/25 13:10:09
 
   implicit none
 
@@ -32,6 +32,8 @@ contains
     integer                   :: i, ig, j
     real, dimension(klon)     :: tamp
 
+    !--------------------------------------------------------------------
+
     tamp = 0.
     do i = 1, knon
        ig = knindex(i)
@@ -50,4 +52,4 @@ contains
 
   END SUBROUTINE gath2cpl
 
-end module gath_cpl
+end module gath2cpl_m

@@ -56,7 +56,7 @@ contains
     REAL qcondc(klon, klev)
     REAL wd(klon)
     REAL pmflxr(klon, klev+1), pmflxs(klon, klev+1)
-    REAL da(klon, klev), phi(klon, klev, klev), mp(klon, klev)
+    REAL, intent(inout):: da(klon, klev), phi(klon, klev, klev), mp(klon, klev)
 
     ! Local:
 

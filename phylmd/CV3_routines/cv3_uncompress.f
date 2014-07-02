@@ -38,7 +38,7 @@ contains
     real upwd1(len, nd), dnwd1(len, nd), dnwd01(len, nd)
     real qcondc1(nloc, nd)
     real wd1(nloc), cape1(nloc)
-    real da1(nloc, nd), phi1(nloc, nd, nd), mp1(nloc, nd)
+    real, intent(inout):: da1(nloc, nd), phi1(nloc, nd, nd), mp1(nloc, nd)
 
     ! local variables:
     integer i, k, j

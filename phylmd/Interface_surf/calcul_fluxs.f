@@ -11,8 +11,8 @@ contains
        petAcoef, peqAcoef, petBcoef, peqBcoef,  &
        tsurf_new, evap, fluxlat, fluxsens, dflux_s, dflux_l)
 
-    ! Cette routine calcule les fluxs en h et q a l'interface et eventuellement
-    ! une temperature de surface (au cas ou ok_veget = false)
+    ! Cette routine calcule les fluxs en h et q à l'interface et une
+    ! température de surface.
 
     ! L. Fairhead 4/2000
 

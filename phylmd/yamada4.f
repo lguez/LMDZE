@@ -2,9 +2,7 @@ module yamada4_m
 
   IMPLICIT NONE
 
-  real, parameter:: kap = 0.4
-  private
-  public yamada4
+  real, parameter, private:: kap = 0.4
 
 contains
 

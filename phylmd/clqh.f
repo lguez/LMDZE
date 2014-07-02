@@ -5,12 +5,11 @@ module clqh_m
 contains
 
   SUBROUTINE clqh(dtime, itime, jour, debut, rlat, knon, nisurf, knindex, &
-       pctsrf, soil_model, tsoil, qsol, ok_veget, ocean, rmu0, co2_ppm, &
-       rugos, rugoro, u1lay, v1lay, coef, t, q, ts, paprs, pplay, delp, &
-       radsol, albedo, alblw, snow, qsurf, precip_rain, precip_snow, fder, &
-       swnet, fluxlat, pctsrf_new, agesno, d_t, d_q, d_ts, z0_new, flux_t, &
-       flux_q, dflux_s, dflux_l, fqcalving, ffonte, run_off_lic_0, flux_o, &
-       flux_g, tslab, seaice)
+       pctsrf, soil_model, tsoil, qsol, rmu0, co2_ppm, rugos, rugoro, u1lay, &
+       v1lay, coef, t, q, ts, paprs, pplay, delp, radsol, albedo, alblw, &
+       snow, qsurf, precip_rain, precip_snow, fder, swnet, fluxlat, &
+       pctsrf_new, agesno, d_t, d_q, d_ts, z0_new, flux_t, flux_q, dflux_s, &
+       dflux_l, fqcalving, ffonte, run_off_lic_0, flux_o, flux_g, tslab, seaice)
 
     ! Author: Z. X. Li (LMD/CNRS)
     ! Date: 1993/08/18
@@ -54,12 +53,10 @@ contains
     integer, intent(in):: jour            ! jour de l'annee en cours
     real, intent(in):: rmu0(klon)         ! cosinus de l'angle solaire zenithal
     real rugos(klon)        ! rugosite
-    integer knindex(klon)
+    integer, intent(in):: knindex(klon)
     real, intent(in):: pctsrf(klon, nbsrf)
     real, intent(in):: rlat(klon)
-    logical ok_veget 
-    REAL co2_ppm            ! taux CO2 atmosphere
-    character(len=*), intent(in):: ocean
+    REAL, intent(in):: co2_ppm            ! taux CO2 atmosphere
 
     REAL d_t(klon, klev)     ! incrementation de "t"
     REAL d_q(klon, klev)     ! incrementation de "q"
@@ -273,16 +270,14 @@ contains
     endif
     ccanopy = co2_ppm
 
-    CALL interfsurf_hq(itime, dtime, jour, rmu0, iim, jjm, &
-         nisurf, knon, knindex, pctsrf, rlat, debut, &
-         ok_veget, soil_model, nsoilmx, tsoil, qsol,  u1lay, v1lay, &
-         temp_air, spechum, tq_cdrag, petAcoef, peqAcoef, &
-         petBcoef, peqBcoef, precip_rain, precip_snow, &
-         fder, rugos, rugoro, &
-         snow, qsurf, ts, p1lay, psref, radsol, ocean, &
-         evap, fluxsens, fluxlat, dflux_l, dflux_s, tsurf_new, &
-         alb_new, alblw, z0_new, pctsrf_new, agesno, fqcalving, &
-         ffonte, run_off_lic_0, flux_o, flux_g, tslab, seaice)
+    CALL interfsurf_hq(itime, dtime, jour, rmu0, iim, jjm, nisurf, knon, &
+         knindex, pctsrf, rlat, debut, soil_model, nsoilmx, tsoil, qsol,  &
+         u1lay, v1lay, temp_air, spechum, tq_cdrag, petAcoef, peqAcoef, &
+         petBcoef, peqBcoef, precip_rain, precip_snow, fder, rugos, rugoro, &
+         snow, qsurf, ts, p1lay, psref, radsol, evap, fluxsens, &
+         fluxlat, dflux_l, dflux_s, tsurf_new, alb_new, alblw, z0_new, &
+         pctsrf_new, agesno, fqcalving, ffonte, run_off_lic_0, flux_o, &
+         flux_g, tslab, seaice)
 
     do i = 1, knon
        flux_t(i, 1) = fluxsens(i)

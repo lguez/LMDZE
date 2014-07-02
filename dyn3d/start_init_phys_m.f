@@ -56,8 +56,7 @@ CONTAINS
     ALLOCATE(lon_rad(iml_phys))
     ALLOCATE(lat_rad(jml_phys))
 
-    ! We get the two standard variables
-    ! 'ST': surface temperature
+    ! Surface temperature:
     call nf95_inq_varid(ncid, 'ST', varid)
     call nf95_get_var(ncid, varid, var_ana)
     CALL conf_dat2d(lon_ini, lat_ini, lon_rad, lat_rad, var_ana)
@@ -65,7 +64,7 @@ CONTAINS
          rlatv, tmp_var) 
     tsol_2d = gr_int_dyn(tmp_var)
 
-    ! Soil moisture
+    ! Soil moisture:
     call nf95_inq_varid(ncid, 'CDSW', varid)
     call nf95_get_var(ncid, varid, var_ana)
     CALL conf_dat2d(lon_ini, lat_ini, lon_rad, lat_rad, var_ana)

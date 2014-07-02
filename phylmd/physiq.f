@@ -111,18 +111,11 @@ contains
     LOGICAL, PARAMETER:: ok_stratus = .FALSE.
     ! Ajouter artificiellement les stratus
 
-    character(len = 6):: ocean = 'force '
-    ! (type de mod\`ele oc\'ean \`a utiliser: "force" ou "slab" mais
-    ! pas "couple")
-
     ! "slab" ocean
     REAL, save:: tslab(klon) ! temperature of ocean slab
     REAL, save:: seaice(klon) ! glace de mer (kg/m2) 
     REAL fluxo(klon) ! flux turbulents ocean-glace de mer 
     REAL fluxg(klon) ! flux turbulents ocean-atmosphere
-
-    ! Modele thermique du sol, a activer pour le cycle diurne:
-    logical:: ok_veget = .false. ! type de modele de vegetation utilise
 
     logical:: ok_journe = .false., ok_mensuel = .true., ok_instan = .false.
     ! sorties journalieres, mensuelles et instantanees dans les
@@ -510,7 +503,6 @@ contains
     REAL ztsol(klon)
     REAL d_h_vcol, d_qt, d_ec
     REAL, SAVE:: d_h_vcol_phy
-    REAL fs_bound, fq_bound
     REAL zero_v(klon)
     CHARACTER(LEN = 20) tit
     INTEGER:: ip_ebil = 0 ! print level for energy conservation diagnostics
@@ -574,10 +566,9 @@ contains
 
     real, parameter:: dobson_u = 2.1415e-05 ! Dobson unit, in kg m-2
 
-    namelist /physiq_nml/ ocean, ok_veget, ok_journe, ok_mensuel, ok_instan, &
-         fact_cldcon, facttemps, ok_newmicro, iflag_cldcon, ratqsbas, &
-         ratqshaut, if_ebil, ok_ade, ok_aie, bl95_b0, bl95_b1, iflag_thermals, &
-         nsplit_thermals
+    namelist /physiq_nml/ ok_journe, ok_mensuel, ok_instan, fact_cldcon, &
+         facttemps, ok_newmicro, iflag_cldcon, ratqsbas, ratqshaut, if_ebil, &
+         ok_ade, ok_aie, bl95_b0, bl95_b1, iflag_thermals, nsplit_thermals
 
     !----------------------------------------------------------------
 
@@ -636,11 +627,11 @@ contains
        frugs = 0.
        itap = 0
        itaprad = 0
-       CALL phyetat0("startphy.nc", pctsrf, ftsol, ftsoil, ocean, tslab, &
-            seaice, fqsurf, qsol, fsnow, falbe, falblw, fevap, rain_fall, &
-            snow_fall, solsw, sollw, dlw, radsol, frugs, agesno, zmea, &
-            zstd, zsig, zgam, zthe, zpic, zval, t_ancien, q_ancien, &
-            ancien_ok, rnebcon, ratqs, clwcon, run_off_lic_0, sig1, w01)
+       CALL phyetat0(pctsrf, ftsol, ftsoil, tslab, seaice, fqsurf, qsol, &
+            fsnow, falbe, falblw, fevap, rain_fall, snow_fall, solsw, sollw, &
+            dlw, radsol, frugs, agesno, zmea, zstd, zsig, zgam, zthe, zpic, &
+            zval, t_ancien, q_ancien, ancien_ok, rnebcon, ratqs, clwcon, &
+            run_off_lic_0, sig1, w01)
 
        ! ATTENTION : il faudra a terme relire q2 dans l'etat initial
        q2 = 1e-8
@@ -651,7 +642,7 @@ contains
        IF (raz_date) itau_phy = 0
 
        PRINT *, 'cycle_diurne = ', cycle_diurne
-       CALL printflag(radpas, ocean /= 'force', ok_journe, ok_instan, ok_region)
+       CALL printflag(radpas, ok_journe, ok_instan, ok_region)
 
        IF (dtphys * REAL(radpas) > 21600. .AND. cycle_diurne) THEN 
           print *, "Au minimum 4 appels par jour si cycle diurne"
@@ -688,11 +679,6 @@ contains
        ! Positionner date0 pour initialisation de ORCHIDEE
        print *, 'physiq date0: ', date0
     ENDIF test_firstcal
-
-    ! Mettre a zero des variables de sortie (pour securite)
-    da = 0.
-    mp = 0.
-    phi = 0.
 
     ! We will modify variables *_seri and we will not touch variables
     ! u, v, t, qx:
@@ -806,10 +792,10 @@ contains
     ! Couche limite:
 
     CALL clmain(dtphys, itap, pctsrf, pctsrf_new, t_seri, q_seri, u_seri, &
-         v_seri, julien, rmu0, co2_ppm, ok_veget, ocean, ftsol, soil_model, &
+         v_seri, julien, rmu0, co2_ppm, ftsol, soil_model, &
          cdmmax, cdhmax, ksta, ksta_ter, ok_kzmin, ftsoil, qsol, paprs, play, &
          fsnow, fqsurf, fevap, falbe, falblw, fluxlat, rain_fall, snow_fall, &
-         fsolsw, fsollw, fder, rlon, rlat, frugs, firstcal, agesno, rugoro, &
+         fsolsw, fsollw, fder, rlat, frugs, firstcal, agesno, rugoro, &
          d_t_vdf, d_q_vdf, d_u_vdf, d_v_vdf, d_ts, fluxt, fluxq, fluxu, &
          fluxv, cdragh, cdragm, q2, dsens, devap, ycoefh, yu1, yv1, t2m, q2m, &
          u10m, v10m, pblh, capCL, oliqCL, cteiCL, pblT, therm, trmb1, trmb2, &
@@ -966,6 +952,9 @@ contains
     else
        ! iflag_con >= 3
 
+       da = 0.
+       mp = 0.
+       phi = 0.
        CALL concvl(dtphys, paprs, play, t_seri, q_seri, u_seri, v_seri, sig1, &
             w01, d_t_con, d_q_con, d_u_con, d_v_con, rain_con, snow_con, &
             ibas_con, itop_con, upwd, dnwd, dnwd0, Ma, cape, iflagctrl, &

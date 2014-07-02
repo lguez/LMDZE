@@ -103,7 +103,7 @@ contains
     REAL prfl(klon, llm+1), psfl(klon, llm+1) !--lessivage large-scale
 
     ! Kerry Emanuel
-    real da(klon, llm), phi(klon, llm, llm), mp(klon, llm)
+    real, intent(in):: da(klon, llm), phi(klon, llm, llm), mp(klon, llm)
     REAL, intent(in):: upwd(klon, llm) ! saturated updraft mass flux
     REAL, intent(in):: dnwd(klon, llm) ! saturated downdraft mass flux
 

@@ -36,6 +36,7 @@ contains
   subroutine read_clesphys2
 
     use unit_nml_m, only: unit_nml
+    use nr_util, only: assert
 
     namelist /clesphys2_nml/cycle_diurne, soil_model, new_oliq, &
          ok_orodr, ok_orolf, ok_limitvrai, nbapp_rad, iflag_con
@@ -45,11 +46,7 @@ contains
     print *, "Enter namelist 'clesphys2_nml'."
     read(unit=*, nml=clesphys2_nml)
     write(unit_nml, nml=clesphys2_nml)
-
-    if (iflag_con <= 1) then
-       print *, "bad value for iflag_con"
-       stop 1
-    end if
+    call assert(iflag_con >= 2, "read_clesphys2 iflag_con")
 
   end subroutine read_clesphys2
 

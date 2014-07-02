@@ -16,7 +16,7 @@ SUBROUTINE cvltr(pdtime,da, phi, mp,paprs,x,upd,dnd,dx)
   REAL, intent(in):: paprs(klon,klev+1) ! pression aux 1/2 couches (bas en haut)
   REAL, intent(in):: x(klon,klev)        ! q de traceur (bas en haut) 
   REAL dx(klon,klev)     ! tendance de traceur  (bas en haut)
-  real da(klon,klev),phi(klon,klev,klev),mp(klon,klev)
+  real, intent(in):: da(klon,klev),phi(klon,klev,klev),mp(klon,klev)
   REAL, intent(in):: upd(klon,klev)      ! saturated updraft mass flux
   REAL, intent(in):: dnd(klon,klev)      ! saturated downdraft mass flux
   !

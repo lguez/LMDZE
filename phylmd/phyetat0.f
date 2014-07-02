@@ -10,11 +10,11 @@ module phyetat0_m
 
 contains
 
-  SUBROUTINE phyetat0(fichnom, pctsrf, tsol, tsoil, ocean, tslab, seaice, &
-       qsurf, qsol, snow, albe, alblw, evap, rain_fall, snow_fall, solsw, &
-       sollw, fder, radsol, frugs, agesno, zmea, zstd, zsig, zgam, zthe, &
-       zpic, zval, t_ancien, q_ancien, ancien_ok, rnebcon, ratqs, clwcon, &
-       run_off_lic_0, sig1, w01)
+  SUBROUTINE phyetat0(pctsrf, tsol, tsoil, tslab, seaice, qsurf, qsol, &
+       snow, albe, alblw, evap, rain_fall, snow_fall, solsw, sollw, fder, &
+       radsol, frugs, agesno, zmea, zstd, zsig, zgam, zthe, zpic, zval, &
+       t_ancien, q_ancien, ancien_ok, rnebcon, ratqs, clwcon, run_off_lic_0, &
+       sig1, w01)
 
     ! From phylmd/phyetat0.F, version 1.4 2005/06/03 10:03:07
     ! Author: Z.X. Li (LMD/CNRS)
@@ -30,14 +30,12 @@ contains
          nf95_inq_varid
     USE temps, ONLY : itau_phy
 
-    CHARACTER(len=*), intent(in):: fichnom
     REAL pctsrf(klon, nbsrf)
     REAL tsol(klon, nbsrf)
     REAL tsoil(klon, nsoilmx, nbsrf)
-    CHARACTER(len=*), intent(in):: ocean
     REAL tslab(klon), seaice(klon)
     REAL qsurf(klon, nbsrf)
-    REAL qsol(klon)
+    REAL, intent(out):: qsol(:) ! (klon)
     REAL snow(klon, nbsrf)
     REAL albe(klon, nbsrf)
     REAL alblw(klon, nbsrf)
@@ -79,8 +77,7 @@ contains
     print *, "Call sequence information: phyetat0"
 
     ! Fichier contenant l'état initial :
-    print *, 'fichnom = ', fichnom
-    call NF95_OPEN(fichnom, NF90_NOWRITE, ncid)
+    call NF95_OPEN("startphy.nc", NF90_NOWRITE, ncid)
 
     ierr = nf90_get_att(ncid, nf90_global, "itau_phy", itau_phy)
     call handle_err("phyetat0 itau_phy", ierr, ncid, nf90_global)
@@ -228,35 +225,9 @@ contains
     ENDDO
 
     !IM "slab" ocean 
-
     ! Lecture de tslab (pour slab ocean seulement): 
-
-    IF (ocean .eq. 'slab ') then
-       call NF95_INQ_VARID(ncid, "TSLAB", varid)
-       call nf95_get_var(ncid, varid, tslab)
-       xmin = 1.0E+20
-       xmax = -1.0E+20
-       DO i = 1, klon
-          xmin = MIN(tslab(i), xmin)
-          xmax = MAX(tslab(i), xmax)
-       ENDDO
-       PRINT *, 'Ecart de la SST tslab:', xmin, xmax
-
-       ! Lecture de seaice (pour slab ocean seulement):
-
-       call NF95_INQ_VARID(ncid, "SEAICE", varid)
-       call nf95_get_var(ncid, varid, seaice)
-       xmin = 1.0E+20
-       xmax = -1.0E+20
-       DO i = 1, klon
-          xmin = MIN(seaice(i), xmin)
-          xmax = MAX(seaice(i), xmax)
-       ENDDO
-       PRINT *, 'Masse de la glace de mer seaice:', xmin, xmax
-    ELSE
-       tslab = 0.
-       seaice = 0.
-    ENDIF
+    tslab = 0.
+    seaice = 0.
 
     ! Lecture de l'humidite de l'air juste au dessus du sol:
 
@@ -308,13 +279,6 @@ contains
        PRINT *, ' Valeur par defaut nulle'
        qsol = 0.
     ENDIF
-    xmin = 1.0E+20
-    xmax = -1.0E+20
-    DO i = 1, klon
-       xmin = MIN(qsol(i), xmin)
-       xmax = MAX(qsol(i), xmax)
-    ENDDO
-    PRINT *, 'Eau dans le sol (mm) <QSOL>', xmin, xmax
 
     ! Lecture de neige au sol:
 

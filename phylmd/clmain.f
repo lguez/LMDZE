@@ -4,18 +4,17 @@ module clmain_m
 
 contains
 
-  SUBROUTINE clmain(dtime, itap, pctsrf, pctsrf_new, t, q, u, v, &
-       jour, rmu0, co2_ppm, ok_veget, ocean, ts, &
-       soil_model, cdmmax, cdhmax, ksta, ksta_ter, ok_kzmin, ftsoil, &
-       qsol, paprs, pplay, snow, qsurf, evap, albe, alblw, fluxlat, &
-       rain_fall, snow_f, solsw, sollw, fder, rlon, rlat, &
-       rugos, debut, agesno, rugoro, d_t, d_q, d_u, d_v, &
-       d_ts, flux_t, flux_q, flux_u, flux_v, cdragh, cdragm, q2, &
-       dflux_t, dflux_q, ycoefh, zu1, zv1, t2m, q2m, u10m, v10m, pblh, &
-       capcl, oliqcl, cteicl, pblt, therm, trmb1, trmb2, trmb3, plcl, &
-       fqcalving, ffonte, run_off_lic_0, flux_o, flux_g, tslab, seaice)
+  SUBROUTINE clmain(dtime, itap, pctsrf, pctsrf_new, t, q, u, v, jour, rmu0, &
+       co2_ppm, ts, soil_model, cdmmax, cdhmax, ksta, ksta_ter, &
+       ok_kzmin, ftsoil, qsol, paprs, pplay, snow, qsurf, evap, albe, alblw, &
+       fluxlat, rain_fall, snow_f, solsw, sollw, fder, rlat, rugos, debut, &
+       agesno, rugoro, d_t, d_q, d_u, d_v, d_ts, flux_t, flux_q, flux_u, &
+       flux_v, cdragh, cdragm, q2, dflux_t, dflux_q, ycoefh, zu1, zv1, t2m, &
+       q2m, u10m, v10m, pblh, capcl, oliqcl, cteicl, pblt, therm, trmb1, &
+       trmb2, trmb3, plcl, fqcalving, ffonte, run_off_lic_0, flux_o, flux_g, &
+       tslab, seaice)
 
-    ! From phylmd/clmain.F, version 1.6 2005/11/16 14:47:19
+    ! From phylmd/clmain.F, version 1.6, 2005/11/16 14:47:19
     ! Author: Z. X. Li (LMD/CNRS), date: 1993/08/18
     ! Objet : interface de couche limite (diffusion verticale)
 
@@ -38,23 +37,12 @@ contains
     USE dimens_m, ONLY: iim, jjm
     USE dimphy, ONLY: klev, klon, zmasq
     USE dimsoil, ONLY: nsoilmx
-    USE dynetat0_m, ONLY: day_ini
-    USE gath_cpl, ONLY: gath2cpl
     use hbtm_m, only: hbtm
-    USE histbeg_totreg_m, ONLY: histbeg_totreg
-    USE histdef_m, ONLY: histdef
-    USE histend_m, ONLY: histend
-    USE histsync_m, ONLY: histsync
-    use histwrite_m, only: histwrite
     USE indicesol, ONLY: epsfra, is_lic, is_oce, is_sic, is_ter, nbsrf
     USE suphec_m, ONLY: rd, rg, rkappa
-    USE temps, ONLY: annee_ref, itau_phy
     use ustarhb_m, only: ustarhb
     use vdif_kcay_m, only: vdif_kcay
     use yamada4_m, only: yamada4
-    use ymds2ju_m, ONLY: ymds2ju
-
-    ! Arguments:
 
     REAL, INTENT(IN):: dtime ! interval du temps (secondes)
     INTEGER, INTENT(IN):: itap ! numero du pas de temps
@@ -68,16 +56,14 @@ contains
     REAL, INTENT(IN):: u(klon, klev), v(klon, klev) ! vitesse
     INTEGER, INTENT(IN):: jour ! jour de l'annee en cours
     REAL, intent(in):: rmu0(klon) ! cosinus de l'angle solaire zenithal     
-    REAL co2_ppm ! taux CO2 atmosphere
-    LOGICAL ok_veget
-    CHARACTER(len=*), INTENT(IN):: ocean
-    REAL ts(klon, nbsrf) ! input-R- temperature du sol (en Kelvin)
+    REAL, intent(in):: co2_ppm ! taux CO2 atmosphere
+    REAL, INTENT(IN):: ts(klon, nbsrf) ! input-R- temperature du sol (en Kelvin)
     LOGICAL, INTENT(IN):: soil_model
     REAL, INTENT(IN):: cdmmax, cdhmax ! seuils cdrm, cdrh
-    REAL ksta, ksta_ter
-    LOGICAL ok_kzmin
+    REAL, INTENT(IN):: ksta, ksta_ter
+    LOGICAL, INTENT(IN):: ok_kzmin
     REAL ftsoil(klon, nsoilmx, nbsrf)
-    REAL qsol(klon)
+    REAL, INTENT(inout):: qsol(klon)
     REAL, INTENT(IN):: paprs(klon, klev+1) ! pression a intercouche (Pa)
     REAL, INTENT(IN):: pplay(klon, klev) ! pression au milieu de couche (Pa)
     REAL snow(klon, nbsrf)
@@ -91,7 +77,6 @@ contains
     REAL, intent(in):: rain_fall(klon), snow_f(klon)
     REAL, INTENT(IN):: solsw(klon, nbsrf), sollw(klon, nbsrf)
     REAL fder(klon)
-    REAL, INTENT(IN):: rlon(klon)
     REAL, INTENT(IN):: rlat(klon) ! latitude en degrés
 
     REAL rugos(klon, nbsrf)
@@ -123,7 +108,7 @@ contains
     REAL, INTENT(out):: cdragh(klon), cdragm(klon)
     real q2(klon, klev+1, nbsrf)
 
-    REAL dflux_t(klon), dflux_q(klon)
+    REAL, INTENT(out):: dflux_t(klon), dflux_q(klon)
     ! dflux_t derive du flux sensible
     ! dflux_q derive du flux latent
     !IM "slab" ocean
@@ -190,7 +175,7 @@ contains
     REAL ysnow(klon), yqsurf(klon), yagesno(klon), yqsol(klon)
     REAL yrain_f(klon), ysnow_f(klon)
     REAL ysollw(klon), ysolsw(klon)
-    REAL yfder(klon), ytaux(klon), ytauy(klon)
+    REAL yfder(klon)
     REAL yrugm(klon), yrads(klon), yrugoro(klon)
 
     REAL yfluxlat(klon)
@@ -226,24 +211,6 @@ contains
 
     REAL zx_alf1, zx_alf2 !valeur ambiante par extrapola.
 
-    ! maf pour sorties IOISPL en cas de debugagage
-
-    CHARACTER(80) cldebug
-    SAVE cldebug
-    CHARACTER(8) cl_surf(nbsrf)
-    SAVE cl_surf
-    INTEGER nhoridbg, nidbg
-    SAVE nhoridbg, nidbg
-    INTEGER ndexbg(iim*(jjm+1))
-    REAL zx_lon(iim, jjm+1), zx_lat(iim, jjm+1), zjulian
-    REAL tabindx(klon)
-    REAL debugtab(iim, jjm+1)
-    LOGICAL first_appel
-    SAVE first_appel
-    DATA first_appel/ .TRUE./
-    LOGICAL:: debugindex = .FALSE.
-    INTEGER idayref
-
     REAL yt2m(klon), yq2m(klon), yu10m(klon)
     REAL yustar(klon)
     ! -- LOOP
@@ -278,35 +245,6 @@ contains
 
     ytherm = 0.
 
-    IF (debugindex .AND. first_appel) THEN
-       first_appel = .FALSE.
-
-       ! initialisation sorties netcdf
-
-       idayref = day_ini
-       CALL ymds2ju(annee_ref, 1, idayref, 0., zjulian)
-       CALL gr_fi_ecrit(1, klon, iim, jjm+1, rlon, zx_lon)
-       DO i = 1, iim
-          zx_lon(i, 1) = rlon(i+1)
-          zx_lon(i, jjm+1) = rlon(i+1)
-       END DO
-       CALL gr_fi_ecrit(1, klon, iim, jjm+1, rlat, zx_lat)
-       cldebug = 'sous_index'
-       CALL histbeg_totreg(cldebug, zx_lon(:, 1), zx_lat(1, :), 1, &
-            iim, 1, jjm+1, itau_phy, zjulian, dtime, nhoridbg, nidbg)
-       ! no vertical axis
-       cl_surf(1) = 'ter'
-       cl_surf(2) = 'lic'
-       cl_surf(3) = 'oce'
-       cl_surf(4) = 'sic'
-       DO nsrf = 1, nbsrf
-          CALL histdef(nidbg, cl_surf(nsrf), cl_surf(nsrf), '-', iim, jjm+1, &
-               nhoridbg, 1, 1, 1, -99, 'inst', dtime, dtime)
-       END DO
-       CALL histend(nidbg)
-       CALL histsync(nidbg)
-    END IF
-
     DO k = 1, klev ! epaisseur de couche
        DO i = 1, klon
           delp(i, k) = paprs(i, k) - paprs(i, k+1)
@@ -336,8 +274,6 @@ contains
     yrain_f = 0.
     ysnow_f = 0.
     yfder = 0.
-    ytaux = 0.
-    ytauy = 0.
     ysolsw = 0.
     ysollw = 0.
     yrugos = 0.
@@ -354,7 +290,6 @@ contains
     pctsrf_new = 0.
     y_flux_u = 0.
     y_flux_v = 0.
-    !$$ PB
     y_dflux_t = 0.
     y_dflux_q = 0.
     ytsoil = 999999.
@@ -365,7 +300,6 @@ contains
     ywindsp = 0.
     ! -- LOOP
     d_ts = 0.
-    !§§§ PB
     yfluxlat = 0.
     flux_t = 0.
     flux_q = 0.
@@ -377,8 +311,6 @@ contains
     d_v = 0.
     ycoefh = 0.
 
-    ! Boucler sur toutes les sous-fractions du sol:
-
     ! Initialisation des "pourcentages potentiels". On considère ici qu'on
     ! peut avoir potentiellement de la glace sur tout le domaine océanique
     ! (à affiner)
@@ -386,6 +318,8 @@ contains
     pctsrf_pot = pctsrf
     pctsrf_pot(:, is_oce) = 1. - zmasq
     pctsrf_pot(:, is_sic) = 1. - zmasq
+
+    ! Boucler sur toutes les sous-fractions du sol:
 
     loop_surface: DO nsrf = 1, nbsrf
        ! Chercher les indices :
@@ -399,18 +333,6 @@ contains
              ni(knon) = i
           END IF
        END DO
-
-       ! variables pour avoir une sortie IOIPSL des INDEX
-       IF (debugindex) THEN
-          tabindx = 0.
-          DO i = 1, knon
-             tabindx(i) = real(i)
-          END DO
-          debugtab = 0.
-          ndexbg = 0
-          CALL gath2cpl(tabindx, debugtab, klon, knon, iim, jjm, ni)
-          CALL histwrite(nidbg, cl_surf(nsrf), itap, debugtab)
-       END IF
 
        if_knon: IF (knon /= 0) then
           DO j = 1, knon
@@ -426,8 +348,6 @@ contains
              ysnow_f(j) = snow_f(i)
              yagesno(j) = agesno(i, nsrf)
              yfder(j) = fder(i)
-             ytaux(j) = flux_u(i, 1, nsrf)
-             ytauy(j) = flux_v(i, 1, nsrf)
              ysolsw(j) = solsw(i, nsrf)
              ysollw(j) = sollw(i, nsrf)
              yrugos(j) = rugos(i, nsrf)
@@ -442,12 +362,9 @@ contains
              ywindsp(j) = sqrt(yu10mx(j)*yu10mx(j)+yu10my(j)*yu10my(j))
           END DO
 
-          ! IF bucket model for continent, copy soil water content
-          IF (nsrf == is_ter .AND. .NOT. ok_veget) THEN
-             DO j = 1, knon
-                i = ni(j)
-                yqsol(j) = qsol(i)
-             END DO
+          ! For continent, copy soil water content
+          IF (nsrf == is_ter) THEN
+             yqsol(:knon) = qsol(ni(:knon))
           ELSE
              yqsol = 0.
           END IF
@@ -496,7 +413,7 @@ contains
           END IF
 
           IF (iflag_pbl >= 3) THEN
-             ! MELLOR ET YAMADA adapté à Mars, Richard Fournier et
+             ! Mellor et Yamada adapté à Mars, Richard Fournier et
              ! Frédéric Hourdin
              yzlay(:knon, 1) = rd * yt(:knon, 1) / (0.5 * (ypaprs(:knon, 1) &
                   + ypplay(:knon, 1))) &
@@ -525,10 +442,7 @@ contains
              END DO
 
              CALL ustarhb(knon, yu, yv, coefm(:knon, 1), yustar)
-
-             IF (prt_level > 9) THEN
-                PRINT *, 'USTAR = ', yustar
-             END IF
+             IF (prt_level > 9) PRINT *, 'USTAR = ', yustar
 
              ! iflag_pbl peut être utilisé comme longueur de mélange
 
@@ -551,19 +465,15 @@ contains
           CALL clvent(knon, dtime, yu1, yv1, coefm(:knon, :), yt, yv, ypaprs, &
                ypplay, ydelp, y_d_v, y_flux_v)
 
-          ! pour le couplage
-          ytaux = y_flux_u(:, 1)
-          ytauy = y_flux_v(:, 1)
-
           ! calculer la diffusion de "q" et de "h"
           CALL clqh(dtime, itap, jour, debut, rlat, knon, nsrf, ni, pctsrf, &
-               soil_model, ytsoil, yqsol, ok_veget, ocean, rmu0, co2_ppm, &
-               yrugos, yrugoro, yu1, yv1, coefh(:knon, :), yt, yq, yts, &
-               ypaprs, ypplay, ydelp, yrads, yalb, yalblw, ysnow, yqsurf, &
-               yrain_f, ysnow_f, yfder, ysolsw, yfluxlat, pctsrf_new, &
-               yagesno, y_d_t, y_d_q, y_d_ts, yz0_new, y_flux_t, y_flux_q, &
-               y_dflux_t, y_dflux_q, y_fqcalving, y_ffonte, y_run_off_lic_0, &
-               y_flux_o, y_flux_g, ytslab, y_seaice)
+               soil_model, ytsoil, yqsol, rmu0, co2_ppm, yrugos, yrugoro, &
+               yu1, yv1, coefh(:knon, :), yt, yq, yts, ypaprs, ypplay, ydelp, &
+               yrads, yalb, yalblw, ysnow, yqsurf, yrain_f, ysnow_f, yfder, &
+               ysolsw, yfluxlat, pctsrf_new, yagesno, y_d_t, y_d_q, y_d_ts, &
+               yz0_new, y_flux_t, y_flux_q, y_dflux_t, y_dflux_q, &
+               y_fqcalving, y_ffonte, y_run_off_lic_0, y_flux_o, y_flux_g, &
+               ytslab, y_seaice)
 
           ! calculer la longueur de rugosite sur ocean
           yrugm = 0.
@@ -629,12 +539,8 @@ contains
              zv1(i) = zv1(i) + yv1(j)
           END DO
           IF (nsrf == is_ter) THEN
-             DO j = 1, knon
-                i = ni(j)
-                qsol(i) = yqsol(j)
-             END DO
-          END IF
-          IF (nsrf == is_lic) THEN
+             qsol(ni(:knon)) = yqsol(:knon)
+          else IF (nsrf == is_lic) THEN
              DO j = 1, knon
                 i = ni(j)
                 run_off_lic_0(i) = y_run_off_lic_0(j)
@@ -660,7 +566,7 @@ contains
              END DO
           END DO
 
-          !cc diagnostic t, q a 2m et u, v a 10m
+          ! diagnostic t, q a 2m et u, v a 10m
 
           DO j = 1, knon
              i = ni(j)
@@ -744,12 +650,6 @@ contains
                 END IF
              END DO
 
-          END IF
-          IF (ocean == 'slab  ') THEN
-             IF (nsrf == is_oce) THEN
-                tslab(1:klon) = ytslab(1:klon)
-                seaice(1:klon) = y_seaice(1:klon)
-             END IF
           END IF
        end IF if_knon
     END DO loop_surface
