@@ -151,7 +151,6 @@ initrrnpb.f
 integrd.f
 interface_surf.f
 interfoce_lim.f
-interfoce_slab.f
 interfsurf_hq.f
 interfsur_lim.f
 interpost.f

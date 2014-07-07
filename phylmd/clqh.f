@@ -5,11 +5,11 @@ module clqh_m
 contains
 
   SUBROUTINE clqh(dtime, itime, jour, debut, rlat, knon, nisurf, knindex, &
-       pctsrf, soil_model, tsoil, qsol, rmu0, co2_ppm, rugos, rugoro, u1lay, &
+       pctsrf, tsoil, qsol, rmu0, co2_ppm, rugos, rugoro, u1lay, &
        v1lay, coef, t, q, ts, paprs, pplay, delp, radsol, albedo, alblw, &
        snow, qsurf, precip_rain, precip_snow, fder, swnet, fluxlat, &
        pctsrf_new, agesno, d_t, d_q, d_ts, z0_new, flux_t, flux_q, dflux_s, &
-       dflux_l, fqcalving, ffonte, run_off_lic_0, flux_o, flux_g, tslab, seaice)
+       dflux_l, fqcalving, ffonte, run_off_lic_0, flux_o, flux_g)
 
     ! Author: Z. X. Li (LMD/CNRS)
     ! Date: 1993/08/18
@@ -46,7 +46,13 @@ contains
     REAL alblw(klon)
     REAL snow(klon)         ! hauteur de neige
     REAL qsurf(klon)         ! humidite de l'air au dessus de la surface
-    real precip_rain(klon), precip_snow(klon)
+
+    real, intent(in):: precip_rain(klon)
+    ! liquid water mass flux (kg/m2/s), positive down
+
+    real, intent(in):: precip_snow(klon)
+    ! solid water mass flux (kg/m2/s), positive down
+
     REAL agesno(klon)
     REAL rugoro(klon)
     REAL run_off_lic_0(klon)! runof glacier au pas de temps precedent
@@ -73,11 +79,13 @@ contains
     ! Flux d'eau "perdue" par la surface et nécessaire pour que limiter la
     ! hauteur de neige, en kg/m2/s
     REAL fqcalving(klon)
+
     !IM "slab" ocean
-    REAL tslab(klon)  !temperature du slab ocean (K) (OCEAN='slab  ')
-    REAL seaice(klon) ! glace de mer en kg/m2
-    REAL flux_o(klon) ! flux entre l'ocean et l'atmosphere W/m2
-    REAL flux_g(klon) ! flux entre l'ocean et la glace de mer W/m2
+
+    REAL, intent(out):: flux_o(klon) ! flux entre l'ocean et l'atmosphere W/m2
+
+    REAL, intent(out):: flux_g(klon) 
+    ! flux entre l'ocean et la glace de mer W/m2
 
     INTEGER i, k
     REAL zx_cq(klon, klev)
@@ -113,9 +121,10 @@ contains
     real swnet(klon), swdown(klon)
     real p1lay(klon)
     !$$$C PB ajout pour soil
-    LOGICAL, intent(in):: soil_model
     REAL tsoil(klon, nsoilmx)
-    REAL qsol(klon)
+
+    REAL, intent(inout):: qsol(klon)
+    ! column-density of water in soil, in kg m-2
 
     ! Parametres de sortie
     real fluxsens(klon), fluxlat(klon)
@@ -270,14 +279,13 @@ contains
     endif
     ccanopy = co2_ppm
 
-    CALL interfsurf_hq(itime, dtime, jour, rmu0, iim, jjm, nisurf, knon, &
-         knindex, pctsrf, rlat, debut, soil_model, nsoilmx, tsoil, qsol,  &
-         u1lay, v1lay, temp_air, spechum, tq_cdrag, petAcoef, peqAcoef, &
-         petBcoef, peqBcoef, precip_rain, precip_snow, fder, rugos, rugoro, &
-         snow, qsurf, ts, p1lay, psref, radsol, evap, fluxsens, &
-         fluxlat, dflux_l, dflux_s, tsurf_new, alb_new, alblw, z0_new, &
-         pctsrf_new, agesno, fqcalving, ffonte, run_off_lic_0, flux_o, &
-         flux_g, tslab, seaice)
+    CALL interfsurf_hq(itime, dtime, jour, rmu0, nisurf, knon, knindex, &
+         pctsrf, rlat, debut, nsoilmx, tsoil, qsol, u1lay, v1lay, &
+         temp_air, spechum, tq_cdrag, petAcoef, peqAcoef, petBcoef, peqBcoef, &
+         precip_rain, precip_snow, fder, rugos, rugoro, snow, qsurf, ts, &
+         p1lay, psref, radsol, evap, fluxsens, fluxlat, dflux_l, dflux_s, &
+         tsurf_new, alb_new, alblw, z0_new, pctsrf_new, agesno, fqcalving, &
+         ffonte, run_off_lic_0, flux_o, flux_g)
 
     do i = 1, knon
        flux_t(i, 1) = fluxsens(i)

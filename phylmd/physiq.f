@@ -22,7 +22,7 @@ contains
     USE clesphys, ONLY: cdhmax, cdmmax, co2_ppm, ecrit_hf, ecrit_ins, &
          ecrit_mth, ecrit_reg, ecrit_tra, ksta, ksta_ter, ok_kzmin
     USE clesphys2, ONLY: cycle_diurne, iflag_con, nbapp_rad, new_oliq, &
-         ok_orodr, ok_orolf, soil_model
+         ok_orodr, ok_orolf
     USE clmain_m, ONLY: clmain
     use clouds_gno_m, only: clouds_gno
     USE comgeomphy, ONLY: airephy, cuphy, cvphy
@@ -242,7 +242,9 @@ contains
     REAL, save:: fqsurf(klon, nbsrf)
     ! humidite de l'air au contact de la surface
 
-    REAL, save:: qsol(klon) ! hauteur d'eau dans le sol
+    REAL, save:: qsol(klon)
+    ! column-density of water in soil, in kg m-2
+
     REAL, save:: fsnow(klon, nbsrf) ! epaisseur neigeuse
     REAL, save:: falbe(klon, nbsrf) ! albedo par type de surface
     REAL, save:: falblw(klon, nbsrf) ! albedo par type de surface
@@ -302,8 +304,11 @@ contains
     REAL frac_impa(klon, llm) ! fractions d'aerosols lessivees (impaction)
     REAL frac_nucl(klon, llm) ! idem (nucleation)
 
-    REAL, save:: rain_fall(klon) ! pluie
-    REAL, save:: snow_fall(klon) ! neige
+    REAL, save:: rain_fall(klon)
+    ! liquid water mass flux (kg/m2/s), positive down
+
+    REAL, save:: snow_fall(klon)
+    ! solid water mass flux (kg/m2/s), positive down
 
     REAL rain_tiedtke(klon), snow_tiedtke(klon)
 
@@ -792,15 +797,14 @@ contains
     ! Couche limite:
 
     CALL clmain(dtphys, itap, pctsrf, pctsrf_new, t_seri, q_seri, u_seri, &
-         v_seri, julien, rmu0, co2_ppm, ftsol, soil_model, &
-         cdmmax, cdhmax, ksta, ksta_ter, ok_kzmin, ftsoil, qsol, paprs, play, &
-         fsnow, fqsurf, fevap, falbe, falblw, fluxlat, rain_fall, snow_fall, &
-         fsolsw, fsollw, fder, rlat, frugs, firstcal, agesno, rugoro, &
-         d_t_vdf, d_q_vdf, d_u_vdf, d_v_vdf, d_ts, fluxt, fluxq, fluxu, &
-         fluxv, cdragh, cdragm, q2, dsens, devap, ycoefh, yu1, yv1, t2m, q2m, &
-         u10m, v10m, pblh, capCL, oliqCL, cteiCL, pblT, therm, trmb1, trmb2, &
-         trmb3, plcl, fqcalving, ffonte, run_off_lic_0, fluxo, fluxg, tslab, &
-         seaice)
+         v_seri, julien, rmu0, co2_ppm, ftsol, cdmmax, cdhmax, &
+         ksta, ksta_ter, ok_kzmin, ftsoil, qsol, paprs, play, fsnow, fqsurf, &
+         fevap, falbe, falblw, fluxlat, rain_fall, snow_fall, fsolsw, fsollw, &
+         fder, rlat, frugs, firstcal, agesno, rugoro, d_t_vdf, d_q_vdf, &
+         d_u_vdf, d_v_vdf, d_ts, fluxt, fluxq, fluxu, fluxv, cdragh, cdragm, &
+         q2, dsens, devap, ycoefh, yu1, yv1, t2m, q2m, u10m, v10m, pblh, &
+         capCL, oliqCL, cteiCL, pblT, therm, trmb1, trmb2, trmb3, plcl, &
+         fqcalving, ffonte, run_off_lic_0, fluxo, fluxg, tslab)
 
     ! Incr\'ementation des flux
 

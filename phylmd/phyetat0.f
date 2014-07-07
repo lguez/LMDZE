@@ -24,10 +24,10 @@ contains
     use dimphy, only: zmasq, klev
     USE dimsoil, ONLY : nsoilmx
     USE indicesol, ONLY : epsfra, is_lic, is_oce, is_sic, is_ter, nbsrf
-    use netcdf, only: nf90_get_att, nf90_global, nf90_inq_varid, NF90_NOERR, &
+    use netcdf, only: nf90_global, nf90_inq_varid, NF90_NOERR, &
          NF90_NOWRITE
-    use netcdf95, only: handle_err, nf95_get_var, nf95_close, NF95_OPEN, &
-         nf95_inq_varid
+    use netcdf95, only: nf95_close, nf95_get_att, nf95_get_var, &
+         nf95_inq_varid, nf95_inquire_variable, NF95_OPEN
     USE temps, ONLY : itau_phy
 
     REAL pctsrf(klon, nbsrf)
@@ -67,7 +67,7 @@ contains
     ! Local:
     REAL fractint(klon)
     REAL xmin, xmax
-    INTEGER ncid, varid
+    INTEGER ncid, varid, ndims
     INTEGER ierr, i, nsrf, isoil 
     CHARACTER(len=7) str7
     CHARACTER(len=2) str2
@@ -79,8 +79,7 @@ contains
     ! Fichier contenant l'état initial :
     call NF95_OPEN("startphy.nc", NF90_NOWRITE, ncid)
 
-    ierr = nf90_get_att(ncid, nf90_global, "itau_phy", itau_phy)
-    call handle_err("phyetat0 itau_phy", ierr, ncid, nf90_global)
+    call nf95_get_att(ncid, nf90_global, "itau_phy", itau_phy)
 
     ! Lecture des latitudes (coordonnees):
 
@@ -94,13 +93,9 @@ contains
 
     ! Lecture du masque terre mer
 
-    ierr = NF90_INQ_VARID(ncid, "masque", varid)
-    IF (ierr == NF90_NOERR) THEN
-       call nf95_get_var(ncid, varid, zmasq)
-    else
-       PRINT *, 'phyetat0: Le champ <masque> est absent'
-       PRINT *, 'fichier startphy non compatible avec phyetat0'
-    ENDIF
+    call NF95_INQ_VARID(ncid, "masque", varid)
+    call nf95_get_var(ncid, varid, zmasq)
+
     ! Lecture des fractions pour chaque sous-surface
 
     ! initialisation des sous-surfaces
@@ -163,46 +158,17 @@ contains
     END DO
 
     ! Lecture des temperatures du sol:
-
-    ierr = NF90_INQ_VARID(ncid, "TS", varid)
-    IF (ierr /= NF90_NOERR) THEN
-       PRINT *, 'phyetat0 : Le champ <TS> est absent'
-       PRINT *, ' Mais je vais essayer de lire TS**'
-       DO nsrf = 1, nbsrf
-          IF (nsrf > 99) THEN
-             PRINT *, "Trop de sous-mailles"
-             stop 1
-          ENDIF
-          WRITE(str2, '(i2.2)') nsrf
-          call NF95_INQ_VARID(ncid, "TS"//str2, varid)
-          call NF95_GET_VAR(ncid, varid, tsol(:, nsrf))
-          xmin = 1.0E+20
-          xmax = -1.0E+20
-          DO i = 1, klon
-             xmin = MIN(tsol(i, nsrf), xmin)
-             xmax = MAX(tsol(i, nsrf), xmax)
-          ENDDO
-          PRINT *, 'Temperature du sol TS**:', nsrf, xmin, xmax
-       ENDDO
-    ELSE
-       PRINT *, 'phyetat0: Le champ <TS> est present'
-       PRINT *, ' J ignore donc les autres temperatures TS**'
+    call NF95_INQ_VARID(ncid, "TS", varid)
+    call nf95_inquire_variable(ncid, varid, ndims = ndims)
+    if (ndims == 2) then
+       call NF95_GET_VAR(ncid, varid, tsol)
+    else
+       print *, "Found only one surface type for soil temperature."
        call nf95_get_var(ncid, varid, tsol(:, 1))
-       xmin = 1.0E+20
-       xmax = -1.0E+20
-       DO i = 1, klon
-          xmin = MIN(tsol(i, 1), xmin)
-          xmax = MAX(tsol(i, 1), xmax)
-       ENDDO
-       PRINT *, 'Temperature du sol <TS>', xmin, xmax
-       DO nsrf = 2, nbsrf
-          DO i = 1, klon
-             tsol(i, nsrf) = tsol(i, 1)
-          ENDDO
-       ENDDO
-    ENDIF
+       tsol(:, 2:nbsrf) = spread(tsol(:, 1), dim = 2, ncopies = nbsrf - 1)
+    end if      
 
-    ! Lecture des temperatures du sol profond:
+   ! Lecture des temperatures du sol profond:
 
     DO nsrf = 1, nbsrf
        DO isoil=1, nsoilmx
@@ -434,13 +400,6 @@ contains
 
     call NF95_INQ_VARID(ncid, "rain_f", varid)
     call NF95_GET_VAR(ncid, varid, rain_fall)
-    xmin = 1.0E+20
-    xmax = -1.0E+20
-    DO i = 1, klon
-       xmin = MIN(rain_fall(i), xmin)
-       xmax = MAX(rain_fall(i), xmax)
-    ENDDO
-    PRINT *, 'Precipitation liquide rain_f:', xmin, xmax
 
     ! Lecture precipitation solide:
 

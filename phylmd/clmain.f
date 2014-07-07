@@ -5,14 +5,13 @@ module clmain_m
 contains
 
   SUBROUTINE clmain(dtime, itap, pctsrf, pctsrf_new, t, q, u, v, jour, rmu0, &
-       co2_ppm, ts, soil_model, cdmmax, cdhmax, ksta, ksta_ter, &
-       ok_kzmin, ftsoil, qsol, paprs, pplay, snow, qsurf, evap, albe, alblw, &
-       fluxlat, rain_fall, snow_f, solsw, sollw, fder, rlat, rugos, debut, &
-       agesno, rugoro, d_t, d_q, d_u, d_v, d_ts, flux_t, flux_q, flux_u, &
-       flux_v, cdragh, cdragm, q2, dflux_t, dflux_q, ycoefh, zu1, zv1, t2m, &
-       q2m, u10m, v10m, pblh, capcl, oliqcl, cteicl, pblt, therm, trmb1, &
-       trmb2, trmb3, plcl, fqcalving, ffonte, run_off_lic_0, flux_o, flux_g, &
-       tslab, seaice)
+       co2_ppm, ts, cdmmax, cdhmax, ksta, ksta_ter, ok_kzmin, ftsoil, qsol, &
+       paprs, pplay, snow, qsurf, evap, albe, alblw, fluxlat, rain_fall, &
+       snow_f, solsw, sollw, fder, rlat, rugos, debut, agesno, rugoro, d_t, &
+       d_q, d_u, d_v, d_ts, flux_t, flux_q, flux_u, flux_v, cdragh, cdragm, &
+       q2, dflux_t, dflux_q, ycoefh, zu1, zv1, t2m, q2m, u10m, v10m, pblh, &
+       capcl, oliqcl, cteicl, pblt, therm, trmb1, trmb2, trmb3, plcl, &
+       fqcalving, ffonte, run_off_lic_0, flux_o, flux_g, tslab)
 
     ! From phylmd/clmain.F, version 1.6, 2005/11/16 14:47:19
     ! Author: Z. X. Li (LMD/CNRS), date: 1993/08/18
@@ -58,12 +57,14 @@ contains
     REAL, intent(in):: rmu0(klon) ! cosinus de l'angle solaire zenithal     
     REAL, intent(in):: co2_ppm ! taux CO2 atmosphere
     REAL, INTENT(IN):: ts(klon, nbsrf) ! input-R- temperature du sol (en Kelvin)
-    LOGICAL, INTENT(IN):: soil_model
     REAL, INTENT(IN):: cdmmax, cdhmax ! seuils cdrm, cdrh
     REAL, INTENT(IN):: ksta, ksta_ter
     LOGICAL, INTENT(IN):: ok_kzmin
     REAL ftsoil(klon, nsoilmx, nbsrf)
+
     REAL, INTENT(inout):: qsol(klon)
+    ! column-density of water in soil, in kg m-2
+
     REAL, INTENT(IN):: paprs(klon, klev+1) ! pression a intercouche (Pa)
     REAL, INTENT(IN):: pplay(klon, klev) ! pression au milieu de couche (Pa)
     REAL snow(klon, nbsrf)
@@ -74,7 +75,12 @@ contains
 
     REAL fluxlat(klon, nbsrf)
 
-    REAL, intent(in):: rain_fall(klon), snow_f(klon)
+    REAL, intent(in):: rain_fall(klon)
+    ! liquid water mass flux (kg/m2/s), positive down
+
+    REAL, intent(in):: snow_f(klon)
+    ! solid water mass flux (kg/m2/s), positive down
+
     REAL, INTENT(IN):: solsw(klon, nbsrf), sollw(klon, nbsrf)
     REAL fder(klon)
     REAL, INTENT(IN):: rlat(klon) ! latitude en degrés
@@ -151,14 +157,10 @@ contains
     ! tslab-in/output-R temperature du slab ocean (en Kelvin) 
     ! uniqmnt pour slab
 
-    REAL seaice(klon)
-    ! seaice---output-R-  glace de mer (kg/m2) (pour OCEAN='slab  ')
-
     ! Local:
 
     REAL y_flux_o(klon), y_flux_g(klon)
     real ytslab(klon)
-    real y_seaice(klon)
     REAL y_fqcalving(klon), y_ffonte(klon)
     real y_run_off_lic_0(klon)
 
@@ -172,8 +174,17 @@ contains
     REAL yu1(klon), yv1(klon)
     ! on rajoute en output yu1 et yv1 qui sont les vents dans
     ! la premiere couche
-    REAL ysnow(klon), yqsurf(klon), yagesno(klon), yqsol(klon)
-    REAL yrain_f(klon), ysnow_f(klon)
+    REAL ysnow(klon), yqsurf(klon), yagesno(klon)
+
+    real yqsol(klon)
+    ! column-density of water in soil, in kg m-2
+
+    REAL yrain_f(klon)
+    ! liquid water mass flux (kg/m2/s), positive down
+
+    REAL ysnow_f(klon)
+    ! solid water mass flux (kg/m2/s), positive down
+
     REAL ysollw(klon), ysolsw(klon)
     REAL yfder(klon)
     REAL yrugm(klon), yrads(klon), yrugoro(klon)
@@ -467,13 +478,12 @@ contains
 
           ! calculer la diffusion de "q" et de "h"
           CALL clqh(dtime, itap, jour, debut, rlat, knon, nsrf, ni, pctsrf, &
-               soil_model, ytsoil, yqsol, rmu0, co2_ppm, yrugos, yrugoro, &
+               ytsoil, yqsol, rmu0, co2_ppm, yrugos, yrugoro, &
                yu1, yv1, coefh(:knon, :), yt, yq, yts, ypaprs, ypplay, ydelp, &
                yrads, yalb, yalblw, ysnow, yqsurf, yrain_f, ysnow_f, yfder, &
                ysolsw, yfluxlat, pctsrf_new, yagesno, y_d_t, y_d_q, y_d_ts, &
                yz0_new, y_flux_t, y_flux_q, y_dflux_t, y_dflux_q, &
-               y_fqcalving, y_ffonte, y_run_off_lic_0, y_flux_o, y_flux_g, &
-               ytslab, y_seaice)
+               y_fqcalving, y_ffonte, y_run_off_lic_0, y_flux_o, y_flux_g)
 
           ! calculer la longueur de rugosite sur ocean
           yrugm = 0.

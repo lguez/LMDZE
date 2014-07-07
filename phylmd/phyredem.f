@@ -30,7 +30,10 @@ contains
     REAL, INTENT(IN):: tsoil(:, :, :) ! (klon, nsoilmx, nbsrf)
     REAL, INTENT(IN):: tslab(:), seaice(:) ! (klon) slab ocean
     REAL, INTENT(IN):: qsurf(:, :) ! (klon, nbsrf)
+
     REAL, intent(in):: qsol(:) ! (klon)
+    ! column-density of water in soil, in kg m-2
+
     REAL, INTENT(IN):: snow(klon, nbsrf)
     REAL, INTENT(IN):: albedo(klon, nbsrf)
     REAL, INTENT(IN):: alblw(klon, nbsrf)
@@ -61,7 +64,7 @@ contains
 
     ! Local:
 
-    INTEGER ncid, idim2, idim3
+    INTEGER ncid, idim2, idim3, dimid_nbsrf
     integer varid, varid_run_off_lic_0, varid_sig1, varid_w01, varid_rlon
     integer varid_rlat, varid_zmasq, varid_fter, varid_flic, varid_foce
     integer varid_fsic
@@ -80,6 +83,7 @@ contains
 
     call nf95_def_dim(ncid, 'points_physiques', klon, idim2)
     call nf95_def_dim(ncid, 'klev', klev, idim3)
+    call nf95_def_dim(ncid, 'nbsrf', nbsrf, dimid_nbsrf)
 
     call nf95_def_var(ncid, 'longitude', nf90_float, idim2, varid_rlon)
     call nf95_def_var(ncid, 'latitude', nf90_float, idim2, varid_rlat)
@@ -111,20 +115,11 @@ contains
     call nf95_put_var(ncid, varid_foce, pctsrf(:, is_oce))
     call nf95_put_var(ncid, varid_fsic, pctsrf(:, is_sic))
 
-    DO nsrf = 1, nbsrf
-       IF (nsrf<=99) THEN
-          WRITE (str2, '(i2.2)') nsrf
-          call nf95_redef(ncid)
-          call nf95_def_var(ncid, 'TS'//str2, nf90_float, idim2, varid)
-          call nf95_put_att(ncid, varid, 'title', &
-               'Temperature de surface No.'//str2)
-          call nf95_enddef(ncid)
-       ELSE
-          PRINT *, 'Trop de sous-mailles'
-          STOP 1
-       END IF
-       call nf95_put_var(ncid, varid, tsol(:, nsrf))
-    END DO
+    call nf95_redef(ncid)
+    call nf95_def_var(ncid, 'TS', nf90_float, (/idim2, dimid_nbsrf/), varid)
+    call nf95_put_att(ncid, varid, 'title', 'surface temperature')
+    call nf95_enddef(ncid)
+    call nf95_put_var(ncid, varid, tsol)
 
     DO nsrf = 1, nbsrf
        DO isoil = 1, nsoilmx

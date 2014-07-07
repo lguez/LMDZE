@@ -1,74 +1,58 @@
-SUBROUTINE calbeta(dtime, indice, knon, snow, qsol, vbeta, vcal, vdif)
-  USE dimens_m
-  USE indicesol
-  USE dimphy
-  USE conf_gcm_m
-  USE suphec_m
+module calbeta_m
+
   IMPLICIT NONE
-  ! ======================================================================
-  ! Auteur(s): Z.X. Li (LMD/CNRS) (adaptation du GCM du LMD)
-  ! date: 19940414
-  ! ======================================================================
 
-  ! Calculer quelques parametres pour appliquer la couche limite
-  ! ------------------------------------------------------------
-  REAL tau_gl ! temps de relaxation pour la glace de mer
-  ! cc      PARAMETER (tau_gl=86400.0*30.0)
-  PARAMETER (tau_gl=86400.0*5.0)
-  REAL mx_eau_sol
-  PARAMETER (mx_eau_sol=150.0)
+contains
 
-  REAL calsol, calsno, calice ! epaisseur du sol: 0.15 m
-  PARAMETER (calsol=1.0/(2.5578E+06*0.15))
-  PARAMETER (calsno=1.0/(2.3867E+06*0.15))
-  PARAMETER (calice=1.0/(5.1444E+06*0.15))
+  SUBROUTINE calbeta(indice, snow, qsol, vbeta, vcal, vdif)
 
-  INTEGER i
+    ! Author: Z. X. Li (LMD/CNRS)
+    ! Date: April 14th, 1994
 
-  REAL dtime
-  REAL snow(klon), qsol(klon)
-  INTEGER indice, knon
+    ! Calcul de quelques paramètres pour appliquer la couche limite.
 
-  REAL vbeta(klon)
-  REAL vcal(klon)
-  REAL vdif(klon)
+    USE indicesol, ONLY: is_lic, is_oce, is_sic, is_ter
 
+    INTEGER, intent(in):: indice
+    REAL, intent(in):: snow(:), qsol(:) ! (knon)
+    REAL, intent(out):: vbeta(:), vcal(:), vdif(:) ! (knon)
 
-  IF (indice==is_oce) THEN
-    DO i = 1, knon
-      vcal(i) = 0.0
-      vbeta(i) = 1.0
-      vdif(i) = 0.0
-    END DO
-  END IF
+    ! Local:
 
-  IF (indice==is_sic) THEN
-    DO i = 1, knon
-      vcal(i) = calice
-      IF (snow(i)>0.0) vcal(i) = calsno
-      vbeta(i) = 1.0
-      vdif(i) = 1.0/tau_gl
-      ! cc          vdif(i) = calice/tau_gl ! c'etait une erreur
-    END DO
-  END IF
+    REAL, PARAMETER:: tau_gl = 86400. * 5. 
+    ! temps de relaxation pour la glace de mer
 
-  IF (indice==is_ter) THEN
-    DO i = 1, knon
-      vcal(i) = calsol
-      IF (snow(i)>0.0) vcal(i) = calsno
-      vbeta(i) = min(2.0*qsol(i)/mx_eau_sol, 1.0)
-      vdif(i) = 0.0
-    END DO
-  END IF
+    REAL, PARAMETER:: max_eau_sol = 150. ! in kg m-2
 
-  IF (indice==is_lic) THEN
-    DO i = 1, knon
-      vcal(i) = calice
-      IF (snow(i)>0.0) vcal(i) = calsno
-      vbeta(i) = 1.0
-      vdif(i) = 0.0
-    END DO
-  END IF
+    ! Pour une épaisseur du sol de 15 cm :
+    REAL, PARAMETER:: calsol = 1. / (2.5578E6 * 0.15)
+    REAL, PARAMETER:: calsno = 1. / (2.3867E6 * 0.15)
+    REAL, PARAMETER:: calice = 1. / (5.1444E6 * 0.15)
 
-  RETURN
-END SUBROUTINE calbeta
+    !------------------------------------------------------------
+
+    select case (indice)
+    case(is_oce)
+       vbeta = 1.
+       vcal = 0.
+       vdif = 0.
+
+    case (is_sic)
+       vbeta = 1.
+       vcal = merge(calsno, calice, snow > 0.)
+       vdif = 1. / tau_gl
+
+    case (is_ter)
+       vbeta = min(2. * qsol / max_eau_sol, 1.)
+       vcal = merge(calsno, calsol, snow > 0.)
+       vdif = 0.
+
+    case (is_lic)
+       vbeta = 1.
+       vcal = merge(calsno, calice, snow > 0.)
+       vdif = 0.
+    END select
+
+  END SUBROUTINE calbeta
+
+end module calbeta_m

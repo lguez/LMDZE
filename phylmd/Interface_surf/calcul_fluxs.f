@@ -98,7 +98,7 @@ contains
        !!CALL flush(6)
     ENDIF
 
-    if (size(coastalflow) /= knon .AND. nisurf == is_ter) then
+    if (size(run_off) /= knon .AND. nisurf == is_ter) then
        write(*, *)'Bizarre, le nombre de points continentaux'
        write(*, *)'a change entre deux appels. J''arrete ...'
        abort_message='Pb run_off'

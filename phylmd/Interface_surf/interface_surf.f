@@ -7,7 +7,6 @@ MODULE interface_surf
 
   ! run_off ruissellement total
   REAL, ALLOCATABLE, DIMENSION(:), SAVE :: run_off, run_off_lic
-  real, allocatable, dimension(:), save :: coastalflow, riverflow
 
   REAL, save :: tau_calv 
   ! temps de relaxation pour la fonte des glaciers, en jours

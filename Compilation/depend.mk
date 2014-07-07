@@ -30,7 +30,7 @@ ajsec.o : suphec.o dimphy.o
 albedo.o : orbite.o YOMCST.o dimphy.o dimens_m.o 
 bilan_dyn.o : paramet_m.o massbar.o init_dynzon.o histwrite.o dimens_m.o comgeom.o comconst.o 
 caladvtrac.o : qminimum.o paramet_m.o dimens_m.o conf_gcm.o advtrac.o 
-calbeta.o : suphec.o conf_gcm.o dimphy.o indicesol.o dimens_m.o 
+calbeta.o : indicesol.o 
 calcul_fluxs.o : interface_surf.o suphec.o FCTTRE.o yoethf.o abort_gcm.o indicesol.o 
 caldyn.o : vitvert.o tourpot.o sortvarc.o paramet_m.o massdair.o massbarxy.o massbar.o flumass.o dudv2.o dudv1.o dteta1.o disvert.o dimens_m.o convmas.o comgeom.o advect.o 
 calfis.o : pressure_var.o physiq.o grid_change.o disvert.o dimphy.o dimens_m.o comgeom.o comconst.o 
@@ -109,7 +109,7 @@ flxdtdq.o : suphec.o dimphy.o
 flxflux.o : FCTTRE.o yoethf.o suphec.o dimphy.o 
 flxini.o : suphec.o flxadjtq.o dimphy.o 
 flxmain.o : yoethf.o YOECUMF.o suphec.o flxini.o flxflux.o flxdtdq.o flxdlfs.o flxddraf.o flxbase.o flxasc.o dimphy.o 
-fonte_neige.o : interface_surf.o FCTTRE.o yoethf.o suphec.o indicesol.o 
+fonte_neige.o : yoethf.o suphec.o interface_surf.o indicesol.o FCTTRE.o 
 gcm.o : yoethf.o unit_nml_m.o tracstoke.o temps.o suphec.o leapfrog.o ioconf_calendar.o init_dynzon.o inithist.o initdynav.o inifilr.o inidissip.o iniadvtrac.o histclo.o grid_change.o dynredem0.o dynetat0.o disvert.o dimphy.o dimens_m.o conf_gcm.o comgeomphy.o comgeom.o comconst.o 
 getso4fromfile.o : dimphy.o dimens_m.o 
 grad.o : paramet_m.o dimens_m.o 
@@ -146,8 +146,7 @@ initrrnpb.o : indicesol.o dimphy.o dimens_m.o
 integrd.o : qminimum.o paramet_m.o massdair.o filtreg.o disvert.o dimens_m.o comgeom.o 
 interface_surf.o : unit_nml_m.o 
 interfoce_lim.o : indicesol.o abort_gcm.o 
-interfoce_slab.o : suphec.o abort_gcm.o clesphys.o indicesol.o 
-interfsurf_hq.o : suphec.o interfsur_lim.o interfoce_slab.o interfoce_lim.o interface_surf.o indicesol.o fonte_neige.o dimphy.o calcul_fluxs.o albsno.o abort_gcm.o 
+interfsurf_hq.o : suphec.o soil.o interfsur_lim.o interfoce_lim.o interface_surf.o indicesol.o fonte_neige.o dimphy.o clesphys2.o calcul_fluxs.o calbeta.o albsno.o abort_gcm.o 
 interfsur_lim.o : dimphy.o abort_gcm.o 
 interpost.o : comgeom.o disvert.o comconst.o paramet_m.o dimens_m.o 
 interpre.o : ener.o temps.o comgeom.o conf_gcm.o disvert.o comconst.o paramet_m.o dimens_m.o 
