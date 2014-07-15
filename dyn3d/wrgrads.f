@@ -2,12 +2,12 @@
 ! $Header: /home/cvsroot/LMDZ4/libf/dyn3d/wrgrads.F,v 1.2 2004/06/22 11:45:30
 ! lmdzadmin Exp $
 
-SUBROUTINE wrgrads(if, nl, field, name, titlevar)
+SUBROUTINE wrgrads(i_f, nl, field, name, titlevar)
   USE gradsdef
   IMPLICIT NONE
 
   ! Declarations
-  ! if indice du fichier
+  ! i_f indice du fichier
   ! nl nombre de couches
   ! field   champ
   ! name    petit nom
@@ -15,8 +15,9 @@ SUBROUTINE wrgrads(if, nl, field, name, titlevar)
 
 
   ! arguments
-  INTEGER if, nl
-  REAL, INTENT (IN) :: field(imx*jmx*lmx)
+  INTEGER, INTENT(IN):: i_f
+  integer nl
+  REAL, INTENT(IN):: field(imx*jmx*lmx)
   CHARACTER *10 name, file
   CHARACTER *10 titlevar
 
@@ -29,96 +30,96 @@ SUBROUTINE wrgrads(if, nl, field, name, titlevar)
 
   writectl = .FALSE.
 
-  PRINT *, if, iid(if), jid(if), ifd(if), jfd(if)
-  iii = iid(if)
-  iji = jid(if)
-  iif = ifd(if)
-  ijf = jfd(if)
+  PRINT *, i_f, iid(i_f), jid(i_f), ifd(i_f), jfd(i_f)
+  iii = iid(i_f)
+  iji = jid(i_f)
+  iif = ifd(i_f)
+  ijf = jfd(i_f)
   im = iif - iii + 1
   jm = ijf - iji + 1
-  lm = lmd(if)
+  lm = lmd(i_f)
 
-  PRINT *, 'im,jm,lm,name,firsttime(if)'
-  PRINT *, im, jm, lm, name, firsttime(if)
+  PRINT *, 'im,jm,lm,name,firsttime(i_f)'
+  PRINT *, im, jm, lm, name, firsttime(i_f)
 
-  IF (firsttime(if)) THEN
-    IF (name==var(1,if)) THEN
-      firsttime(if) = .FALSE.
-      ivar(if) = 1
+  IF (firsttime(i_f)) THEN
+    IF (name==var(1,i_f)) THEN
+      firsttime(i_f) = .FALSE.
+      ivar(i_f) = 1
       PRINT *, 'fin de l initialiation de l ecriture du fichier'
       PRINT *, file
-      PRINT *, 'fichier no: ', if
-      PRINT *, 'unit ', unit(if)
-      PRINT *, 'nvar  ', nvar(if)
-      PRINT *, 'vars ', (var(iv,if), iv=1, nvar(if))
+      PRINT *, 'fichier no: ', i_f
+      PRINT *, 'unit ', unit(i_f)
+      PRINT *, 'nvar  ', nvar(i_f)
+      PRINT *, 'vars ', (var(iv,i_f), iv=1, nvar(i_f))
     ELSE
-      ivar(if) = ivar(if) + 1
-      nvar(if) = ivar(if)
-      var(ivar(if), if) = name
-      tvar(ivar(if), if) = titlevar(1:lnblnk(titlevar))
-      nld(ivar(if), if) = nl
-      PRINT *, 'initialisation ecriture de ', var(ivar(if), if)
-      PRINT *, 'if ivar(if) nld ', if, ivar(if), nld(ivar(if), if)
+      ivar(i_f) = ivar(i_f) + 1
+      nvar(i_f) = ivar(i_f)
+      var(ivar(i_f), i_f) = name
+      tvar(ivar(i_f), i_f) = titlevar(1:lnblnk(titlevar))
+      nld(ivar(i_f), i_f) = nl
+      PRINT *, 'initialisation ecriture de ', var(ivar(i_f), i_f)
+      PRINT *, 'i_f ivar(i_f) nld ', i_f, ivar(i_f), nld(ivar(i_f), i_f)
     END IF
     writectl = .TRUE.
-    itime(if) = 1
+    itime(i_f) = 1
   ELSE
-    ivar(if) = mod(ivar(if), nvar(if)) + 1
-    IF (ivar(if)==nvar(if)) THEN
+    ivar(i_f) = mod(ivar(i_f), nvar(i_f)) + 1
+    IF (ivar(i_f)==nvar(i_f)) THEN
       writectl = .TRUE.
-      itime(if) = itime(if) + 1
+      itime(i_f) = itime(i_f) + 1
     END IF
 
-    IF (var(ivar(if),if)/=name) THEN
+    IF (var(ivar(i_f),i_f)/=name) THEN
       PRINT *, 'Il faut stoker la meme succession de champs a chaque'
       PRINT *, 'pas de temps'
-      PRINT *, 'fichier no: ', if
-      PRINT *, 'unit ', unit(if)
-      PRINT *, 'nvar  ', nvar(if)
-      PRINT *, 'vars ', (var(iv,if), iv=1, nvar(if))
+      PRINT *, 'fichier no: ', i_f
+      PRINT *, 'unit ', unit(i_f)
+      PRINT *, 'nvar  ', nvar(i_f)
+      PRINT *, 'vars ', (var(iv,i_f), iv=1, nvar(i_f))
 
       STOP
     END IF
   END IF
 
-  PRINT *, 'ivar(if),nvar(if),var(ivar(if),if),writectl'
-  PRINT *, ivar(if), nvar(if), var(ivar(if), if), writectl
+  PRINT *, 'ivar(i_f),nvar(i_f),var(ivar(i_f),i_f),writectl'
+  PRINT *, ivar(i_f), nvar(i_f), var(ivar(i_f), i_f), writectl
   DO l = 1, nl
-    irec(if) = irec(if) + 1
-    ! print*,'Ecrit rec=',irec(if),iii,iif,iji,ijf,
-    ! s (l-1)*imd(if)*jmd(if)+(iji-1)*imd(if)+iii
-    ! s ,(l-1)*imd(if)*jmd(if)+(ijf-1)*imd(if)+iif
-    WRITE (unit(if)+1, REC=irec(if))((field((l-1)*imd(if)*jmd(if)+ &
-      (j-1)*imd(if)+i),i=iii,iif), j=iji, ijf)
+    irec(i_f) = irec(i_f) + 1
+    ! print*,'Ecrit rec=',irec(i_f),iii,iif,iji,ijf,
+    ! s (l-1)*imd(i_f)*jmd(i_f)+(iji-1)*imd(i_f)+iii
+    ! s ,(l-1)*imd(i_f)*jmd(i_f)+(ijf-1)*imd(i_f)+iif
+    WRITE (unit(i_f)+1, REC=irec(i_f))((field((l-1)*imd(i_f)*jmd(i_f)+ &
+      (j-1)*imd(i_f)+i),i=iii,iif), j=iji, ijf)
   END DO
   IF (writectl) THEN
 
-    file = fichier(if)
+    file = fichier(i_f)
     ! WARNING! on reecrase le fichier .ctl a chaque ecriture
-    OPEN (unit(if), FILE=file(1:lnblnk(file))//'.ctl', FORM='formatted', &
+    OPEN (unit(i_f), FILE=file(1:lnblnk(file))//'.ctl', FORM='formatted', &
       STATUS='unknown')
-    WRITE (unit(if), '(a5,1x,a40)') 'DSET ', '^' // file(1:lnblnk(file)) // &
+    WRITE (unit(i_f), '(a5,1x,a40)') 'DSET ', '^' // file(1:lnblnk(file)) // &
       '.dat'
 
-    WRITE (unit(if), '(a12)') 'UNDEF 1.0E30'
-    WRITE (unit(if), '(a5,1x,a40)') 'TITLE ', title(if)
-    CALL formcoord(unit(if), im, xd(iii,if), 1., .FALSE., 'XDEF')
-    CALL formcoord(unit(if), jm, yd(iji,if), 1., .TRUE., 'YDEF')
-    CALL formcoord(unit(if), lm, zd(1,if), 1., .FALSE., 'ZDEF')
-    WRITE (unit(if), '(a4,i10,a30)') 'TDEF ', itime(if), &
+    WRITE (unit(i_f), '(a12)') 'UNDEF 1.0E30'
+    WRITE (unit(i_f), '(a5,1x,a40)') 'TITLE ', title(i_f)
+    CALL formcoord(unit(i_f), im, xd(iii,i_f), 1., .FALSE., 'XDEF')
+    CALL formcoord(unit(i_f), jm, yd(iji,i_f), 1., .TRUE., 'YDEF')
+    CALL formcoord(unit(i_f), lm, zd(1,i_f), 1., .FALSE., 'ZDEF')
+    WRITE (unit(i_f), '(a4,i10,a30)') 'TDEF ', itime(i_f), &
       ' LINEAR 02JAN1987 1MO '
-    WRITE (unit(if), '(a4,2x,i5)') 'VARS', nvar(if)
-    DO iv = 1, nvar(if)
-      ! print*,'if,var(iv,if),nld(iv,if),nld(iv,if)-1/nld(iv,if)'
-      ! print*,if,var(iv,if),nld(iv,if),nld(iv,if)-1/nld(iv,if)
-      WRITE (unit(if), 1000) var(iv, if), nld(iv, if) - 1/nld(iv, if), 99, &
-        tvar(iv, if)
+    WRITE (unit(i_f), '(a4,2x,i5)') 'VARS', nvar(i_f)
+    DO iv = 1, nvar(i_f)
+      ! print*,'i_f,var(iv,i_f),nld(iv,i_f),nld(iv,i_f)-1/nld(iv,i_f)'
+      ! print*,i_f,var(iv,i_f),nld(iv,i_f),nld(iv,i_f)-1/nld(iv,i_f)
+      WRITE (unit(i_f), 1000) var(iv, i_f), nld(iv, i_f) - 1/nld(iv, i_f), 99, &
+        tvar(iv, i_f)
     END DO
-    WRITE (unit(if), '(a7)') 'ENDVARS'
+    WRITE (unit(i_f), '(a7)') 'ENDVARS'
 
 1000 FORMAT (A5, 3X, I4, I3, 1X, A39)
 
-    CLOSE (unit(if))
+    CLOSE (unit(i_f))
 
   END IF ! writectl
 

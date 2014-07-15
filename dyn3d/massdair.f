@@ -11,25 +11,22 @@ contains
     ! Calcule la masse d'air dans chaque maille.
     ! Authors: P. Le Van, F. Hourdin
 
-    USE comgeom, ONLY: airesurg
-    USE dimens_m, ONLY: iim, llm
-    USE paramet_m, ONLY: iip1, ip1jmp1, llmp1
+    USE comgeom, ONLY: airesurg_2d
+    USE dimens_m, ONLY: iim, jjm, llm
 
-    REAL, intent(in):: p(ip1jmp1, llmp1) ! aux interfaces des llm couches
-    real, intent(out):: masse(ip1jmp1, llm)
+    REAL, intent(in):: p(iim + 1, jjm + 1, llm + 1)
+    ! aux interfaces des llm couches
 
-    ! Variables locales
-    INTEGER l, ij
+    real, intent(out):: masse(iim + 1, jjm + 1, llm)
+
+    ! Local:
+    INTEGER l
 
     !----------------------------------------------------------
 
-    DO l = 1, llm
-       masse(:, l) = airesurg * (p(:, l) - p(:, l + 1))
-
-       DO ij = 1, ip1jmp1, iip1
-          masse(ij + iim, l) = masse(ij, l)
-       ENDDO
-    end DO
+    forall (l = 1: llm) masse(:iim, :, l) = airesurg_2d(:iim, :) &
+         * (p(:iim, :, l) - p(:iim, :, l + 1))
+    masse(iim + 1, :, :) = masse(1, :, :)
 
   END SUBROUTINE massdair
 

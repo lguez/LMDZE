@@ -30,7 +30,7 @@ contains
     real, intent(inout):: teta((iim + 1) * (jjm + 1), llm)
     REAL q(:, :, :, :) ! (iim + 1, jjm + 1, llm, nq)
     REAL, intent(inout):: ps((iim + 1) * (jjm + 1))
-    REAL masse((iim + 1) * (jjm + 1), llm)
+    REAL, intent(inout):: masse((iim + 1) * (jjm + 1), llm)
     REAL finvmaold((iim + 1) * (jjm + 1), llm)
     real, intent(in):: dt ! time step, in s
     LOGICAL, INTENT (IN) :: leapf

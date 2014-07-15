@@ -13,10 +13,11 @@ contains
 
   SUBROUTINE tau2alpha(type, pim, pjm, factt, taumin, taumax, alpha)
 
+    USE comgeom, ONLY : cu_2d, cv_2d, rlatu, rlatv
     use conf_guide_m, only: lat_min_guide, lat_max_guide
+    use dump2d_m, only: dump2d
     USE dimens_m, ONLY : iim
     USE nr_util, ONLY : pi
-    USE comgeom, ONLY : cu_2d, cv_2d, rlatu, rlatv
     USE serre, ONLY : clat, clon, grossismx, grossismy
 
     !   arguments :
@@ -71,7 +72,7 @@ contains
        END DO
        DO j = 1, jjm
           DO i = 1, iip1
-             dxdyv(i, j) = 0.5*(dxdys(i, j)+dxdys(i+1, j))
+             dxdyv(i, j) = 0.5*(dxdys(i, j)+dxdys(i, j + 1))
           END DO
        END DO
 

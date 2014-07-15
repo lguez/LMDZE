@@ -10,6 +10,7 @@ contains
 
     USE conf_guide_m, ONLY: guide_q, guide_t, guide_u, guide_v, ncep
     USE dimens_m, ONLY: iim, jjm, llm
+    use dump2d_m, only: dump2d
     USE netcdf, ONLY: nf90_get_var, nf90_inq_varid, nf90_nowrite, nf90_open
     USE paramet_m, ONLY: iip1, jjp1
     use reanalyse2nat_m, only: reanalyse2nat

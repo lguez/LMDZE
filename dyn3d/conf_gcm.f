@@ -113,6 +113,10 @@ contains
          'Il faut choisir un nombre de pas par jour multiple de "iphysiq".', &
          ierr = 1)
 
+    if (ok_guide .and. mod(day_step, 4 * iperiod) /= 0) call &
+         abort_gcm(modname = "conf_gcm", &
+         message = 'ok_guide day_step iperiod', ierr = 1)
+
     IF (grossismx < 1.) THEN
        PRINT *, 'Error: grossismx < 1'
        STOP 1

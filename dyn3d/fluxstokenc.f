@@ -15,7 +15,7 @@ contains
     USE tracstoke, ONLY: istdyn, istphy
 
     REAL pbaru(ip1jmp1, llm), pbarv(ip1jm, llm)
-    REAL masse(ip1jmp1, llm)
+    REAL, intent(in):: masse(ip1jmp1, llm)
     real, intent(in):: phi(ip1jmp1, llm)
     real, intent(in):: teta(ip1jmp1, llm)
     REAL, intent(in):: phis(ip1jmp1)
@@ -67,9 +67,7 @@ contains
     END DO
 
     !   selection de la masse instantannee des mailles avant le transport.
-    IF (itau == 0) THEN
-       CALL scopy(ip1jmp1*llm, masse, 1, massem, 1)
-    END IF
+    IF (itau == 0) massem = masse
 
     IF (mod(itau + 1, istdyn) == 0) THEN
        ! on advecte a ce pas de temps

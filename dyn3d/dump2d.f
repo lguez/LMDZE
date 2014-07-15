@@ -1,12 +1,17 @@
+module dump2d_m
+
+  IMPLICIT NONE
+
+contains
+
+SUBROUTINE dump2d(im, jm, z, nom_z)
 
 ! $Header: /home/cvsroot/LMDZ4/libf/dyn3d/dump2d.F,v 1.1.1.1 2004/05/19
 ! 12:53:05 lmdzadmin Exp $
 
-SUBROUTINE dump2d(im, jm, z, nom_z)
-  IMPLICIT NONE
   INTEGER im, jm
   REAL z(im, jm)
-  CHARACTER *80 nom_z
+  CHARACTER(len=*) nom_z
 
   INTEGER i, j, imin, illm, jmin, jllm
   REAL zmin, zllm
@@ -45,3 +50,5 @@ SUBROUTINE dump2d(im, jm, z, nom_z)
   END IF
   RETURN
 END SUBROUTINE dump2d
+
+end module dump2d_m

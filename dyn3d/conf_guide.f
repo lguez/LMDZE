@@ -20,7 +20,9 @@ module conf_guide_m
   LOGICAL:: guide_v = .true. ! gvidage de v
   LOGICAL:: guide_t = .true. ! guidage de T
   LOGICAL:: guide_q = .true. ! guidage de q
-  INTEGER:: online = 1 ! Index de controle du guide
+
+  logical:: online = .true. ! controle du guide
+  ! hors-ligne: x=x_rea
 
   ! Latitude min et max pour le rappel dans le cas ou on 'a les
   ! analyses que sur une bande de latitudes.

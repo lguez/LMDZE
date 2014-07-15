@@ -4,6 +4,7 @@
 !===========================================================================
 
       use dimens_m
+      use dump2d_m, only: dump2d
       use paramet_m
       use comconst
       use disvert_m
