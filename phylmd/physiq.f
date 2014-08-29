@@ -396,7 +396,7 @@ contains
     real zlongi
     REAL z_avant(klon), z_apres(klon), z_factor(klon)
     REAL za, zb
-    REAL zx_t, zx_qs, zdelta, zcor
+    REAL zx_t, zx_qs, zcor
     real zqsat(klon, llm)
     INTEGER i, k, iq, nsrf
     REAL, PARAMETER:: t_coup = 234.
@@ -743,7 +743,7 @@ contains
     julien = MOD(NINT(rdayvrai), 360)
     if (julien == 0) julien = 360
 
-    forall (k = 1: llm) zmasse(:, k) = (paprs(:, k)-paprs(:, k + 1)) / rg
+    forall (k = 1: llm) zmasse(:, k) = (paprs(:, k) - paprs(:, k + 1)) / rg
 
     ! Prescrire l'ozone :
     wo = ozonecm(REAL(julien), paprs)
@@ -931,18 +931,13 @@ contains
        dlw(i) = - 4. * RSIGMA * zxtsol(i)**3 
     ENDDO
 
-    ! Appeler la convection (au choix)
-
-    DO k = 1, llm
-       DO i = 1, klon
-          conv_q(i, k) = d_q_dyn(i, k) + d_q_vdf(i, k) / dtphys
-          conv_t(i, k) = d_t_dyn(i, k) + d_t_vdf(i, k) / dtphys
-       ENDDO
-    ENDDO
-
     IF (check) print *, "avantcon = ", qcheck(paprs, q_seri, ql_seri)
 
+    ! Appeler la convection (au choix)
+
     if (iflag_con == 2) then
+       conv_q = d_q_dyn + d_q_vdf / dtphys
+       conv_t = d_t_dyn + d_t_vdf / dtphys
        z_avant = sum((q_seri + ql_seri) * zmasse, dim=2)
        CALL conflx(dtphys, paprs, play, t_seri(:, llm:1:-1), &
             q_seri(:, llm:1:-1), conv_t, conv_q, zxfluxq(:, 1), omega, &
@@ -967,26 +962,14 @@ contains
        mfu = upwd + dnwd
        IF (.NOT. ok_gust) wd = 0.
 
-       ! Calcul des propri\'et\'es des nuages convectifs
+       IF (thermcep) THEN
+          zqsat = MIN(0.5, r2es * FOEEW(t_seri, rtt >= t_seri) / play)
+          zqsat = zqsat / (1. - retv * zqsat)
+       ELSE
+          zqsat = merge(qsats(t_seri), qsatl(t_seri), t_seri < t_coup) / play
+       ENDIF
 
-       DO k = 1, llm
-          DO i = 1, klon
-             IF (thermcep) THEN
-                zdelta = MAX(0., SIGN(1., rtt - t_seri(i, k)))
-                zqsat(i, k) = r2es * FOEEW(t_seri(i, k), zdelta) / play(i, k)
-                zqsat(i, k) = MIN(0.5, zqsat(i, k))
-                zqsat(i, k) = zqsat(i, k) / (1.-retv*zqsat(i, k))
-             ELSE
-                IF (t_seri(i, k) < t_coup) THEN
-                   zqsat(i, k) = qsats(t_seri(i, k))/play(i, k)
-                ELSE
-                   zqsat(i, k) = qsatl(t_seri(i, k))/play(i, k)
-                ENDIF
-             ENDIF
-          ENDDO
-       ENDDO
-
-       ! calcul des proprietes des nuages convectifs
+       ! Properties of convective clouds
        clwcon0 = fact_cldcon * clwcon0
        call clouds_gno(klon, llm, q_seri, zqsat, clwcon0, ptconv, ratqsc, &
             rnebcon0)
@@ -1225,8 +1208,7 @@ contains
        DO i = 1, klon
           zx_t = t_seri(i, k)
           IF (thermcep) THEN
-             zdelta = MAX(0., SIGN(1., rtt-zx_t))
-             zx_qs = r2es * FOEEW(zx_t, zdelta)/play(i, k)
+             zx_qs = r2es * FOEEW(zx_t, rtt >= zx_t)/play(i, k)
              zx_qs = MIN(0.5, zx_qs)
              zcor = 1./(1.-retv*zx_qs)
              zx_qs = zx_qs*zcor

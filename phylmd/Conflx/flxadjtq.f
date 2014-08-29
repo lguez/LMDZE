@@ -25,7 +25,8 @@ contains
     ! Local:
     REAL zcond(klon), zcond1
     REAL Z5alvcp, z5alscp, zalvdcp, zalsdcp
-    REAL zdelta, zcvm5, zldcp, zqsat, zcor
+    logical zdelta
+    real zcvm5, zldcp, zqsat, zcor
     INTEGER is, i
 
     !---------------------------------------------------------------------
@@ -41,9 +42,9 @@ contains
 
     DO i = 1, klon
        IF (ldflag(i)) THEN
-          zdelta = MAX(0., SIGN(1., RTT-pt(i)))
-          zcvm5 = z5alvcp*(1.-zdelta) + zdelta*z5alscp
-          zldcp = zalvdcp*(1.-zdelta) + zdelta*zalsdcp
+          zdelta = RTT >= pt(i)
+          zcvm5 = merge(z5alscp, z5alvcp, zdelta)
+          zldcp = merge(zalsdcp, zalvdcp, zdelta)
           zqsat = R2ES * FOEEW(pt(i), zdelta) / pp(i)
           zqsat = MIN(0.5, zqsat)
           zcor = 1./(1.-RETV*zqsat)
@@ -64,9 +65,9 @@ contains
     IF (is /= 0) then
        DO i = 1, klon
           IF(ldflag(i).AND.zcond(i).NE.0.) THEN
-             zdelta = MAX(0., SIGN(1., RTT-pt(i)))
-             zcvm5 = z5alvcp*(1.-zdelta) + zdelta*z5alscp
-             zldcp = zalvdcp*(1.-zdelta) + zdelta*zalsdcp
+             zdelta = RTT >= pt(i)
+             zcvm5 = merge(z5alscp, z5alvcp, zdelta)
+             zldcp = merge(zalsdcp, zalvdcp, zdelta)
              zqsat = R2ES* FOEEW(pt(i), zdelta) / pp(i)
              zqsat = MIN(0.5, zqsat)
              zcor = 1./(1.-RETV*zqsat)

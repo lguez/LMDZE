@@ -31,7 +31,7 @@ SUBROUTINE laplacien_gam(klevel, cuvsga, cvusga, unsaigam, unsapolnga, &
 
   ! ...........    variables  locales    .................
 
-  REAL ghy(ip1jm, llm), ghx(ip1jmp1, llm)
+  REAL ghy(ip1jm, klevel), ghx(ip1jmp1, klevel)
   ! ......................................................
 
   CALL scopy(ip1jmp1*klevel, teta, 1, divgra, 1)

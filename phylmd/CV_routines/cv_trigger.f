@@ -1,6 +1,6 @@
 
       SUBROUTINE cv_trigger(len,nd,icb,cbmf,tv,tvp,iflag)
-            use cvparam
+            use cv_param
       implicit none
 
 !-------------------------------------------------------------------
@@ -12,7 +12,7 @@
 
 ! inputs:
        integer, intent(in):: len, nd, icb(len)
-       real cbmf(len), tv(len,nd), tvp(len,nd)
+       real, intent(in):: cbmf(len), tv(len,nd), tvp(len,nd)
 
 ! outputs:
        integer iflag(len) ! also an input

@@ -69,7 +69,6 @@ cvflag.f
 cvltr.f
 cv_mixing.f
 cv_param.f
-cvparam.f
 cv_prelim.f
 cv_thermo.f
 cvthermo.f

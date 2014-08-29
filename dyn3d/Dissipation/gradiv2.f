@@ -12,7 +12,7 @@ contains
 
     USE comgeom, ONLY: cuvscvgam1, cvuscugam1, unsair_gam1, unsapolnga1, &
          unsapolsga1
-    USE dimens_m, ONLY: iim, jjm, llm
+    USE dimens_m, ONLY: iim, jjm
     use divergf_m, only: divergf
     USE filtreg_m, ONLY: filtreg
     use grad_m, only: grad
@@ -29,7 +29,7 @@ contains
     real, intent(in):: cdivu
 
     ! Variables locales :
-    REAL nugrads, div(iim + 1, jjm + 1, llm)
+    REAL nugrads, div(iim + 1, jjm + 1, size(xcov, 3))
     INTEGER iter, klevel
 
     !--------------------------------------------------------------
@@ -47,7 +47,7 @@ contains
        CALL laplacien(klevel, div)
 
        ! Itération de l'opérateur laplacien_gam
-       DO iter = 1, ld -2
+       DO iter = 1, ld - 2
           CALL laplacien_gam(klevel, cuvscvgam1, cvuscugam1, unsair_gam1, &
                unsapolnga1, unsapolsga1, div, div)
        END DO

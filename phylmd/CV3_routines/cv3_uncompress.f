@@ -4,46 +4,48 @@ module cv3_uncompress_m
 
 contains
 
-  SUBROUTINE cv3_uncompress(nloc, len, ncum, nd, idcum, iflag, precip, &
-       VPrecip, sig, w0, ft, fq, fu, fv, inb, Ma, upwd, dnwd, dnwd0, qcondc, &
-       wd, cape, da, phi, mp, iflag1, precip1, VPrecip1, sig1, w01, ft1, fq1, &
-       fu1, fv1, inb1, Ma1, upwd1, dnwd1, dnwd01, qcondc1, wd1, cape1, da1, &
-       phi1, mp1)
+  SUBROUTINE cv3_uncompress(idcum, iflag, precip, VPrecip, sig, w0, ft, fq, &
+       fu, fv, inb, Ma, upwd, dnwd, dnwd0, qcondc, wd, cape, da, phi, mp, &
+       iflag1, precip1, VPrecip1, sig1, w01, ft1, fq1, fu1, fv1, inb1, Ma1, &
+       upwd1, dnwd1, dnwd01, qcondc1, wd1, cape1, da1, phi1, mp1)
 
     USE cv3_param_m, ONLY: nl
+    use dimphy, only: klon, klev
 
     ! inputs:
-    integer, intent(in):: nloc, len, ncum, nd
-    integer, intent(in):: idcum(nloc)
-    integer, intent(in):: iflag(nloc)
-    real, intent(in):: precip(nloc)
-    real, intent(in):: VPrecip(nloc, nd+1)
-    real, intent(in):: sig(nloc, nd), w0(nloc, nd)
-    real, intent(in):: ft(nloc, nd), fq(nloc, nd), fu(nloc, nd), fv(nloc, nd)
-    integer, intent(in):: inb(nloc)
-    real, intent(in):: Ma(nloc, nd)
-    real, intent(in):: upwd(nloc, nd), dnwd(nloc, nd), dnwd0(nloc, nd)
-    real, intent(in):: qcondc(nloc, nd)
-    real, intent(in):: wd(nloc), cape(nloc)
-    real, intent(in):: da(nloc, nd), phi(nloc, nd, nd), mp(nloc, nd)
+    integer, intent(in):: idcum(:) ! (ncum)
+    integer, intent(in):: iflag(klon)
+    real, intent(in):: precip(klon)
+    real, intent(in):: VPrecip(klon, klev+1)
+    real, intent(in):: sig(klon, klev), w0(klon, klev)
+    real, intent(in), dimension(klon, klev):: ft, fq, fu, fv
+    integer, intent(in):: inb(klon)
+    real, intent(in):: Ma(klon, klev)
+    real, intent(in):: upwd(klon, klev), dnwd(klon, klev), dnwd0(klon, klev)
+    real, intent(in):: qcondc(klon, klev)
+    real, intent(in):: wd(klon), cape(klon)
+    real, intent(in):: da(klon, klev), phi(klon, klev, klev), mp(klon, klev)
 
     ! outputs:
-    integer iflag1(len)
-    real precip1(len)
-    real VPrecip1(len, nd+1)
-    real sig1(len, nd), w01(len, nd)
-    real ft1(len, nd), fq1(len, nd), fu1(len, nd), fv1(len, nd)
-    integer inb1(len)
-    real Ma1(len, nd)
-    real upwd1(len, nd), dnwd1(len, nd), dnwd01(len, nd)
-    real qcondc1(nloc, nd)
-    real wd1(nloc), cape1(nloc)
-    real, intent(inout):: da1(nloc, nd), phi1(nloc, nd, nd), mp1(nloc, nd)
+    integer iflag1(klon)
+    real precip1(klon)
+    real VPrecip1(klon, klev+1)
+    real sig1(klon, klev), w01(klon, klev)
+    real ft1(klon, klev), fq1(klon, klev), fu1(klon, klev), fv1(klon, klev)
+    integer, intent(inout):: inb1(klon)
+    real Ma1(klon, klev)
+    real upwd1(klon, klev), dnwd1(klon, klev), dnwd01(klon, klev)
+    real qcondc1(klon, klev)
+    real wd1(klon), cape1(klon)
+    real, intent(inout):: da1(klon, klev), phi1(klon, klev, klev)
+    real, intent(inout):: mp1(klon, klev)
 
     ! local variables:
-    integer i, k, j
+    integer ncum, i, k, j
 
     !-------------------------------------------------------------------
+
+    ncum = size(idcum)
 
     do  i=1, ncum
        precip1(idcum(i))=precip(i)
@@ -73,11 +75,11 @@ contains
     end do
 
     do  i=1, ncum
-       sig1(idcum(i), nd)=sig(i, nd)
+       sig1(idcum(i), klev)=sig(i, klev)
     end do
 
-    do j=1, nd
-       do k=1, nd
+    do j=1, klev
+       do k=1, klev
           do i=1, ncum
              phi1(idcum(i), k, j)=phi(i, k, j)
           end do

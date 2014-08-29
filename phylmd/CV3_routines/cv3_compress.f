@@ -21,7 +21,7 @@ contains
     real, intent(in):: t1(len, nd)
     real, intent(in):: q1(len, nd), qs1(len, nd), u1(len, nd), v1(len, nd)
     real gz1(len, nd), h1(len, nd), lv1(len, nd), cpn1(len, nd)
-    real p1(len, nd), ph1(len, nd+1), tv1(len, nd), tp1(len, nd)
+    real, intent(in):: p1(len, nd), ph1(len, nd+1), tv1(len, nd), tp1(len, nd)
     real tvp1(len, nd), clw1(len, nd)
     real th1(len, nd)
     real sig1(len, nd), w01(len, nd)

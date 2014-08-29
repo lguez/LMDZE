@@ -117,8 +117,8 @@ contains
           zcvgt(i, k) = con_t(i, klev-k + 1)
           zcvgq(i, k) = con_q(i, klev-k + 1)
 
-          zqsat = MIN(0.5, R2ES * FOEEW(t(i, k), &
-               merge(0., 1., rtt < t(i, k))) / paprsf(i, k))
+          zqsat = MIN(0.5, R2ES * FOEEW(t(i, k), rtt >= t(i, k)) &
+               / paprsf(i, k))
           qsen(i, k) = zqsat / (1. - RETV * zqsat)
        ENDDO
     ENDDO

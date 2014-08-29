@@ -11,33 +11,21 @@ contains
 
     ! Calcul des composantes covariantes en x et y du gradient de g.
 
-    USE dimens_m, ONLY: iim
-    USE paramet_m, ONLY: iip1, ip1jm, ip1jmp1
+    USE dimens_m, ONLY: iim, jjm
 
     INTEGER, intent(in):: klevel
-    REAL, intent(in):: g(ip1jmp1, klevel)
-    REAL, intent(out):: gx(ip1jmp1, klevel) , gy(ip1jm, klevel)
+    REAL, intent(in):: g(iim + 1, jjm + 1, klevel)
+    REAL, intent(out):: gx(iim + 1, jjm + 1, klevel) , gy(iim + 1, jjm, klevel)
 
     ! Local:
-    INTEGER l, ij
+    INTEGER i, j
 
     !----------------------------------------------------------------
 
-    DO l = 1, klevel
-       DO ij = 1, ip1jmp1 - 1
-          gx(ij, l) = g(ij +1, l) - g(ij, l)
-       end DO
+    forall (i = 1:iim) gx(i, :, :) = g(i + 1, :, :) - g(i, :, :)
+    gx(iim + 1, :, :)= gx(1, :, :)
 
-       ! correction pour gx(ip1, j, l)
-       ! gx(iip1, j, l)= gx(1, j, l)
-       DO ij = iip1, ip1jmp1, iip1
-          gx(ij, l) = gx(ij -iim, l)
-       end DO
-
-       DO ij = 1, ip1jm
-          gy(ij, l) = g(ij, l) - g(ij +iip1, l)
-       end DO
-    end DO
+    forall (j = 1:jjm) gy(:, j, :) = g(:, j, :) - g(:, j + 1, :)
 
   END SUBROUTINE grad
 

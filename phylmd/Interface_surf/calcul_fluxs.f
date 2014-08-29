@@ -75,7 +75,8 @@ contains
     real, dimension(klon) :: zx_pkh, zx_dq_s_dt, zx_qsat, zx_coef
     real, dimension(klon) :: zx_sl, zx_k1
     real, dimension(klon) :: zx_q_0 , d_ts
-    real :: zdelta, zcvm5, zx_qs, zcor, zx_dq_s_dh
+    logical zdelta
+    real zcvm5, zx_qs, zcor, zx_dq_s_dh
     real :: bilan_f, fq_fonte
     REAL :: subli, fsno
     REAL :: qsat_new, q1_new
@@ -120,8 +121,8 @@ contains
     DO i = 1, knon
        zx_pkh(i) = (ps(i)/ps(i))**RKAPPA
        IF (thermcep) THEN
-          zdelta=MAX(0., SIGN(1., rtt-tsurf(i)))
-          zcvm5 = R5LES*RLVTT*(1.-zdelta) + R5IES*RLSTT*zdelta
+          zdelta= rtt >= tsurf(i)
+          zcvm5 = merge(R5IES*RLSTT, R5LES*RLVTT, zdelta)
           zcvm5 = zcvm5 / RCPD / (1.0+RVTMP2*q1lay(i))
           zx_qs= r2es * FOEEW(tsurf(i), zdelta)/ps(i)
           zx_qs=MIN(0.5, zx_qs)

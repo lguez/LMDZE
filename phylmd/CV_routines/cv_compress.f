@@ -8,18 +8,18 @@
          ,cbmf,plcl,tnk,qnk,gznk &
          ,t,q,qs,u,v,gz,h,lv,cpn,p,ph,tv,tp,tvp,clw  &
          ,dph          )
-            use cvparam
+            use cv_param
       implicit none
 
 
 ! inputs:
       integer, intent(in):: len,ncum,nd,nloc
       integer iflag1(len),nk1(len),icb1(len)
-      real cbmf1(len),plcl1(len),tnk1(len),qnk1(len),gznk1(len)
+      real, intent(in):: cbmf1(len),plcl1(len),tnk1(len),qnk1(len),gznk1(len)
       real, intent(in):: t1(len,nd)
       real, intent(in):: q1(len,nd),qs1(len,nd),u1(len,nd),v1(len,nd)
       real gz1(len,nd),h1(len,nd),lv1(len,nd),cpn1(len,nd)
-      real p1(len,nd),ph1(len,nd+1),tv1(len,nd),tp1(len,nd)
+      real, intent(in):: p1(len,nd),ph1(len,nd+1),tv1(len,nd),tp1(len,nd)
       real tvp1(len,nd),clw1(len,nd)
 
 ! outputs:

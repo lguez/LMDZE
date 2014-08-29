@@ -34,7 +34,7 @@ contains
     ! Variables locales:
     INTEGER i, k, kb, invb(klon)
     REAL zqs, zrhb, zcll, zdthmin(klon), zdthdp
-    REAL zdelta, zcor
+    REAL zcor
 
     !-----------------------------------------------------------
 
@@ -67,8 +67,7 @@ contains
     DO i = 1, klon
        kb=invb(i)
        IF (thermcep) THEN
-          zdelta=MAX(0., SIGN(1., RTT-t(i, kb)))
-          zqs= R2ES*FOEEW(t(i, kb), zdelta)/pplay(i, kb)
+          zqs= R2ES*FOEEW(t(i, kb), RTT >= t(i, kb))/pplay(i, kb)
           zqs=MIN(0.5, zqs)
           zcor=1./(1.-RETV*zqs)
           zqs=zqs*zcor

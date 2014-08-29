@@ -49,7 +49,7 @@ contains
 
     ! Local:
     REAL cevapcu(klev)
-    REAL ztmsmlt, zdelta, zqsat
+    REAL ztmsmlt, zqsat
 
     !jq The variable maxpdmfdp(klon) has been introduced by Olivier Boucher
     !jq 14/11/00 to fix the problem with the negative precipitation.
@@ -160,8 +160,7 @@ contains
                 zsnmlt=MIN(pmflxs(i, k), zfac*(pten(i, k)-ztmelp2))
                 pdpmel(i, k)=zsnmlt
                 ztmsmlt=pten(i, k)-zsnmlt/zfac
-                zdelta=MAX(0., SIGN(1., RTT-ztmsmlt))
-                zqsat = R2ES * FOEEW(ztmsmlt, zdelta) / pap(i, k)
+                zqsat = R2ES * FOEEW(ztmsmlt, RTT >= ztmsmlt) / pap(i, k)
                 zqsat = MIN(0.5, zqsat)
                 zqsat = zqsat / (1. - RETV * zqsat)
                 pqsen(i, k) = zqsat

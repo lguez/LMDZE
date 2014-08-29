@@ -198,7 +198,7 @@ contains
     REAL zm(klon)
     ! current level height + one level up
     REAL zp(klon)
-    REAL zcor, zdelta, zcvm5
+    REAL zcor, zcvm5
 
     REAL fac, pblmin, zmzp, term
 
@@ -520,8 +520,7 @@ contains
              if (.not. Zsat(i)) then
                 T2 = T2m(i) * s(i, k)
                 ! thermodyn functions
-                zdelta=MAX(0., SIGN(1., RTT - T2))
-                qqsat= r2es * FOEEW(T2, zdelta) / pplay(i, k)
+                qqsat= r2es * FOEEW(T2, RTT >= T2) / pplay(i, k)
                 qqsat=MIN(0.5, qqsat)
                 zcor=1./(1.-retv*qqsat)
                 qqsat=qqsat*zcor

@@ -3,7 +3,7 @@
                            ,tv,tvp,p,ph,dph,plcl,cpn &
                            ,iflag,cbmf)
             use cvthermo
-            use cvparam
+            use cv_param
       implicit none
 
 ! inputs:

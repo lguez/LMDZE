@@ -2,7 +2,7 @@
       SUBROUTINE cv_prelim(len,nd,ndp1,t,q,p,ph &
                           ,lv,cpn,tv,gz,h,hm)
             use cvthermo
-            use cvparam
+            use cv_param
       implicit none
 
 !=====================================================================
@@ -12,7 +12,7 @@
 ! inputs:
       integer, intent(in):: len, nd, ndp1
       real, intent(in):: t(len,nd)
-      real q(len,nd), p(len,nd), ph(len,ndp1)
+      real, intent(in):: q(len,nd), p(len,nd), ph(len,ndp1)
 
 ! outputs:
       real lv(len,nd), cpn(len,nd), tv(len,nd)

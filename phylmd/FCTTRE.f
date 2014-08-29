@@ -13,22 +13,22 @@ module FCTTRE
 
   implicit none
 
-  LOGICAL, PARAMETER:: thermcep= .TRUE.
+  LOGICAL, PARAMETER:: thermcep = .TRUE.
 
 contains
 
-  REAL function FOEEW(T, DEL)
+  elemental REAL function FOEEW(T, DEL)
 
     use yoethf_m, only: R3LES, R3IES, R4LES, R4IES
     use SUPHEC_M, only: rtt
 
     REAL, intent(in):: T
-    REAL, intent(in):: DEL ! 1 for ice, 0 for liquid
+    logical, intent(in):: DEL ! ice, else liquid
 
     !-----------------------
 
-    FOEEW = EXP((R3LES * (1. - DEL) + R3IES * DEL) * (T - RTT) &
-         / (T - (R4LES * (1. - DEL) + R4IES * DEL)))
+    FOEEW = exp(merge(R3IES / (T - R4IES), R3lES / (T - R4lES), del) &
+         * (T - RTT))
 
   end function FOEEW
 
@@ -38,37 +38,38 @@ contains
 
     use yoethf_m, only: R4LES, R4IES
 
-    REAL, intent(in):: T, DEL
+    REAL, intent(in):: T
+    logical, intent(in):: DEL ! ice, else liquid
     real, intent(in):: P5ARG, QS, PCOARG
 
     !-----------------------
 
-    FOEDE = QS*PCOARG*P5ARG / (T-(R4LES*(1.-DEL)+R4IES*DEL))**2
+    FOEDE = QS * PCOARG * P5ARG / (T - merge(R4IES, R4lES, del))**2
 
   end function FOEDE
 
   !******************************************
 
-  REAL function qsats(t)
+  elemental REAL function qsats(t)
 
     REAL, intent(in):: T
 
     !-----------------------
 
-    qsats = 100.0 * 0.622 &
+    qsats = 100. * 0.622 &
          * 10.**(2.07023 - 0.00320991 * t - 2484.896 / t + 3.56654 * LOG10(t))
 
   end function qsats
 
   !******************************************
 
-  REAL function qsatl(t)
+  elemental REAL function qsatl(t)
 
     REAL, intent(in):: T
 
     !-----------------------
 
-    qsatl = 100.0 * 0.622 * 10.**(23.8319 - 2948.964 / t &
+    qsatl = 100. * 0.622 * 10.**(23.8319 - 2948.964 / t &
          - 5.028 * LOG10(t) - 29810.16 * EXP(- 0.0699382 * t) &
          + 25.21935 * EXP(- 2999.924 / t))
 

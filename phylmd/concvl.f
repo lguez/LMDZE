@@ -10,7 +10,7 @@ contains
 
     ! From phylmd/concvl.F, version 1.3 2005/04/15 12:36:17
     ! Author: Z. X. Li (LMD/CNRS)
-    ! Date: 1993/08/18
+    ! Date: 1993 August 18
     ! Objet : schéma de convection d'Emanuel (1991), interface
     ! (driver commun aux versions 3 et 4)
 
@@ -26,18 +26,14 @@ contains
     REAL, INTENT (IN):: paprs(klon, klev+1)
     REAL, INTENT (IN):: play(klon, klev)
     REAL, intent(in):: t(klon, klev)
-    real q(klon, klev) ! input vapeur d'eau (en kg/kg)
+    real, intent(in):: q(klon, klev) ! vapeur d'eau (en kg/kg)
     real, INTENT (IN):: u(klon, klev), v(klon, klev)
     REAL, intent(inout):: sig1(klon, klev), w01(klon, klev)
-
-    REAL d_t(klon, klev), d_q(klon, klev), d_u(klon, klev), d_v(klon, &
-         klev)
-    ! d_q-----output-R-increment de la vapeur d'eau
-
-    REAL rain(klon), snow(klon)
-    ! rain----output-R-la pluie (mm/s)
-    ! snow----output-R-la neige (mm/s)
-
+    REAL, intent(out):: d_t(klon, klev)
+    REAL, intent(out):: d_q(klon, klev) ! increment de la vapeur d'eau
+    REAL, intent(out):: d_u(klon, klev), d_v(klon, klev)
+    REAL, intent(out):: rain(klon) ! pluie (mm/s)
+    REAL, intent(out):: snow(klon) ! neige (mm/s)
     INTEGER kbas(klon), ktop(klon)
 
     REAL, intent(out):: upwd(klon, klev)
@@ -61,7 +57,7 @@ contains
     ! Local:
 
     REAL em_ph(klon, klev+1), em_p(klon, klev)
-    REAL zx_t, zdelta, zx_qs, zcor
+    REAL zx_t, zx_qs, zcor
     INTEGER i, k
     REAL qs(klon, klev)
     REAL, save:: cbmf(klon)
@@ -96,8 +92,7 @@ contains
        DO k = 1, klev
           DO i = 1, klon
              zx_t = t(i, k)
-             zdelta = max(0., sign(1., rtt-zx_t))
-             zx_qs = min(0.5, r2es*foeew(zx_t, zdelta)/em_p(i, k)/100.0)
+             zx_qs = min(0.5, r2es*foeew(zx_t, rtt >= zx_t)/em_p(i, k)/100.0)
              zcor = 1./(1.-retv*zx_qs)
              qs(i, k) = zx_qs*zcor
           END DO
@@ -108,8 +103,7 @@ contains
        DO k = 1, klev
           DO i = 1, klon
              zx_t = t(i, k)
-             zdelta = max(0., sign(1., rtt-zx_t))
-             zx_qs = r2es*foeew(zx_t, zdelta)/em_p(i, k)/100.0
+             zx_qs = r2es*foeew(zx_t, rtt >= zx_t)/em_p(i, k)/100.0
              zx_qs = min(0.5, zx_qs)
              zcor = 1./(1.-retv*zx_qs)
              zx_qs = zx_qs*zcor
@@ -118,7 +112,7 @@ contains
        END DO
     END IF
 
-    CALL cv_driver(klon, klev, t, q, qs, u, v, em_p, em_ph, iflag, d_t, d_q, &
+    CALL cv_driver(t, q, qs, u, v, em_p, em_ph, iflag, d_t, d_q, &
          d_u, d_v, rain, pmflxr, cbmf, sig1, w01, kbas, ktop, dtime, ma, &
          upwd, dnwd, dnwd0, qcondc, wd, cape, da, phi, mp)
 

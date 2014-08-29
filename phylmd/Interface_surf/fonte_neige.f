@@ -78,7 +78,8 @@ contains
     real, dimension(klon):: zx_pkh, zx_dq_s_dt, zx_qsat, zx_coef
     real, dimension(klon):: zx_sl, zx_k1
     real, dimension(klon):: d_ts
-    real zdelta, zcvm5, zx_qs, zcor, zx_dq_s_dh
+    logical zdelta
+    real zcvm5, zx_qs, zcor, zx_dq_s_dh
     real fq_fonte
     REAL bil_eau_s(knon) ! in kg m-2
     real snow_evap(klon) ! in kg m-2 s-1
@@ -96,8 +97,8 @@ contains
     DO i = 1, knon
        zx_pkh(i) = (ps(i)/ps(i))**RKAPPA
        IF (thermcep) THEN
-          zdelta=MAX(0., SIGN(1., rtt-tsurf(i)))
-          zcvm5 = R5LES*RLVTT*(1.-zdelta) + R5IES*RLSTT*zdelta
+          zdelta= rtt >= tsurf(i)
+          zcvm5 = merge(R5IES*RLSTT, R5LES*RLVTT, zdelta)
           zcvm5 = zcvm5 / RCPD / (1. + RVTMP2*q1lay(i))
           zx_qs= r2es * FOEEW(tsurf(i), zdelta)/ps(i)
           zx_qs=MIN(0.5, zx_qs)

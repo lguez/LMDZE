@@ -18,18 +18,16 @@ CONTAINS
     USE conf_gcm_m, ONLY: day_step, iperiod
     use conf_guide_m, only: conf_guide, guide_u, guide_v, guide_t, guide_q, &
          ncep, ini_anal, tau_min_u, tau_max_u, tau_min_v, tau_max_v, &
-         tau_min_t, tau_max_t, tau_min_q, tau_max_q, tau_min_p, tau_max_p, &
-         online
+         tau_min_t, tau_max_t, tau_min_q, tau_max_q, online
     USE dimens_m, ONLY: iim, jjm, llm
     USE disvert_m, ONLY: ap, bp, preff, presnivs
     use dump2d_m, only: dump2d
     USE exner_hyb_m, ONLY: exner_hyb
     USE inigrads_m, ONLY: inigrads
-    use massdair_m, only: massdair
     use netcdf, only: nf90_nowrite, nf90_close, nf90_inq_dimid
     use netcdf95, only: nf95_inquire_dimension, nf95_open
     use nr_util, only: pi
-    USE paramet_m, ONLY: iip1, ip1jm, ip1jmp1, jjp1, llmp1
+    USE paramet_m, ONLY: iip1, ip1jmp1, jjp1, llmp1
     USE q_sat_m, ONLY: q_sat
     use read_reanalyse_m, only: read_reanalyse
     USE serre, ONLY: clat, clon
@@ -67,7 +65,7 @@ CONTAINS
     ! alpha=1 signifie pas d'injection
     ! alpha=0 signifie injection totale
     REAL, save:: alpha_q(iim + 1, jjm + 1)
-    REAL, save:: alpha_t(iim + 1, jjm + 1), alpha_p(ip1jmp1)
+    REAL, save:: alpha_t(iim + 1, jjm + 1)
     REAL, save:: alpha_u(iim + 1, jjm + 1), alpha_v(iim + 1, jjm)
 
     INTEGER, save:: step_rea, count_no_rea
@@ -115,11 +113,10 @@ CONTAINS
 
           factt = dtvr * iperiod / daysec
 
-          CALL tau2alpha(3, iip1, jjm, factt, tau_min_v, tau_max_v, alpha_v)
-          CALL tau2alpha(2, iip1, jjp1, factt, tau_min_u, tau_max_u, alpha_u)
-          CALL tau2alpha(1, iip1, jjp1, factt, tau_min_t, tau_max_t, alpha_t)
-          CALL tau2alpha(1, iip1, jjp1, factt, tau_min_p, tau_max_p, alpha_p)
-          CALL tau2alpha(1, iip1, jjp1, factt, tau_min_q, tau_max_q, alpha_q)
+          CALL tau2alpha(3, factt, tau_min_v, tau_max_v, alpha_v)
+          CALL tau2alpha(2, factt, tau_min_u, tau_max_u, alpha_u)
+          CALL tau2alpha(1, factt, tau_min_t, tau_max_t, alpha_t)
+          CALL tau2alpha(1, factt, tau_min_q, tau_max_q, alpha_q)
 
           CALL dump2d(iip1, jjp1, aire, 'AIRE MAILLe ')
           CALL dump2d(iip1, jjp1, alpha_u, 'COEFF U ')
@@ -129,7 +126,7 @@ CONTAINS
           alpha_t = 0.
           alpha_u = 0.
           alpha_v = 0.
-          alpha_p = 0.
+          alpha_q = 0.
        END IF
 
        step_rea = 1

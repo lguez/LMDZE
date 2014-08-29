@@ -3,7 +3,7 @@
                         ,h,lv,ep,sigp,clw,m,ment,elij &
                         ,iflag,mp,qp,up,vp,wt,water,evap)
             use cvthermo
-            use cvparam
+            use cv_param
       implicit none
 
 

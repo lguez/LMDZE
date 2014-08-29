@@ -4,7 +4,7 @@
                           ,hp,tv,tvp,ep,clw,cbmf &
                           ,m,ment,qent,uent,vent,nent,sij,elij)
             use cvthermo
-            use cvparam
+            use cv_param
       implicit none
 
 

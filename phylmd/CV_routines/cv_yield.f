@@ -7,7 +7,7 @@
                    ,iflag,wd,qprime,tprime &
                    ,precip,cbmf,ft,fq,fu,fv,Ma,qcondc)
             use cvthermo
-            use cvparam
+            use cv_param
       implicit none
 
 

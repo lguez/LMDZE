@@ -4,7 +4,7 @@
                              ,p,dph,h,tv,lv &
                              ,inb,inb1,tp,tvp,clw,hp,ep,sigp,frac)
             use cvthermo
-            use cvparam
+            use cv_param
       implicit none
 
 !---------------------------------------------------------------------

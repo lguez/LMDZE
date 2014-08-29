@@ -2,7 +2,7 @@
       SUBROUTINE cv_undilute1(len,nd,t,q,qs,gz,p,nk,icb,icbmax &
                              ,tp,tvp,clw)
             use cvthermo
-            use cvparam
+            use cv_param
       implicit none
 
 
@@ -10,8 +10,8 @@
       integer, intent(in):: len, nd
       integer nk(len), icb(len), icbmax
       real, intent(in):: t(len,nd)
-      real q(len,nd), qs(len,nd), gz(len,nd)
-      real p(len,nd)
+      real, intent(in):: q(len,nd), qs(len,nd), gz(len,nd)
+      real, intent(in):: p(len,nd)
 
 ! outputs:
       real tp(len,nd), tvp(len,nd), clw(len,nd)

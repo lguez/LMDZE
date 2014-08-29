@@ -15,7 +15,7 @@ contains
     use caladvtrac_m, only: caladvtrac
     use caldyn_m, only: caldyn
     USE calfis_m, ONLY: calfis
-    USE comconst, ONLY: daysec, dtphys, dtvr
+    USE comconst, ONLY: daysec, dtvr
     USE comgeom, ONLY: aire_2d, apoln, apols
     USE disvert_m, ONLY: ap, bp
     USE conf_gcm_m, ONLY: day_step, iconser, iperiod, iphysiq, nday, offline, &

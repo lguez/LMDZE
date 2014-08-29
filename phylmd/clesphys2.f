@@ -38,15 +38,15 @@ contains
     use unit_nml_m, only: unit_nml
     use nr_util, only: assert
 
-    namelist /clesphys2_nml/cycle_diurne, soil_model, new_oliq, &
-         ok_orodr, ok_orolf, ok_limitvrai, nbapp_rad, iflag_con
+    namelist /clesphys2_nml/cycle_diurne, soil_model, new_oliq, ok_orodr, &
+         ok_orolf, ok_limitvrai, nbapp_rad, iflag_con
 
     !------------------------------------
 
     print *, "Enter namelist 'clesphys2_nml'."
     read(unit=*, nml=clesphys2_nml)
     write(unit_nml, nml=clesphys2_nml)
-    call assert(iflag_con >= 2, "read_clesphys2 iflag_con")
+    call assert(iflag_con >= 2 .and. iflag_con <= 4, "read_clesphys2 iflag_con")
 
   end subroutine read_clesphys2
 

@@ -84,7 +84,8 @@ contains
 
     REAL zdphi, zdu2, ztvd, ztvu, cdn
     REAL scf
-    REAL zt, zq, zdelta, zcvm5, zcor, zqs, zfr, zdqs
+    REAL zt, zq, zcvm5, zcor, zqs, zfr, zdqs
+    logical zdelta
     REAL z2geomf, zalh2, alm2, zscfh, scfm
     REAL, PARAMETER:: t_coup = 273.15
     REAL gamt(2:klev) ! contre-gradient pour la chaleur sensible: Kelvin/metre
@@ -151,9 +152,9 @@ contains
           ! calculer Qs et dQs/dT:
 
           IF (thermcep) THEN
-             zdelta = MAX(0., SIGN(1., RTT-zt))
-             zcvm5 = R5LES*RLVTT/RCPD/(1.0+RVTMP2*zq)*(1.-zdelta)  &
-                  + R5IES*RLSTT/RCPD/(1.0+RVTMP2*zq)*zdelta
+             zdelta = RTT >=zt
+             zcvm5 = merge(R5IES * RLSTT, R5LES * RLVTT, zdelta) / RCPD &
+                  / (1. + RVTMP2*zq)
              zqs = R2ES * FOEEW(zt, zdelta) / pplay(i, k)
              zqs = MIN(0.5, zqs)
              zcor = 1./(1.-RETV*zqs)

@@ -87,7 +87,8 @@ contains
     PARAMETER (t_coup=234.0)
 
     INTEGER i, k, n, kk
-    REAL zqs(klon), zdqs(klon), zdelta, zcor, zcvm5
+    REAL zqs(klon), zdqs(klon), zcor, zcvm5
+    logical zdelta
     REAL zrfl(klon), zrfln(klon), zqev, zqevt
     REAL zoliq(klon), zcond(klon), zq(klon), zqn(klon), zdelq
     REAL ztglace, zt(klon)
@@ -225,8 +226,7 @@ contains
           DO i = 1, klon
              IF (zrfl(i)>0.) THEN
                 IF (thermcep) THEN
-                   zdelta = max(0., sign(1., rtt-zt(i)))
-                   zqs(i) = r2es*foeew(zt(i), zdelta)/pplay(i, k)
+                   zqs(i) = r2es*foeew(zt(i), rtt >= zt(i))/pplay(i, k)
                    zqs(i) = min(0.5, zqs(i))
                    zcor = 1./(1.-retv*zqs(i))
                    zqs(i) = zqs(i)*zcor
@@ -264,8 +264,8 @@ contains
 
        IF (thermcep) THEN
           DO i = 1, klon
-             zdelta = max(0., sign(1., rtt-zt(i)))
-             zcvm5 = r5les*rlvtt*(1.-zdelta) + r5ies*rlstt*zdelta
+             zdelta = rtt >= zt(i)
+             zcvm5 = merge(r5ies*rlstt, r5les*rlvtt, zdelta)
              zcvm5 = zcvm5/rcpd/(1.0+rvtmp2*zq(i))
              zqs(i) = r2es*foeew(zt(i), zdelta)/pplay(i, k)
              zqs(i) = min(0.5, zqs(i))
