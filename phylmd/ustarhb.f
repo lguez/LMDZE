@@ -33,12 +33,9 @@ contains
 
     REAL ustar(klon)
 
-    INTEGER i, k
-    REAL zxt, zxq, zxu, zxv, zxmod, taux, tauy
+    INTEGER i
+    REAL zxu, zxv, zxmod, taux, tauy
     REAL zx_alf1, zx_alf2 ! parametres pour extrapolation
-    LOGICAL unssrf(klon)  ! unstb pbl w/lvls within srf pbl lyr
-    LOGICAL unsout(klon)  ! unstb pbl w/lvls in outer pbl lyr
-    LOGICAL check(klon)   ! True=>chk if Richardson no.>critcal
 
     !---------------------------------------------------------------
 

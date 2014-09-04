@@ -32,7 +32,7 @@ SUBROUTINE pres2lev(varo, varn, lmo, lmn, po, pn, ni, nj)
   INTEGER ni, nj
   REAL pn(ni, nj, lmn) ! niveau de pression en pascals
 
-  INTEGER i, j, nhoriz ! nombre de point horizontale (input)
+  INTEGER i, j ! nombre de point horizontale (input)
 
   REAL varo(ni, nj, lmo) ! var dans l'ancienne grille (input)
   REAL varn(ni, nj, lmn) ! var dans la nouvelle grille (output)
@@ -41,7 +41,7 @@ SUBROUTINE pres2lev(varo, varn, lmo, lmn, po, pn, ni, nj)
 
   ! Autres variables
   ! """"""""""""""""
-  INTEGER n, ln, lo
+  INTEGER ln, lo
   REAL coef
 
   ! run

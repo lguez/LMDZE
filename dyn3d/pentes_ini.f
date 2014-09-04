@@ -53,7 +53,7 @@ SUBROUTINE pentes_ini(q, w, masse, pbaru, pbarv, mode)
   REAL dyn1, dyn2, dys1, dys2
   REAL qpn, qps, dqzpn, dqzps
   REAL smn, sms, s0n, s0s, sxn(iip1), sxs(iip1)
-  REAL qmin, zq, pente_max
+  REAL qmin, pente_max
 
   REAL ssum
   INTEGER ismax, ismin, lati, latf

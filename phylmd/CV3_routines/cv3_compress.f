@@ -39,7 +39,7 @@ contains
     real sig(nloc, nd), w0(nloc, nd)
 
     ! local variables:
-    integer i, k, nn, j
+    integer i, k, nn
 
 
     do  k=1, nl+1

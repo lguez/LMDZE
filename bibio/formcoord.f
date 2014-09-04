@@ -7,7 +7,7 @@ SUBROUTINE formcoord(unit, n, x, a, rev, text)
   INTEGER n, unit, ndec
   LOGICAL rev
   REAL x(n), a
-  CHARACTER *4 text
+  CHARACTER(len=4) text
 
   INTEGER i, id, i1, i2, in
   REAL dx, dxmin

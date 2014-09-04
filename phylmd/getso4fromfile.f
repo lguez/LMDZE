@@ -20,7 +20,7 @@ contains
 
     CHARACTER(len=15) fname
 
-    CHARACTER*6 cvar
+    CHARACTER(len=6) cvar
     INTEGER START(3), COUNT(3)
     INTEGER  NCID, VARID
     INTEGER imth, i, j, k

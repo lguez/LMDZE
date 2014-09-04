@@ -78,12 +78,7 @@
 !*         1.    initialization
 !                --------------
 
-100   CONTINUE
-
 !*         3.1     gravity wave stress.
-
-300   CONTINUE
-
 
       DO 301 jl = 1, klon
         IF (ktest(jl)==1) THEN

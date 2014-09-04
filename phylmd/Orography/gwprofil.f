@@ -38,7 +38,7 @@ contains
 
     ! 0.2 LOCAL ARRAYS
 
-    INTEGER ilevh, ji, kgwd, jl, jk
+    INTEGER ilevh, kgwd, jl, jk
     REAL zsqr, zalfa, zriw, zdel, zb, zalpha, zdz2n
     REAL zdelp, zdelpt
     REAL zdz2(klon, klev), znorm(klon), zoro(klon)

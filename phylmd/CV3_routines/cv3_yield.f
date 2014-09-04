@@ -52,7 +52,7 @@ contains
     ! local variables:
     integer i,k,il,n,j,num1
     real rat, awat, delti
-    real ax, bx, cx, dx, ex
+    real ax, bx, cx, dx
     real cpinv, rdcp, dpinv
     real lvcp(nloc,na), mke(nloc,na)
     real am(nloc), work(nloc), ad(nloc), amp1(nloc)

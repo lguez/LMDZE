@@ -49,7 +49,6 @@ contains
     REAL tmou(3) ! resolved mountain torque (3 components)
     REAL tsso(3) ! parameterised moutain drag torque (3 components)
     REAL tbls(3) ! parameterised boundary layer torque (3 components)
-    integer iax
 
     REAL ZS(801, 401) ! topographic height
     REAL PS(801, 401) ! surface pressure 

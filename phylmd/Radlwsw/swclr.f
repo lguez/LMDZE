@@ -65,7 +65,7 @@ SUBROUTINE swclr(knu, paer, flag_aer, tauae, pizae, cgae, palbp, pdsig, &
   DOUBLE PRECISION zscat(kdlon)
   DOUBLE PRECISION ztr(kdlon, 2, kflev+1)
 
-  INTEGER jl, jk, ja, jae, jkl, jklp1, jaj, jkm1, in
+  INTEGER jl, jk, ja, jkl, jklp1, jaj, jkm1, in
   DOUBLE PRECISION ztray, zgar, zratio, zff, zfacoa, zcorae
   DOUBLE PRECISION zmue, zgap, zww, zto, zden, zmu1, zden1
   DOUBLE PRECISION zbmu0, zbmu1, zre11

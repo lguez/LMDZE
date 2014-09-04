@@ -74,7 +74,7 @@ contains
     LOGICAL, PARAMETER:: opt_ec = .FALSE.
     ! formule du Centre Europeen dans l'atmosphere
 
-    INTEGER i, k, kk
+    INTEGER i, k
     REAL zgeop(klon, klev)
     REAL zmgeom(klon)
     REAL ri(klon)

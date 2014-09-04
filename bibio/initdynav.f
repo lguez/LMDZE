@@ -35,7 +35,7 @@ contains
     ! Variables locales
     integer horiid, zvertiid
     real julian
-    integer iq, ii, jj, l
+    integer iq, l
 
     !----------------------------------------------------
 

@@ -43,7 +43,7 @@ SUBROUTINE advzp(limit, dtz, w, sm, s0, ssx, sy, sz, ssxx, ssxy, ssxz, syy, &
   ! parbu,pbarv : flux de masse en x et y en Pa.m2.s-1
 
   INTEGER lon, lat, niv
-  INTEGER i, j, jv, k, kp, l, lp
+  INTEGER i, j, jv, k, l, lp
   INTEGER ntra
   ! PARAMETER (ntra = 1)
 
@@ -90,8 +90,6 @@ SUBROUTINE advzp(limit, dtz, w, sm, s0, ssx, sy, sz, ssxx, ssxy, ssxz, syy, &
   REAL fxx(iim, llm, ntra), fxy(iim, llm, ntra)
   REAL fxz(iim, llm, ntra), fyy(iim, llm, ntra)
   REAL fyz(iim, llm, ntra), fzz(iim, llm, ntra)
-  REAL s00(ntra)
-  REAL sm0 ! Just temporal variable
 
   ! work arrays
 

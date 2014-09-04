@@ -38,9 +38,8 @@
       Logical first,testcpu
       SAVE first,testcpu
 
-      REAL      SSUM
-      REAL temps0,temps1,temps2,temps3,temps4,temps5
-      SAVE temps0,temps1,temps2,temps3,temps4,temps5
+      REAL temps1,temps2,temps3,temps4,temps5
+      SAVE temps1,temps2,temps3,temps4,temps5
 
 
       DATA first,testcpu/.true.,.false./

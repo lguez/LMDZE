@@ -48,9 +48,7 @@ contains
     INTEGER j, iday, ny, iyr, iyr1, iyr2
     parameter (ny=jjm+1)
 
-    INTEGER ismaller
-    !JLD      INTEGER idec1, idec2 ! The two decadal data read ini
-    CHARACTER*4 cyear
+    CHARACTER(len=4) cyear
 
     INTEGER im, day1, day2, im2
     double precision so4_1(iim, jjm+1, klev, 12)

@@ -24,7 +24,7 @@ contains
 
     ! Local:
     INTEGER ncid, varid
-    INTEGER iret, ndim, iv, itx, ziv
+    INTEGER ndim, iv, itx, ziv
     INTEGER itax
     INTEGER dims(4), dim_cnt
     INTEGER year, month, day, hours, minutes

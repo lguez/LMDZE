@@ -77,8 +77,7 @@ contains
     real thetath2(klon, klev), wth2(klon, klev)
     common/comtherm/thetath2, wth2
 
-    real count_time
-    integer isplit, nsplit, ialt
+    integer isplit, nsplit
     parameter (nsplit=10)
     data isplit/0/
     save isplit
@@ -90,33 +89,31 @@ contains
     real wmax(klon), wmaxa(klon)
     real wa(klon, klev, klev+1)
     real wd(klon, klev+1)
-    real larg_part(klon, klev, klev+1)
     real fracd(klon, klev+1)
     real xxx(klon, klev+1)
     real larg_cons(klon, klev+1)
     real larg_detr(klon, klev+1)
     real fm0(klon, klev+1), entr0(klon, klev), detr(klon, klev)
-    real pu_therm(klon, klev), pv_therm(klon, klev)
     real fm(klon, klev+1), entr(klon, klev)
     real fmc(klon, klev+1)
 
     !CR:nouvelles variables
     real f_star(klon, klev+1), entr_star(klon, klev)
     real entr_star_tot(klon), entr_star2(klon)
-    real f(klon), f0(klon)
+    real f(klon)
     real zlevinter(klon)
     logical first
     data first /.false./
     save first
 
-    character*2 str2
-    character*10 str10
+    character(len=2) str2
+    character(len=10) str10
 
-    LOGICAL vtest(klon), down
+    LOGICAL vtest(klon)
 
     EXTERNAL SCOPY
 
-    integer ncorrec, ll
+    integer ncorrec
     save ncorrec
     data ncorrec/0/
 

@@ -42,7 +42,7 @@ SUBROUTINE readsulfate_preind (r_day, first, pi_sulfate)
   INTEGER j, iday, ny, iyr
   parameter (ny=jjm+1)
 
-  INTEGER im, day1, day2, im2, ismaller
+  INTEGER im, day1, day2, im2
   double precision pi_so4_1(iim, jjm+1, klev, 12)
 
   double precision pi_so4(klon, klev, 12)  ! SO4 in right dimension
@@ -50,7 +50,7 @@ SUBROUTINE readsulfate_preind (r_day, first, pi_sulfate)
   double precision pi_so4_out(klon, klev)
   SAVE pi_so4_out
 
-  CHARACTER*4 cyear
+  CHARACTER(len=4) cyear
   LOGICAL lnewday
 
 

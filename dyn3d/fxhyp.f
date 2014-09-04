@@ -58,8 +58,6 @@ contains
     INTEGER is2
     SAVE is2
 
-    DOUBLE PRECISION heavyside
-
     !----------------------------------------------------------------------
 
     pi = 2. * ASIN(1.)

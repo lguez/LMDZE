@@ -55,7 +55,7 @@ SUBROUTINE nuage (paprs, pplay, &
   PARAMETER (cetahb = 0.45, cetamb = 0.80)
   !
   INTEGER i, k
-  REAL zflwp, zradef, zfice, zmsac
+  REAL zflwp, zfice
   !
   REAL radius, rad_froid, rad_chaud, rad_chau1, rad_chau2
   PARAMETER (rad_chau1=13.0, rad_chau2=9.0, rad_froid=35.0)
@@ -78,7 +78,6 @@ SUBROUTINE nuage (paprs, pplay, &
   REAL re(klon, klev)       ! cloud droplet effective radius [um]
   REAL sulfate_pi(klon, klev)  ! sulfate aerosol mass concentration [ug m-3] (pre-industrial value)
   REAL cdnc_pi(klon, klev)     ! cloud droplet number concentration [m-3] (pi value)
-  REAL re_pi(klon, klev)       ! cloud droplet effective radius [um] (pi value)
 
   REAL fl(klon, klev)  ! xliq * rneb (denominator to re ; fraction of liquid water clouds within the grid cell)
 

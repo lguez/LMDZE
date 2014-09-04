@@ -16,8 +16,6 @@
 ! Arguments d'entree:
       REAL, intent(in):: paprs(klon,klev+1) ! pression (Pa) a inter-couche
       REAL, intent(in):: pplay(klon,klev) ! pression (Pa) au milieu de couche
-      REAL t(klon,klev) ! temperature (K)
-      REAL q(klon,klev) ! humidite specifique (Kg/Kg)
       REAL rain(klon) ! pluie convective (kg/m2/s)
       REAL snow(klon) ! neige convective (kg/m2/s)
       INTEGER ktop(klon) ! sommet de la convection

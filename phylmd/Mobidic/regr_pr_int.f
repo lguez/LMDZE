@@ -45,7 +45,7 @@ contains
 
     ! Variables local to the procedure:
 
-    integer varid, ncerr ! for NetCDF
+    integer varid ! for NetCDF
 
     real  v1(jjm + 1, 0:size(plev))
     ! Input field at day "julien". "v1(j, k >=1)" is at latitude

@@ -28,7 +28,7 @@
       real va(ngrid,nlay)
       real dv(ngrid,nlay)
 
-      real qa(klon,klev),detr(klon,klev),zf,zf2
+      real detr(klon,klev),zf,zf2
       real wvd(klon,klev+1),wud(klon,klev+1)
       real gamma0,gamma(klon,klev+1)
       real ue(klon,klev),ve(klon,klev)

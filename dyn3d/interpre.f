@@ -36,7 +36,7 @@ SUBROUTINE interpre(q, qppm, w, fluxwppm, masse, apppm, bpppm, massebx, &
   REAL fluxw(iip1, jjp1, llm)
   REAL smass(iip1, jjp1)
   ! ----------------------------------------------------
-  INTEGER l, ij, i, j
+  INTEGER l, i, j
 
   ! CALCUL DE LA PRESSION DE SURFACE
   ! Les coefficients ap et bp sont passés en common

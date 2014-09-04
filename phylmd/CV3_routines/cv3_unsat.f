@@ -33,7 +33,7 @@ contains
     real b(nloc,na)
 
     ! local variables
-    integer i,j,k,il,num1
+    integer i,j,il,num1
     real tinv, delti
     real awat, afac, afac1, afac2, bfac
     real pr1, pr2, sigt, b6, c6, revap, tevap, delth

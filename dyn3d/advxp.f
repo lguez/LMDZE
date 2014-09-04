@@ -84,7 +84,7 @@ SUBROUTINE advxp(limit, dtx, pbaru, sm, s0, ssx, sy, sz, ssxx, ssxy, ssxz, &
   LOGICAL limit
   INTEGER num(jjp1), lonk, numk
   INTEGER lon, lati, latf, niv
-  INTEGER i, i2, i3, j, jv, l, k, iter
+  INTEGER i, i2, i3, j, jv, l, k
 
   lon = iim
   lati = 2

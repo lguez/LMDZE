@@ -43,7 +43,7 @@ contains
 
     ! Variables local to the procedure:
 
-    integer varid, ncerr ! for NetCDF
+    integer varid ! for NetCDF
 
     real  v1(jjm + 1, size(press_in_edg) - 1)
     ! input field at day "julien"

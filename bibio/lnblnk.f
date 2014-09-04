@@ -25,7 +25,7 @@ INTEGER FUNCTION lnblnk(letter)
   IMPLICIT NONE
   INTEGER i, imax
   PARAMETER (imax=256)
-  CHARACTER *256 letter
+  CHARACTER(len=256) letter
 
   i = 0
 

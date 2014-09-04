@@ -40,13 +40,13 @@ contains
     REAL v(klon, klev)
     REAL teta(klon, klev)
     REAL, intent(in):: cd (:) ! (ngrid) cdrag, valeur au debut du pas de temps
-    REAL q2(klon, klev+1), q2s(klon, klev+1)
+    REAL q2(klon, klev+1)
     REAL q2diag(klon, klev+1)
     REAL km(klon, klev+1)
     REAL kn(klon, klev+1)
-    real sq(klon), sqz(klon), zz(klon, klev+1), zq, long0(klon)
+    real sq(klon), sqz(klon), zq, long0(klon)
 
-    integer l_mix, iii
+    integer l_mix
 
     ! nlay : nombre de couches 
     ! nlev : nombre de niveaux
