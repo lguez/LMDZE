@@ -27,7 +27,6 @@ contains
     ! Variables local to the procedure:
     INTEGER ncid, varid
     INTEGER iq
-    INTEGER:: nb = 0
 
     !---------------------------------------------------------
 
@@ -44,10 +43,8 @@ contains
     call nf95_open(fichnom, nf90_write, ncid)
 
     ! Écriture/extension de la coordonnée temps
-    nb = nb + 1
     call nf95_inq_varid(ncid, 'temps', varid)
-    call nf95_put_var(ncid, varid, values=0., start=(/nb/))
-    PRINT *, "Enregistrement pour nb = ", nb
+    call nf95_put_var(ncid, varid, values = 0.)
 
     ! Récriture du tableau de contrôle, "itaufin" n'est pas défini quand
     ! on passe dans "dynredem0"

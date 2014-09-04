@@ -49,7 +49,7 @@ contains
     ! ptimestep            physical timestep (s)
     ! indice               sub-surface index
     ! snow(klon,nbsrf)     snow
-    ! ptsrf(klon)          surface temperature at time-step t (K)
+    ! ptsrf(knon)          surface temperature at time-step t (K)
     ! ptsoil(klon,nsoilmx) temperature inside the ground (K)
     ! pcapcal(klon)        surfacic specific heat (W*m-2*s*K-1)
     ! pfluxgrd(klon)       surface diffusive flux from ground (Wm-2)
@@ -65,7 +65,7 @@ contains
 
     REAL ptimestep
     INTEGER indice, knon
-    REAL ptsrf(klon), ptsoil(klon, nsoilmx), snow(klon)
+    REAL ptsrf(knon), ptsoil(klon, nsoilmx), snow(klon)
     REAL pcapcal(klon), pfluxgrd(klon)
 
     ! -----------------------------------------------------------------------

@@ -82,7 +82,7 @@ contains
     REAL yv1(klon) ! vents au premier niveau
 
     ! Arguments n\'ecessaires pour les sources et puits de traceur :
-    real ftsol(klon, nbsrf) ! Temperature du sol (surf)(Kelvin)
+    real, intent(in):: ftsol(klon, nbsrf) ! Temperature du sol (surf)(Kelvin)
     real pctsrf(klon, nbsrf) ! Pourcentage de sol f(nature du sol)
 
     ! Lessivage pour le on-line

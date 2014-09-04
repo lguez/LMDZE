@@ -50,6 +50,7 @@ paramet_m.f
 phyredem.f
 q_sat.f
 serre.f
+sortvarc.f
 ssum.f
 strlowercase.f
 temps.f

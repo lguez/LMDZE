@@ -10,7 +10,7 @@ contains
     ! Cette routine sert d'interface entre le modèle atmosphérique et
     ! un fichier de conditions aux limites.
 
-    ! L. Fairhead 02/2000
+    ! Laurent FAIRHEAD, February 2000
 
     use abort_gcm_m, only: abort_gcm
     USE dimphy, ONLY: klon

@@ -4,10 +4,10 @@ module fonte_neige_m
 
 contains
 
-  SUBROUTINE fonte_neige(klon, knon, nisurf, dtime, tsurf, p1lay, beta, &
-       coef1lay, ps, precip_rain, precip_snow, snow, qsol, t1lay, q1lay, &
-       u1lay, v1lay, petAcoef, peqAcoef, petBcoef, peqBcoef, tsurf_new, evap, &
-       fqcalving, ffonte, run_off_lic_0)
+  SUBROUTINE fonte_neige(nisurf, dtime, tsurf, p1lay, beta, coef1lay, ps, &
+       precip_rain, precip_snow, snow, qsol, t1lay, q1lay, u1lay, v1lay, &
+       petAcoef, peqAcoef, petBcoef, peqBcoef, tsurf_new, evap, fqcalving, &
+       ffonte, run_off_lic_0)
 
     ! Routine de traitement de la fonte de la neige dans le cas du traitement
     ! de sol simplifié
@@ -17,72 +17,75 @@ contains
     USE fcttre, ONLY: dqsatl, dqsats, foede, foeew, qsatl, qsats, thermcep
     USE indicesol, ONLY: epsfra, is_lic, is_sic, is_ter
     USE interface_surf, ONLY: run_off, run_off_lic, tau_calv
+    use nr_util, only: assert_eq
     USE suphec_m, ONLY: rcpd, rd, rday, retv, rkappa, rlmlt, rlstt, rlvtt, rtt
     USE yoethf_m, ONLY: r2es, r5ies, r5les, rvtmp2
 
-    integer, intent(IN):: klon
-    integer, intent(IN):: knon ! nombre de points à traiter
     integer, intent(IN):: nisurf ! surface à traiter
     real, intent(IN):: dtime ! pas de temps de la physique (en s)
-    real, dimension(klon), intent(IN):: tsurf, p1lay, beta, coef1lay
+    real, dimension(:), intent(IN):: tsurf, p1lay, beta, coef1lay ! (knon)
     ! tsurf temperature de surface
     ! p1lay pression 1er niveau (milieu de couche)
     ! beta evap reelle
     ! coef1lay coefficient d'echange
-    real, dimension(klon), intent(IN):: ps
+    real, dimension(:), intent(IN):: ps ! (knon)
     ! ps pression au sol
 
     real, intent(IN):: precip_rain(:) ! (knon)
     ! precipitation, liquid water mass flux (kg/m2/s), positive down
 
-    real, intent(IN):: precip_snow(klon)
+    real, intent(IN):: precip_snow(:) ! (knon)
     ! precipitation, solid water mass flux (kg/m2/s), positive down
 
-    real, intent(INOUT):: snow(klon) ! column-density of mass of snow, in kg m-2
+    real, intent(INOUT):: snow(:) ! (knon)
+    ! column-density of mass of snow, in kg m-2
 
     real, intent(INOUT):: qsol(:) ! (knon)
     ! column-density of water in soil, in kg m-2
 
-    real, dimension(klon), intent(IN):: t1lay
-    real, dimension(klon), intent(IN):: q1lay
-    real, dimension(klon), intent(IN):: u1lay, v1lay
-    real, dimension(klon), intent(IN):: petAcoef, peqAcoef
+    real, dimension(:), intent(IN):: t1lay ! (knon)
+    real, dimension(:), intent(IN):: q1lay ! (knon)
+    real, dimension(:), intent(IN):: u1lay, v1lay ! (knon)
+    real, dimension(:), intent(IN):: petAcoef, peqAcoef ! (knon)
     ! petAcoef coeff. A de la resolution de la CL pour t
     ! peqAcoef coeff. A de la resolution de la CL pour q
-    real, dimension(klon), intent(IN):: petBcoef, peqBcoef
+    real, dimension(:), intent(IN):: petBcoef, peqBcoef ! (knon)
     ! petBcoef coeff. B de la resolution de la CL pour t
     ! peqBcoef coeff. B de la resolution de la CL pour q
 
-    real, intent(INOUT):: tsurf_new(klon), evap(klon)
+    real, intent(INOUT):: tsurf_new(:)
     ! tsurf_new temperature au sol
+
+    real, intent(IN):: evap(:) ! (knon)
 
     ! Flux d'eau "perdue" par la surface et necessaire pour que limiter la
     ! hauteur de neige, en kg/m2/s
-    real, dimension(klon), intent(INOUT):: fqcalving
+    real, intent(OUT):: fqcalving(:) ! (knon)
 
     ! Flux thermique utiliser pour fondre la neige
-    real, dimension(klon), intent(INOUT):: ffonte
+    real, intent(OUT):: ffonte(:) ! (knon)
 
-    real, dimension(klon), intent(INOUT):: run_off_lic_0
+    real, dimension(:), intent(INOUT):: run_off_lic_0 ! (knon)
     ! run_off_lic_0 run off glacier du pas de temps précedent
 
     ! Local:
 
+    integer knon ! nombre de points à traiter
     real, parameter:: snow_max=3000.
     ! Masse maximum de neige (kg/m2). Au dessus de ce seuil, la neige
     ! en exces "s'ecoule" (calving)
 
     integer i
-    real, dimension(klon):: zx_mh, zx_nh, zx_oh
-    real, dimension(klon):: zx_mq, zx_nq, zx_oq
-    real, dimension(klon):: zx_pkh, zx_dq_s_dt, zx_qsat, zx_coef
-    real, dimension(klon):: zx_sl, zx_k1
-    real, dimension(klon):: d_ts
+    real, dimension(size(ps)):: zx_mh, zx_nh, zx_oh
+    real, dimension(size(ps)):: zx_mq, zx_nq, zx_oq
+    real, dimension(size(ps)):: zx_pkh, zx_dq_s_dt, zx_qsat, zx_coef
+    real, dimension(size(ps)):: zx_sl, zx_k1
+    real, dimension(size(ps)):: d_ts
     logical zdelta
     real zcvm5, zx_qs, zcor, zx_dq_s_dh
     real fq_fonte
-    REAL bil_eau_s(knon) ! in kg m-2
-    real snow_evap(klon) ! in kg m-2 s-1
+    REAL bil_eau_s(size(ps)) ! in kg m-2
+    real snow_evap(size(ps)) ! in kg m-2 s-1
     real, parameter:: t_grnd = 271.35, t_coup = 273.15
     REAL, parameter:: chasno = 3.334E5/(2.3867E6*0.15)
     REAL, parameter:: chaice = 3.334E5/(2.3867E6*0.15)
@@ -90,6 +93,13 @@ contains
     real coeff_rel
 
     !--------------------------------------------------------------------
+
+    knon = assert_eq((/size(tsurf), size(p1lay), size(beta), size(coef1lay), &
+         size(ps), size(precip_rain), size(precip_snow), size(snow), &
+         size(qsol), size(t1lay), size(q1lay), size(u1lay), size(v1lay), &
+         size(petAcoef), size(peqAcoef), size(petBcoef), size(peqBcoef), &
+         size(tsurf_new), size(evap), size(fqcalving), size(ffonte), &
+         size(run_off_lic_0)/), "fonte_neige knon")
 
     ! Initialisations
     coeff_rel = dtime/(tau_calv * rday)
@@ -147,7 +157,7 @@ contains
     WHERE (precip_snow > 0.) snow = snow + precip_snow * dtime
 
     WHERE (evap > 0.)
-       snow_evap = MIN (snow / dtime, evap)
+       snow_evap = MIN(snow / dtime, evap)
        snow = snow - snow_evap * dtime
        snow = MAX(0., snow)
     elsewhere

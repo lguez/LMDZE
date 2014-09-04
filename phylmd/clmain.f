@@ -38,6 +38,7 @@ contains
     USE dimsoil, ONLY: nsoilmx
     use hbtm_m, only: hbtm
     USE indicesol, ONLY: epsfra, is_lic, is_oce, is_sic, is_ter, nbsrf
+    use stdlevvar_m, only: stdlevvar
     USE suphec_m, ONLY: rd, rg, rkappa
     use ustarhb_m, only: ustarhb
     use vdif_kcay_m, only: vdif_kcay
@@ -56,7 +57,7 @@ contains
     INTEGER, INTENT(IN):: jour ! jour de l'annee en cours
     REAL, intent(in):: rmu0(klon) ! cosinus de l'angle solaire zenithal     
     REAL, intent(in):: co2_ppm ! taux CO2 atmosphere
-    REAL, INTENT(IN):: ts(klon, nbsrf) ! input-R- temperature du sol (en Kelvin)
+    REAL, INTENT(IN):: ts(klon, nbsrf) ! temperature du sol (en Kelvin)
     REAL, INTENT(IN):: cdmmax, cdhmax ! seuils cdrm, cdrh
     REAL, INTENT(IN):: ksta, ksta_ter
     LOGICAL, INTENT(IN):: ok_kzmin
@@ -99,8 +100,7 @@ contains
     REAL, intent(out):: d_u(klon, klev), d_v(klon, klev)
     ! changement pour "u" et "v"
 
-    REAL d_ts(klon, nbsrf)
-    ! d_ts-----output-R- le changement pour "ts"
+    REAL, intent(out):: d_ts(klon, nbsrf) ! le changement pour "ts"
 
     REAL flux_t(klon, klev, nbsrf), flux_q(klon, klev, nbsrf)
     ! flux_t---output-R- flux de chaleur sensible (CpT) J/m**2/s (W/m**2)
@@ -305,11 +305,9 @@ contains
     y_dflux_q = 0.
     ytsoil = 999999.
     yrugoro = 0.
-    ! -- LOOP
     yu10mx = 0.
     yu10my = 0.
     ywindsp = 0.
-    ! -- LOOP
     d_ts = 0.
     yfluxlat = 0.
     flux_t = 0.

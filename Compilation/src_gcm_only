@@ -16,6 +16,7 @@ ajsec.f
 albedo.f
 albsno.f
 bilan_dyn.f
+buildop.f
 caladvtrac.f
 calbeta.f
 calcul_fluxs.f
@@ -24,6 +25,7 @@ calfis.f
 calltherm.f
 chem.f
 clcdrag.f
+cleanstr.f
 clesphys2.f
 clmain.f
 clouds_gno.f
@@ -78,6 +80,7 @@ cv_undilute1.f
 cv_undilute2.f
 cv_unsat.f
 cv_yield.f
+decoop.f
 diagcld1.f
 diagcld2.f
 diagetpq.f
@@ -96,6 +99,7 @@ dump2d.f
 dvthermcell2.f
 dynetat0.f
 FCTTRE.f
+findsep.f
 find_str.f
 fisrtilp.f
 fluxstokenc.f
@@ -184,6 +188,7 @@ mathelp.f
 mathop2.f
 mathop.f
 minmaxqfi.f
+moycum.f
 nat2gcm.f
 newmicro.f
 nflxtr.f
@@ -229,7 +234,6 @@ scopy.f
 screenc.f
 screenp.f
 soil.f
-sortvarc.f
 stdlevvar.f
 sugwd.f
 suphec.f
@@ -245,6 +249,7 @@ swu.f
 tau2alpha.f
 thermcell.f
 tracstoke.f
+trans_buff.f
 transp.f
 transp_lay.f
 ustarhb.f

@@ -13,7 +13,6 @@ SUBROUTINE interpre(q, qppm, w, fluxwppm, masse, apppm, bpppm, massebx, &
   USE conf_gcm_m
   USE comgeom
   USE temps
-  USE ener
   IMPLICIT NONE
 
   ! ---------------------------------------------------

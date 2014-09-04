@@ -8,6 +8,7 @@ filtrez
 IOIPSL
 IOIPSL/Calendar
 IOIPSL/Histcom
+IOIPSL/Mathelp
 phylmd
 phylmd/Conflx
 phylmd/CV3_routines

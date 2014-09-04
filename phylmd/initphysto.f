@@ -39,7 +39,6 @@ SUBROUTINE initphysto(infile,rlon,rlat,tstep,t_ops,t_wrt,nq,fileid)
   USE comgeom
   USE serre
   USE temps
-  USE ener
   USE nr_util, ONLY : pi
   USE ymds2ju_m
 

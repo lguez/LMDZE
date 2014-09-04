@@ -32,7 +32,6 @@ contains
     REAL, save:: massem(ip1jmp1, llm)
     real zdp(ip1jmp1)
     REAL pbarug(ip1jmp1, llm), pbarvg(ip1jm, llm), wg(ip1jmp1, llm)
-    REAL cpuadv(nqmx)
 
     INTEGER:: iadvtr = 0
     INTEGER ij, l, iq
@@ -124,7 +123,7 @@ contains
              ! Schema de Frederic Hourdin
           ELSE IF (iadv(iq)==12) THEN
              ! Pas de temps adaptatif
-             CALL adaptdt(iadv(iq), dtbon, n, pbarug, massem)
+             CALL adaptdt(dtbon, n, pbarug, massem)
              IF (n>1) THEN
                 WRITE (*, *) 'WARNING horizontal dt=', dtbon, 'dtvr=', dtvr, &
                      'n=', n
@@ -134,7 +133,7 @@ contains
              END DO
           ELSE IF (iadv(iq)==13) THEN
              ! Pas de temps adaptatif
-             CALL adaptdt(iadv(iq), dtbon, n, pbarug, massem)
+             CALL adaptdt(dtbon, n, pbarug, massem)
              IF (n>1) THEN
                 WRITE (*, *) 'WARNING horizontal dt=', dtbon, 'dtvr=', dtvr, &
                      'n=', n
@@ -148,7 +147,7 @@ contains
              ! Schema de Prather
           ELSE IF (iadv(iq)==30) THEN
              ! Pas de temps adaptatif
-             CALL adaptdt(iadv(iq), dtbon, n, pbarug, massem)
+             CALL adaptdt(dtbon, n, pbarug, massem)
              IF (n>1) THEN
                 WRITE (*, *) 'WARNING horizontal dt=', dtbon, 'dtvr=', dtvr, &
                      'n=', n
@@ -158,7 +157,7 @@ contains
           ELSE IF (iadv(iq)==11 .OR. (iadv(iq)>=16 .AND. iadv(iq)<=18)) THEN
              ! Test sur le flux horizontal
              ! Pas de temps adaptatif
-             CALL adaptdt(iadv(iq), dtbon, n, pbarug, massem)
+             CALL adaptdt(dtbon, n, pbarug, massem)
              IF (n>1) THEN
                 WRITE (*, *) 'WARNING horizontal dt=', dtbon, 'dtvr=', dtvr, &
                      'n=', n

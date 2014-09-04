@@ -28,7 +28,6 @@ SUBROUTINE initfluxsto(tstep, t_ops, t_wrt, nq, fileid, filevid, filedid)
   use conf_gcm_m
   USE dimens_m
   USE disvert_m
-  USE ener
   USE histbeg_totreg_m, ONLY : histbeg_totreg
   USE histdef_m, ONLY : histdef
   USE histend_m, ONLY : histend

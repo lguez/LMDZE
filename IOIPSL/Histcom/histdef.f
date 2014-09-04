@@ -22,7 +22,7 @@ contains
          title, topp, unit_name, var_axid, var_haxid, var_zaxid, zax_name, &
          zax_size, zorig, zsize
     USE ioget_calendar_m, ONLY: ioget_calendar_real
-    USE mathelp, ONLY: buildop
+    USE buildop_m, ONLY: buildop
 
     INTEGER, INTENT(IN):: fileid
     ! (ID of the file the variable should be archived in)
@@ -206,12 +206,12 @@ contains
 
        IF (szz/=zax_size(fileid, zid)) THEN
           str20 = zax_name(fileid, zid)
-          str70 = 'The size of the zoom does not correspond ' // &
-               'to the size of the chosen vertical axis'
           WRITE (str71, '("Size of zoom in z:", I4)') szz
           WRITE (str72, '("Size declared for axis ", a, ":", I4)') &
                trim(str20), zax_size(fileid, zid)
-          CALL histerr(3, 'histdef', str70, str71, str72)
+          CALL histerr(3, 'histdef', 'The size of the zoom does not ' &
+               // 'correspond to the size of the chosen vertical axis', &
+               str71, str72)
        END IF
 
        ! Is the zoom smaler that the total size of the variable ?

@@ -12,13 +12,13 @@ contains
     ! Calcul du terme de convergence horizontale du flux d'enthalpie
     ! potentielle.
 
-    USE dimens_m, ONLY: iim, llm
+    USE dimens_m, ONLY: iim, jjm, llm
     USE paramet_m, ONLY: iip1, iip2, ip1jm, ip1jmp1, jjp1
     USE filtreg_m, ONLY: filtreg
 
     REAL, intent(in):: teta(ip1jmp1, llm)
     REAL, intent(in):: pbaru(ip1jmp1, llm), pbarv(ip1jm, llm)
-    REAL, intent(out):: dteta(ip1jmp1, llm)
+    REAL, intent(out):: dteta(iim + 1, jjm + 1, llm)
 
     ! Local:
     INTEGER l, ij

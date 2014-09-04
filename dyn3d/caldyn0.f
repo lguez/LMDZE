@@ -11,6 +11,7 @@ contains
     ! Authors:  P. Le Van, F. Forget
     ! Objet : calcul des tendances dynamiques
 
+    use bernoui_m, only: bernoui
     USE comgeom, ONLY: airesurg
     use convmas_m, only: convmas
     USE dimens_m, ONLY: iim, jjm, llm
@@ -20,7 +21,7 @@ contains
     use massbarxy_m, only: massbarxy
     use massdair_m, only: massdair
     USE paramet_m, ONLY: iip1, ip1jmp1, jjp1, llmp1
-    use sortvarc0_m, only: sortvarc0
+    use sortvarc_m, only: sortvarc
     use tourpot_m, only: tourpot
     use vitvert_m, only: vitvert
 
@@ -31,7 +32,7 @@ contains
     real, intent(out):: masse(ip1jmp1, llm)
     REAL, INTENT (IN):: pk(iip1, jjp1, llm)
     REAL, INTENT (IN):: phis(ip1jmp1)
-    REAL, INTENT (IN):: phi(ip1jmp1, llm)
+    REAL, INTENT (IN):: phi(iim + 1, jjm + 1, llm)
     REAL, INTENT(out):: w(:, :, :) ! (iim + 1, jjm + 1, llm)
     REAL, intent(out):: pbaru(ip1jmp1, llm), pbarv((iim + 1) * jjm, llm)
 
@@ -40,8 +41,8 @@ contains
     REAL p(ip1jmp1, llmp1)
     REAL massebx(ip1jmp1, llm), masseby((iim + 1) * jjm, llm)
     REAL vorpot(iim + 1, jjm, llm)
-    real ecin(ip1jmp1, llm), convm(ip1jmp1, llm)
-    REAL bern(ip1jmp1, llm)
+    real ecin(iim + 1, jjm + 1, llm), convm(ip1jmp1, llm)
+    REAL bern(iim + 1, jjm + 1, llm)
     REAL massebxy(iim + 1, jjm, llm), dp(ip1jmp1)
     INTEGER l
 
@@ -60,8 +61,9 @@ contains
     CALL vitvert(convm, w)
     CALL tourpot(vcov, ucov, massebxy, vorpot)
     CALL enercin(vcov, ucov, vcont, ucont, ecin)
-    CALL bernoui(ip1jmp1, llm, phi, ecin, bern)
-    CALL sortvarc0(ucov, teta, ps, masse, pk, phis, vorpot, phi, bern, dp)
+    CALL bernoui(phi, ecin, bern)
+    CALL sortvarc(ucov, teta, ps, masse, pk, phis, vorpot, phi, bern, dp, &
+         resetvarc = .true.)
 
   END SUBROUTINE caldyn0
 

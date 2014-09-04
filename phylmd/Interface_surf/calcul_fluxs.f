@@ -4,111 +4,87 @@ module calcul_fluxs_m
 
 contains
 
-  SUBROUTINE calcul_fluxs( klon, knon, nisurf, dtime,  &
-       tsurf, p1lay, cal, beta, coef1lay, ps,  &
-       precip_rain, precip_snow, snow, qsurf,  &
-       radsol, dif_grnd, t1lay, q1lay, u1lay, v1lay,  &
-       petAcoef, peqAcoef, petBcoef, peqBcoef,  &
-       tsurf_new, evap, fluxlat, fluxsens, dflux_s, dflux_l)
+  SUBROUTINE calcul_fluxs(nisurf, dtime, tsurf, p1lay, cal, beta, coef1lay, &
+       ps, qsurf, radsol, dif_grnd, t1lay, q1lay, u1lay, v1lay, petAcoef, &
+       peqAcoef, petBcoef, peqBcoef, tsurf_new, evap, fluxlat, fluxsens, &
+       dflux_s, dflux_l)
 
     ! Cette routine calcule les fluxs en h et q à l'interface et une
     ! température de surface.
 
-    ! L. Fairhead 4/2000
+    ! L. Fairhead April 2000
 
-    ! input:
-    ! knon nombre de points a traiter
-    ! nisurf surface a traiter
-    ! tsurf temperature de surface
-    ! p1lay pression 1er niveau (milieu de couche)
-    ! cal capacite calorifique du sol
-    ! beta evap reelle
-    ! coef1lay coefficient d'echange
-    ! ps pression au sol
-    ! precip_rain precipitations liquides
-    ! precip_snow precipitations solides
-    ! snow champs hauteur de neige
-    ! runoff runoff en cas de trop plein
-    ! petAcoef coeff. A de la resolution de la CL pour t
-    ! peqAcoef coeff. A de la resolution de la CL pour q
+    USE abort_gcm_m, ONLY: abort_gcm
+    USE indicesol, ONLY: is_ter
+    USE fcttre, ONLY: dqsatl, dqsats, foede, foeew, qsatl, qsats, thermcep
+    USE interface_surf, ONLY: run_off
+    use nr_util, only: assert_eq
+    USE suphec_m, ONLY: rcpd, rd, retv, rkappa, rlstt, rlvtt, rtt
+    USE yoethf_m, ONLY: r2es, r5ies, r5les, rvtmp2
+
+    integer, intent(IN):: nisurf ! surface a traiter
+    real, intent(IN):: dtime
+    real, intent(IN):: tsurf(:) ! (knon) temperature de surface
+    real, intent(IN):: p1lay(:) ! (knon) pression 1er niveau (milieu de couche)
+    real, intent(IN):: cal(:) ! (knon) capacité calorifique du sol
+    real, intent(IN):: beta(:) ! (knon) evap reelle
+    real, intent(IN):: coef1lay(:) ! (knon) coefficient d'échange
+    real, intent(IN):: ps(:) ! (knon) pression au sol
+    real, intent(OUT):: qsurf(:) ! (knon) humidite de l'air au dessus du sol
+    real, intent(IN):: radsol(:) ! (knon) rayonnement net au sol (LW + SW)
+
+    real, intent(IN):: dif_grnd(:) ! (knon)
+    ! coefficient diffusion vers le sol profond
+
+    real, intent(IN):: t1lay(:), q1lay(:), u1lay(:), v1lay(:) ! (knon)
+
+    real, intent(IN):: petAcoef(:), peqAcoef(:) ! (knon)
+    ! coefficients A de la résolution de la couche limite pour t et q
+
+    real, intent(IN):: petBcoef(:), peqBcoef(:) ! (knon)
     ! petBcoef coeff. B de la resolution de la CL pour t
     ! peqBcoef coeff. B de la resolution de la CL pour q
-    ! radsol rayonnement net aus sol (LW + SW)
-    ! dif_grnd coeff. diffusion vers le sol profond
 
-    ! output:
-    ! tsurf_new temperature au sol
-    ! qsurf humidite de l'air au dessus du sol
-    ! fluxsens flux de chaleur sensible
+    real, intent(OUT):: tsurf_new(:) ! (knon) température au sol
+    real, intent(OUT):: evap(:), fluxlat(:), fluxsens(:) ! (knon)
     ! fluxlat flux de chaleur latente
+    ! fluxsens flux de chaleur sensible
+    real, intent(OUT):: dflux_s(:), dflux_l(:) ! (knon)
+    ! Dérivées des flux dF/dTs (W m-2 K-1)
     ! dflux_s derivee du flux de chaleur sensible / Ts
     ! dflux_l derivee du flux de chaleur latente / Ts
 
-
-    use indicesol
-    use abort_gcm_m, only: abort_gcm
-    use yoethf_m
-    use fcttre, only: thermcep, foeew, qsats, qsatl, foede, dqsats, dqsatl
-    use SUPHEC_M
-    use interface_surf
-
-    ! Parametres d'entree
-    integer, intent(IN) :: knon, nisurf, klon
-    real , intent(IN) :: dtime
-    real, dimension(klon), intent(IN) :: petAcoef, peqAcoef
-    real, dimension(klon), intent(IN) :: petBcoef, peqBcoef
-    real, dimension(klon), intent(IN) :: ps, q1lay
-    real, dimension(klon), intent(IN) :: tsurf, p1lay, cal, beta, coef1lay
-    real, dimension(klon), intent(IN) :: precip_rain, precip_snow
-    real, dimension(klon), intent(IN) :: radsol, dif_grnd
-    real, dimension(klon), intent(IN) :: t1lay, u1lay, v1lay
-    real, dimension(klon), intent(INOUT) :: snow, qsurf
-
-    ! Parametres sorties
-    real, dimension(klon), intent(OUT):: tsurf_new, evap, fluxsens, fluxlat
-    real, dimension(klon), intent(OUT):: dflux_s, dflux_l
-
-    ! Variables locales
-    integer :: i
-    real, dimension(klon) :: zx_mh, zx_nh, zx_oh
-    real, dimension(klon) :: zx_mq, zx_nq, zx_oq
-    real, dimension(klon) :: zx_pkh, zx_dq_s_dt, zx_qsat, zx_coef
-    real, dimension(klon) :: zx_sl, zx_k1
-    real, dimension(klon) :: zx_q_0 , d_ts
+    ! Local:
+    integer i
+    real, dimension(size(ps)) :: zx_mh, zx_nh, zx_oh
+    real, dimension(size(ps)) :: zx_mq, zx_nq, zx_oq
+    real, dimension(size(ps)) :: zx_pkh, zx_dq_s_dt, zx_qsat, zx_coef
+    real, dimension(size(ps)) :: zx_sl, zx_k1
+    real, dimension(size(ps)) :: zx_q_0 , d_ts
     logical zdelta
     real zcvm5, zx_qs, zcor, zx_dq_s_dh
     real :: bilan_f, fq_fonte
     REAL :: subli, fsno
     REAL :: qsat_new, q1_new
-    real, parameter :: t_grnd = 271.35, t_coup = 273.15
-    !! PB temporaire en attendant mieux pour le modele de neige
-    REAL, parameter :: chasno = 3.334E+05/(2.3867E+06*0.15)
+    integer knon ! nombre de points a traiter
+    real, parameter:: t_grnd = 271.35, t_coup = 273.15
 
-    logical, save :: check = .false.
-    character (len = 20) :: modname = 'calcul_fluxs'
-    logical, save :: fonte_neige = .false.
-    real, save :: max_eau_sol = 150.0
-    character (len = 80) :: abort_message
-    logical, save :: first = .true., second=.false.
+    !---------------------------------------------------------------------
 
-    if (check) write(*, *)'Entree ', modname, ' surface = ', nisurf
-
-    IF (check) THEN
-       WRITE(*, *)' radsol (min, max)' &
-            , MINVAL(radsol(1:knon)), MAXVAL(radsol(1:knon))
-       !!CALL flush(6)
-    ENDIF
+    knon = assert_eq((/size(tsurf), size(p1lay), size(cal), size(beta), &
+         size(coef1lay), size(ps), size(qsurf), size(radsol), size(dif_grnd), &
+         size(t1lay), size(q1lay), size(u1lay), size(v1lay), size(petAcoef), &
+         size(peqAcoef), size(petBcoef), size(peqBcoef), size(tsurf_new), &
+         size(evap), size(fluxlat), size(fluxsens), size(dflux_s), &
+         size(dflux_l)/), "calcul_fluxs knon")
 
     if (size(run_off) /= knon .AND. nisurf == is_ter) then
-       write(*, *)'Bizarre, le nombre de points continentaux'
-       write(*, *)'a change entre deux appels. J''arrete ...'
-       abort_message='Pb run_off'
-       call abort_gcm(modname, abort_message, 1)
+       print *, 'Bizarre, le nombre de points continentaux'
+       print *, 'a change entre deux appels. J''arrete.'
+       call abort_gcm('calcul_fluxs', 'Pb run_off', 1)
     endif
 
-    ! Traitement neige et humidite du sol
-
-    ! Initialisation
+    ! Traitement humidite du sol
 
     evap = 0.
     fluxsens=0.

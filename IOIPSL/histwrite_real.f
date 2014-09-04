@@ -15,7 +15,8 @@ contains
          last_opp, last_wrt, missing_val, nbopp, nb_opp, nb_wrt, ncdf_ids, &
          ncvar_ids, point, regular, scal, scsize, sopps, tax_last, tdimid, &
          topp, var_axid, zorig, zsize
-    USE mathelp, ONLY: trans_buff, moycum
+    USE trans_buff_m, ONLY: trans_buff
+    use moycum_m, only: moycum
     USE mathop_m, ONLY: mathop
     use netcdf, only: NF90_PUT_VAR
 

@@ -8,7 +8,7 @@ contains
 
     ! From LMDZ4/libf/dyn3d/convmas.F, version 1.1.1.1, 2004/05/19 12:53:07
 
-    USE dimens_m, ONLY: llm
+    USE dimens_m, ONLY: iim, jjm, llm
     USE paramet_m, ONLY: ip1jm, ip1jmp1, jjp1, llmm1
     USE filtreg_m, ONLY: filtreg
 
@@ -20,10 +20,10 @@ contains
     ! tableau convm.
 
     REAL, INTENT(IN):: pbaru(ip1jmp1, llm), pbarv(ip1jm, llm)
-    REAL, INTENT(OUT):: convm(ip1jmp1, llm)
+    REAL, INTENT(OUT):: convm(iim + 1, jjm + 1, llm)
 
     ! Local:
-    INTEGER l, ij
+    INTEGER l
 
     !-----------------------------------------------------------------------
 
@@ -35,9 +35,7 @@ contains
 
     ! Intégration de la convergence de masse de haut en bas :
     DO l = llmm1, 1, -1
-       DO ij = 1, ip1jmp1
-          convm(ij, l) = convm(ij, l) + convm(ij, l+1)
-       END DO
+       convm(:, :, l) = convm(:, :, l) + convm(:, :, l+1)
     END DO
 
   END SUBROUTINE convmas

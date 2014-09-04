@@ -50,7 +50,7 @@ contains
     REAL u1lay(klon), v1lay(klon)
     REAL coef(klon, klev)
     REAL, intent(in):: t(klon, klev) ! temperature (K)
-    real ftsol(klon, nbsrf), pctsrf(klon, nbsrf) 
+    real, intent(in):: ftsol(klon, nbsrf), pctsrf(klon, nbsrf) 
     REAL tr(klon, klev), trs(klon)
     REAL, intent(in):: paprs(klon, klev+1)
     real, intent(in):: pplay(klon, klev)

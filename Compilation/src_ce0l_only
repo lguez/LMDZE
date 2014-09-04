@@ -16,7 +16,6 @@ ord_coord.f
 ord_coordm.f
 regr_lat_time_coefoz.f
 regr_pr_o3.f
-sortvarc0.f
 startdyn.f
 start_init_orog_m.f
 start_init_phys_m.f

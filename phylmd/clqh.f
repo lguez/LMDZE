@@ -282,9 +282,9 @@ contains
     CALL interfsurf_hq(itime, dtime, jour, rmu0, nisurf, knon, knindex, &
          pctsrf, rlat, debut, nsoilmx, tsoil, qsol, u1lay, v1lay, &
          temp_air, spechum, tq_cdrag, petAcoef, peqAcoef, petBcoef, peqBcoef, &
-         precip_rain, precip_snow, fder, rugos, rugoro, snow, qsurf, ts, &
+         precip_rain, precip_snow, fder, rugos, rugoro, snow, qsurf, ts(:knon), &
          p1lay, psref, radsol, evap, fluxsens, fluxlat, dflux_l, dflux_s, &
-         tsurf_new, alb_new, alblw, z0_new, pctsrf_new, agesno, fqcalving, &
+         tsurf_new(:knon), alb_new, alblw, z0_new, pctsrf_new, agesno, fqcalving, &
          ffonte, run_off_lic_0, flux_o, flux_g)
 
     do i = 1, knon

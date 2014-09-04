@@ -1,61 +1,29 @@
+module bernoui_m
 
-! $Header: /home/cvsroot/LMDZ4/libf/dyn3d/bernoui.F,v 1.1.1.1 2004/05/19
-! 12:53:06 lmdzadmin Exp $
-
-SUBROUTINE bernoui(ngrid, nlay, pphi, pecin, pbern)
-  USE dimens_m
-  USE paramet_m
-  USE conf_gcm_m
-  USE filtreg_m, ONLY: filtreg
   IMPLICIT NONE
 
-  ! =======================================================================
+contains
 
-  ! Auteur:   P. Le Van
-  ! -------
+  SUBROUTINE bernoui(phi, ecin, bern)
 
-  ! Objet:
-  ! ------
-  ! calcul de la fonction de Bernouilli aux niveaux s  .....
-  ! phi  et  ecin  sont des arguments d'entree pour le s-pg .......
-  ! bern       est un  argument de sortie pour le s-pg  ......
+    ! From LMDZ4/libf/dyn3d/bernoui.F, version 1.1.1.1 2004/05/19 12:53:06
 
-  ! fonction de Bernouilli = bern = filtre de( geopotentiel +
-  ! energ.cinet.)
+    ! Author: P. Le Van
 
-  ! =======================================================================
+    ! Objet: calcul de la fonction de Bernouilli aux niveaux s.
+    ! fonction de Bernouilli = bern = filtre de(geopotentiel + energ.cinet.)
 
-  ! -----------------------------------------------------------------------
-  ! Decalrations:
-  ! -------------
+    USE dimens_m, ONLY: jjm, llm
+    USE filtreg_m, ONLY: filtreg
 
+    REAL, INTENT(IN):: phi(:, :, :), ecin (:, :, :)! (iim + 1, jjm + 1, llm)
+    REAL, intent(out):: bern(:, :, :) ! (iim + 1, jjm + 1, llm)
 
-  ! Arguments:
-  ! ----------
+    !-----------------------------------------------------------------------
 
-  INTEGER nlay, ngrid
-  REAL, INTENT (IN) :: pphi(ngrid*nlay), pecin(ngrid*nlay)
-  REAL pbern(ngrid*nlay)
+    bern = phi + ecin
+    CALL filtreg(bern, jjm + 1, llm, 2, 1, .TRUE.)
 
-  ! Local:
-  ! ------
+  END SUBROUTINE bernoui
 
-  INTEGER ijl
-
-  ! -----------------------------------------------------------------------
-  ! calcul de Bernouilli:
-  ! ---------------------
-
-  DO ijl = 1, ngrid*nlay
-    pbern(ijl) = pphi(ijl) + pecin(ijl)
-  END DO
-
-  ! -----------------------------------------------------------------------
-  ! filtre:
-  ! -------
-
-  CALL filtreg(pbern, jjp1, llm, 2, 1, .TRUE.)
-
-  ! -----------------------------------------------------------------------
-  RETURN
-END SUBROUTINE bernoui
+end module bernoui_m

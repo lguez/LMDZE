@@ -2,7 +2,7 @@
 ! $Header: /home/cvsroot/LMDZ4/libf/dyn3d/adaptdt.F,v 1.1.1.1 2004/05/19
 ! 12:53:05 lmdzadmin Exp $
 
-SUBROUTINE adaptdt(nadv, dtbon, n, pbaru, masse)
+SUBROUTINE adaptdt(dtbon, n, pbaru, masse)
 
   USE dimens_m
   USE paramet_m
@@ -12,14 +12,13 @@ SUBROUTINE adaptdt(nadv, dtbon, n, pbaru, masse)
   USE conf_gcm_m
   USE comgeom
   USE temps
-  USE ener
   IMPLICIT NONE
 
 
   ! ----------------------------------------------------------
   ! Arguments
   ! ----------------------------------------------------------
-  INTEGER n, nadv
+  INTEGER n
   REAL dtbon
   REAL, INTENT (IN) :: pbaru(iip1, jjp1, llm)
   REAL masse(iip1, jjp1, llm)
@@ -41,8 +40,6 @@ SUBROUTINE adaptdt(nadv, dtbon, n, pbaru, masse)
     END DO
   END DO
   n = int(cflmax) + 1
-  ! pour reproduire cas VL du code qui appele x,y,z,y,x
-  ! if (nadv.eq.30) n=n/2   ! Pour Prather
   dtbon = dtvr/n
 
   RETURN

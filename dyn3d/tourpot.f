@@ -11,8 +11,8 @@ contains
     ! Author: P. Le Van
     ! Objet : calcul du tourbillon potentiel
 
-    USE dimens_m, ONLY: iim, jjm, llm
     USE comgeom, ONLY: fext_2d
+    USE dimens_m, ONLY: iim, jjm, llm
     use filtreg_m, only: filtreg
 
     REAL, intent(in):: vcov(:, :, :) ! (iim + 1, jjm, llm)
@@ -23,6 +23,7 @@ contains
     ! = (Filtre(d(vcov)/dx - d(ucov)/dy) + fext) / massebxy
 
     ! Local:
+
     REAL rot(iim + 1, jjm, llm)
     ! relative vorticity multiplied by cell area, in m2 s-1
 
