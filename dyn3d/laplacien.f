@@ -10,13 +10,14 @@ contains
     ! P. Le Van
     ! Calcul de div(grad) de teta.
 
+    use dimens_m, only: iim, jjm
     use divergf_m, only: divergf
     use filtreg_m, only: filtreg
     use grad_m, only: grad
     USE paramet_m, ONLY: ip1jm, ip1jmp1, jjp1
 
     INTEGER, intent(in):: klevel
-    REAL, intent(inout):: teta(ip1jmp1, klevel)
+    REAL, intent(inout):: teta(iim + 1, jjm + 1, klevel)
 
     ! Variables locales:
     REAL ghy(ip1jm, klevel), ghx(ip1jmp1, klevel)

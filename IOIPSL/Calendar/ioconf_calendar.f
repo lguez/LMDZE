@@ -34,7 +34,7 @@ module ioconf_calendar_m
 
 contains
 
-  SUBROUTINE ioconf_calendar (str)
+  SUBROUTINE ioconf_calendar(str)
 
     ! This routine allows to configure the calendar to be used.
     ! This operation is only allowed once and the first call to

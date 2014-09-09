@@ -9,58 +9,42 @@ contains
     ! From libf/dyn3d/divergf.F, version 1.1.1.1 2004/05/19 12:53:05
 
     ! P. Le Van
+
     ! Calcule la divergence à tous les niveaux d'un vecteur de
     ! composantes x et y. x et y sont des composantes covariantes.
 
-    USE comgeom, ONLY: apoln, apols, cuvsurcv, cvusurcu, unsaire
-    USE dimens_m, ONLY: iim
+    USE comgeom, ONLY: apoln, apols, cuvsurcv_2d, cvusurcu_2d, unsaire_2d
+    USE dimens_m, ONLY: iim, jjm
     USE filtreg_m, ONLY: filtreg
-    USE paramet_m, ONLY: iip1, iip2, ip1jm, ip1jmi1, ip1jmp1, jjp1
 
     INTEGER, intent(in):: klevel
-    REAL, intent(in):: x(ip1jmp1, klevel), y(ip1jm, klevel)
-    real, intent(out):: div(ip1jmp1, klevel) ! in (unit of x, y) m-2
+    REAL, intent(in):: x(iim + 1, jjm + 1, klevel), y(iim + 1, jjm, klevel)
+    real, intent(out):: div(iim + 1, jjm + 1, klevel) ! in (unit of x, y) m-2
 
     ! Variables locales :
 
-    INTEGER l, ij
-    REAL aiy1(iim) , aiy2(iim)
-    REAL sumypn, sumyps
+    INTEGER l, i, j
 
     !------------------------------------------------------------
 
     DO l = 1, klevel
-       DO ij = iip2, ip1jm - 1
-          div(ij + 1, l) = cvusurcu(ij+1) * x(ij+1, l) &
-               - cvusurcu(ij) * x(ij , l) + cuvsurcv(ij-iim) * y(ij-iim, l) &
-               - cuvsurcv(ij+1) * y(ij+1, l) 
-       ENDDO
+       forall (i = 2:iim + 1, j = 2:jjm) div(i, j, l) = cvusurcu_2d(i, j) &
+            * x(i, j, l) - cvusurcu_2d(i - 1, j) * x(i - 1, j , l) &
+            + cuvsurcv_2d(i, j - 1) * y(i, j - 1, l) - cuvsurcv_2d(i, j) &
+            * y(i, j, l)
 
-       DO ij = iip2, ip1jm, iip1
-          div(ij, l) = div(ij + iim, l)
-       ENDDO
+       div(1, 2:jjm, l) = div(iim + 1, 2:jjm, l)
 
        ! Calcul aux pôles 
-
-       DO ij = 1, iim
-          aiy1(ij) = cuvsurcv(ij) * y(ij , l)
-          aiy2(ij) = cuvsurcv(ij+ ip1jmi1) * y(ij+ ip1jmi1, l)
-       ENDDO
-       sumypn = SUM(aiy1) / apoln
-       sumyps = SUM(aiy2) / apols
-
-       DO ij = 1, iip1
-          div(ij , l) = - sumypn
-          div(ij + ip1jm, l) = sumyps
-       ENDDO
+       div(:, 1, l) = - SUM(cuvsurcv_2d(:iim, 1) * y(:iim, 1, l)) / apoln
+       div(:, jjm + 1, l) = SUM(cuvsurcv_2d(:iim, jjm) * y(:iim, jjm, l)) &
+            / apols
     end DO
 
-    CALL filtreg(div, jjp1, klevel, 2, 2, .TRUE.)
+    CALL filtreg(div, jjm + 1, klevel, 2, 2, .TRUE.)
 
     DO l = 1, klevel
-       DO ij = iip2, ip1jm
-          div(ij, l) = div(ij, l) * unsaire(ij) 
-       ENDDO
+       div(:, 2:jjm, l) = div(:, 2:jjm, l) * unsaire_2d(:, 2:jjm)
     ENDDO
 
   END SUBROUTINE divergf

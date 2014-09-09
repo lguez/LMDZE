@@ -4,7 +4,7 @@ module interfsur_lim_m
 
 contains
 
-  SUBROUTINE interfsur_lim(itime, dtime, jour, nisurf, knon, knindex, debut, &
+  SUBROUTINE interfsur_lim(itime, dtime, jour, nisurf, knindex, debut, &
        alb_new, z0_new)
 
     ! Cette routine sert d'interface entre le modèle atmosphérique et
@@ -24,9 +24,8 @@ contains
     integer, intent(IN):: nisurf
     ! index de la surface à traiter (1 = sol continental)
 
-    integer, intent(IN):: knon ! nombre de points dans le domaine a traiter
 
-    integer, intent(in):: knindex(:) ! (klon)
+    integer, intent(in):: knindex(:) ! (knon)
     ! index des points de la surface à traiter
 
     logical, intent(IN):: debut ! premier appel à la physique (initialisation)
@@ -34,6 +33,8 @@ contains
     real, intent(out):: z0_new(:) ! (klon) longueur de rugosité lue
 
     ! Local:
+
+    integer knon ! nombre de points dans le domaine a traiter
 
     integer, save:: lmt_pas ! frequence de lecture des conditions limites
     ! (en pas de physique)
@@ -49,6 +50,8 @@ contains
     integer ncid, varid
 
     !------------------------------------------------------------
+
+    knon = size(knindex)
 
     if (debut) then
        lmt_pas = nint(86400./dtime * 1.0) ! pour une lecture une fois par jour

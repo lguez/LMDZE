@@ -31,7 +31,7 @@ contains
     REAL sec
     REAL rtime0
     CHARACTER(len=20) tname, tunit
-    CHARACTER(len=30) str30
+    CHARACTER(len=42) str30
     CHARACTER(len=80) ttitle
     CHARACTER(len=120) assoc
     CHARACTER(len=70) str70

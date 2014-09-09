@@ -87,7 +87,7 @@ diagcld2.o : FCTTRE.o yoethf.o suphec.o dimphy.o
 diagetpq.o : suphec.o dimphy.o 
 diagphy.o : suphec.o dimphy.o 
 dissip.o : nxgraro2.o inidissip.o gradiv2.o divgrad2.o dimens_m.o comdissnew.o 
-divergf.o : paramet_m.o filtreg.o dimens_m.o comgeom.o 
+divergf.o : filtreg.o dimens_m.o comgeom.o 
 diverg_gam.o : comgeom.o paramet_m.o dimens_m.o 
 divgrad2.o : paramet_m.o laplacien.o comgeom.o 
 dqthermcell2.o : dimphy.o dimens_m.o 
@@ -147,7 +147,7 @@ initphysto.o : ymds2ju.o temps.o serre.o comgeom.o conf_gcm.o dimphy.o indicesol
 initrrnpb.o : indicesol.o dimphy.o dimens_m.o 
 integrd.o : qminimum.o paramet_m.o massdair.o filtreg.o disvert.o dimens_m.o comgeom.o 
 interface_surf.o : unit_nml_m.o 
-interfoce_lim.o : indicesol.o abort_gcm.o 
+interfoce_lim.o : indicesol.o dimphy.o abort_gcm.o 
 interfsurf_hq.o : suphec.o soil.o interfsur_lim.o interfoce_lim.o interface_surf.o indicesol.o fonte_neige.o dimphy.o clesphys2.o calcul_fluxs.o calbeta.o albsno.o abort_gcm.o 
 interfsur_lim.o : dimphy.o abort_gcm.o 
 interpost.o : comgeom.o disvert.o comconst.o paramet_m.o dimens_m.o 
@@ -156,7 +156,7 @@ ioget_calendar.o : ioconf_calendar.o calendar.o
 ioipslmpp.o : errioipsl.o 
 isittime.o : ymds2ju.o ju2ymds.o itau2date.o calendar.o 
 itau2date.o : calendar.o 
-laplacien.o : paramet_m.o grad.o filtreg.o divergf.o 
+laplacien.o : paramet_m.o grad.o filtreg.o divergf.o dimens_m.o 
 laplacien_gam.o : comgeom.o paramet_m.o dimens_m.o grad.o 
 laplacien_rot.o : filtreg.o comgeom.o paramet_m.o dimens_m.o 
 laplacien_rotgam.o : comgeom.o paramet_m.o dimens_m.o 

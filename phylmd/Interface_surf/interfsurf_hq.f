@@ -39,7 +39,7 @@ contains
     integer, intent(IN):: nisurf ! index de la surface a traiter
     integer, intent(IN):: knon ! nombre de points de la surface a traiter
 
-    integer, intent(in):: knindex(klon)
+    integer, intent(in):: knindex(:) ! (knon)
     ! index des points de la surface a traiter
 
     real, intent(IN):: pctsrf(klon, nbsrf)
@@ -90,8 +90,7 @@ contains
     ! ps pression au sol
     REAL, DIMENSION(klon), INTENT(INOUT):: radsol
     ! radsol rayonnement net aus sol (LW + SW)
-    real, dimension(klon), intent(INOUT):: evap
-    ! evap evaporation totale
+    real, intent(INOUT):: evap(klon) ! evaporation totale
     real, dimension(klon), intent(OUT):: fluxsens, fluxlat
     ! fluxsens flux de chaleur sensible
     ! fluxlat flux de chaleur latente
@@ -207,8 +206,8 @@ contains
 
        ! calcul albedo: lecture albedo fichier boundary conditions
        ! puis ajout albedo neige
-       call interfsur_lim(itime, dtime, jour, nisurf, knon, knindex, &
-            debut, alb_new, z0_new)
+       call interfsur_lim(itime, dtime, jour, nisurf, knindex, debut, &
+            alb_new, z0_new)
 
        ! calcul snow et qsurf, hydrol adapté
        CALL calbeta(nisurf, snow(:knon), qsol(:knon), beta(:knon), &
@@ -245,8 +244,8 @@ contains
     case (is_oce)
        ! Surface "ocean" appel à l'interface avec l'océan
        ! lecture conditions limites
-       call interfoce_lim(itime, dtime, jour, klon, knon, knindex, debut, &
-            tsurf_temp, pctsrf_new)
+       call interfoce_lim(itime, dtime, jour, knindex, debut, tsurf_temp, &
+            pctsrf_new)
 
        cal = 0.
        beta = 1.
@@ -287,8 +286,8 @@ contains
        ! Surface "glace de mer" appel a l'interface avec l'ocean
 
        ! ! lecture conditions limites
-       CALL interfoce_lim(itime, dtime, jour, klon, knon, knindex, &
-            debut, tsurf_new, pctsrf_new)
+       CALL interfoce_lim(itime, dtime, jour, knindex, debut, tsurf_new, &
+            pctsrf_new)
 
        DO ii = 1, knon
           tsurf_new(ii) = tsurf(ii)

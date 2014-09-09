@@ -36,7 +36,7 @@ contains
 
     REAL t(klon, klev)       ! temperature (K)
     REAL q(klon, klev)       ! humidite specifique (kg/kg)
-    REAL ts(klon)           ! temperature du sol (K)
+    REAL, intent(in):: ts(klon) ! temperature du sol (K)
     REAL evap(klon)         ! evaporation au sol
     REAL paprs(klon, klev+1) ! pression a inter-couche (Pa)
     REAL pplay(klon, klev)   ! pression au milieu de couche (Pa)
@@ -59,14 +59,14 @@ contains
     integer, intent(in):: jour            ! jour de l'annee en cours
     real, intent(in):: rmu0(klon)         ! cosinus de l'angle solaire zenithal
     real rugos(klon)        ! rugosite
-    integer, intent(in):: knindex(klon)
+    integer, intent(in):: knindex(:) ! (knon)
     real, intent(in):: pctsrf(klon, nbsrf)
     real, intent(in):: rlat(klon)
     REAL, intent(in):: co2_ppm            ! taux CO2 atmosphere
 
     REAL d_t(klon, klev)     ! incrementation de "t"
     REAL d_q(klon, klev)     ! incrementation de "q"
-    REAL d_ts(klon)         ! incrementation de "ts"
+    REAL, intent(out):: d_ts(:) ! (knon) incrementation de "ts"
     REAL flux_t(klon, klev)  ! (diagnostic) flux de la chaleur
     !                               sensible, flux de Cp*T, positif vers
     !                               le bas: j/(m**2 s) c.a.d.: W/m2
@@ -128,7 +128,7 @@ contains
 
     ! Parametres de sortie
     real fluxsens(klon), fluxlat(klon)
-    real tsurf_new(klon), alb_new(klon)
+    real tsurf_new(knon), alb_new(klon)
     real z0_new(klon)
     real pctsrf_new(klon, nbsrf)
     ! JLD
@@ -280,12 +280,12 @@ contains
     ccanopy = co2_ppm
 
     CALL interfsurf_hq(itime, dtime, jour, rmu0, nisurf, knon, knindex, &
-         pctsrf, rlat, debut, nsoilmx, tsoil, qsol, u1lay, v1lay, &
-         temp_air, spechum, tq_cdrag, petAcoef, peqAcoef, petBcoef, peqBcoef, &
-         precip_rain, precip_snow, fder, rugos, rugoro, snow, qsurf, ts(:knon), &
-         p1lay, psref, radsol, evap, fluxsens, fluxlat, dflux_l, dflux_s, &
-         tsurf_new(:knon), alb_new, alblw, z0_new, pctsrf_new, agesno, fqcalving, &
-         ffonte, run_off_lic_0, flux_o, flux_g)
+         pctsrf, rlat, debut, nsoilmx, tsoil, qsol, u1lay, v1lay, temp_air, &
+         spechum, tq_cdrag, petAcoef, peqAcoef, petBcoef, peqBcoef, &
+         precip_rain, precip_snow, fder, rugos, rugoro, snow, qsurf, &
+         ts(:knon), p1lay, psref, radsol, evap, fluxsens, fluxlat, dflux_l, &
+         dflux_s, tsurf_new, alb_new, alblw, z0_new, pctsrf_new, agesno, &
+         fqcalving, ffonte, run_off_lic_0, flux_o, flux_g)
 
     do i = 1, knon
        flux_t(i, 1) = fluxsens(i)

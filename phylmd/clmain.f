@@ -475,11 +475,11 @@ contains
                ypplay, ydelp, y_d_v, y_flux_v)
 
           ! calculer la diffusion de "q" et de "h"
-          CALL clqh(dtime, itap, jour, debut, rlat, knon, nsrf, ni, pctsrf, &
-               ytsoil, yqsol, rmu0, co2_ppm, yrugos, yrugoro, &
-               yu1, yv1, coefh(:knon, :), yt, yq, yts, ypaprs, ypplay, ydelp, &
-               yrads, yalb, yalblw, ysnow, yqsurf, yrain_f, ysnow_f, yfder, &
-               ysolsw, yfluxlat, pctsrf_new, yagesno, y_d_t, y_d_q, y_d_ts, &
+          CALL clqh(dtime, itap, jour, debut, rlat, knon, nsrf, ni(:knon), pctsrf, &
+               ytsoil, yqsol, rmu0, co2_ppm, yrugos, yrugoro, yu1, yv1, &
+               coefh(:knon, :), yt, yq, yts, ypaprs, ypplay, ydelp, yrads, &
+               yalb, yalblw, ysnow, yqsurf, yrain_f, ysnow_f, yfder, ysolsw, &
+               yfluxlat, pctsrf_new, yagesno, y_d_t, y_d_q, y_d_ts(:knon), &
                yz0_new, y_flux_t, y_flux_q, y_dflux_t, y_dflux_q, &
                y_fqcalving, y_ffonte, y_run_off_lic_0, y_flux_o, y_flux_g)
 

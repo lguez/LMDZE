@@ -24,7 +24,7 @@ SUBROUTINE laplacien_rot(klevel, rotin, rotout, ghx, ghy)
   ! ..........    variables  en  arguments     .............
 
   INTEGER, INTENT (IN) :: klevel
-  REAL rotin(ip1jm, klevel), rotout(ip1jm, klevel)
+  REAL rotin(iim + 1, jjm, klevel), rotout(ip1jm, klevel)
 
   ! ..........    variables   locales       ................
 

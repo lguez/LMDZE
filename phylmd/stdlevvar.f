@@ -22,29 +22,40 @@ contains
     INTEGER, intent(in):: klon
     ! dimension de la grille physique (= nb_pts_latitude X nb_pts_longitude)
 
-    INTEGER, intent(in):: knon, nsrf
+    INTEGER, intent(in):: knon
     ! knon----input-I- nombre de points pour un type de surface
+    INTEGER, intent(in):: nsrf
     ! nsrf----input-I- indice pour le type de surface; voir indicesol.inc
     LOGICAL, intent(in):: zxli
     ! zxli----input-L- TRUE si calcul des cdrags selon Laurent Li
-    REAL, dimension(klon), intent(in):: u1, v1, t1, q1, z1, ts1
+    REAL, dimension(klon), intent(in):: u1
     ! u1------input-R- vent zonal au 1er niveau du modele
+    REAL, dimension(klon), intent(in):: v1
     ! v1------input-R- vent meridien au 1er niveau du modele
+    REAL, dimension(klon), intent(in):: t1
     ! t1------input-R- temperature de l'air au 1er niveau du modele
+    REAL, dimension(klon), intent(in):: q1
     ! q1------input-R- humidite relative au 1er niveau du modele
+    REAL, dimension(klon), intent(in):: z1
     ! z1------input-R- geopotentiel au 1er niveau du modele
+    REAL, dimension(klon), intent(in):: ts1
     ! ts1-----input-R- temperature de l'air a la surface
-    REAL, dimension(klon), intent(in):: qsurf, rugos
+    REAL, dimension(klon), intent(in):: qsurf
      ! qsurf---input-R- humidite relative a la surface
+    REAL, dimension(klon), intent(in):: rugos
     ! rugos---input-R- rugosite
-   REAL, dimension(klon), intent(in):: psol, pat1
+   REAL, dimension(klon), intent(in):: psol
     ! psol----input-R- pression au sol
+   REAL, dimension(klon), intent(in):: pat1
     ! pat1----input-R- pression au 1er niveau du modele
 
-    REAL, dimension(klon), intent(out):: t_2m, q_2m, t_10m, q_10m
+    REAL, dimension(klon), intent(out):: t_2m
     ! t_2m---output-R- temperature de l'air a 2m
+    REAL, dimension(klon), intent(out):: q_2m
     ! q_2m---output-R- humidite relative a 2m
+    REAL, dimension(klon), intent(out):: t_10m
     ! t_10m--output-R- temperature de l'air a 10m
+    REAL, dimension(klon), intent(out):: q_10m
     ! q_10m--output-R- humidite specifique a 10m
     REAL, dimension(klon), intent(out):: u_10m
     ! u_10m--output-R- vitesse du vent a 10m

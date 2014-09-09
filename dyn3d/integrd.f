@@ -11,7 +11,7 @@ contains
     ! Author: P. Le Van 
     ! Objet: incrémentation des tendances dynamiques
 
-    USE comgeom, ONLY : aire, apoln, apols
+    USE comgeom, ONLY : aire, aire_2d, apoln, apols
     USE dimens_m, ONLY : iim, jjm, llm
     USE disvert_m, ONLY : ap, bp
     USE filtreg_m, ONLY : filtreg
@@ -21,29 +21,28 @@ contains
     use qminimum_m, only: qminimum
 
     REAL vcovm1(ip1jm, llm), ucovm1((iim + 1) * (jjm + 1), llm)
-    REAL, intent(inout):: tetam1((iim + 1) * (jjm + 1), llm)
+    REAL, intent(inout):: tetam1(iim + 1, jjm + 1, llm)
     REAL, intent(inout):: psm1((iim + 1) * (jjm + 1))
-    real massem1((iim + 1) * (jjm + 1), llm)
+    real massem1(iim + 1, jjm + 1, llm)
     REAL, intent(in):: dv(ip1jm, llm), dudyn((iim + 1) * (jjm + 1), llm)
-    REAL dteta((iim + 1) * (jjm + 1), llm), dp((iim + 1) * (jjm + 1))
+    REAL dteta(iim + 1, jjm + 1, llm), dp((iim + 1) * (jjm + 1))
     REAL, intent(inout):: vcov(ip1jm, llm), ucov((iim + 1) * (jjm + 1), llm)
-    real, intent(inout):: teta((iim + 1) * (jjm + 1), llm)
+    real, intent(inout):: teta(iim + 1, jjm + 1, llm)
     REAL q(:, :, :, :) ! (iim + 1, jjm + 1, llm, nq)
     REAL, intent(inout):: ps((iim + 1) * (jjm + 1))
-    REAL, intent(inout):: masse((iim + 1) * (jjm + 1), llm)
-    REAL finvmaold((iim + 1) * (jjm + 1), llm)
+    REAL, intent(inout):: masse(iim + 1, jjm + 1, llm)
+    REAL finvmaold(iim + 1, jjm + 1, llm)
     real, intent(in):: dt ! time step, in s
     LOGICAL, INTENT (IN) :: leapf
 
     ! Local: 
     INTEGER nq
-    REAL vscr(ip1jm), uscr((iim + 1) * (jjm + 1)), hscr((iim + 1) * (jjm + 1))
+    REAL vscr(ip1jm), uscr((iim + 1) * (jjm + 1)), hscr(iim + 1, jjm + 1)
     real pscr((iim + 1) * (jjm + 1))
-    REAL massescr((iim + 1) * (jjm + 1), llm)
-    real finvmasse((iim + 1) * (jjm + 1), llm)
+    REAL massescr(iim + 1, jjm + 1, llm)
+    real finvmasse(iim + 1, jjm + 1, llm)
     REAL p((iim + 1) * (jjm + 1), llmp1)
     REAL tpn, tps, tppn(iim), tpps(iim)
-    REAL qpn, qps, qppn(iim), qpps(iim)
     REAL deltap((iim + 1) * (jjm + 1), llm)
     INTEGER l, ij, iq
 
@@ -109,28 +108,19 @@ contains
           vcov(ij, l) = vcovm1(ij, l) + dt * dv(ij, l)
        END DO
 
-       hscr = teta(:, l)
-       teta(:, l) = tetam1(:, l) * massem1(:, l) / masse(:, l) &
-            + dt * dteta(:, l) / masse(:, l)
+       hscr = teta(:, :, l)
+       teta(:, :, l) = tetam1(:, :, l) * massem1(:, :, l) / masse(:, :, l) &
+            + dt * dteta(:, :, l) / masse(:, :, l)
 
        ! Calcul de la valeur moyenne, unique aux poles pour teta
-
-       DO ij = 1, iim
-          tppn(ij) = aire(ij) * teta(ij, l)
-          tpps(ij) = aire(ij+ip1jm) * teta(ij+ip1jm, l)
-       END DO
-       tpn = sum(tppn)/apoln
-       tps = sum(tpps)/apols
-
-       DO ij = 1, iip1
-          teta(ij, l) = tpn
-          teta(ij+ip1jm, l) = tps
-       END DO
+       teta(:, 1, l) = sum(aire_2d(:iim, 1) * teta(:iim, 1, l)) / apoln
+       teta(:, jjm + 1, l) = sum(aire_2d(:iim, jjm + 1) &
+            * teta(:iim, jjm + 1, l)) / apols
 
        IF (leapf) THEN
           ucovm1(:, l)  =uscr
           vcovm1(:, l) = vscr
-          tetam1(:, l) = hscr
+          tetam1(:, :, l) = hscr
        END IF
     END DO
 
@@ -143,20 +133,11 @@ contains
     CALL qminimum(q, nq, deltap)
 
     ! Calcul de la valeur moyenne, unique aux poles pour q
-
     DO iq = 1, nq
        DO l = 1, llm
-          DO ij = 1, iim
-             qppn(ij) = aire(ij) * q(ij, 1, l, iq)
-             qpps(ij) = aire(ij+ip1jm) * q(ij, jjm + 1, l, iq)
-          END DO
-          qpn = sum(qppn)/apoln
-          qps = sum(qpps)/apols
-
-          DO ij = 1, iip1
-             q(ij, 1, l, iq) = qpn
-             q(ij, jjm + 1, l, iq) = qps
-          END DO
+          q(:, 1, l, iq) = sum(aire_2d(:iim, 1) * q(:iim, 1, l, iq)) / apoln
+          q(:, jjm + 1, l, iq) = sum(aire_2d(:iim, jjm + 1) &
+               * q(:iim, jjm + 1, l, iq)) / apols
        END DO
     END DO
 
