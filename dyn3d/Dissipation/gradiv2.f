@@ -53,7 +53,7 @@ contains
        END DO
     ENDIF
 
-    CALL filtreg(div, jjm + 1, klevel, 2, 1, .TRUE.)
+    CALL filtreg(div, direct = .true., intensive = .true.)
     CALL grad(klevel, div, gdx, gdy)
     nugrads = (-1.)**ld * cdivu
 

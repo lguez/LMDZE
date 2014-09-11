@@ -51,7 +51,7 @@ contains
     deltap = 1.
     call random_number(zh)
     zh = zh - 0.5
-    CALL filtreg(zh, jjp1, 1, 2, 1, .TRUE.)
+    CALL filtreg(zh, direct = .true., intensive = .true.)
 
     DO l = 1, 50
        CALL divgrad2(1, zh, deltap, niterh, divgra, -1.)
@@ -65,10 +65,10 @@ contains
     PRINT *, 'Calcul des valeurs propres de gradiv'
     call random_number(zu)
     zu = zu - 0.5
-    CALL filtreg(zu, jjp1, 1, 2, 1, .TRUE.)
+    CALL filtreg(zu, direct = .true., intensive = .true.)
     call random_number(zv)
     zv = zv - 0.5
-    CALL filtreg(zv, jjm, 1, 2, 1, .FALSE.)
+    CALL filtreg(zv, direct = .true., intensive = .true.)
 
     DO l = 1, 50
        CALL gradiv2(zu, zv, nitergdiv, gx, gy, -1.)
@@ -83,10 +83,10 @@ contains
     PRINT *, 'Calcul des valeurs propres de nxgrarot'
     call random_number(zu)
     zu = zu - 0.5
-    CALL filtreg(zu, jjp1, 1, 2, 1, .TRUE.)
+    CALL filtreg(zu, direct = .true., intensive = .true.)
     call random_number(zv)
     zv = zv - 0.5
-    CALL filtreg(zv, jjm, 1, 2, 1, .FALSE.)
+    CALL filtreg(zv, direct = .true., intensive = .true.)
 
     DO l = 1, 50
        CALL nxgraro2(zu, zv, nitergrot, gx, gy, -1.)

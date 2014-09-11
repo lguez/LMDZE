@@ -16,11 +16,10 @@ contains
 
     use abort_gcm_m, only: abort_gcm
     use comconst, only: kappa, cpp
-    use disvert_m, only: pa, disvert, ap, bp, preff, presnivs, s
+    use disvert_m, only: ap, bp, preff, presnivs, s
     use dimens_m, only: llm
     use exner_hyb_m, only: exner_hyb
     use jumble, only: new_unit
-    use nr_util, only: assert
 
     integer i, unit, l
 

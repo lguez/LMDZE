@@ -44,7 +44,7 @@ contains
 
     ! stockage dans dh de la convergence horizontale filtrée du flux
     ! d'enthalpie potentielle
-    CALL filtreg(dteta, jjp1, llm, 2, 2, .true.)
+    CALL filtreg(dteta, direct = .true., intensive = .false.)
 
   END SUBROUTINE dteta1
 

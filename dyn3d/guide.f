@@ -24,8 +24,9 @@ CONTAINS
     use dump2d_m, only: dump2d
     USE exner_hyb_m, ONLY: exner_hyb
     USE inigrads_m, ONLY: inigrads
-    use netcdf, only: nf90_nowrite, nf90_close, nf90_inq_dimid
-    use netcdf95, only: nf95_inquire_dimension, nf95_open
+    use netcdf, only: nf90_nowrite
+    use netcdf95, only: nf95_close, nf95_inq_dimid, nf95_inquire_dimension, &
+         nf95_open
     use nr_util, only: pi
     USE paramet_m, ONLY: iip1, ip1jmp1, jjp1, llmp1
     USE q_sat_m, ONLY: q_sat
@@ -75,8 +76,8 @@ CONTAINS
     real ztau(iim + 1, jjm + 1)
 
     INTEGER ij, l
-    INTEGER ncidpl, status
-    INTEGER rcod, rid
+    INTEGER ncidpl
+    INTEGER rid
     REAL tau
     INTEGER, SAVE:: nlev
 
@@ -122,7 +123,7 @@ CONTAINS
           CALL dump2d(iip1, jjp1, alpha_u, 'COEFF U ')
           CALL dump2d(iip1, jjp1, alpha_t, 'COEFF T ')
        ELSE
-          ! Cas ou on force exactement par les variables analysees
+          ! Cas où on force exactement par les variables analysées
           alpha_t = 0.
           alpha_u = 0.
           alpha_v = 0.
@@ -140,13 +141,13 @@ CONTAINS
        if (guide_Q) call nf95_open('hur.nc',nf90_nowrite, ncidpl)
 
        IF (ncep) THEN
-          status = nf90_inq_dimid(ncidpl, 'LEVEL', rid)
+          call nf95_inq_dimid(ncidpl, 'LEVEL', rid)
        ELSE
-          status = nf90_inq_dimid(ncidpl, 'PRESSURE', rid)
+          call nf95_inq_dimid(ncidpl, 'PRESSURE', rid)
        END IF
        call nf95_inquire_dimension(ncidpl, rid, nclen=nlev)
        PRINT *, 'nlev', nlev
-       rcod = nf90_close(ncidpl)
+       call nf95_close(ncidpl)
        ! Lecture du premier etat des reanalyses.
        CALL read_reanalyse(1, ps, ucovrea2, vcovrea2, tetarea2, qrea2, &
             masserea2, nlev)

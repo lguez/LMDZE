@@ -41,7 +41,7 @@ contains
             / apols
     end DO
 
-    CALL filtreg(div, jjm + 1, klevel, 2, 2, .TRUE.)
+    CALL filtreg(div, direct = .true., intensive = .false.)
 
     DO l = 1, klevel
        div(:, 2:jjm, l) = div(:, 2:jjm, l) * unsaire_2d(:, 2:jjm)

@@ -24,7 +24,7 @@ contains
 
     !-----------------------------------------------------------------
 
-    CALL filtreg(teta, jjp1, klevel, 2, 1, .TRUE.)
+    CALL filtreg(teta, direct = .true., intensive = .true.)
     CALL grad(klevel, teta, ghx, ghy)
     CALL divergf(klevel, ghx, ghy, teta)
 

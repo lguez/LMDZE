@@ -13,7 +13,7 @@ module etat0_mod
 
 contains
 
-  SUBROUTINE etat0
+  SUBROUTINE etat0(phis)
 
     ! From "etat0_netcdf.F", version 1.3, 2005/05/25 13:10:09
 
@@ -54,7 +54,10 @@ contains
     use temps, only: itau_phy, annee_ref, day_ref
     use test_disvert_m, only: test_disvert
 
-    ! Variables local to the procedure:
+    REAL, intent(out):: phis(:, :) ! (iim + 1, jjm + 1)
+    ! surface geopotential, in m2 s-2
+
+    ! Local:
 
     REAL latfi(klon), lonfi(klon)
     ! (latitude and longitude of a point of the scalar grid identified
@@ -80,7 +83,6 @@ contains
     real seaice(klon) ! kg m-2
     REAL frugs(klon, nbsrf), agesno(klon, nbsrf)
     REAL rugmer(klon)
-    REAL phis(iim + 1, jjm + 1) ! surface geopotential, in m2 s-2
     real, dimension(iim + 1, jjm + 1):: zmea_2d, zstd_2d, zsig_2d, zgam_2d
     real, dimension(iim + 1, jjm + 1):: zthe_2d, zpic_2d, zval_2d
     real, dimension(iim + 1, jjm + 1):: tsol_2d, qsol_2d, ps

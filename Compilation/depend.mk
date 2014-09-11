@@ -1,6 +1,7 @@
 caldyn0.o : vitvert.o tourpot.o sortvarc.o paramet_m.o massdair.o massbarxy.o massbar.o flumass.o disvert.o dimens_m.o convmas.o comgeom.o bernoui.o 
-ce0l.o : unit_nml_m.o limit.o etat0.o conf_gcm.o 
+ce0l.o : unit_nml_m.o limit.o grilles_gcm_netcdf_sub.o etat0.o dimens_m.o conf_gcm.o 
 etat0.o : test_disvert.o temps.o start_inter_3d.o start_init_phys_m.o start_init_orog_m.o startdyn.o serre.o regr_pr_o3.o regr_lat_time_coefoz.o q_sat.o phyredem.o paramet_m.o massdair.o inifilr.o iniadvtrac.o histclo.o grid_change.o grid_atob.o geopot.o exner_hyb.o dynredem1.o dynredem0.o disvert.o dimsoil.o dimens_m.o conf_gcm.o comgeom.o comconst.o caldyn0.o dimphy.o indicesol.o 
+grilles_gcm_netcdf_sub.o : start_init_orog_m.o disvert.o dimens_m.o comgeom.o comconst.o 
 grid_noro_m.o : mva9.o dimens_m.o 
 inter_barxy.o : ord_coordm.o ord_coord.o inter_bary.o inter_barx.o dimens_m.o comgeom.o 
 limit.o : unit_nml_m.o start_init_orog_m.o inter_barxy.o indicesol.o grid_change.o etat0.o dimphy.o dimens_m.o conf_dat2d.o comgeom.o 
@@ -158,7 +159,7 @@ isittime.o : ymds2ju.o ju2ymds.o itau2date.o calendar.o
 itau2date.o : calendar.o 
 laplacien.o : paramet_m.o grad.o filtreg.o divergf.o dimens_m.o 
 laplacien_gam.o : comgeom.o paramet_m.o dimens_m.o grad.o 
-laplacien_rot.o : filtreg.o comgeom.o paramet_m.o dimens_m.o 
+laplacien_rot.o : rotatf.o filtreg.o comgeom.o paramet_m.o dimens_m.o 
 laplacien_rotgam.o : comgeom.o paramet_m.o dimens_m.o 
 leapfrog.o : writehist.o writedynav.o temps.o pressure_var.o integrd.o inidissip.o guide.o geopot.o fluxstokenc.o filtreg.o exner_hyb.o dynredem1.o dynetat0.o dissip.o dimens_m.o conf_gcm.o disvert.o comgeom.o comconst.o calfis.o caldyn.o caladvtrac.o bilan_dyn.o addfi.o 
 lift_noro.o : suphec.o dimphy.o dimens_m.o 
@@ -185,7 +186,7 @@ nflxtr.o : suphec.o dimphy.o
 nuage.o : suphec.o dimphy.o dimens_m.o 
 nxgrad.o : comgeom.o paramet_m.o dimens_m.o 
 nxgrad_gam.o : comgeom.o paramet_m.o dimens_m.o 
-nxgraro2.o : filtreg.o dimens_m.o 
+nxgraro2.o : rotatf.o filtreg.o dimens_m.o 
 o3_chem.o : zenang.o orbite.o regr_pr_comb_coefoz.o dimens_m.o dimphy.o 
 orbite.o : YOMCST.o 
 orodrag.o : gwprofil.o YOEGWD.o suphec.o dimphy.o dimens_m.o 

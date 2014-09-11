@@ -14,6 +14,7 @@ contains
     USE dimens_m, ONLY: iim, jjm
     USE filtreg_m, ONLY: filtreg
     use nr_util, only: assert, assert_eq
+    use rotatf_m, only: rotatf
 
     ! Composantes covariantes de v :
     REAL, intent(in):: xcov(:, :, :) ! (iim + 1, jjm + 1, :)
@@ -49,7 +50,7 @@ contains
        CALL laplacien_rotgam(klevel, rot, rot)
     ENDDO
 
-    CALL filtreg(rot, jjm, klevel, 2, 1, .FALSE.)
+    CALL filtreg(rot, direct = .true., intensive = .true.)
     CALL nxgrad(klevel, rot, grx, gry)
 
     nugradrs = (-1.)**lr * crot

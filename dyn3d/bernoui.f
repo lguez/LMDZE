@@ -22,7 +22,7 @@ contains
     !-----------------------------------------------------------------------
 
     bern = phi + ecin
-    CALL filtreg(bern, jjm + 1, llm, 2, 1, .TRUE.)
+    CALL filtreg(bern, direct = .true., intensive = .true.)
 
   END SUBROUTINE bernoui
 

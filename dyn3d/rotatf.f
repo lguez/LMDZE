@@ -1,59 +1,50 @@
+module rotatf_m
 
-! $Header: /home/cvsroot/LMDZ4/libf/dyn3d/rotatf.F,v 1.1.1.1 2004/05/19
-! 12:53:05 lmdzadmin Exp $
-
-SUBROUTINE rotatf(klevel, x, y, rot)
-
-  ! Auteur : P.Le Van
-  ! **************************************************************
-  ! .  calcule le rotationnel
-  ! a tous les niveaux d'1 vecteur de comp. x et y ..
-  ! x  et  y etant des composantes  covariantes  ...
-  ! ********************************************************************
-  ! klevel, x  et y   sont des arguments d'entree pour le s-prog
-  ! rot          est  un argument  de sortie pour le s-prog
-
-  USE dimens_m
-  USE paramet_m
-  USE comgeom
-  USE filtreg_m, ONLY: filtreg
   IMPLICIT NONE
 
+contains
 
-  ! .....  variables en arguments  ......
+  SUBROUTINE rotatf(klevel, x, y, rot)
 
-  INTEGER, INTENT (IN) :: klevel
-  REAL rot(ip1jm, klevel)
-  REAL, INTENT (IN) :: x(ip1jmp1, klevel), y(ip1jm, klevel)
+    ! From LMDZ4/libf/dyn3d/rotatf.F, version 1.1.1.1 2004/05/19 12:53:05
 
-  ! ...   variables  locales  ...
+    ! Author: P.Le Van
 
-  INTEGER l, ij
+    ! Calcule le rotationnel à tous les niveaux d'un vecteur de
+    ! composantes covariantes x et y.
+
+    USE dimens_m
+    USE paramet_m
+    USE comgeom
+    USE filtreg_m, ONLY: filtreg
 
 
-  DO l = 1, klevel
+    ! .....  variables en arguments  ......
 
-    DO ij = 1, ip1jm - 1
-      rot(ij, l) = y(ij+1, l) - y(ij, l) + x(ij+iip1, l) - x(ij, l)
+    INTEGER, INTENT (IN) :: klevel
+    ! klevel, x  et y   sont des arguments d'entree pour le s-prog
+    ! rot          est  un argument  de sortie pour le s-prog
+
+    REAL rot(iim + 1, jjm, klevel)
+    REAL, INTENT (IN) :: x(iim + 1, jjm + 1, klevel), y(iim + 1, jjm, klevel)
+
+    ! ...   variables  locales  ...
+
+    INTEGER l, i, j
+
+
+    DO l = 1, klevel
+       forall (i = 1:iim, j = 1:jjm) rot(i, j, l) = y(i + 1, j, l) &
+            - y(i, j, l) + x(i, j + 1, l) - x(i, j, l)
+       rot(iim + 1, :, l) = rot(1, :, l)
     END DO
 
-    ! .... correction pour rot( iip1,j,l)  ....
-    ! ....   rot(iip1,j,l)= rot(1,j,l) ...
-    ! DIR$ IVDEP
-    DO ij = iip1, ip1jm, iip1
-      rot(ij, l) = rot(ij-iim, l)
+    CALL filtreg(rot, direct = .true., intensive = .false.)
+
+    DO l = 1, klevel
+       rot(:, :, l) = rot(:, :, l)*unsairez_2d
     END DO
 
-  END DO
+  END SUBROUTINE rotatf
 
-  CALL filtreg(rot, jjm, klevel, 2, 2, .FALSE.)
-
-  DO l = 1, klevel
-    DO ij = 1, ip1jm
-      rot(ij, l) = rot(ij, l)*unsairez(ij)
-    END DO
-  END DO
-
-
-  RETURN
-END SUBROUTINE rotatf
+end module rotatf_m

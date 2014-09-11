@@ -31,7 +31,7 @@ contains
     CALL convflu(pbaru, pbarv, llm, convm)
 
     ! Filtrage :
-    CALL filtreg(convm, jjp1, llm, 2, 2, .TRUE.)
+    CALL filtreg(convm, direct = .true., intensive = .false.)
 
     ! Intégration de la convergence de masse de haut en bas :
     DO l = llmm1, 1, -1

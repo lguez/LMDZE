@@ -18,12 +18,12 @@ SUBROUTINE wrgrads(i_f, nl, field, name, titlevar)
   INTEGER, INTENT(IN):: i_f
   integer nl
   REAL, INTENT(IN):: field(imx*jmx*lmx)
-  CHARACTER(len=10) name, file
-  CHARACTER(len=10) titlevar
+  CHARACTER(len=*) name, titlevar
+  CHARACTER(len=10) file
 
   ! local
 
-  INTEGER im, jm, lm, i, j, l, lnblnk, iv, iii, iji, iif, ijf
+  INTEGER im, jm, lm, i, j, l, iv, iii, iji, iif, ijf
 
   LOGICAL writectl
 
@@ -56,7 +56,7 @@ SUBROUTINE wrgrads(i_f, nl, field, name, titlevar)
       ivar(i_f) = ivar(i_f) + 1
       nvar(i_f) = ivar(i_f)
       var(ivar(i_f), i_f) = name
-      tvar(ivar(i_f), i_f) = titlevar(1:lnblnk(titlevar))
+      tvar(ivar(i_f), i_f) = trim(titlevar)
       nld(ivar(i_f), i_f) = nl
       PRINT *, 'initialisation ecriture de ', var(ivar(i_f), i_f)
       PRINT *, 'i_f ivar(i_f) nld ', i_f, ivar(i_f), nld(ivar(i_f), i_f)
@@ -96,9 +96,9 @@ SUBROUTINE wrgrads(i_f, nl, field, name, titlevar)
 
     file = fichier(i_f)
     ! WARNING! on reecrase le fichier .ctl a chaque ecriture
-    OPEN (unit(i_f), FILE=file(1:lnblnk(file))//'.ctl', FORM='formatted', &
+    OPEN (unit(i_f), FILE=trim(file)//'.ctl', FORM='formatted', &
       STATUS='unknown')
-    WRITE (unit(i_f), '(a5,1x,a40)') 'DSET ', '^' // file(1:lnblnk(file)) // &
+    WRITE (unit(i_f), '(a5,1x,a40)') 'DSET ', '^' // trim(file) // &
       '.dat'
 
     WRITE (unit(i_f), '(a12)') 'UNDEF 1.0E30'

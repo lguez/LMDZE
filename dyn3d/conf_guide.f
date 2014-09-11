@@ -18,8 +18,8 @@ module conf_guide_m
   LOGICAL:: ini_anal = .false. ! Initial = analyse
   LOGICAL:: guide_u = .true. ! guidage de u
   LOGICAL:: guide_v = .true. ! gvidage de v
-  LOGICAL:: guide_t = .true. ! guidage de T
-  LOGICAL:: guide_q = .true. ! guidage de q
+  LOGICAL:: guide_t = .false. ! guidage de T
+  LOGICAL:: guide_q = .false. ! guidage de q
 
   logical:: online = .true. ! controle du guide
   ! hors-ligne: x=x_rea

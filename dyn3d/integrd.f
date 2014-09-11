@@ -93,7 +93,7 @@ contains
     CALL massdair(p, masse)
 
     finvmasse = masse
-    CALL filtreg(finvmasse, jjp1, llm, -2, 2, .TRUE.)
+    CALL filtreg(finvmasse, direct = .false., intensive = .false.)
 
     ! integration de ucov, vcov, h
 

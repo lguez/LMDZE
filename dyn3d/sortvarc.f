@@ -53,7 +53,7 @@ contains
     rmsdpdt = sum(ge) - sum(ge(1, :))
     rmsdpdt = daysec*1.E-2*sqrt(rmsdpdt / (iim * jjp1))
     bernf = bern
-    CALL filtreg(bernf, jjp1, llm, -2, 2, .TRUE.)
+    CALL filtreg(bernf, direct = .false., intensive = .false.)
 
     ! Calcul du moment  angulaire
     radsg = rad/g
