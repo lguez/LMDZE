@@ -6,6 +6,7 @@
                          ts, qsurf, rugos, psol, &
                          ustar, testar, qstar, okri, ri1, &
                          pref, delu, delte, delq)
+        use coefcdrag_m, only: coefcdrag
       use SUPHEC_M
       IMPLICIT NONE
 !-----------------------------------------------------------------------

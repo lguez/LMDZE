@@ -9,9 +9,9 @@ SUBROUTINE dump2d(im, jm, z, nom_z)
 ! $Header: /home/cvsroot/LMDZ4/libf/dyn3d/dump2d.F,v 1.1.1.1 2004/05/19
 ! 12:53:05 lmdzadmin Exp $
 
-  INTEGER im, jm
-  REAL z(im, jm)
-  CHARACTER(len=*) nom_z
+  INTEGER, intent(in):: im, jm
+  REAL, intent(in):: z(im, jm)
+  CHARACTER(len=*), intent(in):: nom_z
 
   INTEGER i, j, imin, illm, jmin, jllm
   REAL zmin, zllm

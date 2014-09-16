@@ -54,6 +54,7 @@ contains
     USE qcheck_m, ONLY: qcheck
     use radlwsw_m, only: radlwsw
     use readsulfate_m, only: readsulfate
+    use readsulfate_preind_m, only: readsulfate_preind
     use sugwd_m, only: sugwd
     USE suphec_m, ONLY: ra, rcpd, retv, rg, rlvtt, romega, rsigma, rtt
     USE temps, ONLY: annee_ref, day_ref, itau_phy

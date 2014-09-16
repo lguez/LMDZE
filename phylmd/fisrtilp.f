@@ -113,14 +113,6 @@ contains
     ! Pour la conversion eau-neige
     REAL zlh_solid(klon), zm_solid
 
-    ! Fonctions en ligne:
-
-    REAL fallvs, fallvc ! vitesse de chute pour crystaux de glace 
-    REAL zzz
-
-    fallvc(zzz) = 3.29/2.0*((zzz)**0.16)*ffallv_con
-    fallvs(zzz) = 3.29/2.0*((zzz)**0.16)*ffallv_lsc
-
     !---------------------------------------------------------------
 
     zdelq = 0.0
@@ -490,6 +482,20 @@ contains
           d_t(i, k) = d_t(i, k) + zlh_solid(i)*zm_solid/(zcpair*zmair)
        END DO
     END DO
+
+  contains
+
+    ! vitesse de chute pour crystaux de glace
+
+    REAL function fallvs(zzz)
+      REAL zzz
+      fallvs = 3.29/2.0*((zzz)**0.16)*ffallv_lsc
+    end function fallvs
+
+    real function fallvc(zzz)
+      REAL zzz
+      fallvc = 3.29/2.0*((zzz)**0.16)*ffallv_con
+    end function fallvc
 
   END SUBROUTINE fisrtilp
 

@@ -10,7 +10,6 @@ contains
 
     USE conf_guide_m, ONLY: guide_q, guide_t, guide_u, guide_v, ncep
     USE dimens_m, ONLY: iim, jjm, llm
-    use dump2d_m, only: dump2d
     USE netcdf, ONLY: nf90_get_var, nf90_inq_varid, nf90_nowrite, nf90_open
     USE paramet_m, ONLY: iip1, jjp1
     use reanalyse2nat_m, only: reanalyse2nat
@@ -49,7 +48,6 @@ contains
        if (guide_u) then
           rcode=nf90_open('u.nc', nf90_nowrite, ncidu)
           rcode = nf90_inq_varid(ncidu, 'UWND', varidu)
-          print *, 'ncidu, varidu', ncidu, varidu
           if (ncidpl.eq.-99) ncidpl=ncidu
        endif
 
@@ -57,7 +55,6 @@ contains
        if (guide_v) then
           rcode=nf90_open('v.nc', nf90_nowrite, ncidv)
           rcode = nf90_inq_varid(ncidv, 'VWND', varidv)
-          print *, 'ncidv, varidv', ncidv, varidv
           if (ncidpl.eq.-99) ncidpl=ncidv
        endif
 
@@ -65,7 +62,6 @@ contains
        if (guide_T) then
           rcode=nf90_open('T.nc', nf90_nowrite, ncidt)
           rcode = nf90_inq_varid(ncidt, 'AIR', varidt)
-          print *, 'ncidt, varidt', ncidt, varidt
           if (ncidpl.eq.-99) ncidpl=ncidt
        endif
 
@@ -73,7 +69,6 @@ contains
        if (guide_Q) then
           rcode=nf90_open('hur.nc', nf90_nowrite, ncidQ)
           rcode = nf90_inq_varid(ncidQ, 'RH', varidQ)
-          print *, 'ncidQ, varidQ', ncidQ, varidQ
           if (ncidpl.eq.-99) ncidpl=ncidQ
        endif
 
@@ -85,13 +80,12 @@ contains
           print *, 'Vous etes entrain de lire des donnees ECMWF'
           rcode = nf90_inq_varid(ncidpl, 'PRESSURE', varidpl)
        endif
-       print *, 'ncidu, varidpl', ncidu, varidpl
     endif
-    print *, 'ok1'
 
     ! Niveaux de pression
-    print *, 'WARNING!!! Il n y a pas de test de coherence'
-    print *, 'sur le nombre de niveaux verticaux dans le fichier nc'
+
+    ! Warning: il n y a pas de test de coherence sur le nombre de
+    ! niveaux verticaux dans le fichier nc'
     status=NF90_GET_VAR(ncidpl, varidpl, pl)
     !  passage en pascal
     pl(:)=100.*pl(:)
@@ -125,23 +119,17 @@ contains
     !  Vent zonal
 
     if (guide_u) then
-       print *, 'avant la lecture de UNCEP nd de niv:', nlevnc
        status=NF90_GET_VAR(ncidu, varidu, unc, start, count)
-       print *, 'WARNING!!! Correction bidon pour palier a un '
-       print *, 'probleme dans la creation des fichiers nc'
+       ! Warning Correction bidon pour palier a un probleme dans la
+       ! creation des fichiers nc
        call correctbid(iim, jjp1*nlevnc, unc)
-       call dump2d(iip1, jjp1, unc, 'UNC COUCHE 1 ')
     endif
 
     !  Temperature
 
-    print *, 'ncidt=', ncidt, 'varidt=', varidt, 'start=', start
-    print *, 'count=', count
     if (guide_T) then
        status=NF90_GET_VAR(ncidt, varidt, tnc, start, count)
-       call dump2d(iip1, jjp1, tnc, 'TNC COUCHE 1 AAA ')
        call correctbid(iim, jjp1*nlevnc, tnc)
-       call dump2d(iip1, jjp1, tnc, 'TNC COUCHE 1 BBB ')
     endif
 
     !  Humidite
@@ -149,7 +137,6 @@ contains
     if (guide_Q) then
        status=NF90_GET_VAR(ncidQ, varidQ, Qnc, start, count)
        call correctbid(iim, jjp1*nlevnc, Qnc)
-       call dump2d(iip1, jjp1, Qnc, 'QNC COUCHE 1 ')
     endif
 
     count(2)=jjm
@@ -158,7 +145,6 @@ contains
     if (guide_v) then
        status=NF90_GET_VAR(ncidv, varidv, vnc, start, count)
        call correctbid(iim, jjm*nlevnc, vnc)
-       call dump2d(iip1, jjm, vnc, 'VNC COUCHE 1 ')
     endif
 
     start(3)=timestep
@@ -172,13 +158,10 @@ contains
     call reanalyse2nat(nlevnc, psi, unc, vnc, tnc, Qnc, pl, u, v, t, Q, &
          masse, pk)
 
-    call dump2d(iip1, jjm, v, 'V COUCHE APRES ')
-
     !  Passage aux variables du modele (vents covariants, temperature
     !  potentielle et humidite specifique)
 
     call nat2gcm(u, v, t, Q, pk, u, v, t, Q)
-    print *, 'TIMESTEP ', timestep
     first=.false.
 
   end subroutine read_reanalyse

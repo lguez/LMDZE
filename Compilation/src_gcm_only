@@ -48,6 +48,7 @@ conf_phys.f
 coordij.f
 correctbid.f
 covnat.f
+createnewfield.f
 ctherm.f
 cv3_closure.f
 cv3_compress.f
@@ -115,6 +116,7 @@ flxmain.f
 fonte_neige.f
 formcoord.f
 gcm.f
+getfieldindex.f
 getso4fromfile.f
 grad.f
 gradiv2.f
@@ -150,6 +152,7 @@ inithist.f
 initial0.f
 initphysto.f
 initrrnpb.f
+int2str.f
 integrd.f
 interface_surf.f
 interfoce_lim.f
@@ -262,6 +265,12 @@ vlyqs.f
 vlz.f
 wrgrads.f
 writedynav.f
+write_field1d.f
+write_field2d.f
+write_field3d.f
+write_field.f
+writefield.f
+writefield_gen.f
 writehist.f
 yamada4.f
 yamada.f

@@ -99,9 +99,8 @@ contains
     ! Depthts:
     ! --------
 
-    REAL fz, rk, fz1, rk1, rk2
+    REAL rk, fz1, rk1, rk2
 
-    fz(rk) = fz1*(dalph_soil**rk-1.)/(dalph_soil-1.)
     pfluxgrd(:) = 0.
     ! calcul de l'inertie thermique a partir de la variable rnat.
     ! on initialise a iice meme au-dessus d'un point de mer au cas
@@ -247,6 +246,13 @@ contains
        pfluxgrd(ig) = pfluxgrd(ig) + pcapcal(ig)*(ptsoil(ig,1)*z1(ig,indice)- &
             lambda*zc(ig,1,indice)-ptsrf(ig))/ptimestep
     END DO
+
+  contains
+
+    real function fz(rk)
+      real rk
+      fz = fz1*(dalph_soil**rk-1.)/(dalph_soil-1.)
+    end function fz
 
   END SUBROUTINE soil
 

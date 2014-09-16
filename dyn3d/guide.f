@@ -21,9 +21,7 @@ CONTAINS
          tau_min_t, tau_max_t, tau_min_q, tau_max_q, online
     USE dimens_m, ONLY: iim, jjm, llm
     USE disvert_m, ONLY: ap, bp, preff, presnivs
-    use dump2d_m, only: dump2d
     USE exner_hyb_m, ONLY: exner_hyb
-    USE inigrads_m, ONLY: inigrads
     use netcdf, only: nf90_nowrite
     use netcdf95, only: nf95_close, nf95_inq_dimid, nf95_inquire_dimension, &
          nf95_open
@@ -33,21 +31,21 @@ CONTAINS
     use read_reanalyse_m, only: read_reanalyse
     USE serre, ONLY: clat, clon
     use tau2alpha_m, only: tau2alpha, dxdys
+    use writefield_m, only: writefield
 
     INTEGER, INTENT(IN):: itau
-
-    ! variables dynamiques
-
     REAL, intent(inout):: ucov(:, :, :) ! (iim + 1, jjm + 1, llm) vent covariant
     REAL, intent(inout):: vcov(:, :, :) ! (iim + 1, jjm, llm) ! vent covariant
 
-    REAL, intent(inout):: teta(iim + 1, jjm + 1, llm) ! température potentielle 
-    REAL, intent(inout):: q(iim + 1, jjm + 1, llm)
+    REAL, intent(inout):: teta(:, :, :) ! (iim + 1, jjm + 1, llm)
+    ! température potentielle 
+
+    REAL, intent(inout):: q(:, :, :) ! (iim + 1, jjm + 1, llm)
     REAL, intent(in):: ps(:, :) ! (iim + 1, jjm + 1) pression au sol
 
     ! Local:
 
-    ! variables dynamiques pour les reanalyses.
+    ! variables dynamiques pour les réanalyses
 
     REAL, save:: ucovrea1(iim + 1, jjm + 1, llm), vcovrea1(iim + 1, jjm, llm)
     ! vents covariants reanalyses
@@ -76,28 +74,21 @@ CONTAINS
     real ztau(iim + 1, jjm + 1)
 
     INTEGER ij, l
-    INTEGER ncidpl
-    INTEGER rid
+    INTEGER ncid, dimid
     REAL tau
     INTEGER, SAVE:: nlev
 
     ! TEST SUR QSAT
     REAL p(iim + 1, jjm + 1, llmp1)
     real pk(iim + 1, jjm + 1, llm), pks(iim + 1, jjm + 1)
-
     REAL qsat(iim + 1, jjm + 1, llm)
-
-    INTEGER, parameter:: igrads = 2
-    REAL:: dtgrads = 100.
 
     !-----------------------------------------------------------------------
 
-    PRINT *, 'Call sequence information: guide'
+    !!PRINT *, 'Call sequence information: guide'
 
     first_call: IF (itau == 0) THEN
        CALL conf_guide
-       CALL inigrads(igrads, rlonv, 180. / pi, -180., 180., rlatu, -90., &
-            90., 180. / pi, presnivs, 1., dtgrads, 'guide', 'dyn_zon ')
 
        IF (online) THEN
           ! Constantes de temps de rappel en jour
@@ -118,10 +109,6 @@ CONTAINS
           CALL tau2alpha(2, factt, tau_min_u, tau_max_u, alpha_u)
           CALL tau2alpha(1, factt, tau_min_t, tau_max_t, alpha_t)
           CALL tau2alpha(1, factt, tau_min_q, tau_max_q, alpha_q)
-
-          CALL dump2d(iip1, jjp1, aire, 'AIRE MAILLe ')
-          CALL dump2d(iip1, jjp1, alpha_u, 'COEFF U ')
-          CALL dump2d(iip1, jjp1, alpha_t, 'COEFF T ')
        ELSE
           ! Cas où on force exactement par les variables analysées
           alpha_t = 0.
@@ -132,22 +119,22 @@ CONTAINS
 
        step_rea = 1
        count_no_rea = 0
-       ncidpl = -99
+       ncid = -99
 
        ! lecture d'un fichier netcdf pour determiner le nombre de niveaux
-       if (guide_u) call nf95_open('u.nc',Nf90_NOWRITe,ncidpl)
-       if (guide_v) call nf95_open('v.nc',nf90_nowrite,ncidpl)
-       if (guide_T) call nf95_open('T.nc',nf90_nowrite,ncidpl)
-       if (guide_Q) call nf95_open('hur.nc',nf90_nowrite, ncidpl)
+       if (guide_u) call nf95_open('u.nc',Nf90_NOWRITe,ncid)
+       if (guide_v) call nf95_open('v.nc',nf90_nowrite,ncid)
+       if (guide_T) call nf95_open('T.nc',nf90_nowrite,ncid)
+       if (guide_Q) call nf95_open('hur.nc',nf90_nowrite, ncid)
 
        IF (ncep) THEN
-          call nf95_inq_dimid(ncidpl, 'LEVEL', rid)
+          call nf95_inq_dimid(ncid, 'LEVEL', dimid)
        ELSE
-          call nf95_inq_dimid(ncidpl, 'PRESSURE', rid)
+          call nf95_inq_dimid(ncid, 'PRESSURE', dimid)
        END IF
-       call nf95_inquire_dimension(ncidpl, rid, nclen=nlev)
+       call nf95_inquire_dimension(ncid, dimid, nclen=nlev)
        PRINT *, 'nlev', nlev
-       call nf95_close(ncidpl)
+       call nf95_close(ncid)
        ! Lecture du premier etat des reanalyses.
        CALL read_reanalyse(1, ps, ucovrea2, vcovrea2, tetarea2, qrea2, &
             masserea2, nlev)
@@ -171,17 +158,17 @@ CONTAINS
        qrea2 = max(qrea2, 0.1)
        factt = dtvr * iperiod / daysec
        ztau = factt / max(alpha_t, 1E-10)
-       CALL wrgrads(igrads, 1, aire, 'aire ', 'aire ')
-       CALL wrgrads(igrads, 1, dxdys, 'dxdy ', 'dxdy ')
-       CALL wrgrads(igrads, 1, alpha_u, 'au ', 'au ')
-       CALL wrgrads(igrads, 1, alpha_t, 'at ', 'at ')
-       CALL wrgrads(igrads, 1, ztau, 'taut ', 'taut ')
-       CALL wrgrads(igrads, llm, ucov, 'u ', 'u ')
-       CALL wrgrads(igrads, llm, ucovrea2, 'ua ', 'ua ')
-       CALL wrgrads(igrads, llm, teta, 'T ', 'T ')
-       CALL wrgrads(igrads, llm, tetarea2, 'Ta ', 'Ta ')
-       CALL wrgrads(igrads, llm, qrea2, 'Qa ', 'Qa ')
-       CALL wrgrads(igrads, llm, q, 'Q ', 'Q ')
+       CALL writefield("aire", aire)
+       CALL writefield("dxdys", dxdys)
+       CALL writefield("alpha_u", alpha_u)
+       CALL writefield("alpha_t", alpha_t)
+       CALL writefield("ztau", ztau)
+       CALL writefield("ucov", ucov)
+       CALL writefield("ucovrea2", ucovrea2)
+       CALL writefield("teta", teta)
+       CALL writefield("tetarea2", tetarea2)
+       CALL writefield("qrea2", qrea2)
+       CALL writefield("q", q)
     ELSE
        count_no_rea = count_no_rea + 1
     END IF

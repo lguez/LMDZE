@@ -52,8 +52,8 @@ SUBROUTINE initfluxsto(tstep, t_ops, t_wrt, nq, fileid, filevid, filedid)
 
   !   Variables locales                                                   
   REAL zjulian
-  CHARACTER*3 str
-  CHARACTER*10 ctrac
+  CHARACTER(len=3) str
+  CHARACTER(len=10) ctrac
   INTEGER iq
   REAL rlong(iip1, jjp1), rlat(iip1, jjp1)
   INTEGER uhoriid, vhoriid, thoriid, zvertiid, dhoriid, dvertiid

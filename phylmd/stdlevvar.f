@@ -9,6 +9,7 @@ contains
 
     ! From LMDZ4/libf/phylmd/stdlevvar.F90, version 1.3 2005/05/25 13:10:09
 
+    use coefcdrag_m, only: coefcdrag
     USE suphec_m, ONLY: rg, rkappa
 
     ! Objet : calcul de la température et de l'humidité relative à 2 m

@@ -45,7 +45,7 @@ SUBROUTINE initphysto(infile,rlon,rlat,tstep,t_ops,t_wrt,nq,fileid)
   IMPLICIT NONE
 
   !   Arguments
-  CHARACTER*(*) infile
+  CHARACTER(len=*) infile
   INTEGER nhoriid, i
   REAL, INTENT (IN) :: tstep
   REAL t_ops, t_wrt
@@ -57,8 +57,8 @@ SUBROUTINE initphysto(infile,rlon,rlat,tstep,t_ops,t_wrt,nq,fileid)
 
   INTEGER tau0
   REAL zjulian
-  CHARACTER*3 str
-  CHARACTER*10 ctrac
+  CHARACTER(len=3) str
+  CHARACTER(len=10) ctrac
   INTEGER iq
   INTEGER uhoriid, vhoriid, thoriid, zvertiid
   INTEGER ii, jj

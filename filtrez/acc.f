@@ -3,7 +3,10 @@
 ! 12:53:09 lmdzadmin Exp $
 
 SUBROUTINE acc(vec, d, im)
-  DIMENSION vec(im, im), d(im)
+  implicit none
+  integer im, i, j
+  real vec(im, im), d(im)
+  real sum, ssum
 
   DO j = 1, im
     DO i = 1, im

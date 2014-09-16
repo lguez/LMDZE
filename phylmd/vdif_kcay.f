@@ -10,6 +10,7 @@ contains
     ! From LMDZ4/libf/phylmd/vdif_kcay.F, version 1.1 2004/06/22 11:45:36
 
     USE dimphy, ONLY: klev, klon
+    use yamada_m, only: yamada
 
     ! dt : pas de temps
     ! g : g

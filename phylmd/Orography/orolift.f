@@ -184,8 +184,8 @@
 
 400   CONTINUE
 
-      DO 401 jk = 1, klev
-        DO 401 jl = 1, klon
+      DO jk = 1, klev
+        DO jl = 1, klon
           IF (ktest(jl)==1) THEN
             ztau(jl,jk) = ztau(jl,klev+1)*paphm1(jl,jk)/paphm1(jl,klev+1)
             ztav(jl,jk) = ztav(jl,klev+1)*paphm1(jl,jk)/paphm1(jl,klev+1)
@@ -193,7 +193,8 @@
             ztau(jl,jk) = 0.0
             ztav(jl,jk) = 0.0
           END IF
-401   CONTINUE
+       end DO
+    end DO
 
 
 !*         5.      COMPUTE TENDENCIES.
@@ -217,8 +218,8 @@
 
 !  PROJECT PERPENDICULARLY TO U NOT TO DESTROY ENERGY
 
-        DO 530 jk = 1, klev
-          DO 530 jl = 1, klon
+        DO jk = 1, klev
+          DO jl = 1, klon
             IF (ktest(jl)==1) THEN
 
               zslow = sqrt(pulow(jl)**2+pvlow(jl)**2)
@@ -238,7 +239,8 @@
               END IF
 
             END IF
-530     CONTINUE
+         end DO
+      end DO
 
 !  6.  LOW LEVEL LIFT, SEMI IMPLICIT:
 !  ----------------------------------

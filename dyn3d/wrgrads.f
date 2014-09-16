@@ -16,9 +16,9 @@ SUBROUTINE wrgrads(i_f, nl, field, name, titlevar)
 
   ! arguments
   INTEGER, INTENT(IN):: i_f
-  integer nl
+  integer, INTENT(IN):: nl
   REAL, INTENT(IN):: field(imx*jmx*lmx)
-  CHARACTER(len=*) name, titlevar
+  CHARACTER(len=*), INTENT(IN):: name, titlevar
   CHARACTER(len=10) file
 
   ! local

@@ -29,11 +29,13 @@ PROGRAM gcm
   USE ioconf_calendar_m, only: ioconf_calendar
   use jumble, only: new_unit
   use leapfrog_m, only: leapfrog
+  use netcdf95, only: nf95_close
   use suphec_m, only: suphec
   use temps, only: day_ref, annee_ref, day_end, itau_dyn
   use tracstoke, only: istdyn, istphy
   use unit_nml_m, only: unit_nml
   use yoethf_m, only: yoethf
+  use write_field, only: NbField, FieldId
 
   IMPLICIT NONE
 
@@ -54,6 +56,8 @@ PROGRAM gcm
   logical mask_v(iim + 1, jjm) 
   ! (mask for points in the "v" grid, first index is for longitude,
   ! second index is for latitude)
+
+  integer i
 
   namelist /main_nml/true_calendar
 
@@ -149,6 +153,11 @@ PROGRAM gcm
 
   close(unit_nml)
   call histclo
+
+  do i = 1, nbfield
+     call nf95_close(FieldId(i))
+  end do
+
   print *, 'Simulation finished'
   print *, 'Everything is cool'
 

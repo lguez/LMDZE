@@ -3,8 +3,12 @@
 ! 12:53:09 lmdzadmin Exp $
 
 SUBROUTINE jacobi(a, n, np, d, v, nrot)
-  PARAMETER (nmax=400)
-  DIMENSION a(np, np), d(np), v(np, np), b(nmax), z(nmax)
+  implicit none
+  integer, PARAMETER:: nmax=400
+  integer n, np
+  real a(np, np), d(np), v(np, np), b(nmax), z(nmax)
+  integer ip, iq, nrot, i, j
+  real sm, g, h, t, theta, c, s, tau, tresh
 
   IF (n>nmax) THEN
     PRINT *, 'n, nmax=', n, nmax

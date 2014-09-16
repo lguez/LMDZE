@@ -13,9 +13,11 @@ contains
     USE conf_gcm_m, ONLY : iapp_tracvl
     USE dimens_m, ONLY : iim, jjm, llm, nqmx
     USE iniadvtrac_m, ONLY : iadv
+    use interpre_m, only: interpre
     use massbar_m, only: massbar
     USE paramet_m, ONLY : iip1, iip2, ijmllm, ijp1llm, ip1jm, ip1jmp1, jjp1, &
          llmp1
+    use vlspltqs_m, only: vlspltqs
 
     REAL, intent(in):: pbaru(ip1jmp1, llm), pbarv(ip1jm, llm)
     REAL, intent(in):: p(ip1jmp1, llmp1)

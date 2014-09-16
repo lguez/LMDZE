@@ -16,7 +16,6 @@ contains
     USE comgeom, ONLY : cu_2d, cv_2d, rlatu, rlatv
     use conf_guide_m, only: lat_min_guide, lat_max_guide
     USE dimens_m, ONLY : iim
-    use dump2d_m, only: dump2d
     USE nr_util, ONLY : pi
     USE serre, ONLY : clat, clon, grossismx, grossismy
 
@@ -70,10 +69,6 @@ contains
              dxdyv(i, j) = 0.5 * (dxdys(i, j) + dxdys(i, j + 1))
           END DO
        END DO
-
-       CALL dump2d(iip1, jjp1, dxdys, 'DX2DY2 SCAL ')
-       CALL dump2d(iip1, jjp1, dxdyu, 'DX2DY2 U ')
-       CALL dump2d(iip1, jjp1, dxdyv, 'DX2DY2 v ')
 
        ! coordonnees du centre du zoom
        CALL coordij(clon, clat, ilon, ilat)

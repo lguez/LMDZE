@@ -120,8 +120,7 @@ contains
        else
           ! Matsuno
           dt = dtvr
-          if (ok_guide .and. itaufin - itau - 1 > day_step / 4) &
-               call guide(itau, ucov, vcov, teta, q, ps)
+          if (ok_guide) call guide(itau, ucov, vcov, teta, q(:, :, :, 1), ps)
           vcovm1 = vcov
           ucovm1 = ucov
           tetam1 = teta
