@@ -1,6 +1,9 @@
 module WriteField_m
 
-  use writefield_gen_m, only: writefield_gen
+  USE write_field, ONLY: ncid, record, varid, nbfield
+  use CreateNewField_m, only: CreateNewField
+  use GetFieldIndex_m, only: GetFieldIndex
+  USE netcdf95, ONLY: nf95_put_var
 
   implicit none
 
@@ -14,36 +17,78 @@ module WriteField_m
 contains
 
   subroutine WriteField1d(name,Field)
-    character(len=*) :: name
-    real, dimension(:) :: Field
-    integer, dimension(1) :: Dim
 
-    Dim=shape(Field)
-    call WriteField_gen(name,Field,Dim(1),1,1)
+    character(len=*), intent(in):: name
+    real, intent(in):: Field(:)
+
+    ! Local:
+    integer index
+
+    !-------------------------------------------
+
+    Index=GetFieldIndex(name)
+
+    if (Index==-1) then
+       call CreateNewField(name, shape(field))
+       Index=nbfield
+    else
+       Record(Index)=Record(Index)+1
+    endif
+
+    call NF95_PUT_VAR(Ncid(Index), Varid(Index), Field, &
+         start = (/1, Record(Index)/))
 
   end subroutine WriteField1d
 
   !****************************************************************
 
   subroutine WriteField2d(name,Field)
-    character(len=*) :: name
-    real, dimension(:,:) :: Field
-    integer, dimension(2) :: Dim
 
-    Dim=shape(Field)
-    call WriteField_gen(name,Field,Dim(1),Dim(2),1)
+    character(len=*), intent(in):: name
+    real, intent(in):: Field(:, :)
+
+    ! Local:
+    integer index
+
+    !-------------------------------------------
+
+    Index=GetFieldIndex(name)
+
+    if (Index==-1) then
+       call CreateNewField(name, shape(field))
+       Index=nbfield
+    else
+       Record(Index)=Record(Index)+1
+    endif
+
+    call NF95_PUT_VAR(Ncid(Index), Varid(Index), Field, &
+         start = (/1, 1, Record(Index)/))
 
   end subroutine WriteField2d
 
   !****************************************************************
 
   subroutine WriteField3d(name,Field)
-    character(len=*) :: name
-    real, dimension(:,:,:) :: Field
-    integer, dimension(3) :: Dim
 
-    Dim=shape(Field)
-    call WriteField_gen(name,Field,Dim(1),Dim(2),Dim(3))
+    character(len=*), intent(in):: name
+    real, intent(in):: Field(:, :, :)
+
+    ! Local:
+    integer index
+
+    !-------------------------------------------
+
+    Index=GetFieldIndex(name)
+
+    if (Index==-1) then
+       call CreateNewField(name, shape(field))
+       Index=nbfield
+    else
+       Record(Index)=Record(Index)+1
+    endif
+
+    call NF95_PUT_VAR(Ncid(Index), Varid(Index), Field, &
+         start = (/1, 1, 1, Record(Index)/))
 
   end subroutine WriteField3d
 

@@ -4,7 +4,6 @@
 !===========================================================================
 
       use dimens_m
-      use dump2d_m, only: dump2d
       use paramet_m
       use comconst
       use disvert_m
@@ -64,9 +63,6 @@
          enddo
       enddo
 
-!     call dump2d(iip1,jjp1,teta,'TETA EN BAS   ')
-!     call dump2d(iip1,jjp1,teta(1,1,llm),'TETA EN HAUT   ')
-
 !  Humidite relative -> specifique
 !  -------------------------------
       if (1.eq.0) then
@@ -83,8 +79,6 @@
       q(:,:,:)=qsat(:,:,:)*rh(:,:,:)
       print*,'calcul de q OK'
 
-      call dump2d(iip1,jjp1,pres,'PRESSION PREMIERE COUCHE   ')
-      call dump2d(iip1,jjp1,q,'HUMIDITE SPECIFIQUE COUCHE 1   ')
       endif
 
 

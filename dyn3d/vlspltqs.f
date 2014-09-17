@@ -43,7 +43,7 @@ contains
 
     ! Local
 
-    INTEGER i, ij, l, j, ii
+    INTEGER ij, l
 
     REAL qsat(ip1jmp1, llm)
     REAL zm(ip1jmp1, llm)

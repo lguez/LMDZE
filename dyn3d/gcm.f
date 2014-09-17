@@ -35,7 +35,7 @@ PROGRAM gcm
   use tracstoke, only: istdyn, istphy
   use unit_nml_m, only: unit_nml
   use yoethf_m, only: yoethf
-  use write_field, only: NbField, FieldId
+  use write_field, only: NbField, Ncid
 
   IMPLICIT NONE
 
@@ -155,7 +155,7 @@ PROGRAM gcm
   call histclo
 
   do i = 1, nbfield
-     call nf95_close(FieldId(i))
+     call nf95_close(Ncid(i))
   end do
 
   print *, 'Simulation finished'

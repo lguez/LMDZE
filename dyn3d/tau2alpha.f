@@ -1,23 +1,19 @@
 module tau2alpha_m
 
-  USE paramet_m, ONLY : iip1, jjp1
-  USE dimens_m, ONLY : jjm
-
   IMPLICIT NONE
-
-  private iip1, jjp1, jjm
-
-  REAL dxdys(iip1, jjp1), dxdyu(iip1, jjp1), dxdyv(iip1, jjm)
 
 contains
 
   SUBROUTINE tau2alpha(type, factt, taumin, taumax, alpha)
 
     USE comgeom, ONLY : cu_2d, cv_2d, rlatu, rlatv
+    USE dimens_m, ONLY : jjm
     use conf_guide_m, only: lat_min_guide, lat_max_guide
     USE dimens_m, ONLY : iim
     USE nr_util, ONLY : pi
+    USE paramet_m, ONLY : iip1, jjp1
     USE serre, ONLY : clat, clon, grossismx, grossismy
+    use writefield_m, only: writefield
 
     INTEGER, intent(in):: type
     REAL, intent(in):: factt, taumin, taumax
@@ -32,6 +28,7 @@ contains
     LOGICAL:: first = .TRUE.
     REAL zdx(iip1, jjp1), zdy(iip1, jjp1)
     REAL zlat
+    REAL dxdys(iip1, jjp1), dxdyu(iip1, jjp1), dxdyv(iip1, jjm)
 
     !------------------------------------------------------------
 
@@ -53,11 +50,14 @@ contains
           zdy(i, 1) = zdy(i, 2)
           zdy(i, jjp1) = zdy(i, jjm)
        END DO
+
        DO j = 1, jjp1
           DO i = 1, iip1
              dxdys(i, j) = sqrt(zdx(i, j)**2 + zdy(i, j)**2)
           END DO
        END DO
+       CALL writefield("dxdys", dxdys)
+
        DO j = 1, jjp1
           DO i = 1, iim
              dxdyu(i, j) = 0.5 * (dxdys(i, j) + dxdys(i + 1, j))

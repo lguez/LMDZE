@@ -30,7 +30,7 @@ CONTAINS
     USE q_sat_m, ONLY: q_sat
     use read_reanalyse_m, only: read_reanalyse
     USE serre, ONLY: clat, clon
-    use tau2alpha_m, only: tau2alpha, dxdys
+    use tau2alpha_m, only: tau2alpha
     use writefield_m, only: writefield
 
     INTEGER, INTENT(IN):: itau
@@ -71,7 +71,6 @@ CONTAINS
 
     INTEGER ilon, ilat
     REAL factt ! pas de temps entre deux appels au guidage, en fraction de jour
-    real ztau(iim + 1, jjm + 1)
 
     INTEGER ij, l
     INTEGER ncid, dimid
@@ -139,6 +138,9 @@ CONTAINS
        CALL read_reanalyse(1, ps, ucovrea2, vcovrea2, tetarea2, qrea2, &
             masserea2, nlev)
        qrea2 = max(qrea2, 0.1)
+
+       CALL writefield("alpha_u", alpha_u)
+       CALL writefield("alpha_t", alpha_t)
     END IF first_call
 
     ! IMPORTATION DES VENTS, PRESSION ET TEMPERATURE REELS:
@@ -157,12 +159,6 @@ CONTAINS
             masserea2, nlev)
        qrea2 = max(qrea2, 0.1)
        factt = dtvr * iperiod / daysec
-       ztau = factt / max(alpha_t, 1E-10)
-       CALL writefield("aire", aire)
-       CALL writefield("dxdys", dxdys)
-       CALL writefield("alpha_u", alpha_u)
-       CALL writefield("alpha_t", alpha_t)
-       CALL writefield("ztau", ztau)
        CALL writefield("ucov", ucov)
        CALL writefield("ucovrea2", ucovrea2)
        CALL writefield("teta", teta)

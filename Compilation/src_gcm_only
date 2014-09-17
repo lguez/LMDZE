@@ -96,7 +96,6 @@ drag_noro.f
 dteta1.f
 dudv1.f
 dudv2.f
-dump2d.f
 dvthermcell2.f
 dynetat0.f
 FCTTRE.f
@@ -114,7 +113,6 @@ flxflux.f
 flxini.f
 flxmain.f
 fonte_neige.f
-formcoord.f
 gcm.f
 getfieldindex.f
 getso4fromfile.f
@@ -142,7 +140,6 @@ histvert.f
 histwrite.f
 histwrite_real.f
 inidissip.f
-inigrads.f
 ini_histins.f
 ini_histrac.f
 initdynav.f
@@ -152,7 +149,6 @@ inithist.f
 initial0.f
 initphysto.f
 initrrnpb.f
-int2str.f
 integrd.f
 interface_surf.f
 interfoce_lim.f
@@ -263,11 +259,7 @@ vlxqs.f
 vly.f
 vlyqs.f
 vlz.f
-wrgrads.f
 writedynav.f
-write_field1d.f
-write_field2d.f
-write_field3d.f
 write_field.f
 writefield.f
 writefield_gen.f

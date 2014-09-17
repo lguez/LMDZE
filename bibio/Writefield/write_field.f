@@ -5,7 +5,7 @@ module write_field
   implicit none
 
   integer, parameter:: MaxWriteField = 100
-  integer, dimension(MaxWriteField), save:: FieldId, FieldVarId, FieldIndex
+  integer, dimension(MaxWriteField), save:: Ncid, Varid, Record
   character(len=255), save:: FieldName(MaxWriteField)
   integer:: NbField = 0
 

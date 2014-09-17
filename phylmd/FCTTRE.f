@@ -17,34 +17,34 @@ module FCTTRE
 
 contains
 
-  elemental REAL function FOEEW(T, DEL)
+  elemental REAL function FOEEW(T, ICE)
 
     use yoethf_m, only: R3LES, R3IES, R4LES, R4IES
     use SUPHEC_M, only: rtt
 
     REAL, intent(in):: T
-    logical, intent(in):: DEL ! ice, else liquid
+    logical, intent(in):: ICE ! else liquid
 
     !-----------------------
 
-    FOEEW = exp(merge(R3IES / (T - R4IES), R3lES / (T - R4lES), del) &
+    FOEEW = exp(merge(R3IES / (T - R4IES), R3lES / (T - R4lES), ice) &
          * (T - RTT))
 
   end function FOEEW
 
   !******************************************
 
-  REAL function FOEDE(T, DEL, P5ARG, QS, PCOARG)
+  REAL function FOEDE(T, ICE, P5ARG, QS, PCOARG)
 
     use yoethf_m, only: R4LES, R4IES
 
     REAL, intent(in):: T
-    logical, intent(in):: DEL ! ice, else liquid
+    logical, intent(in):: ICE ! else liquid
     real, intent(in):: P5ARG, QS, PCOARG
 
     !-----------------------
 
-    FOEDE = QS * PCOARG * P5ARG / (T - merge(R4IES, R4lES, del))**2
+    FOEDE = QS * PCOARG * P5ARG / (T - merge(R4IES, R4lES, ice))**2
 
   end function FOEDE
 

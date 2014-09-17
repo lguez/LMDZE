@@ -139,7 +139,6 @@ histvert.o : strlowercase.o histcom_var.o find_str.o errioipsl.o
 histwrite.o : mathop.o isittime.o histwrite_real.o histvar_seq.o histcom_var.o errioipsl.o 
 histwrite_real.o : mathop.o moycum.o trans_buff.o histcom_var.o 
 inidissip.o : paramet_m.o nxgraro2.o gradiv2.o filtreg.o divgrad2.o conf_gcm.o disvert.o comdissnew.o comconst.o dimens_m.o 
-inigrads.o : gradsdef.o 
 ini_histins.o : ymds2ju.o temps.o phyetat0.o indicesol.o histvert.o histend.o histdef.o histbeg_totreg.o disvert.o dimphy.o dimens_m.o clesphys.o 
 ini_histrac.o : ymds2ju.o temps.o phyetat0.o iniadvtrac.o histvert.o histend.o histdef.o histbeg_totreg.o grid_change.o dimphy.o disvert.o dimens_m.o clesphys.o 
 initdynav.o : ymds2ju.o temps.o paramet_m.o iniadvtrac.o histvert.o histend.o histdef.o histbeg_totreg.o dimens_m.o comgeom.o 
@@ -182,7 +181,7 @@ lwvn.o : raddimlw.o raddim.o dimphy.o dimens_m.o
 mathop.o : mathop2.o errioipsl.o 
 minmaxqfi.o : dimphy.o dimens_m.o 
 moycum.o : errioipsl.o 
-nat2gcm.o : guide.o q_sat.o comgeom.o disvert.o comconst.o paramet_m.o dump2d.o dimens_m.o 
+nat2gcm.o : guide.o q_sat.o comgeom.o disvert.o comconst.o paramet_m.o dimens_m.o 
 newmicro.o : suphec.o dimphy.o conf_phys.o 
 nflxtr.o : suphec.o dimphy.o 
 nuage.o : suphec.o dimphy.o dimens_m.o 
@@ -229,7 +228,7 @@ swr.o : radopt.o radepsi.o raddim.o dimphy.o dimens_m.o
 swtt1.o : raddim.o dimphy.o dimens_m.o 
 swtt.o : raddim.o dimphy.o dimens_m.o 
 swu.o : radopt.o radepsi.o raddim.o suphec.o clesphys.o dimphy.o dimens_m.o 
-tau2alpha.o : serre.o conf_guide.o comgeom.o dimens_m.o paramet_m.o 
+tau2alpha.o : writefield.o serre.o paramet_m.o conf_guide.o dimens_m.o comgeom.o 
 thermcell.o : suphec.o dimphy.o 
 transp.o : suphec.o dimphy.o dimens_m.o 
 transp_lay.o : suphec.o dimphy.o dimens_m.o 
@@ -242,12 +241,8 @@ vlxqs.o : conf_gcm.o disvert.o comconst.o paramet_m.o dimens_m.o
 vly.o : comgeom.o conf_gcm.o disvert.o comconst.o paramet_m.o dimens_m.o 
 vlyqs.o : comgeom.o conf_gcm.o disvert.o comconst.o paramet_m.o dimens_m.o 
 vlz.o : conf_gcm.o disvert.o comconst.o paramet_m.o dimens_m.o 
-wrgrads.o : gradsdef.o 
 writedynav.o : temps.o paramet_m.o initdynav.o iniadvtrac.o histwrite.o histsync.o dimens_m.o covnat.o comconst.o 
-write_field1d.o : int2str.o 
-write_field2d.o : int2str.o 
-write_field3d.o : int2str.o 
-writefield.o : writefield_gen.o 
+writefield.o : getfieldindex.o createnewfield.o write_field.o 
 writefield_gen.o : write_field.o getfieldindex.o createnewfield.o 
 writehist.o : covnat.o histsync.o histwrite.o temps.o paramet_m.o com_io_dyn.o iniadvtrac.o dimens_m.o 
 yamada4.o : dimphy.o 
