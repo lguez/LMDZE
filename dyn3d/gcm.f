@@ -35,7 +35,7 @@ PROGRAM gcm
   use tracstoke, only: istdyn, istphy
   use unit_nml_m, only: unit_nml
   use yoethf_m, only: yoethf
-  use write_field, only: NbField, Ncid
+  use createnewfield_m, only: NbField, Ncid
 
   IMPLICIT NONE
 

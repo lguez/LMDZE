@@ -260,9 +260,7 @@ vly.f
 vlyqs.f
 vlz.f
 writedynav.f
-write_field.f
 writefield.f
-writefield_gen.f
 writehist.f
 yamada4.f
 yamada.f

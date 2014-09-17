@@ -2,25 +2,28 @@ module createnewfield_m
 
   implicit none
 
+  integer, parameter:: MaxWriteField = 100
+  character(len=255), save:: FieldName(MaxWriteField)
+  integer:: NbField = 0
+  integer, save:: Ncid(MaxWriteField)
+
 contains
 
   subroutine CreateNewField(name, my_shape)
 
     USE netcdf, ONLY: nf90_clobber, nf90_double, nf90_unlimited
     USE netcdf95, ONLY: nf95_create, nf95_def_dim, nf95_def_var, nf95_enddef
-    USE write_field, ONLY: ncid, record, fieldname, varid, nbfield
 
     character(len = *), intent(in):: name
     integer, intent(in):: my_shape(:)
 
     ! Local:
-    integer Dimid(size(my_shape) + 1), n_dim
+    integer Dimid(size(my_shape) + 1), n_dim, varid
 
     !--------------------------------------------------------------------
 
     NbField = NbField + 1
     FieldName(NbField) = ADJUSTL(name)
-    Record(NbField) = 1
     n_dim = size(my_shape)
 
     call NF95_CREATE(TRIM(FieldName(NbField)) // '.nc', NF90_CLOBBER, &
@@ -33,8 +36,8 @@ contains
        end if
     end if
     call NF95_DEF_DIM(Ncid(NbField), 'iter', NF90_UNLIMITED, Dimid(n_dim + 1))
-    call NF95_DEF_VAR(Ncid(NbField), FieldName(NbField), NF90_DOUBLE, &
-         Dimid, Varid(NbField))
+    call NF95_DEF_VAR(Ncid(NbField), FieldName(NbField), NF90_DOUBLE, Dimid, &
+         Varid)
     call NF95_ENDDEF(Ncid(NbField))
 
   end subroutine CreateNewField

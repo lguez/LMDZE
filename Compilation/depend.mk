@@ -55,7 +55,6 @@ conflx.o : FCTTRE.o yoethf.o suphec.o dimphy.o flxmain.o
 conf_phys.o : YOMCST.o unit_nml_m.o conema3_m.o comfisrtilp.o clesphys2.o clesphys.o 
 coordij.o : serre.o comgeom.o comconst.o paramet_m.o dimens_m.o 
 covnat.o : paramet_m.o comgeom.o 
-createnewfield.o : write_field.o 
 cv3_closure.o : cvthermo.o cv3_param.o 
 cv3_compress.o : cv3_param.o 
 cv3_feed.o : cv3_param.o 
@@ -114,8 +113,8 @@ flxflux.o : FCTTRE.o yoethf.o suphec.o dimphy.o
 flxini.o : suphec.o flxadjtq.o dimphy.o 
 flxmain.o : yoethf.o YOECUMF.o suphec.o flxini.o flxflux.o flxdtdq.o flxdlfs.o flxddraf.o flxbase.o flxasc.o dimphy.o 
 fonte_neige.o : yoethf.o suphec.o interface_surf.o indicesol.o FCTTRE.o 
-gcm.o : write_field.o yoethf.o unit_nml_m.o tracstoke.o temps.o suphec.o leapfrog.o ioconf_calendar.o init_dynzon.o inithist.o initdynav.o inifilr.o inidissip.o iniadvtrac.o histclo.o grid_change.o dynredem0.o dynetat0.o disvert.o dimphy.o dimens_m.o conf_gcm.o comgeomphy.o comgeom.o comconst.o 
-getfieldindex.o : write_field.o 
+gcm.o : createnewfield.o yoethf.o unit_nml_m.o tracstoke.o temps.o suphec.o leapfrog.o ioconf_calendar.o init_dynzon.o inithist.o initdynav.o inifilr.o inidissip.o iniadvtrac.o histclo.o grid_change.o dynredem0.o dynetat0.o disvert.o dimphy.o dimens_m.o conf_gcm.o comgeomphy.o comgeom.o comconst.o 
+getfieldindex.o : createnewfield.o 
 getso4fromfile.o : dimphy.o dimens_m.o 
 grad.o : dimens_m.o 
 gradiv2.o : laplacien.o grad.o filtreg.o divergf.o dimens_m.o comgeom.o 
@@ -242,8 +241,7 @@ vly.o : comgeom.o conf_gcm.o disvert.o comconst.o paramet_m.o dimens_m.o
 vlyqs.o : comgeom.o conf_gcm.o disvert.o comconst.o paramet_m.o dimens_m.o 
 vlz.o : conf_gcm.o disvert.o comconst.o paramet_m.o dimens_m.o 
 writedynav.o : temps.o paramet_m.o initdynav.o iniadvtrac.o histwrite.o histsync.o dimens_m.o covnat.o comconst.o 
-writefield.o : getfieldindex.o createnewfield.o write_field.o 
-writefield_gen.o : write_field.o getfieldindex.o createnewfield.o 
+writefield.o : getfieldindex.o createnewfield.o 
 writehist.o : covnat.o histsync.o histwrite.o temps.o paramet_m.o com_io_dyn.o iniadvtrac.o dimens_m.o 
 yamada4.o : dimphy.o 
 yamada.o : dimphy.o dimens_m.o 

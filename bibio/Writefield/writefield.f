@@ -1,11 +1,12 @@
 module WriteField_m
 
-  USE write_field, ONLY: ncid, record, varid, nbfield
-  use CreateNewField_m, only: CreateNewField
+  use CreateNewField_m, only: CreateNewField, ncid, nbfield, MaxWriteField
   use GetFieldIndex_m, only: GetFieldIndex
   USE netcdf95, ONLY: nf95_put_var
 
   implicit none
+
+  integer, save:: Record(MaxWriteField)
 
   interface WriteField
      module procedure WriteField3d,WriteField2d,WriteField1d
@@ -31,11 +32,12 @@ contains
     if (Index==-1) then
        call CreateNewField(name, shape(field))
        Index=nbfield
+       Record(Index) = 1
     else
        Record(Index)=Record(Index)+1
     endif
 
-    call NF95_PUT_VAR(Ncid(Index), Varid(Index), Field, &
+    call NF95_PUT_VAR(Ncid(Index), Varid = 1, values = Field, &
          start = (/1, Record(Index)/))
 
   end subroutine WriteField1d
@@ -57,11 +59,12 @@ contains
     if (Index==-1) then
        call CreateNewField(name, shape(field))
        Index=nbfield
+       Record(Index) = 1
     else
        Record(Index)=Record(Index)+1
     endif
 
-    call NF95_PUT_VAR(Ncid(Index), Varid(Index), Field, &
+    call NF95_PUT_VAR(Ncid(Index), Varid = 1, values = Field, &
          start = (/1, 1, Record(Index)/))
 
   end subroutine WriteField2d
@@ -83,11 +86,12 @@ contains
     if (Index==-1) then
        call CreateNewField(name, shape(field))
        Index=nbfield
+       Record(Index) = 1
     else
        Record(Index)=Record(Index)+1
     endif
 
-    call NF95_PUT_VAR(Ncid(Index), Varid(Index), Field, &
+    call NF95_PUT_VAR(Ncid(Index), Varid = 1, values = Field, &
          start = (/1, 1, 1, Record(Index)/))
 
   end subroutine WriteField3d

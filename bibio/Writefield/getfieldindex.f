@@ -6,26 +6,29 @@ contains
 
   integer function GetFieldIndex(name)
 
-    USE write_field, ONLY: fieldname, nbfield
+    USE createnewfield_m, ONLY: fieldname, nbfield
 
     character(len=*), intent(in):: name
 
     ! Local:
-    character(len=255) TrueName
-    integer i
+    character(len(name)) TrueName
 
     !--------------------------------------------------
 
-    TrueName=TRIM(ADJUSTL(name))
+    TrueName = ADJUSTL(name)
 
-    GetFieldIndex=-1
+    if (NbField >= 1) then
+       GetFieldIndex = 1
 
-    do i=1,NbField
-       if (TrueName==FieldName(i)) then
-          GetFieldIndex=i
-          exit
-       endif
-    enddo
+       do while (TrueName /= FieldName(getfieldindex) &
+            .and. GetFieldIndex < NbField)
+          GetFieldIndex = GetFieldIndex + 1
+       end do
+
+       if (TrueName /= FieldName(getfieldindex)) GetFieldIndex = - 1
+    else
+       GetFieldIndex = - 1
+    end if
 
   end function GetFieldIndex
 
