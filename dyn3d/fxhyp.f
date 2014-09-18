@@ -25,7 +25,7 @@ contains
 
     REAL, intent(in):: dzooma ! distance totale de la zone du zoom
 
-    REAL, intent(in):: tau 
+    REAL, intent(in):: tau
     ! raideur de la transition de l'intérieur à l'extérieur du zoom
 
     ! arguments de sortie 
@@ -80,13 +80,13 @@ contains
        STOP 1
     ELSE
        dzoom = dzooma * pi/180.
-    ENDIF
+    END IF
 
     print *, ' xzoom(rad), grossism, tau, dzoom (rad):'
     print *, xzoom, grossism, tau, dzoom
 
     DO i = 0, nmax2 
-       xtild(i) = - pi + FLOAT(i) * depi /nmax2
+       xtild(i) = - pi + REAL(i) * depi /nmax2
     ENDDO
 
     DO i = nmax, nmax2
@@ -107,11 +107,11 @@ contains
           ELSE
              fhyp (i) = TANH (fa/fb)
           ENDIF
-       ENDIF
+       END IF
 
        IF (xtild(i) == 0.) fhyp(i) = 1.
        IF (xtild(i) == pi) fhyp(i) = -1.
-    ENDDO
+    END DO
 
     ! Calcul de beta 
 
@@ -150,17 +150,17 @@ contains
        print *, 'Attention ! La valeur beta calculée dans fxhyp est mauvaise.'
        print *, 'Modifier les valeurs de grossismx, tau ou dzoomx et relancer.'
        STOP 1
-    ENDIF
+    END IF
 
     ! calcul de Xprimt 
 
     DO i = nmax, nmax2
        Xprimt(i) = beta + (grossism - beta) * fhyp(i)
-    ENDDO
+    END DO
 
     DO i = nmax + 1, nmax2
        Xprimt(nmax2 - i) = Xprimt(i)
-    ENDDO
+    END DO
 
     ! Calcul de Xf 
 
@@ -218,7 +218,7 @@ contains
        ENDIF
 
        DO i = ii1, ii2
-          xlon2 = - pi + (FLOAT(i) + xuv - decalx) * depi / FLOAT(iim) 
+          xlon2 = - pi + (REAL(i) + xuv - decalx) * depi / REAL(iim) 
           Xfi = xlon2
 
           it = nmax2
@@ -264,7 +264,7 @@ contains
           end if
 
 
-          xxprim(i) = depi/ (FLOAT(iim) * Xprimin)
+          xxprim(i) = depi/ (REAL(iim) * Xprimin)
           xvrai(i) = xi + xzoom
        end DO
 

@@ -72,14 +72,11 @@ contains
 
     use abort_gcm_m, only: abort_gcm
     use comdissnew, only: read_comdissnew
-    use serre, only: clon, clat, grossismx, grossismy, alphax, alphay, &
-         dzoomx, dzoomy, taux, tauy
+    use serre, only: read_serre
     use unit_nml_m, only: unit_nml
 
     namelist /conf_gcm_nml/dayref, anneeref, raz_date, nday, day_step, &
-         iperiod, iapp_tracvl, iconser, iecri, periodav, &
-         iphysiq, clon, clat, grossismx, grossismy, dzoomx, dzoomy, taux, &
-         tauy, offline
+         iperiod, iapp_tracvl, iconser, iecri, periodav, iphysiq, offline
 
     namelist /iniprint_nml/prt_level
 
@@ -117,20 +114,7 @@ contains
          abort_gcm(modname = "conf_gcm", &
          message = 'ok_guide day_step iperiod', ierr = 1)
 
-    IF (grossismx < 1.) THEN
-       PRINT *, 'Error: grossismx < 1'
-       STOP 1
-    ELSE
-       alphax = 1. - 1. / grossismx
-    ENDIF
-    IF (grossismy < 1.) THEN
-       PRINT *, 'Error: grossismy < 1'
-       STOP 1
-    ELSE
-       alphay = 1. - 1. / grossismy
-    ENDIF
-    PRINT *, 'alphax = ', alphax
-    PRINT *, 'alphay = ', alphay
+    call read_serre
 
   END SUBROUTINE conf_gcm
 

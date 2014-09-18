@@ -4,9 +4,9 @@ module fxyhyper_m
 
 contains
 
-  SUBROUTINE fxyhyper(yzoom, grossy, dzoomy, tauy, xzoom, grossx, dzoomx, &
-       taux, rlatu, yprimu, rlatv, yprimv, rlatu1, yprimu1, rlatu2, yprimu2, &
-       rlonu, xprimu, rlonv, xprimv, rlonm025, xprimm025, rlonp025, xprimp025)
+  SUBROUTINE fxyhyper(rlatu, yprimu, rlatv, yprimv, rlatu1, yprimu1, rlatu2, &
+       yprimu2, rlonu, xprimu, rlonv, xprimv, rlonm025, xprimm025, rlonp025, &
+       xprimp025)
 
     ! From dyn3d/fxyhyper.F, version 1.1.1.1, 2004/05/19 12:53:06
 
@@ -14,23 +14,26 @@ contains
     use fxhyp_m, only: fxhyp
     use fyhyp_m, only: fyhyp
     USE paramet_m, ONLY: iip1
+    use serre, only: clat, grossismy, dzoomy, tauy, clon, grossismx, dzoomx, &
+         taux
 
     ! Auteur : P. Le Van d'après les formulations de R. Sadourny
+
+    ! f(x, y) à dérivée tangente hyperbolique
 
     ! Cette procédure calcule les latitudes (routine fyhyp) et
     ! longitudes (fxhyp) par des fonctions à tangente hyperbolique.
 
     ! Il y a trois paramètres, en plus des coordonnées du centre du
-    ! zoom (xzoom et yzoom) :
+    ! zoom (clon et clat) :
 
-    ! a) le grossissement du zoom : grossy (en y) et grossx (en x)
+    ! a) le grossissement du zoom : grossismy (en y) et grossismx (en x)
     ! b) l' extension du zoom : dzoomy (en y) et dzoomx (en x)
     ! c) la raideur de la transition du zoom : taux et tauy 
 
-    ! Nota bene : il vaut mieux avoir : grossx * dzoomx < pi (radians)
-    ! et grossy * dzoomy < pi/2 (radians)
+    ! Nota bene : il vaut mieux avoir : grossismx * dzoomx < pi (radians)
+    ! et grossismy * dzoomy < pi/2 (radians)
 
-    REAL yzoom, grossy, dzoomy, tauy, xzoom, grossx, dzoomx, taux
     REAL rlatu(:), yprimu(:) ! (jjm + 1)
     real rlatv(:), yprimv(:) ! (jjm)
     real rlatu1(:), yprimu1(:), rlatu2(:), yprimu2(:) ! (jjm)
@@ -44,9 +47,9 @@ contains
 
     !----------------------------------------------------------
 
-    CALL fyhyp(yzoom, grossy, dzoomy, tauy, rlatu, yprimu, rlatv, yprimv, &
+    CALL fyhyp(clat, grossismy, dzoomy, tauy, rlatu, yprimu, rlatv, yprimv, &
          rlatu2, yprimu2, rlatu1, yprimu1, dymin, dymax)
-    CALL fxhyp(xzoom, grossx, dzoomx, taux, rlonm025, xprimm025, rlonv, &
+    CALL fxhyp(clon, grossismx, dzoomx, taux, rlonm025, xprimm025, rlonv, &
          xprimv, rlonu, xprimu, rlonp025, xprimp025, dxmin, dxmax)
 
     DO i = 1, iip1

@@ -36,20 +36,17 @@ SUBROUTINE advn(q, masse, w, pbaru, pbarv, pdt, mode)
   ! Local
   ! ---------
 
-  INTEGER i, ij, l, j, ii
-  INTEGER ijlqmin, iqmin, jqmin, lqmin
-  INTEGER ismin
-
-  REAL zm(ip1jmp1, llm), newmasse
+  INTEGER ij, l
+  REAL zm(ip1jmp1, llm)
   REAL mu(ip1jmp1, llm)
   REAL mv(ip1jm, llm)
   REAL mw(ip1jmp1, llm+1)
-  REAL zq(ip1jmp1, llm), zz, qpn, qps
+  REAL zq(ip1jmp1, llm), qpn, qps
   REAL zqg(ip1jmp1, llm), zqd(ip1jmp1, llm)
   REAL zqs(ip1jmp1, llm), zqn(ip1jmp1, llm)
   REAL zqh(ip1jmp1, llm), zqb(ip1jmp1, llm)
-  REAL temps0, temps1, temps2, temps3
-  REAL ztemps1, ztemps2, ztemps3, ssum
+  REAL temps1, temps2, temps3
+  REAL ssum
   LOGICAL testcpu
   SAVE testcpu
   SAVE temps1, temps2, temps3

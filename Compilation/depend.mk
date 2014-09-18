@@ -227,7 +227,7 @@ swr.o : radopt.o radepsi.o raddim.o dimphy.o dimens_m.o
 swtt1.o : raddim.o dimphy.o dimens_m.o 
 swtt.o : raddim.o dimphy.o dimens_m.o 
 swu.o : radopt.o radepsi.o raddim.o suphec.o clesphys.o dimphy.o dimens_m.o 
-tau2alpha.o : writefield.o serre.o paramet_m.o conf_guide.o dimens_m.o comgeom.o 
+tau2alpha.o : writefield.o serre.o paramet_m.o dimens_m.o conf_guide.o comgeom.o 
 thermcell.o : suphec.o dimphy.o 
 transp.o : suphec.o dimphy.o dimens_m.o 
 transp_lay.o : suphec.o dimphy.o dimens_m.o 
@@ -267,7 +267,7 @@ filtreg.o : inifilr.o dimens_m.o coefils.o
 flumass.o : comgeom.o paramet_m.o dimens_m.o 
 fxhyp.o : paramet_m.o dimens_m.o 
 fxy.o : serre.o dimens_m.o 
-fxyhyper.o : paramet_m.o fyhyp.o fxhyp.o dimens_m.o 
+fxyhyper.o : serre.o paramet_m.o fyhyp.o fxhyp.o dimens_m.o 
 fxysinus.o : dimens_m.o 
 fyhyp.o : paramet_m.o dimens_m.o 
 geopot.o : dimens_m.o 
@@ -283,6 +283,7 @@ massbarxy.o : comgeom.o paramet_m.o dimens_m.o
 massdair.o : dimens_m.o comgeom.o 
 paramet_m.o : dimens_m.o 
 phyredem.o : temps.o indicesol.o dimsoil.o dimphy.o 
+serre.o : unit_nml_m.o 
 sortvarc.o : paramet_m.o massbarxy.o filtreg.o ener.o dimens_m.o comgeom.o comconst.o 
 tourpot.o : filtreg.o dimens_m.o comgeom.o 
 vitvert.o : paramet_m.o disvert.o dimens_m.o 

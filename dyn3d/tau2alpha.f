@@ -6,13 +6,12 @@ contains
 
   SUBROUTINE tau2alpha(type, factt, taumin, taumax, alpha)
 
-    USE comgeom, ONLY : cu_2d, cv_2d, rlatu, rlatv
-    USE dimens_m, ONLY : jjm
+    USE comgeom, ONLY: cu_2d, cv_2d, rlatu, rlatv
     use conf_guide_m, only: lat_min_guide, lat_max_guide
-    USE dimens_m, ONLY : iim
-    USE nr_util, ONLY : pi
-    USE paramet_m, ONLY : iip1, jjp1
-    USE serre, ONLY : clat, clon, grossismx, grossismy
+    USE dimens_m, ONLY: iim, jjm
+    USE nr_util, ONLY: pi
+    USE paramet_m, ONLY: iip1, jjp1
+    USE serre, ONLY: clat, clon, grossismx, grossismy
     use writefield_m, only: writefield
 
     INTEGER, intent(in):: type
@@ -58,17 +57,20 @@ contains
        END DO
        CALL writefield("dxdys", dxdys)
 
-       DO j = 1, jjp1
-          DO i = 1, iim
-             dxdyu(i, j) = 0.5 * (dxdys(i, j) + dxdys(i + 1, j))
+       if (type == 2) then
+          DO j = 1, jjp1
+             DO i = 1, iim
+                dxdyu(i, j) = 0.5 * (dxdys(i, j) + dxdys(i + 1, j))
+             END DO
+             dxdyu(iip1, j) = dxdyu(1, j)
           END DO
-          dxdyu(iip1, j) = dxdyu(1, j)
-       END DO
-       DO j = 1, jjm
-          DO i = 1, iip1
-             dxdyv(i, j) = 0.5 * (dxdys(i, j) + dxdys(i, j + 1))
+       elseif (type == 3) then
+          DO j = 1, jjm
+             DO i = 1, iip1
+                dxdyv(i, j) = 0.5 * (dxdys(i, j) + dxdys(i, j + 1))
+             END DO
           END DO
-       END DO
+       end if
 
        ! coordonnees du centre du zoom
        CALL coordij(clon, clat, ilon, ilat)
@@ -83,10 +85,9 @@ contains
           END DO
        END DO
 
-       IF (abs(grossismx - 1.)<0.1 .OR. abs(grossismy - 1.)<0.1) THEN
-          PRINT *, 'ATTENTION modele peu zoome'
-          PRINT *, 'ATTENTION on prend une constante de guidage cste'
-          gamma = 0.
+       IF (abs(grossismx - 1.) < 0.1 .OR. abs(grossismy - 1.) < 0.1) THEN
+          PRINT *, 'Attention : modèle peu zoomé.'
+          PRINT *, 'On prend une constante de guidage constante.'
        ELSE
           gamma = (dxdy_max - 2. * dxdy_min) / (dxdy_max - dxdy_min)
           PRINT *, 'gamma=', gamma
@@ -115,8 +116,8 @@ contains
              dxdy = dxdyv(i, j)
              zlat = rlatv(j) * 180. / pi
           END IF
-          IF (abs(grossismx - 1.)<0.1 .OR. abs(grossismy - 1.)<0.1) THEN
-             ! pour une grille reguliere, xi=xxx**0=1 -> alpha=alphamin
+          IF (abs(grossismx - 1.) < 0.1 .OR. abs(grossismy - 1.) < 0.1) THEN
+             ! grille regulière
              alpha(i, j) = alphamin
           ELSE
              xi = ((dxdy_max - dxdy) / (dxdy_max - dxdy_min))**gamma

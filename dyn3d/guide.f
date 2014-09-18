@@ -61,8 +61,8 @@ CONTAINS
     REAL, save:: masserea2(ip1jmp1, llm) ! masse
 
     ! alpha determine la part des injections de donnees a chaque etape
-    ! alpha=1 signifie pas d'injection
-    ! alpha=0 signifie injection totale
+    ! alpha=0 signifie pas d'injection
+    ! alpha=1 signifie injection totale
     REAL, save:: alpha_q(iim + 1, jjm + 1)
     REAL, save:: alpha_t(iim + 1, jjm + 1)
     REAL, save:: alpha_u(iim + 1, jjm + 1), alpha_v(iim + 1, jjm)
@@ -104,27 +104,31 @@ CONTAINS
 
           factt = dtvr * iperiod / daysec
 
-          CALL tau2alpha(3, factt, tau_min_v, tau_max_v, alpha_v)
-          CALL tau2alpha(2, factt, tau_min_u, tau_max_u, alpha_u)
-          CALL tau2alpha(1, factt, tau_min_t, tau_max_t, alpha_t)
-          CALL tau2alpha(1, factt, tau_min_q, tau_max_q, alpha_q)
+          if (guide_u) CALL tau2alpha(3, factt, tau_min_v, tau_max_v, alpha_v)
+          if (guide_v) CALL tau2alpha(2, factt, tau_min_u, tau_max_u, alpha_u)
+          if (guide_t) CALL tau2alpha(1, factt, tau_min_t, tau_max_t, alpha_t)
+          if (guide_q) CALL tau2alpha(1, factt, tau_min_q, tau_max_q, alpha_q)
        ELSE
           ! Cas où on force exactement par les variables analysées
-          alpha_t = 0.
-          alpha_u = 0.
-          alpha_v = 0.
-          alpha_q = 0.
+          if (guide_u) alpha_t = 1.
+          if (guide_v) alpha_u = 1.
+          if (guide_t) alpha_v = 1.
+          if (guide_q) alpha_q = 1.
        END IF
 
        step_rea = 1
        count_no_rea = 0
-       ncid = -99
 
        ! lecture d'un fichier netcdf pour determiner le nombre de niveaux
-       if (guide_u) call nf95_open('u.nc',Nf90_NOWRITe,ncid)
-       if (guide_v) call nf95_open('v.nc',nf90_nowrite,ncid)
-       if (guide_T) call nf95_open('T.nc',nf90_nowrite,ncid)
-       if (guide_Q) call nf95_open('hur.nc',nf90_nowrite, ncid)
+       if (guide_u) then
+          call nf95_open('u.nc',Nf90_NOWRITe,ncid)
+       else if (guide_v) then
+          call nf95_open('v.nc',nf90_nowrite,ncid)
+       else if (guide_T) then
+          call nf95_open('T.nc',nf90_nowrite,ncid)
+       else
+          call nf95_open('hur.nc',nf90_nowrite, ncid)
+       end if
 
        IF (ncep) THEN
           call nf95_inq_dimid(ncid, 'LEVEL', dimid)
@@ -139,8 +143,8 @@ CONTAINS
             masserea2, nlev)
        qrea2 = max(qrea2, 0.1)
 
-       CALL writefield("alpha_u", alpha_u)
-       CALL writefield("alpha_t", alpha_t)
+       if (guide_u) CALL writefield("alpha_u", alpha_u)
+       if (guide_t) CALL writefield("alpha_t", alpha_t)
     END IF first_call
 
     ! IMPORTATION DES VENTS, PRESSION ET TEMPERATURE REELS:
@@ -159,12 +163,21 @@ CONTAINS
             masserea2, nlev)
        qrea2 = max(qrea2, 0.1)
        factt = dtvr * iperiod / daysec
-       CALL writefield("ucov", ucov)
-       CALL writefield("ucovrea2", ucovrea2)
-       CALL writefield("teta", teta)
-       CALL writefield("tetarea2", tetarea2)
-       CALL writefield("qrea2", qrea2)
-       CALL writefield("q", q)
+
+       if (guide_u) then
+          CALL writefield("ucov", ucov)
+          CALL writefield("ucovrea2", ucovrea2)
+       end if
+
+       if (guide_t) then
+          CALL writefield("teta", teta)
+          CALL writefield("tetarea2", tetarea2)
+       end if
+
+       if (guide_q) then
+          CALL writefield("qrea2", qrea2)
+          CALL writefield("q", q)
+       end if
     ELSE
        count_no_rea = count_no_rea + 1
     END IF

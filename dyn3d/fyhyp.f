@@ -1,6 +1,6 @@
 module fyhyp_m
 
- IMPLICIT NONE
+  IMPLICIT NONE
 
 contains
 
@@ -79,7 +79,7 @@ contains
             // "et relancer."
        STOP 1
     ELSE
-       dzoom = dzooma*pi/180.
+       dzoom = dzooma * pi/180.
     END IF
 
     print *, 'yzoom(rad), grossism, tau, dzoom (rad):'
