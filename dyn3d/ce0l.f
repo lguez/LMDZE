@@ -8,6 +8,7 @@ PROGRAM ce0l
   use grilles_gcm_netcdf_sub_m, only: grilles_gcm_netcdf_sub
   use jumble, only: new_unit
   use limit_mod, only: limit
+  use serre, only: read_serre
   use unit_nml_m, only: unit_nml
 
   implicit none
@@ -19,6 +20,7 @@ PROGRAM ce0l
   call new_unit(unit_nml)
   open(unit_nml, file="used_namelists.txt", status="replace", action="write")
   CALL conf_gcm
+  call read_serre
   CALL etat0(phis)
   CALL limit
   CALL grilles_gcm_netcdf_sub(phis)

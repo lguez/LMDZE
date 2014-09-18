@@ -34,13 +34,13 @@ contains
 
     ! The modes are filtered from modfrst to modemax.
 
-    USE dimens_m, ONLY : iim, jjm
-    use conf_gcm_m, ONLY : fxyhypb, ysinus
-    USE comgeom, ONLY : rlatu, rlatv, xprimu
-    use nr_util, only: pi
-    USE serre, ONLY : alphax
     USE coefils, ONLY : coefilu, coefilu2, coefilv, coefilv2, eignfnu, &
          eignfnv, modfrstu, modfrstv
+    USE comgeom, ONLY : rlatu, rlatv, xprimu
+    USE dimens_m, ONLY : iim, jjm
+    use inifgn_m, only: inifgn
+    use nr_util, only: pi
+    USE serre, ONLY : grossismx
 
     ! Local:
     REAL dlonu(iim), dlatu(jjm)
@@ -50,7 +50,6 @@ contains
     INTEGER i, j, modemax, imx, k, kf
     REAL dymin, dxmin, colat0
     REAL eignft(iim, iim), coff
-    EXTERNAL inifgn
 
     !-----------------------------------------------------------
 
@@ -90,21 +89,9 @@ contains
 
     colat0 = min(0.5, dymin/dxmin)
 
-    IF (.NOT. fxyhypb .AND. ysinus) THEN
-       colat0 = 0.6
-       ! À revoir pour ysinus
-       alphax = 0.
-    END IF
-
     PRINT *, 'colat0 = ', colat0
-    PRINT *, 'alphax = ', alphax
 
-    IF (alphax == 1.) THEN
-       PRINT *, 'alphax doit etre < a 1. Corriger '
-       STOP 1
-    END IF
-
-    lamdamax = iim / (pi * colat0 * (1. - alphax))
+    lamdamax = iim / (pi * colat0 / grossismx)
     rlamda = lamdamax / sqrt(abs(eignvl(2: iim)))
 
     DO j = 1, jjm

@@ -42,13 +42,6 @@ module conf_gcm_m
   ! Help = Choix du schema d'integration temporel.
   ! y = pure Matsuno sinon c'est du Matsuno-leapfrog
 
-  logical:: fxyhypb = .TRUE.
-  ! fonction f(y) à dérivée tangente hyperbolique, sinon à dérivée
-  ! sinusoïdale
-
-  logical:: ysinus = .TRUE.
-  ! (Fonction f(y) avec y = Sin(latit.) si = .true. sinon y = latit.)
-
   logical:: ok_guide= .FALSE. ! guidage
 
   INTEGER:: iflag_phys = 1
@@ -65,14 +58,13 @@ contains
     ! Version du 29/04/97
 
     ! On ne compare pas les paramètres du zoom (grossismx, grossismy,
-    ! clon, clat, fxyhypb) lus sur le fichier start avec ceux lus dans
+    ! clon, clat) lus sur le fichier start avec ceux lus dans
     ! une namelist, au début de gcm. Ces paramètres définissent entre
     ! autres la grille et doivent être identiques, sinon il y aura
     ! divergence du gcm.
 
     use abort_gcm_m, only: abort_gcm
     use comdissnew, only: read_comdissnew
-    use serre, only: read_serre
     use unit_nml_m, only: unit_nml
 
     namelist /conf_gcm_nml/dayref, anneeref, raz_date, nday, day_step, &
@@ -80,7 +72,7 @@ contains
 
     namelist /iniprint_nml/prt_level
 
-    namelist /logic_nml/ purmats, fxyhypb, ysinus, ok_guide, iflag_phys
+    namelist /logic_nml/ purmats, ok_guide, iflag_phys
 
     !------------------------------------
 
@@ -113,8 +105,6 @@ contains
     if (ok_guide .and. mod(day_step, 4 * iperiod) /= 0) call &
          abort_gcm(modname = "conf_gcm", &
          message = 'ok_guide day_step iperiod', ierr = 1)
-
-    call read_serre
 
   END SUBROUTINE conf_gcm
 

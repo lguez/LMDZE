@@ -46,7 +46,6 @@ contains
     use q_sat_m, only: q_sat
     use regr_lat_time_coefoz_m, only: regr_lat_time_coefoz
     use regr_pr_o3_m, only: regr_pr_o3
-    use serre, only: alphax
     use startdyn, only: start_init_dyn
     USE start_init_orog_m, only: start_init_orog, mask
     use start_init_phys_m, only: start_init_phys
@@ -295,8 +294,6 @@ contains
 
     ! Calcul interm\'ediaire :
     CALL massdair(p3d, masse)
-
-    print *, 'ALPHAX = ', alphax
 
     forall (l = 1:llm)
        masse(:, 1, l) = SUM(aire_2d(:iim, 1) * masse(:iim, 1, l)) / apoln

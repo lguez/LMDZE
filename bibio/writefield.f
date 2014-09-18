@@ -46,11 +46,13 @@ contains
 
   subroutine WriteField2d(name,Field)
 
+    use netcdf, only: nf90_sync
+
     character(len=*), intent(in):: name
     real, intent(in):: Field(:, :)
 
     ! Local:
-    integer index
+    integer index, status
 
     !-------------------------------------------
 
@@ -66,6 +68,7 @@ contains
 
     call NF95_PUT_VAR(Ncid(Index), Varid = 1, values = Field, &
          start = (/1, 1, Record(Index)/))
+    status = nf90_sync(Ncid(Index))
 
   end subroutine WriteField2d
 

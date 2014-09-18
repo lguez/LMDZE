@@ -163,21 +163,15 @@ contains
 
     USE comconst, ONLY : g, omeg, rad
     USE comdissnew, ONLY : coefdis, nitergdiv, nitergrot, niterh
-    use conf_gcm_m, ONLY : fxyhypb, ysinus
-    use fxy_m, only: fxy
     use fxyhyper_m, only: fxyhyper
-    use fxysinus_m, only: fxysinus
     use jumble, only: new_unit
     use nr_util, only: pi
     USE paramet_m, ONLY : iip1, jjp1
-    USE serre, ONLY : alphax, alphay, clat, clon, pxo, pyo, transx, transy
-    ! Modifiés pxo, pyo, transx, transy
 
     ! Local:
-    INTEGER i, j, itmax, itmay, iter, unit
+    INTEGER i, j, unit
     REAL cvu(iip1, jjp1), cuv(iip1, jjm)
     REAL ai14, ai23, airez, un4rad2
-    REAL eps, x1, xo1, f, df, xdm, y1, yo1, ydm
     REAL coslatm, coslatp, radclatm, radclatp
     REAL, dimension(iip1, jjp1):: cuij1, cuij2, cuij3, cuij4 ! in m
     REAL, dimension(iip1, jjp1):: cvij1, cvij2, cvij3, cvij4 ! in m
@@ -215,64 +209,10 @@ contains
     print *, "gamdi_grot = ", gamdi_grot
     print *, "gamdi_h = ", gamdi_h
 
-    IF (fxyhypb) THEN
-       print *, 'inigeom: Y = latitude, dérivée tangente hyperbolique'
-       CALL fxyhyper(rlatu, yprimu, rlatv, yprimv, rlatu1, yprimu1, rlatu2, &
-            yprimu2, rlonu, xprimu, rlonv, xprimv, rlonm025, xprimm025, &
-            rlonp025, xprimp025)
-    ELSE
-       IF (ysinus) THEN
-          print *, 'inigeom: Y = sin(latitude)'
-          ! Utilisation de f(x, y) avec y = sinus de la latitude 
-          CALL fxysinus(rlatu, yprimu, rlatv, yprimv, rlatu1, yprimu1, &
-               rlatu2, yprimu2, rlonu, xprimu, rlonv, xprimv, rlonm025, &
-               xprimm025, rlonp025, xprimp025)
-       ELSE
-          print *, 'Inigeom, Y = Latitude, der. sinusoid .'
-          ! utilisation de f(x, y) a tangente sinusoidale, y etant la latit
-
-          pxo = clon * pi / 180.
-          pyo = 2. * clat * pi / 180.
-
-          ! determination de transx (pour le zoom) par Newton-Raphson
-
-          itmax = 10
-          eps = .1E-7
-
-          xo1 = 0.
-          DO iter = 1, itmax
-             x1 = xo1
-             f = x1 + alphax * sin(x1-pxo)
-             df = 1. + alphax * cos(x1-pxo)
-             x1 = x1 - f / df
-             xdm = abs(x1-xo1)
-             IF (xdm<=eps) EXIT
-             xo1 = x1
-          END DO
-
-          transx = xo1
-
-          itmay = 10
-          eps = .1E-7
-
-          yo1 = 0.
-          DO iter = 1, itmay
-             y1 = yo1
-             f = y1 + alphay * sin(y1-pyo)
-             df = 1. + alphay * cos(y1-pyo)
-             y1 = y1 - f / df
-             ydm = abs(y1-yo1)
-             IF (ydm<=eps) EXIT
-             yo1 = y1
-          END DO
-
-          transy = yo1
-
-          CALL fxy(rlatu, yprimu, rlatv, yprimv, rlatu1, yprimu1, rlatu2, &
-               yprimu2, rlonu, xprimu, rlonv, xprimv, rlonm025, xprimm025, &
-               rlonp025, xprimp025)
-       END IF
-    END IF
+    print *, 'inigeom: Y = latitude, dérivée tangente hyperbolique'
+    CALL fxyhyper(rlatu, yprimu, rlatv, yprimv, rlatu1, yprimu1, rlatu2, &
+         yprimu2, rlonu, xprimu, rlonv, xprimv, rlonm025, xprimm025, &
+         rlonp025, xprimp025)
 
     rlatu(1) = pi / 2.
     rlatu(jjp1) = -rlatu(1)

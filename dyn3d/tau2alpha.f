@@ -20,57 +20,55 @@ contains
 
     ! Local:
     REAL dxdy
-    REAL dxdy_min, dxdy_max
+    REAL, save:: dxdy_min, dxdy_max
     REAL alphamin, alphamax, xi
     REAL, SAVE:: gamma
     INTEGER i, j, ilon, ilat
     LOGICAL:: first = .TRUE.
-    REAL zdx(iip1, jjp1), zdy(iip1, jjp1)
+    REAL dx(iip1, jjp1), dy(iip1, jjp1)
     REAL zlat
-    REAL dxdys(iip1, jjp1), dxdyu(iip1, jjp1), dxdyv(iip1, jjm)
+    REAL, save:: dxdys(iip1, jjp1), dxdyu(iip1, jjp1), dxdyv(iip1, jjm)
 
     !------------------------------------------------------------
 
     IF (first) THEN
        DO j = 2, jjm
           DO i = 2, iip1
-             zdx(i, j) = 0.5 * (cu_2d(i - 1, j) + cu_2d(i, j)) / cos(rlatu(j))
+             dx(i, j) = 0.5 * (cu_2d(i - 1, j) + cu_2d(i, j)) / cos(rlatu(j))
           END DO
-          zdx(1, j) = zdx(iip1, j)
+          dx(1, j) = dx(iip1, j)
        END DO
        DO j = 2, jjm
           DO i = 1, iip1
-             zdy(i, j) = 0.5 * (cv_2d(i, j - 1) + cv_2d(i, j))
+             dy(i, j) = 0.5 * (cv_2d(i, j - 1) + cv_2d(i, j))
           END DO
        END DO
        DO i = 1, iip1
-          zdx(i, 1) = zdx(i, 2)
-          zdx(i, jjp1) = zdx(i, jjm)
-          zdy(i, 1) = zdy(i, 2)
-          zdy(i, jjp1) = zdy(i, jjm)
+          dx(i, 1) = dx(i, 2)
+          dx(i, jjp1) = dx(i, jjm)
+          dy(i, 1) = dy(i, 2)
+          dy(i, jjp1) = dy(i, jjm)
        END DO
 
        DO j = 1, jjp1
           DO i = 1, iip1
-             dxdys(i, j) = sqrt(zdx(i, j)**2 + zdy(i, j)**2)
+             dxdys(i, j) = sqrt(dx(i, j)**2 + dy(i, j)**2)
           END DO
        END DO
        CALL writefield("dxdys", dxdys)
 
-       if (type == 2) then
-          DO j = 1, jjp1
-             DO i = 1, iim
-                dxdyu(i, j) = 0.5 * (dxdys(i, j) + dxdys(i + 1, j))
-             END DO
-             dxdyu(iip1, j) = dxdyu(1, j)
+       DO j = 1, jjp1
+          DO i = 1, iim
+             dxdyu(i, j) = 0.5 * (dxdys(i, j) + dxdys(i + 1, j))
           END DO
-       elseif (type == 3) then
-          DO j = 1, jjm
-             DO i = 1, iip1
-                dxdyv(i, j) = 0.5 * (dxdys(i, j) + dxdys(i, j + 1))
-             END DO
+          dxdyu(iip1, j) = dxdyu(1, j)
+       END DO
+
+       DO j = 1, jjm
+          DO i = 1, iip1
+             dxdyv(i, j) = 0.5 * (dxdys(i, j) + dxdys(i, j + 1))
           END DO
-       end if
+       END DO
 
        ! coordonnees du centre du zoom
        CALL coordij(clon, clat, ilon, ilat)
@@ -90,13 +88,13 @@ contains
           PRINT *, 'On prend une constante de guidage constante.'
        ELSE
           gamma = (dxdy_max - 2. * dxdy_min) / (dxdy_max - dxdy_min)
-          PRINT *, 'gamma=', gamma
-          IF (gamma<1.E-5) THEN
-             PRINT *, 'gamma =', gamma, '<1e-5'
-             STOP
+          IF (gamma < 1E-5) THEN
+             PRINT *, '(dxdy_max - 2. * dxdy_min) / (dxdy_max - dxdy_min) ' &
+                  // '< 1e-5'
+             STOP 1
           END IF
-          PRINT *, 'gamma=', gamma
           gamma = log(0.5) / log(gamma)
+          PRINT *, 'gamma=', gamma
        END IF
        first = .false.
     END IF

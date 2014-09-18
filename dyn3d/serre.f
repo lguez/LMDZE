@@ -5,10 +5,6 @@ module serre
   REAL:: clon = 0. ! longitude of the center of the zoom, in degrees
   real:: clat = 0. ! latitude of the center of the zoom, in degrees
 
-  real, save:: transx, transy
-  real, save:: alphax, alphay ! anciennes formulations des grossissements
-  real, save:: pxo, pyo
-
   real:: grossismx = 1. ! facteur de grossissement du zoom, selon la longitude
   real:: grossismy = 1. ! facteur de grossissement du zoom, selon la latitude
 
@@ -26,6 +22,7 @@ contains
   subroutine read_serre
 
     use unit_nml_m, only: unit_nml
+    use nr_util, only: assert
 
     namelist /serre_nml/ clon, clat, grossismx, grossismy, dzoomx, dzoomy, &
          taux, tauy
@@ -36,20 +33,7 @@ contains
     read(unit=*, nml=serre_nml)
     write(unit_nml, nml=serre_nml)
 
-    IF (grossismx < 1.) THEN
-       PRINT *, 'Error: grossismx < 1'
-       STOP 1
-    ELSE
-       alphax = 1. - 1. / grossismx
-    ENDIF
-    IF (grossismy < 1.) THEN
-       PRINT *, 'Error: grossismy < 1'
-       STOP 1
-    ELSE
-       alphay = 1. - 1. / grossismy
-    ENDIF
-    PRINT *, 'alphax = ', alphax
-    PRINT *, 'alphay = ', alphay
+    call assert(grossismx >= 1. .and. grossismy >= 1., "read_serre grossism")
 
   end subroutine read_serre
 

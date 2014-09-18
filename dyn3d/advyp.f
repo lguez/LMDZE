@@ -101,11 +101,6 @@ SUBROUTINE advyp(limit, dty, pbarv, sm, s0, ssx, sy, sz, ssxx, ssxy, ssxz, &
   ! Special pour poles
 
   REAL sbms, sfms, sfzs, sbmn, sfmn, sfzn
-  REAL sns0(ntra), snsz(ntra), snsm
-  REAL qy1(iim, llm, ntra), qylat(iim, llm, ntra)
-  REAL cx1(llm, ntra), cxlat(llm, ntra)
-  REAL cy1(llm, ntra), cylat(llm, ntra)
-  REAL z1(iim), zcos(iim), zsin(iim)
   REAL ssum
   EXTERNAL ssum
 

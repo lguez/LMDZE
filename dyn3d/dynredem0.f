@@ -11,7 +11,6 @@ CONTAINS
 
     USE comconst, ONLY: cpp, daysec, dtvr, g, kappa, omeg, rad
     USE comgeom, ONLY: aire_2d, cu_2d, cv_2d, rlatu, rlatv, rlonu, rlonv
-    use conf_gcm_m, ONLY: fxyhypb, ysinus
     USE dimens_m, ONLY: iim, jjm, llm, nqmx
     USE disvert_m, ONLY: ap, bp, pa, preff, presnivs
     USE ener, ONLY: ang0, etot0, ptot0, stot0, ztot0
@@ -84,23 +83,12 @@ CONTAINS
     tab_cntrl(21) = clat
     tab_cntrl(22) = grossismx
     tab_cntrl(23) = grossismy
-
-    IF (fxyhypb) THEN
-       tab_cntrl(24) = 1.
-       tab_cntrl(25) = dzoomx
-       tab_cntrl(26) = dzoomy
-       tab_cntrl(27) = 0.
-       tab_cntrl(28) = taux
-       tab_cntrl(29) = tauy
-    ELSE
-       tab_cntrl(24) = 0.
-       tab_cntrl(25) = dzoomx
-       tab_cntrl(26) = dzoomy
-       tab_cntrl(27) = 0.
-       tab_cntrl(28) = 0.
-       tab_cntrl(29) = 0.
-       IF (ysinus) tab_cntrl(27) = 1.
-    END IF
+    tab_cntrl(24) = 1.
+    tab_cntrl(25) = dzoomx
+    tab_cntrl(26) = dzoomy
+    tab_cntrl(27) = 0.
+    tab_cntrl(28) = taux
+    tab_cntrl(29) = tauy
 
     tab_cntrl(30) = real(iday_end)
 

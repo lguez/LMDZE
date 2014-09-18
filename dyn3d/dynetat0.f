@@ -14,7 +14,6 @@ contains
 
     use comconst, only: dtvr
     use comgeom, only: rlonu, rlatu, rlonv, rlatv, cu_2d, cv_2d, aire_2d
-    use conf_gcm_m, only: fxyhypb, ysinus
     use dimens_m, only: iim, jjm, llm, nqmx
     use disvert_m, only: pa
     use ener, only: etot0, ang0, ptot0, stot0, ztot0
@@ -23,7 +22,8 @@ contains
     use netcdf95, only: NF95_GET_VAR, nf95_open, nf95_inq_varid, NF95_CLOSE, &
          NF95_Gw_VAR
     use nr_util, only: assert
-    use serre, only: clon, clat, grossismy, grossismx
+    use serre, only: clon, clat, grossismy, grossismx, dzoomx, dzoomy, taux, &
+         tauy
     use temps, only: day_ref, itau_dyn, annee_ref
 
     REAL, intent(out):: vcov(: , :, :) ! (iim + 1, jjm, llm)
@@ -80,12 +80,16 @@ contains
     stot0 = tab_cntrl(16)
     ang0 = tab_cntrl(17)
     pa = tab_cntrl(18)
+
     clon = tab_cntrl(20)
     clat = tab_cntrl(21)
     grossismx = tab_cntrl(22)
     grossismy = tab_cntrl(23)
-    fxyhypb = tab_cntrl(24) == 1.
-    if (.not. fxyhypb) ysinus = tab_cntrl(27) == 1.
+    dzoomx = tab_cntrl(25)
+    dzoomy = tab_cntrl(26)
+    taux = tab_cntrl(28)
+    tauy = tab_cntrl(29)
+
     itau_dyn = tab_cntrl(31)
 
     call NF95_INQ_VARID (ncid, "rlonu", varid)
