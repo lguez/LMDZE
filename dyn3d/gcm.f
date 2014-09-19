@@ -13,6 +13,7 @@ PROGRAM gcm
   use comgeomphy, only: airephy, cuphy, cvphy, rlatd, rlond
   use conf_gcm_m, only: day_step, iperiod, anneeref, dayref, iecri, iphysiq, &
        nday, raz_date, periodav, conf_gcm, iflag_phys
+  use conf_guide_m, only: conf_guide
   use dimens_m, only: iim, jjm, llm, nqmx
   use dimphy, only: klon
   USE disvert_m, ONLY : disvert
@@ -147,6 +148,8 @@ PROGRAM gcm
   ! Choix des fréquences de stockage pour le hors-ligne :
   istdyn = day_step / 4 ! stockage toutes les 6 h = 1 jour / 4
   istphy = istdyn / iphysiq     
+
+  CALL conf_guide
 
   ! Intégration temporelle du modèle :
   CALL leapfrog(ucov, vcov, teta, ps, masse, phis, q, time_0)

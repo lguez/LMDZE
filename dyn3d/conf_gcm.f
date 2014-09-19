@@ -42,8 +42,6 @@ module conf_gcm_m
   ! Help = Choix du schema d'integration temporel.
   ! y = pure Matsuno sinon c'est du Matsuno-leapfrog
 
-  logical:: ok_guide= .FALSE. ! guidage
-
   INTEGER:: iflag_phys = 1
   ! contrôle l'appel à la physique :
   ! 0 : pas de physique
@@ -72,7 +70,7 @@ contains
 
     namelist /iniprint_nml/prt_level
 
-    namelist /logic_nml/ purmats, ok_guide, iflag_phys
+    namelist /logic_nml/ purmats, iflag_phys
 
     !------------------------------------
 
@@ -101,10 +99,6 @@ contains
          message = &
          'Il faut choisir un nombre de pas par jour multiple de "iphysiq".', &
          ierr = 1)
-
-    if (ok_guide .and. mod(day_step, 4 * iperiod) /= 0) call &
-         abort_gcm(modname = "conf_gcm", &
-         message = 'ok_guide day_step iperiod', ierr = 1)
 
   END SUBROUTINE conf_gcm
 

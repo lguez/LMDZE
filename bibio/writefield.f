@@ -2,7 +2,7 @@ module WriteField_m
 
   use CreateNewField_m, only: CreateNewField, ncid, nbfield, MaxWriteField
   use GetFieldIndex_m, only: GetFieldIndex
-  USE netcdf95, ONLY: nf95_put_var
+  USE netcdf95, ONLY: nf95_put_var, nf95_sync
 
   implicit none
 
@@ -39,6 +39,7 @@ contains
 
     call NF95_PUT_VAR(Ncid(Index), Varid = 1, values = Field, &
          start = (/1, Record(Index)/))
+    call nf95_sync(Ncid(Index))
 
   end subroutine WriteField1d
 
@@ -46,13 +47,11 @@ contains
 
   subroutine WriteField2d(name,Field)
 
-    use netcdf, only: nf90_sync
-
     character(len=*), intent(in):: name
     real, intent(in):: Field(:, :)
 
     ! Local:
-    integer index, status
+    integer index
 
     !-------------------------------------------
 
@@ -68,7 +67,7 @@ contains
 
     call NF95_PUT_VAR(Ncid(Index), Varid = 1, values = Field, &
          start = (/1, 1, Record(Index)/))
-    status = nf90_sync(Ncid(Index))
+    call nf95_sync(Ncid(Index))
 
   end subroutine WriteField2d
 
@@ -96,6 +95,7 @@ contains
 
     call NF95_PUT_VAR(Ncid(Index), Varid = 1, values = Field, &
          start = (/1, 1, 1, Record(Index)/))
+    call nf95_sync(Ncid(Index))
 
   end subroutine WriteField3d
 

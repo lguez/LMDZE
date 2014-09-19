@@ -19,7 +19,8 @@ contains
     USE comgeom, ONLY: aire_2d, apoln, apols
     USE disvert_m, ONLY: ap, bp
     USE conf_gcm_m, ONLY: day_step, iconser, iperiod, iphysiq, nday, offline, &
-         iflag_phys, ok_guide, iecri
+         iflag_phys, iecri
+    USE conf_guide_m, ONLY: ok_guide
     USE dimens_m, ONLY: iim, jjm, llm, nqmx
     use dissip_m, only: dissip
     USE dynetat0_m, ONLY: day_ini

@@ -5,23 +5,22 @@ MODULE guide_m
 
   IMPLICIT NONE
 
-  REAL aire_min, aire_max
-
 CONTAINS
 
   SUBROUTINE guide(itau, ucov, vcov, teta, q, ps)
 
     ! Author: F.Hourdin
 
-    USE comconst, ONLY: cpp, daysec, dtvr, kappa
-    USE comgeom, ONLY: aire, rlatu, rlonv
-    USE conf_gcm_m, ONLY: day_step, iperiod
-    use conf_guide_m, only: conf_guide, guide_u, guide_v, guide_t, guide_q, &
-         ncep, ini_anal, tau_min_u, tau_max_u, tau_min_v, tau_max_v, &
-         tau_min_t, tau_max_t, tau_min_q, tau_max_q, online
+    USE comconst, ONLY: cpp, kappa
+    USE comgeom, ONLY: rlatu, rlatv
+    USE conf_gcm_m, ONLY: day_step
+    use conf_guide_m, only: guide_u, guide_v, guide_t, guide_q, ncep, &
+         ini_anal, tau_min_u, tau_max_u, tau_min_v, tau_max_v, tau_min_t, &
+         tau_max_t, tau_min_q, tau_max_q, online, factt
     USE dimens_m, ONLY: iim, jjm, llm
     USE disvert_m, ONLY: ap, bp, preff, presnivs
     USE exner_hyb_m, ONLY: exner_hyb
+    use init_tau2alpha_m, only: init_tau2alpha
     use netcdf, only: nf90_nowrite
     use netcdf95, only: nf95_close, nf95_inq_dimid, nf95_inquire_dimension, &
          nf95_open
@@ -29,7 +28,7 @@ CONTAINS
     USE paramet_m, ONLY: iip1, ip1jmp1, jjp1, llmp1
     USE q_sat_m, ONLY: q_sat
     use read_reanalyse_m, only: read_reanalyse
-    USE serre, ONLY: clat, clon
+    use serre, only: grossismx, grossismy
     use tau2alpha_m, only: tau2alpha
     use writefield_m, only: writefield
 
@@ -69,10 +68,7 @@ CONTAINS
 
     INTEGER, save:: step_rea, count_no_rea
 
-    INTEGER ilon, ilat
-    REAL factt ! pas de temps entre deux appels au guidage, en fraction de jour
-
-    INTEGER ij, l
+    INTEGER l
     INTEGER ncid, dimid
     REAL tau
     INTEGER, SAVE:: nlev
@@ -82,44 +78,56 @@ CONTAINS
     real pk(iim + 1, jjm + 1, llm), pks(iim + 1, jjm + 1)
     REAL qsat(iim + 1, jjm + 1, llm)
 
+    REAL dxdys(iip1, jjp1), dxdyu(iip1, jjp1), dxdyv(iip1, jjm)
+
     !-----------------------------------------------------------------------
 
     !!PRINT *, 'Call sequence information: guide'
 
     first_call: IF (itau == 0) THEN
-       CALL conf_guide
-
        IF (online) THEN
-          ! Constantes de temps de rappel en jour
+          IF (abs(grossismx - 1.) < 0.1 .OR. abs(grossismy - 1.) < 0.1) THEN
+             ! grille regulière
+             if (guide_u) alpha_u = factt / tau_max_u
+             if (guide_v) alpha_v = factt / tau_max_v
+             if (guide_t) alpha_t = factt / tau_max_t
+             if (guide_q) alpha_q = factt / tau_max_q
+          else
+             call init_tau2alpha(dxdys, dxdyu, dxdyv)
 
-          ! coordonnees du centre du zoom
-          CALL coordij(clon, clat, ilon, ilat)
-          ! aire de la maille au centre du zoom
-          aire_min = aire(ilon+(ilat - 1) * iip1)
-          ! aire maximale de la maille
-          aire_max = 0.
-          DO ij = 1, ip1jmp1
-             aire_max = max(aire_max, aire(ij))
-          END DO
+             if (guide_u) then
+                CALL tau2alpha(dxdyu, rlatu, tau_min_u, tau_max_u, alpha_u)
+                CALL writefield("alpha_u", alpha_u)
+             end if
 
-          factt = dtvr * iperiod / daysec
+             if (guide_v) then
+                CALL tau2alpha(dxdyv, rlatv, tau_min_v, tau_max_v, alpha_v)
+                CALL writefield("alpha_v", alpha_v)
+             end if
 
-          if (guide_u) CALL tau2alpha(3, factt, tau_min_v, tau_max_v, alpha_v)
-          if (guide_v) CALL tau2alpha(2, factt, tau_min_u, tau_max_u, alpha_u)
-          if (guide_t) CALL tau2alpha(1, factt, tau_min_t, tau_max_t, alpha_t)
-          if (guide_q) CALL tau2alpha(1, factt, tau_min_q, tau_max_q, alpha_q)
+             if (guide_t) then
+                CALL tau2alpha(dxdys, rlatu, tau_min_t, tau_max_t, alpha_t)
+                CALL writefield("alpha_t", alpha_t)
+             end if
+
+             if (guide_q)  then
+                CALL tau2alpha(dxdys, rlatu, tau_min_q, tau_max_q, alpha_q)
+                CALL writefield("alpha_q", alpha_q)
+             end if
+          end IF
        ELSE
           ! Cas où on force exactement par les variables analysées
-          if (guide_u) alpha_t = 1.
-          if (guide_v) alpha_u = 1.
-          if (guide_t) alpha_v = 1.
+          if (guide_u) alpha_u = 1.
+          if (guide_v) alpha_v = 1.
+          if (guide_t) alpha_t = 1.
           if (guide_q) alpha_q = 1.
        END IF
 
        step_rea = 1
        count_no_rea = 0
 
-       ! lecture d'un fichier netcdf pour determiner le nombre de niveaux
+       ! lecture d'un fichier netcdf pour determiner le nombre de niveaux :
+
        if (guide_u) then
           call nf95_open('u.nc',Nf90_NOWRITe,ncid)
        else if (guide_v) then
@@ -136,15 +144,13 @@ CONTAINS
           call nf95_inq_dimid(ncid, 'PRESSURE', dimid)
        END IF
        call nf95_inquire_dimension(ncid, dimid, nclen=nlev)
-       PRINT *, 'nlev', nlev
+       PRINT *, 'nlev = ', nlev
        call nf95_close(ncid)
-       ! Lecture du premier etat des reanalyses.
+
+       ! Lecture du premier état des réanalyses :
        CALL read_reanalyse(1, ps, ucovrea2, vcovrea2, tetarea2, qrea2, &
             masserea2, nlev)
        qrea2 = max(qrea2, 0.1)
-
-       if (guide_u) CALL writefield("alpha_u", alpha_u)
-       if (guide_t) CALL writefield("alpha_t", alpha_t)
     END IF first_call
 
     ! IMPORTATION DES VENTS, PRESSION ET TEMPERATURE REELS:
@@ -162,7 +168,6 @@ CONTAINS
        CALL read_reanalyse(step_rea, ps, ucovrea2, vcovrea2, tetarea2, qrea2, &
             masserea2, nlev)
        qrea2 = max(qrea2, 0.1)
-       factt = dtvr * iperiod / daysec
 
        if (guide_u) then
           CALL writefield("ucov", ucov)

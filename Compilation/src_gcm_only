@@ -144,6 +144,7 @@ ini_histins.f
 ini_histrac.f
 initdynav.f
 init_dynzon.f
+init_tau2alpha.f
 initfluxsto.f
 inithist.f
 initial0.f

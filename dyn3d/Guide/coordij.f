@@ -18,7 +18,7 @@ SUBROUTINE coordij(lon, lat, ilon, jlat)
   USE serre
   USE nr_util, ONLY: pi
   IMPLICIT NONE
-  REAL lon, lat
+  REAL, intent(in):: lon, lat
   INTEGER ilon, jlat
   INTEGER i, j
 

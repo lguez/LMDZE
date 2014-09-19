@@ -41,7 +41,6 @@ contains
     ! This routine needs IOIPSL to work
     ! Variables locales
 
-    integer iq, ii, ll
     integer ndexu(ip1jmp1*llm), ndexv(ip1jm*llm), ndex2d(ip1jmp1)
     logical ok_sync
     integer itau_w
