@@ -13,7 +13,8 @@ advz.f
 advzp.f
 aeropt.f
 ajsec.f
-albedo.f
+alboc.f
+alboc_cd.f
 albsno.f
 bilan_dyn.f
 buildop.f
