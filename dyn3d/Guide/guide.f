@@ -59,7 +59,7 @@ CONTAINS
     REAL, save:: qrea2(iim + 1, jjm + 1, llm) ! temp pot reales
     REAL, save:: masserea2(ip1jmp1, llm) ! masse
 
-    ! alpha determine la part des injections de donnees a chaque etape
+    ! alpha détermine la part des injections de données à chaque étape
     ! alpha=0 signifie pas d'injection
     ! alpha=1 signifie injection totale
     REAL, save:: alpha_q(iim + 1, jjm + 1)
@@ -162,7 +162,7 @@ CONTAINS
        tetarea1 = tetarea2
        qrea1 = qrea2
 
-       PRINT *, 'LECTURE REANALYSES, pas ', step_rea, 'apres ', &
+       PRINT *, 'Lecture fichiers guidage, pas ', step_rea, 'apres ', &
             count_no_rea, ' non lectures'
        step_rea = step_rea + 1
        CALL read_reanalyse(step_rea, ps, ucovrea2, vcovrea2, tetarea2, qrea2, &

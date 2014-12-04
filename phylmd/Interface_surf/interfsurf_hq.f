@@ -220,16 +220,19 @@ contains
        ELSE
           cal = RCPD * capsol
        ENDIF
-       CALL calcul_fluxs(nisurf, dtime, tsurf, p1lay(:knon), cal(:knon), beta(:knon), &
-            tq_cdrag(:knon), ps(:knon), qsurf(:knon), radsol(:knon), &
-            dif_grnd(:knon), temp_air(:knon), spechum(:knon), u1_lay(:knon), v1_lay(:knon), petAcoef(:knon), peqAcoef(:knon), &
-            petBcoef(:knon), peqBcoef(:knon), tsurf_new, evap(:knon), fluxlat(:knon), fluxsens(:knon), dflux_s(:knon), &
-            dflux_l(:knon))
+       CALL calcul_fluxs(nisurf, dtime, tsurf, p1lay(:knon), cal(:knon), &
+            beta(:knon), tq_cdrag(:knon), ps(:knon), qsurf(:knon), &
+            radsol(:knon), dif_grnd(:knon), temp_air(:knon), spechum(:knon), &
+            u1_lay(:knon), v1_lay(:knon), petAcoef(:knon), peqAcoef(:knon), &
+            petBcoef(:knon), peqBcoef(:knon), tsurf_new, evap(:knon), &
+            fluxlat(:knon), fluxsens(:knon), dflux_s(:knon), dflux_l(:knon))
 
        CALL fonte_neige(nisurf, dtime, tsurf, p1lay(:knon), beta(:knon), &
-            tq_cdrag(:knon), ps(:knon), precip_rain(:knon), precip_snow(:knon), snow(:knon), qsol(:knon), &
-            temp_air(:knon), spechum(:knon), u1_lay(:knon), v1_lay(:knon), petAcoef(:knon), peqAcoef(:knon), petBcoef(:knon), &
-            peqBcoef(:knon), tsurf_new, evap(:knon), fqcalving(:knon), ffonte(:knon), run_off_lic_0(:knon))
+            tq_cdrag(:knon), ps(:knon), precip_rain(:knon), &
+            precip_snow(:knon), snow(:knon), qsol(:knon), temp_air(:knon), &
+            spechum(:knon), u1_lay(:knon), v1_lay(:knon), petAcoef(:knon), &
+            peqAcoef(:knon), petBcoef(:knon), peqBcoef(:knon), tsurf_new, &
+            evap(:knon), fqcalving(:knon), ffonte(:knon), run_off_lic_0(:knon))
 
        call albsno(klon, knon, dtime, agesno, alb_neig, precip_snow)
        where (snow(1 : knon) < 0.0001) agesno(1 : knon) = 0.
@@ -317,9 +320,10 @@ contains
 
        CALL calcul_fluxs(nisurf, dtime, tsurf_temp, p1lay(:knon), cal(:knon), &
             beta(:knon), tq_cdrag(:knon), ps(:knon), qsurf(:knon), &
-            radsol(:knon), dif_grnd(:knon), temp_air(:knon), spechum(:knon), u1_lay(:knon), v1_lay(:knon), petAcoef(:knon), &
-            peqAcoef(:knon), petBcoef(:knon), peqBcoef(:knon), tsurf_new, evap(:knon), fluxlat(:knon), fluxsens(:knon), &
-            dflux_s(:knon), dflux_l(:knon))
+            radsol(:knon), dif_grnd(:knon), temp_air(:knon), spechum(:knon), &
+            u1_lay(:knon), v1_lay(:knon), petAcoef(:knon), peqAcoef(:knon), &
+            petBcoef(:knon), peqBcoef(:knon), tsurf_new, evap(:knon), &
+            fluxlat(:knon), fluxsens(:knon), dflux_s(:knon), dflux_l(:knon))
 
        !IM: flux entre l'ocean et la glace de mer pour le "slab" ocean
        DO i = 1, knon
@@ -329,9 +333,11 @@ contains
        ENDDO
 
        CALL fonte_neige(nisurf, dtime, tsurf_temp, p1lay(:knon), beta(:knon), &
-            tq_cdrag(:knon), ps(:knon), precip_rain(:knon), precip_snow(:knon), snow(:knon), qsol(:knon), &
-            temp_air(:knon), spechum(:knon), u1_lay(:knon), v1_lay(:knon), petAcoef(:knon), peqAcoef(:knon), petBcoef(:knon), &
-            peqBcoef(:knon), tsurf_new, evap(:knon), fqcalving(:knon), ffonte(:knon), run_off_lic_0(:knon))
+            tq_cdrag(:knon), ps(:knon), precip_rain(:knon), &
+            precip_snow(:knon), snow(:knon), qsol(:knon), temp_air(:knon), &
+            spechum(:knon), u1_lay(:knon), v1_lay(:knon), petAcoef(:knon), &
+            peqAcoef(:knon), petBcoef(:knon), peqBcoef(:knon), tsurf_new, &
+            evap(:knon), fqcalving(:knon), ffonte(:knon), run_off_lic_0(:knon))
 
        ! calcul albedo
 
@@ -371,16 +377,19 @@ contains
        beta = 1.0
        dif_grnd = 0.0
 
-       call calcul_fluxs(nisurf, dtime, tsurf, p1lay(:knon), cal(:knon), beta(:knon), &
-            tq_cdrag(:knon), ps(:knon), qsurf(:knon), radsol(:knon), &
-            dif_grnd(:knon), temp_air(:knon), spechum(:knon), u1_lay(:knon), v1_lay(:knon), petAcoef(:knon), peqAcoef(:knon), &
-            petBcoef(:knon), peqBcoef(:knon), tsurf_new, evap(:knon), fluxlat(:knon), fluxsens(:knon), dflux_s(:knon), &
-            dflux_l(:knon))
+       call calcul_fluxs(nisurf, dtime, tsurf, p1lay(:knon), cal(:knon), &
+            beta(:knon), tq_cdrag(:knon), ps(:knon), qsurf(:knon), &
+            radsol(:knon), dif_grnd(:knon), temp_air(:knon), spechum(:knon), &
+            u1_lay(:knon), v1_lay(:knon), petAcoef(:knon), peqAcoef(:knon), &
+            petBcoef(:knon), peqBcoef(:knon), tsurf_new, evap(:knon), &
+            fluxlat(:knon), fluxsens(:knon), dflux_s(:knon), dflux_l(:knon))
 
        call fonte_neige(nisurf, dtime, tsurf, p1lay(:knon), beta(:knon), &
-            tq_cdrag(:knon), ps(:knon), precip_rain(:knon), precip_snow(:knon), snow(:knon), qsol(:knon), &
-            temp_air(:knon), spechum(:knon), u1_lay(:knon), v1_lay(:knon), petAcoef(:knon), peqAcoef(:knon), petBcoef(:knon), &
-            peqBcoef(:knon), tsurf_new, evap(:knon), fqcalving(:knon), ffonte(:knon), run_off_lic_0(:knon))
+            tq_cdrag(:knon), ps(:knon), precip_rain(:knon), &
+            precip_snow(:knon), snow(:knon), qsol(:knon), temp_air(:knon), &
+            spechum(:knon), u1_lay(:knon), v1_lay(:knon), petAcoef(:knon), &
+            peqAcoef(:knon), petBcoef(:knon), peqBcoef(:knon), tsurf_new, &
+            evap(:knon), fqcalving(:knon), ffonte(:knon), run_off_lic_0(:knon))
 
        ! calcul albedo
        CALL albsno(klon, knon, dtime, agesno, alb_neig, precip_snow)

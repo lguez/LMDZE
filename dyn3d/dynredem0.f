@@ -35,8 +35,7 @@ CONTAINS
     INTEGER, PARAMETER:: length = 100
     REAL tab_cntrl(length) ! tableau des paramètres du run
 
-    ! Variables locales pour NetCDF:
-
+    ! Pour NetCDF :
     INTEGER idim_index
     INTEGER idim_rlonu, idim_rlonv, idim_rlatu, idim_rlatv
     INTEGER idim_s, idim_sig

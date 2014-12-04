@@ -33,8 +33,8 @@ contains
     REAL, INTENT(OUT):: sec
 
     ! Local:
-    INTEGER:: l, n, i, jd, j, d, m, y, ml
-    INTEGER:: add_day
+    INTEGER l, n, i, jd, j, d, m, y, ml
+    INTEGER add_day
 
     !--------------------------------------------------------------------
 

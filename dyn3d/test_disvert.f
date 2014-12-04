@@ -42,27 +42,6 @@ contains
     call exner_hyb(ps, p, pks, pk)
     p_lay = preff * (pk(:, 1, :) / cpp)**(1. / kappa)
 
-    ! Are pressure values in the right order?
-    if (any(p(:, 1, :llm) <= p_lay .or. p_lay <= p(:, 1, 2:))) then
-       ! List details and stop:
-       do l = 1, llm
-          do i = 1, ngrid
-             if (p(i, 1, l) <= p_lay(i, l)) then
-                print 1000, "ps = ", ps(i, 1) / 100., "hPa, p(level ",  l, &
-                     ") = ", p(i, 1, l) / 100., " hPa <= p(layer ", l, ") = ", &
-                     p_lay(i, l) / 100., " hPa"
-             end if
-             if (p_lay(i, l) <= p(i, 1, l+1)) then
-                print 1000, "ps = ", ps(i, 1) / 100., &
-                     "hPa, p(layer ", l, ") = ", p_lay(i, l) / 100., &
-                     " hPa <= p(level ", l + 1, ") = ", &
-                     p(i, 1, l + 1) / 100., " hPa"
-             end if
-          end do
-       end do
-       call abort_gcm("test_disvert", "bad order of pressure values", 1)
-    end if
-
     ! Write distribution for the reference surface pressure (index ngrid):
 
     z = 7. * log(preff / p(ngrid, 1, :llm))
@@ -89,6 +68,27 @@ contains
          7. * log(preff / p_lay(ngrid, llm)), presnivs(llm) / 100.
     close(unit)
     print *, 'The file "full_level.csv" has been created.'
+
+    ! Are pressure values in the right order?
+    if (any(p(:, 1, :llm) <= p_lay .or. p_lay <= p(:, 1, 2:))) then
+       ! List details and stop:
+       do l = 1, llm
+          do i = 1, ngrid
+             if (p(i, 1, l) <= p_lay(i, l)) then
+                print 1000, "ps = ", ps(i, 1) / 100., "hPa, p(level ",  l, &
+                     ") = ", p(i, 1, l) / 100., " hPa <= p(layer ", l, ") = ", &
+                     p_lay(i, l) / 100., " hPa"
+             end if
+             if (p_lay(i, l) <= p(i, 1, l+1)) then
+                print 1000, "ps = ", ps(i, 1) / 100., &
+                     "hPa, p(layer ", l, ") = ", p_lay(i, l) / 100., &
+                     " hPa <= p(level ", l + 1, ") = ", &
+                     p(i, 1, l + 1) / 100., " hPa"
+             end if
+          end do
+       end do
+       call abort_gcm("test_disvert", "bad order of pressure values", 1)
+    end if
 
 1000 format (3(a, g10.4, a, i0))
 
