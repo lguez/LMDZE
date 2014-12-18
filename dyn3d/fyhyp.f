@@ -12,13 +12,12 @@ contains
     ! Author: P. Le Van, from analysis by R. Sadourny 
 
     ! Calcule les latitudes et dérivées dans la grille du GCM pour une
-    ! fonction f(y) à tangente hyperbolique.
+    ! fonction f(y) tangente hyperbolique.
 
     ! Nota bene : il vaut mieux avoir grossism * dzoom < pi / 2 (rad),
     ! en latitude.
 
     USE dimens_m, only: jjm
-    USE paramet_m, only: JJP1
 
     REAL, intent(in):: yzoomdeg
 
@@ -32,15 +31,16 @@ contains
 
     ! arguments de sortie 
 
-    REAL rrlatu(jjp1), yyprimu(jjp1), rrlatv(jjm), yyprimv(jjm)
-    real rlatu2(jjm), yprimu2(jjm), rlatu1(jjm), yprimu1(jjm)
-    DOUBLE PRECISION champmin, champmax
+    REAL, intent(out):: rrlatu(jjm + 1), yyprimu(jjm + 1)
+    REAL, intent(out):: rrlatv(jjm), yyprimv(jjm)
+    real, intent(out):: rlatu2(jjm), yprimu2(jjm), rlatu1(jjm), yprimu1(jjm)
+    DOUBLE PRECISION, intent(out):: champmin, champmax
 
     ! Local: 
 
     INTEGER, PARAMETER:: nmax=30000, nmax2=2*nmax
     REAL dzoom ! distance totale de la zone du zoom (en radians)
-    DOUBLE PRECISION ylat(jjp1), yprim(jjp1)
+    DOUBLE PRECISION ylat(jjm + 1), yprim(jjm + 1)
     DOUBLE PRECISION yuv
     DOUBLE PRECISION, save:: yt(0:nmax2)
     DOUBLE PRECISION fhyp(0:nmax2), beta
@@ -48,7 +48,7 @@ contains
     DOUBLE PRECISION fxm(0:nmax2)
     DOUBLE PRECISION, save:: yf(0:nmax2)
     DOUBLE PRECISION yypr(0:nmax2)
-    DOUBLE PRECISION yvrai(jjp1), yprimm(jjp1), ylatt(jjp1)
+    DOUBLE PRECISION yvrai(jjm + 1), yprimm(jjm + 1), ylatt(jjm + 1)
     DOUBLE PRECISION pi, pis2, epsilon, y0, pisjm
     DOUBLE PRECISION yo1, yi, ylon2, ymoy, yprimin
     DOUBLE PRECISION yfi, yf1, ffdy
@@ -245,7 +245,7 @@ contains
 
        IF (ik==1) THEN
           ypn = pis2
-          DO j = jlat, 1, -1
+          DO j = jjm + 1, 1, -1
              IF (yvrai(j)<=ypn) exit
           END DO
 
@@ -279,22 +279,22 @@ contains
        END DO
 
        IF (ik==1) THEN
-          DO j = 1, jlat
+          DO j = 1, jjm + 1
              rrlatu(j) = ylat(j)
              yyprimu(j) = yprim(j)
           END DO
        ELSE IF (ik==2) THEN
-          DO j = 1, jlat
+          DO j = 1, jjm
              rrlatv(j) = ylat(j)
              yyprimv(j) = yprim(j)
           END DO
        ELSE IF (ik==3) THEN
-          DO j = 1, jlat
+          DO j = 1, jjm
              rlatu2(j) = ylat(j)
              yprimu2(j) = yprim(j)
           END DO
        ELSE IF (ik==4) THEN
-          DO j = 1, jlat
+          DO j = 1, jjm
              rlatu1(j) = ylat(j)
              yprimu1(j) = yprim(j)
           END DO

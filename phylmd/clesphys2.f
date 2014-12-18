@@ -5,8 +5,8 @@ module clesphys2
   implicit none
 
   LOGICAL:: cycle_diurne = .TRUE.
-  ! Cette option permet d'éteindre le cycle diurne.
-  ! Peut être utile pour accélérer le code.
+  ! Cette option permet d'éteindre le cycle diurne. Peut être utile
+  ! pour accélérer le code.
 
   LOGICAL:: soil_model = .TRUE.
   ! Choix du modele de sol (Thermique ?)

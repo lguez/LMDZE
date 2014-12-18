@@ -1,6 +1,6 @@
 MODULE orbite_m
 
-  ! From phylmd/orbite.F, v 1.1.1.1 2004/05/19 12:53:08
+  ! From phylmd/orbite.F, version 1.1.1.1 2004/05/19 12:53:08
 
   IMPLICIT NONE
 
@@ -8,14 +8,16 @@ CONTAINS
 
   SUBROUTINE orbite(xjour, longi, dist)
 
-    USE yomcst, ONLY : r_ecc, r_peri
     use nr_util, only: pi
+    USE yomcst, ONLY : r_ecc, r_peri
 
     ! Auteur(s): Z.X. Li (LMD/CNRS)
     ! Date: 1993/08/18
+
     ! Pour un jour donné, calcule la longitude vraie de la Terre (par
-    ! rapport au point vernal, 21 mars) dans son orbite solaire. Calcule aussi
-    ! la distance Terre-Soleil, c'est-à-dire l'unité astronomique.
+    ! rapport au point vernal, 21 mars) dans son orbite
+    ! solaire. Calcule aussi la distance Terre-Soleil, c'est-à-dire
+    ! l'unité astronomique.
 
     REAL, INTENT (IN):: xjour ! jour de l'année à compter du premier janvier
 

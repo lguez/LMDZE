@@ -4,7 +4,7 @@ module radlwsw_m
 
 contains
 
-  SUBROUTINE radlwsw(dist, rmu0, fract, paprs, play, tsol, albedo, alblw, &
+  SUBROUTINE radlwsw(dist, mu0, fract, paprs, play, tsol, albedo, alblw, &
        t, q, wo, cldfra, cldemi, cldtaupd, heat, heat0, cool, cool0, radsol, &
        albpla, topsw, toplw, solsw, sollw, sollwdown, topsw0, toplw0, solsw0, &
        sollw0, lwdn0, lwdn, lwup0, lwup, swdn0, swdn, swup0, swup, ok_ade, &
@@ -35,7 +35,7 @@ contains
     ! aerosol indirect forcing is F_{AI} = topsw - topswai
     ! aerosol direct forcing is F_{AD} = topswai - topswad
 
-    USE clesphys, ONLY: bug_ozone, solaire
+    USE clesphys, ONLY: solaire
     USE dimphy, ONLY: klev, klon
     use lw_m, only: lw
     USE raddim, ONLY: kdlon
@@ -45,15 +45,12 @@ contains
         
     ! Arguments:
 
-    real dist, rmu0(klon), fract(klon)
-    ! dist-----input-R- distance astronomique terre-soleil
-    ! rmu0-----input-R- cosinus de l'angle zenithal
-    ! fract----input-R- duree d'ensoleillement normalisee
+    real, intent(in):: dist ! distance astronomique terre-soleil
+    real, intent(in):: mu0(klon) ! cosinus de l'angle zenithal
+    real, intent(in):: fract(klon) ! duree d'ensoleillement normalisee
+    real, intent(in):: paprs(klon, klev+1) ! pression a inter-couche (Pa)
+    real, intent(in):: play(klon, klev) ! pression au milieu de couche (Pa)
 
-    real, intent(in):: paprs(klon, klev+1)
-    ! paprs----input-R- pression a inter-couche (Pa)
-    real, intent(in):: play(klon, klev)
-    ! play----input-R- pression au milieu de couche (Pa)
     real tsol(klon), albedo(klon), alblw(klon)
     ! albedo---input-R- albedo du sol (entre 0 et 1)
     ! tsol-----input-R- temperature du sol (en K)
@@ -61,8 +58,10 @@ contains
     ! t--------input-R- temperature (K)
     real q(klon, klev)
     ! q--------input-R- vapeur d'eau (en kg/kg)
+
     real, intent(in):: wo(klon, klev)
-    ! wo-------input-R- contenu en ozone (en kg/kg) correction MPL 100505
+    ! column-density of ozone in a layer, in kilo-Dobsons
+
     real cldfra(klon, klev), cldemi(klon, klev)
     ! cldfra---input-R- fraction nuageuse (entre 0 et 1)
     ! cldemi---input-R- emissivite des nuages dans l'IR (entre 0 et 1)
@@ -155,7 +154,8 @@ contains
     DOUBLE PRECISION PPSOL(kdlon), PDP(kdlon, klev)
     DOUBLE PRECISION PTL(kdlon, klev+1), PPMB(kdlon, klev+1)
     DOUBLE PRECISION PTAVE(kdlon, klev)
-    DOUBLE PRECISION PWV(kdlon, klev), PQS(kdlon, klev), POZON(kdlon, klev)
+    DOUBLE PRECISION PWV(kdlon, klev), PQS(kdlon, klev)
+    DOUBLE PRECISION POZON(kdlon, klev) ! mass fraction of ozone
     DOUBLE PRECISION PAER(kdlon, klev, 5)
     DOUBLE PRECISION PCLDLD(kdlon, klev)
     DOUBLE PRECISION PCLDLU(kdlon, klev)
@@ -164,7 +164,7 @@ contains
     DOUBLE PRECISION POMEGA(kdlon, 2, klev)
     DOUBLE PRECISION PCG(kdlon, 2, klev)
 
-    DOUBLE PRECISION zfract(kdlon), zrmu0(kdlon), zdist
+    DOUBLE PRECISION zfract(kdlon), zrmu0(kdlon)
 
     DOUBLE PRECISION zheat(kdlon, klev), zcool(kdlon, klev)
     DOUBLE PRECISION zheat0(kdlon, klev), zcool0(kdlon, klev)
@@ -188,6 +188,7 @@ contains
     ! Aerosol direct forcing at TOAand surface
 
     DOUBLE PRECISION ztopswai(kdlon), zsolswai(kdlon) ! dito, indirect
+    real, parameter:: dobson_u = 2.1415e-05 ! Dobson unit, in kg m-2
 
     !----------------------------------------------------------------------
 
@@ -205,13 +206,12 @@ contains
     cool = 0.
     heat0 = 0.
     cool0 = 0.
-    zdist = dist
-    PSCT = solaire / zdist / zdist
+    PSCT = solaire / dist**2
 
     loop_iof: DO iof = 0, klon - kdlon, kdlon
        DO i = 1, kdlon
           zfract(i) = fract(iof+i)
-          zrmu0(i) = rmu0(iof+i)
+          zrmu0(i) = mu0(iof+i)
           PALBD(i, 1) = albedo(iof+i)
           PALBD(i, 2) = alblw(iof+i)
           PALBP(i, 1) = albedo(iof+i)
@@ -239,16 +239,8 @@ contains
              PTAVE(i, k) = t(iof+i, k)
              PWV(i, k) = MAX (q(iof+i, k), 1.0e-12)
              PQS(i, k) = PWV(i, k)
-             ! wo:    cm.atm (epaisseur en cm dans la situation standard)
-             ! POZON: kg/kg
-             IF (bug_ozone) then
-                POZON(i, k) = MAX(wo(iof+i, k), 1.0e-12)*RG/46.6968 &
-                     /(paprs(iof+i, k)-paprs(iof+i, k+1)) &
-                     *(paprs(iof+i, 1)/101325.0)
-             ELSE
-                ! le calcul qui suit est maintenant fait dans ozonecm (MPL)
-                POZON(i, k) = wo(i, k)
-             ENDIF
+             POZON(i, k) = wo(iof+i, k) * RG * dobson_u * 1e3 &
+                  / (paprs(iof+i, k) - paprs(iof+i, k+1))
              PCLDLD(i, k) = cldfra(iof+i, k)*cldemi(iof+i, k)
              PCLDLU(i, k) = cldfra(iof+i, k)*cldemi(iof+i, k)
              PCLDSW(i, k) = cldfra(iof+i, k)

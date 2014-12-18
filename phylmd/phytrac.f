@@ -8,10 +8,9 @@ module phytrac_m
 contains
 
   SUBROUTINE phytrac(itap, lmt_pas, julien, gmtime, firstcal, lafin, pdtphys, &
-       u, t_seri, paprs, pplay, pmfu, pmfd, pde_u, pen_d, coefh, fm_therm, &
-       entr_therm, yu1, yv1, ftsol, pctsrf, frac_impa, frac_nucl, pphis, &
-       albsol, rh, cldfra, rneb, diafra, cldliq, pmflxr, pmflxs, prfl, psfl, &
-       da, phi, mp, upwd, dnwd, tr_seri, zmasse)
+       t_seri, paprs, pplay, pmfu, pmfd, pde_u, pen_d, coefh, fm_therm, &
+       entr_therm, yu1, yv1, ftsol, pctsrf, frac_impa, frac_nucl, pphis, da, &
+       phi, mp, upwd, dnwd, tr_seri, zmasse)
 
     ! From phylmd/phytrac.F, version 1.15 2006/02/21 08:08:30 (SVN revision 679)
 
@@ -54,7 +53,6 @@ contains
     logical, intent(in):: firstcal ! first call to "calfis"
     logical, intent(in):: lafin ! fin de la physique
     real, intent(in):: pdtphys ! pas d'integration pour la physique (s)
-    real, intent(in):: u(klon, llm)
     real, intent(in):: t_seri(klon, llm) ! temperature, in K
 
     real, intent(in):: paprs(klon, llm+1)
@@ -90,17 +88,6 @@ contains
     REAL frac_nucl(klon, llm) ! fraction d'aerosols nuclees
 
     real, intent(in):: pphis(klon)
-    real albsol(klon) ! albedo surface
-    real rh(klon, llm) ! humidite relative
-    real cldfra(klon, llm) ! fraction nuageuse (tous les nuages)
-    real rneb(klon, llm) ! fraction nuageuse (grande echelle)
-
-    real diafra(klon, llm)
-    ! (fraction nuageuse (convection ou stratus artificiels))
-
-    real cldliq(klon, llm) ! eau liquide nuageuse
-    REAL pmflxr(klon, llm+1), pmflxs(klon, llm+1) !--lessivage convection
-    REAL prfl(klon, llm+1), psfl(klon, llm+1) !--lessivage large-scale
 
     ! Kerry Emanuel
     real, intent(in):: da(klon, llm), phi(klon, llm, llm), mp(klon, llm)

@@ -13,12 +13,12 @@ contains
 
     ! Configuration de la "physique" de LMDZ.
 
-    USE clesphys, ONLY: bug_ozone, cdhmax, cdmmax, cfc11_ppt, cfc12_ppt, &
-         ch4_ppb, co2_ppm, ecrit_day, ecrit_hf, ecrit_hf2mth, ecrit_ins, &
-         ecrit_mth, ecrit_reg, ecrit_tra, ksta, ksta_ter, latmax_ins, &
-         latmin_ins, lev_histday, lev_histhf, lev_histmth, lonmax_ins, &
-         lonmin_ins, n2o_ppb, ok_isccp, ok_kzmin, ok_regdyn, overlap, rcfc11, &
-         rcfc12, rch4, rco2, rn2o, solaire, top_height, type_run
+    USE clesphys, ONLY: cdhmax, cdmmax, cfc11_ppt, cfc12_ppt, ch4_ppb, &
+         co2_ppm, ecrit_day, ecrit_hf, ecrit_hf2mth, ecrit_ins, ecrit_mth, &
+         ecrit_reg, ecrit_tra, ksta, ksta_ter, latmax_ins, latmin_ins, &
+         lev_histday, lev_histhf, lev_histmth, lonmax_ins, lonmin_ins, &
+         n2o_ppb, ok_isccp, ok_kzmin, ok_regdyn, overlap, rcfc11, rcfc12, &
+         rch4, rco2, rn2o, solaire, top_height, type_run
     use clesphys2, only: read_clesphys2
     USE comfisrtilp, ONLY: cld_lc_con, cld_lc_lsc, cld_tau_con, &
          cld_tau_lsc, coef_eva, ffallv_con, ffallv_lsc, iflag_pdf, reevap_ice
@@ -34,7 +34,7 @@ contains
          ok_kzmin, iflag_pbl, lev_histhf, lev_histday, lev_histmth, &
          type_run, ok_isccp, ok_regdyn, lonmin_ins, lonmax_ins, &
          latmin_ins, latmax_ins, ecrit_ins, ecrit_hf, ecrit_hf2mth, &
-         ecrit_day, ecrit_mth, ecrit_tra, ecrit_reg, bug_ozone
+         ecrit_day, ecrit_mth, ecrit_tra, ecrit_reg
 
     namelist /nuagecom/ rad_chau1, rad_chau2
 
@@ -88,7 +88,6 @@ contains
     ecrit_mth = 86400
     ecrit_tra = 1
     ecrit_reg = NINT(86400. *0.25) ! 4 fois par jour
-    bug_ozone = .false.
 
     print *, "Enter namelist 'conf_phys_nml'."
     read(unit=*, nml=conf_phys_nml)

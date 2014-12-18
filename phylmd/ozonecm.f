@@ -27,7 +27,9 @@ contains
     use phyetat0_m, only: rlat
 
     REAL, INTENT (IN) :: rjour
+
     REAL, INTENT (IN) :: paprs(:, :) ! (klon, llm+1)
+    ! pression pour chaque inter-couche, en Pa
 
     REAL ozonecm(klon, llm)
     ! "ozonecm(j, k)" is the column-density of ozone in cell "(j, k)", that is
@@ -35,54 +37,56 @@ contains
 
     ! Local:
 
-    REAL tozon, pl
+    REAL tozon ! equivalent pressure of ozone above interface "k", in Pa
     INTEGER i, k
 
-    REAL field(klon, llm+1)
-    ! "field(:, k)" is the column-density of ozone between interface
+    REAL field(llm+1)
+    ! "field(k)" is the column-density of ozone between interface
     ! "k" and the top of the atmosphere (interface "llm + 1"), in kDU.
 
-    real, PARAMETER:: ps=101325.
-    REAL, parameter:: an = 360., unit = 2.1415E-5, zo3q3 = 4E-8
-    REAL gms, zslat, zsint, zcost, z, ppm, qpm, a
-    REAL asec, bsec, aprim, zo3a3
+    real, PARAMETER:: ps = 101325.
+    REAL, parameter:: an = 360., zo3q3 = 4E-8
+    real, parameter:: zo3a3 = zo3q3 / ps / 2.
+    REAL, parameter:: dobson_unit = 2.1415E-5 ! in kg m-2
+    REAL gms, slat, slat2, sint, cost, ppm, a
+    REAL asec, bsec, aprim
 
     !----------------------------------------------------------
 
     call assert(shape(paprs) == (/klon, llm + 1/), "ozonecm")
 
-    DO k = 1, llm
-       DO i = 1, klon
-          zslat = sin(pi / 180. * rlat(i))
-          zsint = sin(2.*pi*(rjour+15.)/an)
-          zcost = cos(2.*pi*(rjour+15.)/an)
-          z = 0.0531 + zsint * (-0.001595+0.009443*zslat) &
-               + zcost * (-0.001344-0.00346*zslat) &
-               + zslat**2 * (.056222 + zslat**2 &
-               * (-.037609+.012248*zsint+.00521*zcost+.008890*zslat))
-          zo3a3 = zo3q3/ps/2.
-          z = z - zo3q3*ps
-          gms = z
-          ppm = 800. - (500.*zslat+150.*zcost)*zslat
-          qpm = 1.74E-5 - (7.5E-6*zslat+1.7E-6*zcost)*zslat
-          bsec = 2650. + 5000.*zslat**2
-          a = 4.0*(bsec)**(3./2.)*(ppm)**(3./2.)*(1.0+(bsec/ps)**(3./2.))
-          a = a/(bsec**(3./2.)+ppm**(3./2.))**2
-          aprim = (2.666666*qpm*ppm-a*gms)/(1.0-a)
-          aprim = amax1(0., aprim)
-          asec = (gms-aprim)*(1.0+(bsec/ps)**(3./2.))
-          asec = amax1(0.0, asec)
-          aprim = gms - asec/(1.+(bsec/ps)**(3./2.))
-          pl = paprs(i, k)
-          tozon = aprim / (1. + 3. * (ppm / pl)**2) &
-               + asec / (1. + (bsec / pl)**(3./2.)) + zo3a3 * pl * pl
+    sint = sin(2 * pi * (rjour + 15.) / an)
+    cost = cos(2 * pi * (rjour + 15.) / an)
+    field(llm + 1) = 0.
+
+    DO i = 1, klon
+       slat = sin(pi / 180. * rlat(i))
+       slat2 = slat * slat
+       gms = 0.0531 + sint * (- 0.001595 + 0.009443 * slat) + cost &
+            * (- 0.001344 - 0.00346 * slat) + slat2 * (0.056222 + slat2 &
+            * (- 0.037609 + 0.012248 * sint + 0.00521 * cost + 0.00889 &
+            * slat)) - zo3q3 * ps
+       ppm = 800. - 500. * slat2 - 150. * cost * slat
+       bsec = 2650. + 5000. * slat2
+       a = 4. * bsec**1.5 * ppm**1.5 * (1. + (bsec / ps)**1.5) &
+            / (bsec**1.5 + ppm**1.5)**2
+       aprim = max(0., (2.666666 * (1.74E-5 - 7.5E-6 * slat2 &
+            - 1.7E-6 * cost * slat) * ppm - a * gms) / (1. - a))
+       asec = max(0., (gms - aprim) * (1. + (bsec / ps)**1.5))
+       aprim = gms - asec / (1. + (bsec / ps)**1.5)
+
+       DO k = 1, llm
+          tozon = aprim / (1. + 3. * (ppm / paprs(i, k))**2) &
+               + asec / (1. + (bsec / paprs(i, k))**1.5) &
+               + zo3a3 * paprs(i, k) * paprs(i, k)
           ! Convert from Pa to kDU:
-          field(i, k) = tozon / 9.81 / unit / 1e3
+          field(k) = tozon / 9.81 / dobson_unit / 1e3
        END DO
+
+       forall (k = 1: llm) ozonecm(i, k) = field(k) - field(k + 1)
     END DO
 
-    field(:, llm+1) = 0.
-    forall (k = 1: llm) ozonecm(:, k) = field(:, k) - field(:, k+1)
+    ozonecm = max(ozonecm, 1e-12)
 
   END function ozonecm
 

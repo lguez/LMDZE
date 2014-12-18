@@ -4,7 +4,6 @@ module clesphys
 
   implicit none
 
-  LOGICAL bug_ozone ! Pour retrouver le bug de l'ozone (IPCC)
   REAL co2_ppm ! concentration du gaz carbonique en ppmv
   real solaire ! Constante solaire en W/m2
   double precision RCO2 ! Concentration du CO2

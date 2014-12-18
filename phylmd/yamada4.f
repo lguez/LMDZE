@@ -2,52 +2,55 @@ module yamada4_m
 
   IMPLICIT NONE
 
-  real, parameter, private:: kap = 0.4
+  private
+  public yamada4
+  real, parameter:: kap = 0.4
 
 contains
 
-  SUBROUTINE yamada4(ngrid, dt, g, zlev, zlay, u, v, teta, cd, q2, km, kn, &
-       kq, ustar, iflag_pbl)
+  SUBROUTINE yamada4(ngrid, dt, g, zlev, zlay, u, v, teta, cd, q2, km, kn, kq, &
+       ustar, iflag_pbl)
 
     ! From LMDZ4/libf/phylmd/yamada4.F, version 1.1 2004/06/22 11:45:36
 
-    USE dimphy, ONLY : klev, klon
+    use nr_util, only: assert
+    USE dimphy, ONLY: klev
 
-    integer ngrid
+    integer, intent(in):: ngrid
     REAL, intent(in):: dt ! pas de temps
     real, intent(in):: g
 
-    REAL zlev(klon, klev+1)
+    REAL zlev(ngrid, klev+1)
     ! altitude à chaque niveau (interface inférieure de la couche de
     ! même indice)
 
-    REAL zlay(klon, klev) ! altitude au centre de chaque couche
+    REAL zlay(ngrid, klev) ! altitude au centre de chaque couche
 
-    REAL u(klon, klev), v(klon, klev)
+    REAL u(ngrid, klev), v(ngrid, klev)
     ! vitesse au centre de chaque couche (en entrée : la valeur au
     ! début du pas de temps)
 
-    REAL teta(klon, klev)
+    REAL, intent(in): teta(ngrid, klev)
     ! température potentielle au centre de chaque couche (en entrée :
     ! la valeur au début du pas de temps)
 
     REAL, intent(in):: cd(:) ! (ngrid) cdrag, valeur au début du pas de temps
 
-    REAL, intent(inout):: q2(klon, klev+1)
+    REAL, intent(inout):: q2(ngrid, klev+1)
     ! $q^2$ au bas de chaque couche 
     ! En entrée : la valeur au début du pas de temps ; en sortie : la
     ! valeur à la fin du pas de temps.
 
-    REAL km(klon, klev+1)
+    REAL km(ngrid, klev+1)
     ! diffusivité turbulente de quantité de mouvement (au bas de
     ! chaque couche) (en sortie : la valeur à la fin du pas de temps)
 
-    REAL kn(klon, klev+1)
+    REAL kn(ngrid, klev+1)
     ! diffusivité turbulente des scalaires (au bas de chaque couche)
     ! (en sortie : la valeur à la fin du pas de temps)
 
-    REAL kq(klon, klev+1)
-    real ustar(klon)
+    REAL kq(ngrid, klev+1)
+    real ustar(ngrid)
 
     integer iflag_pbl
     ! iflag_pbl doit valoir entre 6 et 9
@@ -59,62 +62,61 @@ contains
 
     ! Local:
 
-    real kmin, qmin, pblhmin(klon), coriol(klon)
+    real kmin, qmin, pblhmin(ngrid), coriol(ngrid)
     real qpre
-    REAL unsdz(klon, klev)
-    REAL unsdzdec(klon, klev+1)
-    REAL kmpre(klon, klev+1), tmp2
-    REAL mpre(klon, klev+1)
-    real delta(klon, klev+1)
-    real aa(klon, klev+1), aa0, aa1
-    integer, PARAMETER:: nlay = klev
+    REAL unsdz(ngrid, klev)
+    REAL unsdzdec(ngrid, klev+1)
+    REAL kmpre(ngrid, klev+1), tmp2
+    REAL mpre(ngrid, klev+1)
+    real delta(ngrid, klev+1)
+    real aa(ngrid, klev+1), aa0, aa1
     integer, PARAMETER:: nlev = klev+1
     logical:: first = .true.
     integer:: ipas = 0
     integer ig, k
     real ri
-    real rif(klon, klev+1), sm(klon, klev+1), alpha(klon, klev)
-    real m2(klon, klev+1), dz(klon, klev+1), zq, n2(klon, klev+1)
-    real dtetadz(klon, klev+1)
+    real rif(ngrid, klev+1), sm(ngrid, klev+1), alpha(ngrid, klev)
+    real m2(ngrid, klev+1), dz(ngrid, klev+1), zq, n2(ngrid, klev+1)
+    real dtetadz(ngrid, klev+1)
     real m2cstat, mcstat, kmcstat
-    real l(klon, klev+1)
-    real, save:: l0(klon)
-    real sq(klon), sqz(klon), zz(klon, klev+1)
+    real l(ngrid, klev+1)
+    real, save:: l0(ngrid)
+    real sq(ngrid), sqz(ngrid), zz(ngrid, klev+1)
     integer iter
     real:: ric = 0.195, rifc = 0.191, b1 = 16.6, kap = 0.4
-    real rino(klon, klev+1), smyam(klon, klev), styam(klon, klev)
-    real lyam(klon, klev), knyam(klon, klev)
+    real rino(ngrid, klev+1), smyam(ngrid, klev), styam(ngrid, klev)
+    real lyam(ngrid, klev), knyam(ngrid, klev)
 
     !-----------------------------------------------------------------------
 
-    if (.not. (iflag_pbl >= 6 .and. iflag_pbl <= 9)) then
-       print *, 'probleme de coherence dans appel a MY'
-       stop 1
-    endif
+    call assert(iflag_pbl >= 6 .and. iflag_pbl <= 9, "yamada4")
 
     ipas = ipas+1
 
     ! les increments verticaux
     DO ig = 1, ngrid
        ! alerte: zlev n'est pas declare a nlev
-       zlev(ig, nlev) = zlay(ig, nlay) +(zlay(ig, nlay) - zlev(ig, nlev-1))
+       zlev(ig, nlev) = zlay(ig, klev) +(zlay(ig, klev) - zlev(ig, nlev-1))
     ENDDO
 
-    DO k = 1, nlay
+    DO k = 1, klev
        DO ig = 1, ngrid
           unsdz(ig, k) = 1.E+0/(zlev(ig, k+1)-zlev(ig, k))
        ENDDO
     ENDDO
+
     DO ig = 1, ngrid
        unsdzdec(ig, 1) = 1.E+0/(zlay(ig, 1)-zlev(ig, 1))
     ENDDO
-    DO k = 2, nlay
+
+    DO k = 2, klev
        DO ig = 1, ngrid
           unsdzdec(ig, k) = 1.E+0/(zlay(ig, k)-zlay(ig, k-1))
        ENDDO
     ENDDO
+
     DO ig = 1, ngrid
-       unsdzdec(ig, nlay+1) = 1.E+0/(zlev(ig, nlay+1)-zlay(ig, nlay))
+       unsdzdec(ig, klev+1) = 1.E+0/(zlev(ig, klev+1)-zlay(ig, klev))
     ENDDO
 
     do k = 2, klev
@@ -309,7 +311,7 @@ contains
 
     print *, 'pblhmin ', pblhmin
     do k = 2, klev
-       do ig = 1, klon
+       do ig = 1, ngrid
           if (teta(ig, 2).gt.teta(ig, 1)) then
              qmin = ustar(ig)*(max(1.-zlev(ig, k)/pblhmin(ig), 0.))**2
              kmin = kap*zlev(ig, k)*qmin
@@ -332,8 +334,7 @@ contains
     rino = rif
     smyam(:, 1:klev) = sm(:, 1:klev)
     styam = sm(:, 1:klev)*alpha(:, 1:klev)
-    lyam(1:klon, 1:klev) = l(:, 1:klev)
-    knyam(1:klon, 1:klev) = kn(:, 1:klev)
+    lyam(1:ngrid, 1:klev) = l(:, 1:klev)
 
     first = .false.
 

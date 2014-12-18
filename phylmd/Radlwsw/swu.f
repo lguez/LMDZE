@@ -1,8 +1,6 @@
-
-! IM ctes ds clesphys.h   SUBROUTINE SWU
-! (PSCT,RCO2,PCLDSW,PPMB,PPSOL,PRMU0,PFRAC,
 SUBROUTINE swu(psct, pcldsw, ppmb, ppsol, prmu0, pfrac, ptave, pwv, paki, &
     pcld, pclear, pdsig, pfact, prmu, psec, pud)
+
   USE dimens_m
   USE dimphy
   USE clesphys
@@ -178,8 +176,4 @@ SUBROUTINE swu(psct, pcldsw, ppmb, ppsol, prmu0, pfrac, ptave, pwv, paki, &
     END DO
   END DO
 
-
-  ! ------------------------------------------------------------------
-
-  RETURN
 END SUBROUTINE swu

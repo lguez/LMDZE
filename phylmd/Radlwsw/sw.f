@@ -31,9 +31,8 @@ contains
     ! 95-01-01 J.-J. Morcrette direct/diffuse albedo
     ! 03-11-27 J. Quaas Introduce aerosol forcings (based on Boucher)
 
-    USE clesphys, ONLY: bug_ozone
     USE raddim, ONLY: kdlon, kflev
-    USE suphec_m, ONLY: rcpd, rday, rg, md, rmo3
+    USE suphec_m, ONLY: rcpd, rday, rg
 
     ! ARGUMENTS:
 
@@ -127,6 +126,7 @@ contains
     DOUBLE PRECISION, save:: ZFSDNAI(KDLON, KFLEV+1)
 
     logical:: initialized = .false.
+    REAL, PARAMETER :: dobson_u = 2.1415E-05 ! Dobson unit, in kg m-2
 
     !-------------------------------------------------------------------
 
@@ -150,13 +150,7 @@ contains
        DO JK = 1 , KFLEV
           DO JL = 1, KDLON
              ZCLDSW0(JL, JK) = 0.0
-             IF (bug_ozone) then
-                ZOZ(JL, JK) = POZON(JL, JK)*46.6968/RG &
-                     *PDP(JL, JK)*(101325.0/PPSOL(JL))
-             ELSE
-                ! Correction MPL 100505
-                ZOZ(JL, JK) = POZON(JL, JK)*MD/RMO3*46.6968/RG*PDP(JL, JK)
-             ENDIF
+             ZOZ(JL, JK) = POZON(JL, JK) / (dobson_u * 1E3 * rg) * PDP(JL, JK)
           ENDDO
        ENDDO
 

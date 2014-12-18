@@ -4,14 +4,15 @@ module vdif_kcay_m
 
 contains
 
-  SUBROUTINE vdif_kcay(ngrid, dt, g, rconst, plev, temp, zlev, zlay, &
-       u, v, teta, cd, q2, q2diag, km, kn, ustar, l_mix)
+  SUBROUTINE vdif_kcay(ngrid, dt, g, rconst, plev, temp, zlev, zlay, u, v, &
+       teta, cd, q2, q2diag, km, kn, ustar, l_mix)
 
     ! From LMDZ4/libf/phylmd/vdif_kcay.F, version 1.1 2004/06/22 11:45:36
 
     USE dimphy, ONLY: klev, klon
     use yamada_m, only: yamada
 
+    INTEGER ngrid
     ! dt : pas de temps
     ! g : g
     ! zlev : altitude a chaque niveau (interface inferieure de la couche
@@ -58,7 +59,7 @@ contains
     ! q : echelle de vitesse au bas de chaque couche
     ! (valeur a la fin du pas de temps)
 
-    INTEGER nlay, nlev, ngrid
+    INTEGER nlay, nlev
     REAL unsdz(klon, klev)
     REAL unsdzdec(klon, klev+1)
     REAL q(klon, klev+1)

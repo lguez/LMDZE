@@ -393,8 +393,8 @@ contains
 
     REAL zxtsol(klon), zxqsurf(klon), zxsnow(klon), zxfluxlat(klon)
 
-    REAL dist, rmu0(klon), fract(klon)
-    real zlongi
+    REAL dist, mu0(klon), fract(klon)
+    real longi
     REAL z_avant(klon), z_apres(klon), z_factor(klon)
     REAL za, zb
     REAL zx_t, zx_qs, zcor
@@ -647,7 +647,6 @@ contains
        ! on remet le calendrier a zero
        IF (raz_date) itau_phy = 0
 
-       PRINT *, 'cycle_diurne = ', cycle_diurne
        CALL printflag(radpas, ok_journe, ok_instan, ok_region)
 
        IF (dtphys * REAL(radpas) > 21600. .AND. cycle_diurne) THEN 
@@ -771,13 +770,14 @@ contains
     frugs = MAX(frugs, 0.000015)
     zxrugs = sum(frugs * pctsrf, dim = 2)
 
-    ! Calculs nécessaires au calcul de l'albedo dans l'interface
+    ! Calculs nécessaires au calcul de l'albedo dans l'interface avec
+    ! la surface.
 
-    CALL orbite(REAL(julien), zlongi, dist)
+    CALL orbite(REAL(julien), longi, dist)
     IF (cycle_diurne) THEN
-       CALL zenang(zlongi, time, dtphys * REAL(radpas), rmu0, fract)
+       CALL zenang(longi, time, dtphys * REAL(radpas), mu0, fract)
     ELSE
-       rmu0 = -999.999
+       mu0 = -999.999
     ENDIF
 
     ! Calcul de l'abedo moyen par maille
@@ -798,7 +798,7 @@ contains
     ! Couche limite:
 
     CALL clmain(dtphys, itap, pctsrf, pctsrf_new, t_seri, q_seri, u_seri, &
-         v_seri, julien, rmu0, co2_ppm, ftsol, cdmmax, cdhmax, &
+         v_seri, julien, mu0, co2_ppm, ftsol, cdmmax, cdhmax, &
          ksta, ksta_ter, ok_kzmin, ftsoil, qsol, paprs, play, fsnow, fqsurf, &
          fevap, falbe, falblw, fluxlat, rain_fall, snow_fall, fsolsw, fsollw, &
          fder, rlat, frugs, firstcal, agesno, rugoro, d_t_vdf, d_q_vdf, &
@@ -1251,8 +1251,8 @@ contains
             bl95_b1, cldtaupi, re, fl)
     endif
 
-    ! Appeler le rayonnement mais calculer tout d'abord l'albedo du sol.
     IF (MOD(itaprad, radpas) == 0) THEN
+       ! Appeler le rayonnement mais calculer tout d'abord l'albedo du sol.
        DO i = 1, klon
           albsol(i) = falbe(i, is_oce) * pctsrf(i, is_oce) &
                + falbe(i, is_lic) * pctsrf(i, is_lic) &
@@ -1264,7 +1264,7 @@ contains
                + falblw(i, is_sic) * pctsrf(i, is_sic)
        ENDDO
        ! Rayonnement (compatible Arpege-IFS) :
-       CALL radlwsw(dist, rmu0, fract, paprs, play, zxtsol, albsol, &
+       CALL radlwsw(dist, mu0, fract, paprs, play, zxtsol, albsol, &
             albsollw, t_seri, q_seri, wo, cldfra, cldemi, cldtau, heat, &
             heat0, cool, cool0, radsol, albpla, topsw, toplw, solsw, sollw, &
             sollwdown, topsw0, toplw0, solsw0, sollw0, lwdn0, lwdn, lwup0, &
@@ -1272,6 +1272,7 @@ contains
             cg_ae, topswad, solswad, cldtaupi, topswai, solswai)
        itaprad = 0
     ENDIF
+
     itaprad = itaprad + 1
 
     ! Ajouter la tendance des rayonnements (tous les pas)
@@ -1385,11 +1386,10 @@ contains
          d_qt, d_ec)
 
     ! Calcul des tendances traceurs
-    call phytrac(itap, lmt_pas, julien, time, firstcal, lafin, dtphys, u, t, &
+    call phytrac(itap, lmt_pas, julien, time, firstcal, lafin, dtphys, t, &
          paprs, play, mfu, mfd, pde_u, pen_d, ycoefh, fm_therm, entr_therm, &
-         yu1, yv1, ftsol, pctsrf, frac_impa, frac_nucl, pphis, albsol, rhcl, &
-         cldfra, rneb, diafra, cldliq, pmflxr, pmflxs, prfl, psfl, da, phi, &
-         mp, upwd, dnwd, tr_seri, zmasse)
+         yu1, yv1, ftsol, pctsrf, frac_impa, frac_nucl, pphis, da, phi, mp, &
+         upwd, dnwd, tr_seri, zmasse)
 
     IF (offline) call phystokenc(dtphys, rlon, rlat, t, mfu, mfd, pen_u, &
          pde_u, pen_d, pde_d, fm_therm, entr_therm, ycoefh, yu1, yv1, ftsol, &
