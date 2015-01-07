@@ -254,7 +254,7 @@ bernoui.o : filtreg.o dimens_m.o
 coefils.o : dimens_m.o 
 comconst.o : conf_gcm.o 
 comdissnew.o : unit_nml_m.o 
-comgeom.o : paramet_m.o fxyhyper.o comdissnew.o comconst.o dimens_m.o 
+comgeom.o : paramet_m.o fyhyp.o fxhyp.o comdissnew.o comconst.o dimens_m.o 
 conf_gcm.o : unit_nml_m.o comdissnew.o abort_gcm.o 
 convflu.o : comgeom.o paramet_m.o dimens_m.o 
 convmas.o : filtreg.o paramet_m.o dimens_m.o 
@@ -267,9 +267,8 @@ enercin.o : comgeom.o paramet_m.o dimens_m.o
 exner_hyb.o : filtreg.o disvert.o comconst.o dimens_m.o 
 filtreg.o : inifilr.o dimens_m.o coefils.o 
 flumass.o : comgeom.o paramet_m.o dimens_m.o 
-fxhyp.o : paramet_m.o dimens_m.o 
-fxyhyper.o : serre.o paramet_m.o fyhyp.o fxhyp.o dimens_m.o 
-fyhyp.o : paramet_m.o dimens_m.o 
+fxhyp.o : serre.o dimens_m.o 
+fyhyp.o : serre.o dimens_m.o 
 geopot.o : dimens_m.o 
 grid_change.o : dimphy.o dimens_m.o 
 histclo.o : histcom_var.o errioipsl.o 

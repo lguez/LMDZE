@@ -30,7 +30,7 @@ contains
     ! vitesse au centre de chaque couche (en entrée : la valeur au
     ! début du pas de temps)
 
-    REAL, intent(in): teta(ngrid, klev)
+    REAL, intent(in):: teta(ngrid, klev)
     ! température potentielle au centre de chaque couche (en entrée :
     ! la valeur au début du pas de temps)
 
@@ -52,7 +52,7 @@ contains
     REAL kq(ngrid, klev+1)
     real ustar(ngrid)
 
-    integer iflag_pbl
+    integer, intent(in):: iflag_pbl
     ! iflag_pbl doit valoir entre 6 et 9
     ! l = 6, on prend systématiquement une longueur d'équilibre
     ! iflag_pbl = 6 : MY 2.0
@@ -80,12 +80,12 @@ contains
     real dtetadz(ngrid, klev+1)
     real m2cstat, mcstat, kmcstat
     real l(ngrid, klev+1)
-    real, save:: l0(ngrid)
+    real l0(ngrid)
     real sq(ngrid), sqz(ngrid), zz(ngrid, klev+1)
     integer iter
     real:: ric = 0.195, rifc = 0.191, b1 = 16.6, kap = 0.4
     real rino(ngrid, klev+1), smyam(ngrid, klev), styam(ngrid, klev)
-    real lyam(ngrid, klev), knyam(ngrid, klev)
+    real lyam(ngrid, klev)
 
     !-----------------------------------------------------------------------
 
@@ -132,7 +132,7 @@ contains
           else
              rif(ig, k) = rifc
           endif
-          if(rif(ig, k).lt.0.16) then
+          if (rif(ig, k).lt.0.16) then
              alpha(ig, k) = falpha(rif(ig, k))
              sm(ig, k) = fsm(rif(ig, k))
           else
@@ -199,7 +199,7 @@ contains
     do k = 2, klev
        do ig = 1, ngrid
           l(ig, k) = fl(zlev(ig, k), l0(ig), q2(ig, k), n2(ig, k))
-          if(first) then
+          if (first) then
              q2(ig, k) = l(ig, k)**2 * zz(ig, k)
           endif
        enddo

@@ -5,18 +5,17 @@ module serre
   REAL:: clon = 0. ! longitude of the center of the zoom, in degrees
   real:: clat = 0. ! latitude of the center of the zoom, in degrees
 
-  real:: grossismx = 1. ! facteur de grossissement du zoom, selon la longitude
-  real:: grossismy = 1. ! facteur de grossissement du zoom, selon la latitude
+  real:: grossismx = 1., grossismy = 1.
+  ! facteurs de grossissement du zoom, selon la longitude et la latitude
+  ! = 2 si 2 fois, = 3 si 3 fois, etc.
 
-  real:: dzoomx = 0.
-  ! extension en longitude de la zone du zoom (fraction de la zone totale)
+  real:: dzoomx = 0., dzoomy = 0.
+  ! extensions en longitude et latitude de la zone du zoom (fractions
+  ! de la zone totale)
 
-  real:: dzoomy = 0.
-  ! extension en latitude de la zone du zoom (fraction de la zone totale)
-
-  real:: taux = 3. ! raideur du zoom en X
-  real:: tauy = 3. ! raideur du zoom en Y
-
+  real:: taux = 3., tauy = 3. 
+  ! raideur de la transition de l'intérieur à l'extérieur du zoom
+  
 contains
 
   subroutine read_serre

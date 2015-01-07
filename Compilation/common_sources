@@ -26,7 +26,6 @@ exner_hyb.f
 filtreg.f
 flumass.f
 fxhyp.f
-fxyhyper.f
 fyhyp.f
 geopot.f
 grid_change.f

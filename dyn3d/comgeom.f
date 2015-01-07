@@ -163,7 +163,8 @@ contains
 
     USE comconst, ONLY : g, omeg, rad
     USE comdissnew, ONLY : coefdis, nitergdiv, nitergrot, niterh
-    use fxyhyper_m, only: fxyhyper
+    use fxhyp_m, only: fxhyp
+    use fyhyp_m, only: fyhyp
     use jumble, only: new_unit
     use nr_util, only: pi
     USE paramet_m, ONLY : iip1, jjp1
@@ -176,9 +177,9 @@ contains
     REAL, dimension(iip1, jjp1):: cuij1, cuij2, cuij3, cuij4 ! in m
     REAL, dimension(iip1, jjp1):: cvij1, cvij2, cvij3, cvij4 ! in m
     REAL rlatu1(jjm), yprimu1(jjm), rlatu2(jjm), yprimu2(jjm)
-    real yprimv(jjm), yprimu(jjp1)
+    real yprimu(jjp1)
     REAL gamdi_gdiv, gamdi_grot, gamdi_h
-    REAL rlonm025(iip1), xprimm025(iip1), rlonp025(iip1), xprimp025(iip1)
+    REAL xprimm025(iip1), xprimp025(iip1)
     real, dimension(iim + 1, jjm + 1):: aireij1_2d, aireij2_2d, aireij3_2d, &
          aireij4_2d ! in m2
     real airuscv2_2d(iim + 1, jjm) 
@@ -210,9 +211,8 @@ contains
     print *, "gamdi_h = ", gamdi_h
 
     print *, 'inigeom: Y = latitude, dérivée tangente hyperbolique'
-    CALL fxyhyper(rlatu, yprimu, rlatv, yprimv, rlatu1, yprimu1, rlatu2, &
-         yprimu2, rlonu, xprimu, rlonv, xprimv, rlonm025, xprimm025, &
-         rlonp025, xprimp025)
+    CALL fyhyp(rlatu, yprimu, rlatv, rlatu2, yprimu2, rlatu1, yprimu1)
+    CALL fxhyp(xprimm025, rlonv, xprimv, rlonu, xprimu, xprimp025)
 
     rlatu(1) = pi / 2.
     rlatu(jjp1) = -rlatu(1)
