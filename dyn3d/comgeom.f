@@ -210,7 +210,6 @@ contains
     print *, "gamdi_grot = ", gamdi_grot
     print *, "gamdi_h = ", gamdi_h
 
-    print *, 'inigeom: Y = latitude, dérivée tangente hyperbolique'
     CALL fyhyp(rlatu, yprimu, rlatv, rlatu2, yprimu2, rlatu1, yprimu1)
     CALL fxhyp(xprimm025, rlonv, xprimv, rlonu, xprimu, xprimp025)
 

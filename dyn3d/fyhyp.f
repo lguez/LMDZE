@@ -15,6 +15,7 @@ contains
 
     ! Nota bene : il vaut mieux avoir grossismy * dzoomy < pi / 2 (radians).
 
+    use coefpoly_m, only: coefpoly
     USE dimens_m, only: jjm
     use serre, only: clat, grossismy, dzoomy, tauy
 
@@ -52,6 +53,8 @@ contains
     DOUBLE PRECISION heavyside
 
     !-------------------------------------------------------------------
+
+    print *, "Call sequence information: fyhyp"
 
     pi = 2.*asin(1.)
     pis2 = pi/2.
@@ -333,13 +336,11 @@ contains
 
     print *, 'Latitudes'
     print 3, champmin, champmax
-    print *, 'Si cette derniere est trop lache, modifiez les parametres'
-    print *, 'grossismy, tauy, dzoom pour Y et repasser ! '
 
 3   Format(1x, ' Au centre du zoom, la longueur de la maille est', &
          ' d environ ', f0.2, ' degres ', /, &
          ' alors que la maille en dehors de la zone du zoom est ', &
-         "d'environ", f0.2, ' degres ')
+         "d'environ ", f0.2, ' degres ')
 
   END SUBROUTINE fyhyp
 

@@ -29,8 +29,10 @@ contains
     use abort_gcm_m, only: abort_gcm
     use clesphys, only: ecrit_tra
     use clesphys2, only: iflag_con
+    use cltrac_m, only: cltrac
     use cltracrn_m, only: cltracrn
     use ctherm, only: iflag_thermals
+    use cvltr_m, only: cvltr
     use dimens_m, only: llm, nqmx
     use dimphy, only: klon
     use indicesol, only: nbsrf
@@ -234,8 +236,8 @@ contains
                   tr_seri(:, :, it), d_tr_cv(:, :, it))
           else if (iflag_con == 3) then
              ! Emanuel
-             call cvltr(pdtphys, da, phi, mp, paprs, tr_seri(1, 1, it), upwd, &
-                  dnwd, d_tr_cv(1, 1, it))
+             call cvltr(pdtphys, da, phi, mp, paprs, tr_seri(:, :, it), upwd, &
+                  dnwd, d_tr_cv(:, :, it))
           endif
 
           DO k = 1, llm
@@ -319,10 +321,8 @@ contains
                 source(i) = 0.0 ! pas de source, pour l'instant
              ENDDO
 
-             CALL cltrac(pdtphys, coefh, t_seri, &
-                  tr_seri(1, 1, it), source, &
-                  paprs, pplay, delp, &
-                  d_tr_cl(1, 1, it))
+             CALL cltrac(pdtphys, coefh, t_seri, tr_seri(:, :, it), source, &
+                  paprs, pplay, delp, d_tr_cl(1, 1, it))
              DO k = 1, llm
                 DO i = 1, klon
                    tr_seri(i, k, it) = tr_seri(i, k, it) + d_tr_cl(i, k, it)

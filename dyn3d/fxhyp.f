@@ -14,8 +14,12 @@ contains
 
     ! On doit avoir grossismx \times dzoomx < pi (radians)
 
+    ! Le premier point scalaire pour une grille regulière (grossismx =
+    ! 1., taux=0., clon=0.) est à - 180 degrés.
+
+    use coefpoly_m, only: coefpoly
     USE dimens_m, ONLY: iim
-    use nr_util, only: pi_d, twopi_d
+    use nr_util, only: pi_d, twopi_d, arth
     use serre, only: clon, grossismx, dzoomx, taux
 
     REAL, intent(out):: xprimm025(:), rlonv(:), xprimv(:) ! (iim + 1)
@@ -25,32 +29,28 @@ contains
 
     DOUBLE PRECISION champmin, champmax
     real rlonm025(iim + 1), rlonp025(iim + 1)
-    INTEGER, PARAMETER:: nmax = 30000, nmax2 = 2*nmax
-
-    LOGICAL, PARAMETER:: scal180 = .TRUE.
-    ! scal180 = .TRUE. si on veut avoir le premier point scalaire pour
-    ! une grille reguliere (grossismx = 1., taux=0., clon=0.) a
-    ! -180. degres. sinon scal180 = .FALSE.
-
+    INTEGER, PARAMETER:: nmax = 30000, nmax2 = 2 * nmax
     REAL dzoom
     DOUBLE PRECISION xlon(iim + 1), xprimm(iim + 1), xuv
     DOUBLE PRECISION xtild(0:nmax2)
-    DOUBLE PRECISION fhyp(0:nmax2), ffdx, beta, Xprimt(0:nmax2)
-    DOUBLE PRECISION Xf(0:nmax2), xxpr(0:nmax2)
+    DOUBLE PRECISION fhyp(nmax:nmax2), ffdx, beta, Xprimt(0:nmax2)
+    DOUBLE PRECISION Xf(0:nmax2), xxpr(nmax2)
     DOUBLE PRECISION xvrai(iim + 1), xxprim(iim + 1) 
     DOUBLE PRECISION my_eps, xzoom, fa, fb
     DOUBLE PRECISION Xf1, Xfi, a0, a1, a2, a3, xi2
     INTEGER i, it, ik, iter, ii, idif, ii1, ii2
-    DOUBLE PRECISION xi, xo1, xmoy, xlon2, fxm, Xprimin
+    DOUBLE PRECISION xi, xo1, xmoy, fxm, Xprimin
     DOUBLE PRECISION decalx
-    INTEGER, save:: is2
+    INTEGER is2
 
     !----------------------------------------------------------------------
+
+    print *, "Call sequence information: fxhyp"
 
     my_eps = 1e-3
     xzoom = clon * pi_d / 180. 
 
-    IF (grossismx == 1. .AND. scal180) THEN
+    IF (grossismx == 1.) THEN
        decalx = 1.
     else
        decalx = 0.75
@@ -59,8 +59,7 @@ contains
     IF (dzoomx < 1.) THEN
        dzoom = dzoomx * twopi_d
     ELSE IF (dzoomx < 25.) THEN
-       print *, "Le paramètre dzoomx pour fxhyp est trop petit. " &
-            // "L'augmenter et relancer."
+       print *, "dzoomx pour fxhyp est trop petit."
        STOP 1
     ELSE
        dzoom = dzoomx * pi_d / 180.
@@ -68,23 +67,21 @@ contains
 
     print *, 'dzoom (rad):', dzoom
 
-    DO i = 0, nmax2 
-       xtild(i) = - pi_d + REAL(i) * twopi_d / nmax2
-    END DO
+    xtild = arth(- pi_d, twopi_d / nmax2, nmax2 + 1)
 
     DO i = nmax, nmax2
-       fa = taux* (dzoom / 2. - xtild(i))
+       fa = taux * (dzoom / 2. - xtild(i))
        fb = xtild(i) * (pi_d - xtild(i))
 
-       IF (200.* fb < - fa) THEN
+       IF (200. * fb < - fa) THEN
           fhyp(i) = - 1.
        ELSE IF (200. * fb < fa) THEN
           fhyp(i) = 1.
        ELSE
           IF (ABS(fa) < 1e-13.AND.ABS(fb) < 1e-13) THEN
-             IF (200.*fb + fa < 1e-10) THEN
+             IF (200. * fb + fa < 1e-10) THEN
                 fhyp(i) = - 1.
-             ELSE IF (200.*fb - fa < 1e-10) THEN
+             ELSE IF (200. * fb - fa < 1e-10) THEN
                 fhyp(i) = 1.
              END IF
           ELSE
@@ -102,18 +99,18 @@ contains
 
     DO i = nmax + 1, nmax2
        xmoy = 0.5 * (xtild(i-1) + xtild(i))
-       fa = taux* (dzoom / 2. - xmoy)
+       fa = taux * (dzoom / 2. - xmoy)
        fb = xmoy * (pi_d - xmoy)
 
-       IF (200.* fb < - fa) THEN
+       IF (200. * fb < - fa) THEN
           fxm = - 1.
        ELSE IF (200. * fb < fa) THEN
           fxm = 1.
        ELSE
           IF (ABS(fa) < 1e-13.AND.ABS(fb) < 1e-13) THEN
-             IF (200.*fb + fa < 1e-10) THEN
+             IF (200. * fb + fa < 1e-10) THEN
                 fxm = - 1.
-             ELSE IF (200.*fb - fa < 1e-10) THEN
+             ELSE IF (200. * fb - fa < 1e-10) THEN
                 fxm = 1.
              END IF
           ELSE
@@ -151,10 +148,10 @@ contains
 
     DO i = nmax + 1, nmax2
        xmoy = 0.5 * (xtild(i-1) + xtild(i))
-       fa = taux* (dzoom / 2. - xmoy)
+       fa = taux * (dzoom / 2. - xmoy)
        fb = xmoy * (pi_d - xmoy)
 
-       IF (200.* fb < - fa) THEN
+       IF (200. * fb < - fa) THEN
           fxm = - 1.
        ELSE IF (200. * fb < fa) THEN
           fxm = 1.
@@ -167,18 +164,18 @@ contains
        xxpr(i) = beta + (grossismx - beta) * fxm
     END DO
 
-    DO i = nmax + 1, nmax2
-       xxpr(nmax2-i + 1) = xxpr(i)
-    END DO
+    xxpr(:nmax) = xxpr(nmax2:nmax + 1:- 1)
 
     DO i=1, nmax2
        Xf(i) = Xf(i-1) + xxpr(i) * (xtild(i) - xtild(i-1))
     END DO
 
-    ! xuv = 0. si calcul aux points scalaires 
-    ! xuv = 0.5 si calcul aux points U 
+    is2 = 0
 
     loop_ik: DO ik = 1, 4
+       ! xuv = 0. si calcul aux points scalaires 
+       ! xuv = 0.5 si calcul aux points U 
+
        IF (ik == 1) THEN
           xuv = -0.25
        ELSE IF (ik == 2) THEN
@@ -191,16 +188,16 @@ contains
 
        xo1 = 0.
 
-       ii1=1
-       ii2=iim
-       IF (ik == 1.and.grossismx == 1.) THEN
+       IF (ik == 1 .and. grossismx == 1.) THEN
           ii1 = 2 
           ii2 = iim + 1
+       else
+          ii1=1
+          ii2=iim
        END IF
 
        DO i = ii1, ii2
-          xlon2 = - pi_d + (REAL(i) + xuv - decalx) * twopi_d / REAL(iim) 
-          Xfi = xlon2
+          Xfi = - pi_d + (REAL(i) + xuv - decalx) * twopi_d / REAL(iim)
 
           it = nmax2
           do while (xfi < xf(it) .and. it >= 1)
@@ -224,7 +221,7 @@ contains
                xtild(it), xtild(it + 1), a0, a1, a2, a3)
 
           Xf1 = Xf(it)
-          Xprimin = a1 + 2.* a2 * xi + 3.*a3 * xi *xi
+          Xprimin = a1 + 2. * a2 * xi + 3. * a3 * xi * xi
 
           iter = 1
 
@@ -234,13 +231,13 @@ contains
              xo1 = xi
              xi2 = xi * xi
              Xf1 = a0 + a1 * xi + a2 * xi2 + a3 * xi2 * xi
-             Xprimin = a1 + 2.* a2 * xi + 3.* a3 * xi2
+             Xprimin = a1 + 2. * a2 * xi + 3. * a3 * xi2
           end DO
 
           if (ABS(xi - xo1) > my_eps) then
              ! iter == 300
              print *, 'Pas de solution.'
-             print *, i, xlon2
+             print *, i, xfi
              STOP 1
           end if
 
@@ -260,24 +257,15 @@ contains
 
        DO i = 1, iim -1
           IF (xvrai(i + 1) < xvrai(i)) THEN
-             print *, 'Problème avec rlonu(', i + 1, &
-                  ') plus petit que rlonu(', i, ')'
+             print *, 'rlonu(', i + 1, ') < rlonu(', i, ')'
              STOP 1
           END IF
        END DO
 
-       ! Réorganisation des longitudes pour les avoir entre - pi et pi 
-
-       champmin = 1e12
-       champmax = -1e12
-       DO i = 1, iim
-          champmin = MIN(champmin, xvrai(i))
-          champmax = MAX(champmax, xvrai(i))
-       END DO
-
-       IF (.not. (champmin >= -pi_d - 0.1 .and. champmax <= pi_d + 0.1)) THEN
-          print *, 'Reorganisation des longitudes pour avoir entre - pi', &
-               ' et pi '
+       IF (.not. (MINval(xvrai(:iim)) >= - pi_d - 0.1 &
+            .and. MAXval(xvrai(:iim)) <= pi_d + 0.1)) THEN
+          print *, &
+               'Réorganisation des longitudes pour les avoir entre - pi et pi'
 
           IF (xzoom <= 0.) THEN
              IF (ik == 1) THEN
@@ -295,7 +283,7 @@ contains
                 is2 = i
              END IF
 
-             IF (is2.NE. 1) THEN
+             IF (is2 /= 1) THEN
                 DO ii = is2, iim
                    xlon(ii-is2 + 1) = xvrai(ii)
                    xprimm(ii-is2 + 1) = xxprim(ii)
@@ -335,13 +323,11 @@ contains
           END IF
        END IF
 
-       ! Fin de la reorganisation 
-
        xlon(iim + 1) = xlon(1) + twopi_d
        xprimm(iim + 1) = xprimm(1)
 
        DO i = 1, iim + 1
-          xvrai(i) = xlon(i)*180. / pi_d
+          xvrai(i) = xlon(i) * 180. / pi_d
        END DO
 
        IF (ik == 1) THEN
@@ -358,10 +344,8 @@ contains
              xprimu(i) = xprimm(i)
           END DO
        ELSE IF (ik == 4) THEN
-          DO i = 1, iim + 1
-             rlonp025(i) = xlon(i)
-             xprimp025(i) = xprimm(i)
-          END DO
+          rlonp025 = xlon
+          xprimp025 = xprimm
        END IF
     end DO loop_ik
 
@@ -391,7 +375,8 @@ contains
        END IF
 
        IF (rlonp025(i) > rlonu(i)) THEN
-          print *, ' Attention ! rlonp025 > rlonu', i
+          print *, 'rlonp025(', i, ') = ', rlonp025(i)
+          print *, "> rlonu(", i, ") = ", rlonu(i)
           STOP 1
        END IF
     END DO
@@ -402,7 +387,7 @@ contains
 3   Format(1x, ' Au centre du zoom, la longueur de la maille est', &
          ' d environ ', f0.2, ' degres ', /, &
          ' alors que la maille en dehors de la zone du zoom est ', &
-         "d'environ", f0.2, ' degres ')
+         "d'environ ", f0.2, ' degres ')
 
   END SUBROUTINE fxhyp
 
