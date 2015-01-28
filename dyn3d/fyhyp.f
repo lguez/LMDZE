@@ -13,7 +13,7 @@ contains
     ! Calcule les latitudes et dérivées dans la grille du GCM pour une
     ! fonction f(y) à dérivée tangente hyperbolique.
 
-    ! Nota bene : il vaut mieux avoir grossismy * dzoomy < pi / 2 (radians).
+    ! Il vaut mieux avoir : grossismy * dzoom < pi / 2
 
     use coefpoly_m, only: coefpoly
     USE dimens_m, only: jjm
@@ -61,17 +61,7 @@ contains
     pisjm = pi/real(jjm)
     epsilon = 1e-3
     y0 = clat*pi/180.
-
-    IF (dzoomy<1.) THEN
-       dzoom = dzoomy*pi
-    ELSE IF (dzoomy<12.) THEN
-       print *, "Le paramètre dzoomy pour fyhyp est trop petit. L'augmenter " &
-            // "et relancer."
-       STOP 1
-    ELSE
-       dzoom = dzoomy * pi/180.
-    END IF
-
+    dzoom = dzoomy*pi
     print *, 'yzoom(rad), grossismy, tauy, dzoom (rad):'
     print *, y0, grossismy, tauy, dzoom
 

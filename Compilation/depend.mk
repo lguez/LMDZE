@@ -267,7 +267,8 @@ enercin.o : comgeom.o paramet_m.o dimens_m.o
 exner_hyb.o : filtreg.o disvert.o comconst.o dimens_m.o 
 filtreg.o : inifilr.o dimens_m.o coefils.o 
 flumass.o : comgeom.o paramet_m.o dimens_m.o 
-fxhyp.o : serre.o dimens_m.o coefpoly.o 
+fxhyp.o : serre.o fxhyp_loop_ik.o dimens_m.o 
+fxhyp_loop_ik.o : serre.o dimens_m.o coefpoly.o 
 fyhyp.o : serre.o dimens_m.o coefpoly.o 
 geopot.o : dimens_m.o 
 grid_change.o : dimphy.o dimens_m.o 

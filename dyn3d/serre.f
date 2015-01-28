@@ -33,6 +33,7 @@ contains
     write(unit_nml, nml=serre_nml)
 
     call assert(grossismx >= 1. .and. grossismy >= 1., "read_serre grossism")
+    call assert(dzoomx < 1., dzoomy < 1., "read_serre dzoomx dzoomy")
 
   end subroutine read_serre
 

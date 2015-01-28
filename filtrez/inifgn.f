@@ -18,7 +18,6 @@ contains
 
     ! Local:
     REAL vec(iim, iim), vec1(iim, iim)
-    REAL dlonu(iim), dlonv(iim)
     REAL du(iim)
     real d(iim)
     REAL pi
@@ -32,13 +31,8 @@ contains
     pi = 2.*asin(1.)
 
     DO i = 1, iim
-       dlonu(i) = xprimu(i)
-       dlonv(i) = xprimv(i)
-    END DO
-
-    DO i = 1, iim
-       sddv(i) = sqrt(dlonv(i))
-       sddu(i) = sqrt(dlonu(i))
+       sddv(i) = sqrt(xprimv(i))
+       sddu(i) = sqrt(xprimu(i))
        unsddu(i) = 1./sddu(i)
        unsddv(i) = 1./sddv(i)
     END DO

@@ -124,11 +124,11 @@ contains
     ! Calcul des élongations cuij1, ..., cuij4, cvij1, ..., cvij4 aux mêmes
     ! endroits que les aires aireij1_2d, ..., aireij4_2d.
 
-    ! Choix entre une fonction "f(y)" à dérivée sinusoïdale ou à
-    ! dérivée tangente hyperbolique. Calcul des coefficients cu_2d,
-    ! cv_2d, 1. / cu_2d**2, 1. / cv_2d**2. Les coefficients cu_2d et cv_2d
-    ! permettent de passer des vitesses naturelles aux vitesses
-    ! covariantes et contravariantes, ou vice-versa.
+    ! Fonction "f(y)" à dérivée tangente hyperbolique. Calcul des
+    ! coefficients cu_2d, cv_2d, 1. / cu_2d**2, 1. / cv_2d**2. Les
+    ! coefficients cu_2d et cv_2d permettent de passer des vitesses
+    ! naturelles aux vitesses covariantes et contravariantes, ou
+    ! vice-versa.
 
     ! On a :
     ! u(covariant) = cu_2d * u(naturel), u(contravariant) = u(naturel) / cu_2d
@@ -195,11 +195,13 @@ contains
     ELSE
        gamdi_gdiv = 0.
     END IF
+
     IF (nitergrot/=2) THEN
        gamdi_grot = coefdis / (real(nitergrot)-2.)
     ELSE
        gamdi_grot = 0.
     END IF
+
     IF (niterh/=2) THEN
        gamdi_h = coefdis / (real(niterh)-2.)
     ELSE

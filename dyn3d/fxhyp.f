@@ -12,13 +12,13 @@ contains
     ! Calcule les longitudes et dérivées dans la grille du GCM pour
     ! une fonction f(x) à dérivée tangente hyperbolique.
 
-    ! On doit avoir grossismx \times dzoomx < pi (radians)
+    ! Il vaut mieux avoir : grossismx \times dzoom < pi
 
     ! Le premier point scalaire pour une grille regulière (grossismx =
     ! 1., taux=0., clon=0.) est à - 180 degrés.
 
-    use coefpoly_m, only: coefpoly
     USE dimens_m, ONLY: iim
+    use fxhyp_loop_ik_m, only: fxhyp_loop_ik, nmax
     use nr_util, only: pi_d, twopi_d, arth
     use serre, only: clon, grossismx, dzoomx, taux
 
@@ -27,49 +27,34 @@ contains
 
     ! Local:
 
-    DOUBLE PRECISION champmin, champmax
     real rlonm025(iim + 1), rlonp025(iim + 1)
-    INTEGER, PARAMETER:: nmax = 30000, nmax2 = 2 * nmax
     REAL dzoom
-    DOUBLE PRECISION xlon(iim + 1), xprimm(iim + 1), xuv
-    DOUBLE PRECISION xtild(0:nmax2)
-    DOUBLE PRECISION fhyp(nmax:nmax2), ffdx, beta, Xprimt(0:nmax2)
-    DOUBLE PRECISION Xf(0:nmax2), xxpr(nmax2)
-    DOUBLE PRECISION xvrai(iim + 1), xxprim(iim + 1) 
-    DOUBLE PRECISION my_eps, xzoom, fa, fb
-    DOUBLE PRECISION Xf1, Xfi, a0, a1, a2, a3, xi2
-    INTEGER i, it, ik, iter, ii, idif, ii1, ii2
-    DOUBLE PRECISION xi, xo1, xmoy, fxm, Xprimin
+    DOUBLE PRECISION xlon(iim)
+    DOUBLE PRECISION xtild(0:2 * nmax)
+    DOUBLE PRECISION fhyp(nmax:2 * nmax), ffdx, beta, Xprimt(0:2 * nmax)
+    DOUBLE PRECISION Xf(0:2 * nmax), xxpr(2 * nmax)
+    DOUBLE PRECISION xzoom, fa, fb
+    INTEGER i
+    DOUBLE PRECISION xmoy, fxm
     DOUBLE PRECISION decalx
-    INTEGER is2
 
     !----------------------------------------------------------------------
 
     print *, "Call sequence information: fxhyp"
 
-    my_eps = 1e-3
-    xzoom = clon * pi_d / 180. 
+    xzoom = clon * pi_d / 180d0
 
     IF (grossismx == 1.) THEN
-       decalx = 1.
+       decalx = 1d0
     else
-       decalx = 0.75
+       decalx = 0.75d0
     END IF
 
-    IF (dzoomx < 1.) THEN
-       dzoom = dzoomx * twopi_d
-    ELSE IF (dzoomx < 25.) THEN
-       print *, "dzoomx pour fxhyp est trop petit."
-       STOP 1
-    ELSE
-       dzoom = dzoomx * pi_d / 180.
-    END IF
+    dzoom = dzoomx * twopi_d
+    xtild = arth(- pi_d, pi_d / nmax, 2 * nmax + 1)
 
-    print *, 'dzoom (rad):', dzoom
-
-    xtild = arth(- pi_d, twopi_d / nmax2, nmax2 + 1)
-
-    DO i = nmax, nmax2
+    ! Compute fhyp:
+    DO i = nmax, 2 * nmax
        fa = taux * (dzoom / 2. - xtild(i))
        fb = xtild(i) * (pi_d - xtild(i))
 
@@ -78,7 +63,7 @@ contains
        ELSE IF (200. * fb < fa) THEN
           fhyp(i) = 1.
        ELSE
-          IF (ABS(fa) < 1e-13.AND.ABS(fb) < 1e-13) THEN
+          IF (ABS(fa) < 1e-13 .AND. ABS(fb) < 1e-13) THEN
              IF (200. * fb + fa < 1e-10) THEN
                 fhyp(i) = - 1.
              ELSE IF (200. * fb - fa < 1e-10) THEN
@@ -97,7 +82,7 @@ contains
 
     ffdx = 0.
 
-    DO i = nmax + 1, nmax2
+    DO i = nmax + 1, 2 * nmax
        xmoy = 0.5 * (xtild(i-1) + xtild(i))
        fa = taux * (dzoom / 2. - xmoy)
        fb = xmoy * (pi_d - xmoy)
@@ -107,7 +92,7 @@ contains
        ELSE IF (200. * fb < fa) THEN
           fxm = 1.
        ELSE
-          IF (ABS(fa) < 1e-13.AND.ABS(fb) < 1e-13) THEN
+          IF (ABS(fa) < 1e-13 .AND. ABS(fb) < 1e-13) THEN
              IF (200. * fb + fa < 1e-10) THEN
                 fxm = - 1.
              ELSE IF (200. * fb - fa < 1e-10) THEN
@@ -124,7 +109,9 @@ contains
        ffdx = ffdx + fxm * (xtild(i) - xtild(i-1))
     END DO
 
+    print *, "ffdx = ", ffdx
     beta = (grossismx * ffdx - pi_d) / (ffdx - pi_d)
+    print *, "beta = ", beta
 
     IF (2. * beta - grossismx <= 0.) THEN
        print *, 'Attention ! La valeur beta calculée dans fxhyp est mauvaise.'
@@ -133,20 +120,12 @@ contains
     END IF
 
     ! calcul de Xprimt 
+    Xprimt(nmax:2 * nmax) = beta + (grossismx - beta) * fhyp
+    xprimt(:nmax - 1) = xprimt(2 * nmax:nmax + 1:- 1)
 
-    DO i = nmax, nmax2
-       Xprimt(i) = beta + (grossismx - beta) * fhyp(i)
-    END DO
+    ! Calcul de Xf
 
-    DO i = nmax + 1, nmax2
-       Xprimt(nmax2 - i) = Xprimt(i)
-    END DO
-
-    ! Calcul de Xf 
-
-    Xf(0) = - pi_d
-
-    DO i = nmax + 1, nmax2
+    DO i = nmax + 1, 2 * nmax
        xmoy = 0.5 * (xtild(i-1) + xtild(i))
        fa = taux * (dzoom / 2. - xmoy)
        fb = xmoy * (pi_d - xmoy)
@@ -164,213 +143,41 @@ contains
        xxpr(i) = beta + (grossismx - beta) * fxm
     END DO
 
-    xxpr(:nmax) = xxpr(nmax2:nmax + 1:- 1)
+    xxpr(:nmax) = xxpr(2 * nmax:nmax + 1:- 1)
 
-    DO i=1, nmax2
+    Xf(0) = - pi_d
+
+    DO i=1, 2 * nmax - 1
        Xf(i) = Xf(i-1) + xxpr(i) * (xtild(i) - xtild(i-1))
     END DO
 
-    is2 = 0
+    Xf(2 * nmax) = pi_d
 
-    loop_ik: DO ik = 1, 4
-       ! xuv = 0. si calcul aux points scalaires 
-       ! xuv = 0.5 si calcul aux points U 
-
-       IF (ik == 1) THEN
-          xuv = -0.25
-       ELSE IF (ik == 2) THEN
-          xuv = 0.
-       ELSE IF (ik == 3) THEN
-          xuv = 0.50
-       ELSE IF (ik == 4) THEN
-          xuv = 0.25
-       END IF
-
-       xo1 = 0.
-
-       IF (ik == 1 .and. grossismx == 1.) THEN
-          ii1 = 2 
-          ii2 = iim + 1
-       else
-          ii1=1
-          ii2=iim
-       END IF
-
-       DO i = ii1, ii2
-          Xfi = - pi_d + (REAL(i) + xuv - decalx) * twopi_d / REAL(iim)
-
-          it = nmax2
-          do while (xfi < xf(it) .and. it >= 1)
-             it = it - 1
-          end do
-
-          ! Calcul de Xf(xi) 
-
-          xi = xtild(it)
-
-          IF (it == nmax2) THEN
-             it = nmax2 -1
-             Xf(it + 1) = pi_d
-          END IF
-
-          ! Appel de la routine qui calcule les coefficients a0, a1,
-          ! a2, a3 d'un polynome de degre 3 qui passe par les points
-          ! (Xf(it), xtild(it)) et (Xf(it + 1), xtild(it + 1))
-
-          CALL coefpoly(Xf(it), Xf(it + 1), Xprimt(it), Xprimt(it + 1), &
-               xtild(it), xtild(it + 1), a0, a1, a2, a3)
-
-          Xf1 = Xf(it)
-          Xprimin = a1 + 2. * a2 * xi + 3. * a3 * xi * xi
-
-          iter = 1
-
-          do
-             xi = xi - (Xf1 - Xfi) / Xprimin
-             IF (ABS(xi - xo1) <= my_eps .or. iter == 300) exit
-             xo1 = xi
-             xi2 = xi * xi
-             Xf1 = a0 + a1 * xi + a2 * xi2 + a3 * xi2 * xi
-             Xprimin = a1 + 2. * a2 * xi + 3. * a3 * xi2
-          end DO
-
-          if (ABS(xi - xo1) > my_eps) then
-             ! iter == 300
-             print *, 'Pas de solution.'
-             print *, i, xfi
-             STOP 1
-          end if
-
-          xxprim(i) = twopi_d / (REAL(iim) * Xprimin)
-          xvrai(i) = xi + xzoom
-       end DO
-
-       IF (ik == 1 .and. grossismx == 1.) THEN
-          xvrai(1) = xvrai(iim + 1)-twopi_d
-          xxprim(1) = xxprim(iim + 1)
-       END IF
-
-       DO i = 1, iim
-          xlon(i) = xvrai(i)
-          xprimm(i) = xxprim(i)
-       END DO
-
-       DO i = 1, iim -1
-          IF (xvrai(i + 1) < xvrai(i)) THEN
-             print *, 'rlonu(', i + 1, ') < rlonu(', i, ')'
-             STOP 1
-          END IF
-       END DO
-
-       IF (.not. (MINval(xvrai(:iim)) >= - pi_d - 0.1 &
-            .and. MAXval(xvrai(:iim)) <= pi_d + 0.1)) THEN
-          print *, &
-               'Réorganisation des longitudes pour les avoir entre - pi et pi'
-
-          IF (xzoom <= 0.) THEN
-             IF (ik == 1) THEN
-                i = 1
-
-                do while (xvrai(i) < - pi_d .and. i < iim)
-                   i = i + 1
-                end do
-
-                if (xvrai(i) < - pi_d) then
-                   print *, 'Xvrai plus petit que - pi !'
-                   STOP 1
-                end if
-
-                is2 = i
-             END IF
-
-             IF (is2 /= 1) THEN
-                DO ii = is2, iim
-                   xlon(ii-is2 + 1) = xvrai(ii)
-                   xprimm(ii-is2 + 1) = xxprim(ii)
-                END DO
-                DO ii = 1, is2 -1
-                   xlon(ii + iim-is2 + 1) = xvrai(ii) + twopi_d
-                   xprimm(ii + iim-is2 + 1) = xxprim(ii) 
-                END DO
-             END IF
-          ELSE 
-             IF (ik == 1) THEN
-                i = iim
-
-                do while (xvrai(i) > pi_d .and. i > 1)
-                   i = i - 1
-                end do
-
-                if (xvrai(i) > pi_d) then
-                   print *, 'Xvrai plus grand que pi !'
-                   STOP 1
-                end if
-
-                is2 = i
-             END IF
-
-             idif = iim -is2
-
-             DO ii = 1, is2
-                xlon(ii + idif) = xvrai(ii)
-                xprimm(ii + idif) = xxprim(ii)
-             END DO
-
-             DO ii = 1, idif
-                xlon(ii) = xvrai(ii + is2) - twopi_d
-                xprimm(ii) = xxprim(ii + is2) 
-             END DO
-          END IF
-       END IF
-
-       xlon(iim + 1) = xlon(1) + twopi_d
-       xprimm(iim + 1) = xprimm(1)
-
-       DO i = 1, iim + 1
-          xvrai(i) = xlon(i) * 180. / pi_d
-       END DO
-
-       IF (ik == 1) THEN
-          DO i = 1, iim + 1
-             rlonm025(i) = xlon(i)
-             xprimm025(i) = xprimm(i)
-          END DO
-       ELSE IF (ik == 2) THEN
-          rlonv = xlon
-          xprimv = xprimm
-       ELSE IF (ik == 3) THEN
-          DO i = 1, iim + 1
-             rlonu(i) = xlon(i)
-             xprimu(i) = xprimm(i)
-          END DO
-       ELSE IF (ik == 4) THEN
-          rlonp025 = xlon
-          xprimp025 = xprimm
-       END IF
-    end DO loop_ik
+    call fxhyp_loop_ik(1, decalx, xf, xtild, Xprimt, xzoom, rlonm025, &
+         xprimm025, xuv = - 0.25d0)
+    call fxhyp_loop_ik(2, decalx, xf, xtild, Xprimt, xzoom, rlonv, xprimv, &
+         xuv = 0d0)
+    call fxhyp_loop_ik(3, decalx, xf, xtild, Xprimt, xzoom, rlonu, xprimu, &
+         xuv = 0.5d0)
+    call fxhyp_loop_ik(4, decalx, xf, xtild, Xprimt, xzoom, rlonp025, &
+         xprimp025, xuv = 0.25d0)
 
     print *
 
-    DO i = 1, iim
-       xlon(i) = rlonv(i + 1) - rlonv(i)
-    END DO
-    champmin = 1e12
-    champmax = -1e12
-    DO i = 1, iim
-       champmin = MIN(champmin, xlon(i))
-       champmax = MAX(champmax, xlon(i))
-    END DO
-    champmin = champmin * 180. / pi_d
-    champmax = champmax * 180. / pi_d
+    forall (i = 1: iim) xlon(i) = rlonv(i + 1) - rlonv(i)
+    print *, "Minimum longitude step:", MINval(xlon) * 180. / pi_d, "°"
+    print *, "Maximum longitude step:", MAXval(xlon) * 180. / pi_d, "°"
 
     DO i = 1, iim + 1
        IF (rlonp025(i) < rlonv(i)) THEN
-          print *, ' Attention ! rlonp025 < rlonv', i
+          print *, 'rlonp025(', i, ') = ', rlonp025(i)
+          print *, "< rlonv(", i, ") = ", rlonv(i)
           STOP 1
        END IF
 
        IF (rlonv(i) < rlonm025(i)) THEN 
-          print *, ' Attention ! rlonm025 > rlonv', i
+          print *, 'rlonv(', i, ') = ', rlonv(i)
+          print *, "< rlonm025(", i, ") = ", rlonm025(i)
           STOP 1
        END IF
 
@@ -380,14 +187,6 @@ contains
           STOP 1
        END IF
     END DO
-
-    print *, ' Longitudes '
-    print 3, champmin, champmax
-
-3   Format(1x, ' Au centre du zoom, la longueur de la maille est', &
-         ' d environ ', f0.2, ' degres ', /, &
-         ' alors que la maille en dehors de la zone du zoom est ', &
-         "d'environ ", f0.2, ' degres ')
 
   END SUBROUTINE fxhyp
 
