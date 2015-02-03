@@ -114,8 +114,8 @@ contains
     print *, "beta = ", beta
 
     IF (2. * beta - grossismx <= 0.) THEN
-       print *, 'Attention ! La valeur beta calculée dans fxhyp est mauvaise.'
-       print *, 'Modifier les valeurs de grossismx, taux ou dzoomx et relancer.'
+       print *, 'Bad choice of grossismx, taux, dzoomx.'
+       print *, 'Decrease dzoomx or grossismx.'
        STOP 1
     END IF
 
@@ -165,8 +165,8 @@ contains
     print *
 
     forall (i = 1: iim) xlon(i) = rlonv(i + 1) - rlonv(i)
-    print *, "Minimum longitude step:", MINval(xlon) * 180. / pi_d, "°"
-    print *, "Maximum longitude step:", MAXval(xlon) * 180. / pi_d, "°"
+    print *, "Minimum longitude step:", MINval(xlon) * 180. / pi_d, "degrees"
+    print *, "Maximum longitude step:", MAXval(xlon) * 180. / pi_d, "degrees"
 
     DO i = 1, iim + 1
        IF (rlonp025(i) < rlonv(i)) THEN

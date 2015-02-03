@@ -109,24 +109,39 @@ contains
        END IF
     END DO
 
-    IF (.not. (MINval(xvrai(:iim)) >= - pi_d - 1d-5 &
-         .and. MAXval(xvrai(:iim)) <= pi_d + 1d-5)) THEN
+    IF (ik == 1 .and. (MINval(xvrai(:iim)) < - pi_d - 0.1d0 &
+         .or. MAXval(xvrai(:iim)) > pi_d + 0.1d0)) THEN
        IF (xzoom <= 0.) THEN
-          IF (ik == 1) THEN
-             i = 1
+          i = 1
 
-             do while (xvrai(i) < - pi_d .and. i < iim)
-                i = i + 1
-             end do
+          do while (xvrai(i) < - pi_d .and. i < iim)
+             i = i + 1
+          end do
 
-             if (xvrai(i) < - pi_d) then
-                print *, 'Xvrai plus petit que - pi !'
-                STOP 1
-             end if
+          if (xvrai(i) < - pi_d) then
+             print *, 'Xvrai plus petit que - pi !'
+             STOP 1
+          end if
 
-             is2 = i
-          END IF
+          is2 = i
+       ELSE
+          i = iim
 
+          do while (xvrai(i) > pi_d .and. i > 1)
+             i = i - 1
+          end do
+
+          if (xvrai(i) > pi_d) then
+             print *, 'Xvrai plus grand que pi !'
+             STOP 1
+          end if
+
+          is2 = i
+       END IF
+    END IF
+
+    if (is2 /= 0) then
+       IF (xzoom <= 0.) THEN
           IF (is2 /= 1) THEN
              DO ii = is2, iim
                 xlon(ii-is2 + 1) = xvrai(ii)
@@ -137,22 +152,7 @@ contains
                 xprimm(ii + iim-is2 + 1) = xxprim(ii) 
              END DO
           END IF
-       ELSE
-          IF (ik == 1) THEN
-             i = iim
-
-             do while (xvrai(i) > pi_d .and. i > 1)
-                i = i - 1
-             end do
-
-             if (xvrai(i) > pi_d) then
-                print *, 'Xvrai plus grand que pi !'
-                STOP 1
-             end if
-
-             is2 = i
-          END IF
-
+       else
           idif = iim -is2
 
           DO ii = 1, is2
@@ -164,8 +164,8 @@ contains
              xlon(ii) = xvrai(ii + is2) - twopi_d
              xprimm(ii) = xxprim(ii + is2) 
           END DO
-       END IF
-    END IF
+       end IF
+    end if
 
     xlon(iim + 1) = xlon(1) + twopi
     xprimm(iim + 1) = xprimm(1)

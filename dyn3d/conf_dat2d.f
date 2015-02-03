@@ -103,8 +103,8 @@ contains
        end do
 
        xf(i:) = xf(i:) - 2 * pi
-       xf(:) = cshift(xf, shift=i - 1)
-       champd(:, :) = cshift(champd, shift=i - 1)
+       xf(:) = cshift(xf, shift = i - 1)
+       champd(:, :) = cshift(champd, shift = i - 1)
     ENDIF
 
     IF (yd(1) < yd(lats)) THEN

@@ -9,7 +9,7 @@ module serre
   ! facteurs de grossissement du zoom, selon la longitude et la latitude
   ! = 2 si 2 fois, = 3 si 3 fois, etc.
 
-  real:: dzoomx = 0., dzoomy = 0.
+  real:: dzoomx = 0.2, dzoomy = 0.2
   ! extensions en longitude et latitude de la zone du zoom (fractions
   ! de la zone totale)
 
@@ -33,7 +33,8 @@ contains
     write(unit_nml, nml=serre_nml)
 
     call assert(grossismx >= 1. .and. grossismy >= 1., "read_serre grossism")
-    call assert(dzoomx < 1., dzoomy < 1., "read_serre dzoomx dzoomy")
+    call assert(dzoomx > 0., dzoomx < 1., dzoomy < 1., &
+         "read_serre dzoomx dzoomy")
 
   end subroutine read_serre
 
