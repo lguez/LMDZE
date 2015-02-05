@@ -26,15 +26,13 @@ contains
 
     ! Local:
 
-    DOUBLE PRECISION xo1, Xfi, xi, a0, a1, a2, a3, Xf1, Xprimin, xi2
+    DOUBLE PRECISION xo1, Xfi, xi, a0, a1, a2, a3, Xf1, Xprimin
     integer ii1, ii2, i, it, iter, idif, ii
-    DOUBLE PRECISION, parameter:: my_eps = 1e-3
+    DOUBLE PRECISION, parameter:: my_eps = 1e-6
     DOUBLE PRECISION xxprim(iim + 1), xvrai(iim + 1)
     INTEGER:: is2 = 0
 
     !------------------------------------------------------------------
-
-    xo1 = 0.
 
     IF (ik == 1 .and. grossismx == 1.) THEN
        ii1 = 2 
@@ -60,25 +58,19 @@ contains
           it = 2 * nmax -1
        END IF
 
-       ! Appel de la routine qui calcule les coefficients a0, a1,
-       ! a2, a3 d'un polynome de degre 3 qui passe par les points
-       ! (Xf(it), xtild(it)) et (Xf(it + 1), xtild(it + 1))
-
        CALL coefpoly(Xf(it), Xf(it + 1), Xprimt(it), Xprimt(it + 1), &
             xtild(it), xtild(it + 1), a0, a1, a2, a3)
-
        Xf1 = Xf(it)
-       Xprimin = a1 + 2. * a2 * xi + 3. * a3 * xi**2
-
+       Xprimin = a1 + xi * (2d0 * a2 + xi * 3d0 * a3)
+       xo1 = xi
        iter = 1
 
        do
           xi = xi - (Xf1 - Xfi) / Xprimin
           IF (ABS(xi - xo1) <= my_eps .or. iter == 300) exit
           xo1 = xi
-          xi2 = xi * xi
-          Xf1 = a0 + a1 * xi + a2 * xi2 + a3 * xi2 * xi
-          Xprimin = a1 + 2. * a2 * xi + 3. * a3 * xi2
+          Xf1 = a0 + xi * (a1 + xi * (a2 + xi * a3))
+          Xprimin = a1 + xi * (2d0 * a2 + xi * 3d0 * a3)
        end DO
 
        if (ABS(xi - xo1) > my_eps) then

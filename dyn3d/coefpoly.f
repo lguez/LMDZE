@@ -18,6 +18,9 @@ contains
     ! a1 + 2. * a2 * xtild1 + 3. * a3 * xtild1**2 = Xprim1
     ! a1 + 2. * a2 * xtild2 + 3. * a3 * xtild2**2 = Xprim2
 
+    ! (passe par les points (Xf(it), xtild(it)) et (Xf(it + 1),
+    ! xtild(it + 1))
+
     ! On en revient à resoudre un système de 4 équations à 4 inconnues
     ! a0, a1, a2, a3.
 

@@ -42,14 +42,6 @@ contains
 
     print *, "Call sequence information: fxhyp"
 
-    xzoom = clon * pi_d / 180d0
-
-    IF (grossismx == 1.) THEN
-       decalx = 1d0
-    else
-       decalx = 0.75d0
-    END IF
-
     dzoom = dzoomx * twopi_d
     xtild = arth(- pi_d, pi_d / nmax, 2 * nmax + 1)
 
@@ -153,6 +145,13 @@ contains
 
     Xf(2 * nmax) = pi_d
 
+    IF (grossismx == 1.) THEN
+       decalx = 1d0
+    else
+       decalx = 0.75d0
+    END IF
+
+    xzoom = clon * pi_d / 180d0
     call fxhyp_loop_ik(1, decalx, xf, xtild, Xprimt, xzoom, rlonm025, &
          xprimm025, xuv = - 0.25d0)
     call fxhyp_loop_ik(2, decalx, xf, xtild, Xprimt, xzoom, rlonv, xprimv, &

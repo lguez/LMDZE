@@ -8,17 +8,23 @@ makefile_dir = .
 
 VPATH := ${makefile_dir}/.. $(addprefix ${makefile_dir}/../, $(shell cat ${makefile_dir}/directories))
 
-common_sources := $(shell cat ${makefile_dir}/common_sources)
-src_ce0l_only := $(shell cat ${makefile_dir}/src_ce0l_only)
-src_gcm_only := $(shell cat ${makefile_dir}/src_gcm_only)
-sources = ${src_ce0l_only} ${src_gcm_only} ${common_sources}
+src_ce0l := $(shell cat ${makefile_dir}/src_ce0l)
+src_gcm := $(shell cat ${makefile_dir}/src_gcm)
+src_test_ozonecm = $(shell cat ${makefile_dir}/src_test_ozonecm)
+src_test_inter_barxy = $(shell cat ${makefile_dir}/src_test_inter_barxy)
+src_test_fxhyp = $(shell cat ${makefile_dir}/src_test_fxhyp)
+
+sources = $(sort ${src_ce0l} ${src_gcm} ${src_test_ozonecm} ${src_test_inter_barxy} ${src_test_fxhyp})
 
 # 2. Objects and executable files
 
-obj_ce0l := $(sort ${common_sources:.f=.o} ${src_ce0l_only:.f=.o})
-obj_gcm := $(sort ${common_sources:.f=.o} ${src_gcm_only:.f=.o})
+obj_ce0l := $(src_ce0l:.f=.o)
+obj_gcm := $(src_gcm:.f=.o)
+obj_test_ozonecm := $(src_test_ozonecm:.f=.o)
+obj_test_inter_barxy := $(src_test_inter_barxy:.f=.o)
+obj_test_fxhyp := $(src_test_fxhyp:.f=.o)
 objects := $(sources:.f=.o)
-execut = ce0l gcm
+execut = ce0l gcm test_ozonecm test_inter_barxy test_fxhyp
 
 # 3. Compiler-dependent part
 
@@ -37,6 +43,9 @@ ${execut}:
 
 ce0l: ${obj_ce0l}
 gcm: ${obj_gcm}
+test_ozonecm: ${obj_test_ozonecm}
+test_inter_barxy: ${obj_test_inter_barxy}
+test_fxhyp: ${obj_test_fxhyp}
 
 depend ${makefile_dir}/depend.mk:
 	makedepf90 -free -Wmissing -Wconfused $(addprefix -I, ${VPATH}) -nosrc $(addprefix -u , netcdf numer_rec_95 netcdf95 nr_util jumble) ${sources} >${makefile_dir}/depend.mk
