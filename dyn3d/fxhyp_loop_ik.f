@@ -11,26 +11,24 @@ contains
 
     use coefpoly_m, only: coefpoly
     USE dimens_m, ONLY: iim
-    use nr_util, only: pi_d, twopi_d, twopi
+    use nr_util, only: pi_d, twopi_d
     use serre, only: grossismx
 
     INTEGER, intent(in):: ik
     DOUBLE PRECISION, intent(in):: decalx
     DOUBLE PRECISION, intent(in):: Xf(0:), xtild(0:), Xprimt(0:) ! (0:2 * nmax)
     DOUBLE PRECISION, intent(in):: xzoom
-    real, intent(out):: xlon(:), xprimm(:) ! (iim + 1)
+    real, intent(out):: xlon(:), xprimm(:) ! (iim)
 
     DOUBLE PRECISION, intent(in):: xuv
     ! 0. si calcul aux points scalaires 
     ! 0.5 si calcul aux points U 
 
     ! Local:
-
     DOUBLE PRECISION xo1, Xfi, xi, a0, a1, a2, a3, Xf1, Xprimin
-    integer ii1, ii2, i, it, iter, idif, ii
+    integer ii1, ii2, i, it, iter
     DOUBLE PRECISION, parameter:: my_eps = 1e-6
     DOUBLE PRECISION xxprim(iim + 1), xvrai(iim + 1)
-    INTEGER:: is2 = 0
 
     !------------------------------------------------------------------
 
@@ -89,78 +87,17 @@ contains
        xxprim(1) = xxprim(iim + 1)
     END IF
 
-    DO i = 1, iim
-       xlon(i) = xvrai(i)
-       xprimm(i) = xxprim(i)
-    END DO
-
     DO i = 1, iim -1
        IF (xvrai(i + 1) < xvrai(i)) THEN
-          print *, 'rlonu(', i + 1, ') < rlonu(', i, ')'
+          print *, 'xvrai(', i + 1, ') < xvrai(', i, ')'
           STOP 1
        END IF
     END DO
 
-    IF (ik == 1 .and. (MINval(xvrai(:iim)) < - pi_d - 0.1d0 &
-         .or. MAXval(xvrai(:iim)) > pi_d + 0.1d0)) THEN
-       IF (xzoom <= 0.) THEN
-          i = 1
-
-          do while (xvrai(i) < - pi_d .and. i < iim)
-             i = i + 1
-          end do
-
-          if (xvrai(i) < - pi_d) then
-             print *, 'Xvrai plus petit que - pi !'
-             STOP 1
-          end if
-
-          is2 = i
-       ELSE
-          i = iim
-
-          do while (xvrai(i) > pi_d .and. i > 1)
-             i = i - 1
-          end do
-
-          if (xvrai(i) > pi_d) then
-             print *, 'Xvrai plus grand que pi !'
-             STOP 1
-          end if
-
-          is2 = i
-       END IF
-    END IF
-
-    if (is2 /= 0) then
-       IF (xzoom <= 0.) THEN
-          IF (is2 /= 1) THEN
-             DO ii = is2, iim
-                xlon(ii-is2 + 1) = xvrai(ii)
-                xprimm(ii-is2 + 1) = xxprim(ii)
-             END DO
-             DO ii = 1, is2 -1
-                xlon(ii + iim-is2 + 1) = xvrai(ii) + twopi_d
-                xprimm(ii + iim-is2 + 1) = xxprim(ii) 
-             END DO
-          END IF
-       else
-          idif = iim -is2
-
-          DO ii = 1, is2
-             xlon(ii + idif) = xvrai(ii)
-             xprimm(ii + idif) = xxprim(ii)
-          END DO
-
-          DO ii = 1, idif
-             xlon(ii) = xvrai(ii + is2) - twopi_d
-             xprimm(ii) = xxprim(ii + is2) 
-          END DO
-       end IF
-    end if
-
-    xlon(iim + 1) = xlon(1) + twopi
-    xprimm(iim + 1) = xprimm(1)
+    DO i = 1, iim
+       xlon(i) = xvrai(i)
+       xprimm(i) = xxprim(i)
+    END DO
 
   end subroutine fxhyp_loop_ik
 

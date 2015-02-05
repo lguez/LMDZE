@@ -19,22 +19,22 @@ contains
 
     USE dimens_m, ONLY: iim
     use fxhyp_loop_ik_m, only: fxhyp_loop_ik, nmax
-    use nr_util, only: pi_d, twopi_d, arth
+    use nr_util, only: pi, pi_d, twopi_d, arth
+    use principal_cshift_m, only: principal_cshift
     use serre, only: clon, grossismx, dzoomx, taux
 
     REAL, intent(out):: xprimm025(:), rlonv(:), xprimv(:) ! (iim + 1)
     real, intent(out):: rlonu(:), xprimu(:), xprimp025(:) ! (iim + 1)
 
     ! Local:
-
     real rlonm025(iim + 1), rlonp025(iim + 1)
     REAL dzoom
-    DOUBLE PRECISION xlon(iim)
+    real d_rlonv(iim)
     DOUBLE PRECISION xtild(0:2 * nmax)
     DOUBLE PRECISION fhyp(nmax:2 * nmax), ffdx, beta, Xprimt(0:2 * nmax)
     DOUBLE PRECISION Xf(0:2 * nmax), xxpr(2 * nmax)
     DOUBLE PRECISION xzoom, fa, fb
-    INTEGER i
+    INTEGER i, is2
     DOUBLE PRECISION xmoy, fxm
     DOUBLE PRECISION decalx
 
@@ -152,20 +152,52 @@ contains
     END IF
 
     xzoom = clon * pi_d / 180d0
-    call fxhyp_loop_ik(1, decalx, xf, xtild, Xprimt, xzoom, rlonm025, &
-         xprimm025, xuv = - 0.25d0)
-    call fxhyp_loop_ik(2, decalx, xf, xtild, Xprimt, xzoom, rlonv, xprimv, &
-         xuv = 0d0)
-    call fxhyp_loop_ik(3, decalx, xf, xtild, Xprimt, xzoom, rlonu, xprimu, &
-         xuv = 0.5d0)
-    call fxhyp_loop_ik(4, decalx, xf, xtild, Xprimt, xzoom, rlonp025, &
-         xprimp025, xuv = 0.25d0)
+    call fxhyp_loop_ik(1, decalx, xf, xtild, Xprimt, xzoom, rlonm025(:iim), &
+         xprimm025(:iim), xuv = - 0.25d0)
+    call fxhyp_loop_ik(2, decalx, xf, xtild, Xprimt, xzoom, rlonv(:iim), &
+         xprimv(:iim), xuv = 0d0)
+    call fxhyp_loop_ik(3, decalx, xf, xtild, Xprimt, xzoom, rlonu(:iim), &
+         xprimu(:iim), xuv = 0.5d0)
+    call fxhyp_loop_ik(4, decalx, xf, xtild, Xprimt, xzoom, rlonp025(:iim), &
+         xprimp025(:iim), xuv = 0.25d0)
 
-    print *
+    is2 = 0
 
-    forall (i = 1: iim) xlon(i) = rlonv(i + 1) - rlonv(i)
-    print *, "Minimum longitude step:", MINval(xlon) * 180. / pi_d, "degrees"
-    print *, "Maximum longitude step:", MAXval(xlon) * 180. / pi_d, "degrees"
+    IF (MINval(rlonm025(:iim)) < - pi - 0.1 &
+         .or. MAXval(rlonm025(:iim)) > pi + 0.1) THEN
+       IF (clon <= 0.) THEN
+          is2 = 1
+
+          do while (rlonm025(is2) < - pi .and. is2 < iim)
+             is2 = is2 + 1
+          end do
+
+          if (rlonm025(is2) < - pi) then
+             print *, 'Rlonm025 plus petit que - pi !'
+             STOP 1
+          end if
+       ELSE
+          is2 = iim
+
+          do while (rlonm025(is2) > pi .and. is2 > 1)
+             is2 = is2 - 1
+          end do
+
+          if (rlonm025(is2) > pi) then
+             print *, 'Rlonm025 plus grand que pi !'
+             STOP 1
+          end if
+       END IF
+    END IF
+
+    call principal_cshift(is2, rlonm025, xprimm025)
+    call principal_cshift(is2, rlonv, xprimv)
+    call principal_cshift(is2, rlonu, xprimu)
+    call principal_cshift(is2, rlonp025, xprimp025)
+
+    forall (i = 1: iim) d_rlonv(i) = rlonv(i + 1) - rlonv(i)
+    print *, "Minimum longitude step:", MINval(d_rlonv) * 180. / pi, "degrees"
+    print *, "Maximum longitude step:", MAXval(d_rlonv) * 180. / pi, "degrees"
 
     DO i = 1, iim + 1
        IF (rlonp025(i) < rlonv(i)) THEN

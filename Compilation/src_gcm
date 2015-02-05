@@ -260,6 +260,7 @@ prather.f
 pres2lev.f
 press_coefoz.f
 pressure_var.f
+principal_cshift.f
 printflag.f
 qcheck.f
 qminimum.f

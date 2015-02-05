@@ -121,7 +121,7 @@ flxflux.o : FCTTRE.o yoethf.o suphec.o dimphy.o
 flxini.o : suphec.o flxadjtq.o dimphy.o 
 flxmain.o : yoethf.o YOECUMF.o suphec.o flxini.o flxflux.o flxdtdq.o flxdlfs.o flxddraf.o flxbase.o flxasc.o dimphy.o 
 fonte_neige.o : yoethf.o suphec.o interface_surf.o indicesol.o FCTTRE.o 
-fxhyp.o : serre.o fxhyp_loop_ik.o dimens_m.o 
+fxhyp.o : serre.o principal_cshift.o fxhyp_loop_ik.o dimens_m.o 
 fxhyp_loop_ik.o : serre.o dimens_m.o coefpoly.o 
 fyhyp.o : serre.o dimens_m.o coefpoly.o 
 gcm.o : createnewfield.o yoethf.o unit_nml_m.o tracstoke.o temps.o suphec.o leapfrog.o ioconf_calendar.o init_dynzon.o inithist.o initdynav.o inifilr.o inidissip.o iniadvtrac.o histclo.o grid_change.o dynredem0.o dynetat0.o disvert.o dimphy.o dimens_m.o conf_guide.o conf_gcm.o comgeomphy.o comgeom.o comconst.o 
@@ -229,6 +229,7 @@ phystokenc.o : tracstoke.o dimphy.o indicesol.o dimens_m.o histsync.o histwrite.
 phytrac.o : gr_phy_write_3d.o grid_change.o comgeomphy.o iniadvtrac.o temps.o histwrite.o histsync.o suphec.o regr_pr_comb_coefoz.o radiornpb.o press_coefoz.o phyetat0.o o3_chem.o nflxtr.o minmaxqfi.o initrrnpb.o ini_histrac.o indicesol.o dimphy.o dimens_m.o cvltr.o ctherm.o cltracrn.o cltrac.o clesphys2.o clesphys.o abort_gcm.o 
 prather.o : comgeom.o disvert.o comconst.o paramet_m.o dimens_m.o 
 pressure_var.o : dimens_m.o 
+principal_cshift.o : serre.o dimens_m.o 
 qcheck.o : suphec.o dimphy.o comgeomphy.o 
 qminimum.o : paramet_m.o dimens_m.o 
 raddim.o : dimphy.o dimens_m.o 
