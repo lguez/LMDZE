@@ -19,7 +19,7 @@ contains
 
     USE dimens_m, ONLY: iim
     use fxhyp_loop_ik_m, only: fxhyp_loop_ik, nmax
-    use nr_util, only: pi, pi_d, twopi_d, arth
+    use nr_util, only: pi, pi_d, twopi, twopi_d, arth
     use principal_cshift_m, only: principal_cshift
     use serre, only: clon, grossismx, dzoomx, taux
 
@@ -28,7 +28,7 @@ contains
 
     ! Local:
     real rlonm025(iim + 1), rlonp025(iim + 1)
-    REAL dzoom
+    REAL dzoom, step
     real d_rlonv(iim)
     DOUBLE PRECISION xtild(0:2 * nmax)
     DOUBLE PRECISION fhyp(nmax:2 * nmax), ffdx, beta, Xprimt(0:2 * nmax)
@@ -36,130 +36,138 @@ contains
     DOUBLE PRECISION xzoom, fa, fb
     INTEGER i, is2
     DOUBLE PRECISION xmoy, fxm
-    DOUBLE PRECISION decalx
 
     !----------------------------------------------------------------------
 
     print *, "Call sequence information: fxhyp"
 
-    dzoom = dzoomx * twopi_d
-    xtild = arth(- pi_d, pi_d / nmax, 2 * nmax + 1)
+    xzoom = clon * pi_d / 180d0
 
-    ! Compute fhyp:
-    DO i = nmax, 2 * nmax
-       fa = taux * (dzoom / 2. - xtild(i))
-       fb = xtild(i) * (pi_d - xtild(i))
+    test_grossismx: if (grossismx == 1.) then
+       step = twopi / iim
 
-       IF (200. * fb < - fa) THEN
-          fhyp(i) = - 1.
-       ELSE IF (200. * fb < fa) THEN
-          fhyp(i) = 1.
-       ELSE
-          IF (ABS(fa) < 1e-13 .AND. ABS(fb) < 1e-13) THEN
-             IF (200. * fb + fa < 1e-10) THEN
-                fhyp(i) = - 1.
-             ELSE IF (200. * fb - fa < 1e-10) THEN
-                fhyp(i) = 1.
-             END IF
+       xprimm025(:iim) = step
+       xprimp025(:iim) = step
+       xprimv(:iim) = step
+       xprimu(:iim) = step
+
+       rlonv(:iim) = arth(- pi + clon * pi / 180., step, iim)
+       rlonm025(:iim) = rlonv(:iim) - 0.25 * step
+       rlonp025(:iim) = rlonv(:iim) + 0.25 * step
+       rlonu(:iim) = rlonv(:iim) + 0.5 * step
+    else
+       dzoom = dzoomx * twopi_d
+       xtild = arth(- pi_d, pi_d / nmax, 2 * nmax + 1)
+
+       ! Compute fhyp:
+       DO i = nmax, 2 * nmax
+          fa = taux * (dzoom / 2. - xtild(i))
+          fb = xtild(i) * (pi_d - xtild(i))
+
+          IF (200. * fb < - fa) THEN
+             fhyp(i) = - 1.
+          ELSE IF (200. * fb < fa) THEN
+             fhyp(i) = 1.
           ELSE
-             fhyp(i) = TANH(fa / fb)
+             IF (ABS(fa) < 1e-13 .AND. ABS(fb) < 1e-13) THEN
+                IF (200. * fb + fa < 1e-10) THEN
+                   fhyp(i) = - 1.
+                ELSE IF (200. * fb - fa < 1e-10) THEN
+                   fhyp(i) = 1.
+                END IF
+             ELSE
+                fhyp(i) = TANH(fa / fb)
+             END IF
           END IF
+
+          IF (xtild(i) == 0.) fhyp(i) = 1.
+          IF (xtild(i) == pi_d) fhyp(i) = -1.
+       END DO
+
+       ! Calcul de beta 
+
+       ffdx = 0.
+
+       DO i = nmax + 1, 2 * nmax
+          xmoy = 0.5 * (xtild(i-1) + xtild(i))
+          fa = taux * (dzoom / 2. - xmoy)
+          fb = xmoy * (pi_d - xmoy)
+
+          IF (200. * fb < - fa) THEN
+             fxm = - 1.
+          ELSE IF (200. * fb < fa) THEN
+             fxm = 1.
+          ELSE
+             IF (ABS(fa) < 1e-13 .AND. ABS(fb) < 1e-13) THEN
+                IF (200. * fb + fa < 1e-10) THEN
+                   fxm = - 1.
+                ELSE IF (200. * fb - fa < 1e-10) THEN
+                   fxm = 1.
+                END IF
+             ELSE
+                fxm = TANH(fa / fb)
+             END IF
+          END IF
+
+          IF (xmoy == 0.) fxm = 1.
+          IF (xmoy == pi_d) fxm = -1.
+
+          ffdx = ffdx + fxm * (xtild(i) - xtild(i-1))
+       END DO
+
+       print *, "ffdx = ", ffdx
+       beta = (grossismx * ffdx - pi_d) / (ffdx - pi_d)
+       print *, "beta = ", beta
+
+       IF (2. * beta - grossismx <= 0.) THEN
+          print *, 'Bad choice of grossismx, taux, dzoomx.'
+          print *, 'Decrease dzoomx or grossismx.'
+          STOP 1
        END IF
 
-       IF (xtild(i) == 0.) fhyp(i) = 1.
-       IF (xtild(i) == pi_d) fhyp(i) = -1.
-    END DO
+       ! calcul de Xprimt 
+       Xprimt(nmax:2 * nmax) = beta + (grossismx - beta) * fhyp
+       xprimt(:nmax - 1) = xprimt(2 * nmax:nmax + 1:- 1)
 
-    ! Calcul de beta 
+       ! Calcul de Xf
 
-    ffdx = 0.
+       DO i = nmax + 1, 2 * nmax
+          xmoy = 0.5 * (xtild(i-1) + xtild(i))
+          fa = taux * (dzoom / 2. - xmoy)
+          fb = xmoy * (pi_d - xmoy)
 
-    DO i = nmax + 1, 2 * nmax
-       xmoy = 0.5 * (xtild(i-1) + xtild(i))
-       fa = taux * (dzoom / 2. - xmoy)
-       fb = xmoy * (pi_d - xmoy)
-
-       IF (200. * fb < - fa) THEN
-          fxm = - 1.
-       ELSE IF (200. * fb < fa) THEN
-          fxm = 1.
-       ELSE
-          IF (ABS(fa) < 1e-13 .AND. ABS(fb) < 1e-13) THEN
-             IF (200. * fb + fa < 1e-10) THEN
-                fxm = - 1.
-             ELSE IF (200. * fb - fa < 1e-10) THEN
-                fxm = 1.
-             END IF
+          IF (200. * fb < - fa) THEN
+             fxm = - 1.
+          ELSE IF (200. * fb < fa) THEN
+             fxm = 1.
           ELSE
              fxm = TANH(fa / fb)
           END IF
-       END IF
 
-       IF (xmoy == 0.) fxm = 1.
-       IF (xmoy == pi_d) fxm = -1.
+          IF (xmoy == 0.) fxm = 1.
+          IF (xmoy == pi_d) fxm = -1.
+          xxpr(i) = beta + (grossismx - beta) * fxm
+       END DO
 
-       ffdx = ffdx + fxm * (xtild(i) - xtild(i-1))
-    END DO
+       xxpr(:nmax) = xxpr(2 * nmax:nmax + 1:- 1)
 
-    print *, "ffdx = ", ffdx
-    beta = (grossismx * ffdx - pi_d) / (ffdx - pi_d)
-    print *, "beta = ", beta
+       Xf(0) = - pi_d
 
-    IF (2. * beta - grossismx <= 0.) THEN
-       print *, 'Bad choice of grossismx, taux, dzoomx.'
-       print *, 'Decrease dzoomx or grossismx.'
-       STOP 1
-    END IF
+       DO i=1, 2 * nmax - 1
+          Xf(i) = Xf(i-1) + xxpr(i) * (xtild(i) - xtild(i-1))
+       END DO
 
-    ! calcul de Xprimt 
-    Xprimt(nmax:2 * nmax) = beta + (grossismx - beta) * fhyp
-    xprimt(:nmax - 1) = xprimt(2 * nmax:nmax + 1:- 1)
+       Xf(2 * nmax) = pi_d
 
-    ! Calcul de Xf
-
-    DO i = nmax + 1, 2 * nmax
-       xmoy = 0.5 * (xtild(i-1) + xtild(i))
-       fa = taux * (dzoom / 2. - xmoy)
-       fb = xmoy * (pi_d - xmoy)
-
-       IF (200. * fb < - fa) THEN
-          fxm = - 1.
-       ELSE IF (200. * fb < fa) THEN
-          fxm = 1.
-       ELSE
-          fxm = TANH(fa / fb)
-       END IF
-
-       IF (xmoy == 0.) fxm = 1.
-       IF (xmoy == pi_d) fxm = -1.
-       xxpr(i) = beta + (grossismx - beta) * fxm
-    END DO
-
-    xxpr(:nmax) = xxpr(2 * nmax:nmax + 1:- 1)
-
-    Xf(0) = - pi_d
-
-    DO i=1, 2 * nmax - 1
-       Xf(i) = Xf(i-1) + xxpr(i) * (xtild(i) - xtild(i-1))
-    END DO
-
-    Xf(2 * nmax) = pi_d
-
-    IF (grossismx == 1.) THEN
-       decalx = 1d0
-    else
-       decalx = 0.75d0
-    END IF
-
-    xzoom = clon * pi_d / 180d0
-    call fxhyp_loop_ik(1, decalx, xf, xtild, Xprimt, xzoom, rlonm025(:iim), &
-         xprimm025(:iim), xuv = - 0.25d0)
-    call fxhyp_loop_ik(2, decalx, xf, xtild, Xprimt, xzoom, rlonv(:iim), &
-         xprimv(:iim), xuv = 0d0)
-    call fxhyp_loop_ik(3, decalx, xf, xtild, Xprimt, xzoom, rlonu(:iim), &
-         xprimu(:iim), xuv = 0.5d0)
-    call fxhyp_loop_ik(4, decalx, xf, xtild, Xprimt, xzoom, rlonp025(:iim), &
-         xprimp025(:iim), xuv = 0.25d0)
+       call fxhyp_loop_ik(xf, xtild, Xprimt, xzoom, rlonm025(:iim), &
+            xprimm025(:iim), xuv = - 0.25d0)
+       call fxhyp_loop_ik(xf, xtild, Xprimt, xzoom, rlonv(:iim), &
+            xprimv(:iim), xuv = 0d0)
+       call fxhyp_loop_ik(xf, xtild, Xprimt, xzoom, rlonu(:iim), &
+            xprimu(:iim), xuv = 0.5d0)
+       call fxhyp_loop_ik(xf, xtild, Xprimt, xzoom, rlonp025(:iim), &
+            xprimp025(:iim), xuv = 0.25d0)
+    end if test_grossismx
 
     is2 = 0
 

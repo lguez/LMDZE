@@ -6,16 +6,12 @@ module fxhyp_loop_ik_m
 
 contains
 
-  subroutine fxhyp_loop_ik(ik, decalx, xf, xtild, Xprimt, xzoom, xlon, &
-       xprimm, xuv)
+  subroutine fxhyp_loop_ik(xf, xtild, Xprimt, xzoom, xlon, xprimm, xuv)
 
     use coefpoly_m, only: coefpoly
     USE dimens_m, ONLY: iim
     use nr_util, only: pi_d, twopi_d
-    use serre, only: grossismx
 
-    INTEGER, intent(in):: ik
-    DOUBLE PRECISION, intent(in):: decalx
     DOUBLE PRECISION, intent(in):: Xf(0:), xtild(0:), Xprimt(0:) ! (0:2 * nmax)
     DOUBLE PRECISION, intent(in):: xzoom
     real, intent(out):: xlon(:), xprimm(:) ! (iim)
@@ -25,32 +21,26 @@ contains
     ! 0.5 si calcul aux points U 
 
     ! Local:
-    DOUBLE PRECISION xo1, Xfi, xi, a0, a1, a2, a3, Xf1, Xprimin
-    integer ii1, ii2, i, it, iter
-    DOUBLE PRECISION, parameter:: my_eps = 1e-6
-    DOUBLE PRECISION xxprim(iim + 1), xvrai(iim + 1)
+    DOUBLE PRECISION xo1, Xfi, a0, a1, a2, a3, Xf1, Xprimin
+    integer i, it, iter
+    DOUBLE PRECISION, parameter:: my_eps = 1d-6
+
+    DOUBLE PRECISION xxprim(iim), xvrai(iim) 
+    ! intermediary variables because xlon and xprimm are simple precision
 
     !------------------------------------------------------------------
 
-    IF (ik == 1 .and. grossismx == 1.) THEN
-       ii1 = 2 
-       ii2 = iim + 1
-    else
-       ii1=1
-       ii2=iim
-    END IF
-
-    DO i = ii1, ii2
-       Xfi = - pi_d + (i + xuv - decalx) * twopi_d / iim
+    DO i = 1, iim
+       Xfi = - pi_d + (i + xuv - 0.75d0) * twopi_d / iim
 
        it = 2 * nmax
        do while (xfi < xf(it) .and. it >= 1)
           it = it - 1
        end do
 
-       ! Calcul de Xf(xi) 
+       ! Calcul de Xf(xvrai(i)) 
 
-       xi = xtild(it)
+       xvrai(i) = xtild(it)
 
        IF (it == 2 * nmax) THEN
           it = 2 * nmax -1
@@ -59,33 +49,27 @@ contains
        CALL coefpoly(Xf(it), Xf(it + 1), Xprimt(it), Xprimt(it + 1), &
             xtild(it), xtild(it + 1), a0, a1, a2, a3)
        Xf1 = Xf(it)
-       Xprimin = a1 + xi * (2d0 * a2 + xi * 3d0 * a3)
-       xo1 = xi
+       Xprimin = a1 + xvrai(i) * (2d0 * a2 + xvrai(i) * 3d0 * a3)
+       xo1 = xvrai(i)
        iter = 1
 
        do
-          xi = xi - (Xf1 - Xfi) / Xprimin
-          IF (ABS(xi - xo1) <= my_eps .or. iter == 300) exit
-          xo1 = xi
-          Xf1 = a0 + xi * (a1 + xi * (a2 + xi * a3))
-          Xprimin = a1 + xi * (2d0 * a2 + xi * 3d0 * a3)
+          xvrai(i) = xvrai(i) - (Xf1 - Xfi) / Xprimin
+          IF (ABS(xvrai(i) - xo1) <= my_eps .or. iter == 300) exit
+          xo1 = xvrai(i)
+          Xf1 = a0 + xvrai(i) * (a1 + xvrai(i) * (a2 + xvrai(i) * a3))
+          Xprimin = a1 + xvrai(i) * (2d0 * a2 + xvrai(i) * 3d0 * a3)
        end DO
 
-       if (ABS(xi - xo1) > my_eps) then
+       if (ABS(xvrai(i) - xo1) > my_eps) then
           ! iter == 300
           print *, 'Pas de solution.'
           print *, i, xfi
           STOP 1
        end if
 
-       xxprim(i) = twopi_d / (REAL(iim) * Xprimin)
-       xvrai(i) = xi + xzoom
+       xxprim(i) = twopi_d / (iim * Xprimin)
     end DO
-
-    IF (ik == 1 .and. grossismx == 1.) THEN
-       xvrai(1) = xvrai(iim + 1)-twopi_d
-       xxprim(1) = xxprim(iim + 1)
-    END IF
 
     DO i = 1, iim -1
        IF (xvrai(i + 1) < xvrai(i)) THEN
@@ -94,10 +78,8 @@ contains
        END IF
     END DO
 
-    DO i = 1, iim
-       xlon(i) = xvrai(i)
-       xprimm(i) = xxprim(i)
-    END DO
+    xlon = xvrai + xzoom
+    xprimm = xxprim
 
   end subroutine fxhyp_loop_ik
 
