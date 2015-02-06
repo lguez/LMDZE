@@ -223,8 +223,8 @@ contains
     ! Variables propres a la physique
 
     INTEGER, save:: radpas
-    ! (Radiative transfer computations are made every "radpas" call to
-    ! "physiq".)
+    ! Radiative transfer computations are made every "radpas" call to
+    ! "physiq".
 
     REAL radsol(klon)
     SAVE radsol ! bilan radiatif au sol calcule par code radiatif
@@ -649,7 +649,7 @@ contains
 
        CALL printflag(radpas, ok_journe, ok_instan, ok_region)
 
-       IF (dtphys * REAL(radpas) > 21600. .AND. cycle_diurne) THEN 
+       IF (dtphys * radpas > 21600. .AND. cycle_diurne) THEN 
           print *, "Au minimum 4 appels par jour si cycle diurne"
           call abort_gcm('physiq', &
                "Nombre d'appels au rayonnement insuffisant", 1)
@@ -775,7 +775,7 @@ contains
 
     CALL orbite(REAL(julien), longi, dist)
     IF (cycle_diurne) THEN
-       CALL zenang(longi, time, dtphys * REAL(radpas), mu0, fract)
+       CALL zenang(longi, time, dtphys * radpas, mu0, fract)
     ELSE
        mu0 = -999.999
     ENDIF

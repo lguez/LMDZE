@@ -6,6 +6,10 @@ contains
 
   subroutine principal_cshift(is2, xlon, xprimm)
 
+    ! Add or subtract 2 pi so that xlon is near [-pi, pi], then cshift
+    ! so that xlon is in ascending order. Make the same cshift on
+    ! xprimm.
+
     USE dimens_m, ONLY: iim
     use nr_util, only: twopi
     use serre, only: clon

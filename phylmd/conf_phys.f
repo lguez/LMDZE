@@ -24,17 +24,16 @@ contains
          cld_tau_lsc, coef_eva, ffallv_con, ffallv_lsc, iflag_pdf, reevap_ice
     USE conema3_m, ONLY: epmax, iflag_clw, ok_adj_ema
     use unit_nml_m, only: unit_nml
-    USE yomcst, ONLY: r_ecc, r_incl, r_peri
+    USE yomcst, ONLY: read_YOMCST
 
-    namelist /conf_phys_nml/ R_ecc, R_peri, R_incl, solaire, co2_ppm, &
-         CH4_ppb, N2O_ppb, CFC11_ppt, CFC12_ppt, epmax, ok_adj_ema, &
-         iflag_clw, cld_lc_lsc, cld_lc_con, cld_tau_lsc, cld_tau_con, &
-         ffallv_lsc, ffallv_con, coef_eva, reevap_ice, iflag_pdf, &
-         top_height, overlap, cdmmax, cdhmax, ksta, ksta_ter, &
-         ok_kzmin, iflag_pbl, lev_histhf, lev_histday, lev_histmth, &
-         type_run, ok_isccp, ok_regdyn, lonmin_ins, lonmax_ins, &
-         latmin_ins, latmax_ins, ecrit_ins, ecrit_hf, ecrit_hf2mth, &
-         ecrit_day, ecrit_mth, ecrit_tra, ecrit_reg
+    namelist /conf_phys_nml/ solaire, co2_ppm, CH4_ppb, N2O_ppb, CFC11_ppt, &
+         CFC12_ppt, epmax, ok_adj_ema, iflag_clw, cld_lc_lsc, cld_lc_con, &
+         cld_tau_lsc, cld_tau_con, ffallv_lsc, ffallv_con, coef_eva, &
+         reevap_ice, iflag_pdf, top_height, overlap, cdmmax, cdhmax, ksta, &
+         ksta_ter, ok_kzmin, iflag_pbl, lev_histhf, lev_histday, lev_histmth, &
+         type_run, ok_isccp, ok_regdyn, lonmin_ins, lonmax_ins, latmin_ins, &
+         latmax_ins, ecrit_ins, ecrit_hf, ecrit_hf2mth, ecrit_day, ecrit_mth, &
+         ecrit_tra, ecrit_reg
 
     namelist /nuagecom/ rad_chau1, rad_chau2
 
@@ -42,10 +41,8 @@ contains
 
     print *, "Call sequence information: conf_phys"
     call read_clesphys2
+    call read_YOMCST
 
-    R_ecc = 0.016715 ! AMIP II
-    R_peri = 102.7 ! AMIP II
-    R_incl = 23.441 ! AMIP II
     solaire = 1365. ! AMIP II
     co2_ppm = 348. ! AMIP II
     CH4_ppb = 1650.

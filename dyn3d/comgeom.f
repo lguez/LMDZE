@@ -190,20 +190,20 @@ contains
 
     PRINT *, 'Call sequence information: inigeom'
 
-    IF (nitergdiv/=2) THEN
-       gamdi_gdiv = coefdis / (real(nitergdiv)-2.)
+    IF (nitergdiv /= 2) THEN
+       gamdi_gdiv = coefdis / (nitergdiv - 2)
     ELSE
        gamdi_gdiv = 0.
     END IF
 
-    IF (nitergrot/=2) THEN
-       gamdi_grot = coefdis / (real(nitergrot)-2.)
+    IF (nitergrot /= 2) THEN
+       gamdi_grot = coefdis / (nitergrot - 2)
     ELSE
        gamdi_grot = 0.
     END IF
 
-    IF (niterh/=2) THEN
-       gamdi_h = coefdis / (real(niterh)-2.)
+    IF (niterh /= 2) THEN
+       gamdi_h = coefdis / (niterh - 2)
     ELSE
        gamdi_h = 0.
     END IF

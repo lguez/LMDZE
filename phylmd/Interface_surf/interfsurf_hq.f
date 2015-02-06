@@ -19,6 +19,7 @@ contains
     ! Laurent Fairhead, February 2000
 
     USE abort_gcm_m, ONLY: abort_gcm
+    use alboc_m, only: alboc
     USE albsno_m, ONLY: albsno
     use calbeta_m, only: calbeta
     USE calcul_fluxs_m, ONLY: calcul_fluxs
