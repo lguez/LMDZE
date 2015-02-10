@@ -10,6 +10,7 @@ contains
 
     USE comgeom, ONLY: cu_2d, cv_2d, rlatu
     use conf_guide_m, only: guide_u, guide_v
+    use coordij_m, only: coordij
     USE dimens_m, ONLY: iim, jjm
     USE paramet_m, ONLY: iip1, jjp1
     USE serre, ONLY: clat, clon, grossismx, grossismy

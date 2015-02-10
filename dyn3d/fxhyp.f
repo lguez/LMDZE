@@ -33,15 +33,13 @@ contains
     DOUBLE PRECISION xtild(0:2 * nmax)
     DOUBLE PRECISION fhyp(nmax:2 * nmax), ffdx, beta, Xprimt(0:2 * nmax)
     DOUBLE PRECISION Xf(0:2 * nmax), xxpr(2 * nmax)
-    DOUBLE PRECISION xzoom, fa, fb
+    DOUBLE PRECISION fa, fb
     INTEGER i, is2
     DOUBLE PRECISION xmoy, fxm
 
     !----------------------------------------------------------------------
 
     print *, "Call sequence information: fxhyp"
-
-    xzoom = clon * pi_d / 180d0
 
     test_grossismx: if (grossismx == 1.) then
        step = twopi / iim
@@ -51,7 +49,7 @@ contains
        xprimv(:iim) = step
        xprimu(:iim) = step
 
-       rlonv(:iim) = arth(- pi + clon * pi / 180., step, iim)
+       rlonv(:iim) = arth(- pi + clon, step, iim)
        rlonm025(:iim) = rlonv(:iim) - 0.25 * step
        rlonp025(:iim) = rlonv(:iim) + 0.25 * step
        rlonu(:iim) = rlonv(:iim) + 0.5 * step
@@ -159,14 +157,14 @@ contains
 
        Xf(2 * nmax) = pi_d
 
-       call fxhyp_loop_ik(xf, xtild, Xprimt, xzoom, rlonm025(:iim), &
-            xprimm025(:iim), xuv = - 0.25d0)
-       call fxhyp_loop_ik(xf, xtild, Xprimt, xzoom, rlonv(:iim), &
-            xprimv(:iim), xuv = 0d0)
-       call fxhyp_loop_ik(xf, xtild, Xprimt, xzoom, rlonu(:iim), &
-            xprimu(:iim), xuv = 0.5d0)
-       call fxhyp_loop_ik(xf, xtild, Xprimt, xzoom, rlonp025(:iim), &
-            xprimp025(:iim), xuv = 0.25d0)
+       call fxhyp_loop_ik(xf, xtild, Xprimt, rlonm025(:iim), xprimm025(:iim), &
+            xuv = - 0.25d0)
+       call fxhyp_loop_ik(xf, xtild, Xprimt, rlonv(:iim), xprimv(:iim), &
+            xuv = 0d0)
+       call fxhyp_loop_ik(xf, xtild, Xprimt, rlonu(:iim), xprimu(:iim), &
+            xuv = 0.5d0)
+       call fxhyp_loop_ik(xf, xtild, Xprimt, rlonp025(:iim), xprimp025(:iim), &
+            xuv = 0.25d0)
     end if test_grossismx
 
     is2 = 0

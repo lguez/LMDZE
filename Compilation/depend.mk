@@ -1,4 +1,5 @@
 FCTTRE.o : suphec.o yoethf.o 
+YOMCST.o : unit_nml_m.o 
 aaam_bud.o : dimens_m.o 
 abort_gcm.o : histclo.o 
 academic.o : dimens_m.o 
@@ -52,7 +53,7 @@ conf_phys.o : YOMCST.o unit_nml_m.o conema3_m.o comfisrtilp.o clesphys2.o clesph
 conflx.o : FCTTRE.o yoethf.o suphec.o dimphy.o flxmain.o 
 convflu.o : comgeom.o paramet_m.o dimens_m.o 
 convmas.o : filtreg.o paramet_m.o dimens_m.o 
-coordij.o : serre.o comgeom.o comconst.o paramet_m.o dimens_m.o 
+coordij.o : comgeom.o dimens_m.o 
 covcont.o : comgeom.o paramet_m.o dimens_m.o 
 covnat.o : paramet_m.o comgeom.o 
 cv3_closure.o : cvthermo.o cv3_param.o 
@@ -122,7 +123,7 @@ flxini.o : suphec.o flxadjtq.o dimphy.o
 flxmain.o : yoethf.o YOECUMF.o suphec.o flxini.o flxflux.o flxdtdq.o flxdlfs.o flxddraf.o flxbase.o flxasc.o dimphy.o 
 fonte_neige.o : yoethf.o suphec.o interface_surf.o indicesol.o FCTTRE.o 
 fxhyp.o : serre.o principal_cshift.o fxhyp_loop_ik.o dimens_m.o 
-fxhyp_loop_ik.o : serre.o dimens_m.o coefpoly.o 
+fxhyp_loop_ik.o : dimens_m.o coefpoly.o 
 fyhyp.o : serre.o dimens_m.o coefpoly.o 
 gcm.o : createnewfield.o yoethf.o unit_nml_m.o tracstoke.o temps.o suphec.o leapfrog.o ioconf_calendar.o init_dynzon.o inithist.o initdynav.o inifilr.o inidissip.o iniadvtrac.o histclo.o grid_change.o dynredem0.o dynetat0.o disvert.o dimphy.o dimens_m.o conf_guide.o conf_gcm.o comgeomphy.o comgeom.o comconst.o 
 geopot.o : dimens_m.o 
@@ -160,7 +161,7 @@ inidissip.o : paramet_m.o nxgraro2.o gradiv2.o filtreg.o divgrad2.o conf_gcm.o d
 inifgn.o : coefils.o comgeom.o dimens_m.o 
 inifilr.o : serre.o inifgn.o comgeom.o coefils.o dimens_m.o 
 init_dynzon.o : ymds2ju.o temps.o histvert.o histend.o histdef.o histbeg_totreg.o disvert.o dimens_m.o conf_gcm.o comgeom.o 
-init_tau2alpha.o : writefield.o serre.o paramet_m.o dimens_m.o conf_guide.o comgeom.o 
+init_tau2alpha.o : writefield.o serre.o paramet_m.o dimens_m.o coordij.o conf_guide.o comgeom.o 
 initdynav.o : ymds2ju.o temps.o paramet_m.o iniadvtrac.o histvert.o histend.o histdef.o histbeg_totreg.o dimens_m.o comgeom.o 
 initfluxsto.o : ymds2ju.o temps.o serre.o paramet_m.o histvert.o histsync.o histhori_regular.o histend.o histdef.o histbeg_totreg.o disvert.o dimens_m.o conf_gcm.o comgeom.o comconst.o 
 inithist.o : ymds2ju.o temps.o paramet_m.o iniadvtrac.o histvert.o histend.o histdef.o histbeg_totreg.o disvert.o dimens_m.o com_io_dyn.o comgeom.o 

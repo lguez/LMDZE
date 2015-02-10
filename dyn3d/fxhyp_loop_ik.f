@@ -6,14 +6,14 @@ module fxhyp_loop_ik_m
 
 contains
 
-  subroutine fxhyp_loop_ik(xf, xtild, Xprimt, xzoom, xlon, xprimm, xuv)
+  subroutine fxhyp_loop_ik(xf, xtild, Xprimt, xlon, xprimm, xuv)
 
     use coefpoly_m, only: coefpoly
     USE dimens_m, ONLY: iim
     use nr_util, only: pi_d, twopi_d
+    use serre, only: clon
 
     DOUBLE PRECISION, intent(in):: Xf(0:), xtild(0:), Xprimt(0:) ! (0:2 * nmax)
-    DOUBLE PRECISION, intent(in):: xzoom
     real, intent(out):: xlon(:), xprimm(:) ! (iim)
 
     DOUBLE PRECISION, intent(in):: xuv
@@ -78,7 +78,7 @@ contains
        END IF
     END DO
 
-    xlon = xvrai + xzoom
+    xlon = xvrai + clon
     xprimm = xxprim
 
   end subroutine fxhyp_loop_ik

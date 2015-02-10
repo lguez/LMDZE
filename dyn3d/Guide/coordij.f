@@ -1,50 +1,41 @@
+module coordij_m
 
-! $Header: /home/cvsroot/LMDZ4/libf/dyn3d/coordij.F,v 1.1.1.1 2004/05/19
-! 12:53:05 lmdzadmin Exp $
-
-SUBROUTINE coordij(lon, lat, ilon, jlat)
-
-  ! =======================================================================
-
-  ! calcul des coordonnees i et j de la maille scalaire dans
-  ! laquelle se trouve le point (lon,lat) en radian
-
-  ! =======================================================================
-
-  USE dimens_m
-  USE paramet_m
-  USE comconst
-  USE comgeom
-  USE serre
-  USE nr_util, ONLY: pi
   IMPLICIT NONE
-  REAL, intent(in):: lon, lat
-  INTEGER ilon, jlat
-  INTEGER i, j
 
+contains
 
-  REAL zlon, zlat
+  SUBROUTINE coordij(lon, lat, ilon, jlat)
 
-  zlon = lon*pi/180.
-  zlat = lat*pi/180.
+    ! From LMDZ4/libf/dyn3d/coordij.F, version 1.1.1.1 2004/05/19 12:53:05
 
-  DO i = 1, iim + 1
-    IF (rlonu(i)>zlon) THEN
-      ilon = i
-      GO TO 10
-    END IF
-  END DO
-10 CONTINUE
+    ! calcul des coordonnees i et j de la maille scalaire dans
+    ! laquelle se trouve le point (lon, lat) en radian
 
-  j = 0
-  DO j = 1, jjm
-    IF (rlatv(j)<zlat) THEN
-      jlat = j
-      GO TO 20
-    END IF
-  END DO
-20 CONTINUE
-  IF (j==0) j = jjm + 1
+    USE dimens_m, only: iim, jjm
+    USE comgeom, only: rlonu, rlatv
+    USE nr_util, ONLY: pi
 
-  RETURN
-END SUBROUTINE coordij
+    REAL, intent(in):: lon, lat
+    INTEGER ilon, jlat
+    INTEGER i, j
+
+    DO i = 1, iim + 1
+       IF (rlonu(i)>lon) THEN
+          ilon = i
+          exit
+       END IF
+    END DO
+
+    j = 0
+    DO j = 1, jjm
+       IF (rlatv(j)<lat) THEN
+          jlat = j
+          exit
+       END IF
+    END DO
+
+    IF (j==0) j = jjm + 1
+
+  END SUBROUTINE coordij
+
+end module coordij_m
