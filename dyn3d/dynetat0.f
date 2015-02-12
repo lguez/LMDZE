@@ -6,7 +6,7 @@ module dynetat0_m
 
 contains
 
-  SUBROUTINE dynetat0(vcov, ucov, teta, q, masse, ps, phis, time_0)
+  SUBROUTINE dynetat0(vcov, ucov, teta, q, masse, ps, phis)
 
     ! From dynetat0.F, version 1.2, 2004/06/22 11:45:30
     ! Authors: P. Le Van, L. Fairhead
@@ -33,7 +33,6 @@ contains
     REAL, intent(out):: masse(:, :, :) ! (iim + 1, jjm + 1, llm)
     REAL, intent(out):: ps(:, :) ! (iim + 1, jjm + 1) in Pa
     REAL, intent(out):: phis(:, :) ! (iim + 1, jjm + 1)
-    REAL, intent(out):: time_0
 
     ! Local variables: 
     INTEGER iq
@@ -116,12 +115,7 @@ contains
     call NF95_INQ_VARID (ncid, "phisinit", varid)
     call NF95_GET_VAR(ncid, varid, phis)
 
-    call NF95_INQ_VARID (ncid, "temps", varid)
-    call NF95_GET_VAR(ncid, varid, time_0)
-
-    day_ini = tab_cntrl(30) + INT(time_0)
-    time_0 = time_0 - INT(time_0)
-    ! {0 <= time0 < 1}
+    day_ini = tab_cntrl(30)
 
     deallocate(tab_cntrl) ! pointer
 

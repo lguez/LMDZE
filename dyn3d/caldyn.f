@@ -5,7 +5,7 @@ module caldyn_m
 contains
 
   SUBROUTINE caldyn(itau, ucov, vcov, teta, ps, masse, pk, pkf, phis, phi, &
-       dudyn, dv, dteta, dp, w, pbaru, pbarv, time_0, conser)
+       dudyn, dv, dteta, dp, w, pbaru, pbarv, conser)
 
     ! From dyn3d/caldyn.F, version 1.1.1.1, 2004/05/19 12:53:06
     ! Author: P. Le Van
@@ -48,7 +48,6 @@ contains
     real, INTENT(out):: dp(ip1jmp1)
     REAL, INTENT(out):: w(:, :, :) ! (iim + 1, jjm + 1, llm)
     REAL, intent(out):: pbaru(ip1jmp1, llm), pbarv((iim + 1) * jjm, llm)
-    REAL, intent(in):: time_0
     LOGICAL, INTENT(IN):: conser
 
     ! Local:
@@ -98,7 +97,7 @@ contains
     IF (conser) then
        CALL sortvarc(ucov, teta, ps, masse, pk, phis, vorpot, phi, bern, dp, &
             resetvarc = .false.)
-       time = real(itau) / day_step + time_0
+       time = real(itau) / day_step
        heure = mod(itau * dtvr / daysec, 1.) * 24.
        IF (abs(heure-24.) <= 1e-4) heure = 0.
 

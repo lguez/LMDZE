@@ -66,7 +66,7 @@ contains
     logical, intent(in):: lafin ! dernier passage
 
     REAL, intent(in):: rdayvrai
-    ! (elapsed time since January 1st 0h of the starting year, in days)
+    ! elapsed time since January 1st 0h of the starting year, in days
 
     REAL, intent(in):: time ! heure de la journ\'ee en fraction de jour
     REAL, intent(in):: dtphys ! pas d'integration pour la physique (seconde)

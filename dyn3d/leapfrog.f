@@ -4,7 +4,7 @@ module leapfrog_m
 
 contains
 
-  SUBROUTINE leapfrog(ucov, vcov, teta, ps, masse, phis, q, time_0)
+  SUBROUTINE leapfrog(ucov, vcov, teta, ps, masse, phis, q)
 
     ! From dyn3d/leapfrog.F, version 1.6, 2005/04/13 08:58:34 revision 616
     ! Authors: P. Le Van, L. Fairhead, F. Hourdin
@@ -52,8 +52,6 @@ contains
     REAL, intent(inout):: q(:, :, :, :) ! (iim + 1, jjm + 1, llm, nqmx)
     ! mass fractions of advected fields
 
-    REAL, intent(in):: time_0
-
     ! Local:
 
     ! Variables dynamiques:
@@ -87,13 +85,11 @@ contains
     REAL dtetafi(iim + 1, jjm + 1, llm), dqfi(iim + 1, jjm + 1, llm, nqmx)
 
     ! Variables pour le fichier histoire
-
     INTEGER itau ! index of the time step of the dynamics, starts at 0
     INTEGER itaufin
     REAL time ! time of day, as a fraction of day length
     real finvmaold(iim + 1, jjm + 1, llm)
     INTEGER l
-    REAL rdayvrai, rdaym_ini
 
     ! Variables test conservation \'energie
     REAL ecin(iim + 1, jjm + 1, llm), ecin0(iim + 1, jjm + 1, llm)
@@ -134,7 +130,7 @@ contains
        ! Calcul des tendances dynamiques:
        CALL geopot(teta, pk, pks, phis, phi)
        CALL caldyn(itau, ucov, vcov, teta, ps, masse, pk, pkf, phis, phi, &
-            dudyn, dv, dteta, dp, w, pbaru, pbarv, time_0, &
+            dudyn, dv, dteta, dp, w, pbaru, pbarv, &
             conser = MOD(itau, iconser) == 0)
 
        CALL caladvtrac(q, pbaru, pbarv, p3d, masse, teta, pk)
@@ -156,8 +152,7 @@ contains
           ! Calcul des tendances dynamiques:
           CALL geopot(teta, pk, pks, phis, phi)
           CALL caldyn(itau + 1, ucov, vcov, teta, ps, masse, pk, pkf, phis, &
-               phi, dudyn, dv, dteta, dp, w, pbaru, pbarv, time_0, &
-               conser = .false.)
+               phi, dudyn, dv, dteta, dp, w, pbaru, pbarv, conser = .false.)
 
           ! integrations dynamique et traceurs:
           CALL integrd(vcovm1, ucovm1, tetam1, psm1, massem1, dv, dudyn, &
@@ -169,17 +164,13 @@ contains
        end if
 
        IF (MOD(itau + 1, iphysiq) == 0 .AND. iflag_phys /= 0) THEN
-          ! Calcul des tendances physiques:
-
-          rdaym_ini = itau * dtvr / daysec
-          rdayvrai = rdaym_ini + day_ini
-          time = REAL(mod(itau, day_step)) / day_step + time_0
+          ! Calcul des tendances physiques :
+          time = REAL(mod(itau, day_step)) / day_step
           IF (time > 1.) time = time - 1.
+          CALL calfis(itau * dtvr / daysec + day_ini, time, ucov, vcov, teta, &
+               q, pk, phis, phi, w, dufi, dvfi, dtetafi, dqfi, &
+               lafin = itau + 1 == itaufin)
 
-          CALL calfis(rdayvrai, time, ucov, vcov, teta, q, pk, phis, phi, w, &
-               dufi, dvfi, dtetafi, dqfi, lafin = itau + 1 == itaufin)
-
-          ! Ajout des tendances physiques:
           CALL addfi(ucov, vcov, teta, q, dufi, dvfi, dtetafi, dqfi)
        ENDIF
 
@@ -231,7 +222,7 @@ contains
     ! Calcul des tendances dynamiques:
     CALL geopot(teta, pk, pks, phis, phi)
     CALL caldyn(itaufin, ucov, vcov, teta, ps, masse, pk, pkf, phis, phi, &
-         dudyn, dv, dteta, dp, w, pbaru, pbarv, time_0, &
+         dudyn, dv, dteta, dp, w, pbaru, pbarv, &
          conser = MOD(itaufin, iconser) == 0)
 
   END SUBROUTINE leapfrog

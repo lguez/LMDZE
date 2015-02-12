@@ -205,6 +205,7 @@ contains
     print *, "Minimum longitude step:", MINval(d_rlonv) * 180. / pi, "degrees"
     print *, "Maximum longitude step:", MAXval(d_rlonv) * 180. / pi, "degrees"
 
+    ! Check that rlonm025 <= rlonv <= rlonp025 <= rlonu:
     DO i = 1, iim + 1
        IF (rlonp025(i) < rlonv(i)) THEN
           print *, 'rlonp025(', i, ') = ', rlonp025(i)

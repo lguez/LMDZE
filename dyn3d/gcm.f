@@ -87,7 +87,7 @@ PROGRAM gcm
   CALL iniconst
 
   ! Lecture du fichier "start.nc" :
-  CALL dynetat0(vcov, ucov, teta, q, masse, ps, phis, time_0)
+  CALL dynetat0(vcov, ucov, teta, q, masse, ps, phis)
 
   ! On remet le calendrier à zéro si demandé :
   if (raz_date) then
@@ -96,7 +96,6 @@ PROGRAM gcm
      day_ref = dayref
      day_ini = dayref
      itau_dyn = 0
-     time_0 = 0.
   else
      print *, 'On garde les dates du fichier "start".'
   endif
@@ -152,7 +151,7 @@ PROGRAM gcm
   CALL conf_guide
 
   ! Intégration temporelle du modèle :
-  CALL leapfrog(ucov, vcov, teta, ps, masse, phis, q, time_0)
+  CALL leapfrog(ucov, vcov, teta, ps, masse, phis, q)
 
   close(unit_nml)
   call histclo
