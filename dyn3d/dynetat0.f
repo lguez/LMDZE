@@ -2,7 +2,14 @@ module dynetat0_m
 
   IMPLICIT NONE
 
-  INTEGER day_ini
+  INTEGER day_ini 
+  ! day number at the beginning of the run, based on value 1 on January
+  ! 1st of annee_ref
+
+  integer:: day_ref = 1 ! jour de l'année de l'état initial
+  ! (= 350 si 20 décembre par exemple)
+
+  integer:: annee_ref = 1998 ! Annee de l'etat initial (avec 4 chiffres)
 
 contains
 
@@ -14,6 +21,7 @@ contains
 
     use comconst, only: dtvr
     use comgeom, only: rlonu, rlatu, rlonv, rlatv, cu_2d, cv_2d, aire_2d
+    use conf_gcm_m, only: raz_date
     use dimens_m, only: iim, jjm, llm, nqmx
     use disvert_m, only: pa
     use ener, only: etot0, ang0, ptot0, stot0, ztot0
@@ -24,7 +32,8 @@ contains
     use nr_util, only: assert
     use serre, only: clon, clat, grossismy, grossismx, dzoomx, dzoomy, taux, &
          tauy
-    use temps, only: day_ref, itau_dyn, annee_ref
+    use temps, only: itau_dyn
+    use unit_nml_m, only: unit_nml
 
     REAL, intent(out):: vcov(: , :, :) ! (iim + 1, jjm, llm)
     REAL, intent(out):: ucov(:, :, :) ! (iim + 1, jjm + 1, llm)
@@ -38,6 +47,8 @@ contains
     INTEGER iq
     REAL, pointer:: tab_cntrl(:) ! tableau des paramètres du run
     INTEGER ierr, ncid, varid
+
+    namelist /dynetat0_nml/ day_ref, annee_ref
 
     !-----------------------------------------------------------------------
 
@@ -62,12 +73,9 @@ contains
     call assert(int(tab_cntrl(2)) == jjm, "dynetat0 tab_cntrl jjm") 
     call assert(int(tab_cntrl(3)) == llm, "dynetat0 tab_cntrl llm") 
 
-    day_ref = int(tab_cntrl(4))
-    annee_ref = int(tab_cntrl(5))
-
     IF (dtvr /= tab_cntrl(12)) THEN
        print *, 'Warning: the time steps from day_step and "start.nc" ' // &
-          'are different.'
+            'are different.'
        print *, 'dtvr from day_step: ', dtvr
        print *, 'dtvr from "start.nc": ', tab_cntrl(12)
        print *, 'Using the value from day_step.'
@@ -89,7 +97,24 @@ contains
     taux = tab_cntrl(28)
     tauy = tab_cntrl(29)
 
-    itau_dyn = tab_cntrl(31)
+    print *, "Enter namelist 'dynetat0_nml'."
+    read(unit=*, nml=dynetat0_nml)
+    write(unit_nml, nml=dynetat0_nml)
+
+    if (raz_date) then
+       print *, 'On réinitialise à la date lue dans la namelist.'
+       day_ini = day_ref
+       itau_dyn = 0
+    else
+       day_ref = tab_cntrl(4)
+       annee_ref = tab_cntrl(5)
+       itau_dyn = tab_cntrl(31)
+       day_ini = tab_cntrl(30)
+    end if
+
+    print *, "day_ini = ", day_ini
+
+    deallocate(tab_cntrl) ! pointer
 
     call NF95_INQ_VARID (ncid, "rlonu", varid)
     call NF95_GET_VAR(ncid, varid, rlonu)
@@ -114,10 +139,6 @@ contains
 
     call NF95_INQ_VARID (ncid, "phisinit", varid)
     call NF95_GET_VAR(ncid, varid, phis)
-
-    day_ini = tab_cntrl(30)
-
-    deallocate(tab_cntrl) ! pointer
 
     call NF95_INQ_VARID (ncid, "ucov", varid)
     call NF95_GET_VAR(ncid, varid, ucov)

@@ -21,11 +21,11 @@ contains
     use comconst, only: cpp, kappa, iniconst
     use comgeom, only: rlatu, rlonv, rlonu, rlatv, aire_2d, apoln, apols, &
          cu_2d, cv_2d, inigeom
-    use conf_gcm_m, only: dayref, anneeref
     use dimens_m, only: iim, jjm, llm, nqmx
     use dimphy, only: zmasq
     use dimsoil, only: nsoilmx
     use disvert_m, only: ap, bp, preff, pa, disvert
+    use dynetat0_m, only: day_ref, annee_ref
     use dynredem0_m, only: dynredem0
     use dynredem1_m, only: dynredem1
     use exner_hyb_m, only: exner_hyb
@@ -50,8 +50,9 @@ contains
     USE start_init_orog_m, only: start_init_orog, mask
     use start_init_phys_m, only: start_init_phys
     use start_inter_3d_m, only: start_inter_3d
-    use temps, only: itau_phy, annee_ref, day_ref
+    use temps, only: itau_phy
     use test_disvert_m, only: test_disvert
+    use unit_nml_m, only: unit_nml
 
     REAL, intent(out):: phis(:, :) ! (iim + 1, jjm + 1)
     ! surface geopotential, in m2 s-2
@@ -122,9 +123,15 @@ contains
     ! ("p3d(i, j, l)" is at longitude "rlonv(i)", latitude "rlatu(j)",
     ! for interface "l")
 
+    namelist /etat0_nml/ day_ref, annee_ref
+
     !---------------------------------
 
     print *, "Call sequence information: etat0"
+
+    print *, "Enter namelist 'etat0_nml'."
+    read(unit=*, nml=etat0_nml)
+    write(unit_nml, nml=etat0_nml)
 
     CALL iniconst
 
@@ -304,13 +311,11 @@ contains
     ! Initialisation pour traceurs:
     call iniadvtrac
     itau_phy = 0
-    day_ref = dayref
-    annee_ref = anneeref
 
     CALL geopot(teta, pk , pks, phis, phi)
     CALL caldyn0(ucov, vcov, teta, ps, masse, pk, phis, phi, w, pbaru, &
          pbarv)
-    CALL dynredem0("start.nc", dayref, phis)
+    CALL dynredem0("start.nc", day_ref, phis)
     CALL dynredem1("start.nc", vcov, ucov, teta, q, masse, ps, itau=0)
 
     ! Initialisations :

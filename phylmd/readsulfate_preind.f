@@ -10,7 +10,7 @@ contains
 
     use dimens_m
     use dimphy
-    use temps
+    use dynetat0_m, only: annee_ref
     use SUPHEC_M
     use chem
     use getso4fromfile_m, only: getso4fromfile

@@ -25,6 +25,7 @@ SUBROUTINE initphysto(infile,rlon,rlat,tstep,t_ops,t_wrt,nq,fileid)
 
   !   L. Fairhead, 03/99
 
+  use dynetat0_m, only: day_ref, annee_ref
   USE histbeg_totreg_m, ONLY : histbeg_totreg
   USE histdef_m, ONLY : histdef
   USE histend_m, ONLY : histend
@@ -38,7 +39,6 @@ SUBROUTINE initphysto(infile,rlon,rlat,tstep,t_ops,t_wrt,nq,fileid)
   use conf_gcm_m
   USE comgeom
   USE serre
-  USE temps
   USE nr_util, ONLY : pi
   USE ymds2ju_m
 
@@ -62,7 +62,6 @@ SUBROUTINE initphysto(infile,rlon,rlat,tstep,t_ops,t_wrt,nq,fileid)
   INTEGER iq
   INTEGER uhoriid, vhoriid, thoriid, zvertiid
   INTEGER ii, jj
-  INTEGER zan, idayref
   LOGICAL ok_sync
   REAL zx_lon(iim,jjm+1), zx_lat(iim,jjm+1)
 
@@ -78,9 +77,7 @@ SUBROUTINE initphysto(infile,rlon,rlat,tstep,t_ops,t_wrt,nq,fileid)
   !  Appel a histbeg: creation du fichier netcdf et initialisations
   !     diverses
 
-  zan = annee_ref
-  idayref = day_ref
-  CALL ymds2ju(zan,1,idayref,0.0,zjulian)
+  CALL ymds2ju(annee_ref,1,day_ref,0.0,zjulian)
   tau0 = 0
 
   CALL gr_fi_ecrit(1,klon,iim,jjm+1,rlon,zx_lon)

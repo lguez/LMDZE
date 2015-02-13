@@ -38,6 +38,7 @@ contains
     USE dimphy, ONLY: klon
     USE dimsoil, ONLY: nsoilmx
     use drag_noro_m, only: drag_noro
+    use dynetat0_m, only: day_ref, annee_ref
     USE fcttre, ONLY: foeew, qsatl, qsats, thermcep
     use fisrtilp_m, only: fisrtilp
     USE hgardfou_m, ONLY: hgardfou
@@ -57,7 +58,7 @@ contains
     use readsulfate_preind_m, only: readsulfate_preind
     use sugwd_m, only: sugwd
     USE suphec_m, ONLY: ra, rcpd, retv, rg, rlvtt, romega, rsigma, rtt
-    USE temps, ONLY: annee_ref, day_ref, itau_phy
+    USE temps, ONLY: itau_phy
     use unit_nml_m, only: unit_nml
     USE ymds2ju_m, ONLY: ymds2ju
     USE yoethf_m, ONLY: r2es, rvtmp2
@@ -680,7 +681,7 @@ contains
        ! Initialisation des sorties
 
        call ini_histins(dtphys, ok_instan, nid_ins)
-       CALL ymds2ju(annee_ref, 1, int(day_ref), 0., date0)
+       CALL ymds2ju(annee_ref, 1, day_ref, 0., date0)
        ! Positionner date0 pour initialisation de ORCHIDEE
        print *, 'physiq date0: ', date0
     ENDIF test_firstcal

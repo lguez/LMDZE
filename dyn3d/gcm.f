@@ -11,8 +11,8 @@ PROGRAM gcm
   use comconst, only: daysec, dtvr, iniconst
   use comgeom, only: rlatu, aire_2d, cu_2d, cv_2d, rlonv, inigeom
   use comgeomphy, only: airephy, cuphy, cvphy, rlatd, rlond
-  use conf_gcm_m, only: day_step, iperiod, anneeref, dayref, iecri, iphysiq, &
-       nday, raz_date, periodav, conf_gcm, iflag_phys
+  use conf_gcm_m, only: day_step, iperiod, iecri, iphysiq, nday, periodav, &
+       conf_gcm, iflag_phys
   use conf_guide_m, only: conf_guide
   use dimens_m, only: iim, jjm, llm, nqmx
   use dimphy, only: klon
@@ -32,7 +32,6 @@ PROGRAM gcm
   use leapfrog_m, only: leapfrog
   use netcdf95, only: nf95_close
   use suphec_m, only: suphec
-  use temps, only: day_ref, annee_ref, day_end, itau_dyn
   use tracstoke, only: istdyn, istphy
   use unit_nml_m, only: unit_nml
   use yoethf_m, only: yoethf
@@ -47,9 +46,6 @@ PROGRAM gcm
   REAL ps(iim + 1, jjm + 1) ! pression au sol (Pa)
   REAL masse(iim + 1, jjm + 1, llm) ! masse d'air
   REAL phis(iim + 1, jjm + 1) ! géopotentiel au sol
-
-  ! Variables pour le fichier histoire :
-  REAL time_0 ! time in day, as a fraction of day, in [0, 1[
 
   ! Calendrier :
   LOGICAL:: true_calendar = .false. ! default value
@@ -80,26 +76,9 @@ PROGRAM gcm
      call ioconf_calendar('360d')
   endif
 
-  ! Initialisation des traceurs
-  ! Choix du schéma pour l'advection dans le fichier "traceur.def" ou via INCA
   call iniadvtrac
-
   CALL iniconst
-
-  ! Lecture du fichier "start.nc" :
   CALL dynetat0(vcov, ucov, teta, q, masse, ps, phis)
-
-  ! On remet le calendrier à zéro si demandé :
-  if (raz_date) then
-     print *, 'On réinitialise à la date lue dans la namelist.'
-     annee_ref = anneeref
-     day_ref = dayref
-     day_ini = dayref
-     itau_dyn = 0
-  else
-     print *, 'On garde les dates du fichier "start".'
-  endif
-
   CALL disvert
   CALL inigeom ! initialisation de la géometrie
   CALL inifilr ! initialisation du filtre
@@ -133,15 +112,9 @@ PROGRAM gcm
   ENDIF
 
   ! Initialisation des entrées-sorties :
-  day_end = day_ini + nday
-  print *, "day_ini = ", day_ini
-  print *, "day_end = ", day_end
-
-  CALL dynredem0("restart.nc", day_end, phis)
-  CALL inithist(day_ref, annee_ref, dtvr, nqmx, t_ops = iecri * daysec, &
-       t_wrt = iecri * daysec)
-  CALL initdynav(day_ref, annee_ref, dtvr, nqmx, t_ops = iperiod * dtvr, &
-       t_wrt = periodav * daysec)
+  CALL dynredem0("restart.nc", day_ini + nday, phis)
+  CALL inithist(dtvr, nqmx, t_ops = iecri * daysec, t_wrt = iecri * daysec)
+  CALL initdynav(dtvr, nqmx, t_ops = iperiod * dtvr, t_wrt = periodav * daysec)
   call init_dynzon(dt_app = dtvr * iperiod)
 
   ! Choix des fréquences de stockage pour le hors-ligne :
@@ -149,8 +122,6 @@ PROGRAM gcm
   istphy = istdyn / iphysiq     
 
   CALL conf_guide
-
-  ! Intégration temporelle du modèle :
   CALL leapfrog(ucov, vcov, teta, ps, masse, phis, q)
 
   close(unit_nml)

@@ -28,6 +28,7 @@ SUBROUTINE initfluxsto(tstep, t_ops, t_wrt, nq, fileid, filevid, filedid)
   use conf_gcm_m
   USE dimens_m
   USE disvert_m
+  use dynetat0_m, only: day_ref, annee_ref
   USE histbeg_totreg_m, ONLY : histbeg_totreg
   USE histdef_m, ONLY : histdef
   USE histend_m, ONLY : histend
@@ -37,7 +38,7 @@ SUBROUTINE initfluxsto(tstep, t_ops, t_wrt, nq, fileid, filevid, filedid)
   USE nr_util, ONLY : pi
   USE paramet_m
   USE serre
-  USE temps, ONLY : annee_ref, day_ref, itau_dyn
+  USE temps, ONLY : itau_dyn
   use ymds2ju_m, only: ymds2ju
 
   IMPLICIT NONE
@@ -58,7 +59,6 @@ SUBROUTINE initfluxsto(tstep, t_ops, t_wrt, nq, fileid, filevid, filedid)
   REAL rlong(iip1, jjp1), rlat(iip1, jjp1)
   INTEGER uhoriid, vhoriid, thoriid, zvertiid, dhoriid, dvertiid
   INTEGER ii, jj, l
-  INTEGER zan, idayref
   LOGICAL ok_sync
 
   !---------------------------------------------------------
@@ -70,9 +70,7 @@ SUBROUTINE initfluxsto(tstep, t_ops, t_wrt, nq, fileid, filevid, filedid)
 
   !  Appel a histbeg: creation du fichier netcdf et initialisations diverses
 
-  zan = annee_ref
-  idayref = day_ref
-  CALL ymds2ju(zan, 1, idayref, 0.0, zjulian)
+  CALL ymds2ju(annee_ref, 1, day_ref, 0.0, zjulian)
 
   DO jj = 1, jjp1
      DO ii = 1, iip1

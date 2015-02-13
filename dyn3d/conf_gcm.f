@@ -20,11 +20,6 @@ module conf_gcm_m
   integer:: iphysiq = 5
   ! number of time steps of dynamics between calls to physics
 
-  integer:: dayref = 1 ! jour de l'année de l'état initial
-  ! (= 350 si 20 décembre par exemple)
-
-  integer:: anneeref = 1998 ! Annee de l'etat initial (avec 4 chiffres)
-
   logical:: raz_date = .false.
   ! prise en compte de la date initiale de la namelist et remise à
   ! zéro des compteurs de pas de temps (sinon on garde la date du
@@ -65,10 +60,10 @@ contains
     use comdissnew, only: read_comdissnew
     use unit_nml_m, only: unit_nml
 
-    namelist /conf_gcm_nml/dayref, anneeref, raz_date, nday, day_step, &
-         iperiod, iapp_tracvl, iconser, iecri, periodav, iphysiq, offline
+    namelist /conf_gcm_nml/ raz_date, nday, day_step, iperiod, iapp_tracvl, &
+         iconser, iecri, periodav, iphysiq, offline
 
-    namelist /iniprint_nml/prt_level
+    namelist /iniprint_nml/ prt_level
 
     namelist /logic_nml/ purmats, iflag_phys
 

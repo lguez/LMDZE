@@ -4,7 +4,7 @@ module inithist_m
 
 contains
 
-  subroutine inithist(day0, anne0, tstep, nq, t_ops, t_wrt)
+  subroutine inithist(tstep, nq, t_ops, t_wrt)
 
     ! From inithist.F, version 1.1.1.1 2004/05/19 12:53:05
     ! L. Fairhead, LMD, 03/99
@@ -16,6 +16,7 @@ contains
     USE com_io_dyn, ONLY: histid, histuid, histvid
     USE dimens_m, ONLY: jjm, llm
     USE disvert_m, ONLY: presnivs
+    use dynetat0_m, only: day_ref, annee_ref
     USE histbeg_totreg_m, ONLY : histbeg_totreg
     USE histdef_m, ONLY : histdef
     USE histend_m, ONLY : histend
@@ -26,7 +27,6 @@ contains
     USE temps, ONLY: itau_dyn
     USE ymds2ju_m, ONLY: ymds2ju
 
-    integer, intent(in):: day0, anne0 ! date de référence
     real, intent(in):: tstep ! durée du pas de temps en secondes
     integer, intent(in):: nq ! nombre de traceurs
     real, intent(in):: t_ops ! fréquence de l'opération pour IOIPSL
@@ -38,13 +38,10 @@ contains
     real rlong(iip1, jjp1), rlat(iip1, jjp1)
     integer uhoriid, vhoriid, thoriid, zvertiid
     integer ii, jj
-    integer zan, dayref
 
     !-----------------------------------------------------------------------
 
-    zan = anne0
-    dayref = day0
-    CALL ymds2ju(zan, 1, dayref, 0.0, zjulian)
+    CALL ymds2ju(annee_ref, 1, day_ref, 0.0, zjulian)
 
     do jj = 1, jjp1
        do ii = 1, iip1

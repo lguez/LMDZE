@@ -28,8 +28,8 @@ contains
 
     USE dimens_m, ONLY: iim, jjm
     USE dimphy, ONLY: klev, klon
+    USE dynetat0_m, ONLY: annee_ref
     use getso4fromfile_m, only: getso4fromfile
-    USE temps, ONLY: annee_ref
 
     ! Input:
 

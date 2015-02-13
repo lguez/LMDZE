@@ -12,13 +12,14 @@ contains
     use dimens_m, only: iim, jjm, llm
     use dimphy, only: klon
     use disvert_m, only: presnivs
+    use dynetat0_m, only: day_ref, annee_ref
     USE histbeg_totreg_m, ONLY : histbeg_totreg
     USE histdef_m, ONLY : histdef
     USE histend_m, ONLY : histend
     USE histvert_m, ONLY : histvert
     use indicesol, only: nbsrf, clnsurf
     use phyetat0_m, only: rlon, rlat
-    use temps, only: itau_phy, day_ref, annee_ref
+    use temps, only: itau_phy
     USE ymds2ju_m, only: ymds2ju
 
     REAL, intent(in):: dtime ! pas temporel de la physique (s)
@@ -27,7 +28,7 @@ contains
 
     REAL zx_lon(iim, jjm + 1), zx_lat(iim, jjm + 1)
     real zjulian, zsto, zout
-    integer i, nhori, nvert, idayref, nsrf
+    integer i, nhori, nvert, nsrf
 
     !-------------------------------------------------------------------
 
@@ -36,8 +37,7 @@ contains
        zsto = dtime * ecrit_ins
        zout = dtime * ecrit_ins
 
-       idayref = day_ref
-       CALL ymds2ju(annee_ref, 1, idayref, 0.0, zjulian)
+       CALL ymds2ju(annee_ref, 1, day_ref, 0.0, zjulian)
 
        CALL gr_fi_ecrit(1, klon, iim, (jjm + 1), rlon, zx_lon)
        DO i = 1, iim

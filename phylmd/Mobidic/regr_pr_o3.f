@@ -22,13 +22,13 @@ contains
     ! We assume that, in the input file, the pressure levels are in
     ! hPa and strictly increasing.
 
-    use conf_gcm_m, only: dayref
     use dimens_m, only: iim, jjm, llm
+    use dynetat0_m, only: day_ref
+    use grid_change, only: dyn_phy
+    use netcdf, only:  nf90_nowrite, nf90_get_var
     use netcdf95, only: nf95_open, nf95_close, nf95_inq_varid, handle_err, &
          nf95_gw_var
-    use netcdf, only:  nf90_nowrite, nf90_get_var
     use nr_util, only: assert
-    use grid_change, only: dyn_phy
     use numer_rec_95, only: regr1_step_av
 
     REAL, intent(in):: p3d(:, :, :) ! (iim + 1, jjm + 1, llm+1) 
@@ -55,7 +55,7 @@ contains
     integer i, j
 
     real, allocatable:: r_mob(:, :)! (jjm + 1, n_plev)
-    ! (ozone mole fraction from Mobidic at day "dayref")
+    ! (ozone mole fraction from Mobidic at day "day_ref")
     ! (r_mob(j, k) is at latitude "rlatu(j)" and pressure level "plev(k)".)
 
     !------------------------------------------------------------
@@ -90,7 +90,7 @@ contains
     allocate(r_mob(jjm + 1, n_plev))
 
     ! Get data at the right day from the input file:
-    ncerr = nf90_get_var(ncid, varid, r_mob, start=(/1, 1, dayref/))
+    ncerr = nf90_get_var(ncid, varid, r_mob, start=(/1, 1, day_ref/))
     call handle_err("nf90_get_var r_Mob", ncerr)
     ! Latitudes are in increasing order in the input file while
     ! "rlatu" is in decreasing order so we need to invert order:

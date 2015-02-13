@@ -13,6 +13,7 @@ CONTAINS
     USE comgeom, ONLY: aire_2d, cu_2d, cv_2d, rlatu, rlatv, rlonu, rlonv
     USE dimens_m, ONLY: iim, jjm, llm, nqmx
     USE disvert_m, ONLY: ap, bp, pa, preff, presnivs
+    use dynetat0_m, only: day_ref, annee_ref
     USE ener, ONLY: ang0, etot0, ptot0, stot0, ztot0
     USE iniadvtrac_m, ONLY: tname, ttext
     USE ju2ymds_m, ONLY: ju2ymds
@@ -22,7 +23,6 @@ CONTAINS
     USE paramet_m, ONLY: iip1, jjp1, llmp1
     USE serre, ONLY: clat, clon, dzoomx, dzoomy, grossismx, grossismy, taux, &
          tauy
-    USE temps, ONLY: annee_ref, day_ref
     use ymds2ju_m, only: ymds2ju
 
     CHARACTER(len=*), INTENT(IN):: fichnom
@@ -56,11 +56,11 @@ CONTAINS
     DO l = 1, length
        tab_cntrl(l) = 0.
     END DO
-    tab_cntrl(1) = real(iim)
-    tab_cntrl(2) = real(jjm)
-    tab_cntrl(3) = real(llm)
-    tab_cntrl(4) = real(day_ref)
-    tab_cntrl(5) = real(annee_ref)
+    tab_cntrl(1) = iim
+    tab_cntrl(2) = jjm
+    tab_cntrl(3) = llm
+    tab_cntrl(4) = day_ref
+    tab_cntrl(5) = annee_ref
     tab_cntrl(6) = rad
     tab_cntrl(7) = omeg
     tab_cntrl(8) = g
@@ -77,7 +77,6 @@ CONTAINS
     tab_cntrl(19) = preff
 
     ! Paramètres pour le zoom :
-
     tab_cntrl(20) = clon
     tab_cntrl(21) = clat
     tab_cntrl(22) = grossismx
@@ -89,7 +88,7 @@ CONTAINS
     tab_cntrl(28) = taux
     tab_cntrl(29) = tauy
 
-    tab_cntrl(30) = real(iday_end)
+    tab_cntrl(30) = iday_end
 
     CALL nf95_create(fichnom, nf90_clobber, ncid)
     CALL nf95_put_att(ncid, nf90_global, 'title', &

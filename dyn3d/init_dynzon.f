@@ -19,12 +19,13 @@ contains
     USE conf_gcm_m, ONLY: day_step, iperiod, periodav
     USE dimens_m, ONLY: jjm, llm
     USE disvert_m, ONLY: presnivs
+    use dynetat0_m, only: day_ref, annee_ref
     USE histbeg_totreg_m, ONLY: histbeg_totreg
     USE histdef_m, ONLY: histdef
     USE histend_m, ONLY: histend
     USE histvert_m, ONLY: histvert
     USE nr_util, ONLY: pi
-    USE temps, ONLY: annee_ref, day_ref, itau_dyn
+    USE temps, ONLY: itau_dyn
     USE ymds2ju_m, ONLY: ymds2ju
 
     real, intent(in):: dt_app
@@ -47,7 +48,6 @@ contains
 
     integer horiid, vertiid
     real julian
-    integer an, dayref
     real rlong(jjm), rlatg(jjm)
 
     !-----------------------------------------------------------------
@@ -61,9 +61,7 @@ contains
 
     ! Initialisation du fichier contenant les moyennes zonales
 
-    an = annee_ref
-    dayref = day_ref
-    CALL ymds2ju(an, 1, dayref, 0.0, julian)
+    CALL ymds2ju(annee_ref, 1, day_ref, 0.0, julian)
 
     rlong = 0.
     rlatg = rlatv * 180. / pi

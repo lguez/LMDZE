@@ -6,7 +6,7 @@ module initdynav_m
 
 contains
 
-  subroutine initdynav(day0, anne0, tstep, nq, t_ops, t_wrt)
+  subroutine initdynav(tstep, nq, t_ops, t_wrt)
 
     ! From initdynav.F, version 1.1.1.1, 2004/05/19 12:53:05
     ! L. Fairhead, LMD
@@ -16,6 +16,7 @@ contains
 
     USE comgeom, ONLY: rlatu, rlonv
     USE dimens_m, ONLY: llm
+    use dynetat0_m, only: day_ref, annee_ref
     USE histbeg_totreg_m, ONLY: histbeg_totreg
     USE histdef_m, ONLY: histdef
     USE histend_m, ONLY: histend
@@ -26,7 +27,6 @@ contains
     USE temps, ONLY: itau_dyn
     use ymds2ju_m, ONLY: ymds2ju
 
-    integer, intent(in):: day0, anne0 ! date de référence
     real, intent(in):: tstep ! fréquence d'écriture
     integer, intent(in):: nq ! nombre de traceurs
     real, intent(in):: t_ops ! fréquence de l'opération pour IOIPSL
@@ -41,7 +41,7 @@ contains
 
     print *, "Call sequence information: initdynav"
 
-    CALL ymds2ju(anne0, 1, day0, 0., julian)
+    CALL ymds2ju(annee_ref, 1, day_ref, 0., julian)
     call histbeg_totreg('dyn_hist_ave.nc', rlonv * 180. / pi, &
          rlatu * 180. / pi, 1, iip1, 1, jjp1, itau_dyn, julian, tstep, &
          horiid, histaveid)

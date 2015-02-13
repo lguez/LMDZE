@@ -8,7 +8,8 @@ contains
 
     ! From dyn3d/leapfrog.F, version 1.6, 2005/04/13 08:58:34 revision 616
     ! Authors: P. Le Van, L. Fairhead, F. Hourdin
-    ! Matsuno-leapfrog scheme.
+
+    ! Intégration temporelle du modèle : Matsuno-leapfrog scheme.
 
     use addfi_m, only: addfi
     use bilan_dyn_m, only: bilan_dyn

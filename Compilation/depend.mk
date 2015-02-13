@@ -101,11 +101,11 @@ dteta1.o : filtreg.o paramet_m.o dimens_m.o
 dudv1.o : paramet_m.o dimens_m.o 
 dudv2.o : paramet_m.o dimens_m.o 
 dvthermcell2.o : dimphy.o dimens_m.o 
-dynetat0.o : temps.o serre.o iniadvtrac.o ener.o disvert.o dimens_m.o comgeom.o comconst.o 
-dynredem0.o : ymds2ju.o temps.o serre.o paramet_m.o ju2ymds.o iniadvtrac.o ener.o disvert.o dimens_m.o comgeom.o comconst.o 
+dynetat0.o : unit_nml_m.o temps.o serre.o iniadvtrac.o ener.o disvert.o dimens_m.o conf_gcm.o comgeom.o comconst.o 
+dynredem0.o : ymds2ju.o serre.o paramet_m.o ju2ymds.o iniadvtrac.o ener.o dynetat0.o disvert.o dimens_m.o comgeom.o comconst.o 
 dynredem1.o : iniadvtrac.o dimens_m.o 
 enercin.o : comgeom.o paramet_m.o dimens_m.o 
-etat0.o : test_disvert.o temps.o start_inter_3d.o start_init_phys_m.o start_init_orog_m.o startdyn.o regr_pr_o3.o regr_lat_time_coefoz.o q_sat.o phyredem.o paramet_m.o massdair.o inifilr.o iniadvtrac.o histclo.o grid_change.o grid_atob.o geopot.o exner_hyb.o dynredem1.o dynredem0.o disvert.o dimsoil.o dimens_m.o conf_gcm.o comgeom.o comconst.o caldyn0.o dimphy.o indicesol.o 
+etat0.o : unit_nml_m.o test_disvert.o temps.o start_inter_3d.o start_init_phys_m.o start_init_orog_m.o startdyn.o regr_pr_o3.o regr_lat_time_coefoz.o q_sat.o phyredem.o paramet_m.o massdair.o inifilr.o iniadvtrac.o histclo.o grid_change.o grid_atob.o geopot.o exner_hyb.o dynredem1.o dynredem0.o dynetat0.o disvert.o dimsoil.o dimens_m.o comgeom.o comconst.o caldyn0.o dimphy.o indicesol.o 
 exner_hyb.o : filtreg.o disvert.o comconst.o dimens_m.o 
 filtreg.o : inifilr.o dimens_m.o coefils.o 
 findsep.o : cleanstr.o mathelp.o errioipsl.o 
@@ -123,9 +123,9 @@ flxini.o : suphec.o flxadjtq.o dimphy.o
 flxmain.o : yoethf.o YOECUMF.o suphec.o flxini.o flxflux.o flxdtdq.o flxdlfs.o flxddraf.o flxbase.o flxasc.o dimphy.o 
 fonte_neige.o : yoethf.o suphec.o interface_surf.o indicesol.o FCTTRE.o 
 fxhyp.o : serre.o principal_cshift.o fxhyp_loop_ik.o dimens_m.o 
-fxhyp_loop_ik.o : dimens_m.o coefpoly.o 
+fxhyp_loop_ik.o : serre.o dimens_m.o coefpoly.o 
 fyhyp.o : serre.o dimens_m.o coefpoly.o 
-gcm.o : createnewfield.o yoethf.o unit_nml_m.o tracstoke.o temps.o suphec.o leapfrog.o ioconf_calendar.o init_dynzon.o inithist.o initdynav.o inifilr.o inidissip.o iniadvtrac.o histclo.o grid_change.o dynredem0.o dynetat0.o disvert.o dimphy.o dimens_m.o conf_guide.o conf_gcm.o comgeomphy.o comgeom.o comconst.o 
+gcm.o : createnewfield.o yoethf.o unit_nml_m.o tracstoke.o suphec.o leapfrog.o ioconf_calendar.o init_dynzon.o inithist.o initdynav.o inifilr.o inidissip.o iniadvtrac.o histclo.o grid_change.o dynredem0.o dynetat0.o disvert.o dimphy.o dimens_m.o conf_guide.o conf_gcm.o comgeomphy.o comgeom.o comconst.o 
 geopot.o : dimens_m.o 
 getfieldindex.o : createnewfield.o 
 getso4fromfile.o : dimphy.o dimens_m.o 
@@ -154,18 +154,18 @@ histvar_seq.o : histcom_var.o errioipsl.o find_str.o
 histvert.o : strlowercase.o histcom_var.o find_str.o errioipsl.o 
 histwrite.o : mathop.o isittime.o histwrite_real.o histvar_seq.o histcom_var.o errioipsl.o 
 histwrite_real.o : mathop.o moycum.o trans_buff.o histcom_var.o 
-ini_histins.o : ymds2ju.o temps.o phyetat0.o indicesol.o histvert.o histend.o histdef.o histbeg_totreg.o disvert.o dimphy.o dimens_m.o clesphys.o 
-ini_histrac.o : ymds2ju.o temps.o phyetat0.o iniadvtrac.o histvert.o histend.o histdef.o histbeg_totreg.o grid_change.o dimphy.o disvert.o dimens_m.o clesphys.o 
+ini_histins.o : ymds2ju.o temps.o phyetat0.o indicesol.o histvert.o histend.o histdef.o histbeg_totreg.o dynetat0.o disvert.o dimphy.o dimens_m.o clesphys.o 
+ini_histrac.o : ymds2ju.o temps.o phyetat0.o iniadvtrac.o histvert.o histend.o histdef.o histbeg_totreg.o grid_change.o dynetat0.o dimphy.o disvert.o dimens_m.o clesphys.o 
 iniadvtrac.o : dimens_m.o 
 inidissip.o : paramet_m.o nxgraro2.o gradiv2.o filtreg.o divgrad2.o conf_gcm.o disvert.o comdissnew.o comconst.o dimens_m.o 
 inifgn.o : coefils.o comgeom.o dimens_m.o 
 inifilr.o : serre.o inifgn.o comgeom.o coefils.o dimens_m.o 
-init_dynzon.o : ymds2ju.o temps.o histvert.o histend.o histdef.o histbeg_totreg.o disvert.o dimens_m.o conf_gcm.o comgeom.o 
+init_dynzon.o : ymds2ju.o temps.o histvert.o histend.o histdef.o histbeg_totreg.o dynetat0.o disvert.o dimens_m.o conf_gcm.o comgeom.o 
 init_tau2alpha.o : writefield.o serre.o paramet_m.o dimens_m.o coordij.o conf_guide.o comgeom.o 
-initdynav.o : ymds2ju.o temps.o paramet_m.o iniadvtrac.o histvert.o histend.o histdef.o histbeg_totreg.o dimens_m.o comgeom.o 
-initfluxsto.o : ymds2ju.o temps.o serre.o paramet_m.o histvert.o histsync.o histhori_regular.o histend.o histdef.o histbeg_totreg.o disvert.o dimens_m.o conf_gcm.o comgeom.o comconst.o 
-inithist.o : ymds2ju.o temps.o paramet_m.o iniadvtrac.o histvert.o histend.o histdef.o histbeg_totreg.o disvert.o dimens_m.o com_io_dyn.o comgeom.o 
-initphysto.o : ymds2ju.o temps.o serre.o comgeom.o conf_gcm.o dimphy.o indicesol.o comconst.o paramet_m.o dimens_m.o histvert.o histsync.o histend.o histdef.o histbeg_totreg.o 
+initdynav.o : ymds2ju.o temps.o paramet_m.o iniadvtrac.o histvert.o histend.o histdef.o histbeg_totreg.o dynetat0.o dimens_m.o comgeom.o 
+initfluxsto.o : ymds2ju.o temps.o serre.o paramet_m.o histvert.o histsync.o histhori_regular.o histend.o histdef.o histbeg_totreg.o dynetat0.o disvert.o dimens_m.o conf_gcm.o comgeom.o comconst.o 
+inithist.o : ymds2ju.o temps.o paramet_m.o iniadvtrac.o histvert.o histend.o histdef.o histbeg_totreg.o dynetat0.o disvert.o dimens_m.o com_io_dyn.o comgeom.o 
+initphysto.o : ymds2ju.o serre.o comgeom.o conf_gcm.o dimphy.o indicesol.o comconst.o paramet_m.o dimens_m.o histvert.o histsync.o histend.o histdef.o histbeg_totreg.o dynetat0.o 
 initrrnpb.o : indicesol.o dimphy.o dimens_m.o 
 integrd.o : qminimum.o paramet_m.o massdair.o filtreg.o disvert.o dimens_m.o comgeom.o 
 inter_barxy.o : ord_coordm.o ord_coord.o inter_bary.o inter_barx.o dimens_m.o comgeom.o 
@@ -225,7 +225,7 @@ paramet_m.o : dimens_m.o
 pentes_ini.o : comgeom.o disvert.o comconst.o paramet_m.o dimens_m.o 
 phyetat0.o : temps.o indicesol.o dimsoil.o dimphy.o 
 phyredem.o : temps.o indicesol.o dimsoil.o dimphy.o 
-physiq.o : histwrite.o histsync.o zenang.o yoethf.o ymds2ju.o unit_nml_m.o temps.o suphec.o sugwd.o readsulfate_preind.o readsulfate.o radlwsw.o qcheck.o phytrac.o phystokenc.o phyredem.o phyetat0.o ozonecm.o orbite.o newmicro.o ini_histins.o indicesol.o hgardfou.o fisrtilp.o FCTTRE.o drag_noro.o dimsoil.o dimphy.o dimens_m.o diagphy.o diagetpq.o diagcld2.o ctherm.o conflx.o conf_phys.o conf_gcm.o concvl.o comgeomphy.o clouds_gno.o clmain.o clesphys2.o clesphys.o calltherm.o ajsec.o aeropt.o abort_gcm.o aaam_bud.o 
+physiq.o : histwrite.o histsync.o zenang.o yoethf.o ymds2ju.o unit_nml_m.o temps.o suphec.o sugwd.o readsulfate_preind.o readsulfate.o radlwsw.o qcheck.o phytrac.o phystokenc.o phyredem.o phyetat0.o ozonecm.o orbite.o newmicro.o ini_histins.o indicesol.o hgardfou.o fisrtilp.o FCTTRE.o dynetat0.o drag_noro.o dimsoil.o dimphy.o dimens_m.o diagphy.o diagetpq.o diagcld2.o ctherm.o conflx.o conf_phys.o conf_gcm.o concvl.o comgeomphy.o clouds_gno.o clmain.o clesphys2.o clesphys.o calltherm.o ajsec.o aeropt.o abort_gcm.o aaam_bud.o 
 phystokenc.o : tracstoke.o dimphy.o indicesol.o dimens_m.o histsync.o histwrite.o 
 phytrac.o : gr_phy_write_3d.o grid_change.o comgeomphy.o iniadvtrac.o temps.o histwrite.o histsync.o suphec.o regr_pr_comb_coefoz.o radiornpb.o press_coefoz.o phyetat0.o o3_chem.o nflxtr.o minmaxqfi.o initrrnpb.o ini_histrac.o indicesol.o dimphy.o dimens_m.o cvltr.o ctherm.o cltracrn.o cltrac.o clesphys2.o clesphys.o abort_gcm.o 
 prather.o : comgeom.o disvert.o comconst.o paramet_m.o dimens_m.o 
@@ -237,14 +237,14 @@ raddim.o : dimphy.o dimens_m.o
 radiornpb.o : dimphy.o dimens_m.o 
 radlwsw.o : yoethf.o sw.o suphec.o raddim.o lw.o dimphy.o clesphys.o 
 read_reanalyse.o : reanalyse2nat.o paramet_m.o dimens_m.o conf_guide.o 
-readsulfate.o : temps.o getso4fromfile.o dimphy.o dimens_m.o 
-readsulfate_preind.o : getso4fromfile.o chem.o suphec.o temps.o dimphy.o dimens_m.o 
+readsulfate.o : getso4fromfile.o dynetat0.o dimphy.o dimens_m.o 
+readsulfate_preind.o : getso4fromfile.o chem.o suphec.o dynetat0.o dimphy.o dimens_m.o 
 reanalyse2nat.o : massdair.o massbar.o exner_hyb.o comgeom.o disvert.o comconst.o paramet_m.o dimens_m.o 
 regr_lat_time_coefoz.o : comgeom.o dimens_m.o 
 regr_pr_av.o : pressure_var.o press_coefoz.o grid_change.o dimphy.o dimens_m.o 
 regr_pr_comb_coefoz.o : regr_pr_int.o regr_pr_av.o phyetat0.o dimphy.o dimens_m.o 
 regr_pr_int.o : pressure_var.o press_coefoz.o grid_change.o dimphy.o dimens_m.o 
-regr_pr_o3.o : grid_change.o dimens_m.o conf_gcm.o 
+regr_pr_o3.o : grid_change.o dynetat0.o dimens_m.o 
 rotat_nfil.o : comgeom.o paramet_m.o dimens_m.o 
 rotatf.o : filtreg.o comgeom.o paramet_m.o dimens_m.o 
 screenc.o : suphec.o coefcdrag.o 

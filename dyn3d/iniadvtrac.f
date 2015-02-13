@@ -43,6 +43,9 @@ contains
     ! Authors: P. Le Van, L. Fairhead, F. Hourdin, F. Codron,
     ! F. Forget, M.-A. Filiberti
 
+    ! Initialisation des traceurs
+    ! Choix du schéma pour l'advection dans le fichier "traceur.def"
+
     use nr_util, only: assert
     use jumble, only: new_unit
 
