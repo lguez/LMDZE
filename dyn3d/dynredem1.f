@@ -6,7 +6,7 @@ contains
 
   SUBROUTINE dynredem1(fichnom, vcov, ucov, teta, q, masse, ps, itau)
 
-    ! From dyn3d/dynredem.F, version 1.2 2004/06/22 11:45:30
+    ! From dyn3d/dynredem.F, version 1.2, 2004/06/22 11:45:30
     ! Ecriture du fichier de redémarrage au format NetCDF
 
     USE dimens_m, ONLY: iim, jjm, llm, nqmx

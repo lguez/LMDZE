@@ -4,7 +4,7 @@ module calfis_m
 
 contains
 
-  SUBROUTINE calfis(rdayvrai, time, ucov, vcov, teta, q, pk, phis, phi, w, &
+  SUBROUTINE calfis(dayvrai, time, ucov, vcov, teta, q, pk, phis, phi, w, &
        dufi, dvfi, dtetafi, dqfi, lafin)
 
     ! From dyn3d/calfis.F, version 1.3, 2005/05/25 13:10:09
@@ -13,7 +13,7 @@ contains
     ! 1. R\'earrangement des tableaux et transformation des variables
     ! dynamiques en variables physiques
 
-    ! 2. Calcul des termes physiques
+    ! 2. Calcul des tendances physiques
     ! 3. Retransformation des tendances physiques en tendances dynamiques
 
     ! Remarques:
@@ -40,8 +40,10 @@ contains
     use physiq_m, only: physiq
     use pressure_var, only: p3d, pls
 
-    REAL, intent(in):: rdayvrai
-    REAL, intent(in):: time ! heure de la journ\'ee en fraction de jour
+    integer, intent(in):: dayvrai
+    ! current day number, based at value 1 on January 1st of annee_ref
+
+    REAL, intent(in):: time ! time of day, as a fraction of day length
 
     REAL, intent(in):: ucov(:, :, :) ! (iim + 1, jjm + 1, llm) 
     ! covariant zonal velocity
@@ -176,7 +178,7 @@ contains
     forall(l = 1: llm) v(:, l) = pack(zvfi(:, :, l), dyn_phy)
 
     ! Appel de la physique :
-    CALL physiq(lafin, rdayvrai, time, dtphys, paprs, play, pphi, pphis, u, &
+    CALL physiq(lafin, dayvrai, time, dtphys, paprs, play, pphi, pphis, u, &
          v, t, qx, omega, d_u, d_v, d_t, d_qx)
 
     ! transformation des tendances physiques en tendances dynamiques:

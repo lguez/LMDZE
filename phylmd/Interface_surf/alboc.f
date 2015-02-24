@@ -4,7 +4,7 @@ module alboc_m
 
 contains
 
-  SUBROUTINE alboc(rjour, rlat, albedo)
+  SUBROUTINE alboc(jour, rlat, albedo)
 
     ! From LMDZ4/libf/phylmd/albedo.F, version 1.2 2005/02/07 15:00:52
 
@@ -18,7 +18,7 @@ contains
     USE orbite_m, ONLY: orbite
 
     ! Arguments;
-    ! rjour (in, R) : jour dans l'annee (a compter du 1 janvier)
+    ! jour (in) : jour dans l'annee (a compter du 1 janvier)
     ! rlat (in, R) : latitude en degre
     ! albedo (out, R): albedo obtenu (de 0 a 1)
 
@@ -31,7 +31,8 @@ contains
     INTEGER npts ! il controle la precision de l'integration
     PARAMETER (npts=120) ! 120 correspond a l'interval 6 minutes
 
-    REAL rlat(klon), rjour, albedo(klon)
+    integer jour
+    REAL rlat(klon), albedo(klon)
     REAL zdist, zlonsun, zpi, zdeclin
     REAL rmu, alb, srmu, salb, fauxo, aa, bb
     INTEGER i, k
@@ -45,7 +46,7 @@ contains
        zpi = 4.*atan(1.)
 
        ! Calculer la longitude vraie de l'orbite terrestre:
-       CALL orbite(rjour, zlonsun, zdist)
+       CALL orbite(real(jour), zlonsun, zdist)
 
        ! Calculer la declinaison du soleil (qui varie entre + et - R_incl):
        zdeclin = asin(sin(zlonsun*zpi/180.0)*sin(r_incl*zpi/180.0))
@@ -86,7 +87,7 @@ contains
        zpi = 4.*atan(1.)
 
        ! Calculer la longitude vraie de l'orbite terrestre:
-       CALL orbite(rjour, zlonsun, zdist)
+       CALL orbite(real(jour), zlonsun, zdist)
 
        ! Calculer la declinaison du soleil (qui varie entre + et - R_incl):
        zdeclin = asin(sin(zlonsun*zpi/180.0)*sin(r_incl*zpi/180.0))

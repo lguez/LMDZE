@@ -4,7 +4,7 @@ module physiq_m
 
 contains
 
-  SUBROUTINE physiq(lafin, rdayvrai, time, dtphys, paprs, play, pphi, pphis, &
+  SUBROUTINE physiq(lafin, dayvrai, time, dtphys, paprs, play, pphi, pphis, &
        u, v, t, qx, omega, d_u, d_v, d_t, d_qx)
 
     ! From phylmd/physiq.F, version 1.22 2006/02/20 09:38:28
@@ -66,8 +66,8 @@ contains
 
     logical, intent(in):: lafin ! dernier passage
 
-    REAL, intent(in):: rdayvrai
-    ! elapsed time since January 1st 0h of the starting year, in days
+    integer, intent(in):: dayvrai
+    ! current day number, based at value 1 on January 1st of annee_ref
 
     REAL, intent(in):: time ! heure de la journ\'ee en fraction de jour
     REAL, intent(in):: dtphys ! pas d'integration pour la physique (seconde)
@@ -741,7 +741,7 @@ contains
 
     ! Incrémenter le compteur de la physique
     itap = itap + 1
-    julien = MOD(NINT(rdayvrai), 360)
+    julien = MOD(dayvrai, 360)
     if (julien == 0) julien = 360
 
     forall (k = 1: llm) zmasse(:, k) = (paprs(:, k) - paprs(:, k + 1)) / rg
@@ -1229,8 +1229,8 @@ contains
     ! Introduce the aerosol direct and first indirect radiative forcings:
     IF (ok_ade .OR. ok_aie) THEN
        ! Get sulfate aerosol distribution :
-       CALL readsulfate(rdayvrai, firstcal, sulfate)
-       CALL readsulfate_preind(rdayvrai, firstcal, sulfate_pi)
+       CALL readsulfate(dayvrai, time, firstcal, sulfate)
+       CALL readsulfate_preind(dayvrai, time, firstcal, sulfate_pi)
 
        CALL aeropt(play, paprs, t_seri, sulfate, rhcl, tau_ae, piz_ae, cg_ae, &
             aerindex)

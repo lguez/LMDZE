@@ -88,7 +88,6 @@ contains
     ! Variables pour le fichier histoire
     INTEGER itau ! index of the time step of the dynamics, starts at 0
     INTEGER itaufin
-    REAL time ! time of day, as a fraction of day length
     real finvmaold(iim + 1, jjm + 1, llm)
     INTEGER l
 
@@ -165,11 +164,9 @@ contains
        end if
 
        IF (MOD(itau + 1, iphysiq) == 0 .AND. iflag_phys /= 0) THEN
-          ! Calcul des tendances physiques :
-          time = REAL(mod(itau, day_step)) / day_step
-          IF (time > 1.) time = time - 1.
-          CALL calfis(itau * dtvr / daysec + day_ini, time, ucov, vcov, teta, &
-               q, pk, phis, phi, w, dufi, dvfi, dtetafi, dqfi, &
+          CALL calfis(itau / day_step + day_ini, &
+               REAL(mod(itau, day_step)) / day_step, ucov, vcov, teta, q, pk, &
+               phis, phi, w, dufi, dvfi, dtetafi, dqfi, &
                lafin = itau + 1 == itaufin)
 
           CALL addfi(ucov, vcov, teta, q, dufi, dvfi, dtetafi, dqfi)

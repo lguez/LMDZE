@@ -276,7 +276,7 @@ contains
 
        ! calcul albedo
        if (minval(rmu0) == maxval(rmu0) .and. minval(rmu0) == -999.999) then
-          CALL alboc(FLOAT(jour), rlat, alb_eau)
+          CALL alboc(jour, rlat, alb_eau)
        else ! cycle diurne
           CALL alboc_cd(rmu0, alb_eau)
        endif

@@ -3,8 +3,8 @@ module dynetat0_m
   IMPLICIT NONE
 
   INTEGER day_ini 
-  ! day number at the beginning of the run, based on value 1 on January
-  ! 1st of annee_ref
+  ! day number at the beginning of the run, based at value 1 on
+  ! January 1st of annee_ref
 
   integer:: day_ref = 1 ! jour de l'année de l'état initial
   ! (= 350 si 20 décembre par exemple)

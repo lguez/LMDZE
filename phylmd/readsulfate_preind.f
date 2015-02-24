@@ -4,7 +4,7 @@ module readsulfate_preind_m
 
 contains
 
-  SUBROUTINE readsulfate_preind(r_day, first, pi_sulfate)
+  SUBROUTINE readsulfate_preind(dayvrai, time, first, pi_sulfate)
 
     ! Read in /calculate pre-industrial values of sulfate
 
@@ -32,7 +32,11 @@ contains
     !
     ! Input:
     ! ------
-    real, intent(in)::  r_day                   ! Day of integration
+    integer, intent(in):: dayvrai
+    ! current day number, based at value 1 on January 1st of annee_ref
+
+    REAL, intent(in):: time ! heure de la journ\'ee en fraction de jour
+
     LOGICAL, intent(in):: first                 ! First timestep
     ! (and therefore initialization necessary)
     !
@@ -60,7 +64,7 @@ contains
 
 
 
-    iday = INT(r_day)
+    iday = dayvrai
 
     ! Get the year of the run
     iyr  = iday/360
@@ -69,7 +73,7 @@ contains
     iday = iday-iyr*360
 
     ! 0.02 is about 0.5/24, namly less than half an hour
-    lnewday = (r_day-FLOAT(iday).LT.0.02)
+    lnewday = time < 0.02
 
     ! ---------------------------------------------
     ! All has to be done only, if a new day begins!
