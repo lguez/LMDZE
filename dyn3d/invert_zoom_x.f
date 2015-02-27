@@ -1,4 +1,4 @@
-module fxhyp_loop_ik_m
+module invert_zoom_x_m
 
   implicit none
 
@@ -6,7 +6,7 @@ module fxhyp_loop_ik_m
 
 contains
 
-  subroutine fxhyp_loop_ik(xf, xtild, Xprimt, xlon, xprimm, xuv)
+  subroutine invert_zoom_x(xf, xtild, Xprimt, xlon, xprimm, xuv)
 
     use coefpoly_m, only: coefpoly
     USE dimens_m, ONLY: iim
@@ -81,6 +81,6 @@ contains
     xlon = xvrai + clon
     xprimm = xxprim
 
-  end subroutine fxhyp_loop_ik
+  end subroutine invert_zoom_x
 
-end module fxhyp_loop_ik_m
+end module invert_zoom_x_m

@@ -18,7 +18,7 @@ contains
     USE histdef_m, ONLY : histdef
     USE histend_m, ONLY : histend
     USE histvert_m, ONLY : histvert
-    use iniadvtrac_m, only: tnom, ttext
+    use iniadvtrac_m, only: tname, ttext
     use phyetat0_m, only: rlon, rlat
     use temps, only: itau_phy
     USE ymds2ju_m, only: ymds2ju
@@ -63,24 +63,24 @@ contains
     DO it = 1, nq_phys
        ! champ 2D
        iq=it+2
-       CALL histdef(nid_tra, tnom(iq), ttext(iq), "U/kga", iim, jjm+1, &
+       CALL histdef(nid_tra, tname(iq), ttext(iq), "U/kga", iim, jjm+1, &
             nhori, llm, 1, llm, nvert, "ave(X)", zsto, zout)
        if (lessivage) THEN
-          CALL histdef(nid_tra, "fl"//tnom(iq), "Flux "//ttext(iq), &
+          CALL histdef(nid_tra, "fl"//tname(iq), "Flux "//ttext(iq), &
                "U/m2/s", iim, jjm+1, nhori, llm, 1, llm, nvert, &
                "ave(X)", zsto, zout)
        endif
 
        !---Ajout Olivia
-       CALL histdef(nid_tra, "d_tr_th_"//tnom(iq), &
+       CALL histdef(nid_tra, "d_tr_th_"//tname(iq), &
             "tendance thermique"// ttext(iq), "?", &
             iim, jjm+1, nhori, llm, 1, llm, nvert, &
             "ave(X)", zsto, zout)
-       CALL histdef(nid_tra, "d_tr_cv_"//tnom(iq), &
+       CALL histdef(nid_tra, "d_tr_cv_"//tname(iq), &
             "tendance convection"// ttext(iq), "?", &
             iim, jjm+1, nhori, llm, 1, llm, nvert, &
             "ave(X)", zsto, zout)
-       CALL histdef(nid_tra, "d_tr_cl_"//tnom(iq), &
+       CALL histdef(nid_tra, "d_tr_cl_"//tname(iq), &
             "tendance couche limite"// ttext(iq), "?", &
             iim, jjm+1, nhori, llm, 1, llm, nvert, &
             "ave(X)", zsto, zout)

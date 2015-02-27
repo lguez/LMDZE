@@ -10,11 +10,11 @@ VPATH := ${makefile_dir}/.. $(addprefix ${makefile_dir}/../, $(shell cat ${makef
 
 src_ce0l := $(shell cat ${makefile_dir}/src_ce0l)
 src_gcm := $(shell cat ${makefile_dir}/src_gcm)
-src_test_ozonecm = $(shell cat ${makefile_dir}/src_test_ozonecm)
-src_test_inter_barxy = $(shell cat ${makefile_dir}/src_test_inter_barxy)
-src_test_fxhyp = $(shell cat ${makefile_dir}/src_test_fxhyp)
+src_test_ozonecm := $(shell cat ${makefile_dir}/src_test_ozonecm)
+src_test_inter_barxy := $(shell cat ${makefile_dir}/src_test_inter_barxy)
+src_test_fxhyp := $(shell cat ${makefile_dir}/src_test_fxhyp)
 
-sources = $(sort ${src_ce0l} ${src_gcm} ${src_test_ozonecm} ${src_test_inter_barxy} ${src_test_fxhyp})
+sources := $(sort ${src_ce0l} ${src_gcm} ${src_test_ozonecm} ${src_test_inter_barxy} ${src_test_fxhyp})
 
 # 2. Objects and executable files
 

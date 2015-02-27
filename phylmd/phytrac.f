@@ -426,7 +426,7 @@ contains
       use histsync_m, only: histsync
       use histwrite_m, only: histwrite
       use temps, only: itau_phy
-      use iniadvtrac_m, only: tnom
+      use iniadvtrac_m, only: tname
       use comgeomphy, only: airephy
       use dimphy, only: klon
       use grid_change, only: gr_phy_write_2d
@@ -450,17 +450,17 @@ contains
       CALL histwrite(nid_tra, "zmasse", itau_w, gr_phy_write_3d(zmasse))
 
       DO it=1, nqmx - 2
-         CALL histwrite(nid_tra, tnom(it+2), itau_w, &
+         CALL histwrite(nid_tra, tname(it+2), itau_w, &
               gr_phy_write_3d(tr_seri(:, :, it)))
          if (lessivage) THEN
-            CALL histwrite(nid_tra, "fl"//tnom(it+2), itau_w, &
+            CALL histwrite(nid_tra, "fl"//tname(it+2), itau_w, &
                  gr_phy_write_3d(flestottr(:, :, it)))
          endif
-         CALL histwrite(nid_tra, "d_tr_th_"//tnom(it+2), itau_w, &
+         CALL histwrite(nid_tra, "d_tr_th_"//tname(it+2), itau_w, &
               gr_phy_write_3d(d_tr_th(:, :, it)))
-         CALL histwrite(nid_tra, "d_tr_cv_"//tnom(it+2), itau_w, &
+         CALL histwrite(nid_tra, "d_tr_cv_"//tname(it+2), itau_w, &
               gr_phy_write_3d(d_tr_cv(:, :, it)))
-         CALL histwrite(nid_tra, "d_tr_cl_"//tnom(it+2), itau_w, &
+         CALL histwrite(nid_tra, "d_tr_cl_"//tname(it+2), itau_w, &
               gr_phy_write_3d(d_tr_cl(:, :, it)))
       ENDDO
 

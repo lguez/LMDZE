@@ -33,7 +33,6 @@ extrapol.f
 filtreg.f
 flumass.f
 fxhyp.f
-fxhyp_loop_ik.f
 fyhyp.f
 geopot.f
 grid_atob.f
@@ -51,6 +50,7 @@ inifilr.f
 inter_barx.f
 inter_barxy.f
 inter_bary.f
+invert_zoom_x.f
 ioconf_calendar.f
 jacobi.f
 ju2ymds.f

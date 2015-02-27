@@ -1,24 +1,25 @@
-
-! $Header: /home/cvsroot/LMDZ4/libf/dyn3d/heavyside.F,v 1.1.1.1 2004/05/19
-! 12:53:06 lmdzadmin Exp $
-
-
-
-FUNCTION heavyside(a)
-
-  ! ...   P. Le Van  ....
+module heavyside_m
 
   IMPLICIT NONE
 
-  DOUBLE PRECISION heavyside, a
+contains
 
-  IF (a<=0.) THEN
-    heavyside = 0.
-  ELSE
-    heavyside = 1.
-  END IF
+  real FUNCTION heavyside(a)
 
-  RETURN
-END FUNCTION heavyside
+    ! From LMDZ4/libf/dyn3d/heavyside.F,v 1.1.1.1 2004/05/19 12:53:06
 
+    ! ...   P. Le Van  ....
 
+    real, intent(in):: a
+
+    !-------------------------------------------------
+
+    IF (a<=0.) THEN
+       heavyside = 0.
+    ELSE
+       heavyside = 1.
+    END IF
+
+  END FUNCTION heavyside
+
+end module heavyside_m

@@ -30,8 +30,10 @@ module iniadvtrac_m
 
   INTEGER hadv(nqmx) ! indice schéma transport horizontal 
   INTEGER vadv(nqmx) ! indice schéma transport vertical 
-  character(len=8) tnom(nqmx) ! nom court du traceur
-  character(len=10) tname(nqmx) ! nom du traceur pour restart
+
+  character(len=10) tname(nqmx)
+  ! nom du traceur pour fichiers restart et historiques
+
   character(len=13) ttext(nqmx) ! nom long du traceur pour sorties
 
 contains
@@ -79,7 +81,7 @@ contains
        call assert(nq_local == nqmx, "iniadvtrac nq_local")
 
        do iq=1, nqmx
-          read(unit, fmt=*) hadv(iq), vadv(iq), tnom(iq)
+          read(unit, fmt=*) hadv(iq), vadv(iq), tname(iq)
           if (.not. any(hadv(iq) == allowed_adv) &
                .or. .not. any(vadv(iq) == allowed_adv)) then
              print *, "bad number for advection scheme"
@@ -93,16 +95,14 @@ contains
        call assert(nqmx == 4, "iniadvtrac nqmx")
        hadv(:4) = (/14, 10, 10, 10/)
        vadv(:4) = hadv(:4)
-       tnom(1) = 'H2Ov'
-       tnom(2) = 'H2Ol'
-       tnom(3) = 'RN'
-       tnom(4) = 'PB'
+       tname(1) = 'H2Ov'
+       tname(2) = 'H2Ol'
+       tname(3) = 'RN'
+       tname(4) = 'PB'
        do iq = 1, nqmx
-          print *, hadv(iq), vadv(iq), tnom(iq)
+          print *, hadv(iq), vadv(iq), tname(iq)
        end do
     ENDIF
-
-    tname = tnom
 
     ! À partir du nom court du traceur et du schéma d'advection, on
     ! détermine le nom long :
@@ -119,9 +119,9 @@ contains
        endif
 
        IF (iadv(iq) == 0) THEN
-          ttext(iq) = tnom(iq)
+          ttext(iq) = tname(iq)
        ELSE
-          ttext(iq)=trim(tnom(iq)) // descrq(iadv(iq))
+          ttext(iq)=trim(tname(iq)) // descrq(iadv(iq))
        endif
     end do
 

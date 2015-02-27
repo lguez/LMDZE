@@ -142,7 +142,6 @@ flxini.f
 flxmain.f
 fonte_neige.f
 fxhyp.f
-fxhyp_loop_ik.f
 fyhyp.f
 gcm.f
 geopot.f
@@ -197,6 +196,7 @@ interfsurf_hq.f
 interfsur_lim.f
 interpost.f
 interpre.f
+invert_zoom_x.f
 ioconf_calendar.f
 ioget_calendar.f
 ioipslmpp.f

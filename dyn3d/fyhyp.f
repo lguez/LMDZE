@@ -17,6 +17,7 @@ contains
 
     use coefpoly_m, only: coefpoly
     USE dimens_m, only: jjm
+    use heavyside_m, only: heavyside
     use serre, only: clat, grossismy, dzoomy, tauy
 
     REAL, intent(out):: rlatu(jjm + 1), yyprimu(jjm + 1)
@@ -37,7 +38,7 @@ contains
     DOUBLE PRECISION, save:: yf(0:nmax2)
     DOUBLE PRECISION yypr(0:nmax2)
     DOUBLE PRECISION yvrai(jjm + 1), yprimm(jjm + 1), ylatt(jjm + 1)
-    DOUBLE PRECISION pi, pis2, epsilon, y0, pisjm
+    DOUBLE PRECISION pi, pis2, epsilon, pisjm
     DOUBLE PRECISION yo1, yi, ylon2, ymoy, yprimin
     DOUBLE PRECISION yfi, yf1, ffdy
     DOUBLE PRECISION ypn, deply, y00
@@ -50,8 +51,6 @@ contains
     DOUBLE PRECISION fa(0:nmax2), fb(0:nmax2)
     REAL y0min, y0max
 
-    DOUBLE PRECISION heavyside
-
     !-------------------------------------------------------------------
 
     print *, "Call sequence information: fyhyp"
@@ -60,30 +59,29 @@ contains
     pis2 = pi/2.
     pisjm = pi/real(jjm)
     epsilon = 1e-3
-    y0 = clat*pi/180.
     dzoom = dzoomy*pi
     print *, 'yzoom(rad), grossismy, tauy, dzoom (rad):'
-    print *, y0, grossismy, tauy, dzoom
+    print *, clat, grossismy, tauy, dzoom
 
     DO i = 0, nmax2
        yt(i) = -pis2 + real(i)*pi/nmax2
     END DO
 
-    heavyy0m = heavyside(-y0)
-    heavyy0 = heavyside(y0)
-    y0min = 2.*y0*heavyy0m - pis2
-    y0max = 2.*y0*heavyy0 + pis2
+    heavyy0m = heavyside(-clat)
+    heavyy0 = heavyside(clat)
+    y0min = 2.*clat*heavyy0m - pis2
+    y0max = 2.*clat*heavyy0 + pis2
 
     fa = 999.999
     fb = 999.999
 
     DO i = 0, nmax2
-       IF (yt(i)<y0) THEN
-          fa(i) = tauy*(yt(i)-y0 + dzoom/2.)
-          fb(i) = (yt(i)-2.*y0*heavyy0m + pis2)*(y0-yt(i))
-       ELSE IF (yt(i)>y0) THEN
-          fa(i) = tauy*(y0-yt(i) + dzoom/2.)
-          fb(i) = (2.*y0*heavyy0-yt(i) + pis2)*(yt(i)-y0)
+       IF (yt(i)<clat) THEN
+          fa(i) = tauy*(yt(i)-clat + dzoom/2.)
+          fb(i) = (yt(i)-2.*clat*heavyy0m + pis2)*(clat-yt(i))
+       ELSE IF (yt(i)>clat) THEN
+          fa(i) = tauy*(clat-yt(i) + dzoom/2.)
+          fb(i) = (2.*clat*heavyy0-yt(i) + pis2)*(yt(i)-clat)
        END IF
 
        IF (200.*fb(i)<-fa(i)) THEN
@@ -94,7 +92,7 @@ contains
           fhyp(i) = tanh(fa(i)/fb(i))
        END IF
 
-       IF (yt(i)==y0) fhyp(i) = 1.
+       IF (yt(i)==clat) fhyp(i) = 1.
        IF (yt(i)==y0min .OR. yt(i)==y0max) fhyp(i) = -1.
     END DO
 
@@ -104,12 +102,12 @@ contains
 
     DO i = 1, nmax2
        ymoy = 0.5*(yt(i-1) + yt(i))
-       IF (ymoy<y0) THEN
-          fa(i) = tauy*(ymoy-y0 + dzoom/2.)
-          fb(i) = (ymoy-2.*y0*heavyy0m + pis2)*(y0-ymoy)
-       ELSE IF (ymoy>y0) THEN
-          fa(i) = tauy*(y0-ymoy + dzoom/2.)
-          fb(i) = (2.*y0*heavyy0-ymoy + pis2)*(ymoy-y0)
+       IF (ymoy<clat) THEN
+          fa(i) = tauy*(ymoy-clat + dzoom/2.)
+          fb(i) = (ymoy-2.*clat*heavyy0m + pis2)*(clat-ymoy)
+       ELSE IF (ymoy>clat) THEN
+          fa(i) = tauy*(clat-ymoy + dzoom/2.)
+          fb(i) = (2.*clat*heavyy0-ymoy + pis2)*(ymoy-clat)
        END IF
 
        IF (200.*fb(i)<-fa(i)) THEN
@@ -119,7 +117,7 @@ contains
        ELSE
           fxm(i) = tanh(fa(i)/fb(i))
        END IF
-       IF (ymoy==y0) fxm(i) = 1.
+       IF (ymoy==clat) fxm(i) = 1.
        IF (ymoy==y0min .OR. yt(i)==y0max) fxm(i) = -1.
        ffdy = ffdy + fxm(i)*(yt(i)-yt(i-1))
     END DO

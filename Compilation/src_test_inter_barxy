@@ -8,7 +8,6 @@ dimens_m.f
 disvert.f
 errioipsl.f
 fxhyp.f
-fxhyp_loop_ik.f
 fyhyp.f
 heavyside.f
 histclo.f
@@ -16,6 +15,7 @@ histcom_var.f
 inter_barx.f
 inter_barxy.f
 inter_bary.f
+invert_zoom_x.f
 minmax.f
 ord_coord.f
 ord_coordm.f

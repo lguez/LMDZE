@@ -18,7 +18,7 @@ contains
     ! 1., taux=0., clon=0.) est à - 180 degrés.
 
     USE dimens_m, ONLY: iim
-    use fxhyp_loop_ik_m, only: fxhyp_loop_ik, nmax
+    use invert_zoom_x_m, only: invert_zoom_x, nmax
     use nr_util, only: pi, pi_d, twopi, twopi_d, arth
     use principal_cshift_m, only: principal_cshift
     use serre, only: clon, grossismx, dzoomx, taux
@@ -157,13 +157,13 @@ contains
 
        Xf(2 * nmax) = pi_d
 
-       call fxhyp_loop_ik(xf, xtild, Xprimt, rlonm025(:iim), xprimm025(:iim), &
+       call invert_zoom_x(xf, xtild, Xprimt, rlonm025(:iim), xprimm025(:iim), &
             xuv = - 0.25d0)
-       call fxhyp_loop_ik(xf, xtild, Xprimt, rlonv(:iim), xprimv(:iim), &
+       call invert_zoom_x(xf, xtild, Xprimt, rlonv(:iim), xprimv(:iim), &
             xuv = 0d0)
-       call fxhyp_loop_ik(xf, xtild, Xprimt, rlonu(:iim), xprimu(:iim), &
+       call invert_zoom_x(xf, xtild, Xprimt, rlonu(:iim), xprimu(:iim), &
             xuv = 0.5d0)
-       call fxhyp_loop_ik(xf, xtild, Xprimt, rlonp025(:iim), xprimp025(:iim), &
+       call invert_zoom_x(xf, xtild, Xprimt, rlonp025(:iim), xprimp025(:iim), &
             xuv = 0.25d0)
     end if test_grossismx
 

@@ -122,9 +122,8 @@ flxflux.o : FCTTRE.o yoethf.o suphec.o dimphy.o
 flxini.o : suphec.o flxadjtq.o dimphy.o 
 flxmain.o : yoethf.o YOECUMF.o suphec.o flxini.o flxflux.o flxdtdq.o flxdlfs.o flxddraf.o flxbase.o flxasc.o dimphy.o 
 fonte_neige.o : yoethf.o suphec.o interface_surf.o indicesol.o FCTTRE.o 
-fxhyp.o : serre.o principal_cshift.o fxhyp_loop_ik.o dimens_m.o 
-fxhyp_loop_ik.o : serre.o dimens_m.o coefpoly.o 
-fyhyp.o : serre.o dimens_m.o coefpoly.o 
+fxhyp.o : serre.o principal_cshift.o invert_zoom_x.o dimens_m.o 
+fyhyp.o : serre.o heavyside.o dimens_m.o coefpoly.o 
 gcm.o : createnewfield.o yoethf.o unit_nml_m.o tracstoke.o suphec.o leapfrog.o ioconf_calendar.o init_dynzon.o inithist.o initdynav.o inifilr.o inidissip.o iniadvtrac.o histclo.o grid_change.o dynredem0.o dynetat0.o disvert.o dimphy.o dimens_m.o conf_guide.o conf_gcm.o comgeomphy.o comgeom.o comconst.o 
 geopot.o : dimens_m.o 
 getfieldindex.o : createnewfield.o 
@@ -175,6 +174,7 @@ interfsur_lim.o : dimphy.o abort_gcm.o
 interfsurf_hq.o : suphec.o soil.o interfsur_lim.o interfoce_lim.o interface_surf.o indicesol.o fonte_neige.o dimphy.o clesphys2.o calcul_fluxs.o calbeta.o albsno.o alboc.o abort_gcm.o 
 interpost.o : comgeom.o disvert.o comconst.o paramet_m.o dimens_m.o 
 interpre.o : temps.o comgeom.o conf_gcm.o disvert.o comconst.o paramet_m.o dimens_m.o 
+invert_zoom_x.o : serre.o dimens_m.o coefpoly.o 
 ioconf_calendar.o : errioipsl.o strlowercase.o calendar.o 
 ioget_calendar.o : ioconf_calendar.o calendar.o 
 ioipslmpp.o : errioipsl.o 

@@ -1,7 +1,7 @@
 coefpoly.f
 dimens_m.f
 fxhyp.f
-fxhyp_loop_ik.f
+invert_zoom_x.f
 principal_cshift.f
 serre.f
 test_fxhyp.f

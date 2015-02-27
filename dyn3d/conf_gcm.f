@@ -50,12 +50,6 @@ contains
     ! Auteurs : L. Fairhead, P. Le Van
     ! Version du 29/04/97
 
-    ! On ne compare pas les paramètres du zoom (grossismx, grossismy,
-    ! clon, clat) lus sur le fichier start avec ceux lus dans
-    ! une namelist, au début de gcm. Ces paramètres définissent entre
-    ! autres la grille et doivent être identiques, sinon il y aura
-    ! divergence du gcm.
-
     use abort_gcm_m, only: abort_gcm
     use comdissnew, only: read_comdissnew
     use unit_nml_m, only: unit_nml
