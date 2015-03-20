@@ -14,7 +14,6 @@ contains
     USE dimens_m, ONLY : iim, llm
     USE paramet_m, ONLY : iip1, iip2, ip1jm, ip1jmp1
     USE comconst, ONLY : daysec
-    USE comgeom, ONLY : unsaire
 
     REAL, intent(in):: ucov(ip1jmp1, llm), vcov(ip1jm, llm)
     real, intent(in):: teta(ip1jmp1, llm)

@@ -43,21 +43,17 @@ contains
     USE serre, ONLY : grossismx
 
     ! Local:
-    REAL dlonu(iim), dlatu(jjm)
+    REAL dlatu(jjm)
     REAL rlamda(2: iim), eignvl(iim)
 
     REAL lamdamax, cof
     INTEGER i, j, modemax, imx, k, kf
-    REAL dymin, dxmin, colat0
+    REAL dymin, colat0
     REAL eignft(iim, iim), coff
 
     !-----------------------------------------------------------
 
     print *, "Call sequence information: inifilr"
-
-    DO i = 1, iim
-       dlonu(i) = xprimu(i)
-    END DO
 
     CALL inifgn(eignvl)
 
@@ -78,16 +74,12 @@ contains
        dlatu(j) = rlatu(j) - rlatu(j+1)
     END DO
 
-    dxmin = dlonu(1)
-    DO i = 2, iim
-       dxmin = min(dxmin, dlonu(i))
-    END DO
     dymin = dlatu(1)
     DO j = 2, jjm
        dymin = min(dymin, dlatu(j))
     END DO
 
-    colat0 = min(0.5, dymin/dxmin)
+    colat0 = min(0.5, dymin / minval(xprimu(:iim)))
 
     PRINT *, 'colat0 = ', colat0
 

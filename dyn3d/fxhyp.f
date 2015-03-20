@@ -53,7 +53,7 @@ contains
        rlonm025(:iim) = rlonv(:iim) - 0.25 * step
        rlonp025(:iim) = rlonv(:iim) + 0.25 * step
        rlonu(:iim) = rlonv(:iim) + 0.5 * step
-    else
+    else test_grossismx
        dzoom = dzoomx * twopi_d
        xtild = arth(- pi_d, pi_d / nmax, 2 * nmax + 1)
 

@@ -5,7 +5,7 @@ abort_gcm.o : histclo.o
 academic.o : dimens_m.o 
 adaptdt.o : temps.o comgeom.o conf_gcm.o disvert.o comconst.o paramet_m.o dimens_m.o 
 addfi.o : dimens_m.o comgeom.o comconst.o 
-advect.o : comgeom.o comconst.o paramet_m.o dimens_m.o 
+advect.o : comconst.o paramet_m.o dimens_m.o 
 advn.o : comgeom.o conf_gcm.o disvert.o comconst.o paramet_m.o dimens_m.o 
 advtrac.o : vlspltqs.o paramet_m.o massbar.o interpre.o iniadvtrac.o dimens_m.o conf_gcm.o comconst.o 
 advx.o : disvert.o comconst.o paramet_m.o dimens_m.o 
@@ -53,7 +53,7 @@ conf_phys.o : YOMCST.o unit_nml_m.o conema3_m.o comfisrtilp.o clesphys2.o clesph
 conflx.o : FCTTRE.o yoethf.o suphec.o dimphy.o flxmain.o 
 convflu.o : comgeom.o paramet_m.o dimens_m.o 
 convmas.o : filtreg.o paramet_m.o dimens_m.o 
-coordij.o : comgeom.o dimens_m.o 
+coordij.o : dimens_m.o comgeom.o 
 covcont.o : comgeom.o paramet_m.o dimens_m.o 
 covnat.o : paramet_m.o comgeom.o 
 cv3_closure.o : cvthermo.o cv3_param.o 
@@ -157,7 +157,7 @@ ini_histins.o : ymds2ju.o temps.o phyetat0.o indicesol.o histvert.o histend.o hi
 ini_histrac.o : ymds2ju.o temps.o phyetat0.o iniadvtrac.o histvert.o histend.o histdef.o histbeg_totreg.o grid_change.o dynetat0.o dimphy.o disvert.o dimens_m.o clesphys.o 
 iniadvtrac.o : dimens_m.o 
 inidissip.o : paramet_m.o nxgraro2.o gradiv2.o filtreg.o divgrad2.o conf_gcm.o disvert.o comdissnew.o comconst.o dimens_m.o 
-inifgn.o : coefils.o comgeom.o dimens_m.o 
+inifgn.o : dimens_m.o comgeom.o coefils.o 
 inifilr.o : serre.o inifgn.o comgeom.o coefils.o dimens_m.o 
 init_dynzon.o : ymds2ju.o temps.o histvert.o histend.o histdef.o histbeg_totreg.o dynetat0.o disvert.o dimens_m.o conf_gcm.o comgeom.o 
 init_tau2alpha.o : writefield.o serre.o paramet_m.o dimens_m.o coordij.o conf_guide.o comgeom.o 

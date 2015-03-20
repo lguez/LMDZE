@@ -8,33 +8,26 @@ contains
 
     ! From LMDZ4/libf/dyn3d/coordij.F, version 1.1.1.1 2004/05/19 12:53:05
 
-    ! calcul des coordonnees i et j de la maille scalaire dans
-    ! laquelle se trouve le point (lon, lat) en radian
+    ! Calcul des coordonnées ilon et jlat de la maille scalaire dans
+    ! laquelle se trouve le point (lon, lat).
 
-    USE dimens_m, only: iim, jjm
     USE comgeom, only: rlonu, rlatv
-    USE nr_util, ONLY: pi
+    USE dimens_m, only: iim, jjm
 
-    REAL, intent(in):: lon, lat
-    INTEGER ilon, jlat
-    INTEGER i, j
+    REAL, intent(in):: lon, lat ! in rad
+    INTEGER, intent(out):: ilon, jlat
 
-    DO i = 1, iim + 1
-       IF (rlonu(i)>lon) THEN
-          ilon = i
-          exit
-       END IF
-    END DO
+    !----------------------------------------------------------
 
-    j = 0
-    DO j = 1, jjm
-       IF (rlatv(j)<lat) THEN
-          jlat = j
-          exit
-       END IF
-    END DO
+    ilon = 1
+    do while (ilon <= iim .and. rlonu(ilon) <= lon)
+       ilon = ilon + 1
+    end do
 
-    IF (j==0) j = jjm + 1
+    jlat = 1
+    do while (jlat <= jjm - 1 .and. rlatv(jlat) >= lat)
+       jlat = jlat + 1
+    end do
 
   END SUBROUTINE coordij
 

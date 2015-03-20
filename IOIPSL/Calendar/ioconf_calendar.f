@@ -17,14 +17,14 @@ module ioconf_calendar_m
   ! Year of xxx days with months of equal length. The origin for the
   ! julian days is then also 1 Jan 0.
 
-  ! As one can see it is difficult to go from one calendar to the
-  ! other. All operations involving julian days will be wrong. This
-  ! calendar will lock as soon as possible the length of the year and
-  ! forbid any further modification.
+  ! It is difficult to go from one calendar to the other. All
+  ! operations involving julian days will be wrong. This calendar will
+  ! lock the length of the year as soon as possible and forbid any
+  ! further modification.
 
-  ! For the non leap-year calendar the method is still brute force.
-  ! We need to find an integer series which takes care of the length
-  ! of the various month. (Jan)
+  ! For the no-leap calendar, the method is still brute force. We
+  ! need to find an integer series which takes care of the length of
+  ! the various month. (Jan)
 
   implicit none
 
@@ -40,27 +40,28 @@ contains
     ! This operation is only allowed once and the first call to
     ! ymds2ju or ju2ymsd will lock the current configuration.
     ! the argument to ioconf_calendar can be any of the following:
-    !  - gregorian: This is the gregorian calendar (default here)
-    !  - noleap: A calendar without leap years = 365 days
-    !  - xxxd: A calendar of xxx days (has to be a modulo of 12)
-    !                with 12 month of equal length
+
+    ! - gregorian: this is the gregorian calendar (default here)
+
+    ! - noleap: A calendar without leap years = 365 days
+
+    ! - xxxd: A calendar of xxx days (has to be a modulo of 12) with
+    ! 12 month of equal length
 
     use calendar, only: lock_unan
-    use strlowercase_m
-    use errioipsl
+    use strlowercase_m, only: strlowercase
+    use errioipsl, only: histerr
 
     CHARACTER(LEN=*), INTENT(IN):: str
 
-    INTEGER:: leng, ipos
-    CHARACTER(LEN=10):: str10
+    ! Local:
+    INTEGER leng, ipos
+    CHARACTER(LEN=10) str10
     !--------------------------------------------------------------------
 
-    ! 1.0 Clean up the sring !
-
-    CALL strlowercase (str)
+    CALL strlowercase(str)
 
     IF (.NOT.lock_unan) THEN
-
        lock_unan=.TRUE.
 
        SELECT CASE(str)
@@ -104,7 +105,7 @@ contains
           ipos = INDEX(str, 'd')
           IF (ipos == 4) THEN
              READ(str(1:3), '(I3)') leng
-             IF ( (MOD(leng, 12) == 0).AND.(leng > 1) ) THEN
+             IF ((MOD(leng, 12) == 0).AND.(leng > 1)) THEN
                 calendar_used = str
                 un_an = leng
                 mon_len(:) = leng

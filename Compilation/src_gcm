@@ -204,7 +204,6 @@ isittime.f
 ismax.f
 ismin.f
 itau2date.f
-jacobi.f
 ju2ymds.f
 laplacien.f
 laplacien_gam.f

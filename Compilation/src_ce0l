@@ -52,7 +52,6 @@ inter_barxy.f
 inter_bary.f
 invert_zoom_x.f
 ioconf_calendar.f
-jacobi.f
 ju2ymds.f
 limit.f
 massbar.f

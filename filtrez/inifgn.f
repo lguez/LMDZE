@@ -10,11 +10,12 @@ contains
 
     ! H.Upadyaya, O.Sharma 
 
-    USE dimens_m, ONLY: iim
-    USE comgeom, ONLY: xprimu, xprimv
     USE coefils, ONLY: eignfnu, eignfnv, sddu, sddv, unsddu, unsddv
+    USE comgeom, ONLY: xprimu, xprimv
+    USE dimens_m, ONLY: iim
+    use numer_rec_95, only: jacobi
 
-    real dv(iim)
+    real, intent(out):: dv(iim)
 
     ! Local:
     REAL vec(iim, iim), vec1(iim, iim)
@@ -23,7 +24,7 @@ contains
     REAL pi
     INTEGER i, j, k, imm1, nrot
 
-    EXTERNAL acc, jacobi
+    EXTERNAL acc
 
     !----------------------------------------------------------------
 
@@ -74,11 +75,11 @@ contains
        END DO
     END DO
 
-    CALL jacobi(vec, iim, iim, dv, eignfnv, nrot)
+    CALL jacobi(vec, dv, eignfnv, nrot)
     CALL acc(eignfnv, d, iim)
     CALL eigen_sort(dv, eignfnv, iim, iim)
 
-    CALL jacobi(vec1, iim, iim, du, eignfnu, nrot)
+    CALL jacobi(vec1, du, eignfnu, nrot)
     CALL acc(eignfnu, d, iim)
     CALL eigen_sort(du, eignfnu, iim, iim)
 
