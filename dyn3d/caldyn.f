@@ -76,7 +76,7 @@ contains
     CALL tourpot(vcov, ucov, massebxy, vorpot)
     CALL dudv1(vorpot, pbaru, pbarv, dudyn(:, 2: jjm, :), dv)
     CALL enercin(vcov, ucov, vcont, ucont, ecin)
-    CALL bernoui(phi, ecin, bern)
+    bern = bernoui(phi, ecin)
     CALL dudv2(teta, pkf, bern, dudyn, dv)
 
     forall (l = 1: llm) ang_3d(:, :, l) = ucov(:, :, l) + constang_2d

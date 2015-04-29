@@ -42,7 +42,6 @@ contains
     REAL massebx(ip1jmp1, llm), masseby((iim + 1) * jjm, llm)
     REAL vorpot(iim + 1, jjm, llm)
     real ecin(iim + 1, jjm + 1, llm), convm(ip1jmp1, llm)
-    REAL bern(iim + 1, jjm + 1, llm)
     REAL massebxy(iim + 1, jjm, llm), dp(ip1jmp1)
     INTEGER l
 
@@ -61,9 +60,8 @@ contains
     CALL vitvert(convm, w)
     CALL tourpot(vcov, ucov, massebxy, vorpot)
     CALL enercin(vcov, ucov, vcont, ucont, ecin)
-    CALL bernoui(phi, ecin, bern)
-    CALL sortvarc(ucov, teta, ps, masse, pk, phis, vorpot, phi, bern, dp, &
-         resetvarc = .true.)
+    CALL sortvarc(ucov, teta, ps, masse, pk, phis, vorpot, phi, &
+         bernoui(phi, ecin), dp, resetvarc = .true.)
 
   END SUBROUTINE caldyn0
 

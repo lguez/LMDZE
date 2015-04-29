@@ -8,8 +8,8 @@ contains
 
     ! From filtrez/filtreg.F, version 1.1.1.1, 2004/05/19 12:53:09
     ! Author: P. Le Van
-    ! Objet : filtre matriciel longitudinal, avec les matrices précalculées
-    ! pour l'opérateur filtre. 
+    ! Objet : filtre matriciel longitudinal, avec les matrices pr\'ecalcul\'ees
+    ! pour l'op\'erateur filtre. 
 
     USE coefils, ONLY: sddu, sddv, unsddu, unsddv
     USE dimens_m, ONLY: iim, jjm
@@ -18,17 +18,17 @@ contains
     use nr_util, only: assert
 
     REAL, intent(inout):: champ(:, :, :) ! (iim + 1, nlat, nbniv)
-    ! en entrée : champ à filtrer, en sortie : champ filtré
+    ! en entr\'ee : champ \`a filtrer, en sortie : champ filtr\'e
 
     logical, intent(in):: direct ! filtre direct ou inverse 
 
     logical, intent(in):: intensive
-    ! champ intensif ou extensif (pondéré par les aires)
+    ! champ intensif ou extensif (pond\'er\'e par les aires)
 
     ! Local:
     LOGICAL griscal
-    INTEGER nlat ! nombre de latitudes à filtrer
-    integer nbniv ! nombre de niveaux verticaux à filtrer 
+    INTEGER nlat ! nombre de latitudes \`a filtrer
+    integer nbniv ! nombre de niveaux verticaux \`a filtrer 
     INTEGER jdfil1, jdfil2, jffil1, jffil2, jdfil, jffil
     INTEGER i, j, l, k
     REAL eignq(iim), sdd1(iim), sdd2(iim)
@@ -75,7 +75,7 @@ contains
        jffil2 = jjm
     END IF
 
-    DO hemisph = 1, 2
+    loop_hemisph: DO hemisph = 1, 2
        IF (hemisph==1) THEN
           jdfil = jdfil1
           jffil = jffil1
@@ -168,7 +168,7 @@ contains
              champ(iim + 1, j, l) = champ(1, j, l)
           END DO loop_latitude
        END DO loop_vertical
-    end DO
+    end DO loop_hemisph
 
   END SUBROUTINE filtreg
 
