@@ -126,6 +126,7 @@ errioipsl.f
 exner_hyb.f
 FCTTRE.f
 filtreg.f
+filtreg_hemisph.f
 findsep.f
 find_str.f
 fisrtilp.f

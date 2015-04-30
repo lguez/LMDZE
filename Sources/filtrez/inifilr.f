@@ -1,17 +1,20 @@
 module inifilr_m
 
-  use dimens_m, only: iim
-
   IMPLICIT NONE
 
   INTEGER jfiltnu, jfiltsu, jfiltnv, jfiltsv
-  INTEGER, PARAMETER:: nfilun=3, nfilus=2, nfilvn=2, nfilvs=2
 
-  real matriceun(iim,iim,nfilun), matriceus(iim,iim,nfilus)
-  real matricevn(iim,iim,nfilvn), matricevs(iim,iim,nfilvs)
-  real matrinvn(iim,iim,nfilun), matrinvs(iim,iim,nfilus)
+  ! North:
+  real, allocatable:: matriceun(:, :, :), matrinvn(:, :, :) 
+  ! (iim, iim, 2:jfiltnu)
 
-  private iim, nfilun, nfilus, nfilvn, nfilvs
+  real, allocatable:: matricevn(:, :, :) ! (iim, iim, jfiltnv)
+
+  ! South:
+  real, allocatable:: matriceus(:, :, :), matrinvs(:, :, :)
+  ! (iim, iim, jfiltsu:jjm)
+
+  real, allocatable:: matricevs(:, :, :) ! (iim, iim, jfiltsv:jjm)
 
 contains
 
@@ -234,78 +237,10 @@ contains
     PRINT *, 'Modes premiers u '
     PRINT 334, modfrstu
 
-    IF (nfilun < jfiltnu) THEN
-       PRINT *, 'le parametre nfilun utilise pour la matrice ', &
-            'matriceun est trop petit ! '
-       PRINT *, 'Le changer dans parafilt.h et le mettre a ', jfiltnu
-       PRINT *, 'Pour information, nfilun, nfilus, nfilvn, nfilvs ', &
-            'doivent etre egaux successivement a ', jfiltnu, &
-            jjm - jfiltsu + 1, jfiltnv, jjm - jfiltsv + 1
-       STOP 1
-    END IF
-    IF (nfilun > jfiltnu+2) THEN
-       PRINT *, 'le parametre nfilun utilise pour la matrice ', &
-            'matriceun est trop grand ! Gachis de memoire ! '
-       PRINT *, 'Le changer dans parafilt.h et le mettre a ', jfiltnu
-       PRINT *, 'Pour information, nfilun, nfilus, nfilvn, nfilvs ', &
-            'doivent etre egaux successivement a ', &
-            jfiltnu, jjm - jfiltsu + 1, jfiltnv, jjm - jfiltsv + 1
-    END IF
-    IF (nfilus < jjm-jfiltsu+1) THEN
-       PRINT *, 'le parametre nfilus utilise pour la matrice ', &
-            'matriceus est trop petit ! '
-       PRINT *, 'Le changer dans parafilt.h et le mettre a ', &
-            jjm - jfiltsu + 1
-       PRINT *, 'Pour information , nfilun, nfilus, nfilvn, nfilvs ', &
-            'doivent etre egaux successivement a ', &
-            jfiltnu, jjm - jfiltsu + 1, jfiltnv, jjm - jfiltsv + 1
-       STOP 1
-    END IF
-    IF (nfilus > jjm-jfiltsu+3) THEN
-       PRINT *, 'le parametre nfilus utilise pour la matrice ', &
-            'matriceus est trop grand ! '
-       PRINT *, 'Le changer dans parafilt.h et le mettre a ', &
-            jjm - jfiltsu + 1
-       PRINT *, 'Pour information , nfilun, nfilus, nfilvn, nfilvs ', &
-            'doivent etre egaux successivement a ', &
-            jfiltnu, jjm - jfiltsu + 1, jfiltnv, jjm - jfiltsv + 1
-    END IF
-    IF (nfilvn < jfiltnv) THEN
-       PRINT *, 'le parametre nfilvn utilise pour la matrice ', &
-            'matricevn est trop petit ! '
-       PRINT *, 'Le changer dans parafilt.h et le mettre a ', jfiltnv
-       PRINT *, 'Pour information , nfilun, nfilus, nfilvn, nfilvs ', &
-            'doivent etre egaux successivement a ', &
-            jfiltnu, jjm - jfiltsu + 1, jfiltnv, jjm - jfiltsv + 1
-       STOP 1
-    END IF
-    IF (nfilvn > jfiltnv+2) THEN
-       PRINT *, 'le parametre nfilvn utilise pour la matrice ', &
-            'matricevn est trop grand ! Gachis de memoire ! '
-       PRINT *, 'Le changer dans parafilt.h et le mettre a ', jfiltnv
-       PRINT *, 'Pour information , nfilun, nfilus, nfilvn, nfilvs ', &
-            'doivent etre egaux successivement a ', &
-            jfiltnu, jjm - jfiltsu + 1, jfiltnv, jjm - jfiltsv + 1
-    END IF
-    IF (nfilvs < jjm-jfiltsv+1) THEN
-       PRINT *, 'le parametre nfilvs utilise pour la matrice ', &
-            'matricevs est trop petit ! Le changer dans parafilt.h '
-       PRINT *, 'Le changer dans parafilt.h et le mettre a ', &
-            jjm - jfiltsv + 1
-       PRINT *, 'Pour information , nfilun, nfilus, nfilvn, nfilvs ', &
-            'doivent etre egaux successivement a ', &
-            jfiltnu, jjm - jfiltsu + 1, jfiltnv, jjm - jfiltsv + 1
-       STOP 1
-    END IF
-    IF (nfilvs > jjm-jfiltsv+3) THEN
-       PRINT *, 'le parametre nfilvs utilise pour la matrice ', &
-            'matricevs est trop grand ! Gachis de memoire ! '
-       PRINT *, 'Le changer dans parafilt.h et le mettre a ', &
-            jjm - jfiltsv + 1
-       PRINT *, 'Pour information , nfilun, nfilus, nfilvn, nfilvs ', &
-            'doivent etre egaux successivement a ', &
-            jfiltnu, jjm - jfiltsu + 1, jfiltnv, jjm - jfiltsv + 1
-    END IF
+    allocate(matriceun(iim, iim, 2:jfiltnu), matrinvn(iim, iim, 2:jfiltnu))
+    allocate(matricevn(iim, iim, jfiltnv))
+    allocate(matricevs(iim, iim, jfiltsv:jjm))
+    allocate(matriceus(iim, iim, jfiltsu:jjm), matrinvs(iim, iim, jfiltsu:jjm))
 
     ! Calcul de la matrice filtre 'matriceu' pour les champs situes
     ! sur la grille scalaire
@@ -331,7 +266,7 @@ contains
           end IF
           eignft(i, :) = eignfnv(:, i) * coff
        END DO
-       matriceus(:, :, j - jfiltsu + 1) = matmul(eignfnv, eignft)
+       matriceus(:, :, j) = matmul(eignfnv, eignft)
     END DO
 
     ! Calcul de la matrice filtre 'matricev' pour les champs situes
@@ -358,7 +293,7 @@ contains
           end IF
           eignft(i, :) = eignfnu(:, i)*coff
        END DO
-       matricevs(:, :, j-jfiltsv+1) = matmul(eignfnu, eignft)
+       matricevs(:, :, j) = matmul(eignfnu, eignft)
     END DO
 
     ! Calcul de la matrice filtre 'matrinv' pour les champs situes
@@ -385,7 +320,7 @@ contains
           end IF
           eignft(i, :) = eignfnv(:, i)*coff
        END DO
-       matrinvs(:, :, j-jfiltsu+1) = matmul(eignfnv, eignft)
+       matrinvs(:, :, j) = matmul(eignfnv, eignft)
     END DO
 
 334 FORMAT (1X, 24I3)

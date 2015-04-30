@@ -107,7 +107,8 @@ dynredem1.o : iniadvtrac.o dimens_m.o
 enercin.o : comgeom.o paramet_m.o dimens_m.o 
 etat0.o : unit_nml_m.o test_disvert.o temps.o start_inter_3d.o start_init_phys_m.o start_init_orog_m.o startdyn.o regr_pr_o3.o regr_lat_time_coefoz.o q_sat.o phyredem.o paramet_m.o massdair.o inifilr.o iniadvtrac.o histclo.o grid_change.o grid_atob.o geopot.o exner_hyb.o dynredem1.o dynredem0.o dynetat0.o disvert.o dimsoil.o dimens_m.o comgeom.o comconst.o caldyn0.o dimphy.o indicesol.o 
 exner_hyb.o : filtreg.o disvert.o comconst.o dimens_m.o 
-filtreg.o : inifilr.o dimens_m.o coefils.o 
+filtreg.o : inifilr.o filtreg_hemisph.o dimens_m.o coefils.o 
+filtreg_hemisph.o : dimens_m.o 
 findsep.o : cleanstr.o mathelp.o errioipsl.o 
 fisrtilp.o : yoethf.o suphec.o FCTTRE.o dimphy.o comfisrtilp.o 
 flumass.o : comgeom.o paramet_m.o dimens_m.o 
@@ -158,7 +159,7 @@ ini_histrac.o : ymds2ju.o temps.o phyetat0.o iniadvtrac.o histvert.o histend.o h
 iniadvtrac.o : dimens_m.o 
 inidissip.o : paramet_m.o nxgraro2.o gradiv2.o filtreg.o divgrad2.o conf_gcm.o disvert.o comdissnew.o comconst.o dimens_m.o 
 inifgn.o : dimens_m.o comgeom.o coefils.o 
-inifilr.o : serre.o inifgn.o comgeom.o coefils.o dimens_m.o 
+inifilr.o : serre.o inifgn.o dimens_m.o comgeom.o coefils.o 
 init_dynzon.o : ymds2ju.o temps.o histvert.o histend.o histdef.o histbeg_totreg.o dynetat0.o disvert.o dimens_m.o conf_gcm.o comgeom.o 
 init_tau2alpha.o : writefield.o serre.o paramet_m.o dimens_m.o coordij.o conf_guide.o comgeom.o 
 initdynav.o : ymds2ju.o temps.o paramet_m.o iniadvtrac.o histvert.o histend.o histdef.o histbeg_totreg.o dynetat0.o dimens_m.o comgeom.o 
