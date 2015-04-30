@@ -18,7 +18,7 @@ CONTAINS
          ini_anal, tau_min_u, tau_max_u, tau_min_v, tau_max_v, tau_min_t, &
          tau_max_t, tau_min_q, tau_max_q, online, factt
     USE dimens_m, ONLY: iim, jjm, llm
-    USE disvert_m, ONLY: ap, bp, preff, presnivs
+    USE disvert_m, ONLY: ap, bp, preff
     USE exner_hyb_m, ONLY: exner_hyb
     use init_tau2alpha_m, only: init_tau2alpha
     use netcdf, only: nf90_nowrite

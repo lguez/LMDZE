@@ -30,7 +30,7 @@ contains
     INTEGER nlat ! nombre de latitudes \`a filtrer
     integer nbniv ! nombre de niveaux verticaux \`a filtrer 
     INTEGER jdfil1, jdfil2, jffil1, jffil2, jdfil, jffil
-    INTEGER i, j, l, k
+    INTEGER j, l
     REAL eignq(iim), sdd1(iim), sdd2(iim)
     INTEGER hemisph
 
@@ -75,7 +75,7 @@ contains
        jffil2 = jjm
     END IF
 
-    loop_hemisph: DO hemisph = 1, 2
+    DO hemisph = 1, 2
        IF (hemisph==1) THEN
           jdfil = jdfil1
           jffil = jffil1
@@ -84,91 +84,41 @@ contains
           jffil = jffil2
        END IF
 
-       loop_vertical: DO l = 1, nbniv
-          loop_latitude: DO j = jdfil, jffil
-             DO i = 1, iim
-                champ(i, j, l) = champ(i, j, l)*sdd1(i)
-             END DO
+       DO l = 1, nbniv
+          DO j = jdfil, jffil
+             champ(:iim, j, l) = champ(:iim, j, l) * sdd1
 
              IF (hemisph==1) THEN
                 IF (.not. direct) THEN
-                   DO k = 1, iim
-                      eignq(k) = 0.
-                   END DO
-                   DO k = 1, iim
-                      DO i = 1, iim
-                         eignq(k) = eignq(k) + matrinvn(k, i, j)*champ(i, j, l)
-                      END DO
-                   END DO
+                   eignq = matmul(matrinvn(:, :, j), champ(:iim, j, l))
                 ELSE IF (griscal) THEN
-                   DO k = 1, iim
-                      eignq(k) = 0.
-                   END DO
-                   DO i = 1, iim
-                      DO k = 1, iim
-                         eignq(k) = eignq(k) + matriceun(k, i, j) &
-                              * champ(i, j, l)
-                      END DO
-                   END DO
+                   eignq = matmul(matriceun(:, :, j), champ(:iim, j, l))
                 ELSE
-                   DO k = 1, iim
-                      eignq(k) = 0.
-                   END DO
-                   DO i = 1, iim
-                      DO k = 1, iim
-                         eignq(k) = eignq(k) + matricevn(k, i, j) &
-                              * champ(i, j, l)
-                      END DO
-                   END DO
+                   eignq = matmul(matricevn(:, :, j), champ(:iim, j, l))
                 END IF
              ELSE
                 IF (.not. direct) THEN
-                   DO k = 1, iim
-                      eignq(k) = 0.
-                   END DO
-                   DO i = 1, iim
-                      DO k = 1, iim
-                         eignq(k) = eignq(k) + matrinvs(k, i, j-jfiltsu+1) &
-                              *champ(i, j, l)
-                      END DO
-                   END DO
+                   eignq = matmul(matrinvs(:, :, j - jfiltsu + 1), &
+                        champ(:iim, j, l))
                 ELSE IF (griscal) THEN
-                   DO k = 1, iim
-                      eignq(k) = 0.
-                   END DO
-                   DO i = 1, iim
-                      DO k = 1, iim
-                         eignq(k) = eignq(k) + matriceus(k, i, j-jfiltsu+1) &
-                              *champ(i, j , l)
-                      END DO
-                   END DO
+                   eignq = matmul(matriceus(:, :, j - jfiltsu + 1), &
+                        champ(:iim, j, l))
                 ELSE
-                   DO k = 1, iim
-                      eignq(k) = 0.
-                   END DO
-                   DO i = 1, iim
-                      DO k = 1, iim
-                         eignq(k) = eignq(k) + matricevs(k, i, j-jfiltsv+1) &
-                              *champ(i, j , l)
-                      END DO
-                   END DO
+                   eignq = matmul(matricevs(:, :, j - jfiltsv + 1), &
+                        champ(:iim, j, l))
                 END IF
              END IF
 
              IF (direct) THEN
-                DO i = 1, iim
-                   champ(i, j, l) = (champ(i, j, l)+eignq(i))*sdd2(i)
-                end DO
+                champ(:iim, j, l) = (champ(:iim, j, l) + eignq) * sdd2
              ELSE
-                DO i = 1, iim
-                   champ(i, j, l) = (champ(i, j, l)-eignq(i))*sdd2(i)
-                end DO
+                champ(:iim, j, l) = (champ(:iim, j, l) - eignq) * sdd2
              END IF
 
              champ(iim + 1, j, l) = champ(1, j, l)
-          END DO loop_latitude
-       END DO loop_vertical
-    end DO loop_hemisph
+          END DO
+       END DO
+    end DO
 
   END SUBROUTINE filtreg
 

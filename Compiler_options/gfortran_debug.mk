@@ -4,10 +4,10 @@
 netcdf_inc_dir = /usr/include
 netcdf_lib_dir = 
 
-numer_rec_95_dir = ${HOME}/User_install/lib/Numer_Rec_95_debug
-nr_util_dir = ${HOME}/User_install/lib/NR_util_debug
-netcdf95_dir = ${HOME}/User_install/lib/NetCDF95_debug
-jumble_dir = ${HOME}/User_install/lib/Jumble_debug
+numer_rec_95_dir = ${HOME}/Desktop/lib/Numer_Rec_95_debug
+nr_util_dir = ${HOME}/Desktop/lib/NR_util_debug
+netcdf95_dir = ${HOME}/Desktop/lib/NetCDF95_debug
+jumble_dir = ${HOME}/Desktop/lib/Jumble_debug
 
 # Include flags:
 FFLAGS = $(addprefix -I, ${netcdf_inc_dir} ${numer_rec_95_dir} ${netcdf95_dir} ${nr_util_dir} ${jumble_dir})

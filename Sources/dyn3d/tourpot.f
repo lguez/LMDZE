@@ -6,7 +6,7 @@ contains
 
   SUBROUTINE tourpot(vcov, ucov, massebxy, vorpot)
 
-    ! From LMDZ4/libf/dyn3d/tourpot.F, version 1.1.1.1 2004/05/19 12:53:06
+    ! From LMDZ4/libf/dyn3d/tourpot.F, version 1.1.1.1, 2004/05/19 12:53:06
 
     ! Author: P. Le Van
     ! Objet : calcul du tourbillon potentiel
