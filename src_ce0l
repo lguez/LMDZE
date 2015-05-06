@@ -30,8 +30,9 @@ errioipsl.f
 etat0.f
 exner_hyb.f
 extrapol.f
-filtreg.f
 filtreg_hemisph.f
+filtreg_scal.f
+filtreg_v.f
 flumass.f
 fxhyp.f
 fyhyp.f

@@ -42,7 +42,6 @@ contains
 
     real p(iip1, jjp1, llmp1)
     real pks(iip1, jjp1)
-    real pkf(iip1, jjp1, llm)
     real pls(iip1, jjp1, llm)
     real prefkap, unskap
 
@@ -53,7 +52,7 @@ contains
     ! calcul de la pression au milieu des couches
     forall (l = 1: llm + 1) p(:, :, l) = ap(l) + bp(l) * psi
     call massdair(p, masse)
-    CALL exner_hyb(psi, p, pks, pk, pkf)
+    CALL exner_hyb(psi, p, pks, pk)
 
     ! Calcul de pls, pression au milieu des couches, en Pascals
     unskap=1./kappa

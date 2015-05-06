@@ -118,11 +118,11 @@ CONTAINS
                               miss_val, nb_max, work_out)
              ENDIF
           CASE('coll')
-             ierr = ma_fucoll_r11(nb, work_in, nb_index, nindex, &
-                            miss_val, nb_max, work_out)
+             ierr = ma_fucoll_r11(nb, work_in, nb_index, nindex, nb_max, &
+                  work_out)
           CASE('fill')
-             ierr = ma_fufill_r11(nb, work_in, nb_index, nindex, &
-                            miss_val, nb_max, work_out)
+             ierr = ma_fufill_r11(nb, work_in, nb_index, nindex, nb_max, &
+                  work_out)
           CASE('undef')
              ierr = ma_fuundef_r11(nb, work_in, nb_index, nindex, &
                             miss_val, nb_max, work_out)
@@ -273,11 +273,11 @@ CONTAINS
                              miss_val, nb_max, work_out)
              ENDIF
           CASE('coll')
-             ierr = ma_fucoll_r21(nb, work_in, nb_index, nindex, &
-                           miss_val, nb_max, work_out)
+             ierr = ma_fucoll_r21(nb, work_in, nb_index, nindex, nb_max, &
+                  work_out)
           CASE('fill')
-             ierr = ma_fufill_r21(nb, work_in, nb_index, nindex, &
-                           miss_val, nb_max, work_out)
+             ierr = ma_fufill_r21(nb, work_in, nb_index, nindex, nb_max, &
+                  work_out)
           CASE('undef')
              ierr = ma_fuundef_r21(nb, work_in, nb_index, nindex, &
                            miss_val, nb_max, work_out)
@@ -428,11 +428,11 @@ CONTAINS
                      miss_val, nb_max, work_out)
              ENDIF
           CASE('coll')
-             ierr = ma_fucoll_r31(nb, work_in, nb_index, nindex, &
-                  miss_val, nb_max, work_out)
+             ierr = ma_fucoll_r31(nb, work_in, nb_index, nindex, nb_max, &
+                  work_out)
           CASE('fill')
-             ierr = ma_fufill_r31(nb, work_in, nb_index, nindex, &
-                  miss_val, nb_max, work_out)
+             ierr = ma_fufill_r31(nb, work_in, nb_index, nindex, nb_max, &
+                  work_out)
           CASE('undef')
              ierr = ma_fuundef_r31(nb, work_in, nb_index, nindex, &
                   miss_val, nb_max, work_out)

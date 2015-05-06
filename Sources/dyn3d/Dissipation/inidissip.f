@@ -27,7 +27,8 @@ contains
     USE conf_gcm_m, ONLY: iperiod
     USE dimens_m, ONLY: iim, jjm
     use divgrad2_m, only: divgrad2
-    use filtreg_m, only: filtreg
+    use filtreg_scal_m, only: filtreg_scal
+    use filtreg_v_m, only: filtreg_v
     use gradiv2_m, only: gradiv2
     use jumble, only: new_unit
     use nxgraro2_m, only: nxgraro2
@@ -51,7 +52,7 @@ contains
     deltap = 1.
     call random_number(zh)
     zh = zh - 0.5
-    CALL filtreg(zh, direct = .true., intensive = .true.)
+    CALL filtreg_scal(zh, direct = .true., intensive = .true.)
 
     DO l = 1, 50
        CALL divgrad2(1, zh, deltap, niterh, divgra, -1.)
@@ -65,10 +66,10 @@ contains
     PRINT *, 'Calcul des valeurs propres de gradiv'
     call random_number(zu)
     zu = zu - 0.5
-    CALL filtreg(zu, direct = .true., intensive = .true.)
+    CALL filtreg_scal(zu, direct = .true., intensive = .true.)
     call random_number(zv)
     zv = zv - 0.5
-    CALL filtreg(zv, direct = .true., intensive = .true.)
+    CALL filtreg_v(zv, intensive = .true.)
 
     DO l = 1, 50
        CALL gradiv2(zu, zv, nitergdiv, gx, gy, -1.)
@@ -83,10 +84,10 @@ contains
     PRINT *, 'Calcul des valeurs propres de nxgrarot'
     call random_number(zu)
     zu = zu - 0.5
-    CALL filtreg(zu, direct = .true., intensive = .true.)
+    CALL filtreg_scal(zu, direct = .true., intensive = .true.)
     call random_number(zv)
     zv = zv - 0.5
-    CALL filtreg(zv, direct = .true., intensive = .true.)
+    CALL filtreg_v(zv, intensive = .true.)
 
     DO l = 1, 50
        CALL nxgraro2(zu, zv, nitergrot, gx, gy, -1.)

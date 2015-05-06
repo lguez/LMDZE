@@ -12,7 +12,7 @@ contains
 
     use dimens_m, only: iim, jjm
     use divergf_m, only: divergf
-    use filtreg_m, only: filtreg
+    use filtreg_scal_m, only: filtreg_scal
     use grad_m, only: grad
     USE paramet_m, ONLY: ip1jm, ip1jmp1, jjp1
 
@@ -24,7 +24,7 @@ contains
 
     !-----------------------------------------------------------------
 
-    CALL filtreg(teta, direct = .true., intensive = .true.)
+    CALL filtreg_scal(teta, direct = .true., intensive = .true.)
     CALL grad(klevel, teta, ghx, ghy)
     CALL divergf(klevel, ghx, ghy, teta)
 

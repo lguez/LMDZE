@@ -11,13 +11,13 @@ contains
 
     ! From dyn3d/sortvarc.F, version 1.1.1.1 2004/05/19 12:53:07
     ! Author: P. Le Van
-    ! Objet : sortie des variables de contrôle
+    ! Objet : sortie des variables de contr\^ole
 
     USE comconst, ONLY: daysec, g, omeg, rad
     USE comgeom, ONLY: aire_2d, cu_2d, rlatu
     USE dimens_m, ONLY: iim, jjm, llm
     USE ener, ONLY: ang0, etot0, ptot0, stot0, ztot0
-    use filtreg_m, only: filtreg
+    use filtreg_scal_m, only: filtreg_scal
     use massbarxy_m, only: massbarxy
     USE paramet_m, ONLY: iip1, ip1jm, jjp1
 
@@ -53,7 +53,7 @@ contains
     rmsdpdt = sum(ge) - sum(ge(1, :))
     rmsdpdt = daysec*1.E-2*sqrt(rmsdpdt / (iim * jjp1))
     bernf = bern
-    CALL filtreg(bernf, direct = .false., intensive = .false.)
+    CALL filtreg_scal(bernf, direct = .false., intensive = .false.)
 
     ! Calcul du moment  angulaire
     radsg = rad/g

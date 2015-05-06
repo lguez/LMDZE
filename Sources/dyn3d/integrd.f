@@ -14,7 +14,7 @@ contains
     USE comgeom, ONLY : aire, aire_2d, apoln, apols
     USE dimens_m, ONLY : iim, jjm, llm
     USE disvert_m, ONLY : ap, bp
-    USE filtreg_m, ONLY : filtreg
+    USE filtreg_scal_m, ONLY : filtreg_scal
     use massdair_m, only: massdair
     use nr_util, only: assert
     USE paramet_m, ONLY : iip1, iip2, ip1jm, ip1jmp1, jjp1, llmp1
@@ -93,7 +93,7 @@ contains
     CALL massdair(p, masse)
 
     finvmasse = masse
-    CALL filtreg(finvmasse, direct = .false., intensive = .false.)
+    CALL filtreg_scal(finvmasse, direct = .false., intensive = .false.)
 
     ! integration de ucov, vcov, h
 

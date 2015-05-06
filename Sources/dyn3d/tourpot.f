@@ -13,7 +13,7 @@ contains
 
     USE comgeom, ONLY: fext_2d
     USE dimens_m, ONLY: iim, jjm, llm
-    use filtreg_m, only: filtreg
+    use filtreg_v_m, only: filtreg_v
 
     REAL, intent(in):: vcov(:, :, :) ! (iim + 1, jjm, llm)
     REAL, intent(in):: ucov(:, :, :) ! (iim + 1, jjm + 1, llm)
@@ -37,7 +37,7 @@ contains
          = vcov(i + 1, j, :) - vcov(i, j, :) + ucov(i, j + 1, :) - ucov(i, j, :)
     rot(iim + 1, :, :) = rot(1, :, :)
 
-    CALL filtreg(rot, direct = .true., intensive = .true.)
+    CALL filtreg_v(rot, intensive = .true.)
 
     forall (l = 1: llm) vorpot(:iim, :, l) &
          = (rot(:iim, :, l) + fext_2d(:iim, :)) / massebxy(:iim, :, l)

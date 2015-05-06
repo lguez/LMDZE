@@ -27,7 +27,7 @@ contains
     USE dynetat0_m, ONLY: day_ini
     use dynredem1_m, only: dynredem1
     USE exner_hyb_m, ONLY: exner_hyb
-    use filtreg_m, only: filtreg
+    use filtreg_scal_m, only: filtreg_scal
     use fluxstokenc_m, only: fluxstokenc
     use geopot_m, only: geopot
     USE guide_m, ONLY: guide
@@ -108,7 +108,9 @@ contains
 
     ! On initialise la pression et la fonction d'Exner :
     forall (l = 1: llm + 1) p3d(:, :, l) = ap(l) + bp(l) * ps
-    CALL exner_hyb(ps, p3d, pks, pk, pkf)
+    CALL exner_hyb(ps, p3d, pks, pk)
+    pkf = pk
+    CALL filtreg_scal(pkf, direct = .true., intensive = .true.)
 
     time_integration: do itau = 0, itaufin - 1
        leapf = mod(itau, iperiod) /= 0
@@ -124,7 +126,7 @@ contains
           massem1 = masse
           psm1 = ps
           finvmaold = masse
-          CALL filtreg(finvmaold, direct = .false., intensive = .false.)
+          CALL filtreg_scal(finvmaold, direct = .false., intensive = .false.)
        end if
 
        ! Calcul des tendances dynamiques:
@@ -145,7 +147,9 @@ contains
             leapf)
 
        forall (l = 1: llm + 1) p3d(:, :, l) = ap(l) + bp(l) * ps
-       CALL exner_hyb(ps, p3d, pks, pk, pkf)
+       CALL exner_hyb(ps, p3d, pks, pk)
+       pkf = pk
+       CALL filtreg_scal(pkf, direct = .true., intensive = .true.)
 
        if (.not. leapf) then
           ! Matsuno backward
@@ -160,7 +164,9 @@ contains
                finvmaold, dtvr, leapf=.false.)
 
           forall (l = 1: llm + 1) p3d(:, :, l) = ap(l) + bp(l) * ps
-          CALL exner_hyb(ps, p3d, pks, pk, pkf)
+          CALL exner_hyb(ps, p3d, pks, pk)
+          pkf = pk
+          CALL filtreg_scal(pkf, direct = .true., intensive = .true.)
        end if
 
        IF (MOD(itau + 1, iphysiq) == 0 .AND. iflag_phys /= 0) THEN

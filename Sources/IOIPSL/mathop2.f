@@ -475,10 +475,10 @@ CONTAINS
 
   !************************************************
 
-  INTEGER FUNCTION ma_fufill_r11(nb, x, nbi, ind, miss_val, nbo, y)
+  INTEGER FUNCTION ma_fufill_r11(nb, x, nbi, ind, nbo, y)
     INTEGER :: nb, nbo, nbi
     INTEGER :: ind(nbi)
-    REAL :: x(nb), miss_val, y(nbo)
+    REAL :: x(nb), y(nbo)
 
     INTEGER :: i, ii, ipos
     !---------------------------------------------------------------------
@@ -516,10 +516,10 @@ CONTAINS
 
   !************************************************
 
-  INTEGER FUNCTION ma_fucoll_r11(nb, x, nbi, ind, miss_val, nbo, y)
+  INTEGER FUNCTION ma_fucoll_r11(nb, x, nbi, ind, nbo, y)
     INTEGER :: nb, nbo, nbi
     INTEGER :: ind(nbi)
-    REAL :: x(nb), miss_val, y(nbo)
+    REAL :: x(nb), y(nbo)
 
     INTEGER :: i, ipos
     !---------------------------------------------------------------------
@@ -1171,10 +1171,10 @@ CONTAINS
 
   !************************************************
 
-  INTEGER FUNCTION ma_fufill_r21(nb, x, nbi, ind, miss_val, nbo, y)
+  INTEGER FUNCTION ma_fufill_r21(nb, x, nbi, ind, nbo, y)
     INTEGER :: nb(2), nbo, nbi
     INTEGER :: ind(nbi)
-    REAL :: x(nb(1), nb(2)), miss_val, y(nbo)
+    REAL :: x(nb(1), nb(2)), y(nbo)
 
     INTEGER :: i, j, ij, ii, ipos
     !---------------------------------------------------------------------
@@ -1214,10 +1214,10 @@ CONTAINS
 
   !************************************************
 
-  INTEGER FUNCTION ma_fucoll_r21(nb, x, nbi, ind, miss_val, nbo, y)
+  INTEGER FUNCTION ma_fucoll_r21(nb, x, nbi, ind, nbo, y)
     INTEGER :: nb(2), nbo, nbi
     INTEGER :: ind(nbi)
-    REAL :: x(nb(1), nb(2)), miss_val, y(nbo)
+    REAL :: x(nb(1), nb(2)), y(nbo)
 
     INTEGER :: i, j, ij, ipos
     !---------------------------------------------------------------------
@@ -1930,10 +1930,10 @@ CONTAINS
 
   !************************************************
 
-  INTEGER FUNCTION ma_fufill_r31(nb, x, nbi, ind, miss_val, nbo, y)
+  INTEGER FUNCTION ma_fufill_r31(nb, x, nbi, ind, nbo, y)
     INTEGER :: nb(3), nbo, nbi
     INTEGER :: ind(nbi)
-    REAL :: x(nb(1), nb(2), nb(3)), miss_val, y(nbo)
+    REAL :: x(nb(1), nb(2), nb(3)), y(nbo)
 
     INTEGER :: i, j, k, ij, ii, ipos, ipp, isb
     !---------------------------------------------------------------------
@@ -1975,10 +1975,10 @@ CONTAINS
 
   !************************************************
 
-  INTEGER FUNCTION ma_fucoll_r31(nb, x, nbi, ind, miss_val, nbo, y)
+  INTEGER FUNCTION ma_fucoll_r31(nb, x, nbi, ind, nbo, y)
     INTEGER :: nb(3), nbo, nbi
     INTEGER :: ind(nbi)
-    REAL :: x(nb(1), nb(2), nb(3)), miss_val, y(nbo)
+    REAL :: x(nb(1), nb(2), nb(3)), y(nbo)
 
     INTEGER :: i, j, k, ij, ipos, ipp, isb
     !---------------------------------------------------------------------

@@ -14,7 +14,7 @@ contains
 
     USE dimens_m, ONLY: iim, jjm, llm
     USE paramet_m, ONLY: iip1, iip2, ip1jm, ip1jmp1, jjp1
-    USE filtreg_m, ONLY: filtreg
+    USE filtreg_scal_m, ONLY: filtreg_scal
 
     REAL, intent(in):: teta(ip1jmp1, llm)
     REAL, intent(in):: pbaru(ip1jmp1, llm), pbarv(ip1jm, llm)
@@ -44,7 +44,7 @@ contains
 
     ! stockage dans dh de la convergence horizontale filtrée du flux
     ! d'enthalpie potentielle
-    CALL filtreg(dteta, direct = .true., intensive = .false.)
+    CALL filtreg_scal(dteta, direct = .true., intensive = .false.)
 
   END SUBROUTINE dteta1
 

@@ -15,7 +15,7 @@ contains
 
     USE comgeom, ONLY: apoln, apols, cuvsurcv_2d, cvusurcu_2d, unsaire_2d
     USE dimens_m, ONLY: iim, jjm
-    USE filtreg_m, ONLY: filtreg
+    USE filtreg_scal_m, ONLY: filtreg_scal
 
     INTEGER, intent(in):: klevel
     REAL, intent(in):: x(iim + 1, jjm + 1, klevel), y(iim + 1, jjm, klevel)
@@ -41,7 +41,7 @@ contains
             / apols
     end DO
 
-    CALL filtreg(div, direct = .true., intensive = .false.)
+    CALL filtreg_scal(div, direct = .true., intensive = .false.)
 
     DO l = 1, klevel
        div(:, 2:jjm, l) = div(:, 2:jjm, l) * unsaire_2d(:, 2:jjm)

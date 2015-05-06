@@ -16,7 +16,7 @@ SUBROUTINE laplacien_rot(klevel, rotin, rotout, ghx, ghy)
   USE dimens_m
   USE paramet_m
   USE comgeom
-  USE filtreg_m, ONLY: filtreg
+  USE filtreg_v_m, ONLY: filtreg_v
   use rotatf_m, only: rotatf
 
   IMPLICIT NONE
@@ -34,7 +34,7 @@ SUBROUTINE laplacien_rot(klevel, rotin, rotout, ghx, ghy)
   ! ........................................................
 
 
-  CALL filtreg(rotin, direct = .true., intensive = .true.)
+  CALL filtreg_v(rotin, intensive = .true.)
 
   CALL nxgrad(klevel, rotin, ghx, ghy)
   CALL rotatf(klevel, ghx, ghy, rotout)

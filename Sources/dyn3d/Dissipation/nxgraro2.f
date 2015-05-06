@@ -12,7 +12,7 @@ contains
     ! Calcul de nxgrad(rot) du vecteur v
 
     USE dimens_m, ONLY: iim, jjm
-    USE filtreg_m, ONLY: filtreg
+    USE filtreg_v_m, ONLY: filtreg_v
     use nr_util, only: assert, assert_eq
     use rotatf_m, only: rotatf
 
@@ -50,7 +50,7 @@ contains
        CALL laplacien_rotgam(klevel, rot, rot)
     ENDDO
 
-    CALL filtreg(rot, direct = .true., intensive = .true.)
+    CALL filtreg_v(rot, intensive = .true.)
     CALL nxgrad(klevel, rot, grx, gry)
 
     nugradrs = (-1.)**lr * crot

@@ -14,7 +14,7 @@ contains
          unsapolsga1
     USE dimens_m, ONLY: iim, jjm
     use divergf_m, only: divergf
-    USE filtreg_m, ONLY: filtreg
+    USE filtreg_scal_m, ONLY: filtreg_scal
     use grad_m, only: grad
     use laplacien_m, only: laplacien
     use nr_util, only: assert_eq, assert
@@ -53,7 +53,7 @@ contains
        END DO
     ENDIF
 
-    CALL filtreg(div, direct = .true., intensive = .true.)
+    CALL filtreg_scal(div, direct = .true., intensive = .true.)
     CALL grad(klevel, div, gdx, gdy)
     nugrads = (-1.)**ld * cdivu
 

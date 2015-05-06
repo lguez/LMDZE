@@ -10,7 +10,7 @@ contains
 
     USE dimens_m, ONLY: iim, jjm, llm
     USE paramet_m, ONLY: ip1jm, ip1jmp1, jjp1, llmm1
-    USE filtreg_m, ONLY: filtreg
+    USE filtreg_scal_m, ONLY: filtreg_scal
 
     ! Authors: P. Le Van, F. Hourdin
     ! Objet: calcul de la convergence du flux de masse aux niveaux p
@@ -31,7 +31,7 @@ contains
     CALL convflu(pbaru, pbarv, llm, convm)
 
     ! Filtrage :
-    CALL filtreg(convm, direct = .true., intensive = .false.)
+    CALL filtreg_scal(convm, direct = .true., intensive = .false.)
 
     ! Intégration de la convergence de masse de haut en bas :
     DO l = llmm1, 1, -1

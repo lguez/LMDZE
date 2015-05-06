@@ -16,7 +16,7 @@ contains
     USE dimens_m
     USE paramet_m
     USE comgeom
-    USE filtreg_m, ONLY: filtreg
+    USE filtreg_v_m, ONLY: filtreg_v
 
 
     ! .....  variables en arguments  ......
@@ -39,7 +39,7 @@ contains
        rot(iim + 1, :, l) = rot(1, :, l)
     END DO
 
-    CALL filtreg(rot, direct = .true., intensive = .false.)
+    CALL filtreg_v(rot, intensive = .false.)
 
     DO l = 1, klevel
        rot(:, :, l) = rot(:, :, l)*unsairez_2d

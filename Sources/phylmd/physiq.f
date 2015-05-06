@@ -25,7 +25,7 @@ contains
          ok_orodr, ok_orolf
     USE clmain_m, ONLY: clmain
     use clouds_gno_m, only: clouds_gno
-    USE comgeomphy, ONLY: airephy, cuphy, cvphy
+    USE comgeomphy, ONLY: airephy
     USE concvl_m, ONLY: concvl
     USE conf_gcm_m, ONLY: offline, raz_date
     USE conf_phys_m, ONLY: conf_phys
