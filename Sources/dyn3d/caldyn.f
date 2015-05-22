@@ -34,8 +34,8 @@ contains
 
     INTEGER, INTENT(IN):: itau
     REAL, INTENT(IN):: ucov(:, :, :) ! (iim + 1, jjm + 1, llm) vent covariant
-    REAL, INTENT(IN):: vcov(:, :, :) ! (iim + 1, jjm, llm) ! vent covariant
-    REAL, INTENT(IN):: teta(ip1jmp1, llm)
+    REAL, INTENT(IN):: vcov(:, :, :) ! (iim + 1, jjm, llm) vent covariant
+    REAL, INTENT(IN):: teta(:, :, :) ! (iim + 1, jjm + 1, llm)
     REAL, INTENT (IN):: ps(ip1jmp1)
     real, intent(out):: masse(ip1jmp1, llm)
     REAL, INTENT(IN):: pk(iip1, jjp1, llm)
@@ -44,7 +44,7 @@ contains
     REAL, INTENT(IN):: phi(iim + 1, jjm + 1, llm)
     REAL dudyn(:, :, :) ! (iim + 1, jjm + 1, llm)
     real dv((iim + 1) * jjm, llm)
-    REAL, INTENT(out):: dteta(ip1jmp1, llm)
+    REAL, INTENT(out):: dteta(:, :, :) ! (iim + 1, jjm + 1, llm)
     real, INTENT(out):: dp(ip1jmp1)
     REAL, INTENT(out):: w(:, :, :) ! (iim + 1, jjm + 1, llm)
     REAL, intent(out):: pbaru(ip1jmp1, llm), pbarv((iim + 1) * jjm, llm)

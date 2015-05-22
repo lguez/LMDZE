@@ -14,7 +14,6 @@ MODULE histcom_var
   REAL, DIMENSION(nb_files_max), SAVE::date0, deltat
 
   ! Counter of elements
-  INTEGER, SAVE:: nb_files=0
   INTEGER, DIMENSION(nb_files_max), SAVE:: nb_var=0, nb_tax=0
 
   ! NETCDF IDs for files and axes

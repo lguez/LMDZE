@@ -4,7 +4,7 @@ module writehist_m
 
 contains
 
-  subroutine writehist(time, vcov, ucov, teta, phi, q, masse, ps)
+  subroutine writehist(time, vcov, ucov, teta, phi, masse, ps)
 
     ! From writehist.F 1403 2010-07-01 09:02:53Z
     ! Écriture du fichier histoire au format IOIPSL
@@ -12,7 +12,6 @@ contains
     ! L. Fairhead, LMD, 03/99
 
     use dimens_m, only: nqmx, llm, jjm
-    USE iniadvtrac_m, ONLY: ttext
     use com_io_dyn, only: histid, histvid, histuid
     use paramet_m, only: ip1jm, ip1jmp1, iip1, jjp1
     use temps, only: itau_dyn
@@ -26,7 +25,6 @@ contains
     ! ucov: vents u covariants
     ! teta: temperature potentielle
     ! phi : geopotentiel instantane
-    ! q : traceurs
     ! masse: masse
     ! ps :pression au sol
 
@@ -35,7 +33,6 @@ contains
     REAL vcov(ip1jm, llm), ucov(ip1jmp1, llm) 
     REAL teta(ip1jmp1, llm), phi(ip1jmp1, llm) 
     REAL, intent(in):: ps(ip1jmp1), masse(ip1jmp1, llm) 
-    REAL q(ip1jmp1, llm, nqmx)
     integer time
 
     ! This routine needs IOIPSL to work
@@ -76,13 +73,6 @@ contains
 
     call histwrite(histid, 'phi', itau_w, phi)
 
-    ! Traceurs
-
-    ! DO iq=1, nqmx
-    ! call histwrite(histid, ttext(iq), itau_w, q(:, :, iq), 
-    ! . iip1*jjp1*llm, ndexu)
-    ! enddo
-    !C
     ! Masse
 
     call histwrite(histid, 'masse', itau_w, masse)

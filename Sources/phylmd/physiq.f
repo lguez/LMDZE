@@ -1475,11 +1475,11 @@ contains
     ! Si c'est la fin, il faut conserver l'etat de redemarrage
     IF (lafin) THEN
        itau_phy = itau_phy + itap
-       CALL phyredem("restartphy.nc", rlat, rlon, pctsrf, ftsol, ftsoil, &
-            tslab, seaice, fqsurf, qsol, fsnow, falbe, falblw, fevap, &
-            rain_fall, snow_fall, solsw, sollw, dlw, radsol, frugs, &
-            agesno, zmea, zstd, zsig, zgam, zthe, zpic, zval, t_ancien, &
-            q_ancien, rnebcon, ratqs, clwcon, run_off_lic_0, sig1, w01)
+       CALL phyredem("restartphy.nc", pctsrf, ftsol, ftsoil, tslab, seaice, &
+            fqsurf, qsol, fsnow, falbe, falblw, fevap, rain_fall, snow_fall, &
+            solsw, sollw, dlw, radsol, frugs, agesno, zmea, zstd, zsig, zgam, &
+            zthe, zpic, zval, t_ancien, q_ancien, rnebcon, ratqs, clwcon, &
+            run_off_lic_0, sig1, w01)
     ENDIF
 
     firstcal = .FALSE.

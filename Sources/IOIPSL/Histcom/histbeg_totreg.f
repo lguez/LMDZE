@@ -16,6 +16,8 @@ MODULE histbeg_totreg_m
 
   IMPLICIT NONE
 
+  INTEGER:: nb_files = 0
+
 CONTAINS
 
   SUBROUTINE histbeg_totreg(filename, lon_1d, lat_1d, orix, szx, oriy, szy, &
@@ -31,8 +33,8 @@ CONTAINS
     USE ioipslmpp, ONLY: ioipslmpp_file
     USE errioipsl, ONLY: histerr
     USE histcom_var, ONLY: assc_file, date0, deltat, full_size, itau0, &
-         lock_modname, model_name, nb_files, nb_files_max, nb_hax, nb_tax, &
-         nb_var, nb_zax, ncdf_ids, regular, slab_ori, slab_sz, xid, yid, zoom
+         lock_modname, model_name, nb_files_max, nb_hax, nb_tax, nb_var, &
+         nb_zax, ncdf_ids, regular, slab_ori, slab_sz, xid, yid, zoom
     use histhori_regular_m, only: histhori_regular
     USE netcdf, ONLY: nf90_clobber, nf90_global
     use netcdf95, only: nf95_create, nf95_def_dim, nf95_put_att

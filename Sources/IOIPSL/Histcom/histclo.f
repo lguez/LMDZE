@@ -11,7 +11,8 @@ contains
     ! all opened files.
 
     USE errioipsl, ONLY: histerr
-    USE histcom_var, ONLY: nb_files, ncdf_ids
+    use histbeg_totreg_m, ONLY: nb_files
+    USE histcom_var, ONLY: ncdf_ids
     USE netcdf, ONLY: nf90_close, nf90_noerr
 
     INTEGER, INTENT (IN), OPTIONAL:: fid ! file id

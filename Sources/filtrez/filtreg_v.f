@@ -9,9 +9,8 @@ contains
     ! From filtrez/filtreg.F, version 1.1.1.1, 2004/05/19 12:53:09
     ! Author: P. Le Van
 
-    ! Filtre matriciel longitudinal, avec les matrices
-    ! pr\'ecalcul\'ees pour l'op\'erateur filtre. On v grid, direct
-    ! only.
+    ! Matrix filter on longitudes. Matrices have already been
+    ! computed. On v grid, direct filter only.
 
     USE coefils, ONLY: sddu, unsddu
     USE dimens_m, ONLY: iim, jjm
@@ -23,7 +22,7 @@ contains
     ! en entr\'ee : champ \`a filtrer, en sortie : champ filtr\'e
 
     logical, intent(in):: intensive
-    ! champ intensif ou extensif (pond\'er\'e par les aires)
+    ! false means the field is weighted by the area of the mesh
 
     ! Local:
     REAL sdd1(iim), sdd2(iim)

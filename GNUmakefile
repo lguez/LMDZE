@@ -34,13 +34,10 @@ include Compiler_options/${FC}_${mode}.mk
 # 4. Rules
 
 SHELL = bash
+LINK.o = $(FC) $(LDFLAGS) $(TARGET_ARCH)
 .DELETE_ON_ERROR:
 .PHONY: all clean clobber depend
 all: ${execut} log
-
-${execut}:
-	$(FC) $(LDFLAGS) $^ $(LDLIBS) -o $@
-
 ce0l: ${obj_ce0l}
 gcm: ${obj_gcm}
 test_ozonecm: ${obj_test_ozonecm}

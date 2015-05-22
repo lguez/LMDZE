@@ -4,16 +4,17 @@ module phyredem_m
 
 contains
 
-  SUBROUTINE phyredem(fichnom, rlat, rlon, pctsrf, tsol, tsoil, tslab, &
-       seaice, qsurf, qsol, snow, albedo, alblw, evap, rain_fall, snow_fall, &
-       solsw, sollw, fder, radsol, frugs, agesno, zmea, zstd, zsig, zgam, &
-       zthe, zpic, zval, t_ancien, q_ancien, rnebcon, ratqs, clwcon, &
-       run_off_lic_0, sig1, w01)
+  SUBROUTINE phyredem(fichnom, pctsrf, tsol, tsoil, tslab, seaice, qsurf, &
+       qsol, snow, albedo, alblw, evap, rain_fall, snow_fall, solsw, sollw, &
+       fder, radsol, frugs, agesno, zmea, zstd, zsig, zgam, zthe, zpic, zval, &
+       t_ancien, q_ancien, rnebcon, ratqs, clwcon, run_off_lic_0, sig1, w01)
 
-    ! From phylmd/phyredem.F, version 1.3 2005/05/25 13:10:09
+    ! From phylmd/phyredem.F, version 1.3, 2005/05/25 13:10:09
     ! Author: Z. X. Li (LMD/CNRS)
     ! Date: 1993/08/18
-    ! Objet : écriture de l'état de démarrage ou redémarrage pour la physique
+
+    ! Objet : \'ecriture de l'\'etat de d\'emarrage ou red\'emarrage
+    ! pour la physique
 
     USE dimphy, ONLY: klev, klon, zmasq
     USE dimsoil, ONLY: nsoilmx
@@ -21,11 +22,11 @@ contains
     USE netcdf, ONLY: nf90_clobber, nf90_global, nf90_float
     USE netcdf95, ONLY: nf95_create, nf95_put_att, nf95_def_dim, &
          nf95_def_var, nf95_enddef, nf95_redef, nf95_put_var, nf95_close
+    use phyetat0_m, only: rlat, rlon
     USE temps, ONLY: itau_phy
 
     CHARACTER(len=*), INTENT(IN):: fichnom
-    REAL, INTENT(IN):: rlat(klon), rlon(klon)
-    REAL, INTENT(IN):: pctsrf(klon, nbsrf)
+    REAL, INTENT(IN):: pctsrf(:, :) ! (klon, nbsrf)
     REAL, INTENT(IN):: tsol(:, :) ! (klon, nbsrf)
     REAL, INTENT(IN):: tsoil(:, :, :) ! (klon, nsoilmx, nbsrf)
     REAL, INTENT(IN):: tslab(:), seaice(:) ! (klon) slab ocean
@@ -78,7 +79,7 @@ contains
     CALL nf95_create(fichnom, nf90_clobber, ncid)
 
     call nf95_put_att(ncid, nf90_global, 'title', &
-         'Fichier redémarrage physique')
+         'start file for the physics code')
     call nf95_put_att(ncid, nf90_global, "itau_phy", itau_phy)
 
     call nf95_def_dim(ncid, 'points_physiques', klon, idim2)

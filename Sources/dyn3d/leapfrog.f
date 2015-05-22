@@ -216,7 +216,7 @@ contains
 
        IF (MOD(itau + 1, iecri * day_step) == 0) THEN
           CALL geopot(teta, pk, pks, phis, phi)
-          CALL writehist(itau, vcov, ucov, teta, phi, q, masse, ps)
+          CALL writehist(itau, vcov, ucov, teta, phi, masse, ps)
        END IF
     end do time_integration
 

@@ -6,8 +6,8 @@ CONTAINS
 
   SUBROUTINE dynredem0(fichnom, iday_end, phis)
 
-    ! From dyn3d/dynredem.F, version 1.2 2004/06/22 11:45:30
-    ! Ecriture du fichier de redémarrage au format NetCDF (initialisation)
+    ! From dyn3d/dynredem.F, version 1.2, 2004/06/22 11:45:30
+    ! \'Ecriture du fichier de red\'emarrage au format NetCDF (initialisation)
 
     USE comconst, ONLY: cpp, daysec, dtvr, g, kappa, omeg, rad
     USE comgeom, ONLY: aire_2d, cu_2d, cv_2d, rlatu, rlatv, rlonu, rlonv
@@ -33,7 +33,7 @@ CONTAINS
 
     INTEGER iq, l
     INTEGER, PARAMETER:: length = 100
-    REAL tab_cntrl(length) ! tableau des paramètres du run
+    REAL tab_cntrl(length) ! tableau des param\`etres du run
 
     ! Pour NetCDF :
     INTEGER idim_index
@@ -53,9 +53,6 @@ CONTAINS
     CALL ymds2ju(annee_ref, 1, iday_end, 0., zjulian)
     CALL ju2ymds(zjulian, yyears0, mmois0, jjour0, hours)
 
-    DO l = 1, length
-       tab_cntrl(l) = 0.
-    END DO
     tab_cntrl(1) = iim
     tab_cntrl(2) = jjm
     tab_cntrl(3) = llm
@@ -76,7 +73,7 @@ CONTAINS
     tab_cntrl(18) = pa
     tab_cntrl(19) = preff
 
-    ! Paramètres pour le zoom :
+    ! Param\`etres pour le zoom :
     tab_cntrl(20) = clon
     tab_cntrl(21) = clat
     tab_cntrl(22) = grossismx
@@ -89,10 +86,11 @@ CONTAINS
     tab_cntrl(29) = tauy
 
     tab_cntrl(30) = iday_end
+    tab_cntrl(31:) = 0.
 
     CALL nf95_create(fichnom, nf90_clobber, ncid)
     CALL nf95_put_att(ncid, nf90_global, 'title', &
-         'Fichier de démarrage dynamique')
+         'start file for the dynamics code')
 
     ! Definir les dimensions du fichiers:
 

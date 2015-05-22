@@ -43,8 +43,10 @@ grid_noro_m.f
 grilles_gcm_netcdf_sub.f
 gr_int_dyn_m.f
 heavyside.f
+histbeg_totreg.f
 histclo.f
 histcom_var.f
+histhori_regular.f
 indicesol.f
 iniadvtrac.f
 inifgn.f
@@ -54,6 +56,7 @@ inter_barxy.f
 inter_bary.f
 invert_zoom_x.f
 ioconf_calendar.f
+ioipslmpp.f
 ju2ymds.f
 limit.f
 massbar.f
@@ -64,6 +67,7 @@ mva9.f
 ord_coord.f
 ord_coordm.f
 paramet_m.f
+phyetat0.f
 phyredem.f
 principal_cshift.f
 q_sat.f

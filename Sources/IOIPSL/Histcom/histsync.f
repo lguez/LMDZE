@@ -11,7 +11,8 @@ contains
 
     ! file: optional argument for fileid
 
-    USE histcom_var, ONLY: nb_files, ncdf_ids
+    use histbeg_totreg_m, ONLY: nb_files
+    USE histcom_var, ONLY: ncdf_ids
     USE netcdf, ONLY: nf90_sync
 
     INTEGER, INTENT(IN), OPTIONAL:: file

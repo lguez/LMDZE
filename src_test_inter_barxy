@@ -10,12 +10,15 @@ errioipsl.f
 fxhyp.f
 fyhyp.f
 heavyside.f
+histbeg_totreg.f
 histclo.f
 histcom_var.f
+histhori_regular.f
 inter_barx.f
 inter_barxy.f
 inter_bary.f
 invert_zoom_x.f
+ioipslmpp.f
 minmax.f
 ord_coord.f
 ord_coordm.f

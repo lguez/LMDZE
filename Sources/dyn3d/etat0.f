@@ -32,7 +32,6 @@ contains
     use geopot_m, only: geopot
     use grid_atob, only: grille_m
     use grid_change, only: init_dyn_phy, dyn_phy
-    use histclo_m, only: histclo
     use indicesol, only: is_oce, is_sic, is_ter, is_lic, epsfra
     use iniadvtrac_m, only: iniadvtrac
     use inifilr_m, only: inifilr
@@ -42,6 +41,7 @@ contains
          nf95_inq_varid, nf95_open
     use nr_util, only: pi, assert
     use paramet_m, only: ip1jm, ip1jmp1
+    use phyetat0_m, only: rlat, rlon
     use phyredem_m, only: phyredem
     use q_sat_m, only: q_sat
     use regr_lat_time_coefoz_m, only: regr_lat_time_coefoz
@@ -58,10 +58,6 @@ contains
     ! surface geopotential, in m2 s-2
 
     ! Local:
-
-    REAL latfi(klon), lonfi(klon)
-    ! (latitude and longitude of a point of the scalar grid identified
-    ! by a simple index, in degrees)
 
     REAL, dimension(iim + 1, jjm + 1, llm):: ucov, t3d, teta
     REAL vcov(iim + 1, jjm, llm)
@@ -143,15 +139,15 @@ contains
     CALL inigeom
     CALL inifilr
 
-    latfi(1) = 90.
-    latfi(2:klon-1) = pack(spread(rlatu(2:jjm), 1, iim), .true.) * 180. / pi
+    rlat(1) = 90.
+    rlat(2:klon-1) = pack(spread(rlatu(2:jjm), 1, iim), .true.) * 180. / pi
     ! (with conversion to degrees)
-    latfi(klon) = - 90.
+    rlat(klon) = - 90.
 
-    lonfi(1) = 0.
-    lonfi(2:klon-1) = pack(spread(rlonv(:iim), 2, jjm - 1), .true.) * 180. / pi
+    rlon(1) = 0.
+    rlon(2:klon-1) = pack(spread(rlonv(:iim), 2, jjm - 1), .true.) * 180. / pi
     ! (with conversion to degrees)
-    lonfi(klon) = 0.
+    rlon(klon) = 0.
 
     call start_init_orog(phis, zmea_2d, zstd_2d, zsig_2d, zgam_2d, zthe_2d, &
          zpic_2d, zval_2d) ! also compute "mask"
@@ -352,12 +348,11 @@ contains
     sig1 = 0.
     w01 = 0.
 
-    call phyredem("startphy.nc", latfi, lonfi, pctsrf, tsoil(:, 1, :), tsoil, &
+    call phyredem("startphy.nc", pctsrf, tsoil(:, 1, :), tsoil, &
          tsoil(:, 1, is_oce), seaice, qsolsrf, pack(qsol_2d, dyn_phy), snsrf, &
          albe, alblw, evap, rain_fall, snow_fall, solsw, sollw, fder, radsol, &
          frugs, agesno, zmea, zstd, zsig, zgam, zthe, zpic, zval, t_ancien, &
          q_ancien, rnebcon, ratqs, clwcon, run_off_lic_0, sig1, w01)
-    CALL histclo
 
   END SUBROUTINE etat0
 

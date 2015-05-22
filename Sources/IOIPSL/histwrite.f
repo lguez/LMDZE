@@ -3,10 +3,10 @@ MODULE histwrite_m
   ! From histcom.f90, version 2.1 2004/04/21 09:27:10
 
   USE errioipsl, ONLY: histerr
+  use histbeg_totreg_m, ONLY: nb_files
   USE histcom_var, ONLY: datasz_in, datasz_max, date0, deltat, &
        freq_opp, freq_wrt, fuchnbout, last_opp, last_opp_chk, last_wrt, &
-       last_wrt_chk, missing_val, nbopp, nb_files, scal, scsize, sopps, &
-       topp
+       last_wrt_chk, missing_val, nbopp, scal, scsize, sopps, topp
   use histvar_seq_m, only: histvar_seq
   use histwrite_real_m, only: histwrite_real
   use isittime_m, only: isittime

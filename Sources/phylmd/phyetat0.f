@@ -4,7 +4,9 @@ module phyetat0_m
 
   IMPLICIT none
 
-  REAL, save:: rlat(klon), rlon(klon) ! latitude and longitude, in degrees
+  REAL, save:: rlat(klon), rlon(klon)
+  ! latitude and longitude of a point of the scalar grid identified
+  ! by a simple index, in degrees
 
   private klon
 
