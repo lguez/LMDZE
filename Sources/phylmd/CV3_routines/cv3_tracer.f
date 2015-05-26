@@ -4,12 +4,12 @@ module cv3_tracer_m
 
 contains
 
-  SUBROUTINE cv3_tracer(nloc, len, ncum, nd, na, ment, sij, da, phi)
+  SUBROUTINE cv3_tracer(nloc, ncum, na, ment, sij, da, phi)
 
     implicit none
 
     ! Inputs:
-    integer, intent(in):: ncum, nd, na, nloc, len
+    integer, intent(in):: ncum, na, nloc
     real ment(nloc, na, na), sij(nloc, na, na)
 
     ! Ouputs:

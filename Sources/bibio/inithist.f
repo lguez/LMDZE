@@ -12,11 +12,10 @@ contains
     ! Routine d'initialisation des écritures des fichiers histoires
     ! LMDZ au format IOIPSL.
 
-    USE comgeom, ONLY: rlatu, rlatv, rlonu, rlonv
     USE com_io_dyn, ONLY: histid, histuid, histvid
     USE dimens_m, ONLY: jjm, llm
     USE disvert_m, ONLY: presnivs
-    use dynetat0_m, only: day_ref, annee_ref
+    use dynetat0_m, only: day_ref, annee_ref, rlatu, rlatv, rlonu, rlonv
     USE histbeg_totreg_m, ONLY : histbeg_totreg
     USE histdef_m, ONLY : histdef
     USE histend_m, ONLY : histend

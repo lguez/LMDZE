@@ -4,7 +4,7 @@ module fyhyp_m
 
 contains
 
-  SUBROUTINE fyhyp(rlatu, yyprimu, rlatv, rlatu2, yprimu2, rlatu1, yprimu1)
+  SUBROUTINE fyhyp(rlatu, rlatv, rlatu2, yprimu2, rlatu1, yprimu1)
 
     ! From LMDZ4/libf/dyn3d/fyhyp.F, version 1.2, 2005/06/03 09:11:32
 
@@ -17,10 +17,10 @@ contains
 
     use coefpoly_m, only: coefpoly
     USE dimens_m, only: jjm
+    use dynetat0_m, only: clat, grossismy, dzoomy, tauy
     use heavyside_m, only: heavyside
-    use serre, only: clat, grossismy, dzoomy, tauy
 
-    REAL, intent(out):: rlatu(jjm + 1), yyprimu(jjm + 1)
+    REAL, intent(out):: rlatu(jjm + 1)
     REAL, intent(out):: rlatv(jjm)
     real, intent(out):: rlatu2(jjm), yprimu2(jjm), rlatu1(jjm), yprimu1(jjm)
 
@@ -259,7 +259,6 @@ contains
        IF (ik==1) THEN
           DO j = 1, jjm + 1
              rlatu(j) = ylat(j)
-             yyprimu(j) = yprim(j)
           END DO
        ELSE IF (ik==2) THEN
           DO j = 1, jjm

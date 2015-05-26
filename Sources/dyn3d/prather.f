@@ -3,12 +3,14 @@
 ! 12:53:07 lmdzadmin Exp $
 
 SUBROUTINE prather(q, w, masse, pbaru, pbarv, nt, dt)
-  USE dimens_m
-  USE paramet_m
+
   USE comconst
+  USE dimens_m
   USE disvert_m
-  USE comgeom
+  USE dynetat0_m, only: rlonv, rlonu
   USE nr_util, ONLY: pi
+  USE paramet_m
+
   IMPLICIT NONE
 
   ! =======================================================================

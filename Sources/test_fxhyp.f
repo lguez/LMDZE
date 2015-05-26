@@ -3,7 +3,7 @@ program test_fxhyp
   USE dimens_m, ONLY: iim
   use fxhyp_m, only: fxhyp
   use jumble, only: new_unit
-  use serre, only: read_serre
+  use read_serre_m, only: read_serre
   use unit_nml_m, only: unit_nml
 
   implicit none

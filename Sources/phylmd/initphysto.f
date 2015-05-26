@@ -38,7 +38,6 @@ SUBROUTINE initphysto(infile,rlon,rlat,tstep,t_ops,t_wrt,nq,fileid)
   USE dimphy
   use conf_gcm_m
   USE comgeom
-  USE serre
   USE nr_util, ONLY : pi
   USE ymds2ju_m
 

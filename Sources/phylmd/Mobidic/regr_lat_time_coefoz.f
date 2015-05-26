@@ -37,7 +37,7 @@ contains
     ! not use values of the input time coordinate).
 
     use dimens_m, only: jjm
-    use comgeom, only: rlatv
+    use dynetat0_m, only: rlatv
     use nr_util, only: pi
     use numer_rec_95, only: regr1_step_av, regr3_lint
     use netcdf95, only: nf95_open, nf95_gw_var, nf95_close, &
@@ -237,12 +237,11 @@ contains
     ! dimensions and variables, and writes one of the coordinate variables.
 
     use dimens_m, only: jjm
-    use comgeom, only: rlatu
-    use nr_util, only: assert_eq, pi
-
+    use dynetat0_m, only: rlatu
+    use netcdf, only: nf90_clobber, nf90_float, nf90_copy_att, nf90_global
     use netcdf95, only: nf95_create, nf95_def_dim, nf95_def_var, &
          nf95_put_att, nf95_enddef, nf95_copy_att, nf95_put_var
-    use netcdf, only: nf90_clobber, nf90_float, nf90_copy_att, nf90_global
+    use nr_util, only: assert_eq, pi
 
     integer, intent(in):: ncid_in, varid_in(:), n_plev
     character(len=*), intent(in):: name_out(:) ! of NetCDF variables

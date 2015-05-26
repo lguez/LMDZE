@@ -1,15 +1,53 @@
 module dynetat0_m
 
+  use dimens_m, only: iim, jjm
+
   IMPLICIT NONE
+
+  private iim, jjm
 
   INTEGER day_ini 
   ! day number at the beginning of the run, based at value 1 on
   ! January 1st of annee_ref
 
-  integer:: day_ref = 1 ! jour de l'année de l'état initial
-  ! (= 350 si 20 décembre par exemple)
+  integer:: day_ref = 1 ! jour de l'ann\'ee de l'\'etat initial
+  ! (= 350 si 20 d\'ecembre par exemple)
 
   integer:: annee_ref = 1998 ! Annee de l'etat initial (avec 4 chiffres)
+
+  REAL clon ! longitude of the center of the zoom, in rad
+  real clat ! latitude of the center of the zoom, in rad
+
+  real grossismx, grossismy
+  ! facteurs de grossissement du zoom, selon la longitude et la latitude
+  ! = 2 si 2 fois, = 3 si 3 fois, etc.
+
+  real dzoomx, dzoomy
+  ! extensions en longitude et latitude de la zone du zoom (fractions
+  ! de la zone totale)
+
+  real taux, tauy
+  ! raideur de la transition de l'int\'erieur à l'ext\'erieur du zoom
+  
+  real rlatu(jjm + 1)
+  ! (latitudes of points of the "scalar" and "u" grid, in rad)
+
+  real rlatv(jjm) 
+  ! (latitudes of points of the "v" grid, in rad, in decreasing order)
+
+  real rlonu(iim + 1) ! longitudes of points of the "u" grid, in rad
+
+  real rlonv(iim + 1)
+  ! (longitudes of points of the "scalar" and "v" grid, in rad)
+
+  real xprimu(iim + 1), xprimv(iim + 1)
+  ! xprimu et xprimv sont respectivement les valeurs de dx / dX aux
+  ! points u et v.
+
+  REAL xprimm025(iim + 1), xprimp025(iim + 1)
+  REAL rlatu1(jjm), rlatu2(jjm), yprimu1(jjm), yprimu2(jjm)
+
+  save
 
 contains
 
@@ -20,7 +58,6 @@ contains
     ! This procedure reads the initial state of the atmosphere.
 
     use comconst, only: dtvr
-    use comgeom, only: rlonu, rlatu, rlonv, rlatv, cu_2d, cv_2d, aire_2d
     use conf_gcm_m, only: raz_date
     use dimens_m, only: iim, jjm, llm, nqmx
     use disvert_m, only: pa
@@ -30,8 +67,6 @@ contains
     use netcdf95, only: NF95_GET_VAR, nf95_open, nf95_inq_varid, NF95_CLOSE, &
          NF95_Gw_VAR
     use nr_util, only: assert
-    use serre, only: clon, clat, grossismy, grossismx, dzoomx, dzoomy, taux, &
-         tauy
     use temps, only: itau_dyn
     use unit_nml_m, only: unit_nml
 
@@ -45,7 +80,7 @@ contains
 
     ! Local variables: 
     INTEGER iq
-    REAL, pointer:: tab_cntrl(:) ! tableau des paramètres du run
+    REAL, pointer:: tab_cntrl(:) ! tableau des param\`etres du run
     INTEGER ierr, ncid, varid
 
     namelist /dynetat0_nml/ day_ref, annee_ref
@@ -63,7 +98,7 @@ contains
          size(masse, 3)/) == llm, "dynetat0 llm")
     call assert(size(q, 4) == nqmx, "dynetat0 q nqmx")
 
-    ! Fichier état initial :
+    ! Fichier \'etat initial :
     call nf95_open("start.nc", NF90_NOWRITE, ncid)
 
     call nf95_inq_varid(ncid, "controle", varid)
@@ -102,7 +137,7 @@ contains
     write(unit_nml, nml=dynetat0_nml)
 
     if (raz_date) then
-       print *, 'On réinitialise à la date lue dans la namelist.'
+       print *, 'Resetting the date, using the namelist.'
        day_ini = day_ref
        itau_dyn = 0
     else
@@ -128,14 +163,29 @@ contains
     call NF95_INQ_VARID (ncid, "rlatv", varid)
     call NF95_GET_VAR(ncid, varid, rlatv)
 
-    call NF95_INQ_VARID (ncid, "cu", varid)
-    call NF95_GET_VAR(ncid, varid, cu_2d)
+    CALL nf95_inq_varid(ncid, 'xprimu', varid)
+    CALL nf95_get_var(ncid, varid, xprimu)
 
-    call NF95_INQ_VARID (ncid, "cv", varid)
-    call NF95_GET_VAR(ncid, varid, cv_2d)
+    CALL nf95_inq_varid(ncid, 'xprimv', varid)
+    CALL nf95_get_var(ncid, varid, xprimv)
 
-    call NF95_INQ_VARID (ncid, "aire", varid)
-    call NF95_GET_VAR(ncid, varid, aire_2d)
+    CALL nf95_inq_varid(ncid, 'xprimm025', varid)
+    CALL nf95_get_var(ncid, varid, xprimm025)
+
+    CALL nf95_inq_varid(ncid, 'xprimp025', varid)
+    CALL nf95_get_var(ncid, varid, xprimp025)
+
+    call NF95_INQ_VARID (ncid, "rlatu1", varid)
+    call NF95_GET_VAR(ncid, varid, rlatu1)
+
+    call NF95_INQ_VARID (ncid, "rlatu2", varid)
+    call NF95_GET_VAR(ncid, varid, rlatu2)
+
+    CALL nf95_inq_varid(ncid, 'yprimu1', varid)
+    CALL nf95_get_var(ncid, varid, yprimu1)
+
+    CALL nf95_inq_varid(ncid, 'yprimu2', varid)
+    CALL nf95_get_var(ncid, varid, yprimu2)
 
     call NF95_INQ_VARID (ncid, "phisinit", varid)
     call NF95_GET_VAR(ncid, varid, phis)

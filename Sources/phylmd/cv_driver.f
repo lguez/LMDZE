@@ -448,8 +448,7 @@ contains
 
        ! --- passive tracers
 
-       if (iflag_con == 3) CALL cv3_tracer(klon, klon, ncum, klev, klev, &
-            ment, sij, da, phi)
+       if (iflag_con == 3) CALL cv3_tracer(klon, ncum, klev, ment, sij, da, phi)
 
        ! --- UNCOMPRESS THE FIELDS
 

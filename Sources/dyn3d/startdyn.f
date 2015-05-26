@@ -14,9 +14,10 @@ CONTAINS
 
   SUBROUTINE start_init_dyn(tsol_2d, phis, ps)
 
-    use comgeom, only: rlonu, rlatv, aire_2d, apoln, apols
+    use comgeom, only: aire_2d, apoln, apols
     use conf_dat2d_m, only: conf_dat2d
     use dimens_m, only: iim, jjm
+    use dynetat0_m, only: rlonu, rlatv
     use gr_int_dyn_m, only: gr_int_dyn
     use inter_barxy_m, only: inter_barxy
     use netcdf, only: nf90_nowrite

@@ -93,7 +93,7 @@ contains
              ZOZ(i, k) = POZON(i, k)*PDP(i, k) * MD/RMO3
           ENDDO
        ENDDO
-       CALL LWU(PAER, PDP, PPMB, PPSOL, ZOZ, PTAVE, PVIEW, PWV, ZABCU)
+       CALL LWU(PAER, PDP, PPMB, ZOZ, PTAVE, PVIEW, PWV, ZABCU)
        CALL LWBV(ILIM, PDP, PDT0, PEMIS, PPMB, PTL, PTAVE, ZABCU, &
             ZFLUC, ZBINT, ZBSUI, ZCTS, ZCNTRB)
        itaplw0 = 0

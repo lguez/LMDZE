@@ -8,12 +8,12 @@ contains
 
   SUBROUTINE init_tau2alpha(dxdys, dxdyu, dxdyv)
 
-    USE comgeom, ONLY: cu_2d, cv_2d, rlatu
+    USE comgeom, ONLY: cu_2d, cv_2d
     use conf_guide_m, only: guide_u, guide_v
     use coordij_m, only: coordij
     USE dimens_m, ONLY: iim, jjm
+    USE dynetat0_m, ONLY: clat, clon, grossismx, grossismy, rlatu
     USE paramet_m, ONLY: iip1, jjp1
-    USE serre, ONLY: clat, clon, grossismx, grossismy
     use writefield_m, only: writefield
 
     REAL, intent(out):: dxdys(iip1, jjp1), dxdyu(iip1, jjp1), dxdyv(iip1, jjm)

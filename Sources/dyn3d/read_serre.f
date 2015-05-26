@@ -1,25 +1,13 @@
-module serre
+module read_serre_m
 
   implicit none
 
-  REAL:: clon = 0. ! longitude of the center of the zoom, in rad
-  real:: clat = 0. ! latitude of the center of the zoom, in rad
-
-  real:: grossismx = 1., grossismy = 1.
-  ! facteurs de grossissement du zoom, selon la longitude et la latitude
-  ! = 2 si 2 fois, = 3 si 3 fois, etc.
-
-  real:: dzoomx = 0.2, dzoomy = 0.2
-  ! extensions en longitude et latitude de la zone du zoom (fractions
-  ! de la zone totale)
-
-  real:: taux = 3., tauy = 3. 
-  ! raideur de la transition de l'intérieur à l'extérieur du zoom
-  
 contains
 
   subroutine read_serre
 
+    use dynetat0_m, only: clon, clat, grossismx, grossismy, dzoomx, dzoomy, &
+         taux, tauy
     use unit_nml_m, only: unit_nml
     use nr_util, only: assert, pi
 
@@ -30,6 +18,16 @@ contains
          dzoomy, taux, tauy
 
     !-------------------------------------------------
+
+    ! Default values:
+    clon_deg = 0.
+    clat_deg = 0.
+    grossismx = 1.
+    grossismy = 1.
+    dzoomx = 0.2
+    dzoomy = 0.2
+    taux = 3.
+    tauy = 3. 
 
     print *, "Enter namelist 'serre_nml'."
     read(unit=*, nml=serre_nml)
@@ -43,4 +41,4 @@ contains
 
   end subroutine read_serre
 
-end module serre
+end module read_serre_m

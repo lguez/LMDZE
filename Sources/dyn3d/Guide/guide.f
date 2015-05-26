@@ -12,13 +12,13 @@ CONTAINS
     ! Author: F.Hourdin
 
     USE comconst, ONLY: cpp, kappa
-    USE comgeom, ONLY: rlatu, rlatv
     USE conf_gcm_m, ONLY: day_step
     use conf_guide_m, only: guide_u, guide_v, guide_t, guide_q, ncep, &
          ini_anal, tau_min_u, tau_max_u, tau_min_v, tau_max_v, tau_min_t, &
          tau_max_t, tau_min_q, tau_max_q, online, factt
     USE dimens_m, ONLY: iim, jjm, llm
     USE disvert_m, ONLY: ap, bp, preff
+    use dynetat0_m, only: grossismx, grossismy, rlatu, rlatv
     USE exner_hyb_m, ONLY: exner_hyb
     use init_tau2alpha_m, only: init_tau2alpha
     use netcdf, only: nf90_nowrite
@@ -28,7 +28,6 @@ CONTAINS
     USE paramet_m, ONLY: iip1, ip1jmp1, jjp1, llmp1
     USE q_sat_m, ONLY: q_sat
     use read_reanalyse_m, only: read_reanalyse
-    use serre, only: grossismx, grossismy
     use tau2alpha_m, only: tau2alpha
     use writefield_m, only: writefield
 

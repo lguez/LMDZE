@@ -6,6 +6,8 @@ comgeom.f
 conf_gcm.f
 dimens_m.f
 disvert.f
+dynetat0.f
+ener.f
 errioipsl.f
 fxhyp.f
 fyhyp.f
@@ -14,6 +16,7 @@ histbeg_totreg.f
 histclo.f
 histcom_var.f
 histhori_regular.f
+iniadvtrac.f
 inter_barx.f
 inter_barxy.f
 inter_bary.f
@@ -23,6 +26,7 @@ minmax.f
 ord_coord.f
 ord_coordm.f
 principal_cshift.f
-serre.f
+read_serre.f
+temps.f
 test_inter_barxy.f
 unit_nml_m.f

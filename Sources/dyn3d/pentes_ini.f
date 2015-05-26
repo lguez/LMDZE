@@ -3,12 +3,14 @@
 ! 12:53:07 lmdzadmin Exp $
 
 SUBROUTINE pentes_ini(q, w, masse, pbaru, pbarv, mode)
-  USE dimens_m
-  USE paramet_m
+
   USE comconst
+  USE dynetat0_m, only: rlonv, rlonu
+  USE dimens_m
   USE disvert_m
-  USE comgeom
   USE nr_util, ONLY: pi
+  USE paramet_m
+
   IMPLICIT NONE
 
   ! =======================================================================

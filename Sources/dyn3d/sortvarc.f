@@ -14,8 +14,9 @@ contains
     ! Objet : sortie des variables de contr\^ole
 
     USE comconst, ONLY: daysec, g, omeg, rad
-    USE comgeom, ONLY: aire_2d, cu_2d, rlatu
+    USE comgeom, ONLY: aire_2d, cu_2d
     USE dimens_m, ONLY: iim, jjm, llm
+    use dynetat0_m, ONLY: rlatu
     USE ener, ONLY: ang0, etot0, ptot0, stot0, ztot0
     use filtreg_scal_m, only: filtreg_scal
     use massbarxy_m, only: massbarxy

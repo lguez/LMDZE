@@ -14,9 +14,8 @@ contains
     ! Routine d'initialisation des écritures des fichiers histoires au
     ! format IOIPSL. Initialisation du fichier histoire moyenne.
 
-    USE comgeom, ONLY: rlatu, rlonv
     USE dimens_m, ONLY: llm
-    use dynetat0_m, only: day_ref, annee_ref
+    use dynetat0_m, only: day_ref, annee_ref, rlatu, rlonv
     USE histbeg_totreg_m, ONLY: histbeg_totreg
     USE histdef_m, ONLY: histdef
     USE histend_m, ONLY: histend

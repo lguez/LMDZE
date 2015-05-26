@@ -64,17 +64,6 @@ module comgeom
   real fext((iim + 1) * jjm), constang((iim + 1) * (jjm + 1))
   equivalence (fext, fext_2d), (constang, constang_2d)
 
-  real rlatu(jjm + 1)
-  ! (latitudes of points of the "scalar" and "u" grid, in rad)
-
-  real rlatv(jjm) 
-  ! (latitudes of points of the "v" grid, in rad, in decreasing order)
-
-  real rlonu(iim + 1) ! longitudes of points of the "u" grid, in rad
-
-  real rlonv(iim + 1)
-  ! (longitudes of points of the "scalar" and "v" grid, in rad)
-
   real cuvsurcv_2d(iim + 1, jjm), cvsurcuv_2d(iim + 1, jjm) ! no dimension
   real cuvsurcv((iim + 1) * jjm), cvsurcuv((iim + 1) * jjm) ! no dimension
   equivalence (cuvsurcv, cuvsurcv_2d), (cvsurcuv, cvsurcuv_2d)
@@ -110,8 +99,6 @@ module comgeom
   real unsairz_gam_2d(iim + 1, jjm)
   real unsairz_gam((iim + 1) * jjm)
   equivalence (unsairz_gam, unsairz_gam_2d)
-
-  real xprimu(iim + 1), xprimv(iim + 1)
 
   save
 
@@ -152,19 +139,16 @@ contains
     ! dépendant de j uniquement, sera ici indicé aussi en i pour un
     ! adressage plus facile en ij.
 
-    ! xprimu et xprimv sont respectivement les valeurs de dx / dX aux
-    ! points u et v. yprimu et yprimv sont respectivement les valeurs
-    ! de dy / dY aux points u et v. rlatu et rlatv sont respectivement
-    ! les valeurs de la latitude aux points u et v. cvu et cv_2d sont
-    ! respectivement les valeurs de cv_2d aux points u et v.
+    ! cvu et cv_2d sont respectivement les valeurs de
+    ! cv_2d aux points u et v.
 
     ! cu_2d, cuv, cuscal, cuz sont respectivement les valeurs de cu_2d
     ! aux points u, v, scalaires, et z. Cf. "inigeom.txt".
 
     USE comconst, ONLY : g, omeg, rad
     USE comdissnew, ONLY : coefdis, nitergdiv, nitergrot, niterh
-    use fxhyp_m, only: fxhyp
-    use fyhyp_m, only: fyhyp
+    use dynetat0_m, only: xprimp025, xprimm025, rlatu1, rlatu2, rlatu, rlatv, &
+         yprimu1, yprimu2, rlonu, rlonv
     use jumble, only: new_unit
     use nr_util, only: pi
     USE paramet_m, ONLY : iip1, jjp1
@@ -176,10 +160,7 @@ contains
     REAL coslatm, coslatp, radclatm, radclatp
     REAL, dimension(iip1, jjp1):: cuij1, cuij2, cuij3, cuij4 ! in m
     REAL, dimension(iip1, jjp1):: cvij1, cvij2, cvij3, cvij4 ! in m
-    REAL rlatu1(jjm), yprimu1(jjm), rlatu2(jjm), yprimu2(jjm)
-    real yprimu(jjp1)
     REAL gamdi_gdiv, gamdi_grot, gamdi_h
-    REAL xprimm025(iip1), xprimp025(iip1)
     real, dimension(iim + 1, jjm + 1):: aireij1_2d, aireij2_2d, aireij3_2d, &
          aireij4_2d ! in m2
     real airuscv2_2d(iim + 1, jjm) 
@@ -211,17 +192,6 @@ contains
     print *, 'gamdi_gdiv = ', gamdi_gdiv
     print *, "gamdi_grot = ", gamdi_grot
     print *, "gamdi_h = ", gamdi_h
-
-    CALL fyhyp(rlatu, yprimu, rlatv, rlatu2, yprimu2, rlatu1, yprimu1)
-    CALL fxhyp(xprimm025, rlonv, xprimv, rlonu, xprimu, xprimp025)
-
-    rlatu(1) = pi / 2.
-    rlatu(jjp1) = -rlatu(1)
-
-    ! Calcul aux pôles 
-
-    yprimu(1) = 0.
-    yprimu(jjp1) = 0.
 
     un4rad2 = 0.25 * rad * rad
 

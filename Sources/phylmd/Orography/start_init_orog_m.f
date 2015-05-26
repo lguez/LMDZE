@@ -17,7 +17,7 @@ CONTAINS
        zthe_2d, zpic_2d, zval_2d)
 
     use conf_dat2d_m, only: conf_dat2d
-    use comgeom, only: rlatu, rlonv
+    use dynetat0_m, only: rlatu, rlonv
     use grid_noro_m, only: grid_noro
     use indicesol, only: epsfra
     use netcdf, only: nf90_nowrite

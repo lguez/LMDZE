@@ -143,8 +143,6 @@ flxflux.f
 flxini.f
 flxmain.f
 fonte_neige.f
-fxhyp.f
-fyhyp.f
 gcm.f
 geopot.f
 getfieldindex.f
@@ -284,7 +282,6 @@ rotat_nfil.f
 scopy.f
 screenc.f
 screenp.f
-serre.f
 soil.f
 sortvarc.f
 ssum.f

@@ -18,10 +18,10 @@ contains
     ! 1., taux=0., clon=0.) est à - 180 degrés.
 
     USE dimens_m, ONLY: iim
+    use dynetat0_m, only: clon, grossismx, dzoomx, taux
     use invert_zoom_x_m, only: invert_zoom_x, nmax
     use nr_util, only: pi, pi_d, twopi, twopi_d, arth
     use principal_cshift_m, only: principal_cshift
-    use serre, only: clon, grossismx, dzoomx, taux
 
     REAL, intent(out):: xprimm025(:), rlonv(:), xprimv(:) ! (iim + 1)
     real, intent(out):: rlonu(:), xprimu(:), xprimp025(:) ! (iim + 1)

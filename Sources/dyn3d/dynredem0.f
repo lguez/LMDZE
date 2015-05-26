@@ -10,10 +10,11 @@ CONTAINS
     ! \'Ecriture du fichier de red\'emarrage au format NetCDF (initialisation)
 
     USE comconst, ONLY: cpp, daysec, dtvr, g, kappa, omeg, rad
-    USE comgeom, ONLY: aire_2d, cu_2d, cv_2d, rlatu, rlatv, rlonu, rlonv
     USE dimens_m, ONLY: iim, jjm, llm, nqmx
     USE disvert_m, ONLY: ap, bp, pa, preff, presnivs
-    use dynetat0_m, only: day_ref, annee_ref
+    use dynetat0_m, only: day_ref, annee_ref, clat, clon, dzoomx, dzoomy, &
+         grossismx, grossismy, taux, tauy, rlatu, rlatv, rlonu, rlonv, rlatu1, &
+         rlatu2, yprimu1, yprimu2, xprimp025, xprimm025, xprimu, xprimv
     USE ener, ONLY: ang0, etot0, ptot0, stot0, ztot0
     USE iniadvtrac_m, ONLY: tname, ttext
     USE ju2ymds_m, ONLY: ju2ymds
@@ -21,8 +22,6 @@ CONTAINS
     USE netcdf95, ONLY: nf95_close, nf95_create, nf95_def_dim, nf95_def_var, &
          nf95_enddef, nf95_inq_varid, nf95_put_att, nf95_put_var
     USE paramet_m, ONLY: iip1, jjp1, llmp1
-    USE serre, ONLY: clat, clon, dzoomx, dzoomy, grossismx, grossismy, taux, &
-         tauy
     use ymds2ju_m, only: ymds2ju
 
     CHARACTER(len=*), INTENT(IN):: fichnom
@@ -31,7 +30,7 @@ CONTAINS
 
     ! Local:
 
-    INTEGER iq, l
+    INTEGER iq
     INTEGER, PARAMETER:: length = 100
     REAL tab_cntrl(length) ! tableau des param\`etres du run
 
@@ -120,6 +119,20 @@ CONTAINS
     CALL nf95_def_var(ncid, 'rlatv', nf90_float, idim_rlatv, varid)
     CALL nf95_put_att(ncid, varid, 'title', 'Latitudes des points V')
 
+    CALL nf95_def_var(ncid, 'xprimu', nf90_float, idim_rlonu, varid)
+    CALL nf95_put_att(ncid, varid, 'title', 'dx / dX aux points u')
+
+    CALL nf95_def_var(ncid, 'xprimv', nf90_float, idim_rlonv, varid)
+    CALL nf95_put_att(ncid, varid, 'title', 'dx / dX aux points v')
+
+    CALL nf95_def_var(ncid, 'xprimm025', nf90_float, idim_rlonu, varid)
+    CALL nf95_def_var(ncid, 'xprimp025', nf90_float, idim_rlonu, varid)
+
+    CALL nf95_def_var(ncid, 'rlatu1', nf90_float, idim_rlatv, varid)
+    CALL nf95_def_var(ncid, 'rlatu2', nf90_float, idim_rlatv, varid)
+    CALL nf95_def_var(ncid, 'yprimu1', nf90_float, idim_rlatv, varid)
+    CALL nf95_def_var(ncid, 'yprimu2', nf90_float, idim_rlatv, varid)
+
     CALL nf95_def_var(ncid, 'ap', nf90_float, idim_sig, varid)
     CALL nf95_put_att(ncid, varid, 'title', 'Coefficient A pour hybride')
 
@@ -127,20 +140,6 @@ CONTAINS
     CALL nf95_put_att(ncid, varid, 'title', 'Coefficient B pour hybride')
 
     CALL nf95_def_var(ncid, 'presnivs', nf90_float, idim_s, varid)
-
-    ! Coefficients de passage cov. <-> contra. <--> naturel
-
-    CALL nf95_def_var(ncid, 'cu', nf90_float, (/idim_rlonu, idim_rlatu/), varid)
-    CALL nf95_put_att(ncid, varid, 'title', 'Coefficient de passage pour U')
-
-    CALL nf95_def_var(ncid, 'cv', nf90_float, (/idim_rlonv, idim_rlatv/), varid)
-    CALL nf95_put_att(ncid, varid, 'title', 'Coefficient de passage pour V')
-
-    ! Aire de chaque maille:
-
-    CALL nf95_def_var(ncid, 'aire', nf90_float, (/idim_rlonv, idim_rlatu/), &
-         varid)
-    CALL nf95_put_att(ncid, varid, 'title', 'Aires de chaque maille')
 
     ! Geopentiel au sol:
 
@@ -199,6 +198,30 @@ CONTAINS
     CALL nf95_inq_varid(ncid, 'rlatv', varid)
     CALL nf95_put_var(ncid, varid, rlatv)
 
+    CALL nf95_inq_varid(ncid, 'xprimu', varid)
+    CALL nf95_put_var(ncid, varid, xprimu)
+
+    CALL nf95_inq_varid(ncid, 'xprimv', varid)
+    CALL nf95_put_var(ncid, varid, xprimv)
+
+    CALL nf95_inq_varid(ncid, 'xprimm025', varid)
+    CALL nf95_put_var(ncid, varid, xprimm025)
+
+    CALL nf95_inq_varid(ncid, 'xprimp025', varid)
+    CALL nf95_put_var(ncid, varid, xprimp025)
+
+    call NF95_INQ_VARID (ncid, "rlatu1", varid)
+    call NF95_PUT_VAR(ncid, varid, rlatu1)
+
+    call NF95_INQ_VARID (ncid, "rlatu2", varid)
+    call NF95_PUT_VAR(ncid, varid, rlatu2)
+
+    CALL nf95_inq_varid(ncid, 'yprimu1', varid)
+    CALL nf95_put_var(ncid, varid, yprimu1)
+
+    CALL nf95_inq_varid(ncid, 'yprimu2', varid)
+    CALL nf95_put_var(ncid, varid, yprimu2)
+
     CALL nf95_inq_varid(ncid, 'ap', varid)
     CALL nf95_put_var(ncid, varid, ap)
 
@@ -208,19 +231,10 @@ CONTAINS
     CALL nf95_inq_varid(ncid, 'presnivs', varid)
     CALL nf95_put_var(ncid, varid, presnivs)
 
-    CALL nf95_inq_varid(ncid, 'cu', varid)
-    CALL nf95_put_var(ncid, varid, cu_2d)
-
-    CALL nf95_inq_varid(ncid, 'cv', varid)
-    CALL nf95_put_var(ncid, varid, cv_2d)
-
-    CALL nf95_inq_varid(ncid, 'aire', varid)
-    CALL nf95_put_var(ncid, varid, aire_2d)
-
     CALL nf95_inq_varid(ncid, 'phisinit', varid)
     CALL nf95_put_var(ncid, varid, phis)
 
-    CALL nf95_close(ncid) ! fermer le fichier
+    CALL nf95_close(ncid)
 
     PRINT *, 'iim, jjm, llm, iday_end', iim, jjm, llm, iday_end
     PRINT *, 'rad, omeg, g, cpp, kappa', rad, omeg, g, cpp, kappa

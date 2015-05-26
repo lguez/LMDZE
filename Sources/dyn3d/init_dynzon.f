@@ -15,11 +15,10 @@ contains
 
     ! From LMDZ4/libf/dyn3d/bilan_dyn.F, version 1.5 2005/03/16 10:12:17
 
-    USE comgeom, ONLY: rlatv
     USE conf_gcm_m, ONLY: day_step, iperiod, periodav
     USE dimens_m, ONLY: jjm, llm
     USE disvert_m, ONLY: presnivs
-    use dynetat0_m, only: day_ref, annee_ref
+    use dynetat0_m, only: day_ref, annee_ref, rlatv
     USE histbeg_totreg_m, ONLY: histbeg_totreg
     USE histdef_m, ONLY: histdef
     USE histend_m, ONLY: histend
@@ -69,11 +68,11 @@ contains
     call histbeg_totreg('dynzon', rlong(:1), rlatg, 1, 1, 1, jjm, itau_dyn, &
          julian, dt_cum, horiid, fileid)
 
-    ! Appel à histvert pour la grille verticale
+    ! Appel \`a histvert pour la grille verticale
 
     call histvert(fileid, 'presnivs', 'Niveaux sigma', 'mb', presnivs, vertiid)
 
-    ! Appels à histdef pour la définition des variables à sauvegarder
+    ! Appels \`a histdef pour la d\'efinition des variables \`a sauvegarder
     do iQ = 1, nQ
        do itr = 1, ntr
           if (itr == 1) then
@@ -88,29 +87,29 @@ contains
        enddo
     enddo
 
-    ! Déclarations des champs avec dimension verticale
+    ! D\'eclarations des champs avec dimension verticale
     do iQ = 1, nQ
        do itr = 1, ntr
           call histdef(fileid, znom(itr, iQ), noml(itr, iQ), &
                zunites(itr, iQ), 1, jjm, horiid, llm, 1, llm, vertiid, &
                'ave(X)', dt_cum, dt_cum)
        enddo
-       ! Déclarations pour les fonctions de courant
+       ! D\'eclarations pour les fonctions de courant
        call histdef(fileid, 'psi' // nom(iQ), 'stream fn. ' // noml(2, iQ), &
             zunites(2, iQ), 1, jjm, horiid, llm, 1, llm, vertiid, &
             'ave(X)', dt_cum, dt_cum)
     enddo
 
-    ! Déclarations pour les champs de transport d'air
+    ! D\'eclarations pour les champs de transport d'air
     call histdef(fileid, 'masse', 'masse', 'kg', 1, jjm, horiid, llm, 1, &
          llm, vertiid, 'ave(X)', dt_cum, dt_cum)
     call histdef(fileid, 'v', 'v', 'm/s', 1, jjm, horiid, llm, 1, llm, &
          vertiid, 'ave(X)', dt_cum, dt_cum)
-    ! Déclarations pour les fonctions de courant
+    ! D\'eclarations pour les fonctions de courant
     call histdef(fileid, 'psi', 'stream fn. MMC ', 'mega t/s', 1, jjm, &
          horiid, llm, 1, llm, vertiid, 'ave(X)', dt_cum, dt_cum)
 
-    ! Déclaration des champs 1D de transport en latitude
+    ! D\'eclaration des champs 1D de transport en latitude
     do iQ = 1, nQ
        do itr = 2, ntr
           call histdef(fileid, 'a' // znom(itr, iQ), noml(itr, iQ), &

@@ -11,13 +11,15 @@
 !
 !   --------------------------------------------------------------------
 !
-      use dimens_m
-      use paramet_m
       use comconst
+      use dimens_m
       use disvert_m
       use conf_gcm_m
-      use comgeom
+      use comgeom, only: aire, apoln, apols
       USE nr_util, ONLY : pi
+      USE dynetat0_m, only: rlonv, rlonu
+      use paramet_m
+
       IMPLICIT NONE
 !
 !

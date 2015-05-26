@@ -10,8 +10,8 @@ contains
 
     use coefpoly_m, only: coefpoly
     USE dimens_m, ONLY: iim
+    use dynetat0_m, only: clon
     use nr_util, only: pi_d, twopi_d
-    use serre, only: clon
 
     DOUBLE PRECISION, intent(in):: Xf(0:), xtild(0:), Xprimt(0:) ! (0:2 * nmax)
     real, intent(out):: xlon(:), xprimm(:) ! (iim)

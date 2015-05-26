@@ -14,13 +14,15 @@ SUBROUTINE limy(s0, sy, sm, pente_max)
 
 
   ! --------------------------------------------------------------------
-  USE dimens_m
-  USE paramet_m
   USE comconst
-  USE disvert_m
+  use comgeom, only: aire
   USE conf_gcm_m
-  USE comgeom
+  USE dimens_m
+  USE disvert_m
+  USE dynetat0_m, only: rlonv, rlonu
   USE nr_util, ONLY: pi
+  USE paramet_m
+
   IMPLICIT NONE
 
 

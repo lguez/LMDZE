@@ -39,11 +39,10 @@ contains
 
     USE coefils, ONLY : coefilu, coefilu2, coefilv, coefilv2, eignfnu, &
          eignfnv, modfrstu, modfrstv
-    USE comgeom, ONLY : rlatu, rlatv, xprimu
     USE dimens_m, ONLY : iim, jjm
+    USE dynetat0_m, ONLY : rlatu, rlatv, xprimu, grossismx
     use inifgn_m, only: inifgn
     use nr_util, only: pi
-    USE serre, ONLY : grossismx
 
     ! Local:
     REAL dlatu(jjm)

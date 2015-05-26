@@ -3,13 +3,13 @@ PROGRAM gcm
   ! Authors: P. Le Van, L. Fairhead, F. Hourdin
   ! From "gcm.F", version 1.4, 2006/04/04 15:05:16
 
-  ! General circulation model of LMD. Avec coordonnée verticale
-  ! hybride, avec nouveaux opérateurs de dissipation "*" ("gradiv2",
-  ! "divgrad2", "nxgraro2"). Possibilité de choisir le schéma pour
+  ! General circulation model of LMD. Avec coordonn\'ee verticale
+  ! hybride, avec nouveaux op\'erateurs de dissipation "*" ("gradiv2",
+  ! "divgrad2", "nxgraro2"). Possibilit\'e de choisir le sch\'ema pour
   ! l'advection de "q", en modifiant "iadv" dans "traceur.def".
 
   use comconst, only: daysec, dtvr, iniconst
-  use comgeom, only: rlatu, aire_2d, cu_2d, cv_2d, rlonv, inigeom
+  use comgeom, only:  aire_2d, cu_2d, cv_2d, inigeom
   use comgeomphy, only: airephy, cuphy, cvphy, rlatd, rlond
   use conf_gcm_m, only: day_step, iperiod, iecri, iphysiq, nday, periodav, &
        conf_gcm, iflag_phys
@@ -17,7 +17,7 @@ PROGRAM gcm
   use dimens_m, only: iim, jjm, llm, nqmx
   use dimphy, only: klon
   USE disvert_m, ONLY : disvert
-  use dynetat0_m, only: dynetat0, day_ini
+  use dynetat0_m, only: rlatu, rlonv, dynetat0, day_ini
   use dynredem0_m, only: dynredem0
   use grid_change, only: dyn_phy, init_dyn_phy
   use histclo_m, only: histclo
@@ -41,11 +41,11 @@ PROGRAM gcm
 
   ! Variables dynamiques :
   REAL ucov(iim + 1, jjm + 1, llm), vcov(iim + 1, jjm, llm)  ! vent covariant
-  REAL teta(iim + 1, jjm + 1, llm) ! température potentielle 
-  REAL q(iim + 1, jjm + 1, llm, nqmx) ! champs advectés
+  REAL teta(iim + 1, jjm + 1, llm) ! temp\'erature potentielle 
+  REAL q(iim + 1, jjm + 1, llm, nqmx) ! champs advect\'es
   REAL ps(iim + 1, jjm + 1) ! pression au sol (Pa)
   REAL masse(iim + 1, jjm + 1, llm) ! masse d'air
-  REAL phis(iim + 1, jjm + 1) ! géopotentiel au sol
+  REAL phis(iim + 1, jjm + 1) ! g\'eopotentiel au sol
 
   ! Calendrier :
   LOGICAL:: true_calendar = .false. ! default value
@@ -80,7 +80,7 @@ PROGRAM gcm
   CALL iniconst
   CALL dynetat0(vcov, ucov, teta, q, masse, ps, phis)
   CALL disvert
-  CALL inigeom ! initialisation de la géometrie
+  CALL inigeom ! initialisation de la g\'eometrie
   CALL inifilr ! initialisation du filtre
   CALL inidissip
   call init_dyn_phy
@@ -111,13 +111,13 @@ PROGRAM gcm
      call yoethf
   ENDIF
 
-  ! Initialisation des entrées-sorties :
+  ! Initialisation des entr\'ees-sorties :
   CALL dynredem0("restart.nc", day_ini + nday, phis)
   CALL inithist(dtvr, nqmx, t_ops = iecri * daysec, t_wrt = iecri * daysec)
   CALL initdynav(dtvr, nqmx, t_ops = iperiod * dtvr, t_wrt = periodav * daysec)
   call init_dynzon(dt_app = dtvr * iperiod)
 
-  ! Choix des fréquences de stockage pour le hors-ligne :
+  ! Choix des fr\'equences de stockage pour le hors-ligne :
   istdyn = day_step / 4 ! stockage toutes les 6 h = 1 jour / 4
   istphy = istdyn / iphysiq     
 

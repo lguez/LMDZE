@@ -1,12 +1,14 @@
 program test_inter_barxy
 
   use comconst, only: dtvr, daysec, iniconst
-  use comgeom, only: rlonu, rlatv, inigeom
+  use comgeom, only: inigeom
   use conf_gcm_m, only: conf_gcm, day_step
   use dimens_m, only: iim, jjm
+  USE dynetat0_m, only: rlonu, rlatv
   use disvert_m, only: pa
   use inter_barxy_m, only: inter_barxy
   USE nr_util, ONLY : pi
+  use read_serre_m, only: read_serre
 
   implicit none
 
@@ -34,6 +36,7 @@ program test_inter_barxy
   print *, 'dtvr = ', dtvr
   pa = 5e4
   CALL iniconst
+  call read_serre
   CALL inigeom
 
   lon_ini = - pi + 2 * pi / iml_dyn * (/(i, i = 0, iml_dyn - 1)/)

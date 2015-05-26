@@ -73,7 +73,7 @@ principal_cshift.f
 q_sat.f
 regr_lat_time_coefoz.f
 regr_pr_o3.f
-serre.f
+read_serre.f
 sortvarc.f
 ssum.f
 startdyn.f

@@ -8,7 +8,7 @@ PROGRAM ce0l
   use grilles_gcm_netcdf_sub_m, only: grilles_gcm_netcdf_sub
   use jumble, only: new_unit
   use limit_mod, only: limit
-  use serre, only: read_serre
+  use read_serre_m, only: read_serre
   use unit_nml_m, only: unit_nml
 
   implicit none

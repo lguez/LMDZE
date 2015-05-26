@@ -7,16 +7,16 @@
 !    *************************************************************
 !     q,masse_adv_v,w sont des arguments d'entree  pour le s-pg ....
 !     dq              sont des arguments de sortie pour le s-pg ....
-!
-!
-!   ----------------------------------------------------------------
-      use dimens_m
-      use paramet_m
+
       use comconst
-      use disvert_m
+      use comgeom, only: aire
       use conf_gcm_m
-      use comgeom
+      use dimens_m
+      use disvert_m
+      USE dynetat0_m, only: rlonv, rlonu
       USE nr_util, ONLY : pi
+      use paramet_m
+
       IMPLICIT NONE
 !
 !

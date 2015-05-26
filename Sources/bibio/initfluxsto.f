@@ -24,11 +24,10 @@ SUBROUTINE initfluxsto(tstep, t_ops, t_wrt, nq, fileid, filevid, filedid)
   !   L. Fairhead, 03/99                                             
 
   USE comconst
-  USE comgeom
   use conf_gcm_m
   USE dimens_m
   USE disvert_m
-  use dynetat0_m, only: day_ref, annee_ref
+  use dynetat0_m, only: day_ref, annee_ref, rlonu, rlatu, rlonv, rlatv
   USE histbeg_totreg_m, ONLY : histbeg_totreg
   USE histdef_m, ONLY : histdef
   USE histend_m, ONLY : histend
@@ -37,7 +36,6 @@ SUBROUTINE initfluxsto(tstep, t_ops, t_wrt, nq, fileid, filevid, filedid)
   USE histvert_m, ONLY : histvert
   USE nr_util, ONLY : pi
   USE paramet_m
-  USE serre
   USE temps, ONLY : itau_dyn
   use ymds2ju_m, only: ymds2ju
 

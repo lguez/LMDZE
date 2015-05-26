@@ -11,8 +11,8 @@ contains
     ! Calcul des coordonnées ilon et jlat de la maille scalaire dans
     ! laquelle se trouve le point (lon, lat).
 
-    USE comgeom, only: rlonu, rlatv
     USE dimens_m, only: iim, jjm
+    USE dynetat0_m, only: rlonu, rlatv
 
     REAL, intent(in):: lon, lat ! in rad
     INTEGER, intent(out):: ilon, jlat

@@ -12,10 +12,10 @@ contains
     ! It uses files with climatological data.
     ! Both grids must be regular.
 
-    use comgeom, only: rlonu, rlatv
     use conf_dat2d_m, only: conf_dat2d
     use dimens_m, only: iim, jjm
     use dimphy, only: klon, zmasq
+    use dynetat0_m, only: rlonu, rlatv
     use etat0_mod, only: pctsrf
     use grid_change, only: dyn_phy
     use indicesol, only: epsfra, nbsrf, is_ter, is_oce, is_lic, is_sic
@@ -33,8 +33,8 @@ contains
     ! Variables local to the procedure:
 
     LOGICAL:: extrap = .FALSE.
-    ! (extrapolation de données, comme pour les SST lorsque le fichier
-    ! ne contient pas uniquement des points océaniques)
+    ! (extrapolation de donn\'ees, comme pour les SST lorsque le fichier
+    ! ne contient pas uniquement des points oc\'eaniques)
 
     REAL phy_alb(klon, 360)
     REAL phy_sst(klon, 360)
@@ -44,7 +44,7 @@ contains
 
     real pctsrf_t(klon, nbsrf, 360) ! composition of the surface
 
-    ! Pour le champ de départ:
+    ! Pour le champ de d\'epart:
     INTEGER imdep, jmdep, lmdep
 
     REAL, ALLOCATABLE:: dlon(:), dlat(:)
@@ -52,7 +52,7 @@ contains
     REAL, ALLOCATABLE:: champ(:, :)
     REAL, ALLOCATABLE:: work(:, :)
 
-    ! Pour le champ interpolé 3D :
+    ! Pour le champ interpol\'e 3D :
     REAL, allocatable:: champtime(:, :, :)
     REAL champan(iim + 1, jjm + 1, 360)
 
@@ -148,7 +148,7 @@ contains
     call nf95_inq_dimid(ncid, "time", dimid)
     call NF95_INQuire_DIMension(ncid, dimid, nclen=lmdep)
     print *, 'lmdep = ', lmdep
-    ! Coordonnée temporelle fichiers AMIP pas en jours. Ici on suppose
+    ! Coordonn\'ee temporelle fichiers AMIP pas en jours. Ici on suppose
     ! qu'on a 12 mois (de 30 jours).
     IF (lmdep /= 12) then
        print *, 'Unknown AMIP file: not 12 months?'
@@ -199,7 +199,7 @@ contains
        pctsrf_t(:, is_ter, k) = pctsrf(:, is_ter)
        pctsrf_t(:, is_lic, k) = pctsrf(:, is_lic)
        pctsrf_t(:, is_sic, k) = max(phy_ice - pctsrf_t(:, is_lic, k), 0.)
-       ! Il y a des cas où il y a de la glace dans landiceref et
+       ! Il y a des cas o\`u il y a de la glace dans landiceref et
        ! pas dans AMIP
        WHERE (1. - zmasq < EPSFRA)
           pctsrf_t(:, is_sic, k) = 0.
@@ -219,13 +219,13 @@ contains
 
        DO i = 1, klon
           if (pctsrf_t(i, is_oce, k) < 0.) then
-             print *, 'Problème sous maille : pctsrf_t(', i, &
+             print *, 'Bad surface fraction: pctsrf_t(', i, &
                   ', is_oce, ', k, ') = ', pctsrf_t(i, is_oce, k)
           ENDIF
           IF (abs(pctsrf_t(i, is_ter, k) + pctsrf_t(i, is_lic, k) &
                + pctsrf_t(i, is_oce, k) + pctsrf_t(i, is_sic, k) - 1.) &
                > EPSFRA) THEN 
-             print *, 'Problème sous surface :'
+             print *, 'Bad surface fraction:'
              print *, "pctsrf_t(", i, ", :, ", k, ") = ", &
                   pctsrf_t(i, :, k)
              print *, "phy_ice(", i, ") = ", phy_ice(i)

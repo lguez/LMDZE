@@ -11,8 +11,8 @@ contains
     ! xprimm.
 
     USE dimens_m, ONLY: iim
+    use dynetat0_m, only: clon
     use nr_util, only: twopi
-    use serre, only: clon
 
     integer, intent(in):: is2
     real, intent(inout):: xlon(:), xprimm(:) ! (iim + 1)

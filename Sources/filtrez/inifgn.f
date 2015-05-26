@@ -11,8 +11,8 @@ contains
     ! H.Upadyaya, O.Sharma 
 
     USE coefils, ONLY: eignfnu, eignfnv, sddu, sddv, unsddu, unsddv
-    USE comgeom, ONLY: xprimu, xprimv
     USE dimens_m, ONLY: iim
+    USE dynetat0_m, ONLY: xprimu, xprimv
     use numer_rec_95, only: jacobi
 
     real, intent(out):: dv(iim)

@@ -42,8 +42,8 @@ contains
     use abort_gcm_m, only: abort_gcm
     use comconst, only: daysec, dtvr
     use conf_gcm_m, only: day_step, iperiod
+    use dynetat0_m, only: grossismx, grossismy
     use nr_util, only: assert
-    use serre, only: grossismx, grossismy
     use unit_nml_m, only: unit_nml
 
     namelist /conf_guide_nml/ ncep, ini_anal, guide_u, guide_v, guide_t, &
