@@ -139,11 +139,8 @@ contains
     ! dépendant de j uniquement, sera ici indicé aussi en i pour un
     ! adressage plus facile en ij.
 
-    ! cvu et cv_2d sont respectivement les valeurs de
-    ! cv_2d aux points u et v.
-
-    ! cu_2d, cuv, cuscal, cuz sont respectivement les valeurs de cu_2d
-    ! aux points u, v, scalaires, et z. Cf. "inigeom.txt".
+    ! cv_2d est aux points v. cu_2d est aux points
+    ! u. Cf. "inigeom.txt".
 
     USE comconst, ONLY : g, omeg, rad
     USE comdissnew, ONLY : coefdis, nitergdiv, nitergrot, niterh
@@ -155,7 +152,6 @@ contains
 
     ! Local:
     INTEGER i, j, unit
-    REAL cvu(iip1, jjp1), cuv(iip1, jjm)
     REAL ai14, ai23, airez, un4rad2
     REAL coslatm, coslatp, radclatm, radclatp
     REAL, dimension(iip1, jjp1):: cuij1, cuij2, cuij3, cuij4 ! in m
@@ -163,9 +159,6 @@ contains
     REAL gamdi_gdiv, gamdi_grot, gamdi_h
     real, dimension(iim + 1, jjm + 1):: aireij1_2d, aireij2_2d, aireij3_2d, &
          aireij4_2d ! in m2
-    real airuscv2_2d(iim + 1, jjm) 
-    real airvscu2_2d(iim + 1, jjm), aiuscv2gam_2d(iim + 1, jjm) 
-    real aivscu2gam_2d(iim + 1, jjm)
 
     !------------------------------------------------------------------
 
@@ -335,16 +328,12 @@ contains
        unsairz_gam_2d(iip1, j) = unsairz_gam_2d(1, j)
     END DO
 
-    ! Calcul des élongations cu_2d, cv_2d, cvu 
+    ! Calcul des élongations cu_2d, cv_2d
 
     DO j = 1, jjm
        DO i = 1, iim
           cv_2d(i, j) = 0.5 * &
                (cvij2(i, j) + cvij3(i, j) + cvij1(i, j + 1) + cvij4(i, j + 1))
-          cvu(i, j) = 0.5 * (cvij1(i, j) + cvij4(i, j) + cvij2(i, j) &
-               + cvij3(i, j))
-          cuv(i, j) = 0.5 * (cuij2(i, j) + cuij3(i, j) + cuij1(i, j + 1) &
-               + cuij4(i, j + 1))
           unscv2_2d(i, j) = 1. / cv_2d(i, j)**2
        END DO
        DO i = 1, iim
@@ -355,9 +344,7 @@ contains
           cvscuvgam_2d(i, j) = cvsurcuv_2d(i, j)**(-gamdi_grot)
        END DO
        cv_2d(iip1, j) = cv_2d(1, j)
-       cvu(iip1, j) = cvu(1, j)
        unscv2_2d(iip1, j) = unscv2_2d(1, j)
-       cuv(iip1, j) = cuv(1, j)
        cuvsurcv_2d(iip1, j) = cuvsurcv_2d(1, j)
        cvsurcuv_2d(iip1, j) = cvsurcuv_2d(1, j)
        cuvscvgam1_2d(iip1, j) = cuvscvgam1_2d(1, j)
@@ -389,29 +376,9 @@ contains
 
     cu_2d(:, 1) = 0.
     unscu2_2d(:, 1) = 0.
-    cvu(:, 1) = 0.
 
     cu_2d(:, jjp1) = 0.
     unscu2_2d(:, jjp1) = 0.
-    cvu(:, jjp1) = 0.
-
-    DO j = 1, jjm
-       DO i = 1, iim
-          airvscu2_2d(i, j) = airev_2d(i, j) / (cuv(i, j) * cuv(i, j))
-          aivscu2gam_2d(i, j) = airvscu2_2d(i, j)**(-gamdi_grot)
-       END DO
-       airvscu2_2d(iip1, j) = airvscu2_2d(1, j)
-       aivscu2gam_2d(iip1, j) = aivscu2gam_2d(1, j)
-    END DO
-
-    DO j = 2, jjm
-       DO i = 1, iim
-          airuscv2_2d(i, j) = aireu_2d(i, j) / (cvu(i, j) * cvu(i, j))
-          aiuscv2gam_2d(i, j) = airuscv2_2d(i, j)**(-gamdi_grot)
-       END DO
-       airuscv2_2d(iip1, j) = airuscv2_2d(1, j)
-       aiuscv2gam_2d(iip1, j) = aiuscv2gam_2d(1, j)
-    END DO
 
     ! Calcul des aires aux pôles :
 

@@ -24,10 +24,9 @@ module conf_guide_m
   logical:: online = .true. ! controle du guide
   ! hors-ligne: x=x_rea
 
-  ! Latitude min et max pour le rappel dans le cas ou on 'a les
-  ! analyses que sur une bande de latitudes.
-  REAL:: lat_min_guide = -90. ! Latitude minimum pour le guidage
-  real:: lat_max_guide = 90. ! Latitude maximum pour le guidage
+  ! Dans le cas où on n'a les analyses que sur une bande de latitudes :
+  REAL, save:: lat_min_guide ! minimum latitude for nudging, in rad
+  real, save:: lat_max_guide ! maximum latitude for nudging, in rad
 
   logical, save:: ok_guide ! guidage
   REAL, save:: factt ! pas de temps entre deux appels au guidage, en jours
@@ -43,13 +42,18 @@ contains
     use comconst, only: daysec, dtvr
     use conf_gcm_m, only: day_step, iperiod
     use dynetat0_m, only: grossismx, grossismy
-    use nr_util, only: assert
+    use nr_util, only: assert, pi
     use unit_nml_m, only: unit_nml
+
+    ! Local:
+
+    REAL:: lat_min_guide_deg = -90. ! in degrees
+    real:: lat_max_guide_deg = 90. ! in degrees
 
     namelist /conf_guide_nml/ ncep, ini_anal, guide_u, guide_v, guide_t, &
          guide_q, online, tau_min_u, tau_max_u, tau_min_v, tau_max_v, &
          tau_min_t, tau_max_t, tau_min_q, tau_max_q, tau_min_p, tau_max_p, &
-         lat_min_guide, lat_max_guide
+         lat_min_guide_deg, lat_max_guide_deg
 
     !-----------------------------------------------------------------------
 
@@ -58,6 +62,9 @@ contains
     print *, "Enter namelist 'conf_guide_nml'."
     read(unit=*, nml=conf_guide_nml)
     write(unit_nml, nml=conf_guide_nml)
+
+    lat_min_guide = lat_min_guide_deg / 180. * pi
+    lat_max_guide = lat_max_guide_deg / 180. * pi
 
     ok_guide = any((/guide_u, guide_v, guide_t, guide_q/))
     if (ok_guide .and. mod(day_step, 4 * iperiod) /= 0) call &

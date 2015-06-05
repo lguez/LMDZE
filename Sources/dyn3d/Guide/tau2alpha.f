@@ -18,7 +18,6 @@ contains
     ! Local:
     REAL alphamin, alphamax, xi
     INTEGER i, j, n_lon, n_lat
-    REAL zlat
 
     !------------------------------------------------------------
 
@@ -32,8 +31,7 @@ contains
     alphamax = factt / taumin
 
     DO j = 1, n_lat
-       zlat = rlat(j) * 180. / pi
-       IF (lat_min_guide <= zlat .AND. zlat <= lat_max_guide) THEN
+       IF (lat_min_guide <= rlat(j) .AND. rlat(j) <= lat_max_guide) THEN
           DO i = 1, n_lon
              xi = min(((dxdy_max - dxdy(i, j)) &
                   / (dxdy_max - dxdy_min))**gamma, 1.)

@@ -65,12 +65,11 @@ contains
 
     ! Local:
 
-    INTEGER ncid, idim2, idim3, dimid_nbsrf
+    INTEGER ncid, idim2, idim3, dimid_nbsrf, dimid_nsoilmx
     integer varid, varid_run_off_lic_0, varid_sig1, varid_w01, varid_rlon
     integer varid_rlat, varid_zmasq, varid_fter, varid_flic, varid_foce
-    integer varid_fsic
-    INTEGER isoil, nsrf
-    CHARACTER(len=7) str7
+    integer varid_fsic, varid_ts, varid_tsoil
+    INTEGER nsrf
     CHARACTER(len=2) str2
 
     !------------------------------------------------------------
@@ -85,6 +84,7 @@ contains
     call nf95_def_dim(ncid, 'points_physiques', klon, idim2)
     call nf95_def_dim(ncid, 'klev', klev, idim3)
     call nf95_def_dim(ncid, 'nbsrf', nbsrf, dimid_nbsrf)
+    call nf95_def_dim(ncid, 'nsoilmx', nsoilmx, dimid_nsoilmx)
 
     call nf95_def_var(ncid, 'longitude', nf90_float, idim2, varid_rlon)
     call nf95_def_var(ncid, 'latitude', nf90_float, idim2, varid_rlat)
@@ -106,6 +106,13 @@ contains
     call nf95_def_var(ncid, 'FSIC', nf90_float, idim2, varid_fsic)
     call nf95_put_att(ncid, varid_fsic, 'title', 'fraction glace mer')
 
+    call nf95_def_var(ncid, 'TS', nf90_float, (/idim2, dimid_nbsrf/), varid_ts)
+    call nf95_put_att(ncid, varid_ts, 'title', 'surface temperature')
+
+    call nf95_def_var(ncid, 'Tsoil', nf90_float, (/idim2, dimid_nsoilmx, &
+         dimid_nbsrf/), varid_tsoil)
+    call nf95_put_att(ncid, varid_tsoil, 'title', 'soil temperature')
+
     call nf95_enddef(ncid)
 
     call nf95_put_var(ncid, varid_rlon, rlon)
@@ -115,29 +122,8 @@ contains
     call nf95_put_var(ncid, varid_flic, pctsrf(:, is_lic))
     call nf95_put_var(ncid, varid_foce, pctsrf(:, is_oce))
     call nf95_put_var(ncid, varid_fsic, pctsrf(:, is_sic))
-
-    call nf95_redef(ncid)
-    call nf95_def_var(ncid, 'TS', nf90_float, (/idim2, dimid_nbsrf/), varid)
-    call nf95_put_att(ncid, varid, 'title', 'surface temperature')
-    call nf95_enddef(ncid)
-    call nf95_put_var(ncid, varid, tsol)
-
-    DO nsrf = 1, nbsrf
-       DO isoil = 1, nsoilmx
-          IF (isoil<=99 .AND. nsrf<=99) THEN
-             WRITE (str7, '(i2.2, "srf", i2.2)') isoil, nsrf
-             call nf95_redef(ncid)
-             call nf95_def_var(ncid, 'Tsoil'//str7, nf90_float, idim2, varid)
-             call nf95_put_att(ncid, varid, 'title', &
-                  'Temperature du sol No.'//str7)
-             call nf95_enddef(ncid)
-          ELSE
-             PRINT *, 'Trop de couches'
-             STOP 1
-          END IF
-          call nf95_put_var(ncid, varid, tsoil(:, isoil, nsrf))
-       END DO
-    END DO
+    call nf95_put_var(ncid, varid_ts, tsol)
+    call nf95_put_var(ncid, varid_tsoil, tsoil)
 
     !IM "slab" ocean
     call nf95_redef(ncid)

@@ -3,6 +3,8 @@ module inifilr_m
   IMPLICIT NONE
 
   INTEGER jfiltnu, jfiltsu, jfiltnv, jfiltsv
+  ! jfiltn index of the last scalar line filtered in NH
+  ! jfilts index of the first line filtered in SH
 
   ! North:
   real, allocatable:: matriceun(:, :, :), matrinvn(:, :, :) 
@@ -24,34 +26,29 @@ contains
     ! H. Upadhyaya, O. Sharma
 
     ! This routine computes the eigenfunctions of the laplacian on the
-    ! stretched grid, and the filtering coefficients.
-    ! We designate:
-    ! eignfn eigenfunctions of the discrete laplacian
-    ! eigenvl eigenvalues
-    ! jfiltn index of the last scalar line filtered in NH
-    ! jfilts index of the first line filtered in SH
-    ! modfrst index of the mode from where modes are filtered
-    ! modemax maximum number of modes (im)
-    ! coefil filtering coefficients (lamda_max * cos(rlat) / lamda)
-    ! sdd SQRT(dx)
+    ! stretched grid, and the filtering coefficients. The modes are
+    ! filtered from modfrst to iim.
 
-    ! The modes are filtered from modfrst to modemax.
-
-    USE coefils, ONLY : coefilu, coefilu2, coefilv, coefilv2, eignfnu, &
-         eignfnv, modfrstu, modfrstv
     USE dimens_m, ONLY : iim, jjm
     USE dynetat0_m, ONLY : rlatu, rlatv, xprimu, grossismx
-    use inifgn_m, only: inifgn
+    use inifgn_m, only: inifgn, eignfnu, eignfnv
     use nr_util, only: pi
 
     ! Local:
     REAL dlatu(jjm)
-    REAL rlamda(2: iim), eignvl(iim)
-
+    REAL rlamda(2: iim)
+    real eignvl(iim) ! eigenvalues
     REAL lamdamax, cof
-    INTEGER i, j, modemax, imx, k, kf
+    INTEGER i, j, k, kf
     REAL dymin, colat0
     REAL eignft(iim, iim), coff
+
+    ! Filtering coefficients (lamda_max * cos(rlat) / lamda):
+    real coefilu(iim, jjm), coefilv(iim, jjm)
+    real coefilu2(iim, jjm), coefilv2(iim, jjm)
+
+    integer modfrstu(jjm), modfrstv(jjm)
+    ! index of the mode from where modes are filtered
 
     !-----------------------------------------------------------
 
@@ -73,7 +70,7 @@ contains
     ! Calcul de colat0
 
     DO j = 1, jjm
-       dlatu(j) = rlatu(j) - rlatu(j+1)
+       dlatu(j) = rlatu(j) - rlatu(j + 1)
     END DO
 
     dymin = dlatu(1)
@@ -99,34 +96,27 @@ contains
 
     ! Determination de jfiltnu, jfiltnv, jfiltsu, jfiltsv
 
-    modemax = iim
-    imx = iim
-
-    PRINT *, 'TRUNCATION AT ', imx
+    PRINT *, 'TRUNCATION AT ', iim
 
     DO j = 2, jjm / 2 + 1
        IF (cos(rlatu(j)) / colat0 < 1. &
-            .and. rlamda(imx) * cos(rlatu(j)) < 1.) jfiltnu = j
+            .and. rlamda(iim) * cos(rlatu(j)) < 1.) jfiltnu = j
 
        IF (cos(rlatu(jjm - j + 2)) / colat0 < 1. &
-            .and. rlamda(imx) * cos(rlatu(jjm - j + 2)) < 1.) &
+            .and. rlamda(iim) * cos(rlatu(jjm - j + 2)) < 1.) &
             jfiltsu = jjm - j + 2
     END DO
 
-    DO j = 1, jjm/2
-       cof = cos(rlatv(j))/colat0
-       IF (cof < 1.) THEN
-          IF (rlamda(imx)*cos(rlatv(j)) < 1.) jfiltnv = j
-       END IF
+    DO j = 1, jjm / 2
+       IF (cos(rlatv(j)) / colat0 < 1. .and. rlamda(iim) * cos(rlatv(j)) < 1.) &
+            jfiltnv = j
 
-       cof = cos(rlatv(jjm-j+1))/colat0
-       IF (cof < 1.) THEN
-          IF (rlamda(imx)*cos(rlatv(jjm-j+1)) < 1.) jfiltsv = jjm - j + 1
-       END IF
+       IF (cos(rlatv(jjm - j + 1)) / colat0 < 1. .and. rlamda(iim) &
+            * cos(rlatv(jjm - j + 1)) < 1.) jfiltsv = jjm - j + 1
     END DO
 
     IF (jfiltnu <= 0) jfiltnu = 1
-    IF (jfiltnu > jjm/2+1) THEN
+    IF (jfiltnu > jjm / 2 + 1) THEN
        PRINT *, 'jfiltnu en dehors des valeurs acceptables ', jfiltnu
        STOP 1
     END IF
@@ -138,7 +128,7 @@ contains
     END IF
 
     IF (jfiltnv <= 0) jfiltnv = 1
-    IF (jfiltnv > jjm/2) THEN
+    IF (jfiltnv > jjm / 2) THEN
        PRINT *, 'jfiltnv en dehors des valeurs acceptables ', jfiltnv
        STOP 1
     END IF
@@ -160,70 +150,66 @@ contains
     END DO
 
     DO j = 2, jfiltnu
-       DO k = 2, modemax
-          cof = rlamda(k) * cos(rlatu(j))
-          IF (cof < 1.) exit
+       DO k = 2, iim
+          IF (rlamda(k) * cos(rlatu(j)) < 1.) exit
        end DO
-       if (k == modemax + 1) cycle
+       if (k == iim + 1) cycle
        modfrstu(j) = k
 
        kf = modfrstu(j)
-       DO k = kf, modemax
-          cof = rlamda(k)*cos(rlatu(j))
+       DO k = kf, iim
+          cof = rlamda(k) * cos(rlatu(j))
           coefilu(k, j) = cof - 1.
-          coefilu2(k, j) = cof*cof - 1.
+          coefilu2(k, j) = cof**2 - 1.
        end DO
     END DO
 
     DO j = 1, jfiltnv
-       DO k = 2, modemax
-          cof = rlamda(k)*cos(rlatv(j))
-          IF (cof < 1.) exit
+       DO k = 2, iim
+          IF (rlamda(k) * cos(rlatv(j)) < 1.) exit
        end DO
-       if (k == modemax + 1) cycle
+       if (k == iim + 1) cycle
        modfrstv(j) = k
 
        kf = modfrstv(j)
-       DO k = kf, modemax
-          cof = rlamda(k)*cos(rlatv(j))
+       DO k = kf, iim
+          cof = rlamda(k) * cos(rlatv(j))
           coefilv(k, j) = cof - 1.
-          coefilv2(k, j) = cof*cof - 1.
+          coefilv2(k, j) = cof**2 - 1.
        end DO
     end DO
 
     DO j = jfiltsu, jjm
-       DO k = 2, modemax
-          cof = rlamda(k)*cos(rlatu(j))
-          IF (cof < 1.) exit
+       DO k = 2, iim
+          IF (rlamda(k) * cos(rlatu(j)) < 1.) exit
        end DO
-       if (k == modemax + 1) cycle
+       if (k == iim + 1) cycle
        modfrstu(j) = k
 
        kf = modfrstu(j)
-       DO k = kf, modemax
-          cof = rlamda(k)*cos(rlatu(j))
+       DO k = kf, iim
+          cof = rlamda(k) * cos(rlatu(j))
           coefilu(k, j) = cof - 1.
-          coefilu2(k, j) = cof*cof - 1.
+          coefilu2(k, j) = cof**2 - 1.
        end DO
     end DO
 
     DO j = jfiltsv, jjm
-       DO k = 2, modemax
-          cof = rlamda(k)*cos(rlatv(j))
-          IF (cof < 1.) exit
+       DO k = 2, iim
+          IF (rlamda(k) * cos(rlatv(j)) < 1.) exit
        end DO
-       if (k == modemax + 1) cycle
+       if (k == iim + 1) cycle
        modfrstv(j) = k
 
        kf = modfrstv(j)
-       DO k = kf, modemax
-          cof = rlamda(k)*cos(rlatv(j))
+       DO k = kf, iim
+          cof = rlamda(k) * cos(rlatv(j))
           coefilv(k, j) = cof - 1.
-          coefilv2(k, j) = cof*cof - 1.
+          coefilv2(k, j) = cof**2 - 1.
        end DO
     END DO
 
-    IF (jfiltnv>=jjm/2 .OR. jfiltnu>=jjm/2) THEN
+    IF (jfiltnv>=jjm / 2 .OR. jfiltnu>=jjm / 2) THEN
        IF (jfiltnv == jfiltsv) jfiltsv = 1 + jfiltnv
        IF (jfiltnu == jfiltsu) jfiltsu = 1 + jfiltnu
 
@@ -251,7 +237,7 @@ contains
           else
              coff = coefilu(i, j)
           end IF
-          eignft(i, :) = eignfnv(:, i)*coff
+          eignft(i, :) = eignfnv(:, i) * coff
        END DO
        matriceun(:, :, j) = matmul(eignfnv, eignft)
     END DO
@@ -278,7 +264,7 @@ contains
           else
              coff = coefilv(i, j)
           end IF
-          eignft(i, :) = eignfnu(:, i)*coff
+          eignft(i, :) = eignfnu(:, i) * coff
        END DO
        matricevn(:, :, j) = matmul(eignfnu, eignft)
     END DO
@@ -290,7 +276,7 @@ contains
           else
              coff = coefilv(i, j)
           end IF
-          eignft(i, :) = eignfnu(:, i)*coff
+          eignft(i, :) = eignfnu(:, i) * coff
        END DO
        matricevs(:, :, j) = matmul(eignfnu, eignft)
     END DO
@@ -303,9 +289,9 @@ contains
           IF (i < modfrstu(j)) then
              coff = 0.
           else
-             coff = coefilu(i, j)/(1.+coefilu(i, j))
+             coff = coefilu(i, j) / (1. + coefilu(i, j))
           end IF
-          eignft(i, :) = eignfnv(:, i)*coff
+          eignft(i, :) = eignfnv(:, i) * coff
        END DO
        matrinvn(:, :, j) = matmul(eignfnv, eignft)
     END DO
@@ -315,9 +301,9 @@ contains
           IF (i < modfrstu(j)) then
              coff = 0.
           else
-             coff = coefilu(i, j)/(1.+coefilu(i, j))
+             coff = coefilu(i, j) / (1. + coefilu(i, j))
           end IF
-          eignft(i, :) = eignfnv(:, i)*coff
+          eignft(i, :) = eignfnv(:, i) * coff
        END DO
        matrinvs(:, :, j) = matmul(eignfnv, eignft)
     END DO

@@ -40,6 +40,10 @@ CONTAINS
     INTEGER idim_s, idim_sig
     INTEGER dimid_temps
     INTEGER ncid, varid
+    integer varid_controle, varid_rlonu, varid_rlatu, varid_rlonv, varid_rlatv
+    integer varid_xprimu, varid_xprimv, varid_xprimm025, varid_xprimp025
+    integer varid_rlatu1, varid_rlatu2, varid_yprimu1, varid_yprimu2, varid_ap
+    integer varid_bp, varid_presnivs, varid_phisinit
 
     REAL zjulian, hours
     INTEGER yyears0, jjour0, mmois0
@@ -104,48 +108,50 @@ CONTAINS
 
     ! Definir et enregistrer certains champs invariants:
 
-    CALL nf95_def_var(ncid, 'controle', nf90_float, idim_index, varid)
-    CALL nf95_put_att(ncid, varid, 'title', 'Parametres de controle')
+    CALL nf95_def_var(ncid, 'controle', nf90_float, idim_index, varid_controle)
+    CALL nf95_put_att(ncid, varid_controle, 'title', 'Parametres de controle')
 
-    CALL nf95_def_var(ncid, 'rlonu', nf90_float, idim_rlonu, varid)
-    CALL nf95_put_att(ncid, varid, 'title', 'Longitudes des points U')
+    CALL nf95_def_var(ncid, 'rlonu', nf90_float, idim_rlonu, varid_rlonu)
+    CALL nf95_put_att(ncid, varid_rlonu, 'title', 'Longitudes des points U')
 
-    CALL nf95_def_var(ncid, 'rlatu', nf90_float, idim_rlatu, varid)
-    CALL nf95_put_att(ncid, varid, 'title', 'Latitudes des points U')
+    CALL nf95_def_var(ncid, 'rlatu', nf90_float, idim_rlatu, varid_rlatu)
+    CALL nf95_put_att(ncid, varid_rlatu, 'title', 'Latitudes des points U')
 
-    CALL nf95_def_var(ncid, 'rlonv', nf90_float, idim_rlonv, varid)
-    CALL nf95_put_att(ncid, varid, 'title', 'Longitudes des points V')
+    CALL nf95_def_var(ncid, 'rlonv', nf90_float, idim_rlonv, varid_rlonv)
+    CALL nf95_put_att(ncid, varid_rlonv, 'title', 'Longitudes des points V')
 
-    CALL nf95_def_var(ncid, 'rlatv', nf90_float, idim_rlatv, varid)
-    CALL nf95_put_att(ncid, varid, 'title', 'Latitudes des points V')
+    CALL nf95_def_var(ncid, 'rlatv', nf90_float, idim_rlatv, varid_rlatv)
+    CALL nf95_put_att(ncid, varid_rlatv, 'title', 'Latitudes des points V')
 
-    CALL nf95_def_var(ncid, 'xprimu', nf90_float, idim_rlonu, varid)
-    CALL nf95_put_att(ncid, varid, 'title', 'dx / dX aux points u')
+    CALL nf95_def_var(ncid, 'xprimu', nf90_float, idim_rlonu, varid_xprimu)
+    CALL nf95_put_att(ncid, varid_xprimu, 'title', 'dx / dX aux points u')
 
-    CALL nf95_def_var(ncid, 'xprimv', nf90_float, idim_rlonv, varid)
-    CALL nf95_put_att(ncid, varid, 'title', 'dx / dX aux points v')
+    CALL nf95_def_var(ncid, 'xprimv', nf90_float, idim_rlonv, varid_xprimv)
+    CALL nf95_put_att(ncid, varid_xprimv, 'title', 'dx / dX aux points v')
 
-    CALL nf95_def_var(ncid, 'xprimm025', nf90_float, idim_rlonu, varid)
-    CALL nf95_def_var(ncid, 'xprimp025', nf90_float, idim_rlonu, varid)
+    CALL nf95_def_var(ncid, 'xprimm025', nf90_float, idim_rlonu, &
+         varid_xprimm025)
+    CALL nf95_def_var(ncid, 'xprimp025', nf90_float, idim_rlonu, &
+         varid_xprimp025)
 
-    CALL nf95_def_var(ncid, 'rlatu1', nf90_float, idim_rlatv, varid)
-    CALL nf95_def_var(ncid, 'rlatu2', nf90_float, idim_rlatv, varid)
-    CALL nf95_def_var(ncid, 'yprimu1', nf90_float, idim_rlatv, varid)
-    CALL nf95_def_var(ncid, 'yprimu2', nf90_float, idim_rlatv, varid)
+    CALL nf95_def_var(ncid, 'rlatu1', nf90_float, idim_rlatv, varid_rlatu1)
+    CALL nf95_def_var(ncid, 'rlatu2', nf90_float, idim_rlatv, varid_rlatu2)
+    CALL nf95_def_var(ncid, 'yprimu1', nf90_float, idim_rlatv, varid_yprimu1)
+    CALL nf95_def_var(ncid, 'yprimu2', nf90_float, idim_rlatv, varid_yprimu2)
 
-    CALL nf95_def_var(ncid, 'ap', nf90_float, idim_sig, varid)
-    CALL nf95_put_att(ncid, varid, 'title', 'Coefficient A pour hybride')
+    CALL nf95_def_var(ncid, 'ap', nf90_float, idim_sig, varid_ap)
+    CALL nf95_put_att(ncid, varid_ap, 'title', 'Coefficient A pour hybride')
 
-    CALL nf95_def_var(ncid, 'bp', nf90_float, idim_sig, varid)
-    CALL nf95_put_att(ncid, varid, 'title', 'Coefficient B pour hybride')
+    CALL nf95_def_var(ncid, 'bp', nf90_float, idim_sig, varid_bp)
+    CALL nf95_put_att(ncid, varid_bp, 'title', 'Coefficient B pour hybride')
 
-    CALL nf95_def_var(ncid, 'presnivs', nf90_float, idim_s, varid)
+    CALL nf95_def_var(ncid, 'presnivs', nf90_float, idim_s, varid_presnivs)
 
     ! Geopentiel au sol:
 
     CALL nf95_def_var(ncid, 'phisinit', nf90_float, &
-         (/idim_rlonv, idim_rlatu/), varid)
-    CALL nf95_put_att(ncid, varid, 'title', 'Geopotentiel au sol')
+         (/idim_rlonv, idim_rlatu/), varid_phisinit)
+    CALL nf95_put_att(ncid, varid_phisinit, 'title', 'Geopotentiel au sol')
 
     ! Definir les variables pour pouvoir les enregistrer plus tard:
 
@@ -183,56 +189,23 @@ CONTAINS
 
     CALL nf95_enddef(ncid)
 
-    CALL nf95_inq_varid(ncid, 'controle', varid)
-    CALL nf95_put_var(ncid, varid, tab_cntrl)
-
-    CALL nf95_inq_varid(ncid, 'rlonu', varid)
-    CALL nf95_put_var(ncid, varid, rlonu)
-
-    CALL nf95_inq_varid(ncid, 'rlatu', varid)
-    CALL nf95_put_var(ncid, varid, rlatu)
-
-    CALL nf95_inq_varid(ncid, 'rlonv', varid)
-    CALL nf95_put_var(ncid, varid, rlonv)
-
-    CALL nf95_inq_varid(ncid, 'rlatv', varid)
-    CALL nf95_put_var(ncid, varid, rlatv)
-
-    CALL nf95_inq_varid(ncid, 'xprimu', varid)
-    CALL nf95_put_var(ncid, varid, xprimu)
-
-    CALL nf95_inq_varid(ncid, 'xprimv', varid)
-    CALL nf95_put_var(ncid, varid, xprimv)
-
-    CALL nf95_inq_varid(ncid, 'xprimm025', varid)
-    CALL nf95_put_var(ncid, varid, xprimm025)
-
-    CALL nf95_inq_varid(ncid, 'xprimp025', varid)
-    CALL nf95_put_var(ncid, varid, xprimp025)
-
-    call NF95_INQ_VARID (ncid, "rlatu1", varid)
-    call NF95_PUT_VAR(ncid, varid, rlatu1)
-
-    call NF95_INQ_VARID (ncid, "rlatu2", varid)
-    call NF95_PUT_VAR(ncid, varid, rlatu2)
-
-    CALL nf95_inq_varid(ncid, 'yprimu1', varid)
-    CALL nf95_put_var(ncid, varid, yprimu1)
-
-    CALL nf95_inq_varid(ncid, 'yprimu2', varid)
-    CALL nf95_put_var(ncid, varid, yprimu2)
-
-    CALL nf95_inq_varid(ncid, 'ap', varid)
-    CALL nf95_put_var(ncid, varid, ap)
-
-    CALL nf95_inq_varid(ncid, 'bp', varid)
-    CALL nf95_put_var(ncid, varid, bp)
-
-    CALL nf95_inq_varid(ncid, 'presnivs', varid)
-    CALL nf95_put_var(ncid, varid, presnivs)
-
-    CALL nf95_inq_varid(ncid, 'phisinit', varid)
-    CALL nf95_put_var(ncid, varid, phis)
+    CALL nf95_put_var(ncid, varid_controle, tab_cntrl)
+    CALL nf95_put_var(ncid, varid_rlonu, rlonu)
+    CALL nf95_put_var(ncid, varid_rlatu, rlatu)
+    CALL nf95_put_var(ncid, varid_rlonv, rlonv)
+    CALL nf95_put_var(ncid, varid_rlatv, rlatv)
+    CALL nf95_put_var(ncid, varid_xprimu, xprimu)
+    CALL nf95_put_var(ncid, varid_xprimv, xprimv)
+    CALL nf95_put_var(ncid, varid_xprimm025, xprimm025)
+    CALL nf95_put_var(ncid, varid_xprimp025, xprimp025)
+    call NF95_PUT_VAR(ncid, varid_rlatu1, rlatu1)
+    call NF95_PUT_VAR(ncid, varid_rlatu2, rlatu2)
+    CALL nf95_put_var(ncid, varid_yprimu1, yprimu1)
+    CALL nf95_put_var(ncid, varid_yprimu2, yprimu2)
+    CALL nf95_put_var(ncid, varid_ap, ap)
+    CALL nf95_put_var(ncid, varid_bp, bp)
+    CALL nf95_put_var(ncid, varid_presnivs, presnivs)
+    CALL nf95_put_var(ncid, varid_phisinit, phis)
 
     CALL nf95_close(ncid)
 

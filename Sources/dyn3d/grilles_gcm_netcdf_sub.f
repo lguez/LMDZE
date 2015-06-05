@@ -24,7 +24,7 @@ contains
 
     ! Local:
 
-    REAL grille_s(iim+1, jjm+1)
+    REAL grille_s(iim + 1, jjm + 1)
     INTEGER i, j
 
     ! For Netcdf:

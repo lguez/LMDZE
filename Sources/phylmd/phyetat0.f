@@ -70,8 +70,7 @@ contains
     REAL fractint(klon)
     REAL xmin, xmax
     INTEGER ncid, varid, ndims
-    INTEGER ierr, i, nsrf, isoil 
-    CHARACTER(len=7) str7
+    INTEGER ierr, i, nsrf 
     CHARACTER(len=2) str2
 
     !---------------------------------------------------------------
@@ -172,25 +171,8 @@ contains
 
    ! Lecture des temperatures du sol profond:
 
-    DO nsrf = 1, nbsrf
-       DO isoil=1, nsoilmx
-          IF (isoil > 99 .AND. nsrf > 99) THEN
-             PRINT *, "Trop de couches ou sous-mailles"
-             stop 1
-          ENDIF
-          WRITE(str7, '(i2.2, "srf", i2.2)') isoil, nsrf
-          ierr = NF90_INQ_VARID(ncid, 'Tsoil'//str7, varid)
-          IF (ierr /= NF90_NOERR) THEN
-             PRINT *, "phyetat0: Le champ <Tsoil"//str7//"> est absent"
-             PRINT *, " Il prend donc la valeur de surface"
-             DO i=1, klon
-                tsoil(i, isoil, nsrf)=tsol(i, nsrf)
-             ENDDO
-          ELSE
-             call NF95_GET_VAR(ncid, varid, tsoil(:, isoil, nsrf))
-          ENDIF
-       ENDDO
-    ENDDO
+    call NF95_INQ_VARID(ncid, 'Tsoil', varid)
+    call NF95_GET_VAR(ncid, varid, tsoil)
 
     !IM "slab" ocean 
     ! Lecture de tslab (pour slab ocean seulement): 

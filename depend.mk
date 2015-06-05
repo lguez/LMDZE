@@ -38,7 +38,6 @@ cltrac.o : suphec.o dimphy.o dimens_m.o
 cltracrn.o : suphec.o dimphy.o indicesol.o 
 clvent.o : suphec.o dimphy.o 
 coefcdrag.o : yoethf.o suphec.o indicesol.o 
-coefils.o : dimens_m.o 
 coefkz.o : clcdrag.o conf_phys.o FCTTRE.o yoethf.o suphec.o conf_gcm.o dimphy.o indicesol.o 
 coefkz2.o : suphec.o conf_gcm.o dimphy.o indicesol.o dimens_m.o 
 coefkzmin.o : suphec.o dimphy.o 
@@ -108,8 +107,8 @@ enercin.o : comgeom.o paramet_m.o dimens_m.o
 etat0.o : unit_nml_m.o test_disvert.o temps.o start_inter_3d.o start_init_phys_m.o start_init_orog_m.o startdyn.o regr_pr_o3.o regr_lat_time_coefoz.o q_sat.o phyredem.o phyetat0.o paramet_m.o massdair.o inifilr.o iniadvtrac.o grid_change.o grid_atob.o geopot.o fyhyp.o fxhyp.o exner_hyb.o dynredem1.o dynredem0.o dynetat0.o disvert.o dimsoil.o dimens_m.o comgeom.o comconst.o caldyn0.o dimphy.o indicesol.o 
 exner_hyb.o : disvert.o comconst.o dimens_m.o 
 filtreg_hemisph.o : dimens_m.o 
-filtreg_scal.o : inifilr.o filtreg_hemisph.o dimens_m.o coefils.o 
-filtreg_v.o : inifilr.o filtreg_hemisph.o dimens_m.o coefils.o 
+filtreg_scal.o : inifilr.o inifgn.o filtreg_hemisph.o dimens_m.o 
+filtreg_v.o : inifilr.o inifgn.o filtreg_hemisph.o dimens_m.o 
 findsep.o : cleanstr.o mathelp.o errioipsl.o 
 fisrtilp.o : yoethf.o suphec.o FCTTRE.o dimphy.o comfisrtilp.o 
 flumass.o : comgeom.o paramet_m.o dimens_m.o 
@@ -159,8 +158,8 @@ ini_histins.o : ymds2ju.o temps.o phyetat0.o indicesol.o histvert.o histend.o hi
 ini_histrac.o : ymds2ju.o temps.o phyetat0.o iniadvtrac.o histvert.o histend.o histdef.o histbeg_totreg.o grid_change.o dynetat0.o dimphy.o disvert.o dimens_m.o clesphys.o 
 iniadvtrac.o : dimens_m.o 
 inidissip.o : paramet_m.o nxgraro2.o gradiv2.o filtreg_v.o filtreg_scal.o divgrad2.o conf_gcm.o disvert.o comdissnew.o comconst.o dimens_m.o 
-inifgn.o : dynetat0.o dimens_m.o coefils.o 
-inifilr.o : inifgn.o dynetat0.o dimens_m.o coefils.o 
+inifgn.o : dynetat0.o dimens_m.o 
+inifilr.o : inifgn.o dynetat0.o dimens_m.o 
 init_dynzon.o : ymds2ju.o temps.o histvert.o histend.o histdef.o histbeg_totreg.o dynetat0.o disvert.o dimens_m.o conf_gcm.o 
 init_tau2alpha.o : writefield.o paramet_m.o dynetat0.o dimens_m.o coordij.o conf_guide.o comgeom.o 
 initdynav.o : ymds2ju.o temps.o paramet_m.o iniadvtrac.o histvert.o histend.o histdef.o histbeg_totreg.o dynetat0.o dimens_m.o 
