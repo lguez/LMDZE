@@ -27,7 +27,7 @@ contains
     ! champ intensif ou extensif (pond\'er\'e par les aires)
 
     ! Local:
-    REAL sdd1(iim), sdd2(iim)
+    REAL sdd(iim)
 
     !-----------------------------------------------------------
 
@@ -35,19 +35,17 @@ contains
     call assert(size(champ, 2) == jjm + 1, "filtreg_scal jjm + 1")
 
     IF (intensive) THEN
-       sdd1 = sddv
-       sdd2 = unsddv
+       sdd = sddv
     ELSE
-       sdd1 = unsddv
-       sdd2 = sddv
+       sdd = unsddv
     END IF
 
     if (direct) then
-       call filtreg_hemisph(champ(:, 2:jfiltnu, :), sdd1, sdd2, matriceun)
-       call filtreg_hemisph(champ(:, jfiltsu:jjm, :), sdd1, sdd2, matriceus)
+       call filtreg_hemisph(champ(:, 2:jfiltnu, :), sdd, matriceun)
+       call filtreg_hemisph(champ(:, jfiltsu:jjm, :), sdd, matriceus)
     else
-       call filtreg_hemisph(champ(:, 2:jfiltnu, :), sdd1, sdd2, - matrinvn)
-       call filtreg_hemisph(champ(:, jfiltsu:jjm, :), sdd1, sdd2, - matrinvs)
+       call filtreg_hemisph(champ(:, 2:jfiltnu, :), sdd, - matrinvn)
+       call filtreg_hemisph(champ(:, jfiltsu:jjm, :), sdd, - matrinvs)
     end if
 
   END SUBROUTINE filtreg_scal

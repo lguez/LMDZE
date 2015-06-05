@@ -25,7 +25,7 @@ contains
     ! false means the field is weighted by the area of the mesh
 
     ! Local:
-    REAL sdd1(iim), sdd2(iim)
+    REAL sdd(iim)
 
     !-----------------------------------------------------------
 
@@ -33,15 +33,13 @@ contains
     call assert(size(champ, 2) == jjm, "filtreg_v jjm")
 
     IF (intensive) THEN
-       sdd1 = sddu
-       sdd2 = unsddu
+       sdd = sddu
     ELSE
-       sdd1 = unsddu
-       sdd2 = sddu
+       sdd = unsddu
     END IF
 
-    call filtreg_hemisph(champ(:, :jfiltnv, :), sdd1, sdd2, matricevn)
-    call filtreg_hemisph(champ(:, jfiltsv:jjm, :), sdd1, sdd2, matricevs)
+    call filtreg_hemisph(champ(:, :jfiltnv, :), sdd, matricevn)
+    call filtreg_hemisph(champ(:, jfiltsv:jjm, :), sdd, matricevs)
 
   END SUBROUTINE filtreg_v
 
