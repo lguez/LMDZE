@@ -32,11 +32,7 @@ contains
     call assert(size(champ, 1) == iim + 1, "filtreg_v iim + 1")
     call assert(size(champ, 2) == jjm, "filtreg_v jjm")
 
-    IF (intensive) THEN
-       sdd = sddu
-    ELSE
-       sdd = unsddu
-    END IF
+    sdd = merge(sddu, unsddu, intensive)
 
     call filtreg_hemisph(champ(:, :jfiltnv, :), sdd, matricevn)
     call filtreg_hemisph(champ(:, jfiltsv:jjm, :), sdd, matricevs)

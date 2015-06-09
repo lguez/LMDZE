@@ -32,15 +32,16 @@ contains
     USE dimens_m, ONLY : iim, jjm
     USE dynetat0_m, ONLY : rlatu, rlatv, xprimu, grossismx
     use inifgn_m, only: inifgn, eignfnu, eignfnv
+    use jumble, only: new_unit
     use nr_util, only: pi
 
     ! Local:
     REAL dlatu(jjm)
     REAL rlamda(2: iim)
     real eignvl(iim) ! eigenvalues
-    REAL lamdamax, cof
-    INTEGER i, j, k, kf
-    REAL dymin, colat0
+    REAL cof
+    INTEGER i, j, k, kf, unit
+    REAL colat0
     REAL eignft(iim, iim), coff
 
     ! Filtering coefficients (lamda_max * cos(rlat) / lamda):
@@ -56,8 +57,10 @@ contains
 
     CALL inifgn(eignvl)
 
-    PRINT *, 'EIGNVL '
-    PRINT "(1X, 5E13.6)", eignvl
+    call new_unit(unit)
+    open(unit, file = "eignvl.txt", status = "replace", action = "write") 
+    write(unit, fmt = *) EIGNVL
+    close(unit)
 
     ! compute eigenvalues and eigenfunctions
     ! compute the filtering coefficients for scalar lines and
@@ -68,35 +71,17 @@ contains
     ! is set equal to zero for the regular grid case
 
     ! Calcul de colat0
-
-    DO j = 1, jjm
-       dlatu(j) = rlatu(j) - rlatu(j + 1)
-    END DO
-
-    dymin = dlatu(1)
-    DO j = 2, jjm
-       dymin = min(dymin, dlatu(j))
-    END DO
-
-    colat0 = min(0.5, dymin / minval(xprimu(:iim)))
-
+    forall (j = 1:jjm) dlatu(j) = rlatu(j) - rlatu(j + 1)
+    colat0 = min(0.5, minval(dlatu) / minval(xprimu(:iim)))
     PRINT *, 'colat0 = ', colat0
 
-    lamdamax = iim / (pi * colat0 / grossismx)
-    rlamda = lamdamax / sqrt(abs(eignvl(2: iim)))
-
-    DO j = 1, jjm
-       DO i = 1, iim
-          coefilu(i, j) = 0.
-          coefilv(i, j) = 0.
-          coefilu2(i, j) = 0.
-          coefilv2(i, j) = 0.
-       end DO
-    END DO
+    rlamda = iim / (pi * colat0 / grossismx) / sqrt(abs(eignvl(2: iim)))
+    coefilu = 0.
+    coefilv = 0.
+    coefilu2 = 0.
+    coefilv2 = 0.
 
     ! Determination de jfiltnu, jfiltnv, jfiltsu, jfiltsv
-
-    PRINT *, 'TRUNCATION AT ', iim
 
     DO j = 2, jjm / 2 + 1
        IF (cos(rlatu(j)) / colat0 < 1. &

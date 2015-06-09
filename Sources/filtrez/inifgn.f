@@ -10,7 +10,7 @@ module inifgn_m
   real unsddu(iim), unsddv(iim)
 
   real eignfnu(iim, iim), eignfnv(iim, iim)
-  ! eignfn eigenfunctions of the discrete laplacian
+  ! eigenfunctions of the discrete laplacian
 
 contains
 
@@ -18,22 +18,20 @@ contains
 
     ! From LMDZ4/libf/filtrez/inifgn.F, v 1.1.1.1 2004/05/19 12:53:09
 
-    ! H.Upadyaya, O.Sharma 
+    ! H. Upadyaya, O. Sharma 
 
+    use acc_m, only: acc 
     USE dimens_m, ONLY: iim
     USE dynetat0_m, ONLY: xprimu, xprimv
     use nr_util, only: pi
-    use numer_rec_95, only: jacobi
+    use numer_rec_95, only: jacobi, eigsrt
 
-    real, intent(out):: dv(iim)
+    real, intent(out):: dv(:) ! (iim)
 
     ! Local:
     REAL vec(iim, iim), vec1(iim, iim)
     REAL du(iim)
-    real d(iim)
     INTEGER i, j, k, nrot
-
-    EXTERNAL acc
 
     !----------------------------------------------------------------
 
@@ -82,12 +80,12 @@ contains
     END DO
 
     CALL jacobi(vec, dv, eignfnv, nrot)
-    CALL acc(eignfnv, d, iim)
-    CALL eigen_sort(dv, eignfnv, iim, iim)
+    CALL acc(eignfnv)
+    CALL eigsrt(dv, eignfnv)
 
     CALL jacobi(vec1, du, eignfnu, nrot)
-    CALL acc(eignfnu, d, iim)
-    CALL eigen_sort(du, eignfnu, iim, iim)
+    CALL acc(eignfnu)
+    CALL eigsrt(du, eignfnu)
 
   END SUBROUTINE inifgn
 

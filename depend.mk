@@ -158,7 +158,7 @@ ini_histins.o : ymds2ju.o temps.o phyetat0.o indicesol.o histvert.o histend.o hi
 ini_histrac.o : ymds2ju.o temps.o phyetat0.o iniadvtrac.o histvert.o histend.o histdef.o histbeg_totreg.o grid_change.o dynetat0.o dimphy.o disvert.o dimens_m.o clesphys.o 
 iniadvtrac.o : dimens_m.o 
 inidissip.o : paramet_m.o nxgraro2.o gradiv2.o filtreg_v.o filtreg_scal.o divgrad2.o conf_gcm.o disvert.o comdissnew.o comconst.o dimens_m.o 
-inifgn.o : dynetat0.o dimens_m.o 
+inifgn.o : dynetat0.o acc.o dimens_m.o 
 inifilr.o : inifgn.o dynetat0.o dimens_m.o 
 init_dynzon.o : ymds2ju.o temps.o histvert.o histend.o histdef.o histbeg_totreg.o dynetat0.o disvert.o dimens_m.o conf_gcm.o 
 init_tau2alpha.o : writefield.o paramet_m.o dynetat0.o dimens_m.o coordij.o conf_guide.o comgeom.o 

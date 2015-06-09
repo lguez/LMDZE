@@ -22,7 +22,6 @@ disvert.f
 dynetat0.f
 dynredem0.f
 dynredem1.f
-eigen_sort.f
 enercin.f
 ener.f
 errioipsl.f

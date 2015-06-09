@@ -34,11 +34,7 @@ contains
     call assert(size(champ, 1) == iim + 1, "filtreg_scal iim + 1")
     call assert(size(champ, 2) == jjm + 1, "filtreg_scal jjm + 1")
 
-    IF (intensive) THEN
-       sdd = sddv
-    ELSE
-       sdd = unsddv
-    END IF
+    sdd = merge(sddv, unsddv, intensive)
 
     if (direct) then
        call filtreg_hemisph(champ(:, 2:jfiltnu, :), sdd, matriceun)
