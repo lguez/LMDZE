@@ -41,11 +41,7 @@ contains
        ! Calcul de Xf(xvrai(i)) 
 
        xvrai(i) = xtild(it)
-
-       IF (it == 2 * nmax) THEN
-          it = 2 * nmax -1
-       END IF
-
+       IF (it == 2 * nmax) it = 2 * nmax -1
        CALL coefpoly(Xf(it), Xf(it + 1), Xprimt(it), Xprimt(it + 1), &
             xtild(it), xtild(it + 1), a0, a1, a2, a3)
        Xf1 = Xf(it)

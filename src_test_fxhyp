@@ -18,6 +18,7 @@ invert_zoom_x.f
 ioipslmpp.f
 principal_cshift.f
 read_serre.f
+tanh_cautious.f
 temps.f
 test_fxhyp.f
 unit_nml_m.f

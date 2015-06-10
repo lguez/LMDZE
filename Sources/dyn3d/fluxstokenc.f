@@ -37,7 +37,7 @@ contains
     !-------------------------------------------------------------
 
     IF (itau == 0) THEN
-       CALL initfluxsto(time_step, istdyn*time_step, istdyn*time_step, nqmx, &
+       CALL initfluxsto(time_step, istdyn*time_step, istdyn*time_step, &
             fluxid, fluxvid, fluxdid)
        CALL histwrite(fluxid, 'phis', 1, phis)
        CALL histwrite(fluxid, 'aire', 1, aire)

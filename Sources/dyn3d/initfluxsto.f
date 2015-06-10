@@ -1,4 +1,4 @@
-SUBROUTINE initfluxsto(tstep, t_ops, t_wrt, nq, fileid, filevid, filedid)
+SUBROUTINE initfluxsto(tstep, t_ops, t_wrt, fileid, filevid, filedid)
 
   ! From bibio/initfluxsto.F, v 1.1.1.1 2004/05/19 12:53:05
 
@@ -15,7 +15,6 @@ SUBROUTINE initfluxsto(tstep, t_ops, t_wrt, nq, fileid, filevid, filedid)
   !      tstep: duree du pas de temps en seconde                          
   !      t_ops: frequence de l'operation pour IOIPSL                      
   !      t_wrt: frequence d'ecriture sur le fichier                       
-  !      nq: nombre de traceurs                                           
 
   !   Sortie:                                                             
   !      fileid: ID du fichier netcdf cree                                
@@ -42,18 +41,15 @@ SUBROUTINE initfluxsto(tstep, t_ops, t_wrt, nq, fileid, filevid, filedid)
   IMPLICIT NONE
 
   !   Arguments                                                           
-  INTEGER itau
   REAL, INTENT (IN) :: tstep
   REAL t_ops, t_wrt
   INTEGER fileid, filevid, filedid
-  INTEGER nq, ndex(1)
   REAL nivd(1)
 
   !   Variables locales                                                   
   REAL zjulian
   CHARACTER(len=3) str
   CHARACTER(len=10) ctrac
-  INTEGER iq
   REAL rlong(iip1, jjp1), rlat(iip1, jjp1)
   INTEGER uhoriid, vhoriid, thoriid, zvertiid, dhoriid, dvertiid
   INTEGER ii, jj, l

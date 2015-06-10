@@ -123,7 +123,7 @@ flxflux.o : FCTTRE.o yoethf.o suphec.o dimphy.o
 flxini.o : suphec.o flxadjtq.o dimphy.o 
 flxmain.o : yoethf.o YOECUMF.o suphec.o flxini.o flxflux.o flxdtdq.o flxdlfs.o flxddraf.o flxbase.o flxasc.o dimphy.o 
 fonte_neige.o : yoethf.o suphec.o interface_surf.o indicesol.o FCTTRE.o 
-fxhyp.o : principal_cshift.o invert_zoom_x.o dynetat0.o dimens_m.o 
+fxhyp.o : tanh_cautious.o principal_cshift.o invert_zoom_x.o dynetat0.o dimens_m.o 
 fyhyp.o : heavyside.o dynetat0.o dimens_m.o coefpoly.o 
 gcm.o : createnewfield.o yoethf.o unit_nml_m.o tracstoke.o suphec.o leapfrog.o ioconf_calendar.o init_dynzon.o inithist.o initdynav.o inifilr.o inidissip.o iniadvtrac.o histclo.o grid_change.o dynredem0.o dynetat0.o disvert.o dimphy.o dimens_m.o conf_guide.o conf_gcm.o comgeomphy.o comgeom.o comconst.o 
 geopot.o : dimens_m.o 
