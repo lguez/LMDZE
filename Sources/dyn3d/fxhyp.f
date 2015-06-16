@@ -15,7 +15,7 @@ contains
     ! Il vaut mieux avoir : grossismx \times dzoom < pi
 
     ! Le premier point scalaire pour une grille regulière (grossismx =
-    ! 1., taux=0., clon=0.) est à - 180 degrés.
+    ! 1., taux = 0., clon = 0.) est à - 180 degrés.
 
     USE dimens_m, ONLY: iim
     use dynetat0_m, only: clon, grossismx, dzoomx, taux
@@ -33,9 +33,9 @@ contains
     real d_rlonv(iim)
     DOUBLE PRECISION xtild(0:2 * nmax)
     DOUBLE PRECISION fhyp(nmax:2 * nmax), ffdx, beta, Xprimt(0:2 * nmax)
-    DOUBLE PRECISION Xf(0:2 * nmax), xxpr(2 * nmax)
+    DOUBLE PRECISION Xf(0:2 * nmax)
     INTEGER i, is2
-    DOUBLE PRECISION, dimension(nmax + 1:2 * nmax):: xmoy, fxm
+    DOUBLE PRECISION, dimension(nmax + 1:2 * nmax):: xxpr, xmoy, fxm
 
     !----------------------------------------------------------------------
 
@@ -91,16 +91,15 @@ contains
 
        ! Calcul de Xf
 
-       xxpr(nmax + 1:2 * nmax) = beta + (grossismx - beta) * fxm
-       xxpr(:nmax) = xxpr(2 * nmax:nmax + 1:- 1)
+       xxpr = beta + (grossismx - beta) * fxm
+       Xf(nmax) = 0d0
 
-       Xf(0) = - pi_d
-
-       DO i=1, 2 * nmax - 1
+       DO i = nmax + 1, 2 * nmax - 1
           Xf(i) = Xf(i-1) + xxpr(i) * (xtild(i) - xtild(i-1))
        END DO
 
        Xf(2 * nmax) = pi_d
+       xf(:nmax - 1) = - xf(2 * nmax:nmax + 1:- 1)
 
        call invert_zoom_x(xf, xtild, Xprimt, rlonm025(:iim), xprimm025(:iim), &
             xuv = - 0.25d0)

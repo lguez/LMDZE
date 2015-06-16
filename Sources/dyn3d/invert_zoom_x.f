@@ -12,13 +12,15 @@ contains
     USE dimens_m, ONLY: iim
     use dynetat0_m, only: clon
     use nr_util, only: pi_d, twopi_d
+    use numer_rec_95, only: hunt
 
     DOUBLE PRECISION, intent(in):: Xf(0:), xtild(0:), Xprimt(0:) ! (0:2 * nmax)
     real, intent(out):: xlon(:), xprimm(:) ! (iim)
 
     DOUBLE PRECISION, intent(in):: xuv
+    ! between - 0.25 and 0.5
     ! 0. si calcul aux points scalaires 
-    ! 0.5 si calcul aux points U 
+    ! 0.5 si calcul aux points U
 
     ! Local:
     DOUBLE PRECISION xo1, Xfi, a0, a1, a2, a3, Xf1, Xprimin
@@ -30,20 +32,22 @@ contains
 
     !------------------------------------------------------------------
 
+    it = 0 ! initial guess
+
     DO i = 1, iim
        Xfi = - pi_d + (i + xuv - 0.75d0) * twopi_d / iim
+       ! - pi <= xfi < pi
 
-       it = 2 * nmax
-       do while (xfi < xf(it) .and. it >= 1)
-          it = it - 1
-       end do
+       call hunt(xf, xfi, it, my_lbound = 0)
+       it = max(0, it)
+       ! In principle, xfi >= xf(0), max with 0 just in case of
+       ! roundoff error. {0 <= it <= 2 * nmax - 1}
 
        ! Calcul de Xf(xvrai(i)) 
 
-       xvrai(i) = xtild(it)
-       IF (it == 2 * nmax) it = 2 * nmax -1
        CALL coefpoly(Xf(it), Xf(it + 1), Xprimt(it), Xprimt(it + 1), &
             xtild(it), xtild(it + 1), a0, a1, a2, a3)
+       xvrai(i) = xtild(it)
        Xf1 = Xf(it)
        Xprimin = a1 + xvrai(i) * (2d0 * a2 + xvrai(i) * 3d0 * a3)
        xo1 = xvrai(i)

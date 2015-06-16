@@ -293,9 +293,9 @@ contains
           ENDDO
        ENDDO
 
-       CALL LW(PPMB, PDP, PPSOL, PDT0, PEMIS, PTL, PTAVE, PWV, POZON, PAER, &
-            PCLDLD, PCLDLU, PVIEW, zcool, zcool0, ztoplw, zsollw, ztoplw0, &
-            zsollw0, zsollwdown, ZFLUP, ZFLDN, ZFLUP0, ZFLDN0)
+       CALL LW(PPMB, PDP, PDT0, PEMIS, PTL, PTAVE, PWV, POZON, PAER, PCLDLD, &
+            PCLDLU, PVIEW, zcool, zcool0, ztoplw, zsollw, ztoplw0, zsollw0, &
+            zsollwdown, ZFLUP, ZFLDN, ZFLUP0, ZFLDN0)
        CALL SW(PSCT, zrmu0, zfract, PPMB, PDP, PPSOL, PALBD, PALBP, PTAVE, &
             PWV, PQS, POZON, PAER, PCLDSW, PTAU, POMEGA, PCG, zheat, zheat0, &
             zalbpla, ztopsw, zsolsw, ztopsw0, zsolsw0, ZFSUP, ZFSDN, ZFSUP0, &

@@ -4,8 +4,8 @@ module vdif_kcay_m
 
 contains
 
-  SUBROUTINE vdif_kcay(ngrid, dt, g, rconst, plev, temp, zlev, zlay, u, v, &
-       teta, cd, q2, q2diag, km, kn, ustar, l_mix)
+  SUBROUTINE vdif_kcay(ngrid, dt, g, plev, zlev, zlay, u, v, teta, cd, q2, &
+       q2diag, km, kn, ustar, l_mix)
 
     ! From LMDZ4/libf/phylmd/vdif_kcay.F, version 1.1 2004/06/22 11:45:36
 
@@ -33,8 +33,7 @@ contains
 
     REAL, intent(in):: dt
     real, intent(in):: g
-    real rconst
-    real plev(klon, klev+1), temp(klon, klev)
+    real plev(klon, klev+1)
     real ustar(klon), snstable
     REAL zlev(klon, klev+1)
     REAL zlay(klon, klev)
@@ -198,8 +197,7 @@ contains
 
     ! Initialisation de q2
 
-    call yamada(ngrid, g, rconst, plev, temp, zlev, zlay, u, v, teta, &
-         q2diag, km, kn, ustar, l_mix)
+    call yamada(ngrid, g, zlev, zlay, u, v, teta, q2diag, km, kn)
     if (first.and.1.eq.1) then
        first=.false.
        q2=q2diag

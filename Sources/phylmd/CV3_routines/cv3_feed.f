@@ -4,8 +4,8 @@ module cv3_feed_m
 
 contains
 
-  SUBROUTINE cv3_feed(len, nd, t, q, qs, p, ph, hm, gz, nk, icb, icbmax, &
-       iflag, tnk, qnk, gznk, plcl)
+  SUBROUTINE cv3_feed(len, nd, t, q, qs, p, ph, gz, nk, icb, icbmax, iflag, &
+       tnk, qnk, gznk, plcl)
 
     ! Purpose: CONVECTIVE FEED
 
@@ -25,7 +25,7 @@ contains
     integer, intent(in):: len, nd
     real, intent(in):: t(len, nd)
     real, intent(in):: q(len, nd), qs(len, nd), p(len, nd)
-    real hm(len, nd), gz(len, nd)
+    real gz(len, nd)
     real, intent(in):: ph(len, nd+1)
 
     ! outputs:
@@ -35,8 +35,6 @@ contains
 
     ! local variables:
     integer i, k
-    integer ihmin(len)
-    real work(len)
     real pnk(len), qsnk(len), rh(len), chi(len)
     real A, B ! convect3
 

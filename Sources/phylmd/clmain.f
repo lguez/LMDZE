@@ -19,13 +19,13 @@ contains
 
     ! Tout ce qui a trait aux traceurs est dans "phytrac". Le calcul
     ! de la couche limite pour les traceurs se fait avec "cltrac" et
-    ! ne tient pas compte de la différentiation des sous-fractions de
-    ! sol.
+    ! ne tient pas compte de la diff\'erentiation des sous-fractions
+    ! de sol.
 
-    ! Pour pouvoir extraire les coefficients d'échanges et le vent
-    ! dans la première couche, trois champs ont été créés : "ycoefh",
-    ! "zu1" et "zv1". Nous avons moyenné les valeurs de ces trois
-    ! champs sur les quatre sous-surfaces du modèle.
+    ! Pour pouvoir extraire les coefficients d'\'echanges et le vent
+    ! dans la premi\`ere couche, trois champs ont \'et\'e cr\'e\'es : "ycoefh",
+    ! "zu1" et "zv1". Nous avons moyenn\'e les valeurs de ces trois
+    ! champs sur les quatre sous-surfaces du mod\`ele.
 
     use clqh_m, only: clqh
     use clvent_m, only: clvent
@@ -86,7 +86,7 @@ contains
 
     REAL, INTENT(IN):: solsw(klon, nbsrf), sollw(klon, nbsrf)
     REAL fder(klon)
-    REAL, INTENT(IN):: rlat(klon) ! latitude en degrés
+    REAL, INTENT(IN):: rlat(klon) ! latitude en degr\'es
 
     REAL rugos(klon, nbsrf)
     ! rugos----input-R- longeur de rugosite (en m)
@@ -219,7 +219,7 @@ contains
     INTEGER ni(klon), knon, j
 
     REAL pctsrf_pot(klon, nbsrf)
-    ! "pourcentage potentiel" pour tenir compte des éventuelles
+    ! "pourcentage potentiel" pour tenir compte des \'eventuelles
     ! apparitions ou disparitions de la glace de mer
 
     REAL zx_alf1, zx_alf2 !valeur ambiante par extrapola.
@@ -322,9 +322,9 @@ contains
     d_v = 0.
     ycoefh = 0.
 
-    ! Initialisation des "pourcentages potentiels". On considère ici qu'on
-    ! peut avoir potentiellement de la glace sur tout le domaine océanique
-    ! (à affiner)
+    ! Initialisation des "pourcentages potentiels". On consid\`ere ici qu'on
+    ! peut avoir potentiellement de la glace sur tout le domaine oc\'eanique
+    ! (\`a affiner)
 
     pctsrf_pot = pctsrf
     pctsrf_pot(:, is_oce) = 1. - zmasq
@@ -337,7 +337,7 @@ contains
        ni = 0
        knon = 0
        DO i = 1, klon
-          ! Pour déterminer le domaine à traiter, on utilise les surfaces
+          ! Pour d\'eterminer le domaine \`a traiter, on utilise les surfaces
           ! "potentielles"
           IF (pctsrf_pot(i, nsrf) > epsfra) THEN
              knon = knon + 1
@@ -424,8 +424,8 @@ contains
           END IF
 
           IF (iflag_pbl >= 3) THEN
-             ! Mellor et Yamada adapté à Mars, Richard Fournier et
-             ! Frédéric Hourdin
+             ! Mellor et Yamada adapt\'e \`a Mars, Richard Fournier et
+             ! Fr\'ed\'eric Hourdin
              yzlay(:knon, 1) = rd * yt(:knon, 1) / (0.5 * (ypaprs(:knon, 1) &
                   + ypplay(:knon, 1))) &
                   * (ypaprs(:knon, 1) - ypplay(:knon, 1)) / rg
@@ -455,12 +455,12 @@ contains
              CALL ustarhb(knon, yu, yv, coefm(:knon, 1), yustar)
              IF (prt_level > 9) PRINT *, 'USTAR = ', yustar
 
-             ! iflag_pbl peut être utilisé comme longueur de mélange
+             ! iflag_pbl peut \^etre utilis\'e comme longueur de m\'elange
 
              IF (iflag_pbl >= 11) THEN
-                CALL vdif_kcay(knon, dtime, rg, rd, ypaprs, yt, yzlev, yzlay, &
-                     yu, yv, yteta, coefm(:knon, 1), yq2, q2diag, ykmm, ykmn, &
-                     yustar, iflag_pbl)
+                CALL vdif_kcay(knon, dtime, rg, ypaprs, yzlev, yzlay, yu, yv, &
+                     yteta, coefm(:knon, 1), yq2, q2diag, ykmm, ykmn, yustar, &
+                     iflag_pbl)
              ELSE
                 CALL yamada4(knon, dtime, rg, yzlev, yzlay, yu, yv, yteta, &
                      coefm(:knon, 1), yq2, ykmm, ykmn, ykmq, yustar, iflag_pbl)
@@ -653,7 +653,7 @@ contains
           IF (nsrf == is_sic) THEN
              DO j = 1, knon
                 i = ni(j)
-                ! On pondère lorsque l'on fait le bilan au sol :
+                ! On pond\`ere lorsque l'on fait le bilan au sol :
                 IF (pctsrf_new(i, is_sic)>epsfra) THEN
                    flux_g(i) = y_flux_g(j)
                 ELSE

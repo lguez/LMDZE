@@ -1,4 +1,3 @@
-bibio
 dyn3d
 dyn3d/Dissipation
 dyn3d/Guide
@@ -10,6 +9,7 @@ IOIPSL
 IOIPSL/Calendar
 IOIPSL/Histcom
 IOIPSL/Mathelp
+misc
 phylmd
 phylmd/Conflx
 phylmd/CV3_routines

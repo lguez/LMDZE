@@ -4,8 +4,7 @@ module yamada_m
 
 contains
 
-  SUBROUTINE yamada(ngrid, g, rconst, plev, temp, zlev, zlay, u, v, teta, q2, &
-       km, kn, ustar, l_mix)
+  SUBROUTINE yamada(ngrid, g, zlev, zlay, u, v, teta, q2, km, kn)
 
     ! From LMDZ4/libf/phylmd/yamada.F,v 1.1 2004/06/22 11:45:36
 
@@ -33,9 +32,6 @@ contains
 
     ! .......................................................................
     REAL, INTENT (IN) :: g
-    REAL rconst
-    REAL plev(klon, klev+1), temp(klon, klev)
-    REAL ustar(klon), snstable
     REAL zlev(klon, klev+1)
     REAL zlay(klon, klev)
     REAL u(klon, klev)
@@ -44,7 +40,7 @@ contains
     REAL q2(klon, klev+1)
     REAL km(klon, klev+1)
     REAL kn(klon, klev+1)
-    INTEGER l_mix, ngrid
+    INTEGER ngrid
 
 
     INTEGER nlay, nlev

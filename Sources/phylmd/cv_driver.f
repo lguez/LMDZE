@@ -309,7 +309,7 @@ contains
     ! --- CONVECTIVE FEED
 
     if (iflag_con == 3) then
-       CALL cv3_feed(klon, klev, t1, q1, qs1, p1, ph1, hm1, gz1, nk1, icb1, &
+       CALL cv3_feed(klon, klev, t1, q1, qs1, p1, ph1, gz1, nk1, icb1, &
             icbmax, iflag1, tnk1, qnk1, gznk1, plcl1) ! klev->na
     else
        ! iflag_con == 4
@@ -404,9 +404,9 @@ contains
        ! --- MIXING
 
        if (iflag_con == 3) then
-          CALL cv3_mixing(klon, ncum, klev, klev, icb, nk, inb, ph, t, q, &
-               qs, u, v, h, lv, qnk, hp, tv, tvp, ep, clw, m, sig, ment, &
-               qent, uent, vent, nent, sij, elij, ments, qents)
+          CALL cv3_mixing(klon, ncum, klev, klev, icb, nk, inb, t, q, qs, u, &
+               v, h, lv, hp, ep, clw, m, sig, ment, qent, uent, vent, nent, &
+               sij, elij, ments, qents)
        else
           ! iflag_con == 4
           CALL cv_mixing(klon, ncum, klev, icb, nk, inb, inbis, ph, t, q, qs, &
