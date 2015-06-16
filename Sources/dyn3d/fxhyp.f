@@ -28,14 +28,12 @@ contains
     real, intent(out):: rlonu(:), xprimu(:), xprimp025(:) ! (iim + 1)
 
     ! Local:
-    real rlonm025(iim + 1), rlonp025(iim + 1)
+    real rlonm025(iim + 1), rlonp025(iim + 1), d_rlonv(iim)
     REAL dzoom, step
-    real d_rlonv(iim)
-    DOUBLE PRECISION xtild(0:2 * nmax)
-    DOUBLE PRECISION fhyp(nmax:2 * nmax), ffdx, beta, Xprimt(0:2 * nmax)
-    DOUBLE PRECISION Xf(0:2 * nmax)
+    DOUBLE PRECISION, dimension(0:nmax):: xtild, fhyp, G, Xf
+    DOUBLE PRECISION ffdx, beta
     INTEGER i, is2
-    DOUBLE PRECISION, dimension(nmax + 1:2 * nmax):: xxpr, xmoy, fxm
+    DOUBLE PRECISION xxpr(nmax - 1), xmoy(nmax), fxm(nmax)
 
     !----------------------------------------------------------------------
 
@@ -55,15 +53,15 @@ contains
        rlonu(:iim) = rlonv(:iim) + 0.5 * step
     else test_grossismx
        dzoom = dzoomx * twopi_d
-       xtild = arth(- pi_d, pi_d / nmax, 2 * nmax + 1)
-       forall (i = nmax + 1:2 * nmax) xmoy(i) = 0.5d0 * (xtild(i-1) + xtild(i))
+       xtild = arth(0d0, pi_d / nmax, nmax + 1)
+       forall (i = 1:nmax) xmoy(i) = 0.5d0 * (xtild(i-1) + xtild(i))
 
        ! Compute fhyp:
-       fhyp(nmax + 1:2 * nmax - 1) = tanh_cautious(taux * (dzoom / 2. &
-            - xtild(nmax + 1:2 * nmax - 1)), xtild(nmax + 1:2 * nmax - 1) &
-            * (pi_d - xtild(nmax + 1:2 * nmax - 1)))
-       fhyp(nmax) = 1d0
-       fhyp(2 * nmax) = -1d0
+       fhyp(1:nmax - 1) = tanh_cautious(taux * (dzoom / 2. &
+            - xtild(1:nmax - 1)), xtild(1:nmax - 1) &
+            * (pi_d - xtild(1:nmax - 1)))
+       fhyp(0) = 1d0
+       fhyp(nmax) = -1d0
 
        fxm = tanh_cautious(taux * (dzoom / 2. - xmoy), xmoy * (pi_d - xmoy))
 
@@ -71,7 +69,7 @@ contains
 
        ffdx = 0.
 
-       DO i = nmax + 1, 2 * nmax
+       DO i = 1, nmax
           ffdx = ffdx + fxm(i) * (xtild(i) - xtild(i-1))
        END DO
 
@@ -85,29 +83,24 @@ contains
           STOP 1
        END IF
 
-       ! calcul de Xprimt 
-       Xprimt(nmax:2 * nmax) = beta + (grossismx - beta) * fhyp
-       xprimt(:nmax - 1) = xprimt(2 * nmax:nmax + 1:- 1)
+       G = beta + (grossismx - beta) * fhyp
 
        ! Calcul de Xf
 
-       xxpr = beta + (grossismx - beta) * fxm
-       Xf(nmax) = 0d0
+       xxpr = beta + (grossismx - beta) * fxm(:nmax - 1)
+       Xf(0) = 0d0
 
-       DO i = nmax + 1, 2 * nmax - 1
+       DO i = 1, nmax - 1
           Xf(i) = Xf(i-1) + xxpr(i) * (xtild(i) - xtild(i-1))
        END DO
 
-       Xf(2 * nmax) = pi_d
-       xf(:nmax - 1) = - xf(2 * nmax:nmax + 1:- 1)
+       Xf(nmax) = pi_d
 
-       call invert_zoom_x(xf, xtild, Xprimt, rlonm025(:iim), xprimm025(:iim), &
+       call invert_zoom_x(xf, xtild, G, rlonm025(:iim), xprimm025(:iim), &
             xuv = - 0.25d0)
-       call invert_zoom_x(xf, xtild, Xprimt, rlonv(:iim), xprimv(:iim), &
-            xuv = 0d0)
-       call invert_zoom_x(xf, xtild, Xprimt, rlonu(:iim), xprimu(:iim), &
-            xuv = 0.5d0)
-       call invert_zoom_x(xf, xtild, Xprimt, rlonp025(:iim), xprimp025(:iim), &
+       call invert_zoom_x(xf, xtild, G, rlonv(:iim), xprimv(:iim), xuv = 0d0)
+       call invert_zoom_x(xf, xtild, G, rlonu(:iim), xprimu(:iim), xuv = 0.5d0)
+       call invert_zoom_x(xf, xtild, G, rlonp025(:iim), xprimp025(:iim), &
             xuv = 0.25d0)
     end if test_grossismx
 

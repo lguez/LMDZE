@@ -4,42 +4,38 @@ module coefpoly_m
 
 contains
 
-  SUBROUTINE coefpoly(xf1, xf2, xprim1, xprim2, xtild1, xtild2, a0, a1, a2, a3)
+  SUBROUTINE coefpoly(y1, y2, yp1, yp2, x1, x2, a0, a1, a2, a3)
 
     ! From LMDZ4/libf/dyn3d/coefpoly.F, version 1.1.1.1 2004/05/19 12:53:05
 
     ! Author: P. Le Van
 
     ! Calcul des coefficients a0, a1, a2, a3 du polynôme de degré 3
-    ! qui passe par les points (xtild1, Xf1) et (xtild2, Xf2) avec les
-    ! dérivées xprim1 et xprim2. Système linéaire de 4 équations à 4
+    ! qui passe par les points (x1, Y1) et (x2, Y2) avec les
+    ! dérivées yp1 et yp2. Système linéaire de 4 équations à 4
     ! inconnues :
 
-    ! a0 + a1 * xtild1 + a2 * xtild1**2 + a3 * xtild1**3 = Xf1
-    ! a0 + a1 * xtild2 + a2 * xtild2**2 + a3 * xtild2**3 = Xf2
-    ! a1 + 2 * a2 * xtild1 + 3 * a3 * xtild1**2 = Xprim1
-    ! a1 + 2 * a2 * xtild2 + 3 * a3 * xtild2**2 = Xprim2
+    ! a0 + a1 * x1 + a2 * x1**2 + a3 * x1**3 = Y1
+    ! a0 + a1 * x2 + a2 * x2**2 + a3 * x2**3 = Y2
+    ! a1 + 2 * a2 * x1 + 3 * a3 * x1**2 = Yp1
+    ! a1 + 2 * a2 * x2 + 3 * a3 * x2**2 = Yp2
 
-    DOUBLE PRECISION, intent(in):: xf1, xf2, xprim1, xprim2, xtild1, xtild2
+    DOUBLE PRECISION, intent(in):: y1, y2, yp1, yp2, x1, x2
     DOUBLE PRECISION, intent(out):: a0, a1, a2, a3
 
     ! Local:
-    DOUBLE PRECISION xtil1car, xtil2car, derr, x1x2car
+    DOUBLE PRECISION x1car, x2car
 
     !------------------------------------------------------------
 
-    xtil1car = xtild1 * xtild1
-    xtil2car = xtild2 * xtild2
+    x1car = x1 * x1
+    x2car = x2 * x2
 
-    derr = 2d0 * (xf2-xf1)/(xtild1-xtild2)
+    a3 = (2d0 * (y2-y1)/(x1-x2)+yp1+yp2)/((x1-x2) * (x1-x2))
+    a2 = (yp1-yp2+3d0 * a3 * (x2car-x1car))/(2d0 * (x1-x2))
 
-    x1x2car = (xtild1-xtild2) * (xtild1-xtild2)
-
-    a3 = (derr+xprim1+xprim2)/x1x2car
-    a2 = (xprim1-xprim2+3d0 * a3 * (xtil2car-xtil1car))/(2d0 * (xtild1-xtild2))
-
-    a1 = xprim1 - 3d0 * a3 * xtil1car - 2d0 * a2 * xtild1
-    a0 = xf1 - a3 * xtild1 * xtil1car - a2 * xtil1car - a1 * xtild1
+    a1 = yp1 - 3d0 * a3 * x1car - 2d0 * a2 * x1
+    a0 = y1 - a3 * x1 * x1car - a2 * x1car - a1 * x1
 
   END SUBROUTINE coefpoly
 
