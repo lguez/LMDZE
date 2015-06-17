@@ -9,7 +9,7 @@ contains
 
     ! From dyn3d/grid_noro.F, version 1.1.1.1 2004/05/19 12:53:06
 
-    ! Authors: François Lott, Laurent Li, A. Harzallah and Laurent
+    ! Authors: Fran\c{}cois Lott, Laurent Li, A. Harzallah and Laurent
     ! Fairhead
 
     ! Compute the parameters of the sub-grid scale orography scheme as
@@ -32,21 +32,27 @@ contains
     use mva9_m, only: mva9
     use nr_util, only: assert, pi
 
-    REAL, intent(in):: xdata(:), ydata(:) ! coordinates of input field
-    REAL, intent(in):: zdata(:, :) ! input field
+    ! Coordinates of input field:
+    REAL, intent(in):: xdata(:) ! (iusn)
+    REAL, intent(in):: ydata(:) ! (jusn)
+
+    REAL, intent(in):: zdata(:, :) ! (iusn, jusn) input field
     REAL, intent(in):: x(:), y(:) ! coordinates of output field
 
     ! Correlations of US Navy orography gradients:
-    REAL, intent(out):: zphi(:, :) ! orography not smoothed
-    real, intent(out):: zmea(:, :) ! smoothed orography
-    real, intent(out):: zstd(:, :) ! Standard deviation
-    REAL, intent(out):: zsig(:, :) ! Slope
-    real, intent(out):: zgam(:, :) ! Anisotropy
-    real, intent(out):: zthe(:, :) ! Orientation of the small axis
-    REAL, intent(out):: zpic(:, :) ! Maximum altitude
-    real, intent(out):: zval(:, :) ! Minimum altitude
+    REAL, intent(out):: zphi(:, :) ! (iim + 1, jjm + 1) orography not smoothed
+    real, intent(out):: zmea(:, :) ! (iim + 1, jjm + 1) smoothed orography
+    real, intent(out):: zstd(:, :) ! (iim + 1, jjm + 1) Standard deviation
+    REAL, intent(out):: zsig(:, :) ! (iim + 1, jjm + 1) Slope
+    real, intent(out):: zgam(:, :) ! (iim + 1, jjm + 1) Anisotropy
 
-    real, intent(out):: mask(:, :) ! fraction of land
+    real, intent(out):: zthe(:, :) ! (iim + 1, jjm + 1)
+    ! Orientation of the small axis
+
+    REAL, intent(out):: zpic(:, :) ! (iim + 1, jjm + 1) Maximum altitude
+    real, intent(out):: zval(:, :) ! (iim + 1, jjm + 1) Minimum altitude
+
+    real, intent(out):: mask(:, :) ! (iim + 1, jjm + 1) fraction of land
 
     ! Variables local to the procedure:
 
@@ -63,13 +69,11 @@ contains
     ! Correlations of US Navy orography gradients:
     REAL, dimension(iusn + 2 * iext, jusn + 2):: zxtzxusn, zytzyusn, zxtzyusn
 
-    real, dimension(iim + 1, jjm + 1):: mask_tmp, num_tot, num_lan, zmea0
+    real, dimension(iim + 1, jjm + 1):: mask_tmp, num_tot, num_lan
     REAL a(iim + 1), b(iim + 1), c(jjm + 1), d(jjm + 1)
     real weighx, weighy, xincr, xk, xp, xm, xw, xq, xl
     real zbordnor, zdeltax, zbordsud, zdeltay, zbordoue, zlenx, zleny, zmeasud
-    real zllmpic, zllmmea, zllmgam, zllmthe, zllmstd, zllmsig, zllmval
-    real zpicnor, zminthe, zsigsud, zstdnor, zstdsud, zvalsud, zvalnor
-    real zweinor, zweisud, zsignor, zpicsud, zmeanor, zbordest
+    real zweinor, zweisud, zmeanor, zbordest
     integer ii, i, jj, j
     real, parameter:: rad = 6371229.
 
@@ -88,7 +92,7 @@ contains
          size(zsig, 2), size(zgam, 2), size(zthe, 2), size(zpic, 2), &
          size(zval, 2), size(mask, 2)/) == jjm + 1, "grid_noro jjm")
 
-    print *, "Paramètres de l'orographie à l'échelle sous-maille" 
+    print *, "Parameters of subgrid-scale orography" 
     zdeltay = 2. * pi / real(jusn) * rad
 
     ! Extension of the US Navy database for computations at boundaries:
@@ -216,14 +220,6 @@ contains
     ! Compute parameters needed by the Lott & Miller (1997) and Lott
     ! (1999) subgrid-scale orographic scheme.
 
-    zllmmea = 0.
-    zllmstd = 0.
-    zllmsig = 0.
-    zllmgam = 0.
-    zllmpic = 0.
-    zllmval = 0.
-    zllmthe = 0.
-    zminthe = 0.
     DO ii = 1, iim + 1
        DO jj = 1, jjm + 1
           mask(ii, jj) = num_lan(ii, jj) / num_tot(ii, jj)
@@ -248,7 +244,13 @@ contains
        zytzy(ii, jjm + 1) = zytzy(ii, jjm)
     ENDDO
 
-    zmea0 = zmea ! not smoothed
+    ! Masque prenant en compte maximum de terre. On met un seuil \`a 10
+    ! % de terre car en dessous les param\`etres de surface n'ont pas de
+    ! sens.
+    mask_tmp = merge(1., 0., mask >= 0.1)
+
+    zphi(:iim, :) = zmea(:iim, :) * mask_tmp(:iim, :)
+    ! (zmea is not yet smoothed)
 
     ! Filters to smooth out fields for input into subgrid-scale
     ! orographic scheme.
@@ -262,11 +264,6 @@ contains
     CALL MVA9(zxtzy) 
     CALL MVA9(zytzy)
 
-    ! Masque prenant en compte maximum de terre. On met un seuil à 10
-    ! % de terre car en dessous les paramètres de surface n'ont pas de
-    ! sens.
-    mask_tmp = merge(1., 0., mask >= 0.1)
-
     DO ii = 1, iim
        DO jj = 1, jjm + 1
           ! Coefficients K, L et M:
@@ -276,9 +273,9 @@ contains
           xp = xk - sqrt(xl**2 + xm**2)
           xq = xk + sqrt(xl**2 + xm**2)
           xw = 1e-8
-          if(xp.le.xw) xp = 0.
-          if(xq.le.xw) xq = xw
-          if(abs(xm).le.xw) xm = xw * sign(1., xm)
+          if (xp <= xw) xp = 0.
+          if (xq <= xw) xq = xw
+          if (abs(xm) <= xw) xm = xw * sign(1., xm)
           ! modification pour masque de terre fractionnaire
           ! slope: 
           zsig(ii, jj) = sqrt(xq) * mask_tmp(ii, jj)
@@ -286,29 +283,21 @@ contains
           zgam(ii, jj) = xp / xq * mask_tmp(ii, jj)
           ! angle theta:
           zthe(ii, jj) = 57.29577951 * atan2(xm, xl) / 2. * mask_tmp(ii, jj)
-          zphi(ii, jj) = zmea0(ii, jj) * mask_tmp(ii, jj)
-          zmea(ii, jj) = zmea(ii, jj) * mask_tmp(ii, jj)
-          zpic(ii, jj) = zpic(ii, jj) * mask_tmp(ii, jj)
-          zval(ii, jj) = zval(ii, jj) * mask_tmp(ii, jj)
-          zstd(ii, jj) = zstd(ii, jj) * mask_tmp(ii, jj)
-          zllmmea = MAX(zmea(ii, jj), zllmmea)
-          zllmstd = MAX(zstd(ii, jj), zllmstd)
-          zllmsig = MAX(zsig(ii, jj), zllmsig)
-          zllmgam = MAX(zgam(ii, jj), zllmgam)
-          zllmthe = MAX(zthe(ii, jj), zllmthe)
-          zminthe = min(zthe(ii, jj), zminthe)
-          zllmpic = MAX(zpic(ii, jj), zllmpic)
-          zllmval = MAX(zval(ii, jj), zllmval)
        ENDDO
     ENDDO
 
-    print *, 'MEAN ORO: ', zllmmea
-    print *, 'ST. DEV.: ', zllmstd
-    print *, 'PENTE: ', zllmsig
-    print *, 'ANISOTROP: ', zllmgam
-    print *, 'ANGLE: ', zminthe, zllmthe
-    print *, 'pic: ', zllmpic
-    print *, 'val: ', zllmval
+    zmea(:iim, :) = zmea(:iim, :) * mask_tmp(:iim, :)
+    zpic(:iim, :) = zpic(:iim, :) * mask_tmp(:iim, :)
+    zval(:iim, :) = zval(:iim, :) * mask_tmp(:iim, :)
+    zstd(:iim, :) = zstd(:iim, :) * mask_tmp(:iim, :)
+
+    print *, 'MEAN ORO: ', MAXVAL(zmea(:iim, :))
+    print *, 'ST. DEV.: ', MAXVAL(zstd(:iim, :))
+    print *, 'PENTE: ', MAXVAL(zsig(:iim, :))
+    print *, 'ANISOTROP: ', MAXVAL(zgam(:iim, :))
+    print *, 'ANGLE: ', minval(zthe(:iim, :)), MAXVAL(zthe(:iim, :))
+    print *, 'pic: ', MAXVAL(zpic(:iim, :))
+    print *, 'val: ', MAXVAL(zval(:iim, :))
 
     ! gamma and theta at 1. and 0. at poles
     zmea(iim + 1, :) = zmea(1, :)
@@ -320,33 +309,10 @@ contains
     zgam(iim + 1, :) = zgam(1, :)
     zthe(iim + 1, :) = zthe(1, :)
 
-    zmeanor = 0.
-    zmeasud = 0.
-    zstdnor = 0.
-    zstdsud = 0.
-    zsignor = 0.
-    zsigsud = 0.
-    zweinor = 0.
-    zweisud = 0.
-    zpicnor = 0.
-    zpicsud = 0. 
-    zvalnor = 0.
-    zvalsud = 0. 
-
-    DO ii = 1, iim
-       zweinor = zweinor + weight(ii, 1)
-       zweisud = zweisud + weight(ii, jjm + 1)
-       zmeanor = zmeanor + zmea(ii, 1) * weight(ii, 1)
-       zmeasud = zmeasud + zmea(ii, jjm + 1) * weight(ii, jjm + 1)
-       zstdnor = zstdnor + zstd(ii, 1) * weight(ii, 1)
-       zstdsud = zstdsud + zstd(ii, jjm + 1) * weight(ii, jjm + 1)
-       zsignor = zsignor + zsig(ii, 1) * weight(ii, 1)
-       zsigsud = zsigsud + zsig(ii, jjm + 1) * weight(ii, jjm + 1)
-       zpicnor = zpicnor + zpic(ii, 1) * weight(ii, 1)
-       zpicsud = zpicsud + zpic(ii, jjm + 1) * weight(ii, jjm + 1)
-       zvalnor = zvalnor + zval(ii, 1) * weight(ii, 1)
-       zvalsud = zvalsud + zval(ii, jjm + 1) * weight(ii, jjm + 1)
-    ENDDO
+    zweinor = sum(weight(:iim, 1))
+    zweisud = sum(weight(:iim, jjm + 1))
+    zmeanor = sum(zmea(:iim, 1) * weight(:iim, 1))
+    zmeasud = sum(zmea(:iim, jjm + 1) * weight(:iim, jjm + 1))
 
     zmea(:, 1) = zmeanor / zweinor
     zmea(:, jjm + 1) = zmeasud / zweisud
@@ -354,17 +320,21 @@ contains
     zphi(:, 1) = zmeanor / zweinor
     zphi(:, jjm + 1) = zmeasud / zweisud
 
-    zpic(:, 1) = zpicnor / zweinor
-    zpic(:, jjm + 1) = zpicsud / zweisud
+    zpic(:, 1) = sum(zpic(:iim, 1) * weight(:iim, 1)) / zweinor
+    zpic(:, jjm + 1) = sum(zpic(:iim, jjm + 1) * weight(:iim, jjm + 1)) &
+         / zweisud
 
-    zval(:, 1) = zvalnor / zweinor
-    zval(:, jjm + 1) = zvalsud / zweisud
+    zval(:, 1) = sum(zval(:iim, 1) * weight(:iim, 1)) / zweinor
+    zval(:, jjm + 1) = sum(zval(:iim, jjm + 1) * weight(:iim, jjm + 1)) &
+         / zweisud
 
-    zstd(:, 1) = zstdnor / zweinor
-    zstd(:, jjm + 1) = zstdsud / zweisud
+    zstd(:, 1) = sum(zstd(:iim, 1) * weight(:iim, 1)) / zweinor
+    zstd(:, jjm + 1) = sum(zstd(:iim, jjm + 1) * weight(:iim, jjm + 1)) &
+         / zweisud
 
-    zsig(:, 1) = zsignor / zweinor
-    zsig(:, jjm + 1) = zsigsud / zweisud
+    zsig(:, 1) = sum(zsig(:iim, 1) * weight(:iim, 1)) / zweinor
+    zsig(:, jjm + 1) = sum(zsig(:iim, jjm + 1) * weight(:iim, jjm + 1)) &
+         / zweisud
 
     zgam(:, 1) = 1.
     zgam(:, jjm + 1) = 1.

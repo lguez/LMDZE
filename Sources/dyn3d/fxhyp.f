@@ -30,10 +30,10 @@ contains
     ! Local:
     real rlonm025(iim + 1), rlonp025(iim + 1), d_rlonv(iim)
     REAL dzoom, step
-    DOUBLE PRECISION, dimension(0:nmax):: xtild, fhyp, G, Xf
-    DOUBLE PRECISION ffdx, beta
+    DOUBLE PRECISION, dimension(0:nmax):: xtild, fhyp, G, Xf, ffdx
+    DOUBLE PRECISION beta
     INTEGER i, is2
-    DOUBLE PRECISION xxpr(nmax - 1), xmoy(nmax), fxm(nmax)
+    DOUBLE PRECISION xmoy(nmax), fxm(nmax)
 
     !----------------------------------------------------------------------
 
@@ -57,27 +57,27 @@ contains
        forall (i = 1:nmax) xmoy(i) = 0.5d0 * (xtild(i-1) + xtild(i))
 
        ! Compute fhyp:
-       fhyp(1:nmax - 1) = tanh_cautious(taux * (dzoom / 2. &
+       fhyp(1:nmax - 1) = tanh_cautious(taux * (dzoom / 2d0 &
             - xtild(1:nmax - 1)), xtild(1:nmax - 1) &
             * (pi_d - xtild(1:nmax - 1)))
        fhyp(0) = 1d0
        fhyp(nmax) = -1d0
 
-       fxm = tanh_cautious(taux * (dzoom / 2. - xmoy), xmoy * (pi_d - xmoy))
+       fxm = tanh_cautious(taux * (dzoom / 2d0 - xmoy), xmoy * (pi_d - xmoy))
 
-       ! Calcul de beta 
+       ! Compute \int_0 ^{\tilde x} F:
 
-       ffdx = 0.
+       ffdx(0) = 0d0
 
        DO i = 1, nmax
-          ffdx = ffdx + fxm(i) * (xtild(i) - xtild(i-1))
+          ffdx(i) = ffdx(i - 1) + fxm(i) * (xtild(i) - xtild(i-1))
        END DO
 
-       print *, "ffdx = ", ffdx
-       beta = (pi_d - grossismx * ffdx) / (pi_d - ffdx)
+       print *, "ffdx(nmax) = ", ffdx(nmax)
+       beta = (pi_d - grossismx * ffdx(nmax)) / (pi_d - ffdx(nmax))
        print *, "beta = ", beta
 
-       IF (2. * beta - grossismx <= 0.) THEN
+       IF (2d0 * beta - grossismx <= 0d0) THEN
           print *, 'Bad choice of grossismx, taux, dzoomx.'
           print *, 'Decrease dzoomx or grossismx.'
           STOP 1
@@ -85,15 +85,8 @@ contains
 
        G = beta + (grossismx - beta) * fhyp
 
-       ! Calcul de Xf
-
-       xxpr = beta + (grossismx - beta) * fxm(:nmax - 1)
-       Xf(0) = 0d0
-
-       DO i = 1, nmax - 1
-          Xf(i) = Xf(i-1) + xxpr(i) * (xtild(i) - xtild(i-1))
-       END DO
-
+       Xf(:nmax - 1) = beta * xtild(:nmax - 1) + (grossismx - beta) &
+            * ffdx(:nmax - 1)
        Xf(nmax) = pi_d
 
        call invert_zoom_x(xf, xtild, G, rlonm025(:iim), xprimm025(:iim), &
