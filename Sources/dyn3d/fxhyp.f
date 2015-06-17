@@ -12,7 +12,7 @@ contains
     ! Calcule les longitudes et dérivées dans la grille du GCM pour
     ! une fonction f(x) à dérivée tangente hyperbolique.
 
-    ! Il vaut mieux avoir : grossismx \times dzoom < pi
+    ! Il vaut mieux avoir : grossismx \times delta < pi
 
     ! Le premier point scalaire pour une grille regulière (grossismx =
     ! 1., taux = 0., clon = 0.) est à - 180 degrés.
@@ -29,7 +29,7 @@ contains
 
     ! Local:
     real rlonm025(iim + 1), rlonp025(iim + 1), d_rlonv(iim)
-    REAL dzoom, step
+    REAL delta, step
     DOUBLE PRECISION, dimension(0:nmax):: xtild, fhyp, G, Xf, ffdx
     DOUBLE PRECISION beta
     INTEGER i, is2
@@ -39,7 +39,7 @@ contains
 
     print *, "Call sequence information: fxhyp"
 
-    test_grossismx: if (grossismx == 1.) then
+    if (grossismx == 1.) then
        step = twopi / iim
 
        xprimm025(:iim) = step
@@ -51,19 +51,19 @@ contains
        rlonm025(:iim) = rlonv(:iim) - 0.25 * step
        rlonp025(:iim) = rlonv(:iim) + 0.25 * step
        rlonu(:iim) = rlonv(:iim) + 0.5 * step
-    else test_grossismx
-       dzoom = dzoomx * twopi_d
+    else
+       delta = dzoomx * twopi_d
        xtild = arth(0d0, pi_d / nmax, nmax + 1)
        forall (i = 1:nmax) xmoy(i) = 0.5d0 * (xtild(i-1) + xtild(i))
 
        ! Compute fhyp:
-       fhyp(1:nmax - 1) = tanh_cautious(taux * (dzoom / 2d0 &
+       fhyp(1:nmax - 1) = tanh_cautious(taux * (delta / 2d0 &
             - xtild(1:nmax - 1)), xtild(1:nmax - 1) &
             * (pi_d - xtild(1:nmax - 1)))
        fhyp(0) = 1d0
        fhyp(nmax) = -1d0
 
-       fxm = tanh_cautious(taux * (dzoom / 2d0 - xmoy), xmoy * (pi_d - xmoy))
+       fxm = tanh_cautious(taux * (delta / 2d0 - xmoy), xmoy * (pi_d - xmoy))
 
        ! Compute \int_0 ^{\tilde x} F:
 
@@ -95,7 +95,7 @@ contains
        call invert_zoom_x(xf, xtild, G, rlonu(:iim), xprimu(:iim), xuv = 0.5d0)
        call invert_zoom_x(xf, xtild, G, rlonp025(:iim), xprimp025(:iim), &
             xuv = 0.25d0)
-    end if test_grossismx
+    end if
 
     is2 = 0
 
