@@ -4,14 +4,14 @@ module HBTM_m
 
 contains
 
-  SUBROUTINE HBTM(knon, paprs, pplay, t2m, t10m, q2m, q10m, ustar, flux_t, &
+  SUBROUTINE HBTM(knon, paprs, pplay, t2m, q2m, ustar, flux_t, &
        flux_q, u, v, t, q, pblh, cape, EauLiq, ctei, pblT, therm, trmb1, &
        trmb2, trmb3, plcl)
 
-    ! D'après Holstag et Boville et Troen et Mahrt
+    ! D'apr\'es Holstag et Boville et Troen et Mahrt
     ! JAS 47 BLM
-    ! Algorithme thèse Anne Mathieu
-    ! Critère d'entraînement Peter Duynkerke (JAS 50)
+    ! Algorithme th\'ese Anne Mathieu
+    ! Crit\'ere d'entra\^inement Peter Duynkerke (JAS 50)
     ! written by: Anne MATHIEU and Alain LAHELLEC, 22nd November 1999
     ! features : implem. exces Mathieu
 
@@ -23,11 +23,11 @@ contains
 
     ! fin therm a la HBTM passage a forme Mathieu 12/09/2001
 
-    ! Adaptation a LMDZ version couplee
-    ! Pour le moment on fait passer en argument les grandeurs de surface :
-    ! flux, t, q2m, t, q10m, on va utiliser systematiquement les grandeurs a 2m
-    ! mais on garde la possibilité de changer si besoin est (jusqu'à présent
-    ! la forme de HB avec le 1er niveau modele etait conservee)
+    ! Adaptation a LMDZ version couplee Pour le moment on fait passer
+    ! en argument les grandeurs de surface : flux, t, q2m, t, on va
+    ! utiliser systematiquement les grandeurs a 2m mais on garde la
+    ! possibilit\'e de changer si besoin est (jusqu'à pr\'esent la
+    ! forme de HB avec le 1er niveau modele etait conservee)
 
     USE dimphy, ONLY: klev, klon
     USE suphec_m, ONLY: rcpd, rd, retv, rg, rkappa, rlvtt, rtt, rv
@@ -41,9 +41,8 @@ contains
     INTEGER, intent(in):: knon
 
     REAL, intent(in):: t2m(klon) ! temperature a 2 m
-    real t10m(klon) ! temperature a 10 m
     ! q a 2 et 10m
-    REAL q2m(klon), q10m(klon)
+    REAL q2m(klon)
     REAL ustar(klon)
     ! pression a inter-couche (Pa)
     REAL paprs(klon, klev+1)
@@ -164,11 +163,9 @@ contains
     REAL EauLiq(klon)
     ! Critere d'instab d'entrainmt des nuages de
     REAL ctei(klon)
-    REAL the1, the2, aa, zthvd, zthvu, xintpos, qqsat
+    REAL aa, zthvd, zthvu, qqsat
     REAL a1, a2, a3
-    REAL xhis, rnum, th1, thv1, thv2, ql2
-    REAL qsat2, qT1, q2, t1, t2, xnull
-    REAL quadsat, spblh, reduc
+    REAL t2
 
     ! inverse phi function for momentum
     REAL phiminv(klon)
@@ -198,7 +195,7 @@ contains
     REAL zm(klon)
     ! current level height + one level up
     REAL zp(klon)
-    REAL zcor, zcvm5
+    REAL zcor
 
     REAL fac, pblmin, zmzp, term
 

@@ -15,7 +15,7 @@ contains
 
     ! Il vaut mieux avoir : grossismy * dzoom < pi / 2
 
-    use coefpoly_m, only: coefpoly
+    use coefpoly_m, only: coefpoly, a0, a1, a2, a3
     USE dimens_m, only: jjm
     use dynetat0_m, only: clat, grossismy, dzoomy, tauy
     use heavyside_m, only: heavyside
@@ -47,7 +47,7 @@ contains
     INTEGER i, j, it, ik, iter, jlat
     INTEGER jpn, jjpn
     SAVE jpn
-    DOUBLE PRECISION a0, a1, a2, a3, yi2, heavyy0, heavyy0m
+    DOUBLE PRECISION yi2, heavyy0, heavyy0m
     DOUBLE PRECISION fa(0:nmax2), fb(0:nmax2)
     REAL y0min, y0max
 
@@ -187,7 +187,7 @@ contains
           ! et Y'(yi) 
 
           CALL coefpoly(yf(it), yf(it + 1), ytprim(it), ytprim(it + 1), &
-               yt(it), yt(it + 1), a0, a1, a2, a3)
+               yt(it), yt(it + 1))
 
           yf1 = yf(it)
           yprimin = a1 + 2.*a2*yi + 3.*a3*yi*yi

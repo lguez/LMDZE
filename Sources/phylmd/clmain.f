@@ -613,7 +613,7 @@ contains
 
           END DO
 
-          CALL hbtm(knon, ypaprs, ypplay, yt2m, yt10m, yq2m, yq10m, yustar, &
+          CALL hbtm(knon, ypaprs, ypplay, yt2m, yq2m, yustar, &
                y_flux_t, y_flux_q, yu, yv, yt, yq, ypblh, ycapcl, yoliqcl, &
                ycteicl, ypblt, ytherm, ytrmb1, ytrmb2, ytrmb3, ylcl)
 

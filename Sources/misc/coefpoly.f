@@ -2,9 +2,11 @@ module coefpoly_m
 
   IMPLICIT NONE
 
+  DOUBLE PRECISION a0, a1, a2, a3
+
 contains
 
-  SUBROUTINE coefpoly(y1, y2, yp1, yp2, x1, x2, a0, a1, a2, a3)
+  SUBROUTINE coefpoly(y1, y2, yp1, yp2, x1, x2)
 
     ! From LMDZ4/libf/dyn3d/coefpoly.F, version 1.1.1.1 2004/05/19 12:53:05
 
@@ -21,7 +23,6 @@ contains
     ! a1 + 2 * a2 * x2 + 3 * a3 * x2**2 = Yp2
 
     DOUBLE PRECISION, intent(in):: y1, y2, yp1, yp2, x1, x2
-    DOUBLE PRECISION, intent(out):: a0, a1, a2, a3
 
     ! Local:
     DOUBLE PRECISION x1car, x2car

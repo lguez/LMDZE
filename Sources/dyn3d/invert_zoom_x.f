@@ -3,16 +3,19 @@ module invert_zoom_x_m
   implicit none
 
   INTEGER, PARAMETER:: nmax = 30000
+  DOUBLE PRECISION abs_y
+
+  private abs_y, funcd
 
 contains
 
   subroutine invert_zoom_x(xf, xtild, G, xlon, xprim, xuv)
 
-    use coefpoly_m, only: coefpoly
+    use coefpoly_m, only: coefpoly, a1, a2, a3
     USE dimens_m, ONLY: iim
     use dynetat0_m, only: clon
     use nr_util, only: pi_d, twopi_d
-    use numer_rec_95, only: hunt
+    use numer_rec_95, only: hunt, rtsafe
 
     DOUBLE PRECISION, intent(in):: Xf(0:), xtild(0:), G(0:) ! (0:nmax)
 
@@ -24,11 +27,9 @@ contains
     ! 0.5 si calcul aux points U
 
     ! Local:
-    DOUBLE PRECISION Y, abs_y, a0, a1, a2, a3
-    integer i, it, iter
-    real, parameter:: my_eps = 1e-6
+    DOUBLE PRECISION Y
+    integer i, it
 
-    real xo1, Xf1
     real xvrai(iim), Gvrai(iim) 
     ! intermediary variables because xlon and xprim are simple precision
 
@@ -45,30 +46,11 @@ contains
        ! {0 <= it <= nmax - 1}
 
        ! Calcul de xvrai(i) et Gvrai(i)
-
        CALL coefpoly(Xf(it), Xf(it + 1), G(it), G(it + 1), xtild(it), &
-            xtild(it + 1), a0, a1, a2, a3)
-       xvrai(i) = xtild(it)
-       Xf1 = Xf(it)
-       Gvrai(i) = G(it)
-       xo1 = xvrai(i)
-       iter = 1
-
-       do
-          xvrai(i) = xvrai(i) - (Xf1 - abs_y) / Gvrai(i)
-          IF (ABS(xvrai(i) - xo1) <= my_eps .or. iter == 300) exit
-          xo1 = xvrai(i)
-          Xf1 = a0 + xvrai(i) * (a1 + xvrai(i) * (a2 + xvrai(i) * a3))
-          Gvrai(i) = a1 + xvrai(i) * (2d0 * a2 + xvrai(i) * 3d0 * a3)
-       end DO
-
-       if (ABS(xvrai(i) - xo1) > my_eps) then
-          ! iter == 300
-          print *, 'Pas de solution.'
-          print *, i, abs_y
-          STOP 1
-       end if
-
+            xtild(it + 1))
+       xvrai(i) = rtsafe(funcd, real(xtild(it)), real(xtild(it + 1)), &
+            xacc = 1e-6)
+       Gvrai(i) = a1 + xvrai(i) * (2d0 * a2 + xvrai(i) * 3d0 * a3)
        if (y < 0d0) xvrai(i) = - xvrai(i)
     end DO
 
@@ -83,5 +65,19 @@ contains
     xprim = twopi_d / (iim * Gvrai)
 
   end subroutine invert_zoom_x
+
+  !**********************************************************************
+
+  SUBROUTINE funcd(x, fval, fderiv)
+
+    use coefpoly_m, only: a0, a1, a2, a3
+
+    REAL, INTENT(IN):: x
+    REAL, INTENT(OUT):: fval, fderiv
+
+    fval = a0 + x * (a1 + x * (a2 + x * a3)) - abs_y
+    fderiv = a1 + x * (2. * a2 + x * 3. * a3)
+
+  END SUBROUTINE funcd
 
 end module invert_zoom_x_m
