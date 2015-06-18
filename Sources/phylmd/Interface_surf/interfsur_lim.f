@@ -4,10 +4,9 @@ module interfsur_lim_m
 
 contains
 
-  SUBROUTINE interfsur_lim(itime, dtime, jour, nisurf, knindex, debut, &
-       alb_new, z0_new)
+  SUBROUTINE interfsur_lim(itime, dtime, jour, knindex, debut, alb_new, z0_new)
 
-    ! Cette routine sert d'interface entre le modèle atmosphérique et
+    ! Cette routine sert d'interface entre le mod\`ele atmosph\'erique et
     ! un fichier de conditions aux limites.
 
     ! Laurent FAIRHEAD, February 2000
@@ -21,16 +20,12 @@ contains
     real, intent(IN):: dtime ! pas de temps de la physique (en s)
     integer, intent(IN):: jour ! jour a lire dans l'annee
 
-    integer, intent(IN):: nisurf
-    ! index de la surface à traiter (1 = sol continental)
-
-
     integer, intent(in):: knindex(:) ! (knon)
-    ! index des points de la surface à traiter
+    ! index des points de la surface \`a traiter
 
-    logical, intent(IN):: debut ! premier appel à la physique (initialisation)
+    logical, intent(IN):: debut ! premier appel \`a la physique (initialisation)
     real, intent(out):: alb_new(:) ! (klon) albedo lu
-    real, intent(out):: z0_new(:) ! (klon) longueur de rugosité lue
+    real, intent(out):: z0_new(:) ! (klon) longueur de rugosit\'e lue
 
     ! Local:
 
@@ -40,7 +35,7 @@ contains
     ! (en pas de physique)
 
     logical, save:: deja_lu_sur
-    ! jour à lire déjà lu pour une surface précédente
+    ! jour \`a lire d\'ej\`a lu pour une surface pr\'ec\'edente
 
     integer, save:: jour_lu_sur
 
@@ -70,7 +65,7 @@ contains
        call NF95_INQ_VARID(ncid, 'ALB', varid)
        call NF95_GET_VAR(ncid, varid, alb_lu, start=(/1, jour/))
 
-       ! Lecture rugosité
+       ! Lecture rugosit\'e
        call NF95_INQ_VARID(ncid, 'RUG', varid)
        call NF95_GET_VAR(ncid, varid, rug_lu, start=(/1, jour/))
 

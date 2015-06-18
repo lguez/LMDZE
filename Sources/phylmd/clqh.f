@@ -17,7 +17,7 @@ contains
 
     USE conf_phys_m, ONLY : iflag_pbl
     USE dimens_m, ONLY : iim, jjm
-    USE dimphy, ONLY : klev, klon, zmasq
+    USE dimphy, ONLY : klev, klon
     USE dimsoil, ONLY : nsoilmx
     USE indicesol, ONLY : is_ter, nbsrf
     USE interfsurf_hq_m, ONLY : interfsurf_hq
@@ -76,7 +76,7 @@ contains
     !IM cf JLD
     ! Flux thermique utiliser pour fondre la neige
     REAL ffonte(klon)
-    ! Flux d'eau "perdue" par la surface et nécessaire pour que limiter la
+    ! Flux d'eau "perdue" par la surface et n\'ecessaire pour que limiter la
     ! hauteur de neige, en kg/m2/s
     REAL fqcalving(klon)
 

@@ -87,7 +87,7 @@ contains
        !     1. calcul de w
        !     2. groupement des mailles pres du pole.
 
-       CALL groupe(massem, pbaruc, pbarvc, pbarug, pbarvg, wg)
+       CALL groupe(pbaruc, pbarvc, pbarug, pbarvg, wg)
 
        CALL histwrite(fluxid, 'masse', itau, massem)
        CALL histwrite(fluxid, 'pbaru', itau, pbarug)

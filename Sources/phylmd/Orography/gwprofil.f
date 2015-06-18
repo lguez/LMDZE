@@ -4,7 +4,7 @@ module gwprofil_m
 
 contains
 
-  SUBROUTINE gwprofil(nlon, nlev, kgwd, kdx, ktest, kkcrith, kcrit, paphm1, &
+  SUBROUTINE gwprofil(nlon, nlev, ktest, kkcrith, kcrit, paphm1, &
        prho, pstab, pvph, pri, ptau, pdmod, psig, pvar)
 
     ! Method. The stress profile for gravity waves is computed as
@@ -27,7 +27,7 @@ contains
     ! 0.1 ARGUMENTS
 
     INTEGER nlon, nlev
-    INTEGER kkcrith(nlon), kcrit(nlon), kdx(nlon), ktest(nlon)
+    INTEGER kkcrith(nlon), kcrit(nlon), ktest(nlon)
 
     REAL paphm1(nlon, nlev+1), pstab(nlon, nlev+1), prho(nlon, nlev+1), &
          pvph(nlon, nlev+1), pri(nlon, nlev+1), ptau(nlon, nlev+1)
@@ -38,7 +38,7 @@ contains
 
     ! 0.2 LOCAL ARRAYS
 
-    INTEGER ilevh, kgwd, jl, jk
+    INTEGER ilevh, jl, jk
     REAL zsqr, zalfa, zriw, zdel, zb, zalpha, zdz2n
     REAL zdelp, zdelpt
     REAL zdz2(klon, klev), znorm(klon), zoro(klon)

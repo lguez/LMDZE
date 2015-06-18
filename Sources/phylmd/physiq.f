@@ -1325,8 +1325,8 @@ contains
        ENDDO
 
        CALL drag_noro(klon, llm, dtphys, paprs, play, zmea, zstd, zsig, zgam, &
-            zthe, zpic, zval, igwd, idx, itest, t_seri, u_seri, v_seri, &
-            zulow, zvlow, zustrdr, zvstrdr, d_t_oro, d_u_oro, d_v_oro)
+            zthe, zpic, zval, itest, t_seri, u_seri, v_seri, zulow, zvlow, &
+            zustrdr, zvstrdr, d_t_oro, d_u_oro, d_v_oro)
 
        ! ajout des tendances
        DO k = 1, llm

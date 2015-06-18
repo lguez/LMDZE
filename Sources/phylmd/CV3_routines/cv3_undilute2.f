@@ -1,6 +1,6 @@
 
       SUBROUTINE cv3_undilute2(nloc,ncum,nd,icb,icbs,nk &
-                             ,tnk,qnk,gznk,t,q,qs,gz &
+                             ,tnk,qnk,gznk,t,qs,gz &
                              ,p,h,tv,lv,pbase,buoybase,plcl &
                              ,inb,tp,tvp,clw,hp,ep,sigp,buoy)
       use conema3_m
@@ -30,7 +30,7 @@
 ! inputs:
       integer, intent(in):: ncum, nd, nloc
       integer icb(nloc), icbs(nloc), nk(nloc)
-      real t(nloc,nd), q(nloc,nd), qs(nloc,nd), gz(nloc,nd)
+      real t(nloc,nd), qs(nloc,nd), gz(nloc,nd)
       real p(nloc,nd)
       real tnk(nloc), qnk(nloc), gznk(nloc)
       real lv(nloc,nd), tv(nloc,nd), h(nloc,nd)
@@ -44,10 +44,9 @@
 
 ! local variables:
       integer i, k
-      real tg,qg,ahg,alv,s,tc,es,denom,rg,tca,elacrit
-      real by, defrac, pden
-      real ah0(nloc), cape(nloc), capem(nloc), byp(nloc)
-      logical lcape(nloc)
+      real tg,qg,ahg,alv,s,tc,es,denom,rg
+      real pden
+      real ah0(nloc)
 
 !=====================================================================
 ! --- SOME INITIALIZATIONS

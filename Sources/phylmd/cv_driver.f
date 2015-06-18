@@ -381,11 +381,11 @@ contains
 
        if (iflag_con == 3) then
           CALL cv3_undilute2(klon, ncum, klev, icb, icbs, nk, tnk, qnk, gznk, &
-               t, q, qs, gz, p, h, tv, lv, pbase, buoybase, plcl, inb, tp, &
+               t, qs, gz, p, h, tv, lv, pbase, buoybase, plcl, inb, tp, &
                tvp, clw, hp, ep, sigp, buoy) !na->klev
        else
           ! iflag_con == 4
-          CALL cv_undilute2(klon, ncum, klev, icb, nk, tnk, qnk, gznk, t, q, &
+          CALL cv_undilute2(klon, ncum, klev, icb, nk, tnk, qnk, gznk, t, &
                qs, gz, p, dph, h, tv, lv, inb, inbis, tp, tvp, clw, hp, ep, &
                sigp, frac)
        endif

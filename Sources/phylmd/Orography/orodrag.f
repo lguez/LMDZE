@@ -1,4 +1,4 @@
-    SUBROUTINE orodrag(nlon,nlev,kgwd,kdx,ktest,ptsphy,paphm1,papm1,pgeom1, &
+    SUBROUTINE orodrag(nlon,nlev,ktest,ptsphy,paphm1,papm1,pgeom1, &
         ptm1,pum1,pvm1,pmea,pstd,psig,pgamma,ptheta,ppic,pval &
         ,pulow,pvlow,pvom,pvol,pte)
 
@@ -63,7 +63,7 @@
 
 
       INTEGER nlon, nlev, klevm1
-      INTEGER kgwd, jl, ilevp1, jk, ji
+      INTEGER jl, ilevp1, jk, ji
       REAL zdelp, ztemp, zforc, ztend
       REAL rover, zb, zc, zconb, zabsv
       REAL zzd1, ratio, zbet, zust, zvst, zdis
@@ -75,15 +75,15 @@
       REAL pgamma(nlon), ptheta(nlon), ppic(nlon), pval(nlon), &
         pgeom1(nlon,nlev), papm1(nlon,nlev), paphm1(nlon,nlev+1)
 
-      INTEGER kdx(nlon), ktest(nlon)
+      INTEGER ktest(nlon)
 !-----------------------------------------------------------------------
 
 !*       0.2   local arrays
 !              ------------
-      INTEGER isect(klon), icrit(klon), ikcrith(klon), ikenvh(klon), &
-        iknu(klon), iknu2(klon), ikcrit(klon), ikhlim(klon)
+      INTEGER icrit(klon), ikcrith(klon), ikenvh(klon), &
+        iknu(klon), iknu2(klon), ikcrit(klon)
 
-      REAL ztau(klon,klev+1), ztauf(klon,klev+1), zstab(klon,klev+1), &
+      REAL ztau(klon,klev+1), zstab(klon,klev+1), &
         zvph(klon,klev+1), zrho(klon,klev+1), zri(klon,klev+1), &
         zpsi(klon,klev+1), zzdep(klon,klev)
       REAL zdudt(klon), zdvdt(klon), zdtdt(klon), zdedt(klon), zvidis(klon), &
@@ -96,41 +96,22 @@
 !*         1.    initialization
 !                --------------
 
-100   CONTINUE
-
-!     ------------------------------------------------------------------
-
 !*         1.1   computational constants
 !                -----------------------
 
-110   CONTINUE
-
-!     ztmst=twodt
-!     if(nstep.eq.nstart) ztmst=0.5*twodt
       klevm1 = klev - 1
       ztmst = ptsphy
       zrtmst = 1./ztmst
 !     ------------------------------------------------------------------
 
-120   CONTINUE
-
-!     ------------------------------------------------------------------
-
 !*         1.3   check whether row contains point for printing
 !                ---------------------------------------------
-
-130   CONTINUE
-
-!     ------------------------------------------------------------------
 
 !*         2.     precompute basic state variables.
 !*                ---------- ----- ----- ----------
 !*                define low level wind, project winds in plane of
 !*                low level wind, determine sector in which to take
 !*                the variance and set indicator for critical levels.
-
-200   CONTINUE
-
 
 
       CALL orosetup(nlon,ktest,ikcrit,ikcrith,icrit,ikenvh,iknu,iknu2,paphm1, &
@@ -146,8 +127,6 @@
 !*                 supercritical forms.computes anisotropy coefficient
 !*                 as measure of orographic twodimensionality.
 
-300   CONTINUE
-
       CALL gwstress(nlon,nlev,ktest,icrit,ikenvh,iknu,zrho,zstab,zvph,pstd, &
         psig,pmea,ppic,ztau,pgeom1,zdmod)
 
@@ -155,17 +134,12 @@
 !*         4.      compute stress profile.
 !*                 ------- ------ --------
 
-400   CONTINUE
-
-
-      CALL gwprofil(nlon,nlev,kgwd,kdx,ktest,ikcrith,icrit,paphm1,zrho,zstab, &
+      CALL gwprofil(nlon,nlev,ktest,ikcrith,icrit,paphm1,zrho,zstab, &
         zvph,zri,ztau,zdmod,psig,pstd)
 
 
 !*         5.      compute tendencies.
 !*                 -------------------
-
-500   CONTINUE
 
 !  explicit solution at all levels for the gravity wave
 !  implicit solution for the blocked levels
@@ -183,8 +157,6 @@
       DO 524 jk = 1, klev
 
 
-!     do 523 jl=1,kgwd
-!     ji=kdx(jl)
 !  Modif vectorisation 02/04/2004
         DO 523 ji = 1, klon
           IF (ktest(ji)==1) THEN

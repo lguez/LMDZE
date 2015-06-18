@@ -30,7 +30,7 @@ contains
     DOUBLE PRECISION Y
     integer i, it
 
-    real xvrai(iim), Gvrai(iim) 
+    DOUBLE PRECISION xvrai(iim), Gvrai(iim) 
     ! intermediary variables because xlon and xprim are simple precision
 
     !------------------------------------------------------------------
@@ -48,8 +48,7 @@ contains
        ! Calcul de xvrai(i) et Gvrai(i)
        CALL coefpoly(Xf(it), Xf(it + 1), G(it), G(it + 1), xtild(it), &
             xtild(it + 1))
-       xvrai(i) = rtsafe(funcd, real(xtild(it)), real(xtild(it + 1)), &
-            xacc = 1e-6)
+       xvrai(i) = rtsafe(funcd, xtild(it), xtild(it + 1), xacc = 1d-6)
        Gvrai(i) = a1 + xvrai(i) * (2d0 * a2 + xvrai(i) * 3d0 * a3)
        if (y < 0d0) xvrai(i) = - xvrai(i)
     end DO
@@ -72,11 +71,11 @@ contains
 
     use coefpoly_m, only: a0, a1, a2, a3
 
-    REAL, INTENT(IN):: x
-    REAL, INTENT(OUT):: fval, fderiv
+    DOUBLE PRECISION, INTENT(IN):: x
+    DOUBLE PRECISION, INTENT(OUT):: fval, fderiv
 
     fval = a0 + x * (a1 + x * (a2 + x * a3)) - abs_y
-    fderiv = a1 + x * (2. * a2 + x * 3. * a3)
+    fderiv = a1 + x * (2d0 * a2 + x * 3d0 * a3)
 
   END SUBROUTINE funcd
 

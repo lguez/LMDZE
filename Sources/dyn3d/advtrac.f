@@ -83,7 +83,7 @@ contains
        ! 1. calcul de w
        ! 2. groupement des mailles pres du pole.
 
-       CALL groupe(massem, pbaruc, pbarvc, pbarug, pbarvg, wg)
+       CALL groupe(pbaruc, pbarvc, pbarug, pbarvg, wg)
 
        ! test sur l'eventuelle creation de valeurs negatives de la masse
        DO l = 1, llm - 1
@@ -105,7 +105,7 @@ contains
 
        ! Advection proprement dite
 
-       ! Calcul des moyennes basées sur la masse
+       ! Calcul des moyennes bas\'ees sur la masse
        CALL massbar(massem, massebx, masseby)
 
        ! Appel des sous programmes d'advection

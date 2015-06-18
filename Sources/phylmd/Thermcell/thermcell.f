@@ -8,17 +8,17 @@ contains
        po, pduadj, pdvadj, pdtadj, pdoadj, fm0, entr0, r_aspect, l_mix, w2di, &
        tho)
 
-    ! Calcul du transport vertical dans la couche limite en présence
-    ! de "thermiques" explicitement représentés. Récriture à partir
-    ! d'un listing papier à Habas, le 14/02/00. Le thermique est
-    ! supposé homogène et dissipé par mélange avec son
-    ! environnement. La longueur "l_mix" contrôle l'efficacité du
-    ! mélange. Le calcul du transport des différentes espèces se fait
+    ! Calcul du transport vertical dans la couche limite en pr\'esence
+    ! de "thermiques" explicitement repr\'esent\'es. R\'ecriture \`a partir
+    ! d'un listing papier \`a Habas, le 14/02/00. Le thermique est
+    ! suppos\'e homog\`ene et dissip\'e par m\'elange avec son
+    ! environnement. La longueur "l_mix" contrôle l'efficacit\'e du
+    ! m\'elange. Le calcul du transport des diff\'erentes esp\`eces se fait
     ! en prenant en compte :
     ! 1. un flux de masse montant
     ! 2. un flux de masse descendant
-    ! 3. un entraînement
-    ! 4. un détraînement
+    ! 3. un entra\^inement
+    ! 4. un d\'etra\^inement
 
     USE dimphy, ONLY : klev, klon
     USE suphec_m, ONLY : rd, rg, rkappa
@@ -46,25 +46,20 @@ contains
     ! local:
 
     INTEGER ig, k, l, lmaxa(klon), lmix(klon)
-    real zsortie1d(klon)
     ! CR: on remplace lmax(klon, klev+1)
     INTEGER lmax(klon), lmin(klon), lentr(klon)
     real linter(klon)
     real zmix(klon), fracazmix(klon)
 
-    real zmax(klon), zw, zz, zw2(klon, klev+1), ztva(klon, klev), zzz
+    real zmax(klon), zw, zw2(klon, klev+1), ztva(klon, klev)
 
     real zlev(klon, klev+1), zlay(klon, klev)
     REAL zh(klon, klev), zdhadj(klon, klev)
     REAL ztv(klon, klev)
     real zu(klon, klev), zv(klon, klev), zo(klon, klev)
-    REAL wh(klon, klev+1)
-    real wu(klon, klev+1), wv(klon, klev+1), wo(klon, klev+1)
     real zla(klon, klev+1)
     real zwa(klon, klev+1)
     real zld(klon, klev+1)
-    real zwd(klon, klev+1)
-    real zsortie(klon, klev)
     real zva(klon, klev)
     real zua(klon, klev)
     real zoa(klon, klev)
@@ -105,11 +100,6 @@ contains
     logical first
     data first /.false./
     save first
-
-    character(len=2) str2
-    character(len=10) str10
-
-    LOGICAL vtest(klon)
 
     EXTERNAL SCOPY
 
@@ -422,7 +412,7 @@ contains
 
     ! calcul de la largeur de chaque ascendance dans le cas conservatif.
     ! dans ce cas simple, on suppose que la largeur de l'ascendance provenant
-    ! d'une couche est égale à la hauteur de la couche alimentante.
+    ! d'une couche est \'egale \`a la hauteur de la couche alimentante.
     ! La vitesse maximale dans l'ascendance est aussi prise comme estimation
     ! de la vitesse d'entrainement horizontal dans la couche alimentante.
 
@@ -447,7 +437,7 @@ contains
        enddo
     enddo
 
-    ! calcul de la fraction de la maille concernée par l'ascendance en tenant
+    ! calcul de la fraction de la maille concern\'ee par l'ascendance en tenant
     ! compte de l'epluchage du thermique.
 
     !CR def de zmix continu (profil parabolique des vitesses)

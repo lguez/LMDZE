@@ -1,6 +1,6 @@
 
       SUBROUTINE cv_undilute2(nloc,ncum,nd,icb,nk &
-                             ,tnk,qnk,gznk,t,q,qs,gz &
+                             ,tnk,qnk,gznk,t,qs,gz &
                              ,p,dph,h,tv,lv &
                              ,inb,inb1,tp,tvp,clw,hp,ep,sigp,frac)
             use cvthermo
@@ -21,7 +21,7 @@
 ! inputs:
       integer, intent(in):: ncum, nd, nloc
       integer icb(nloc), nk(nloc)
-      real t(nloc,nd), q(nloc,nd), qs(nloc,nd), gz(nloc,nd)
+      real t(nloc,nd), qs(nloc,nd), gz(nloc,nd)
       real p(nloc,nd), dph(nloc,nd)
       real tnk(nloc), qnk(nloc), gznk(nloc)
       real lv(nloc,nd), tv(nloc,nd), h(nloc,nd)

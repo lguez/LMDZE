@@ -1,4 +1,4 @@
-SUBROUTINE groupe(pext, pbaru, pbarv, pbarum, pbarvm, wm)
+SUBROUTINE groupe(pbaru, pbarv, pbarum, pbarvm, wm)
 
   ! From dyn3d/groupe.F, v 1.1.1.1 2004/05/19 12:53:06
 
@@ -6,7 +6,7 @@ SUBROUTINE groupe(pext, pbaru, pbarv, pbarum, pbarvm, wm)
   ! poles en "regroupant" les mailles 2 par 2 puis 4 par 4 etc. au fur  
   ! et a mesure qu'on se rapproche du pole.                             
 
-  ! en entree: pext, pbaru et pbarv                                     
+  ! en entree: pbaru et pbarv                                     
   ! en sortie:  pbarum, pbarvm et wm.                                    
 
   ! remarque, le wm est recalcule a partir des pbaru pbarv et on n'a    
@@ -24,8 +24,6 @@ SUBROUTINE groupe(pext, pbaru, pbarv, pbarum, pbarvm, wm)
   INTEGER, PARAMETER:: ngroup = 3
 
   REAL pbaru(iip1, jjp1, llm), pbarv(iip1, jjm, llm)
-  REAL pext(iip1, jjp1, llm)
-
   REAL, intent(out):: pbarum(iip1, jjp1, llm)
   real pbarvm(iip1, jjm, llm)
   REAL wm(iip1, jjp1, llm)

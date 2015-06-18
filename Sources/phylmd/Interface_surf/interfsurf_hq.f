@@ -12,9 +12,9 @@ contains
        tsurf_new, alb_new, alblw, z0_new, pctsrf_new, agesno, fqcalving, &
        ffonte, run_off_lic_0, flux_o, flux_g)
 
-    ! Cette routine sert d'aiguillage entre l'atmosphère et la surface
-    ! en général (sols continentaux, océans, glaces) pour les flux de
-    ! chaleur et d'humidité.
+    ! Cette routine sert d'aiguillage entre l'atmosph\`ere et la surface
+    ! en g\'en\'eral (sols continentaux, oc\'eans, glaces) pour les flux de
+    ! chaleur et d'humidit\'e.
 
     ! Laurent Fairhead, February 2000
 
@@ -84,7 +84,7 @@ contains
     ! rugos rugosite
     ! rugoro rugosite orographique
     real, intent(INOUT):: snow(klon), qsurf(klon)
-    real, intent(IN):: tsurf(:) ! (knon) température de surface
+    real, intent(IN):: tsurf(:) ! (knon) temp\'erature de surface
     real, dimension(klon), intent(IN):: p1lay
     ! p1lay pression 1er niveau (milieu de couche)
     real, dimension(klon), intent(IN):: ps
@@ -96,7 +96,7 @@ contains
     ! fluxsens flux de chaleur sensible
     ! fluxlat flux de chaleur latente
     real, dimension(klon), intent(OUT):: dflux_l, dflux_s
-    real, intent(OUT):: tsurf_new(knon) ! température au sol
+    real, intent(OUT):: tsurf_new(knon) ! temp\'erature au sol
     real, intent(OUT):: alb_new(klon) ! albedo
     real, dimension(klon), intent(OUT):: alblw
     real, dimension(klon), intent(OUT):: z0_new
@@ -105,7 +105,7 @@ contains
     ! pctsrf_new nouvelle repartition des surfaces
     real, dimension(klon), intent(INOUT):: agesno
 
-    ! Flux d'eau "perdue" par la surface et nécessaire pour que limiter la
+    ! Flux d'eau "perdue" par la surface et n\'ecessaire pour que limiter la
     ! hauteur de neige, en kg/m2/s
     !jld a rajouter real, dimension(klon), intent(INOUT):: fqcalving
     real, dimension(klon), intent(INOUT):: fqcalving
@@ -207,10 +207,9 @@ contains
 
        ! calcul albedo: lecture albedo fichier boundary conditions
        ! puis ajout albedo neige
-       call interfsur_lim(itime, dtime, jour, nisurf, knindex, debut, &
-            alb_new, z0_new)
+       call interfsur_lim(itime, dtime, jour, knindex, debut, alb_new, z0_new)
 
-       ! calcul snow et qsurf, hydrol adapté
+       ! calcul snow et qsurf, hydrol adapt\'e
        CALL calbeta(nisurf, snow(:knon), qsol(:knon), beta(:knon), &
             capsol(:knon), dif_grnd(:knon))
 
@@ -246,7 +245,7 @@ contains
        ! Remplissage des pourcentages de surface
        pctsrf_new(:, nisurf) = pctsrf(:, nisurf)
     case (is_oce)
-       ! Surface "ocean" appel à l'interface avec l'océan
+       ! Surface "ocean" appel \`a l'interface avec l'oc\'ean
        ! lecture conditions limites
        call interfoce_lim(itime, dtime, jour, knindex, debut, tsurf_temp, &
             pctsrf_new)

@@ -5,8 +5,8 @@ module drag_noro_m
 contains
 
   SUBROUTINE drag_noro(nlon, nlev, dtime, paprs, pplay, pmea, pstd, psig, &
-       pgam, pthe, ppic, pval, kgwd, kdx, ktest, t, u, v, pulow, pvlow, &
-       pustr, pvstr, d_t, d_u, d_v)
+       pgam, pthe, ppic, pval, ktest, t, u, v, pulow, pvlow, pustr, pvstr, &
+       d_t, d_u, d_v)
 
     ! From LMDZ4/libf/phylmd/orografi.F, version 1.4 2005/12/01 11:27:29
 
@@ -44,7 +44,7 @@ contains
     real, INTENT (IN):: u(nlon, nlev), v(nlon, nlev)
     REAL d_t(nlon, nlev), d_u(nlon, nlev), d_v(nlon, nlev)
 
-    INTEGER i, k, kgwd, kdx(nlon), ktest(nlon)
+    INTEGER i, k, ktest(nlon)
 
     ! Variables locales:
 
@@ -100,7 +100,7 @@ contains
 
     ! appeler la routine principale
 
-    CALL orodrag(klon, klev, kgwd, kdx, ktest, dtime, papmh, papmf, zgeom, &
+    CALL orodrag(klon, klev, ktest, dtime, papmh, papmf, zgeom, &
          pt, pu, pv, pmea, pstd, psig, pgam, pthe, ppic, pval, pulow, pvlow, &
          pdudt, pdvdt, pdtdt)
 
