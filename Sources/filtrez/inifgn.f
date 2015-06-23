@@ -23,15 +23,14 @@ contains
     use acc_m, only: acc 
     USE dimens_m, ONLY: iim
     USE dynetat0_m, ONLY: xprimu, xprimv
-    use nr_util, only: pi
     use numer_rec_95, only: jacobi, eigsrt
 
     real, intent(out):: dv(:) ! (iim) eigenvalues sorted in descending order
 
     ! Local:
-    REAL vec(iim, iim), vec1(iim, iim)
+    REAL, dimension(iim, iim):: a, b, c
     REAL du(iim)
-    INTEGER i, j, k, nrot
+    INTEGER i
 
     !----------------------------------------------------------------
 
@@ -42,50 +41,20 @@ contains
     unsddu = 1. / sddu
     unsddv = 1. / sddv
 
-    DO j = 1, iim
-       DO i = 1, iim
-          vec(i, j) = 0.
-          vec1(i, j) = 0.
-          eignfnv(i, j) = 0.
-          eignfnu(i, j) = 0.
-       END DO
-    END DO
+    b = 0.
+    b(iim, 1) = 1. / (sddu(iim) * sddv(1))
+    forall (i = 1:iim) b(i, i) = - 1./ (sddu(i) * sddv(i))
+    forall (i = 1:iim - 1) b(i, i + 1) = 1. / (sddu(i) * sddv(i + 1))
 
-    eignfnv(1, 1) = - 1.
-    eignfnv(iim, 1) = 1.
-    DO i = 1, iim - 1
-       eignfnv(i+1, i+1) = - 1.
-       eignfnv(i, i+1) = 1.
-    END DO
+    c = - transpose(b)
 
-    DO j = 1, iim
-       DO i = 1, iim
-          eignfnv(i, j) = eignfnv(i, j) / (sddu(i) * sddv(j))
-       END DO
-    END DO
-
-    DO j = 1, iim
-       DO i = 1, iim
-          eignfnu(i, j) = - eignfnv(j, i)
-       END DO
-    END DO
-
-    DO j = 1, iim
-       DO i = 1, iim
-          vec(i, j) = 0.0
-          vec1(i, j) = 0.0
-          DO k = 1, iim
-             vec(i, j) = vec(i, j) + eignfnu(i, k) * eignfnv(k, j)
-             vec1(i, j) = vec1(i, j) + eignfnv(i, k) * eignfnu(k, j)
-          END DO
-       END DO
-    END DO
-
-    CALL jacobi(vec, dv, eignfnv, nrot)
+    a = matmul(c, b)
+    CALL jacobi(a, dv, eignfnv)
     CALL acc(eignfnv)
     CALL eigsrt(dv, eignfnv)
 
-    CALL jacobi(vec1, du, eignfnu, nrot)
+    a = matmul(b, c)
+    CALL jacobi(a, du, eignfnu)
     CALL acc(eignfnu)
     CALL eigsrt(du, eignfnu)
 
