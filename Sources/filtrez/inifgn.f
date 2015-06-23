@@ -6,7 +6,7 @@ module inifgn_m
 
   private iim
 
-  real sddu(iim), sddv(iim) ! SQRT(dx)
+  real sddu(iim), sddv(iim) ! SQRT(dx / di)
   real unsddu(iim), unsddv(iim)
 
   real eignfnu(iim, iim), eignfnv(iim, iim)
@@ -26,7 +26,7 @@ contains
     use nr_util, only: pi
     use numer_rec_95, only: jacobi, eigsrt
 
-    real, intent(out):: dv(:) ! (iim)
+    real, intent(out):: dv(:) ! (iim) eigenvalues sorted in descending order
 
     ! Local:
     REAL vec(iim, iim), vec1(iim, iim)
@@ -34,6 +34,8 @@ contains
     INTEGER i, j, k, nrot
 
     !----------------------------------------------------------------
+
+    print *, "Call sequence information: inifgn"
 
     sddv = sqrt(xprimv(:iim))
     sddu = sqrt(xprimu(:iim))

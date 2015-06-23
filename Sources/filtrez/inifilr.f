@@ -38,29 +38,25 @@ contains
     ! Local:
     REAL dlatu(jjm)
     REAL rlamda(2: iim)
-    real eignvl(iim) ! eigenvalues
+    real eignvl(iim) ! eigenvalues sorted in descending order
     REAL cof
-    INTEGER i, j, k, kf, unit
-    REAL colat0
+    INTEGER i, j, k, unit
+    REAL colat0 ! > 0
     REAL eignft(iim, iim), coff
 
     ! Filtering coefficients (lamda_max * cos(rlat) / lamda):
     real coefilu(iim, jjm), coefilv(iim, jjm)
     real coefilu2(iim, jjm), coefilv2(iim, jjm)
 
-    integer modfrstu(jjm), modfrstv(jjm)
-    ! index of the mode from where modes are filtered
+    ! Index of the mode from where modes are filtered:
+    integer, allocatable:: modfrstnu(:), modfrstsu(:)
+    integer, allocatable:: modfrstnv(:), modfrstsv(:)
 
     !-----------------------------------------------------------
 
     print *, "Call sequence information: inifilr"
 
     CALL inifgn(eignvl)
-
-    call new_unit(unit)
-    open(unit, file = "eignvl.txt", status = "replace", action = "write") 
-    write(unit, fmt = *) EIGNVL
-    close(unit)
 
     ! compute eigenvalues and eigenfunctions
     ! compute the filtering coefficients for scalar lines and
@@ -76,136 +72,133 @@ contains
     PRINT *, 'colat0 = ', colat0
 
     rlamda = iim / (pi * colat0 / grossismx) / sqrt(abs(eignvl(2: iim)))
+
+    ! Determination de jfiltnu, jfiltsu, jfiltnv, jfiltsv
+
+    jfiltnu = (jjm + 1) / 2
+    do while (cos(rlatu(jfiltnu)) >= colat0 &
+         .or. rlamda(iim) * cos(rlatu(jfiltnu)) >= 1.)
+       jfiltnu = jfiltnu - 1
+    end do
+
+    jfiltsu = jjm / 2 + 2
+    do while (cos(rlatu(jfiltsu)) >= colat0 &
+         .or. rlamda(iim) * cos(rlatu(jfiltsu)) >= 1.)
+       jfiltsu = jfiltsu + 1
+    end do
+
+    jfiltnv = jjm / 2
+    do while ((cos(rlatv(jfiltnv)) >= colat0 &
+         .or. rlamda(iim) * cos(rlatv(jfiltnv)) >= 1.) .and. jfiltnv >= 2)
+       jfiltnv = jfiltnv - 1
+    end do
+
+    if (cos(rlatv(jfiltnv)) >= colat0 &
+         .or. rlamda(iim) * cos(rlatv(jfiltnv)) >= 1.) then
+       ! {jfiltnv == 1}
+       PRINT *, 'Could not find jfiltnv.'
+       STOP 1
+    END IF
+
+    jfiltsv = (jjm + 1)/ 2 + 1
+    do while ((cos(rlatv(jfiltsv)) >= colat0 &
+         .or. rlamda(iim) * cos(rlatv(jfiltsv)) >= 1.) .and. jfiltsv <= jjm - 1)
+       jfiltsv = jfiltsv + 1
+    end do
+
+    IF (cos(rlatv(jfiltsv)) >= colat0 &
+         .or. rlamda(iim) * cos(rlatv(jfiltsv)) >= 1.) THEN
+       ! {jfiltsv == jjm}
+       PRINT *, 'Could not find jfiltsv.'
+       STOP 1
+    END IF
+
+    PRINT *, 'jfiltnu =', jfiltnu
+    PRINT *, 'jfiltsu =', jfiltsu
+    PRINT *, 'jfiltnv =', jfiltnv
+    PRINT *, 'jfiltsv =', jfiltsv
+
+    ! Determination de coefilu, coefilv, modfrst[ns][uv]:
+
+    allocate(modfrstnu(2:jfiltnu), modfrstsu(jfiltsu:jjm))
+    allocate(modfrstnv(jfiltnv), modfrstsv(jfiltsv:jjm))
     coefilu = 0.
     coefilv = 0.
     coefilu2 = 0.
     coefilv2 = 0.
 
-    ! Determination de jfiltnu, jfiltnv, jfiltsu, jfiltsv
-
-    DO j = 2, jjm / 2 + 1
-       IF (cos(rlatu(j)) / colat0 < 1. &
-            .and. rlamda(iim) * cos(rlatu(j)) < 1.) jfiltnu = j
-
-       IF (cos(rlatu(jjm - j + 2)) / colat0 < 1. &
-            .and. rlamda(iim) * cos(rlatu(jjm - j + 2)) < 1.) &
-            jfiltsu = jjm - j + 2
-    END DO
-
-    DO j = 1, jjm / 2
-       IF (cos(rlatv(j)) / colat0 < 1. .and. rlamda(iim) * cos(rlatv(j)) < 1.) &
-            jfiltnv = j
-
-       IF (cos(rlatv(jjm - j + 1)) / colat0 < 1. .and. rlamda(iim) &
-            * cos(rlatv(jjm - j + 1)) < 1.) jfiltsv = jjm - j + 1
-    END DO
-
-    IF (jfiltnu <= 0) jfiltnu = 1
-    IF (jfiltnu > jjm / 2 + 1) THEN
-       PRINT *, 'jfiltnu en dehors des valeurs acceptables ', jfiltnu
-       STOP 1
-    END IF
-
-    IF (jfiltsu <= 0) jfiltsu = 1
-    IF (jfiltsu > jjm + 1) THEN
-       PRINT *, 'jfiltsu en dehors des valeurs acceptables ', jfiltsu
-       STOP 1
-    END IF
-
-    IF (jfiltnv <= 0) jfiltnv = 1
-    IF (jfiltnv > jjm / 2) THEN
-       PRINT *, 'jfiltnv en dehors des valeurs acceptables ', jfiltnv
-       STOP 1
-    END IF
-
-    IF (jfiltsv <= 0) jfiltsv = 1
-    IF (jfiltsv > jjm) THEN
-       PRINT *, 'jfiltsv en dehors des valeurs acceptables ', jfiltsv
-       STOP 1
-    END IF
-
-    PRINT *, 'jfiltnv jfiltsv jfiltnu jfiltsu ', jfiltnv, jfiltsv, jfiltnu, &
-         jfiltsu
-
-    ! Determination de coefilu, coefilv, n=modfrstu, modfrstv
-
-    DO j = 1, jjm
-       modfrstu(j) = iim
-       modfrstv(j) = iim
-    END DO
-
     DO j = 2, jfiltnu
-       DO k = 2, iim
-          IF (rlamda(k) * cos(rlatu(j)) < 1.) exit
-       end DO
-       if (k == iim + 1) cycle
-       modfrstu(j) = k
+       modfrstnu(j) = 2
+       do while (rlamda(modfrstnu(j)) * cos(rlatu(j)) >= 1. &
+            .and. modfrstnu(j) <= iim - 1)
+          modfrstnu(j) = modfrstnu(j) + 1
+       end do
 
-       kf = modfrstu(j)
-       DO k = kf, iim
-          cof = rlamda(k) * cos(rlatu(j))
-          coefilu(k, j) = cof - 1.
-          coefilu2(k, j) = cof**2 - 1.
-       end DO
+       if (rlamda(modfrstnu(j)) * cos(rlatu(j)) < 1.) then
+          DO k = modfrstnu(j), iim
+             cof = rlamda(k) * cos(rlatu(j))
+             coefilu(k, j) = cof - 1.
+             coefilu2(k, j) = cof**2 - 1.
+          end DO
+       end if
     END DO
 
     DO j = 1, jfiltnv
-       DO k = 2, iim
-          IF (rlamda(k) * cos(rlatv(j)) < 1.) exit
-       end DO
-       if (k == iim + 1) cycle
-       modfrstv(j) = k
+       modfrstnv(j) = 2
+       do while (rlamda(modfrstnv(j)) * cos(rlatv(j)) >= 1. &
+            .and. modfrstnv(j) <= iim - 1)
+          modfrstnv(j) = modfrstnv(j) + 1
+       end do
 
-       kf = modfrstv(j)
-       DO k = kf, iim
-          cof = rlamda(k) * cos(rlatv(j))
-          coefilv(k, j) = cof - 1.
-          coefilv2(k, j) = cof**2 - 1.
-       end DO
+       if (rlamda(modfrstnv(j)) * cos(rlatv(j)) < 1.) then
+          DO k = modfrstnv(j), iim
+             cof = rlamda(k) * cos(rlatv(j))
+             coefilv(k, j) = cof - 1.
+             coefilv2(k, j) = cof**2 - 1.
+          end DO
+       end if
     end DO
 
     DO j = jfiltsu, jjm
-       DO k = 2, iim
-          IF (rlamda(k) * cos(rlatu(j)) < 1.) exit
-       end DO
-       if (k == iim + 1) cycle
-       modfrstu(j) = k
+       modfrstsu(j) = 2
+       do while (rlamda(modfrstsu(j)) * cos(rlatu(j)) >= 1. &
+            .and. modfrstsu(j) <= iim - 1)
+          modfrstsu(j) = modfrstsu(j) + 1
+       end do
 
-       kf = modfrstu(j)
-       DO k = kf, iim
-          cof = rlamda(k) * cos(rlatu(j))
-          coefilu(k, j) = cof - 1.
-          coefilu2(k, j) = cof**2 - 1.
-       end DO
+       if (rlamda(modfrstsu(j)) * cos(rlatu(j)) < 1.) then
+          DO k = modfrstsu(j), iim
+             cof = rlamda(k) * cos(rlatu(j))
+             coefilu(k, j) = cof - 1.
+             coefilu2(k, j) = cof**2 - 1.
+          end DO
+       end if
     end DO
 
     DO j = jfiltsv, jjm
-       DO k = 2, iim
-          IF (rlamda(k) * cos(rlatv(j)) < 1.) exit
-       end DO
-       if (k == iim + 1) cycle
-       modfrstv(j) = k
+       modfrstsv(j) = 2
+       do while (rlamda(modfrstsv(j)) * cos(rlatv(j)) >= 1. &
+            .and. modfrstsv(j) <= iim - 1)
+          modfrstsv(j) = modfrstsv(j) + 1
+       end do
 
-       kf = modfrstv(j)
-       DO k = kf, iim
-          cof = rlamda(k) * cos(rlatv(j))
-          coefilv(k, j) = cof - 1.
-          coefilv2(k, j) = cof**2 - 1.
-       end DO
+       if (rlamda(modfrstsv(j)) * cos(rlatv(j)) < 1.) then
+          DO k = modfrstsv(j), iim
+             cof = rlamda(k) * cos(rlatv(j))
+             coefilv(k, j) = cof - 1.
+             coefilv2(k, j) = cof**2 - 1.
+          end DO
+       end if
     END DO
 
-    IF (jfiltnv>=jjm / 2 .OR. jfiltnu>=jjm / 2) THEN
-       IF (jfiltnv == jfiltsv) jfiltsv = 1 + jfiltnv
-       IF (jfiltnu == jfiltsu) jfiltsu = 1 + jfiltnu
-
-       PRINT *, 'jfiltnv jfiltsv jfiltnu jfiltsu', jfiltnv, jfiltsv, jfiltnu, &
-            jfiltsu
-    END IF
-
-    PRINT *, 'Modes premiers v '
-    PRINT 334, modfrstv
-    PRINT *, 'Modes premiers u '
-    PRINT 334, modfrstu
+    call new_unit(unit)
+    open(unit, file = "inifilr_out.txt", status = "replace", action = "write") 
+    write(unit, fmt = *) '"EIGNVL"', eignvl
+    write(unit, fmt = *) '"modfrstnu"', modfrstnu
+    write(unit, fmt = *) '"modfrstsu"', modfrstsu
+    write(unit, fmt = *) '"modfrstnv"', modfrstnv
+    write(unit, fmt = *) '"modfrstsv"', modfrstsv
+    close(unit)
 
     allocate(matriceun(iim, iim, 2:jfiltnu), matrinvn(iim, iim, 2:jfiltnu))
     allocate(matricevn(iim, iim, jfiltnv))
@@ -217,7 +210,7 @@ contains
 
     DO j = 2, jfiltnu
        DO i = 1, iim
-          IF (i < modfrstu(j)) then
+          IF (i < modfrstnu(j)) then
              coff = 0.
           else
              coff = coefilu(i, j)
@@ -229,7 +222,7 @@ contains
 
     DO j = jfiltsu, jjm
        DO i = 1, iim
-          IF (i < modfrstu(j)) then
+          IF (i < modfrstsu(j)) then
              coff = 0.
           else
              coff = coefilu(i, j)
@@ -244,7 +237,7 @@ contains
 
     DO j = 1, jfiltnv
        DO i = 1, iim
-          IF (i < modfrstv(j)) then
+          IF (i < modfrstnv(j)) then
              coff = 0.
           else
              coff = coefilv(i, j)
@@ -256,7 +249,7 @@ contains
 
     DO j = jfiltsv, jjm
        DO i = 1, iim
-          IF (i < modfrstv(j)) then
+          IF (i < modfrstsv(j)) then
              coff = 0.
           else
              coff = coefilv(i, j)
@@ -271,7 +264,7 @@ contains
 
     DO j = 2, jfiltnu
        DO i = 1, iim
-          IF (i < modfrstu(j)) then
+          IF (i < modfrstnu(j)) then
              coff = 0.
           else
              coff = coefilu(i, j) / (1. + coefilu(i, j))
@@ -283,7 +276,7 @@ contains
 
     DO j = jfiltsu, jjm
        DO i = 1, iim
-          IF (i < modfrstu(j)) then
+          IF (i < modfrstsu(j)) then
              coff = 0.
           else
              coff = coefilu(i, j) / (1. + coefilu(i, j))
@@ -292,8 +285,6 @@ contains
        END DO
        matrinvs(:, :, j) = matmul(eignfnv, eignft)
     END DO
-
-334 FORMAT (1X, 24I3)
 
   END SUBROUTINE inifilr
 

@@ -48,7 +48,7 @@ SUBROUTINE initphysto(infile,rlon,rlat,tstep,t_ops,t_wrt,nq,fileid)
   INTEGER nhoriid, i
   REAL, INTENT (IN) :: tstep
   REAL t_ops, t_wrt
-  INTEGER fileid, filevid
+  INTEGER fileid
   INTEGER nq, l
   REAL nivsigs(llm)
 
@@ -58,9 +58,7 @@ SUBROUTINE initphysto(infile,rlon,rlat,tstep,t_ops,t_wrt,nq,fileid)
   REAL zjulian
   CHARACTER(len=3) str
   CHARACTER(len=10) ctrac
-  INTEGER iq
   INTEGER uhoriid, vhoriid, thoriid, zvertiid
-  INTEGER ii, jj
   LOGICAL ok_sync
   REAL zx_lon(iim,jjm+1), zx_lat(iim,jjm+1)
 

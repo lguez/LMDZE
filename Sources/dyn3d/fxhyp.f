@@ -10,12 +10,12 @@ contains
     ! Author: P. Le Van, from formulas by R. Sadourny
 
     ! Calcule les longitudes et dérivées dans la grille du GCM pour
-    ! une fonction f(x) à dérivée tangente hyperbolique.
+    ! une fonction x_f(\tilde x) à dérivée tangente hyperbolique.
 
     ! Il vaut mieux avoir : grossismx \times delta < pi
 
     ! Le premier point scalaire pour une grille regulière (grossismx =
-    ! 1., taux = 0., clon = 0.) est à - 180 degrés.
+    ! 1) avec clon = 0 est à - 180 degrés.
 
     USE dimens_m, ONLY: iim
     use dynetat0_m, only: clon, grossismx, dzoomx, taux

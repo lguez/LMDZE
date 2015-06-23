@@ -503,7 +503,6 @@ contains
     REAL ue_lay(klon, llm) ! transport zonal de l'energie a chaque niveau vert.
     REAL uq_lay(klon, llm) ! transport zonal de l'eau a chaque niveau vert.
 
-    REAL zsto
     real date0
 
     ! Variables li\'ees au bilan d'\'energie et d'enthalpie :
@@ -1494,8 +1493,7 @@ contains
       USE histsync_m, ONLY: histsync
       USE histwrite_m, ONLY: histwrite
 
-      real zout
-      integer itau_w ! pas de temps ecriture
+      integer i, itau_w ! pas de temps ecriture
       REAL zx_tmp_2d(iim, jjm + 1), zx_tmp_3d(iim, jjm + 1, llm)
 
       !--------------------------------------------------
@@ -1503,15 +1501,11 @@ contains
       IF (ok_instan) THEN
          ! Champs 2D:
 
-         zsto = dtphys * ecrit_ins
-         zout = dtphys * ecrit_ins
          itau_w = itau_phy + itap
 
-         i = NINT(zout/zsto)
          CALL gr_fi_ecrit(1, klon, iim, jjm + 1, pphis, zx_tmp_2d)
          CALL histwrite(nid_ins, "phis", itau_w, zx_tmp_2d)
 
-         i = NINT(zout/zsto)
          CALL gr_fi_ecrit(1, klon, iim, jjm + 1, airephy, zx_tmp_2d)
          CALL histwrite(nid_ins, "aire", itau_w, zx_tmp_2d)
 

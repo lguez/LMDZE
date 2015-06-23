@@ -27,7 +27,7 @@ module dynetat0_m
   ! de la zone totale)
 
   real taux, tauy
-  ! raideur de la transition de l'int\'erieur à l'ext\'erieur du zoom
+  ! raideur de la transition de l'int\'erieur \`a l'ext\'erieur du zoom
   
   real rlatu(jjm + 1)
   ! (latitudes of points of the "scalar" and "u" grid, in rad)
@@ -41,7 +41,7 @@ module dynetat0_m
   ! (longitudes of points of the "scalar" and "v" grid, in rad)
 
   real xprimu(iim + 1), xprimv(iim + 1)
-  ! xprimu et xprimv sont respectivement les valeurs de dx / dX aux
+  ! xprimu et xprimv sont respectivement les valeurs de dx / di aux
   ! points u et v.
 
   REAL xprimm025(iim + 1), xprimp025(iim + 1)
