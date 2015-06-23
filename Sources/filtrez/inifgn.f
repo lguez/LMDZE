@@ -42,9 +42,9 @@ contains
     unsddv = 1. / sddv
 
     b = 0.
-    b(iim, 1) = 1. / (sddu(iim) * sddv(1))
-    forall (i = 1:iim) b(i, i) = - 1./ (sddu(i) * sddv(i))
-    forall (i = 1:iim - 1) b(i, i + 1) = 1. / (sddu(i) * sddv(i + 1))
+    b(iim, 1) = unsddu(iim) * unsddv(1)
+    forall (i = 1:iim) b(i, i) = - unsddu(i) * unsddv(i)
+    forall (i = 1:iim - 1) b(i, i + 1) = unsddu(i) * unsddv(i + 1)
 
     c = - transpose(b)
 
