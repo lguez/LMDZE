@@ -4,13 +4,13 @@ module physiq_m
 
 contains
 
-  SUBROUTINE physiq(lafin, dayvrai, time, dtphys, paprs, play, pphi, pphis, &
-       u, v, t, qx, omega, d_u, d_v, d_t, d_qx)
+  SUBROUTINE physiq(lafin, dayvrai, time, paprs, play, pphi, pphis, u, v, t, &
+       qx, omega, d_u, d_v, d_t, d_qx)
 
     ! From phylmd/physiq.F, version 1.22 2006/02/20 09:38:28
     ! (subversion revision 678)
 
-    ! Author: Z.X. Li (LMD/CNRS) 1993
+    ! Author: Z. X. Li (LMD/CNRS) 1993
 
     ! This is the main procedure for the "physics" part of the program.
 
@@ -25,9 +25,10 @@ contains
          ok_orodr, ok_orolf
     USE clmain_m, ONLY: clmain
     use clouds_gno_m, only: clouds_gno
+    use comconst, only: dtphys
     USE comgeomphy, ONLY: airephy
     USE concvl_m, ONLY: concvl
-    USE conf_gcm_m, ONLY: offline, raz_date
+    USE conf_gcm_m, ONLY: offline, raz_date, day_step, iphysiq
     USE conf_phys_m, ONLY: conf_phys
     use conflx_m, only: conflx
     USE ctherm, ONLY: iflag_thermals, nsplit_thermals
@@ -70,7 +71,6 @@ contains
     ! current day number, based at value 1 on January 1st of annee_ref
 
     REAL, intent(in):: time ! heure de la journ\'ee en fraction de jour
-    REAL, intent(in):: dtphys ! pas d'integration pour la physique (seconde)
 
     REAL, intent(in):: paprs(:, :) ! (klon, llm + 1)
     ! pression pour chaque inter-couche, en Pa
@@ -319,8 +319,7 @@ contains
     REAL dlw(klon) ! derivee infra rouge
     SAVE dlw
     REAL bils(klon) ! bilan de chaleur au sol
-    REAL fder(klon) ! Derive de flux (sensible et latente) 
-    save fder
+    REAL, save:: fder(klon) ! Derive de flux (sensible et latente) 
     REAL ve(klon) ! integr. verticale du transport meri. de l'energie
     REAL vq(klon) ! integr. verticale du transport meri. de l'eau
     REAL ue(klon) ! integr. verticale du transport zonal de l'energie
@@ -370,21 +369,16 @@ contains
     ! Le rayonnement n'est pas calcul\'e tous les pas, il faut donc que
     ! les variables soient r\'emanentes.
     REAL, save:: heat(klon, llm) ! chauffage solaire
-    REAL heat0(klon, llm) ! chauffage solaire ciel clair
+    REAL, save:: heat0(klon, llm) ! chauffage solaire ciel clair
     REAL, save:: cool(klon, llm) ! refroidissement infrarouge
-    REAL cool0(klon, llm) ! refroidissement infrarouge ciel clair
+    REAL, save:: cool0(klon, llm) ! refroidissement infrarouge ciel clair
     REAL, save:: topsw(klon), toplw(klon), solsw(klon)
     REAL, save:: sollw(klon) ! rayonnement infrarouge montant \`a la surface
     real, save:: sollwdown(klon) ! downward LW flux at surface
     REAL, save:: topsw0(klon), toplw0(klon), solsw0(klon), sollw0(klon)
-    REAL albpla(klon)
+    REAL, save:: albpla(klon)
     REAL fsollw(klon, nbsrf) ! bilan flux IR pour chaque sous surface
     REAL fsolsw(klon, nbsrf) ! flux solaire absorb. pour chaque sous surface
-    SAVE albpla
-    SAVE heat0, cool0
-
-    INTEGER itaprad
-    SAVE itaprad
 
     REAL conv_q(klon, llm) ! convergence de l'humidite (kg/kg/s)
     REAL conv_t(klon, llm) ! convergence of temperature (K/s)
@@ -632,7 +626,6 @@ contains
 
        frugs = 0.
        itap = 0
-       itaprad = 0
        CALL phyetat0(pctsrf, ftsol, ftsoil, tslab, seaice, fqsurf, qsol, &
             fsnow, falbe, falblw, fevap, rain_fall, snow_fall, solsw, sollw, &
             dlw, radsol, frugs, agesno, zmea, zstd, zsig, zgam, zthe, zpic, &
@@ -642,18 +635,15 @@ contains
        ! ATTENTION : il faudra a terme relire q2 dans l'etat initial
        q2 = 1e-8
 
-       radpas = NINT(86400. / dtphys / nbapp_rad)
+       lmt_pas = day_step / iphysiq
+       print *, 'Number of time steps of "physics" per day: ', lmt_pas
 
-       ! on remet le calendrier a zero
+       radpas = lmt_pas / nbapp_rad
+
+       ! On remet le calendrier a zero
        IF (raz_date) itau_phy = 0
 
        CALL printflag(radpas, ok_journe, ok_instan, ok_region)
-
-       IF (dtphys * radpas > 21600. .AND. cycle_diurne) THEN 
-          print *, "Au minimum 4 appels par jour si cycle diurne"
-          call abort_gcm('physiq', &
-               "Nombre d'appels au rayonnement insuffisant", 1)
-       ENDIF
 
        ! Initialisation pour le sch\'ema de convection d'Emanuel :
        IF (iflag_con >= 3) THEN
@@ -667,9 +657,6 @@ contains
        else
           rugoro = 0.
        ENDIF
-
-       lmt_pas = NINT(86400. / dtphys) ! tous les jours
-       print *, 'Number of time steps of "physics" per day: ', lmt_pas
 
        ecrit_ins = NINT(ecrit_ins/dtphys)
        ecrit_hf = NINT(ecrit_hf/dtphys)
@@ -798,14 +785,14 @@ contains
     ! Couche limite:
 
     CALL clmain(dtphys, itap, pctsrf, pctsrf_new, t_seri, q_seri, u_seri, &
-         v_seri, julien, mu0, co2_ppm, ftsol, cdmmax, cdhmax, &
-         ksta, ksta_ter, ok_kzmin, ftsoil, qsol, paprs, play, fsnow, fqsurf, &
-         fevap, falbe, falblw, fluxlat, rain_fall, snow_fall, fsolsw, fsollw, &
-         fder, rlat, frugs, firstcal, agesno, rugoro, d_t_vdf, d_q_vdf, &
-         d_u_vdf, d_v_vdf, d_ts, fluxt, fluxq, fluxu, fluxv, cdragh, cdragm, &
-         q2, dsens, devap, ycoefh, yu1, yv1, t2m, q2m, u10m, v10m, pblh, &
-         capCL, oliqCL, cteiCL, pblT, therm, trmb1, trmb2, trmb3, plcl, &
-         fqcalving, ffonte, run_off_lic_0, fluxo, fluxg, tslab)
+         v_seri, julien, mu0, co2_ppm, ftsol, cdmmax, cdhmax, ksta, ksta_ter, &
+         ok_kzmin, ftsoil, qsol, paprs, play, fsnow, fqsurf, fevap, falbe, &
+         falblw, fluxlat, rain_fall, snow_fall, fsolsw, fsollw, fder, rlat, &
+         frugs, firstcal, agesno, rugoro, d_t_vdf, d_q_vdf, d_u_vdf, d_v_vdf, &
+         d_ts, fluxt, fluxq, fluxu, fluxv, cdragh, cdragm, q2, dsens, devap, &
+         ycoefh, yu1, yv1, t2m, q2m, u10m, v10m, pblh, capCL, oliqCL, cteiCL, &
+         pblT, therm, trmb1, trmb2, trmb3, plcl, fqcalving, ffonte, &
+         run_off_lic_0, fluxo, fluxg, tslab)
 
     ! Incr\'ementation des flux
 
@@ -1251,7 +1238,7 @@ contains
             bl95_b1, cldtaupi, re, fl)
     endif
 
-    IF (MOD(itaprad, radpas) == 0) THEN
+    IF (MOD(itap - 1, radpas) == 0) THEN
        ! Appeler le rayonnement mais calculer tout d'abord l'albedo du sol.
        DO i = 1, klon
           albsol(i) = falbe(i, is_oce) * pctsrf(i, is_oce) &
@@ -1270,10 +1257,7 @@ contains
             sollwdown, topsw0, toplw0, solsw0, sollw0, lwdn0, lwdn, lwup0, &
             lwup, swdn0, swdn, swup0, swup, ok_ade, ok_aie, tau_ae, piz_ae, &
             cg_ae, topswad, solswad, cldtaupi, topswai, solswai)
-       itaprad = 0
     ENDIF
-
-    itaprad = itaprad + 1
 
     ! Ajouter la tendance des rayonnements (tous les pas)
 

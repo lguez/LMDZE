@@ -5,8 +5,8 @@ module clesphys2
   implicit none
 
   LOGICAL:: cycle_diurne = .TRUE.
-  ! Cette option permet d'éteindre le cycle diurne. Peut être utile
-  ! pour accélérer le code.
+  ! Cette option permet d'\'eteindre le cycle diurne. Peut \^etre utile
+  ! pour acc\'el\'erer le code.
 
   LOGICAL:: soil_model = .TRUE.
   ! Choix du modele de sol (Thermique ?)
@@ -37,6 +37,7 @@ contains
 
     use unit_nml_m, only: unit_nml
     use nr_util, only: assert
+    use conf_gcm_m, only: day_step, iphysiq
 
     namelist /clesphys2_nml/cycle_diurne, soil_model, new_oliq, ok_orodr, &
          ok_orolf, ok_limitvrai, nbapp_rad, iflag_con
@@ -47,6 +48,11 @@ contains
     read(unit=*, nml=clesphys2_nml)
     write(unit_nml, nml=clesphys2_nml)
     call assert(iflag_con >= 2 .and. iflag_con <= 4, "read_clesphys2 iflag_con")
+    call assert(mod(day_step / iphysiq, nbapp_rad) == 0, &
+         "read_clesphys2 nbapp_rad")
+    call assert(nbapp_rad >= 4 .or. .not. cycle_diurne, &
+         "read_clesphys2: minimum 4 calls to radiative transfer per day if " &
+         // "cycle diurne")
 
   end subroutine read_clesphys2
 

@@ -4,8 +4,8 @@ module calfis_m
 
 contains
 
-  SUBROUTINE calfis(dayvrai, time, ucov, vcov, teta, q, pk, phis, phi, w, &
-       dufi, dvfi, dtetafi, dqfi, lafin)
+  SUBROUTINE calfis(ucov, vcov, teta, q, pk, phis, phi, w, dufi, dvfi, &
+       dtetafi, dqfi, dayvrai, time, lafin)
 
     ! From dyn3d/calfis.F, version 1.3, 2005/05/25 13:10:09
     ! Authors: P. Le Van, F. Hourdin
@@ -30,7 +30,7 @@ contains
     ! rayonnement) et l'aire de la maille (quand on veut int\'egrer une
     ! grandeur horizontalement).
 
-    use comconst, only: kappa, cpp, dtphys, g
+    use comconst, only: kappa, cpp, g
     use comgeom, only: apoln, cu_2d, cv_2d, unsaire_2d, apols
     use dimens_m, only: iim, jjm, llm, nqmx
     use dimphy, only: klon
@@ -40,11 +40,6 @@ contains
     use nr_util, only: pi
     use physiq_m, only: physiq
     use pressure_var, only: p3d, pls
-
-    integer, intent(in):: dayvrai
-    ! current day number, based at value 1 on January 1st of annee_ref
-
-    REAL, intent(in):: time ! time of day, as a fraction of day length
 
     REAL, intent(in):: ucov(:, :, :) ! (iim + 1, jjm + 1, llm) 
     ! covariant zonal velocity
@@ -75,6 +70,11 @@ contains
     ! tendency for the potential temperature
 
     REAL, intent(out):: dqfi(:, :, :, :) ! (iim + 1, jjm + 1, llm, nqmx)
+
+    integer, intent(in):: dayvrai
+    ! current day number, based at value 1 on January 1st of annee_ref
+
+    REAL, intent(in):: time ! time of day, as a fraction of day length
     LOGICAL, intent(in):: lafin
 
     ! Local:
@@ -179,8 +179,8 @@ contains
     forall(l = 1: llm) v(:, l) = pack(zvfi(:, :, l), dyn_phy)
 
     ! Appel de la physique :
-    CALL physiq(lafin, dayvrai, time, dtphys, paprs, play, pphi, pphis, u, &
-         v, t, qx, omega, d_u, d_v, d_t, d_qx)
+    CALL physiq(lafin, dayvrai, time, paprs, play, pphi, pphis, u, v, t, qx, &
+         omega, d_u, d_v, d_t, d_qx)
 
     ! transformation des tendances physiques en tendances dynamiques:
 

@@ -2,11 +2,9 @@ module conf_gcm_m
 
   IMPLICIT NONE
 
-  INTEGER:: nday = 10 ! nombre de jours d'intégration
-  integer:: day_step = 240 ! nombre de pas par jour, multiple de iperiod
-
-  integer:: iperiod = 5
-  ! periode pour le pas Matsuno (en pas de temps)
+  INTEGER:: nday = 10 ! nombre de jours d'int\'egration
+  integer:: day_step = 240 ! nombre de pas de temps de la dynamique par jour
+  integer:: iperiod = 5 ! periode pour le pas Matsuno (en pas de temps)
 
   integer:: iapp_tracvl = 5
   ! Should normally be equal to "iperiod"
@@ -21,8 +19,8 @@ module conf_gcm_m
   ! number of time steps of dynamics between calls to physics
 
   logical:: raz_date = .false.
-  ! prise en compte de la date initiale de la namelist et remise à
-  ! zéro des compteurs de pas de temps (sinon on garde la date du
+  ! prise en compte de la date initiale de la namelist et remise \`a
+  ! z\'ero des compteurs de pas de temps (sinon on garde la date du
   ! fichier restart)
 
   integer:: periodav = 1 
@@ -31,17 +29,17 @@ module conf_gcm_m
   logical:: offline = .FALSE.
   ! permet de mettre en route la nouvelle parametrisation de l'eau liquide
 
-  integer:: prt_level = 0 ! niveau d'impression souhaité (0 = minimum)
+  integer:: prt_level = 0 ! niveau d'impression souhait\'e (0 = minimum)
 
   LOGICAL:: purmats= .FALSE.
   ! Help = Choix du schema d'integration temporel.
   ! y = pure Matsuno sinon c'est du Matsuno-leapfrog
 
   INTEGER:: iflag_phys = 1
-  ! contrôle l'appel à la physique :
+  ! contr\^ole l'appel \`a la physique :
   ! 0 : pas de physique
-  ! 1 : physique normale (appel à phylmd, phymars...) (default)
-  ! 2 : rappel Newtonien pour la température + friction au sol
+  ! 1 : physique normale (appel \`a phylmd, phymars...) (default)
+  ! 2 : rappel Newtonien pour la temp\'erature + friction au sol
 
 contains
 

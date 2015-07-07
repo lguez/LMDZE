@@ -1,59 +1,32 @@
-SUBROUTINE alboc_cd(rmu0, albedo)
-  ! From LMDZ4/libf/phylmd/albedo.F,v 1.2 2005/02/07 15:00:52
-  USE dimens_m
-  USE dimphy
+module alboc_cd_m
+
   IMPLICIT NONE
-  ! ======================================================================
-  ! Auteur(s): Z.X. Li (LMD/CNRS)
-  ! date: 19940624
-  ! Calculer l'albedo sur l'ocean en fonction de l'angle zenithal moyen
-  ! Formule due a Larson and Barkstrom (1977) Proc. of the symposium
-  ! on radiation in the atmosphere, 19-28 August 1976, science Press,
-  ! 1977 pp 451-453, ou These de 3eme cycle de Sylvie Joussaume.
 
-  ! Arguments
-  ! rmu0    (in): cosinus de l'angle solaire zenithal
-  ! albedo (out): albedo de surface de l'ocean
-  ! ======================================================================
-  REAL rmu0(klon), albedo(klon)
+contains
 
-  REAL fmagic ! un facteur magique pour regler l'albedo
-  ! cc      PARAMETER (fmagic=0.7)
-  ! ccIM => a remplacer
-  ! PARAMETER (fmagic=1.32)
-  PARAMETER (fmagic=1.0)
-  ! PARAMETER (fmagic=0.7)
+  SUBROUTINE alboc_cd(rmu0, albedo)
 
-  REAL fauxo
-  INTEGER i
-  ! ccIM
-  LOGICAL ancien_albedo
-  PARAMETER (ancien_albedo=.FALSE.)
-  ! SAVE albedo
+    ! From LMDZ4/libf/phylmd/albedo.F, version 1.2 2005/02/07 15:00:52
 
-  IF (ancien_albedo) THEN
+    ! Author: Z. X. Li (LMD/CNRS)
+    ! Date: 1994/06/24
 
-    DO i = 1, klon
+    ! Calculer l'alb\'edo sur l'oc\'ean en fonction de l'angle
+    ! z\'enithal moyen. Formule due \`a Larson and Barkstrom,
+    ! Proceedings of the symposium on radiation in the atmosphere,
+    ! 19-28 August 1976, science Press, 1977, pages 451-453, ou
+    ! th\`ese de 3\`eme cycle de Sylvie Joussaume.
 
-      rmu0(i) = max(rmu0(i), 0.0)
+    REAL, intent(in):: rmu0(:) ! cosinus de l'angle solaire z\'enithal
+    real, intent(out):: albedo(:) ! alb\'edo de surface de l'oc\'ean
 
-      fauxo = (1.47-acos(rmu0(i)))/0.15
-      albedo(i) = fmagic*(.03+.630/(1.+fauxo*fauxo))
-      albedo(i) = max(min(albedo(i),0.60), 0.04)
-    END DO
+    ! Local:
+    REAL, PARAMETER:: fmagic = 1. ! facteur magique pour r\'egler l'alb\'edo
 
-    ! nouvel albedo
+    !----------------------------------------------------------
 
-  ELSE
+    albedo = max(min(fmagic * 0.058 / (max(rmu0, 0.) + 0.3), 0.6), 0.04)
 
-    DO i = 1, klon
-      rmu0(i) = max(rmu0(i), 0.0)
-      ! IM:orig albedo(i) = 0.058/(rmu0(i) + 0.30)
-      albedo(i) = fmagic*0.058/(rmu0(i)+0.30)
-      albedo(i) = max(min(albedo(i),0.60), 0.04)
-    END DO
+  END SUBROUTINE alboc_cd
 
-  END IF
-
-  RETURN
-END SUBROUTINE alboc_cd
+end module alboc_cd_m

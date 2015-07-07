@@ -170,9 +170,9 @@ contains
        end if
 
        IF (MOD(itau + 1, iphysiq) == 0 .AND. iflag_phys /= 0) THEN
-          CALL calfis(itau / day_step + day_ini, &
-               REAL(mod(itau, day_step)) / day_step, ucov, vcov, teta, q, pk, &
-               phis, phi, w, dufi, dvfi, dtetafi, dqfi, &
+          CALL calfis(ucov, vcov, teta, q, pk, phis, phi, w, dufi, dvfi, &
+               dtetafi, dqfi, dayvrai = itau / day_step + day_ini, &
+               time = REAL(mod(itau, day_step)) / day_step, &
                lafin = itau + 1 == itaufin)
 
           CALL addfi(ucov, vcov, teta, q, dufi, dvfi, dtetafi, dqfi)

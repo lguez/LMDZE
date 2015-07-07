@@ -24,7 +24,7 @@ contains
     ! index des points de la surface \`a traiter
 
     logical, intent(IN):: debut ! premier appel \`a la physique (initialisation)
-    real, intent(out):: alb_new(:) ! (klon) albedo lu
+    real, intent(out):: alb_new(:) ! (knon) albedo lu
     real, intent(out):: z0_new(:) ! (klon) longueur de rugosit\'e lue
 
     ! Local:
@@ -75,9 +75,8 @@ contains
     endif
 
     ! Recopie des variables dans les champs de sortie
-    alb_new(:knon) = alb_lu(knindex(:knon))
+    alb_new = alb_lu(knindex(:knon))
     z0_new(:knon) = rug_lu(knindex(:knon))
-    alb_new(knon + 1:) = 999999.
     z0_new(knon + 1:) = 999999.
 
   END SUBROUTINE interfsur_lim

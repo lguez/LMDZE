@@ -28,6 +28,7 @@ contains
 
     ! Local:
     DOUBLE PRECISION Y
+    DOUBLE PRECISION h ! step of the uniform grid
     integer i, it
 
     DOUBLE PRECISION xvrai(iim), Gvrai(iim) 
@@ -36,9 +37,10 @@ contains
     !------------------------------------------------------------------
 
     it = 0 ! initial guess
+    h = twopi_d / iim
 
     DO i = 1, iim
-       Y = - pi_d + (i + xuv - 0.75d0) * twopi_d / iim
+       Y = - pi_d + (i + xuv - 0.75d0) * h
        ! - pi <= y < pi
        abs_y = abs(y)
 
@@ -61,7 +63,7 @@ contains
     END DO
 
     xlon = xvrai + clon
-    xprim = twopi_d / (iim * Gvrai)
+    xprim = h / Gvrai
 
   end subroutine invert_zoom_x
 

@@ -31,7 +31,7 @@ contains
 
     USE dimens_m, ONLY : iim, jjm
     USE dynetat0_m, ONLY : rlatu, rlatv, xprimu, grossismx
-    use inifgn_m, only: inifgn, eignfnu, eignfnv
+    use inifgn_m, only: inifgn
     use jumble, only: new_unit
     use nr_util, only: pi
 
@@ -43,6 +43,9 @@ contains
     INTEGER i, j, k, unit
     REAL colat0 ! > 0
     REAL eignft(iim, iim), coff
+
+    real eignfnu(iim, iim), eignfnv(iim, iim)
+    ! eigenfunctions of the discrete laplacian
 
     ! Filtering coefficients (lamda_max * cos(rlat) / lamda):
     real coefilu(iim, jjm), coefilv(iim, jjm)
@@ -56,7 +59,7 @@ contains
 
     print *, "Call sequence information: inifilr"
 
-    CALL inifgn(eignvl)
+    CALL inifgn(eignvl, eignfnu, eignfnv)
 
     ! compute eigenvalues and eigenfunctions
     ! compute the filtering coefficients for scalar lines and

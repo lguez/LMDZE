@@ -5,27 +5,42 @@ module clqh_m
 contains
 
   SUBROUTINE clqh(dtime, itime, jour, debut, rlat, knon, nisurf, knindex, &
-       pctsrf, tsoil, qsol, rmu0, co2_ppm, rugos, rugoro, u1lay, &
-       v1lay, coef, t, q, ts, paprs, pplay, delp, radsol, albedo, alblw, &
-       snow, qsurf, precip_rain, precip_snow, fder, swnet, fluxlat, &
-       pctsrf_new, agesno, d_t, d_q, d_ts, z0_new, flux_t, flux_q, dflux_s, &
-       dflux_l, fqcalving, ffonte, run_off_lic_0, flux_o, flux_g)
+       pctsrf, tsoil, qsol, rmu0, co2_ppm, rugos, rugoro, u1lay, v1lay, coef, &
+       t, q, ts, paprs, pplay, delp, radsol, albedo, alblw, snow, qsurf, &
+       precip_rain, precip_snow, fder, swnet, fluxlat, pctsrf_new, agesno, &
+       d_t, d_q, d_ts, z0_new, flux_t, flux_q, dflux_s, dflux_l, fqcalving, &
+       ffonte, run_off_lic_0, flux_o, flux_g)
 
     ! Author: Z. X. Li (LMD/CNRS)
     ! Date: 1993/08/18
     ! Objet : diffusion verticale de "q" et de "h"
 
-    USE conf_phys_m, ONLY : iflag_pbl
-    USE dimens_m, ONLY : iim, jjm
-    USE dimphy, ONLY : klev, klon
-    USE dimsoil, ONLY : nsoilmx
-    USE indicesol, ONLY : is_ter, nbsrf
-    USE interfsurf_hq_m, ONLY : interfsurf_hq
-    USE suphec_m, ONLY : rcpd, rd, rg, rkappa
+    USE conf_phys_m, ONLY: iflag_pbl
+    USE dimens_m, ONLY: iim, jjm
+    USE dimphy, ONLY: klev, klon
+    USE dimsoil, ONLY: nsoilmx
+    USE indicesol, ONLY: is_ter, nbsrf
+    USE interfsurf_hq_m, ONLY: interfsurf_hq
+    USE suphec_m, ONLY: rcpd, rd, rg, rkappa
 
-    ! Arguments:
-    INTEGER, intent(in):: knon
     REAL, intent(in):: dtime              ! intervalle du temps (s)
+    integer, intent(in):: itime
+    integer, intent(in):: jour            ! jour de l'annee en cours
+    logical, intent(in):: debut
+    real, intent(in):: rlat(klon)
+    INTEGER, intent(in):: knon
+    integer nisurf
+    integer, intent(in):: knindex(:) ! (knon)
+    real, intent(in):: pctsrf(klon, nbsrf)
+    REAL tsoil(klon, nsoilmx)
+
+    REAL, intent(inout):: qsol(klon)
+    ! column-density of water in soil, in kg m-2
+
+    real, intent(in):: rmu0(klon)         ! cosinus de l'angle solaire zenithal
+    REAL, intent(in):: co2_ppm            ! taux CO2 atmosphere
+    real rugos(klon)        ! rugosite
+    REAL rugoro(klon)
     REAL u1lay(klon)        ! vitesse u de la 1ere couche (m/s)
     REAL v1lay(klon)        ! vitesse v de la 1ere couche (m/s)
 
@@ -37,13 +52,12 @@ contains
     REAL t(klon, klev)       ! temperature (K)
     REAL q(klon, klev)       ! humidite specifique (kg/kg)
     REAL, intent(in):: ts(klon) ! temperature du sol (K)
-    REAL evap(klon)         ! evaporation au sol
     REAL paprs(klon, klev+1) ! pression a inter-couche (Pa)
     REAL pplay(klon, klev)   ! pression au milieu de couche (Pa)
     REAL delp(klon, klev)    ! epaisseur de couche en pression (Pa)
     REAL radsol(klon)       ! ray. net au sol (Solaire+IR) W/m2
     REAL albedo(klon)       ! albedo de la surface
-    REAL alblw(klon)
+    REAL, intent(out):: alblw(:) ! (knon)
     REAL snow(klon)         ! hauteur de neige
     REAL qsurf(klon)         ! humidite de l'air au dessus de la surface
 
@@ -53,32 +67,30 @@ contains
     real, intent(in):: precip_snow(klon)
     ! solid water mass flux (kg/m2/s), positive down
 
+    real, intent(inout):: fder(klon)
+    real swnet(klon)
+    real fluxlat(klon)
+    real pctsrf_new(klon, nbsrf)
     REAL agesno(klon)
-    REAL rugoro(klon)
-    REAL run_off_lic_0(klon)! runof glacier au pas de temps precedent
-    integer, intent(in):: jour            ! jour de l'annee en cours
-    real, intent(in):: rmu0(klon)         ! cosinus de l'angle solaire zenithal
-    real rugos(klon)        ! rugosite
-    integer, intent(in):: knindex(:) ! (knon)
-    real, intent(in):: pctsrf(klon, nbsrf)
-    real, intent(in):: rlat(klon)
-    REAL, intent(in):: co2_ppm            ! taux CO2 atmosphere
-
     REAL d_t(klon, klev)     ! incrementation de "t"
     REAL d_q(klon, klev)     ! incrementation de "q"
     REAL, intent(out):: d_ts(:) ! (knon) incrementation de "ts"
+    real z0_new(klon)
     REAL flux_t(klon, klev)  ! (diagnostic) flux de la chaleur
     !                               sensible, flux de Cp*T, positif vers
     !                               le bas: j/(m**2 s) c.a.d.: W/m2
     REAL flux_q(klon, klev)  ! flux de la vapeur d'eau:kg/(m**2 s)
     REAL dflux_s(klon) ! derivee du flux sensible dF/dTs
     REAL dflux_l(klon) ! derivee du flux latent dF/dTs
-    !IM cf JLD
-    ! Flux thermique utiliser pour fondre la neige
-    REAL ffonte(klon)
+
     ! Flux d'eau "perdue" par la surface et n\'ecessaire pour que limiter la
     ! hauteur de neige, en kg/m2/s
     REAL fqcalving(klon)
+
+    ! Flux thermique utiliser pour fondre la neige
+    REAL ffonte(klon)
+
+    REAL run_off_lic_0(klon)! runof glacier au pas de temps precedent
 
     !IM "slab" ocean
 
@@ -86,6 +98,10 @@ contains
 
     REAL, intent(out):: flux_g(klon) 
     ! flux entre l'ocean et la glace de mer W/m2
+
+    ! Local:
+
+    REAL evap(klon)         ! evaporation au sol
 
     INTEGER i, k
     REAL zx_cq(klon, klev)
@@ -108,30 +124,16 @@ contains
     REAL z_gamaq(klon, 2:klev), z_gamah(klon, 2:klev)
     REAL zdelz
 
-    ! Rajout pour l'interface
-    integer, intent(in):: itime
-    integer nisurf
-    logical, intent(in):: debut
     real zlev1(klon)
-    real fder(klon)
     real temp_air(klon), spechum(klon)
     real epot_air(klon), ccanopy(klon)
     real tq_cdrag(klon), petAcoef(klon), peqAcoef(klon)
     real petBcoef(klon), peqBcoef(klon)
-    real swnet(klon), swdown(klon)
+    real swdown(klon)
     real p1lay(klon)
-    !$$$C PB ajout pour soil
-    REAL tsoil(klon, nsoilmx)
 
-    REAL, intent(inout):: qsol(klon)
-    ! column-density of water in soil, in kg m-2
-
-    ! Parametres de sortie
-    real fluxsens(klon), fluxlat(klon)
-    real tsurf_new(knon), alb_new(klon)
-    real z0_new(klon)
-    real pctsrf_new(klon, nbsrf)
-    ! JLD
+    real fluxsens(klon)
+    real tsurf_new(knon)
     real zzpk
 
     character (len = 20) :: modname = 'Debut clqh'
@@ -284,14 +286,14 @@ contains
          spechum, tq_cdrag, petAcoef, peqAcoef, petBcoef, peqBcoef, &
          precip_rain, precip_snow, fder, rugos, rugoro, snow, qsurf, &
          ts(:knon), p1lay, psref, radsol, evap, fluxsens, fluxlat, dflux_l, &
-         dflux_s, tsurf_new, alb_new, alblw, z0_new, pctsrf_new, agesno, &
-         fqcalving, ffonte, run_off_lic_0, flux_o, flux_g)
+         dflux_s, tsurf_new, alblw, z0_new, pctsrf_new, agesno, fqcalving, &
+         ffonte, run_off_lic_0, flux_o, flux_g)
 
     do i = 1, knon
        flux_t(i, 1) = fluxsens(i)
        flux_q(i, 1) = - evap(i)
        d_ts(i) = tsurf_new(i) - ts(i)
-       albedo(i) = alb_new(i)
+       albedo(i) = alblw(i)
     enddo
 
     !==== une fois on a zx_h_ts, on peut faire l'iteration ========

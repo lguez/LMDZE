@@ -41,8 +41,8 @@ module dynetat0_m
   ! (longitudes of points of the "scalar" and "v" grid, in rad)
 
   real xprimu(iim + 1), xprimv(iim + 1)
-  ! xprimu et xprimv sont respectivement les valeurs de dx / di aux
-  ! points u et v.
+  ! xprim[uv] = 2 pi / iim * (derivative of the longitudinal zoom
+  ! function)(rlon[uv])
 
   REAL xprimm025(iim + 1), xprimp025(iim + 1)
   REAL rlatu1(jjm), rlatu2(jjm), yprimu1(jjm), yprimu2(jjm)
