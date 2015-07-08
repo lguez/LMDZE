@@ -32,21 +32,18 @@ SUBROUTINE limx(s0, sx, sm, pente_max)
   ! Local
   ! ---------
 
-  INTEGER ij, l, j, i, iju, ijq, indu(ip1jmp1), niju
-  INTEGER n0, iadvplus(ip1jmp1, llm), nl(llm)
+  INTEGER ij, l
 
   REAL q(ip1jmp1, llm)
   REAL dxq(ip1jmp1, llm)
 
-
-  REAL new_m, zm
   REAL dxqu(ip1jmp1)
   REAL adxqu(ip1jmp1), dxqmax(ip1jmp1)
 
-  LOGICAL extremum, first
+  LOGICAL first
   SAVE first
 
-  REAL ssum, cvmgp, cvmgt
+  REAL ssum
   INTEGER ismax, ismin
   EXTERNAL ssum, convflu, ismin, ismax
 

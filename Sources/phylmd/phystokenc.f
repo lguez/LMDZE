@@ -9,13 +9,14 @@ contains
        frac_impa, frac_nucl, pphis, paire, dtime, itap)
 
     ! From phylmd/phystokenc.F, version 1.2 2004/06/22 11:45:35
-    ! Author: Frédéric Hourdin
-    ! Objet : écriture des variables pour transport offline
+    ! Author: Fr\'ed\'eric Hourdin
+    ! Objet : \'ecriture des variables pour transport offline
 
     USE histwrite_m, ONLY: histwrite
     USE histsync_m, ONLY: histsync
     USE dimens_m, ONLY: iim, jjm, nqmx
     USE indicesol, ONLY: nbsrf
+    use initphysto_m, only: initphysto
     USE dimphy, ONLY: klev, klon
     USE tracstoke, ONLY: istphy
 
@@ -109,7 +110,7 @@ contains
 
     IF (iadvtr==0) THEN
        CALL initphysto('phystoke', rlon, rlat, dtime, dtime*istphy, &
-            dtime*istphy, nqmx, physid)
+            dtime*istphy, physid)
     END IF
 
     i = itap

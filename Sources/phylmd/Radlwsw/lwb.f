@@ -1260,8 +1260,6 @@
 !*         1.0     PLANCK FUNCTIONS AND GRADIENTS
 !                  ------------------------------
 !
- 100  CONTINUE
-!
       DO 102 JK = 1 , KFLEV+1
       DO 101 JL = 1, KDLON
       PBINT(JL,JK) = 0.
@@ -1276,8 +1274,6 @@
 !
 !*         1.1   LEVELS FROM SURFACE TO KFLEV
 !                ----------------------------
-!
- 110  CONTINUE
 !
       DO 112 JK = 1 , KFLEV
       DO 111 JL = 1, KDLON
@@ -1300,8 +1296,6 @@
 !*         1.2   TOP OF THE ATMOSPHERE AND SURFACE
 !                ---------------------------------
 !
- 120  CONTINUE
-!
       DO 121 JL = 1, KDLON
       ZTI(JL)=(PTL(JL,KFLEV+1)-TSTAND)/TSTAND
       ZTI2(JL) = (PTL(JL,1) + PDT0(JL) - TSTAND) / TSTAND
@@ -1323,8 +1317,6 @@
 !*         1.3   GRADIENTS IN SUB-LAYERS
 !                -----------------------
 !
- 130  CONTINUE
-!
       DO 132 JK = 1 , KFLEV
       JK2 = 2 * JK
       JK1 = JK2 - 1
@@ -1338,11 +1330,6 @@
 !
 !*         2.0   CHOOSE THE RELEVANT SETS OF PADE APPROXIMANTS
 !                ---------------------------------------------
-!
- 200  CONTINUE
-!
-!
- 210  CONTINUE
 !
       DO 211 JL=1, KDLON
       ZDSTO1 = (PTL(JL,KFLEV+1)-TINTP(1)) / TSTP
@@ -1377,8 +1364,6 @@
  212  CONTINUE
  213  CONTINUE
  214  CONTINUE
-!
- 220  CONTINUE
 !
       DO 225 JK=1,KFLEV
       DO 221 JL=1, KDLON

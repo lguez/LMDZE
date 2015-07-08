@@ -6,12 +6,12 @@ contains
 
   SUBROUTINE clmain(dtime, itap, pctsrf, pctsrf_new, t, q, u, v, jour, rmu0, &
        co2_ppm, ts, cdmmax, cdhmax, ksta, ksta_ter, ok_kzmin, ftsoil, qsol, &
-       paprs, pplay, snow, qsurf, evap, albe, alblw, fluxlat, rain_fall, &
-       snow_f, solsw, sollw, fder, rlat, rugos, debut, agesno, rugoro, d_t, &
-       d_q, d_u, d_v, d_ts, flux_t, flux_q, flux_u, flux_v, cdragh, cdragm, &
-       q2, dflux_t, dflux_q, ycoefh, zu1, zv1, t2m, q2m, u10m, v10m, pblh, &
-       capcl, oliqcl, cteicl, pblt, therm, trmb1, trmb2, trmb3, plcl, &
-       fqcalving, ffonte, run_off_lic_0, flux_o, flux_g, tslab)
+       paprs, pplay, snow, qsurf, evap, falbe, fluxlat, rain_fall, snow_f, &
+       solsw, sollw, fder, rlat, rugos, debut, agesno, rugoro, d_t, d_q, d_u, &
+       d_v, d_ts, flux_t, flux_q, flux_u, flux_v, cdragh, cdragm, q2, &
+       dflux_t, dflux_q, ycoefh, zu1, zv1, t2m, q2m, u10m, v10m, pblh, capcl, &
+       oliqcl, cteicl, pblt, therm, trmb1, trmb2, trmb3, plcl, fqcalving, &
+       ffonte, run_off_lic_0, flux_o, flux_g, tslab)
 
     ! From phylmd/clmain.F, version 1.6, 2005/11/16 14:47:19
     ! Author: Z. X. Li (LMD/CNRS), date: 1993/08/18
@@ -73,8 +73,7 @@ contains
     REAL snow(klon, nbsrf)
     REAL qsurf(klon, nbsrf)
     REAL evap(klon, nbsrf)
-    REAL albe(klon, nbsrf)
-    REAL alblw(klon, nbsrf)
+    REAL, intent(inout):: falbe(klon, nbsrf)
 
     REAL fluxlat(klon, nbsrf)
 
@@ -172,7 +171,6 @@ contains
 
     REAL yts(klon), yrugos(klon), ypct(klon), yz0_new(klon)
     REAL yalb(klon)
-    REAL yalblw(klon)
     REAL yu1(klon), yv1(klon)
     ! on rajoute en output yu1 et yv1 qui sont les vents dans
     ! la premiere couche
@@ -282,7 +280,6 @@ contains
     yts = 0.
     ysnow = 0.
     yqsurf = 0.
-    yalb = 0.
     yrain_f = 0.
     ysnow_f = 0.
     yfder = 0.
@@ -352,7 +349,7 @@ contains
              ytslab(i) = tslab(i)
              ysnow(j) = snow(i, nsrf)
              yqsurf(j) = qsurf(i, nsrf)
-             yalb(j) = albe(i, nsrf)
+             yalb(j) = falbe(i, nsrf)
              yrain_f(j) = rain_fall(i)
              ysnow_f(j) = snow_f(i)
              yagesno(j) = agesno(i, nsrf)
@@ -478,8 +475,8 @@ contains
           CALL clqh(dtime, itap, jour, debut, rlat, knon, nsrf, ni(:knon), &
                pctsrf, ytsoil, yqsol, rmu0, co2_ppm, yrugos, yrugoro, yu1, &
                yv1, coefh(:knon, :), yt, yq, yts, ypaprs, ypplay, ydelp, &
-               yrads, yalb, yalblw(:knon), ysnow, yqsurf, yrain_f, ysnow_f, &
-               yfder, ysolsw, yfluxlat, pctsrf_new, yagesno, y_d_t, y_d_q, &
+               yrads, yalb(:knon), ysnow, yqsurf, yrain_f, ysnow_f, yfder, &
+               ysolsw, yfluxlat, pctsrf_new, yagesno, y_d_t, y_d_q, &
                y_d_ts(:knon), yz0_new, y_flux_t, y_flux_q, y_dflux_t, &
                y_dflux_q, y_fqcalving, y_ffonte, y_run_off_lic_0, y_flux_o, &
                y_flux_g)
@@ -518,8 +515,7 @@ contains
 
           evap(:, nsrf) = -flux_q(:, 1, nsrf)
 
-          albe(:, nsrf) = 0.
-          alblw(:, nsrf) = 0.
+          falbe(:, nsrf) = 0.
           snow(:, nsrf) = 0.
           qsurf(:, nsrf) = 0.
           rugos(:, nsrf) = 0.
@@ -527,8 +523,7 @@ contains
           DO j = 1, knon
              i = ni(j)
              d_ts(i, nsrf) = y_d_ts(j)
-             albe(i, nsrf) = yalb(j)
-             alblw(i, nsrf) = yalblw(j)
+             falbe(i, nsrf) = yalb(j)
              snow(i, nsrf) = ysnow(j)
              qsurf(i, nsrf) = yqsurf(j)
              rugos(i, nsrf) = yz0_new(j)

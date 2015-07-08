@@ -217,12 +217,7 @@ contains
        CALL histdef(nid_ins, "albs", "Surface albedo", "-", &
             iim, (jjm + 1), nhori, 1, 1, 1, -99,  &
             "inst(X)", zsto, zout)
-       CALL histdef(nid_ins, "albslw", "Surface albedo LW", "-", &
-            iim, (jjm + 1), nhori, 1, 1, 1, -99,  &
-            "inst(X)", zsto, zout)
 
-       !IM cf. AM 081204 BEG
-       ! HBTM2
        CALL histdef(nid_ins, "s_pblh", "Boundary Layer Height", "m", &
             iim, (jjm + 1), nhori, 1, 1, 1, -99, &
             "inst(X)", zsto, zout)

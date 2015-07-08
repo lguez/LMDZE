@@ -4,7 +4,7 @@ module radlwsw_m
 
 contains
 
-  SUBROUTINE radlwsw(dist, mu0, fract, paprs, play, tsol, albedo, alblw, &
+  SUBROUTINE radlwsw(dist, mu0, fract, paprs, play, tsol, albedo, &
        t, q, wo, cldfra, cldemi, cldtaupd, heat, heat0, cool, cool0, radsol, &
        albpla, topsw, toplw, solsw, sollw, sollwdown, topsw0, toplw0, solsw0, &
        sollw0, lwdn0, lwdn, lwup0, lwup, swdn0, swdn, swup0, swup, ok_ade, &
@@ -50,12 +50,9 @@ contains
     real, intent(in):: fract(klon) ! duree d'ensoleillement normalisee
     real, intent(in):: paprs(klon, klev+1) ! pression a inter-couche (Pa)
     real, intent(in):: play(klon, klev) ! pression au milieu de couche (Pa)
-
-    real tsol(klon), albedo(klon), alblw(klon)
-    ! albedo---input-R- albedo du sol (entre 0 et 1)
-    ! tsol-----input-R- temperature du sol (en K)
-    real, intent(in):: t(klon, klev)
-    ! t--------input-R- temperature (K)
+    real, intent(in):: tsol(klon) ! temperature du sol (en K)
+    real, intent(in):: albedo(klon) ! albedo du sol (entre 0 et 1)
+    real, intent(in):: t(klon, klev) ! temperature (K)
     real q(klon, klev)
     ! q--------input-R- vapeur d'eau (en kg/kg)
 
@@ -78,8 +75,7 @@ contains
     real cool0(klon, klev)
     real radsol(klon)
     ! radsol---output-R- bilan radiatif net au sol (W/m**2) (+ vers le bas)
-    real albpla(klon)
-    ! albpla---output-R- albedo planetaire (entre 0 et 1)
+    real, intent(out):: albpla(klon) ! albedo planetaire (entre 0 et 1)
     real topsw(klon)
     ! topsw----output-R- flux solaire net au sommet de l'atm.
 
@@ -213,9 +209,9 @@ contains
           zfract(i) = fract(iof+i)
           zrmu0(i) = mu0(iof+i)
           PALBD(i, 1) = albedo(iof+i)
-          PALBD(i, 2) = alblw(iof+i)
+          PALBD(i, 2) = albedo(iof+i)
           PALBP(i, 1) = albedo(iof+i)
-          PALBP(i, 2) = alblw(iof+i)
+          PALBP(i, 2) = albedo(iof+i)
           ! cf. JLD pour etre en accord avec ORCHIDEE il faut mettre
           ! PEMIS(i) = 0.96
           PEMIS(i) = 1.0 

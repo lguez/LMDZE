@@ -359,8 +359,8 @@ contains
 
     call phyredem("startphy.nc", pctsrf, tsoil(:, 1, :), tsoil, &
          tsoil(:, 1, is_oce), seaice, qsolsrf, pack(qsol_2d, dyn_phy), snsrf, &
-         albe, alblw, evap, rain_fall, snow_fall, solsw, sollw, fder, radsol, &
-         frugs, agesno, zmea, zstd, zsig, zgam, zthe, zpic, zval, t_ancien, &
+         albe, evap, rain_fall, snow_fall, solsw, sollw, fder, radsol, frugs, &
+         agesno, zmea, zstd, zsig, zgam, zthe, zpic, zval, t_ancien, &
          q_ancien, rnebcon, ratqs, clwcon, run_off_lic_0, sig1, w01)
 
   END SUBROUTINE etat0

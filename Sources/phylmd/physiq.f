@@ -248,8 +248,7 @@ contains
     ! column-density of water in soil, in kg m-2
 
     REAL, save:: fsnow(klon, nbsrf) ! epaisseur neigeuse
-    REAL, save:: falbe(klon, nbsrf) ! albedo par type de surface
-    REAL, save:: falblw(klon, nbsrf) ! albedo par type de surface
+    REAL, save:: falbe(klon, nbsrf) ! albedo visible par type de surface
 
     ! Param\`etres de l'orographie \`a l'\'echelle sous-maille (OESM) :
     REAL, save:: zmea(klon) ! orographie moyenne
@@ -334,8 +333,7 @@ contains
     INTEGER, SAVE:: lmt_pas ! number of time steps of "physics" per day
     REAL, save:: pctsrf(klon, nbsrf) ! percentage of surface
     REAL pctsrf_new(klon, nbsrf) ! pourcentage surfaces issus d'ORCHIDEE
-    REAL, save:: albsol(klon) ! albedo du sol total
-    REAL, save:: albsollw(klon) ! albedo du sol total
+    REAL, save:: albsol(klon) ! albedo du sol total visible
     REAL, SAVE:: wo(klon, llm) ! column density of ozone in a cell, in kDU
 
     ! Declaration des procedures appelees
@@ -627,7 +625,7 @@ contains
        frugs = 0.
        itap = 0
        CALL phyetat0(pctsrf, ftsol, ftsoil, tslab, seaice, fqsurf, qsol, &
-            fsnow, falbe, falblw, fevap, rain_fall, snow_fall, solsw, sollw, &
+            fsnow, falbe, fevap, rain_fall, snow_fall, solsw, sollw, &
             dlw, radsol, frugs, agesno, zmea, zstd, zsig, zgam, zthe, zpic, &
             zval, t_ancien, q_ancien, ancien_ok, rnebcon, ratqs, clwcon, &
             run_off_lic_0, sig1, w01)
@@ -769,7 +767,6 @@ contains
 
     ! Calcul de l'abedo moyen par maille
     albsol = sum(falbe * pctsrf, dim = 2)
-    albsollw = sum(falblw * pctsrf, dim = 2)
 
     ! R\'epartition sous maille des flux longwave et shortwave
     ! R\'epartition du longwave par sous-surface lin\'earis\'ee
@@ -787,9 +784,9 @@ contains
     CALL clmain(dtphys, itap, pctsrf, pctsrf_new, t_seri, q_seri, u_seri, &
          v_seri, julien, mu0, co2_ppm, ftsol, cdmmax, cdhmax, ksta, ksta_ter, &
          ok_kzmin, ftsoil, qsol, paprs, play, fsnow, fqsurf, fevap, falbe, &
-         falblw, fluxlat, rain_fall, snow_fall, fsolsw, fsollw, fder, rlat, &
-         frugs, firstcal, agesno, rugoro, d_t_vdf, d_q_vdf, d_u_vdf, d_v_vdf, &
-         d_ts, fluxt, fluxq, fluxu, fluxv, cdragh, cdragm, q2, dsens, devap, &
+         fluxlat, rain_fall, snow_fall, fsolsw, fsollw, fder, rlat, frugs, &
+         firstcal, agesno, rugoro, d_t_vdf, d_q_vdf, d_u_vdf, d_v_vdf, d_ts, &
+         fluxt, fluxq, fluxu, fluxv, cdragh, cdragm, q2, dsens, devap, &
          ycoefh, yu1, yv1, t2m, q2m, u10m, v10m, pblh, capCL, oliqCL, cteiCL, &
          pblT, therm, trmb1, trmb2, trmb3, plcl, fqcalving, ffonte, &
          run_off_lic_0, fluxo, fluxg, tslab)
@@ -1240,23 +1237,16 @@ contains
 
     IF (MOD(itap - 1, radpas) == 0) THEN
        ! Appeler le rayonnement mais calculer tout d'abord l'albedo du sol.
-       DO i = 1, klon
-          albsol(i) = falbe(i, is_oce) * pctsrf(i, is_oce) &
-               + falbe(i, is_lic) * pctsrf(i, is_lic) &
-               + falbe(i, is_ter) * pctsrf(i, is_ter) &
-               + falbe(i, is_sic) * pctsrf(i, is_sic)
-          albsollw(i) = falblw(i, is_oce) * pctsrf(i, is_oce) &
-               + falblw(i, is_lic) * pctsrf(i, is_lic) &
-               + falblw(i, is_ter) * pctsrf(i, is_ter) &
-               + falblw(i, is_sic) * pctsrf(i, is_sic)
-       ENDDO
+       ! Calcul de l'abedo moyen par maille
+       albsol = sum(falbe * pctsrf, dim = 2)
+
        ! Rayonnement (compatible Arpege-IFS) :
-       CALL radlwsw(dist, mu0, fract, paprs, play, zxtsol, albsol, &
-            albsollw, t_seri, q_seri, wo, cldfra, cldemi, cldtau, heat, &
-            heat0, cool, cool0, radsol, albpla, topsw, toplw, solsw, sollw, &
-            sollwdown, topsw0, toplw0, solsw0, sollw0, lwdn0, lwdn, lwup0, &
-            lwup, swdn0, swdn, swup0, swup, ok_ade, ok_aie, tau_ae, piz_ae, &
-            cg_ae, topswad, solswad, cldtaupi, topswai, solswai)
+       CALL radlwsw(dist, mu0, fract, paprs, play, zxtsol, albsol, t_seri, &
+            q_seri, wo, cldfra, cldemi, cldtau, heat, heat0, cool, cool0, &
+            radsol, albpla, topsw, toplw, solsw, sollw, sollwdown, topsw0, &
+            toplw0, solsw0, sollw0, lwdn0, lwdn, lwup0, lwup, swdn0, swdn, &
+            swup0, swup, ok_ade, ok_aie, tau_ae, piz_ae, cg_ae, topswad, &
+            solswad, cldtaupi, topswai, solswai)
     ENDIF
 
     ! Ajouter la tendance des rayonnements (tous les pas)
@@ -1459,7 +1449,7 @@ contains
     IF (lafin) THEN
        itau_phy = itau_phy + itap
        CALL phyredem("restartphy.nc", pctsrf, ftsol, ftsoil, tslab, seaice, &
-            fqsurf, qsol, fsnow, falbe, falblw, fevap, rain_fall, snow_fall, &
+            fqsurf, qsol, fsnow, falbe, fevap, rain_fall, snow_fall, &
             solsw, sollw, dlw, radsol, frugs, agesno, zmea, zstd, zsig, zgam, &
             zthe, zpic, zval, t_ancien, q_ancien, rnebcon, ratqs, clwcon, &
             run_off_lic_0, sig1, w01)
@@ -1621,7 +1611,7 @@ contains
             CALL histwrite(nid_ins, "rugs_"//clnsurf(nsrf), itau_w, &
                  zx_tmp_2d) 
 
-            zx_tmp_fi2d(1 : klon) = falbe(1 : klon, nsrf)
+            zx_tmp_fi2d(1 : klon) = falbe(:, nsrf)
             CALL gr_fi_ecrit(1, klon, iim, jjm + 1, zx_tmp_fi2d, zx_tmp_2d)
             CALL histwrite(nid_ins, "albe_"//clnsurf(nsrf), itau_w, &
                  zx_tmp_2d) 
@@ -1629,8 +1619,6 @@ contains
          END DO
          CALL gr_fi_ecrit(1, klon, iim, jjm + 1, albsol, zx_tmp_2d)
          CALL histwrite(nid_ins, "albs", itau_w, zx_tmp_2d)
-         CALL gr_fi_ecrit(1, klon, iim, jjm + 1, albsollw, zx_tmp_2d)
-         CALL histwrite(nid_ins, "albslw", itau_w, zx_tmp_2d)
 
          CALL gr_fi_ecrit(1, klon, iim, jjm + 1, zxrugs, zx_tmp_2d)
          CALL histwrite(nid_ins, "rugs", itau_w, zx_tmp_2d)

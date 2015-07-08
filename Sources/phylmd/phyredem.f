@@ -5,7 +5,7 @@ module phyredem_m
 contains
 
   SUBROUTINE phyredem(fichnom, pctsrf, tsol, tsoil, tslab, seaice, qsurf, &
-       qsol, snow, albedo, alblw, evap, rain_fall, snow_fall, solsw, sollw, &
+       qsol, snow, albedo, evap, rain_fall, snow_fall, solsw, sollw, &
        fder, radsol, frugs, agesno, zmea, zstd, zsig, zgam, zthe, zpic, zval, &
        t_ancien, q_ancien, rnebcon, ratqs, clwcon, run_off_lic_0, sig1, w01)
 
@@ -37,7 +37,6 @@ contains
 
     REAL, INTENT(IN):: snow(klon, nbsrf)
     REAL, INTENT(IN):: albedo(klon, nbsrf)
-    REAL, INTENT(IN):: alblw(klon, nbsrf)
     REAL, INTENT(IN):: evap(klon, nbsrf)
     REAL, INTENT(IN):: rain_fall(klon)
     REAL, INTENT(IN):: snow_fall(klon)
@@ -175,23 +174,6 @@ contains
        END IF
        call nf95_put_var(ncid, varid, albedo(:, nsrf))
     END DO
-
-    !IM BEG albedo LW
-    DO nsrf = 1, nbsrf
-       IF (nsrf<=99) THEN
-          WRITE (str2, '(i2.2)') nsrf
-          call nf95_redef(ncid)
-          call nf95_def_var(ncid, 'ALBLW'//str2, nf90_float, idim2, varid)
-          call nf95_put_att(ncid, varid, 'title', &
-               'albedo LW de surface No.'//str2)
-          call nf95_enddef(ncid)
-       ELSE
-          PRINT *, 'Trop de sous-mailles'
-          STOP 1
-       END IF
-       call nf95_put_var(ncid, varid, alblw(:, nsrf))
-    END DO
-    !IM END albedo LW
 
     DO nsrf = 1, nbsrf
        IF (nsrf<=99) THEN

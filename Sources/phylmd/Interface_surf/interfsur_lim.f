@@ -4,7 +4,7 @@ module interfsur_lim_m
 
 contains
 
-  SUBROUTINE interfsur_lim(itime, dtime, jour, knindex, debut, alb_new, z0_new)
+  SUBROUTINE interfsur_lim(itime, dtime, jour, knindex, debut, alblw, z0_new)
 
     ! Cette routine sert d'interface entre le mod\`ele atmosph\'erique et
     ! un fichier de conditions aux limites.
@@ -24,7 +24,7 @@ contains
     ! index des points de la surface \`a traiter
 
     logical, intent(IN):: debut ! premier appel \`a la physique (initialisation)
-    real, intent(out):: alb_new(:) ! (knon) albedo lu
+    real, intent(out):: alblw(:) ! (knon) albedo lu
     real, intent(out):: z0_new(:) ! (klon) longueur de rugosit\'e lue
 
     ! Local:
@@ -75,8 +75,8 @@ contains
     endif
 
     ! Recopie des variables dans les champs de sortie
-    alb_new = alb_lu(knindex(:knon))
-    z0_new(:knon) = rug_lu(knindex(:knon))
+    alblw = alb_lu(knindex)
+    z0_new(:knon) = rug_lu(knindex)
     z0_new(knon + 1:) = 999999.
 
   END SUBROUTINE interfsur_lim

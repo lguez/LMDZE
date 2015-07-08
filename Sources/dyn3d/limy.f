@@ -39,15 +39,13 @@ SUBROUTINE limy(s0, sy, sm, pente_max)
 
   REAL q(ip1jmp1, llm)
   REAL airej2, airejjm, airescb(iim), airesch(iim)
-  REAL sigv, dyq(ip1jmp1), dyqv(ip1jm)
+  REAL dyq(ip1jmp1), dyqv(ip1jm)
   REAL adyqv(ip1jm), dyqmax(ip1jmp1)
-  REAL qbyv(ip1jm, llm)
 
-  REAL qpns, qpsn, apn, aps, dyn1, dys1, dyn2, dys2
-  LOGICAL extremum, first
+  REAL qpns, qpsn
+  LOGICAL first
   SAVE first
 
-  REAL convpn, convps, convmpn, convmps
   REAL sinlon(iip1), sinlondlon(iip1)
   REAL coslon(iip1), coslondlon(iip1)
   SAVE sinlon, coslon, sinlondlon, coslondlon

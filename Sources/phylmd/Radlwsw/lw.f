@@ -8,6 +8,7 @@ contains
        PCLDLU, PVIEW, PCOLR, PCOLR0, PTOPLW, PSOLLW, PTOPLW0, PSOLLW0, &
        psollwdown, plwup, plwdn, plwup0, plwdn0)
 
+    use lwbv_m, only: lwbv
     use LWU_m, only: LWU
     USE suphec_m, ONLY: md, rcpd, rday, rg, rmo3
     USE raddim, ONLY: kdlon, kflev
@@ -93,7 +94,7 @@ contains
           ENDDO
        ENDDO
        CALL LWU(PAER, PDP, PPMB, ZOZ, PTAVE, PVIEW, PWV, ZABCU)
-       CALL LWBV(ILIM, PDP, PDT0, PEMIS, PPMB, PTL, PTAVE, ZABCU, &
+       CALL LWBV(ILIM, PDT0, PEMIS, PPMB, PTL, PTAVE, ZABCU, &
             ZFLUC, ZBINT, ZBSUI, ZCTS, ZCNTRB)
        itaplw0 = 0
     ENDIF

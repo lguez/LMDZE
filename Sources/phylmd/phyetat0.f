@@ -13,7 +13,7 @@ module phyetat0_m
 contains
 
   SUBROUTINE phyetat0(pctsrf, tsol, tsoil, tslab, seaice, qsurf, qsol, &
-       snow, albe, alblw, evap, rain_fall, snow_fall, solsw, sollw, fder, &
+       snow, albe, evap, rain_fall, snow_fall, solsw, sollw, fder, &
        radsol, frugs, agesno, zmea, zstd, zsig, zgam, zthe, zpic, zval, &
        t_ancien, q_ancien, ancien_ok, rnebcon, ratqs, clwcon, run_off_lic_0, &
        sig1, w01)
@@ -40,7 +40,6 @@ contains
     REAL, intent(out):: qsol(:) ! (klon)
     REAL snow(klon, nbsrf)
     REAL albe(klon, nbsrf)
-    REAL alblw(klon, nbsrf)
     REAL evap(klon, nbsrf)
     REAL, intent(out):: rain_fall(klon)
     REAL snow_fall(klon)
@@ -306,36 +305,6 @@ contains
        DO nsrf = 2, nbsrf
           DO i = 1, klon
              albe(i, nsrf) = albe(i, 1)
-          ENDDO
-       ENDDO
-    ENDIF
-
-    ! Lecture de albedo au sol LW:
-
-    ierr = NF90_INQ_VARID(ncid, "ALBLW", varid)
-    IF (ierr /= NF90_NOERR) THEN
-       PRINT *, 'phyetat0: Le champ <ALBLW> est absent'
-       ! PRINT *, ' Mais je vais essayer de lire ALBLW**'
-       PRINT *, ' Mais je vais prendre ALBE**'
-       DO nsrf = 1, nbsrf
-          DO i = 1, klon
-             alblw(i, nsrf) = albe(i, nsrf)
-          ENDDO
-       ENDDO
-    ELSE
-       PRINT *, 'phyetat0: Le champ <ALBLW> est present'
-       PRINT *, ' J ignore donc les autres ALBLW**'
-       call nf95_get_var(ncid, varid, alblw(:, 1))
-       xmin = 1.0E+20
-       xmax = -1.0E+20
-       DO i = 1, klon
-          xmin = MIN(alblw(i, 1), xmin)
-          xmax = MAX(alblw(i, 1), xmax)
-       ENDDO
-       PRINT *, 'Neige du sol <ALBLW>', xmin, xmax
-       DO nsrf = 2, nbsrf
-          DO i = 1, klon
-             alblw(i, nsrf) = alblw(i, 1)
           ENDDO
        ENDDO
     ENDIF
