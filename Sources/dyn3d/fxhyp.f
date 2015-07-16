@@ -24,12 +24,25 @@ contains
     use principal_cshift_m, only: principal_cshift
     use tanh_cautious_m, only: tanh_cautious
 
-    REAL, intent(out):: xprimm025(:), rlonv(:), xprimv(:) ! (iim + 1)
-    real, intent(out):: rlonu(:), xprimu(:), xprimp025(:) ! (iim + 1)
+    REAL, intent(out):: xprimm025(:) ! (iim + 1)
+
+    REAL, intent(out):: rlonv(:) ! (iim + 1)
+    ! longitudes of points of the "scalar" and "v" grid, in rad
+
+    REAL, intent(out):: xprimv(:) ! (iim + 1)
+    ! 2 pi / iim * (derivative of the longitudinal zoom function)(rlonv)
+
+    real, intent(out):: rlonu(:) ! (iim + 1)
+    ! longitudes of points of the "u" grid, in rad
+
+    real, intent(out):: xprimu(:) ! (iim + 1)
+    ! 2 pi / iim * (derivative of the longitudinal zoom function)(rlonu)
+
+    real, intent(out):: xprimp025(:) ! (iim + 1)
 
     ! Local:
     real rlonm025(iim + 1), rlonp025(iim + 1), d_rlonv(iim)
-    REAL delta, step
+    REAL delta, h
     DOUBLE PRECISION, dimension(0:nmax):: xtild, fhyp, G, Xf, ffdx
     DOUBLE PRECISION beta
     INTEGER i, is2
@@ -40,17 +53,17 @@ contains
     print *, "Call sequence information: fxhyp"
 
     if (grossismx == 1.) then
-       step = twopi / iim
+       h = twopi / iim
 
-       xprimm025(:iim) = step
-       xprimp025(:iim) = step
-       xprimv(:iim) = step
-       xprimu(:iim) = step
+       xprimm025(:iim) = h
+       xprimp025(:iim) = h
+       xprimv(:iim) = h
+       xprimu(:iim) = h
 
-       rlonv(:iim) = arth(- pi + clon, step, iim)
-       rlonm025(:iim) = rlonv(:iim) - 0.25 * step
-       rlonp025(:iim) = rlonv(:iim) + 0.25 * step
-       rlonu(:iim) = rlonv(:iim) + 0.5 * step
+       rlonv(:iim) = arth(- pi + clon, h, iim)
+       rlonm025(:iim) = rlonv(:iim) - 0.25 * h
+       rlonp025(:iim) = rlonv(:iim) + 0.25 * h
+       rlonu(:iim) = rlonv(:iim) + 0.5 * h
     else
        delta = dzoomx * twopi_d
        xtild = arth(0d0, pi_d / nmax, nmax + 1)

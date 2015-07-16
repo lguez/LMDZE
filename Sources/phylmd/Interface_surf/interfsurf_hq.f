@@ -9,7 +9,7 @@ contains
        spechum, tq_cdrag, petAcoef, peqAcoef, petBcoef, peqBcoef, &
        precip_rain, precip_snow, fder, rugos, rugoro, snow, qsurf, tsurf, &
        p1lay, ps, radsol, evap, fluxsens, fluxlat, dflux_l, dflux_s, &
-       tsurf_new, alblw, z0_new, pctsrf_new, agesno, fqcalving, ffonte, &
+       tsurf_new, albedo, z0_new, pctsrf_new, agesno, fqcalving, ffonte, &
        run_off_lic_0, flux_o, flux_g)
 
     ! Cette routine sert d'aiguillage entre l'atmosph\`ere et la surface
@@ -96,7 +96,7 @@ contains
     ! fluxlat flux de chaleur latente
     real, dimension(klon), intent(OUT):: dflux_l, dflux_s
     real, intent(OUT):: tsurf_new(knon) ! temp\'erature au sol
-    real, intent(OUT):: alblw(:) ! (knon) albedo
+    real, intent(OUT):: albedo(:) ! (knon) albedo
     real, intent(OUT):: z0_new(klon) ! surface roughness
     real, dimension(klon, nbsrf), intent(OUT):: pctsrf_new
     ! pctsrf_new nouvelle repartition des surfaces
@@ -199,7 +199,7 @@ contains
 
        ! calcul albedo: lecture albedo fichier boundary conditions
        ! puis ajout albedo neige
-       call interfsur_lim(itime, dtime, jour, knindex, debut, alblw, z0_new)
+       call interfsur_lim(itime, dtime, jour, knindex, debut, albedo, z0_new)
 
        ! calcul snow et qsurf, hydrol adapt\'e
        CALL calbeta(nisurf, snow(:knon), qsol(:knon), beta(:knon), &
@@ -229,8 +229,8 @@ contains
        call albsno(klon, knon, dtime, agesno, alb_neig, precip_snow)
        where (snow(1 : knon) < 0.0001) agesno(1 : knon) = 0.
        zfra(:knon) = max(0.0, min(1.0, snow(1:knon)/(snow(1:knon) + 10.0)))
-       alblw = alb_neig(:knon) * zfra(:knon) &
-            + alblw * (1. - zfra(:knon))
+       albedo = alb_neig(:knon) * zfra(:knon) &
+            + albedo * (1. - zfra(:knon))
        z0_new = sqrt(z0_new**2 + rugoro**2)
 
        ! Remplissage des pourcentages de surface
@@ -261,9 +261,9 @@ contains
 
        ! calcul albedo
        if (cycle_diurne) then
-          CALL alboc_cd(rmu0(knindex), alblw)
+          CALL alboc_cd(rmu0(knindex), albedo)
        else
-          CALL alboc(jour, rlat(knindex), alblw)
+          CALL alboc(jour, rlat(knindex), albedo)
        endif
 
        z0_new = sqrt(rugos**2 + rugoro**2)
@@ -326,7 +326,7 @@ contains
        CALL albsno(klon, knon, dtime, agesno, alb_neig, precip_snow)
        WHERE (snow(1 : knon) < 0.0001) agesno(1 : knon) = 0.
        zfra(:knon) = MAX(0.0, MIN(1.0, snow(1:knon)/(snow(1:knon) + 10.0)))
-       alblw = alb_neig(:knon) * zfra(:knon) + 0.6 * (1.0 - zfra(:knon))
+       albedo = alb_neig(:knon) * zfra(:knon) + 0.6 * (1.0 - zfra(:knon))
 
        fder = fder + dflux_s + dflux_l
 
@@ -371,7 +371,7 @@ contains
        CALL albsno(klon, knon, dtime, agesno, alb_neig, precip_snow)
        WHERE (snow(1 : knon) < 0.0001) agesno(1 : knon) = 0.
        zfra(:knon) = MAX(0.0, MIN(1.0, snow(1:knon)/(snow(1:knon) + 10.0)))
-       alblw = 0.77
+       albedo = 0.77
 
        ! Rugosite
        z0_new = rugoro

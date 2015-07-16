@@ -7,12 +7,14 @@ module inifilr_m
   ! jfilts index of the first line filtered in SH
 
   ! North:
+
   real, allocatable:: matriceun(:, :, :), matrinvn(:, :, :) 
   ! (iim, iim, 2:jfiltnu)
 
   real, allocatable:: matricevn(:, :, :) ! (iim, iim, jfiltnv)
 
   ! South:
+
   real, allocatable:: matriceus(:, :, :), matrinvs(:, :, :)
   ! (iim, iim, jfiltsu:jjm)
 
@@ -25,7 +27,7 @@ contains
     ! From filtrez/inifilr.F, version 1.1.1.1 2004/05/19 12:53:09
     ! H. Upadhyaya, O. Sharma
 
-    ! This routine computes the eigenfunctions of the laplacian on the
+    ! This routine computes the eigenvectors of the laplacian on the
     ! stretched grid, and the filtering coefficients. The modes are
     ! filtered from modfrst to iim.
 
@@ -45,7 +47,7 @@ contains
     REAL eignft(iim, iim), coff
 
     real eignfnu(iim, iim), eignfnv(iim, iim)
-    ! eigenfunctions of the discrete laplacian
+    ! eigenvectors of the discrete laplacian
 
     ! Filtering coefficients (lamda_max * cos(rlat) / lamda):
     real coefilu(iim, jjm), coefilv(iim, jjm)
@@ -61,7 +63,7 @@ contains
 
     CALL inifgn(eignvl, eignfnu, eignfnv)
 
-    ! compute eigenvalues and eigenfunctions
+    ! compute eigenvalues and eigenvectors
     ! compute the filtering coefficients for scalar lines and
     ! meridional wind v-lines
     ! we filter all those latitude lines where coefil < 1

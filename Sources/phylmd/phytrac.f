@@ -116,7 +116,7 @@ contains
     ! 
     ! Pour la source de radon et son reservoir de sol
 
-    REAL, save:: trs(klon, nqmx - 2) ! Concentration de radon dans le sol
+    REAL, save:: trs(klon, nqmx - 2) ! Concentration de traceur dans le sol
 
     REAL masktr(klon, nqmx - 2) ! Masque reservoir de sol traceur
     ! Masque de l'echange avec la surface
@@ -155,7 +155,10 @@ contains
 
     REAL d_tr(klon, llm), d_trs(klon) ! tendances de traceurs 
     REAL d_tr_cl(klon, llm, nqmx - 2) ! tendance de traceurs couche limite
-    REAL d_tr_cv(klon, llm, nqmx - 2) ! tendance de traceurs conv pour chq traceur
+
+    REAL d_tr_cv(klon, llm, nqmx - 2) 
+    ! tendance de traceurs conv pour chq traceur
+
     REAL d_tr_th(klon, llm, nqmx - 2) ! la tendance des thermiques
     REAL d_tr_dec(klon, llm, 2) ! la tendance de la decroissance 
     ! ! radioactive du rn - > pb 
@@ -296,29 +299,22 @@ contains
        DO it=1, nqmx - 2
           if (clsol(it)) then 
              ! couche limite avec quantite dans le sol calculee
-             CALL cltracrn(it, pdtphys, yu1, yv1, &
-                  coefh, t_seri, ftsol, pctsrf, &
-                  tr_seri(:, :, it), trs(1, it), &
-                  paprs, pplay, delp, &
-                  masktr(1, it), fshtr(1, it), hsoltr(it), &
-                  tautr(it), vdeptr(it), &
-                  rlat, &
-                  d_tr_cl(1, 1, it), d_trs)
+             CALL cltracrn(it, pdtphys, yu1, yv1, coefh, t_seri, ftsol, &
+                  pctsrf, tr_seri(:, :, it), trs(:, it), paprs, pplay, delp, &
+                  masktr(1, it), fshtr(1, it), hsoltr(it), tautr(it), &
+                  vdeptr(it), rlat, d_tr_cl(1, 1, it), d_trs)
              DO k = 1, llm
                 DO i = 1, klon
                    tr_seri(i, k, it) = tr_seri(i, k, it) + d_tr_cl(i, k, it)
                 ENDDO
              ENDDO
 
-             ! Traceur ds sol
-
-             DO i = 1, klon
-                trs(i, it) = trs(i, it) + d_trs(i)
-             END DO
-          else ! couche limite avec flux prescrit
+             trs(:, it) = trs(:, it) + d_trs
+          else
+             ! couche limite avec flux prescrit
              !MAF provisoire source / traceur a creer
              DO i=1, klon
-                source(i) = 0.0 ! pas de source, pour l'instant
+                source(i) = 0. ! pas de source, pour l'instant
              ENDDO
 
              CALL cltrac(pdtphys, coefh, t_seri, tr_seri(:, :, it), source, &

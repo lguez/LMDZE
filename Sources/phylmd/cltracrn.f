@@ -10,8 +10,8 @@ contains
 
     ! From phylmd/cltracrn.F, version 1.2 2005/05/25 13:10:09
 
-    ! Author: Alex A.
-    ! Date: february 1999
+    ! Author: Alexandre ARMENGAUD
+    ! Date: February 1999
     ! Inspiré de clqh et clvent
 
     ! Objet: diffusion verticale de traceurs avec quantité de traceur
@@ -25,53 +25,53 @@ contains
     use dimphy, only: klon, klev
     use SUPHEC_M, only: RD, rg
 
-    ! Arguments:
+    INTEGER itr
     ! itr--- -input-R- le type de traceur 1- Rn 2 - Pb
-    ! dtime----input-R- intervalle de temps (en second)
-    ! u1lay----input-R- vent u de la premiere couche (m/s)
-    ! v1lay----input-R- vent v de la premiere couche (m/s)
-    ! coef-----input-R- le coefficient d'echange (m**2/s) l>1
-    ! paprs----input-R- pression a l'inter-couche (Pa)
-    ! pplay----input-R- pression au milieu de couche (Pa)
-    ! delp-----input-R- epaisseur de couche (Pa)
-    ! ftsol----input-R- temperature du sol (en Kelvin)
-    ! tr-------input-R- traceurs
-    ! trs------input-R- traceurs dans le sol
-    ! masktr---input-R- Masque reservoir de sol traceur (1 = reservoir)
-    ! fshtr----input-R- Flux surfacique de production dans le sol
-    ! tautr----input-R- Constante de decroissance du traceur
-    ! vdeptr---input-R- Vitesse de depot sec dans la couche brownienne
-    ! hsoltr---input-R- Epaisseur equivalente du reservoir de sol
-    ! lat-----input-R- latitude en degree
-    ! d_tr-----output-R- le changement de "tr"
-    ! d_trs----output-R- le changement de "trs"
 
     REAL, intent(in):: dtime
+    ! dtime----input-R- intervalle de temps (en second)
     REAL u1lay(klon), v1lay(klon)
+    ! u1lay----input-R- vent u de la premiere couche (m/s)
+    ! v1lay----input-R- vent v de la premiere couche (m/s)
     REAL coef(klon, klev)
+    ! coef-----input-R- le coefficient d'echange (m**2/s) l>1
     REAL, intent(in):: t(klon, klev) ! temperature (K)
     real, intent(in):: ftsol(klon, nbsrf), pctsrf(klon, nbsrf) 
-    REAL tr(klon, klev), trs(klon)
+    ! ftsol----input-R- temperature du sol (en Kelvin)
+    REAL, intent(in):: tr(klon, klev) ! traceur
+    REAL, intent(in):: trs(:) ! (klon) traceur dans le sol
     REAL, intent(in):: paprs(klon, klev+1)
+    ! paprs----input-R- pression a l'inter-couche (Pa)
     real, intent(in):: pplay(klon, klev)
+    ! pplay----input-R- pression au milieu de couche (Pa)
     real delp(klon, klev)
+    ! delp-----input-R- epaisseur de couche (Pa)
     REAL masktr(klon) 
+    ! masktr---input-R- Masque reservoir de sol traceur (1 = reservoir)
     REAL fshtr(klon) 
+    ! fshtr----input-R- Flux surfacique de production dans le sol
     REAL hsoltr
+    ! hsoltr---input-R- Epaisseur equivalente du reservoir de sol
     REAL tautr
-    REAL vdeptr
+    ! tautr----input-R- Constante de decroissance du traceur
+
+    REAL, intent(in):: vdeptr
+    ! vitesse de d\'ep\^ot sec dans la couche brownienne
+
     REAL, intent(in):: lat(klon) 
+    ! lat-----input-R- latitude en degree
     REAL d_tr(klon, klev)
+    ! d_tr-----output-R- le changement de "tr"
 
-    REAL d_trs(klon) ! (diagnostic) traceur ds le sol
+    REAL, intent(out):: d_trs(:) ! (klon) (diagnostic) changement de "trs"
 
-    INTEGER i, k, itr, n, l
+    ! Local:
+    INTEGER i, k, n, l
     REAL rotrhi(klon)
     REAL zx_coef(klon, klev)
     REAL zx_buf(klon)
     REAL zx_ctr(klon, klev)
     REAL zx_dtr(klon, klev)
-    REAL zx_trs(klon)
     REAL zx_a, zx_b
 
     REAL local_tr(klon, klev)
@@ -105,9 +105,7 @@ contains
        ENDDO
     ENDDO
 
-    DO i = 1, klon
-       local_trs(i) = trs(i)
-    ENDDO
+    local_trs = trs
 
     ! Attention si dans clmain zx_alf1(i) = 1.
     ! Il doit y avoir coherence (donc la meme chose ici)
@@ -169,21 +167,19 @@ contains
 
     DO i = 1, klon
        IF (NINT(masktr(i)) .EQ. 1) THEN
-          zx_trs(i) = local_trs(i)
-          zx_a = zx_trs(i) &
+          zx_a = local_trs(i) &
                +fshtr(i)*dtime*rotrhi(i) &
                +rotrhi(i)*masktr(i)*zx_coef(i, 1)/RG &
                *(zx_ctr(i, 1)*(zx_alpha1(i)+zx_alpha2(i)*zx_dtr(i, 2)) &
                +zx_alpha2(i)*zx_ctr(i, 2))
-          ! Pour l'instant, pour aller vite, le depot sec est traite
-          ! comme une decroissance :
+          ! Pour l'instant, pour aller vite, le d\'ep\^ot sec est trait\'e
+          ! comme une d\'ecroissance :
           zx_b = 1. + rotrhi(i)*masktr(i)*zx_coef(i, 1)/RG &
                * (1.-zx_dtr(i, 1) &
                *(zx_alpha1(i)+zx_alpha2(i)*zx_dtr(i, 2))) &
                + dtime / tautr &
                + dtime * vdeptr / hsoltr
-          zx_trs(i) = zx_a / zx_b
-          local_trs(i) = zx_trs(i)
+          local_trs(i) = zx_a / zx_b
        ENDIF
 
        ! Si on est entre 60N et 70N on divise par 2 l'emanation
@@ -192,8 +188,7 @@ contains
             .AND.lat(i).LE.70.) .OR. &
             (itr.eq.2.AND.NINT(masktr(i)).EQ.1.AND.lat(i).GE.60. &
             .AND.lat(i).LE.70.)) THEN
-          zx_trs(i) = local_trs(i)
-          zx_a = zx_trs(i) &
+          zx_a = local_trs(i) &
                +(fshtr(i)/2.)*dtime*rotrhi(i) &
                +rotrhi(i)*masktr(i)*zx_coef(i, 1)/RG &
                *(zx_ctr(i, 1)*(zx_alpha1(i)+zx_alpha2(i)*zx_dtr(i, 2)) &
@@ -203,8 +198,7 @@ contains
                *(zx_alpha1(i)+zx_alpha2(i)*zx_dtr(i, 2))) &
                + dtime / tautr &
                + dtime * vdeptr / hsoltr
-          zx_trs(i) = zx_a / zx_b
-          local_trs(i) = zx_trs(i)
+          local_trs(i) = zx_a / zx_b
        ENDIF
 
        ! Au dessus des oceans et aux hautes latitudes
@@ -214,7 +208,6 @@ contains
 
        IF ((itr.EQ.1.AND.NINT(masktr(i)).EQ.0) .OR. &
             (itr.EQ.1.AND.NINT(masktr(i)).EQ.1.AND.lat(i).LT.-60.)) THEN
-          zx_trs(i) = 0.
           local_trs(i) = 0.
        END IF
 
@@ -223,23 +216,20 @@ contains
 
        IF ((itr.EQ.1.AND.NINT(masktr(i)).EQ.0) .OR. &
             (itr.EQ.1.AND.NINT(masktr(i)).EQ.1.AND.lat(i).GT.70.)) THEN
-          zx_trs(i) = 0.
           local_trs(i) = 0.
        END IF
 
        ! Au dessus des oceans la source est nulle
 
        IF (itr.eq.1.AND.NINT(masktr(i)).EQ.0) THEN
-          zx_trs(i) = 0.
           local_trs(i) = 0.
        END IF
-
     ENDDO ! sur le i=1, klon
 
-    ! une fois qu'on a zx_trs, on peut faire l'iteration
+    ! une fois qu'on a local_trs, on peut faire l'iteration
 
     DO i = 1, klon
-       local_tr(i, 1) = zx_ctr(i, 1)+zx_dtr(i, 1)*zx_trs(i)
+       local_tr(i, 1) = zx_ctr(i, 1)+zx_dtr(i, 1)*local_trs(i)
     ENDDO
     DO l = 2, klev
        DO i = 1, klon
@@ -255,9 +245,7 @@ contains
           d_tr(i, l) = local_tr(i, l) - tr(i, l)
        ENDDO
     ENDDO
-    DO i = 1, klon
-       d_trs(i) = local_trs(i) - trs(i)
-    ENDDO
+    d_trs = local_trs - trs
 
   END SUBROUTINE cltracrn
 

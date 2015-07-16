@@ -73,7 +73,6 @@ contains
     REAL sn(klon)
     REAL qsolsrf(klon, nbsrf), snsrf(klon, nbsrf) 
     REAL albe(klon, nbsrf), evap(klon, nbsrf)
-    REAL alblw(klon, nbsrf)
     REAL tsoil(klon, nsoilmx, nbsrf) 
     REAL radsol(klon), rain_fall(klon), snow_fall(klon)
     REAL solsw(klon), sollw(klon), fder(klon)
@@ -332,7 +331,6 @@ contains
     albe(:, is_lic) = 0.6
     albe(:, is_oce) = 0.5
     albe(:, is_sic) = 0.6
-    alblw = albe
     evap = 0.
     qsolsrf = 150.
     tsoil = spread(spread(pack(tsol_2d, dyn_phy), 2, nsoilmx), 3, nbsrf)

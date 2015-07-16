@@ -21,7 +21,7 @@ contains
     USE indicesol, ONLY: is_lic, is_oce, is_sic, is_ter, nbsrf
     USE netcdf, ONLY: nf90_clobber, nf90_global, nf90_float
     USE netcdf95, ONLY: nf95_create, nf95_put_att, nf95_def_dim, &
-         nf95_def_var, nf95_enddef, nf95_redef, nf95_put_var, nf95_close
+         nf95_def_var, nf95_enddef, nf95_put_var, nf95_close
     use phyetat0_m, only: rlat, rlon
     USE temps, ONLY: itau_phy
 
@@ -67,9 +67,13 @@ contains
     INTEGER ncid, idim2, idim3, dimid_nbsrf, dimid_nsoilmx
     integer varid, varid_run_off_lic_0, varid_sig1, varid_w01, varid_rlon
     integer varid_rlat, varid_zmasq, varid_fter, varid_flic, varid_foce
-    integer varid_fsic, varid_ts, varid_tsoil
-    INTEGER nsrf
-    CHARACTER(len=2) str2
+    integer varid_fsic, varid_ts, varid_tsoil, varid_tslab, varid_SEAICE
+    integer varid_qs, varid_QSOL, varid_albe, varid_evap, varid_snow
+    integer varid_rads, varid_solsw, varid_sollw, varid_fder, varid_rain_f
+    integer varid_snow_f, varid_rug, varid_agesno, varid_zmea, varid_zstd
+    integer varid_zsig, varid_zgam, varid_zthe, varid_zpic, varid_zval
+    integer varid_tancien, varid_qancien, varid_rugmer, varid_clwcon
+    integer varid_rnebcon, varid_ratqs
 
     !------------------------------------------------------------
 
@@ -112,234 +116,86 @@ contains
          dimid_nbsrf/), varid_tsoil)
     call nf95_put_att(ncid, varid_tsoil, 'title', 'soil temperature')
 
-    call nf95_enddef(ncid)
-
-    call nf95_put_var(ncid, varid_rlon, rlon)
-    call nf95_put_var(ncid, varid_rlat, rlat)
-    call nf95_put_var(ncid, varid_zmasq, zmasq)
-    call nf95_put_var(ncid, varid_fter, pctsrf(:, is_ter))
-    call nf95_put_var(ncid, varid_flic, pctsrf(:, is_lic))
-    call nf95_put_var(ncid, varid_foce, pctsrf(:, is_oce))
-    call nf95_put_var(ncid, varid_fsic, pctsrf(:, is_sic))
-    call nf95_put_var(ncid, varid_ts, tsol)
-    call nf95_put_var(ncid, varid_tsoil, tsoil)
-
-    !IM "slab" ocean
-    call nf95_redef(ncid)
-    call nf95_def_var(ncid, 'TSLAB', nf90_float, idim2, varid)
-    call nf95_put_att(ncid, varid, 'title', &
+    call nf95_def_var(ncid, 'TSLAB', nf90_float, idim2, varid_tslab)
+    call nf95_put_att(ncid, varid_tslab, 'title', &
          'Ecart de la SST (pour slab-ocean)')
-    call nf95_enddef(ncid)
-    call nf95_put_var(ncid, varid, tslab)
 
-    call nf95_redef(ncid)
-    call nf95_def_var(ncid, 'SEAICE', nf90_float, idim2, varid)
-    call nf95_put_att(ncid, varid, 'title', &
+    call nf95_def_var(ncid, 'SEAICE', nf90_float, idim2, varid_SEAICE)
+    call nf95_put_att(ncid, varid_SEAICE, 'title', &
          'Glace de mer kg/m2 (pour slab-ocean)')
-    call nf95_enddef(ncid)
-    call nf95_put_var(ncid, varid, seaice)
 
-    DO nsrf = 1, nbsrf
-       IF (nsrf<=99) THEN
-          WRITE (str2, '(i2.2)') nsrf
-          call nf95_redef(ncid)
-          call nf95_def_var(ncid, 'QS'//str2, nf90_float, idim2, varid)
-          call nf95_put_att(ncid, varid, 'title', &
-               'Humidite de surface No.'//str2)
-          call nf95_enddef(ncid)
-       ELSE
-          PRINT *, 'Trop de sous-mailles'
-          STOP 1
-       END IF
-       call nf95_put_var(ncid, varid, qsurf(:, nsrf))
-    END DO
+    call nf95_def_var(ncid, 'QS', nf90_float, (/idim2, dimid_nbsrf/), varid_qs)
+    call nf95_put_att(ncid, varid, 'title', 'Humidite de surface')
 
-    call nf95_redef(ncid)
-    call nf95_def_var(ncid, 'QSOL', nf90_float, idim2, varid)
-    call nf95_put_att(ncid, varid, 'title', 'Eau dans le sol (mm)')
-    call nf95_enddef(ncid)
-    call nf95_put_var(ncid, varid, qsol)
+    call nf95_def_var(ncid, 'QSOL', nf90_float, idim2, varid_QSOL)
+    call nf95_put_att(ncid, varid_QSOL, 'title', 'Eau dans le sol (mm)')
 
-    DO nsrf = 1, nbsrf
-       IF (nsrf<=99) THEN
-          WRITE (str2, '(i2.2)') nsrf
-          call nf95_redef(ncid)
-          call nf95_def_var(ncid, 'ALBE'//str2, nf90_float, idim2, varid)
-          call nf95_put_att(ncid, varid, 'title', &
-               'albedo de surface No.'//str2)
-          call nf95_enddef(ncid)
-       ELSE
-          PRINT *, 'Trop de sous-mailles'
-          STOP 1
-       END IF
-       call nf95_put_var(ncid, varid, albedo(:, nsrf))
-    END DO
+    call nf95_def_var(ncid, 'ALBE', nf90_float, (/idim2, dimid_nbsrf/), &
+         varid_albe)
+    call nf95_put_att(ncid, varid_albe, 'title', 'albedo de surface')
 
-    DO nsrf = 1, nbsrf
-       IF (nsrf<=99) THEN
-          WRITE (str2, '(i2.2)') nsrf
-          call nf95_redef(ncid)
-          call nf95_def_var(ncid, 'EVAP'//str2, nf90_float, idim2, varid)
-          call nf95_put_att(ncid, varid, 'title', &
-               'Evaporation de surface No.'//str2)
-          call nf95_enddef(ncid)
-       ELSE
-          PRINT *, 'Trop de sous-mailles'
-          STOP 1
-       END IF
-       call nf95_put_var(ncid, varid, evap(:, nsrf))
-    END DO
+    call nf95_def_var(ncid, 'EVAP', nf90_float, (/idim2, dimid_nbsrf/), &
+         varid_evap)
+    call nf95_put_att(ncid, varid_evap, 'title', 'Evaporation de surface')
 
-    DO nsrf = 1, nbsrf
-       IF (nsrf<=99) THEN
-          WRITE (str2, '(i2.2)') nsrf
-          call nf95_redef(ncid)
-          call nf95_def_var(ncid, 'SNOW'//str2, nf90_float, idim2, varid)
-          call nf95_put_att(ncid, varid, 'title', &
-               'Neige de surface No.'//str2)
-          call nf95_enddef(ncid)
-       ELSE
-          PRINT *, 'Trop de sous-mailles'
-          STOP 1
-       END IF
-       call nf95_put_var(ncid, varid, snow(:, nsrf))
-    END DO
+    call nf95_def_var(ncid, 'SNOW', nf90_float, (/idim2, dimid_nbsrf/), &
+         varid_snow)
+    call nf95_put_att(ncid, varid_snow, 'title', 'Neige de surface')
 
-    call nf95_redef(ncid)
-    call nf95_def_var(ncid, 'RADS', nf90_float, idim2, varid)
-    call nf95_put_att(ncid, varid, 'title', &
+    call nf95_def_var(ncid, 'RADS', nf90_float, idim2, varid_rads)
+    call nf95_put_att(ncid, varid_rads, 'title', &
          'Rayonnement net a la surface')
-    call nf95_enddef(ncid)
-    call nf95_put_var(ncid, varid, radsol)
 
-    call nf95_redef(ncid)
-    call nf95_def_var(ncid, 'solsw', nf90_float, idim2, varid)
-    call nf95_put_att(ncid, varid, 'title', &
+    call nf95_def_var(ncid, 'solsw', nf90_float, idim2, varid_solsw)
+    call nf95_put_att(ncid, varid_solsw, 'title', &
          'Rayonnement solaire a la surface')
-    call nf95_enddef(ncid)
-    call nf95_put_var(ncid, varid, solsw)
 
-    call nf95_redef(ncid)
-    call nf95_def_var(ncid, 'sollw', nf90_float, idim2, varid)
-    call nf95_put_att(ncid, varid, 'title', &
+    call nf95_def_var(ncid, 'sollw', nf90_float, idim2, varid_sollw)
+    call nf95_put_att(ncid, varid_sollw, 'title', &
          'Rayonnement IF a la surface')
-    call nf95_enddef(ncid)
-    call nf95_put_var(ncid, varid, sollw)
 
-    call nf95_redef(ncid)
-    call nf95_def_var(ncid, 'fder', nf90_float, idim2, varid)
-    call nf95_put_att(ncid, varid, 'title', 'Derive de flux')
-    call nf95_enddef(ncid)
-    call nf95_put_var(ncid, varid, fder)
+    call nf95_def_var(ncid, 'fder', nf90_float, idim2, varid_fder)
+    call nf95_put_att(ncid, varid_fder, 'title', 'Derive de flux')
 
-    call nf95_redef(ncid)
-    call nf95_def_var(ncid, 'rain_f', nf90_float, idim2, varid)
-    call nf95_put_att(ncid, varid, 'title', 'precipitation liquide')
-    call nf95_enddef(ncid)
-    call nf95_put_var(ncid, varid, rain_fall)
+    call nf95_def_var(ncid, 'rain_f', nf90_float, idim2, varid_rain_f)
+    call nf95_put_att(ncid, varid_rain_f, 'title', 'precipitation liquide')
 
-    call nf95_redef(ncid)
-    call nf95_def_var(ncid, 'snow_f', nf90_float, idim2, varid)
-    call nf95_put_att(ncid, varid, 'title', 'precipitation solide')
-    call nf95_enddef(ncid)
-    call nf95_put_var(ncid, varid, snow_fall)
+    call nf95_def_var(ncid, 'snow_f', nf90_float, idim2, varid_snow_f)
+    call nf95_put_att(ncid, varid_snow_f, 'title', 'precipitation solide')
 
-    DO nsrf = 1, nbsrf
-       IF (nsrf<=99) THEN
-          WRITE (str2, '(i2.2)') nsrf
-          call nf95_redef(ncid)
-          call nf95_def_var(ncid, 'RUG'//str2, nf90_float, idim2, varid)
-          call nf95_put_att(ncid, varid, 'title', &
-               'rugosite de surface No.'//str2)
-          call nf95_enddef(ncid)
-       ELSE
-          PRINT *, 'Trop de sous-mailles'
-          STOP 1
-       END IF
-       call nf95_put_var(ncid, varid, frugs(:, nsrf))
-    END DO
+    call nf95_def_var(ncid, 'RUG', nf90_float, (/idim2, dimid_nbsrf/), &
+         varid_rug)
+    call nf95_put_att(ncid, varid_rug, 'title', 'rugosite de surface')
 
-    DO nsrf = 1, nbsrf
-       IF (nsrf<=99) THEN
-          WRITE (str2, '(i2.2)') nsrf
-          call nf95_redef(ncid)
-          call nf95_def_var(ncid, 'AGESNO'//str2, nf90_float, idim2, varid)
-          call nf95_put_att(ncid, varid, 'title', &
-               'Age de la neige surface No.'//str2)
-          call nf95_enddef(ncid)
-       ELSE
-          PRINT *, 'Trop de sous-mailles'
-          STOP 1
-       END IF
-       call nf95_put_var(ncid, varid, agesno(:, nsrf))
-    END DO
+    call nf95_def_var(ncid, 'AGESNO', nf90_float, (/idim2, dimid_nbsrf/), &
+         varid_agesno)
+    call nf95_put_att(ncid, varid_agesno, 'title', 'Age de la neige surface')
 
-    call nf95_redef(ncid)
-    call nf95_def_var(ncid, 'ZMEA', nf90_float, idim2, varid)
-    call nf95_enddef(ncid)
-    call nf95_put_var(ncid, varid, zmea)
+    call nf95_def_var(ncid, 'ZMEA', nf90_float, idim2, varid_zmea)
+    call nf95_def_var(ncid, 'ZSTD', nf90_float, idim2, varid_zstd)
+    call nf95_def_var(ncid, 'ZSIG', nf90_float, idim2, varid_zsig)
+    call nf95_def_var(ncid, 'ZGAM', nf90_float, idim2, varid_zgam)
+    call nf95_def_var(ncid, 'ZTHE', nf90_float, idim2, varid_zthe)
+    call nf95_def_var(ncid, 'ZPIC', nf90_float, idim2, varid_zpic)
+    call nf95_def_var(ncid, 'ZVAL', nf90_float, idim2, varid_zval)
+    call nf95_def_var(ncid, 'TANCIEN', nf90_float, (/idim2, idim3/), &
+         varid_tancien)
+    call nf95_def_var(ncid, 'QANCIEN', nf90_float, (/idim2, idim3/), &
+         varid_qancien)
 
-    call nf95_redef(ncid)
-    call nf95_def_var(ncid, 'ZSTD', nf90_float, idim2, varid)
-    call nf95_enddef(ncid)
-    call nf95_put_var(ncid, varid, zstd)
-    call nf95_redef(ncid)
-    call nf95_def_var(ncid, 'ZSIG', nf90_float, idim2, varid)
-    call nf95_enddef(ncid)
-    call nf95_put_var(ncid, varid, zsig)
-    call nf95_redef(ncid)
-    call nf95_def_var(ncid, 'ZGAM', nf90_float, idim2, varid)
-    call nf95_enddef(ncid)
-    call nf95_put_var(ncid, varid, zgam)
-    call nf95_redef(ncid)
-    call nf95_def_var(ncid, 'ZTHE', nf90_float, idim2, varid)
-    call nf95_enddef(ncid)
-    call nf95_put_var(ncid, varid, zthe)
-    call nf95_redef(ncid)
-    call nf95_def_var(ncid, 'ZPIC', nf90_float, idim2, varid)
-    call nf95_enddef(ncid)
-    call nf95_put_var(ncid, varid, zpic)
-    call nf95_redef(ncid)
-    call nf95_def_var(ncid, 'ZVAL', nf90_float, idim2, varid)
-    call nf95_enddef(ncid)
-    call nf95_put_var(ncid, varid, zval)
-
-    call nf95_redef(ncid)
-    call nf95_def_var(ncid, 'TANCIEN', nf90_float, (/idim2, idim3/), varid)
-    call nf95_enddef(ncid)
-    call nf95_put_var(ncid, varid, t_ancien)
-
-    call nf95_redef(ncid)
-    call nf95_def_var(ncid, 'QANCIEN', nf90_float, (/idim2, idim3/), varid)
-    call nf95_enddef(ncid)
-    call nf95_put_var(ncid, varid, q_ancien)
-
-    call nf95_redef(ncid)
-    call nf95_def_var(ncid, 'RUGMER', nf90_float, idim2, varid)
-    call nf95_put_att(ncid, varid, 'title', &
+    call nf95_def_var(ncid, 'RUGMER', nf90_float, idim2, varid_rugmer)
+    call nf95_put_att(ncid, varid_rugmer, 'title', &
          'Longueur de rugosite sur mer')
-    call nf95_enddef(ncid)
-    call nf95_put_var(ncid, varid, frugs(:, is_oce))
 
-    call nf95_redef(ncid)
-    call nf95_def_var(ncid, 'CLWCON', nf90_float, idim2, varid)
-    call nf95_put_att(ncid, varid, 'title', 'Eau liquide convective')
-    call nf95_enddef(ncid)
-    call nf95_put_var(ncid, varid, clwcon(:, 1))
+    call nf95_def_var(ncid, 'CLWCON', nf90_float, idim2, varid_clwcon)
+    call nf95_put_att(ncid, varid_clwcon, 'title', 'Eau liquide convective')
 
-    call nf95_redef(ncid)
-    call nf95_def_var(ncid, 'RNEBCON', nf90_float, idim2, varid)
-    call nf95_put_att(ncid, varid, 'title', 'Nebulosite convective')
-    call nf95_enddef(ncid)
-    call nf95_put_var(ncid, varid, rnebcon(:, 1))
+    call nf95_def_var(ncid, 'RNEBCON', nf90_float, idim2, varid_rnebcon)
+    call nf95_put_att(ncid, varid_rnebcon, 'title', 'Nebulosite convective')
 
-    call nf95_redef(ncid)
-    call nf95_def_var(ncid, 'RATQS', nf90_float, idim2, varid)
-    call nf95_put_att(ncid, varid, 'title', 'Ratqs')
-    call nf95_enddef(ncid)
-    call nf95_put_var(ncid, varid, ratqs(:, 1))
+    call nf95_def_var(ncid, 'RATQS', nf90_float, idim2, varid_ratqs)
+    call nf95_put_att(ncid, varid_ratqs, 'title', 'Ratqs')
 
-    call nf95_redef(ncid)
     call nf95_def_var(ncid, 'RUNOFFLIC0', nf90_float, idim2, &
          varid_run_off_lic_0)
     call nf95_put_att(ncid, varid_run_off_lic_0, 'title', 'Runofflic0')
@@ -354,6 +210,43 @@ contains
 
     call nf95_enddef(ncid)
 
+    call nf95_put_var(ncid, varid_rlon, rlon)
+    call nf95_put_var(ncid, varid_rlat, rlat)
+    call nf95_put_var(ncid, varid_zmasq, zmasq)
+    call nf95_put_var(ncid, varid_fter, pctsrf(:, is_ter))
+    call nf95_put_var(ncid, varid_flic, pctsrf(:, is_lic))
+    call nf95_put_var(ncid, varid_foce, pctsrf(:, is_oce))
+    call nf95_put_var(ncid, varid_fsic, pctsrf(:, is_sic))
+    call nf95_put_var(ncid, varid_ts, tsol)
+    call nf95_put_var(ncid, varid_tsoil, tsoil)
+    call nf95_put_var(ncid, varid_tslab, tslab)
+    call nf95_put_var(ncid, varid_SEAICE, seaice)
+    call nf95_put_var(ncid, varid_qs, qsurf)
+    call nf95_put_var(ncid, varid_QSOL, qsol)
+    call nf95_put_var(ncid, varid_albe, albedo)
+    call nf95_put_var(ncid, varid_evap, evap)
+    call nf95_put_var(ncid, varid_snow, snow)
+    call nf95_put_var(ncid, varid_rads, radsol)
+    call nf95_put_var(ncid, varid_solsw, solsw)
+    call nf95_put_var(ncid, varid_sollw, sollw)
+    call nf95_put_var(ncid, varid_fder, fder)
+    call nf95_put_var(ncid, varid_rain_f, rain_fall)
+    call nf95_put_var(ncid, varid_snow_f, snow_fall)
+    call nf95_put_var(ncid, varid_rug, frugs)
+    call nf95_put_var(ncid, varid_agesno, agesno)
+    call nf95_put_var(ncid, varid_zmea, zmea)
+    call nf95_put_var(ncid, varid_zstd, zstd)
+    call nf95_put_var(ncid, varid_zsig, zsig)
+    call nf95_put_var(ncid, varid_zgam, zgam)
+    call nf95_put_var(ncid, varid_zthe, zthe)
+    call nf95_put_var(ncid, varid_zpic, zpic)
+    call nf95_put_var(ncid, varid_zval, zval)
+    call nf95_put_var(ncid, varid_tancien, t_ancien)
+    call nf95_put_var(ncid, varid_qancien, q_ancien)
+    call nf95_put_var(ncid, varid_rugmer, frugs(:, is_oce))
+    call nf95_put_var(ncid, varid_clwcon, clwcon(:, 1))
+    call nf95_put_var(ncid, varid_rnebcon, rnebcon(:, 1))
+    call nf95_put_var(ncid, varid_ratqs, ratqs(:, 1))
     call nf95_put_var(ncid, varid_run_off_lic_0, run_off_lic_0)
     call nf95_put_var(ncid, varid_sig1, sig1)
     call nf95_put_var(ncid, varid_w01, w01)

@@ -30,19 +30,18 @@ module dynetat0_m
   ! raideur de la transition de l'int\'erieur \`a l'ext\'erieur du zoom
   
   real rlatu(jjm + 1)
-  ! (latitudes of points of the "scalar" and "u" grid, in rad)
+  ! latitudes of points of the "scalar" and "u" grid, in rad
 
   real rlatv(jjm) 
-  ! (latitudes of points of the "v" grid, in rad, in decreasing order)
+  ! latitudes of points of the "v" grid, in rad, in decreasing order
 
   real rlonu(iim + 1) ! longitudes of points of the "u" grid, in rad
 
   real rlonv(iim + 1)
-  ! (longitudes of points of the "scalar" and "v" grid, in rad)
+  ! longitudes of points of the "scalar" and "v" grid, in rad
 
   real xprimu(iim + 1), xprimv(iim + 1)
-  ! xprim[uv] = 2 pi / iim * (derivative of the longitudinal zoom
-  ! function)(rlon[uv])
+  ! 2 pi / iim * (derivative of the longitudinal zoom function)(rlon[uv])
 
   REAL xprimm025(iim + 1), xprimp025(iim + 1)
   REAL rlatu1(jjm), rlatu2(jjm), yprimu1(jjm), yprimu2(jjm)

@@ -30,17 +30,15 @@ SUBROUTINE prather(q, w, masse, pbaru, pbarv, nt, dt)
 
   ! Arguments:
   ! ----------
-  INTEGER iq, nt
+  INTEGER nt
   REAL, INTENT (IN) :: pbaru(ip1jmp1, llm), pbarv(ip1jm, llm)
   REAL masse(iip1, jjp1, llm)
   REAL q(iip1, jjp1, llm, 0:9)
   REAL w(ip1jmp1, llm)
-  INTEGER ordre, ilim
 
   ! Local:
   ! ------
   LOGICAL limit
-  REAL zq(iip1, jjp1, llm)
   REAL sm(iip1, jjp1, llm)
   REAL s0(iip1, jjp1, llm), sx(iip1, jjp1, llm)
   REAL sy(iip1, jjp1, llm), sz(iip1, jjp1, llm)

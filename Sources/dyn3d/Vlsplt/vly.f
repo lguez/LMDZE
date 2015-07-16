@@ -25,7 +25,7 @@
 !   ----------
       REAL masse(ip1jmp1,llm),pente_max
       REAL masse_adv_v( ip1jm,llm)
-      REAL q(ip1jmp1,llm), dq( ip1jmp1,llm)
+      REAL q(ip1jmp1,llm)
 !
 !      Local
 !   ---------
@@ -33,14 +33,14 @@
       INTEGER i,ij,l
 !
       REAL airej2,airejjm,airescb(iim),airesch(iim)
-      REAL dyq(ip1jmp1,llm),dyqv(ip1jm),zdvm(ip1jmp1,llm)
+      REAL dyq(ip1jmp1,llm),dyqv(ip1jm)
       REAL adyqv(ip1jm),dyqmax(ip1jmp1)
       REAL qbyv(ip1jm,llm)
 
-      REAL qpns,qpsn,apn,aps,dyn1,dys1,dyn2,dys2,newmasse,fn,fs
+      REAL qpns,qpsn,dyn1,dys1,dyn2,dys2,newmasse,fn,fs
 !     REAL newq,oldmasse
-      Logical extremum,first,testcpu
-      REAL temps0,temps1,temps2,temps3,temps4,temps5,second
+      Logical first,testcpu
+      REAL temps0,temps1,temps2,temps3,temps4,temps5
       SAVE temps0,temps1,temps2,temps3,temps4,temps5
       SAVE first,testcpu
 

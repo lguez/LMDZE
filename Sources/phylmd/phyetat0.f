@@ -69,8 +69,7 @@ contains
     REAL fractint(klon)
     REAL xmin, xmax
     INTEGER ncid, varid, ndims
-    INTEGER ierr, i, nsrf 
-    CHARACTER(len=2) str2
+    INTEGER ierr, i
 
     !---------------------------------------------------------------
 
@@ -166,9 +165,9 @@ contains
        print *, "Found only one surface type for soil temperature."
        call nf95_get_var(ncid, varid, tsol(:, 1))
        tsol(:, 2:nbsrf) = spread(tsol(:, 1), dim = 2, ncopies = nbsrf - 1)
-    end if      
+    end if
 
-   ! Lecture des temperatures du sol profond:
+    ! Lecture des temperatures du sol profond:
 
     call NF95_INQ_VARID(ncid, 'Tsoil', varid)
     call NF95_GET_VAR(ncid, varid, tsoil)
@@ -180,43 +179,15 @@ contains
 
     ! Lecture de l'humidite de l'air juste au dessus du sol:
 
-    ierr = NF90_INQ_VARID(ncid, "QS", varid)
-    IF (ierr /= NF90_NOERR) THEN
-       PRINT *, 'phyetat0: Le champ <QS> est absent'
-       PRINT *, ' Mais je vais essayer de lire QS**'
-       DO nsrf = 1, nbsrf
-          IF (nsrf > 99) THEN
-             PRINT *, "Trop de sous-mailles"
-             stop 1
-          ENDIF
-          WRITE(str2, '(i2.2)') nsrf
-          call NF95_INQ_VARID(ncid, "QS"//str2, varid)
-          call NF95_GET_VAR(ncid, varid, qsurf(:, nsrf))
-          xmin = 1.0E+20
-          xmax = -1.0E+20
-          DO i = 1, klon
-             xmin = MIN(qsurf(i, nsrf), xmin)
-             xmax = MAX(qsurf(i, nsrf), xmax)
-          ENDDO
-          PRINT *, 'Humidite pres du sol QS**:', nsrf, xmin, xmax
-       ENDDO
-    ELSE
-       PRINT *, 'phyetat0: Le champ <QS> est present'
-       PRINT *, ' J ignore donc les autres humidites QS**'
-       call nf95_get_var(ncid, varid, qsurf(:, 1))
-       xmin = 1.0E+20
-       xmax = -1.0E+20
-       DO i = 1, klon
-          xmin = MIN(qsurf(i, 1), xmin)
-          xmax = MAX(qsurf(i, 1), xmax)
-       ENDDO
-       PRINT *, 'Humidite pres du sol <QS>', xmin, xmax
-       DO nsrf = 2, nbsrf
-          DO i = 1, klon
-             qsurf(i, nsrf) = qsurf(i, 1)
-          ENDDO
-       ENDDO
-    ENDIF
+    call NF95_INQ_VARID(ncid, "QS", varid)
+    call nf95_get_var(ncid, varid, qsurf)
+    xmin = 1.0E+20
+    xmax = -1.0E+20
+    DO i = 1, klon
+       xmin = MIN(qsurf(i, 1), xmin)
+       xmax = MAX(qsurf(i, 1), xmax)
+    ENDDO
+    PRINT *, 'Humidite pres du sol <QS>', xmin, xmax
 
     ! Eau dans le sol (pour le modele de sol "bucket")
 
@@ -231,123 +202,39 @@ contains
 
     ! Lecture de neige au sol:
 
-    ierr = NF90_INQ_VARID(ncid, "SNOW", varid)
-    IF (ierr /= NF90_NOERR) THEN
-       PRINT *, 'phyetat0: Le champ <SNOW> est absent'
-       PRINT *, ' Mais je vais essayer de lire SNOW**'
-       DO nsrf = 1, nbsrf
-          IF (nsrf > 99) THEN
-             PRINT *, "Trop de sous-mailles"
-             stop 1
-          ENDIF
-          WRITE(str2, '(i2.2)') nsrf
-          call NF95_INQ_VARID(ncid, "SNOW"//str2, varid)
-          call NF95_GET_VAR(ncid, varid, snow(:, nsrf))
-          xmin = 1.0E+20
-          xmax = -1.0E+20
-          DO i = 1, klon
-             xmin = MIN(snow(i, nsrf), xmin)
-             xmax = MAX(snow(i, nsrf), xmax)
-          ENDDO
-          PRINT *, 'Neige du sol SNOW**:', nsrf, xmin, xmax
-       ENDDO
-    ELSE
-       PRINT *, 'phyetat0: Le champ <SNOW> est present'
-       PRINT *, ' J ignore donc les autres neiges SNOW**'
-       call nf95_get_var(ncid, varid, snow(:, 1))
-       xmin = 1.0E+20
-       xmax = -1.0E+20
-       DO i = 1, klon
-          xmin = MIN(snow(i, 1), xmin)
-          xmax = MAX(snow(i, 1), xmax)
-       ENDDO
-       PRINT *, 'Neige du sol <SNOW>', xmin, xmax
-       DO nsrf = 2, nbsrf
-          DO i = 1, klon
-             snow(i, nsrf) = snow(i, 1)
-          ENDDO
-       ENDDO
-    ENDIF
+    call NF95_INQ_VARID(ncid, "SNOW", varid)
+    call nf95_get_var(ncid, varid, snow)
+    xmin = 1.0E+20
+    xmax = -1.0E+20
+    DO i = 1, klon
+       xmin = MIN(snow(i, 1), xmin)
+       xmax = MAX(snow(i, 1), xmax)
+    ENDDO
+    PRINT *, 'Neige du sol <SNOW>', xmin, xmax
 
     ! Lecture de albedo au sol:
 
-    ierr = NF90_INQ_VARID(ncid, "ALBE", varid)
-    IF (ierr /= NF90_NOERR) THEN
-       PRINT *, 'phyetat0: Le champ <ALBE> est absent'
-       PRINT *, ' Mais je vais essayer de lire ALBE**'
-       DO nsrf = 1, nbsrf
-          IF (nsrf > 99) THEN
-             PRINT *, "Trop de sous-mailles"
-             stop 1
-          ENDIF
-          WRITE(str2, '(i2.2)') nsrf
-          call NF95_INQ_VARID(ncid, "ALBE"//str2, varid)
-          call NF95_GET_VAR(ncid, varid, albe(:, nsrf))
-          xmin = 1.0E+20
-          xmax = -1.0E+20
-          DO i = 1, klon
-             xmin = MIN(albe(i, nsrf), xmin)
-             xmax = MAX(albe(i, nsrf), xmax)
-          ENDDO
-          PRINT *, 'Albedo du sol ALBE**:', nsrf, xmin, xmax
-       ENDDO
-    ELSE
-       PRINT *, 'phyetat0: Le champ <ALBE> est present'
-       PRINT *, ' J ignore donc les autres ALBE**'
-       call nf95_get_var(ncid, varid, albe(:, 1))
-       xmin = 1.0E+20
-       xmax = -1.0E+20
-       DO i = 1, klon
-          xmin = MIN(albe(i, 1), xmin)
-          xmax = MAX(albe(i, 1), xmax)
-       ENDDO
-       PRINT *, 'Neige du sol <ALBE>', xmin, xmax
-       DO nsrf = 2, nbsrf
-          DO i = 1, klon
-             albe(i, nsrf) = albe(i, 1)
-          ENDDO
-       ENDDO
-    ENDIF
+    call NF95_INQ_VARID(ncid, "ALBE", varid)
+    call nf95_get_var(ncid, varid, albe)
+    xmin = 1.0E+20
+    xmax = -1.0E+20
+    DO i = 1, klon
+       xmin = MIN(albe(i, 1), xmin)
+       xmax = MAX(albe(i, 1), xmax)
+    ENDDO
+    PRINT *, 'Neige du sol <ALBE>', xmin, xmax
 
     ! Lecture de evaporation: 
 
-    ierr = NF90_INQ_VARID(ncid, "EVAP", varid)
-    IF (ierr /= NF90_NOERR) THEN
-       PRINT *, 'phyetat0: Le champ <EVAP> est absent'
-       PRINT *, ' Mais je vais essayer de lire EVAP**'
-       DO nsrf = 1, nbsrf
-          IF (nsrf > 99) THEN
-             PRINT *, "Trop de sous-mailles"
-             stop 1
-          ENDIF
-          WRITE(str2, '(i2.2)') nsrf
-          call NF95_INQ_VARID(ncid, "EVAP"//str2, varid)
-          call NF95_GET_VAR(ncid, varid, evap(:, nsrf))
-          xmin = 1.0E+20
-          xmax = -1.0E+20
-          DO i = 1, klon
-             xmin = MIN(evap(i, nsrf), xmin)
-             xmax = MAX(evap(i, nsrf), xmax)
-          ENDDO
-          PRINT *, 'evap du sol EVAP**:', nsrf, xmin, xmax
-       ENDDO
-    ELSE
-       PRINT *, 'phyetat0: Le champ <EVAP> est present'
-       PRINT *, ' J ignore donc les autres EVAP**'
-       call nf95_get_var(ncid, varid, evap(:, 1))
-       xmin = 1.0E+20
-       xmax = -1.0E+20
-       DO i = 1, klon
-          xmin = MIN(evap(i, 1), xmin)
-          xmax = MAX(evap(i, 1), xmax)
-       ENDDO
-       PRINT *, 'Evap du sol <EVAP>', xmin, xmax
-       DO nsrf = 2, nbsrf
-          DO i = 1, klon
-             evap(i, nsrf) = evap(i, 1)
-          ENDDO
-       ENDDO
-    ENDIF
+    call NF95_INQ_VARID(ncid, "EVAP", varid)
+    call nf95_get_var(ncid, varid, evap)
+    xmin = 1.0E+20
+    xmax = -1.0E+20
+    DO i = 1, klon
+       xmin = MIN(evap(i, 1), xmin)
+       xmax = MAX(evap(i, 1), xmax)
+    ENDDO
+    PRINT *, 'Evap du sol <EVAP>', xmin, xmax
 
     ! Lecture precipitation liquide:
 
@@ -428,87 +315,27 @@ contains
 
     ! Lecture de la longueur de rugosite 
 
-    ierr = NF90_INQ_VARID(ncid, "RUG", varid)
-    IF (ierr /= NF90_NOERR) THEN
-       PRINT *, 'phyetat0: Le champ <RUG> est absent'
-       PRINT *, ' Mais je vais essayer de lire RUG**'
-       DO nsrf = 1, nbsrf
-          IF (nsrf > 99) THEN
-             PRINT *, "Trop de sous-mailles"
-             stop 1
-          ENDIF
-          WRITE(str2, '(i2.2)') nsrf
-          call NF95_INQ_VARID(ncid, "RUG"//str2, varid)
-          call NF95_GET_VAR(ncid, varid, frugs(:, nsrf))
-          xmin = 1.0E+20
-          xmax = -1.0E+20
-          DO i = 1, klon
-             xmin = MIN(frugs(i, nsrf), xmin)
-             xmax = MAX(frugs(i, nsrf), xmax)
-          ENDDO
-          PRINT *, 'rugosite du sol RUG**:', nsrf, xmin, xmax
-       ENDDO
-    ELSE
-       PRINT *, 'phyetat0: Le champ <RUG> est present'
-       PRINT *, ' J ignore donc les autres RUG**'
-       call nf95_get_var(ncid, varid, frugs(:, 1))
-       xmin = 1.0E+20
-       xmax = -1.0E+20
-       DO i = 1, klon
-          xmin = MIN(frugs(i, 1), xmin)
-          xmax = MAX(frugs(i, 1), xmax)
-       ENDDO
-       PRINT *, 'rugosite <RUG>', xmin, xmax
-       DO nsrf = 2, nbsrf
-          DO i = 1, klon
-             frugs(i, nsrf) = frugs(i, 1)
-          ENDDO
-       ENDDO
-    ENDIF
+    call NF95_INQ_VARID(ncid, "RUG", varid)
+    call nf95_get_var(ncid, varid, frugs)
+    xmin = 1.0E+20
+    xmax = -1.0E+20
+    DO i = 1, klon
+       xmin = MIN(frugs(i, 1), xmin)
+       xmax = MAX(frugs(i, 1), xmax)
+    ENDDO
+    PRINT *, 'rugosite <RUG>', xmin, xmax
 
     ! Lecture de l'age de la neige:
 
-    ierr = NF90_INQ_VARID(ncid, "AGESNO", varid)
-    IF (ierr /= NF90_NOERR) THEN
-       PRINT *, 'phyetat0: Le champ <AGESNO> est absent'
-       PRINT *, ' Mais je vais essayer de lire AGESNO**'
-       DO nsrf = 1, nbsrf
-          IF (nsrf > 99) THEN
-             PRINT *, "Trop de sous-mailles"
-             stop 1
-          ENDIF
-          WRITE(str2, '(i2.2)') nsrf
-          ierr = NF90_INQ_VARID(ncid, "AGESNO"//str2, varid)
-          IF (ierr /= NF90_NOERR) THEN
-             PRINT *, "phyetat0: Le champ <AGESNO"//str2//"> est absent"
-             agesno = 50.0
-          ENDIF
-          call NF95_GET_VAR(ncid, varid, agesno(:, nsrf))
-          xmin = 1.0E+20
-          xmax = -1.0E+20
-          DO i = 1, klon
-             xmin = MIN(agesno(i, nsrf), xmin)
-             xmax = MAX(agesno(i, nsrf), xmax)
-          ENDDO
-          PRINT *, 'Age de la neige AGESNO**:', nsrf, xmin, xmax
-       ENDDO
-    ELSE
-       PRINT *, 'phyetat0: Le champ <AGESNO> est present'
-       PRINT *, ' J ignore donc les autres AGESNO**'
-       call nf95_get_var(ncid, varid, agesno(:, 1))
-       xmin = 1.0E+20
-       xmax = -1.0E+20
-       DO i = 1, klon
-          xmin = MIN(agesno(i, 1), xmin)
-          xmax = MAX(agesno(i, 1), xmax)
-       ENDDO
-       PRINT *, 'Age de la neige <AGESNO>', xmin, xmax
-       DO nsrf = 2, nbsrf
-          DO i = 1, klon
-             agesno(i, nsrf) = agesno(i, 1)
-          ENDDO
-       ENDDO
-    ENDIF
+    call NF95_INQ_VARID(ncid, "AGESNO", varid)
+    call nf95_get_var(ncid, varid, agesno)
+    xmin = 1.0E+20
+    xmax = -1.0E+20
+    DO i = 1, klon
+       xmin = MIN(agesno(i, 1), xmin)
+       xmax = MAX(agesno(i, 1), xmax)
+    ENDDO
+    PRINT *, 'Age de la neige <AGESNO>', xmin, xmax
 
     call NF95_INQ_VARID(ncid, "ZMEA", varid)
     call NF95_GET_VAR(ncid, varid, zmea)
