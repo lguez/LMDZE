@@ -85,12 +85,11 @@ contains
     REAL zc(klon, nsoilmx, nbsrf), zd(klon, nsoilmx, nbsrf)
     REAL lambda
     SAVE dz1, dz2, zc, zd, lambda
-    LOGICAL firstcall, firstsurf(nbsrf)
-    SAVE firstcall, firstsurf
+    LOGICAL firstsurf(nbsrf)
+    SAVE firstsurf
     REAL isol, isno, iice
     SAVE isol, isno, iice
 
-    DATA firstcall/.TRUE./
     DATA firstsurf/.TRUE., .TRUE., .TRUE., .TRUE./
 
     DATA isol, isno, iice/2000., 2000., 2000./
@@ -131,8 +130,6 @@ contains
        STOP 1
     END IF
 
-
-    ! $$$      IF (firstcall) THEN
     IF (firstsurf(indice)) THEN
 
        ! -----------------------------------------------------------------------
@@ -175,12 +172,11 @@ contains
        END DO
        ! PB
        firstsurf(indice) = .FALSE.
-       ! $$$         firstcall =.false.
 
        ! Initialisations:
        ! ----------------
 
-    ELSE !--not firstcall
+    ELSE
        ! -----------------------------------------------------------------------
        ! Computation of the soil temperatures using the Cgrd and Dgrd
        ! coefficient computed at the previous time-step:
@@ -200,7 +196,7 @@ contains
           END DO
        END DO
 
-    END IF !--not firstcall
+    END IF
     ! -----------------------------------------------------------------------
     ! Computation of the Cgrd and Dgrd coefficient for the next step:
     ! ---------------------------------------------------------------

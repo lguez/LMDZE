@@ -65,21 +65,11 @@ SUBROUTINE swclr(knu, paer, flag_aer, tauae, pizae, cgae, palbp, pdsig, &
   DOUBLE PRECISION zscat(kdlon)
   DOUBLE PRECISION ztr(kdlon, 2, kflev+1)
 
-  INTEGER jl, jk, ja, jkl, jklp1, jaj, jkm1, in
+  INTEGER jl, jk, ja, jkl, jklp1, jaj, jkm1
   DOUBLE PRECISION ztray, zgar, zratio, zff, zfacoa, zcorae
   DOUBLE PRECISION zmue, zgap, zww, zto, zden, zmu1, zden1
   DOUBLE PRECISION zbmu0, zbmu1, zre11
 
-  ! * Prescribed Data for Aerosols:
-
-  DOUBLE PRECISION taua(2, 5), rpiza(2, 5), rcga(2, 5)
-  SAVE taua, rpiza, rcga
-  DATA ((taua(in,ja),ja=1,5), in=1, 2)/.730719, .912819, .725059, .745405, &
-    .682188, .730719, .912819, .725059, .745405, .682188/
-  DATA ((rpiza(in,ja),ja=1,5), in=1, 2)/.872212, .982545, .623143, .944887, &
-    .997975, .872212, .982545, .623143, .944887, .997975/
-  DATA ((rcga(in,ja),ja=1,5), in=1, 2)/.647596, .739002, .580845, .662657, &
-    .624246, .647596, .739002, .580845, .662657, .624246/
   ! ------------------------------------------------------------------
 
   ! *         1.    OPTICAL PARAMETERS FOR AEROSOLS AND RAYLEIGH
@@ -96,24 +86,6 @@ SUBROUTINE swclr(knu, paer, flag_aer, tauae, pizae, cgae, palbp, pdsig, &
   END DO
 
   DO jk = 1, kflev
-    ! -OB
-    ! DO 104 JL = 1, KDLON
-    ! PCGAZ(JL,JK) = 0.
-    ! PPIZAZ(JL,JK) =  0.
-    ! PTAUAZ(JL,JK) = 0.
-    ! 104  CONTINUE
-    ! -OB
-    ! DO 106 JAE=1,5
-    ! DO 105 JL = 1, KDLON
-    ! PTAUAZ(JL,JK)=PTAUAZ(JL,JK)
-    ! S        +PAER(JL,JK,JAE)*TAUA(KNU,JAE)
-    ! PPIZAZ(JL,JK)=PPIZAZ(JL,JK)+PAER(JL,JK,JAE)
-    ! S        * TAUA(KNU,JAE)*RPIZA(KNU,JAE)
-    ! PCGAZ(JL,JK) =  PCGAZ(JL,JK) +PAER(JL,JK,JAE)
-    ! S        * TAUA(KNU,JAE)*RPIZA(KNU,JAE)*RCGA(KNU,JAE)
-    ! 105  CONTINUE
-    ! 106  CONTINUE
-    ! -OB
     DO jl = 1, kdlon
       ptauaz(jl, jk) = flag_aer*tauae(jl, jk, knu)
       ppizaz(jl, jk) = flag_aer*pizae(jl, jk, knu)
@@ -142,11 +114,6 @@ SUBROUTINE swclr(knu, paer, flag_aer, tauae, pizae, cgae, palbp, pdsig, &
         ppizaz(jl, jk) = 1. - repsct
       END DO
     END IF ! check flag_aer
-    ! 107  CONTINUE
-    ! PRINT 9107,JK,((PAER(JL,JK,JAE),JAE=1,5)
-    ! $ ,PTAUAZ(JL,JK),PPIZAZ(JL,JK),PCGAZ(JL,JK),JL=1,KDLON)
-    ! 9107 FORMAT(1X,'SWCLR_107',I3,8E12.5)
-
   END DO
 
   ! ------------------------------------------------------------------

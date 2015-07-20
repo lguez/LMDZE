@@ -12,7 +12,7 @@ contains
     ! de "thermiques" explicitement repr\'esent\'es. R\'ecriture \`a partir
     ! d'un listing papier \`a Habas, le 14/02/00. Le thermique est
     ! suppos\'e homog\`ene et dissip\'e par m\'elange avec son
-    ! environnement. La longueur "l_mix" contrôle l'efficacit\'e du
+    ! environnement. La longueur "l_mix" contr\^ole l'efficacit\'e du
     ! m\'elange. Le calcul du transport des diff\'erentes esp\`eces se fait
     ! en prenant en compte :
     ! 1. un flux de masse montant
@@ -97,15 +97,8 @@ contains
     real entr_star_tot(klon), entr_star2(klon)
     real f(klon)
     real zlevinter(klon)
-    logical first
-    data first /.false./
-    save first
 
     EXTERNAL SCOPY
-
-    integer ncorrec
-    save ncorrec
-    data ncorrec/0/
 
     !-----------------------------------------------------------------------
 

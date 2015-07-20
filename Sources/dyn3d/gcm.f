@@ -112,7 +112,7 @@ PROGRAM gcm
   ENDIF
 
   ! Initialisation des entr\'ees-sorties :
-  CALL dynredem0("restart.nc", day_ini + nday, phis)
+  CALL dynredem0(day_ini + nday, phis)
   CALL inithist(dtvr, nqmx, t_ops = iecri * daysec, t_wrt = iecri * daysec)
   CALL initdynav(dtvr, nqmx, t_ops = iperiod * dtvr, t_wrt = periodav * daysec)
   call init_dynzon(dt_app = dtvr * iperiod)

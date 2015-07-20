@@ -10,7 +10,7 @@ contains
   SUBROUTINE phytrac(itap, lmt_pas, julien, gmtime, firstcal, lafin, pdtphys, &
        t_seri, paprs, pplay, pmfu, pmfd, pde_u, pen_d, coefh, fm_therm, &
        entr_therm, yu1, yv1, ftsol, pctsrf, frac_impa, frac_nucl, pphis, da, &
-       phi, mp, upwd, dnwd, tr_seri, zmasse)
+       phi, mp, upwd, dnwd, tr_seri, zmasse, ncid_startphy)
 
     ! From phylmd/phytrac.F, version 1.15 2006/02/21 08:08:30 (SVN revision 679)
 
@@ -39,10 +39,12 @@ contains
     use ini_histrac_m, only: ini_histrac
     use initrrnpb_m, only: initrrnpb
     use minmaxqfi_m, only: minmaxqfi
+    use netcdf95, only: nf95_inq_varid, nf95_get_var, nf95_put_var
     use nflxtr_m, only: nflxtr
     use nr_util, only: assert
     use o3_chem_m, only: o3_chem
     use phyetat0_m, only: rlat
+    use phyredem0_m, only: ncid_restartphy
     use press_coefoz_m, only: press_coefoz
     use radiornpb_m, only: radiornpb
     use regr_pr_comb_coefoz_m, only: regr_pr_comb_coefoz
@@ -102,7 +104,9 @@ contains
     real, intent(in):: zmasse(:, :) ! (klon, llm)
     ! (column-density of mass of air in a cell, in kg m-2)
 
-    ! Variables local to the procedure:
+    integer, intent(in):: ncid_startphy
+
+    ! Local:
 
     integer nsplit
 
@@ -170,7 +174,7 @@ contains
     ! ! dans chaque couche 
 
     real ztra_th(klon, llm)
-    integer isplit
+    integer isplit, varid
 
     ! Controls:
     logical:: couchelimite = .true.
@@ -193,13 +197,10 @@ contains
 
        ! Initialisation de certaines variables pour le radon et le plomb 
        ! Initialisation du traceur dans le sol (couche limite radonique)
-       trs(:, :) = 0.
+       trs(:, 2:) = 0.
 
-       open (unit=99, file='starttrac', status='old', err=999, &
-            form='formatted')
-       read(unit=99, fmt=*) (trs(i, 1), i=1, klon)
-999    continue
-       close(unit=99)
+       call nf95_inq_varid(ncid_startphy, "trs", varid)
+       call nf95_get_var(ncid_startphy, varid, trs(:, 1))
 
        ! Initialisation de la fraction d'aerosols lessivee
 
@@ -403,13 +404,8 @@ contains
     call write_histrac(lessivage, itap, nid_tra)
 
     if (lafin) then
-       print *, "C'est la fin de la physique."
-       open(unit=99, file='restarttrac', form='formatted')
-       do i=1, klon
-          write(unit=99, fmt=*) trs(i, 1)
-       enddo
-       PRINT *, 'Ecriture du fichier restarttrac'
-       close(unit=99)
+       call nf95_inq_varid(ncid_restartphy, "trs", varid)
+       call nf95_put_var(ncid_restartphy, varid, trs(:, 1))
     endif
 
   contains

@@ -53,8 +53,6 @@ SUBROUTINE prather(q, w, masse, pbaru, pbarv, nt, dt)
 
   REAL sinlon(iip1), sinlondlon(iip1)
   REAL coslon(iip1), coslondlon(iip1)
-  REAL qmin, qmax
-  SAVE qmin, qmax
   SAVE sinlon, coslon, sinlondlon, coslondlon
   REAL dyn1, dyn2, dys1, dys2, qpn, qps, dqzpn, dqzps
   REAL masn, mass
@@ -68,8 +66,6 @@ SUBROUTINE prather(q, w, masse, pbaru, pbarv, nt, dt)
 
 
   DATA first/.TRUE./
-  DATA qmin, qmax/ -1.E33, 1.E33/
-
 
   ! ==========================================================================
   ! ==========================================================================

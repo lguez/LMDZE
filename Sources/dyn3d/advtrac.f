@@ -17,6 +17,7 @@ contains
     use massbar_m, only: massbar
     USE paramet_m, ONLY : iip1, iip2, ijmllm, ijp1llm, ip1jm, ip1jmp1, jjp1, &
          llmp1
+    use vlsplt_m, only: vlsplt
     use vlspltqs_m, only: vlspltqs
 
     REAL, intent(in):: pbaru(ip1jmp1, llm), pbarv(ip1jm, llm)
@@ -111,19 +112,17 @@ contains
        ! Appel des sous programmes d'advection
 
        DO iq = 1, nqmx
-          IF (iadv(iq)==0) CYCLE
-
-          ! Schema de Van Leer I MUSCL
-
-          IF (iadv(iq)==10) THEN
+          select case (iadv(iq))
+          case (10)
+             ! Schema de Van Leer I MUSCL
              CALL vlsplt(q(:, :, iq), 2., massem, wg, pbarug, pbarvg, dtvr)
+          case (14)
              ! Schema "pseudo amont" + test sur humidite specifique
              ! pour la vapeur d'eau. F. Codron
-          ELSE IF (iadv(iq)==14) THEN
              CALL vlspltqs(q(1, 1, 1), 2., massem, wg, pbarug, pbarvg, dtvr, &
                   p, pk, teta)
+          case (12)
              ! Schema de Frederic Hourdin
-          ELSE IF (iadv(iq)==12) THEN
              ! Pas de temps adaptatif
              CALL adaptdt(dtbon, n, pbarug, massem)
              IF (n>1) THEN
@@ -133,7 +132,7 @@ contains
              DO indice = 1, n
                 CALL advn(q(1, 1, iq), massem, wg, pbarug, pbarvg, dtbon, 1)
              END DO
-          ELSE IF (iadv(iq)==13) THEN
+          case (13)
              ! Pas de temps adaptatif
              CALL adaptdt(dtbon, n, pbarug, massem)
              IF (n>1) THEN
@@ -143,11 +142,11 @@ contains
              DO indice = 1, n
                 CALL advn(q(1, 1, iq), massem, wg, pbarug, pbarvg, dtbon, 2)
              END DO
+          case (20)
              ! Schema de pente SLOPES
-          ELSE IF (iadv(iq)==20) THEN
              CALL pentes_ini(q(1, 1, iq), wg, massem, pbarug, pbarvg, 0)
+          case (30)
              ! Schema de Prather
-          ELSE IF (iadv(iq)==30) THEN
              ! Pas de temps adaptatif
              CALL adaptdt(dtbon, n, pbarug, massem)
              IF (n>1) THEN
@@ -155,8 +154,8 @@ contains
                      'n=', n
              END IF
              CALL prather(q(1, 1, iq), wg, massem, pbarug, pbarvg, n, dtbon)
+          case (11, 16:18)
              ! Schemas PPM Lin et Rood
-          ELSE IF (iadv(iq)==11 .OR. (iadv(iq)>=16 .AND. iadv(iq)<=18)) THEN
              ! Test sur le flux horizontal
              ! Pas de temps adaptatif
              CALL adaptdt(dtbon, n, pbarug, massem)
@@ -213,7 +212,7 @@ contains
 
              ! Ss-prg interface PPM3d-LMDZ.4
              CALL interpost(q(1, 1, iq), qppm(1, 1, iq))
-          END IF
+          END select
        END DO
 
        ! on reinitialise a zero les flux de masse cumules

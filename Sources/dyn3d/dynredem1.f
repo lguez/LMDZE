@@ -4,18 +4,18 @@ module dynredem1_m
 
 contains
 
-  SUBROUTINE dynredem1(fichnom, vcov, ucov, teta, q, masse, ps, itau)
+  SUBROUTINE dynredem1(vcov, ucov, teta, q, masse, ps, itau)
 
     ! From dyn3d/dynredem.F, version 1.2, 2004/06/22 11:45:30
-    ! Ecriture du fichier de redémarrage au format NetCDF
+    ! Ecriture du fichier de red\'emarrage au format NetCDF
 
     USE dimens_m, ONLY: iim, jjm, llm, nqmx
+    use dynredem0_m, only: ncid
     USE iniadvtrac_m, ONLY: tname
     use netcdf, only: nf90_write
     use netcdf95, only: nf95_close, nf95_inq_varid, nf95_open, nf95_put_var
     use nr_util, only: assert
 
-    CHARACTER(len=*), INTENT (IN):: fichnom
     REAL, INTENT(IN):: vcov(:, :, :) ! (iim + 1, jjm, llm)
     REAL, INTENT(IN):: ucov(:, :, :) ! (iim + 1, jjm + 1, llm)
     REAL, INTENT(IN):: teta(:, :, :) ! (iim + 1, jjm + 1, llm)
@@ -24,9 +24,8 @@ contains
     REAL, INTENT(IN):: ps(:, :) ! (iim + 1, jjm + 1)
     INTEGER, INTENT(IN):: itau
 
-    ! Variables local to the procedure:
-    INTEGER ncid, varid
-    INTEGER iq
+    ! Local:
+    INTEGER varid, iq
 
     !---------------------------------------------------------
 
@@ -40,18 +39,16 @@ contains
          size(masse, 3)/) == llm, "dynredem1 llm")
     call assert(size(q, 4) == nqmx, "dynredem1 nqmx")
 
-    call nf95_open(fichnom, nf90_write, ncid)
-
-    ! Écriture/extension de la coordonnée temps
+    ! \'Ecriture/extension de la coordonn\'ee temps
     call nf95_inq_varid(ncid, 'temps', varid)
     call nf95_put_var(ncid, varid, values = 0.)
 
-    ! Récriture du tableau de contrôle, "itaufin" n'est pas défini quand
+    ! R\'ecriture du tableau de contr\^ole, "itaufin" n'est pas d\'efini quand
     ! on passe dans "dynredem0"
     call nf95_inq_varid(ncid, 'controle', varid)
     call nf95_put_var(ncid, varid, real(itau), start=(/31/))
 
-    ! Écriture des champs
+    ! \'Ecriture des champs
 
     call nf95_inq_varid(ncid, 'ucov', varid)
     call nf95_put_var(ncid, varid, ucov)

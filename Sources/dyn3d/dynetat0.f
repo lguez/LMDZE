@@ -200,12 +200,12 @@ contains
 
     DO iq = 1, nqmx
        call NF95_INQ_VARID(ncid, tname(iq), varid, ierr)
-       IF (ierr /= NF90_NOERR) THEN
+       IF (ierr == NF90_NOERR) THEN
+          call NF95_GET_VAR(ncid, varid, q(:, :, :, iq))
+       ELSE
           PRINT *, 'dynetat0: "' // tname(iq) // '" not found, ' // &
                "setting it to zero..."
           q(:, :, :, iq) = 0.
-       ELSE
-          call NF95_GET_VAR(ncid, varid, q(:, :, :, iq))
        ENDIF
     ENDDO
 

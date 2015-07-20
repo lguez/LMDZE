@@ -220,8 +220,7 @@ contains
        END IF
     end do time_integration
 
-    CALL dynredem1("restart.nc", vcov, ucov, teta, q, masse, ps, &
-         itau = itau_dyn + itaufin)
+    CALL dynredem1(vcov, ucov, teta, q, masse, ps, itau = itau_dyn + itaufin)
 
     ! Calcul des tendances dynamiques:
     CALL geopot(teta, pk, pks, phis, phi)

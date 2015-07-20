@@ -40,15 +40,9 @@ SUBROUTINE limz(s0, sz, sm, pente_max)
   REAL dzqw(ip1jmp1)
   REAL adzqw(ip1jmp1), dzqmax(ip1jmp1)
 
-  LOGICAL first
-  SAVE first
-
   REAL ssum
   INTEGER ismax, ismin
   EXTERNAL ssum, convflu, ismin, ismax
-
-  DATA first/.TRUE./
-
 
   DO l = 1, llm
     DO ij = 1, ip1jmp1

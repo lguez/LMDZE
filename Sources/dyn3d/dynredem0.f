@@ -2,9 +2,11 @@ MODULE dynredem0_m
 
   IMPLICIT NONE
 
+  INTEGER ncid
+
 CONTAINS
 
-  SUBROUTINE dynredem0(fichnom, iday_end, phis)
+  SUBROUTINE dynredem0(iday_end, phis)
 
     ! From dyn3d/dynredem.F, version 1.2, 2004/06/22 11:45:30
     ! \'Ecriture du fichier de red\'emarrage au format NetCDF (initialisation)
@@ -19,12 +21,11 @@ CONTAINS
     USE iniadvtrac_m, ONLY: tname, ttext
     USE ju2ymds_m, ONLY: ju2ymds
     USE netcdf, ONLY: nf90_clobber, nf90_float, nf90_global, nf90_unlimited
-    USE netcdf95, ONLY: nf95_close, nf95_create, nf95_def_dim, nf95_def_var, &
-         nf95_enddef, nf95_inq_varid, nf95_put_att, nf95_put_var
+    USE netcdf95, ONLY: nf95_create, nf95_def_dim, nf95_def_var, nf95_enddef, &
+         nf95_inq_varid, nf95_put_att, nf95_put_var
     USE paramet_m, ONLY: iip1, jjp1, llmp1
     use ymds2ju_m, only: ymds2ju
 
-    CHARACTER(len=*), INTENT(IN):: fichnom
     INTEGER, INTENT(IN):: iday_end
     REAL, INTENT(IN):: phis(:, :)
 
@@ -39,7 +40,7 @@ CONTAINS
     INTEGER idim_rlonu, idim_rlonv, idim_rlatu, idim_rlatv
     INTEGER idim_s, idim_sig
     INTEGER dimid_temps
-    INTEGER ncid, varid
+    INTEGER varid
     integer varid_controle, varid_rlonu, varid_rlatu, varid_rlonv, varid_rlatv
     integer varid_xprimu, varid_xprimv, varid_xprimm025, varid_xprimp025
     integer varid_rlatu1, varid_rlatu2, varid_yprimu1, varid_yprimu2, varid_ap
@@ -91,7 +92,7 @@ CONTAINS
     tab_cntrl(30) = iday_end
     tab_cntrl(31:) = 0.
 
-    CALL nf95_create(fichnom, nf90_clobber, ncid)
+    CALL nf95_create("restart.nc", nf90_clobber, ncid)
     CALL nf95_put_att(ncid, nf90_global, 'title', &
          'start file for the dynamics code')
 
@@ -206,8 +207,6 @@ CONTAINS
     CALL nf95_put_var(ncid, varid_bp, bp)
     CALL nf95_put_var(ncid, varid_presnivs, presnivs)
     CALL nf95_put_var(ncid, varid_phisinit, phis)
-
-    CALL nf95_close(ncid)
 
     PRINT *, 'iim, jjm, llm, iday_end', iim, jjm, llm, iday_end
     PRINT *, 'rad, omeg, g, cpp, kappa', rad, omeg, g, cpp, kappa

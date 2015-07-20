@@ -51,16 +51,7 @@ contains
     REAL mv(ip1jm, llm)
     REAL mw(ip1jmp1, llm+1)
     REAL zq(ip1jmp1, llm)
-    REAL temps1, temps2, temps3
     REAL zzpbar, zzw
-    LOGICAL testcpu
-    SAVE testcpu
-    SAVE temps1, temps2, temps3
-
-    REAL qmin, qmax
-    DATA qmin, qmax/0., 1.e33/
-    DATA testcpu/.false./
-    DATA temps1, temps2, temps3/0., 0., 0./
 
     !--pour rapport de melange saturant--
 

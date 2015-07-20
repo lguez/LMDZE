@@ -45,17 +45,8 @@ SUBROUTINE advn(q, masse, w, pbaru, pbarv, pdt, mode)
   REAL zqg(ip1jmp1, llm), zqd(ip1jmp1, llm)
   REAL zqs(ip1jmp1, llm), zqn(ip1jmp1, llm)
   REAL zqh(ip1jmp1, llm), zqb(ip1jmp1, llm)
-  REAL temps1, temps2, temps3
   REAL ssum
-  LOGICAL testcpu
-  SAVE testcpu
-  SAVE temps1, temps2, temps3
   REAL zzpbar, zzw
-
-  REAL qmin, qmax
-  DATA qmin, qmax/0., 1./
-  DATA testcpu/.FALSE./
-  DATA temps1, temps2, temps3/0., 0., 0./
 
   zzpbar = 0.5*pdt
   zzw = pdt

@@ -41,11 +41,8 @@
       REAL qbyv(ip1jm,llm)
 
       REAL qpns,qpsn,dyn1,dys1,dyn2,dys2,newmasse,fn,fs
-!     REAL newq,oldmasse
-      Logical first,testcpu
-      REAL temps0,temps1,temps2,temps3,temps4,temps5
-      SAVE temps0,temps1,temps2,temps3,temps4,temps5
-      SAVE first,testcpu
+      Logical first
+      SAVE first
 
       REAL convpn,convps,convmpn,convmps
       REAL sinlon(iip1),sinlondlon(iip1)
@@ -56,8 +53,7 @@
 !
       REAL      SSUM
 
-      DATA first,testcpu/.true.,.false./
-      DATA temps0,temps1,temps2,temps3,temps4,temps5/0.,0.,0.,0.,0.,0./
+      DATA first/.true./
 
       IF(first) THEN
          PRINT*,'Shema  Amont nouveau  appele dans  Vanleer   '

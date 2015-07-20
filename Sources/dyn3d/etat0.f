@@ -20,6 +20,7 @@ contains
     use caldyn0_m, only: caldyn0
     use comconst, only: cpp, kappa, iniconst
     use comgeom, only: aire_2d, apoln, apols, cu_2d, cv_2d, inigeom
+    use conf_gcm_m, only: nday, day_step, iphysiq
     use dimens_m, only: iim, jjm, llm, nqmx
     use dimphy, only: zmasq
     use dimsoil, only: nsoilmx
@@ -39,11 +40,12 @@ contains
     use inifilr_m, only: inifilr
     use massdair_m, only: massdair
     use netcdf, only: nf90_nowrite
-    use netcdf95, only: nf95_close, nf95_get_var, nf95_gw_var, &
+    use netcdf95, only: nf95_close, nf95_get_var, nf95_gw_var, nf95_put_var, &
          nf95_inq_varid, nf95_open
     use nr_util, only: pi, assert
     use paramet_m, only: ip1jm, ip1jmp1
     use phyetat0_m, only: rlat, rlon
+    use phyredem0_m, only: phyredem0, ncid_restartphy
     use phyredem_m, only: phyredem
     use q_sat_m, only: q_sat
     use regr_lat_time_coefoz_m, only: regr_lat_time_coefoz
@@ -70,14 +72,12 @@ contains
     ! and pressure level "pls(i, j, l)".)
 
     real qsat(iim + 1, jjm + 1, llm) ! mass fraction of saturating water vapor
-    REAL sn(klon)
     REAL qsolsrf(klon, nbsrf), snsrf(klon, nbsrf) 
     REAL albe(klon, nbsrf), evap(klon, nbsrf)
     REAL tsoil(klon, nsoilmx, nbsrf) 
-    REAL radsol(klon), rain_fall(klon), snow_fall(klon)
-    REAL solsw(klon), sollw(klon), fder(klon)
+    REAL null_array(klon)
+    REAL solsw(klon), sollw(klon)
     !IM "slab" ocean
-    real seaice(klon) ! kg m-2
     REAL frugs(klon, nbsrf), agesno(klon, nbsrf)
     REAL rugmer(klon)
     real, dimension(iim + 1, jjm + 1):: zmea_2d, zstd_2d, zsig_2d, zgam_2d
@@ -88,7 +88,6 @@ contains
     REAL zthe(klon)
     REAL zpic(klon), zval(klon)
     REAL t_ancien(klon, llm), q_ancien(klon, llm)
-    REAL run_off_lic_0(klon)
     real clwcon(klon, llm), rnebcon(klon, llm), ratqs(klon, llm)
 
     ! D\'eclarations pour lecture glace de mer :
@@ -221,9 +220,7 @@ contains
        q(:, :, :, 5) = q(:, :, :, 5) * 48. / 29.
     end if
 
-    sn = 0. ! snow
-    radsol = 0.
-    seaice = 0.
+    null_array = 0.
     rugmer = 0.001
     zmea = pack(zmea_2d, dyn_phy)
     zstd = pack(zstd_2d, dyn_phy)
@@ -312,21 +309,14 @@ contains
             SUM(aire_2d(:iim, jjm + 1) * masse(:iim, jjm + 1, l)) / apols
     END forall
 
-    ! Initialisation pour traceurs:
     call iniadvtrac
-    itau_phy = 0
-
     CALL geopot(teta, pk , pks, phis, phi)
-    CALL caldyn0(ucov, vcov, teta, ps, masse, pk, phis, phi, w, pbaru, &
-         pbarv)
-    CALL dynredem0("start.nc", day_ref, phis)
-    CALL dynredem1("start.nc", vcov, ucov, teta, q, masse, ps, itau=0)
+    CALL caldyn0(ucov, vcov, teta, ps, masse, pk, phis, phi, w, pbaru, pbarv)
+    CALL dynredem0(day_ref, phis)
+    CALL dynredem1(vcov, ucov, teta, q, masse, ps, itau = 0)
 
     ! Initialisations :
-    snsrf(:, is_ter) = sn
-    snsrf(:, is_lic) = sn
-    snsrf(:, is_oce) = sn
-    snsrf(:, is_sic) = sn
+    snsrf = 0.
     albe(:, is_ter) = 0.08
     albe(:, is_lic) = 0.6
     albe(:, is_oce) = 0.5
@@ -334,32 +324,34 @@ contains
     evap = 0.
     qsolsrf = 150.
     tsoil = spread(spread(pack(tsol_2d, dyn_phy), 2, nsoilmx), 3, nbsrf)
-    rain_fall = 0.
-    snow_fall = 0.
     solsw = 165.
     sollw = -53.
     t_ancien = 273.15
     q_ancien = 0.
     agesno = 0.
-    seaice = 0.
 
     frugs(:, is_oce) = rugmer
     frugs(:, is_ter) = MAX(1e-5, zstd * zsig / 2)
     frugs(:, is_lic) = MAX(1e-5, zstd * zsig / 2)
     frugs(:, is_sic) = 0.001
-    fder = 0.
     clwcon = 0.
     rnebcon = 0.
     ratqs = 0.
-    run_off_lic_0 = 0.
     sig1 = 0.
     w01 = 0.
 
-    call phyredem("startphy.nc", pctsrf, tsoil(:, 1, :), tsoil, &
-         tsoil(:, 1, is_oce), seaice, qsolsrf, pack(qsol_2d, dyn_phy), snsrf, &
-         albe, evap, rain_fall, snow_fall, solsw, sollw, fder, radsol, frugs, &
+    itau_phy = 0
+    nday = 0
+    call phyredem0(lmt_pas = day_step / iphysiq)
+
+    call nf95_inq_varid(ncid_restartphy, "trs", varid)
+    call nf95_put_var(ncid_restartphy, varid, null_array)
+
+    call phyredem(pctsrf, tsoil(:, 1, :), tsoil, tsoil(:, 1, is_oce), &
+         null_array, qsolsrf, pack(qsol_2d, dyn_phy), snsrf, albe, evap, &
+         null_array, null_array, solsw, sollw, null_array, null_array, frugs, &
          agesno, zmea, zstd, zsig, zgam, zthe, zpic, zval, t_ancien, &
-         q_ancien, rnebcon, ratqs, clwcon, run_off_lic_0, sig1, w01)
+         q_ancien, rnebcon, ratqs, clwcon, null_array, sig1, w01)
 
   END SUBROUTINE etat0
 

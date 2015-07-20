@@ -46,11 +46,13 @@ contains
     USE indicesol, ONLY: clnsurf, epsfra, is_lic, is_oce, is_sic, is_ter, &
          nbsrf
     USE ini_histins_m, ONLY: ini_histins
+    use netcdf95, only: NF95_CLOSE
     use newmicro_m, only: newmicro
     USE orbite_m, ONLY: orbite
     USE ozonecm_m, ONLY: ozonecm
     USE phyetat0_m, ONLY: phyetat0, rlat, rlon
     USE phyredem_m, ONLY: phyredem
+    USE phyredem0_m, ONLY: phyredem0
     USE phystokenc_m, ONLY: phystokenc
     USE phytrac_m, ONLY: phytrac
     USE qcheck_m, ONLY: qcheck
@@ -155,14 +157,6 @@ contains
 
     integer nlevSTD
     PARAMETER(nlevSTD = 17)
-    real rlevSTD(nlevSTD)
-    DATA rlevSTD/100000., 92500., 85000., 70000., &
-         60000., 50000., 40000., 30000., 25000., 20000., &
-         15000., 10000., 7000., 5000., 3000., 2000., 1000./
-    CHARACTER(LEN = 4) clevSTD(nlevSTD)
-    DATA clevSTD/'1000', '925 ', '850 ', '700 ', '600 ', &
-         '500 ', '400 ', '300 ', '250 ', '200 ', '150 ', '100 ', &
-         '70 ', '50 ', '30 ', '20 ', '10 '/
 
     ! prw: precipitable water
     real prw(klon)
@@ -177,50 +171,6 @@ contains
     INTEGER kmaxm1, lmaxm1
     PARAMETER(kmaxm1 = kmax-1, lmaxm1 = lmax-1)
 
-    REAL zx_tau(kmaxm1), zx_pc(lmaxm1)
-    DATA zx_tau/0., 0.3, 1.3, 3.6, 9.4, 23., 60./
-    DATA zx_pc/50., 180., 310., 440., 560., 680., 800./
-
-    ! cldtopres pression au sommet des nuages
-    REAL cldtopres(lmaxm1)
-    DATA cldtopres/50., 180., 310., 440., 560., 680., 800./
-
-    ! taulev: numero du niveau de tau dans les sorties ISCCP
-    CHARACTER(LEN = 4) taulev(kmaxm1)
-
-    DATA taulev/'tau0', 'tau1', 'tau2', 'tau3', 'tau4', 'tau5', 'tau6'/
-    CHARACTER(LEN = 3) pclev(lmaxm1)
-    DATA pclev/'pc1', 'pc2', 'pc3', 'pc4', 'pc5', 'pc6', 'pc7'/
-
-    CHARACTER(LEN = 28) cnameisccp(lmaxm1, kmaxm1)
-    DATA cnameisccp/'pc< 50hPa, tau< 0.3', 'pc= 50-180hPa, tau< 0.3', &
-         'pc= 180-310hPa, tau< 0.3', 'pc= 310-440hPa, tau< 0.3', &
-         'pc= 440-560hPa, tau< 0.3', 'pc= 560-680hPa, tau< 0.3', &
-         'pc= 680-800hPa, tau< 0.3', 'pc< 50hPa, tau= 0.3-1.3', &
-         'pc= 50-180hPa, tau= 0.3-1.3', 'pc= 180-310hPa, tau= 0.3-1.3', &
-         'pc= 310-440hPa, tau= 0.3-1.3', 'pc= 440-560hPa, tau= 0.3-1.3', &
-         'pc= 560-680hPa, tau= 0.3-1.3', 'pc= 680-800hPa, tau= 0.3-1.3', &
-         'pc< 50hPa, tau= 1.3-3.6', 'pc= 50-180hPa, tau= 1.3-3.6', &
-         'pc= 180-310hPa, tau= 1.3-3.6', 'pc= 310-440hPa, tau= 1.3-3.6', &
-         'pc= 440-560hPa, tau= 1.3-3.6', 'pc= 560-680hPa, tau= 1.3-3.6', &
-         'pc= 680-800hPa, tau= 1.3-3.6', 'pc< 50hPa, tau= 3.6-9.4', &
-         'pc= 50-180hPa, tau= 3.6-9.4', 'pc= 180-310hPa, tau= 3.6-9.4', &
-         'pc= 310-440hPa, tau= 3.6-9.4', 'pc= 440-560hPa, tau= 3.6-9.4', &
-         'pc= 560-680hPa, tau= 3.6-9.4', 'pc= 680-800hPa, tau= 3.6-9.4', &
-         'pc< 50hPa, tau= 9.4-23', 'pc= 50-180hPa, tau= 9.4-23', &
-         'pc= 180-310hPa, tau= 9.4-23', 'pc= 310-440hPa, tau= 9.4-23', &
-         'pc= 440-560hPa, tau= 9.4-23', 'pc= 560-680hPa, tau= 9.4-23', &
-         'pc= 680-800hPa, tau= 9.4-23', 'pc< 50hPa, tau= 23-60', &
-         'pc= 50-180hPa, tau= 23-60', 'pc= 180-310hPa, tau= 23-60', &
-         'pc= 310-440hPa, tau= 23-60', 'pc= 440-560hPa, tau= 23-60', &
-         'pc= 560-680hPa, tau= 23-60', 'pc= 680-800hPa, tau= 23-60', &
-         'pc< 50hPa, tau> 60.', 'pc= 50-180hPa, tau> 60.', &
-         'pc= 180-310hPa, tau> 60.', 'pc= 310-440hPa, tau> 60.', &
-         'pc= 440-560hPa, tau> 60.', 'pc= 560-680hPa, tau> 60.', &
-         'pc= 680-800hPa, tau> 60.'/
-
-    ! ISCCP simulator v3.4
-
     ! Variables propres a la physique
 
     INTEGER, save:: radpas
@@ -230,7 +180,7 @@ contains
     REAL radsol(klon)
     SAVE radsol ! bilan radiatif au sol calcule par code radiatif
 
-    INTEGER, SAVE:: itap ! number of calls to "physiq"
+    INTEGER:: itap = 0 ! number of calls to "physiq"
 
     REAL, save:: ftsol(klon, nbsrf) ! skin temperature of surface fraction
 
@@ -563,6 +513,7 @@ contains
     ! (column-density of mass of air in a cell, in kg m-2)
 
     real, parameter:: dobson_u = 2.1415e-05 ! Dobson unit, in kg m-2
+    integer, save:: ncid_startphy
 
     namelist /physiq_nml/ ok_journe, ok_mensuel, ok_instan, fact_cldcon, &
          facttemps, ok_newmicro, iflag_cldcon, ratqsbas, ratqshaut, if_ebil, &
@@ -623,12 +574,11 @@ contains
        ! Initialiser les compteurs:
 
        frugs = 0.
-       itap = 0
        CALL phyetat0(pctsrf, ftsol, ftsoil, tslab, seaice, fqsurf, qsol, &
-            fsnow, falbe, fevap, rain_fall, snow_fall, solsw, sollw, &
-            dlw, radsol, frugs, agesno, zmea, zstd, zsig, zgam, zthe, zpic, &
-            zval, t_ancien, q_ancien, ancien_ok, rnebcon, ratqs, clwcon, &
-            run_off_lic_0, sig1, w01)
+            fsnow, falbe, fevap, rain_fall, snow_fall, solsw, sollw, dlw, &
+            radsol, frugs, agesno, zmea, zstd, zsig, zgam, zthe, zpic, zval, &
+            t_ancien, q_ancien, ancien_ok, rnebcon, ratqs, clwcon, &
+            run_off_lic_0, sig1, w01, ncid_startphy)
 
        ! ATTENTION : il faudra a terme relire q2 dans l'etat initial
        q2 = 1e-8
@@ -668,6 +618,7 @@ contains
        CALL ymds2ju(annee_ref, 1, day_ref, 0., date0)
        ! Positionner date0 pour initialisation de ORCHIDEE
        print *, 'physiq date0: ', date0
+       CALL phyredem0(lmt_pas)
     ENDIF test_firstcal
 
     ! We will modify variables *_seri and we will not touch variables
@@ -677,7 +628,7 @@ contains
     v_seri = v
     q_seri = qx(:, :, ivap)
     ql_seri = qx(:, :, iliq)
-    tr_seri = qx(:, :, 3: nqmx)
+    tr_seri = qx(:, :, 3:nqmx)
 
     ztsol = sum(ftsol * pctsrf, dim = 2)
 
@@ -1363,7 +1314,7 @@ contains
     call phytrac(itap, lmt_pas, julien, time, firstcal, lafin, dtphys, t, &
          paprs, play, mfu, mfd, pde_u, pen_d, ycoefh, fm_therm, entr_therm, &
          yu1, yv1, ftsol, pctsrf, frac_impa, frac_nucl, pphis, da, phi, mp, &
-         upwd, dnwd, tr_seri, zmasse)
+         upwd, dnwd, tr_seri, zmasse, ncid_startphy)
 
     IF (offline) call phystokenc(dtphys, rlon, rlat, t, mfu, mfd, pen_u, &
          pde_u, pen_d, pde_d, fm_therm, entr_therm, ycoefh, yu1, yv1, ftsol, &
@@ -1442,18 +1393,16 @@ contains
        ENDDO
     ENDDO
 
-    ! Ecriture des sorties
     call write_histins
 
-    ! Si c'est la fin, il faut conserver l'etat de redemarrage
-    IF (lafin) THEN
-       itau_phy = itau_phy + itap
-       CALL phyredem("restartphy.nc", pctsrf, ftsol, ftsoil, tslab, seaice, &
-            fqsurf, qsol, fsnow, falbe, fevap, rain_fall, snow_fall, &
-            solsw, sollw, dlw, radsol, frugs, agesno, zmea, zstd, zsig, zgam, &
-            zthe, zpic, zval, t_ancien, q_ancien, rnebcon, ratqs, clwcon, &
-            run_off_lic_0, sig1, w01)
-    ENDIF
+    IF (lafin) then
+       call NF95_CLOSE(ncid_startphy)
+       CALL phyredem(pctsrf, ftsol, ftsoil, tslab, seaice, fqsurf, qsol, &
+            fsnow, falbe, fevap, rain_fall, snow_fall, solsw, sollw, dlw, &
+            radsol, frugs, agesno, zmea, zstd, zsig, zgam, zthe, zpic, zval, &
+            t_ancien, q_ancien, rnebcon, ratqs, clwcon, run_off_lic_0, sig1, &
+            w01)
+    end IF
 
     firstcal = .FALSE.
 
@@ -1462,6 +1411,8 @@ contains
     subroutine write_histins
 
       ! From phylmd/write_histins.h, version 1.2 2005/05/25 13:10:09
+
+      ! Ecriture des sorties
 
       use dimens_m, only: iim, jjm
       USE histsync_m, ONLY: histsync

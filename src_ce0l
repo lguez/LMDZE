@@ -67,6 +67,7 @@ ord_coordm.f
 paramet_m.f
 phyetat0.f
 phyredem.f
+phyredem0.f
 principal_cshift.f
 q_sat.f
 regr_lat_time_coefoz.f

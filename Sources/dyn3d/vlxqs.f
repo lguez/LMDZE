@@ -35,14 +35,14 @@
       REAL adxqu(ip1jmp1),dxqmax(ip1jmp1,llm)
       REAL u_mq(ip1jmp1,llm)
 
-      Logical first,testcpu
-      SAVE first,testcpu
+      Logical first
+      SAVE first
 
       REAL temps1,temps2,temps3,temps4,temps5
       SAVE temps1,temps2,temps3,temps4,temps5
 
 
-      DATA first,testcpu/.true.,.false./
+      DATA first/.true./
 
       IF(first) THEN
          temps1=0.

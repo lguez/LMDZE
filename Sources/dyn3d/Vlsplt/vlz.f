@@ -21,29 +21,20 @@
 !
 !   Arguments:
 !   ----------
-      REAL masse(ip1jmp1,llm),pente_max
+      REAL masse(ip1jmp1,llm)
+      real, intent(in):: pente_max
       REAL q(ip1jmp1,llm)
       REAL w(ip1jmp1,llm+1)
 !
 !      Local
 !   ---------
 !
-      INTEGER i,ij,l,j,ii
+      INTEGER ij,l
 !
       REAL wq(ip1jmp1,llm+1),newmasse
 
       REAL dzq(ip1jmp1,llm),dzqw(ip1jmp1,llm),adzqw(ip1jmp1,llm),dzqmax
       REAL sigw
-
-      LOGICAL testcpu
-      SAVE testcpu
-
-      REAL temps0,temps1,temps2,temps3,temps4,temps5,second
-      SAVE temps0,temps1,temps2,temps3,temps4,temps5
-      REAL      SSUM
-
-      DATA testcpu/.false./
-      DATA temps0,temps1,temps2,temps3,temps4,temps5/0.,0.,0.,0.,0.,0./
 
 !    On oriente tout dans le sens de la pression c'est a dire dans le
 !    sens de W
