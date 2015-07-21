@@ -178,7 +178,6 @@ inidissip.f
 inifgn.f
 inifilr.f
 ini_histins.f
-ini_histrac.f
 initdynav.f
 init_dynzon.f
 initfluxsto.f
