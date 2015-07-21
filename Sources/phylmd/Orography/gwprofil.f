@@ -4,40 +4,37 @@ module gwprofil_m
 
 contains
 
-  SUBROUTINE gwprofil(nlon, nlev, ktest, kkcrith, kcrit, paphm1, &
-       prho, pstab, pvph, pri, ptau, pdmod, psig, pvar)
+  SUBROUTINE gwprofil(nlon, nlev, ktest, kkcrith, kcrit, paphm1, prho, pstab, &
+       pvph, pri, ptau, pdmod, psig, pvar)
 
     ! Method. The stress profile for gravity waves is computed as
     ! follows: it is constant (no gwd) at the levels between the
     ! ground and the top of the blocked layer (kkenvh).  It decreases
-    ! linearly with height from the top of the blocked layer to
-    ! 3*varor (kknu), to simulate lee waves or nonlinear gravity wave
+    ! linearly with height from the top of the blocked layer to 3 *
+    ! varor (kknu), to simulate lee waves or nonlinear gravity wave
     ! breaking. Above it is constant, except when the wave encounters
     ! a critical level (kcrit) or when it breaks.
 
-    ! Reference.
-    ! See ECMWF research department documentation of the "I.F.S."
+    ! Reference. See ECMWF research department documentation of the
+    ! "I.F.S."
 
-    ! Modifications.
-    ! Passage of the new gwdrag TO I.F.S. (F. LOTT, 22/11/93)
+    ! Modifications. Passage of the new gwdrag TO I.F.S. (F. LOTT,
+    ! 22/11/93)
 
     USE dimphy, ONLY : klev, klon
     USE yoegwd, ONLY : gkdrag, grahilo, grcrit, gssec, gtsec, nstra
 
-    ! 0.1 ARGUMENTS
-
-    INTEGER nlon, nlev
-    INTEGER kkcrith(nlon), kcrit(nlon), ktest(nlon)
-
-    REAL paphm1(nlon, nlev+1), pstab(nlon, nlev+1), prho(nlon, nlev+1), &
-         pvph(nlon, nlev+1), pri(nlon, nlev+1), ptau(nlon, nlev+1)
-
-    REAL pdmod(nlon)
+    INTEGER, intent(in):: nlon, nlev
+    INTEGER, intent(in):: ktest(nlon), kkcrith(nlon), kcrit(nlon)
+    REAL, intent(in):: paphm1(nlon, nlev+1), prho(nlon, nlev+1)
+    REAL, intent(in):: pstab(nlon, nlev+1)
+    real, intent(in):: pvph(nlon, nlev+1), pri(nlon, nlev+1)
+    real ptau(nlon, nlev+1)
+    REAL, intent(in):: pdmod(nlon)
     REAL, INTENT (IN) :: psig(nlon)
     REAL, INTENT (IN) :: pvar(nlon)
 
-    ! 0.2 LOCAL ARRAYS
-
+    ! Local:
     INTEGER ilevh, jl, jk
     REAL zsqr, zalfa, zriw, zdel, zb, zalpha, zdz2n
     REAL zdelp, zdelpt

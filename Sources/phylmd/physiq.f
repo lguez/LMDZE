@@ -59,7 +59,7 @@ contains
     use radlwsw_m, only: radlwsw
     use readsulfate_m, only: readsulfate
     use readsulfate_preind_m, only: readsulfate_preind
-    use sugwd_m, only: sugwd
+    use yoegwd, only: sugwd
     USE suphec_m, ONLY: ra, rcpd, retv, rg, rlvtt, romega, rsigma, rtt
     USE temps, ONLY: itau_phy
     use unit_nml_m, only: unit_nml

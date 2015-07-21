@@ -156,14 +156,7 @@
         END IF
 2110  CONTINUE
 
-
-200   CONTINUE
-
-!***********************************************************
-
 !*         3.      COMPUTE MOUNTAIN LIFT
-
-300   CONTINUE
 
       DO 301 jl = 1, klon
         IF (ktest(jl)==1) THEN
@@ -182,8 +175,6 @@
 !*                 --------------------
 
 
-400   CONTINUE
-
       DO jk = 1, klev
         DO jl = 1, klon
           IF (ktest(jl)==1) THEN
@@ -201,7 +192,6 @@
 !*                 -------------------
       IF (lifthigh) THEN
 
-500     CONTINUE
 !     PRINT *,'  DANS OROLIFT: 500'
 
 !  EXPLICIT SOLUTION AT ALL LEVELS
