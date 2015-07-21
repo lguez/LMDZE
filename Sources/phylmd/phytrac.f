@@ -9,8 +9,8 @@ contains
 
   SUBROUTINE phytrac(itap, lmt_pas, julien, gmtime, firstcal, lafin, pdtphys, &
        t_seri, paprs, pplay, pmfu, pmfd, pde_u, pen_d, coefh, fm_therm, &
-       entr_therm, yu1, yv1, ftsol, pctsrf, frac_impa, frac_nucl, pphis, da, &
-       phi, mp, upwd, dnwd, tr_seri, zmasse, ncid_startphy)
+       entr_therm, yu1, yv1, ftsol, pctsrf, frac_impa, frac_nucl, da, phi, &
+       mp, upwd, dnwd, tr_seri, zmasse, ncid_startphy, nid_ins)
 
     ! From phylmd/phytrac.F, version 1.15 2006/02/21 08:08:30 (SVN revision 679)
 
@@ -36,7 +36,6 @@ contains
     use dimens_m, only: llm, nqmx
     use dimphy, only: klon
     use indicesol, only: nbsrf
-    use ini_histrac_m, only: ini_histrac
     use initrrnpb_m, only: initrrnpb
     use minmaxqfi_m, only: minmaxqfi
     use netcdf95, only: nf95_inq_varid, nf95_get_var, nf95_put_var
@@ -91,8 +90,6 @@ contains
     REAL frac_impa(klon, llm) ! fraction d'aerosols impactes
     REAL frac_nucl(klon, llm) ! fraction d'aerosols nuclees
 
-    real, intent(in):: pphis(klon)
-
     ! Kerry Emanuel
     real, intent(in):: da(klon, llm), phi(klon, llm, llm), mp(klon, llm)
     REAL, intent(in):: upwd(klon, llm) ! saturated updraft mass flux
@@ -104,7 +101,7 @@ contains
     real, intent(in):: zmasse(:, :) ! (klon, llm)
     ! (column-density of mass of air in a cell, in kg m-2)
 
-    integer, intent(in):: ncid_startphy
+    integer, intent(in):: ncid_startphy, nid_ins
 
     ! Local:
 
@@ -138,7 +135,6 @@ contains
     SAVE scavtr
 
     CHARACTER itn
-    INTEGER, save:: nid_tra
 
     ! nature du traceur
 
@@ -191,9 +187,6 @@ contains
        print *, 'phytrac: pdtphys = ', pdtphys
        PRINT *, 'Frequency of tracer output: ecrit_tra = ', ecrit_tra
        inirnpb = .true.
-
-       ! Initialisation des sorties :
-       call ini_histrac(nid_tra, pdtphys, nqmx - 2, lessivage)
 
        ! Initialisation de certaines variables pour le radon et le plomb 
        ! Initialisation du traceur dans le sol (couche limite radonique)
@@ -401,7 +394,7 @@ contains
     ENDIF
 
     ! Ecriture des sorties
-    call write_histrac(lessivage, itap, nid_tra)
+    call write_histrac(lessivage, itap, nid_ins)
 
     if (lafin) then
        call nf95_inq_varid(ncid_restartphy, "trs", varid)
@@ -410,7 +403,7 @@ contains
 
   contains
 
-    subroutine write_histrac(lessivage, itap, nid_tra)
+    subroutine write_histrac(lessivage, itap, nid_ins)
 
       ! From phylmd/write_histrac.h, version 1.9 2006/02/21 08:08:30
 
@@ -419,49 +412,38 @@ contains
       use histwrite_m, only: histwrite
       use temps, only: itau_phy
       use iniadvtrac_m, only: tname
-      use comgeomphy, only: airephy
       use dimphy, only: klon
       use grid_change, only: gr_phy_write_2d
       use gr_phy_write_3d_m, only: gr_phy_write_3d
 
       logical, intent(in):: lessivage
       integer, intent(in):: itap ! number of calls to "physiq"
-      integer, intent(in):: nid_tra
+      integer, intent(in):: nid_ins
 
       ! Variables local to the procedure:
       integer it
       integer itau_w ! pas de temps ecriture
-      logical, parameter:: ok_sync = .true.
 
       !-----------------------------------------------------
 
       itau_w = itau_phy + itap
 
-      CALL histwrite(nid_tra, "phis", itau_w, gr_phy_write_2d(pphis))
-      CALL histwrite(nid_tra, "aire", itau_w, gr_phy_write_2d(airephy))
-      CALL histwrite(nid_tra, "zmasse", itau_w, gr_phy_write_3d(zmasse))
+      CALL histwrite(nid_ins, "zmasse", itau_w, gr_phy_write_3d(zmasse))
 
       DO it=1, nqmx - 2
-         CALL histwrite(nid_tra, tname(it+2), itau_w, &
+         CALL histwrite(nid_ins, tname(it+2), itau_w, &
               gr_phy_write_3d(tr_seri(:, :, it)))
          if (lessivage) THEN
-            CALL histwrite(nid_tra, "fl"//tname(it+2), itau_w, &
+            CALL histwrite(nid_ins, "fl"//tname(it+2), itau_w, &
                  gr_phy_write_3d(flestottr(:, :, it)))
          endif
-         CALL histwrite(nid_tra, "d_tr_th_"//tname(it+2), itau_w, &
+         CALL histwrite(nid_ins, "d_tr_th_"//tname(it+2), itau_w, &
               gr_phy_write_3d(d_tr_th(:, :, it)))
-         CALL histwrite(nid_tra, "d_tr_cv_"//tname(it+2), itau_w, &
+         CALL histwrite(nid_ins, "d_tr_cv_"//tname(it+2), itau_w, &
               gr_phy_write_3d(d_tr_cv(:, :, it)))
-         CALL histwrite(nid_tra, "d_tr_cl_"//tname(it+2), itau_w, &
+         CALL histwrite(nid_ins, "d_tr_cl_"//tname(it+2), itau_w, &
               gr_phy_write_3d(d_tr_cl(:, :, it)))
       ENDDO
-
-      CALL histwrite(nid_tra, "pplay", itau_w, gr_phy_write_3d(pplay))
-      CALL histwrite(nid_tra, "T", itau_w, gr_phy_write_3d(t_seri))
-
-      if (ok_sync) then
-         call histsync(nid_tra)
-      endif
 
     end subroutine write_histrac
 

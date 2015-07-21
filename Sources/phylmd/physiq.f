@@ -1313,8 +1313,8 @@ contains
     ! Calcul des tendances traceurs
     call phytrac(itap, lmt_pas, julien, time, firstcal, lafin, dtphys, t, &
          paprs, play, mfu, mfd, pde_u, pen_d, ycoefh, fm_therm, entr_therm, &
-         yu1, yv1, ftsol, pctsrf, frac_impa, frac_nucl, pphis, da, phi, mp, &
-         upwd, dnwd, tr_seri, zmasse, ncid_startphy)
+         yu1, yv1, ftsol, pctsrf, frac_impa, frac_nucl, da, phi, mp, upwd, &
+         dnwd, tr_seri, zmasse, ncid_startphy, nid_ins)
 
     IF (offline) call phystokenc(dtphys, rlon, rlat, t, mfu, mfd, pen_u, &
          pde_u, pen_d, pde_d, fm_therm, entr_therm, ycoefh, yu1, yv1, ftsol, &

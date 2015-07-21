@@ -9,7 +9,7 @@ contains
     ! From phylmd/ini_histins.h, v 1.2 2005/05/25 13:10:09
 
     use clesphys, only: ecrit_ins
-    use dimens_m, only: iim, jjm, llm
+    use dimens_m, only: iim, jjm, llm, nqmx
     use dimphy, only: klon
     use disvert_m, only: presnivs
     use dynetat0_m, only: day_ref, annee_ref
@@ -18,6 +18,7 @@ contains
     USE histend_m, ONLY : histend
     USE histvert_m, ONLY : histvert
     use indicesol, only: nbsrf, clnsurf
+    use iniadvtrac_m, only: tname, ttext
     use phyetat0_m, only: rlon, rlat
     use temps, only: itau_phy
     USE ymds2ju_m, only: ymds2ju
@@ -28,12 +29,11 @@ contains
 
     REAL zx_lon(iim, jjm + 1), zx_lat(iim, jjm + 1)
     real zjulian, zsto, zout
-    integer i, nhori, nvert, nsrf
+    integer i, nhori, nvert, nsrf, iq, it
 
     !-------------------------------------------------------------------
 
     IF (ok_instan) THEN
-
        zsto = dtime * ecrit_ins
        zout = dtime * ecrit_ins
 
@@ -290,6 +290,36 @@ contains
        CALL histdef(nid_ins, "dqvdf", "Boundary-layer dQ", "Kg/Kg/s", &
             iim, (jjm + 1), nhori, llm, 1, llm, nvert, &
             "inst(X)", zsto, zout)
+
+       CALL histdef(nid_ins, "zmasse", "column density of air in cell", &
+            "kg m-2", iim, jjm + 1, nhori, llm, 1, llm, nvert, "inst(X)", &
+            zsto, zout)
+
+       DO it = 1, nqmx - 2
+          ! champ 2D
+          iq=it+2
+          CALL histdef(nid_ins, tname(iq), ttext(iq), "U/kga", iim, jjm+1, &
+               nhori, llm, 1, llm, nvert, "inst(X)", zsto, zout)
+          CALL histdef(nid_ins, "fl"//tname(iq), "Flux "//ttext(iq), &
+               "U/m2/s", iim, jjm+1, nhori, llm, 1, llm, nvert, &
+               "inst(X)", zsto, zout)
+
+          !---Ajout Olivia
+          CALL histdef(nid_ins, "d_tr_th_"//tname(iq), &
+               "tendance thermique"// ttext(iq), "?", &
+               iim, jjm+1, nhori, llm, 1, llm, nvert, &
+               "inst(X)", zsto, zout)
+          CALL histdef(nid_ins, "d_tr_cv_"//tname(iq), &
+               "tendance convection"// ttext(iq), "?", &
+               iim, jjm+1, nhori, llm, 1, llm, nvert, &
+               "inst(X)", zsto, zout)
+          CALL histdef(nid_ins, "d_tr_cl_"//tname(iq), &
+               "tendance couche limite"// ttext(iq), "?", &
+               iim, jjm+1, nhori, llm, 1, llm, nvert, &
+               "inst(X)", zsto, zout)
+          !---fin Olivia
+
+       ENDDO
 
        CALL histend(nid_ins)
     ENDIF
