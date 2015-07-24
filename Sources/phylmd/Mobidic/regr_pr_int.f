@@ -4,7 +4,7 @@ module regr_pr_int_m
 
 contains
 
-  subroutine regr_pr_int(ncid, name, julien, top_value, v3)
+  subroutine regr_pr_int(ncid, name, julien, pplay, top_value, v3)
 
     ! "regr_pr_int" stands for "regrid pressure interpolation".
 
@@ -30,11 +30,13 @@ contains
     use nr_util, only: assert
     use numer_rec_95, only: regr1_lint
     use press_coefoz_m, only: plev
-    use pressure_var, only: pls
 
     integer, intent(in):: ncid ! NetCDF ID of the file
     character(len=*), intent(in):: name ! of the NetCDF variable
     integer, intent(in):: julien ! jour julien, 1 <= julien <= 360
+
+    real, intent(in):: pplay(:, :) ! (klon, llm)
+    ! (pression pour le mileu de chaque couche, en Pa)
 
     real, intent(in):: top_value
     ! (extra value of field at 0 pressure)
@@ -47,16 +49,15 @@ contains
 
     integer varid ! for NetCDF
 
-    real  v1(jjm + 1, 0:size(plev))
+    real v1(jjm + 1, 0:size(plev))
     ! Input field at day "julien". "v1(j, k >=1)" is at latitude
     ! "rlatu(j)" and pressure "plev(k)".
 
-    real v2(iim + 1, jjm + 1, llm)
-    ! Regridded field on the "dynamics" horizontal grid. "v2(i, j, k)"
-    ! is at longitude "rlonv(i)", latitude "rlatu(j)" and pressure
-    ! "pls(i, j, k)".
+    real v2(klon, 0:size(plev))
+    ! Field on the "physics" horizontal grid.  "v2(i, k >= 1)" is at
+    ! longitude "xlon(i)", latitude "xlat(i)" and pressure "plev(k)".)
 
-    integer i, j, k
+    integer i, k
 
     !--------------------------------------------
 
@@ -73,18 +74,14 @@ contains
     ! Complete "v1" with the value at 0 pressure:
     v1(:, 0) = top_value
 
-    ! Regrid in pressure at each horizontal position:
-    do j = 1, jjm + 1
-       do i = 1, iim
-          if (dyn_phy(i, j)) then
-             v2(i, j, llm:1:-1) &
-                  = regr1_lint(v1(j, :), (/0., plev/), pls(i, j, llm:1:-1))
-             ! (invert order of indices because "pls" is in descending order)
-          end if
-       end do
-    end do
+    forall (k = 0:size(plev)) v2(:, k) = pack(spread(v1(:, k), dim = 1, &
+         ncopies = iim + 1), dyn_phy)
 
-    forall (k = 1:llm) v3(:, k) = pack(v2(:, :, k), dyn_phy)
+    ! Regrid in pressure at each horizontal position:
+    do i = 1, klon
+       v3(i, llm:1:-1) = regr1_lint(v2(i, :), (/0., plev/), pplay(i, llm:1:-1))
+       ! (invert order of indices because "pplay" is in descending order)
+    end do
 
   end subroutine regr_pr_int
 

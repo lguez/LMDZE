@@ -34,7 +34,7 @@ module regr_pr_comb_coefoz_m
 
 contains
 
-  subroutine regr_pr_comb_coefoz(julien)
+  subroutine regr_pr_comb_coefoz(julien, paprs, pplay)
 
     ! "regr_pr_comb_coefoz" stands for "regrid pressure combine
     ! coefficients ozone".
@@ -53,6 +53,12 @@ contains
     use regr_pr_int_m, only: regr_pr_int
 
     integer, intent(in):: julien ! jour julien, 1 <= julien <= 360
+
+    real, intent(in):: paprs(:, :) ! (klon, llm + 1)
+    ! (pression pour chaque inter-couche, en Pa)
+
+    real, intent(in):: pplay(:, :) ! (klon, llm)
+    ! (pression pour le mileu de chaque couche, en Pa)
 
     ! Variables local to the procedure:
 
@@ -84,12 +90,12 @@ contains
 
     call nf95_open("coefoz_LMDZ.nc", nf90_nowrite, ncid)
 
-    call regr_pr_av(ncid, "a2", julien, a2)
+    call regr_pr_av(ncid, "a2", julien, paprs, a2)
 
-    call regr_pr_av(ncid, "a4", julien, a4_mass)
+    call regr_pr_av(ncid, "a4", julien, paprs, a4_mass)
     a4_mass = a4_mass * 48. / 29.
 
-    call regr_pr_av(ncid, "a6", julien, a6)
+    call regr_pr_av(ncid, "a6", julien, paprs, a6)
 
     ! Compute "a6_mass" avoiding underflow, do not divide by 1e4
     ! before dividing by molecular mass:
@@ -100,18 +106,18 @@ contains
     ! (We use as few local variables as possible, in order to spare
     ! main memory.)
 
-    call regr_pr_av(ncid, "P_net_Mob", julien, c_Mob)
+    call regr_pr_av(ncid, "P_net_Mob", julien, paprs, c_Mob)
 
-    call regr_pr_av(ncid, "r_Mob", julien, coefoz)
+    call regr_pr_av(ncid, "r_Mob", julien, paprs, coefoz)
     c_mob = c_mob - a2 * coefoz
 
-    call regr_pr_int(ncid, "Sigma_Mob", julien, top_value=0., v3=coefoz)
+    call regr_pr_int(ncid, "Sigma_Mob", julien, pplay, top_value=0., v3=coefoz)
     c_mob = (c_mob - a6 * coefoz) * 48. / 29.
 
-    call regr_pr_av(ncid, "temp_Mob", julien, coefoz)
+    call regr_pr_av(ncid, "temp_Mob", julien, paprs, coefoz)
     c_mob = c_mob - a4_mass * coefoz
 
-    call regr_pr_av(ncid, "R_Het", julien, r_het_interm)
+    call regr_pr_av(ncid, "R_Het", julien, paprs, r_het_interm)
     ! Heterogeneous chemistry is only at high latitudes:
     forall (k = 1: llm)
        where (abs(rlat) <= 45.) r_het_interm(:, k) = 0.

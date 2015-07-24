@@ -339,7 +339,7 @@ contains
        ! Ozone as a tracer:
        if (mod(itap - 1, lmt_pas) == 0) then
           ! Once per day, update the coefficients for ozone chemistry:
-          call regr_pr_comb_coefoz(julien)
+          call regr_pr_comb_coefoz(julien, paprs, pplay)
        end if
        call o3_chem(julien, gmtime, t_seri, zmasse, pdtphys, tr_seri(:, :, 3))
     end if

@@ -35,7 +35,6 @@ contains
     use inidissip_m, only: idissip
     use integrd_m, only: integrd
     use nr_util, only: assert
-    USE pressure_var, ONLY: p3d
     USE temps, ONLY: itau_dyn
     use writedynav_m, only: writedynav
     use writehist_m, only: writehist
@@ -97,6 +96,10 @@ contains
     REAL vcont((iim + 1) * jjm, llm), ucont((iim + 1) * (jjm + 1), llm)
     logical leapf
     real dt ! time step, in s
+
+    REAL p3d(iim + 1, jjm + 1, llm+1) ! pressure at layer interfaces, in Pa
+    ! ("p3d(i, j, l)" is at longitude "rlonv(i)", latitude "rlatu(j)",
+    ! for interface "l")
 
     !---------------------------------------------------
 
@@ -167,7 +170,7 @@ contains
        end if
 
        IF (MOD(itau + 1, iphysiq) == 0 .AND. iflag_phys /= 0) THEN
-          CALL calfis(ucov, vcov, teta, q, pk, phis, phi, w, dufi, dvfi, &
+          CALL calfis(ucov, vcov, teta, q, p3d, pk, phis, phi, w, dufi, dvfi, &
                dtetafi, dqfi, dayvrai = itau / day_step + day_ini, &
                time = REAL(mod(itau, day_step)) / day_step, &
                lafin = itau + 1 == itaufin)

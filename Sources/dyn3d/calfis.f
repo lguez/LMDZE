@@ -4,7 +4,7 @@ module calfis_m
 
 contains
 
-  SUBROUTINE calfis(ucov, vcov, teta, q, pk, phis, phi, w, dufi, dvfi, &
+  SUBROUTINE calfis(ucov, vcov, teta, q, p3d, pk, phis, phi, w, dufi, dvfi, &
        dtetafi, dqfi, dayvrai, time, lafin)
 
     ! From dyn3d/calfis.F, version 1.3, 2005/05/25 13:10:09
@@ -39,7 +39,6 @@ contains
     use grid_change, only: dyn_phy, gr_fi_dyn
     use nr_util, only: pi
     use physiq_m, only: physiq
-    use pressure_var, only: p3d, pls
 
     REAL, intent(in):: ucov(:, :, :) ! (iim + 1, jjm + 1, llm) 
     ! covariant zonal velocity
@@ -52,6 +51,11 @@ contains
 
     REAL, intent(in):: q(:, :, :, :) ! (iim + 1, jjm + 1, llm, nqmx)
     ! mass fractions of advected fields
+
+    REAL, intent(in):: p3d(:, :, :) ! (iim + 1, jjm + 1, llm+1) 
+    ! pressure at layer interfaces, in Pa
+    ! ("p3d(i, j, l)" is at longitude "rlonv(i)", latitude "rlatu(j)",
+    ! for interface "l")
 
     REAL, intent(in):: pk(:, :, :) ! (iim + 1, jjm + 1, llm)
     ! Exner = cp * (p / preff)**kappa 
@@ -104,8 +108,7 @@ contains
     ! 43. Température et pression milieu couche
     DO l = 1, llm
        pksurcp = pk(:, :, l) / cpp
-       pls(:, :, l) = preff * pksurcp**(1./ kappa)
-       play(:, l) = pack(pls(:, :, l), dyn_phy)
+       play(:, l) = pack(preff * pksurcp**(1./ kappa), dyn_phy)
        t(:, l) = pack(teta(:, :, l) * pksurcp, dyn_phy)
     ENDDO
 
