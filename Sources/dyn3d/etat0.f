@@ -101,12 +101,8 @@ contains
 
     REAL pk(iim + 1, jjm + 1, llm) ! fonction d'Exner aux milieux des couches 
     real pks(iim + 1, jjm + 1)
-
     REAL masse(iim + 1, jjm + 1, llm)
     REAL phi(iim + 1, jjm + 1, llm)
-    REAL pbaru(ip1jmp1, llm), pbarv(ip1jm, llm)
-    REAL w(iim + 1, jjm + 1, llm)
-
     real sig1(klon, llm) ! section adiabatic updraft
     real w01(klon, llm) ! vertical velocity within adiabatic updraft
 
@@ -294,7 +290,7 @@ contains
     pctsrf(:, is_oce) = 1. - zmasq
     WHERE (pctsrf(:, is_oce) < EPSFRA) pctsrf(:, is_oce) = 0.
 
-    ! V\'erification que somme des sous-surfaces vaut 1 :
+    ! V\'erification que la somme des sous-surfaces vaut 1 :
     ji = count(abs(sum(pctsrf, dim = 2) - 1.) > EPSFRA)
     IF (ji /= 0) then
        PRINT *, 'Bad surface percentages for ', ji, 'points'
@@ -311,7 +307,7 @@ contains
 
     call iniadvtrac
     CALL geopot(teta, pk , pks, phis, phi)
-    CALL caldyn0(ucov, vcov, teta, ps, masse, pk, phis, phi, w, pbaru, pbarv)
+    CALL caldyn0(ucov, vcov, teta, ps, pk, phis, phi)
     CALL dynredem0(day_ref, phis)
     CALL dynredem1(vcov, ucov, teta, q, masse, ps, itau = 0)
 

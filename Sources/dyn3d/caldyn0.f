@@ -4,8 +4,7 @@ module caldyn0_m
 
 contains
 
-  SUBROUTINE caldyn0(ucov, vcov, teta, ps, masse, pk, phis, phi, w, &
-       pbaru, pbarv)
+  SUBROUTINE caldyn0(ucov, vcov, teta, ps, pk, phis, phi)
 
     ! From dyn3d/caldyn0.F, version 1.1.1.1, 2004/05/19 12:53:07
     ! Authors:  P. Le Van, F. Forget
@@ -30,14 +29,14 @@ contains
     REAL, INTENT(IN):: vcov(:, :, :) ! (iim + 1, jjm, llm) ! vent covariant
     REAL, INTENT(IN):: teta(ip1jmp1, llm)
     REAL, INTENT (IN):: ps(ip1jmp1)
-    real, intent(out):: masse(ip1jmp1, llm)
     REAL, INTENT (IN):: pk(iip1, jjp1, llm)
     REAL, INTENT (IN):: phis(ip1jmp1)
     REAL, INTENT (IN):: phi(iim + 1, jjm + 1, llm)
-    REAL, INTENT(out):: w(:, :, :) ! (iim + 1, jjm + 1, llm)
-    REAL, intent(out):: pbaru(ip1jmp1, llm), pbarv((iim + 1) * jjm, llm)
 
     ! Local:
+    real masse(ip1jmp1, llm)
+    REAL w(iim + 1, jjm + 1, llm)
+    REAL pbaru(ip1jmp1, llm), pbarv((iim + 1) * jjm, llm)
     REAL vcont((iim + 1) * jjm, llm), ucont(ip1jmp1, llm)
     REAL p(ip1jmp1, llmp1)
     REAL massebx(ip1jmp1, llm), masseby((iim + 1) * jjm, llm)
