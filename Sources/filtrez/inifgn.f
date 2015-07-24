@@ -35,7 +35,7 @@ contains
 
     ! Local:
 
-    REAL a(iim, iim) ! second derivative, symmetric, elements are angle^{-2}
+    REAL delta(iim, iim) ! second derivative, symmetric, elements are angle^{-2}
 
     REAL deriv_u(iim, iim), deriv_v(iim, iim) 
     ! first derivative at u and v longitudes, elements are angle^{-1}
@@ -59,13 +59,13 @@ contains
 
     deriv_v = - transpose(deriv_u)
 
-    a = matmul(deriv_v, deriv_u) ! second derivative at v longitudes
-    CALL jacobi(a, eignval_v, eignfnv)
+    delta = matmul(deriv_v, deriv_u) ! second derivative at v longitudes
+    CALL jacobi(delta, eignval_v, eignfnv)
     CALL acc(eignfnv)
     CALL eigsrt(eignval_v, eignfnv)
 
-    a = matmul(deriv_u, deriv_v) ! second derivative at u longitudes
-    CALL jacobi(a, eignval_u, eignfnu)
+    delta = matmul(deriv_u, deriv_v) ! second derivative at u longitudes
+    CALL jacobi(delta, eignval_u, eignfnu)
     CALL acc(eignfnu)
     CALL eigsrt(eignval_u, eignfnu)
 

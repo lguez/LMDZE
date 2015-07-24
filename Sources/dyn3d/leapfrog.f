@@ -18,6 +18,7 @@ contains
     USE calfis_m, ONLY: calfis
     USE comconst, ONLY: daysec, dtvr
     USE comgeom, ONLY: aire_2d, apoln, apols
+    use covcont_m, only: covcont
     USE disvert_m, ONLY: ap, bp
     USE conf_gcm_m, ONLY: day_step, iconser, iperiod, iphysiq, nday, offline, &
          iflag_phys, iecri
@@ -88,7 +89,6 @@ contains
     ! Variables pour le fichier histoire
     INTEGER itau ! index of the time step of the dynamics, starts at 0
     INTEGER itaufin
-    real finvmaold(iim + 1, jjm + 1, llm)
     INTEGER l
 
     ! Variables test conservation \'energie
@@ -125,8 +125,6 @@ contains
           tetam1 = teta
           massem1 = masse
           psm1 = ps
-          finvmaold = masse
-          CALL filtreg_scal(finvmaold, direct = .false., intensive = .false.)
        end if
 
        ! Calcul des tendances dynamiques:
@@ -143,8 +141,7 @@ contains
 
        ! Int\'egrations dynamique et traceurs:
        CALL integrd(vcovm1, ucovm1, tetam1, psm1, massem1, dv, dudyn, dteta, &
-            dp, vcov, ucov, teta, q(:, :, :, :2), ps, masse, finvmaold, dt, &
-            leapf)
+            dp, vcov, ucov, teta, q(:, :, :, :2), ps, masse, dt, leapf)
 
        forall (l = 1: llm + 1) p3d(:, :, l) = ap(l) + bp(l) * ps
        CALL exner_hyb(ps, p3d, pks, pk)
@@ -160,8 +157,8 @@ contains
 
           ! integrations dynamique et traceurs:
           CALL integrd(vcovm1, ucovm1, tetam1, psm1, massem1, dv, dudyn, &
-               dteta, dp, vcov, ucov, teta, q(:, :, :, :2), ps, masse, &
-               finvmaold, dtvr, leapf=.false.)
+               dteta, dp, vcov, ucov, teta, q(:, :, :, :2), ps, masse, dtvr, &
+               leapf=.false.)
 
           forall (l = 1: llm + 1) p3d(:, :, l) = ap(l) + bp(l) * ps
           CALL exner_hyb(ps, p3d, pks, pk)

@@ -14,6 +14,7 @@ contains
     use bernoui_m, only: bernoui
     USE comgeom, ONLY: airesurg
     use convmas_m, only: convmas
+    use covcont_m, only: covcont
     USE dimens_m, ONLY: iim, jjm, llm
     USE disvert_m, ONLY: ap, bp
     use flumass_m, only: flumass

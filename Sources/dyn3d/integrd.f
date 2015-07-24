@@ -5,7 +5,7 @@ module integrd_m
 contains
 
   SUBROUTINE integrd(vcovm1, ucovm1, tetam1, psm1, massem1, dv, dudyn, dteta, &
-       dp, vcov, ucov, teta, q, ps, masse, finvmaold, dt, leapf)
+       dp, vcov, ucov, teta, q, ps, masse, dt, leapf)
 
     ! From dyn3d/integrd.F, version 1.1.1.1, 2004/05/19 12:53:05
     ! Author: P. Le Van 
@@ -14,7 +14,6 @@ contains
     USE comgeom, ONLY : aire, aire_2d, apoln, apols
     USE dimens_m, ONLY : iim, jjm, llm
     USE disvert_m, ONLY : ap, bp
-    USE filtreg_scal_m, ONLY : filtreg_scal
     use massdair_m, only: massdair
     use nr_util, only: assert
     USE paramet_m, ONLY : iip1, iip2, ip1jm, ip1jmp1, jjp1, llmp1
@@ -23,24 +22,22 @@ contains
     REAL vcovm1(ip1jm, llm), ucovm1((iim + 1) * (jjm + 1), llm)
     REAL, intent(inout):: tetam1(iim + 1, jjm + 1, llm)
     REAL, intent(inout):: psm1((iim + 1) * (jjm + 1))
-    real massem1(iim + 1, jjm + 1, llm)
+    real, intent(inout):: massem1(iim + 1, jjm + 1, llm)
     REAL, intent(in):: dv(ip1jm, llm), dudyn((iim + 1) * (jjm + 1), llm)
-    REAL dteta(iim + 1, jjm + 1, llm), dp((iim + 1) * (jjm + 1))
+    REAL, intent(in):: dteta(iim + 1, jjm + 1, llm), dp((iim + 1) * (jjm + 1))
     REAL, intent(inout):: vcov(ip1jm, llm), ucov((iim + 1) * (jjm + 1), llm)
     real, intent(inout):: teta(iim + 1, jjm + 1, llm)
     REAL q(:, :, :, :) ! (iim + 1, jjm + 1, llm, nq)
     REAL, intent(inout):: ps((iim + 1) * (jjm + 1))
     REAL, intent(inout):: masse(iim + 1, jjm + 1, llm)
-    REAL finvmaold(iim + 1, jjm + 1, llm)
     real, intent(in):: dt ! time step, in s
     LOGICAL, INTENT (IN) :: leapf
 
     ! Local: 
+    REAL finvmaold(iim + 1, jjm + 1, llm)
     INTEGER nq
     REAL vscr(ip1jm), uscr((iim + 1) * (jjm + 1)), hscr(iim + 1, jjm + 1)
     real pscr((iim + 1) * (jjm + 1))
-    REAL massescr(iim + 1, jjm + 1, llm)
-    real finvmasse(iim + 1, jjm + 1, llm)
     REAL p((iim + 1) * (jjm + 1), llmp1)
     REAL tpn, tps, tppn(iim), tpps(iim)
     REAL deltap((iim + 1) * (jjm + 1), llm)
@@ -60,8 +57,6 @@ contains
           uscr(ij+ip1jm) = 0.
        END DO
     END DO
-
-    massescr = masse
 
     ! Integration de ps :
 
@@ -90,10 +85,7 @@ contains
     ! Calcul de la nouvelle masse d'air au dernier temps integre t+1
 
     forall (l = 1: llm + 1) p(:, l) = ap(l) + bp(l) * ps
-    CALL massdair(p, masse)
-
-    finvmasse = masse
-    CALL filtreg_scal(finvmasse, direct = .false., intensive = .false.)
+    CALL massdair(p, finvmaold)
 
     ! integration de ucov, vcov, h
 
@@ -109,8 +101,8 @@ contains
        END DO
 
        hscr = teta(:, :, l)
-       teta(:, :, l) = tetam1(:, :, l) * massem1(:, :, l) / masse(:, :, l) &
-            + dt * dteta(:, :, l) / masse(:, :, l)
+       teta(:, :, l) = tetam1(:, :, l) * massem1(:, :, l) / finvmaold(:, :, l) &
+            + dt * dteta(:, :, l) / finvmaold(:, :, l)
 
        ! Calcul de la valeur moyenne, unique aux poles pour teta
        teta(:, 1, l) = sum(aire_2d(:iim, 1) * teta(:iim, 1, l)) / apoln
@@ -141,14 +133,14 @@ contains
        END DO
     END DO
 
-    finvmaold = finvmasse
-
     ! Fin de l'integration de q
 
     IF (leapf) THEN
        psm1 = pscr
-       massem1 = massescr
+       massem1 = masse
     END IF
+
+    masse = finvmaold
 
   END SUBROUTINE integrd
 

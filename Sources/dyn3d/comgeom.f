@@ -111,11 +111,10 @@ contains
     ! Calcul des élongations cuij1, ..., cuij4, cvij1, ..., cvij4 aux mêmes
     ! endroits que les aires aireij1_2d, ..., aireij4_2d.
 
-    ! Fonction "f(y)" à dérivée tangente hyperbolique. Calcul des
-    ! coefficients cu_2d, cv_2d, 1. / cu_2d**2, 1. / cv_2d**2. Les
-    ! coefficients cu_2d et cv_2d permettent de passer des vitesses
-    ! naturelles aux vitesses covariantes et contravariantes, ou
-    ! vice-versa.
+    ! Calcul des coefficients cu_2d, cv_2d, 1. / cu_2d**2, 1. /
+    ! cv_2d**2. Les coefficients cu_2d et cv_2d permettent de passer
+    ! des vitesses naturelles aux vitesses covariantes et
+    ! contravariantes, ou vice-versa.
 
     ! On a :
     ! u(covariant) = cu_2d * u(naturel), u(contravariant) = u(naturel) / cu_2d
@@ -124,9 +123,6 @@ contains
     ! On en tire : 
     ! u(covariant) = cu_2d * cu_2d * u(contravariant)
     ! v(covariant) = cv_2d * cv_2d * v(contravariant)
-
-    ! On a l'application (x(X), y(Y)) avec - im / 2 + 1 <= X <= im / 2
-    ! et - jm / 2 <= Y <= jm / 2
 
     ! x est la longitude du point en radians.
     ! y est la latitude du point en radians.
@@ -139,19 +135,17 @@ contains
     ! dépendant de j uniquement, sera ici indicé aussi en i pour un
     ! adressage plus facile en ij.
 
-    ! cv_2d est aux points v. cu_2d est aux points
-    ! u. Cf. "inigeom.txt".
+    ! cv_2d est aux points v. cu_2d est aux points u. Cf. "inigeom.txt".
 
     USE comconst, ONLY : g, omeg, rad
     USE comdissnew, ONLY : coefdis, nitergdiv, nitergrot, niterh
     use dynetat0_m, only: xprimp025, xprimm025, rlatu1, rlatu2, rlatu, rlatv, &
-         yprimu1, yprimu2, rlonu, rlonv
-    use jumble, only: new_unit
+         yprimu1, yprimu2
     use nr_util, only: pi
     USE paramet_m, ONLY : iip1, jjp1
 
     ! Local:
-    INTEGER i, j, unit
+    INTEGER i, j
     REAL ai14, ai23, airez, un4rad2
     REAL coslatm, coslatp, radclatm, radclatp
     REAL, dimension(iip1, jjp1):: cuij1, cuij2, cuij3, cuij4 ! in m
@@ -409,14 +403,6 @@ contains
     DO j = 1, jjp1
        constang_2d(iip1, j) = constang_2d(1, j)
     END DO
-
-    call new_unit(unit)
-    open(unit, file="longitude_latitude.txt", status="replace", action="write")
-    write(unit, fmt=*) '"longitudes at V points (degrees)"', rlonv * 180. / pi
-    write(unit, fmt=*) '"latitudes at V points (degrees)"', rlatv * 180. / pi
-    write(unit, fmt=*) '"longitudes at U points (degrees)"', rlonu * 180. / pi
-    write(unit, fmt=*) '"latitudes at U points (degrees)"', rlatu * 180. / pi
-    close(unit)
 
   END SUBROUTINE inigeom
 

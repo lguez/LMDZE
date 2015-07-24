@@ -9,12 +9,14 @@ contains
 
     ! From LMDZ4/libf/dyn3d/bilan_dyn.F, version 1.5 2005/03/16 10:12:17
 
-    ! Sous-programme consacré à des diagnostics dynamiques de base.
-    ! De façon générale, les moyennes des scalaires Q sont pondérées
-    ! par la masse. Les flux de masse sont, eux, simplement moyennés.
+    ! Sous-programme consacr\'e \`a des diagnostics dynamiques de
+    ! base.  De fa\c{}con g\'en\'erale, les moyennes des scalaires Q
+    ! sont pond\'er\'ees par la masse. Les flux de masse sont, eux,
+    ! simplement moyenn\'es.
 
     USE comconst, ONLY: cpp
     USE comgeom, ONLY: constang_2d, cu_2d, cv_2d
+    use covcont_m, only: covcont
     USE dimens_m, ONLY: iim, jjm, llm
     USE histwrite_m, ONLY: histwrite
     use init_dynzon_m, only: ncum, fileid, znom, ntr, nq, nom
@@ -37,16 +39,16 @@ contains
     integer:: itau = 0
     real qy, factv(jjm, llm)
 
-    ! Variables dynamiques intermédiaires
+    ! Variables dynamiques interm\'ediaires
     REAL vcont(iip1, jjm, llm), ucont(iip1, jjp1, llm)
     REAL ang(iip1, jjp1, llm), unat(iip1, jjp1, llm)
     REAL massebx(iip1, jjp1, llm), masseby(iip1, jjm, llm)
     REAL ecin(iip1, jjp1, llm)
 
-    ! Champ contenant les scalaires advectés
+    ! Champ contenant les scalaires advect\'es
     real Q(iip1, jjp1, llm, nQ)
 
-    ! Champs cumulés
+    ! Champs cumul\'es
     real, save:: ps_cum(iip1, jjp1)
     real, save:: masse_cum(iip1, jjp1, llm)
     real, save:: flux_u_cum(iip1, jjp1, llm)
@@ -69,12 +71,12 @@ contains
 
     ! Calcul des champs dynamiques
 
-    ! Énergie cinétique
+    ! \'Energie cin\'etique
     ucont = 0
     CALL covcont(llm, ucov, vcov, ucont, vcont)
     CALL enercin(vcov, ucov, vcont, ucont, ecin)
 
-    ! moment cinétique
+    ! moment cin\'etique
     forall (l = 1: llm)
        ang(:, :, l) = ucov(:, :, l) + constang_2d
        unat(:, :, l) = ucont(:, :, l) * cu_2d
@@ -117,7 +119,7 @@ contains
          + flux_u(i, :, :) * 0.5 * (Q(i, :, :, iQ) + Q(i + 1, :, :, iQ))
     flux_uQ_cum(iip1, :, :, :) = flux_uQ_cum(1, :, :, :)
 
-    ! Flux méridien
+    ! Flux m\'eridien
     forall (iQ = 1: nQ, j = 1: jjm) flux_vQ_cum(:, j, :, iQ) &
          = flux_vQ_cum(:, j, :, iQ) &
          + flux_v(:, j, :) * 0.5 * (Q(:, j, :, iQ) + Q(:, j + 1, :, iQ))
@@ -132,7 +134,7 @@ contains
        flux_uQ_cum = flux_uQ_cum / ncum
        flux_vQ_cum = flux_vQ_cum / ncum
 
-       ! Transport méridien
+       ! Transport m\'eridien
 
        ! Cumul zonal des masses des mailles
 
@@ -176,7 +178,7 @@ contains
                 vq(j, l, istn, iQ) = vqtmp(j, l) - vq(j, l, immc, iQ)
              enddo
           enddo
-          ! Fonction de courant méridienne pour la quantité Q
+          ! Fonction de courant m\'eridienne pour la quantit\'e Q
           do l = llm, 1, -1
              do j = 1, jjm
                 psiQ(j, l, iQ) = psiQ(j, l + 1, iQ) + vq(j, l, itot, iQ)
@@ -184,7 +186,7 @@ contains
           enddo
        enddo
 
-       ! Fonction de courant pour la circulation méridienne moyenne
+       ! Fonction de courant pour la circulation m\'eridienne moyenne
        psi = 0.
        do l = llm, 1, -1
           do j = 1, jjm
@@ -206,7 +208,7 @@ contains
        psi = psi * 1e-9
        call histwrite(fileid, 'psi', itau, psi(:, :llm))
 
-       ! Intégrale verticale
+       ! Int\'egrale verticale
 
        forall (iQ = 1: nQ, itr = 2: ntr) avq(:, itr, iQ) &
             = sum(vq(:, :, itr, iQ) * zmasse, dim=2) / cv_2d(1, :)

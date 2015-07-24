@@ -17,6 +17,7 @@ contains
     USE comgeom, ONLY: airesurg, constang_2d
     USE conf_gcm_m, ONLY: day_step
     use convmas_m, only: convmas
+    use covcont_m, only: covcont
     USE dimens_m, ONLY: iim, jjm, llm
     USE disvert_m, ONLY: ap, bp
     use dteta1_m, only: dteta1
