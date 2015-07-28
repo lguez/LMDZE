@@ -2,11 +2,10 @@ module inifilr_m
 
   IMPLICIT NONE
 
-  INTEGER jfiltnu, jfiltsu, jfiltnv, jfiltsv
-  ! jfiltn index of the last scalar line filtered in NH
-  ! jfilts index of the first line filtered in SH
-
   ! North:
+
+  INTEGER jfiltnu, jfiltnv
+  ! index of the last scalar line filtered in northern hemisphere
 
   real, allocatable:: matriceun(:, :, :), matrinvn(:, :, :) 
   ! (iim, iim, 2:jfiltnu)
@@ -14,6 +13,9 @@ module inifilr_m
   real, allocatable:: matricevn(:, :, :) ! (iim, iim, jfiltnv)
 
   ! South:
+
+  integer jfiltsu, jfiltsv
+  ! index of the first line filtered in southern hemisphere
 
   real, allocatable:: matriceus(:, :, :), matrinvs(:, :, :)
   ! (iim, iim, jfiltsu:jjm)
@@ -24,12 +26,15 @@ contains
 
   SUBROUTINE inifilr
 
-    ! From filtrez/inifilr.F, version 1.1.1.1 2004/05/19 12:53:09
+    ! From filtrez/inifilr.F, version 1.1.1.1, 2004/05/19 12:53:09
     ! H. Upadhyaya, O. Sharma
 
-    ! This routine computes the eigenvectors of the laplacian on the
-    ! stretched grid, and the filtering coefficients. The modes are
-    ! filtered from modfrst to iim.
+    ! This procedure computes the filtering coefficients for scalar
+    ! lines and meridional wind v lines. The modes are filtered from
+    ! modfrst to iim. We filter all those latitude lines where coefil
+    ! < 1. No filtering at poles. colat0 is to be used when alpha
+    ! (stretching coefficient) is set equal to zero for the regular
+    ! grid case.
 
     USE dimens_m, ONLY : iim, jjm
     USE dynetat0_m, ONLY : rlatu, rlatv, xprimu, grossismx
@@ -38,24 +43,28 @@ contains
     use nr_util, only: pi
 
     ! Local:
+
     REAL dlatu(jjm)
     REAL rlamda(2: iim)
-    real eignvl(iim) ! eigenvalues sorted in descending order
-    REAL cof
-    INTEGER i, j, k, unit
+    real eignvl(iim) ! eigenvalues sorted in descending order (<= 0)
+    INTEGER i, j, unit
     REAL colat0 ! > 0
-    REAL eignft(iim, iim), coff
+    REAL eignft(iim, iim)
 
     real eignfnu(iim, iim), eignfnv(iim, iim)
-    ! eigenvectors of the discrete laplacian
+    ! eigenvectors of the discrete second derivative with respect to longitude
 
     ! Filtering coefficients (lamda_max * cos(rlat) / lamda):
-    real coefilu(iim, jjm), coefilv(iim, jjm)
-    real coefilu2(iim, jjm), coefilv2(iim, jjm)
+    real, allocatable:: coefilnu(:, :) ! (iim, 2:jfiltnu)
+    real, allocatable:: coefilsu(:, :) ! (iim, jfiltsu:jjm)
+    real, allocatable:: coefilnv(:, :) ! (iim, jfiltnv)
+    real, allocatable:: coefilsv(:, :) ! (iim, jfiltsv:jjm)
 
     ! Index of the mode from where modes are filtered:
-    integer, allocatable:: modfrstnu(:), modfrstsu(:)
-    integer, allocatable:: modfrstnv(:), modfrstsv(:)
+    integer, allocatable:: modfrstnu(:) ! (2:jfiltnu)
+    integer, allocatable:: modfrstsu(:) ! (jfiltsu:jjm)
+    integer, allocatable:: modfrstnv(:) ! (jfiltnv)
+    integer, allocatable:: modfrstsv(:) ! (jfiltsv:jjm)
 
     !-----------------------------------------------------------
 
@@ -63,20 +72,12 @@ contains
 
     CALL inifgn(eignvl, eignfnu, eignfnv)
 
-    ! compute eigenvalues and eigenvectors
-    ! compute the filtering coefficients for scalar lines and
-    ! meridional wind v-lines
-    ! we filter all those latitude lines where coefil < 1
-    ! NO FILTERING AT POLES
-    ! colat0 is to be used when alpha (stretching coefficient)
-    ! is set equal to zero for the regular grid case
-
     ! Calcul de colat0
     forall (j = 1:jjm) dlatu(j) = rlatu(j) - rlatu(j + 1)
     colat0 = min(0.5, minval(dlatu) / minval(xprimu(:iim)))
     PRINT *, 'colat0 = ', colat0
 
-    rlamda = iim / (pi * colat0 / grossismx) / sqrt(abs(eignvl(2: iim)))
+    rlamda = iim / (pi * colat0 / grossismx) / sqrt(- eignvl(2: iim))
 
     ! Determination de jfiltnu, jfiltsu, jfiltnv, jfiltsv
 
@@ -123,14 +124,17 @@ contains
     PRINT *, 'jfiltnv =', jfiltnv
     PRINT *, 'jfiltsv =', jfiltsv
 
-    ! Determination de coefilu, coefilv, modfrst[ns][uv]:
+    ! D\'etermination de coefil[ns][uv], modfrst[ns][uv]:
 
     allocate(modfrstnu(2:jfiltnu), modfrstsu(jfiltsu:jjm))
     allocate(modfrstnv(jfiltnv), modfrstsv(jfiltsv:jjm))
-    coefilu = 0.
-    coefilv = 0.
-    coefilu2 = 0.
-    coefilv2 = 0.
+    allocate(coefilnu(iim, 2:jfiltnu), coefilsu(iim, jfiltsu:jjm))
+    allocate(coefilnv(iim, jfiltnv), coefilsv(iim, jfiltsv:jjm))
+
+    coefilnu = 0.
+    coefilnv = 0.
+    coefilsu = 0.
+    coefilsv = 0.
 
     DO j = 2, jfiltnu
        modfrstnu(j) = 2
@@ -140,10 +144,8 @@ contains
        end do
 
        if (rlamda(modfrstnu(j)) * cos(rlatu(j)) < 1.) then
-          DO k = modfrstnu(j), iim
-             cof = rlamda(k) * cos(rlatu(j))
-             coefilu(k, j) = cof - 1.
-             coefilu2(k, j) = cof**2 - 1.
+          DO i = modfrstnu(j), iim
+             coefilnu(i, j) = rlamda(i) * cos(rlatu(j)) - 1.
           end DO
        end if
     END DO
@@ -156,10 +158,8 @@ contains
        end do
 
        if (rlamda(modfrstnv(j)) * cos(rlatv(j)) < 1.) then
-          DO k = modfrstnv(j), iim
-             cof = rlamda(k) * cos(rlatv(j))
-             coefilv(k, j) = cof - 1.
-             coefilv2(k, j) = cof**2 - 1.
+          DO i = modfrstnv(j), iim
+             coefilnv(i, j) = rlamda(i) * cos(rlatv(j)) - 1.
           end DO
        end if
     end DO
@@ -172,10 +172,8 @@ contains
        end do
 
        if (rlamda(modfrstsu(j)) * cos(rlatu(j)) < 1.) then
-          DO k = modfrstsu(j), iim
-             cof = rlamda(k) * cos(rlatu(j))
-             coefilu(k, j) = cof - 1.
-             coefilu2(k, j) = cof**2 - 1.
+          DO i = modfrstsu(j), iim
+             coefilsu(i, j) = rlamda(i) * cos(rlatu(j)) - 1.
           end DO
        end if
     end DO
@@ -188,10 +186,8 @@ contains
        end do
 
        if (rlamda(modfrstsv(j)) * cos(rlatv(j)) < 1.) then
-          DO k = modfrstsv(j), iim
-             cof = rlamda(k) * cos(rlatv(j))
-             coefilv(k, j) = cof - 1.
-             coefilv2(k, j) = cof**2 - 1.
+          DO i = modfrstsv(j), iim
+             coefilsv(i, j) = rlamda(i) * cos(rlatv(j)) - 1.
           end DO
        end if
     END DO
@@ -214,26 +210,16 @@ contains
     ! sur la grille scalaire
 
     DO j = 2, jfiltnu
-       DO i = 1, iim
-          IF (i < modfrstnu(j)) then
-             coff = 0.
-          else
-             coff = coefilu(i, j)
-          end IF
-          eignft(i, :) = eignfnv(:, i) * coff
-       END DO
+       eignft(:modfrstnu(j) - 1, :) = 0.
+       forall (i = modfrstnu(j):iim) eignft(i, :) = eignfnv(:, i) &
+            * coefilnu(i, j)
        matriceun(:, :, j) = matmul(eignfnv, eignft)
     END DO
 
     DO j = jfiltsu, jjm
-       DO i = 1, iim
-          IF (i < modfrstsu(j)) then
-             coff = 0.
-          else
-             coff = coefilu(i, j)
-          end IF
-          eignft(i, :) = eignfnv(:, i) * coff
-       END DO
+       eignft(:modfrstsu(j) - 1, :) = 0.
+       forall (i = modfrstsu(j):iim) eignft(i, :) = eignfnv(:, i) &
+            * coefilsu(i, j)
        matriceus(:, :, j) = matmul(eignfnv, eignft)
     END DO
 
@@ -241,26 +227,16 @@ contains
     ! sur la grille de V ou de Z
 
     DO j = 1, jfiltnv
-       DO i = 1, iim
-          IF (i < modfrstnv(j)) then
-             coff = 0.
-          else
-             coff = coefilv(i, j)
-          end IF
-          eignft(i, :) = eignfnu(:, i) * coff
-       END DO
+       eignft(:modfrstnv(j) - 1, :) = 0.
+       forall (i = modfrstnv(j): iim) eignft(i, :) = eignfnu(:, i) &
+            * coefilnv(i, j)
        matricevn(:, :, j) = matmul(eignfnu, eignft)
     END DO
 
     DO j = jfiltsv, jjm
-       DO i = 1, iim
-          IF (i < modfrstsv(j)) then
-             coff = 0.
-          else
-             coff = coefilv(i, j)
-          end IF
-          eignft(i, :) = eignfnu(:, i) * coff
-       END DO
+       eignft(:modfrstsv(j) - 1, :) = 0.
+       forall (i = modfrstsv(j):iim) eignft(i, :) = eignfnu(:, i) &
+            * coefilsv(i, j)
        matricevs(:, :, j) = matmul(eignfnu, eignft)
     END DO
 
@@ -268,26 +244,16 @@ contains
     ! sur la grille scalaire , pour le filtre inverse
 
     DO j = 2, jfiltnu
-       DO i = 1, iim
-          IF (i < modfrstnu(j)) then
-             coff = 0.
-          else
-             coff = coefilu(i, j) / (1. + coefilu(i, j))
-          end IF
-          eignft(i, :) = eignfnv(:, i) * coff
-       END DO
+       eignft(:modfrstnu(j) - 1, :) = 0.
+       forall (i = modfrstnu(j):iim) eignft(i, :) = eignfnv(:, i) &
+            * coefilnu(i, j) / (1. + coefilnu(i, j))
        matrinvn(:, :, j) = matmul(eignfnv, eignft)
     END DO
 
     DO j = jfiltsu, jjm
-       DO i = 1, iim
-          IF (i < modfrstsu(j)) then
-             coff = 0.
-          else
-             coff = coefilu(i, j) / (1. + coefilu(i, j))
-          end IF
-          eignft(i, :) = eignfnv(:, i) * coff
-       END DO
+       eignft(:modfrstsu(j) - 1, :) = 0.
+       forall (i = modfrstsu(j):iim) eignft(i, :) = eignfnv(:, i) &
+            * coefilsu(i, j) / (1. + coefilsu(i, j))
        matrinvs(:, :, j) = matmul(eignfnv, eignft)
     END DO
 
