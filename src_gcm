@@ -1,3 +1,4 @@
+a2c.f
 aaam_bud.f
 abort_gcm.f
 academic.f
@@ -60,6 +61,8 @@ convflu.f
 convmas.f
 coordij.f
 correctbid.f
+cosa.f
+cosc.f
 covcont.f
 covnat.f
 createnewfield.f
@@ -123,6 +126,9 @@ ener.f
 errioipsl.f
 exner_hyb.f
 FCTTRE.f
+filcr.f
+filew.f
+filns.f
 filtreg_hemisph.f
 filtreg_scal.f
 filtreg_v.f
@@ -141,6 +147,9 @@ flxflux.f
 flxini.f
 flxmain.f
 fonte_neige.f
+fxppm.f
+fyppm.f
+fzppm.f
 gcm.f
 geopot.f
 getfieldindex.f
@@ -177,6 +186,7 @@ iniadvtrac.f
 inidissip.f
 inifgn.f
 inifilr.f
+inifilr_hemisph.f
 ini_histins.f
 initdynav.f
 init_dynzon.f
@@ -211,6 +221,7 @@ lift_noro.f
 limx.f
 limy.f
 limz.f
+lmtppm.f
 lwb.f
 lwbv.f
 lwc.f
@@ -247,8 +258,8 @@ ozonecm.f
 paramet_m.f
 pentes_ini.f
 phyetat0.f
-phyredem.f
 phyredem0.f
+phyredem.f
 physiq.f
 phystokenc.f
 phytrac.f
@@ -259,6 +270,7 @@ press_coefoz.f
 principal_cshift.f
 printflag.f
 qcheck.f
+qckxyz.f
 qminimum.f
 q_sat.f
 raddim.f
@@ -316,12 +328,18 @@ vlz.f
 writedynav.f
 writefield.f
 writehist.f
+xadv.f
+xmist.f
+xtp.f
+yadv.f
 yamada4.f
 yamada.f
 ymds2ju.f
+ymist.f
 YOECUMF.f
 YOEGWD.f
 yoethf.f
 YOMCST.f
+ytp.f
 zenang.f
 zilch.f

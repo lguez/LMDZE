@@ -10,6 +10,7 @@ contains
     USE dimens_m
     USE dimphy
     use lwvd_m, only: lwvd
+    use lwvn_m, only: lwvn
     USE suphec_m
     USE raddim
     USE raddimlw
@@ -94,8 +95,7 @@ contains
 
     ! * CONTRIBUTION FROM ADJACENT LAYERS
 
-    CALL lwvn(kuaer, ktraer, pabcu, pdbsl, pga, pgb, zadjd, zadju, pcntrb, &
-         zdbdt)
+    CALL lwvn(kuaer, pabcu, pdbsl, pga, pgb, zadjd, zadju, pcntrb, zdbdt)
     ! * CONTRIBUTION FROM DISTANT LAYERS
 
     CALL lwvd(ktraer, pabcu, zdbdt, pga, pgb, pcntrb, zdisd, zdisu)

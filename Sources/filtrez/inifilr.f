@@ -7,14 +7,14 @@ module inifilr_m
   INTEGER jfiltnu, jfiltnv
   ! index of the last scalar line filtered in northern hemisphere
 
-  real, allocatable:: matriceun(:, :, :) ! (iim, iim, 2:jfiltnu)
+  real, pointer:: matriceun(:, :, :) ! (iim, iim, jfiltnu - 1)
   ! matrice filtre pour les champs situes sur la grille scalaire
 
-  real, allocatable:: matrinvn(:, :, :) ! (iim, iim, 2:jfiltnu)
+  real, pointer:: matrinvn(:, :, :) ! (iim, iim, jfiltnu - 1)
   ! matrice filtre pour les champs situes sur la grille scalaire, pour
   ! le filtre inverse
 
-  real, allocatable:: matricevn(:, :, :) ! (iim, iim, jfiltnv)
+  real, pointer:: matricevn(:, :, :) ! (iim, iim, jfiltnv)
   ! matrice filtre pour les champs situes sur la grille de V ou de Z
 
   ! South:
@@ -22,14 +22,14 @@ module inifilr_m
   integer jfiltsu, jfiltsv
   ! index of the first line filtered in southern hemisphere
 
-  real, allocatable:: matriceus(:, :, :) ! (iim, iim, jfiltsu:jjm)
+  real, pointer:: matriceus(:, :, :) ! (iim, iim, jjm - jfiltsu + 1)
   ! matrice filtre pour les champs situes sur la grille scalaire
 
-  real, allocatable:: matrinvs(:, :, :) ! (iim, iim, jfiltsu:jjm)
+  real, pointer:: matrinvs(:, :, :) ! (iim, iim, jjm - jfiltsu + 1)
   ! matrice filtre pour les champs situes sur la grille scalaire, pour
   ! le filtre inverse
 
-  real, allocatable:: matricevs(:, :, :) ! (iim, iim, jfiltsv:jjm)
+  real, pointer:: matricevs(:, :, :) ! (iim, iim, jjm - jfiltsv + 1)
   ! matrice filtre pour les champs situes sur la grille de V ou de Z
 
 contains
@@ -49,29 +49,21 @@ contains
     USE dimens_m, ONLY : iim, jjm
     USE dynetat0_m, ONLY : rlatu, rlatv, xprimu, grossismx
     use inifgn_m, only: inifgn
+    use inifilr_hemisph_m, only: inifilr_hemisph
     use jumble, only: new_unit
-    use nr_util, only: pi
+    use nr_util, only: pi, ifirstloc
 
     ! Local:
 
     REAL dlatu(jjm)
-    REAL rlamda(2:iim)
+    REAL rlamda(2:iim) ! > 0, in descending order
     real eignvl(iim) ! eigenvalues sorted in descending order (<= 0)
-    INTEGER i, j, unit
+    INTEGER j, unit
     REAL colat0 ! > 0
-    REAL eignft(iim, iim)
+    integer j1 ! index of smallest positive latitude
 
     real eignfnu(iim, iim), eignfnv(iim, iim)
     ! eigenvectors of the discrete second derivative with respect to longitude
-
-    ! Filtering coefficients (lamda_max * cos(rlat) / lamda):
-    real coefil(iim)
-
-    ! Index of the mode from where modes are filtered:
-    integer, allocatable:: modfrstnu(:) ! (2:jfiltnu)
-    integer, allocatable:: modfrstsu(:) ! (jfiltsu:jjm)
-    integer, allocatable:: modfrstnv(:) ! (jfiltnv)
-    integer, allocatable:: modfrstsv(:) ! (jfiltsv:jjm)
 
     !-----------------------------------------------------------
 
@@ -85,207 +77,43 @@ contains
     PRINT *, 'colat0 = ', colat0
 
     rlamda = iim / (pi * colat0 / grossismx) / sqrt(- eignvl(2: iim))
+    call new_unit(unit)
+    open(unit, file = "inifilr_out.txt", status = "replace", action = "write") 
+    write(unit, fmt = *) '"EIGNVL"', eignvl
+    close(unit)
+    open(unit, file = "modfrst.csv", status = "replace", action = "write") 
+    write(unit, fmt = *) '"rlat (degrees)" modfrst' ! title line
 
-    ! D\'etermination de jfilt[ns][uv] :
+   ! D\'etermination de jfilt[ns][uv] :
 
-    jfiltnu = (jjm + 1) / 2
-    do while (cos(rlatu(jfiltnu)) >= colat0 &
-         .or. rlamda(iim) * cos(rlatu(jfiltnu)) >= 1.)
-       jfiltnu = jfiltnu - 1
-    end do
+    j1 = jjm + 1 - ifirstloc(rlatu(jjm:1:- 1) >= 0.)
 
-    jfiltsu = jjm / 2 + 2
-    do while (cos(rlatu(jfiltsu)) >= colat0 &
-         .or. rlamda(iim) * cos(rlatu(jfiltsu)) >= 1.)
-       jfiltsu = jfiltsu + 1
-    end do
+    call inifilr_hemisph(rlatu(j1:2:- 1), colat0, rlamda, unit, eignfnv, &
+         jfiltnu, matriceun, matrinvn)
+    jfiltnu = j1 + 1 - jfiltnu
+    matriceun = matriceun(:, :, jfiltnu - 1:1:- 1)
+    matrinvn = matrinvn(:, :, jfiltnu - 1:1:- 1)
 
-    jfiltnv = jjm / 2
-    do while ((cos(rlatv(jfiltnv)) >= colat0 &
-         .or. rlamda(iim) * cos(rlatv(jfiltnv)) >= 1.) .and. jfiltnv >= 2)
-       jfiltnv = jfiltnv - 1
-    end do
+    call inifilr_hemisph(- rlatu(j1 + 1:jjm), colat0, rlamda, unit, eignfnv, &
+         jfiltsu, matriceus, matrinvs)
+    jfiltsu = j1 + jfiltsu
 
-    if (cos(rlatv(jfiltnv)) >= colat0 &
-         .or. rlamda(iim) * cos(rlatv(jfiltnv)) >= 1.) then
-       ! {jfiltnv == 1}
-       PRINT *, 'Could not find jfiltnv.'
-       STOP 1
-    END IF
+    j1 = jjm + 1 - ifirstloc(rlatv(jjm:1:- 1) >= 0.)
 
-    jfiltsv = (jjm + 1)/ 2 + 1
-    do while ((cos(rlatv(jfiltsv)) >= colat0 &
-         .or. rlamda(iim) * cos(rlatv(jfiltsv)) >= 1.) .and. jfiltsv <= jjm - 1)
-       jfiltsv = jfiltsv + 1
-    end do
+    call inifilr_hemisph(rlatv(j1:1:- 1), colat0, rlamda, unit, eignfnu, &
+         jfiltnv, matricevn)
+    jfiltnv = j1 + 1 - jfiltnv
+    matricevn = matricevn(:, :, jfiltnv:1:- 1)
 
-    IF (cos(rlatv(jfiltsv)) >= colat0 &
-         .or. rlamda(iim) * cos(rlatv(jfiltsv)) >= 1.) THEN
-       ! {jfiltsv == jjm}
-       PRINT *, 'Could not find jfiltsv.'
-       STOP 1
-    END IF
+    call inifilr_hemisph(- rlatv(j1 + 1:jjm), colat0, rlamda, unit, eignfnu, &
+         jfiltsv, matricevs)
+    jfiltsv = j1 + jfiltsv
 
+    close(unit)
     PRINT *, 'jfiltnu =', jfiltnu
     PRINT *, 'jfiltsu =', jfiltsu
     PRINT *, 'jfiltnv =', jfiltnv
     PRINT *, 'jfiltsv =', jfiltsv
-
-    ! D\'etermination de modfrst[ns][uv] :
-
-    allocate(modfrstnu(2:jfiltnu), modfrstsu(jfiltsu:jjm))
-    allocate(modfrstnv(jfiltnv), modfrstsv(jfiltsv:jjm))
-
-    DO j = 2, jfiltnu
-       modfrstnu(j) = 2
-       do while (rlamda(modfrstnu(j)) * cos(rlatu(j)) >= 1. &
-            .and. modfrstnu(j) <= iim - 1)
-          modfrstnu(j) = modfrstnu(j) + 1
-       end do
-    END DO
-
-    DO j = 1, jfiltnv
-       modfrstnv(j) = 2
-       do while (rlamda(modfrstnv(j)) * cos(rlatv(j)) >= 1. &
-            .and. modfrstnv(j) <= iim - 1)
-          modfrstnv(j) = modfrstnv(j) + 1
-       end do
-    end DO
-
-    DO j = jfiltsu, jjm
-       modfrstsu(j) = 2
-       do while (rlamda(modfrstsu(j)) * cos(rlatu(j)) >= 1. &
-            .and. modfrstsu(j) <= iim - 1)
-          modfrstsu(j) = modfrstsu(j) + 1
-       end do
-    end DO
-
-    DO j = jfiltsv, jjm
-       modfrstsv(j) = 2
-       do while (rlamda(modfrstsv(j)) * cos(rlatv(j)) >= 1. &
-            .and. modfrstsv(j) <= iim - 1)
-          modfrstsv(j) = modfrstsv(j) + 1
-       end do
-    END DO
-
-    call new_unit(unit)
-
-    open(unit, file = "inifilr_out.txt", status = "replace", action = "write") 
-    write(unit, fmt = *) '"EIGNVL"', eignvl
-    close(unit)
-
-    open(unit, file = "modfrstnu.csv", status = "replace", action = "write") 
-    write(unit, fmt = *) '"rlatu (degrees north)" modfrstnu ' &
-         // '"rlamda(modfrstnu) * cos(rlatu) < 1"'
-    DO j = 2, jfiltnu
-       write(unit, fmt = *) rlatu(j) / pi * 180., modfrstnu(j), &
-            rlamda(modfrstnu(j)) * cos(rlatu(j)) < 1
-    end DO
-    close(unit)
-
-    open(unit, file = "modfrstnv.csv", status = "replace", action = "write") 
-    write(unit, fmt = *) '"rlatv (degrees north)" modfrstnv ' &
-         // '"rlamda(modfrstnv) * cos(rlatv) < 1"'
-    DO j = 1, jfiltnv
-       write(unit, fmt = *) rlatv(j) / pi * 180., modfrstnv(j), &
-            rlamda(modfrstnv(j)) * cos(rlatv(j)) < 1
-    end DO
-    close(unit)
-
-    open(unit, file = "modfrstsu.csv", status = "replace", action = "write") 
-     write(unit, fmt = *) '"rlatu (degrees north)" modfrstsu ' &
-         // '"rlamda(modfrstsu) * cos(rlatu) < 1"'
-   DO j = jfiltsu, jjm
-       write(unit, fmt = *) rlatu(j) / pi * 180., modfrstsu(j), &
-            rlamda(modfrstsu(j)) * cos(rlatu(j)) < 1
-    end DO
-    close(unit)
-
-    open(unit, file = "modfrstsv.csv", status = "replace", action = "write") 
-    write(unit, fmt = *) '"rlatv (degrees north)" modfrstsv ' &
-         // '"rlamda(modfrstsv) * cos(rlatv) < 1"'
-    DO j = jfiltsv, jjm
-       write(unit, fmt = *) rlatv(j) / pi * 180., modfrstsv(j), &
-            rlamda(modfrstsv(j)) * cos(rlatv(j)) < 1
-    end DO
-    close(unit)
-
-    allocate(matriceun(iim, iim, 2:jfiltnu), matrinvn(iim, iim, 2:jfiltnu))
-    allocate(matricevn(iim, iim, jfiltnv))
-    allocate(matricevs(iim, iim, jfiltsv:jjm))
-    allocate(matriceus(iim, iim, jfiltsu:jjm), matrinvs(iim, iim, jfiltsu:jjm))
-
-    ! Calcul de matriceu et matrinv
-
-    DO j = 2, jfiltnu
-       if (rlamda(modfrstnu(j)) * cos(rlatu(j)) < 1.) then
-          DO i = modfrstnu(j), iim
-             coefil(i) = rlamda(i) * cos(rlatu(j)) - 1.
-          end DO
-
-          eignft(:modfrstnu(j) - 1, :) = 0.
-
-          forall (i = modfrstnu(j):iim) eignft(i, :) = eignfnv(:, i) * coefil(i)
-          matriceun(:, :, j) = matmul(eignfnv, eignft)
-
-          forall (i = modfrstnu(j):iim) eignft(i, :) = eignfnv(:, i) &
-               * coefil(i) / (1. + coefil(i))
-          matrinvn(:, :, j) = matmul(eignfnv, eignft)
-       else
-          matriceun(:, :, j) = 0.
-          matrinvn(:, :, j) = 0.
-       end if
-    END DO
-
-    DO j = jfiltsu, jjm
-       if (rlamda(modfrstsu(j)) * cos(rlatu(j)) < 1.) then
-          DO i = modfrstsu(j), iim
-             coefil(i) = rlamda(i) * cos(rlatu(j)) - 1.
-          end DO
-
-          eignft(:modfrstsu(j) - 1, :) = 0.
-
-          forall (i = modfrstsu(j):iim) eignft(i, :) = eignfnv(:, i) * coefil(i)
-          matriceus(:, :, j) = matmul(eignfnv, eignft)
-
-          forall (i = modfrstsu(j):iim) eignft(i, :) = eignfnv(:, i) &
-               * coefil(i) / (1. + coefil(i))
-          matrinvs(:, :, j) = matmul(eignfnv, eignft)
-       else
-          matriceus(:, :, j) = 0.
-          matrinvs(:, :, j) = 0.
-       end if
-    END DO
-
-    ! Calcul de matricev
-
-    DO j = 1, jfiltnv
-       if (rlamda(modfrstnv(j)) * cos(rlatv(j)) < 1.) then
-          DO i = modfrstnv(j), iim
-             coefil(i) = rlamda(i) * cos(rlatv(j)) - 1.
-          end DO
-
-          eignft(:modfrstnv(j) - 1, :) = 0.
-          forall (i = modfrstnv(j):iim) eignft(i, :) = eignfnu(:, i) * coefil(i)
-          matricevn(:, :, j) = matmul(eignfnu, eignft)
-       else
-          matricevn(:, :, j) = 0.
-       end if
-    END DO
-
-    DO j = jfiltsv, jjm
-       if (rlamda(modfrstsv(j)) * cos(rlatv(j)) < 1.) then
-          DO i = modfrstsv(j), iim
-             coefil(i) = rlamda(i) * cos(rlatv(j)) - 1.
-          end DO
-
-          eignft(:modfrstsv(j) - 1, :) = 0.
-          forall (i = modfrstsv(j):iim) eignft(i, :) = eignfnu(:, i) * coefil(i)
-          matricevs(:, :, j) = matmul(eignfnu, eignft)
-       else
-          matricevs(:, :, j) = 0.
-       end if
-    END DO
 
   END SUBROUTINE inifilr
 

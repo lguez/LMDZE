@@ -110,7 +110,7 @@ filtreg_scal.o : inifilr.o inifgn.o filtreg_hemisph.o dimens_m.o
 filtreg_v.o : inifilr.o inifgn.o filtreg_hemisph.o dimens_m.o 
 findsep.o : cleanstr.o mathelp.o errioipsl.o 
 fisrtilp.o : yoethf.o suphec.o FCTTRE.o dimphy.o comfisrtilp.o 
-flumass.o : comgeom.o paramet_m.o dimens_m.o 
+flumass.o : paramet_m.o dimens_m.o comgeom.o 
 fluxstokenc.o : tracstoke.o comgeom.o paramet_m.o dimens_m.o histwrite.o 
 flxadjtq.o : yoethf.o suphec.o FCTTRE.o dimphy.o 
 flxasc.o : YOECUMF.o suphec.o flxadjtq.o dimphy.o 
@@ -157,7 +157,8 @@ ini_histins.o : ymds2ju.o temps.o phyetat0.o iniadvtrac.o indicesol.o histvert.o
 iniadvtrac.o : dimens_m.o 
 inidissip.o : paramet_m.o nxgraro2.o gradiv2.o filtreg_v.o filtreg_scal.o divgrad2.o conf_gcm.o disvert.o comdissnew.o comconst.o dimens_m.o 
 inifgn.o : dynetat0.o acc.o dimens_m.o 
-inifilr.o : inifgn.o dynetat0.o dimens_m.o 
+inifilr.o : inifilr_hemisph.o inifgn.o dynetat0.o dimens_m.o 
+inifilr_hemisph.o : dimens_m.o 
 init_dynzon.o : ymds2ju.o temps.o histvert.o histend.o histdef.o histbeg_totreg.o dynetat0.o disvert.o dimens_m.o conf_gcm.o 
 init_tau2alpha.o : writefield.o paramet_m.o dynetat0.o dimens_m.o coordij.o conf_guide.o comgeom.o 
 initdynav.o : ymds2ju.o temps.o paramet_m.o iniadvtrac.o histvert.o histend.o histdef.o histbeg_totreg.o dynetat0.o dimens_m.o 
@@ -197,12 +198,12 @@ lwc.o : radopt.o radepsi.o raddim.o dimphy.o dimens_m.o
 lwtt.o : raddimlw.o raddim.o dimphy.o dimens_m.o 
 lwttm.o : raddimlw.o raddim.o dimphy.o dimens_m.o 
 lwu.o : raddimlw.o radopt.o radepsi.o raddim.o suphec.o clesphys.o 
-lwv.o : raddimlw.o raddim.o suphec.o lwvd.o dimphy.o dimens_m.o 
+lwv.o : raddimlw.o raddim.o suphec.o lwvn.o lwvd.o dimphy.o dimens_m.o 
 lwvb.o : raddimlw.o radopt.o raddim.o dimphy.o dimens_m.o 
 lwvd.o : raddimlw.o raddim.o dimphy.o dimens_m.o 
 lwvn.o : raddimlw.o raddim.o dimphy.o dimens_m.o 
-massbar.o : comgeom.o paramet_m.o dimens_m.o 
-massbarxy.o : comgeom.o paramet_m.o dimens_m.o 
+massbar.o : paramet_m.o dimens_m.o comgeom.o 
+massbarxy.o : paramet_m.o dimens_m.o comgeom.o 
 massdair.o : dimens_m.o comgeom.o 
 mathop.o : mathop2.o errioipsl.o 
 minmaxqfi.o : dimphy.o dimens_m.o 
