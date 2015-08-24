@@ -102,11 +102,13 @@ contains
             * ffdx(:nmax - 1)
        Xf(nmax) = pi_d
 
-       call invert_zoom_x(xf, xtild, G, rlonm025(:iim), xprimm025(:iim), &
+       call invert_zoom_x(beta, xf, xtild, G, rlonm025(:iim), xprimm025(:iim), &
             xuv = - 0.25d0)
-       call invert_zoom_x(xf, xtild, G, rlonv(:iim), xprimv(:iim), xuv = 0d0)
-       call invert_zoom_x(xf, xtild, G, rlonu(:iim), xprimu(:iim), xuv = 0.5d0)
-       call invert_zoom_x(xf, xtild, G, rlonp025(:iim), xprimp025(:iim), &
+       call invert_zoom_x(beta, xf, xtild, G, rlonv(:iim), xprimv(:iim), &
+            xuv = 0d0)
+       call invert_zoom_x(beta, xf, xtild, G, rlonu(:iim), xprimu(:iim), &
+            xuv = 0.5d0)
+       call invert_zoom_x(beta, xf, xtild, G, rlonp025(:iim), xprimp025(:iim), &
             xuv = 0.25d0)
     end if
 

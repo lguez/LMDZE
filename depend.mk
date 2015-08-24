@@ -7,7 +7,7 @@ adaptdt.o : temps.o comgeom.o conf_gcm.o disvert.o comconst.o paramet_m.o dimens
 addfi.o : dimens_m.o comgeom.o comconst.o 
 advect.o : comconst.o paramet_m.o dimens_m.o 
 advn.o : comgeom.o conf_gcm.o disvert.o comconst.o paramet_m.o dimens_m.o 
-advtrac.o : vlspltqs.o vlsplt.o paramet_m.o massbar.o interpre.o iniadvtrac.o dimens_m.o conf_gcm.o comconst.o 
+advtrac.o : vlspltqs.o vlsplt.o ppm3d.o paramet_m.o massbar.o interpre.o iniadvtrac.o dimens_m.o conf_gcm.o comconst.o 
 advx.o : disvert.o comconst.o paramet_m.o dimens_m.o 
 advxp.o : disvert.o comconst.o paramet_m.o dimens_m.o 
 advy.o : comgeom.o disvert.o comconst.o paramet_m.o dimens_m.o 
@@ -268,6 +268,7 @@ swu.o : radopt.o radepsi.o raddim.o suphec.o clesphys.o dimphy.o dimens_m.o
 tau2alpha.o : init_tau2alpha.o conf_guide.o 
 test_disvert.o : exner_hyb.o dimens_m.o disvert.o comconst.o abort_gcm.o 
 test_fxhyp.o : unit_nml_m.o read_serre.o fxhyp.o dimens_m.o 
+test_inifilr.o : read_serre.o unit_nml_m.o inifilr.o fyhyp.o fxhyp.o dynetat0.o dimens_m.o 
 test_inter_barxy.o : read_serre.o inter_barxy.o disvert.o dynetat0.o dimens_m.o conf_gcm.o comgeom.o comconst.o 
 test_ozonecm.o : unit_nml_m.o phyetat0.o ozonecm.o disvert.o dimphy.o dimens_m.o 
 thermcell.o : suphec.o dimphy.o 

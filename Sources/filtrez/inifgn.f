@@ -26,6 +26,7 @@ contains
     use acc_m, only: acc 
     USE dimens_m, ONLY: iim
     USE dynetat0_m, ONLY: xprimu, xprimv
+    use jumble, only: new_unit
     use numer_rec_95, only: jacobi, eigsrt
 
     real, intent(out):: eignval_v(:) ! (iim)
@@ -41,7 +42,7 @@ contains
     ! first derivative at u and v longitudes, elements are angle^{-1}
 
     REAL eignval_u(iim)
-    INTEGER i
+    INTEGER i, unit
 
     !----------------------------------------------------------------
 
@@ -68,6 +69,11 @@ contains
     CALL jacobi(delta, eignval_u, eignfnu)
     CALL acc(eignfnu)
     CALL eigsrt(eignval_u, eignfnu)
+
+    call new_unit(unit)
+    open(unit, file = "inifgn_out.txt", status = "replace", action = "write") 
+    write(unit, fmt = *) '"eignval_v"', eignval_v
+    close(unit)
 
   END SUBROUTINE inifgn
 

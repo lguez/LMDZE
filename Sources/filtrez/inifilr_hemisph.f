@@ -37,7 +37,7 @@ contains
     integer, allocatable:: modfrst(:) ! (jfilt:n) in {2, ..., iim}
 
     ! Filtering coefficients (lamda_max * cos(rlat) / lamda):
-    real coefil(iim)
+    real coefil(2:iim)
 
     !-----------------------------------------------------------
 
@@ -54,10 +54,7 @@ contains
     if (present(matrinv)) allocate(matrinv(iim, iim, n - jfilt + 1))
 
     DO j = jfilt, n
-       DO i = modfrst(j), iim
-          coefil(i) = rlamda(i) * cos(rlat(j)) - 1.
-       end DO
-
+       coefil(modfrst(j):) = rlamda(modfrst(j):) * cos(rlat(j)) - 1.
        eignft(:modfrst(j) - 1, :) = 0.
 
        forall (i = modfrst(j):iim) eignft(i, :) = eignfn(:, i) * coefil(i)

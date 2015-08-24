@@ -78,36 +78,33 @@ contains
 
     rlamda = iim / (pi * colat0 / grossismx) / sqrt(- eignvl(2: iim))
     call new_unit(unit)
-    open(unit, file = "inifilr_out.txt", status = "replace", action = "write") 
-    write(unit, fmt = *) '"EIGNVL"', eignvl
-    close(unit)
     open(unit, file = "modfrst.csv", status = "replace", action = "write") 
     write(unit, fmt = *) '"rlat (degrees)" modfrst' ! title line
 
    ! D\'etermination de jfilt[ns][uv] :
 
-    j1 = jjm + 1 - ifirstloc(rlatu(jjm:1:- 1) >= 0.)
+    j1 = ifirstloc(rlatu <= 0.)
 
-    call inifilr_hemisph(rlatu(j1:2:- 1), colat0, rlamda, unit, eignfnv, &
+    call inifilr_hemisph(rlatu(j1 - 1:2:- 1), colat0, rlamda, unit, eignfnv, &
          jfiltnu, matriceun, matrinvn)
-    jfiltnu = j1 + 1 - jfiltnu
+    jfiltnu = j1 - jfiltnu
     matriceun = matriceun(:, :, jfiltnu - 1:1:- 1)
     matrinvn = matrinvn(:, :, jfiltnu - 1:1:- 1)
 
-    call inifilr_hemisph(- rlatu(j1 + 1:jjm), colat0, rlamda, unit, eignfnv, &
+    call inifilr_hemisph(- rlatu(j1:jjm), colat0, rlamda, unit, eignfnv, &
          jfiltsu, matriceus, matrinvs)
-    jfiltsu = j1 + jfiltsu
+    jfiltsu = j1 - 1 + jfiltsu
 
-    j1 = jjm + 1 - ifirstloc(rlatv(jjm:1:- 1) >= 0.)
+    j1 = ifirstloc(rlatv <= 0.)
 
-    call inifilr_hemisph(rlatv(j1:1:- 1), colat0, rlamda, unit, eignfnu, &
+    call inifilr_hemisph(rlatv(j1 - 1:1:- 1), colat0, rlamda, unit, eignfnu, &
          jfiltnv, matricevn)
-    jfiltnv = j1 + 1 - jfiltnv
+    jfiltnv = j1 - jfiltnv
     matricevn = matricevn(:, :, jfiltnv:1:- 1)
 
-    call inifilr_hemisph(- rlatv(j1 + 1:jjm), colat0, rlamda, unit, eignfnu, &
+    call inifilr_hemisph(- rlatv(j1:jjm), colat0, rlamda, unit, eignfnu, &
          jfiltsv, matricevs)
-    jfiltsv = j1 + jfiltsv
+    jfiltsv = j1 - 1 + jfiltsv
 
     close(unit)
     PRINT *, 'jfiltnu =', jfiltnu

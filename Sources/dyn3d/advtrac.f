@@ -17,6 +17,7 @@ contains
     use massbar_m, only: massbar
     USE paramet_m, ONLY : iip1, iip2, ijmllm, ijp1llm, ip1jm, ip1jmp1, jjp1, &
          llmp1
+    use ppm3d_m, only: ppm3d
     use vlsplt_m, only: vlsplt
     use vlspltqs_m, only: vlspltqs
 
@@ -188,25 +189,25 @@ contains
                    ! Ss-prg PPM3d de Lin
                    CALL ppm3d(1, qppm(1, 1, iq), psppm, psppm, unatppm, &
                         vnatppm, fluxwppm, dtbon, 2, 2, 2, 1, iim, jjp1, 2, &
-                        llm, apppm, bpppm, 0.01, 6400000, fill, dum, 220.)
+                        llm, apppm, bpppm, 0.01, 6400000, fill, 220.)
                    ! Monotonic PPM
                 ELSE IF (iadv(iq)==16) THEN
                    ! Ss-prg PPM3d de Lin
                    CALL ppm3d(1, qppm(1, 1, iq), psppm, psppm, unatppm, &
                         vnatppm, fluxwppm, dtbon, 3, 3, 3, 1, iim, jjp1, 2, &
-                        llm, apppm, bpppm, 0.01, 6400000, fill, dum, 220.)
+                        llm, apppm, bpppm, 0.01, 6400000, fill, 220.)
                    ! Semi Monotonic PPM
                 ELSE IF (iadv(iq)==17) THEN
                    ! Ss-prg PPM3d de Lin
                    CALL ppm3d(1, qppm(1, 1, iq), psppm, psppm, unatppm, &
                         vnatppm, fluxwppm, dtbon, 4, 4, 4, 1, iim, jjp1, 2, &
-                        llm, apppm, bpppm, 0.01, 6400000, fill, dum, 220.)
+                        llm, apppm, bpppm, 0.01, 6400000, fill, 220.)
                    ! Positive Definite PPM
                 ELSE IF (iadv(iq)==18) THEN
                    ! Ss-prg PPM3d de Lin
                    CALL ppm3d(1, qppm(1, 1, iq), psppm, psppm, unatppm, &
                         vnatppm, fluxwppm, dtbon, 5, 5, 5, 1, iim, jjp1, 2, &
-                        llm, apppm, bpppm, 0.01, 6400000, fill, dum, 220.)
+                        llm, apppm, bpppm, 0.01, 6400000, fill, 220.)
                 END IF
              END DO
 
