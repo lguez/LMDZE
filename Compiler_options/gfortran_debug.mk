@@ -9,6 +9,8 @@ nr_util_dir = ${HOME}/Desktop/lib/NR_util_debug
 netcdf95_dir = ${HOME}/Desktop/lib/NetCDF95_debug
 jumble_dir = ${HOME}/Desktop/lib/Jumble_debug
 
+lib_dir_list = ${netcdf_lib_dir} ${numer_rec_95_dir} ${netcdf95_dir} ${nr_util_dir} ${jumble_dir}
+
 # Include flags:
 FFLAGS = $(addprefix -I, ${netcdf_inc_dir} ${numer_rec_95_dir} ${netcdf95_dir} ${nr_util_dir} ${jumble_dir})
 
@@ -27,6 +29,11 @@ FFLAGS += -fcheck=bounds -fcheck=do -fcheck=mem -fcheck=pointer -fcheck=recursio
 # Optimization options:
 FFLAGS += -O0
 
-LDLIBS = $(addprefix -L, ${netcdf_lib_dir} ${numer_rec_95_dir} ${netcdf95_dir} ${nr_util_dir} ${jumble_dir}) -ljumble -lnetcdf95 -lnetcdff -lnetcdf -lnumer_rec_95 -lnr_util
+# Hardware model options:
+FFLAGS += -mcmodel=medium
+
+comma = ,
+
+LDLIBS = $(addprefix -L, ${lib_dir_list}) -lnetcdf95 -lnetcdff -lnetcdf -lnumer_rec_95 -ljumble -lnr_util $(addprefix -Wl${comma}-rpath${comma}, ${lib_dir_list})
 
 version_flag = --version

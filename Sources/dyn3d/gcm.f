@@ -9,15 +9,15 @@ PROGRAM gcm
   ! l'advection de "q", en modifiant "iadv" dans "traceur.def".
 
   use comconst, only: daysec, dtvr, iniconst
-  use comgeom, only:  aire_2d, cu_2d, cv_2d, inigeom
-  use comgeomphy, only: airephy, cuphy, cvphy, rlatd, rlond
+  use comgeom, only:  aire_2d, inigeom
+  use comgeomphy, only: airephy
   use conf_gcm_m, only: day_step, iperiod, iecri, iphysiq, nday, periodav, &
        conf_gcm, iflag_phys
   use conf_guide_m, only: conf_guide
   use dimens_m, only: iim, jjm, llm, nqmx
   use dimphy, only: klon
   USE disvert_m, ONLY : disvert
-  use dynetat0_m, only: rlatu, rlonv, dynetat0, day_ini
+  use dynetat0_m, only: dynetat0, day_ini
   use dynredem0_m, only: dynredem0
   use grid_change, only: dyn_phy, init_dyn_phy
   use histclo_m, only: histclo
@@ -47,13 +47,7 @@ PROGRAM gcm
   REAL masse(iim + 1, jjm + 1, llm) ! masse d'air
   REAL phis(iim + 1, jjm + 1) ! g\'eopotentiel au sol
 
-  ! Calendrier :
   LOGICAL:: true_calendar = .false. ! default value
-
-  logical mask_v(iim + 1, jjm) 
-  ! (mask for points in the "v" grid, first index is for longitude,
-  ! second index is for latitude)
-
   integer i
 
   namelist /main_nml/true_calendar
@@ -87,25 +81,6 @@ PROGRAM gcm
 
   ! Initialisation de la physique :
   IF (iflag_phys == 1) THEN
-     rlatd(1)=rlatu(1)
-     rlatd(2:klon-1) = pack(spread(rlatu(2:jjm), 1, iim), .true.)
-     rlatd(klon)= rlatu(jjm + 1)
-
-     rlond(1)=0.
-     rlond(2:klon-1) = pack(spread(rlonv(:iim), 2, jjm - 1), .true.)
-     rlond(klon)= 0.
-
-     cuphy = pack(cu_2d, dyn_phy)
-
-     ! Construct a mask for points in the "v" grid:
-     mask_v = .true.
-     mask_v(2:, 1) = .false.
-     mask_v(iim + 1, 2:) = .false.
-
-     cvphy(:klon - 1) = pack(cv_2d, mask_v)
-     cvphy(klon) = cv_2d(1, jjm)
-     ! (that value of "cv_2d" is used twice in "cvphy")
-
      airephy = pack(aire_2d, dyn_phy)
      CALL suphec
      call yoethf

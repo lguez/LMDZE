@@ -28,7 +28,7 @@ contains
   function gr_fi_dyn(pfi)
 
     ! From gr_fi_dyn.F, version 1.1.1.1 2004/05/19 12:53:05
-    ! Passage d'un champ de la grille physique à la grille dynamique
+    ! Passage d'un champ de la grille physique \`a la grille dynamique
 
     use dimphy, only: klon
 
@@ -42,7 +42,7 @@ contains
 
     if (size(pfi) /= klon) stop "gr_fi_dyn"
 
-    ! Traitement des pôles :
+    ! Traitement des p\^oles :
     field(2:, 1) = pfi(1)
     field(2:, jjm + 1) = pfi(klon)
     ! (We leave undefined elements in "field")
@@ -60,13 +60,13 @@ contains
   function gr_phy_write_2d(pfi)
 
     ! From phylmd/physiq.F, version 1.22 2006/02/20 09:38:28
-    ! Transforme une variable de la grille physique à la grille d'écriture.
+    ! Transforme une variable de la grille physique \`a la grille d'\'ecriture.
     ! The grid for output files does not duplicate the first longitude
     ! in the last longitude.
 
     use dimphy, only: klon
 
-    REAL, intent(in):: pfi(:)
+    REAL, intent(in):: pfi(:) ! (klon)
     real gr_phy_write_2d(iim, jjm + 1)
 
     ! Variable local to the procedure:
@@ -76,12 +76,32 @@ contains
 
     if (size(pfi) /= klon) stop "gr_phy_write_2d"
 
-    ! Traitement des pôles :
+    ! Traitement des p\^oles :
     field(2:, 1) = pfi(1)
     field(2:, jjm + 1) = pfi(klon)
 
     gr_phy_write_2d = unpack(pfi, dyn_phy(:iim, :), field)
 
   END function gr_phy_write_2d
+
+  !********************************************
+
+  function gr_dyn_phy(v)
+
+    ! Passage d'un champ 3D de la grille dynamique \`a la grille physique
+
+    use dimphy, only: klon
+
+    REAL, intent(in):: v(:, :, :) ! (iim + 1, jjm + 1, :)
+    real gr_dyn_phy(klon, size(v, 3))
+
+    ! Local:
+    integer k
+
+    !-----------------------------------------------------------------------
+
+    forall (k = 1:size(v, 3)) gr_dyn_phy(:, k) = pack(v(:, :, k), dyn_phy)
+
+  END function gr_dyn_phy
 
 end module grid_change

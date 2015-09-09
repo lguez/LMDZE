@@ -7,7 +7,7 @@ contains
   SUBROUTINE ppm3d(igd, q, ps1, ps2, u, v, w, ndt, iord, jord, kord, nc, imr, &
        jnp, j1, nlay, ap, bp, pt, ae, fill, umax)
 
-    ! rajout de déclarations
+    ! rajout de d\'eclarations
     ! integer Jmax,kmax,ndt0,nstep,k,j,i,ic,l,js,jn,imh,iad,jad,krd
     ! integer iu,iiu,j2,jmr,js0,jt
     ! real dtdy,dtdy5,rcap,iml,jn0,imjm,pi,dl,dp
@@ -224,7 +224,7 @@ contains
     INTEGER igd, iord, jord, kord, nc, jnp, j1, nlay, ae
     REAL q(imr, jnp, nlay, nc), ps1(imr, jnp), ps2(imr, jnp), &
          u(imr, jnp, nlay), v(imr, jnp, nlay), ap(nlay+1), bp(nlay+1), &
-         w(imr, jnp, nlay), ndt, val(nlay), umax
+         w(imr, jnp, nlay), ndt, umax
     INTEGER imrd2
     REAL pt
     LOGICAL cross, fill
@@ -706,7 +706,7 @@ contains
        IF (j1/=2) THEN
           DO k = 1, nlay
              DO i = 1, imr
-                ! j=1 c'est le pôle Sud, j=JNP c'est le pôle Nord
+                ! j=1 c'est le p\^ole Sud, j=JNP c'est le p\^ole Nord
                 q(i, 2, k, ic) = q(i, 1, k, ic)
                 q(i, jmr, k, ic) = q(i, jmp, k, ic)
              END DO

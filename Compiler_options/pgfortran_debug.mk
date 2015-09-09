@@ -24,7 +24,7 @@ FFLAGS += -g -gopt -Mchkfpstk -Mchkptr -Mpgicoff
 # for a "gcm" run.
 
 # Language options:
-FFLAGS += -Mstandard -Mallocatable=95 -Mbackslash -Mdefaultunit -Mrecursive
+FFLAGS += -Mfree -Mstandard -Mallocatable=95 -Mbackslash -Mdefaultunit -Mrecursive
 
 # Target-specific Options:
 FFLAGS += -Kieee -Ktrap=fp

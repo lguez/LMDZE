@@ -1,5 +1,7 @@
 module regr_pr_int_m
 
+  ! Author: Lionel GUEZ
+
   implicit none
 
 contains
@@ -25,7 +27,7 @@ contains
 
     use dimens_m, only: iim, jjm, llm
     use dimphy, only: klon
-    use grid_change, only: dyn_phy
+    use grid_change, only: gr_dyn_phy
     use netcdf95, only: nf95_inq_varid, nf95_get_var
     use nr_util, only: assert
     use numer_rec_95, only: regr1_lint
@@ -57,7 +59,7 @@ contains
     ! Field on the "physics" horizontal grid.  "v2(i, k >= 1)" is at
     ! longitude "xlon(i)", latitude "xlat(i)" and pressure "plev(k)".)
 
-    integer i, k
+    integer i
 
     !--------------------------------------------
 
@@ -74,8 +76,7 @@ contains
     ! Complete "v1" with the value at 0 pressure:
     v1(:, 0) = top_value
 
-    forall (k = 0:size(plev)) v2(:, k) = pack(spread(v1(:, k), dim = 1, &
-         ncopies = iim + 1), dyn_phy)
+    v2 = gr_dyn_phy(spread(v1, dim = 1, ncopies = iim + 1))
 
     ! Regrid in pressure at each horizontal position:
     do i = 1, klon

@@ -9,14 +9,14 @@ all_nag: objects CG_ce0l CG_gcm CR_ce0l CR_gcm
 objects: ${objects}
 
 # Call graphs:
-CG_ce0l: ${common_sources} ${src_ce0l_only}
-	nag_fcalls95 ${nag_fcalls_options} -listing $@ $^
+CG_ce0l: ${src_ce0l}
+	nagfor =callgraph ${nag_fcalls_options} -o $@ $^
 
 CG_gcm: ${common_sources} ${src_gcm_only}
 	nag_fcalls95 ${nag_fcalls_options} -listing $@ $^
 
 # Cross references:
-CR_ce0l: ${common_sources} ${src_ce0l_only}
+CR_ce0l: ${src_ce0l}
 	nag_xref95 ${nag_cross_options} -listing $@ $^
 
 CR_gcm: ${common_sources} ${src_gcm_only}

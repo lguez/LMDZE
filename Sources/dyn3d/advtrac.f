@@ -54,7 +54,7 @@ contains
     REAL qppm(iim*jjp1, llm, nqmx)
     REAL fluxwppm(iim, jjp1, llm)
     REAL apppm(llmp1), bpppm(llmp1)
-    LOGICAL:: dum = .TRUE., fill = .TRUE.
+    LOGICAL:: fill = .TRUE.
 
     !-----------------------------------------------------------
 

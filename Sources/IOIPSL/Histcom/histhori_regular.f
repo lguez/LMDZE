@@ -35,7 +35,8 @@ contains
     USE histcom_var, ONLY: full_size, hax_name, nb_hax, ncdf_ids, &
          slab_ori, slab_sz, xid, yid
     USE netcdf, ONLY: nf90_def_var, nf90_enddef, nf90_float, &
-         nf90_put_att, nf90_put_var, nf90_redef
+         nf90_put_att, nf90_put_var
+    use netcdf95, only: nf95_redef
 
     INTEGER, INTENT (IN):: pfileid, pim, pjm
     REAL, INTENT (IN), DIMENSION (pim, pjm):: plon, plat
@@ -126,7 +127,7 @@ contains
 
     iret = nf90_put_var(ncid, nlatid, plat(1, 1:par_szy))
 
-    iret = nf90_redef(ncid)
+    call nf95_redef(ncid)
 
   END SUBROUTINE histhori_regular
 

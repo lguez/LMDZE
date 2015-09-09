@@ -186,7 +186,6 @@ contains
           pcntrb(jl, jk+1, jk) = zglayu(jl)
           pcntrb(jl, jk, jk) = 0.0
        END DO
-
     END DO
 
     DO jk = 1, kflev
@@ -198,8 +197,6 @@ contains
           END DO
        END DO
     END DO
-
-    RETURN
 
   END SUBROUTINE lwvn
 

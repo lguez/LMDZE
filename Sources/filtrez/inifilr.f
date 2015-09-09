@@ -57,7 +57,7 @@ contains
 
     REAL dlatu(jjm)
     REAL rlamda(2:iim) ! > 0, in descending order
-    real eignvl(iim) ! eigenvalues sorted in descending order (<= 0)
+    real eignvl(iim) ! eigenvalues (<= 0) sorted in descending order
     INTEGER j, unit
     REAL colat0 ! > 0
     integer j1 ! index of smallest positive latitude
@@ -77,11 +77,10 @@ contains
     PRINT *, 'colat0 = ', colat0
 
     rlamda = iim / (pi * colat0 / grossismx) / sqrt(- eignvl(2: iim))
+    print *, "1 / rlamda(iim) = ", 1. / rlamda(iim)
     call new_unit(unit)
     open(unit, file = "modfrst.csv", status = "replace", action = "write") 
     write(unit, fmt = *) '"rlat (degrees)" modfrst' ! title line
-
-   ! D\'etermination de jfilt[ns][uv] :
 
     j1 = ifirstloc(rlatu <= 0.)
 

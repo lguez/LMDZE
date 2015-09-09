@@ -13,11 +13,11 @@ contains
 
     use histbeg_totreg_m, ONLY: nb_files
     USE histcom_var, ONLY: ncdf_ids
-    USE netcdf, ONLY: nf90_sync
+    USE netcdf95, ONLY: nf95_sync
 
     INTEGER, INTENT(IN), OPTIONAL:: file
 
-    INTEGER:: ifile, ncid, iret
+    INTEGER:: ifile, ncid
 
     LOGICAL:: file_exists
     !---------------------------------------------------------------------
@@ -34,7 +34,7 @@ contains
 
        IF (file_exists) THEN
           ncid = ncdf_ids(ifile)
-          iret = nf90_sync(ncid)
+          call nf95_sync(ncid)
        END IF
 
     END DO

@@ -25,7 +25,7 @@ contains
 
     use dimens_m, only: iim, jjm, llm
     use dimphy, only: klon
-    use grid_change, only: dyn_phy
+    use grid_change, only: gr_dyn_phy
     use netcdf95, only: nf95_inq_varid, nf95_get_var
     use nr_util, only: assert
     use numer_rec_95, only: regr1_step_av
@@ -57,7 +57,7 @@ contains
     ! longitude "xlon(i)", latitude "xlat(i)" and for pressure
     ! interval "[press_in_edg(k), press_in_edg(k+1)]".)
 
-    integer i, k
+    integer i
 
     !--------------------------------------------
 
@@ -72,8 +72,7 @@ contains
     ! "rlatu" is in descending order so we need to invert order:
     v1 = v1(jjm+1:1:-1, :)
 
-    forall (k = 1:size(press_in_edg) - 1) v2(:, k) = pack(spread(v1(:, k), &
-         dim = 1, ncopies = iim + 1), dyn_phy)
+    v2 = gr_dyn_phy(spread(v1, dim = 1, ncopies = iim + 1))
 
     ! Regrid in pressure at each horizontal position:
     do i = 1, klon

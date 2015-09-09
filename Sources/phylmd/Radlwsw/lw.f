@@ -10,33 +10,32 @@ contains
 
     use lwbv_m, only: lwbv
     use LWU_m, only: LWU
-    USE suphec_m, ONLY: md, rcpd, rday, rg, rmo3
     USE raddim, ONLY: kdlon, kflev
     USE raddimlw, ONLY: nua
+    USE suphec_m, ONLY: md, rcpd, rday, rg, rmo3
 
     ! Method.
 
     ! 1. Computes the pressure and temperature weighted amounts of
     ! absorbers.
 
-    ! 2. Computes the planck functions on the interfaces and the
-    ! gradient of planck functions in the layers.
+    ! 2. Computes the Planck functions on the interfaces and the
+    ! gradient of Planck functions in the layers.
 
-    ! 3. Performs the vertical integration distinguishing the con-
-    ! tributions of the adjacent and distant layers and those from the
-    ! boundaries.
+    ! 3. Performs the vertical integration distinguishing the
+    ! contributions of the adjacent and distant layers and those from
+    ! the boundaries.
 
     ! 4. Computes the clear-sky downward and upward emissivities.
 
     ! 5. Introduces the effects of the clouds on the fluxes.
 
-    ! Reference: see radiation's part of the model's documentation and
-    ! ECMWF research department documentation of the IFS
+    ! Reference: see radiation part of ECMWF documentation of the IFS.
 
     ! Author:
-    ! Jean-Jacques Morcrette *ECMWF*
+    ! Jean-Jacques Morcrette ECMWF
 
-    ! Original : 89-07-14
+    ! Original : July 14th, 1989
 
     DOUBLE PRECISION PCLDLD(KDLON, KFLEV) ! DOWNWARD EFFECTIVE CLOUD COVER
     DOUBLE PRECISION PCLDLU(KDLON, KFLEV) ! UPWARD EFFECTIVE CLOUD COVER
@@ -68,13 +67,17 @@ contains
     DOUBLE PRECISION ZABCU(KDLON, NUA, 3*KFLEV+1)
     DOUBLE PRECISION ZOZ(KDLON, KFLEV)
 
-    DOUBLE PRECISION ZFLUX(KDLON, 2, KFLEV+1) ! RADIATIVE FLUXES (1:up; 2:down)
-    DOUBLE PRECISION ZFLUC(KDLON, 2, KFLEV+1) ! CLEAR-SKY RADIATIVE FLUXES
-    DOUBLE PRECISION ZBINT(KDLON, KFLEV+1) ! Intermediate variable
-    DOUBLE PRECISION ZBSUI(KDLON) ! Intermediate variable
-    DOUBLE PRECISION ZCTS(KDLON, KFLEV) ! Intermediate variable
-    DOUBLE PRECISION ZCNTRB(KDLON, KFLEV+1, KFLEV+1) ! Intermediate variable
-    SAVE ZFLUX, ZFLUC, ZBINT, ZBSUI, ZCTS, ZCNTRB
+    DOUBLE PRECISION, save:: ZFLUX(KDLON, 2, KFLEV+1)
+    ! RADIATIVE FLUXES (1:up; 2:down)
+
+    DOUBLE PRECISION, save:: ZFLUC(KDLON, 2, KFLEV+1)
+    ! CLEAR-SKY RADIATIVE FLUXES
+
+    ! Intermediate variables:
+    DOUBLE PRECISION, save:: ZBINT(KDLON, KFLEV+1)
+    DOUBLE PRECISION, save:: ZBSUI(KDLON)
+    DOUBLE PRECISION, save:: ZCTS(KDLON, KFLEV)
+    DOUBLE PRECISION, save:: ZCNTRB(KDLON, KFLEV+1, KFLEV+1)
 
     INTEGER ilim, i, k, kpl1
 

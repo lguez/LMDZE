@@ -9,8 +9,10 @@ contains
     USE dimens_m, ONLY: iim
 
     REAL, intent(inout):: champ(:, :, :) ! (iim + 1, :, :)
-    REAL, intent(in):: sdd(:) ! (iim)
-    real, intent(in), dimension(:, :, :):: matri ! (iim, iim, :)
+    REAL, intent(in):: sdd(:) ! (iim) xprim[uv]^{\pm 1/2}
+
+    real, intent(in), dimension(:, :, :):: matri ! (iim, iim, :) 
+    ! filtering matrix
 
     ! Local:
     integer l, j

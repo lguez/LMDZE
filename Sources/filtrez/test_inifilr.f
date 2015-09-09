@@ -11,7 +11,6 @@ program test_inifilr
   use netcdf, only: NF90_CLOBBER, NF90_FLOAT
   use netcdf95, only: nf95_create, NF95_DEF_DIM, NF95_DEF_VAR, NF95_ENDDEF, &
        NF95_PUT_VAR, NF95_CLOSE, nf95_put_att
-
   use nr_util, only: pi
   use unit_nml_m, only: unit_nml
   use read_serre_m, only: read_serre
@@ -19,12 +18,9 @@ program test_inifilr
   IMPLICIT NONE
 
   integer ncid, dimid_longitude
-  integer dimid_rlatu_north, dimid_rlatv_north
-  integer dimid_rlatu_south, dimid_rlatv_south
-  integer varid_matriceun, varid_matrinvn, varid_matricevn
-  integer varid_matriceus, varid_matrinvs, varid_matricevs
-  integer varid_rlatu_north, varid_rlatv_north
-  integer varid_rlatu_south, varid_rlatv_south
+  integer dimid_rlatu, dimid_rlatv
+  integer varid_matriceu, varid_matrinv, varid_matricev
+  integer varid_rlatu, varid_rlatv
 
   !-----------------------------------------------------------------------
 
@@ -43,54 +39,36 @@ program test_inifilr
   call nf95_create("test_inifilr_out.nc", NF90_CLOBBER, ncid)
 
   call NF95_DEF_DIM(ncid, "longitude", iim, dimid_longitude)
-  call NF95_DEF_DIM(ncid, "rlatu_north", jfiltnu - 1, dimid_rlatu_north)
-  call NF95_DEF_DIM(ncid, "rlatv_north", jfiltnv, dimid_rlatv_north)
-  call NF95_DEF_DIM(ncid, "rlatu_south", jjm - jfiltsu + 1, dimid_rlatu_south)
-  call NF95_DEF_DIM(ncid, "rlatv_south", jjm - jfiltsv + 1, dimid_rlatv_south)
+  call NF95_DEF_DIM(ncid, "rlatu", jfiltnu + jjm - jfiltsu, dimid_rlatu)
+  call NF95_DEF_DIM(ncid, "rlatv", jfiltnv + jjm - jfiltsv + 1, dimid_rlatv)
 
-  call NF95_DEF_VAR(ncid, "rlatu_north", NF90_FLOAT, dimid_rlatu_north, &
-       varid_rlatu_north)
-  call nf95_put_att(ncid, varid_rlatu_north, "units", "degrees_north")
+  call NF95_DEF_VAR(ncid, "rlatu", NF90_FLOAT, dimid_rlatu, varid_rlatu)
+  call nf95_put_att(ncid, varid_rlatu, "units", "degrees_north")
 
-  call NF95_DEF_VAR(ncid, "rlatv_north", NF90_FLOAT, dimid_rlatv_north, &
-       varid_rlatv_north)
-  call nf95_put_att(ncid, varid_rlatv_north, "units", "degrees_north")
+  call NF95_DEF_VAR(ncid, "rlatv", NF90_FLOAT, dimid_rlatv, varid_rlatv)
+  call nf95_put_att(ncid, varid_rlatv, "units", "degrees_north")
 
-  call NF95_DEF_VAR(ncid, "rlatu_south", NF90_FLOAT, dimid_rlatu_south, &
-       varid_rlatu_south)
-  call nf95_put_att(ncid, varid_rlatu_south, "units", "degrees_north")
-
-  call NF95_DEF_VAR(ncid, "rlatv_south", NF90_FLOAT, dimid_rlatv_south, &
-       varid_rlatv_south)
-  call nf95_put_att(ncid, varid_rlatv_south, "units", "degrees_north")
-
-
-  call NF95_DEF_VAR(ncid, "matriceun", NF90_FLOAT, &
-       (/dimid_longitude, dimid_longitude, dimid_rlatu_north/), varid_matriceun)
-  call NF95_DEF_VAR(ncid, "matrinvn", NF90_FLOAT, &
-       (/dimid_longitude, dimid_longitude, dimid_rlatu_north/), varid_matrinvn)
-  call NF95_DEF_VAR(ncid, "matricevn", NF90_FLOAT, &
-       (/dimid_longitude, dimid_longitude, dimid_rlatv_north/), varid_matricevn)
-  call NF95_DEF_VAR(ncid, "matriceus", NF90_FLOAT, &
-       (/dimid_longitude, dimid_longitude, dimid_rlatu_south/), varid_matriceus)
-  call NF95_DEF_VAR(ncid, "matrinvs", NF90_FLOAT, &
-       (/dimid_longitude, dimid_longitude, dimid_rlatu_south/), varid_matrinvs)
-  call NF95_DEF_VAR(ncid, "matricevs", NF90_FLOAT, &
-       (/dimid_longitude, dimid_longitude, dimid_rlatv_south/), varid_matricevs)
+  call NF95_DEF_VAR(ncid, "matriceu", NF90_FLOAT, &
+       (/dimid_longitude, dimid_longitude, dimid_rlatu/), varid_matriceu)
+  call NF95_DEF_VAR(ncid, "matrinv", NF90_FLOAT, &
+       (/dimid_longitude, dimid_longitude, dimid_rlatu/), varid_matrinv)
+  call NF95_DEF_VAR(ncid, "matricev", NF90_FLOAT, &
+       (/dimid_longitude, dimid_longitude, dimid_rlatv/), varid_matricev)
 
   call NF95_ENDDEF(ncid)
 
-  call NF95_PUT_VAR(ncid, varid_rlatu_north, rlatu(2:jfiltnu) / pi * 180.)
-  call NF95_PUT_VAR(ncid, varid_rlatv_north, rlatv(:jfiltnv) / pi * 180.)
-  call NF95_PUT_VAR(ncid, varid_rlatu_south, rlatu(jfiltsu:jjm) / pi * 180.)
-  call NF95_PUT_VAR(ncid, varid_rlatv_south, rlatv(jfiltsv:) / pi * 180.)
+  call NF95_PUT_VAR(ncid, varid_rlatu, &
+       (/rlatu(2:jfiltnu), rlatu(jfiltsu:jjm)/) / pi * 180.)
+  call NF95_PUT_VAR(ncid, varid_rlatv, &
+       (/rlatv(:jfiltnv), rlatv(jfiltsv:)/) / pi * 180.)
 
-  call NF95_PUT_VAR(ncid, varid_matriceun, matriceun)
-  call NF95_PUT_VAR(ncid, varid_matrinvn, matrinvn)
-  call NF95_PUT_VAR(ncid, varid_matricevn, matricevn)
-  call NF95_PUT_VAR(ncid, varid_matriceus, matriceus)
-  call NF95_PUT_VAR(ncid, varid_matrinvs, matrinvs)
-  call NF95_PUT_VAR(ncid, varid_matricevs, matricevs)
+  call NF95_PUT_VAR(ncid, varid_matriceu, matriceun)
+  call NF95_PUT_VAR(ncid, varid_matrinv, matrinvn)
+  call NF95_PUT_VAR(ncid, varid_matricev, matricevn)
+  call NF95_PUT_VAR(ncid, varid_matriceu, matriceus, start = (/1, 1, jfiltnu/))
+  call NF95_PUT_VAR(ncid, varid_matrinv, matrinvs, start = (/1, 1, jfiltnu/))
+  call NF95_PUT_VAR(ncid, varid_matricev, matricevs, &
+       start = (/1, 1, jfiltnv + 1/))
 
   call NF95_CLOSE(ncid)
 
