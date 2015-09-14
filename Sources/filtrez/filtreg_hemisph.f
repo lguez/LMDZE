@@ -12,7 +12,7 @@ contains
     REAL, intent(in):: sdd(:) ! (iim) xprim[uv]^{\pm 1/2}
 
     real, intent(in), dimension(:, :, :):: matri ! (iim, iim, :) 
-    ! filtering matrix
+    ! filtering matrix, last dimension is latitude
 
     ! Local:
     integer l, j

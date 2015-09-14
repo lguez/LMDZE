@@ -71,5 +71,6 @@ program test_inifilr
        start = (/1, 1, jfiltnv + 1/))
 
   call NF95_CLOSE(ncid)
+  print *, 'Created file "test_inifilr_out.nc".'
 
 end program test_inifilr

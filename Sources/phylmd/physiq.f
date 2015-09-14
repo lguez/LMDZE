@@ -62,6 +62,7 @@ contains
     use yoegwd, only: sugwd
     USE suphec_m, ONLY: ra, rcpd, retv, rg, rlvtt, romega, rsigma, rtt
     USE temps, ONLY: itau_phy
+    use transp_m, only: transp
     use unit_nml_m, only: unit_nml
     USE ymds2ju_m, ONLY: ymds2ju
     USE yoethf_m, ONLY: r2es, rvtmp2
@@ -289,7 +290,6 @@ contains
     ! Declaration des procedures appelees
 
     EXTERNAL nuage ! calculer les proprietes radiatives
-    EXTERNAL transp ! transport total de l'eau et de l'energie
 
     ! Variables locales
 

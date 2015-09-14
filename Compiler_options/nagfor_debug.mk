@@ -16,8 +16,6 @@ FFLAGS = $(addprefix -I, ${netcdf_inc_dir} ${numer_rec_95_dir} ${netcdf95_dir} $
 
 FFLAGS += -free
 
-comma = ,
-
 LDLIBS = $(addprefix -L, ${lib_dir_list}) -lnetcdf95 -lnetcdf -lnumer_rec_95 -ljumble -lnr_util
 
 version_flag = -V

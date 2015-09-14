@@ -2,35 +2,28 @@ module inifilr_m
 
   IMPLICIT NONE
 
-  ! North:
-
   INTEGER jfiltnu, jfiltnv
-  ! index of the last scalar line filtered in northern hemisphere
-
-  real, pointer:: matriceun(:, :, :) ! (iim, iim, jfiltnu - 1)
-  ! matrice filtre pour les champs situes sur la grille scalaire
-
-  real, pointer:: matrinvn(:, :, :) ! (iim, iim, jfiltnu - 1)
-  ! matrice filtre pour les champs situes sur la grille scalaire, pour
-  ! le filtre inverse
-
-  real, pointer:: matricevn(:, :, :) ! (iim, iim, jfiltnv)
-  ! matrice filtre pour les champs situes sur la grille de V ou de Z
-
-  ! South:
+  ! index of the last line filtered in northern hemisphere at rlat[uv]
+  ! latitudes
 
   integer jfiltsu, jfiltsv
-  ! index of the first line filtered in southern hemisphere
+  ! index of the first line filtered in southern hemisphere at
+  ! rlat[uv] latitudes
 
+  ! Filtre pour les champs situes sur la grille scalaire (longitudes
+  ! rlonv, latitudes rlatu) :
+  real, pointer:: matriceun(:, :, :) ! (iim, iim, jfiltnu - 1)
   real, pointer:: matriceus(:, :, :) ! (iim, iim, jjm - jfiltsu + 1)
-  ! matrice filtre pour les champs situes sur la grille scalaire
 
+  ! Filtre pour les champs situes sur la grille scalaire (longitudes
+  ! rlonv, latitudes rlatu), pour le filtre inverse :
+  real, pointer:: matrinvn(:, :, :) ! (iim, iim, jfiltnu - 1)
   real, pointer:: matrinvs(:, :, :) ! (iim, iim, jjm - jfiltsu + 1)
-  ! matrice filtre pour les champs situes sur la grille scalaire, pour
-  ! le filtre inverse
 
+  ! Filtre pour les champs situes sur la grille de la vorticit\'e
+  ! (longitudes rlonu, latitudes rlatv)
+  real, pointer:: matricevn(:, :, :) ! (iim, iim, jfiltnv) matrice
   real, pointer:: matricevs(:, :, :) ! (iim, iim, jjm - jfiltsv + 1)
-  ! matrice filtre pour les champs situes sur la grille de V ou de Z
 
 contains
 
@@ -51,7 +44,7 @@ contains
     use inifgn_m, only: inifgn
     use inifilr_hemisph_m, only: inifilr_hemisph
     use jumble, only: new_unit
-    use nr_util, only: pi, ifirstloc
+    use nr_util, only: pi, ifirstloc, assert
 
     ! Local:
 
@@ -60,10 +53,11 @@ contains
     real eignvl(iim) ! eigenvalues (<= 0) sorted in descending order
     INTEGER j, unit
     REAL colat0 ! > 0
-    integer j1 ! index of smallest positive latitude
+    integer j1 ! index of negative latitude closest to the equator
 
     real eignfnu(iim, iim), eignfnv(iim, iim)
-    ! eigenvectors of the discrete second derivative with respect to longitude
+    ! eigenvectors of the discrete second derivative with respect to
+    ! longitude, at rlon[uv] longitudes
 
     !-----------------------------------------------------------
 
@@ -76,33 +70,38 @@ contains
     colat0 = min(0.5, minval(dlatu) / minval(xprimu(:iim)))
     PRINT *, 'colat0 = ', colat0
 
-    rlamda = iim / (pi * colat0 / grossismx) / sqrt(- eignvl(2: iim))
+    rlamda = iim / pi / colat0 * grossismx / sqrt(- eignvl(2: iim))
     print *, "1 / rlamda(iim) = ", 1. / rlamda(iim)
+
+    ! This is demonstrated in the notes but just to be sure:
+    call assert(rlamda(iim) * colat0 >= 1. - epsilon(0.), &
+         "inifilr rlamda(iim) * colat0")
+
     call new_unit(unit)
     open(unit, file = "modfrst.csv", status = "replace", action = "write") 
     write(unit, fmt = *) '"rlat (degrees)" modfrst' ! title line
 
     j1 = ifirstloc(rlatu <= 0.)
 
-    call inifilr_hemisph(rlatu(j1 - 1:2:- 1), colat0, rlamda, unit, eignfnv, &
-         jfiltnu, matriceun, matrinvn)
+    call inifilr_hemisph(rlatu(j1 - 1:2:- 1), rlamda, unit, eignfnv, jfiltnu, &
+         matriceun, matrinvn)
     jfiltnu = j1 - jfiltnu
     matriceun = matriceun(:, :, jfiltnu - 1:1:- 1)
     matrinvn = matrinvn(:, :, jfiltnu - 1:1:- 1)
 
-    call inifilr_hemisph(- rlatu(j1:jjm), colat0, rlamda, unit, eignfnv, &
-         jfiltsu, matriceus, matrinvs)
+    call inifilr_hemisph(- rlatu(j1:jjm), rlamda, unit, eignfnv, jfiltsu, &
+         matriceus, matrinvs)
     jfiltsu = j1 - 1 + jfiltsu
 
     j1 = ifirstloc(rlatv <= 0.)
 
-    call inifilr_hemisph(rlatv(j1 - 1:1:- 1), colat0, rlamda, unit, eignfnu, &
-         jfiltnv, matricevn)
+    call inifilr_hemisph(rlatv(j1 - 1:1:- 1), rlamda, unit, eignfnu, jfiltnv, &
+         matricevn)
     jfiltnv = j1 - jfiltnv
     matricevn = matricevn(:, :, jfiltnv:1:- 1)
 
-    call inifilr_hemisph(- rlatv(j1:jjm), colat0, rlamda, unit, eignfnu, &
-         jfiltsv, matricevs)
+    call inifilr_hemisph(- rlatv(j1:jjm), rlamda, unit, eignfnu, jfiltsv, &
+         matricevs)
     jfiltsv = j1 - 1 + jfiltsv
 
     close(unit)

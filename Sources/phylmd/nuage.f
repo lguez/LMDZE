@@ -10,6 +10,7 @@ SUBROUTINE nuage (paprs, pplay, &
   !
   use dimens_m
   use dimphy
+  use nr_util, only: pi
   use SUPHEC_M
   IMPLICIT none
   !======================================================================
@@ -122,7 +123,7 @@ SUBROUTINE nuage (paprs, pplay, &
            !
            rad_chaud =  &
                 1.1 * ( (pqlwp(i,k) * pplay(i,k) / (RD * T(i,k)) )   &
-                / (4./3. * RPI * 1000. * cdnc(i,k)) )**(1./3.)
+                / (4./3. * PI * 1000. * cdnc(i,k)) )**(1./3.)
            !
            ! Convert to um. CDR shall be at least 3 um.
            !
@@ -147,7 +148,7 @@ SUBROUTINE nuage (paprs, pplay, &
            ! ice cloud contribution) but using cdnc_pi instead of
            ! cdnc.
            radius = MAX(1.1e6 * ( (pqlwp(i,k)*pplay(i,k)/(RD*T(i,k)))   &
-                / (4./3.*RPI*1000.*cdnc_pi(i,k)) )**(1./3.),  &
+                / (4./3.*PI*1000.*cdnc_pi(i,k)) )**(1./3.),  &
                 3.) * (1.-zfice) + rad_froid * zfice
            cldtaupi(i,k) = 3.0/2.0 * zflwp / radius
 

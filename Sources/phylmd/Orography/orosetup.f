@@ -10,6 +10,7 @@ SUBROUTINE orosetup(nlon, ktest, kkcrit, kkcrith, kcrit, kkenvh, kknu, kknu2, &
 
   USE dimens_m
   USE dimphy
+  use nr_util, only: pi
   USE suphec_m
   USE yoegwd
 
@@ -64,7 +65,7 @@ SUBROUTINE orosetup(nlon, ktest, kkcrit, kkcrith, kcrit, kkenvh, kknu, kknu2, &
   !old  zcons2=g**2/cpd
   zcons2 = rg**2/rcpd
   !old  zcons3=1.5*api
-  zcons3 = 1.5*rpi
+  zcons3 = 1.5*pi
 
   ! 2.
 
@@ -203,7 +204,7 @@ SUBROUTINE orosetup(nlon, ktest, kkcrit, kkcrith, kcrit, kkenvh, kknu, kknu2, &
         zu = pulow(jl)
      END IF
      zphi = atan(pvlow(jl)/zu)
-     ppsi(jl, klev+1) = ptheta(jl)*rpi/180. - zphi
+     ppsi(jl, klev+1) = ptheta(jl)*pi/180. - zphi
      zb(jl) = 1. - 0.18*pgamma(jl) - 0.04*pgamma(jl)**2
      zc(jl) = 0.48*pgamma(jl) + 0.3*pgamma(jl)**2
      pd1(jl) = zb(jl) - (zb(jl)-zc(jl))*(sin(ppsi(jl, klev+1))**2)
@@ -337,7 +338,7 @@ SUBROUTINE orosetup(nlon, ktest, kkcrit, kkcrith, kcrit, kkenvh, kknu, kknu2, &
            zrhop = prho(jl, jk+1)
            znup(jl) = znup(jl) + (zdelp/rg)*((zstabp/zrhop+zstabm/zrhom)/2.)/ &
                 zwind
-           IF ((znum(jl)<=rpi/2.) .AND. (znup(jl)>rpi/2.) .AND. (kkcrith( &
+           IF ((znum(jl)<=pi/2.) .AND. (znup(jl)>pi/2.) .AND. (kkcrith( &
                 jl)==klev)) kkcrith(jl) = jk
 
         END IF
@@ -362,7 +363,7 @@ SUBROUTINE orosetup(nlon, ktest, kkcrit, kkcrith, kcrit, kkenvh, kknu, kknu2, &
               zu = pum1(jl, jk)
            END IF
            zphi = atan(pvm1(jl, jk)/zu)
-           ppsi(jl, jk) = ptheta(jl)*rpi/180. - zphi
+           ppsi(jl, jk) = ptheta(jl)*pi/180. - zphi
         END IF
      end DO
   end DO

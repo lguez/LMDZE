@@ -4,18 +4,17 @@ module inifilr_hemisph_m
 
 contains
 
-  subroutine inifilr_hemisph(rlat, colat0, rlamda, unit, eignfn, jfilt, &
-       matrice, matrinv)
+  subroutine inifilr_hemisph(rlat, rlamda, unit, eignfn, jfilt, matrice, &
+       matrinv)
 
     ! See notes.
 
     USE dimens_m, ONLY : iim
     use nr_util, only: pi, ifirstloc
 
-    real, intent(in):: rlat(:) ! (n)
+    real, intent(in):: rlat(:) ! (n_lat)
     ! latitudes, in rad, in [0, pi / 2[, in strictly ascending order
 
-    REAL, intent(in):: colat0 ! > 0
     REAL, intent(in):: rlamda(2:) ! (2:iim) > 0, in descending order
     integer, intent(in):: unit
 
@@ -23,45 +22,42 @@ contains
     ! eigenvectors of the discrete second derivative with respect to longitude
 
     integer, intent(out):: jfilt
-    real, pointer:: matrice(:, :, :) ! (iim, iim, n - jfilt + 1) matrice filtre
 
-    real, pointer, optional:: matrinv(:, :, :) ! (iim, iim, n - jfilt + 1) 
+    real, pointer:: matrice(:, :, :) ! (iim, iim, n_lat - jfilt + 1)
+    ! matrice filtre
+
+    real, pointer, optional:: matrinv(:, :, :) ! (iim, iim, n_lat - jfilt + 1) 
     ! matrice pour le filtre inverse
 
     ! Local:
 
-    integer n, i, j
+    integer n_lat, i, j
     REAL eignft(iim, iim)
 
     ! Index of the mode from where modes are filtered:
-    integer, allocatable:: modfrst(:) ! (jfilt:n) in {2, ..., iim}
+    integer modfrst ! in {2, ..., iim}
 
     ! Filtering coefficients (lamda_max * cos(rlat) / lamda):
     real coefil(2:iim)
 
     !-----------------------------------------------------------
 
-    n = size(rlat)
-    jfilt = ifirstloc(cos(rlat) < min(colat0, 1. / rlamda(iim)))
-    allocate(modfrst(jfilt:n))
+    n_lat = size(rlat)
+    jfilt = ifirstloc(cos(rlat) < 1. / rlamda(iim))
+    allocate(matrice(iim, iim, n_lat - jfilt + 1))
+    if (present(matrinv)) allocate(matrinv(iim, iim, n_lat - jfilt + 1))
 
-    DO j = jfilt, n
-       modfrst(j) = ifirstloc(rlamda < 1. / cos(rlat(j)), my_lbound = 2)
-       write(unit, fmt = *) rlat(j) / pi * 180., modfrst(j)
-    END DO
+    DO j = jfilt, n_lat
+       modfrst = ifirstloc(rlamda < 1. / cos(rlat(j)), my_lbound = 2)
+       write(unit, fmt = *) rlat(j) / pi * 180., modfrst
+       coefil(modfrst:) = rlamda(modfrst:) * cos(rlat(j)) - 1.
+       eignft(:modfrst - 1, :) = 0.
 
-    allocate(matrice(iim, iim, n - jfilt + 1))
-    if (present(matrinv)) allocate(matrinv(iim, iim, n - jfilt + 1))
-
-    DO j = jfilt, n
-       coefil(modfrst(j):) = rlamda(modfrst(j):) * cos(rlat(j)) - 1.
-       eignft(:modfrst(j) - 1, :) = 0.
-
-       forall (i = modfrst(j):iim) eignft(i, :) = eignfn(:, i) * coefil(i)
+       forall (i = modfrst:iim) eignft(i, :) = eignfn(:, i) * coefil(i)
        matrice(:, :, j - jfilt + 1) = matmul(eignfn, eignft)
 
        if (present(matrinv)) then
-          forall (i = modfrst(j):iim) eignft(i, :) = eignfn(:, i) * coefil(i) &
+          forall (i = modfrst:iim) eignft(i, :) = eignfn(:, i) * coefil(i) &
                / (1. + coefil(i))
           matrinv(:, :, j - jfilt + 1) = matmul(eignfn, eignft)
        end if

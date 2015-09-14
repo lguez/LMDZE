@@ -7,15 +7,6 @@ contains
   SUBROUTINE ppm3d(igd, q, ps1, ps2, u, v, w, ndt, iord, jord, kord, nc, imr, &
        jnp, j1, nlay, ap, bp, pt, ae, fill, umax)
 
-    ! rajout de d\'eclarations
-    ! integer Jmax,kmax,ndt0,nstep,k,j,i,ic,l,js,jn,imh,iad,jad,krd
-    ! integer iu,iiu,j2,jmr,js0,jt
-    ! real dtdy,dtdy5,rcap,iml,jn0,imjm,pi,dl,dp
-    ! real dt,cr1,maxdt,ztc,d5,sum1,sum2,ru
-
-    ! ********************************************************************
-
-    ! =============
     ! INPUT:
     ! =============
 
@@ -52,29 +43,7 @@ contains
     ! currently under development.
     ! p(i,j,k) = (AP(k)*PT + BP(k)*PS(i,j))/(D(k)-C(k)*TE**(-1/kapa))
 
-    ! /////////////////////////////////
-    ! / \ ------------- PTOP --------------  AP(1), BP(1)
-    ! |
-    ! delp(1)    |  ........... Q(i,j,1) ............
-    ! |
-    ! W(1)    \ / ---------------------------------  AP(2), BP(2)
-
-
-
-    ! W(k-1)   / \ ---------------------------------  AP(k), BP(k)
-    ! |
-    ! delp(K)    |  ........... Q(i,j,k) ............
-    ! |
-    ! W(k)    \ / ---------------------------------  AP(k+1), BP(k+1)
-
-
-
-    ! / \ ---------------------------------  AP(NLAY), BP(NLAY)
-    ! |
-    ! delp(NLAY)   |  ........... Q(i,j,NLAY) .........
-    ! |
-    ! W(NLAY)=0  \ / ------------- surface ----------- AP(NLAY+1), BP(NLAY+1)
-    ! //////////////////////////////////
+    ! Cf. ppm3d.txt.
 
     ! U(IMR,JNP,NLAY) & V(IMR,JNP,NLAY):winds (m/s) at mid-time-level (t+NDT/2)
     ! U and V may need to be polar filtered in advance in some cases.
@@ -84,17 +53,7 @@ contains
     ! pole (j=1) to north pole (j=JNP) ]
 
     ! IGD = 1  GEOS-GCM C-Grid
-    ! [North]
-
-    ! V(i,j)
-    ! |
-    ! |
-    ! |
-    ! U(i-1,j)---Q(i,j)---U(i,j) [EAST]
-    ! |
-    ! |
-    ! |
-    ! V(i,j-1)
+    ! Cf. ppm3d.txt.
 
     ! U(i,  1) is defined at South Pole.
     ! V(i,  1) is half grid north of the South Pole.

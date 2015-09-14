@@ -1,11 +1,12 @@
 module suphec_m
 
+  use nr_util, only: pi
+
   implicit none
 
   ! A1.0 Fundamental constants
-  REAL RPI
-  real, parameter:: RCLUM = 299792458.
-  real, parameter:: RHPLA = 6.6260755E-34
+  real, parameter:: RCLUM = 299792458. ! speed of light, m s-1
+  real, parameter:: RHPLA = 6.6260755E-34 ! Planck constant, J s
   real, parameter:: KBOL = 1.380658E-23 ! Boltzmann constant, in J K-1
   real, parameter:: NAVO = 6.0221367E23 ! Avogadro number, in mol-1
 
@@ -20,7 +21,8 @@ module suphec_m
   real, parameter:: RA = 6371229.
 
   ! A1.3 Radiation
-  REAL RSIGMA
+  REAL, parameter:: rsigma = 2. * pi**5 * (kbol / rhpla)**3 * kbol / rclum**2 &
+       / 15.
 
   ! A1.4 Thermodynamic gas phase
   REAL, parameter:: R = NAVO * KBOL ! ideal gas constant, in J K-1 mol-1
@@ -36,31 +38,31 @@ module suphec_m
   ! specific ideal gas constant for dry air, in J K-1 kg-1
   ! (factor 1e3: conversion from g to kg)
 
-  real RCPV, RCVD, RCVV
+  real, save:: RCPV, RCVD, RCVV
 
   real, parameter:: RCPD = 7. / 2 * RD 
   ! specific heat capacity for dry air, in J K-1 kg-1
 
   real, parameter:: RMO3 = 47.9942
   REAL, parameter:: RKAPPA = RD/RCPD
-  real RETV
+  real, save:: RETV
 
   ! A1.5, 6 Thermodynamic liquid, solid phases
-  REAL RCW, RCS
+  REAL, save:: RCW, RCS
 
   ! A1.7 Thermodynamic transition of phase
-  REAL RLMLT
+  REAL, save:: RLMLT
   real, parameter:: RTT = 273.16
   real, parameter:: RLVTT = 2.5008E+6
   real, parameter:: RLSTT = 2.8345E+6
   real, parameter:: RATM = 1e5
 
   ! A1.8 Curve of saturation
-  REAL RALPW, RBETW, RGAMW, RALPS, RBETS, RGAMS
+  REAL, save:: RALPW, RBETW, RGAMW, RALPS, RBETS, RGAMS
   real, parameter:: RESTT = 611.14
-  REAL RALPD, RBETD, RGAMD
+  REAL, save:: RALPD, RBETD, RGAMD
 
-  save
+  private pi
 
 contains
 
@@ -73,20 +75,11 @@ contains
 
     PRINT *, 'Call sequence information: suphec'
 
-    ! 1. DEFINE FUNDAMENTAL CONSTANTS
-
-    print *, 'Constants of the ICM'
-    RPI = 2.*ASIN(1.)
-    print *, 'Fundamental constants '
-    print '('' PI = '', E13.7, '' -'')', RPI
-    print '('' c = '', E13.7, ''m s-1'')', RCLUM
-    print '('' h = '', E13.7, ''J s'')', RHPLA
-
     ! 2. DEFINE ASTRONOMICAL CONSTANTS
 
-    RSIYEA = 365.25*RDAY*2.*RPI/6.283076
+    RSIYEA = 365.25*RDAY*2.*PI/6.283076
     RSIDAY = RDAY/(1.+RDAY/RSIYEA)
-    ROMEGA = 2.*RPI/RSIDAY
+    ROMEGA = 2.*PI/RSIDAY
 
     print *, 'Astronomical constants '
     print '('' day = '', E13.7, '' s'')', RDAY
@@ -104,7 +97,6 @@ contains
 
     ! 4. DEFINE RADIATION CONSTANTS.
 
-    rsigma = 2.*rpi**5 * (kbol/rhpla)**3 * kbol/rclum/rclum/15.
     print *, ' Radiation '
     print '('' Stefan-Bol. = '', E13.7, '' W m-2 K-4'')', RSIGMA
 

@@ -1,13 +1,15 @@
 # These are compiler dependent macros, meant to be included in the
 # makefile for LMDZE.
 
-netcdf_inc_dir = /opt/netcdf3/pgf/include
-netcdf_lib_dir = /opt/netcdf3/pgf/lib
+netcdf_inc_dir = /opt/netcdf42/pgf95/include
+netcdf_lib_dir = /opt/netcdf42/pgf95/lib
 
-numer_rec_95_dir = /data/guez/lib/Numer_Rec_95_pgf95_debug
-nr_util_dir = /data/guez/lib/NR_util_pgf95_debug
-netcdf95_dir = /data/guez/lib/NetCDF95_pgf95_debug
-jumble_dir = /data/guez/lib/Jumble_pgf95_debug
+numer_rec_95_dir = /data/guez/lib/Numer_Rec_95_pgfortran
+nr_util_dir = /data/guez/lib/NR_util_pgfortran
+netcdf95_dir = /data/guez/lib/NetCDF95_pgfortran
+jumble_dir = /data/guez/lib/Jumble_pgfortran
+
+lib_dir_list = ${netcdf_lib_dir} ${numer_rec_95_dir} ${netcdf95_dir} ${nr_util_dir} ${jumble_dir}
 
 # Include flags:
 FFLAGS = $(addprefix -I, ${netcdf_inc_dir} ${numer_rec_95_dir} ${netcdf95_dir} ${nr_util_dir} ${jumble_dir})
@@ -31,6 +33,6 @@ FFLAGS += -Kieee -Ktrap=fp
 
 LDFLAGS = -g
 
-LDLIBS = $(addprefix -L, ${netcdf_lib_dir} ${numer_rec_95_dir} ${netcdf95_dir} ${nr_util_dir} ${jumble_dir}) -ljumble -lnetcdf95 -lnetcdf -lnumer_rec_95 -lnr_util
+LDLIBS = $(addprefix -L, ${lib_dir_list}) -lnetcdf95 -lnetcdff -lnetcdf -lnumer_rec_95 -ljumble -lnr_util $(addprefix -rpath , ${lib_dir_list})
 
 version_flag = -V
