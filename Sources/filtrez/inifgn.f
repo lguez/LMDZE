@@ -23,7 +23,6 @@ contains
     ! Computes the eigenvalues and eigenvectors of the discrete analog
     ! of the second derivative with respect to longitude.
 
-    use acc_m, only: acc 
     USE dimens_m, ONLY: iim
     USE dynetat0_m, ONLY: xprimu, xprimv
     use jumble, only: new_unit
@@ -62,12 +61,10 @@ contains
 
     delta = matmul(deriv_v, deriv_u) ! second derivative at v longitudes
     CALL jacobi(delta, eignval_v, eignfnv)
-    CALL acc(eignfnv)
     CALL eigsrt(eignval_v, eignfnv)
 
     delta = matmul(deriv_u, deriv_v) ! second derivative at u longitudes
     CALL jacobi(delta, eignval_u, eignfnu)
-    CALL acc(eignfnu)
     CALL eigsrt(eignval_u, eignfnu)
 
     call new_unit(unit)

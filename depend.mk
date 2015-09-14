@@ -156,7 +156,7 @@ histwrite_real.o : mathop.o moycum.o trans_buff.o histcom_var.o
 ini_histins.o : ymds2ju.o temps.o phyetat0.o iniadvtrac.o indicesol.o histvert.o histend.o histdef.o histbeg_totreg.o dynetat0.o disvert.o dimphy.o dimens_m.o clesphys.o 
 iniadvtrac.o : dimens_m.o 
 inidissip.o : paramet_m.o nxgraro2.o gradiv2.o filtreg_v.o filtreg_scal.o divgrad2.o conf_gcm.o disvert.o comdissnew.o comconst.o dimens_m.o 
-inifgn.o : dynetat0.o acc.o dimens_m.o 
+inifgn.o : dynetat0.o dimens_m.o 
 inifilr.o : inifilr_hemisph.o inifgn.o dynetat0.o dimens_m.o 
 inifilr_hemisph.o : dimens_m.o 
 init_dynzon.o : ymds2ju.o temps.o histvert.o histend.o histdef.o histbeg_totreg.o dynetat0.o disvert.o dimens_m.o conf_gcm.o 
