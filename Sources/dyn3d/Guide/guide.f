@@ -125,7 +125,7 @@ CONTAINS
        step_rea = 1
        count_no_rea = 0
 
-       ! lecture d'un fichier netcdf pour determiner le nombre de niveaux :
+       ! Lecture d'un fichier NetCDF pour d\'eterminer le nombre de niveaux :
 
        if (guide_u) then
           call nf95_open('u.nc',Nf90_NOWRITe,ncid)

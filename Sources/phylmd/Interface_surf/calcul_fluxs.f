@@ -4,8 +4,8 @@ module calcul_fluxs_m
 
 contains
 
-  SUBROUTINE calcul_fluxs(nisurf, dtime, tsurf, p1lay, cal, beta, coef1lay, &
-       ps, qsurf, radsol, dif_grnd, t1lay, q1lay, u1lay, v1lay, petAcoef, &
+  SUBROUTINE calcul_fluxs(dtime, tsurf, p1lay, cal, beta, coef1lay, ps, &
+       qsurf, radsol, dif_grnd, t1lay, q1lay, u1lay, v1lay, petAcoef, &
        peqAcoef, petBcoef, peqBcoef, tsurf_new, evap, fluxlat, fluxsens, &
        dflux_s, dflux_l)
 
@@ -15,14 +15,12 @@ contains
     ! L. Fairhead April 2000
 
     USE abort_gcm_m, ONLY: abort_gcm
-    USE indicesol, ONLY: is_ter
     USE fcttre, ONLY: dqsatl, dqsats, foede, foeew, qsatl, qsats, thermcep
-    USE interface_surf, ONLY: run_off
+    USE indicesol, ONLY: is_ter
     use nr_util, only: assert_eq
     USE suphec_m, ONLY: rcpd, rd, retv, rkappa, rlstt, rlvtt, rtt
     USE yoethf_m, ONLY: r2es, r5ies, r5les, rvtmp2
 
-    integer, intent(IN):: nisurf ! surface a traiter
     real, intent(IN):: dtime
     real, intent(IN):: tsurf(:) ! (knon) temperature de surface
     real, intent(IN):: p1lay(:) ! (knon) pression 1er niveau (milieu de couche)
@@ -42,17 +40,17 @@ contains
     ! coefficients A de la résolution de la couche limite pour t et q
 
     real, intent(IN):: petBcoef(:), peqBcoef(:) ! (knon)
-    ! petBcoef coeff. B de la resolution de la CL pour t
-    ! peqBcoef coeff. B de la resolution de la CL pour q
+    ! coeff. B de la resolution de la CL pour t et q
 
     real, intent(OUT):: tsurf_new(:) ! (knon) température au sol
-    real, intent(OUT):: evap(:), fluxlat(:), fluxsens(:) ! (knon)
-    ! fluxlat flux de chaleur latente
-    ! fluxsens flux de chaleur sensible
+    real, intent(OUT):: evap(:) ! (knon)
+
+    real, intent(OUT):: fluxlat(:), fluxsens(:) ! (knon)
+    ! flux de chaleur latente et sensible
+
     real, intent(OUT):: dflux_s(:), dflux_l(:) ! (knon)
-    ! Dérivées des flux dF/dTs (W m-2 K-1)
-    ! dflux_s derivee du flux de chaleur sensible / Ts
-    ! dflux_l derivee du flux de chaleur latente / Ts
+    ! dérivées des flux de chaleurs sensible et latente par rapport à
+    ! Ts (W m-2 K-1)
 
     ! Local:
     integer i
@@ -73,12 +71,6 @@ contains
          size(peqAcoef), size(petBcoef), size(peqBcoef), size(tsurf_new), &
          size(evap), size(fluxlat), size(fluxsens), size(dflux_s), &
          size(dflux_l)/), "calcul_fluxs knon")
-
-    if (size(run_off) /= knon .AND. nisurf == is_ter) then
-       print *, 'Bizarre, le nombre de points continentaux'
-       print *, 'a change entre deux appels. J''arrete.'
-       call abort_gcm('calcul_fluxs', 'Pb run_off', 1)
-    endif
 
     ! Traitement humidite du sol
 

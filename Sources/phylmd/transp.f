@@ -4,8 +4,7 @@ module transp_m
 
 contains
 
-  SUBROUTINE transp(paprs, tsol, t, q, u, v, geom, vtran_e, vtran_q, utran_e, &
-       utran_q)
+  SUBROUTINE transp(paprs, t, q, u, v, geom, vtran_e, vtran_q, utran_e, utran_q)
 
     ! From LMDZ4/libf/phylmd/transp.F,v 1.1.1.1 2004/05/19 12:53:09
 
@@ -20,7 +19,6 @@ contains
 
 
     REAL, INTENT (IN) :: paprs(klon, klev+1)
-    REAL tsol(klon)
     REAL, INTENT (IN) :: t(klon, klev)
     REAL, INTENT (IN) :: q(klon, klev), u(klon, klev), v(klon, klev)
     REAL utran_e(klon), utran_q(klon), vtran_e(klon), vtran_q(klon)

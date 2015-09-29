@@ -4,8 +4,8 @@ module aaam_bud_m
 
 contains
 
-  subroutine aaam_bud(rea, rg, ome, plat, plon, phis, dragu, liftu, phyu, &
-       dragv, liftv, phyv, p, u, v, aam, torsfc)
+  subroutine aaam_bud(rg, ome, plat, plon, phis, dragu, liftu, phyu, dragv, &
+       liftv, phyv, p, u, v, aam, torsfc)
 
     ! Author: F. Lott (LMD/CNRS). Date: 2003/10/20. Object: Compute
     ! different terms of the axial AAAM budget and mountain torque.
@@ -14,8 +14,8 @@ contains
 
     USE dimens_m, ONLY : iim, jjm
     use nr_util, only: assert_eq, assert, pi
+    USE suphec_m, ONLY: ra
 
-    real, intent(in):: rea ! Earth radius
     real, intent(in):: rg ! gravity constant
     real, intent(in):: ome ! Earth rotation rate
 
@@ -171,32 +171,32 @@ contains
 
     DO j = 1, jjm 
        DO i = 1, iim
-          raam(1) = raam(1) - rea**3 * dlon * dlat * 0.5 * (cos(zlon(i )) &
+          raam(1) = raam(1) - ra**3 * dlon * dlat * 0.5 * (cos(zlon(i )) &
                * sin(zlat(j )) * cos(zlat(j )) * ub(i , j ) + cos(zlon(i )) &
                * sin(zlat(j + 1)) * cos(zlat(j + 1)) * ub(i , j + 1)) &
-               + rea**3 * dlon * dlat * 0.5 * (sin(zlon(i )) * cos(zlat(j )) &
+               + ra**3 * dlon * dlat * 0.5 * (sin(zlon(i )) * cos(zlat(j )) &
                * vb(i , j ) + sin(zlon(i )) * cos(zlat(j + 1)) * vb(i , j + 1))
 
-          oaam(1) = oaam(1) - ome * rea**4 * dlon * dlat / rg * 0.5 &
+          oaam(1) = oaam(1) - ome * ra**4 * dlon * dlat / rg * 0.5 &
                * (cos(zlon(i )) * cos(zlat(j ))**2 * sin(zlat(j )) &
                * ps(i , j ) + cos(zlon(i )) * cos(zlat(j + 1))**2 &
                * sin(zlat(j + 1)) * ps(i , j + 1))
 
-          raam(2) = raam(2) - rea**3 * dlon * dlat * 0.5 * (sin(zlon(i )) &
+          raam(2) = raam(2) - ra**3 * dlon * dlat * 0.5 * (sin(zlon(i )) &
                * sin(zlat(j )) * cos(zlat(j )) * ub(i , j ) + sin(zlon(i )) &
                * sin(zlat(j + 1)) * cos(zlat(j + 1)) * ub(i , j + 1)) &
-               - rea**3 * dlon * dlat * 0.5 * (cos(zlon(i )) * cos(zlat(j )) &
+               - ra**3 * dlon * dlat * 0.5 * (cos(zlon(i )) * cos(zlat(j )) &
                * vb(i , j ) + cos(zlon(i )) * cos(zlat(j + 1)) * vb(i , j + 1))
 
-          oaam(2) = oaam(2) - ome * rea**4 * dlon * dlat / rg * 0.5 &
+          oaam(2) = oaam(2) - ome * ra**4 * dlon * dlat / rg * 0.5 &
                * (sin(zlon(i )) * cos(zlat(j ))**2 * sin(zlat(j )) &
                * ps(i , j ) + sin(zlon(i )) * cos(zlat(j + 1))**2 &
                * sin(zlat(j + 1)) * ps(i , j + 1))
 
-          raam(3) = raam(3) + rea**3 * dlon * dlat * 0.5 * (cos(zlat(j))**2 &
+          raam(3) = raam(3) + ra**3 * dlon * dlat * 0.5 * (cos(zlat(j))**2 &
                * ub(i, j) + cos(zlat(j + 1))**2 * ub(i, j + 1))
 
-          oaam(3) = oaam(3) + ome * rea**4 * dlon * dlat / rg * 0.5 &
+          oaam(3) = oaam(3) + ome * ra**4 * dlon * dlat / rg * 0.5 &
                * (cos(zlat(j))**3 * ps(i, j) + cos(zlat(j + 1))**3 &
                * ps(i, j + 1))
        ENDDO
@@ -206,10 +206,10 @@ contains
 
     DO j = 1, jjm
        DO i = 1, iim
-          tmou(1) = tmou(1) - rea**2 * dlon * 0.5 * sin(zlon(i)) &
+          tmou(1) = tmou(1) - ra**2 * dlon * 0.5 * sin(zlon(i)) &
                * (zs(i, j) - zs(i, j + 1)) &
                * (cos(zlat(j + 1)) * ps(i, j + 1) + cos(zlat(j)) * ps(i, j)) 
-          tmou(2) = tmou(2) + rea**2 * dlon * 0.5 * cos(zlon(i)) &
+          tmou(2) = tmou(2) + ra**2 * dlon * 0.5 * cos(zlon(i)) &
                * (zs(i, j) - zs(i, j + 1)) &
                * (cos(zlat(j + 1)) * ps(i, j + 1) + cos(zlat(j)) * ps(i, j)) 
        ENDDO
@@ -217,13 +217,13 @@ contains
 
     DO j = 2, jjm 
        DO i = 1, iim
-          tmou(1) = tmou(1) + rea**2 * dlat * 0.5 * sin(zlat(j)) &
+          tmou(1) = tmou(1) + ra**2 * dlat * 0.5 * sin(zlat(j)) &
                * (zs(i + 1, j) - zs(i, j)) &
                * (cos(zlon(i + 1)) * ps(i + 1, j) + cos(zlon(i)) * ps(i, j))
-          tmou(2) = tmou(2) + rea**2 * dlat * 0.5 * sin(zlat(j)) &
+          tmou(2) = tmou(2) + ra**2 * dlat * 0.5 * sin(zlat(j)) &
                * (zs(i + 1, j) - zs(i, j)) &
                * (sin(zlon(i + 1)) * ps(i + 1, j) + sin(zlon(i)) * ps(i, j))
-          tmou(3) = tmou(3) - rea**2 * dlat * 0.5* cos(zlat(j)) &
+          tmou(3) = tmou(3) - ra**2 * dlat * 0.5* cos(zlat(j)) &
                * (zs(i + 1, j) - zs(i, j)) * (ps(i + 1, j) + ps(i, j))
        ENDDO
     ENDDO
@@ -232,30 +232,30 @@ contains
 
     DO j = 2, jjm
        DO i = 1, iim
-          tsso(1) = tsso(1) - rea**3 * cos(zlat(j)) * dlon * dlat* &
+          tsso(1) = tsso(1) - ra**3 * cos(zlat(j)) * dlon * dlat* &
                ssou(i, j) * sin(zlat(j)) * cos(zlon(i)) &
-               + rea**3 * cos(zlat(j)) * dlon * dlat* &
+               + ra**3 * cos(zlat(j)) * dlon * dlat* &
                ssov(i, j) * sin(zlon(i))
 
-          tsso(2) = tsso(2) - rea**3 * cos(zlat(j)) * dlon * dlat* &
+          tsso(2) = tsso(2) - ra**3 * cos(zlat(j)) * dlon * dlat* &
                ssou(i, j) * sin(zlat(j)) * sin(zlon(i)) &
-               - rea**3 * cos(zlat(j)) * dlon * dlat* &
+               - ra**3 * cos(zlat(j)) * dlon * dlat* &
                ssov(i, j) * cos(zlon(i))
 
-          tsso(3) = tsso(3) + rea**3 * cos(zlat(j)) * dlon * dlat* &
+          tsso(3) = tsso(3) + ra**3 * cos(zlat(j)) * dlon * dlat* &
                ssou(i, j) * cos(zlat(j))
 
-          tbls(1) = tbls(1) - rea**3 * cos(zlat(j)) * dlon * dlat* &
+          tbls(1) = tbls(1) - ra**3 * cos(zlat(j)) * dlon * dlat* &
                blsu(i, j) * sin(zlat(j)) * cos(zlon(i)) &
-               + rea**3 * cos(zlat(j)) * dlon * dlat* &
+               + ra**3 * cos(zlat(j)) * dlon * dlat* &
                blsv(i, j) * sin(zlon(i))
 
-          tbls(2) = tbls(2) - rea**3 * cos(zlat(j)) * dlon * dlat* &
+          tbls(2) = tbls(2) - ra**3 * cos(zlat(j)) * dlon * dlat* &
                blsu(i, j) * sin(zlat(j)) * sin(zlon(i)) &
-               - rea**3 * cos(zlat(j)) * dlon * dlat* &
+               - ra**3 * cos(zlat(j)) * dlon * dlat* &
                blsv(i, j) * cos(zlon(i))
 
-          tbls(3) = tbls(3) + rea**3 * cos(zlat(j)) * dlon * dlat* &
+          tbls(3) = tbls(3) + ra**3 * cos(zlat(j)) * dlon * dlat* &
                blsu(i, j) * cos(zlat(j))
        ENDDO
     ENDDO

@@ -149,7 +149,7 @@ contains
           print *, ' nisurf = ', nisurf, ' /= is_ter = ', is_ter
           print *, 'or on doit commencer par les surfaces continentales'
           abort_message='voir ci-dessus'
-          call abort_gcm(modname, abort_message, 1)
+          call abort_gcm(modname, abort_message)
        endif
        if (is_oce > is_sic) then
           print *, 'Warning:'
@@ -157,7 +157,7 @@ contains
           print *, ' l''ocean doit etre traite avant la banquise'
           print *, ' or is_oce = ', is_oce, '> is_sic = ', is_sic
           abort_message='voir ci-dessus'
-          call abort_gcm(modname, abort_message, 1)
+          call abort_gcm(modname, abort_message)
        endif
     endif
     first_call = .false.
@@ -182,17 +182,15 @@ contains
 
     select case (nisurf)
     case (is_ter)
-       ! Surface "terre" appel a l'interface avec les sols continentaux
+       ! Surface "terre", appel \`a l'interface avec les sols continentaux
 
        ! allocation du run-off
        if (.not. allocated(run_off)) then
           allocate(run_off(knon))
           run_off = 0.
        else if (size(run_off) /= knon) then
-          print *, 'Bizarre, le nombre de points continentaux'
-          print *, 'a change entre deux appels. J''arrete '
-          abort_message='voir ci-dessus'
-          call abort_gcm(modname, abort_message, 1)
+          call abort_gcm(modname, 'Something is wrong: the number of ' &
+               // 'continental points has changed since last call.')
        endif
 
        ! Calcul age de la neige
@@ -212,7 +210,8 @@ contains
        ELSE
           cal = RCPD * capsol
        ENDIF
-       CALL calcul_fluxs(nisurf, dtime, tsurf, p1lay(:knon), cal(:knon), &
+
+       CALL calcul_fluxs(dtime, tsurf, p1lay(:knon), cal(:knon), &
             beta(:knon), tq_cdrag(:knon), ps(:knon), qsurf(:knon), &
             radsol(:knon), dif_grnd(:knon), temp_air(:knon), spechum(:knon), &
             u1_lay(:knon), v1_lay(:knon), petAcoef(:knon), peqAcoef(:knon), &
@@ -246,7 +245,7 @@ contains
        dif_grnd = 0.
        alb_neig = 0.
        agesno = 0.
-       call calcul_fluxs(nisurf, dtime, tsurf_temp, p1lay(:knon), &
+       call calcul_fluxs(dtime, tsurf_temp, p1lay(:knon), &
             cal(:knon), beta(:knon), tq_cdrag(:knon), ps(:knon), &
             qsurf(:knon), radsol(:knon), dif_grnd(:knon), temp_air(:knon), &
             spechum(:knon), u1_lay(:knon), v1_lay(:knon), petAcoef(:knon), &
@@ -300,7 +299,7 @@ contains
        tsurf_temp = tsurf_new
        beta = 1.0
 
-       CALL calcul_fluxs(nisurf, dtime, tsurf_temp, p1lay(:knon), cal(:knon), &
+       CALL calcul_fluxs(dtime, tsurf_temp, p1lay(:knon), cal(:knon), &
             beta(:knon), tq_cdrag(:knon), ps(:knon), qsurf(:knon), &
             radsol(:knon), dif_grnd(:knon), temp_air(:knon), spechum(:knon), &
             u1_lay(:knon), v1_lay(:knon), petAcoef(:knon), peqAcoef(:knon), &
@@ -353,7 +352,7 @@ contains
        beta = 1.0
        dif_grnd = 0.0
 
-       call calcul_fluxs(nisurf, dtime, tsurf, p1lay(:knon), cal(:knon), &
+       call calcul_fluxs(dtime, tsurf, p1lay(:knon), cal(:knon), &
             beta(:knon), tq_cdrag(:knon), ps(:knon), qsurf(:knon), &
             radsol(:knon), dif_grnd(:knon), temp_air(:knon), spechum(:knon), &
             u1_lay(:knon), v1_lay(:knon), petAcoef(:knon), peqAcoef(:knon), &
@@ -382,7 +381,7 @@ contains
     case default
        print *, 'Index surface = ', nisurf
        abort_message = 'Index surface non valable'
-       call abort_gcm(modname, abort_message, 1)
+       call abort_gcm(modname, abort_message)
     end select
 
   END SUBROUTINE interfsurf_hq

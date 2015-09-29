@@ -77,15 +77,11 @@ contains
     read(unit=*, nml=conf_gcm_nml)
     write(unit_nml, nml=conf_gcm_nml)
 
-    IF (MOD(day_step, iperiod) /= 0) call abort_gcm(modname = "conf_gcm", &
-         message = &
-         'Il faut choisir un nombre de pas par jour multiple de "iperiod".', &
-         ierr = 1)
+    IF (MOD(day_step, iperiod) /= 0) call abort_gcm("conf_gcm", &
+         'Il faut choisir un nombre de pas par jour multiple de "iperiod".')
 
-    IF (MOD(day_step, iphysiq)/= 0) call abort_gcm(modname = "conf_gcm", &
-         message = &
-         'Il faut choisir un nombre de pas par jour multiple de "iphysiq".', &
-         ierr = 1)
+    IF (MOD(day_step, iphysiq)/= 0) call abort_gcm("conf_gcm", &
+         'Il faut choisir un nombre de pas par jour multiple de "iphysiq".')
 
   END SUBROUTINE conf_gcm
 

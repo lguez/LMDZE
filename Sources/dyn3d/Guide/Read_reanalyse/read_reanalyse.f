@@ -14,7 +14,7 @@ contains
     USE paramet_m, ONLY: iip1, jjp1
     use reanalyse2nat_m, only: reanalyse2nat
 
-    integer timestep
+    integer, intent(in):: timestep
     real, intent(in):: psi(iip1, jjp1)
     real u(iip1, jjp1, llm), v(iip1, jjm, llm)
     real t(iip1, jjp1, llm), q(iip1, jjp1, llm)

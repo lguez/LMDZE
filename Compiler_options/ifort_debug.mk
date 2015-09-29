@@ -3,7 +3,7 @@
 
 # For ifort 12
 
-netcdf_dir = /smplocal/pub/NetCDF/4.1.3/seq
+netcdf_dir = /smplocal/pub/NetCDF/4.3.3.1/seq
 ##netcdf_dir = /opt/netcdf42/ifort
 
 netcdf_inc_dir = ${netcdf_dir}/include

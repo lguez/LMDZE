@@ -18,6 +18,7 @@ contains
     USE exner_hyb_m, ONLY: exner_hyb
     use massbar_m, only: massbar
     use massdair_m, only: massdair
+    use pres2lev_m, only: pres2lev
 
     integer nlevnc
     real, intent(in):: psi(iip1, jjp1)

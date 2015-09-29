@@ -38,6 +38,7 @@ contains
     use indicesol, only: nbsrf
     use initrrnpb_m, only: initrrnpb
     use minmaxqfi_m, only: minmaxqfi
+    use netcdf, only: NF90_FILL_float
     use netcdf95, only: nf95_inq_varid, nf95_get_var, nf95_put_var
     use nflxtr_m, only: nflxtr
     use nr_util, only: assert
@@ -194,6 +195,8 @@ contains
 
        call nf95_inq_varid(ncid_startphy, "trs", varid)
        call nf95_get_var(ncid_startphy, varid, trs(:, 1))
+       if (any(trs(:, 1) == NF90_FILL_float)) call abort_gcm("phytrac", &
+            "some missing values in trs(:, 1)")
 
        ! Initialisation de la fraction d'aerosols lessivee
 

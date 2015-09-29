@@ -60,7 +60,7 @@ contains
     use readsulfate_m, only: readsulfate
     use readsulfate_preind_m, only: readsulfate_preind
     use yoegwd, only: sugwd
-    USE suphec_m, ONLY: ra, rcpd, retv, rg, rlvtt, romega, rsigma, rtt
+    USE suphec_m, ONLY: rcpd, retv, rg, rlvtt, romega, rsigma, rtt
     USE temps, ONLY: itau_phy
     use transp_m, only: transp
     use unit_nml_m, only: unit_nml
@@ -523,7 +523,7 @@ contains
 
     IF (if_ebil >= 1) zero_v = 0.
     IF (nqmx < 2) CALL abort_gcm('physiq', &
-         'eaux vapeur et liquide sont indispensables', 1)
+         'eaux vapeur et liquide sont indispensables')
 
     test_firstcal: IF (firstcal) THEN
        ! initialiser
@@ -1303,8 +1303,8 @@ contains
        ENDDO
     ENDDO
 
-    CALL aaam_bud(ra, rg, romega, rlat, rlon, pphis, zustrdr, zustrli, &
-         zustrph, zvstrdr, zvstrli, zvstrph, paprs, u, v, aam, torsfc)
+    CALL aaam_bud(rg, romega, rlat, rlon, pphis, zustrdr, zustrli, zustrph, &
+         zvstrdr, zvstrli, zvstrph, paprs, u, v, aam, torsfc)
 
     IF (if_ebil >= 2) CALL diagetpq(airephy, 'after orography', ip_ebil, 2, &
          2, dtphys, t_seri, q_seri, ql_seri, u_seri, v_seri, paprs, d_h_vcol, &
@@ -1321,8 +1321,7 @@ contains
          pctsrf, frac_impa, frac_nucl, pphis, airephy, dtphys, itap)
 
     ! Calculer le transport de l'eau et de l'energie (diagnostique)
-    CALL transp(paprs, zxtsol, t_seri, q_seri, u_seri, v_seri, zphi, ve, vq, &
-         ue, uq)
+    CALL transp(paprs, t_seri, q_seri, u_seri, v_seri, zphi, ve, vq, ue, uq)
 
     ! diag. bilKP
 

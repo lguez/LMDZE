@@ -1,6 +1,6 @@
 FCTTRE.o : suphec.o yoethf.o 
 YOMCST.o : unit_nml_m.o 
-aaam_bud.o : dimens_m.o 
+aaam_bud.o : suphec.o dimens_m.o 
 abort_gcm.o : histclo.o 
 academic.o : dimens_m.o 
 adaptdt.o : temps.o comgeom.o conf_gcm.o disvert.o comconst.o paramet_m.o dimens_m.o 
@@ -22,7 +22,7 @@ bilan_dyn.o : paramet_m.o massbar.o init_dynzon.o histwrite.o dimens_m.o covcont
 buildop.o : decoop.o errioipsl.o 
 caladvtrac.o : qminimum.o paramet_m.o dimens_m.o conf_gcm.o advtrac.o 
 calbeta.o : indicesol.o 
-calcul_fluxs.o : yoethf.o suphec.o interface_surf.o FCTTRE.o indicesol.o abort_gcm.o 
+calcul_fluxs.o : yoethf.o suphec.o indicesol.o FCTTRE.o abort_gcm.o 
 caldyn.o : vitvert.o tourpot.o sortvarc.o paramet_m.o massdair.o massbarxy.o massbar.o flumass.o dynetat0.o dudv2.o dudv1.o dteta1.o disvert.o dimens_m.o covcont.o convmas.o conf_gcm.o comgeom.o comconst.o bernoui.o advect.o 
 caldyn0.o : vitvert.o tourpot.o sortvarc.o paramet_m.o massdair.o massbarxy.o massbar.o flumass.o disvert.o dimens_m.o covcont.o convmas.o comgeom.o bernoui.o 
 calfis.o : physiq.o grid_change.o dynetat0.o disvert.o dimphy.o dimens_m.o comgeom.o comconst.o 
@@ -240,7 +240,7 @@ read_reanalyse.o : reanalyse2nat.o paramet_m.o dimens_m.o conf_guide.o
 read_serre.o : unit_nml_m.o dynetat0.o 
 readsulfate.o : getso4fromfile.o dynetat0.o dimphy.o dimens_m.o 
 readsulfate_preind.o : getso4fromfile.o chem.o suphec.o dynetat0.o dimphy.o dimens_m.o 
-reanalyse2nat.o : massdair.o massbar.o exner_hyb.o comgeom.o disvert.o comconst.o paramet_m.o dimens_m.o 
+reanalyse2nat.o : pres2lev.o massdair.o massbar.o exner_hyb.o comgeom.o disvert.o comconst.o paramet_m.o dimens_m.o 
 regr_lat_time_coefoz.o : dynetat0.o dimens_m.o 
 regr_pr_av.o : press_coefoz.o grid_change.o dimphy.o dimens_m.o 
 regr_pr_comb_coefoz.o : regr_pr_int.o regr_pr_av.o phyetat0.o dimphy.o dimens_m.o 

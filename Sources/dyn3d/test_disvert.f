@@ -87,7 +87,7 @@ contains
              end if
           end do
        end do
-       call abort_gcm("test_disvert", "bad order of pressure values", 1)
+       call abort_gcm("test_disvert", "bad order of pressure values")
     end if
 
 1000 format (3(a, g10.4, a, i0))

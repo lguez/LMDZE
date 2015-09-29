@@ -68,8 +68,7 @@ contains
 
     ok_guide = any((/guide_u, guide_v, guide_t, guide_q/))
     if (ok_guide .and. mod(day_step, 4 * iperiod) /= 0) call &
-         abort_gcm(modname = "conf_guide", &
-         message = 'ok_guide day_step iperiod', ierr = 1)
+         abort_gcm("conf_guide", 'ok_guide day_step iperiod')
 
     if (ok_guide .and. online) then
        factt = dtvr * iperiod / daysec

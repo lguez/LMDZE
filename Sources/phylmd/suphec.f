@@ -11,10 +11,14 @@ module suphec_m
   real, parameter:: NAVO = 6.0221367E23 ! Avogadro number, in mol-1
 
   ! A1.1 Astronomical constants
-  REAL RSIYEA, RSIDAY, ROMEGA
+
+  REAL ROMEGA
   real, parameter:: RDAY = 86400.
-  real, parameter:: REA = 149597870000.
-  real, parameter:: REPSM = 0.409093
+
+  REAL, parameter:: RSIYEA = 365.25 * RDAY * 2. * PI / 6.283076
+  ! sideral year, in s
+
+  REAL, parameter:: RSIDAY = RDAY / (1. + RDAY / RSIYEA) ! sideral day, in s
 
   ! A1.2 Geoide
   real, parameter:: RG = 9.80665 ! acceleration of gravity, in m s-2
@@ -77,16 +81,9 @@ contains
 
     ! 2. DEFINE ASTRONOMICAL CONSTANTS
 
-    RSIYEA = 365.25*RDAY*2.*PI/6.283076
-    RSIDAY = RDAY/(1.+RDAY/RSIYEA)
     ROMEGA = 2.*PI/RSIDAY
 
     print *, 'Astronomical constants '
-    print '('' day = '', E13.7, '' s'')', RDAY
-    print '('' half g. axis = '', E13.7, '' m'')', REA
-    print '('' mean anomaly = '', E13.7, '' -'')', REPSM
-    print '('' sideral year = '', E13.7, '' s'')', RSIYEA
-    print '('' sideral day = '', E13.7, '' s'')', RSIDAY
     print '('' omega = '', E13.7, '' s-1'')', ROMEGA
 
     ! 3. DEFINE GEOIDE.
