@@ -21,9 +21,6 @@ CONTAINS
     use dynetat0_m, only: grossismx, grossismy, rlatu, rlatv
     USE exner_hyb_m, ONLY: exner_hyb
     use init_tau2alpha_m, only: init_tau2alpha
-    use netcdf, only: nf90_nowrite
-    use netcdf95, only: nf95_close, nf95_inq_dimid, nf95_inquire_dimension, &
-         nf95_open
     use nr_util, only: pi
     USE paramet_m, ONLY: iip1, ip1jmp1, jjp1, llmp1
     USE q_sat_m, ONLY: q_sat
@@ -56,7 +53,6 @@ CONTAINS
 
     REAL, save:: tetarea2(iim + 1, jjm + 1, llm) ! temp pot reales
     REAL, save:: qrea2(iim + 1, jjm + 1, llm) ! temp pot reales
-    REAL, save:: masserea2(ip1jmp1, llm) ! masse
 
     ! alpha détermine la part des injections de données à chaque étape
     ! alpha=0 signifie pas d'injection
@@ -65,12 +61,8 @@ CONTAINS
     REAL, save:: alpha_t(iim + 1, jjm + 1)
     REAL, save:: alpha_u(iim + 1, jjm + 1), alpha_v(iim + 1, jjm)
 
-    INTEGER, save:: step_rea, count_no_rea
-
     INTEGER l
-    INTEGER ncid, dimid
     REAL tau
-    INTEGER, SAVE:: nlev
 
     ! TEST SUR QSAT
     REAL p(iim + 1, jjm + 1, llmp1)
@@ -81,9 +73,7 @@ CONTAINS
 
     !-----------------------------------------------------------------------
 
-    !!PRINT *, 'Call sequence information: guide'
-
-    first_call: IF (itau == 0) THEN
+    IF (itau == 0) THEN
        IF (online) THEN
           IF (abs(grossismx - 1.) < 0.1 .OR. abs(grossismy - 1.) < 0.1) THEN
              ! grille regulière
@@ -122,37 +112,26 @@ CONTAINS
           if (guide_q) alpha_q = 1.
        END IF
 
-       step_rea = 1
-       count_no_rea = 0
-
-       ! Lecture d'un fichier NetCDF pour d\'eterminer le nombre de niveaux :
-
-       if (guide_u) then
-          call nf95_open('u.nc',Nf90_NOWRITe,ncid)
-       else if (guide_v) then
-          call nf95_open('v.nc',nf90_nowrite,ncid)
-       else if (guide_T) then
-          call nf95_open('T.nc',nf90_nowrite,ncid)
-       else
-          call nf95_open('hur.nc',nf90_nowrite, ncid)
-       end if
-
-       IF (ncep) THEN
-          call nf95_inq_dimid(ncid, 'LEVEL', dimid)
-       ELSE
-          call nf95_inq_dimid(ncid, 'PRESSURE', dimid)
-       END IF
-       call nf95_inquire_dimension(ncid, dimid, nclen=nlev)
-       PRINT *, 'nlev = ', nlev
-       call nf95_close(ncid)
-
        ! Lecture du premier état des réanalyses :
-       CALL read_reanalyse(1, ps, ucovrea2, vcovrea2, tetarea2, qrea2, &
-            masserea2, nlev)
+       CALL read_reanalyse(ps, ucovrea2, vcovrea2, tetarea2, qrea2)
        qrea2 = max(qrea2, 0.1)
-    END IF first_call
 
-    ! IMPORTATION DES VENTS, PRESSION ET TEMPERATURE REELS:
+       if (ini_anal) then
+          IF (guide_u) ucov = ucovrea2
+          IF (guide_v) vcov = vcovrea2
+          IF (guide_t) teta = tetarea2
+
+          IF (guide_q) then
+             ! Calcul de l'humidité saturante :
+             forall (l = 1: llm + 1) p(:, :, l) = ap(l) + bp(l) * ps
+             CALL exner_hyb(ps, p, pks, pk)
+             q = q_sat(pk * teta / cpp, preff * (pk / cpp)**(1. / kappa)) &
+                  * qrea2 * 0.01
+          end IF
+       end if
+    END IF
+
+    ! Importation des vents, pression et temp\'erature r\'eels :
 
     ! Nudging fields are given 4 times per day:
     IF (mod(itau, day_step / 4) == 0) THEN
@@ -161,11 +140,7 @@ CONTAINS
        tetarea1 = tetarea2
        qrea1 = qrea2
 
-       PRINT *, 'Lecture fichiers guidage, pas ', step_rea, 'apres ', &
-            count_no_rea, ' non lectures'
-       step_rea = step_rea + 1
-       CALL read_reanalyse(step_rea, ps, ucovrea2, vcovrea2, tetarea2, qrea2, &
-            masserea2, nlev)
+       CALL read_reanalyse(ps, ucovrea2, vcovrea2, tetarea2, qrea2)
        qrea2 = max(qrea2, 0.1)
 
        if (guide_u) then
@@ -182,8 +157,6 @@ CONTAINS
           CALL writefield("qrea2", qrea2)
           CALL writefield("q", q)
        end if
-    ELSE
-       count_no_rea = count_no_rea + 1
     END IF
 
     ! Guidage
@@ -192,25 +165,17 @@ CONTAINS
 
     ! x_gcm = a * x_gcm + (1 - a) * x_reanalyses
 
-    IF (guide_u) THEN
-       IF (itau == 0 .AND. ini_anal) then
-          ucov = ucovrea1
-       else
-          forall (l = 1: llm) ucov(:, :, l) = (1. - alpha_u) * ucov(:, :, l) &
-               + alpha_u * ((1. - tau) * ucovrea1(:, :, l) &
-               + tau * ucovrea2(:, :, l))
-       end IF
-    END IF
+    IF (guide_u) forall (l = 1: llm) ucov(:, :, l) = (1. - alpha_u) &
+         * ucov(:, :, l) + alpha_u * ((1. - tau) * ucovrea1(:, :, l) + tau &
+         * ucovrea2(:, :, l))
 
-    IF (guide_t) THEN
-       IF (itau == 0 .AND. ini_anal) then
-          teta = tetarea1
-       else
-          forall (l = 1: llm) teta(:, :, l) = (1. - alpha_t) * teta(:, :, l) &
-               + alpha_t * ((1. - tau) * tetarea1(:, :, l) &
-               + tau * tetarea2(:, :, l))
-       end IF
-    END IF
+    IF (guide_v) forall (l = 1: llm) vcov(:, :, l) = (1. - alpha_v) &
+         * vcov(:, :, l) + alpha_v * ((1. - tau) * vcovrea1(:, :, l) + tau &
+         * vcovrea2(:, :, l))
+
+    IF (guide_t) forall (l = 1: llm) teta(:, :, l) = (1. - alpha_t) &
+         * teta(:, :, l) + alpha_t * ((1. - tau) * tetarea1(:, :, l) + tau &
+         * tetarea2(:, :, l))
 
     IF (guide_q) THEN
        ! Calcul de l'humidité saturante :
@@ -219,23 +184,9 @@ CONTAINS
        qsat = q_sat(pk * teta / cpp, preff * (pk / cpp)**(1. / kappa))
 
        ! humidité relative en % -> humidité spécifique
-       IF (itau == 0 .AND. ini_anal) then
-          q = qsat * qrea1 * 0.01
-       else
-          forall (l = 1: llm) q(:, :, l) = (1. - alpha_q) * q(:, :, l) &
-               + alpha_q * (qsat(:, :, l) * ((1. - tau) * qrea1(:, :, l) &
-               + tau * qrea2(:, :, l)) * 0.01)
-       end IF
-    END IF
-
-    IF (guide_v) THEN
-       IF (itau == 0 .AND. ini_anal) then
-          vcov = vcovrea1
-       else
-          forall (l = 1: llm) vcov(:, :, l) = (1. - alpha_v) * vcov(:, :, l) &
-               + alpha_v * ((1. - tau) * vcovrea1(:, :, l) &
-               + tau * vcovrea2(:, :, l))
-       end IF
+       forall (l = 1: llm) q(:, :, l) = (1. - alpha_q) * q(:, :, l) &
+            + alpha_q * (qsat(:, :, l) * ((1. - tau) * qrea1(:, :, l) &
+            + tau * qrea2(:, :, l)) * 0.01)
     END IF
 
   END SUBROUTINE guide

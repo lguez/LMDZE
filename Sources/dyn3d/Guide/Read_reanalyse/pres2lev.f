@@ -20,14 +20,14 @@ contains
     ! ARGUMENTS
     ! """""""""
 
-    INTEGER lmo ! dimensions ancienne couches (input)
+    INTEGER, intent(in):: lmo ! dimensions ancienne couches (input)
     INTEGER lmn ! dimensions nouvelle couches (input)
     INTEGER lmomx ! dimensions ancienne couches (input)
     INTEGER lmnmx ! dimensions nouvelle couches (input)
 
     PARAMETER (lmomx=10000, lmnmx=10000)
 
-    REAL po(lmo) ! niveau de pression en millibars
+    REAL, intent(in):: po(lmo) ! niveau de pression en millibars
     INTEGER ni, nj
     REAL pn(ni, nj, lmn) ! niveau de pression en pascals
 

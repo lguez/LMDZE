@@ -4,11 +4,10 @@ module reanalyse2nat_m
 
 contains
 
-  subroutine reanalyse2nat(nlevnc, psi, unc, vnc, tnc, qnc, pl, u, v, t, q, &
-       masse, pk)
+  subroutine reanalyse2nat(nlevnc, psi, unc, vnc, tnc, qnc, pl, u, v, t, q, pk)
 
-    ! Inversion nord-sud de la grille et interpolation sur les niveaux
-    ! verticaux du modèle.
+    ! Inversion nord-sud de la grille et interpolation verticale sur
+    ! les niveaux du modèle.
 
     USE dimens_m, ONLY: iim, jjm, llm
     USE paramet_m, ONLY: iip1, jjp1, llmp1
@@ -20,15 +19,14 @@ contains
     use massdair_m, only: massdair
     use pres2lev_m, only: pres2lev
 
-    integer nlevnc
+    integer, intent(in):: nlevnc
     real, intent(in):: psi(iip1, jjp1)
     real unc(iip1, jjp1, nlevnc), vnc(iip1, jjm, nlevnc)
     real tnc(iip1, jjp1, nlevnc)
     real qnc(iip1, jjp1, nlevnc)
-    real pl(nlevnc)
-    real u(iip1, jjp1, llm), v(iip1, jjm, llm)
-    real t(iip1, jjp1, llm), q(iip1, jjp1, llm)
-    real masse(iip1, jjp1, llm)
+    real, intent(in):: pl(nlevnc)
+    real, intent(out):: u(iip1, jjp1, llm), v(iip1, jjm, llm)
+    real, intent(out):: t(iip1, jjp1, llm), q(iip1, jjp1, llm)
     real pk(iip1, jjp1, llm)
 
     ! Local:
@@ -52,7 +50,6 @@ contains
 
     ! calcul de la pression au milieu des couches
     forall (l = 1: llm + 1) p(:, :, l) = ap(l) + bp(l) * psi
-    call massdair(p, masse)
     CALL exner_hyb(psi, p, pks, pk)
 
     ! Calcul de pls, pression au milieu des couches, en Pascals
