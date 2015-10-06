@@ -8,11 +8,12 @@ contains
 
     ! From LMDZ4/libf/dyn3d/read_reanalyse.F, version 1.3, 2005/04/15 12:31:21
 
-    USE conf_guide_m, ONLY: guide_q, guide_t, guide_u, guide_v, ncep
+    USE conf_guide_m, ONLY: guide_q, guide_t, guide_u, guide_v
     USE dimens_m, ONLY: iim, jjm, llm
+    use nat2gcm_m, only: nat2gcm
     USE netcdf, ONLY: nf90_nowrite
     USE netcdf95, ONLY: nf95_get_var, nf95_inq_dimid, nf95_inq_varid, &
-         nf95_inquire_dimension, nf95_open
+         nf95_inquire_dimension, nf95_open, find_coord
     USE paramet_m, ONLY: iip1, jjp1
     use reanalyse2nat_m, only: reanalyse2nat
 
@@ -22,7 +23,7 @@ contains
     real, intent(out):: t(:, :, :), q(:, :, :) ! (iip1, jjp1, llm)
 
     ! Local:
-    integer, save:: nlevnc
+    integer nlevnc
     integer:: timestep = 0
     real pk(iip1, jjp1, llm)
     integer, save:: ncidu, varidu, ncidv, varidv, ncidt, varidt, ncidQ, varidQ
@@ -31,15 +32,16 @@ contains
     real, allocatable, save:: vnc(:, :, :) ! (iip1, jjm, nlevnc)
     real, allocatable, save:: tnc(:, :, :), Qnc(:, :, :) ! (iip1, jjp1, nlevnc)
     real, allocatable, save:: pl(:) ! (nlevnc)
+    real latitude(jjm + 1)
     logical:: first = .true.
-    character(len = 8) name
+    logical, save:: invert_y
 
     ! -----------------------------------------------------------------
 
     ! Initialisation de la lecture des fichiers
 
     if (first) then
-       print *, 'Intitialisation de read reanalsye'
+       print *, 'Intitialisation de read reanalyse'
 
        ! Vent zonal
        if (guide_u) then
@@ -77,52 +79,56 @@ contains
           ncid = ncidq
        end if
 
-       name = merge('LEVEL   ', 'PRESSURE', ncep)
-       call nf95_inq_dimid(ncid, name, dimid)
+       call find_coord(ncid, dimid = dimid, varid = varid, std_name = "plev")
        call nf95_inquire_dimension(ncid, dimid, nclen = nlevnc)
-       call nf95_inq_varid(ncid, name, varid)
        PRINT *, 'nlevnc = ', nlevnc
        allocate(unc(iip1, jjp1, nlevnc), vnc(iip1, jjm, nlevnc))
        allocate(tnc(iip1, jjp1, nlevnc), Qnc(iip1, jjp1, nlevnc), pl(nlevnc))
        call NF95_GET_VAR(ncid, varid, pl)
        pl = 100. * pl ! passage en pascal
+
+       ! Read latitude values just to know their order:
+       call find_coord(ncid, varid = varid, std_name = "latitude")
+       call nf95_get_var(ncid, varid, latitude)
+       invert_y = latitude(1) < latitude(2)
+
        first = .false.
     endif
 
-    ! lecture des champs u, v, T
+    ! lecture des champs u, v, T, q
 
     timestep = timestep + 1
-    unc = 0.
-    vnc = 0.
-    tnc = 0.
-    Qnc = 0.
 
     ! Vent zonal
     if (guide_u) then
        call NF95_GET_VAR(ncidu, varidu, unc, start = (/1, 1, 1, timestep/))
-       call correctbid(iim, jjp1 * nlevnc, unc)
-    endif
+    else
+       unc = 0.
+    end if
 
     ! Temperature
     if (guide_T) then
        call NF95_GET_VAR(ncidt, varidt, tnc, start = (/1, 1, 1, timestep/))
-       call correctbid(iim, jjp1 * nlevnc, tnc)
-    endif
+    else
+       tnc = 0.
+    end if
 
     ! Humidite
     if (guide_Q) then
        call NF95_GET_VAR(ncidQ, varidQ, Qnc, start = (/1, 1, 1, timestep/))
-       call correctbid(iim, jjp1 * nlevnc, Qnc)
-    endif
+    else
+       Qnc = 0.
+    end if
 
     ! Vent meridien
     if (guide_v) then
        call NF95_GET_VAR(ncidv, varidv, vnc, start = (/1, 1, 1, timestep/))
-       call correctbid(iim, jjm * nlevnc, vnc)
-    endif
+    else
+       vnc = 0.
+    end if
 
-    call reanalyse2nat(nlevnc, psi, unc, vnc, tnc, Qnc, pl, u, v, t, Q, pk)
-    call nat2gcm(u, v, t, Q, pk, u, v, t, Q)
+    call reanalyse2nat(invert_y, psi, unc, vnc, tnc, Qnc, pl, u, v, t, Q, pk)
+    call nat2gcm(pk, u, v, t)
 
   end subroutine read_reanalyse
 

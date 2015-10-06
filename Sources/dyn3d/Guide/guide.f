@@ -13,9 +13,9 @@ CONTAINS
 
     USE comconst, ONLY: cpp, kappa
     USE conf_gcm_m, ONLY: day_step
-    use conf_guide_m, only: guide_u, guide_v, guide_t, guide_q, ncep, &
-         ini_anal, tau_min_u, tau_max_u, tau_min_v, tau_max_v, tau_min_t, &
-         tau_max_t, tau_min_q, tau_max_q, online, factt
+    use conf_guide_m, only: guide_u, guide_v, guide_t, guide_q, ini_anal, &
+         tau_min_u, tau_max_u, tau_min_v, tau_max_v, tau_min_t, tau_max_t, &
+         tau_min_q, tau_max_q, online, factt
     USE dimens_m, ONLY: iim, jjm, llm
     USE disvert_m, ONLY: ap, bp, preff
     use dynetat0_m, only: grossismx, grossismy, rlatu, rlatv

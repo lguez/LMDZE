@@ -72,14 +72,11 @@ contains
     CALL coordij(clon, clat, ilon, ilat)
     ! aire de la maille au centre du zoom
     dxdy_min = dxdys(ilon, ilat)
+    print *, "dxdy_min = ", dxdy_min
 
     ! dxdy maximal de la maille :
-    dxdy_max = 0.
-    DO j = 1, jjp1
-       DO i = 1, iip1
-          dxdy_max = max(dxdy_max, dxdys(i, j))
-       END DO
-    END DO
+    dxdy_max = maxval(dxdys)
+    print *, "dxdy_max = ", dxdy_max
 
     IF (abs(grossismx - 1.) < 0.1 .OR. abs(grossismy - 1.) < 0.1) THEN
        PRINT *, 'Attention : modèle peu zoomé.'

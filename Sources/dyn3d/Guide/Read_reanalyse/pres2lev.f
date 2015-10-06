@@ -4,75 +4,69 @@ module pres2lev_m
 
 contains
 
-  SUBROUTINE pres2lev(varo, varn, lmo, lmn, po, pn, ni, nj)
+  SUBROUTINE pres2lev(varo, varn, po, pn)
 
-    ! From LMDZ4/libf/dyn3d/pres2lev.F, v 1.1.1.1 2004/05/19 12:53:07
+    ! From LMDZ4/libf/dyn3d/pres2lev.F, version 1.1.1.1 2004/05/19 12:53:07
 
-    ! interpolation lineaire pour passer
-    ! a une nouvelle discretisation verticale pour
-    ! les variables de GCM
-    ! Francois Forget (01/1995)
+    ! Interpolation lin\'eaire pour passer \`a une nouvelle
+    ! discr\'etisation verticale pour les variables de GCM.
 
-    ! MOdif remy roca 12/97 pour passer de pres2sig
+    ! Francois Forget (January 1995)
 
-    ! Declarations:
+    REAL, intent(in):: varo(:, :, :) ! (ni, nj, lmo) var in the old grid
+    REAL, intent(out):: varn(:, :, :) ! (ni, nj, lmn)! var in the new grid
 
-    ! ARGUMENTS
-    ! """""""""
+    REAL, intent(in):: po(:) ! (lmo) 
+    ! pressure levels, old  (in monotonic order), in hPa
 
-    INTEGER, intent(in):: lmo ! dimensions ancienne couches (input)
-    INTEGER lmn ! dimensions nouvelle couches (input)
-    INTEGER lmomx ! dimensions ancienne couches (input)
-    INTEGER lmnmx ! dimensions nouvelle couches (input)
+    REAL, intent(in):: pn(:, :, :) ! (ni, nj, lmn) pressure levels, new, in Pa
 
-    PARAMETER (lmomx=10000, lmnmx=10000)
-
-    REAL, intent(in):: po(lmo) ! niveau de pression en millibars
+    ! Local:
+    INTEGER lmn ! dimensions nouvelle couches
     INTEGER ni, nj
-    REAL pn(ni, nj, lmn) ! niveau de pression en pascals
-
-    INTEGER i, j ! nombre de point horizontale (input)
-
-    REAL varo(ni, nj, lmo) ! var dans l'ancienne grille (input)
-    REAL varn(ni, nj, lmn) ! var dans la nouvelle grille (output)
-
-    REAL zvaro(lmomx), zpo(lmomx)
-
-    ! Autres variables
-    ! """"""""""""""""
+    INTEGER lmo ! dimensions ancienne couches
+    INTEGER i, j
+    REAL zvaro(size(po))
+    real zpo(size(po)) ! pressure levels, old, in descending order, in hPa
     INTEGER ln, lo
-    REAL coef
 
-    ! run
+    !--------------------------------------------------------------
+
+    lmo = size(po)
+    ni = size(varn, 1)
+    nj = size(varn, 2)
+    lmn = size(varn, 3)
 
     DO i = 1, ni
        DO j = 1, nj
-          ! a chaque point de grille correspond un nouveau sigma old
-          ! qui vaut pres(l)/ps(i, j)
-          DO lo = 1, lmo
-             zpo(lo) = po(lmo+1-lo)
-             zvaro(lo) = varo(i, j, lmo+1-lo)
-          END DO
+          if (po(1) < po(2)) then
+             ! Inversion de l'ordre des niveaux verticaux :
+             zpo = po(lmo:1:- 1)
+             zvaro = varo(i, j, lmo:1:- 1)
+          else
+             zpo = po
+             zvaro = varo(i, j, :)
+          end if
 
           DO ln = 1, lmn
-             IF (pn(i, j, ln)>=zpo(1)) THEN
+             IF (pn(i, j, ln) >= zpo(1)) THEN
                 varn(i, j, ln) = zvaro(1)
-             ELSE IF (pn(i, j, ln)<=zpo(lmo)) THEN
+             ELSE IF (pn(i, j, ln) <= zpo(lmo)) THEN
                 varn(i, j, ln) = zvaro(lmo)
              ELSE
                 DO lo = 1, lmo - 1
-                   IF ((pn(i, j, ln)<=zpo(lo)) .AND. (pn(i, j, ln)>zpo(lo+1))) THEN
-                      coef = (pn(i, j, ln)-zpo(lo))/(zpo(lo+1)-zpo(lo))
-                      varn(i, j, ln) = zvaro(lo) + coef*(zvaro(lo+1)-zvaro(lo))
-                      ! print*, 'pn(', ln, ')=', pn(i, j, ln), varn(i, j, ln)
+                   IF ((pn(i, j, ln) <= zpo(lo)) &
+                        .AND. (pn(i, j, ln) > zpo(lo + 1))) THEN
+                      varn(i, j, ln) = zvaro(lo) + (pn(i, j, ln) - zpo(lo)) &
+                           / (zpo(lo + 1) - zpo(lo)) * (zvaro(lo + 1) &
+                           - zvaro(lo))
                    END IF
                 END DO
              END IF
           END DO
-
        END DO
     END DO
-    RETURN
+
   END SUBROUTINE pres2lev
 
 end module pres2lev_m

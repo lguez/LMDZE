@@ -4,30 +4,35 @@ module reanalyse2nat_m
 
 contains
 
-  subroutine reanalyse2nat(nlevnc, psi, unc, vnc, tnc, qnc, pl, u, v, t, q, pk)
+  subroutine reanalyse2nat(invert_y, psi, unc, vnc, tnc, qnc, pl, u, v, t, q, &
+       pk)
 
     ! Inversion nord-sud de la grille et interpolation verticale sur
     ! les niveaux du modèle.
 
-    USE dimens_m, ONLY: iim, jjm, llm
-    USE paramet_m, ONLY: iip1, jjp1, llmp1
     USE comconst, ONLY: cpp, kappa
-    USE disvert_m, ONLY: ap, bp, preff
     USE comgeom, ONLY: aireu_2d, airev_2d, aire_2d
+    USE dimens_m, ONLY: iim, jjm, llm
+    USE disvert_m, ONLY: ap, bp, preff
     USE exner_hyb_m, ONLY: exner_hyb
     use massbar_m, only: massbar
     use massdair_m, only: massdair
+    USE paramet_m, ONLY: iip1, jjp1, llmp1
     use pres2lev_m, only: pres2lev
 
-    integer, intent(in):: nlevnc
-    real, intent(in):: psi(iip1, jjp1)
-    real unc(iip1, jjp1, nlevnc), vnc(iip1, jjm, nlevnc)
-    real tnc(iip1, jjp1, nlevnc)
-    real qnc(iip1, jjp1, nlevnc)
-    real, intent(in):: pl(nlevnc)
-    real, intent(out):: u(iip1, jjp1, llm), v(iip1, jjm, llm)
-    real, intent(out):: t(iip1, jjp1, llm), q(iip1, jjp1, llm)
-    real pk(iip1, jjp1, llm)
+    logical, intent(in):: invert_y
+    real, intent(in):: psi(:, :) ! (iip1, jjp1)
+
+    real, intent(in):: unc(:, :, :) ! (iip1, jjp1, :)
+    real, intent(in):: vnc(:, :, :) ! (iip1, jjm, :)
+    real, intent(in):: tnc(:, :, :) ! (iip1, jjp1, :)
+    real, intent(in):: qnc(:, :, :) ! (iip1, jjp1, :)
+    real, intent(in):: pl(:)
+
+    real, intent(out):: u(:, :, :) ! (iip1, jjp1, llm)
+    real, intent(out):: v(:, :, :) ! (iip1, jjm, llm)
+    real, intent(out):: t(:, :, :), q(:, :, :) ! (iip1, jjp1, llm)
+    real, intent(out):: pk(:, :, :) ! (iip1, jjp1, llm)
 
     ! Local:
 
@@ -89,33 +94,23 @@ contains
        enddo
     enddo
 
-    call pres2lev(unc, zu, nlevnc, llm, pl, plunc, iip1, jjp1)
-    call pres2lev(vnc, zv, nlevnc, llm, pl, plvnc, iip1, jjm )
-    call pres2lev(tnc, zt, nlevnc, llm, pl, plsnc, iip1, jjp1)
-    call pres2lev(qnc, zq, nlevnc, llm, pl, plsnc, iip1, jjp1)
+    call pres2lev(unc, zu, pl, plunc)
+    call pres2lev(vnc, zv, pl, plvnc )
+    call pres2lev(tnc, zt, pl, plsnc)
+    call pres2lev(qnc, zq, pl, plsnc)
 
-    ! Inversion Nord/Sud
-    do l=1, llm
-       do j=1, jjp1
-          do i=1, iim
-             u(i, j, l)=zu(i, jjp1+1-j, l)
-             t(i, j, l)=zt(i, jjp1+1-j, l)
-             q(i, j, l)=zq(i, jjp1+1-j, l)
-          enddo
-          u(iip1, j, l)=u(1, j, l)
-          t(iip1, j, l)=t(1, j, l)
-          q(iip1, j, l)=q(1, j, l)
-       enddo
-    enddo
-
-    do l=1, llm
-       do j=1, jjm
-          do i=1, iim
-             v(i, j, l)=zv(i, jjm+1-j, l)
-          enddo
-          v(iip1, j, l)=v(1, j, l)
-       enddo
-    enddo
+    if (invert_y) then
+       ! Inversion Nord/Sud
+       u=zu(:, jjp1:1:-1, :)
+       v=zv(:, jjm:1:-1, :)
+       t=zt(:, jjp1:1:-1, :)
+       q=zq(:, jjp1:1:-1, :)
+    else
+       u = zu
+       v = zv
+       t = zt
+       q = zq
+    end if
 
   end subroutine reanalyse2nat
 

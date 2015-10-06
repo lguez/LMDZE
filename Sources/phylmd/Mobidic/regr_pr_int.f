@@ -19,11 +19,10 @@ contains
     ! that the input data is already on the LMDZ "rlatu" latitude
     ! grid.
 
-    ! The target vertical LMDZ grid is the grid of mid-layers.
-    ! The input data does not depend on longitude, but the pressure
-    ! at LMDZ mid-layers does.
-    ! Therefore, the values on the LMDZ grid do depend on longitude.
-    ! Regridding is by linear interpolation.
+    ! The target vertical LMDZ grid is the grid of mid-layers. The
+    ! input data does not depend on longitude, but the pressure at
+    ! LMDZ mid-layers does. Therefore, the values on the LMDZ grid do
+    ! depend on longitude. Regridding is by linear interpolation.
 
     use dimens_m, only: iim, jjm, llm
     use dimphy, only: klon

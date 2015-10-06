@@ -208,7 +208,7 @@ massdair.o : dimens_m.o comgeom.o
 mathop.o : mathop2.o errioipsl.o 
 minmaxqfi.o : dimphy.o dimens_m.o 
 moycum.o : errioipsl.o 
-nat2gcm.o : guide.o q_sat.o comgeom.o disvert.o comconst.o paramet_m.o dimens_m.o 
+nat2gcm.o : paramet_m.o disvert.o dimens_m.o comgeom.o comconst.o 
 newmicro.o : suphec.o dimphy.o conf_phys.o 
 nflxtr.o : suphec.o dimphy.o 
 nuage.o : suphec.o dimphy.o dimens_m.o 
@@ -236,11 +236,11 @@ qminimum.o : paramet_m.o dimens_m.o
 raddim.o : dimphy.o dimens_m.o 
 radiornpb.o : dimphy.o dimens_m.o 
 radlwsw.o : yoethf.o sw.o suphec.o raddim.o lw.o dimphy.o clesphys.o 
-read_reanalyse.o : reanalyse2nat.o paramet_m.o dimens_m.o conf_guide.o 
+read_reanalyse.o : reanalyse2nat.o paramet_m.o nat2gcm.o dimens_m.o conf_guide.o 
 read_serre.o : unit_nml_m.o dynetat0.o 
 readsulfate.o : getso4fromfile.o dynetat0.o dimphy.o dimens_m.o 
 readsulfate_preind.o : getso4fromfile.o chem.o suphec.o dynetat0.o dimphy.o dimens_m.o 
-reanalyse2nat.o : pres2lev.o massdair.o massbar.o exner_hyb.o comgeom.o disvert.o comconst.o paramet_m.o dimens_m.o 
+reanalyse2nat.o : pres2lev.o paramet_m.o massdair.o massbar.o exner_hyb.o disvert.o dimens_m.o comgeom.o comconst.o 
 regr_lat_time_coefoz.o : dynetat0.o dimens_m.o 
 regr_pr_av.o : press_coefoz.o grid_change.o dimphy.o dimens_m.o 
 regr_pr_comb_coefoz.o : regr_pr_int.o regr_pr_av.o phyetat0.o dimphy.o dimens_m.o 

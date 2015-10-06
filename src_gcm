@@ -59,7 +59,6 @@ conf_phys.f
 convflu.f
 convmas.f
 coordij.f
-correctbid.f
 cosa.f
 cosc.f
 covcont.f

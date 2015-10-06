@@ -14,7 +14,6 @@ module conf_guide_m
   REAL:: tau_min_p = 0.03
   REAL:: tau_max_p = 10.
 
-  LOGICAL:: ncep = .false. ! Coordonnee vert NCEP ou ECMWF
   LOGICAL:: ini_anal = .false. ! Initial = analyse
   LOGICAL:: guide_u = .false. ! guidage de u
   LOGICAL:: guide_v = .false. ! gvidage de v
@@ -50,9 +49,9 @@ contains
     REAL:: lat_min_guide_deg = -90. ! in degrees
     real:: lat_max_guide_deg = 90. ! in degrees
 
-    namelist /conf_guide_nml/ ncep, ini_anal, guide_u, guide_v, guide_t, &
-         guide_q, online, tau_min_u, tau_max_u, tau_min_v, tau_max_v, &
-         tau_min_t, tau_max_t, tau_min_q, tau_max_q, tau_min_p, tau_max_p, &
+    namelist /conf_guide_nml/ ini_anal, guide_u, guide_v, guide_t, guide_q, &
+         online, tau_min_u, tau_max_u, tau_min_v, tau_max_v, tau_min_t, &
+         tau_max_t, tau_min_q, tau_max_q, tau_min_p, tau_max_p, &
          lat_min_guide_deg, lat_max_guide_deg
 
     !-----------------------------------------------------------------------
