@@ -6,45 +6,21 @@ module albsno_m
 
 contains
 
-  SUBROUTINE albsno(klon, knon, dtime, agesno, alb_neig_grid, precip_snow)
+  SUBROUTINE albsno(dtime, agesno, alb_neig, precip_snow)
 
-    INTEGER klon, knon
-    REAL dtime
-    REAL, DIMENSION(klon):: alb_neig_grid, agesno, precip_snow
-
-    ! Local:
-
-    INTEGER, PARAMETER :: nvm = 8
-    REAL veget(klon, nvm)
-
-    INTEGER i, nv
-
-    REAL init(nvm), decay(nvm)
-    REAL as
-    DATA init /0.55, 0.14, 0.18, 0.29, 0.15, 0.15, 0.14, 0./
-    DATA decay /0.30, 0.67, 0.63, 0.45, 0.40, 0.14, 0.06, 1./
+    REAL, intent(in):: dtime
+    REAL, intent(inout):: agesno(:) ! (knon)
+    real, intent(out):: alb_neig(:) ! (knon)
+    real, intent(in):: precip_snow(:) !(knon)
 
     !------------------------------------------------------------------------
 
-    veget = 0.
-    veget(:, 1) = 1. ! desert partout
-    DO i = 1, knon
-       alb_neig_grid(i) = 0.0
-    ENDDO
-    DO nv = 1, nvm
-       DO i = 1, knon
-          as = init(nv)+decay(nv)*EXP(-agesno(i)/5.)
-          alb_neig_grid(i) = alb_neig_grid(i) + veget(i, nv)*as
-       ENDDO
-    ENDDO
+    ! D\'esert partout:
+    alb_neig = 0.55 + 0.3 * EXP(- agesno / 5.)
 
-    !! modilation en fonction de l'age de la neige
-
-    DO i = 1, knon
-       agesno(i) = (agesno(i) + (1.-agesno(i)/50.)*dtime/86400.)&
-            & * EXP(-1.*MAX(0.0, precip_snow(i))*dtime/0.3)
-       agesno(i) = MAX(agesno(i), 0.0)
-    ENDDO
+    ! Modulation en fonction de l'\^age de la neige :
+    agesno = max((agesno + (1. - agesno / 50.) * dtime / 86400.) &
+         * EXP(- MAX(0., precip_snow) * dtime / 0.3), 0.)
 
   END SUBROUTINE albsno
 

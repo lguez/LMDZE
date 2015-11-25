@@ -170,7 +170,7 @@ contains
     INTEGER kmax, lmax
     PARAMETER(kmax = 8, lmax = 8)
     INTEGER kmaxm1, lmaxm1
-    PARAMETER(kmaxm1 = kmax-1, lmaxm1 = lmax-1)
+    PARAMETER(kmaxm1 = kmax - 1, lmaxm1 = lmax - 1)
 
     ! Variables propres a la physique
 
@@ -713,7 +713,7 @@ contains
     IF (cycle_diurne) THEN
        CALL zenang(longi, time, dtphys * radpas, mu0, fract)
     ELSE
-       mu0 = -999.999
+       mu0 = - 999.999
     ENDIF
 
     ! Calcul de l'abedo moyen par maille
@@ -875,10 +875,10 @@ contains
        conv_q = d_q_dyn + d_q_vdf / dtphys
        conv_t = d_t_dyn + d_t_vdf / dtphys
        z_avant = sum((q_seri + ql_seri) * zmasse, dim=2)
-       CALL conflx(dtphys, paprs, play, t_seri(:, llm:1:-1), &
-            q_seri(:, llm:1:-1), conv_t, conv_q, zxfluxq(:, 1), omega, &
-            d_t_con, d_q_con, rain_con, snow_con, mfu(:, llm:1:-1), &
-            mfd(:, llm:1:-1), pen_u, pde_u, pen_d, pde_d, kcbot, kctop, &
+       CALL conflx(dtphys, paprs, play, t_seri(:, llm:1:- 1), &
+            q_seri(:, llm:1:- 1), conv_t, conv_q, zxfluxq(:, 1), omega, &
+            d_t_con, d_q_con, rain_con, snow_con, mfu(:, llm:1:- 1), &
+            mfd(:, llm:1:- 1), pen_u, pde_u, pen_d, pde_d, kcbot, kctop, &
             kdtop, pmflxr, pmflxs)
        WHERE (rain_con < 0.) rain_con = 0.
        WHERE (snow_con < 0.) snow_con = 0.
@@ -1066,17 +1066,17 @@ contains
 
     ! 1. NUAGES CONVECTIFS
 
-    IF (iflag_cldcon <= -1) THEN
+    IF (iflag_cldcon <= - 1) THEN
        ! seulement pour Tiedtke
        snow_tiedtke = 0.
-       if (iflag_cldcon == -1) then
+       if (iflag_cldcon == - 1) then
           rain_tiedtke = rain_con
        else
           rain_tiedtke = 0.
           do k = 1, llm
              do i = 1, klon
                 if (d_q_con(i, k) < 0.) then
-                   rain_tiedtke(i) = rain_tiedtke(i)-d_q_con(i, k)/dtphys &
+                   rain_tiedtke(i) = rain_tiedtke(i) - d_q_con(i, k)/dtphys &
                         *zmasse(i, k)
                 endif
              enddo
@@ -1146,7 +1146,7 @@ contains
           IF (thermcep) THEN
              zx_qs = r2es * FOEEW(zx_t, rtt >= zx_t)/play(i, k)
              zx_qs = MIN(0.5, zx_qs)
-             zcor = 1./(1.-retv*zx_qs)
+             zcor = 1./(1. - retv*zx_qs)
              zx_qs = zx_qs*zcor
           ELSE
              IF (zx_t < t_coup) THEN
@@ -1204,7 +1204,7 @@ contains
 
     DO k = 1, llm
        DO i = 1, klon
-          t_seri(i, k) = t_seri(i, k) + (heat(i, k)-cool(i, k)) * dtphys/86400.
+          t_seri(i, k) = t_seri(i, k) + (heat(i, k) - cool(i, k)) * dtphys/86400.
        ENDDO
     ENDDO
 
@@ -1237,11 +1237,11 @@ contains
     ! Param\'etrisation de l'orographie \`a l'\'echelle sous-maille :
 
     IF (ok_orodr) THEN
-       ! selection des points pour lesquels le shema est actif:
+       ! S\'election des points pour lesquels le sch\'ema est actif :
        igwd = 0
        DO i = 1, klon
           itest(i) = 0
-          IF (((zpic(i)-zmea(i)) > 100.).AND.(zstd(i) > 10.)) THEN
+          IF (zpic(i) - zmea(i) > 100. .AND. zstd(i) > 10.) THEN
              itest(i) = 1
              igwd = igwd + 1
              idx(igwd) = i
@@ -1267,7 +1267,7 @@ contains
        igwd = 0
        DO i = 1, klon
           itest(i) = 0
-          IF ((zpic(i) - zmea(i)) > 100.) THEN
+          IF (zpic(i) - zmea(i) > 100.) THEN
              itest(i) = 1
              igwd = igwd + 1
              idx(igwd) = i
@@ -1379,7 +1379,7 @@ contains
     DO iq = 3, nqmx
        DO k = 1, llm
           DO i = 1, klon
-             d_qx(i, k, iq) = (tr_seri(i, k, iq-2) - qx(i, k, iq)) / dtphys
+             d_qx(i, k, iq) = (tr_seri(i, k, iq - 2) - qx(i, k, iq)) / dtphys
           ENDDO
        ENDDO
     ENDDO
@@ -1499,7 +1499,7 @@ contains
          CALL gr_fi_ecrit(1, klon, iim, jjm + 1, bils, zx_tmp_2d)
          CALL histwrite(nid_ins, "bils", itau_w, zx_tmp_2d)
 
-         zx_tmp_fi2d(1:klon) = -1*sens(1:klon)
+         zx_tmp_fi2d(1:klon) = - sens(1:klon)
          ! CALL gr_fi_ecrit(1, klon, iim, jjm + 1, sens, zx_tmp_2d)
          CALL gr_fi_ecrit(1, klon, iim, jjm + 1, zx_tmp_fi2d, zx_tmp_2d)
          CALL histwrite(nid_ins, "sens", itau_w, zx_tmp_2d)

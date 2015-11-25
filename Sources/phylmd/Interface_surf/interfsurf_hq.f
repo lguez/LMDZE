@@ -134,8 +134,8 @@ contains
     real, parameter:: calice=1.0/(5.1444e6 * 0.15), tau_gl=86400. * 5.
     real, parameter:: calsno=1./(2.3867e6 * 0.15)
     real tsurf_temp(knon)
-    real alb_neig(klon)
-    real zfra(klon)
+    real alb_neig(knon)
+    real zfra(knon)
 
     !-------------------------------------------------------------
 
@@ -171,7 +171,6 @@ contains
     dif_grnd = 999999.
     capsol = 999999.
     z0_new = 999999.
-    alb_neig = 999999.
     tsurf_new = 999999.
 
     !IM: "slab" ocean; initialisations
@@ -195,11 +194,12 @@ contains
 
        ! Calcul age de la neige
 
-       ! calcul albedo: lecture albedo fichier boundary conditions
-       ! puis ajout albedo neige
+       ! Read albedo from the file containing boundary conditions then
+       ! add the albedo of snow:
+
        call interfsur_lim(itime, dtime, jour, knindex, debut, albedo, z0_new)
 
-       ! calcul snow et qsurf, hydrol adapt\'e
+       ! Calcul snow et qsurf, hydrologie adapt\'ee
        CALL calbeta(nisurf, snow(:knon), qsol(:knon), beta(:knon), &
             capsol(:knon), dif_grnd(:knon))
 
@@ -225,11 +225,10 @@ contains
             peqAcoef(:knon), petBcoef(:knon), peqBcoef(:knon), tsurf_new, &
             evap(:knon), fqcalving(:knon), ffonte(:knon), run_off_lic_0(:knon))
 
-       call albsno(klon, knon, dtime, agesno, alb_neig, precip_snow)
-       where (snow(1 : knon) < 0.0001) agesno(1 : knon) = 0.
-       zfra(:knon) = max(0.0, min(1.0, snow(1:knon)/(snow(1:knon) + 10.0)))
-       albedo = alb_neig(:knon) * zfra(:knon) &
-            + albedo * (1. - zfra(:knon))
+       call albsno(dtime, agesno(:knon), alb_neig, precip_snow(:knon))
+       where (snow(:knon) < 0.0001) agesno(:knon) = 0.
+       zfra = max(0.0, min(1.0, snow(:knon)/(snow(:knon) + 10.0)))
+       albedo = alb_neig * zfra + albedo * (1. - zfra)
        z0_new = sqrt(z0_new**2 + rugoro**2)
 
        ! Remplissage des pourcentages de surface
@@ -243,7 +242,6 @@ contains
        cal = 0.
        beta = 1.
        dif_grnd = 0.
-       alb_neig = 0.
        agesno = 0.
        call calcul_fluxs(dtime, tsurf_temp, p1lay(:knon), &
             cal(:knon), beta(:knon), tq_cdrag(:knon), ps(:knon), &
@@ -258,7 +256,7 @@ contains
        flux_o(:knon) = fluxsens(:knon) - evap(:knon) &
             * merge(RLSTT, RLVTT, tsurf_new < RTT)
 
-       ! calcul albedo
+       ! Compute the albedo:
        if (cycle_diurne) then
           CALL alboc_cd(rmu0(knindex), albedo)
        else
@@ -320,12 +318,12 @@ contains
             peqAcoef(:knon), petBcoef(:knon), peqBcoef(:knon), tsurf_new, &
             evap(:knon), fqcalving(:knon), ffonte(:knon), run_off_lic_0(:knon))
 
-       ! calcul albedo
+       ! Compute the albedo:
 
-       CALL albsno(klon, knon, dtime, agesno, alb_neig, precip_snow)
-       WHERE (snow(1 : knon) < 0.0001) agesno(1 : knon) = 0.
-       zfra(:knon) = MAX(0.0, MIN(1.0, snow(1:knon)/(snow(1:knon) + 10.0)))
-       albedo = alb_neig(:knon) * zfra(:knon) + 0.6 * (1.0 - zfra(:knon))
+       CALL albsno(dtime, agesno(:knon), alb_neig, precip_snow(:knon))
+       WHERE (snow(:knon) < 0.0001) agesno(:knon) = 0.
+       zfra = MAX(0.0, MIN(1.0, snow(:knon)/(snow(:knon) + 10.0)))
+       albedo = alb_neig * zfra + 0.6 * (1.0 - zfra)
 
        fder = fder + dflux_s + dflux_l
 
@@ -367,9 +365,8 @@ contains
             evap(:knon), fqcalving(:knon), ffonte(:knon), run_off_lic_0(:knon))
 
        ! calcul albedo
-       CALL albsno(klon, knon, dtime, agesno, alb_neig, precip_snow)
-       WHERE (snow(1 : knon) < 0.0001) agesno(1 : knon) = 0.
-       zfra(:knon) = MAX(0.0, MIN(1.0, snow(1:knon)/(snow(1:knon) + 10.0)))
+       CALL albsno(dtime, agesno(:knon), alb_neig, precip_snow(:knon))
+       WHERE (snow(:knon) < 0.0001) agesno(:knon) = 0.
        albedo = 0.77
 
        ! Rugosite

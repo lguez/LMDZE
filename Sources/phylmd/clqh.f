@@ -70,7 +70,7 @@ contains
     real swnet(klon)
     real fluxlat(klon)
     real pctsrf_new(klon, nbsrf)
-    REAL agesno(klon)
+    REAL, intent(inout):: agesno(klon)
     REAL d_t(klon, klev) ! incrementation de "t"
     REAL d_q(klon, klev) ! incrementation de "q"
     REAL, intent(out):: d_ts(:) ! (knon) incrementation de "ts"
