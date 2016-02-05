@@ -7,6 +7,7 @@ contains
   SUBROUTINE interfoce_lim(itime, dtime, jour, knindex, debut, lmt_sst, &
        pctsrf_new)
 
+    ! lecture conditions limites
     ! Cette routine sert d'interface entre le modèle atmosphérique et
     ! un fichier de conditions aux limites.
 

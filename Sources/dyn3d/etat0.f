@@ -54,7 +54,6 @@ contains
     USE start_init_orog_m, only: start_init_orog, mask
     use start_init_phys_m, only: start_init_phys
     use start_inter_3d_m, only: start_inter_3d
-    use temps, only: itau_phy
     use test_disvert_m, only: test_disvert
     use unit_nml_m, only: unit_nml
 
@@ -336,18 +335,17 @@ contains
     sig1 = 0.
     w01 = 0.
 
-    itau_phy = 0
     nday = 0
-    call phyredem0(lmt_pas = day_step / iphysiq)
+    call phyredem0(lmt_pas = day_step / iphysiq, itau_phy = 0)
 
     call nf95_inq_varid(ncid_restartphy, "trs", varid)
     call nf95_put_var(ncid_restartphy, varid, null_array)
 
-    call phyredem(pctsrf, tsoil(:, 1, :), tsoil, tsoil(:, 1, is_oce), &
-         null_array, qsolsrf, pack(qsol_2d, dyn_phy), snsrf, albe, evap, &
-         null_array, null_array, solsw, sollw, null_array, null_array, frugs, &
-         agesno, zmea, zstd, zsig, zgam, zthe, zpic, zval, t_ancien, &
-         q_ancien, rnebcon, ratqs, clwcon, null_array, sig1, w01)
+    call phyredem(pctsrf, tsoil(:, 1, :), tsoil, qsolsrf, &
+         pack(qsol_2d, dyn_phy), snsrf, albe, evap, null_array, null_array, &
+         solsw, sollw, null_array, null_array, frugs, agesno, zmea, zstd, &
+         zsig, zgam, zthe, zpic, zval, t_ancien, q_ancien, rnebcon, ratqs, &
+         clwcon, null_array, sig1, w01)
 
   END SUBROUTINE etat0
 

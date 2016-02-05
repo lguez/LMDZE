@@ -12,11 +12,11 @@ module phyetat0_m
 
 contains
 
-  SUBROUTINE phyetat0(pctsrf, tsol, tsoil, tslab, seaice, qsurf, qsol, &
-       snow, albe, evap, rain_fall, snow_fall, solsw, sollw, fder, &
-       radsol, frugs, agesno, zmea, zstd, zsig, zgam, zthe, zpic, zval, &
-       t_ancien, q_ancien, ancien_ok, rnebcon, ratqs, clwcon, run_off_lic_0, &
-       sig1, w01, ncid_startphy)
+  SUBROUTINE phyetat0(pctsrf, tsol, tsoil, qsurf, qsol, snow, albe, evap, &
+       rain_fall, snow_fall, solsw, sollw, fder, radsol, frugs, agesno, zmea, &
+       zstd, zsig, zgam, zthe, zpic, zval, t_ancien, q_ancien, ancien_ok, &
+       rnebcon, ratqs, clwcon, run_off_lic_0, sig1, w01, ncid_startphy, &
+       itau_phy)
 
     ! From phylmd/phyetat0.F, version 1.4 2005/06/03 10:03:07
     ! Author: Z.X. Li (LMD/CNRS)
@@ -26,46 +26,43 @@ contains
     use dimphy, only: zmasq, klev
     USE dimsoil, ONLY : nsoilmx
     USE indicesol, ONLY : epsfra, is_lic, is_oce, is_sic, is_ter, nbsrf
-    use netcdf, only: nf90_global, nf90_inq_varid, NF90_NOERR, &
-         NF90_NOWRITE
+    use netcdf, only: nf90_global, nf90_inq_varid, NF90_NOERR, NF90_NOWRITE
     use netcdf95, only: nf95_close, nf95_get_att, nf95_get_var, &
          nf95_inq_varid, nf95_inquire_variable, NF95_OPEN
-    USE temps, ONLY : itau_phy
 
-    REAL pctsrf(klon, nbsrf)
-    REAL tsol(klon, nbsrf)
-    REAL tsoil(klon, nsoilmx, nbsrf)
-    REAL tslab(klon), seaice(klon)
-    REAL qsurf(klon, nbsrf)
+    REAL, intent(out):: pctsrf(klon, nbsrf)
+    REAL, intent(out):: tsol(klon, nbsrf)
+    REAL, intent(out):: tsoil(klon, nsoilmx, nbsrf)
+    REAL, intent(out):: qsurf(klon, nbsrf)
     REAL, intent(out):: qsol(:) ! (klon)
-    REAL snow(klon, nbsrf)
-    REAL albe(klon, nbsrf)
-    REAL evap(klon, nbsrf)
+    REAL, intent(out):: snow(klon, nbsrf)
+    REAL, intent(out):: albe(klon, nbsrf)
+    REAL, intent(out):: evap(klon, nbsrf)
     REAL, intent(out):: rain_fall(klon)
-    REAL snow_fall(klon)
-    real solsw(klon)
+    REAL, intent(out):: snow_fall(klon)
+    real, intent(out):: solsw(klon)
     REAL, intent(out):: sollw(klon)
-    real fder(klon)
-    REAL radsol(klon)
-    REAL frugs(klon, nbsrf)
-    REAL agesno(klon, nbsrf)
+    real, intent(out):: fder(klon)
+    REAL, intent(out):: radsol(klon)
+    REAL, intent(out):: frugs(klon, nbsrf)
+    REAL, intent(out):: agesno(klon, nbsrf)
     REAL, intent(out):: zmea(klon)
     REAL, intent(out):: zstd(klon)
     REAL, intent(out):: zsig(klon)
-    REAL zgam(klon)
-    REAL zthe(klon)
-    REAL zpic(klon)
-    REAL zval(klon)
-    REAL t_ancien(klon, klev), q_ancien(klon, klev)
+    REAL, intent(out):: zgam(klon)
+    REAL, intent(out):: zthe(klon)
+    REAL, intent(out):: zpic(klon)
+    REAL, intent(out):: zval(klon)
+    REAL, intent(out):: t_ancien(klon, klev), q_ancien(klon, klev)
     LOGICAL, intent(out):: ancien_ok
-    real rnebcon(klon, klev), ratqs(klon, klev), clwcon(klon, klev)
-    REAL run_off_lic_0(klon)
+    real, intent(out):: rnebcon(klon, klev), ratqs(klon, klev)
+    REAL, intent(out):: clwcon(klon, klev), run_off_lic_0(klon)
     real, intent(out):: sig1(klon, klev) ! section adiabatic updraft
 
     real, intent(out):: w01(klon, klev) 
     ! vertical velocity within adiabatic updraft
 
-    integer, intent(out):: ncid_startphy
+    integer, intent(out):: ncid_startphy, itau_phy
 
     ! Local:
     REAL fractint(klon)
@@ -172,11 +169,6 @@ contains
 
     call NF95_INQ_VARID(ncid_startphy, 'Tsoil', varid)
     call NF95_GET_VAR(ncid_startphy, varid, tsoil)
-
-    !IM "slab" ocean 
-    ! Lecture de tslab (pour slab ocean seulement): 
-    tslab = 0.
-    seaice = 0.
 
     ! Lecture de l'humidite de l'air juste au dessus du sol:
 

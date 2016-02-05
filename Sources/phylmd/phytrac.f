@@ -10,7 +10,7 @@ contains
   SUBROUTINE phytrac(itap, lmt_pas, julien, gmtime, firstcal, lafin, pdtphys, &
        t_seri, paprs, pplay, pmfu, pmfd, pde_u, pen_d, coefh, fm_therm, &
        entr_therm, yu1, yv1, ftsol, pctsrf, frac_impa, frac_nucl, da, phi, &
-       mp, upwd, dnwd, tr_seri, zmasse, ncid_startphy, nid_ins)
+       mp, upwd, dnwd, tr_seri, zmasse, ncid_startphy, nid_ins, itau_phy)
 
     ! From phylmd/phytrac.F, version 1.15 2006/02/21 08:08:30 (SVN revision 679)
 
@@ -102,7 +102,7 @@ contains
     real, intent(in):: zmasse(:, :) ! (klon, llm)
     ! (column-density of mass of air in a cell, in kg m-2)
 
-    integer, intent(in):: ncid_startphy, nid_ins
+    integer, intent(in):: ncid_startphy, nid_ins, itau_phy
 
     ! Local:
 
@@ -413,7 +413,6 @@ contains
       use dimens_m, only: iim, jjm, llm
       use histsync_m, only: histsync
       use histwrite_m, only: histwrite
-      use temps, only: itau_phy
       use iniadvtrac_m, only: tname
       use dimphy, only: klon
       use grid_change, only: gr_phy_write_2d

@@ -7,9 +7,9 @@ contains
   SUBROUTINE clqh(dtime, itime, jour, debut, rlat, knon, nisurf, knindex, &
        pctsrf, tsoil, qsol, rmu0, co2_ppm, rugos, rugoro, u1lay, v1lay, coef, &
        t, q, ts, paprs, pplay, delp, radsol, albedo, snow, qsurf, &
-       precip_rain, precip_snow, fder, swnet, fluxlat, pctsrf_new, agesno, &
-       d_t, d_q, d_ts, z0_new, flux_t, flux_q, dflux_s, dflux_l, fqcalving, &
-       ffonte, run_off_lic_0, flux_o, flux_g)
+       precip_rain, precip_snow, fder, fluxlat, pctsrf_new, agesno, d_t, d_q, &
+       d_ts, z0_new, flux_t, flux_q, dflux_s, dflux_l, fqcalving, ffonte, &
+       run_off_lic_0)
 
     ! Author: Z. X. Li (LMD/CNRS)
     ! Date: 1993/08/18
@@ -29,7 +29,7 @@ contains
     logical, intent(in):: debut
     real, intent(in):: rlat(klon)
     INTEGER, intent(in):: knon
-    integer nisurf
+    integer, intent(in):: nisurf
     integer, intent(in):: knindex(:) ! (knon)
     real, intent(in):: pctsrf(klon, nbsrf)
     REAL tsoil(klon, nsoilmx)
@@ -67,10 +67,9 @@ contains
     ! solid water mass flux (kg / m2 / s), positive down
 
     real, intent(inout):: fder(klon)
-    real swnet(klon)
     real fluxlat(klon)
     real pctsrf_new(klon, nbsrf)
-    REAL, intent(inout):: agesno(klon)
+    REAL, intent(inout):: agesno(:) ! (knon)
     REAL d_t(klon, klev) ! incrementation de "t"
     REAL d_q(klon, klev) ! incrementation de "q"
     REAL, intent(out):: d_ts(:) ! (knon) incrementation de "ts"
@@ -90,13 +89,6 @@ contains
     REAL ffonte(klon)
 
     REAL run_off_lic_0(klon)! runof glacier au pas de temps precedent
-
-    !IM "slab" ocean
-
-    REAL, intent(out):: flux_o(klon) ! flux entre l'ocean et l'atmosphere W / m2
-
-    REAL, intent(out):: flux_g(klon) 
-    ! flux entre l'ocean et la glace de mer W / m2
 
     ! Local:
 
@@ -128,7 +120,6 @@ contains
     real epot_air(klon), ccanopy(klon)
     real tq_cdrag(klon), petAcoef(klon), peqAcoef(klon)
     real petBcoef(klon), peqBcoef(klon)
-    real swdown(klon)
     real p1lay(klon)
 
     real fluxsens(klon)
@@ -258,11 +249,6 @@ contains
     p1lay(1:knon) = pplay(1:knon, 1)
     zlev1(1:knon) = delp(1:knon, 1)
 
-    if(nisurf == is_ter) THEN 
-       swdown(:knon) = swnet(:knon) / (1 - albedo) 
-    else 
-       swdown(:knon) = swnet(:knon)
-    endif
     ccanopy = co2_ppm
 
     CALL interfsurf_hq(itime, dtime, jour, rmu0, nisurf, knon, knindex, &
@@ -271,7 +257,7 @@ contains
          precip_rain, precip_snow, fder, rugos, rugoro, snow, qsurf, &
          ts(:knon), p1lay, psref, radsol, evap, fluxsens, fluxlat, dflux_l, &
          dflux_s, tsurf_new, albedo, z0_new, pctsrf_new, agesno, fqcalving, &
-         ffonte, run_off_lic_0, flux_o, flux_g)
+         ffonte, run_off_lic_0)
 
     flux_t(:knon, 1) = fluxsens(:knon)
     flux_q(:knon, 1) = - evap(:knon)

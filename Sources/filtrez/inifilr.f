@@ -72,9 +72,8 @@ contains
 
     rlamda = iim / pi / colat0 * grossismx / sqrt(- eignvl(2: iim))
     print *, "1 / rlamda(iim) = ", 1. / rlamda(iim)
-
     ! This is demonstrated in the notes but just to be sure:
-    call assert(rlamda(iim) * colat0 >= 1. - epsilon(0.), &
+    call assert(rlamda(iim) * colat0 >= 1. - 2. * epsilon(0.), &
          "inifilr rlamda(iim) * colat0")
 
     call new_unit(unit)

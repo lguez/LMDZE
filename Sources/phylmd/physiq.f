@@ -48,6 +48,7 @@ contains
     USE ini_histins_m, ONLY: ini_histins
     use netcdf95, only: NF95_CLOSE
     use newmicro_m, only: newmicro
+    use nuage_m, only: nuage
     USE orbite_m, ONLY: orbite
     USE ozonecm_m, ONLY: ozonecm
     USE phyetat0_m, ONLY: phyetat0, rlat, rlon
@@ -61,7 +62,6 @@ contains
     use readsulfate_preind_m, only: readsulfate_preind
     use yoegwd, only: sugwd
     USE suphec_m, ONLY: rcpd, retv, rg, rlvtt, romega, rsigma, rtt
-    USE temps, ONLY: itau_phy
     use transp_m, only: transp
     use unit_nml_m, only: unit_nml
     USE ymds2ju_m, ONLY: ymds2ju
@@ -115,12 +115,6 @@ contains
 
     LOGICAL, PARAMETER:: ok_stratus = .FALSE.
     ! Ajouter artificiellement les stratus
-
-    ! "slab" ocean
-    REAL, save:: tslab(klon) ! temperature of ocean slab
-    REAL, save:: seaice(klon) ! glace de mer (kg/m2) 
-    REAL fluxo(klon) ! flux turbulents ocean-glace de mer 
-    REAL fluxg(klon) ! flux turbulents ocean-atmosphere
 
     logical:: ok_journe = .false., ok_mensuel = .true., ok_instan = .false.
     ! sorties journalieres, mensuelles et instantanees dans les
@@ -230,9 +224,7 @@ contains
     REAL, save:: sig1(klon, llm), w01(klon, llm)
     REAL, save:: wd(klon)
 
-    ! Variables locales pour la couche limite (al1):
-
-    ! Variables locales:
+    ! Variables pour la couche limite (al1):
 
     REAL cdragh(klon) ! drag coefficient pour T and Q
     REAL cdragm(klon) ! drag coefficient pour vent
@@ -287,12 +279,6 @@ contains
     REAL, save:: albsol(klon) ! albedo du sol total visible
     REAL, SAVE:: wo(klon, llm) ! column density of ozone in a cell, in kDU
 
-    ! Declaration des procedures appelees
-
-    EXTERNAL nuage ! calculer les proprietes radiatives
-
-    ! Variables locales
-
     real, save:: clwcon(klon, llm), rnebcon(klon, llm)
     real, save:: clwcon0(klon, llm), rnebcon0(klon, llm)
 
@@ -346,7 +332,7 @@ contains
     REAL, PARAMETER:: t_coup = 234.
     REAL zphi(klon, llm)
 
-    ! cf. AM Variables locales pour la CLA (hbtm2)
+    ! cf. AM Variables pour la CLA (hbtm2)
 
     REAL, SAVE:: pblh(klon, nbsrf) ! Hauteur de couche limite
     REAL, SAVE:: plcl(klon, nbsrf) ! Niveau de condensation de la CLA
@@ -364,7 +350,7 @@ contains
     REAL s_therm(klon), s_trmb1(klon), s_trmb2(klon)
     REAL s_trmb3(klon)
 
-    ! Variables locales pour la convection de K. Emanuel :
+    ! Variables pour la convection de K. Emanuel :
 
     REAL upwd(klon, llm) ! saturated updraft mass flux
     REAL dnwd(klon, llm) ! saturated downdraft mass flux
@@ -422,7 +408,7 @@ contains
     integer:: iflag_cldcon = 1
     logical ptconv(klon, llm)
 
-    ! Variables locales pour effectuer les appels en s\'erie :
+    ! Variables pour effectuer les appels en s\'erie :
 
     REAL t_seri(klon, llm), q_seri(klon, llm)
     REAL ql_seri(klon, llm)
@@ -469,7 +455,7 @@ contains
     REAL sulfate(klon, llm) ! SO4 aerosol concentration (micro g/m3)
 
     REAL, save:: sulfate_pi(klon, llm)
-    ! SO4 aerosol concentration, in micro g/m3, pre-industrial value
+    ! SO4 aerosol concentration, in \mu g/m3, pre-industrial value
 
     REAL cldtaupi(klon, llm)
     ! cloud optical thickness for pre-industrial (pi) aerosols
@@ -513,7 +499,7 @@ contains
     ! (column-density of mass of air in a cell, in kg m-2)
 
     real, parameter:: dobson_u = 2.1415e-05 ! Dobson unit, in kg m-2
-    integer, save:: ncid_startphy
+    integer, save:: ncid_startphy, itau_phy
 
     namelist /physiq_nml/ ok_journe, ok_mensuel, ok_instan, fact_cldcon, &
          facttemps, ok_newmicro, iflag_cldcon, ratqsbas, ratqshaut, if_ebil, &
@@ -574,11 +560,11 @@ contains
        ! Initialiser les compteurs:
 
        frugs = 0.
-       CALL phyetat0(pctsrf, ftsol, ftsoil, tslab, seaice, fqsurf, qsol, &
+       CALL phyetat0(pctsrf, ftsol, ftsoil, fqsurf, qsol, &
             fsnow, falbe, fevap, rain_fall, snow_fall, solsw, sollw, dlw, &
             radsol, frugs, agesno, zmea, zstd, zsig, zgam, zthe, zpic, zval, &
             t_ancien, q_ancien, ancien_ok, rnebcon, ratqs, clwcon, &
-            run_off_lic_0, sig1, w01, ncid_startphy)
+            run_off_lic_0, sig1, w01, ncid_startphy, itau_phy)
 
        ! ATTENTION : il faudra a terme relire q2 dans l'etat initial
        q2 = 1e-8
@@ -614,11 +600,11 @@ contains
 
        ! Initialisation des sorties
 
-       call ini_histins(dtphys, ok_instan, nid_ins)
+       call ini_histins(dtphys, ok_instan, nid_ins, itau_phy)
        CALL ymds2ju(annee_ref, 1, day_ref, 0., date0)
        ! Positionner date0 pour initialisation de ORCHIDEE
        print *, 'physiq date0: ', date0
-       CALL phyredem0(lmt_pas)
+       CALL phyredem0(lmt_pas, itau_phy)
     ENDIF test_firstcal
 
     ! We will modify variables *_seri and we will not touch variables
@@ -740,7 +726,7 @@ contains
          fluxt, fluxq, fluxu, fluxv, cdragh, cdragm, q2, dsens, devap, &
          ycoefh, yu1, yv1, t2m, q2m, u10m, v10m, pblh, capCL, oliqCL, cteiCL, &
          pblT, therm, trmb1, trmb2, trmb3, plcl, fqcalving, ffonte, &
-         run_off_lic_0, fluxo, fluxg, tslab)
+         run_off_lic_0)
 
     ! Incr\'ementation des flux
 
@@ -1314,7 +1300,7 @@ contains
     call phytrac(itap, lmt_pas, julien, time, firstcal, lafin, dtphys, t, &
          paprs, play, mfu, mfd, pde_u, pen_d, ycoefh, fm_therm, entr_therm, &
          yu1, yv1, ftsol, pctsrf, frac_impa, frac_nucl, da, phi, mp, upwd, &
-         dnwd, tr_seri, zmasse, ncid_startphy, nid_ins)
+         dnwd, tr_seri, zmasse, ncid_startphy, nid_ins, itau_phy)
 
     IF (offline) call phystokenc(dtphys, rlon, rlat, t, mfu, mfd, pen_u, &
          pde_u, pen_d, pde_d, fm_therm, entr_therm, ycoefh, yu1, yv1, ftsol, &
@@ -1396,7 +1382,7 @@ contains
 
     IF (lafin) then
        call NF95_CLOSE(ncid_startphy)
-       CALL phyredem(pctsrf, ftsol, ftsoil, tslab, seaice, fqsurf, qsol, &
+       CALL phyredem(pctsrf, ftsol, ftsoil, fqsurf, qsol, &
             fsnow, falbe, fevap, rain_fall, snow_fall, solsw, sollw, dlw, &
             radsol, frugs, agesno, zmea, zstd, zsig, zgam, zthe, zpic, zval, &
             t_ancien, q_ancien, rnebcon, ratqs, clwcon, run_off_lic_0, sig1, &

@@ -115,11 +115,11 @@ contains
           ! for liquid water clouds: 
           IF (ok_aie) THEN
              cdnc(i, k) = 10.**(bl95_b0 + bl95_b1 &
-                  * log10(MAX(sulfate(i, k), 1e-4))) * 1.e6
+                  * log10(MAX(sulfate(i, k), 1e-4)) + 6.)
              cdnc_pi(i, k) = 10.**(bl95_b0 + bl95_b1 &
-                  * log10(MAX(sulfate_pi(i, k), 1e-4))) * 1e6
+                  * log10(MAX(sulfate_pi(i, k), 1e-4)) + 6.)
 
-             ! Restrict to interval [20, 1000] cm^3:
+             ! Restrict to interval [20, 1000] cm-3:
              cdnc(i, k) = MIN(1000e6, MAX(20e6, cdnc(i, k)))
              cdnc_pi(i, k) = MIN(1000e6, MAX(20e6, cdnc_pi(i, k)))
 

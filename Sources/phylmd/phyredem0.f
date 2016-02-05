@@ -6,7 +6,7 @@ module phyredem0_m
 
 contains
 
-  SUBROUTINE phyredem0(lmt_pas)
+  SUBROUTINE phyredem0(lmt_pas, itau_phy)
 
     ! From phylmd/phyredem.F, version 1.3, 2005/05/25 13:10:09
     ! Author: Z. X. Li (LMD/CNRS)
@@ -23,9 +23,9 @@ contains
     USE netcdf95, ONLY: nf95_create, nf95_put_att, nf95_def_dim, &
          nf95_def_var, nf95_enddef, nf95_put_var
     use phyetat0_m, only: rlat, rlon
-    USE temps, ONLY: itau_phy
 
     INTEGER, intent(in):: lmt_pas ! number of time steps of "physics" per day
+    INTEGER, intent(in):: itau_phy
 
     ! Local:
 
@@ -77,14 +77,6 @@ contains
     call nf95_def_var(ncid_restartphy, 'Tsoil', nf90_float, &
          (/idim2, dimid_nsoilmx, dimid_nbsrf/), varid)
     call nf95_put_att(ncid_restartphy, varid, 'title', 'soil temperature')
-
-    call nf95_def_var(ncid_restartphy, 'TSLAB', nf90_float, idim2, varid)
-    call nf95_put_att(ncid_restartphy, varid, 'title', &
-         'Ecart de la SST (pour slab-ocean)')
-
-    call nf95_def_var(ncid_restartphy, 'SEAICE', nf90_float, idim2, varid)
-    call nf95_put_att(ncid_restartphy, varid, 'title', &
-         'Glace de mer kg/m2 (pour slab-ocean)')
 
     call nf95_def_var(ncid_restartphy, 'QS', nf90_float, &
          (/idim2, dimid_nbsrf/), varid)

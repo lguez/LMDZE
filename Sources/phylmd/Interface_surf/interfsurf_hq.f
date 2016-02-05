@@ -10,7 +10,7 @@ contains
        precip_rain, precip_snow, fder, rugos, rugoro, snow, qsurf, tsurf, &
        p1lay, ps, radsol, evap, fluxsens, fluxlat, dflux_l, dflux_s, &
        tsurf_new, albedo, z0_new, pctsrf_new, agesno, fqcalving, ffonte, &
-       run_off_lic_0, flux_o, flux_g)
+       run_off_lic_0)
 
     ! Cette routine sert d'aiguillage entre l'atmosph\`ere et la surface
     ! en g\'en\'eral (sols continentaux, oc\'eans, glaces) pour les flux de
@@ -74,10 +74,10 @@ contains
     ! peqBcoef coeff. B de la resolution de la CL pour q
 
     real, intent(IN):: precip_rain(klon)
-    ! precipitation, liquid water mass flux (kg/m2/s), positive down
+    ! precipitation, liquid water mass flux (kg / m2 / s), positive down
 
     real, intent(IN):: precip_snow(klon)
-    ! precipitation, solid water mass flux (kg/m2/s), positive down
+    ! precipitation, solid water mass flux (kg / m2 / s), positive down
 
     REAL, INTENT(INOUT):: fder(klon) ! derivee des flux (pour le couplage)
     real, intent(IN):: rugos(klon) ! rugosite
@@ -88,8 +88,10 @@ contains
     ! p1lay pression 1er niveau (milieu de couche)
     real, dimension(klon), intent(IN):: ps
     ! ps pression au sol
+
     REAL, DIMENSION(klon), INTENT(INOUT):: radsol
-    ! radsol rayonnement net aus sol (LW + SW)
+    ! rayonnement net au sol (LW + SW)
+
     real, intent(INOUT):: evap(klon) ! evaporation totale
     real, dimension(klon), intent(OUT):: fluxsens, fluxlat
     ! fluxsens flux de chaleur sensible
@@ -100,10 +102,10 @@ contains
     real, intent(OUT):: z0_new(klon) ! surface roughness
     real, dimension(klon, nbsrf), intent(OUT):: pctsrf_new
     ! pctsrf_new nouvelle repartition des surfaces
-    real, dimension(klon), intent(INOUT):: agesno
+    real, intent(INOUT):: agesno(:) ! (knon)
 
     ! Flux d'eau "perdue" par la surface et n\'ecessaire pour que limiter la
-    ! hauteur de neige, en kg/m2/s
+    ! hauteur de neige, en kg / m2 / s
     !jld a rajouter real, dimension(klon), intent(INOUT):: fqcalving
     real, dimension(klon), intent(INOUT):: fqcalving
 
@@ -114,25 +116,14 @@ contains
     real, dimension(klon), intent(INOUT):: run_off_lic_0
     ! run_off_lic_0 runoff glacier du pas de temps precedent
 
-    !IM: "slab" ocean
-    real, dimension(klon), intent(OUT):: flux_o, flux_g
-
     ! Local:
-
-    REAL, dimension(klon):: soilcap
-    REAL, dimension(klon):: soilflux
-
-    !IM: "slab" ocean
-    real, parameter:: t_grnd=271.35
-    integer i
-
-    character (len = 20), save:: modname = 'interfsurf_hq'
-    character (len = 80):: abort_message
-    logical, save:: first_call = .true.
-    integer:: ii
+    REAL soilcap(klon)
+    REAL soilflux(klon)
+    logical:: first_call = .true.
+    integer ii
     real, dimension(klon):: cal, beta, dif_grnd, capsol
-    real, parameter:: calice=1.0/(5.1444e6 * 0.15), tau_gl=86400. * 5.
-    real, parameter:: calsno=1./(2.3867e6 * 0.15)
+    real, parameter:: calice = 1. / (5.1444e6 * 0.15), tau_gl = 86400. * 5.
+    real, parameter:: calsno = 1. / (2.3867e6 * 0.15)
     real tsurf_temp(knon)
     real alb_neig(knon)
     real zfra(knon)
@@ -144,38 +135,33 @@ contains
 
     if (first_call) then
        call conf_interface
+
        if (nisurf /= is_ter .and. klon > 1) then
-          print *, ' Warning:'
           print *, ' nisurf = ', nisurf, ' /= is_ter = ', is_ter
           print *, 'or on doit commencer par les surfaces continentales'
-          abort_message='voir ci-dessus'
-          call abort_gcm(modname, abort_message)
+          call abort_gcm("interfsurf_hq", &
+               'On doit commencer par les surfaces continentales')
        endif
+
        if (is_oce > is_sic) then
-          print *, 'Warning:'
-          print *, ' Pour des raisons de sequencement dans le code'
-          print *, ' l''ocean doit etre traite avant la banquise'
-          print *, ' or is_oce = ', is_oce, '> is_sic = ', is_sic
-          abort_message='voir ci-dessus'
-          call abort_gcm(modname, abort_message)
+          print *, 'is_oce = ', is_oce, '> is_sic = ', is_sic
+          call abort_gcm("interfsurf_hq", &
+               'L''ocean doit etre traite avant la banquise')
        endif
+
+       first_call = .false.
     endif
-    first_call = .false.
 
     ! Initialisations diverses
 
-    ffonte(1:knon)=0.
-    fqcalving(1:knon)=0.
+    ffonte(1:knon) = 0.
+    fqcalving(1:knon) = 0.
     cal = 999999.
     beta = 999999.
     dif_grnd = 999999.
     capsol = 999999.
     z0_new = 999999.
     tsurf_new = 999999.
-
-    !IM: "slab" ocean; initialisations
-    flux_o = 0.
-    flux_g = 0.
 
     ! Aiguillage vers les differents schemas de surface
 
@@ -188,7 +174,7 @@ contains
           allocate(run_off(knon))
           run_off = 0.
        else if (size(run_off) /= knon) then
-          call abort_gcm(modname, 'Something is wrong: the number of ' &
+          call abort_gcm("interfsurf_hq", 'Something is wrong: the number of ' &
                // 'continental points has changed since last call.')
        endif
 
@@ -225,17 +211,17 @@ contains
             peqAcoef(:knon), petBcoef(:knon), peqBcoef(:knon), tsurf_new, &
             evap(:knon), fqcalving(:knon), ffonte(:knon), run_off_lic_0(:knon))
 
-       call albsno(dtime, agesno(:knon), alb_neig, precip_snow(:knon))
-       where (snow(:knon) < 0.0001) agesno(:knon) = 0.
-       zfra = max(0.0, min(1.0, snow(:knon)/(snow(:knon) + 10.0)))
+       call albsno(dtime, agesno, alb_neig, precip_snow(:knon))
+       where (snow(:knon) < 0.0001) agesno = 0.
+       zfra = max(0., min(1., snow(:knon) / (snow(:knon) + 10.)))
        albedo = alb_neig * zfra + albedo * (1. - zfra)
        z0_new = sqrt(z0_new**2 + rugoro**2)
 
        ! Remplissage des pourcentages de surface
        pctsrf_new(:, nisurf) = pctsrf(:, nisurf)
     case (is_oce)
-       ! Surface "ocean" appel \`a l'interface avec l'oc\'ean
-       ! lecture conditions limites
+       ! Surface "oc\'ean", appel \`a l'interface avec l'oc\'ean
+
        call interfoce_lim(itime, dtime, jour, knindex, debut, tsurf_temp, &
             pctsrf_new)
 
@@ -243,18 +229,13 @@ contains
        beta = 1.
        dif_grnd = 0.
        agesno = 0.
-       call calcul_fluxs(dtime, tsurf_temp, p1lay(:knon), &
-            cal(:knon), beta(:knon), tq_cdrag(:knon), ps(:knon), &
-            qsurf(:knon), radsol(:knon), dif_grnd(:knon), temp_air(:knon), &
-            spechum(:knon), u1_lay(:knon), v1_lay(:knon), petAcoef(:knon), &
-            peqAcoef(:knon), petBcoef(:knon), peqBcoef(:knon), &
-            tsurf_new, evap(:knon), fluxlat(:knon), fluxsens(:knon), &
-            dflux_s(:knon), dflux_l(:knon))
+       call calcul_fluxs(dtime, tsurf_temp, p1lay(:knon), cal(:knon), &
+            beta(:knon), tq_cdrag(:knon), ps(:knon), qsurf(:knon), &
+            radsol(:knon), dif_grnd(:knon), temp_air(:knon), spechum(:knon), &
+            u1_lay(:knon), v1_lay(:knon), petAcoef(:knon), peqAcoef(:knon), &
+            petBcoef(:knon), peqBcoef(:knon), tsurf_new, evap(:knon), &
+            fluxlat(:knon), fluxsens(:knon), dflux_s(:knon), dflux_l(:knon))
        fder = fder + dflux_s + dflux_l
-
-       !IM: flux ocean-atmosphere utile pour le "slab" ocean
-       flux_o(:knon) = fluxsens(:knon) - evap(:knon) &
-            * merge(RLSTT, RLVTT, tsurf_new < RTT)
 
        ! Compute the albedo:
        if (cycle_diurne) then
@@ -274,7 +255,7 @@ contains
        DO ii = 1, knon
           tsurf_new(ii) = tsurf(ii)
           IF (pctsrf_new(knindex(ii), nisurf) < EPSFRA) then
-             snow(ii) = 0.0
+             snow(ii) = 0.
              tsurf_new(ii) = RTT - 1.8
              IF (soil_model) tsoil(ii, :) = RTT - 1.8
           endif
@@ -290,12 +271,12 @@ contains
           radsol(1:knon) = radsol(1:knon) + soilflux(1:knon)
           dif_grnd = 0.
        ELSE
-          dif_grnd = 1.0 / tau_gl
+          dif_grnd = 1. / tau_gl
           cal = RCPD * calice
-          WHERE (snow > 0.0) cal = RCPD * calsno
+          WHERE (snow > 0.) cal = RCPD * calsno
        ENDIF
        tsurf_temp = tsurf_new
-       beta = 1.0
+       beta = 1.
 
        CALL calcul_fluxs(dtime, tsurf_temp, p1lay(:knon), cal(:knon), &
             beta(:knon), tq_cdrag(:knon), ps(:knon), qsurf(:knon), &
@@ -303,13 +284,6 @@ contains
             u1_lay(:knon), v1_lay(:knon), petAcoef(:knon), peqAcoef(:knon), &
             petBcoef(:knon), peqBcoef(:knon), tsurf_new, evap(:knon), &
             fluxlat(:knon), fluxsens(:knon), dflux_s(:knon), dflux_l(:knon))
-
-       !IM: flux entre l'ocean et la glace de mer pour le "slab" ocean
-       DO i = 1, knon
-          flux_g(i) = 0.0
-          IF (cal(i) > 1e-15) flux_g(i) = (tsurf_new(i) - t_grnd) &
-               * dif_grnd(i) * RCPD / cal(i)
-       ENDDO
 
        CALL fonte_neige(nisurf, dtime, tsurf_temp, p1lay(:knon), beta(:knon), &
             tq_cdrag(:knon), ps(:knon), precip_rain(:knon), &
@@ -320,10 +294,10 @@ contains
 
        ! Compute the albedo:
 
-       CALL albsno(dtime, agesno(:knon), alb_neig, precip_snow(:knon))
-       WHERE (snow(:knon) < 0.0001) agesno(:knon) = 0.
-       zfra = MAX(0.0, MIN(1.0, snow(:knon)/(snow(:knon) + 10.0)))
-       albedo = alb_neig * zfra + 0.6 * (1.0 - zfra)
+       CALL albsno(dtime, agesno, alb_neig, precip_snow(:knon))
+       WHERE (snow(:knon) < 0.0001) agesno = 0.
+       zfra = MAX(0., MIN(1., snow(:knon) / (snow(:knon) + 10.)))
+       albedo = alb_neig * zfra + 0.6 * (1. - zfra)
 
        fder = fder + dflux_s + dflux_l
 
@@ -345,10 +319,10 @@ contains
           radsol(1:knon) = radsol(1:knon) + soilflux(1:knon)
        ELSE
           cal = RCPD * calice
-          WHERE (snow > 0.0) cal = RCPD * calsno
+          WHERE (snow > 0.) cal = RCPD * calsno
        ENDIF
-       beta = 1.0
-       dif_grnd = 0.0
+       beta = 1.
+       dif_grnd = 0.
 
        call calcul_fluxs(dtime, tsurf, p1lay(:knon), cal(:knon), &
             beta(:knon), tq_cdrag(:knon), ps(:knon), qsurf(:knon), &
@@ -365,8 +339,8 @@ contains
             evap(:knon), fqcalving(:knon), ffonte(:knon), run_off_lic_0(:knon))
 
        ! calcul albedo
-       CALL albsno(dtime, agesno(:knon), alb_neig, precip_snow(:knon))
-       WHERE (snow(:knon) < 0.0001) agesno(:knon) = 0.
+       CALL albsno(dtime, agesno, alb_neig, precip_snow(:knon))
+       WHERE (snow(:knon) < 0.0001) agesno = 0.
        albedo = 0.77
 
        ! Rugosite
@@ -377,8 +351,7 @@ contains
 
     case default
        print *, 'Index surface = ', nisurf
-       abort_message = 'Index surface non valable'
-       call abort_gcm(modname, abort_message)
+       call abort_gcm("interfsurf_hq", 'Index surface non valable')
     end select
 
   END SUBROUTINE interfsurf_hq

@@ -90,7 +90,7 @@ contains
        call abort_gcm("test_disvert", "bad order of pressure values")
     end if
 
-1000 format (3(a, g10.4, a, i0))
+1000 format (3(a, g11.4, a, i0))
 
   end subroutine test_disvert
 

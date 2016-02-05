@@ -11,7 +11,7 @@ contains
        d_v, d_ts, flux_t, flux_q, flux_u, flux_v, cdragh, cdragm, q2, &
        dflux_t, dflux_q, ycoefh, zu1, zv1, t2m, q2m, u10m, v10m, pblh, capcl, &
        oliqcl, cteicl, pblt, therm, trmb1, trmb2, trmb3, plcl, fqcalving, &
-       ffonte, run_off_lic_0, flux_o, flux_g, tslab)
+       ffonte, run_off_lic_0)
 
     ! From phylmd/clmain.F, version 1.6, 2005/11/16 14:47:19
     ! Author: Z. X. Li (LMD/CNRS), date: 1993/08/18
@@ -149,19 +149,8 @@ contains
     !           hauteur de neige, en kg/m2/s
     REAL run_off_lic_0(klon)
 
-    REAL flux_o(klon), flux_g(klon)
-    !IM "slab" ocean
-    ! flux_g---output-R-  flux glace (pour OCEAN='slab  ')
-    ! flux_o---output-R-  flux ocean (pour OCEAN='slab  ')
-
-    REAL tslab(klon)
-    ! tslab-in/output-R temperature du slab ocean (en Kelvin) 
-    ! uniqmnt pour slab
-
     ! Local:
 
-    REAL y_flux_o(klon), y_flux_g(klon)
-    real ytslab(klon)
     REAL y_fqcalving(klon), y_ffonte(klon)
     real y_run_off_lic_0(klon)
 
@@ -185,7 +174,6 @@ contains
     REAL ysnow_f(klon)
     ! solid water mass flux (kg/m2/s), positive down
 
-    REAL ysollw(klon), ysolsw(klon)
     REAL yfder(klon)
     REAL yrugm(klon), yrads(klon), yrugoro(klon)
 
@@ -283,8 +271,6 @@ contains
     yrain_f = 0.
     ysnow_f = 0.
     yfder = 0.
-    ysolsw = 0.
-    ysollw = 0.
     yrugos = 0.
     yu1 = 0.
     yv1 = 0.
@@ -346,7 +332,6 @@ contains
              i = ni(j)
              ypct(j) = pctsrf(i, nsrf)
              yts(j) = ts(i, nsrf)
-             ytslab(i) = tslab(i)
              ysnow(j) = snow(i, nsrf)
              yqsurf(j) = qsurf(i, nsrf)
              yalb(j) = falbe(i, nsrf)
@@ -354,13 +339,11 @@ contains
              ysnow_f(j) = snow_f(i)
              yagesno(j) = agesno(i, nsrf)
              yfder(j) = fder(i)
-             ysolsw(j) = solsw(i, nsrf)
-             ysollw(j) = sollw(i, nsrf)
              yrugos(j) = rugos(i, nsrf)
              yrugoro(j) = rugoro(i)
              yu1(j) = u1lay(i)
              yv1(j) = v1lay(i)
-             yrads(j) = ysolsw(j) + ysollw(j)
+             yrads(j) = solsw(i, nsrf) + sollw(i, nsrf)
              ypaprs(j, klev+1) = paprs(i, klev+1)
              y_run_off_lic_0(j) = run_off_lic_0(i)
              yu10mx(j) = u10m(i, nsrf)
@@ -476,10 +459,9 @@ contains
                pctsrf, ytsoil, yqsol, rmu0, co2_ppm, yrugos, yrugoro, yu1, &
                yv1, coefh(:knon, :), yt, yq, yts, ypaprs, ypplay, ydelp, &
                yrads, yalb(:knon), ysnow, yqsurf, yrain_f, ysnow_f, yfder, &
-               ysolsw, yfluxlat, pctsrf_new, yagesno, y_d_t, y_d_q, &
+               yfluxlat, pctsrf_new, yagesno(:knon), y_d_t, y_d_q, &
                y_d_ts(:knon), yz0_new, y_flux_t, y_flux_q, y_dflux_t, &
-               y_dflux_q, y_fqcalving, y_ffonte, y_run_off_lic_0, y_flux_o, &
-               y_flux_g)
+               y_dflux_q, y_fqcalving, y_ffonte, y_run_off_lic_0)
 
           ! calculer la longueur de rugosite sur ocean
           yrugm = 0.
@@ -630,31 +612,6 @@ contains
                 q2(i, k, nsrf) = yq2(j, k)
              END DO
           END DO
-          !IM "slab" ocean
-          IF (nsrf == is_oce) THEN
-             DO j = 1, knon
-                ! on projette sur la grille globale
-                i = ni(j)
-                IF (pctsrf_new(i, is_oce)>epsfra) THEN
-                   flux_o(i) = y_flux_o(j)
-                ELSE
-                   flux_o(i) = 0.
-                END IF
-             END DO
-          END IF
-
-          IF (nsrf == is_sic) THEN
-             DO j = 1, knon
-                i = ni(j)
-                ! On pond\`ere lorsque l'on fait le bilan au sol :
-                IF (pctsrf_new(i, is_sic)>epsfra) THEN
-                   flux_g(i) = y_flux_g(j)
-                ELSE
-                   flux_g(i) = 0.
-                END IF
-             END DO
-
-          END IF
        end IF if_knon
     END DO loop_surface
 
