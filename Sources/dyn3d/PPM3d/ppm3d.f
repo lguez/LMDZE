@@ -349,7 +349,6 @@ contains
     END DO
 
     DO k = 1, nlay
-
        IF (igd==0) THEN
           ! Convert winds on A-Grid to Courant number on C-Grid.
           CALL a2c(u(1,1,k), v(1,1,k), imr, jmr, j1, j2, crx, cry, dtdx5, dtdy5)
