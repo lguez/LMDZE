@@ -13,11 +13,9 @@ contains
     USE conf_gcm_m, ONLY : iapp_tracvl
     USE dimens_m, ONLY : iim, jjm, llm, nqmx
     USE iniadvtrac_m, ONLY : iadv
-    use interpre_m, only: interpre
     use massbar_m, only: massbar
     USE paramet_m, ONLY : iip1, iip2, ijmllm, ijp1llm, ip1jm, ip1jmp1, jjp1, &
          llmp1
-    use ppm3d_m, only: ppm3d
     use vlsplt_m, only: vlsplt
     use vlspltqs_m, only: vlspltqs
 
@@ -117,12 +115,7 @@ contains
           case (10)
              ! Schema de Van Leer I MUSCL
              CALL vlsplt(q(:, :, iq), 2., massem, wg, pbarug, pbarvg, dtvr)
-          case (14)
-             ! Schema "pseudo amont" + test sur humidite specifique
-             ! pour la vapeur d'eau. F. Codron
-             CALL vlspltqs(q(1, 1, 1), 2., massem, wg, pbarug, pbarvg, dtvr, &
-                  p, pk, teta)
-          case (12)
+           case (12)
              ! Schema de Frederic Hourdin
              ! Pas de temps adaptatif
              CALL adaptdt(dtbon, n, pbarug, massem)
@@ -143,76 +136,11 @@ contains
              DO indice = 1, n
                 CALL advn(q(1, 1, iq), massem, wg, pbarug, pbarvg, dtbon, 2)
              END DO
-          case (20)
-             ! Schema de pente SLOPES
-             CALL pentes_ini(q(1, 1, iq), wg, massem, pbarug, pbarvg, 0)
-          case (30)
-             ! Schema de Prather
-             ! Pas de temps adaptatif
-             CALL adaptdt(dtbon, n, pbarug, massem)
-             IF (n>1) THEN
-                WRITE (*, *) 'WARNING horizontal dt=', dtbon, 'dtvr=', dtvr, &
-                     'n=', n
-             END IF
-             CALL prather(q(1, 1, iq), wg, massem, pbarug, pbarvg, n, dtbon)
-          case (11, 16:18)
-             ! Schemas PPM Lin et Rood
-             ! Test sur le flux horizontal
-             ! Pas de temps adaptatif
-             CALL adaptdt(dtbon, n, pbarug, massem)
-             IF (n>1) THEN
-                WRITE (*, *) 'WARNING horizontal dt=', dtbon, 'dtvr=', dtvr, &
-                     'n=', n
-             END IF
-             ! Test sur le flux vertical
-             cflmaxz = 0.
-             DO l = 2, llm
-                DO ij = iip2, ip1jm
-                   aaa = wg(ij, l)*dtvr/massem(ij, l)
-                   cflmaxz = max(cflmaxz, aaa)
-                   bbb = -wg(ij, l)*dtvr/massem(ij, l-1)
-                   cflmaxz = max(cflmaxz, bbb)
-                END DO
-             END DO
-             IF (cflmaxz>=1) THEN
-                WRITE (*, *) 'WARNING vertical', 'CFLmaxz=', cflmaxz
-             END IF
-
-             ! Ss-prg interface LMDZ.4->PPM3d
-             CALL interpre(q(1, 1, iq), qppm(1, 1, iq), wg, fluxwppm, massem, &
-                  apppm, bpppm, massebx, masseby, pbarug, pbarvg, unatppm, &
-                  vnatppm, psppm)
-
-             DO indice = 1, n
-                ! VL (version PPM) horiz. et PPM vert.
-                IF (iadv(iq)==11) THEN
-                   ! Ss-prg PPM3d de Lin
-                   CALL ppm3d(1, qppm(1, 1, iq), psppm, psppm, unatppm, &
-                        vnatppm, fluxwppm, dtbon, 2, 2, 2, 1, iim, jjp1, 2, &
-                        llm, apppm, bpppm, 0.01, 6400000, fill, 220.)
-                   ! Monotonic PPM
-                ELSE IF (iadv(iq)==16) THEN
-                   ! Ss-prg PPM3d de Lin
-                   CALL ppm3d(1, qppm(1, 1, iq), psppm, psppm, unatppm, &
-                        vnatppm, fluxwppm, dtbon, 3, 3, 3, 1, iim, jjp1, 2, &
-                        llm, apppm, bpppm, 0.01, 6400000, fill, 220.)
-                   ! Semi Monotonic PPM
-                ELSE IF (iadv(iq)==17) THEN
-                   ! Ss-prg PPM3d de Lin
-                   CALL ppm3d(1, qppm(1, 1, iq), psppm, psppm, unatppm, &
-                        vnatppm, fluxwppm, dtbon, 4, 4, 4, 1, iim, jjp1, 2, &
-                        llm, apppm, bpppm, 0.01, 6400000, fill, 220.)
-                   ! Positive Definite PPM
-                ELSE IF (iadv(iq)==18) THEN
-                   ! Ss-prg PPM3d de Lin
-                   CALL ppm3d(1, qppm(1, 1, iq), psppm, psppm, unatppm, &
-                        vnatppm, fluxwppm, dtbon, 5, 5, 5, 1, iim, jjp1, 2, &
-                        llm, apppm, bpppm, 0.01, 6400000, fill, 220.)
-                END IF
-             END DO
-
-             ! Ss-prg interface PPM3d-LMDZ.4
-             CALL interpost(q(1, 1, iq), qppm(1, 1, iq))
+         case (14)
+             ! Schema "pseudo amont" + test sur humidite specifique
+             ! pour la vapeur d'eau. F. Codron
+             CALL vlspltqs(q(1, 1, 1), 2., massem, wg, pbarug, pbarvg, dtvr, &
+                  p, pk, teta)
           END select
        END DO
 

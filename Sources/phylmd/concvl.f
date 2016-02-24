@@ -98,8 +98,8 @@ contains
           END DO
        END DO
     ELSE
-       ! iflag_con=3 (modif de puristes qui fait la diffce pour la
-       ! convergence numerique)
+       ! iflag_con=3 (modification de puristes qui fait la
+       ! diff\'erence pour la convergence numerique)
        DO k = 1, klev
           DO i = 1, klon
              zx_t = t(i, k)
@@ -112,9 +112,9 @@ contains
        END DO
     END IF
 
-    CALL cv_driver(t, q, qs, u, v, em_p, em_ph, iflag, d_t, d_q, &
-         d_u, d_v, rain, pmflxr, cbmf, sig1, w01, kbas, ktop, dtime, ma, &
-         upwd, dnwd, dnwd0, qcondc, wd, cape, da, phi, mp)
+    CALL cv_driver(t, q, qs, u, v, em_p, em_ph, iflag, d_t, d_q, d_u, d_v, &
+         rain, pmflxr, cbmf, sig1, w01, kbas, ktop, dtime, ma, upwd, dnwd, &
+         dnwd0, qcondc, wd, cape, da, phi, mp)
 
     DO i = 1, klon
        rain(i) = rain(i)/86400.
