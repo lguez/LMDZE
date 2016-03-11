@@ -53,13 +53,10 @@ contains
 
     real zmax(klon), zw, zw2(klon, klev+1), ztva(klon, klev)
 
-    real zlev(klon, klev+1), zlay(klon, klev)
+    real zlev(klon, klev+1)
     REAL zh(klon, klev), zdhadj(klon, klev)
     REAL ztv(klon, klev)
     real zu(klon, klev), zv(klon, klev), zo(klon, klev)
-    real zla(klon, klev+1)
-    real zwa(klon, klev+1)
-    real zld(klon, klev+1)
     real zva(klon, klev)
     real zua(klon, klev)
     real zoa(klon, klev)
@@ -72,18 +69,13 @@ contains
     real thetath2(klon, klev), wth2(klon, klev)
     common/comtherm/thetath2, wth2
 
-    integer isplit, nsplit
+    integer nsplit
     parameter (nsplit=10)
-    data isplit/0/
-    save isplit
 
-    logical sorties
     real rho(klon, klev), rhobarz(klon, klev+1), masse(klon, klev)
     real zpspsk(klon, klev)
 
     real wmax(klon), wmaxa(klon)
-    real wa(klon, klev, klev+1)
-    real wd(klon, klev+1)
     real fracd(klon, klev+1)
     real xxx(klon, klev+1)
     real larg_cons(klon, klev+1)
@@ -104,7 +96,6 @@ contains
 
     ! initialisation:
 
-    sorties=.true.
     IF(ngrid.NE.klon) THEN
        PRINT *
        PRINT *, 'STOP dans convadj'
@@ -141,11 +132,6 @@ contains
        zlev(ig, 1)=0.
        zlev(ig, nlay+1)=(2.*pphi(ig, klev)-pphi(ig, klev-1))/RG
     enddo
-    do l=1, nlay
-       do ig=1, ngrid
-          zlay(ig, l)=pphi(ig, l)/RG
-       enddo
-    enddo
 
     ! Calcul des densites
 
@@ -158,14 +144,6 @@ contains
     do l=2, nlay
        do ig=1, ngrid
           rhobarz(ig, l)=0.5*(rho(ig, l)+rho(ig, l-1))
-       enddo
-    enddo
-
-    do k=1, nlay
-       do l=1, nlay+1
-          do ig=1, ngrid
-             wa(ig, k, l)=0.
-          enddo
        enddo
     enddo
 
@@ -545,9 +523,6 @@ contains
        do ig=1, ngrid
           if(fracd(ig, l).lt.0.1) then
              stop'fracd trop petit'
-          else
-             ! vitesse descendante "diagnostique"
-             wd(ig, l)=fm(ig, l)/(fracd(ig, l)*rhobarz(ig, l))
           endif
        enddo
     enddo
@@ -618,25 +593,6 @@ contains
           pdtadj(ig, l)=zdhadj(ig, l)*zpspsk(ig, l)
        enddo
     enddo
-
-    print *, '14 OK convect8'
-
-    ! Calculs pour les sorties
-
-    if(sorties) then
-       do l=1, nlay
-          do ig=1, ngrid
-             zla(ig, l)=(1.-fracd(ig, l))*zmax(ig)
-             zld(ig, l)=fracd(ig, l)*zmax(ig)
-             if(1.-fracd(ig, l).gt.1.e-10) &
-                  zwa(ig, l)=wd(ig, l)*fracd(ig, l)/(1.-fracd(ig, l))
-          enddo
-       enddo
-
-       isplit=isplit+1
-    endif
-
-    print *, '19 OK convect8'
 
   end SUBROUTINE thermcell
 

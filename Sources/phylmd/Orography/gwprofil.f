@@ -35,7 +35,7 @@ contains
     REAL, INTENT (IN) :: pvar(nlon)
 
     ! Local:
-    INTEGER ilevh, jl, jk
+    INTEGER jl, jk
     REAL zsqr, zalfa, zriw, zdel, zb, zalpha, zdz2n
     REAL zdelp, zdelpt
     REAL zdz2(klon, klev), znorm(klon), zoro(klon)
@@ -46,8 +46,6 @@ contains
     ! 1. INITIALIZATION
 
     ! COMPUTATIONAL CONSTANTS.
-
-    ilevh = klev/3
 
     DO jl = 1, klon
        IF (ktest(jl)==1) THEN

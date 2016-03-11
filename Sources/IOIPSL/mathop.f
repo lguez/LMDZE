@@ -56,7 +56,6 @@ CONTAINS
 
     INTEGER :: ierr
 
-    INTRINSIC SIN, COS, TAN, ASIN, ACOS, ATAN, EXP, ALOG, SQRT, ABS
     !--------------------------------------------------------------------
     ierr = 0
 
@@ -211,7 +210,6 @@ CONTAINS
 
     INTEGER :: ierr
 
-    INTRINSIC SIN, COS, TAN, ASIN, ACOS, ATAN, EXP, ALOG, SQRT, ABS
     !--------------------------------------------------------------------
     ierr = 0
 
@@ -366,7 +364,6 @@ CONTAINS
 
     INTEGER :: ierr
 
-    INTRINSIC SIN, COS, TAN, ASIN, ACOS, ATAN, EXP, ALOG, SQRT, ABS
     !--------------------------------------------------------------------
     ierr = 0
 

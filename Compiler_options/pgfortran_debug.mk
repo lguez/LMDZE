@@ -1,13 +1,13 @@
 # These are compiler dependent macros, meant to be included in the
 # makefile for LMDZE.
 
-netcdf_inc_dir = /opt/netcdf42/pgf95/include
-netcdf_lib_dir = /opt/netcdf42/pgf95/lib
+netcdf_inc_dir = /opt/netcdf43/pgf2013/include
+netcdf_lib_dir = /opt/netcdf43/pgf2013/lib
 
-numer_rec_95_dir = /data/guez/lib/Numer_Rec_95_pgfortran
-nr_util_dir = /data/guez/lib/NR_util_pgfortran
-netcdf95_dir = /data/guez/lib/NetCDF95_pgfortran
-jumble_dir = /data/guez/lib/Jumble_pgfortran
+numer_rec_95_dir = /data/guez/lib/Numer_Rec_95_pgfortran_debug
+nr_util_dir = /data/guez/lib/NR_util_pgfortran_debug
+netcdf95_dir = /data/guez/lib/NetCDF95_pgfortran_debug
+jumble_dir = /data/guez/lib/Jumble_pgfortran_debug
 
 lib_dir_list = ${netcdf_lib_dir} ${numer_rec_95_dir} ${netcdf95_dir} ${nr_util_dir} ${jumble_dir}
 

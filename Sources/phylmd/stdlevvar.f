@@ -11,6 +11,7 @@ contains
 
     use coefcdrag_m, only: coefcdrag
     USE suphec_m, ONLY: rg, rkappa
+    use screenp_m, only: screenp
 
     ! Objet : calcul de la température et de l'humidité relative à 2 m
     ! et du module du vent à 10 m à partir des relations de
@@ -90,7 +91,6 @@ contains
     LOGICAL okri
     REAL, dimension(klon):: u_zref_p, temp_p, q_zref_p
     !convertgence
-    REAL, dimension(klon):: te_zref_con, q_zref_con
     REAL, dimension(klon):: u_zref_c, temp_c, q_zref_c
     REAL, dimension(klon):: ok_pred, ok_corr
 
@@ -124,7 +124,7 @@ contains
 
     ! First aproximation of variables at zref  
     zref = 2.0
-    CALL screenp(klon, knon, nsrf, speed, tpot, q1, &
+    CALL screenp(klon, knon, speed, tpot, q1, &
          ts1, qsurf, rugos, lmon, &
          ustar, testar, qstar, zref, &
          delu, delte, delq)
@@ -157,11 +157,6 @@ contains
           ! return to normal temperature
 
           temp(i) = te_zref(i) * (psol(i)/pref(i))**(-RKAPPA)
-
-          IF(n == ncon) THEN
-             te_zref_con(i) = te_zref(i)
-             q_zref_con(i) = q_zref(i)
-          ENDIF
        ENDDO
     ENDDO
 
@@ -181,7 +176,7 @@ contains
     ! First aproximation of variables at zref  
 
     zref = 10.0
-    CALL screenp(klon, knon, nsrf, speed, tpot, q1, &
+    CALL screenp(klon, knon, speed, tpot, q1, &
          ts1, qsurf, rugos, lmon, &
          ustar, testar, qstar, zref, &
          delu, delte, delq)

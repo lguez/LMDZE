@@ -14,11 +14,9 @@ contains
 
     ! L. Fairhead April 2000
 
-    USE abort_gcm_m, ONLY: abort_gcm
     USE fcttre, ONLY: dqsatl, dqsats, foede, foeew, qsatl, qsats, thermcep
-    USE indicesol, ONLY: is_ter
     use nr_util, only: assert_eq
-    USE suphec_m, ONLY: rcpd, rd, retv, rkappa, rlstt, rlvtt, rtt
+    USE suphec_m, ONLY: rcpd, rd, retv, rlstt, rlvtt, rtt
     USE yoethf_m, ONLY: r2es, r5ies, r5les, rvtmp2
 
     real, intent(IN):: dtime

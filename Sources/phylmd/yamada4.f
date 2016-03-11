@@ -21,40 +21,40 @@ contains
     real, intent(in):: g
 
     REAL zlev(ngrid, klev+1)
-    ! altitude à chaque niveau (interface inférieure de la couche de
-    ! même indice)
+    ! altitude \`a chaque niveau (interface inf\'erieure de la couche de
+    ! m\^eme indice)
 
     REAL zlay(ngrid, klev) ! altitude au centre de chaque couche
 
     REAL u(ngrid, klev), v(ngrid, klev)
-    ! vitesse au centre de chaque couche (en entrée : la valeur au
-    ! début du pas de temps)
+    ! vitesse au centre de chaque couche (en entr\'ee : la valeur au
+    ! d\'ebut du pas de temps)
 
     REAL, intent(in):: teta(ngrid, klev)
-    ! température potentielle au centre de chaque couche (en entrée :
-    ! la valeur au début du pas de temps)
+    ! temp\'erature potentielle au centre de chaque couche (en entr\'ee :
+    ! la valeur au d\'ebut du pas de temps)
 
-    REAL, intent(in):: cd(:) ! (ngrid) cdrag, valeur au début du pas de temps
+    REAL, intent(in):: cd(:) ! (ngrid) cdrag, valeur au d\'ebut du pas de temps
 
     REAL, intent(inout):: q2(ngrid, klev+1)
     ! $q^2$ au bas de chaque couche 
-    ! En entrée : la valeur au début du pas de temps ; en sortie : la
-    ! valeur à la fin du pas de temps.
+    ! En entr\'ee : la valeur au d\'ebut du pas de temps ; en sortie : la
+    ! valeur \`a la fin du pas de temps.
 
     REAL km(ngrid, klev+1)
-    ! diffusivité turbulente de quantité de mouvement (au bas de
-    ! chaque couche) (en sortie : la valeur à la fin du pas de temps)
+    ! diffusivit\'e turbulente de quantit\'e de mouvement (au bas de
+    ! chaque couche) (en sortie : la valeur \`a la fin du pas de temps)
 
     REAL kn(ngrid, klev+1)
-    ! diffusivité turbulente des scalaires (au bas de chaque couche)
-    ! (en sortie : la valeur à la fin du pas de temps)
+    ! diffusivit\'e turbulente des scalaires (au bas de chaque couche)
+    ! (en sortie : la valeur \`a la fin du pas de temps)
 
     REAL kq(ngrid, klev+1)
     real ustar(ngrid)
 
     integer, intent(in):: iflag_pbl
     ! iflag_pbl doit valoir entre 6 et 9
-    ! l = 6, on prend systématiquement une longueur d'équilibre
+    ! l = 6, on prend syst\'ematiquement une longueur d'\'equilibre
     ! iflag_pbl = 6 : MY 2.0
     ! iflag_pbl = 7 : MY 2.0.Fournier
     ! iflag_pbl = 8 : MY 2.5
@@ -69,7 +69,7 @@ contains
     REAL kmpre(ngrid, klev+1), tmp2
     REAL mpre(ngrid, klev+1)
     real delta(ngrid, klev+1)
-    real aa(ngrid, klev+1), aa0, aa1
+    real aa(ngrid, klev+1), aa1
     integer, PARAMETER:: nlev = klev+1
     logical:: first = .true.
     integer:: ipas = 0
@@ -84,8 +84,6 @@ contains
     real sq(ngrid), sqz(ngrid), zz(ngrid, klev+1)
     integer iter
     real:: ric = 0.195, rifc = 0.191, b1 = 16.6, kap = 0.4
-    real rino(ngrid, klev+1), smyam(ngrid, klev), styam(ngrid, klev)
-    real lyam(ngrid, klev)
 
     !-----------------------------------------------------------------------
 
@@ -143,8 +141,8 @@ contains
        enddo
     enddo
 
-    ! Au premier appel, on détermine l et q2 de façon itérative.
-    ! Itération pour déterminer la longueur de mélange
+    ! Au premier appel, on d\'etermine l et q2 de façon it\'erative.
+    ! It\'eration pour d\'eterminer la longueur de m\'elange
 
     if (first .or. iflag_pbl == 6) then
        do ig = 1, ngrid
@@ -265,7 +263,6 @@ contains
                 delta(ig, k) = 1.e-20
              endif
              km(ig, k) = l(ig, k)*sqrt(q2(ig, k))*sm(ig, k)
-             aa0 = (m2(ig, k)-alpha(ig, k)*n2(ig, k)-delta(ig, k)/b1)
              aa1 = (m2(ig, k)*(1.-rif(ig, k))-delta(ig, k)/b1)
              aa(ig, k) = aa1*dt/(delta(ig, k)*l(ig, k))
              qpre = sqrt(q2(ig, k))
@@ -288,7 +285,7 @@ contains
        enddo
     endif
 
-    ! Calcul des coefficients de mélange
+    ! Calcul des coefficients de m\'elange
     do k = 2, klev
        do ig = 1, ngrid
           zq = sqrt(q2(ig, k))
@@ -328,13 +325,6 @@ contains
           endif
        enddo
     enddo
-
-    ! Diagnostique pour stokage
-
-    rino = rif
-    smyam(:, 1:klev) = sm(:, 1:klev)
-    styam = sm(:, 1:klev)*alpha(:, 1:klev)
-    lyam(1:ngrid, 1:klev) = l(:, 1:klev)
 
     first = .false.
 

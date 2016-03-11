@@ -54,7 +54,7 @@ contains
     real rat, awat, delti
     real ax, bx, cx, dx
     real cpinv, rdcp, dpinv
-    real lvcp(nloc,na), mke(nloc,na)
+    real lvcp(nloc,na)
     real am(nloc), work(nloc), ad(nloc), amp1(nloc)
 !!!      real up1(nloc), dn1(nloc)
     real up1(nloc,nd,nd), dn1(nloc,nd,nd)
@@ -625,12 +625,6 @@ contains
     !        icb represente de niveau ou se trouve la
     !        base du nuage , et inb le top du nuage
     !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-
-    do i=1,nd
-       do il=1,ncum
-          mke(il,i)=upwd(il,i)+dnwd(il,i)
-       enddo
-    enddo
 
     do i=1,nd
        DO  il=1,ncum

@@ -2,24 +2,29 @@ module histwrite_real_m
 
   implicit none
 
+  REAL, ALLOCATABLE, SAVE:: buffer(:)
+
 contains
 
-  SUBROUTINE histwrite_real(fileid, varid, itau, nbdpt, buff_tmp, nbindex, &
-       nindex, do_oper, do_write)
+  SUBROUTINE histwrite_real(datasz_max, fileid, varid, itau, nbdpt, buff_tmp, &
+       nbindex, nindex, do_oper, do_write)
 
     ! This subroutine is internal and does the calculations and writing
     ! if needed. At a later stage it should be split into an operation
     ! and writing subroutines.
 
-    USE histcom_var, ONLY: buffer, buff_pos, datasz_max, deltat, &
-         last_opp, last_wrt, missing_val, nbopp, nb_opp, nb_wrt, ncdf_ids, &
-         ncvar_ids, point, regular, scal, scsize, sopps, tax_last, tdimid, &
-         topp, var_axid, zorig, zsize
-    USE trans_buff_m, ONLY: trans_buff
-    use moycum_m, only: moycum
+    use histbeg_totreg_m, only: deltat, regular
+    USE histcom_var, ONLY: last_opp, last_wrt, missing_val, nbopp, nb_opp, &
+         nb_wrt, ncdf_ids, scal, scsize, sopps, tax_last, tdimid, topp, &
+         var_axid, zorig, zsize
+    use histdef_m, only: buff_pos, point
+    use histend_m, only: ncvar_ids
     USE mathop_m, ONLY: mathop
+    use moycum_m, only: moycum
     use netcdf, only: NF90_PUT_VAR
+    USE trans_buff_m, ONLY: trans_buff
 
+    INTEGER, INTENT(IN):: datasz_max(:, :) ! (nb_files_max, nb_var_max)
     INTEGER, INTENT(IN):: fileid, varid, itau, nbdpt
     REAL buff_tmp(:)
 

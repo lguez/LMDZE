@@ -14,7 +14,7 @@ contains
     use divergf_m, only: divergf
     use filtreg_scal_m, only: filtreg_scal
     use grad_m, only: grad
-    USE paramet_m, ONLY: ip1jm, ip1jmp1, jjp1
+    USE paramet_m, ONLY: ip1jm, ip1jmp1
 
     INTEGER, intent(in):: klevel
     REAL, intent(inout):: teta(iim + 1, jjm + 1, klevel)

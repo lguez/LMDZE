@@ -21,8 +21,7 @@ CONTAINS
     use dynetat0_m, only: grossismx, grossismy, rlatu, rlatv
     USE exner_hyb_m, ONLY: exner_hyb
     use init_tau2alpha_m, only: init_tau2alpha
-    use nr_util, only: pi
-    USE paramet_m, ONLY: iip1, ip1jmp1, jjp1, llmp1
+    USE paramet_m, ONLY: iip1, jjp1, llmp1
     USE q_sat_m, ONLY: q_sat
     use read_reanalyse_m, only: read_reanalyse
     use tau2alpha_m, only: tau2alpha

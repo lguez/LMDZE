@@ -58,7 +58,7 @@ contains
 
     INTEGER jl, jk, ja, ikp1, ikn, ikd1, jkj, ikd2
     INTEGER ikjp1, ikm1, ikj, jlk, iku1, ijkl, iku2
-    INTEGER ind1, ind2, ind3, ind4, itt
+    INTEGER itt
     DOUBLE PRECISION zww, zdzxdg, zdzxmg
 
     ! *         1.    INITIALIZATION
@@ -93,13 +93,6 @@ contains
 
     ! *         2.      VERTICAL INTEGRATION
     ! --------------------
-
-
-    ind1 = 0
-    ind3 = 0
-    ind4 = 1
-    ind2 = 1
-
 
     ! *         2.2     CONTRIBUTION FROM DISTANT LAYERS
     ! ---------------------------------

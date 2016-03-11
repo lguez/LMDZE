@@ -21,7 +21,6 @@ inter_barx.f
 inter_barxy.f
 inter_bary.f
 invert_zoom_x.f
-ioipslmpp.f
 minmax.f
 ord_coord.f
 ord_coordm.f

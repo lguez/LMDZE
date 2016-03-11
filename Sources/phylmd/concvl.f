@@ -16,7 +16,6 @@ contains
 
     use clesphys2, only: iflag_con
     use cv_driver_m, only: cv_driver
-    USE dimens_m, ONLY: nqmx
     USE dimphy, ONLY: klev, klon
     USE fcttre, ONLY: foeew
     USE suphec_m, ONLY: retv, rtt

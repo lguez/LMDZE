@@ -75,7 +75,6 @@ SUBROUTINE lwc(klim, pcldld, pcldlu, pemis, pfluc, pbint, pbsuin, pcts, &
 
   INTEGER jk, jl, imaxc, imx1, imx2, jkj, jkp1, jkm1
   INTEGER jk1, jk2, jkc, jkcp1, jcloud
-  INTEGER imxm1, imxp1
   DOUBLE PRECISION zcfrac
   ! ------------------------------------------------------------------
 
@@ -125,10 +124,6 @@ SUBROUTINE lwc(klim, pcldld, pcldlu, pemis, pfluc, pbint, pbsuin, pcts, &
   ! ---------------------------------------
 
   IF (imaxc>0) THEN
-
-    imxp1 = imaxc + 1
-    imxm1 = imaxc - 1
-
     ! *         2.0     INITIALIZE TO CLEAR-SKY FLUXES
     ! ------------------------------
 

@@ -12,11 +12,10 @@ contains
 
     USE comconst, ONLY: cpp, kappa
     USE comgeom, ONLY: aireu_2d, airev_2d, aire_2d
-    USE dimens_m, ONLY: iim, jjm, llm
+    USE dimens_m, ONLY: jjm, llm
     USE disvert_m, ONLY: ap, bp, preff
     USE exner_hyb_m, ONLY: exner_hyb
     use massbar_m, only: massbar
-    use massdair_m, only: massdair
     USE paramet_m, ONLY: iip1, jjp1, llmp1
     use pres2lev_m, only: pres2lev
 
@@ -47,7 +46,7 @@ contains
     real p(iip1, jjp1, llmp1)
     real pks(iip1, jjp1)
     real pls(iip1, jjp1, llm)
-    real prefkap, unskap
+    real unskap
 
     integer i, j, l
 
@@ -59,7 +58,6 @@ contains
 
     ! Calcul de pls, pression au milieu des couches, en Pascals
     unskap=1./kappa
-    prefkap = preff ** kappa
     DO l = 1, llm
        DO j=1, jjp1
           DO i =1, iip1

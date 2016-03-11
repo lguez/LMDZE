@@ -141,7 +141,6 @@ contains
     USE comdissnew, ONLY : coefdis, nitergdiv, nitergrot, niterh
     use dynetat0_m, only: xprimp025, xprimm025, rlatu1, rlatu2, rlatu, rlatv, &
          yprimu1, yprimu2
-    use nr_util, only: pi
     USE paramet_m, ONLY : iip1, jjp1
 
     ! Local:

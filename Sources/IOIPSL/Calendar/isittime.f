@@ -4,8 +4,7 @@ module isittime_m
 
 contains
 
-  SUBROUTINE isittime &
-       &  (itau, date0, dt, freq, last_action, last_check, do_action)
+  SUBROUTINE isittime(itau, date0, dt, freq, last_action, last_check, do_action)
 
     ! This subroutine checks the time has come for a given action.
     ! This is computed from the current time-step(itau).
@@ -29,10 +28,9 @@ contains
     use ymds2ju_m
 
     INTEGER, INTENT(IN):: itau
+    REAL, INTENT(IN):: date0
     REAL, INTENT(IN):: dt, freq
     INTEGER, INTENT(IN):: last_action, last_check
-    REAL, INTENT(IN):: date0
-
     LOGICAL, INTENT(OUT):: do_action
 
     REAL:: dt_action, dt_check

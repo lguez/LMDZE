@@ -11,7 +11,6 @@ contains
 
     ! Laurent FAIRHEAD, February 2000
 
-    use abort_gcm_m, only: abort_gcm
     USE dimphy, ONLY: klon
     use netcdf, only: NF90_NOWRITE
     use netcdf95, only: NF95_close, NF95_GET_VAR, NF95_INQ_VARID, NF95_OPEN

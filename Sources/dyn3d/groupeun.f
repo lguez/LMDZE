@@ -16,8 +16,8 @@ SUBROUTINE groupeun(jjmax, llmax, q)
   INTEGER ngroup
   PARAMETER (ngroup=3)
 
-  REAL airen, airecn, qn
-  REAL aires, airecs, qs
+  REAL airen, qn
+  REAL aires, qs
 
   INTEGER i, j, l, ig, j1, j2, i0, jd
 
@@ -30,10 +30,8 @@ SUBROUTINE groupeun(jjmax, llmax, q)
       DO j = j1 - jd, j2 - jd
         DO i0 = 1, iim, 2**(ngroup-ig+1)
           airen = 0.
-          airecn = 0.
           qn = 0.
           aires = 0.
-          airecs = 0.
           qs = 0.
           DO i = i0, i0 + 2**(ngroup-ig+1) - 1
             airen = airen + aire_2d(i, j)
@@ -41,8 +39,6 @@ SUBROUTINE groupeun(jjmax, llmax, q)
             qn = qn + q(i, j, l)
             qs = qs + q(i, jjp1-j+1-jd, l)
           END DO
-          airecn = 0.
-          airecs = 0.
           DO i = i0, i0 + 2**(ngroup-ig+1) - 1
             q(i, j, l) = qn*aire_2d(i, j)/airen
             q(i, jjp1-j+1-jd, l) = qs*aire_2d(i, jjp1-j+1)/aires

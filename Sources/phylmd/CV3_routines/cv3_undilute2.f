@@ -44,7 +44,7 @@
 
 ! local variables:
       integer i, k
-      real tg,qg,ahg,alv,s,tc,es,denom,rg
+      real tg,qg,ahg,alv,s,tc,es,denom
       real pden
       real ah0(nloc)
 
@@ -141,8 +141,6 @@
 
                clw(i,k)=qnk(i)-qg
                clw(i,k)=max(0.0,clw(i,k))
-               rg=qg/(1.-qnk(i))
-! ori               tvp(i,k)=tp(i,k)*(1.+rg*epsi)
 ! convect3: (qg utilise au lieu du vrai mixing ratio rg):
                tvp(i,k)=tp(i,k)*(1.+qg/eps-qnk(i)) ! whole thing
             endif

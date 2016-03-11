@@ -26,7 +26,7 @@ contains
     ! Jean-Louis Dufresne, July 2002
 
     USE dimphy, ONLY: klev, klon
-    USE suphec_m, ONLY: rcpd, rcpv, rcs, rcw, rg, rlstt, rlvtt
+    USE suphec_m, ONLY: rcpd, rcpv, rcw, rg, rlvtt
 
     ! Arguments: 
 
@@ -90,13 +90,12 @@ contains
     REAL zec_col(klon)
     REAL zh_dair_col(klon)
     REAL zh_qw_col(klon), zh_ql_col(klon)
-    REAL d_h_dair, d_h_qw, d_h_ql
-    REAL airetot, zcpvap, zcwat, zcice
+    REAL airetot, zcpvap, zcwat
     INTEGER i, k
     INTEGER, PARAMETER:: ndiag = 10 ! max number of diagnostic in parallel
     integer:: pas(ndiag) = 0
-    REAL, save:: h_vcol_pre(ndiag), h_dair_pre(ndiag), h_qw_pre(ndiag)
-    REAL, save:: h_ql_pre(ndiag), qw_pre(ndiag), ql_pre(ndiag)
+    REAL, save:: h_vcol_pre(ndiag)
+    REAL, save:: qw_pre(ndiag), ql_pre(ndiag)
     REAL, save:: ec_pre(ndiag)
 
     !-------------------------------------------------------------
@@ -119,7 +118,6 @@ contains
 
     zcpvap=RCPV
     zcwat=RCW
-    zcice=RCS
 
     ! Compute vertical sum for each atmospheric column
     DO k = 1, klev
@@ -175,18 +173,12 @@ contains
 
     IF (idiag2 > 0 .and. pas(idiag2) /= 0) THEN
        d_h_vcol = (h_vcol_tot - h_vcol_pre(idiag2) )/dtime
-       d_h_dair = (h_dair_tot- h_dair_pre(idiag2))/dtime
-       d_h_qw = (h_qw_tot - h_qw_pre(idiag2) )/dtime
-       d_h_ql = (h_ql_tot - h_ql_pre(idiag2) )/dtime 
        d_qw = (qw_tot - qw_pre(idiag2) )/dtime
        d_ql = (ql_tot - ql_pre(idiag2) )/dtime
        d_ec = (ec_tot - ec_pre(idiag2) )/dtime
        d_qt = d_qw + d_ql
     ELSE 
        d_h_vcol = 0.
-       d_h_dair = 0.
-       d_h_qw = 0.
-       d_h_ql = 0.
        d_qw = 0.
        d_ql = 0.
        d_ec = 0.
@@ -202,9 +194,6 @@ contains
     ! Store the new atmospheric state in "idiag"
     pas(idiag)=pas(idiag)+1
     h_vcol_pre(idiag) = h_vcol_tot
-    h_dair_pre(idiag) = h_dair_tot
-    h_qw_pre(idiag) = h_qw_tot
-    h_ql_pre(idiag) = h_ql_tot
     qw_pre(idiag) = qw_tot
     ql_pre(idiag) = ql_tot
     ec_pre (idiag) = ec_tot

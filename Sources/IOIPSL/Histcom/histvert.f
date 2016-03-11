@@ -16,8 +16,9 @@ contains
     USE find_str_m, ONLY: find_str
     USE histcom_var, ONLY: nb_zax, nb_zax_max, ncdf_ids, zax_ids, &
          zax_name, zax_name_length, zax_size
-    USE netcdf, ONLY: nf90_def_dim, nf90_def_var, nf90_enddef, &
-         nf90_float, nf90_put_att, nf90_put_var, nf90_redef
+    USE netcdf95, ONLY: nf95_def_dim, nf95_def_var, nf95_enddef, &
+         nf95_put_att, nf95_put_var, nf95_redef
+    use netcdf, only: nf90_float
     USE strlowercase_m, ONLY: strlowercase
 
     INTEGER, INTENT(IN):: pfileid 
@@ -43,7 +44,7 @@ contains
     CHARACTER(len=70):: str70, str71, str72
     CHARACTER(len=80):: str80
     CHARACTER(len=20):: direction
-    INTEGER:: iret, leng, ncid
+    INTEGER:: leng, ncid
 
     !---------------------------------------------------------------------
 
@@ -107,28 +108,28 @@ contains
     ncid = ncdf_ids(pfileid)
 
     leng = min(len_trim(pzaxname), 20)
-    iret = nf90_def_dim(ncid, pzaxname(1:leng), pzsize, zaxid_tmp)
-    iret = nf90_def_var(ncid, pzaxname(1:leng), nf90_float, zaxid_tmp, zdimid)
+    call nf95_def_dim(ncid, pzaxname(1:leng), pzsize, zaxid_tmp)
+    call nf95_def_var(ncid, pzaxname(1:leng), nf90_float, zaxid_tmp, zdimid)
 
     leng = min(len_trim(pzaxunit), 20)
-    iret = nf90_put_att(ncid, zdimid, 'units', pzaxunit(1:leng))
-    iret = nf90_put_att(ncid, zdimid, 'positive', trim(direction))
+    call NF95_PUT_ATT(ncid, zdimid, 'units', pzaxunit(1:leng))
+    call NF95_PUT_ATT(ncid, zdimid, 'positive', trim(direction))
 
-    iret = nf90_put_att(ncid, zdimid, 'valid_min', real(minval( &
+    call NF95_PUT_ATT(ncid, zdimid, 'valid_min', real(minval( &
          pzvalues(1:pzsize))))
-    iret = nf90_put_att(ncid, zdimid, 'valid_max', real(maxval( &
+    call NF95_PUT_ATT(ncid, zdimid, 'valid_max', real(maxval( &
          pzvalues(1:pzsize))))
 
     leng = min(len_trim(pzaxname), 20)
-    iret = nf90_put_att(ncid, zdimid, 'title', pzaxname(1:leng))
+    call NF95_PUT_ATT(ncid, zdimid, 'title', pzaxname(1:leng))
     leng = min(len_trim(pzaxtitle), 80)
-    iret = nf90_put_att(ncid, zdimid, 'long_name', pzaxtitle(1:leng))
+    call NF95_PUT_ATT(ncid, zdimid, 'long_name', pzaxtitle(1:leng))
 
-    iret = nf90_enddef(ncid)
+    call nf95_enddef(ncid)
 
-    iret = nf90_put_var(ncid, zdimid, pzvalues(1:pzsize))
+    call nf95_put_var(ncid, zdimid, pzvalues(1:pzsize))
 
-    iret = nf90_redef(ncid)
+    call nf95_redef(ncid)
 
     ! 3.0 add the information to the common
 

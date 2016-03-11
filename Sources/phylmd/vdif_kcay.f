@@ -107,7 +107,6 @@ contains
     ! gnmax : borne superieure de gn (0.0233)
     ! gninf : vrai si gn est en dessous de sa borne inferieure
     ! gnsup : vrai si gn est en dessus de sa borne superieure
-    ! gm : drole d'objet bien utile
     ! ri : nombre de Richardson
     ! sn : coefficient de stabilite pour n
     ! snq2 : premier terme du developement limite de sn en q2
@@ -119,8 +118,6 @@ contains
     REAL gnmax
     LOGICAL gninf
     LOGICAL gnsup
-    REAL gm
-    ! REAL ri(klon, klev+1)
     REAL sn(klon, klev+1)
     REAL snq2(klon, klev+1)
     REAL sm(klon, klev+1)
@@ -326,9 +323,6 @@ contains
 
           gn=-long(igrid, ilev)**2 / q2(igrid, ilev) &
                * n2(igrid, ilev)
-          gm=long(igrid, ilev)**2 / q2(igrid, ilev) &
-               * m2(igrid, ilev)
-
           gninf=.false.
           gnsup=.false.
           long(igrid, ilev)=long(igrid, ilev)

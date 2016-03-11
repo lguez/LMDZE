@@ -33,7 +33,7 @@
 ! local variables:
       integer i, k
       integer icb1(len), icbs(len), icbsmax2 ! convect3
-      real tg, qg, alv, s, ahg, tc, denom, es, rg
+      real tg, qg, alv, s, ahg, tc, denom, es
       real ah0(len), cpp(len)
       real tnk(len), qnk(len), gznk(len), ticb(len), gzicb(len)
       real qsicb(len) ! convect3
@@ -176,8 +176,6 @@
          clw(i,icbs(i))=qnk(i)-qg
          clw(i,icbs(i))=max(0.0,clw(i,icbs(i)))
 
-         rg=qg/(1.-qnk(i))
-! ori         tvp(i,icb(i))=tp(i,icb(i))*(1.+rg*epsi)
 ! convect3: (qg utilise au lieu du vrai mixing ratio rg)
          tvp(i,icbs(i))=tp(i,icbs(i))*(1.+qg/eps-qnk(i)) !whole thing
 
@@ -275,8 +273,6 @@
          clw(i,icb(i)+1)=qnk(i)-qg
          clw(i,icb(i)+1)=max(0.0,clw(i,icb(i)+1))
 
-         rg=qg/(1.-qnk(i))
-! ori         tvp(i,icb(i))=tp(i,icb(i))*(1.+rg*epsi)
 ! convect3: (qg utilise au lieu du vrai mixing ratio rg)
          tvp(i,icb(i)+1)=tp(i,icb(i)+1)*(1.+qg/eps-qnk(i)) !whole thing
 

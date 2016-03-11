@@ -296,6 +296,10 @@ contains
             "kg m-2", iim, jjm + 1, nhori, llm, 1, llm, nvert, "inst(X)", &
             zsto, zout)
 
+       CALL histdef(nid_ins, "rhum", "Relative humidity", &
+            "", iim, jjm + 1, nhori, llm, 1, llm, nvert, "inst(X)", &
+            zsto, zout)
+
        DO it = 1, nqmx - 2
           ! champ 2D
           iq=it+2

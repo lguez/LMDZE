@@ -15,7 +15,6 @@ SUBROUTINE limy(s0, sy, sm, pente_max)
 
   ! --------------------------------------------------------------------
   USE comconst
-  use comgeom, only: aire
   USE conf_gcm_m
   USE dimens_m
   USE disvert_m
@@ -38,11 +37,9 @@ SUBROUTINE limy(s0, sy, sm, pente_max)
   INTEGER i, ij, l
 
   REAL q(ip1jmp1, llm)
-  REAL airej2, airejjm, airescb(iim), airesch(iim)
   REAL dyq(ip1jmp1), dyqv(ip1jm)
   REAL adyqv(ip1jm), dyqmax(ip1jmp1)
 
-  REAL qpns, qpsn
   LOGICAL first
   SAVE first
 
@@ -51,9 +48,8 @@ SUBROUTINE limy(s0, sy, sm, pente_max)
   SAVE sinlon, coslon, sinlondlon, coslondlon
 
 
-  REAL ssum
   INTEGER ismax, ismin
-  EXTERNAL ssum, convflu, ismin, ismax
+  EXTERNAL convflu, ismin, ismax
 
   DATA first/.TRUE./
 
@@ -89,15 +85,6 @@ SUBROUTINE limy(s0, sy, sm, pente_max)
     ! cercle
     ! de latitude autour du pole (qpns pour le pole nord et qpsn pour
     ! le pole nord) qui sera utilisee pour evaluer les pentes au pole.
-
-    airej2 = ssum(iim, aire(iip2), 1)
-    airejjm = ssum(iim, aire(ip1jm-iim), 1)
-    DO i = 1, iim
-      airescb(i) = aire(i+iip1)*q(i+iip1, l)
-      airesch(i) = aire(i+ip1jm-iip1)*q(i+ip1jm-iip1, l)
-    END DO
-    qpns = ssum(iim, airescb, 1)/airej2
-    qpsn = ssum(iim, airesch, 1)/airejjm
 
     ! calcul des pentes aux points v
 

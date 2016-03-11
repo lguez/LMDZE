@@ -20,7 +20,6 @@ inifgn.f
 inifilr.f
 inifilr_hemisph.f
 invert_zoom_x.f
-ioipslmpp.f
 principal_cshift.f
 read_serre.f
 tanh_cautious.f

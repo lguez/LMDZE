@@ -15,7 +15,6 @@ histcom_var.f
 histhori_regular.f
 iniadvtrac.f
 invert_zoom_x.f
-ioipslmpp.f
 principal_cshift.f
 read_serre.f
 tanh_cautious.f

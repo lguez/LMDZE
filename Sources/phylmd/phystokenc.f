@@ -14,7 +14,7 @@ contains
 
     USE histwrite_m, ONLY: histwrite
     USE histsync_m, ONLY: histsync
-    USE dimens_m, ONLY: iim, jjm, nqmx
+    USE dimens_m, ONLY: iim, jjm
     USE indicesol, ONLY: nbsrf
     use initphysto_m, only: initphysto
     USE dimphy, ONLY: klev, klon

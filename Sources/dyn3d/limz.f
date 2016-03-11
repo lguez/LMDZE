@@ -40,9 +40,7 @@ SUBROUTINE limz(s0, sz, sm, pente_max)
   REAL dzqw(ip1jmp1)
   REAL adzqw(ip1jmp1), dzqmax(ip1jmp1)
 
-  REAL ssum
-  INTEGER ismax, ismin
-  EXTERNAL ssum, convflu, ismin, ismax
+  EXTERNAL convflu
 
   DO l = 1, llm
     DO ij = 1, ip1jmp1

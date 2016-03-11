@@ -32,7 +32,7 @@ contains
     USE interfoce_lim_m, ONLY: interfoce_lim
     USE interfsur_lim_m, ONLY: interfsur_lim
     use soil_m, only: soil
-    USE suphec_m, ONLY: rcpd, rlstt, rlvtt, rtt
+    USE suphec_m, ONLY: rcpd, rtt
 
     integer, intent(IN):: itime ! numero du pas de temps
     real, intent(IN):: dtime ! pas de temps de la physique (en s)

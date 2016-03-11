@@ -1,153 +1,155 @@
-SUBROUTINE initfluxsto(tstep, t_ops, t_wrt, fileid, filevid, filedid)
-
-  ! From bibio/initfluxsto.F, v 1.1.1.1 2004/05/19 12:53:05
-
-  !   Routine d'initialisation des ecritures des fichiers histoires LMDZ  
-  !   au format IOIPSL                                                    
-  !   Appels succesifs des routines: histbeg                              
-  !                                  histhori                             
-  !                                  histver                              
-  !                                  histdef                              
-  !                                  histend                              
-
-  !   Entree:                                                             
-  !      day0, anne0: date de reference                                    
-  !      tstep: duree du pas de temps en seconde                          
-  !      t_ops: frequence de l'operation pour IOIPSL                      
-  !      t_wrt: frequence d'ecriture sur le fichier                       
-
-  !   Sortie:                                                             
-  !      fileid: ID du fichier netcdf cree                                
-  !      filevid:ID du fichier netcdf pour la grille v                    
-
-  !   L. Fairhead, 03/99                                             
-
-  USE comconst
-  use conf_gcm_m
-  USE dimens_m
-  USE disvert_m
-  use dynetat0_m, only: day_ref, annee_ref, rlonu, rlatu, rlonv, rlatv
-  USE histbeg_totreg_m, ONLY : histbeg_totreg
-  USE histdef_m, ONLY : histdef
-  USE histend_m, ONLY : histend
-  use histhori_regular_m, only: histhori_regular
-  use histsync_m, only: histsync
-  USE histvert_m, ONLY : histvert
-  USE nr_util, ONLY : pi
-  USE paramet_m
-  USE temps, ONLY : itau_dyn
-  use ymds2ju_m, only: ymds2ju
+module initfluxsto_m
 
   IMPLICIT NONE
 
-  !   Arguments                                                           
-  REAL, INTENT (IN) :: tstep
-  REAL t_ops, t_wrt
-  INTEGER fileid, filevid, filedid
-  REAL nivd(1)
+contains
 
-  !   Variables locales                                                   
-  REAL zjulian
-  CHARACTER(len=3) str
-  CHARACTER(len=10) ctrac
-  REAL rlong(iip1, jjp1), rlat(iip1, jjp1)
-  INTEGER uhoriid, vhoriid, thoriid, zvertiid, dhoriid, dvertiid
-  INTEGER ii, jj, l
-  LOGICAL ok_sync
+  SUBROUTINE initfluxsto(tstep, t_ops, t_wrt, fileid, filevid, filedid)
 
-  !---------------------------------------------------------
+    ! From bibio/initfluxsto.F, v 1.1.1.1 2004/05/19 12:53:05
 
-  !  Initialisations                                                      
-  str = 'q  '
-  ctrac = 'traceur   '
-  ok_sync = .TRUE.
+    !   Routine d'initialisation des ecritures des fichiers histoires LMDZ  
+    !   au format IOIPSL                                                    
+    !   Appels succesifs des routines: histbeg                              
+    !                                  histhori                             
+    !                                  histver                              
+    !                                  histdef                              
+    !                                  histend                              
 
-  !  Appel a histbeg: creation du fichier netcdf et initialisations diverses
+    !   Entree:                                                             
+    !      day0, anne0: date de reference                                    
+    !      tstep: duree du pas de temps en seconde                          
+    !      t_ops: frequence de l'operation pour IOIPSL                      
+    !      t_wrt: frequence d'ecriture sur le fichier                       
 
-  CALL ymds2ju(annee_ref, 1, day_ref, 0.0, zjulian)
+    !   Sortie:                                                             
+    !      fileid: ID du fichier netcdf cree                                
+    !      filevid:ID du fichier netcdf pour la grille v                    
 
-  DO jj = 1, jjp1
-     DO ii = 1, iip1
-        rlong(ii, jj) = rlonu(ii)*180./pi
-        rlat(ii, jj) = rlatu(jj)*180./pi
-     END DO
-  END DO
+    !   L. Fairhead, 03/99                                             
 
-  CALL histbeg_totreg('fluxstoke', rlong(:, 1), rlat(1, :), 1, iip1, 1, jjp1, &
-       itau_dyn, zjulian, tstep, uhoriid, fileid)
+    USE comconst
+    use conf_gcm_m
+    USE dimens_m
+    USE disvert_m
+    use dynetat0_m, only: day_ref, annee_ref, rlonu, rlatu, rlonv, rlatv
+    USE histbeg_totreg_m, ONLY : histbeg_totreg
+    USE histdef_m, ONLY : histdef
+    USE histend_m, ONLY : histend
+    use histhori_regular_m, only: histhori_regular
+    use histsync_m, only: histsync
+    USE histvert_m, ONLY : histvert
+    USE nr_util, ONLY : pi
+    USE paramet_m
+    USE temps, ONLY : itau_dyn
+    use ymds2ju_m, only: ymds2ju
 
-  !  Creation du fichier histoire pour la grille en V (oblige pour l'instant,
-  !  IOIPSL ne permet pas de grilles avec des nombres de point differents dans
-  !  un meme fichier)                                                     
+    !   Arguments                                                           
+    REAL, INTENT (IN) :: tstep
+    REAL t_ops, t_wrt
+    INTEGER fileid, filevid, filedid
+    REAL nivd(1)
 
-  DO jj = 1, jjm
-     DO ii = 1, iip1
-        rlong(ii, jj) = rlonv(ii)*180./pi
-        rlat(ii, jj) = rlatv(jj)*180./pi
-     END DO
-  END DO
+    !   Variables locales                                                   
+    REAL zjulian
+    REAL rlong(iip1, jjp1), rlat(iip1, jjp1)
+    INTEGER uhoriid, vhoriid, thoriid, zvertiid, dhoriid, dvertiid
+    INTEGER ii, jj, l
+    LOGICAL ok_sync
 
-  CALL histbeg_totreg('fluxstokev.nc', rlong(:, 1), rlat(1, :jjm), 1, iip1, &
-       1, jjm, itau_dyn, zjulian, tstep, vhoriid, filevid)
+    !---------------------------------------------------------
 
-  CALL histbeg_totreg('defstoke.nc', (/1./), (/1./), 1, 1, 1, 1, itau_dyn, &
-       zjulian, tstep, dhoriid, filedid)
+    !  Initialisations                                                      
+    ok_sync = .TRUE.
 
-  !  Appel a histhori pour rajouter les autres grilles horizontales       
+    !  Appel a histbeg: creation du fichier netcdf et initialisations diverses
 
-  DO jj = 1, jjp1
-     DO ii = 1, iip1
-        rlong(ii, jj) = rlonv(ii)*180./pi
-        rlat(ii, jj) = rlatu(jj)*180./pi
-     END DO
-  END DO
+    CALL ymds2ju(annee_ref, 1, day_ref, 0.0, zjulian)
 
-  CALL histhori_regular(fileid, iip1, rlong, jjp1, rlat, 'scalar', &
-       'Grille points scalaires', thoriid)
+    DO jj = 1, jjp1
+       DO ii = 1, iip1
+          rlong(ii, jj) = rlonu(ii)*180./pi
+          rlat(ii, jj) = rlatu(jj)*180./pi
+       END DO
+    END DO
 
-  !  Appel a histvert pour la grille verticale                            
+    CALL histbeg_totreg('fluxstoke', rlong(:, 1), rlat(1, :), 1, iip1, 1, jjp1, &
+         itau_dyn, zjulian, tstep, uhoriid, fileid)
 
-  CALL histvert(fileid, 'sig_s', 'Niveaux sigma', 'sigma_level', &
-       (/(real(l), l = 1, llm)/), zvertiid)
-  ! Pour le fichier V                                                     
-  CALL histvert(filevid, 'sig_s', 'Niveaux sigma', 'sigma_level', &
-       (/(real(l), l = 1, llm)/), zvertiid)
-  ! pour le fichier def                                                   
-  nivd(1) = 1
-  CALL histvert(filedid, 'sig_s', 'Niveaux sigma', 'sigma_level', nivd, &
-       dvertiid)
+    !  Creation du fichier histoire pour la grille en V (oblige pour l'instant,
+    !  IOIPSL ne permet pas de grilles avec des nombres de point differents dans
+    !  un meme fichier)                                                     
 
-  !  Appels a histdef pour la definition des variables a sauvegarder      
-  CALL histdef(fileid, 'phis', 'Surface geop. height', '-', iip1, jjp1, &
-       thoriid, 1, 1, 1, -99, 'once', t_ops, t_wrt)
-  CALL histdef(fileid, 'aire', 'Grid area', '-', iip1, jjp1, thoriid, 1, 1, &
-       1, -99, 'once', t_ops, t_wrt)
-  CALL histdef(filedid, 'dtvr', 'tps dyn', 's', 1, 1, dhoriid, 1, 1, 1, -99, &
-       'once', t_ops, t_wrt)
-  CALL histdef(filedid, 'istdyn', 'tps stock', 's', 1, 1, dhoriid, 1, 1, 1, &
-       -99, 'once', t_ops, t_wrt)
-  CALL histdef(filedid, 'istphy', 'tps stock phy', 's', 1, 1, dhoriid, 1, 1, &
-       1, -99, 'once', t_ops, t_wrt)
-  CALL histdef(fileid, 'masse', 'Masse', 'kg', iip1, jjp1, thoriid, llm, 1, &
-       llm, zvertiid, 'inst(X)', t_ops, t_wrt)
-  CALL histdef(fileid, 'pbaru', 'flx de masse zonal', 'kg m/s', iip1, jjp1, &
-       uhoriid, llm, 1, llm, zvertiid, 'inst(X)', t_ops, t_wrt)
-  CALL histdef(filevid, 'pbarv', 'flx de masse mer', 'kg m/s', iip1, jjm, &
-       vhoriid, llm, 1, llm, zvertiid, 'inst(X)', t_ops, t_wrt)
-  CALL histdef(fileid, 'w', 'flx de masse vert', 'kg m/s', iip1, jjp1, &
-       thoriid, llm, 1, llm, zvertiid, 'inst(X)', t_ops, t_wrt)
-  CALL histdef(fileid, 'teta', 'temperature potentielle', '-', iip1, jjp1, &
-       thoriid, llm, 1, llm, zvertiid, 'inst(X)', t_ops, t_wrt)
-  CALL histdef(fileid, 'phi', 'geopotentiel instantane', '-', iip1, jjp1, &
-       thoriid, llm, 1, llm, zvertiid, 'inst(X)', t_ops, t_wrt)
+    DO jj = 1, jjm
+       DO ii = 1, iip1
+          rlong(ii, jj) = rlonv(ii)*180./pi
+          rlat(ii, jj) = rlatv(jj)*180./pi
+       END DO
+    END DO
 
-  CALL histend(fileid)
-  CALL histend(filevid)
-  CALL histend(filedid)
-  IF (ok_sync) THEN
-     CALL histsync(fileid)
-     CALL histsync(filevid)
-     CALL histsync(filedid)
-  END IF
+    CALL histbeg_totreg('fluxstokev.nc', rlong(:, 1), rlat(1, :jjm), 1, iip1, &
+         1, jjm, itau_dyn, zjulian, tstep, vhoriid, filevid)
 
-END SUBROUTINE initfluxsto
+    CALL histbeg_totreg('defstoke.nc', (/1./), (/1./), 1, 1, 1, 1, itau_dyn, &
+         zjulian, tstep, dhoriid, filedid)
+
+    !  Appel a histhori pour rajouter les autres grilles horizontales       
+
+    DO jj = 1, jjp1
+       DO ii = 1, iip1
+          rlong(ii, jj) = rlonv(ii)*180./pi
+          rlat(ii, jj) = rlatu(jj)*180./pi
+       END DO
+    END DO
+
+    CALL histhori_regular(fileid, iip1, rlong, jjp1, rlat, 'scalar', &
+         'Grille points scalaires', thoriid)
+
+    !  Appel a histvert pour la grille verticale                            
+
+    CALL histvert(fileid, 'sig_s', 'Niveaux sigma', 'sigma_level', &
+         (/(real(l), l = 1, llm)/), zvertiid)
+    ! Pour le fichier V                                                     
+    CALL histvert(filevid, 'sig_s', 'Niveaux sigma', 'sigma_level', &
+         (/(real(l), l = 1, llm)/), zvertiid)
+    ! pour le fichier def                                                   
+    nivd(1) = 1
+    CALL histvert(filedid, 'sig_s', 'Niveaux sigma', 'sigma_level', nivd, &
+         dvertiid)
+
+    !  Appels a histdef pour la definition des variables a sauvegarder      
+    CALL histdef(fileid, 'phis', 'Surface geop. height', '-', iip1, jjp1, &
+         thoriid, 1, 1, 1, -99, 'once', t_ops, t_wrt)
+    CALL histdef(fileid, 'aire', 'Grid area', '-', iip1, jjp1, thoriid, 1, 1, &
+         1, -99, 'once', t_ops, t_wrt)
+    CALL histdef(filedid, 'dtvr', 'tps dyn', 's', 1, 1, dhoriid, 1, 1, 1, -99, &
+         'once', t_ops, t_wrt)
+    CALL histdef(filedid, 'istdyn', 'tps stock', 's', 1, 1, dhoriid, 1, 1, 1, &
+         -99, 'once', t_ops, t_wrt)
+    CALL histdef(filedid, 'istphy', 'tps stock phy', 's', 1, 1, dhoriid, 1, 1, &
+         1, -99, 'once', t_ops, t_wrt)
+    CALL histdef(fileid, 'masse', 'Masse', 'kg', iip1, jjp1, thoriid, llm, 1, &
+         llm, zvertiid, 'inst(X)', t_ops, t_wrt)
+    CALL histdef(fileid, 'pbaru', 'flx de masse zonal', 'kg m/s', iip1, jjp1, &
+         uhoriid, llm, 1, llm, zvertiid, 'inst(X)', t_ops, t_wrt)
+    CALL histdef(filevid, 'pbarv', 'flx de masse mer', 'kg m/s', iip1, jjm, &
+         vhoriid, llm, 1, llm, zvertiid, 'inst(X)', t_ops, t_wrt)
+    CALL histdef(fileid, 'w', 'flx de masse vert', 'kg m/s', iip1, jjp1, &
+         thoriid, llm, 1, llm, zvertiid, 'inst(X)', t_ops, t_wrt)
+    CALL histdef(fileid, 'teta', 'temperature potentielle', '-', iip1, jjp1, &
+         thoriid, llm, 1, llm, zvertiid, 'inst(X)', t_ops, t_wrt)
+    CALL histdef(fileid, 'phi', 'geopotentiel instantane', '-', iip1, jjp1, &
+         thoriid, llm, 1, llm, zvertiid, 'inst(X)', t_ops, t_wrt)
+
+    CALL histend(fileid)
+    CALL histend(filevid)
+    CALL histend(filedid)
+    IF (ok_sync) THEN
+       CALL histsync(fileid)
+       CALL histsync(filevid)
+       CALL histsync(filedid)
+    END IF
+
+  END SUBROUTINE initfluxsto
+
+end module initfluxsto_m

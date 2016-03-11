@@ -8,14 +8,14 @@ contains
 
     ! From dyn3d/caladvtrac.F, version 1.3 2005/04/13 08:58:34
     ! Authors: F. Hourdin, P. Le Van, F. Forget, F. Codron
-    ! F. Codron (10/99) : ajout humidité spécifique pour eau vapeur
-    ! Schéma de Van Leer
+    ! F. Codron (10/99) : ajout humidit\'e sp\'ecifique pour eau vapeur
+    ! Sch\'ema de Van Leer
 
-    ! Calcul des tendances advection des traceurs (dont l'humidité)
+    ! Calcul des tendances advection des traceurs (dont l'humidit\'e)
 
     use advtrac_m, only: advtrac
     use conf_gcm_m, only: iapp_tracvl
-    use dimens_m, only: iim, jjm, llm, nqmx
+    use dimens_m, only: iim, jjm, llm
     use paramet_m, only: ip1jmp1
     use qminimum_m, only: qminimum
 

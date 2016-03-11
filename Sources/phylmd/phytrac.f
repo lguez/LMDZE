@@ -410,12 +410,8 @@ contains
 
       ! From phylmd/write_histrac.h, version 1.9 2006/02/21 08:08:30
 
-      use dimens_m, only: iim, jjm, llm
-      use histsync_m, only: histsync
       use histwrite_m, only: histwrite
       use iniadvtrac_m, only: tname
-      use dimphy, only: klon
-      use grid_change, only: gr_phy_write_2d
       use gr_phy_write_3d_m, only: gr_phy_write_3d
 
       logical, intent(in):: lessivage

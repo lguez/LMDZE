@@ -11,7 +11,6 @@ MODULE histcom_var
 
   ! Time variables
   INTEGER, SAVE:: itau0(nb_files_max)=0
-  REAL, DIMENSION(nb_files_max), SAVE::date0, deltat
 
   ! Counter of elements
   INTEGER, DIMENSION(nb_files_max), SAVE:: nb_var=0, nb_tax=0
@@ -48,22 +47,18 @@ MODULE histcom_var
        scsize, zorig, zsize
   ! Sizes for the data as it goes through the various math operations
   INTEGER, SAVE:: datasz_in(nb_files_max, nb_var_max, 3) = -1
-  INTEGER, SAVE:: datasz_max(nb_files_max, nb_var_max) = -1
 
   INTEGER, DIMENSION(nb_files_max, nb_var_max), SAVE:: var_haxid, var_zaxid, &
-       var_axid, ncvar_ids
+       var_axid
 
   REAL, SAVE:: minmax(nb_files_max, nb_var_max, 2)
 
-  REAL, DIMENSION(nb_files_max, nb_var_max), SAVE:: &
-       freq_opp, freq_wrt
-  INTEGER, DIMENSION(nb_files_max, nb_var_max), SAVE:: &
-       last_opp, last_wrt, last_opp_chk, last_wrt_chk, nb_opp, nb_wrt, point
+  REAL, DIMENSION(nb_files_max, nb_var_max), SAVE:: freq_opp, freq_wrt
+  INTEGER, DIMENSION(nb_files_max, nb_var_max), SAVE:: last_opp, last_wrt, &
+       last_opp_chk, last_wrt_chk, nb_opp, nb_wrt
 
   ! Book keeping for the buffers
-  INTEGER:: buff_pos = 0
-  REAL, ALLOCATABLE, SAVE:: buffer(:)
-  LOGICAL:: zoom(nb_files_max) = .FALSE., regular(nb_files_max) = .TRUE.
+  LOGICAL:: zoom(nb_files_max) = .FALSE.
 
   ! Book keeping of the axes
 

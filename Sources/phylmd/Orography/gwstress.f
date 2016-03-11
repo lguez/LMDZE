@@ -1,116 +1,116 @@
-    SUBROUTINE gwstress(nlon,nlev,ktest,kcrit,kkenvh,kknu,prho,pstab,pvph, &
-        pstd,psig,pmea,ppic,ptau,pgeom1,pdmod)
+module gwstress_m
 
-!**** *gwstress*
+  IMPLICIT NONE
 
-!     purpose.
-!     --------
+contains
 
-!**   interface.
-!     ----------
-!     call *gwstress*  from *gwdrag*
+  SUBROUTINE gwstress(nlon,nlev,ktest,kkenvh,prho,pstab,pvph, &
+       pstd,psig,pmea,ppic,ptau,pgeom1,pdmod)
 
-!        explicit arguments :
-!        --------------------
-!     ==== inputs ===
-!     ==== outputs ===
+    !**** *gwstress*
 
-!        implicit arguments :   none
-!        --------------------
+    !     purpose.
+    !     --------
 
-!     method.
-!     -------
+    !**   interface.
+    !     ----------
+    !     call *gwstress*  from *gwdrag*
+
+    !        explicit arguments :
+    !        --------------------
+    !     ==== inputs ===
+    !     ==== outputs ===
+
+    !        implicit arguments :   none
+    !        --------------------
+
+    !     method.
+    !     -------
 
 
-!     externals.
-!     ----------
+    !     externals.
+    !     ----------
 
 
-!     reference.
-!     ----------
+    !     reference.
+    !     ----------
 
-!        see ecmwf research department documentation of the "i.f.s."
+    !        see ecmwf research department documentation of the "i.f.s."
 
-!     author.
-!     -------
+    !     author.
+    !     -------
 
-!     modifications.
-!     --------------
-!     f. lott put the new gwd on ifs      22/11/93
+    !     modifications.
+    !     --------------
+    !     f. lott put the new gwd on ifs      22/11/93
 
-!-----------------------------------------------------------------------
-      USE dimens_m
-      USE dimphy
-      USE suphec_m
-      USE yoegwd
-      IMPLICIT NONE
+    !-----------------------------------------------------------------------
+    USE dimens_m
+    USE dimphy
+    USE suphec_m
+    USE yoegwd
 
-!-----------------------------------------------------------------------
+    !-----------------------------------------------------------------------
 
-!*       0.1   arguments
-!              ---------
+    !*       0.1   arguments
+    !              ---------
 
-      INTEGER nlon, nlev
-      INTEGER kcrit(nlon), ktest(nlon), kkenvh(nlon), kknu(nlon)
+    INTEGER nlon, nlev
+    INTEGER ktest(nlon), kkenvh(nlon)
 
-      REAL prho(nlon,nlev+1), pstab(nlon,nlev+1), ptau(nlon,nlev+1), &
-        pvph(nlon,nlev+1), pgeom1(nlon,nlev)
-      REAL, INTENT (IN) :: pstd(nlon)
+    REAL prho(nlon,nlev+1), pstab(nlon,nlev+1), ptau(nlon,nlev+1), &
+         pvph(nlon,nlev+1), pgeom1(nlon,nlev)
+    REAL, INTENT (IN) :: pstd(nlon)
 
-      REAL, INTENT (IN) :: psig(nlon)
-      REAL pmea(nlon), ppic(nlon)
-      REAL pdmod(nlon)
+    REAL, INTENT (IN) :: psig(nlon)
+    REAL pmea(nlon), ppic(nlon)
+    REAL pdmod(nlon)
 
-!-----------------------------------------------------------------------
+    !-----------------------------------------------------------------------
 
-!*       0.2   local arrays
-!              ------------
-      INTEGER jl
-      REAL zblock, zvar, zeff
-      LOGICAL lo
+    !*       0.2   local arrays
+    !              ------------
+    INTEGER jl
+    REAL zblock, zvar, zeff
 
-!-----------------------------------------------------------------------
+    !-----------------------------------------------------------------------
 
-!*       0.3   functions
-!              ---------
-!     ------------------------------------------------------------------
+    !*       0.3   functions
+    !              ---------
+    !     ------------------------------------------------------------------
 
-!*         1.    initialization
-!                --------------
+    !*         1.    initialization
+    !                --------------
 
-!*         3.1     gravity wave stress.
+    !*         3.1     gravity wave stress.
 
-      DO 301 jl = 1, klon
-        IF (ktest(jl)==1) THEN
+    DO jl = 1, klon
+       IF (ktest(jl)==1) THEN
 
-!  effective mountain height above the blocked flow
+          !  effective mountain height above the blocked flow
 
           IF (kkenvh(jl)==klev) THEN
-            zblock = 0.0
+             zblock = 0.0
           ELSE
-            zblock = (pgeom1(jl,kkenvh(jl))+pgeom1(jl,kkenvh(jl)+1))/2./rg
+             zblock = (pgeom1(jl,kkenvh(jl))+pgeom1(jl,kkenvh(jl)+1))/2./rg
           END IF
 
           zvar = ppic(jl) - pmea(jl)
           zeff = amax1(0.,zvar-zblock)
 
           ptau(jl,klev+1) = prho(jl,klev+1)*gkdrag*psig(jl)*zeff**2/4./ &
-            pstd(jl)*pvph(jl,klev+1)*pdmod(jl)*sqrt(pstab(jl,klev+1))
+               pstd(jl)*pvph(jl,klev+1)*pdmod(jl)*sqrt(pstab(jl,klev+1))
 
-!  too small value of stress or  low level flow include critical level
-!  or low level flow:  gravity wave stress nul.
-
-          lo = (ptau(jl,klev+1)<gtsec) .OR. (kcrit(jl)>=kknu(jl)) .OR. &
-            (pvph(jl,klev+1)<gvcrit)
-!       if(lo) ptau(jl,klev+1)=0.0
-
-        ELSE
+          !  too small value of stress or  low level flow include critical level
+          !  or low level flow:  gravity wave stress nul.
+       ELSE
 
           ptau(jl,klev+1) = 0.0
 
-        END IF
+       END IF
 
-301   CONTINUE
+    end DO
 
-      RETURN
-    END
+  END SUBROUTINE gwstress
+
+end module gwstress_m

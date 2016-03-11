@@ -16,7 +16,7 @@ contains
     USE disvert_m, ONLY : ap, bp
     use massdair_m, only: massdair
     use nr_util, only: assert
-    USE paramet_m, ONLY : iip1, iip2, ip1jm, ip1jmp1, jjp1, llmp1
+    USE paramet_m, ONLY : iip1, iip2, ip1jm, llmp1
     use qminimum_m, only: qminimum
 
     REAL vcovm1(ip1jm, llm), ucovm1((iim + 1) * (jjm + 1), llm)

@@ -31,7 +31,6 @@ contains
     real uent(nloc, na, na), vent(nloc, na, na)
     real sij(nloc, na, na), elij(nloc, na, na)
     real ments(nloc, nd, nd), qents(nloc, nd, nd)
-    real sigij(nloc, nd, nd)
     integer nent(nloc, nd)
 
     ! local variables:
@@ -139,20 +138,6 @@ contains
           end if
        end do
     end do
-
-    do j=minorig, nl
-       do i=minorig, nl
-          do il=1, ncum
-             if ((j >= (icb(il)-1)).and.(j <= inb(il)) &
-                  .and.(i >= icb(il)).and.(i <= inb(il)))then
-                sigij(il, i, j)=sij(il, i, j)
-             endif
-          end do
-       end do
-    end do
-    !@ enddo
-
-    !@170 continue
 
     ! --- NORMALIZE ENTRAINED AIR MASS FLUXES
     ! --- TO REPRESENT EQUAL PROBABILITIES OF MIXING

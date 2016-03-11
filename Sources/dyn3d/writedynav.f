@@ -20,7 +20,7 @@ contains
     USE iniadvtrac_m, ONLY: ttext
     use initdynav_m, only: histaveid
     use nr_util, only: assert
-    USE paramet_m, ONLY: iip1, ip1jm, ip1jmp1, jjp1
+    USE paramet_m, ONLY: ip1jm, ip1jmp1
     USE temps, ONLY: itau_dyn
 
     ! Vents covariants :

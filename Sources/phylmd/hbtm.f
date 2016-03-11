@@ -26,15 +26,14 @@ contains
     ! Adaptation a LMDZ version couplee Pour le moment on fait passer
     ! en argument les grandeurs de surface : flux, t, q2m, t, on va
     ! utiliser systematiquement les grandeurs a 2m mais on garde la
-    ! possibilit\'e de changer si besoin est (jusqu'à pr\'esent la
+    ! possibilit\'e de changer si besoin est (jusqu'\`a pr\'esent la
     ! forme de HB avec le 1er niveau modele etait conservee)
 
     USE dimphy, ONLY: klev, klon
-    USE suphec_m, ONLY: rcpd, rd, retv, rg, rkappa, rlvtt, rtt, rv
+    USE suphec_m, ONLY: rcpd, rd, retv, rg, rkappa, rtt
     USE yoethf_m, ONLY: r2es, rvtmp2
     USE fcttre, ONLY: foeew
 
-    REAL RLvCp, REPS
     ! Arguments:
 
     ! nombre de points a calculer
@@ -122,14 +121,6 @@ contains
     REAL rhino(klon, klev)
     ! pts w/unstbl pbl (positive virtual ht flx)
     LOGICAL unstbl(klon)
-    ! stable pbl with levels within pbl
-    LOGICAL stblev(klon)
-    ! unstbl pbl with levels within pbl
-    LOGICAL unslev(klon)
-    ! unstb pbl w/lvls within srf pbl lyr
-    LOGICAL unssrf(klon)
-    ! unstb pbl w/lvls in outer pbl lyr
-    LOGICAL unsout(klon)
     LOGICAL check(klon) ! Richardson number > critical
     ! flag de prolongerment cape pour pt Omega
     LOGICAL omegafl(klon)
@@ -146,58 +137,30 @@ contains
     REAL trmb1(klon), trmb2(klon), trmb3(klon)
     ! Algorithme thermique
     REAL s(klon, klev) ! [P/Po]^Kappa milieux couches
-    ! equivalent potential temperature of therma
-    REAL The_th(klon)
     ! total water of thermal
     REAL qT_th(klon)
     ! T thermique niveau precedent
-    REAL Tbef(klon)
     REAL qsatbef(klon)
     ! le thermique est sature
     LOGICAL Zsat(klon)
     ! Cape du thermique
     REAL Cape(klon)
-    ! Cape locale
-    REAL Kape(klon)
     ! Eau liqu integr du thermique
     REAL EauLiq(klon)
     ! Critere d'instab d'entrainmt des nuages de
     REAL ctei(klon)
-    REAL aa, zthvd, zthvu, qqsat
-    REAL a1, a2, a3
+    REAL zthvd, zthvu, qqsat
     REAL t2
 
     ! inverse phi function for momentum
     REAL phiminv(klon)
-    ! inverse phi function for heat
-    REAL phihinv(klon)
     ! turbulent velocity scale for momentum
     REAL wm(klon)
-    ! k*ustar*pblh
-    REAL fak1(klon)
-    ! k*wm*pblh
-    REAL fak2(klon)
-    ! fakn*wstr/wm
-    REAL fak3(klon)
-    ! level eddy diffusivity for momentum
-    REAL pblk(klon)
-    ! Prandtl number for eddy diffusivities
-    REAL pr(klon)
-    ! zmzp / Obukhov length
-    REAL zl(klon)
-    ! zmzp / pblh
-    REAL zh(klon)
-    ! (1-(zmzp/pblh))**2
-    REAL zzh(klon)
-    ! w*, convective velocity scale
-    REAL wstr(klon)
-    ! current level height
-    REAL zm(klon)
     ! current level height + one level up
     REAL zp(klon)
     REAL zcor
 
-    REAL fac, pblmin, zmzp, term
+    REAL pblmin
 
     !-----------------------------------------------------------------
 
@@ -207,10 +170,6 @@ contains
 
     b212=sqrt(b1*b2)
     b2sr=sqrt(b2)
-
-    ! Initialisation
-    RLvCp = RLVTT/RCPD
-    REPS = RD/RV
 
     ! Calculer les hauteurs de chaque couche
     ! (geopotentielle Int_dp/ro = Int_[Rd.T.dp/p] z = geop/g)
@@ -271,7 +230,6 @@ contains
     ! until the Richardson number between the first level and the
     ! current level exceeds the "critical" value.  (bonne idee Nu de
     ! separer le Ric et l'exces de temp du thermique)
-    fac = 100.
     DO k = 2, isommet
        DO i = 1, knon
           IF (check(i)) THEN
@@ -335,11 +293,6 @@ contains
           ! forme Mathieu :
           q_star = kqfs(i)/wm(i)
           t_star = khfs(i)/wm(i)
-
-          a1=b1*(1.+2.*RETV*qT_th(i))*t_star**2
-          a2=(RETV*T2m(i))**2*b2*q_star**2
-          a3=2.*RETV*T2m(i)*b212*q_star*t_star
-          aa=a1+a2+a3
 
           therm(i) = sqrt( b1*(1.+2.*RETV*qT_th(i))*t_star**2 &
                + (RETV*T2m(i))**2*b2*q_star**2 &
@@ -416,11 +369,8 @@ contains
        ! omegafl utilise pour prolongement CAPE
        omegafl(i) = .FALSE.
        Cape(i) = 0.
-       Kape(i) = 0.
        EauLiq(i) = 0.
        CTEI(i) = 0.
-       pblk(i) = 0.0
-       fak1(i) = ustar(i)*pblh(i)*vk
 
        ! Do additional preparation for unstable cases only, set temperature
        ! and moisture perturbations depending on stability.
@@ -430,15 +380,8 @@ contains
           zxt=(T2m(i)-zref*0.5*RG/RCPD/(1.+RVTMP2*qT_th(i))) &
                *(1.+RETV*qT_th(i))
           phiminv(i) = (1. - binm*pblh(i)/obklen(i))**onet
-          phihinv(i) = sqrt(1. - binh*pblh(i)/obklen(i))
           wm(i) = ustar(i)*phiminv(i)
-          fak2(i) = wm(i)*pblh(i)*vk
-          wstr(i) = (heatv(i)*RG*pblh(i)/zxt)**onet
-          fak3(i) = fakn*wstr(i)/wm(i)
        ENDIF
-       ! Computes Theta_e for thermal (all cases : to be modified)
-       ! attention ajout therm(i) = virtuelle
-       The_th(i) = T2m(i) + therm(i) + RLvCp*qT_th(i)
     ENDDO
 
     ! Main level loop to compute the diffusivities and
@@ -446,69 +389,8 @@ contains
     loop_level: DO k = 2, isommet
        ! Find levels within boundary layer:
        DO i = 1, knon
-          unslev(i) = .FALSE.
-          stblev(i) = .FALSE.
-          zm(i) = z(i, k-1)
           zp(i) = z(i, k)
           IF (zkmin == 0. .AND. zp(i) > pblh(i)) zp(i) = pblh(i)
-          IF (zm(i) < pblh(i)) THEN
-             zmzp = 0.5*(zm(i) + zp(i))
-             zh(i) = zmzp/pblh(i)
-             zl(i) = zmzp/obklen(i)
-             zzh(i) = 0.
-             IF (zh(i) <= 1.) zzh(i) = (1. - zh(i))**2
-
-             ! stblev for points zm < plbh and stable and neutral
-             ! unslev for points zm < plbh and unstable
-             IF (unstbl(i)) THEN
-                unslev(i) = .TRUE.
-             ELSE
-                stblev(i) = .TRUE.
-             ENDIF
-          ENDIF
-       ENDDO
-
-       ! Stable and neutral points; set diffusivities; counter-gradient
-       ! terms zero for stable case:
-       DO i = 1, knon
-          IF (stblev(i)) THEN
-             IF (zl(i) <= 1.) THEN
-                pblk(i) = fak1(i)*zh(i)*zzh(i)/(1. + betas*zl(i))
-             ELSE
-                pblk(i) = fak1(i)*zh(i)*zzh(i)/(betas + zl(i))
-             ENDIF
-          ENDIF
-       ENDDO
-
-       ! unssrf, unstable within surface layer of pbl
-       ! unsout, unstable within outer layer of pbl
-       DO i = 1, knon
-          unssrf(i) = .FALSE.
-          unsout(i) = .FALSE.
-          IF (unslev(i)) THEN
-             IF (zh(i) < sffrac) THEN
-                unssrf(i) = .TRUE.
-             ELSE
-                unsout(i) = .TRUE.
-             ENDIF
-          ENDIF
-       ENDDO
-
-       ! Unstable for surface layer; counter-gradient terms zero
-       DO i = 1, knon
-          IF (unssrf(i)) THEN
-             term = (1. - betam*zl(i))**onet
-             pblk(i) = fak1(i)*zh(i)*zzh(i)*term
-             pr(i) = term/sqrt(1. - betah*zl(i))
-          ENDIF
-       ENDDO
-
-       ! Unstable for outer layer; counter-gradient terms non-zero:
-       DO i = 1, knon
-          IF (unsout(i)) THEN
-             pblk(i) = fak2(i)*zh(i)*zzh(i)
-             pr(i) = phiminv(i)/phihinv(i) + ccon*fak3(i)/fak
-          ENDIF
        ENDDO
 
        ! For all layers, compute integral info and CTEI
@@ -531,7 +413,6 @@ contains
                            * (qT_th(i)-qsatbef(i)) / (qsatbef(i)-qqsat)
                    endif
                    Zsat(i) = .true.
-                   Tbef(i) = T2
                 endif
              endif
              qsatbef(i) = qqsat

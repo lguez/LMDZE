@@ -9,11 +9,11 @@ contains
     ! From LMDZ4/libf/dyn3d/read_reanalyse.F, version 1.3, 2005/04/15 12:31:21
 
     USE conf_guide_m, ONLY: guide_q, guide_t, guide_u, guide_v
-    USE dimens_m, ONLY: iim, jjm, llm
+    USE dimens_m, ONLY: jjm, llm
     use nat2gcm_m, only: nat2gcm
     USE netcdf, ONLY: nf90_nowrite
-    USE netcdf95, ONLY: nf95_get_var, nf95_inq_dimid, nf95_inq_varid, &
-         nf95_inquire_dimension, nf95_open, find_coord
+    USE netcdf95, ONLY: nf95_get_var, nf95_inq_varid, nf95_inquire_dimension, &
+         nf95_open, find_coord
     USE paramet_m, ONLY: iip1, jjp1
     use reanalyse2nat_m, only: reanalyse2nat
 

@@ -43,7 +43,6 @@ contains
     USE dimphy
     use conf_gcm_m
     USE comgeom
-    USE nr_util, ONLY : pi
     USE ymds2ju_m
 
     !   Arguments
@@ -59,8 +58,6 @@ contains
 
     INTEGER tau0
     REAL zjulian
-    CHARACTER(len=3) str
-    CHARACTER(len=10) ctrac
     INTEGER zvertiid
     LOGICAL ok_sync
     REAL zx_lon(iim,jjm+1), zx_lat(iim,jjm+1)
@@ -70,8 +67,6 @@ contains
     !-----------------------------------------------------
 
     !  Initialisations
-    str = 'q  '
-    ctrac = 'traceur   '
     ok_sync = .TRUE.
 
     !  Appel a histbeg: creation du fichier netcdf et initialisations

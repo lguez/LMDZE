@@ -1,6 +1,11 @@
 module histend_m
 
+  use histcom_var, only: nb_files_max, nb_var_max
+
   implicit none
+
+  INTEGER, SAVE:: ncvar_ids(nb_files_max, nb_var_max)
+  private nb_files_max, nb_var_max
 
 contains
 
@@ -10,12 +15,11 @@ contains
     ! axes in the NetCDF file and puts it into write mode.
 
     USE errioipsl, ONLY: histerr
-    USE histcom_var, ONLY: date0, freq_opp, freq_wrt, fullop, &
-         missing_val, name, nb_tax, nb_var, ncdf_ids, ncvar_ids, regular, &
-         tax_name, tdimid, tid, title, topp, unit_name, var_axid, var_zaxid, &
-         xid, yid, zax_ids, zax_name
+    use histbeg_totreg_m, ONLY: date0, regular
+    USE histcom_var, ONLY: freq_opp, freq_wrt, fullop, missing_val, name, &
+         nb_tax, nb_var, ncdf_ids, tax_name, tdimid, tid, title, topp, &
+         unit_name, var_axid, var_zaxid, xid, yid, zax_ids, zax_name
     USE ioget_calendar_m, ONLY: ioget_calendar_str
-    USE ioipslmpp, ONLY: ioipslmpp_addatt
     USE ju2ymds_m, ONLY: ju2ymds
     USE netcdf, ONLY: nf90_float, nf90_unlimited
     use netcdf95, only: nf95_def_dim, nf95_def_var, nf95_put_att, nf95_enddef
@@ -183,9 +187,6 @@ contains
           call nf95_put_att(ncid, varid, 'associate', trim(assoc))
        END IF
     END DO
-
-    ! Add MPP attributes
-    CALL ioipslmpp_addatt(ncid)
 
     ! 3.0 Put the netcdf file into write mode
     call nf95_enddef(ncid)

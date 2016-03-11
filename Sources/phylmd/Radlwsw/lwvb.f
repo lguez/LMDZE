@@ -74,14 +74,13 @@ SUBROUTINE lwvb(kuaer, ktraer, klim, pabcu, padjd, padju, pb, pbint, pbsui, &
   DOUBLE PRECISION zfu(kdlon)
   DOUBLE PRECISION ztt(kdlon, ntra)
   DOUBLE PRECISION ztt1(kdlon, ntra)
-  DOUBLE PRECISION ztt2(kdlon, ntra)
   DOUBLE PRECISION zuu(kdlon, nua)
   DOUBLE PRECISION zcnsol(kdlon)
   DOUBLE PRECISION zcntop(kdlon)
 
   INTEGER jk, jl, ja
   INTEGER jstra, jstru
-  INTEGER ind1, ind2, ind3, ind4, in, jlim
+  INTEGER in, jlim
   DOUBLE PRECISION zctstr
   ! -----------------------------------------------------------------------
 
@@ -98,7 +97,6 @@ SUBROUTINE lwvb(kuaer, ktraer, klim, pabcu, padjd, padju, pb, pbint, pbsui, &
     DO jl = 1, kdlon
       ztt(jl, ja) = 1.0
       ztt1(jl, ja) = 1.0
-      ztt2(jl, ja) = 1.0
     END DO
   END DO
 
@@ -112,13 +110,6 @@ SUBROUTINE lwvb(kuaer, ktraer, klim, pabcu, padjd, padju, pb, pbint, pbsui, &
 
   ! *         2.      VERTICAL INTEGRATION
   ! --------------------
-
-
-  ind1 = 0
-  ind3 = 0
-  ind4 = 1
-  ind2 = 1
-
 
   ! *         2.3     EXCHANGE WITH TOP OF THE ATMOSPHERE
   ! -----------------------------------

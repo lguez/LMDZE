@@ -11,11 +11,10 @@ contains
 
     USE comconst, ONLY : dtvr
     USE conf_gcm_m, ONLY : iapp_tracvl
-    USE dimens_m, ONLY : iim, jjm, llm, nqmx
+    USE dimens_m, ONLY : jjm, llm, nqmx
     USE iniadvtrac_m, ONLY : iadv
     use massbar_m, only: massbar
-    USE paramet_m, ONLY : iip1, iip2, ijmllm, ijp1llm, ip1jm, ip1jmp1, jjp1, &
-         llmp1
+    USE paramet_m, ONLY : iip1, iip2, ijmllm, ijp1llm, ip1jm, ip1jmp1, llmp1
     use vlsplt_m, only: vlsplt
     use vlspltqs_m, only: vlspltqs
 
@@ -40,19 +39,9 @@ contains
     REAL zdpmin, zdpmax
     EXTERNAL minmax
 
-    ! Rajouts pour PPM
-
     INTEGER indice, n
     ! Pas de temps adaptatif pour que CFL < 1 
     REAL dtbon
-    REAL cflmaxz ! CFL maximum
-    real aaa, bbb
-    REAL psppm(iim, jjp1) ! pression au sol 
-    REAL unatppm(iim, jjp1, llm), vnatppm(iim, jjp1, llm)
-    REAL qppm(iim*jjp1, llm, nqmx)
-    REAL fluxwppm(iim, jjp1, llm)
-    REAL apppm(llmp1), bpppm(llmp1)
-    LOGICAL:: fill = .TRUE.
 
     !-----------------------------------------------------------
 

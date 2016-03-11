@@ -9,8 +9,9 @@ contains
     ! Author: F. Hourdin
 
     USE histwrite_m, ONLY: histwrite
-    USE dimens_m, ONLY: jjm, llm, nqmx
-    USE paramet_m, ONLY: iip1, ijmllm, ijp1llm, ip1jm, ip1jmp1, jjp1
+    use initfluxsto_m, only: initfluxsto
+    USE dimens_m, ONLY: jjm, llm
+    USE paramet_m, ONLY: iip1, ijmllm, ijp1llm, ip1jm, ip1jmp1
     USE comgeom, ONLY: aire
     USE tracstoke, ONLY: istdyn, istphy
 

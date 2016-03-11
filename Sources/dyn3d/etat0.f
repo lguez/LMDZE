@@ -43,7 +43,6 @@ contains
     use netcdf95, only: nf95_close, nf95_get_var, nf95_gw_var, nf95_put_var, &
          nf95_inq_varid, nf95_open
     use nr_util, only: pi, assert
-    use paramet_m, only: ip1jm, ip1jmp1
     use phyetat0_m, only: rlat, rlon
     use phyredem0_m, only: phyredem0, ncid_restartphy
     use phyredem_m, only: phyredem

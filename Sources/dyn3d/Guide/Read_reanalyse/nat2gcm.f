@@ -9,10 +9,9 @@ contains
     ! Passage aux variables du mod\`ele (vents covariants,
     ! temp\'erature potentielle et humidit\'e sp\'ecifique).
 
-    use comconst, only: cpp, kappa
+    use comconst, only: cpp
     use comgeom, only: cu_2d, cv_2d
     use dimens_m, only: iim, jjm, llm
-    use disvert_m, only: preff
     use paramet_m, only: iip1, jjp1
 
     real, intent(in):: pk(iip1, jjp1, llm)

@@ -27,8 +27,8 @@ contains
     USE dimsoil, ONLY : nsoilmx
     USE indicesol, ONLY : epsfra, is_lic, is_oce, is_sic, is_ter, nbsrf
     use netcdf, only: nf90_global, nf90_inq_varid, NF90_NOERR, NF90_NOWRITE
-    use netcdf95, only: nf95_close, nf95_get_att, nf95_get_var, &
-         nf95_inq_varid, nf95_inquire_variable, NF95_OPEN
+    use netcdf95, only: nf95_get_att, nf95_get_var, nf95_inq_varid, &
+         nf95_inquire_variable, NF95_OPEN
 
     REAL, intent(out):: pctsrf(klon, nbsrf)
     REAL, intent(out):: tsol(klon, nbsrf)

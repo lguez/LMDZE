@@ -10,18 +10,18 @@ contains
        ffonte, run_off_lic_0)
 
     ! Routine de traitement de la fonte de la neige dans le cas du traitement
-    ! de sol simplifié
+    ! de sol simplifi\'e
 
     ! LF 03/2001
 
-    USE fcttre, ONLY: dqsatl, dqsats, foede, foeew, qsatl, qsats, thermcep
+    USE fcttre, ONLY: foeew, qsatl, qsats, thermcep
     USE indicesol, ONLY: epsfra, is_lic, is_sic, is_ter
     USE interface_surf, ONLY: run_off, run_off_lic, tau_calv
     use nr_util, only: assert_eq
-    USE suphec_m, ONLY: rcpd, rd, rday, retv, rkappa, rlmlt, rlstt, rlvtt, rtt
+    USE suphec_m, ONLY: rcpd, rday, retv, rlmlt, rlstt, rlvtt, rtt
     USE yoethf_m, ONLY: r2es, r5ies, r5les, rvtmp2
 
-    integer, intent(IN):: nisurf ! surface à traiter
+    integer, intent(IN):: nisurf ! surface \`a traiter
     real, intent(IN):: dtime ! pas de temps de la physique (en s)
     real, dimension(:), intent(IN):: tsurf, p1lay, beta, coef1lay ! (knon)
     ! tsurf temperature de surface
@@ -66,23 +66,18 @@ contains
     real, intent(OUT):: ffonte(:) ! (knon)
 
     real, dimension(:), intent(INOUT):: run_off_lic_0 ! (knon)
-    ! run_off_lic_0 run off glacier du pas de temps précedent
+    ! run_off_lic_0 run off glacier du pas de temps pr\'ecedent
 
     ! Local:
 
-    integer knon ! nombre de points à traiter
+    integer knon ! nombre de points \`a traiter
     real, parameter:: snow_max=3000.
     ! Masse maximum de neige (kg/m2). Au dessus de ce seuil, la neige
     ! en exces "s'ecoule" (calving)
 
     integer i
-    real, dimension(size(ps)):: zx_mh, zx_nh, zx_oh
-    real, dimension(size(ps)):: zx_mq, zx_nq, zx_oq
-    real, dimension(size(ps)):: zx_pkh, zx_dq_s_dt, zx_qsat, zx_coef
-    real, dimension(size(ps)):: zx_sl, zx_k1
-    real, dimension(size(ps)):: d_ts
     logical zdelta
-    real zcvm5, zx_qs, zcor, zx_dq_s_dh
+    real zcvm5, zx_qs, zcor
     real fq_fonte
     REAL bil_eau_s(size(ps)) ! in kg m-2
     real snow_evap(size(ps)) ! in kg m-2 s-1
@@ -105,7 +100,6 @@ contains
     coeff_rel = dtime/(tau_calv * rday)
     bil_eau_s = 0.
     DO i = 1, knon
-       zx_pkh(i) = (ps(i)/ps(i))**RKAPPA
        IF (thermcep) THEN
           zdelta= rtt >= tsurf(i)
           zcvm5 = merge(R5IES*RLSTT, R5LES*RLVTT, zdelta)
@@ -114,45 +108,16 @@ contains
           zx_qs=MIN(0.5, zx_qs)
           zcor=1./(1.-retv*zx_qs)
           zx_qs=zx_qs*zcor
-          zx_dq_s_dh = FOEDE(tsurf(i), zdelta, zcvm5, zx_qs, zcor) /RLVTT &
-               / zx_pkh(i)
        ELSE
           IF (tsurf(i) < t_coup) THEN
              zx_qs = qsats(tsurf(i)) / ps(i)
-             zx_dq_s_dh = dqsats(tsurf(i), zx_qs)/RLVTT / zx_pkh(i)
           ELSE
              zx_qs = qsatl(tsurf(i)) / ps(i)
-             zx_dq_s_dh = dqsatl(tsurf(i), zx_qs)/RLVTT / zx_pkh(i)
           ENDIF
        ENDIF
-       zx_dq_s_dt(i) = RCPD * zx_pkh(i) * zx_dq_s_dh
-       zx_qsat(i) = zx_qs
-       zx_coef(i) = coef1lay(i) * (1. + SQRT(u1lay(i)**2 + v1lay(i)**2)) &
-            * p1lay(i) / (RD * t1lay(i))
     ENDDO
 
     ! Calcul de la temperature de surface
-
-    ! zx_sl = chaleur latente d'evaporation ou de sublimation
-
-    do i = 1, knon
-       zx_sl(i) = RLVTT
-       if (tsurf(i) < RTT) zx_sl(i) = RLSTT
-       zx_k1(i) = zx_coef(i)
-    enddo
-
-    do i = 1, knon
-       ! Q
-       zx_oq(i) = 1. - (beta(i) * zx_k1(i) * peqBcoef(i) * dtime)
-       zx_mq(i) = beta(i) * zx_k1(i) * (peqAcoef(i) - zx_qsat(i) &
-            + zx_dq_s_dt(i) * tsurf(i)) / zx_oq(i)
-       zx_nq(i) = beta(i) * zx_k1(i) * (-1. * zx_dq_s_dt(i)) / zx_oq(i)
-
-       ! H
-       zx_oh(i) = 1. - (zx_k1(i) * petBcoef(i) * dtime)
-       zx_mh(i) = zx_k1(i) * petAcoef(i) / zx_oh(i)
-       zx_nh(i) = - (zx_k1(i) * RCPD * zx_pkh(i))/ zx_oh(i)
-    enddo
 
     WHERE (precip_snow > 0.) snow = snow + precip_snow * dtime
 
@@ -184,10 +149,9 @@ contains
              bil_eau_s(i) = bil_eau_s(i) + fq_fonte
              tsurf_new(i) = RTT
           ENDIF
-          d_ts(i) = tsurf_new(i) - tsurf(i)
        endif
 
-       ! S'il y a une hauteur trop importante de neige, elle s'écoule
+       ! S'il y a une hauteur trop importante de neige, elle s'\'ecoule
        fqcalving(i) = max(0., snow(i) - snow_max)/dtime
        snow(i)=min(snow(i), snow_max)
 

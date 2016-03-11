@@ -152,7 +152,7 @@ contains
     DOUBLE PRECISION PTAVE(kdlon, klev)
     DOUBLE PRECISION PWV(kdlon, klev), PQS(kdlon, klev)
     DOUBLE PRECISION POZON(kdlon, klev) ! mass fraction of ozone
-    DOUBLE PRECISION PAER(kdlon, klev, 5)
+    DOUBLE PRECISION PAER(kdlon, klev, 5) ! AEROSOLS' OPTICAL THICKNESS
     DOUBLE PRECISION PCLDLD(kdlon, klev)
     DOUBLE PRECISION PCLDLU(kdlon, klev)
     DOUBLE PRECISION PCLDSW(kdlon, klev)
@@ -293,7 +293,7 @@ contains
             PCLDLU, PVIEW, zcool, zcool0, ztoplw, zsollw, ztoplw0, zsollw0, &
             zsollwdown, ZFLUP, ZFLDN, ZFLUP0, ZFLDN0)
        CALL SW(PSCT, zrmu0, zfract, PPMB, PDP, PPSOL, PALBD, PALBP, PTAVE, &
-            PWV, PQS, POZON, PAER, PCLDSW, PTAU, POMEGA, PCG, zheat, zheat0, &
+            PWV, PQS, POZON, PCLDSW, PTAU, POMEGA, PCG, zheat, zheat0, &
             zalbpla, ztopsw, zsolsw, ztopsw0, zsolsw0, ZFSUP, ZFSDN, ZFSUP0, &
             ZFSDN0, tauae, pizae, cgae, PTAUA, POMEGAA, ztopswad, zsolswad, &
             ztopswai, zsolswai, ok_ade, ok_aie)

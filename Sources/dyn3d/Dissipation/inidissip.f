@@ -32,7 +32,6 @@ contains
     use gradiv2_m, only: gradiv2
     use jumble, only: new_unit
     use nxgraro2_m, only: nxgraro2
-    USE paramet_m, ONLY: jjp1
 
     ! Variables local to the procedure:
     REAL zvert(llm), max_zvert ! no dimension

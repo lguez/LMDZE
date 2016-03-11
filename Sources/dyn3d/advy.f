@@ -84,9 +84,6 @@ SUBROUTINE advy(limit, dty, pbarv, sm, s0, sx, sy, sz)
 
   ! Special pour poles
 
-  REAL ssum
-  EXTERNAL ssum
-
   LOGICAL limit
 
   lon = iim ! rem : Il est possible qu'un pbl. arrive ici

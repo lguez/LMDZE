@@ -100,10 +100,6 @@ SUBROUTINE advyp(limit, dty, pbarv, sm, s0, ssx, sy, sz, ssxx, ssxy, ssxz, &
 
   ! Special pour poles
 
-  REAL sbms, sfms, sfzs, sbmn, sfmn, sfzn
-  REAL ssum
-  EXTERNAL ssum
-
   REAL sqi, sqf
   LOGICAL limit
 
@@ -111,17 +107,6 @@ SUBROUTINE advyp(limit, dty, pbarv, sm, s0, ssx, sy, sz, ssxx, ssxy, ssxz, &
   lat = jjp1 ! a cause des dim. differentes entre les
   niv = llm !       tab. S et VGRI
 
-  ! -----------------------------------------------------------------
-  ! initialisations
-
-  sbms = 0.
-  sfms = 0.
-  sfzs = 0.
-  sbmn = 0.
-  sfmn = 0.
-  sfzn = 0.
-
-  ! -----------------------------------------------------------------
   ! *** Test : diag de la qtite totale de traceur dans
   ! l'atmosphere avant l'advection en Y
 

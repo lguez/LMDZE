@@ -5,7 +5,7 @@ module clqh_m
 contains
 
   SUBROUTINE clqh(dtime, itime, jour, debut, rlat, knon, nisurf, knindex, &
-       pctsrf, tsoil, qsol, rmu0, co2_ppm, rugos, rugoro, u1lay, v1lay, coef, &
+       pctsrf, tsoil, qsol, rmu0, rugos, rugoro, u1lay, v1lay, coef, &
        t, q, ts, paprs, pplay, delp, radsol, albedo, snow, qsurf, &
        precip_rain, precip_snow, fder, fluxlat, pctsrf_new, agesno, d_t, d_q, &
        d_ts, z0_new, flux_t, flux_q, dflux_s, dflux_l, fqcalving, ffonte, &
@@ -16,10 +16,9 @@ contains
     ! Objet : diffusion verticale de "q" et de "h"
 
     USE conf_phys_m, ONLY: iflag_pbl
-    USE dimens_m, ONLY: iim, jjm
     USE dimphy, ONLY: klev, klon
     USE dimsoil, ONLY: nsoilmx
-    USE indicesol, ONLY: is_ter, nbsrf
+    USE indicesol, ONLY: nbsrf
     USE interfsurf_hq_m, ONLY: interfsurf_hq
     USE suphec_m, ONLY: rcpd, rd, rg, rkappa
 
@@ -38,7 +37,6 @@ contains
     ! column-density of water in soil, in kg m-2
 
     real, intent(in):: rmu0(klon) ! cosinus de l'angle solaire zenithal
-    REAL, intent(in):: co2_ppm ! taux CO2 atmosphere
     real rugos(klon) ! rugosite
     REAL rugoro(klon)
     REAL u1lay(klon) ! vitesse u de la 1ere couche (m / s)
@@ -104,7 +102,6 @@ contains
     REAL zx_coef(klon, klev)
     REAL local_h(klon, klev) ! enthalpie potentielle
     REAL local_q(klon, klev)
-    REAL local_ts(klon)
     REAL psref(klon) ! pression de reference pour temperature potent.
     REAL zx_pkh(klon, klev), zx_pkf(klon, klev)
 
@@ -115,9 +112,7 @@ contains
     REAL z_gamaq(klon, 2:klev), z_gamah(klon, 2:klev)
     REAL zdelz
 
-    real zlev1(klon)
     real temp_air(klon), spechum(klon)
-    real epot_air(klon), ccanopy(klon)
     real tq_cdrag(klon), petAcoef(klon), peqAcoef(klon)
     real petBcoef(klon), peqBcoef(klon)
     real p1lay(klon)
@@ -150,7 +145,6 @@ contains
 
     DO i = 1, knon
        psref(i) = paprs(i, 1) !pression de reference est celle au sol
-       local_ts(i) = ts(i)
     ENDDO
     DO k = 1, klev
        DO i = 1, knon
@@ -244,12 +238,8 @@ contains
     peqBcoef(1:knon) = zx_dq(1:knon, 1)
     tq_cdrag(1:knon) =coef(:knon, 1)
     temp_air(1:knon) =t(1:knon, 1)
-    epot_air(1:knon) =local_h(1:knon, 1)
     spechum(1:knon)=q(1:knon, 1)
     p1lay(1:knon) = pplay(1:knon, 1)
-    zlev1(1:knon) = delp(1:knon, 1)
-
-    ccanopy = co2_ppm
 
     CALL interfsurf_hq(itime, dtime, jour, rmu0, nisurf, knon, knindex, &
          pctsrf, rlat, debut, nsoilmx, tsoil, qsol, u1lay, v1lay, temp_air, &

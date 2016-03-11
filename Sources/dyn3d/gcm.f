@@ -15,7 +15,6 @@ PROGRAM gcm
        conf_gcm, iflag_phys
   use conf_guide_m, only: conf_guide
   use dimens_m, only: iim, jjm, llm, nqmx
-  use dimphy, only: klon
   USE disvert_m, ONLY : disvert
   use dynetat0_m, only: dynetat0, day_ini
   use dynredem0_m, only: dynredem0

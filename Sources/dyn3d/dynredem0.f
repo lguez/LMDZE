@@ -22,7 +22,7 @@ CONTAINS
     USE ju2ymds_m, ONLY: ju2ymds
     USE netcdf, ONLY: nf90_clobber, nf90_float, nf90_global, nf90_unlimited
     USE netcdf95, ONLY: nf95_create, nf95_def_dim, nf95_def_var, nf95_enddef, &
-         nf95_inq_varid, nf95_put_att, nf95_put_var
+         nf95_put_att, nf95_put_var
     USE paramet_m, ONLY: iip1, jjp1, llmp1
     use ymds2ju_m, only: ymds2ju
 

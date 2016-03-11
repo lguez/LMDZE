@@ -11,9 +11,9 @@ contains
     ! Appels successifs des routines histwrite
     ! L. Fairhead, LMD, 03/99
 
-    use dimens_m, only: nqmx, llm, jjm
+    use dimens_m, only: llm
     use com_io_dyn, only: histid, histvid, histuid
-    use paramet_m, only: ip1jm, ip1jmp1, iip1, jjp1
+    use paramet_m, only: ip1jm, ip1jmp1
     use temps, only: itau_dyn
     use histwrite_m, only: histwrite
     use histsync_m, only: histsync
@@ -38,7 +38,6 @@ contains
     ! This routine needs IOIPSL to work
     ! Variables locales
 
-    integer ndexu(ip1jmp1*llm), ndexv(ip1jm*llm), ndex2d(ip1jmp1)
     logical ok_sync
     integer itau_w
     REAL vnat(ip1jm, llm), unat(ip1jmp1, llm)
@@ -47,9 +46,6 @@ contains
 
     ! Initialisations
 
-    ndexu = 0
-    ndexv = 0
-    ndex2d = 0
     ok_sync =.TRUE.
     itau_w = itau_dyn + time
     ! Passage aux composantes naturelles du vent

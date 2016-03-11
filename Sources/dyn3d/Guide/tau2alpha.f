@@ -8,7 +8,7 @@ contains
 
     use conf_guide_m, only: lat_min_guide, lat_max_guide, factt
     use init_tau2alpha_m, only: dxdy_min, dxdy_max, gamma
-    USE nr_util, ONLY: pi, assert_eq
+    USE nr_util, ONLY: assert_eq
 
     REAL, intent(in):: dxdy(:, :) ! (n_lon, n_lat)
     REAL, intent(in):: rlat(:) ! (n_lat)

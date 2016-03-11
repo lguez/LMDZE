@@ -46,7 +46,7 @@ SUBROUTINE swu(psct, pcldsw, ppmb, ppsol, prmu0, pfrac, ptave, pwv, paki, &
   DOUBLE PRECISION zsigo(kdlon)
   DOUBLE PRECISION zud(kdlon, 2)
   DOUBLE PRECISION zrth, zrtu, zwh2o, zdsco2, zdsh2o, zfppw
-  INTEGER jl, jk, jkp1, jkl, jklp1, ja
+  INTEGER jl, jk, jkp1, jkl, ja
 
   ! * Prescribed Data:
 
@@ -58,10 +58,10 @@ SUBROUTINE swu(psct, pcldsw, ppmb, ppsol, prmu0, pfrac, ptave, pwv, paki, &
   SAVE rtdh2o, rtdumg
   DOUBLE PRECISION rth2o, rtumg
   SAVE rth2o, rtumg
-  DATA zpdh2o, zpdumg/0.8, 0.75/
-  DATA zprh2o, zprumg/30000., 30000./
-  DATA rtdh2o, rtdumg/0.40, 0.375/
-  DATA rth2o, rtumg/240., 240./
+  DATA zpdh2o, zpdumg/0.8d0, 0.75d0/
+  DATA zprh2o, zprumg/30000.d0, 30000.d0/
+  DATA rtdh2o, rtdumg/0.40d0, 0.375d0/
+  DATA rth2o, rtumg/240.d0, 240.d0/
   ! ------------------------------------------------------------------
 
   ! *         1.     COMPUTES AMOUNTS OF ABSORBERS
@@ -105,7 +105,6 @@ SUBROUTINE swu(psct, pcldsw, ppmb, ppsol, prmu0, pfrac, ptave, pwv, paki, &
   DO jk = 1, kflev
     jkp1 = jk + 1
     jkl = kflev + 1 - jk
-    jklp1 = jkl + 1
     DO jl = 1, kdlon
       zrth = (rth2o/ptave(jl,jk))**rtdh2o
       zrtu = (rtumg/ptave(jl,jk))**rtdumg

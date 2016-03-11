@@ -38,7 +38,7 @@ contains
     character(len=3) descrq(0:14)
     integer iq, iostat, nq_local, unit
 
-    integer, parameter:: allowed_adv(10) = (/0, 10, 12, 13, 14/)
+    integer, parameter:: allowed_adv(5) = (/0, 10, 12, 13, 14/)
     ! Allowed values for iadv:
     ! 10: schema Van-leer (retenu pour l'eau vapeur et liquide)
     ! 12: schema Frederic Hourdin I
@@ -75,8 +75,8 @@ contains
        end do
        close(unit) 
     else
-       print *, 'Probl\`eme à l''ouverture de "traceur.def"'
-       print *, 'Attention : on prend des valeurs par d\'efaut.'
+       print *, 'Could not open "traceur.def".'
+       print *, 'Using default values.'
        call assert(nqmx == 4, "iniadvtrac nqmx")
        iadv(:4) = (/14, 10, 10, 10/)
        tname(1) = 'H2Ov'

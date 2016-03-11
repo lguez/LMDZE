@@ -14,7 +14,6 @@ contains
 
     USE indicesol, ONLY: is_oce
     USE dimphy, ONLY: klev, klon
-    USE conf_gcm_m, ONLY: prt_level
     USE suphec_m, ONLY: rcpd, rd, retv, rg, rkappa, rlstt, rlvtt, rtt
     USE yoethf_m, ONLY: r2es, r5ies, r5les, rvtmp2
     USE fcttre, ONLY: dqsatl, dqsats, foede, foeew, qsatl, qsats, thermcep

@@ -5,7 +5,7 @@ module clmain_m
 contains
 
   SUBROUTINE clmain(dtime, itap, pctsrf, pctsrf_new, t, q, u, v, jour, rmu0, &
-       co2_ppm, ts, cdmmax, cdhmax, ksta, ksta_ter, ok_kzmin, ftsoil, qsol, &
+       ts, cdmmax, cdhmax, ksta, ksta_ter, ok_kzmin, ftsoil, qsol, &
        paprs, pplay, snow, qsurf, evap, falbe, fluxlat, rain_fall, snow_f, &
        solsw, sollw, fder, rlat, rugos, debut, agesno, rugoro, d_t, d_q, d_u, &
        d_v, d_ts, flux_t, flux_q, flux_u, flux_v, cdragh, cdragm, q2, &
@@ -33,7 +33,6 @@ contains
     use coefkzmin_m, only: coefkzmin
     USE conf_gcm_m, ONLY: prt_level
     USE conf_phys_m, ONLY: iflag_pbl
-    USE dimens_m, ONLY: iim, jjm
     USE dimphy, ONLY: klev, klon, zmasq
     USE dimsoil, ONLY: nsoilmx
     use hbtm_m, only: hbtm
@@ -56,7 +55,6 @@ contains
     REAL, INTENT(IN):: u(klon, klev), v(klon, klev) ! vitesse
     INTEGER, INTENT(IN):: jour ! jour de l'annee en cours
     REAL, intent(in):: rmu0(klon) ! cosinus de l'angle solaire zenithal     
-    REAL, intent(in):: co2_ppm ! taux CO2 atmosphere
     REAL, INTENT(IN):: ts(klon, nbsrf) ! temperature du sol (en Kelvin)
     REAL, INTENT(IN):: cdmmax, cdhmax ! seuils cdrm, cdrh
     REAL, INTENT(IN):: ksta, ksta_ter
@@ -212,11 +210,6 @@ contains
 
     REAL yt2m(klon), yq2m(klon), yu10m(klon)
     REAL yustar(klon)
-    ! -- LOOP
-    REAL yu10mx(klon)
-    REAL yu10my(klon)
-    REAL ywindsp(klon)
-    ! -- LOOP
 
     REAL yt10m(klon), yq10m(klon)
     REAL ypblh(klon)
@@ -289,9 +282,6 @@ contains
     y_dflux_q = 0.
     ytsoil = 999999.
     yrugoro = 0.
-    yu10mx = 0.
-    yu10my = 0.
-    ywindsp = 0.
     d_ts = 0.
     yfluxlat = 0.
     flux_t = 0.
@@ -346,9 +336,6 @@ contains
              yrads(j) = solsw(i, nsrf) + sollw(i, nsrf)
              ypaprs(j, klev+1) = paprs(i, klev+1)
              y_run_off_lic_0(j) = run_off_lic_0(i)
-             yu10mx(j) = u10m(i, nsrf)
-             yu10my(j) = v10m(i, nsrf)
-             ywindsp(j) = sqrt(yu10mx(j)*yu10mx(j)+yu10my(j)*yu10my(j))
           END DO
 
           ! For continent, copy soil water content
@@ -456,7 +443,7 @@ contains
 
           ! calculer la diffusion de "q" et de "h"
           CALL clqh(dtime, itap, jour, debut, rlat, knon, nsrf, ni(:knon), &
-               pctsrf, ytsoil, yqsol, rmu0, co2_ppm, yrugos, yrugoro, yu1, &
+               pctsrf, ytsoil, yqsol, rmu0, yrugos, yrugoro, yu1, &
                yv1, coefh(:knon, :), yt, yq, yts, ypaprs, ypplay, ydelp, &
                yrads, yalb(:knon), ysnow, yqsurf, yrain_f, ysnow_f, yfder, &
                yfluxlat, pctsrf_new, yagesno(:knon), y_d_t, y_d_q, &

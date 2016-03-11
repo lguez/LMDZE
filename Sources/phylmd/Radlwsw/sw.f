@@ -5,7 +5,7 @@ module sw_m
 contains
 
   SUBROUTINE SW(PSCT, PRMU0, PFRAC, PPMB, PDP, PPSOL, PALBD, PALBP, PTAVE, &
-       PWV, PQS, POZON, PAER, PCLDSW, PTAU, POMEGA, PCG, PHEAT, PHEAT0, &
+       PWV, PQS, POZON, PCLDSW, PTAU, POMEGA, PCG, PHEAT, PHEAT0, &
        PALBPLA, PTOPSW, PSOLSW, PTOPSW0, PSOLSW0, ZFSUP, ZFSDN, ZFSUP0, &
        ZFSDN0, tauae, pizae, cgae, PTAUA, POMEGAA, PTOPSWAD, PSOLSWAD, &
        PTOPSWAI, PSOLSWAI, ok_ade, ok_aie)
@@ -33,6 +33,8 @@ contains
 
     USE raddim, ONLY: kdlon, kflev
     USE suphec_m, ONLY: rcpd, rday, rg
+    use sw1s_m, only: sw1s
+    use sw2s_m, only: sw2s
 
     ! ARGUMENTS:
 
@@ -49,7 +51,6 @@ contains
     DOUBLE PRECISION PWV(KDLON, KFLEV) ! SPECIFIC HUMIDITY (KG/KG)
     DOUBLE PRECISION PQS(KDLON, KFLEV) ! SATURATED WATER VAPOUR (KG/KG)
     DOUBLE PRECISION POZON(KDLON, KFLEV) ! OZONE CONCENTRATION (KG/KG)
-    DOUBLE PRECISION PAER(KDLON, KFLEV, 5) ! AEROSOLS' OPTICAL THICKNESS
 
     DOUBLE PRECISION PALBD(KDLON, 2) ! albedo du sol (lumiere diffuse)
     DOUBLE PRECISION PALBP(KDLON, 2) ! albedo du sol (lumiere parallele)
@@ -160,14 +161,14 @@ contains
             ZAKI, ZCLD, ZCLEAR, ZDSIG, ZFACT, ZRMU, ZSEC, ZUD)
        INU = 1
        CALL SW1S(INU, &
-            PAER, flag_aer, tauae, pizae, cgae, &
-            PALBD, PALBP, PCG, ZCLD, ZCLEAR, ZCLDSW0, &
+            flag_aer, tauae, pizae, cgae, &
+            PALBD, PALBP, PCG, ZCLD, ZCLEAR, &
             ZDSIG, POMEGA, ZOZ, ZRMU, ZSEC, PTAU, ZUD, &
             ZFD, ZFU)
        INU = 2
        CALL SW2S(INU, &
-            PAER, flag_aer, tauae, pizae, cgae, &
-            ZAKI, PALBD, PALBP, PCG, ZCLD, ZCLEAR, ZCLDSW0, &
+            flag_aer, tauae, pizae, cgae, &
+            ZAKI, PALBD, PALBP, PCG, ZCLD, ZCLEAR, &
             ZDSIG, POMEGA, ZOZ, ZRMU, ZSEC, PTAU, ZUD, &
             PWV, PQS, &
             ZFDOWN, ZFUP)
@@ -184,14 +185,14 @@ contains
             ZAKI, ZCLD, ZCLEAR, ZDSIG, ZFACT, ZRMU, ZSEC, ZUD)
        INU = 1
        CALL SW1S(INU, &
-            PAER, flag_aer, tauae, pizae, cgae, &
-            PALBD, PALBP, PCG, ZCLD, ZCLEAR, PCLDSW, &
+            flag_aer, tauae, pizae, cgae, &
+            PALBD, PALBP, PCG, ZCLD, ZCLEAR, &
             ZDSIG, POMEGA, ZOZ, ZRMU, ZSEC, PTAU, ZUD, &
             ZFD, ZFU)
        INU = 2
        CALL SW2S(INU, &
-            PAER, flag_aer, tauae, pizae, cgae, &
-            ZAKI, PALBD, PALBP, PCG, ZCLD, ZCLEAR, PCLDSW, &
+            flag_aer, tauae, pizae, cgae, &
+            ZAKI, PALBD, PALBP, PCG, ZCLD, ZCLEAR, &
             ZDSIG, POMEGA, ZOZ, ZRMU, ZSEC, PTAU, ZUD, &
             PWV, PQS, &
             ZFDOWN, ZFUP)
@@ -213,14 +214,14 @@ contains
                ZAKI, ZCLD, ZCLEAR, ZDSIG, ZFACT, ZRMU, ZSEC, ZUD)
           INU = 1
           CALL SW1S(INU, &
-               PAER, flag_aer, tauae, pizae, cgae, &
-               PALBD, PALBP, PCG, ZCLD, ZCLEAR, PCLDSW, &
+               flag_aer, tauae, pizae, cgae, &
+               PALBD, PALBP, PCG, ZCLD, ZCLEAR, &
                ZDSIG, POMEGA, ZOZ, ZRMU, ZSEC, PTAU, ZUD, &
                ZFD, ZFU)
           INU = 2
           CALL SW2S(INU, &
-               PAER, flag_aer, tauae, pizae, cgae, &
-               ZAKI, PALBD, PALBP, PCG, ZCLD, ZCLEAR, PCLDSW, &
+               flag_aer, tauae, pizae, cgae, &
+               ZAKI, PALBD, PALBP, PCG, ZCLD, ZCLEAR, &
                ZDSIG, POMEGA, ZOZ, ZRMU, ZSEC, PTAU, ZUD, &
                PWV, PQS, &
                ZFDOWN, ZFUP)
@@ -242,14 +243,14 @@ contains
                ZAKI, ZCLD, ZCLEAR, ZDSIG, ZFACT, ZRMU, ZSEC, ZUD)
           INU = 1
           CALL SW1S(INU, &
-               PAER, flag_aer, tauae, pizae, cgae, &
-               PALBD, PALBP, PCG, ZCLD, ZCLEAR, PCLDSW, &
+               flag_aer, tauae, pizae, cgae, &
+               PALBD, PALBP, PCG, ZCLD, ZCLEAR, &
                ZDSIG, POMEGAA, ZOZ, ZRMU, ZSEC, PTAUA, ZUD, &
                ZFD, ZFU)
           INU = 2
           CALL SW2S(INU, &
-               PAER, flag_aer, tauae, pizae, cgae, &
-               ZAKI, PALBD, PALBP, PCG, ZCLD, ZCLEAR, PCLDSW, &
+               flag_aer, tauae, pizae, cgae, &
+               ZAKI, PALBD, PALBP, PCG, ZCLD, ZCLEAR, &
                ZDSIG, POMEGAA, ZOZ, ZRMU, ZSEC, PTAUA, ZUD, &
                PWV, PQS, &
                ZFDOWN, ZFUP)

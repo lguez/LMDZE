@@ -12,8 +12,7 @@ contains
     USE dimens_m, ONLY: iim, jjm, llm, nqmx
     use dynredem0_m, only: ncid
     USE iniadvtrac_m, ONLY: tname
-    use netcdf, only: nf90_write
-    use netcdf95, only: nf95_close, nf95_inq_varid, nf95_open, nf95_put_var
+    use netcdf95, only: nf95_close, nf95_inq_varid, nf95_put_var
     use nr_util, only: assert
 
     REAL, INTENT(IN):: vcov(:, :, :) ! (iim + 1, jjm, llm)

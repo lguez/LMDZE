@@ -1,6 +1,12 @@
 module histdef_m
 
+  USE histcom_var, ONLY: nb_files_max, nb_var_max
+
   implicit none
+
+  INTEGER:: buff_pos = 0
+  INTEGER, SAVE:: point(nb_files_max, nb_var_max)
+  private nb_files_max, nb_var_max
 
 contains
 
@@ -12,17 +18,17 @@ contains
     ! operation to be performed on the variable, the frequency of
     ! this operation and the frequency of the archiving.
 
+    USE buildop_m, ONLY: buildop
     USE errioipsl, ONLY: histerr
     USE find_str_m, ONLY: find_str
-    USE histcom_var, ONLY: buff_pos, deltat, freq_opp, freq_wrt, fullop, &
-         full_size, itau0, last_opp, last_opp_chk, last_wrt, last_wrt_chk, &
-         missing_val, name, name_length, nbopp, nbopp_max, nb_hax, nb_opp, &
-         nb_tax, nb_var, nb_var_max, nb_wrt, nb_zax, point, scal, scsize, &
-         slab_ori, slab_sz, sopps, tax_last, tax_name, tax_name_length, &
-         title, topp, unit_name, var_axid, var_haxid, var_zaxid, zax_name, &
-         zax_size, zorig, zsize
+    use histbeg_totreg_m, only: deltat
+    USE histcom_var, ONLY: freq_opp, freq_wrt, fullop, full_size, itau0, &
+         last_opp, last_opp_chk, last_wrt, last_wrt_chk, missing_val, name, &
+         name_length, nbopp, nbopp_max, nb_hax, nb_opp, nb_tax, nb_var, &
+         nb_wrt, nb_zax, scal, scsize, slab_ori, slab_sz, sopps, &
+         tax_last, tax_name, tax_name_length, title, topp, unit_name, &
+         var_axid, var_haxid, var_zaxid, zax_name, zax_size, zorig, zsize
     USE ioget_calendar_m, ONLY: ioget_calendar_real
-    USE buildop_m, ONLY: buildop
 
     INTEGER, INTENT(IN):: fileid
     ! (ID of the file the variable should be archived in)

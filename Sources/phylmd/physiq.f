@@ -19,8 +19,8 @@ contains
     use aeropt_m, only: aeropt
     use ajsec_m, only: ajsec
     use calltherm_m, only: calltherm
-    USE clesphys, ONLY: cdhmax, cdmmax, co2_ppm, ecrit_hf, ecrit_ins, &
-         ecrit_mth, ecrit_reg, ecrit_tra, ksta, ksta_ter, ok_kzmin
+    USE clesphys, ONLY: cdhmax, cdmmax, ecrit_hf, ecrit_ins, ecrit_mth, &
+         ecrit_reg, ecrit_tra, ksta, ksta_ter, ok_kzmin
     USE clesphys2, ONLY: cycle_diurne, iflag_con, nbapp_rad, new_oliq, &
          ok_orodr, ok_orolf
     USE clmain_m, ONLY: clmain
@@ -63,6 +63,7 @@ contains
     use yoegwd, only: sugwd
     USE suphec_m, ONLY: rcpd, retv, rg, rlvtt, romega, rsigma, rtt
     use transp_m, only: transp
+    use transp_lay_m, only: transp_lay
     use unit_nml_m, only: unit_nml
     USE ymds2ju_m, ONLY: ymds2ju
     USE yoethf_m, ONLY: r2es, rvtmp2
@@ -204,10 +205,8 @@ contains
     REAL, save:: zpic(klon) ! Maximum de l'OESM
     REAL, save:: zval(klon) ! Minimum de l'OESM
     REAL, save:: rugoro(klon) ! longueur de rugosite de l'OESM
-
     REAL zulow(klon), zvlow(klon)
-
-    INTEGER igwd, idx(klon), itest(klon)
+    INTEGER igwd, itest(klon)
 
     REAL agesno(klon, nbsrf)
     SAVE agesno ! age de la neige
@@ -719,7 +718,7 @@ contains
     ! Couche limite:
 
     CALL clmain(dtphys, itap, pctsrf, pctsrf_new, t_seri, q_seri, u_seri, &
-         v_seri, julien, mu0, co2_ppm, ftsol, cdmmax, cdhmax, ksta, ksta_ter, &
+         v_seri, julien, mu0, ftsol, cdmmax, cdhmax, ksta, ksta_ter, &
          ok_kzmin, ftsoil, qsol, paprs, play, fsnow, fqsurf, fevap, falbe, &
          fluxlat, rain_fall, snow_fall, fsolsw, fsollw, fder, rlat, frugs, &
          firstcal, agesno, rugoro, d_t_vdf, d_q_vdf, d_u_vdf, d_v_vdf, d_ts, &
@@ -1230,7 +1229,6 @@ contains
           IF (zpic(i) - zmea(i) > 100. .AND. zstd(i) > 10.) THEN
              itest(i) = 1
              igwd = igwd + 1
-             idx(igwd) = i
           ENDIF
        ENDDO
 
@@ -1256,7 +1254,6 @@ contains
           IF (zpic(i) - zmea(i) > 100.) THEN
              itest(i) = 1
              igwd = igwd + 1
-             idx(igwd) = i
           ENDIF
        ENDDO
 
@@ -1311,7 +1308,7 @@ contains
 
     ! diag. bilKP
 
-    CALL transp_lay(paprs, zxtsol, t_seri, q_seri, u_seri, v_seri, zphi, &
+    CALL transp_lay(paprs, t_seri, q_seri, u_seri, v_seri, zphi, &
          ve_lay, vq_lay, ue_lay, uq_lay)
 
     ! Accumuler les variables a stocker dans les fichiers histoire:
@@ -1613,6 +1610,9 @@ contains
 
          CALL gr_fi_ecrit(llm, klon, iim, jjm + 1, d_q_vdf, zx_tmp_3d)
          CALL histwrite(nid_ins, "dqvdf", itau_w, zx_tmp_3d)
+
+         CALL gr_fi_ecrit(llm, klon, iim, jjm + 1, zx_rh, zx_tmp_3d)
+         CALL histwrite(nid_ins, "rhum", itau_w, zx_tmp_3d)
 
          call histsync(nid_ins)
       ENDIF

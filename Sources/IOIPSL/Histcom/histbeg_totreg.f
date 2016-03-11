@@ -14,9 +14,15 @@ MODULE histbeg_totreg_m
   ! constant are equal. In other words we do not need the full 2D
   ! matrix to describe the grid, just two vectors.
 
+  USE histcom_var, only: nb_files_max
+
   IMPLICIT NONE
 
   INTEGER:: nb_files = 0
+  REAL, DIMENSION(nb_files_max), SAVE:: date0, deltat
+  LOGICAL:: regular(nb_files_max) = .TRUE.
+
+  private nb_files_max
 
 CONTAINS
 
@@ -30,11 +36,10 @@ CONTAINS
     ! setting a zoom. It also gets the global parameters into the
     ! input-output subsystem.
 
-    USE ioipslmpp, ONLY: ioipslmpp_file
     USE errioipsl, ONLY: histerr
-    USE histcom_var, ONLY: assc_file, date0, deltat, full_size, itau0, &
-         lock_modname, model_name, nb_files_max, nb_hax, nb_tax, nb_var, &
-         nb_zax, ncdf_ids, regular, slab_ori, slab_sz, xid, yid, zoom
+    USE histcom_var, ONLY: assc_file, full_size, itau0, lock_modname, &
+         model_name, nb_hax, nb_tax, nb_var, nb_zax, ncdf_ids, slab_ori, &
+         slab_sz, xid, yid, zoom
     use histhori_regular_m, only: histhori_regular
     USE netcdf, ONLY: nf90_clobber, nf90_global
     use netcdf95, only: nf95_create, nf95_def_dim, nf95_put_att
@@ -108,10 +113,6 @@ CONTAINS
     ELSE
        file = filename(:lengf)
     END IF
-
-    ! Add PE number in file name on MPP
-
-    CALL ioipslmpp_file(file)
 
     ! Keep track of the name of the files opened
 

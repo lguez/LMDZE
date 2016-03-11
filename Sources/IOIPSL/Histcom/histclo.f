@@ -24,6 +24,8 @@ contains
 
     !---------------------------------------------------------------------
 
+    print *, "Call sequence information: histclo"
+
     IF (present(fid)) THEN
        start_loop = fid
        end_loop = fid

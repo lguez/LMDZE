@@ -35,24 +35,6 @@
       REAL adxqu(ip1jmp1),dxqmax(ip1jmp1,llm)
       REAL u_mq(ip1jmp1,llm)
 
-      Logical first
-      SAVE first
-
-      REAL temps1,temps2,temps3,temps4,temps5
-      SAVE temps1,temps2,temps3,temps4,temps5
-
-
-      DATA first/.true./
-
-      IF(first) THEN
-         temps1=0.
-         temps2=0.
-         temps3=0.
-         temps4=0.
-         temps5=0.
-         first=.false.
-      ENDIF
-
 !   calcul de la pente a droite et a gauche de la maille
 
 

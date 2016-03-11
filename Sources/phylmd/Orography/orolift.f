@@ -46,8 +46,8 @@
 !*       0.2   LOCAL ARRAYS
 !              ------------
       LOGICAL lifthigh
-      INTEGER klevm1, jl, ilevh, jk
-      REAL zcons1, ztmst, zrtmst, zpi, zhgeo
+      INTEGER jl, jk
+      REAL zcons1, ztmst, zpi, zhgeo
       REAL zdelp, zslow, zsqua, zscav, zbet
       INTEGER iknub(klon), iknul(klon)
       LOGICAL ll1(klon,klev+1)
@@ -64,9 +64,7 @@
 
       IF (nlon/=klon .OR. nlev/=klev) STOP
       zcons1 = 1./rd
-      klevm1 = klev - 1
       ztmst = ptsphy
-      zrtmst = 1./ztmst
       zpi = acos(-1.)
 
       DO 1001 jl = 1, klon
@@ -75,7 +73,6 @@
         pvlow(jl) = 0.0
         iknub(jl) = klev
         iknul(jl) = klev
-        ilevh = klev/3
         ll1(jl,klev+1) = .FALSE.
         DO 1000 jk = 1, klev
           pvom(jl,jk) = 0.0

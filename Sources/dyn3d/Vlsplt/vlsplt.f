@@ -13,7 +13,7 @@ contains
     ! Sch\'ema d'advection "pseudo-amont".
 
     USE dimens_m, ONLY: iim, llm
-    USE paramet_m, ONLY: iip1, iip2, ijp1llm, ip1jm, ip1jmp1
+    USE paramet_m, ONLY: iip1, iip2, ip1jm, ip1jmp1
     use vlx_m, only: vlx
 
     REAL, intent(inout):: q(ip1jmp1, llm)

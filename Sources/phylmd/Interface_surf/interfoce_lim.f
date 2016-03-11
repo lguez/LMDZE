@@ -13,12 +13,11 @@ contains
 
     ! Laurent FAIRHEAD, February 2000
 
-    use abort_gcm_m, only: abort_gcm
     USE dimphy, ONLY: klon
     USE indicesol, ONLY: is_lic, is_oce, is_sic, is_ter, nbsrf
-    USE netcdf, ONLY: nf90_noerr, nf90_nowrite
+    USE netcdf, ONLY: nf90_nowrite
     use netcdf95, only: NF95_CLOSE, nf95_get_var, NF95_INQ_VARID, nf95_open
-    use nr_util, only: assert_eq
+    use nr_util, only: assert
 
     integer, intent(IN):: itime ! numero du pas de temps courant
     real, intent(IN):: dtime ! pas de temps de la physique (en s)
@@ -37,8 +36,6 @@ contains
 
     ! Local:
 
-    integer knon ! nombre de points dans le domaine a traiter
-
     INTEGER, save:: lmt_pas ! frequence de lecture des conditions limites
     ! (en pas de physique)
 
@@ -56,7 +53,7 @@ contains
 
     ! --------------------------------------------------
 
-    knon = assert_eq(size(knindex), size(lmt_sst), "interfoce_lim knon")
+    call assert(size(knindex) == size(lmt_sst), "interfoce_lim knon")
 
     if (debut .and. .not. allocated(sst_lu)) then
        lmt_pas = nint(86400. / dtime) ! pour une lecture une fois par jour

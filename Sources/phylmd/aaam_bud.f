@@ -41,7 +41,6 @@ contains
 
     INTEGER nlev ! number of vertical levels
     INTEGER i, j, k, l
-    REAL hadley, hadday
     REAL dlat, dlon ! latitude and longitude increments (radians)
 
     REAL raam(3) ! wind AAM (components 1 & 2: equatorial; component 3: axial)
@@ -69,8 +68,6 @@ contains
        stop 1
     endif
 
-    hadley = 1e18
-    hadday = 1e18 * 24. * 3600.
     dlat = pi / jjm
     dlon = 2 * pi / real(iim) 
 

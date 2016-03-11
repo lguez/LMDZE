@@ -55,8 +55,6 @@ contains
     DOUBLE PRECISION zglayd(kdlon)
     DOUBLE PRECISION zglayu(kdlon)
     DOUBLE PRECISION ztt(kdlon, ntra)
-    DOUBLE PRECISION ztt1(kdlon, ntra)
-    DOUBLE PRECISION ztt2(kdlon, ntra)
     DOUBLE PRECISION zuu(kdlon, nua)
 
     INTEGER jk, jl, ja, im12, ind, inu, ixu, jg
@@ -67,7 +65,7 @@ contains
 
     DOUBLE PRECISION wg1(2)
     SAVE wg1
-    DATA (wg1(jk), jk=1, 2)/1.0, 1.0/
+    DATA (wg1(jk), jk=1, 2)/1d0, 1d0/
     ! -----------------------------------------------------------------------
 
     ! *         1.    INITIALIZATION
@@ -92,8 +90,6 @@ contains
     DO ja = 1, ntra
        DO jl = 1, kdlon
           ztt(jl, ja) = 1.0
-          ztt1(jl, ja) = 1.0
-          ztt2(jl, ja) = 1.0
        END DO
     END DO
 

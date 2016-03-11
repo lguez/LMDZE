@@ -3,16 +3,18 @@ MODULE histwrite_m
   ! From histcom.f90, version 2.1 2004/04/21 09:27:10
 
   USE errioipsl, ONLY: histerr
-  use histbeg_totreg_m, ONLY: nb_files
-  USE histcom_var, ONLY: datasz_in, datasz_max, date0, deltat, &
-       freq_opp, freq_wrt, fuchnbout, last_opp, last_opp_chk, last_wrt, &
-       last_wrt_chk, missing_val, nbopp, scal, scsize, sopps, topp
+  use histbeg_totreg_m, ONLY: nb_files, date0, deltat
+  USE histcom_var, ONLY: datasz_in, freq_opp, freq_wrt, fuchnbout, last_opp, &
+       last_opp_chk, last_wrt, last_wrt_chk, missing_val, nb_files_max, &
+       nb_var_max, nbopp, scal, scsize, sopps, topp
   use histvar_seq_m, only: histvar_seq
   use histwrite_real_m, only: histwrite_real
   use isittime_m, only: isittime
   USE mathop_m, ONLY: mathop
 
   implicit none
+
+  INTEGER, SAVE:: datasz_max(nb_files_max, nb_var_max) = -1
 
   INTERFACE histwrite
      ! The "histwrite" procedures give the data to the input-output system.
@@ -158,8 +160,8 @@ CONTAINS
        nbpt_out = datasz_max(fileid, varid)
        CALL mathop(sopps(fileid, varid, 1), nbpt_in, pdata, missing_val, &
             nbindex, nindex, scal(fileid, varid, 1), nbpt_out, buff_tmp)
-       CALL histwrite_real(fileid, varid, itau, nbpt_out, buff_tmp, nbindex, &
-            nindex, do_oper, do_write)
+       CALL histwrite_real(datasz_max, fileid, varid, itau, nbpt_out, &
+            buff_tmp, nbindex, nindex, do_oper, do_write)
     ENDIF
 
     ! 6.0 Manage time steps
@@ -291,7 +293,7 @@ CONTAINS
        CALL mathop (sopps(fileid, varid, 1), nbpt_in, pdata, &
             missing_val, nbindex, nindex, &
             scal(fileid, varid, 1), nbpt_out, buff_tmp)
-       CALL histwrite_real (fileid, varid, itau, nbpt_out, &
+       CALL histwrite_real (datasz_max, fileid, varid, itau, nbpt_out, &
             buff_tmp, nbindex, nindex, do_oper, do_write)
     ENDIF
 
@@ -428,7 +430,7 @@ CONTAINS
        CALL mathop (sopps(fileid, varid, 1), nbpt_in, pdata, &
             missing_val, nbindex, nindex, &
             scal(fileid, varid, 1), nbpt_out, buff_tmp)
-       CALL histwrite_real (fileid, varid, itau, nbpt_out, &
+       CALL histwrite_real(datasz_max, fileid, varid, itau, nbpt_out, &
             buff_tmp, nbindex, nindex, do_oper, do_write)
     ENDIF
 

@@ -4,9 +4,11 @@
 
       USE dimens_m
       USE dimphy
+      use gwstress_m, only: gwstress
       USE suphec_m
       USE yoegwd
       use gwprofil_m, only: gwprofil
+      use orosetup_m, only: orosetup
       IMPLICIT NONE
 
 
@@ -40,11 +42,6 @@
 !     method.
 !     -------
 
-!     externals.
-!     ----------
-      INTEGER ismin, ismax
-      EXTERNAL ismin, ismax
-
 !     reference.
 !     ----------
 
@@ -62,7 +59,7 @@
 !              ---------
 
 
-      INTEGER nlon, nlev, klevm1
+      INTEGER nlon, nlev
       INTEGER jl, ilevp1, jk, ji
       REAL zdelp, ztemp, zforc, ztend
       REAL rover, zb, zc, zconb, zabsv
@@ -86,9 +83,9 @@
       REAL ztau(klon,klev+1), zstab(klon,klev+1), &
         zvph(klon,klev+1), zrho(klon,klev+1), zri(klon,klev+1), &
         zpsi(klon,klev+1), zzdep(klon,klev)
-      REAL zdudt(klon), zdvdt(klon), zdtdt(klon), zdedt(klon), zvidis(klon), &
+      REAL zdudt(klon), zdvdt(klon), zvidis(klon), &
         znu(klon), zd1(klon), zd2(klon), zdmod(klon)
-      REAL ztmst, zrtmst
+      REAL ztmst
       REAL, INTENT (IN) :: ptsphy
 
 !------------------------------------------------------------------
@@ -99,9 +96,7 @@
 !*         1.1   computational constants
 !                -----------------------
 
-      klevm1 = klev - 1
       ztmst = ptsphy
-      zrtmst = 1./ztmst
 !     ------------------------------------------------------------------
 
 !*         1.3   check whether row contains point for printing
@@ -115,7 +110,7 @@
 
 
       CALL orosetup(nlon,ktest,ikcrit,ikcrith,icrit,ikenvh,iknu,iknu2,paphm1, &
-        papm1,pum1,pvm1,ptm1,pgeom1,pstd,zrho,zri,zstab,ztau,zvph,zpsi,zzdep, &
+        papm1,pum1,pvm1,ptm1,pgeom1,zrho,zri,zstab,ztau,zvph,zpsi,zzdep, &
         pulow,pvlow,ptheta,pgamma,pmea,ppic,pval,znu,zd1,zd2,zdmod)
 
 
@@ -127,7 +122,7 @@
 !*                 supercritical forms.computes anisotropy coefficient
 !*                 as measure of orographic twodimensionality.
 
-      CALL gwstress(nlon,nlev,ktest,icrit,ikenvh,iknu,zrho,zstab,zvph,pstd, &
+      CALL gwstress(nlon,nlev,ktest,ikenvh,zrho,zstab,zvph,pstd, &
         psig,pmea,ppic,ztau,pgeom1,zdmod)
 
 
@@ -148,7 +143,6 @@
         zvidis(jl) = 0.0
         zdudt(jl) = 0.0
         zdvdt(jl) = 0.0
-        zdtdt(jl) = 0.0
 510   CONTINUE
 
       ilevp1 = klev + 1
@@ -208,10 +202,7 @@
             zust = pum1(ji,jk) + ztmst*zdudt(ji)
             zvst = pvm1(ji,jk) + ztmst*zdvdt(ji)
             zdis = 0.5*(pum1(ji,jk)**2+pvm1(ji,jk)**2-zust**2-zvst**2)
-            zdedt(ji) = zdis/ztmst
             zvidis(ji) = zvidis(ji) + zdis*zdelp
-            zdtdt(ji) = zdedt(ji)/rcpd
-!     pte(ji,jk)=zdtdt(ji)
 
 !  ENCORE UN TRUC POUR EVITER LES EXPLOSIONS
 
