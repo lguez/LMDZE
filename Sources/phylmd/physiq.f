@@ -383,7 +383,8 @@ contains
     INTEGER, save:: ibas_con(klon), itop_con(klon)
 
     REAL rain_con(klon), rain_lsc(klon)
-    REAL snow_con(klon), snow_lsc(klon)
+    REAL, save:: snow_con(klon)
+    real snow_lsc(klon)
     REAL d_ts(klon, nbsrf)
 
     REAL d_u_vdf(klon, llm), d_v_vdf(klon, llm)
@@ -486,7 +487,6 @@ contains
     SAVE ffonte
     SAVE fqcalving
     SAVE rain_con
-    SAVE snow_con
     SAVE topswai
     SAVE topswad
     SAVE solswai
@@ -878,7 +878,7 @@ contains
        CALL concvl(dtphys, paprs, play, t_seri, q_seri, u_seri, v_seri, sig1, &
             w01, d_t_con, d_q_con, d_u_con, d_v_con, rain_con, snow_con, &
             ibas_con, itop_con, upwd, dnwd, dnwd0, Ma, cape, iflagctrl, &
-            qcondc, wd, pmflxr, pmflxs, da, phi, mp)
+            qcondc, wd, pmflxr, da, phi, mp)
        clwcon0 = qcondc
        mfu = upwd + dnwd
        IF (.NOT. ok_gust) wd = 0.

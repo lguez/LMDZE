@@ -46,7 +46,7 @@ contains
     real, intent(out):: fv1(klon, klev) ! v-wind tend
     real, intent(out):: precip1(klon) ! precipitation
 
-    real, intent(out):: VPrecip1(klon, klev+1)
+    real, intent(out):: VPrecip1(klon, klev + 1)
     ! vertical profile of precipitation
 
     real, intent(inout):: cbmf1(klon) ! cloud base mass flux
@@ -60,7 +60,10 @@ contains
     real, intent(in):: delt ! time step
     real Ma1(klon, klev)
     ! Ma1 Real Output mass flux adiabatic updraft
-    real, intent(out):: upwd1(klon, klev) ! total upward mass flux (adiab+mixed)
+
+    real, intent(out):: upwd1(klon, klev) 
+    ! total upward mass flux (adiab + mixed)
+
     real, intent(out):: dnwd1(klon, klev) ! saturated downward mass flux (mixed)
     real, intent(out):: dnwd01(klon, klev) ! unsaturated downward mass flux
 
@@ -74,9 +77,9 @@ contains
     real, intent(inout):: da1(klon, klev), phi1(klon, klev, klev)
     real, intent(inout):: mp1(klon, klev)
 
-    ! --- ARGUMENTS
+    ! ARGUMENTS
 
-    ! --- On input:
+    ! On input:
 
     ! t: Array of absolute temperature (K) of dimension KLEV, with first
     ! index corresponding to lowest model level. Note that this array
@@ -104,7 +107,7 @@ contains
     ! index corresponding to lowest model level. Must be defined
     ! at same grid levels as T.
 
-    ! ph: Array of pressure (mb) of dimension KLEV+1, with first index
+    ! ph: Array of pressure (mb) of dimension KLEV + 1, with first index
     ! corresponding to lowest level. These pressures are defined at
     ! levels intermediate between those of P, T, Q and QS. The first
     ! value of PH should be greater than (i.e. at a lower level than)
@@ -115,7 +118,7 @@ contains
 
     ! delt: The model time step (sec) between calls to CONVECT
 
-    ! --- On Output:
+    ! On Output:
 
     ! iflag: An output integer whose value denotes the following:
     ! VALUE INTERPRETATION
@@ -211,7 +214,7 @@ contains
     real t(klon, klev), q(klon, klev), qs(klon, klev)
     real u(klon, klev), v(klon, klev)
     real gz(klon, klev), h(klon, klev), lv(klon, klev), cpn(klon, klev)
-    real p(klon, klev), ph(klon, klev+1), tv(klon, klev), tp(klon, klev)
+    real p(klon, klev), ph(klon, klev + 1), tv(klon, klev), tp(klon, klev)
     real clw(klon, klev)
     real dph(klon, klev)
     real pbase(klon), buoybase(klon), th(klon, klev)
@@ -232,24 +235,25 @@ contains
     real Ma(klon, klev), mike(klon, klev), tls(klon, klev)
     real tps(klon, klev), qprime(klon), tprime(klon)
     real precip(klon)
-    real VPrecip(klon, klev+1)
+    real VPrecip(klon, klev + 1)
     real qcondc(klon, klev) ! cld
     real wd(klon) ! gust
 
     !-------------------------------------------------------------------
-    ! --- SET CONSTANTS AND PARAMETERS
 
-    ! -- set simulation flags:
+    ! SET CONSTANTS AND PARAMETERS
+
+    ! set simulation flags:
     ! (common cvflag)
 
     CALL cv_flag
 
-    ! -- set thermodynamical constants:
+    ! set thermodynamical constants:
     ! (common cvthermo)
 
     CALL cv_thermo
 
-    ! -- set convect parameters
+    ! set convect parameters
 
     ! includes microphysical parameters and parameters that
     ! control the rate of approach to quasi-equilibrium)
@@ -257,7 +261,7 @@ contains
 
     if (iflag_con == 3) CALL cv3_param(klev, delt)
 
-    ! --- INITIALIZE OUTPUT ARRAYS AND PARAMETERS
+    ! INITIALIZE OUTPUT ARRAYS AND PARAMETERS
 
     do k = 1, klev
        do i = 1, klon
@@ -285,7 +289,7 @@ contains
        iflag1(i) = 0
        wd1(i) = 0.0
        cape1(i) = 0.0
-       VPrecip1(i, klev+1) = 0.0
+       VPrecip1(i, klev + 1) = 0.0
     end do
 
     if (iflag_con == 3) then
@@ -295,7 +299,7 @@ contains
        enddo
     endif
 
-    ! --- CALCULATE ARRAYS OF GEOPOTENTIAL, HEAT CAPACITY & STATIC ENERGY
+    ! CALCULATE ARRAYS OF GEOPOTENTIAL, HEAT CAPACITY & STATIC ENERGY
 
     if (iflag_con == 3) then
        CALL cv3_prelim(klon, klev, klev + 1, t1, q1, p1, ph1, lv1, cpn1, tv1, &
@@ -306,7 +310,7 @@ contains
             gz1, h1, hm1)
     endif
 
-    ! --- CONVECTIVE FEED
+    ! CONVECTIVE FEED
 
     if (iflag_con == 3) then
        CALL cv3_feed(klon, klev, t1, q1, qs1, p1, ph1, gz1, nk1, icb1, &
@@ -317,8 +321,8 @@ contains
             iflag1, tnk1, qnk1, gznk1, plcl1)
     endif
 
-    ! --- UNDILUTE (ADIABATIC) UPDRAFT / 1st part
-    ! (up through ICB for convect4, up through ICB+1 for convect3)
+    ! UNDILUTE (ADIABATIC) UPDRAFT / 1st part
+    ! (up through ICB for convect4, up through ICB + 1 for convect3)
     ! Calculates the lifted parcel virtual temperature at nk, the
     ! actual temperature, and the adiabatic liquid water content.
 
@@ -331,7 +335,7 @@ contains
             tp1, tvp1, clw1)
     endif
 
-    ! --- TRIGGERING
+    ! TRIGGERING
 
     if (iflag_con == 3) then
        CALL cv3_trigger(klon, klev, icb1, plcl1, p1, th1, tv1, tvp1, pbase1, &
@@ -341,18 +345,18 @@ contains
        CALL cv_trigger(klon, klev, icb1, cbmf1, tv1, tvp1, iflag1)
     end if
 
-    ! --- IF THIS POINT IS REACHED, MOIST CONVECTIVE ADJUSTMENT IS NECESSARY
+    ! Moist convective adjustment is necessary
 
     ncum = 0
     do i = 1, klon
-       if(iflag1(i) == 0)then
-          ncum = ncum+1
+       if (iflag1(i) == 0) then
+          ncum = ncum + 1
           idcum(ncum) = i
        endif
     end do
 
     IF (ncum > 0) THEN
-       ! --- COMPRESS THE FIELDS
+       ! COMPRESS THE FIELDS
        ! (-> vectorization over convective gridpoints)
 
        if (iflag_con == 3) then
@@ -371,13 +375,13 @@ contains
                tv, tp, tvp, clw, dph)
        endif
 
-       ! --- UNDILUTE (ADIABATIC) UPDRAFT / second part :
-       ! --- FIND THE REST OF THE LIFTED PARCEL TEMPERATURES
-       ! --- &
-       ! --- COMPUTE THE PRECIPITATION EFFICIENCIES AND THE
-       ! --- FRACTION OF PRECIPITATION FALLING OUTSIDE OF CLOUD
-       ! --- &
-       ! --- FIND THE LEVEL OF NEUTRAL BUOYANCY
+       ! UNDILUTE (ADIABATIC) UPDRAFT / second part :
+       ! FIND THE REST OF THE LIFTED PARCEL TEMPERATURES
+       ! &
+       ! COMPUTE THE PRECIPITATION EFFICIENCIES AND THE
+       ! FRACTION OF PRECIPITATION FALLING OUTSIDE OF CLOUD
+       ! &
+       ! FIND THE LEVEL OF NEUTRAL BUOYANCY
 
        if (iflag_con == 3) then
           CALL cv3_undilute2(klon, ncum, klev, icb, icbs, nk, tnk, qnk, gznk, &
@@ -390,7 +394,7 @@ contains
                sigp, frac)
        endif
 
-       ! --- CLOSURE
+       ! CLOSURE
 
        if (iflag_con == 3) then
           CALL cv3_closure(klon, ncum, klev, icb, inb, pbase, p, ph, tv, &
@@ -401,7 +405,7 @@ contains
                plcl, cpn, iflag, cbmf)
        endif
 
-       ! --- MIXING
+       ! MIXING
 
        if (iflag_con == 3) then
           CALL cv3_mixing(klon, ncum, klev, klev, icb, nk, inb, t, q, qs, u, &
@@ -414,7 +418,7 @@ contains
                uent, vent, nent, sij, elij)
        endif
 
-       ! --- UNSATURATED (PRECIPITATING) DOWNDRAFTS
+       ! UNSATURATED (PRECIPITATING) DOWNDRAFTS
 
        if (iflag_con == 3) then
           CALL cv3_unsat(klon, ncum, klev, klev, icb, inb, t, q, qs, gz, u, &
@@ -427,7 +431,7 @@ contains
                water, evap)
        endif
 
-       ! --- YIELD
+       ! YIELD
        ! (tendencies, precipitation, variables of interface with other
        ! processes, etc)
 
@@ -446,11 +450,11 @@ contains
                qcondc)
        endif
 
-       ! --- passive tracers
+       ! passive tracers
 
        if (iflag_con == 3) CALL cv3_tracer(klon, ncum, klev, ment, sij, da, phi)
 
-       ! --- UNCOMPRESS THE FIELDS
+       ! UNCOMPRESS THE FIELDS
 
        ! set iflag1 = 42 for non convective points
        do i = 1, klon

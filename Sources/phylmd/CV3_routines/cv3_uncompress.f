@@ -12,7 +12,6 @@ contains
     USE cv3_param_m, ONLY: nl
     use dimphy, only: klon, klev
 
-    ! inputs:
     integer, intent(in):: idcum(:) ! (ncum)
     integer, intent(in):: iflag(klon)
     real, intent(in):: precip(klon)
@@ -40,7 +39,7 @@ contains
     real, intent(inout):: da1(klon, klev), phi1(klon, klev, klev)
     real, intent(inout):: mp1(klon, klev)
 
-    ! local variables:
+    ! Local:
     integer ncum, i, k, j
 
     !-------------------------------------------------------------------
