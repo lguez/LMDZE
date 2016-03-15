@@ -234,7 +234,8 @@ contains
              ! Tiedke
              CALL nflxtr(pdtphys, pmfu, pmfd, pde_u, pen_d, paprs, &
                   tr_seri(:, :, it), d_tr_cv(:, :, it))
-          else if (iflag_con == 3) then
+          else
+             ! iflag_con >= 3
              ! Emanuel
              call cvltr(pdtphys, da, phi, mp, paprs, tr_seri(:, :, it), upwd, &
                   dnwd, d_tr_cv(:, :, it))

@@ -14,11 +14,6 @@ contains
 
     ! Several modules corresponding to different physical processes
 
-    ! Several versions of convect may be used:
-    ! - iflag_con = 3: version lmd
-    ! - iflag_con = 4: version 4.3b
-
-    use clesphys2, only: iflag_con
     use cv3_compress_m, only: cv3_compress
     use cv3_feed_m, only: cv3_feed
     use cv3_mixing_m, only: cv3_mixing
@@ -28,8 +23,6 @@ contains
     use cv3_uncompress_m, only: cv3_uncompress
     use cv3_unsat_m, only: cv3_unsat
     use cv3_yield_m, only: cv3_yield
-    use cv_feed_m, only: cv_feed
-    use cv_uncompress_m, only: cv_uncompress
     USE dimphy, ONLY: klev, klon
 
     real, intent(in):: t1(klon, klev) ! temperature
@@ -259,7 +252,7 @@ contains
     ! control the rate of approach to quasi-equilibrium)
     ! (common cvparam)
 
-    if (iflag_con == 3) CALL cv3_param(klev, delt)
+    CALL cv3_param(klev, delt)
 
     ! INITIALIZE OUTPUT ARRAYS AND PARAMETERS
 
@@ -292,58 +285,33 @@ contains
        VPrecip1(i, klev + 1) = 0.0
     end do
 
-    if (iflag_con == 3) then
-       do il = 1, klon
-          sig1(il, klev) = sig1(il, klev) + 1.
-          sig1(il, klev) = min(sig1(il, klev), 12.1)
-       enddo
-    endif
+    do il = 1, klon
+       sig1(il, klev) = sig1(il, klev) + 1.
+       sig1(il, klev) = min(sig1(il, klev), 12.1)
+    enddo
 
     ! CALCULATE ARRAYS OF GEOPOTENTIAL, HEAT CAPACITY & STATIC ENERGY
 
-    if (iflag_con == 3) then
-       CALL cv3_prelim(klon, klev, klev + 1, t1, q1, p1, ph1, lv1, cpn1, tv1, &
-            gz1, h1, hm1, th1)
-    else
-       ! iflag_con == 4
-       CALL cv_prelim(klon, klev, klev + 1, t1, q1, p1, ph1, lv1, cpn1, tv1, &
-            gz1, h1, hm1)
-    endif
+    CALL cv3_prelim(klon, klev, klev + 1, t1, q1, p1, ph1, lv1, cpn1, tv1, &
+         gz1, h1, hm1, th1)
 
     ! CONVECTIVE FEED
 
-    if (iflag_con == 3) then
-       CALL cv3_feed(klon, klev, t1, q1, qs1, p1, ph1, gz1, nk1, icb1, &
-            icbmax, iflag1, tnk1, qnk1, gznk1, plcl1) ! klev->na
-    else
-       ! iflag_con == 4
-       CALL cv_feed(klon, klev, t1, q1, qs1, p1, hm1, gz1, nk1, icb1, icbmax, &
-            iflag1, tnk1, qnk1, gznk1, plcl1)
-    endif
+    CALL cv3_feed(klon, klev, t1, q1, qs1, p1, ph1, gz1, nk1, icb1, &
+         icbmax, iflag1, tnk1, qnk1, gznk1, plcl1) ! klev->na
 
     ! UNDILUTE (ADIABATIC) UPDRAFT / 1st part
     ! (up through ICB for convect4, up through ICB + 1 for convect3)
     ! Calculates the lifted parcel virtual temperature at nk, the
     ! actual temperature, and the adiabatic liquid water content.
 
-    if (iflag_con == 3) then
-       CALL cv3_undilute1(klon, klev, t1, q1, qs1, gz1, plcl1, p1, nk1, icb1, &
-            tp1, tvp1, clw1, icbs1) ! klev->na
-    else
-       ! iflag_con == 4
-       CALL cv_undilute1(klon, klev, t1, q1, qs1, gz1, p1, nk1, icb1, icbmax, &
-            tp1, tvp1, clw1)
-    endif
+    CALL cv3_undilute1(klon, klev, t1, q1, qs1, gz1, plcl1, p1, nk1, icb1, &
+         tp1, tvp1, clw1, icbs1) ! klev->na
 
     ! TRIGGERING
 
-    if (iflag_con == 3) then
-       CALL cv3_trigger(klon, klev, icb1, plcl1, p1, th1, tv1, tvp1, pbase1, &
-            buoybase1, iflag1, sig1, w01) ! klev->na
-    else
-       ! iflag_con == 4
-       CALL cv_trigger(klon, klev, icb1, cbmf1, tv1, tvp1, iflag1)
-    end if
+    CALL cv3_trigger(klon, klev, icb1, plcl1, p1, th1, tv1, tvp1, pbase1, &
+         buoybase1, iflag1, sig1, w01) ! klev->na
 
     ! Moist convective adjustment is necessary
 
@@ -359,21 +327,12 @@ contains
        ! COMPRESS THE FIELDS
        ! (-> vectorization over convective gridpoints)
 
-       if (iflag_con == 3) then
-          CALL cv3_compress(klon, klon, ncum, klev, iflag1, nk1, icb1, icbs1, &
-               plcl1, tnk1, qnk1, gznk1, pbase1, buoybase1, t1, q1, qs1, u1, &
-               v1, gz1, th1, h1, lv1, cpn1, p1, ph1, tv1, tp1, tvp1, clw1, &
-               sig1, w01, iflag, nk, icb, icbs, plcl, tnk, qnk, gznk, pbase, &
-               buoybase, t, q, qs, u, v, gz, th, h, lv, cpn, p, ph, tv, tp, &
-               tvp, clw, sig, w0)
-       else
-          ! iflag_con == 4
-          CALL cv_compress(klon, klon, ncum, klev, iflag1, nk1, icb1, cbmf1, &
-               plcl1, tnk1, qnk1, gznk1, t1, q1, qs1, u1, v1, gz1, h1, lv1, &
-               cpn1, p1, ph1, tv1, tp1, tvp1, clw1, iflag, nk, icb, cbmf, &
-               plcl, tnk, qnk, gznk, t, q, qs, u, v, gz, h, lv, cpn, p, ph, &
-               tv, tp, tvp, clw, dph)
-       endif
+       CALL cv3_compress(klon, klon, ncum, klev, iflag1, nk1, icb1, icbs1, &
+            plcl1, tnk1, qnk1, gznk1, pbase1, buoybase1, t1, q1, qs1, u1, &
+            v1, gz1, th1, h1, lv1, cpn1, p1, ph1, tv1, tp1, tvp1, clw1, &
+            sig1, w01, iflag, nk, icb, icbs, plcl, tnk, qnk, gznk, pbase, &
+            buoybase, t, q, qs, u, v, gz, th, h, lv, cpn, p, ph, tv, tp, &
+            tvp, clw, sig, w0)
 
        ! UNDILUTE (ADIABATIC) UPDRAFT / second part :
        ! FIND THE REST OF THE LIFTED PARCEL TEMPERATURES
@@ -383,76 +342,40 @@ contains
        ! &
        ! FIND THE LEVEL OF NEUTRAL BUOYANCY
 
-       if (iflag_con == 3) then
-          CALL cv3_undilute2(klon, ncum, klev, icb, icbs, nk, tnk, qnk, gznk, &
-               t, qs, gz, p, h, tv, lv, pbase, buoybase, plcl, inb, tp, &
-               tvp, clw, hp, ep, sigp, buoy) !na->klev
-       else
-          ! iflag_con == 4
-          CALL cv_undilute2(klon, ncum, klev, icb, nk, tnk, qnk, gznk, t, &
-               qs, gz, p, dph, h, tv, lv, inb, inbis, tp, tvp, clw, hp, ep, &
-               sigp, frac)
-       endif
+       CALL cv3_undilute2(klon, ncum, klev, icb, icbs, nk, tnk, qnk, gznk, &
+            t, qs, gz, p, h, tv, lv, pbase, buoybase, plcl, inb, tp, &
+            tvp, clw, hp, ep, sigp, buoy) !na->klev
 
        ! CLOSURE
 
-       if (iflag_con == 3) then
-          CALL cv3_closure(klon, ncum, klev, icb, inb, pbase, p, ph, tv, &
-               buoy, sig, w0, cape, m) ! na->klev
-       else
-          ! iflag_con == 4
-          CALL cv_closure(klon, ncum, klev, nk, icb, tv, tvp, p, ph, dph, &
-               plcl, cpn, iflag, cbmf)
-       endif
+       CALL cv3_closure(klon, ncum, klev, icb, inb, pbase, p, ph, tv, &
+            buoy, sig, w0, cape, m) ! na->klev
 
        ! MIXING
 
-       if (iflag_con == 3) then
-          CALL cv3_mixing(klon, ncum, klev, klev, icb, nk, inb, t, q, qs, u, &
-               v, h, lv, hp, ep, clw, m, sig, ment, qent, uent, vent, nent, &
-               sij, elij, ments, qents)
-       else
-          ! iflag_con == 4
-          CALL cv_mixing(klon, ncum, klev, icb, nk, inb, inbis, ph, t, q, qs, &
-               u, v, h, lv, qnk, hp, tv, tvp, ep, clw, cbmf, m, ment, qent, &
-               uent, vent, nent, sij, elij)
-       endif
+       CALL cv3_mixing(klon, ncum, klev, klev, icb, nk, inb, t, q, qs, u, &
+            v, h, lv, hp, ep, clw, m, sig, ment, qent, uent, vent, nent, &
+            sij, elij, ments, qents)
 
        ! UNSATURATED (PRECIPITATING) DOWNDRAFTS
 
-       if (iflag_con == 3) then
-          CALL cv3_unsat(klon, ncum, klev, klev, icb, inb, t, q, qs, gz, u, &
-               v, p, ph, th, tv, lv, cpn, ep, sigp, clw, m, ment, elij, delt, &
-               plcl, mp, qp, up, vp, wt, water, evap, b)! na->klev
-       else
-          ! iflag_con == 4
-          CALL cv_unsat(klon, ncum, klev, inb, t, q, qs, gz, u, v, p, ph, h, &
-               lv, ep, sigp, clw, m, ment, elij, iflag, mp, qp, up, vp, wt, &
-               water, evap)
-       endif
+       CALL cv3_unsat(klon, ncum, klev, klev, icb, inb, t, q, qs, gz, u, &
+            v, p, ph, th, tv, lv, cpn, ep, sigp, clw, m, ment, elij, delt, &
+            plcl, mp, qp, up, vp, wt, water, evap, b)! na->klev
 
        ! YIELD
        ! (tendencies, precipitation, variables of interface with other
        ! processes, etc)
 
-       if (iflag_con == 3) then
-          CALL cv3_yield(klon, ncum, klev, klev, icb, inb, delt, t, q, u, v, &
-               gz, p, ph, h, hp, lv, cpn, th, ep, clw, m, tp, mp, qp, up, vp, &
-               wt, water, evap, b, ment, qent, uent, vent, nent, elij, sig, &
-               tv, tvp, iflag, precip, VPrecip, ft, fq, fu, fv, upwd, dnwd, &
-               dnwd0, ma, mike, tls, tps, qcondc, wd)! na->klev
-       else
-          ! iflag_con == 4
-          CALL cv_yield(klon, ncum, klev, nk, icb, inb, delt, t, q, u, v, gz, &
-               p, ph, h, hp, lv, cpn, ep, clw, frac, m, mp, qp, up, vp, wt, &
-               water, evap, ment, qent, uent, vent, nent, elij, tv, tvp, &
-               iflag, wd, qprime, tprime, precip, cbmf, ft, fq, fu, fv, Ma, &
-               qcondc)
-       endif
+       CALL cv3_yield(klon, ncum, klev, klev, icb, inb, delt, t, q, u, v, &
+            gz, p, ph, h, hp, lv, cpn, th, ep, clw, m, tp, mp, qp, up, vp, &
+            wt, water, evap, b, ment, qent, uent, vent, nent, elij, sig, &
+            tv, tvp, iflag, precip, VPrecip, ft, fq, fu, fv, upwd, dnwd, &
+            dnwd0, ma, mike, tls, tps, qcondc, wd)! na->klev
 
        ! passive tracers
 
-       if (iflag_con == 3) CALL cv3_tracer(klon, ncum, klev, ment, sij, da, phi)
+       CALL cv3_tracer(klon, ncum, klev, ment, sij, da, phi)
 
        ! UNCOMPRESS THE FIELDS
 
@@ -461,18 +384,11 @@ contains
           iflag1(i) = 42
        end do
 
-       if (iflag_con == 3) then
-          CALL cv3_uncompress(idcum(:ncum), iflag, precip, VPrecip, sig, w0, &
-               ft, fq, fu, fv, inb, Ma, upwd, dnwd, dnwd0, qcondc, wd, cape, &
-               da, phi, mp, iflag1, precip1, VPrecip1, sig1, w01, ft1, fq1, &
-               fu1, fv1, inb1, Ma1, upwd1, dnwd1, dnwd01, qcondc1, wd1, &
-               cape1, da1, phi1, mp1)
-       else
-          ! iflag_con == 4
-          CALL cv_uncompress(idcum(:ncum), iflag, precip, cbmf, ft, fq, fu, &
-               fv, Ma, qcondc, iflag1, precip1, cbmf1, ft1, fq1, fu1, fv1, &
-               Ma1, qcondc1)
-       endif
+       CALL cv3_uncompress(idcum(:ncum), iflag, precip, VPrecip, sig, w0, &
+            ft, fq, fu, fv, inb, Ma, upwd, dnwd, dnwd0, qcondc, wd, cape, &
+            da, phi, mp, iflag1, precip1, VPrecip1, sig1, w01, ft1, fq1, &
+            fu1, fv1, inb1, Ma1, upwd1, dnwd1, dnwd01, qcondc1, wd1, &
+            cape1, da1, phi1, mp1)
     ENDIF ! ncum>0
 
   end SUBROUTINE cv_driver
