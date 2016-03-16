@@ -65,7 +65,7 @@ cv3_undilute1.o : cvthermo.o cv3_param.o
 cv3_undilute2.o : cvthermo.o cv3_param.o conema3_m.o 
 cv3_unsat.o : cvflag.o cvthermo.o cv3_param.o 
 cv3_yield.o : cvflag.o cvthermo.o cv3_param.o conema3_m.o 
-cv_driver.o : dimphy.o cv3_yield.o cv3_unsat.o cv3_uncompress.o cv3_tracer.o cv3_prelim.o cv3_param.o cv3_mixing.o cv3_feed.o cv3_compress.o 
+cv_driver.o : dimphy.o cv3_yield.o cv3_unsat.o cv3_undilute2.o cv3_uncompress.o cv3_tracer.o cv3_prelim.o cv3_param.o cv3_mixing.o cv3_feed.o cv3_compress.o 
 cv_flag.o : cvflag.o 
 cv_thermo.o : cvthermo.o suphec.o 
 cvltr.o : suphec.o dimphy.o 
@@ -141,7 +141,7 @@ histvar_seq.o : histcom_var.o errioipsl.o find_str.o
 histvert.o : strlowercase.o histcom_var.o find_str.o errioipsl.o 
 histwrite.o : mathop.o isittime.o histwrite_real.o histvar_seq.o histcom_var.o histbeg_totreg.o errioipsl.o 
 histwrite_real.o : trans_buff.o moycum.o mathop.o histend.o histdef.o histcom_var.o histbeg_totreg.o 
-ini_histins.o : ymds2ju.o phyetat0.o iniadvtrac.o indicesol.o histvert.o histend.o histdef.o histbeg_totreg.o dynetat0.o disvert.o dimphy.o dimens_m.o clesphys.o 
+ini_histins.o : ymds2ju.o phyetat0.o iniadvtrac.o indicesol.o histvert.o histend.o histdef.o histbeg_totreg.o dynetat0.o disvert.o dimphy.o dimens_m.o clesphys2.o clesphys.o 
 iniadvtrac.o : dimens_m.o 
 inidissip.o : nxgraro2.o gradiv2.o filtreg_v.o filtreg_scal.o divgrad2.o conf_gcm.o disvert.o comdissnew.o comconst.o dimens_m.o 
 inifgn.o : dynetat0.o dimens_m.o 

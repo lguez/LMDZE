@@ -9,6 +9,7 @@ contains
     ! From phylmd/ini_histins.h, v 1.2 2005/05/25 13:10:09
 
     use clesphys, only: ecrit_ins
+    use clesphys2, only: conv_emanuel
     use dimens_m, only: iim, jjm, llm, nqmx
     use dimphy, only: klon
     use disvert_m, only: presnivs
@@ -260,7 +261,8 @@ contains
             iim, (jjm + 1), nhori, 1, 1, 1, -99, &
             "inst(X)", zsto, zout)
 
-       !IM cf. AM 081204 END
+       if (conv_emanuel) CALL histdef(nid_ins, "ptop", "cloud top pressure", &
+            "Pa", iim, jjm + 1, nhori, 1, 1, 1, -99, "inst(X)", zsto, zout)
 
        ! Champs 3D:
 

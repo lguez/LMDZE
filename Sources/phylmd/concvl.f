@@ -5,14 +5,13 @@ module concvl_m
 contains
 
   SUBROUTINE concvl(dtime, paprs, play, t, q, u, v, sig1, w01, d_t, d_q, d_u, &
-       d_v, rain, snow_con, kbas, itop_con, upwd, dnwd, dnwd0, ma, cape, &
-       iflag, qcondc, wd, pmflxr, da, phi, mp)
+       d_v, rain, kbas, itop_con, upwd, dnwd, dnwd0, ma, cape, iflag, qcondc, &
+       wd, pmflxr, da, phi, mp)
 
     ! From phylmd/concvl.F, version 1.3, 2005/04/15 12:36:17
     ! Author: Z. X. Li (LMD/CNRS)
     ! Date: 1993 August 18
     ! Objet : schéma de convection d'Emanuel (1991), interface
-    ! (driver commun aux versions 3 et 4)
 
     use cv_driver_m, only: cv_driver
     USE dimphy, ONLY: klev, klon
@@ -31,9 +30,8 @@ contains
     REAL, intent(out):: d_q(klon, klev) ! increment de la vapeur d'eau
     REAL, intent(out):: d_u(klon, klev), d_v(klon, klev)
     REAL, intent(out):: rain(klon) ! pluie (mm / s)
-    REAL, intent(out):: snow_con(klon) ! neige (mm / s)
     INTEGER, intent(out):: kbas(klon)
-    integer itop_con(klon)
+    integer, intent(inout):: itop_con(klon)
 
     REAL, intent(out):: upwd(klon, klev)
     ! saturated updraft mass flux (kg / m2 / s)
@@ -56,17 +54,8 @@ contains
     REAL zx_qs, cor
     INTEGER i, k
     REAL qs(klon, klev)
-    REAL, save:: cbmf(klon)
-    INTEGER:: ifrst = 0
 
     !-----------------------------------------------------------------
-
-    snow_con = 0.
-
-    IF (ifrst == 0) THEN
-       ifrst = 1
-       cbmf = 0.
-    END IF
 
     DO k = 1, klev
        DO i = 1, klon
@@ -77,8 +66,8 @@ contains
     END DO
 
     CALL cv_driver(t, q, qs, u, v, play / 100., paprs / 100., iflag, d_t, &
-         d_q, d_u, d_v, rain, pmflxr, cbmf, sig1, w01, kbas, itop_con, dtime, &
-         ma, upwd, dnwd, dnwd0, qcondc, wd, cape, da, phi, mp)
+         d_q, d_u, d_v, rain, pmflxr, sig1, w01, kbas, itop_con, dtime, ma, &
+         upwd, dnwd, dnwd0, qcondc, wd, cape, da, phi, mp)
 
     rain = rain / 86400.
     d_t = dtime * d_t

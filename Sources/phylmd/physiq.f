@@ -381,9 +381,10 @@ contains
     REAL prfl(klon, llm + 1), psfl(klon, llm + 1)
 
     INTEGER, save:: ibas_con(klon), itop_con(klon)
+    real ema_pct(klon) ! Emanuel pressure at cloud top, in Pa
 
     REAL rain_con(klon), rain_lsc(klon)
-    REAL, save:: snow_con(klon)
+    REAL, save:: snow_con(klon) ! neige (mm / s)
     real snow_lsc(klon)
     REAL d_ts(klon, nbsrf)
 
@@ -861,9 +862,10 @@ contains
        mp = 0.
        phi = 0.
        CALL concvl(dtphys, paprs, play, t_seri, q_seri, u_seri, v_seri, sig1, &
-            w01, d_t_con, d_q_con, d_u_con, d_v_con, rain_con, snow_con, &
-            ibas_con, itop_con, upwd, dnwd, dnwd0, Ma, cape, iflagctrl, &
-            qcondc, wd, pmflxr, da, phi, mp)
+            w01, d_t_con, d_q_con, d_u_con, d_v_con, rain_con, ibas_con, &
+            itop_con, upwd, dnwd, dnwd0, Ma, cape, iflagctrl, qcondc, wd, &
+            pmflxr, da, phi, mp)
+       snow_con = 0.
        clwcon0 = qcondc
        mfu = upwd + dnwd
        IF (.NOT. ok_gust) wd = 0.
@@ -880,6 +882,7 @@ contains
        call clouds_gno(klon, llm, q_seri, zqsat, clwcon0, ptconv, ratqsc, &
             rnebcon0)
 
+       forall (i = 1:klon) ema_pct(i) = paprs(i,itop_con(i) + 1)
        mfd = 0.
        pen_u = 0.
        pen_d = 0.
@@ -1585,6 +1588,11 @@ contains
 
          CALL gr_fi_ecrit(1, klon, iim, jjm + 1, s_trmb3, zx_tmp_2d)
          CALL histwrite(nid_ins, "s_trmb3", itau_w, zx_tmp_2d)
+
+         if (conv_emanuel) then
+            CALL gr_fi_ecrit(1, klon, iim, jjm + 1, ema_pct, zx_tmp_2d)
+            CALL histwrite(nid_ins, "ptop", itau_w, zx_tmp_2d)
+         end if
 
          ! Champs 3D:
 

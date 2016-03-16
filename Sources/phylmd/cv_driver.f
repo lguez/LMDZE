@@ -4,9 +4,9 @@ module cv_driver_m
 
 contains
 
-  SUBROUTINE cv_driver(t1, q1, qs1, u1, v1, p1, ph1, iflag1, ft1, &
-       fq1, fu1, fv1, precip1, VPrecip1, cbmf1, sig1, w01, icb1, inb1, delt, &
-       Ma1, upwd1, dnwd1, dnwd01, qcondc1, wd1, cape1, da1, phi1, mp1)
+  SUBROUTINE cv_driver(t1, q1, qs1, u1, v1, p1, ph1, iflag1, ft1, fq1, fu1, &
+       fv1, precip1, VPrecip1, sig1, w01, icb1, inb1, delt, Ma1, upwd1, &
+       dnwd1, dnwd01, qcondc1, wd1, cape1, da1, phi1, mp1)
 
     ! From LMDZ4/libf/phylmd/cv_driver.F, version 1.3, 2005/04/15 12:36:17
     ! Main driver for convection
@@ -21,6 +21,7 @@ contains
     use cv3_prelim_m, only: cv3_prelim
     use cv3_tracer_m, only: cv3_tracer
     use cv3_uncompress_m, only: cv3_uncompress
+    use cv3_undilute2_m, only: cv3_undilute2
     use cv3_unsat_m, only: cv3_unsat
     use cv3_yield_m, only: cv3_yield
     USE dimphy, ONLY: klev, klon
@@ -42,7 +43,6 @@ contains
     real, intent(out):: VPrecip1(klon, klev + 1)
     ! vertical profile of precipitation
 
-    real, intent(inout):: cbmf1(klon) ! cloud base mass flux
     real, intent(inout):: sig1(klon, klev) ! section adiabatic updraft
 
     real, intent(inout):: w01(klon, klev) 
@@ -201,7 +201,7 @@ contains
     integer iflag(klon), nk(klon), icb(klon)
     integer nent(klon, klev)
     integer icbs(klon)
-    integer inb(klon), inbis(klon)
+    integer inb(klon)
 
     real plcl(klon), tnk(klon), qnk(klon), gznk(klon)
     real t(klon, klev), q(klon, klev), qs(klon, klev)
@@ -209,12 +209,11 @@ contains
     real gz(klon, klev), h(klon, klev), lv(klon, klev), cpn(klon, klev)
     real p(klon, klev), ph(klon, klev + 1), tv(klon, klev), tp(klon, klev)
     real clw(klon, klev)
-    real dph(klon, klev)
     real pbase(klon), buoybase(klon), th(klon, klev)
     real tvp(klon, klev)
     real sig(klon, klev), w0(klon, klev)
     real hp(klon, klev), ep(klon, klev), sigp(klon, klev)
-    real frac(klon), buoy(klon, klev)
+    real buoy(klon, klev)
     real cape(klon)
     real m(klon, klev), ment(klon, klev, klev), qent(klon, klev, klev)
     real uent(klon, klev, klev), vent(klon, klev, klev)
@@ -226,7 +225,7 @@ contains
     real fu(klon, klev), fv(klon, klev)
     real upwd(klon, klev), dnwd(klon, klev), dnwd0(klon, klev)
     real Ma(klon, klev), mike(klon, klev), tls(klon, klev)
-    real tps(klon, klev), qprime(klon), tprime(klon)
+    real tps(klon, klev)
     real precip(klon)
     real VPrecip(klon, klev + 1)
     real qcondc(klon, klev) ! cld
@@ -238,16 +237,13 @@ contains
 
     ! set simulation flags:
     ! (common cvflag)
-
     CALL cv_flag
 
     ! set thermodynamical constants:
     ! (common cvthermo)
-
     CALL cv_thermo
 
     ! set convect parameters
-
     ! includes microphysical parameters and parameters that
     ! control the rate of approach to quasi-equilibrium)
     ! (common cvparam)
@@ -265,7 +261,6 @@ contains
           tvp1(i, k) = 0.0
           tp1(i, k) = 0.0
           clw1(i, k) = 0.0
-          !ym
           clw(i, k) = 0.0
           gz1(i, k) = 0.
           VPrecip1(i, k) = 0.
@@ -291,12 +286,10 @@ contains
     enddo
 
     ! CALCULATE ARRAYS OF GEOPOTENTIAL, HEAT CAPACITY & STATIC ENERGY
-
     CALL cv3_prelim(klon, klev, klev + 1, t1, q1, p1, ph1, lv1, cpn1, tv1, &
          gz1, h1, hm1, th1)
 
     ! CONVECTIVE FEED
-
     CALL cv3_feed(klon, klev, t1, q1, qs1, p1, ph1, gz1, nk1, icb1, &
          icbmax, iflag1, tnk1, qnk1, gznk1, plcl1) ! klev->na
 
@@ -304,12 +297,10 @@ contains
     ! (up through ICB for convect4, up through ICB + 1 for convect3)
     ! Calculates the lifted parcel virtual temperature at nk, the
     ! actual temperature, and the adiabatic liquid water content.
-
     CALL cv3_undilute1(klon, klev, t1, q1, qs1, gz1, plcl1, p1, nk1, icb1, &
          tp1, tvp1, clw1, icbs1) ! klev->na
 
     ! TRIGGERING
-
     CALL cv3_trigger(klon, klev, icb1, plcl1, p1, th1, tv1, tvp1, pbase1, &
          buoybase1, iflag1, sig1, w01) ! klev->na
 
@@ -326,7 +317,6 @@ contains
     IF (ncum > 0) THEN
        ! COMPRESS THE FIELDS
        ! (-> vectorization over convective gridpoints)
-
        CALL cv3_compress(klon, klon, ncum, klev, iflag1, nk1, icb1, icbs1, &
             plcl1, tnk1, qnk1, gznk1, pbase1, buoybase1, t1, q1, qs1, u1, &
             v1, gz1, th1, h1, lv1, cpn1, p1, ph1, tv1, tp1, tvp1, clw1, &
@@ -341,24 +331,20 @@ contains
        ! FRACTION OF PRECIPITATION FALLING OUTSIDE OF CLOUD
        ! &
        ! FIND THE LEVEL OF NEUTRAL BUOYANCY
-
        CALL cv3_undilute2(klon, ncum, klev, icb, icbs, nk, tnk, qnk, gznk, &
             t, qs, gz, p, h, tv, lv, pbase, buoybase, plcl, inb, tp, &
             tvp, clw, hp, ep, sigp, buoy) !na->klev
 
        ! CLOSURE
-
        CALL cv3_closure(klon, ncum, klev, icb, inb, pbase, p, ph, tv, &
             buoy, sig, w0, cape, m) ! na->klev
 
        ! MIXING
-
        CALL cv3_mixing(klon, ncum, klev, klev, icb, nk, inb, t, q, qs, u, &
             v, h, lv, hp, ep, clw, m, sig, ment, qent, uent, vent, nent, &
             sij, elij, ments, qents)
 
        ! UNSATURATED (PRECIPITATING) DOWNDRAFTS
-
        CALL cv3_unsat(klon, ncum, klev, klev, icb, inb, t, q, qs, gz, u, &
             v, p, ph, th, tv, lv, cpn, ep, sigp, clw, m, ment, elij, delt, &
             plcl, mp, qp, up, vp, wt, water, evap, b)! na->klev
@@ -366,7 +352,6 @@ contains
        ! YIELD
        ! (tendencies, precipitation, variables of interface with other
        ! processes, etc)
-
        CALL cv3_yield(klon, ncum, klev, klev, icb, inb, delt, t, q, u, v, &
             gz, p, ph, h, hp, lv, cpn, th, ep, clw, m, tp, mp, qp, up, vp, &
             wt, water, evap, b, ment, qent, uent, vent, nent, elij, sig, &
@@ -374,7 +359,6 @@ contains
             dnwd0, ma, mike, tls, tps, qcondc, wd)! na->klev
 
        ! passive tracers
-
        CALL cv3_tracer(klon, ncum, klev, ment, sij, da, phi)
 
        ! UNCOMPRESS THE FIELDS
@@ -389,7 +373,7 @@ contains
             da, phi, mp, iflag1, precip1, VPrecip1, sig1, w01, ft1, fq1, &
             fu1, fv1, inb1, Ma1, upwd1, dnwd1, dnwd01, qcondc1, wd1, &
             cape1, da1, phi1, mp1)
-    ENDIF ! ncum>0
+    ENDIF
 
   end SUBROUTINE cv_driver
 
