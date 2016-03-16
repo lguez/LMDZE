@@ -3,7 +3,6 @@ dyn3d/Dissipation
 dyn3d/Guide
 dyn3d/Guide/Read_reanalyse
 dyn3d/Inter_barxy
-dyn3d/PPM3d
 dyn3d/Vlsplt
 filtrez
 IOIPSL
@@ -13,8 +12,7 @@ IOIPSL/Mathelp
 misc
 phylmd
 phylmd/Conflx
-phylmd/CV3_routines
-phylmd/CV_routines
+phylmd/CV30_routines
 phylmd/Interface_surf
 phylmd/Mobidic
 phylmd/Orography
