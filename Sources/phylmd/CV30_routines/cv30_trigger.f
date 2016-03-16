@@ -1,7 +1,7 @@
 
-      SUBROUTINE cv3_trigger(len,nd,icb,plcl,p,th,tv,tvp &
+      SUBROUTINE cv30_trigger(len,nd,icb,plcl,p,th,tv,tvp &
                       ,pbase,buoybase,iflag,sig,w0)
-            use cv3_param_m
+            use cv30_param_m
       implicit none
 
 !-------------------------------------------------------------------

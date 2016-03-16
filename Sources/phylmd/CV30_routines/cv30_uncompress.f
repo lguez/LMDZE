@@ -1,15 +1,15 @@
-module cv3_uncompress_m
+module cv30_uncompress_m
 
   implicit none
 
 contains
 
-  SUBROUTINE cv3_uncompress(idcum, iflag, precip, VPrecip, sig, w0, ft, fq, &
+  SUBROUTINE cv30_uncompress(idcum, iflag, precip, VPrecip, sig, w0, ft, fq, &
        fu, fv, inb, Ma, upwd, dnwd, dnwd0, qcondc, wd, cape, da, phi, mp, &
        iflag1, precip1, VPrecip1, sig1, w01, ft1, fq1, fu1, fv1, inb1, Ma1, &
        upwd1, dnwd1, dnwd01, qcondc1, wd1, cape1, da1, phi1, mp1)
 
-    USE cv3_param_m, ONLY: nl
+    USE cv30_param_m, ONLY: nl
     use dimphy, only: klon, klev
 
     integer, intent(in):: idcum(:) ! (ncum)
@@ -85,6 +85,6 @@ contains
        end do
     end do
 
-  end SUBROUTINE cv3_uncompress
+  end SUBROUTINE cv30_uncompress
 
-end module cv3_uncompress_m
+end module cv30_uncompress_m

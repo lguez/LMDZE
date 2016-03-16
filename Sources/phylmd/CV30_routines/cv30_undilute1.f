@@ -1,7 +1,7 @@
 
-      SUBROUTINE cv3_undilute1(len,nd,t,q,qs,gz,plcl,p,nk,icb &
+      SUBROUTINE cv30_undilute1(len,nd,t,q,qs,gz,plcl,p,nk,icb &
                              ,tp,tvp,clw,icbs)
-            use cv3_param_m
+            use cv30_param_m
             use cvthermo
       implicit none
 
@@ -196,11 +196,11 @@
 !
 ! * the routine above computes tvp from minorig to icbs (included).
 !
-! * to compute buoybase (in cv3_trigger.F), both tvp(icb) and tvp(icb+1)
+! * to compute buoybase (in cv30_trigger.F), both tvp(icb) and tvp(icb+1)
 !    must be known. This is the case if icbs=icb+1, but not if icbs=icb.
 !
 ! * therefore, in the case icbs=icb, we compute tvp at level icb+1
-!   (tvp at other levels will be computed in cv3_undilute2.F)
+!   (tvp at other levels will be computed in cv30_undilute2.F)
 !
 
         do i=1,len

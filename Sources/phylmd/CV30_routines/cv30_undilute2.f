@@ -1,10 +1,10 @@
-module cv3_undilute2_m
+module cv30_undilute2_m
 
   implicit none
 
 contains
 
-  SUBROUTINE cv3_undilute2(nloc, ncum, nd, icb, icbs, nk, tnk, qnk, gznk, t, &
+  SUBROUTINE cv30_undilute2(nloc, ncum, nd, icb, icbs, nk, tnk, qnk, gznk, t, &
        qs, gz, p, h, tv, lv, pbase, buoybase, plcl, inb, tp, tvp, clw, hp, &
        ep, sigp, buoy)
 
@@ -16,7 +16,7 @@ contains
     ! Vertical profile of buoyancy computed here (use of buoybase).
 
     use conema3_m, only: epmax
-    use cv3_param_m, only: dtovsh, minorig, nl, nlp, pbcrit, ptcrit, spfac
+    use cv30_param_m, only: dtovsh, minorig, nl, nlp, pbcrit, ptcrit, spfac
     use cvthermo, only: cl, clmcpv, cpd, cpv, eps, lv0, rrv
 
     ! inputs:
@@ -190,6 +190,6 @@ contains
        end do
     end do
 
-  end SUBROUTINE cv3_undilute2
+  end SUBROUTINE cv30_undilute2
 
-end module cv3_undilute2_m
+end module cv30_undilute2_m

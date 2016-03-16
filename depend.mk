@@ -54,18 +54,18 @@ convmas.o : filtreg_scal.o paramet_m.o dimens_m.o
 coordij.o : dynetat0.o dimens_m.o 
 covcont.o : comgeom.o paramet_m.o dimens_m.o 
 covnat.o : paramet_m.o comgeom.o 
-cv3_closure.o : cvthermo.o cv3_param.o 
-cv3_compress.o : cv3_param.o 
-cv3_feed.o : cv3_param.o 
-cv3_mixing.o : cvthermo.o cv3_param.o 
-cv3_prelim.o : cvthermo.o cv3_param.o 
-cv3_trigger.o : cv3_param.o 
-cv3_uncompress.o : dimphy.o cv3_param.o 
-cv3_undilute1.o : cvthermo.o cv3_param.o 
-cv3_undilute2.o : cvthermo.o cv3_param.o conema3_m.o 
-cv3_unsat.o : cvflag.o cvthermo.o cv3_param.o 
-cv3_yield.o : cvflag.o cvthermo.o cv3_param.o conema3_m.o 
-cv_driver.o : dimphy.o cv3_yield.o cv3_unsat.o cv3_undilute2.o cv3_uncompress.o cv3_tracer.o cv3_prelim.o cv3_param.o cv3_mixing.o cv3_feed.o cv3_compress.o 
+cv30_closure.o : cvthermo.o cv30_param.o 
+cv30_compress.o : cv30_param.o 
+cv30_feed.o : cv30_param.o 
+cv30_mixing.o : cvthermo.o cv30_param.o 
+cv30_prelim.o : cvthermo.o cv30_param.o 
+cv30_trigger.o : cv30_param.o 
+cv30_uncompress.o : dimphy.o cv30_param.o 
+cv30_undilute1.o : cvthermo.o cv30_param.o 
+cv30_undilute2.o : cvthermo.o cv30_param.o conema3_m.o 
+cv30_unsat.o : cvflag.o cvthermo.o cv30_param.o 
+cv30_yield.o : cvflag.o cvthermo.o cv30_param.o conema3_m.o 
+cv_driver.o : dimphy.o cv30_yield.o cv30_unsat.o cv30_undilute2.o cv30_uncompress.o cv30_tracer.o cv30_prelim.o cv30_param.o cv30_mixing.o cv30_feed.o cv30_compress.o 
 cv_flag.o : cvflag.o 
 cv_thermo.o : cvthermo.o suphec.o 
 cvltr.o : suphec.o dimphy.o 

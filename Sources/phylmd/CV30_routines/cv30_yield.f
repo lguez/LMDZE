@@ -1,10 +1,10 @@
-module cv3_yield_m
+module cv30_yield_m
 
   implicit none
 
 contains
 
-  SUBROUTINE cv3_yield(nloc,ncum,nd,na  &
+  SUBROUTINE cv30_yield(nloc,ncum,nd,na  &
        ,icb,inb,delt &
        ,t,rr,u,v,gz,p,ph,h,hp,lv,cpn,th &
        ,ep,clw,m,tp,mp,rp,up,vp &
@@ -14,7 +14,7 @@ contains
        ,iflag,precip,VPrecip,ft,fr,fu,fv &
        ,upwd,dnwd,dnwd0,ma,mike,tls,tps,qcondc,wd)
     use conema3_m
-    use cv3_param_m
+    use cv30_param_m
     use cvthermo
     use cvflag
 
@@ -697,6 +697,6 @@ contains
        enddo                                               ! cld
     enddo                                                ! cld
 
-  end SUBROUTINE cv3_yield
+  end SUBROUTINE cv30_yield
 
-end module cv3_yield_m
+end module cv30_yield_m

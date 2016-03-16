@@ -14,16 +14,16 @@ contains
 
     ! Several modules corresponding to different physical processes
 
-    use cv3_compress_m, only: cv3_compress
-    use cv3_feed_m, only: cv3_feed
-    use cv3_mixing_m, only: cv3_mixing
-    use cv3_param_m, only: cv3_param
-    use cv3_prelim_m, only: cv3_prelim
-    use cv3_tracer_m, only: cv3_tracer
-    use cv3_uncompress_m, only: cv3_uncompress
-    use cv3_undilute2_m, only: cv3_undilute2
-    use cv3_unsat_m, only: cv3_unsat
-    use cv3_yield_m, only: cv3_yield
+    use cv30_compress_m, only: cv30_compress
+    use cv30_feed_m, only: cv30_feed
+    use cv30_mixing_m, only: cv30_mixing
+    use cv30_param_m, only: cv30_param
+    use cv30_prelim_m, only: cv30_prelim
+    use cv30_tracer_m, only: cv30_tracer
+    use cv30_uncompress_m, only: cv30_uncompress
+    use cv30_undilute2_m, only: cv30_undilute2
+    use cv30_unsat_m, only: cv30_unsat
+    use cv30_yield_m, only: cv30_yield
     USE dimphy, ONLY: klev, klon
 
     real, intent(in):: t1(klon, klev) ! temperature
@@ -248,7 +248,7 @@ contains
     ! control the rate of approach to quasi-equilibrium)
     ! (common cvparam)
 
-    CALL cv3_param(klev, delt)
+    CALL cv30_param(klev, delt)
 
     ! INITIALIZE OUTPUT ARRAYS AND PARAMETERS
 
@@ -286,22 +286,22 @@ contains
     enddo
 
     ! CALCULATE ARRAYS OF GEOPOTENTIAL, HEAT CAPACITY & STATIC ENERGY
-    CALL cv3_prelim(klon, klev, klev + 1, t1, q1, p1, ph1, lv1, cpn1, tv1, &
+    CALL cv30_prelim(klon, klev, klev + 1, t1, q1, p1, ph1, lv1, cpn1, tv1, &
          gz1, h1, hm1, th1)
 
     ! CONVECTIVE FEED
-    CALL cv3_feed(klon, klev, t1, q1, qs1, p1, ph1, gz1, nk1, icb1, &
+    CALL cv30_feed(klon, klev, t1, q1, qs1, p1, ph1, gz1, nk1, icb1, &
          icbmax, iflag1, tnk1, qnk1, gznk1, plcl1) ! klev->na
 
     ! UNDILUTE (ADIABATIC) UPDRAFT / 1st part
     ! (up through ICB for convect4, up through ICB + 1 for convect3)
     ! Calculates the lifted parcel virtual temperature at nk, the
     ! actual temperature, and the adiabatic liquid water content.
-    CALL cv3_undilute1(klon, klev, t1, q1, qs1, gz1, plcl1, p1, nk1, icb1, &
+    CALL cv30_undilute1(klon, klev, t1, q1, qs1, gz1, plcl1, p1, nk1, icb1, &
          tp1, tvp1, clw1, icbs1) ! klev->na
 
     ! TRIGGERING
-    CALL cv3_trigger(klon, klev, icb1, plcl1, p1, th1, tv1, tvp1, pbase1, &
+    CALL cv30_trigger(klon, klev, icb1, plcl1, p1, th1, tv1, tvp1, pbase1, &
          buoybase1, iflag1, sig1, w01) ! klev->na
 
     ! Moist convective adjustment is necessary
@@ -317,7 +317,7 @@ contains
     IF (ncum > 0) THEN
        ! COMPRESS THE FIELDS
        ! (-> vectorization over convective gridpoints)
-       CALL cv3_compress(klon, klon, ncum, klev, iflag1, nk1, icb1, icbs1, &
+       CALL cv30_compress(klon, klon, ncum, klev, iflag1, nk1, icb1, icbs1, &
             plcl1, tnk1, qnk1, gznk1, pbase1, buoybase1, t1, q1, qs1, u1, &
             v1, gz1, th1, h1, lv1, cpn1, p1, ph1, tv1, tp1, tvp1, clw1, &
             sig1, w01, iflag, nk, icb, icbs, plcl, tnk, qnk, gznk, pbase, &
@@ -331,35 +331,35 @@ contains
        ! FRACTION OF PRECIPITATION FALLING OUTSIDE OF CLOUD
        ! &
        ! FIND THE LEVEL OF NEUTRAL BUOYANCY
-       CALL cv3_undilute2(klon, ncum, klev, icb, icbs, nk, tnk, qnk, gznk, &
+       CALL cv30_undilute2(klon, ncum, klev, icb, icbs, nk, tnk, qnk, gznk, &
             t, qs, gz, p, h, tv, lv, pbase, buoybase, plcl, inb, tp, &
             tvp, clw, hp, ep, sigp, buoy) !na->klev
 
        ! CLOSURE
-       CALL cv3_closure(klon, ncum, klev, icb, inb, pbase, p, ph, tv, &
+       CALL cv30_closure(klon, ncum, klev, icb, inb, pbase, p, ph, tv, &
             buoy, sig, w0, cape, m) ! na->klev
 
        ! MIXING
-       CALL cv3_mixing(klon, ncum, klev, klev, icb, nk, inb, t, q, qs, u, &
+       CALL cv30_mixing(klon, ncum, klev, klev, icb, nk, inb, t, q, qs, u, &
             v, h, lv, hp, ep, clw, m, sig, ment, qent, uent, vent, nent, &
             sij, elij, ments, qents)
 
        ! UNSATURATED (PRECIPITATING) DOWNDRAFTS
-       CALL cv3_unsat(klon, ncum, klev, klev, icb, inb, t, q, qs, gz, u, &
+       CALL cv30_unsat(klon, ncum, klev, klev, icb, inb, t, q, qs, gz, u, &
             v, p, ph, th, tv, lv, cpn, ep, sigp, clw, m, ment, elij, delt, &
             plcl, mp, qp, up, vp, wt, water, evap, b)! na->klev
 
        ! YIELD
        ! (tendencies, precipitation, variables of interface with other
        ! processes, etc)
-       CALL cv3_yield(klon, ncum, klev, klev, icb, inb, delt, t, q, u, v, &
+       CALL cv30_yield(klon, ncum, klev, klev, icb, inb, delt, t, q, u, v, &
             gz, p, ph, h, hp, lv, cpn, th, ep, clw, m, tp, mp, qp, up, vp, &
             wt, water, evap, b, ment, qent, uent, vent, nent, elij, sig, &
             tv, tvp, iflag, precip, VPrecip, ft, fq, fu, fv, upwd, dnwd, &
             dnwd0, ma, mike, tls, tps, qcondc, wd)! na->klev
 
        ! passive tracers
-       CALL cv3_tracer(klon, ncum, klev, ment, sij, da, phi)
+       CALL cv30_tracer(klon, ncum, klev, ment, sij, da, phi)
 
        ! UNCOMPRESS THE FIELDS
 
@@ -368,7 +368,7 @@ contains
           iflag1(i) = 42
        end do
 
-       CALL cv3_uncompress(idcum(:ncum), iflag, precip, VPrecip, sig, w0, &
+       CALL cv30_uncompress(idcum(:ncum), iflag, precip, VPrecip, sig, w0, &
             ft, fq, fu, fv, inb, Ma, upwd, dnwd, dnwd0, qcondc, wd, cape, &
             da, phi, mp, iflag1, precip1, VPrecip1, sig1, w01, ft1, fq1, &
             fu1, fv1, inb1, Ma1, upwd1, dnwd1, dnwd01, qcondc1, wd1, &

@@ -1,15 +1,15 @@
-module cv3_unsat_m
+module cv30_unsat_m
 
   implicit none
 
 contains
 
-  SUBROUTINE cv3_unsat(nloc,ncum,nd,na,icb,inb &
+  SUBROUTINE cv30_unsat(nloc,ncum,nd,na,icb,inb &
        ,t,rr,rs,gz,u,v,p,ph &
        ,th,tv,lv,cpn,ep,sigp,clw &
        ,m,ment,elij,delt,plcl &
        ,mp,rp,up,vp,wt,water,evap,b)
-    use cv3_param_m
+    use cv30_param_m
     use cvthermo
     use cvflag
 
@@ -316,6 +316,6 @@ contains
 
     end DO
 
-  end SUBROUTINE cv3_unsat
+  end SUBROUTINE cv30_unsat
 
-end module cv3_unsat_m
+end module cv30_unsat_m

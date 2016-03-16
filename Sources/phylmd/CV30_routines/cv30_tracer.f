@@ -1,10 +1,10 @@
-module cv3_tracer_m
+module cv30_tracer_m
 
   implicit none
 
 contains
 
-  SUBROUTINE cv3_tracer(nloc, ncum, na, ment, sij, da, phi)
+  SUBROUTINE cv30_tracer(nloc, ncum, na, ment, sij, da, phi)
 
     implicit none
 
@@ -31,6 +31,6 @@ contains
        end do
     end do
 
-  end SUBROUTINE cv3_tracer
+  end SUBROUTINE cv30_tracer
 
-end module cv3_tracer_m
+end module cv30_tracer_m

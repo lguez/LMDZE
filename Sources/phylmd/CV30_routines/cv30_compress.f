@@ -1,16 +1,16 @@
-module cv3_compress_m
+module cv30_compress_m
 
   implicit none
 
 contains
 
-  SUBROUTINE cv3_compress(len, nloc, ncum, nd, iflag1, nk1, icb1, icbs1, &
+  SUBROUTINE cv30_compress(len, nloc, ncum, nd, iflag1, nk1, icb1, icbs1, &
        plcl1, tnk1, qnk1, gznk1, pbase1, buoybase1, t1, q1, qs1, u1, v1, gz1, &
        th1, h1, lv1, cpn1, p1, ph1, tv1, tp1, tvp1, clw1, sig1, w01, iflag, &
        nk, icb, icbs, plcl, tnk, qnk, gznk, pbase, buoybase, t, q, qs, u, v, &
        gz, th, h, lv, cpn, p, ph, tv, tp, tvp, clw, sig, w0)
 
-    use cv3_param_m
+    use cv30_param_m
 
 
     ! inputs:
@@ -91,6 +91,6 @@ contains
        endif
     end do
 
-  end SUBROUTINE cv3_compress
+  end SUBROUTINE cv30_compress
 
-end module cv3_compress_m
+end module cv30_compress_m

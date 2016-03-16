@@ -1,13 +1,13 @@
-module cv3_mixing_m
+module cv30_mixing_m
 
   implicit none
 
 contains
 
-  SUBROUTINE cv3_mixing(nloc, ncum, nd, na, icb, nk, inb, t, rr, rs, u, v, h, &
+  SUBROUTINE cv30_mixing(nloc, ncum, nd, na, icb, nk, inb, t, rr, rs, u, v, h, &
        lv, hp, ep, clw, m, sig, ment, qent, uent, vent, nent, sij, elij, &
        ments, qents)
-    use cv3_param_m
+    use cv30_param_m
     use cvthermo
 
     !---------------------------------------------------------------------
@@ -49,7 +49,7 @@ contains
     do j=1, nl
        do i=1, ncum
           nent(i, j)=0
-          ! in convect3, m is computed in cv3_closure
+          ! in convect3, m is computed in cv30_closure
           ! ori m(i, 1)=0.0
        end do
     end do
@@ -316,6 +316,6 @@ contains
        enddo
     enddo
 
-  end SUBROUTINE cv3_mixing
+  end SUBROUTINE cv30_mixing
 
-end module cv3_mixing_m
+end module cv30_mixing_m

@@ -1,12 +1,12 @@
-module cv3_prelim_m
+module cv30_prelim_m
 
   implicit none
 
 contains
 
-  SUBROUTINE cv3_prelim(len, nd, ndp1, t, q, p, ph, lv, cpn, tv, gz, h, hm, th)
+  SUBROUTINE cv30_prelim(len, nd, ndp1, t, q, p, ph, lv, cpn, tv, gz, h, hm, th)
 
-    USE cv3_param_m, ONLY: nl
+    USE cv30_param_m, ONLY: nl
     USE cvthermo, ONLY: cl, clmcpv, cpd, cpv, eps, lv0, rrd, rrv
 
     ! Calculate arrays of geopotential, heat capacity and static energy
@@ -65,6 +65,6 @@ contains
        end do
     end do
 
-  end SUBROUTINE cv3_prelim
+  end SUBROUTINE cv30_prelim
 
-end module cv3_prelim_m
+end module cv30_prelim_m

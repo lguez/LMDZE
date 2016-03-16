@@ -1,4 +1,4 @@
-module cv3_param_m
+module cv30_param_m
 
   ! From LMDZ4/libf/phylmd/cvparam3.h, version 1.1.1.1, 2004/05/19 12:53:09
 
@@ -40,7 +40,7 @@ module cv3_param_m
 
 contains
 
-  SUBROUTINE cv3_param(nd, delt)
+  SUBROUTINE cv30_param(nd, delt)
 
     ! From LMDZ4/libf/phylmd/cv3_routines.F, version 1.5, 2005/07/11 15:20:02
 
@@ -92,6 +92,6 @@ contains
 
     betad=10.0 ! original value (from convect 4.3)
 
-  end SUBROUTINE cv3_param
+  end SUBROUTINE cv30_param
 
-end module cv3_param_m
+end module cv30_param_m

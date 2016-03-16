@@ -1,10 +1,10 @@
-module cv3_feed_m
+module cv30_feed_m
 
   implicit none
 
 contains
 
-  SUBROUTINE cv3_feed(len, nd, t, q, qs, p, ph, gz, nk, icb, icbmax, iflag, &
+  SUBROUTINE cv30_feed(len, nd, t, q, qs, p, ph, gz, nk, icb, icbmax, iflag, &
        tnk, qnk, gznk, plcl)
 
     ! Purpose: convective feed
@@ -14,7 +14,7 @@ contains
     ! - here, nk(i) = minorig
     ! - icb defined differently (plcl compared with ph instead of p)
 
-    use cv3_param_m, only: minorig, nl, nlm
+    use cv30_param_m, only: minorig, nl, nlm
 
     integer, intent(in):: len, nd
     real, intent(in):: t(len, nd)
@@ -100,6 +100,6 @@ contains
        if (iflag(i) < 7) icbmax = max(icbmax, icb(i))
     end do
 
-  end SUBROUTINE cv3_feed
+  end SUBROUTINE cv30_feed
 
-end module cv3_feed_m
+end module cv30_feed_m
