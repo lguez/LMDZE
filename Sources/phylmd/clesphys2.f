@@ -25,11 +25,7 @@ module clesphys2
   INTEGER:: nbapp_rad = 12
   ! nombre d'appels des routines de rayonnements par jour
 
-  INTEGER:: iflag_con = 2
-  ! Convection scheme:
-  ! 2 Tiedtke
-  ! 3 Emanuel
-  ! 4 Emanuel vect
+  logical:: conv_emanuel = .true. ! convection scheme of Emanuel, else Tiedtke
 
 contains
 
@@ -40,14 +36,13 @@ contains
     use conf_gcm_m, only: day_step, iphysiq
 
     namelist /clesphys2_nml/cycle_diurne, soil_model, new_oliq, ok_orodr, &
-         ok_orolf, ok_limitvrai, nbapp_rad, iflag_con
+         ok_orolf, ok_limitvrai, nbapp_rad, conv_emanuel
 
     !------------------------------------
 
     print *, "Enter namelist 'clesphys2_nml'."
     read(unit=*, nml=clesphys2_nml)
     write(unit_nml, nml=clesphys2_nml)
-    call assert(iflag_con >= 2 .and. iflag_con <= 4, "read_clesphys2 iflag_con")
     call assert(mod(day_step / iphysiq, nbapp_rad) == 0, &
          "read_clesphys2 nbapp_rad")
     call assert(nbapp_rad >= 4 .or. .not. cycle_diurne, &

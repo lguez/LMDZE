@@ -67,7 +67,7 @@ cv3_unsat.o : cvflag.o cvthermo.o cv3_param.o
 cv3_yield.o : cvflag.o cvthermo.o cv3_param.o conema3_m.o 
 cv_driver.o : dimphy.o cv3_yield.o cv3_unsat.o cv3_uncompress.o cv3_tracer.o cv3_prelim.o cv3_param.o cv3_mixing.o cv3_feed.o cv3_compress.o 
 cv_flag.o : cvflag.o 
-cv_thermo.o : cvthermo.o suphec.o clesphys2.o 
+cv_thermo.o : cvthermo.o suphec.o 
 cvltr.o : suphec.o dimphy.o 
 decoop.o : findsep.o errioipsl.o 
 diagcld1.o : suphec.o dimphy.o dimens_m.o 

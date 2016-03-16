@@ -21,7 +21,7 @@ contains
     use calltherm_m, only: calltherm
     USE clesphys, ONLY: cdhmax, cdmmax, ecrit_hf, ecrit_ins, ecrit_mth, &
          ecrit_reg, ecrit_tra, ksta, ksta_ter, ok_kzmin
-    USE clesphys2, ONLY: cycle_diurne, iflag_con, nbapp_rad, new_oliq, &
+    USE clesphys2, ONLY: cycle_diurne, conv_emanuel, nbapp_rad, new_oliq, &
          ok_orodr, ok_orolf
     USE clmain_m, ONLY: clmain
     use clouds_gno_m, only: clouds_gno
@@ -579,7 +579,7 @@ contains
        CALL printflag(radpas, ok_journe, ok_instan, ok_region)
 
        ! Initialisation pour le sch\'ema de convection d'Emanuel :
-       IF (iflag_con >= 3) THEN
+       IF (conv_emanuel) THEN
           ibas_con = 1
           itop_con = 1
        ENDIF
@@ -856,22 +856,7 @@ contains
 
     ! Appeler la convection (au choix)
 
-    if (iflag_con == 2) then
-       conv_q = d_q_dyn + d_q_vdf / dtphys
-       conv_t = d_t_dyn + d_t_vdf / dtphys
-       z_avant = sum((q_seri + ql_seri) * zmasse, dim=2)
-       CALL conflx(dtphys, paprs, play, t_seri(:, llm:1:- 1), &
-            q_seri(:, llm:1:- 1), conv_t, conv_q, zxfluxq(:, 1), omega, &
-            d_t_con, d_q_con, rain_con, snow_con, mfu(:, llm:1:- 1), &
-            mfd(:, llm:1:- 1), pen_u, pde_u, pen_d, pde_d, kcbot, kctop, &
-            kdtop, pmflxr, pmflxs)
-       WHERE (rain_con < 0.) rain_con = 0.
-       WHERE (snow_con < 0.) snow_con = 0.
-       ibas_con = llm + 1 - kcbot
-       itop_con = llm + 1 - kctop
-    else
-       ! iflag_con >= 3
-
+    if (conv_emanuel) then
        da = 0.
        mp = 0.
        phi = 0.
@@ -900,6 +885,19 @@ contains
        pen_d = 0.
        pde_d = 0.
        pde_u = 0.
+    else
+       conv_q = d_q_dyn + d_q_vdf / dtphys
+       conv_t = d_t_dyn + d_t_vdf / dtphys
+       z_avant = sum((q_seri + ql_seri) * zmasse, dim=2)
+       CALL conflx(dtphys, paprs, play, t_seri(:, llm:1:- 1), &
+            q_seri(:, llm:1:- 1), conv_t, conv_q, zxfluxq(:, 1), omega, &
+            d_t_con, d_q_con, rain_con, snow_con, mfu(:, llm:1:- 1), &
+            mfd(:, llm:1:- 1), pen_u, pde_u, pen_d, pde_d, kcbot, kctop, &
+            kdtop, pmflxr, pmflxs)
+       WHERE (rain_con < 0.) rain_con = 0.
+       WHERE (snow_con < 0.) snow_con = 0.
+       ibas_con = llm + 1 - kcbot
+       itop_con = llm + 1 - kctop
     END if
 
     DO k = 1, llm
@@ -933,7 +931,7 @@ contains
        print *, "Precip = ", zx_t
     ENDIF
 
-    IF (iflag_con == 2) THEN
+    IF (.not. conv_emanuel) THEN
        z_apres = sum((q_seri + ql_seri) * zmasse, dim=2)
        z_factor = (z_avant - (rain_con + snow_con) * dtphys) / z_apres
        DO k = 1, llm

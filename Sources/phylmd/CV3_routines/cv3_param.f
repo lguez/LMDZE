@@ -2,7 +2,7 @@ module cv3_param_m
 
   ! From LMDZ4/libf/phylmd/cvparam3.h, version 1.1.1.1, 2004/05/19 12:53:09
 
-  ! Parameters for iflag_con = 3:
+  ! Parameters for Emanuel convection scheme:
   ! - microphysical parameters
   ! - parameters that control the rate of approach to quasi-equilibrium
 
@@ -44,7 +44,7 @@ contains
 
     ! From LMDZ4/libf/phylmd/cv3_routines.F, version 1.5, 2005/07/11 15:20:02
 
-    ! Set parameters for iflag_con = 3
+    ! Set parameters for Emanuel convection scheme
 
     integer, intent(in):: nd
     real, intent(in):: delt ! timestep (seconds)

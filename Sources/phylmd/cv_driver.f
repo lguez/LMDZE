@@ -203,7 +203,7 @@ contains
     integer icbs(klon)
     integer inb(klon), inbis(klon)
 
-    real cbmf(klon), plcl(klon), tnk(klon), qnk(klon), gznk(klon)
+    real plcl(klon), tnk(klon), qnk(klon), gznk(klon)
     real t(klon, klev), q(klon, klev), qs(klon, klev)
     real u(klon, klev), v(klon, klev)
     real gz(klon, klev), h(klon, klev), lv(klon, klev), cpn(klon, klev)

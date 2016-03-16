@@ -28,7 +28,7 @@ contains
 
     use abort_gcm_m, only: abort_gcm
     use clesphys, only: ecrit_tra
-    use clesphys2, only: iflag_con
+    use clesphys2, only: conv_emanuel
     use cltrac_m, only: cltrac
     use cltracrn_m, only: cltracrn
     use ctherm, only: iflag_thermals
@@ -230,15 +230,12 @@ contains
     if (convection) then
        ! Calcul de l'effet de la convection
        DO it=1, nqmx - 2
-          if (iflag_con == 2) then
-             ! Tiedke
-             CALL nflxtr(pdtphys, pmfu, pmfd, pde_u, pen_d, paprs, &
-                  tr_seri(:, :, it), d_tr_cv(:, :, it))
-          else
-             ! iflag_con >= 3
-             ! Emanuel
+          if (conv_emanuel) then
              call cvltr(pdtphys, da, phi, mp, paprs, tr_seri(:, :, it), upwd, &
                   dnwd, d_tr_cv(:, :, it))
+          else
+             CALL nflxtr(pdtphys, pmfu, pmfd, pde_u, pen_d, paprs, &
+                  tr_seri(:, :, it), d_tr_cv(:, :, it))
           endif
 
           DO k = 1, llm
