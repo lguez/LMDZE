@@ -4,6 +4,8 @@ module cvflag
 
   implicit none
 
-  logical cvflag_grav
+  logical:: cvflag_grav = .TRUE.
+  ! rend la gravit\'e plus explicite et \'eventuellement diff\'erente
+  ! de 10.
 
 end module cvflag

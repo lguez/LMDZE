@@ -76,7 +76,6 @@ cv30_undilute2.f
 cv30_unsat.f
 cv30_yield.f
 cv_driver.f
-cv_flag.f
 cvflag.f
 cvltr.f
 cv_thermo.f
@@ -305,4 +304,3 @@ YOEGWD.f
 yoethf.f
 YOMCST.f
 zenang.f
-zilch.f

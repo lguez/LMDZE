@@ -4,30 +4,29 @@ module HBTM_m
 
 contains
 
-  SUBROUTINE HBTM(knon, paprs, pplay, t2m, q2m, ustar, flux_t, &
-       flux_q, u, v, t, q, pblh, cape, EauLiq, ctei, pblT, therm, trmb1, &
-       trmb2, trmb3, plcl)
+  SUBROUTINE HBTM(knon, paprs, pplay, t2m, q2m, ustar, flux_t, flux_q, u, v, &
+       t, q, pblh, cape, EauLiq, ctei, pblT, therm, trmb1, trmb2, trmb3, plcl)
 
     ! D'apr\'es Holstag et Boville et Troen et Mahrt
     ! JAS 47 BLM
-    ! Algorithme th\'ese Anne Mathieu
-    ! Crit\'ere d'entra\^inement Peter Duynkerke (JAS 50)
-    ! written by: Anne MATHIEU and Alain LAHELLEC, 22nd November 1999
-    ! features : implem. exces Mathieu
 
-    ! modifications : decembre 99 passage th a niveau plus bas. voir fixer
-    ! la prise du th a z/Lambda = -.2 (max Ray)
-    ! Autre algo : entrainement ~ Theta+v =cste mais comment=>The?
-    ! on peut fixer q a .7 qsat (cf. non adiabatique) => T2 et The2
-    ! voir aussi //KE pblh = niveau The_e ou l = env.
+    ! Algorithme th\'ese Anne Mathieu. Crit\'ere d'entra\^inement
+    ! Peter Duynkerke (JAS 50).  Written by: Anne MATHIEU and Alain
+    ! LAHELLEC, 22nd November 1999.
 
-    ! fin therm a la HBTM passage a forme Mathieu 12/09/2001
+    ! Modifications : d\'ecembre 99 passage th \`a niveau plus bas. Voir fixer
+    ! la prise du th \`a z/Lambda = -.2 (max Ray)
+    ! Autre algorithme : entra\^inement ~ Theta + v =constante
+    !  mais comment ? The ?
+    ! On peut fixer q \`a 0.7 qsat (cf. non adiabatique) d'où T2 et The2.
+    ! Voir aussi KE pblh = niveau The_e ou l = env.
 
-    ! Adaptation a LMDZ version couplee Pour le moment on fait passer
-    ! en argument les grandeurs de surface : flux, t, q2m, t, on va
-    ! utiliser systematiquement les grandeurs a 2m mais on garde la
-    ! possibilit\'e de changer si besoin est (jusqu'\`a pr\'esent la
-    ! forme de HB avec le 1er niveau modele etait conservee)
+    ! Adaptation \`a LMDZ version coupl\'ee. Pour le moment on fait
+    ! passer en argument les grandeurs de surface : flux, t, q2m. On
+    ! va utiliser syst\'ematiquement les grandeurs \`a 2 m mais on
+    ! garde la possibilit\'e de changer si besoin (jusqu'\`a pr\'esent
+    ! la forme de HB avec le premier niveau mod\`ele \'etait
+    ! conserv\'ee).
 
     USE dimphy, ONLY: klev, klon
     USE suphec_m, ONLY: rcpd, rd, retv, rg, rkappa, rtt
@@ -39,24 +38,39 @@ contains
     ! nombre de points a calculer
     INTEGER, intent(in):: knon
 
+    ! pression a inter-couche (Pa)
+    REAL, intent(in):: paprs(klon, klev+1)
+    ! pression au milieu de couche (Pa)
+    REAL, intent(in):: pplay(klon, klev)
     REAL, intent(in):: t2m(klon) ! temperature a 2 m
     ! q a 2 et 10m
-    REAL q2m(klon)
-    REAL ustar(klon)
-    ! pression a inter-couche (Pa)
-    REAL paprs(klon, klev+1)
-    ! pression au milieu de couche (Pa)
-    REAL pplay(klon, klev)
+    REAL, intent(in):: q2m(klon)
+    REAL, intent(in):: ustar(klon)
     ! Flux
-    REAL flux_t(klon, klev), flux_q(klon, klev)
+    REAL, intent(in):: flux_t(klon, klev), flux_q(klon, klev)
     ! vitesse U (m/s)
-    REAL u(klon, klev)
+    REAL, intent(in):: u(klon, klev)
     ! vitesse V (m/s)
-    REAL v(klon, klev)
+    REAL, intent(in):: v(klon, klev)
     ! temperature (K)
-    REAL t(klon, klev)
+    REAL, intent(in):: t(klon, klev)
     ! vapeur d'eau (kg/kg)
-    REAL q(klon, klev)
+    REAL, intent(in):: q(klon, klev)
+
+    REAL, intent(out):: pblh(:) ! (knon)
+    ! Cape du thermique
+    REAL Cape(klon)
+    ! Eau liqu integr du thermique
+    REAL EauLiq(klon)
+    ! Critere d'instab d'entrainmt des nuages de
+    REAL ctei(klon)
+    REAL pblT(klon)
+    ! thermal virtual temperature excess
+    REAL therm(klon)
+    REAL trmb1(klon), trmb2(klon), trmb3(klon)
+    REAL plcl(klon)
+
+    ! Local:
 
     INTEGER isommet
     ! limite max sommet pbl
@@ -124,17 +138,11 @@ contains
     LOGICAL check(klon) ! Richardson number > critical
     ! flag de prolongerment cape pour pt Omega
     LOGICAL omegafl(klon)
-    REAL pblh(klon)
-    REAL pblT(klon)
-    REAL plcl(klon)
 
     ! Monin-Obukhov lengh
     REAL obklen(klon)
 
     REAL zdu2
-    ! thermal virtual temperature excess
-    REAL therm(klon)
-    REAL trmb1(klon), trmb2(klon), trmb3(klon)
     ! Algorithme thermique
     REAL s(klon, klev) ! [P/Po]^Kappa milieux couches
     ! total water of thermal
@@ -143,12 +151,6 @@ contains
     REAL qsatbef(klon)
     ! le thermique est sature
     LOGICAL Zsat(klon)
-    ! Cape du thermique
-    REAL Cape(klon)
-    ! Eau liqu integr du thermique
-    REAL EauLiq(klon)
-    ! Critere d'instab d'entrainmt des nuages de
-    REAL ctei(klon)
     REAL zthvd, zthvu, qqsat
     REAL t2
 
@@ -202,7 +204,7 @@ contains
 
        ! convention >0 vers le bas ds lmdz
        khfs(i) = - flux_t(i, 1)*zxt*Rd / (RCPD*paprs(i, 1))
-       kqfs(i) = - flux_q(i, 1)*zxt*Rd / (paprs(i, 1))
+       kqfs(i) = - flux_q(i, 1)*zxt*Rd / paprs(i, 1)
        ! verifier que khfs et kqfs sont bien de la forme w'l'
        heatv(i) = khfs(i) + 0.608*zxt*kqfs(i)
        ! a comparer aussi aux sorties de clqh : flux_T/RoCp et flux_q/RoLv

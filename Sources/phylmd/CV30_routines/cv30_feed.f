@@ -14,7 +14,7 @@ contains
     ! - here, nk(i) = minorig
     ! - icb defined differently (plcl compared with ph instead of p)
 
-    use cv30_param_m, only: minorig, nl, nlm
+    use cv30_param_m, only: minorig, nl
 
     integer, intent(in):: len, nd
     real, intent(in):: t(len, nd)
@@ -73,7 +73,7 @@ contains
     ! Calculate first level above lcl (= icb)
 
     do i = 1, len
-       icb(i) = nlm
+       icb(i) = nl - 1
     end do
 
     ! La modification consiste \`a comparer plcl \`a ph et non \`a p:
@@ -85,7 +85,7 @@ contains
     end do
 
     do i = 1, len
-       if ((icb(i) == nlm).and.(iflag(i) == 0)) iflag(i) = 9
+       if ((icb(i) == nl - 1).and.(iflag(i) == 0)) iflag(i) = 9
     end do
 
     do i = 1, len

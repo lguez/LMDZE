@@ -14,6 +14,7 @@ contains
     use dimphy, only: klon
     use disvert_m, only: presnivs
     use dynetat0_m, only: day_ref, annee_ref
+    use gr_fi_ecrit_m, only: gr_fi_ecrit
     USE histbeg_totreg_m, ONLY : histbeg_totreg
     USE histdef_m, ONLY : histdef
     USE histend_m, ONLY : histend

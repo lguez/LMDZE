@@ -16,7 +16,7 @@ contains
     ! Vertical profile of buoyancy computed here (use of buoybase).
 
     use conema3_m, only: epmax
-    use cv30_param_m, only: dtovsh, minorig, nl, nlp, pbcrit, ptcrit, spfac
+    use cv30_param_m, only: dtovsh, minorig, nl, pbcrit, ptcrit, spfac
     use cvthermo, only: cl, clmcpv, cpd, cpv, eps, lv0, rrv
 
     ! inputs:
@@ -137,7 +137,7 @@ contains
     ! tvp est calcule en une seule fois, et sans retirer
     ! l'eau condensee (~> reversible CAPE)
     do i = 1, ncum
-       tp(i, nlp) = tp(i, nl)
+       tp(i, nl + 1) = tp(i, nl)
     end do
 
     ! EFFECTIVE VERTICAL PROFILE OF BUOYANCY:
@@ -177,7 +177,7 @@ contains
 
     ! CALCULATE LIQUID WATER STATIC ENERGY OF LIFTED PARCEL
 
-    do k = 1, nlp
+    do k = 1, nl + 1
        do i = 1, ncum
           hp(i, k) = h(i, k)
        enddo

@@ -331,7 +331,7 @@ contains
     REAL, PARAMETER:: t_coup = 234.
     REAL zphi(klon, llm)
 
-    ! cf. AM Variables pour la CLA (hbtm2)
+    ! cf. Anne Mathieu variables pour la couche limite atmosphérique (hbtm)
 
     REAL, SAVE:: pblh(klon, nbsrf) ! Hauteur de couche limite
     REAL, SAVE:: plcl(klon, nbsrf) ! Niveau de condensation de la CLA
@@ -343,7 +343,7 @@ contains
     REAL, SAVE:: trmb1(klon, nbsrf) ! deep_cape
     REAL, SAVE:: trmb2(klon, nbsrf) ! inhibition 
     REAL, SAVE:: trmb3(klon, nbsrf) ! Point Omega
-    ! Grdeurs de sorties
+    ! Grandeurs de sorties
     REAL s_pblh(klon), s_lcl(klon), s_capCL(klon)
     REAL s_oliqCL(klon), s_cteiCL(klon), s_pblt(klon)
     REAL s_therm(klon), s_trmb1(klon), s_trmb2(klon)
@@ -1398,6 +1398,7 @@ contains
       ! Ecriture des sorties
 
       use dimens_m, only: iim, jjm
+      use gr_fi_ecrit_m, only: gr_fi_ecrit
       USE histsync_m, ONLY: histsync
       USE histwrite_m, ONLY: histwrite
 

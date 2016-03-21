@@ -124,8 +124,9 @@ contains
     REAL t2m(klon, nbsrf), q2m(klon, nbsrf)
     REAL u10m(klon, nbsrf), v10m(klon, nbsrf)
 
-    !IM cf. AM : pbl, hbtm (Comme les autres diagnostics on cumule ds
-    ! physiq ce qui permet de sortir les grdeurs par sous surface)
+    ! Ionela Musat cf. Anne Mathieu : pbl, hbtm (Comme les autres
+    ! diagnostics on cumule dans physiq ce qui permet de sortir les
+    ! grandeurs par sous-surface)
     REAL pblh(klon, nbsrf)
     ! pblh------- HCL
     REAL capcl(klon, nbsrf)
@@ -575,8 +576,8 @@ contains
 
           END DO
 
-          CALL hbtm(knon, ypaprs, ypplay, yt2m, yq2m, yustar, &
-               y_flux_t, y_flux_q, yu, yv, yt, yq, ypblh, ycapcl, yoliqcl, &
+          CALL hbtm(knon, ypaprs, ypplay, yt2m, yq2m, yustar, y_flux_t, &
+               y_flux_q, yu, yv, yt, yq, ypblh(:knon), ycapcl, yoliqcl, &
                ycteicl, ypblt, ytherm, ytrmb1, ytrmb2, ytrmb3, ylcl)
 
           DO j = 1, knon

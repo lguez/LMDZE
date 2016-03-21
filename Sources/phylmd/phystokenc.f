@@ -12,6 +12,7 @@ contains
     ! Author: Fr\'ed\'eric Hourdin
     ! Objet : \'ecriture des variables pour transport offline
 
+    use gr_fi_ecrit_m, only: gr_fi_ecrit
     USE histwrite_m, ONLY: histwrite
     USE histsync_m, ONLY: histsync
     USE dimens_m, ONLY: iim, jjm

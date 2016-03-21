@@ -8,9 +8,8 @@ module cv30_param_m
 
   implicit none
 
-  integer noff ! integer limit for convection (nd - noff)
   integer minorig ! first level of convection
-  integer nl, nlp, nlm
+  integer nl ! limit for convection
   real sigd ! FRACTIONAL AREA COVERED BY UNSATURATED DNDRAFT 
   real spfac ! FRACTION OF PRECIPITATION FALLING OUTSIDE OF CLOUD 
 
@@ -40,24 +39,21 @@ module cv30_param_m
 
 contains
 
-  SUBROUTINE cv30_param(nd, delt)
+  SUBROUTINE cv30_param(delt)
 
     ! From LMDZ4/libf/phylmd/cv3_routines.F, version 1.5, 2005/07/11 15:20:02
 
     ! Set parameters for Emanuel convection scheme
 
-    integer, intent(in):: nd
+    USE dimphy, ONLY: klev
+
     real, intent(in):: delt ! timestep (seconds)
 
     !------------------------------------------------------------
 
     ! Limit levels for convection:
-
-    noff = 1
     minorig = 1
-    nl = nd - noff
-    nlp=nl+1
-    nlm=nl-1
+    nl = klev - 1
 
     ! "Microphysical" parameters:
 
@@ -70,13 +66,11 @@ contains
     omtrain = 45.0 ! used also for snow (no distinction rain/snow)
 
     ! Misc:
-
     dtovsh = -0.2 ! dT for overshoot
     dpbase = -40. ! definition cloud base (400m above LCL)
     dttrig = 5. ! (loose) condition for triggering
 
     ! Rate of approach to quasi-equilibrium:
-
     dtcrit = -2.0
     tau = 8000.
     beta = 1.0 - delt/tau
@@ -85,11 +79,9 @@ contains
     alpha = alpha*1.5
 
     ! Interface cloud parameterization:
-
     delta=0.01 ! cld
 
     ! Interface with boundary-layer (gust factor): (sb)
-
     betad=10.0 ! original value (from convect 4.3)
 
   end SUBROUTINE cv30_param

@@ -142,9 +142,8 @@ contains
     ! --- NORMALIZE ENTRAINED AIR MASS FLUXES
     ! --- TO REPRESENT EQUAL PROBABILITIES OF MIXING
 
-    call zilch(asum, nloc*nd)
-    call zilch(csum, nloc*nd)
-    call zilch(csum, nloc*nd)
+    asum = 0.
+    csum = 0.
 
     do il=1, ncum
        lwork(il) = .FALSE.

@@ -230,8 +230,8 @@ contains
        enddo
        if(num1.le.0) cycle
 
-       call zilch(amp1,ncum)
-       call zilch(ad,ncum)
+       amp1(:ncum) = 0.
+       ad(:ncum) = 0.
 
        do  k=i+1,nl+1
           do  il=1,ncum

@@ -235,10 +235,6 @@ contains
 
     ! SET CONSTANTS AND PARAMETERS
 
-    ! set simulation flags:
-    ! (common cvflag)
-    CALL cv_flag
-
     ! set thermodynamical constants:
     ! (common cvthermo)
     CALL cv_thermo
@@ -248,7 +244,7 @@ contains
     ! control the rate of approach to quasi-equilibrium)
     ! (common cvparam)
 
-    CALL cv30_param(klev, delt)
+    CALL cv30_param(delt)
 
     ! INITIALIZE OUTPUT ARRAYS AND PARAMETERS
 
@@ -324,13 +320,10 @@ contains
             buoybase, t, q, qs, u, v, gz, th, h, lv, cpn, p, ph, tv, tp, &
             tvp, clw, sig, w0)
 
-       ! UNDILUTE (ADIABATIC) UPDRAFT / second part :
-       ! FIND THE REST OF THE LIFTED PARCEL TEMPERATURES
-       ! &
-       ! COMPUTE THE PRECIPITATION EFFICIENCIES AND THE
-       ! FRACTION OF PRECIPITATION FALLING OUTSIDE OF CLOUD
-       ! &
-       ! FIND THE LEVEL OF NEUTRAL BUOYANCY
+       ! Undilute (adiabatic) updraft, second part: find the rest of
+       ! the lifted parcel temperatures; compute the precipitation
+       ! efficiencies and the fraction of precipitation falling
+       ! outside of cloud; find the level of neutral buoyancy.
        CALL cv30_undilute2(klon, ncum, klev, icb, icbs, nk, tnk, qnk, gznk, &
             t, qs, gz, p, h, tv, lv, pbase, buoybase, plcl, inb, tp, &
             tvp, clw, hp, ep, sigp, buoy) !na->klev
@@ -344,14 +337,13 @@ contains
             v, h, lv, hp, ep, clw, m, sig, ment, qent, uent, vent, nent, &
             sij, elij, ments, qents)
 
-       ! UNSATURATED (PRECIPITATING) DOWNDRAFTS
-       CALL cv30_unsat(klon, ncum, klev, klev, icb, inb, t, q, qs, gz, u, &
-            v, p, ph, th, tv, lv, cpn, ep, sigp, clw, m, ment, elij, delt, &
-            plcl, mp, qp, up, vp, wt, water, evap, b)! na->klev
+       ! Unsaturated (precipitating) downdrafts
+       CALL cv30_unsat(klon, ncum, klev, klev, icb(:ncum), inb(:ncum), t, q, &
+            qs, gz, u, v, p, ph, th, tv, lv, cpn, ep, sigp, clw, m, ment, &
+            elij, delt, plcl, mp, qp, up, vp, wt, water, evap, b)! na->klev
 
-       ! YIELD
-       ! (tendencies, precipitation, variables of interface with other
-       ! processes, etc)
+       ! Yield (tendencies, precipitation, variables of interface with
+       ! other processes, etc)
        CALL cv30_yield(klon, ncum, klev, klev, icb, inb, delt, t, q, u, v, &
             gz, p, ph, h, hp, lv, cpn, th, ep, clw, m, tp, mp, qp, up, vp, &
             wt, water, evap, b, ment, qent, uent, vent, nent, elij, sig, &
@@ -364,9 +356,7 @@ contains
        ! UNCOMPRESS THE FIELDS
 
        ! set iflag1 = 42 for non convective points
-       do i = 1, klon
-          iflag1(i) = 42
-       end do
+       iflag1 = 42
 
        CALL cv30_uncompress(idcum(:ncum), iflag, precip, VPrecip, sig, w0, &
             ft, fq, fu, fv, inb, Ma, upwd, dnwd, dnwd0, qcondc, wd, cape, &
