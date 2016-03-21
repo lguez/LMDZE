@@ -14,6 +14,7 @@ contains
 
     ! Several modules corresponding to different physical processes
 
+    use cv30_closure_m, only: cv30_closure
     use cv30_compress_m, only: cv30_compress
     use cv30_feed_m, only: cv30_feed
     use cv30_mixing_m, only: cv30_mixing
@@ -26,22 +27,77 @@ contains
     use cv30_yield_m, only: cv30_yield
     USE dimphy, ONLY: klev, klon
 
-    real, intent(in):: t1(klon, klev) ! temperature
-    real, intent(in):: q1(klon, klev) ! specific hum
-    real, intent(in):: qs1(klon, klev) ! sat specific hum
-    real, intent(in):: u1(klon, klev) ! u-wind
-    real, intent(in):: v1(klon, klev) ! v-wind
-    real, intent(in):: p1(klon, klev) ! full level pressure
-    real, intent(in):: ph1(klon, klev + 1) ! half level pressure
-    integer, intent(out):: iflag1(klon) ! flag for Emanuel conditions
-    real, intent(out):: ft1(klon, klev) ! temp tend
-    real, intent(out):: fq1(klon, klev) ! spec hum tend
-    real, intent(out):: fu1(klon, klev) ! u-wind tend
-    real, intent(out):: fv1(klon, klev) ! v-wind tend
-    real, intent(out):: precip1(klon) ! precipitation
+    real, intent(in):: t1(klon, klev)
+    ! temperature (K), with first index corresponding to lowest model
+    ! level
+
+    real, intent(in):: q1(klon, klev)
+    ! Specific humidity, with first index corresponding to lowest
+    ! model level. Must be defined at same grid levels as T1.
+
+    real, intent(in):: qs1(klon, klev)
+    ! Saturation specific humidity, with first index corresponding to
+    ! lowest model level. Must be defined at same grid levels as
+    ! T1.
+
+    real, intent(in):: u1(klon, klev), v1(klon, klev)
+    ! Zonal wind and meridional velocity (m/s), witth first index
+    ! corresponding with the lowest model level. Defined at same
+    ! levels as T1.
+
+    real, intent(in):: p1(klon, klev)
+    ! Full level pressure (mb) of dimension KLEV, with first index
+    ! corresponding to lowest model level. Must be defined at same
+    ! grid levels as T1.
+
+    real, intent(in):: ph1(klon, klev + 1) 
+    ! Half level pressure (mb), with first index corresponding to
+    ! lowest level. These pressures are defined at levels intermediate
+    ! between those of P1, T1, Q1 and QS1. The first value of PH
+    ! should be greater than (i.e. at a lower level than) the first
+    ! value of the array P1.
+
+    integer, intent(out):: iflag1(klon)
+    ! Flag for Emanuel conditions.
+
+    ! 0: Moist convection occurs.
+
+    ! 1: Moist convection occurs, but a CFL condition on the
+    ! subsidence warming is violated. This does not cause the scheme
+    ! to terminate.
+
+    ! 2: Moist convection, but no precipitation because ep(inb) < 1e-4
+
+    ! 3: No moist convection because new cbmf is 0 and old cbmf is 0.
+
+    ! 4: No moist convection; atmosphere is not unstable
+
+    ! 6: No moist convection because ihmin le minorig.
+
+    ! 7: No moist convection because unreasonable parcel level
+    ! temperature or specific humidity.
+
+    ! 8: No moist convection: lifted condensation level is above the
+    ! 200 mb level.
+
+    ! 9: No moist convection: cloud base is higher then the level NL-1.
+
+    real, intent(out):: ft1(klon, klev)
+    ! Temperature tendency (K/s), defined at same grid levels as T1,
+    ! Q1, QS1 and P1.
+
+    real, intent(out):: fq1(klon, klev)
+    ! Specific humidity tendencies (s-1), defined at same grid levels
+    ! as T1, Q1, QS1 and P1.
+
+    real, intent(out):: fu1(klon, klev), fv1(klon, klev)
+    ! Forcing (tendency) of zonal and meridional velocity (m/s^2),
+    ! defined at same grid levels as T1.
+
+    real, intent(out):: precip1(klon) ! convective precipitation rate (mm/day)
 
     real, intent(out):: VPrecip1(klon, klev + 1)
-    ! vertical profile of precipitation
+    ! vertical profile of convective precipitation (kg/m2/s)
 
     real, intent(inout):: sig1(klon, klev) ! section adiabatic updraft
 
@@ -50,9 +106,9 @@ contains
 
     integer, intent(out):: icb1(klon)
     integer, intent(inout):: inb1(klon)
-    real, intent(in):: delt ! time step
-    real Ma1(klon, klev)
-    ! Ma1 Real Output mass flux adiabatic updraft
+    real, intent(in):: delt ! the model time step (sec) between calls
+
+    real Ma1(klon, klev) ! Output mass flux adiabatic updraft
 
     real, intent(out):: upwd1(klon, klev) 
     ! total upward mass flux (adiab + mixed)
@@ -60,113 +116,18 @@ contains
     real, intent(out):: dnwd1(klon, klev) ! saturated downward mass flux (mixed)
     real, intent(out):: dnwd01(klon, klev) ! unsaturated downward mass flux
 
-    real qcondc1(klon, klev) ! cld
-    ! qcondc1 Real Output in-cld mixing ratio of condensed water
-    real wd1(klon) ! gust
-    ! wd1 Real Output downdraft velocity scale for sfc fluxes
-    real cape1(klon)
-    ! cape1 Real Output CAPE
+    real qcondc1(klon, klev) ! Output in-cld mixing ratio of condensed water
 
+    real wd1(klon) ! gust
+    ! Output downdraft velocity scale for surface fluxes
+    ! A convective downdraft velocity scale. For use in surface
+    ! flux parameterizations. See convect.ps file for details.
+
+    real cape1(klon) ! Output
     real, intent(inout):: da1(klon, klev), phi1(klon, klev, klev)
     real, intent(inout):: mp1(klon, klev)
 
-    ! ARGUMENTS
-
-    ! On input:
-
-    ! t: Array of absolute temperature (K) of dimension KLEV, with first
-    ! index corresponding to lowest model level. Note that this array
-    ! will be altered by the subroutine if dry convective adjustment
-    ! occurs and if IPBL is not equal to 0.
-
-    ! q: Array of specific humidity (gm/gm) of dimension KLEV, with first
-    ! index corresponding to lowest model level. Must be defined
-    ! at same grid levels as T. Note that this array will be altered
-    ! if dry convective adjustment occurs and if IPBL is not equal to 0.
-
-    ! qs: Array of saturation specific humidity of dimension KLEV, with first
-    ! index corresponding to lowest model level. Must be defined
-    ! at same grid levels as T. Note that this array will be altered
-    ! if dry convective adjustment occurs and if IPBL is not equal to 0.
-
-    ! u: Array of zonal wind velocity (m/s) of dimension KLEV, witth first
-    ! index corresponding with the lowest model level. Defined at
-    ! same levels as T. Note that this array will be altered if
-    ! dry convective adjustment occurs and if IPBL is not equal to 0.
-
-    ! v: Same as u but for meridional velocity.
-
-    ! p: Array of pressure (mb) of dimension KLEV, with first
-    ! index corresponding to lowest model level. Must be defined
-    ! at same grid levels as T.
-
-    ! ph: Array of pressure (mb) of dimension KLEV + 1, with first index
-    ! corresponding to lowest level. These pressures are defined at
-    ! levels intermediate between those of P, T, Q and QS. The first
-    ! value of PH should be greater than (i.e. at a lower level than)
-    ! the first value of the array P.
-
-    ! nl: The maximum number of levels to which convection can penetrate, plus 1
-    ! NL MUST be less than or equal to KLEV-1.
-
-    ! delt: The model time step (sec) between calls to CONVECT
-
-    ! On Output:
-
-    ! iflag: An output integer whose value denotes the following:
-    ! VALUE INTERPRETATION
-    ! ----- --------------
-    ! 0 Moist convection occurs.
-    ! 1 Moist convection occurs, but a CFL condition
-    ! on the subsidence warming is violated. This
-    ! does not cause the scheme to terminate.
-    ! 2 Moist convection, but no precip because ep(inb) lt 0.0001
-    ! 3 No moist convection because new cbmf is 0 and old cbmf is 0.
-    ! 4 No moist convection; atmosphere is not
-    ! unstable
-    ! 6 No moist convection because ihmin le minorig.
-    ! 7 No moist convection because unreasonable
-    ! parcel level temperature or specific humidity.
-    ! 8 No moist convection: lifted condensation
-    ! level is above the 200 mb level.
-    ! 9 No moist convection: cloud base is higher
-    ! then the level NL-1.
-
-    ! ft: Array of temperature tendency (K/s) of dimension KLEV, defined at same
-    ! grid levels as T, Q, QS and P.
-
-    ! fq: Array of specific humidity tendencies ((gm/gm)/s) of dimension KLEV,
-    ! defined at same grid levels as T, Q, QS and P.
-
-    ! fu: Array of forcing of zonal velocity (m/s^2) of dimension KLEV,
-    ! defined at same grid levels as T.
-
-    ! fv: Same as FU, but for forcing of meridional velocity.
-
-    ! precip: Scalar convective precipitation rate (mm/day).
-
-    ! VPrecip: Vertical profile of convective precipitation (kg/m2/s).
-
-    ! wd: A convective downdraft velocity scale. For use in surface
-    ! flux parameterizations. See convect.ps file for details.
-
-    ! tprime: A convective downdraft temperature perturbation scale (K).
-    ! For use in surface flux parameterizations. See convect.ps
-    ! file for details.
-
-    ! qprime: A convective downdraft specific humidity
-    ! perturbation scale (gm/gm).
-    ! For use in surface flux parameterizations. See convect.ps
-    ! file for details.
-
-    ! cbmf: The cloud base mass flux ((kg/m**2)/s). THIS SCALAR VALUE MUST
-    ! BE STORED BY THE CALLING PROGRAM AND RETURNED TO CONVECT AT
-    ! ITS NEXT CALL. That is, the value of CBMF must be "remembered"
-    ! by the calling program between calls to CONVECT.
-
-    ! det: Array of detrainment mass flux of dimension KLEV.
-
-    ! Local arrays
+    ! Local:
 
     real da(klon, klev), phi(klon, klev, klev), mp(klon, klev)
 
@@ -195,7 +156,7 @@ contains
 
     integer ncum
 
-    ! (local) compressed fields:
+    ! Compressed fields:
 
     integer idcum(klon)
     integer iflag(klon), nk(klon), icb(klon)
@@ -243,37 +204,36 @@ contains
     ! includes microphysical parameters and parameters that
     ! control the rate of approach to quasi-equilibrium)
     ! (common cvparam)
-
     CALL cv30_param(delt)
 
     ! INITIALIZE OUTPUT ARRAYS AND PARAMETERS
 
     do k = 1, klev
        do i = 1, klon
-          ft1(i, k) = 0.0
-          fq1(i, k) = 0.0
-          fu1(i, k) = 0.0
-          fv1(i, k) = 0.0
-          tvp1(i, k) = 0.0
-          tp1(i, k) = 0.0
-          clw1(i, k) = 0.0
-          clw(i, k) = 0.0
+          ft1(i, k) = 0.
+          fq1(i, k) = 0.
+          fu1(i, k) = 0.
+          fv1(i, k) = 0.
+          tvp1(i, k) = 0.
+          tp1(i, k) = 0.
+          clw1(i, k) = 0.
+          clw(i, k) = 0.
           gz1(i, k) = 0.
           VPrecip1(i, k) = 0.
-          Ma1(i, k) = 0.0
-          upwd1(i, k) = 0.0
-          dnwd1(i, k) = 0.0
-          dnwd01(i, k) = 0.0
-          qcondc1(i, k) = 0.0
+          Ma1(i, k) = 0.
+          upwd1(i, k) = 0.
+          dnwd1(i, k) = 0.
+          dnwd01(i, k) = 0.
+          qcondc1(i, k) = 0.
        end do
     end do
 
     do i = 1, klon
-       precip1(i) = 0.0
+       precip1(i) = 0.
        iflag1(i) = 0
-       wd1(i) = 0.0
-       cape1(i) = 0.0
-       VPrecip1(i, klev + 1) = 0.0
+       wd1(i) = 0.
+       cape1(i) = 0.
+       VPrecip1(i, klev + 1) = 0.
     end do
 
     do il = 1, klon
@@ -320,13 +280,9 @@ contains
             buoybase, t, q, qs, u, v, gz, th, h, lv, cpn, p, ph, tv, tp, &
             tvp, clw, sig, w0)
 
-       ! Undilute (adiabatic) updraft, second part: find the rest of
-       ! the lifted parcel temperatures; compute the precipitation
-       ! efficiencies and the fraction of precipitation falling
-       ! outside of cloud; find the level of neutral buoyancy.
-       CALL cv30_undilute2(klon, ncum, klev, icb, icbs, nk, tnk, qnk, gznk, &
-            t, qs, gz, p, h, tv, lv, pbase, buoybase, plcl, inb, tp, &
-            tvp, clw, hp, ep, sigp, buoy) !na->klev
+       CALL cv30_undilute2(ncum, icb, icbs, nk, tnk, qnk, gznk, t, qs, gz, p, &
+            h, tv, lv, pbase, buoybase, plcl, inb(:ncum), tp, tvp, clw, hp, &
+            ep, sigp, buoy)
 
        ! CLOSURE
        CALL cv30_closure(klon, ncum, klev, icb, inb, pbase, p, ph, tv, &
@@ -338,9 +294,9 @@ contains
             sij, elij, ments, qents)
 
        ! Unsaturated (precipitating) downdrafts
-       CALL cv30_unsat(klon, ncum, klev, klev, icb(:ncum), inb(:ncum), t, q, &
-            qs, gz, u, v, p, ph, th, tv, lv, cpn, ep, sigp, clw, m, ment, &
-            elij, delt, plcl, mp, qp, up, vp, wt, water, evap, b)! na->klev
+       CALL cv30_unsat(ncum, icb(:ncum), inb(:ncum), t, q, qs, gz, u, v, p, &
+            ph, th, tv, lv, cpn, ep, sigp, clw, m, ment, elij, delt, plcl, &
+            mp, qp, up, vp, wt, water, evap, b(:ncum, :))
 
        ! Yield (tendencies, precipitation, variables of interface with
        ! other processes, etc)

@@ -6,10 +6,16 @@ module cv30_param_m
   ! - microphysical parameters
   ! - parameters that control the rate of approach to quasi-equilibrium
 
+  USE dimphy, ONLY: klev
+
   implicit none
 
   integer minorig ! first level of convection
-  integer nl ! limit for convection
+
+  integer, parameter:: nl = klev - 1
+  ! Limit for convection. The maximum number of levels to which
+  ! convection can penetrate, plus 1.  nl must be <= KLEV-1.
+
   real sigd ! FRACTIONAL AREA COVERED BY UNSATURATED DNDRAFT 
   real spfac ! FRACTION OF PRECIPITATION FALLING OUTSIDE OF CLOUD 
 
@@ -37,6 +43,8 @@ module cv30_param_m
   real delta
   real betad
 
+  private klev
+
 contains
 
   SUBROUTINE cv30_param(delt)
@@ -45,15 +53,12 @@ contains
 
     ! Set parameters for Emanuel convection scheme
 
-    USE dimphy, ONLY: klev
-
     real, intent(in):: delt ! timestep (seconds)
 
     !------------------------------------------------------------
 
     ! Limit levels for convection:
     minorig = 1
-    nl = klev - 1
 
     ! "Microphysical" parameters:
 

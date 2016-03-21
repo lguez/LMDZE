@@ -4,43 +4,49 @@ module cv30_undilute2_m
 
 contains
 
-  SUBROUTINE cv30_undilute2(nloc, ncum, nd, icb, icbs, nk, tnk, qnk, gznk, t, &
-       qs, gz, p, h, tv, lv, pbase, buoybase, plcl, inb, tp, tvp, clw, hp, &
-       ep, sigp, buoy)
+  SUBROUTINE cv30_undilute2(ncum, icb, icbs, nk, tnk, qnk, gznk, t, qs, gz, &
+       p, h, tv, lv, pbase, buoybase, plcl, inb, tp, tvp, clw, hp, ep, sigp, &
+       buoy)
 
-    ! Purpose: find the rest of the lifted parcel temperatures;
-    ! compute the precipitation efficiencies and the fraction of
-    ! precipitation falling outside of cloud; find the level of
-    ! neutral buoyancy.
+    ! Undilute (adiabatic) updraft, second part. Purpose: find the
+    ! rest of the lifted parcel temperatures; compute the
+    ! precipitation efficiencies and the fraction of precipitation
+    ! falling outside of cloud; find the level of neutral buoyancy.
 
     ! Vertical profile of buoyancy computed here (use of buoybase).
 
     use conema3_m, only: epmax
     use cv30_param_m, only: dtovsh, minorig, nl, pbcrit, ptcrit, spfac
     use cvthermo, only: cl, clmcpv, cpd, cpv, eps, lv0, rrv
+    USE dimphy, ONLY: klon, klev
 
-    ! inputs:
-    integer, intent(in):: nloc, ncum, nd
-    integer icb(nloc), icbs(nloc), nk(nloc)
-    ! icbs (input) is the first level above LCL (may differ from icb)
-    real tnk(nloc), qnk(nloc), gznk(nloc)
-    real t(nloc, nd), qs(nloc, nd), gz(nloc, nd)
-    real p(nloc, nd), h(nloc, nd)
-    real tv(nloc, nd), lv(nloc, nd)
-    real pbase(nloc), buoybase(nloc), plcl(nloc)
+    integer, intent(in):: ncum
+
+    integer, intent(in):: icb(klon), icbs(klon)
+    ! icbs is the first level above LCL (may differ from icb)
+
+    integer, intent(in):: nk(klon)
+    real, intent(in):: tnk(klon), qnk(klon), gznk(klon)
+    real, intent(in):: t(klon, klev), qs(klon, klev), gz(klon, klev)
+    real, intent(in):: p(klon, klev), h(klon, klev)
+    real, intent(in):: tv(klon, klev), lv(klon, klev)
+    real, intent(in):: pbase(klon), buoybase(klon), plcl(klon)
 
     ! outputs:
-    integer inb(nloc)
-    real tp(nloc, nd), tvp(nloc, nd), clw(nloc, nd)
+    integer, intent(out):: inb(:) ! (ncum)
+    ! first model level above the level of neutral buoyancy of the
+    ! parcel (<= nl - 1)
+
+    real tp(klon, klev), tvp(klon, klev), clw(klon, klev)
     ! condensed water not removed from tvp
-    real hp(nloc, nd), ep(nloc, nd), sigp(nloc, nd)
-    real buoy(nloc, nd)
+    real hp(klon, klev), ep(klon, klev), sigp(klon, klev)
+    real buoy(klon, klev)
 
     ! Local:
     integer i, k
     real tg, qg, ahg, alv, s, tc, es, denom
     real pden
-    real ah0(nloc)
+    real ah0(klon)
 
     !---------------------------------------------------------------------
 
@@ -160,12 +166,9 @@ contains
        buoy(icb(i), k) = buoybase(i)
     end do
 
-    ! FIND THE FIRST MODEL LEVEL (INB) ABOVE THE PARCEL'S
-    ! LEVEL OF NEUTRAL BUOYANCY
+    ! Compute inb:
 
-    do i = 1, ncum
-       inb(i) = nl - 1
-    end do
+    inb = nl - 1
 
     do i = 1, ncum
        do k = 1, nl - 1

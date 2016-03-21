@@ -18,7 +18,7 @@ contains
 
     ! inputs:
     integer, intent(in):: ncum, nd, na, nloc
-    integer icb(nloc), inb(nloc), nk(nloc)
+    integer, intent(in):: icb(nloc), inb(nloc), nk(nloc)
     real sig(nloc, nd)
     real t(nloc, nd), rr(nloc, nd), rs(nloc, nd)
     real u(nloc, nd), v(nloc, nd)
@@ -122,8 +122,6 @@ contains
 
        ! *** if no air can entrain at level i assume that updraft detrains ***
        ! *** at that level and calculate detrained air flux and properties ***
-
-       !@ do 170 i=icb(il), inb(il)
 
        do il=1, ncum
           if ((i >= icb(il)).and.(i <= inb(il)).and.(nent(il, i) == 0)) then

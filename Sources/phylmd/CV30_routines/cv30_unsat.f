@@ -4,34 +4,34 @@ module cv30_unsat_m
 
 contains
 
-  SUBROUTINE cv30_unsat(nloc, ncum, nd, na, icb, inb, t, rr, rs, gz, u, v, p, &
-       ph, th, tv, lv, cpn, ep, sigp, clw, m, ment, elij, delt, plcl, mp, rp, &
-       up, vp, wt, water, evap, b)
+  SUBROUTINE cv30_unsat(ncum, icb, inb, t, rr, rs, gz, u, v, p, ph, th, tv, &
+       lv, cpn, ep, sigp, clw, m, ment, elij, delt, plcl, mp, rp, up, vp, wt, &
+       water, evap, b)
 
     use cv30_param_m, only: nl, sigd
-    use cvflag, only: cvflag_grav
     use cvthermo, only: cpd, ginv, grav
+    USE dimphy, ONLY: klon, klev
 
     ! inputs:
-    integer, intent(in):: nloc, ncum, nd, na
+    integer, intent(in):: ncum
     integer, intent(in):: icb(:), inb(:) ! (ncum)
-    real t(nloc, nd), rr(nloc, nd), rs(nloc, nd)
-    real gz(nloc, na)
-    real u(nloc, nd), v(nloc, nd)
-    real p(nloc, nd), ph(nloc, nd + 1)
-    real th(nloc, na)
-    real tv(nloc, na)
-    real lv(nloc, na)
-    real cpn(nloc, na)
-    real ep(nloc, na), sigp(nloc, na), clw(nloc, na)
-    real m(nloc, na), ment(nloc, na, na), elij(nloc, na, na)
+    real t(klon, klev), rr(klon, klev), rs(klon, klev)
+    real gz(klon, klev)
+    real u(klon, klev), v(klon, klev)
+    real p(klon, klev), ph(klon, klev + 1)
+    real th(klon, klev)
+    real tv(klon, klev)
+    real lv(klon, klev)
+    real cpn(klon, klev)
+    real, intent(in):: ep(klon, klev), sigp(klon, klev), clw(klon, klev)
+    real m(klon, klev), ment(klon, klev, klev), elij(klon, klev, klev)
     real, intent(in):: delt
-    real plcl(nloc)
+    real plcl(klon)
 
     ! outputs:
-    real mp(nloc, na), rp(nloc, na), up(nloc, na), vp(nloc, na)
-    real wt(nloc, na), water(nloc, na), evap(nloc, na)
-    real b(:, :) ! (nloc, na)
+    real mp(klon, klev), rp(klon, klev), up(klon, klev), vp(klon, klev)
+    real wt(klon, klev), water(klon, klev), evap(klon, klev)
+    real b(:, :) ! (ncum, klev)
 
     ! Local:
     integer i, j, il, num1
@@ -40,9 +40,9 @@ contains
     real pr1, pr2, sigt, b6, c6, revap, tevap, delth
     real amfac, amp2, xf, tf, fac2, ur, sru, fac, d, af, bf
     real ampmax
-    real lvcp(nloc, na)
-    real wdtrain(nloc)
-    logical lwork(nloc)
+    real lvcp(klon, klev)
+    real wdtrain(ncum)
+    logical lwork(ncum)
 
     !------------------------------------------------------
 
@@ -66,15 +66,11 @@ contains
 
     ! check whether ep(inb) = 0, if so, skip precipitating 
     ! downdraft calculation 
+    forall (il = 1:ncum) lwork(il) = ep(il, inb(il)) >= 1e-4
 
-    do il = 1, ncum
-       lwork(il) = .TRUE.
-       if (ep(il, inb(il)) < 0.0001) lwork(il) = .FALSE.
-    enddo
+    wdtrain = 0.
 
-    wdtrain(:ncum) = 0.
-
-    downdraft_loop: DO i = nl + 1, 1, - 1
+    downdraft_loop: DO i = nl - 1, 1, - 1
        num1 = 0
 
        do il = 1, ncum
@@ -89,11 +85,7 @@ contains
 
           do il = 1, ncum
              if (i <= inb(il) .and. lwork(il)) then
-                if (cvflag_grav) then
-                   wdtrain(il) = grav * ep(il, i) * m(il, i) * clw(il, i)
-                else
-                   wdtrain(il) = 10. * ep(il, i) * m(il, i) * clw(il, i)
-                endif
+                wdtrain(il) = grav * ep(il, i) * m(il, i) * clw(il, i)
              endif
           enddo
 
@@ -103,12 +95,8 @@ contains
                    if (i <= inb(il) .and. lwork(il)) then
                       awat = elij(il, j, i) - (1. - ep(il, i)) * clw(il, i)
                       awat = amax1(awat, 0.)
-                      if (cvflag_grav) then
-                         wdtrain(il) = wdtrain(il) + grav * awat &
-                              * ment(il, j, i)
-                      else
-                         wdtrain(il) = wdtrain(il) + 10. * awat * ment(il, j, i)
-                      endif
+                      wdtrain(il) = wdtrain(il) + grav * awat &
+                           * ment(il, j, i)
                    endif
                 enddo
              end do
@@ -182,13 +170,8 @@ contains
                 if (i /= 1) then
                    tevap = amax1(0., evap(il, i))
                    delth = amax1(0.001, (th(il, i) - th(il, i - 1)))
-                   if (cvflag_grav) then
-                      mp(il, i) = 100. * ginv * lvcp(il, i) * sigd * tevap &
-                           * (p(il, i - 1) - p(il, i)) / delth
-                   else
-                      mp(il, i) = 10. * lvcp(il, i) * sigd * tevap &
-                           * (p(il, i - 1) - p(il, i)) / delth
-                   endif
+                   mp(il, i) = 100. * ginv * lvcp(il, i) * sigd * tevap &
+                        * (p(il, i - 1) - p(il, i)) / delth
 
                    ! if hydrostatic assumption fails, 
                    ! solve cubic difference equation for downdraft theta 
@@ -227,22 +210,15 @@ contains
                       endif
                       mp(il, i) = amax1(0., mp(il, i))
 
-                      if (cvflag_grav) then
-                         ! Il y a vraisemblablement une erreur dans la
-                         ! ligne 2 suivante: il faut diviser par (mp(il,
-                         ! i) * sigd * grav) et non par (mp(il, i) + sigd
-                         ! * 0.1).  Et il faut bien revoir les facteurs
-                         ! 100.
-                         b(il, i - 1) = b(il, i) + 100. * (p(il, i - 1) &
-                              - p(il, i)) * tevap / (mp(il, i) + sigd * 0.1) &
-                              - 10. * (th(il, i) - th(il, i - 1)) * t(il, i) &
-                              / (lvcp(il, i) * sigd * th(il, i))
-                      else
-                         b(il, i - 1) = b(il, i) + 100. * (p(il, i - 1) &
-                              - p(il, i)) * tevap / (mp(il, i) + sigd * 0.1) &
-                              - 10. * (th(il, i) - th(il, i - 1)) * t(il, i) &
-                              / (lvcp(il, i) * sigd * th(il, i))
-                      endif
+                      ! Il y a vraisemblablement une erreur dans la
+                      ! ligne 2 suivante: il faut diviser par (mp(il,
+                      ! i) * sigd * grav) et non par (mp(il, i) + sigd
+                      ! * 0.1).  Et il faut bien revoir les facteurs
+                      ! 100.
+                      b(il, i - 1) = b(il, i) + 100. * (p(il, i - 1) &
+                           - p(il, i)) * tevap / (mp(il, i) + sigd * 0.1) &
+                           - 10. * (th(il, i) - th(il, i - 1)) * t(il, i) &
+                           / (lvcp(il, i) * sigd * th(il, i))
                       b(il, i - 1) = amax1(b(il, i - 1), 0.)
                    endif
 
@@ -268,17 +244,10 @@ contains
                    rp(il, i) = rr(il, i)
 
                    if (mp(il, i) > mp(il, i + 1)) then
-                      if (cvflag_grav) then
-                         rp(il, i) = rp(il, i + 1) * mp(il, i + 1) + rr(il, i) &
-                              * (mp(il, i) - mp(il, i + 1)) + 100. * ginv &
-                              * 0.5 * sigd * (ph(il, i) - ph(il, i + 1)) &
-                              * (evap(il, i + 1) + evap(il, i))
-                      else
-                         rp(il, i) = rp(il, i + 1) * mp(il, i + 1) + rr(il, i) &
-                              * (mp(il, i) - mp(il, i + 1)) + 5. * sigd &
-                              * (ph(il, i) - ph(il, i + 1)) &
-                              * (evap(il, i + 1) + evap(il, i))
-                      endif
+                      rp(il, i) = rp(il, i + 1) * mp(il, i + 1) + rr(il, i) &
+                           * (mp(il, i) - mp(il, i + 1)) + 100. * ginv &
+                           * 0.5 * sigd * (ph(il, i) - ph(il, i + 1)) &
+                           * (evap(il, i + 1) + evap(il, i))
                       rp(il, i) = rp(il, i) / mp(il, i)
                       up(il, i) = up(il, i + 1) * mp(il, i + 1) + u(il, i) &
                            * (mp(il, i) - mp(il, i + 1))
@@ -288,18 +257,11 @@ contains
                       vp(il, i) = vp(il, i) / mp(il, i)
                    else
                       if (mp(il, i + 1) > 1e-16) then
-                         if (cvflag_grav) then
-                            rp(il, i) = rp(il, i + 1) &
-                                 + 100. * ginv * 0.5 * sigd * (ph(il, i) &
-                                 - ph(il, i + 1)) &
-                                 * (evap(il, i + 1) + evap(il, i)) &
-                                 / mp(il, i + 1)
-                         else
-                            rp(il, i) = rp(il, i + 1) &
-                                 + 5. * sigd * (ph(il, i) - ph(il, i + 1)) &
-                                 * (evap(il, i + 1) + evap(il, i)) &
-                                 / mp(il, i + 1)
-                         endif
+                         rp(il, i) = rp(il, i + 1) &
+                              + 100. * ginv * 0.5 * sigd * (ph(il, i) &
+                              - ph(il, i + 1)) &
+                              * (evap(il, i + 1) + evap(il, i)) &
+                              / mp(il, i + 1)
                          up(il, i) = up(il, i + 1)
                          vp(il, i) = vp(il, i + 1)
                       endif
