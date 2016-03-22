@@ -81,7 +81,7 @@ contains
     real fq_fonte
     REAL bil_eau_s(size(ps)) ! in kg m-2
     real snow_evap(size(ps)) ! in kg m-2 s-1
-    real, parameter:: t_grnd = 271.35, t_coup = 273.15
+    real, parameter:: t_coup = 273.15
     REAL, parameter:: chasno = 3.334E5/(2.3867E6*0.15)
     REAL, parameter:: chaice = 3.334E5/(2.3867E6*0.15)
     real, parameter:: max_eau_sol = 150. ! in kg m-2

@@ -68,7 +68,7 @@ contains
     ! RKAR : constante de von Karman
     REAL, PARAMETER:: RKAR=0.40
     ! niter : nombre iterations calcul "corrector"
-    INTEGER, parameter:: niter=2, ncon=niter-1
+    INTEGER, parameter:: niter=2
 
     ! Variables locales
     INTEGER i, n
@@ -84,7 +84,6 @@ contains
     REAL, dimension(klon):: zdte, zdq 
     ! lmon : longueur de Monin-Obukhov selon Hess, Colman and McAvaney 
     DOUBLE PRECISION, dimension(klon):: lmon
-    DOUBLE PRECISION, parameter:: eps=1.0D-20
     REAL, dimension(klon):: delu, delte, delq
     REAL, dimension(klon):: u_zref, te_zref, q_zref 
     REAL, dimension(klon):: temp, pref

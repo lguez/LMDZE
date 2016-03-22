@@ -12,14 +12,14 @@ objects: ${objects}
 CG_ce0l: ${src_ce0l}
 	nagfor =callgraph ${nag_fcalls_options} -o $@ $^
 
-CG_gcm: ${common_sources} ${src_gcm_only}
-	nag_fcalls95 ${nag_fcalls_options} -listing $@ $^
+CG_gcm: ${src_gcm}
+	nagfor =callgraph ${nag_fcalls_options} -o $@ $^
 
 # Cross references:
 CR_ce0l: ${src_ce0l}
 	nag_xref95 ${nag_cross_options} -listing $@ $^
 
-CR_gcm: ${common_sources} ${src_gcm_only}
+CR_gcm: ${src_gcm}
 	nag_xref95 ${nag_cross_options} -listing $@ $^
 
 .PHONY: clean_nag

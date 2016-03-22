@@ -8,12 +8,6 @@ addfi.o : dimens_m.o comgeom.o comconst.o
 advect.o : paramet_m.o dimens_m.o 
 advn.o : comgeom.o conf_gcm.o disvert.o comconst.o paramet_m.o dimens_m.o 
 advtrac.o : vlspltqs.o vlsplt.o paramet_m.o massbar.o iniadvtrac.o dimens_m.o conf_gcm.o comconst.o 
-advx.o : disvert.o comconst.o paramet_m.o dimens_m.o 
-advxp.o : disvert.o comconst.o paramet_m.o dimens_m.o 
-advy.o : comgeom.o disvert.o comconst.o paramet_m.o dimens_m.o 
-advyp.o : comgeom.o disvert.o paramet_m.o comconst.o dimens_m.o 
-advz.o : disvert.o comconst.o paramet_m.o dimens_m.o 
-advzp.o : comgeom.o disvert.o comconst.o paramet_m.o dimens_m.o 
 aeropt.o : suphec.o dimphy.o 
 ajsec.o : suphec.o dimphy.o 
 alboc.o : YOMCST.o orbite.o 
@@ -173,9 +167,6 @@ laplacien_rotgam.o : comgeom.o paramet_m.o dimens_m.o
 leapfrog.o : writehist.o writedynav.o temps.o integrd.o inidissip.o guide.o geopot.o fluxstokenc.o filtreg_scal.o exner_hyb.o dynredem1.o dynetat0.o dissip.o dimens_m.o conf_guide.o conf_gcm.o disvert.o covcont.o comgeom.o comconst.o calfis.o caldyn.o caladvtrac.o bilan_dyn.o addfi.o 
 lift_noro.o : suphec.o dimphy.o dimens_m.o 
 limit.o : unit_nml_m.o start_init_orog_m.o inter_barxy.o indicesol.o grid_change.o etat0.o dynetat0.o dimphy.o dimens_m.o conf_dat2d.o 
-limx.o : comgeom.o conf_gcm.o disvert.o comconst.o paramet_m.o dimens_m.o 
-limy.o : paramet_m.o dynetat0.o disvert.o dimens_m.o conf_gcm.o comconst.o 
-limz.o : comgeom.o conf_gcm.o disvert.o comconst.o paramet_m.o dimens_m.o 
 lw.o : suphec.o raddimlw.o raddim.o lwu.o lwbv.o 
 lwb.o : raddimlw.o raddim.o dimphy.o dimens_m.o 
 lwbv.o : raddimlw.o raddim.o suphec.o lwv.o dimphy.o dimens_m.o 

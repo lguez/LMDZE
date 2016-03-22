@@ -18,7 +18,7 @@ contains
     use cv30_compress_m, only: cv30_compress
     use cv30_feed_m, only: cv30_feed
     use cv30_mixing_m, only: cv30_mixing
-    use cv30_param_m, only: cv30_param
+    use cv30_param_m, only: cv30_param, nl
     use cv30_prelim_m, only: cv30_prelim
     use cv30_tracer_m, only: cv30_tracer
     use cv30_uncompress_m, only: cv30_uncompress
@@ -182,7 +182,8 @@ contains
     real sij(klon, klev, klev), elij(klon, klev, klev)
     real qp(klon, klev), up(klon, klev), vp(klon, klev)
     real wt(klon, klev), water(klon, klev), evap(klon, klev)
-    real b(klon, klev), ft(klon, klev), fq(klon, klev)
+    real, allocatable:: b(:, :) ! (ncum, nl)
+    real ft(klon, klev), fq(klon, klev)
     real fu(klon, klev), fv(klon, klev)
     real upwd(klon, klev), dnwd(klon, klev), dnwd0(klon, klev)
     real Ma(klon, klev), mike(klon, klev), tls(klon, klev)
@@ -271,6 +272,8 @@ contains
     end do
 
     IF (ncum > 0) THEN
+       allocate(b(ncum, nl))
+
        ! COMPRESS THE FIELDS
        ! (-> vectorization over convective gridpoints)
        CALL cv30_compress(klon, klon, ncum, klev, iflag1, nk1, icb1, icbs1, &
@@ -294,17 +297,17 @@ contains
             sij, elij, ments, qents)
 
        ! Unsaturated (precipitating) downdrafts
-       CALL cv30_unsat(ncum, icb(:ncum), inb(:ncum), t, q, qs, gz, u, v, p, &
-            ph, th, tv, lv, cpn, ep, sigp, clw, m, ment, elij, delt, plcl, &
-            mp, qp, up, vp, wt, water, evap, b(:ncum, :))
+       CALL cv30_unsat(icb(:ncum), inb(:ncum), t, q, qs, gz, u, v, p, ph, th, &
+            tv, lv, cpn, ep, sigp, clw, m, ment, elij, delt, plcl, mp, qp, &
+            up, vp, wt, water, evap, b)
 
        ! Yield (tendencies, precipitation, variables of interface with
        ! other processes, etc)
-       CALL cv30_yield(klon, ncum, klev, klev, icb, inb, delt, t, q, u, v, &
-            gz, p, ph, h, hp, lv, cpn, th, ep, clw, m, tp, mp, qp, up, vp, &
-            wt, water, evap, b, ment, qent, uent, vent, nent, elij, sig, &
-            tv, tvp, iflag, precip, VPrecip, ft, fq, fu, fv, upwd, dnwd, &
-            dnwd0, ma, mike, tls, tps, qcondc, wd)! na->klev
+       CALL cv30_yield(icb(:ncum), inb(:ncum), delt, t, q, u, v, gz, p, ph, &
+            h, hp, lv, cpn, th, ep, clw, m, tp, mp, qp, up, vp, wt, &
+            water(:ncum, :nl), evap(:ncum, :nl), b, ment, qent, uent, vent, &
+            nent, elij, sig, tv, tvp, iflag, precip, VPrecip, ft, fq, fu, fv, &
+            upwd, dnwd, dnwd0, ma, mike, tls, tps, qcondc, wd)
 
        ! passive tracers
        CALL cv30_tracer(klon, ncum, klev, ment, sij, da, phi)

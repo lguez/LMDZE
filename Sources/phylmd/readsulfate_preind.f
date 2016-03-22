@@ -48,8 +48,7 @@ contains
     ! Local Variables:
     ! ----------------
     INTEGER i, ig, k, it
-    INTEGER j, iday, ny, iyr
-    parameter (ny=jjm+1)
+    INTEGER j, iday, iyr
 
     INTEGER im, day1, day2, im2
     double precision pi_so4_1(iim, jjm+1, klev, 12)

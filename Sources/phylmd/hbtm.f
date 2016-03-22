@@ -80,36 +80,20 @@ contains
     PARAMETER (vk=0.35)
     REAL ricr
     PARAMETER (ricr=0.4)
-    REAL fak
-    ! b calcul du Prandtl et de dTetas
-    PARAMETER (fak=8.5)
-    REAL fakn
     ! a
-    PARAMETER (fakn=7.2)
     REAL onet
     PARAMETER (onet=1.0/3.0)
-    REAL t_coup
-    PARAMETER(t_coup=273.15)
     REAL zkmin
     PARAMETER (zkmin=0.01)
     REAL betam
     ! pour Phim / h dans la S.L stable
     PARAMETER (betam=15.0)
-    REAL betah
-    PARAMETER (betah=15.0)
-    REAL betas
-    ! Phit dans la S.L. stable (mais 2 formes /
-    PARAMETER (betas=5.0)
     ! z/OBL<>1
     REAL sffrac
     ! S.L. = z/h < .1
     PARAMETER (sffrac=0.1)
     REAL binm
     PARAMETER (binm=betam*sffrac)
-    REAL binh
-    PARAMETER (binh=betah*sffrac)
-    REAL ccon
-    PARAMETER (ccon=fak*sffrac*vk)
 
     REAL q_star, t_star
     ! Lambert correlations T' q' avec T* q*

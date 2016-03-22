@@ -4,8 +4,8 @@ module cv30_unsat_m
 
 contains
 
-  SUBROUTINE cv30_unsat(ncum, icb, inb, t, rr, rs, gz, u, v, p, ph, th, tv, &
-       lv, cpn, ep, sigp, clw, m, ment, elij, delt, plcl, mp, rp, up, vp, wt, &
+  SUBROUTINE cv30_unsat(icb, inb, t, rr, rs, gz, u, v, p, ph, th, tv, lv, &
+       cpn, ep, sigp, clw, m, ment, elij, delt, plcl, mp, rp, up, vp, wt, &
        water, evap, b)
 
     use cv30_param_m, only: nl, sigd
@@ -13,7 +13,6 @@ contains
     USE dimphy, ONLY: klon, klev
 
     ! inputs:
-    integer, intent(in):: ncum
     integer, intent(in):: icb(:), inb(:) ! (ncum)
     real t(klon, klev), rr(klon, klev), rs(klon, klev)
     real gz(klon, klev)
@@ -31,9 +30,10 @@ contains
     ! outputs:
     real mp(klon, klev), rp(klon, klev), up(klon, klev), vp(klon, klev)
     real wt(klon, klev), water(klon, klev), evap(klon, klev)
-    real b(:, :) ! (ncum, klev)
+    real, intent(out):: b(:, :) ! (ncum, nl)
 
     ! Local:
+    integer ncum
     integer i, j, il, num1
     real tinv, delti
     real awat, afac, afac1, afac2, bfac
@@ -41,11 +41,12 @@ contains
     real amfac, amp2, xf, tf, fac2, ur, sru, fac, d, af, bf
     real ampmax
     real lvcp(klon, klev)
-    real wdtrain(ncum)
-    logical lwork(ncum)
+    real wdtrain(size(icb))
+    logical lwork(size(icb))
 
     !------------------------------------------------------
 
+    ncum = size(icb)
     delti = 1. / delt
     tinv = 1. / 3.
     mp = 0.
@@ -94,16 +95,15 @@ contains
                 do il = 1, ncum
                    if (i <= inb(il) .and. lwork(il)) then
                       awat = elij(il, j, i) - (1. - ep(il, i)) * clw(il, i)
-                      awat = amax1(awat, 0.)
-                      wdtrain(il) = wdtrain(il) + grav * awat &
-                           * ment(il, j, i)
+                      awat = max(awat, 0.)
+                      wdtrain(il) = wdtrain(il) + grav * awat * ment(il, j, i)
                    endif
                 enddo
              end do
           endif
 
           ! find rain water and evaporation using provisional 
-          ! estimates of rp(i)and rp(i - 1) 
+          ! estimates of rp(i) and rp(i - 1) 
 
           do il = 1, ncum
              if (i <= inb(il) .and. lwork(il)) then
@@ -114,8 +114,9 @@ contains
                         - t(il, i)) + gz(il, i + 1) - gz(il, i)) / lv(il, i)
                    rp(il, i) = 0.5 * (rp(il, i) + rr(il, i))
                 endif
-                rp(il, i) = amax1(rp(il, i), 0.)
-                rp(il, i) = amin1(rp(il, i), rs(il, i))
+
+                rp(il, i) = max(rp(il, i), 0.)
+                rp(il, i) = min(rp(il, i), rs(il, i))
                 rp(il, inb(il)) = rr(il, inb(il))
 
                 if (i == 1) then
@@ -125,16 +126,17 @@ contains
                    rp(il, i - 1) = rp(il, i) + (cpd * (t(il, i) &
                         - t(il, i - 1)) + gz(il, i) - gz(il, i - 1)) / lv(il, i)
                    rp(il, i - 1) = 0.5 * (rp(il, i - 1) + rr(il, i - 1))
-                   rp(il, i - 1) = amin1(rp(il, i - 1), rs(il, i - 1))
-                   rp(il, i - 1) = amax1(rp(il, i - 1), 0.)
+                   rp(il, i - 1) = min(rp(il, i - 1), rs(il, i - 1))
+                   rp(il, i - 1) = max(rp(il, i - 1), 0.)
                    afac1 = p(il, i) * (rs(il, i) - rp(il, i)) &
                         / (1e4 + 2000. * p(il, i) * rs(il, i))
                    afac2 = p(il, i - 1) * (rs(il, i - 1) - rp(il, i - 1)) &
                         / (1e4 + 2000. * p(il, i - 1) * rs(il, i - 1))
                    afac = 0.5 * (afac1 + afac2)
                 endif
-                if (i == inb(il))afac = 0.
-                afac = amax1(afac, 0.)
+
+                if (i == inb(il)) afac = 0.
+                afac = max(afac, 0.)
                 bfac = 1. / (sigd * wt(il, i))
 
                 ! prise en compte de la variation progressive de sigt dans
@@ -168,21 +170,22 @@ contains
                 ! hydrostatic approximation 
 
                 if (i /= 1) then
-                   tevap = amax1(0., evap(il, i))
-                   delth = amax1(0.001, (th(il, i) - th(il, i - 1)))
+                   tevap = max(0., evap(il, i))
+                   delth = max(0.001, (th(il, i) - th(il, i - 1)))
                    mp(il, i) = 100. * ginv * lvcp(il, i) * sigd * tevap &
                         * (p(il, i - 1) - p(il, i)) / delth
 
-                   ! if hydrostatic assumption fails, 
-                   ! solve cubic difference equation for downdraft theta 
-                   ! and mass flux from two simultaneous differential eqns 
+                   ! If hydrostatic assumption fails, solve cubic
+                   ! difference equation for downdraft theta and mass
+                   ! flux from two simultaneous differential equations
 
                    amfac = sigd * sigd * 70. * ph(il, i) &
                         * (p(il, i - 1) - p(il, i)) &
                         * (th(il, i) - th(il, i - 1)) / (tv(il, i) * th(il, i))
                    amp2 = abs(mp(il, i + 1) * mp(il, i + 1) - mp(il, i) &
                         * mp(il, i))
-                   if (amp2 > (0.1 * amfac)) then
+
+                   if (amp2 > 0.1 * amfac) then
                       xf = 100. * sigd * sigd * sigd * (ph(il, i) &
                            - ph(il, i + 1))
                       tf = b(il, i) - 5. * (th(il, i) - th(il, i - 1)) &
@@ -192,13 +195,14 @@ contains
                            * mp(il, i + 1) * xf * tf + 50. * (p(il, i - 1) &
                            - p(il, i)) * xf * tevap
                       fac2 = 1.
-                      if (bf < 0.)fac2 = - 1.
+                      if (bf < 0.) fac2 = - 1.
                       bf = abs(bf)
                       ur = 0.25 * bf * bf - af * af * af * tinv * tinv * tinv
+
                       if (ur >= 0.) then
                          sru = sqrt(ur)
                          fac = 1.
-                         if ((0.5 * bf - sru) < 0.)fac = - 1.
+                         if ((0.5 * bf - sru) < 0.) fac = - 1.
                          mp(il, i) = mp(il, i + 1) * tinv &
                               + (0.5 * bf + sru)**tinv &
                               + fac * (abs(0.5 * bf - sru))**tinv
@@ -208,10 +212,11 @@ contains
                          mp(il, i) = mp(il, i + 1) * tinv + 2. &
                               * sqrt(af * tinv) * cos(d * tinv)
                       endif
-                      mp(il, i) = amax1(0., mp(il, i))
+
+                      mp(il, i) = max(0., mp(il, i))
 
                       ! Il y a vraisemblablement une erreur dans la
-                      ! ligne 2 suivante: il faut diviser par (mp(il,
+                      ! ligne suivante : il faut diviser par (mp(il,
                       ! i) * sigd * grav) et non par (mp(il, i) + sigd
                       ! * 0.1).  Et il faut bien revoir les facteurs
                       ! 100.
@@ -219,23 +224,19 @@ contains
                            - p(il, i)) * tevap / (mp(il, i) + sigd * 0.1) &
                            - 10. * (th(il, i) - th(il, i - 1)) * t(il, i) &
                            / (lvcp(il, i) * sigd * th(il, i))
-                      b(il, i - 1) = amax1(b(il, i - 1), 0.)
+                      b(il, i - 1) = max(b(il, i - 1), 0.)
                    endif
 
                    ! limit magnitude of mp(i) to meet cfl condition 
-
                    ampmax = 2. * (ph(il, i) - ph(il, i + 1)) * delti
                    amp2 = 2. * (ph(il, i - 1) - ph(il, i)) * delti
-                   ampmax = amin1(ampmax, amp2)
-                   mp(il, i) = amin1(mp(il, i), ampmax)
+                   ampmax = min(ampmax, amp2)
+                   mp(il, i) = min(mp(il, i), ampmax)
 
                    ! force mp to decrease linearly to zero 
                    ! between cloud base and the surface 
-
-                   if (p(il, i) > p(il, icb(il))) then
-                      mp(il, i) = mp(il, icb(il)) * (p(il, 1) - p(il, i)) &
-                           / (p(il, 1) - p(il, icb(il)))
-                   endif
+                   if (p(il, i) > p(il, icb(il))) mp(il, i) = mp(il, icb(il)) &
+                        * (p(il, 1) - p(il, i)) / (p(il, 1) - p(il, icb(il)))
                 endif ! i == 1
 
                 ! find mixing ratio of precipitating downdraft 
@@ -257,17 +258,16 @@ contains
                       vp(il, i) = vp(il, i) / mp(il, i)
                    else
                       if (mp(il, i + 1) > 1e-16) then
-                         rp(il, i) = rp(il, i + 1) &
-                              + 100. * ginv * 0.5 * sigd * (ph(il, i) &
-                              - ph(il, i + 1)) &
-                              * (evap(il, i + 1) + evap(il, i)) &
-                              / mp(il, i + 1)
+                         rp(il, i) = rp(il, i + 1) + 100. * ginv * 0.5 * sigd &
+                              * (ph(il, i) - ph(il, i + 1)) &
+                              * (evap(il, i + 1) + evap(il, i)) / mp(il, i + 1)
                          up(il, i) = up(il, i + 1)
                          vp(il, i) = vp(il, i + 1)
                       endif
                    endif
-                   rp(il, i) = amin1(rp(il, i), rs(il, i))
-                   rp(il, i) = amax1(rp(il, i), 0.)
+
+                   rp(il, i) = min(rp(il, i), rs(il, i))
+                   rp(il, i) = max(rp(il, i), 0.)
                 endif
              endif
           end do

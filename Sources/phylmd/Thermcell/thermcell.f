@@ -69,9 +69,6 @@ contains
     real thetath2(klon, klev), wth2(klon, klev)
     common/comtherm/thetath2, wth2
 
-    integer nsplit
-    parameter (nsplit=10)
-
     real rho(klon, klev), rhobarz(klon, klev+1), masse(klon, klev)
     real zpspsk(klon, klev)
 

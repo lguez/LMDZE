@@ -6,12 +6,6 @@ addfi.f
 advect.f
 advn.f
 advtrac.f
-advx.f
-advxp.f
-advy.f
-advyp.f
-advz.f
-advzp.f
 aeropt.f
 ajsec.f
 alboc_cd.f
@@ -76,7 +70,6 @@ cv30_undilute2.f
 cv30_unsat.f
 cv30_yield.f
 cv_driver.f
-cvflag.f
 cvltr.f
 cv_thermo.f
 cvthermo.f
@@ -191,9 +184,6 @@ laplacien_rot.f
 laplacien_rotgam.f
 leapfrog.f
 lift_noro.f
-limx.f
-limy.f
-limz.f
 lwb.f
 lwbv.f
 lwc.f

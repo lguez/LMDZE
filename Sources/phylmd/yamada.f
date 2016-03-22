@@ -43,9 +43,8 @@ contains
     INTEGER ngrid
 
 
-    INTEGER nlay, nlev
+    INTEGER nlay
     PARAMETER (nlay=klev)
-    PARAMETER (nlev=klev+1)
 
     LOGICAL first
     SAVE first

@@ -147,10 +147,7 @@ contains
     REAL termq3m2
 
     ! q2min : borne inferieure de q2
-    ! q2max : borne superieure de q2
-
     REAL q2min
-    REAL q2max
 
     ! knmin : borne inferieure de kn
     ! kmmin : borne inferieure de km
@@ -174,7 +171,6 @@ contains
     PARAMETER (knmin=1.E-5)
     PARAMETER (kmmin=1.E-5)
     PARAMETER (q2min=1.e-5)
-    PARAMETER (q2max=1.E+2)
     PARAMETER (nlay=klev)
     PARAMETER (nlev=klev+1)
 

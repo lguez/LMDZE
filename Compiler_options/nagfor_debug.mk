@@ -1,10 +1,10 @@
 # These are compiler dependent macros, meant to be included in the
 # makefile for LMDZE.
 
-netcdf_inc_dir = /opt/netcdf3/nag/include
-netcdf_lib_dir = /opt/netcdf3/nag/lib
+netcdf_inc_dir = /opt/netcdf3/nagfor/include
+netcdf_lib_dir = /opt/netcdf3/nagfor/lib
 
-numer_rec_95_dir = /data/guez/lib/Numer_Rec_95_nagfor
+numer_rec_95_dir = /data/guez/lib/Numer_Rec_95_nagfor_debug
 nr_util_dir = /data/guez/lib/NR_util_nagfor
 netcdf95_dir = /data/guez/lib/NetCDF95_nagfor
 jumble_dir = /data/guez/lib/Jumble_nagfor

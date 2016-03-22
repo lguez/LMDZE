@@ -148,12 +148,6 @@ contains
     REAL lwup0(klon, llm + 1), lwup(klon, llm + 1)
     SAVE lwdn0, lwdn, lwup0, lwup 
 
-    ! Amip2
-    ! variables a une pression donnee
-
-    integer nlevSTD
-    PARAMETER(nlevSTD = 17)
-
     ! prw: precipitable water
     real prw(klon)
 
@@ -161,11 +155,6 @@ contains
     ! flwc, fiwc = Liquid Water Content & Ice Water Content (kg/kg)
     REAL flwp(klon), fiwp(klon)
     REAL flwc(klon, llm), fiwc(klon, llm)
-
-    INTEGER kmax, lmax
-    PARAMETER(kmax = 8, lmax = 8)
-    INTEGER kmaxm1, lmaxm1
-    PARAMETER(kmaxm1 = kmax - 1, lmaxm1 = lmax - 1)
 
     ! Variables propres a la physique
 
@@ -498,7 +487,6 @@ contains
     real zmasse(klon, llm) 
     ! (column-density of mass of air in a cell, in kg m-2)
 
-    real, parameter:: dobson_u = 2.1415e-05 ! Dobson unit, in kg m-2
     integer, save:: ncid_startphy, itau_phy
 
     namelist /physiq_nml/ ok_journe, ok_mensuel, ok_instan, fact_cldcon, &

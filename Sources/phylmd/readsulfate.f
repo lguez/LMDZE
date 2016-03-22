@@ -49,8 +49,7 @@ contains
     ! Local Variables:
 
     INTEGER i, ig, k, it
-    INTEGER j, iday, ny, iyr, iyr1, iyr2
-    parameter (ny=jjm+1)
+    INTEGER j, iday, iyr, iyr1, iyr2
 
     CHARACTER(len=4) cyear
 
