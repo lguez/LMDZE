@@ -5,9 +5,9 @@ module cv30_uncompress_m
 contains
 
   SUBROUTINE cv30_uncompress(idcum, iflag, precip, VPrecip, sig, w0, ft, fq, &
-       fu, fv, inb, Ma, upwd, dnwd, dnwd0, qcondc, wd, cape, da, phi, mp, &
-       iflag1, precip1, VPrecip1, sig1, w01, ft1, fq1, fu1, fv1, inb1, Ma1, &
-       upwd1, dnwd1, dnwd01, qcondc1, wd1, cape1, da1, phi1, mp1)
+       fu, fv, inb, Ma, upwd, dnwd, dnwd0, qcondc, cape, da, phi, mp, iflag1, &
+       precip1, VPrecip1, sig1, w01, ft1, fq1, fu1, fv1, inb1, Ma1, upwd1, &
+       dnwd1, dnwd01, qcondc1, cape1, da1, phi1, mp1)
 
     USE cv30_param_m, ONLY: nl
     use dimphy, only: klon, klev
@@ -22,7 +22,7 @@ contains
     real, intent(in):: Ma(klon, klev)
     real, intent(in):: upwd(klon, klev), dnwd(klon, klev), dnwd0(klon, klev)
     real, intent(in):: qcondc(klon, klev)
-    real, intent(in):: wd(klon), cape(klon)
+    real, intent(in):: cape(klon)
     real, intent(in):: da(klon, klev), phi(klon, klev, klev), mp(klon, klev)
 
     ! outputs:
@@ -35,7 +35,7 @@ contains
     real Ma1(klon, klev)
     real upwd1(klon, klev), dnwd1(klon, klev), dnwd01(klon, klev)
     real qcondc1(klon, klev)
-    real wd1(klon), cape1(klon)
+    real cape1(klon)
     real, intent(inout):: da1(klon, klev), phi1(klon, klev, klev)
     real, intent(inout):: mp1(klon, klev)
 
@@ -49,7 +49,6 @@ contains
     do  i=1, ncum
        precip1(idcum(i))=precip(i)
        iflag1(idcum(i))=iflag(i)
-       wd1(idcum(i))=wd(i)
        inb1(idcum(i))=inb(i)
        cape1(idcum(i))=cape(i)
     end do

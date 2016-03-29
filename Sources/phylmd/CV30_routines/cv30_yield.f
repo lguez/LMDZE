@@ -7,7 +7,7 @@ contains
   SUBROUTINE cv30_yield(icb, inb, delt, t, rr, u, v, gz, p, ph, h, hp, lv, &
        cpn, th, ep, clw, m, tp, mp, rp, up, vp, wt, water, evap, b, ment, &
        qent, uent, vent, nent, elij, sig, tv, tvp, iflag, precip, VPrecip, &
-       ft, fr, fu, fv, upwd, dnwd, dnwd0, ma, mike, tls, tps, qcondc, wd)
+       ft, fr, fu, fv, upwd, dnwd, dnwd0, ma, mike, tls, tps, qcondc)
 
     use conema3_m, only: iflag_clw
     use cv30_param_m, only: delta, minorig, nl, sigd
@@ -28,7 +28,8 @@ contains
     real tp(klon, klev)
     real mp(klon, klev), rp(klon, klev), up(klon, klev)
     real vp(klon, klev), wt(klon, klev)
-    real, intent(in):: water(:, :), evap(:, :), b(:, :) ! (ncum, nl)
+    real, intent(in):: water(:, :), evap(:, :) ! (ncum, nl)
+    real, intent(in):: b(:, :) ! (ncum, nl - 1)
     real ment(klon, klev, klev), qent(klon, klev, klev), uent(klon, klev, klev)
     real vent(klon, klev, klev)
     integer nent(klon, klev)
@@ -49,7 +50,6 @@ contains
     real mike(klon, klev)
     real tls(klon, klev), tps(klon, klev)
     real qcondc(klon, klev)
-    real wd(klon) ! gust
 
     ! Local:
     integer ncum
@@ -74,7 +74,6 @@ contains
 
     do il = 1, ncum
        precip(il) = 0.0
-       wd(il) = 0.0 ! gust
        VPrecip(il, klev + 1) = 0.
     enddo
 

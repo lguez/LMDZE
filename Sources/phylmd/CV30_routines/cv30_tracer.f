@@ -6,16 +6,16 @@ contains
 
   SUBROUTINE cv30_tracer(nloc, ncum, na, ment, sij, da, phi)
 
-    implicit none
+    ! Passive tracers.
 
-    ! Inputs:
     integer, intent(in):: ncum, na, nloc
-    real ment(nloc, na, na), sij(nloc, na, na)
+    real, intent(in):: ment(nloc, na, na), sij(nloc, na, na)
 
     ! Ouputs:
-    real da(nloc, na), phi(nloc, na, na)
+    real, intent(out):: da(nloc, na)
+    real phi(nloc, na, na)
 
-    ! Local variables:
+    ! Local:
     integer i, j, k
 
     !------------------------------------------------------------
@@ -25,7 +25,7 @@ contains
     do j = 1, na
        do k = 1, na
           do i = 1, ncum
-             da(i, j) = da(i, j)+(1.-sij(i, k, j))*ment(i, k, j)
+             da(i, j) = da(i, j) + (1. - sij(i, k, j)) * ment(i, k, j)
              phi(i, j, k) = sij(i, k, j) * ment(i, k, j)
           end do
        end do

@@ -10,11 +10,11 @@ contains
     use cv30_param_m
     use cvthermo
 
-    !---------------------------------------------------------------------
+    !
     ! a faire:
     ! - changer rr(il, 1) -> qnk(il)
     ! - vectorisation de la partie normalisation des flux (do 789)
-    !---------------------------------------------------------------------
+    !
 
     ! inputs:
     integer, intent(in):: ncum, nd, na, nloc
@@ -44,7 +44,7 @@ contains
     real zm(nloc, na)
     logical lwork(nloc)
 
-    ! --- INITIALIZE VARIOUS ARRAYS USED IN THE COMPUTATIONS
+    ! INITIALIZE VARIOUS ARRAYS USED IN THE COMPUTATIONS
 
     do j=1, nl
        do i=1, ncum
@@ -73,9 +73,9 @@ contains
 
     zm(:, :)=0.
 
-    ! --- CALCULATE ENTRAINED AIR MASS FLUX (ment), TOTAL WATER MIXING
-    ! --- RATIO (QENT), TOTAL CONDENSED WATER (elij), AND MIXING
-    ! --- FRACTION (sij)
+    ! CALCULATE ENTRAINED AIR MASS FLUX (ment), TOTAL WATER MIXING
+    ! RATIO (QENT), TOTAL CONDENSED WATER (elij), AND MIXING
+    ! FRACTION (sij)
 
     do i=minorig+1, nl
 
@@ -120,8 +120,8 @@ contains
           end do
        end do
 
-       ! *** if no air can entrain at level i assume that updraft detrains ***
-       ! *** at that level and calculate detrained air flux and properties ***
+       !  if no air can entrain at level i assume that updraft detrains 
+       !  at that level and calculate detrained air flux and properties 
 
        do il=1, ncum
           if ((i >= icb(il)).and.(i <= inb(il)).and.(nent(il, i) == 0)) then
@@ -137,8 +137,8 @@ contains
        end do
     end do
 
-    ! --- NORMALIZE ENTRAINED AIR MASS FLUXES
-    ! --- TO REPRESENT EQUAL PROBABILITIES OF MIXING
+    ! NORMALIZE ENTRAINED AIR MASS FLUXES
+    ! TO REPRESENT EQUAL PROBABILITIES OF MIXING
 
     asum = 0.
     csum = 0.

@@ -4,9 +4,9 @@ module cv30_unsat_m
 
 contains
 
-  SUBROUTINE cv30_unsat(icb, inb, t, rr, rs, gz, u, v, p, ph, th, tv, lv, &
-       cpn, ep, sigp, clw, m, ment, elij, delt, plcl, mp, rp, up, vp, wt, &
-       water, evap, b)
+  SUBROUTINE cv30_unsat(icb, inb, t, q, qs, gz, u, v, p, ph, th, tv, lv, cpn, &
+       ep, sigp, clw, m, ment, elij, delt, plcl, mp, qp, up, vp, wt, water, &
+       evap, b)
 
     use cv30_param_m, only: nl, sigd
     use cvthermo, only: cpd, ginv, grav
@@ -14,9 +14,9 @@ contains
 
     ! inputs:
     integer, intent(in):: icb(:), inb(:) ! (ncum)
-    real t(klon, klev), rr(klon, klev), rs(klon, klev)
-    real gz(klon, klev)
-    real u(klon, klev), v(klon, klev)
+    real, intent(in):: t(:, :), q(:, :), qs(:, :) ! (klon, klev)
+    real, intent(in):: gz(:, :) ! (klon, klev)
+    real, intent(in):: u(:, :), v(:, :) ! (klon, klev)
     real p(klon, klev), ph(klon, klev + 1)
     real th(klon, klev)
     real tv(klon, klev)
@@ -28,9 +28,10 @@ contains
     real plcl(klon)
 
     ! outputs:
-    real mp(klon, klev), rp(klon, klev), up(klon, klev), vp(klon, klev)
+    real, intent(out):: mp(klon, klev)
+    real, intent(out):: qp(:, :), up(:, :), vp(:, :) ! (ncum, nl)
     real wt(klon, klev), water(klon, klev), evap(klon, klev)
-    real, intent(out):: b(:, :) ! (ncum, nl)
+    real, intent(out):: b(:, :) ! (ncum, nl - 1)
 
     ! Local:
     integer ncum
@@ -50,17 +51,16 @@ contains
     delti = 1. / delt
     tinv = 1. / 3.
     mp = 0.
+    b = 0.
 
     do i = 1, nl
        do il = 1, ncum
-          mp(il, i) = 0.
-          rp(il, i) = rr(il, i)
+          qp(il, i) = q(il, i)
           up(il, i) = u(il, i)
           vp(il, i) = v(il, i)
           wt(il, i) = 0.001
           water(il, i) = 0.
           evap(il, i) = 0.
-          b(il, i) = 0.
           lvcp(il, i) = lv(il, i) / cpn(il, i)
        enddo
     enddo
@@ -103,35 +103,35 @@ contains
           endif
 
           ! find rain water and evaporation using provisional 
-          ! estimates of rp(i) and rp(i - 1) 
+          ! estimates of qp(i) and qp(i - 1) 
 
           do il = 1, ncum
              if (i <= inb(il) .and. lwork(il)) then
                 wt(il, i) = 45.
 
                 if (i < inb(il)) then
-                   rp(il, i) = rp(il, i + 1) + (cpd * (t(il, i + 1) &
+                   qp(il, i) = qp(il, i + 1) + (cpd * (t(il, i + 1) &
                         - t(il, i)) + gz(il, i + 1) - gz(il, i)) / lv(il, i)
-                   rp(il, i) = 0.5 * (rp(il, i) + rr(il, i))
+                   qp(il, i) = 0.5 * (qp(il, i) + q(il, i))
                 endif
 
-                rp(il, i) = max(rp(il, i), 0.)
-                rp(il, i) = min(rp(il, i), rs(il, i))
-                rp(il, inb(il)) = rr(il, inb(il))
+                qp(il, i) = max(qp(il, i), 0.)
+                qp(il, i) = min(qp(il, i), qs(il, i))
+                qp(il, inb(il)) = q(il, inb(il))
 
                 if (i == 1) then
-                   afac = p(il, 1) * (rs(il, 1) - rp(il, 1)) &
-                        / (1e4 + 2000. * p(il, 1) * rs(il, 1))
+                   afac = p(il, 1) * (qs(il, 1) - qp(il, 1)) &
+                        / (1e4 + 2000. * p(il, 1) * qs(il, 1))
                 else
-                   rp(il, i - 1) = rp(il, i) + (cpd * (t(il, i) &
+                   qp(il, i - 1) = qp(il, i) + (cpd * (t(il, i) &
                         - t(il, i - 1)) + gz(il, i) - gz(il, i - 1)) / lv(il, i)
-                   rp(il, i - 1) = 0.5 * (rp(il, i - 1) + rr(il, i - 1))
-                   rp(il, i - 1) = min(rp(il, i - 1), rs(il, i - 1))
-                   rp(il, i - 1) = max(rp(il, i - 1), 0.)
-                   afac1 = p(il, i) * (rs(il, i) - rp(il, i)) &
-                        / (1e4 + 2000. * p(il, i) * rs(il, i))
-                   afac2 = p(il, i - 1) * (rs(il, i - 1) - rp(il, i - 1)) &
-                        / (1e4 + 2000. * p(il, i - 1) * rs(il, i - 1))
+                   qp(il, i - 1) = 0.5 * (qp(il, i - 1) + q(il, i - 1))
+                   qp(il, i - 1) = min(qp(il, i - 1), qs(il, i - 1))
+                   qp(il, i - 1) = max(qp(il, i - 1), 0.)
+                   afac1 = p(il, i) * (qs(il, i) - qp(il, i)) &
+                        / (1e4 + 2000. * p(il, i) * qs(il, i))
+                   afac2 = p(il, i - 1) * (qs(il, i - 1) - qp(il, i - 1)) &
+                        / (1e4 + 2000. * p(il, i - 1) * qs(il, i - 1))
                    afac = 0.5 * (afac1 + afac2)
                 endif
 
@@ -242,14 +242,14 @@ contains
                 ! find mixing ratio of precipitating downdraft 
 
                 if (i /= inb(il)) then
-                   rp(il, i) = rr(il, i)
+                   qp(il, i) = q(il, i)
 
                    if (mp(il, i) > mp(il, i + 1)) then
-                      rp(il, i) = rp(il, i + 1) * mp(il, i + 1) + rr(il, i) &
+                      qp(il, i) = qp(il, i + 1) * mp(il, i + 1) + q(il, i) &
                            * (mp(il, i) - mp(il, i + 1)) + 100. * ginv &
                            * 0.5 * sigd * (ph(il, i) - ph(il, i + 1)) &
                            * (evap(il, i + 1) + evap(il, i))
-                      rp(il, i) = rp(il, i) / mp(il, i)
+                      qp(il, i) = qp(il, i) / mp(il, i)
                       up(il, i) = up(il, i + 1) * mp(il, i + 1) + u(il, i) &
                            * (mp(il, i) - mp(il, i + 1))
                       up(il, i) = up(il, i) / mp(il, i)
@@ -258,7 +258,7 @@ contains
                       vp(il, i) = vp(il, i) / mp(il, i)
                    else
                       if (mp(il, i + 1) > 1e-16) then
-                         rp(il, i) = rp(il, i + 1) + 100. * ginv * 0.5 * sigd &
+                         qp(il, i) = qp(il, i + 1) + 100. * ginv * 0.5 * sigd &
                               * (ph(il, i) - ph(il, i + 1)) &
                               * (evap(il, i + 1) + evap(il, i)) / mp(il, i + 1)
                          up(il, i) = up(il, i + 1)
@@ -266,8 +266,8 @@ contains
                       endif
                    endif
 
-                   rp(il, i) = min(rp(il, i), rs(il, i))
-                   rp(il, i) = max(rp(il, i), 0.)
+                   qp(il, i) = min(qp(il, i), qs(il, i))
+                   qp(il, i) = max(qp(il, i), 0.)
                 endif
              endif
           end do

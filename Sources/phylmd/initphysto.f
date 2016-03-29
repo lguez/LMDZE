@@ -31,7 +31,7 @@ contains
     !   L. Fairhead, 03/99
 
     use dynetat0_m, only: day_ref, annee_ref
-    use gr_fi_ecrit_m, only: gr_fi_ecrit
+    use gr_phy_write_m, only: gr_phy_write
     USE histbeg_totreg_m, ONLY : histbeg_totreg
     USE histdef_m, ONLY : histdef
     USE histend_m, ONLY : histend
@@ -76,12 +76,12 @@ contains
     CALL ymds2ju(annee_ref,1,day_ref,0.0,zjulian)
     tau0 = 0
 
-    CALL gr_fi_ecrit(1,klon,iim,jjm+1,rlon,zx_lon)
+    zx_lon = gr_phy_write(rlon)
     DO i = 1, iim
        zx_lon(i,1) = rlon(i+1)
        zx_lon(i,jjm+1) = rlon(i+1)
     END DO
-    CALL gr_fi_ecrit(1,klon,iim,jjm+1,rlat,zx_lat)
+    zx_lat = gr_phy_write(rlat)
 
 
     CALL histbeg_totreg(infile,zx_lon(:,1),zx_lat(1,:),1,iim,1,jjm+1,tau0, &

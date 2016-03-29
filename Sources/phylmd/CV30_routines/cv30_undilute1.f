@@ -5,6 +5,11 @@
             use cvthermo
       implicit none
 
+    ! UNDILUTE (ADIABATIC) UPDRAFT / 1st part
+    ! (up through ICB for convect4, up through ICB + 1 for convect3)
+    ! Calculates the lifted parcel virtual temperature at nk, the
+    ! actual temperature, and the adiabatic liquid water content.
+
 !----------------------------------------------------------------
 ! Equivalent de TLIFT entre NK et ICB+1 inclus
 !

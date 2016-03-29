@@ -6,7 +6,7 @@ contains
 
   SUBROUTINE concvl(dtime, paprs, play, t, q, u, v, sig1, w01, d_t, d_q, d_u, &
        d_v, rain, kbas, itop_con, upwd, dnwd, dnwd0, ma, cape, iflag, qcondc, &
-       wd, pmflxr, da, phi, mp)
+       pmflxr, da, phi, mp)
 
     ! From phylmd/concvl.F, version 1.3, 2005/04/15 12:36:17
     ! Author: Z. X. Li (LMD/CNRS)
@@ -22,8 +22,8 @@ contains
     REAL, INTENT (IN):: dtime ! pas d'integration (s)
     REAL, INTENT (IN):: paprs(klon, klev + 1)
     REAL, INTENT (IN):: play(klon, klev)
-    REAL, intent(in):: t(klon, klev)
-    real, intent(in):: q(klon, klev) ! vapeur d'eau (en kg / kg)
+    REAL, intent(in):: t(klon, klev) ! temperature (K)
+    real, intent(in):: q(klon, klev) ! fraction massique de vapeur d'eau
     real, INTENT (IN):: u(klon, klev), v(klon, klev)
     REAL, intent(inout):: sig1(klon, klev), w01(klon, klev)
     REAL, intent(out):: d_t(klon, klev)
@@ -46,7 +46,6 @@ contains
     real cape(klon) ! output (J / kg)
     INTEGER iflag(klon)
     REAL qcondc(klon, klev)
-    REAL wd(klon)
     REAL pmflxr(klon, klev + 1)
     REAL, intent(inout):: da(klon, klev), phi(klon, klev, klev), mp(klon, klev)
 
@@ -67,8 +66,7 @@ contains
 
     CALL cv_driver(t, q, qs, u, v, play / 100., paprs / 100., iflag, d_t, &
          d_q, d_u, d_v, rain, pmflxr, sig1, w01, kbas, itop_con, dtime, ma, &
-         upwd, dnwd, dnwd0, qcondc, wd, cape, da, phi, mp)
-
+         upwd, dnwd, dnwd0, qcondc, cape, da, phi, mp)
     rain = rain / 86400.
     d_t = dtime * d_t
     d_q = dtime * d_q

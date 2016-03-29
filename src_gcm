@@ -126,11 +126,10 @@ getso4fromfile.f
 grad.f
 gradiv2.f
 gradsdef.f
-gr_fi_ecrit.f
 grid_change.f
 groupe.f
 groupeun.f
-gr_phy_write_3d.f
+gr_phy_write.f
 gr_u_scal.f
 gr_v_scal.f
 guide.f

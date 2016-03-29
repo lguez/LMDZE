@@ -57,35 +57,6 @@ contains
 
   !********************************************
 
-  function gr_phy_write_2d(pfi)
-
-    ! From phylmd/physiq.F, version 1.22 2006/02/20 09:38:28
-    ! Transforme une variable de la grille physique \`a la grille d'\'ecriture.
-    ! The grid for output files does not duplicate the first longitude
-    ! in the last longitude.
-
-    use dimphy, only: klon
-
-    REAL, intent(in):: pfi(:) ! (klon)
-    real gr_phy_write_2d(iim, jjm + 1)
-
-    ! Variable local to the procedure:
-    real field(iim, jjm + 1)
-
-    !-----------------------------------------------------------------------
-
-    if (size(pfi) /= klon) stop "gr_phy_write_2d"
-
-    ! Traitement des p\^oles :
-    field(2:, 1) = pfi(1)
-    field(2:, jjm + 1) = pfi(klon)
-
-    gr_phy_write_2d = unpack(pfi, dyn_phy(:iim, :), field)
-
-  END function gr_phy_write_2d
-
-  !********************************************
-
   function gr_dyn_phy(v)
 
     ! Passage d'un champ 3D de la grille dynamique \`a la grille physique

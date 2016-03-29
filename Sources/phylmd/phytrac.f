@@ -410,7 +410,7 @@ contains
 
       use histwrite_m, only: histwrite
       use iniadvtrac_m, only: tname
-      use gr_phy_write_3d_m, only: gr_phy_write_3d
+      use gr_phy_write_m, only: gr_phy_write
 
       logical, intent(in):: lessivage
       integer, intent(in):: itap ! number of calls to "physiq"
@@ -424,21 +424,21 @@ contains
 
       itau_w = itau_phy + itap
 
-      CALL histwrite(nid_ins, "zmasse", itau_w, gr_phy_write_3d(zmasse))
+      CALL histwrite(nid_ins, "zmasse", itau_w, gr_phy_write(zmasse))
 
       DO it=1, nqmx - 2
          CALL histwrite(nid_ins, tname(it+2), itau_w, &
-              gr_phy_write_3d(tr_seri(:, :, it)))
+              gr_phy_write(tr_seri(:, :, it)))
          if (lessivage) THEN
             CALL histwrite(nid_ins, "fl"//tname(it+2), itau_w, &
-                 gr_phy_write_3d(flestottr(:, :, it)))
+                 gr_phy_write(flestottr(:, :, it)))
          endif
          CALL histwrite(nid_ins, "d_tr_th_"//tname(it+2), itau_w, &
-              gr_phy_write_3d(d_tr_th(:, :, it)))
+              gr_phy_write(d_tr_th(:, :, it)))
          CALL histwrite(nid_ins, "d_tr_cv_"//tname(it+2), itau_w, &
-              gr_phy_write_3d(d_tr_cv(:, :, it)))
+              gr_phy_write(d_tr_cv(:, :, it)))
          CALL histwrite(nid_ins, "d_tr_cl_"//tname(it+2), itau_w, &
-              gr_phy_write_3d(d_tr_cl(:, :, it)))
+              gr_phy_write(d_tr_cl(:, :, it)))
       ENDDO
 
     end subroutine write_histrac

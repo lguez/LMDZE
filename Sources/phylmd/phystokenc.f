@@ -12,7 +12,7 @@ contains
     ! Author: Fr\'ed\'eric Hourdin
     ! Objet : \'ecriture des variables pour transport offline
 
-    use gr_fi_ecrit_m, only: gr_fi_ecrit
+    use gr_phy_write_m, only: gr_phy_write
     USE histwrite_m, ONLY: histwrite
     USE histsync_m, ONLY: histsync
     USE dimens_m, ONLY: iim, jjm
@@ -115,11 +115,11 @@ contains
     END IF
 
     i = itap
-    CALL gr_fi_ecrit(1, klon, iim, jjm+1, pphis, zx_tmp_2d)
+    zx_tmp_2d = gr_phy_write(pphis)
     CALL histwrite(physid, 'phis', i, zx_tmp_2d)
 
     i = itap
-    CALL gr_fi_ecrit(1, klon, iim, jjm+1, paire, zx_tmp_2d)
+    zx_tmp_2d = gr_phy_write(paire)
     CALL histwrite(physid, 'aire', i, zx_tmp_2d)
 
     iadvtr = iadvtr + 1
@@ -222,22 +222,22 @@ contains
 
        irec = irec + 1
 
-       CALL gr_fi_ecrit(klev, klon, iim, jjm+1, t, zx_tmp_3d)
+       zx_tmp_3d = gr_phy_write(t)
        CALL histwrite(physid, 't', itap, zx_tmp_3d)
 
-       CALL gr_fi_ecrit(klev, klon, iim, jjm+1, mfu, zx_tmp_3d)
+       zx_tmp_3d = gr_phy_write(mfu)
        CALL histwrite(physid, 'mfu', itap, zx_tmp_3d)
-       CALL gr_fi_ecrit(klev, klon, iim, jjm+1, mfd, zx_tmp_3d)
+       zx_tmp_3d = gr_phy_write(mfd)
        CALL histwrite(physid, 'mfd', itap, zx_tmp_3d)
-       CALL gr_fi_ecrit(klev, klon, iim, jjm+1, en_u, zx_tmp_3d)
+       zx_tmp_3d = gr_phy_write(en_u)
        CALL histwrite(physid, 'en_u', itap, zx_tmp_3d)
-       CALL gr_fi_ecrit(klev, klon, iim, jjm+1, de_u, zx_tmp_3d)
+       zx_tmp_3d = gr_phy_write(de_u)
        CALL histwrite(physid, 'de_u', itap, zx_tmp_3d)
-       CALL gr_fi_ecrit(klev, klon, iim, jjm+1, en_d, zx_tmp_3d)
+       zx_tmp_3d = gr_phy_write(en_d)
        CALL histwrite(physid, 'en_d', itap, zx_tmp_3d)
-       CALL gr_fi_ecrit(klev, klon, iim, jjm+1, de_d, zx_tmp_3d)
+       zx_tmp_3d = gr_phy_write(de_d)
        CALL histwrite(physid, 'de_d', itap, zx_tmp_3d)
-       CALL gr_fi_ecrit(klev, klon, iim, jjm+1, coefh, zx_tmp_3d)
+       zx_tmp_3d = gr_phy_write(coefh)
        CALL histwrite(physid, 'coefh', itap, zx_tmp_3d)
 
        DO k = 1, klev
@@ -246,40 +246,40 @@ contains
           END DO
        END DO
 
-       CALL gr_fi_ecrit(klev, klon, iim, jjm+1, fm_therm1, zx_tmp_3d)
+       zx_tmp_3d = gr_phy_write(fm_therm1)
        CALL histwrite(physid, 'fm_th', itap, zx_tmp_3d)
 
-       CALL gr_fi_ecrit(klev, klon, iim, jjm+1, entr_therm, zx_tmp_3d)
+       zx_tmp_3d = gr_phy_write(entr_therm)
        CALL histwrite(physid, 'en_th', itap, zx_tmp_3d)
        !ccc 
-       CALL gr_fi_ecrit(klev, klon, iim, jjm+1, frac_impa, zx_tmp_3d)
+       zx_tmp_3d = gr_phy_write(frac_impa)
        CALL histwrite(physid, 'frac_impa', itap, zx_tmp_3d)
 
-       CALL gr_fi_ecrit(klev, klon, iim, jjm+1, frac_nucl, zx_tmp_3d)
+       zx_tmp_3d = gr_phy_write(frac_nucl)
        CALL histwrite(physid, 'frac_nucl', itap, zx_tmp_3d)
 
-       CALL gr_fi_ecrit(1, klon, iim, jjm+1, pyu1, zx_tmp_2d)
+       zx_tmp_2d = gr_phy_write(pyu1)
        CALL histwrite(physid, 'pyu1', itap, zx_tmp_2d)
 
-       CALL gr_fi_ecrit(1, klon, iim, jjm+1, pyv1, zx_tmp_2d)
+       zx_tmp_2d = gr_phy_write(pyv1)
        CALL histwrite(physid, 'pyv1', itap, zx_tmp_2d)
 
-       CALL gr_fi_ecrit(1, klon, iim, jjm+1, pftsol1, zx_tmp_2d)
+       zx_tmp_2d = gr_phy_write(pftsol1)
        CALL histwrite(physid, 'ftsol1', itap, zx_tmp_2d)
-       CALL gr_fi_ecrit(1, klon, iim, jjm+1, pftsol2, zx_tmp_2d)
+       zx_tmp_2d = gr_phy_write(pftsol2)
        CALL histwrite(physid, 'ftsol2', itap, zx_tmp_2d)
-       CALL gr_fi_ecrit(1, klon, iim, jjm+1, pftsol3, zx_tmp_2d)
+       zx_tmp_2d = gr_phy_write(pftsol3)
        CALL histwrite(physid, 'ftsol3', itap, zx_tmp_2d)
-       CALL gr_fi_ecrit(1, klon, iim, jjm+1, pftsol4, zx_tmp_2d)
+       zx_tmp_2d = gr_phy_write(pftsol4)
        CALL histwrite(physid, 'ftsol4', itap, zx_tmp_2d)
 
-       CALL gr_fi_ecrit(1, klon, iim, jjm+1, ppsrf1, zx_tmp_2d)
+       zx_tmp_2d = gr_phy_write(ppsrf1)
        CALL histwrite(physid, 'psrf1', itap, zx_tmp_2d)
-       CALL gr_fi_ecrit(1, klon, iim, jjm+1, ppsrf2, zx_tmp_2d)
+       zx_tmp_2d = gr_phy_write(ppsrf2)
        CALL histwrite(physid, 'psrf2', itap, zx_tmp_2d)
-       CALL gr_fi_ecrit(1, klon, iim, jjm+1, ppsrf3, zx_tmp_2d)
+       zx_tmp_2d = gr_phy_write(ppsrf3)
        CALL histwrite(physid, 'psrf3', itap, zx_tmp_2d)
-       CALL gr_fi_ecrit(1, klon, iim, jjm+1, ppsrf4, zx_tmp_2d)
+       zx_tmp_2d = gr_phy_write(ppsrf4)
        CALL histwrite(physid, 'psrf4', itap, zx_tmp_2d)
 
        IF (ok_sync) CALL histsync(physid)

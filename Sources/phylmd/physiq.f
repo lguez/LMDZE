@@ -108,9 +108,6 @@ contains
 
     LOGICAL:: firstcal = .true.
 
-    LOGICAL ok_gust ! pour activer l'effet des gust sur flux surface
-    PARAMETER (ok_gust = .FALSE.)
-
     LOGICAL, PARAMETER:: check = .FALSE. 
     ! Verifier la conservation du modele en eau
 
@@ -197,23 +194,15 @@ contains
     REAL zulow(klon), zvlow(klon)
     INTEGER igwd, itest(klon)
 
-    REAL agesno(klon, nbsrf)
-    SAVE agesno ! age de la neige
+    REAL, save:: agesno(klon, nbsrf) ! age de la neige
+    REAL, save:: run_off_lic_0(klon)
 
-    REAL run_off_lic_0(klon)
-    SAVE run_off_lic_0
-    !KE43
-    ! Variables liees a la convection de K. Emanuel (sb):
-
-    REAL Ma(klon, llm) ! undilute upward mass flux
-    SAVE Ma
-    REAL qcondc(klon, llm) ! in-cld water content from convect
-    SAVE qcondc 
+    ! Variables li\'ees \`a la convection d'Emanuel :
+    REAL, save:: Ma(klon, llm) ! undilute upward mass flux
+    REAL, save:: qcondc(klon, llm) ! in-cld water content from convect
     REAL, save:: sig1(klon, llm), w01(klon, llm)
-    REAL, save:: wd(klon)
 
-    ! Variables pour la couche limite (al1):
-
+    ! Variables pour la couche limite (Alain Lahellec) :
     REAL cdragh(klon) ! drag coefficient pour T and Q
     REAL cdragm(klon) ! drag coefficient pour vent
 
@@ -851,12 +840,11 @@ contains
        phi = 0.
        CALL concvl(dtphys, paprs, play, t_seri, q_seri, u_seri, v_seri, sig1, &
             w01, d_t_con, d_q_con, d_u_con, d_v_con, rain_con, ibas_con, &
-            itop_con, upwd, dnwd, dnwd0, Ma, cape, iflagctrl, qcondc, wd, &
-            pmflxr, da, phi, mp)
+            itop_con, upwd, dnwd, dnwd0, Ma, cape, iflagctrl, qcondc, pmflxr, &
+            da, phi, mp)
        snow_con = 0.
        clwcon0 = qcondc
        mfu = upwd + dnwd
-       IF (.NOT. ok_gust) wd = 0.
 
        IF (thermcep) THEN
           zqsat = MIN(0.5, r2es * FOEEW(t_seri, rtt >= t_seri) / play)
@@ -1386,7 +1374,7 @@ contains
       ! Ecriture des sorties
 
       use dimens_m, only: iim, jjm
-      use gr_fi_ecrit_m, only: gr_fi_ecrit
+      use gr_phy_write_m, only: gr_phy_write
       USE histsync_m, ONLY: histsync
       USE histwrite_m, ONLY: histwrite
 
@@ -1400,213 +1388,213 @@ contains
 
          itau_w = itau_phy + itap
 
-         CALL gr_fi_ecrit(1, klon, iim, jjm + 1, pphis, zx_tmp_2d)
+         zx_tmp_2d = gr_phy_write(pphis)
          CALL histwrite(nid_ins, "phis", itau_w, zx_tmp_2d)
 
-         CALL gr_fi_ecrit(1, klon, iim, jjm + 1, airephy, zx_tmp_2d)
+         zx_tmp_2d = gr_phy_write(airephy)
          CALL histwrite(nid_ins, "aire", itau_w, zx_tmp_2d)
 
          DO i = 1, klon
             zx_tmp_fi2d(i) = paprs(i, 1)
          ENDDO
-         CALL gr_fi_ecrit(1, klon, iim, jjm + 1, zx_tmp_fi2d, zx_tmp_2d)
+         zx_tmp_2d = gr_phy_write(zx_tmp_fi2d)
          CALL histwrite(nid_ins, "psol", itau_w, zx_tmp_2d)
 
          DO i = 1, klon
             zx_tmp_fi2d(i) = rain_fall(i) + snow_fall(i)
          ENDDO
-         CALL gr_fi_ecrit(1, klon, iim, jjm + 1, zx_tmp_fi2d, zx_tmp_2d)
+         zx_tmp_2d = gr_phy_write(zx_tmp_fi2d)
          CALL histwrite(nid_ins, "precip", itau_w, zx_tmp_2d)
 
          DO i = 1, klon
             zx_tmp_fi2d(i) = rain_lsc(i) + snow_lsc(i)
          ENDDO
-         CALL gr_fi_ecrit(1, klon, iim, jjm + 1, zx_tmp_fi2d, zx_tmp_2d)
+         zx_tmp_2d = gr_phy_write(zx_tmp_fi2d)
          CALL histwrite(nid_ins, "plul", itau_w, zx_tmp_2d)
 
          DO i = 1, klon
             zx_tmp_fi2d(i) = rain_con(i) + snow_con(i)
          ENDDO
-         CALL gr_fi_ecrit(1, klon, iim, jjm + 1, zx_tmp_fi2d, zx_tmp_2d)
+         zx_tmp_2d = gr_phy_write(zx_tmp_fi2d)
          CALL histwrite(nid_ins, "pluc", itau_w, zx_tmp_2d)
 
-         CALL gr_fi_ecrit(1, klon, iim, jjm + 1, zxtsol, zx_tmp_2d)
+         zx_tmp_2d = gr_phy_write(zxtsol)
          CALL histwrite(nid_ins, "tsol", itau_w, zx_tmp_2d)
          !ccIM
-         CALL gr_fi_ecrit(1, klon, iim, jjm + 1, zt2m, zx_tmp_2d)
+         zx_tmp_2d = gr_phy_write(zt2m)
          CALL histwrite(nid_ins, "t2m", itau_w, zx_tmp_2d)
 
-         CALL gr_fi_ecrit(1, klon, iim, jjm + 1, zq2m, zx_tmp_2d)
+         zx_tmp_2d = gr_phy_write(zq2m)
          CALL histwrite(nid_ins, "q2m", itau_w, zx_tmp_2d)
 
-         CALL gr_fi_ecrit(1, klon, iim, jjm + 1, zu10m, zx_tmp_2d)
+         zx_tmp_2d = gr_phy_write(zu10m)
          CALL histwrite(nid_ins, "u10m", itau_w, zx_tmp_2d)
 
-         CALL gr_fi_ecrit(1, klon, iim, jjm + 1, zv10m, zx_tmp_2d)
+         zx_tmp_2d = gr_phy_write(zv10m)
          CALL histwrite(nid_ins, "v10m", itau_w, zx_tmp_2d)
 
-         CALL gr_fi_ecrit(1, klon, iim, jjm + 1, snow_fall, zx_tmp_2d)
+         zx_tmp_2d = gr_phy_write(snow_fall)
          CALL histwrite(nid_ins, "snow", itau_w, zx_tmp_2d)
 
-         CALL gr_fi_ecrit(1, klon, iim, jjm + 1, cdragm, zx_tmp_2d)
+         zx_tmp_2d = gr_phy_write(cdragm)
          CALL histwrite(nid_ins, "cdrm", itau_w, zx_tmp_2d)
 
-         CALL gr_fi_ecrit(1, klon, iim, jjm + 1, cdragh, zx_tmp_2d)
+         zx_tmp_2d = gr_phy_write(cdragh)
          CALL histwrite(nid_ins, "cdrh", itau_w, zx_tmp_2d)
 
-         CALL gr_fi_ecrit(1, klon, iim, jjm + 1, toplw, zx_tmp_2d)
+         zx_tmp_2d = gr_phy_write(toplw)
          CALL histwrite(nid_ins, "topl", itau_w, zx_tmp_2d)
 
-         CALL gr_fi_ecrit(1, klon, iim, jjm + 1, evap, zx_tmp_2d)
+         zx_tmp_2d = gr_phy_write(evap)
          CALL histwrite(nid_ins, "evap", itau_w, zx_tmp_2d)
 
-         CALL gr_fi_ecrit(1, klon, iim, jjm + 1, solsw, zx_tmp_2d)
+         zx_tmp_2d = gr_phy_write(solsw)
          CALL histwrite(nid_ins, "sols", itau_w, zx_tmp_2d)
 
-         CALL gr_fi_ecrit(1, klon, iim, jjm + 1, sollw, zx_tmp_2d)
+         zx_tmp_2d = gr_phy_write(sollw)
          CALL histwrite(nid_ins, "soll", itau_w, zx_tmp_2d)
 
-         CALL gr_fi_ecrit(1, klon, iim, jjm + 1, sollwdown, zx_tmp_2d)
+         zx_tmp_2d = gr_phy_write(sollwdown)
          CALL histwrite(nid_ins, "solldown", itau_w, zx_tmp_2d)
 
-         CALL gr_fi_ecrit(1, klon, iim, jjm + 1, bils, zx_tmp_2d)
+         zx_tmp_2d = gr_phy_write(bils)
          CALL histwrite(nid_ins, "bils", itau_w, zx_tmp_2d)
 
          zx_tmp_fi2d(1:klon) = - sens(1:klon)
-         ! CALL gr_fi_ecrit(1, klon, iim, jjm + 1, sens, zx_tmp_2d)
-         CALL gr_fi_ecrit(1, klon, iim, jjm + 1, zx_tmp_fi2d, zx_tmp_2d)
+         ! zx_tmp_2d = gr_phy_write(sens)
+         zx_tmp_2d = gr_phy_write(zx_tmp_fi2d)
          CALL histwrite(nid_ins, "sens", itau_w, zx_tmp_2d)
 
-         CALL gr_fi_ecrit(1, klon, iim, jjm + 1, fder, zx_tmp_2d)
+         zx_tmp_2d = gr_phy_write(fder)
          CALL histwrite(nid_ins, "fder", itau_w, zx_tmp_2d)
 
-         CALL gr_fi_ecrit(1, klon, iim, jjm + 1, d_ts(1, is_oce), zx_tmp_2d)
+         zx_tmp_2d = gr_phy_write(d_ts(:, is_oce))
          CALL histwrite(nid_ins, "dtsvdfo", itau_w, zx_tmp_2d)
 
-         CALL gr_fi_ecrit(1, klon, iim, jjm + 1, d_ts(1, is_ter), zx_tmp_2d)
+         zx_tmp_2d = gr_phy_write(d_ts(:, is_ter))
          CALL histwrite(nid_ins, "dtsvdft", itau_w, zx_tmp_2d)
 
-         CALL gr_fi_ecrit(1, klon, iim, jjm + 1, d_ts(1, is_lic), zx_tmp_2d)
+         zx_tmp_2d = gr_phy_write(d_ts(:, is_lic))
          CALL histwrite(nid_ins, "dtsvdfg", itau_w, zx_tmp_2d)
 
-         CALL gr_fi_ecrit(1, klon, iim, jjm + 1, d_ts(1, is_sic), zx_tmp_2d)
+         zx_tmp_2d = gr_phy_write(d_ts(:, is_sic))
          CALL histwrite(nid_ins, "dtsvdfi", itau_w, zx_tmp_2d)
 
          DO nsrf = 1, nbsrf
             !XXX
             zx_tmp_fi2d(1 : klon) = pctsrf(1 : klon, nsrf)*100.
-            CALL gr_fi_ecrit(1, klon, iim, jjm + 1, zx_tmp_fi2d, zx_tmp_2d)
+            zx_tmp_2d = gr_phy_write(zx_tmp_fi2d)
             CALL histwrite(nid_ins, "pourc_"//clnsurf(nsrf), itau_w, &
                  zx_tmp_2d) 
 
             zx_tmp_fi2d(1 : klon) = pctsrf(1 : klon, nsrf)
-            CALL gr_fi_ecrit(1, klon, iim, jjm + 1, zx_tmp_fi2d, zx_tmp_2d)
+            zx_tmp_2d = gr_phy_write(zx_tmp_fi2d)
             CALL histwrite(nid_ins, "fract_"//clnsurf(nsrf), itau_w, &
                  zx_tmp_2d) 
 
             zx_tmp_fi2d(1 : klon) = fluxt(1 : klon, 1, nsrf)
-            CALL gr_fi_ecrit(1, klon, iim, jjm + 1, zx_tmp_fi2d, zx_tmp_2d)
+            zx_tmp_2d = gr_phy_write(zx_tmp_fi2d)
             CALL histwrite(nid_ins, "sens_"//clnsurf(nsrf), itau_w, &
                  zx_tmp_2d) 
 
             zx_tmp_fi2d(1 : klon) = fluxlat(1 : klon, nsrf)
-            CALL gr_fi_ecrit(1, klon, iim, jjm + 1, zx_tmp_fi2d, zx_tmp_2d)
+            zx_tmp_2d = gr_phy_write(zx_tmp_fi2d)
             CALL histwrite(nid_ins, "lat_"//clnsurf(nsrf), itau_w, &
                  zx_tmp_2d) 
 
             zx_tmp_fi2d(1 : klon) = ftsol(1 : klon, nsrf)
-            CALL gr_fi_ecrit(1, klon, iim, jjm + 1, zx_tmp_fi2d, zx_tmp_2d)
+            zx_tmp_2d = gr_phy_write(zx_tmp_fi2d)
             CALL histwrite(nid_ins, "tsol_"//clnsurf(nsrf), itau_w, &
                  zx_tmp_2d) 
 
             zx_tmp_fi2d(1 : klon) = fluxu(1 : klon, 1, nsrf)
-            CALL gr_fi_ecrit(1, klon, iim, jjm + 1, zx_tmp_fi2d, zx_tmp_2d)
+            zx_tmp_2d = gr_phy_write(zx_tmp_fi2d)
             CALL histwrite(nid_ins, "taux_"//clnsurf(nsrf), itau_w, &
                  zx_tmp_2d) 
 
             zx_tmp_fi2d(1 : klon) = fluxv(1 : klon, 1, nsrf)
-            CALL gr_fi_ecrit(1, klon, iim, jjm + 1, zx_tmp_fi2d, zx_tmp_2d)
+            zx_tmp_2d = gr_phy_write(zx_tmp_fi2d)
             CALL histwrite(nid_ins, "tauy_"//clnsurf(nsrf), itau_w, &
                  zx_tmp_2d)
 
             zx_tmp_fi2d(1 : klon) = frugs(1 : klon, nsrf)
-            CALL gr_fi_ecrit(1, klon, iim, jjm + 1, zx_tmp_fi2d, zx_tmp_2d)
+            zx_tmp_2d = gr_phy_write(zx_tmp_fi2d)
             CALL histwrite(nid_ins, "rugs_"//clnsurf(nsrf), itau_w, &
                  zx_tmp_2d) 
 
             zx_tmp_fi2d(1 : klon) = falbe(:, nsrf)
-            CALL gr_fi_ecrit(1, klon, iim, jjm + 1, zx_tmp_fi2d, zx_tmp_2d)
+            zx_tmp_2d = gr_phy_write(zx_tmp_fi2d)
             CALL histwrite(nid_ins, "albe_"//clnsurf(nsrf), itau_w, &
                  zx_tmp_2d) 
 
          END DO
-         CALL gr_fi_ecrit(1, klon, iim, jjm + 1, albsol, zx_tmp_2d)
+         zx_tmp_2d = gr_phy_write(albsol)
          CALL histwrite(nid_ins, "albs", itau_w, zx_tmp_2d)
 
-         CALL gr_fi_ecrit(1, klon, iim, jjm + 1, zxrugs, zx_tmp_2d)
+         zx_tmp_2d = gr_phy_write(zxrugs)
          CALL histwrite(nid_ins, "rugs", itau_w, zx_tmp_2d)
 
          !HBTM2
 
-         CALL gr_fi_ecrit(1, klon, iim, jjm + 1, s_pblh, zx_tmp_2d)
+         zx_tmp_2d = gr_phy_write(s_pblh)
          CALL histwrite(nid_ins, "s_pblh", itau_w, zx_tmp_2d)
 
-         CALL gr_fi_ecrit(1, klon, iim, jjm + 1, s_pblt, zx_tmp_2d)
+         zx_tmp_2d = gr_phy_write(s_pblt)
          CALL histwrite(nid_ins, "s_pblt", itau_w, zx_tmp_2d)
 
-         CALL gr_fi_ecrit(1, klon, iim, jjm + 1, s_lcl, zx_tmp_2d)
+         zx_tmp_2d = gr_phy_write(s_lcl)
          CALL histwrite(nid_ins, "s_lcl", itau_w, zx_tmp_2d)
 
-         CALL gr_fi_ecrit(1, klon, iim, jjm + 1, s_capCL, zx_tmp_2d)
+         zx_tmp_2d = gr_phy_write(s_capCL)
          CALL histwrite(nid_ins, "s_capCL", itau_w, zx_tmp_2d)
 
-         CALL gr_fi_ecrit(1, klon, iim, jjm + 1, s_oliqCL, zx_tmp_2d)
+         zx_tmp_2d = gr_phy_write(s_oliqCL)
          CALL histwrite(nid_ins, "s_oliqCL", itau_w, zx_tmp_2d)
 
-         CALL gr_fi_ecrit(1, klon, iim, jjm + 1, s_cteiCL, zx_tmp_2d)
+         zx_tmp_2d = gr_phy_write(s_cteiCL)
          CALL histwrite(nid_ins, "s_cteiCL", itau_w, zx_tmp_2d)
 
-         CALL gr_fi_ecrit(1, klon, iim, jjm + 1, s_therm, zx_tmp_2d)
+         zx_tmp_2d = gr_phy_write(s_therm)
          CALL histwrite(nid_ins, "s_therm", itau_w, zx_tmp_2d)
 
-         CALL gr_fi_ecrit(1, klon, iim, jjm + 1, s_trmb1, zx_tmp_2d)
+         zx_tmp_2d = gr_phy_write(s_trmb1)
          CALL histwrite(nid_ins, "s_trmb1", itau_w, zx_tmp_2d)
 
-         CALL gr_fi_ecrit(1, klon, iim, jjm + 1, s_trmb2, zx_tmp_2d)
+         zx_tmp_2d = gr_phy_write(s_trmb2)
          CALL histwrite(nid_ins, "s_trmb2", itau_w, zx_tmp_2d)
 
-         CALL gr_fi_ecrit(1, klon, iim, jjm + 1, s_trmb3, zx_tmp_2d)
+         zx_tmp_2d = gr_phy_write(s_trmb3)
          CALL histwrite(nid_ins, "s_trmb3", itau_w, zx_tmp_2d)
 
          if (conv_emanuel) then
-            CALL gr_fi_ecrit(1, klon, iim, jjm + 1, ema_pct, zx_tmp_2d)
+            zx_tmp_2d = gr_phy_write(ema_pct)
             CALL histwrite(nid_ins, "ptop", itau_w, zx_tmp_2d)
          end if
 
          ! Champs 3D:
 
-         CALL gr_fi_ecrit(llm, klon, iim, jjm + 1, t_seri, zx_tmp_3d)
+         zx_tmp_3d = gr_phy_write(t_seri)
          CALL histwrite(nid_ins, "temp", itau_w, zx_tmp_3d)
 
-         CALL gr_fi_ecrit(llm, klon, iim, jjm + 1, u_seri, zx_tmp_3d)
+         zx_tmp_3d = gr_phy_write(u_seri)
          CALL histwrite(nid_ins, "vitu", itau_w, zx_tmp_3d)
 
-         CALL gr_fi_ecrit(llm, klon, iim, jjm + 1, v_seri, zx_tmp_3d)
+         zx_tmp_3d = gr_phy_write(v_seri)
          CALL histwrite(nid_ins, "vitv", itau_w, zx_tmp_3d)
 
-         CALL gr_fi_ecrit(llm, klon, iim, jjm + 1, zphi, zx_tmp_3d)
+         zx_tmp_3d = gr_phy_write(zphi)
          CALL histwrite(nid_ins, "geop", itau_w, zx_tmp_3d)
 
-         CALL gr_fi_ecrit(llm, klon, iim, jjm + 1, play, zx_tmp_3d)
+         zx_tmp_3d = gr_phy_write(play)
          CALL histwrite(nid_ins, "pres", itau_w, zx_tmp_3d)
 
-         CALL gr_fi_ecrit(llm, klon, iim, jjm + 1, d_t_vdf, zx_tmp_3d)
+         zx_tmp_3d = gr_phy_write(d_t_vdf)
          CALL histwrite(nid_ins, "dtvdf", itau_w, zx_tmp_3d)
 
-         CALL gr_fi_ecrit(llm, klon, iim, jjm + 1, d_q_vdf, zx_tmp_3d)
+         zx_tmp_3d = gr_phy_write(d_q_vdf)
          CALL histwrite(nid_ins, "dqvdf", itau_w, zx_tmp_3d)
 
-         CALL gr_fi_ecrit(llm, klon, iim, jjm + 1, zx_rh, zx_tmp_3d)
+         zx_tmp_3d = gr_phy_write(zx_rh)
          CALL histwrite(nid_ins, "rhum", itau_w, zx_tmp_3d)
 
          call histsync(nid_ins)
