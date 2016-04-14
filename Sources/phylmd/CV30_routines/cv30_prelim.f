@@ -7,7 +7,7 @@ contains
   SUBROUTINE cv30_prelim(len, nd, ndp1, t, q, p, ph, lv, cpn, tv, gz, h, hm, th)
 
     USE cv30_param_m, ONLY: nl
-    USE cvthermo, ONLY: cl, clmcpv, cpd, cpv, eps, lv0, rrd, rrv
+    USE cv_thermo_m, ONLY: cl, clmcpv, cpd, cpv, eps, lv0, rrd, rrv
 
     ! Calculate arrays of geopotential, heat capacity and static energy
 

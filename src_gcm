@@ -72,7 +72,6 @@ cv30_yield.f
 cv_driver.f
 cvltr.f
 cv_thermo.f
-cvthermo.f
 decoop.f
 diagcld1.f
 diagcld2.f

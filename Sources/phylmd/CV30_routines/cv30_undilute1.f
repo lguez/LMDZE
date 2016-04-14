@@ -2,7 +2,7 @@
       SUBROUTINE cv30_undilute1(len,nd,t,q,qs,gz,plcl,p,nk,icb &
                              ,tp,tvp,clw,icbs)
             use cv30_param_m
-            use cvthermo
+            use cv_thermo_m
       implicit none
 
     ! UNDILUTE (ADIABATIC) UPDRAFT / 1st part

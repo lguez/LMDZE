@@ -17,7 +17,7 @@ contains
 
     use conema3_m, only: epmax
     use cv30_param_m, only: dtovsh, minorig, nl, pbcrit, ptcrit, spfac
-    use cvthermo, only: cl, clmcpv, cpd, cpv, eps, lv0, rrv
+    use cv_thermo_m, only: cl, clmcpv, cpd, cpv, eps, lv0, rrv
     USE dimphy, ONLY: klon, klev
 
     integer, intent(in):: ncum

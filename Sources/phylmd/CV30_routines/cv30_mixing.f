@@ -8,7 +8,7 @@ contains
        lv, hp, ep, clw, m, sig, ment, qent, uent, vent, nent, sij, elij, &
        ments, qents)
     use cv30_param_m
-    use cvthermo
+    use cv_thermo_m
 
     !
     ! a faire:

@@ -13,15 +13,14 @@ contains
     use dimens_m, only: iim, jjm, llm, nqmx
     use dimphy, only: klon
     use disvert_m, only: presnivs
-    use dynetat0_m, only: day_ref, annee_ref
-    use gr_phy_write_m, only: gr_phy_write
+    use dynetat0_m, only: day_ref, annee_ref, rlatu, rlonv
     USE histbeg_totreg_m, ONLY : histbeg_totreg
     USE histdef_m, ONLY : histdef
     USE histend_m, ONLY : histend
     USE histvert_m, ONLY : histvert
     use indicesol, only: nbsrf, clnsurf
     use iniadvtrac_m, only: tname, ttext
-    use phyetat0_m, only: rlon, rlat
+    use nr_util, only: pi
     USE ymds2ju_m, only: ymds2ju
 
     REAL, intent(in):: dtime ! pas temporel de la physique (s)
@@ -30,34 +29,24 @@ contains
     integer, intent(in):: itau_phy
 
     ! Local:
-    REAL zx_lon(iim, jjm + 1), zx_lat(iim, jjm + 1)
     real zjulian, zsto, zout
-    integer i, nhori, nvert, nsrf, iq, it
+    integer nhori, nvert, nsrf, iq, it
 
     !-------------------------------------------------------------------
 
     IF (ok_instan) THEN
        zsto = dtime * ecrit_ins
        zout = dtime * ecrit_ins
-
        CALL ymds2ju(annee_ref, 1, day_ref, 0.0, zjulian)
-
-       zx_lon = gr_phy_write(rlon)
-       DO i = 1, iim
-          zx_lon(i, 1) = rlon(i+1)
-          zx_lon(i, (jjm + 1)) = rlon(i+1)
-       ENDDO
-       zx_lat = gr_phy_write(rlat)
-       CALL histbeg_totreg("histins", zx_lon(:, 1), zx_lat(1, :), 1, iim, 1, &
-            jjm + 1, itau_phy, zjulian, dtime, nhori, nid_ins)
+       CALL histbeg_totreg("histins", rlonv(:iim) / pi * 180., &
+            rlatu / pi * 180., 1, iim, &
+            1, jjm + 1, itau_phy, zjulian, dtime, nhori, nid_ins)
        write(*, *)'Inst ', itau_phy, zjulian
        CALL histvert(nid_ins, "presnivs", "Vertical levels", "mb", &
             presnivs/100., nvert)
-
        CALL histdef(nid_ins, "phis", "Surface geop. height", "-", &
             iim, (jjm + 1), nhori, 1, 1, 1, -99, &
             "once", zsto, zout)
-
        CALL histdef(nid_ins, "aire", "Grid area", "-", &
             iim, (jjm + 1), nhori, 1, 1, 1, -99, &
             "once", zsto, zout)

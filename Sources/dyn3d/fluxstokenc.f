@@ -15,7 +15,7 @@ contains
     USE comgeom, ONLY: aire
     USE tracstoke, ONLY: istdyn, istphy
 
-    REAL pbaru(ip1jmp1, llm), pbarv(ip1jm, llm)
+    REAL, intent(in):: pbaru(ip1jmp1, llm), pbarv(ip1jm, llm)
     REAL, intent(in):: masse(ip1jmp1, llm)
     real, intent(in):: phi(ip1jmp1, llm)
     real, intent(in):: teta(ip1jmp1, llm)
@@ -23,7 +23,7 @@ contains
     REAL, intent(in):: time_step
     INTEGER, INTENT (IN):: itau
 
-    ! Variables local to the procedure:
+    ! Local:
 
     REAL, SAVE:: pbaruc(ip1jmp1, llm), pbarvc(ip1jm, llm)
     REAL, SAVE:: massem(ip1jmp1, llm)
@@ -55,7 +55,7 @@ contains
        CALL initial0(ijmllm, pbarvc)
     END IF
 
-    !   accumulation des flux de masse horizontaux
+    ! Accumulation des flux de masse horizontaux
     DO l = 1, llm
        DO ij = 1, ip1jmp1
           pbaruc(ij, l) = pbaruc(ij, l) + pbaru(ij, l)
@@ -67,12 +67,12 @@ contains
        END DO
     END DO
 
-    !   selection de la masse instantannee des mailles avant le transport.
+    ! S\'election de la masse instantan\'ee des mailles avant le transport.
     IF (itau == 0) massem = masse
 
     IF (mod(itau + 1, istdyn) == 0) THEN
-       ! on advecte a ce pas de temps
-       !    normalisation
+       ! On advecte \`a ce pas de temps
+       ! normalisation
        DO l = 1, llm
           DO ij = 1, ip1jmp1
              pbaruc(ij, l) = pbaruc(ij, l)/float(istdyn)
@@ -84,9 +84,9 @@ contains
           END DO
        END DO
 
-       !   traitement des flux de masse avant advection.
-       !     1. calcul de w
-       !     2. groupement des mailles pres du pole.
+       ! Traitement des flux de masse avant advection.
+       ! 1. Calcul de w
+       ! 2. Groupement des mailles pr\`es du p\^ole.
 
        CALL groupe(pbaruc, pbarvc, pbarug, pbarvg, wg)
 

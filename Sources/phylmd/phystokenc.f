@@ -4,9 +4,9 @@ module phystokenc_m
 
 contains
 
-  SUBROUTINE phystokenc(pdtphys, rlon, rlat, pt, pmfu, pmfd, pen_u, pde_u, &
-       pen_d, pde_d, pfm_therm, pentr_therm, pcoefh, yu1, yv1, ftsol, pctsrf, &
-       frac_impa, frac_nucl, pphis, paire, dtime, itap)
+  SUBROUTINE phystokenc(pdtphys, pt, pmfu, pmfd, pen_u, pde_u, pen_d, pde_d, &
+       pfm_therm, pentr_therm, pcoefh, yu1, yv1, ftsol, pctsrf, frac_impa, &
+       frac_nucl, pphis, paire, dtime, itap)
 
     ! From phylmd/phystokenc.F, version 1.2 2004/06/22 11:45:35
     ! Author: Fr\'ed\'eric Hourdin
@@ -22,7 +22,6 @@ contains
     USE tracstoke, ONLY: istphy
 
     REAL, INTENT (IN):: pdtphys ! pas d'integration pour la physique (seconde)
-    REAL, INTENT (IN):: rlon(klon), rlat(klon)
     REAL, intent(in):: pt(klon, klev)
 
     ! convection: 
@@ -70,7 +69,6 @@ contains
 
     real t(klon, klev)
     INTEGER, SAVE:: physid
-    REAL zx_tmp_3d(iim, jjm+1, klev), zx_tmp_2d(iim, jjm+1)
 
     ! Les Thermiques
 
@@ -109,19 +107,12 @@ contains
 
     ok_sync = .TRUE.
 
-    IF (iadvtr==0) THEN
-       CALL initphysto('phystoke', rlon, rlat, dtime, dtime*istphy, &
-            dtime*istphy, physid)
-    END IF
+    IF (iadvtr==0) CALL initphysto('phystoke', dtime, dtime*istphy, dtime*istphy, physid)
 
     i = itap
-    zx_tmp_2d = gr_phy_write(pphis)
-    CALL histwrite(physid, 'phis', i, zx_tmp_2d)
-
+    CALL histwrite(physid, 'phis', i, gr_phy_write(pphis))
     i = itap
-    zx_tmp_2d = gr_phy_write(paire)
-    CALL histwrite(physid, 'aire', i, zx_tmp_2d)
-
+    CALL histwrite(physid, 'aire', i, gr_phy_write(paire))
     iadvtr = iadvtr + 1
 
     IF (mod(iadvtr, istphy) == 1 .OR. istphy == 1) THEN
@@ -222,66 +213,35 @@ contains
 
        irec = irec + 1
 
-       zx_tmp_3d = gr_phy_write(t)
-       CALL histwrite(physid, 't', itap, zx_tmp_3d)
-
-       zx_tmp_3d = gr_phy_write(mfu)
-       CALL histwrite(physid, 'mfu', itap, zx_tmp_3d)
-       zx_tmp_3d = gr_phy_write(mfd)
-       CALL histwrite(physid, 'mfd', itap, zx_tmp_3d)
-       zx_tmp_3d = gr_phy_write(en_u)
-       CALL histwrite(physid, 'en_u', itap, zx_tmp_3d)
-       zx_tmp_3d = gr_phy_write(de_u)
-       CALL histwrite(physid, 'de_u', itap, zx_tmp_3d)
-       zx_tmp_3d = gr_phy_write(en_d)
-       CALL histwrite(physid, 'en_d', itap, zx_tmp_3d)
-       zx_tmp_3d = gr_phy_write(de_d)
-       CALL histwrite(physid, 'de_d', itap, zx_tmp_3d)
-       zx_tmp_3d = gr_phy_write(coefh)
-       CALL histwrite(physid, 'coefh', itap, zx_tmp_3d)
-
+       CALL histwrite(physid, 't', itap, gr_phy_write(t))
+       CALL histwrite(physid, 'mfu', itap, gr_phy_write(mfu))
+       CALL histwrite(physid, 'mfd', itap, gr_phy_write(mfd))
+       CALL histwrite(physid, 'en_u', itap, gr_phy_write(en_u))
+       CALL histwrite(physid, 'de_u', itap, gr_phy_write(de_u))
+       CALL histwrite(physid, 'en_d', itap, gr_phy_write(en_d))
+       CALL histwrite(physid, 'de_d', itap, gr_phy_write(de_d))
+       CALL histwrite(physid, 'coefh', itap, gr_phy_write(coefh))
        DO k = 1, klev
           DO i = 1, klon
              fm_therm1(i, k) = fm_therm(i, k)
           END DO
        END DO
 
-       zx_tmp_3d = gr_phy_write(fm_therm1)
-       CALL histwrite(physid, 'fm_th', itap, zx_tmp_3d)
-
-       zx_tmp_3d = gr_phy_write(entr_therm)
-       CALL histwrite(physid, 'en_th', itap, zx_tmp_3d)
+       CALL histwrite(physid, 'fm_th', itap, gr_phy_write(fm_therm1))
+       CALL histwrite(physid, 'en_th', itap, gr_phy_write(entr_therm))
        !ccc 
-       zx_tmp_3d = gr_phy_write(frac_impa)
-       CALL histwrite(physid, 'frac_impa', itap, zx_tmp_3d)
-
-       zx_tmp_3d = gr_phy_write(frac_nucl)
-       CALL histwrite(physid, 'frac_nucl', itap, zx_tmp_3d)
-
-       zx_tmp_2d = gr_phy_write(pyu1)
-       CALL histwrite(physid, 'pyu1', itap, zx_tmp_2d)
-
-       zx_tmp_2d = gr_phy_write(pyv1)
-       CALL histwrite(physid, 'pyv1', itap, zx_tmp_2d)
-
-       zx_tmp_2d = gr_phy_write(pftsol1)
-       CALL histwrite(physid, 'ftsol1', itap, zx_tmp_2d)
-       zx_tmp_2d = gr_phy_write(pftsol2)
-       CALL histwrite(physid, 'ftsol2', itap, zx_tmp_2d)
-       zx_tmp_2d = gr_phy_write(pftsol3)
-       CALL histwrite(physid, 'ftsol3', itap, zx_tmp_2d)
-       zx_tmp_2d = gr_phy_write(pftsol4)
-       CALL histwrite(physid, 'ftsol4', itap, zx_tmp_2d)
-
-       zx_tmp_2d = gr_phy_write(ppsrf1)
-       CALL histwrite(physid, 'psrf1', itap, zx_tmp_2d)
-       zx_tmp_2d = gr_phy_write(ppsrf2)
-       CALL histwrite(physid, 'psrf2', itap, zx_tmp_2d)
-       zx_tmp_2d = gr_phy_write(ppsrf3)
-       CALL histwrite(physid, 'psrf3', itap, zx_tmp_2d)
-       zx_tmp_2d = gr_phy_write(ppsrf4)
-       CALL histwrite(physid, 'psrf4', itap, zx_tmp_2d)
-
+       CALL histwrite(physid, 'frac_impa', itap, gr_phy_write(frac_impa))
+       CALL histwrite(physid, 'frac_nucl', itap, gr_phy_write(frac_nucl))
+       CALL histwrite(physid, 'pyu1', itap, gr_phy_write(pyu1))
+       CALL histwrite(physid, 'pyv1', itap, gr_phy_write(pyv1))
+       CALL histwrite(physid, 'ftsol1', itap, gr_phy_write(pftsol1))
+       CALL histwrite(physid, 'ftsol2', itap, gr_phy_write(pftsol2))
+       CALL histwrite(physid, 'ftsol3', itap, gr_phy_write(pftsol3))
+       CALL histwrite(physid, 'ftsol4', itap, gr_phy_write(pftsol4))
+       CALL histwrite(physid, 'psrf1', itap, gr_phy_write(ppsrf1))
+       CALL histwrite(physid, 'psrf2', itap, gr_phy_write(ppsrf2))
+       CALL histwrite(physid, 'psrf3', itap, gr_phy_write(ppsrf3))
+       CALL histwrite(physid, 'psrf4', itap, gr_phy_write(ppsrf4))
        IF (ok_sync) CALL histsync(physid)
 
        ! Test sur la valeur des coefficients de lessivage 

@@ -9,7 +9,7 @@ contains
        evap, b)
 
     use cv30_param_m, only: nl, sigd
-    use cvthermo, only: cpd, ginv, grav
+    use cv_thermo_m, only: cpd, ginv, grav
     USE dimphy, ONLY: klon, klev
 
     ! inputs:

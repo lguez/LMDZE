@@ -10,7 +10,7 @@ contains
     ! Vectorization: S. Bony
 
     use cv30_param_m, only: alpha, beta, dtcrit, minorig, nl
-    use cvthermo, only: rrd
+    use cv_thermo_m, only: rrd
 
     ! input:
     integer, intent(in):: ncum, nd, nloc

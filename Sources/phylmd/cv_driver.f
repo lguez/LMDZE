@@ -26,6 +26,7 @@ contains
     use cv30_undilute2_m, only: cv30_undilute2
     use cv30_unsat_m, only: cv30_unsat
     use cv30_yield_m, only: cv30_yield
+    use cv_thermo_m, only: cv_thermo
     USE dimphy, ONLY: klev, klon
 
     real, intent(in):: t1(klon, klev) ! temperature (K)
@@ -167,7 +168,6 @@ contains
     ! SET CONSTANTS AND PARAMETERS
 
     ! set thermodynamical constants:
-    ! (common cvthermo)
     CALL cv_thermo
 
     ! set convect parameters

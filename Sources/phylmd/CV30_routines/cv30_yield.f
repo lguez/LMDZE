@@ -11,7 +11,7 @@ contains
 
     use conema3_m, only: iflag_clw
     use cv30_param_m, only: delta, minorig, nl, sigd
-    use cvthermo, only: cl, cpd, cpv, grav, rowl, rrd, rrv
+    use cv_thermo_m, only: cl, cpd, cpv, grav, rowl, rrd, rrv
     USE dimphy, ONLY: klev, klon
 
     ! inputs:

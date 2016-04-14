@@ -82,7 +82,7 @@ contains
     REAL, intent(in):: play(:, :) ! (klon, llm)
     ! pression pour le mileu de chaque couche (en Pa)
 
-    REAL, intent(in):: pphi(:, :) ! (klon, llm) 
+    REAL, intent(in):: pphi(:, :) ! (klon, llm)
     ! géopotentiel de chaque couche (référence sol)
 
     REAL, intent(in):: pphis(:) ! (klon) géopotentiel du sol
@@ -108,7 +108,7 @@ contains
 
     LOGICAL:: firstcal = .true.
 
-    LOGICAL, PARAMETER:: check = .FALSE. 
+    LOGICAL, PARAMETER:: check = .FALSE.
     ! Verifier la conservation du modele en eau
 
     LOGICAL, PARAMETER:: ok_stratus = .FALSE.
@@ -143,7 +143,7 @@ contains
 
     REAL lwdn0(klon, llm + 1), lwdn(klon, llm + 1)
     REAL lwup0(klon, llm + 1), lwup(klon, llm + 1)
-    SAVE lwdn0, lwdn, lwup0, lwup 
+    SAVE lwdn0, lwdn, lwup0, lwup
 
     ! prw: precipitable water
     real prw(klon)
@@ -211,7 +211,7 @@ contains
     REAL yu1(klon) ! vents dans la premiere couche U
     REAL yv1(klon) ! vents dans la premiere couche V
     REAL ffonte(klon, nbsrf) !Flux thermique utilise pour fondre la neige
-    REAL fqcalving(klon, nbsrf) !Flux d'eau "perdue" par la surface 
+    REAL fqcalving(klon, nbsrf) !Flux d'eau "perdue" par la surface
     ! !et necessaire pour limiter la
     ! !hauteur de neige, en kg/m2/s
     REAL zxffonte(klon), zxfqcalving(klon)
@@ -238,7 +238,7 @@ contains
     REAL dlw(klon) ! derivee infra rouge
     SAVE dlw
     REAL bils(klon) ! bilan de chaleur au sol
-    REAL, save:: fder(klon) ! Derive de flux (sensible et latente) 
+    REAL, save:: fder(klon) ! Derive de flux (sensible et latente)
     REAL ve(klon) ! integr. verticale du transport meri. de l'energie
     REAL vq(klon) ! integr. verticale du transport meri. de l'eau
     REAL ue(klon) ! integr. verticale du transport zonal de l'energie
@@ -319,7 +319,7 @@ contains
     REAL, SAVE:: pblt(klon, nbsrf) ! T a la Hauteur de couche limite
     REAL, SAVE:: therm(klon, nbsrf)
     REAL, SAVE:: trmb1(klon, nbsrf) ! deep_cape
-    REAL, SAVE:: trmb2(klon, nbsrf) ! inhibition 
+    REAL, SAVE:: trmb2(klon, nbsrf) ! inhibition
     REAL, SAVE:: trmb3(klon, nbsrf) ! Point Omega
     ! Grandeurs de sorties
     REAL s_pblh(klon), s_lcl(klon), s_capCL(klon)
@@ -401,8 +401,6 @@ contains
     REAL zustrph(klon), zvstrph(klon)
     REAL aam, torsfc
 
-    REAL zx_tmp_fi2d(klon) ! variable temporaire grille physique
-
     INTEGER, SAVE:: nid_ins
 
     REAL ve_lay(klon, llm) ! transport meri. de l'energie a chaque niveau vert.
@@ -419,7 +417,7 @@ contains
     REAL zero_v(klon)
     CHARACTER(LEN = 20) tit
     INTEGER:: ip_ebil = 0 ! print level for energy conservation diagnostics
-    INTEGER:: if_ebil = 0 ! verbosity for diagnostics of energy conservation 
+    INTEGER:: if_ebil = 0 ! verbosity for diagnostics of energy conservation
 
     REAL d_t_ec(klon, llm) ! tendance due \`a la conversion Ec -> E thermique
     REAL ZRCPD
@@ -473,7 +471,7 @@ contains
     SAVE d_u_con
     SAVE d_v_con
 
-    real zmasse(klon, llm) 
+    real zmasse(klon, llm)
     ! (column-density of mass of air in a cell, in kg m-2)
 
     integer, save:: ncid_startphy, itau_phy
@@ -521,7 +519,7 @@ contains
        pblt =0. ! T a la Hauteur de couche limite
        therm =0.
        trmb1 =0. ! deep_cape
-       trmb2 =0. ! inhibition 
+       trmb2 =0. ! inhibition
        trmb3 =0. ! Point Omega
 
        IF (if_ebil >= 1) d_h_vcol_phy = 0.
@@ -595,15 +593,15 @@ contains
 
     ztsol = sum(ftsol * pctsrf, dim = 2)
 
-    IF (if_ebil >= 1) THEN 
+    IF (if_ebil >= 1) THEN
        tit = 'after dynamics'
        CALL diagetpq(airephy, tit, ip_ebil, 1, 1, dtphys, t_seri, q_seri, &
             ql_seri, u_seri, v_seri, paprs, d_h_vcol, d_qt, d_ec)
        ! Comme les tendances de la physique sont ajout\'es dans la
-       !  dynamique, la variation d'enthalpie par la dynamique devrait
-       !  \^etre \'egale \`a la variation de la physique au pas de temps
-       !  pr\'ec\'edent.  Donc la somme de ces 2 variations devrait \^etre
-       !  nulle.
+       ! dynamique, la variation d'enthalpie par la dynamique devrait
+       ! \^etre \'egale \`a la variation de la physique au pas de temps
+       ! pr\'ec\'edent. Donc la somme de ces 2 variations devrait \^etre
+       ! nulle.
        call diagphy(airephy, tit, ip_ebil, zero_v, zero_v, zero_v, zero_v, &
             zero_v, zero_v, zero_v, zero_v, ztsol, d_h_vcol + d_h_vcol_phy, &
             d_qt, 0.)
@@ -658,7 +656,7 @@ contains
     ENDDO
     ql_seri = 0.
 
-    IF (if_ebil >= 2) THEN 
+    IF (if_ebil >= 2) THEN
        tit = 'after reevap'
        CALL diagetpq(airephy, tit, ip_ebil, 2, 1, dtphys, t_seri, q_seri, &
             ql_seri, u_seri, v_seri, paprs, d_h_vcol, d_qt, d_ec)
@@ -736,7 +734,7 @@ contains
        ENDDO
     ENDDO
 
-    IF (if_ebil >= 2) THEN 
+    IF (if_ebil >= 2) THEN
        tit = 'after clmain'
        CALL diagetpq(airephy, tit, ip_ebil, 2, 2, dtphys, t_seri, q_seri, &
             ql_seri, u_seri, v_seri, paprs, d_h_vcol, d_qt, d_ec)
@@ -757,8 +755,8 @@ contains
        zxffonte(i) = 0.
        zxfqcalving(i) = 0.
 
-       s_pblh(i) = 0. 
-       s_lcl(i) = 0. 
+       s_pblh(i) = 0.
+       s_lcl(i) = 0.
        s_capCL(i) = 0.
        s_oliqCL(i) = 0.
        s_cteiCL(i) = 0.
@@ -769,7 +767,7 @@ contains
        s_trmb3(i) = 0.
 
        IF (abs(pctsrf(i, is_ter) + pctsrf(i, is_lic) + pctsrf(i, is_oce) &
-            + pctsrf(i, is_sic) - 1.)  >  EPSFRA) print *, &
+            + pctsrf(i, is_sic) - 1.) > EPSFRA) print *, &
             'physiq : probl\`eme sous surface au point ', i, &
             pctsrf(i, 1 : nbsrf)
     ENDDO
@@ -827,12 +825,12 @@ contains
     ! Calculer la dérive du flux infrarouge
 
     DO i = 1, klon
-       dlw(i) = - 4. * RSIGMA * zxtsol(i)**3 
+       dlw(i) = - 4. * RSIGMA * zxtsol(i)**3
     ENDDO
 
     IF (check) print *, "avantcon = ", qcheck(paprs, q_seri, ql_seri)
 
-    ! Appeler la convection (au choix)
+    ! Appeler la convection
 
     if (conv_emanuel) then
        da = 0.
@@ -858,7 +856,7 @@ contains
        call clouds_gno(klon, llm, q_seri, zqsat, clwcon0, ptconv, ratqsc, &
             rnebcon0)
 
-       forall (i = 1:klon) ema_pct(i) = paprs(i,itop_con(i) + 1)
+       forall (i = 1:klon) ema_pct(i) = paprs(i, itop_con(i) + 1)
        mfd = 0.
        pen_u = 0.
        pen_d = 0.
@@ -888,7 +886,7 @@ contains
        ENDDO
     ENDDO
 
-    IF (if_ebil >= 2) THEN 
+    IF (if_ebil >= 2) THEN
        tit = 'after convect'
        CALL diagetpq(airephy, tit, ip_ebil, 2, 2, dtphys, t_seri, q_seri, &
             ql_seri, u_seri, v_seri, paprs, d_h_vcol, d_qt, d_ec)
@@ -942,7 +940,7 @@ contains
             q_seri, d_u_ajs, d_v_ajs, d_t_ajs, d_q_ajs, fm_therm, entr_therm)
     endif
 
-    IF (if_ebil >= 2) THEN 
+    IF (if_ebil >= 2) THEN
        tit = 'after dry_adjust'
        CALL diagetpq(airephy, tit, ip_ebil, 2, 2, dtphys, t_seri, q_seri, &
             ql_seri, u_seri, v_seri, paprs, d_h_vcol, d_qt, d_ec)
@@ -969,7 +967,7 @@ contains
     do k = 1, llm
        do i = 1, klon
           ratqss(i, k) = ratqsbas + (ratqshaut - ratqsbas) &
-               * min((paprs(i, 1) - play(i, k)) / (paprs(i, 1) - 3e4), 1.) 
+               * min((paprs(i, 1) - play(i, k)) / (paprs(i, 1) - 3e4), 1.)
        enddo
     enddo
 
@@ -1016,7 +1014,7 @@ contains
        print *, "Precip = ", zx_t
     ENDIF
 
-    IF (if_ebil >= 2) THEN 
+    IF (if_ebil >= 2) THEN
        tit = 'after fisrt'
        CALL diagetpq(airephy, tit, ip_ebil, 2, 2, dtphys, t_seri, q_seri, &
             ql_seri, u_seri, v_seri, paprs, d_h_vcol, d_qt, d_ec)
@@ -1170,7 +1168,7 @@ contains
        ENDDO
     ENDDO
 
-    IF (if_ebil >= 2) THEN 
+    IF (if_ebil >= 2) THEN
        tit = 'after rad'
        CALL diagetpq(airephy, tit, ip_ebil, 2, 2, dtphys, t_seri, q_seri, &
             ql_seri, u_seri, v_seri, paprs, d_h_vcol, d_qt, d_ec)
@@ -1276,9 +1274,9 @@ contains
          yu1, yv1, ftsol, pctsrf, frac_impa, frac_nucl, da, phi, mp, upwd, &
          dnwd, tr_seri, zmasse, ncid_startphy, nid_ins, itau_phy)
 
-    IF (offline) call phystokenc(dtphys, rlon, rlat, t, mfu, mfd, pen_u, &
-         pde_u, pen_d, pde_d, fm_therm, entr_therm, ycoefh, yu1, yv1, ftsol, &
-         pctsrf, frac_impa, frac_nucl, pphis, airephy, dtphys, itap)
+    IF (offline) call phystokenc(dtphys, t, mfu, mfd, pen_u, pde_u, pen_d, &
+         pde_d, fm_therm, entr_therm, ycoefh, yu1, yv1, ftsol, pctsrf, &
+         frac_impa, frac_nucl, pphis, airephy, dtphys, itap)
 
     ! Calculer le transport de l'eau et de l'energie (diagnostique)
     CALL transp(paprs, t_seri, q_seri, u_seri, v_seri, zphi, ve, vq, ue, uq)
@@ -1301,11 +1299,11 @@ contains
        END DO
     END DO
 
-    IF (if_ebil >= 1) THEN 
+    IF (if_ebil >= 1) THEN
        tit = 'after physic'
        CALL diagetpq(airephy, tit, ip_ebil, 1, 1, dtphys, t_seri, q_seri, &
             ql_seri, u_seri, v_seri, paprs, d_h_vcol, d_qt, d_ec)
-       ! Comme les tendances de la physique sont ajoute dans la dynamique, 
+       ! Comme les tendances de la physique sont ajoute dans la dynamique,
        ! on devrait avoir que la variation d'entalpie par la dynamique
        ! est egale a la variation de la physique au pas de temps precedent.
        ! Donc la somme de ces 2 variations devrait etre nulle.
@@ -1373,230 +1371,93 @@ contains
 
       ! Ecriture des sorties
 
-      use dimens_m, only: iim, jjm
       use gr_phy_write_m, only: gr_phy_write
       USE histsync_m, ONLY: histsync
       USE histwrite_m, ONLY: histwrite
 
-      integer i, itau_w ! pas de temps ecriture
-      REAL zx_tmp_2d(iim, jjm + 1), zx_tmp_3d(iim, jjm + 1, llm)
+      integer itau_w ! pas de temps d'\'ecriture
 
       !--------------------------------------------------
 
       IF (ok_instan) THEN
-         ! Champs 2D:
-
          itau_w = itau_phy + itap
-
-         zx_tmp_2d = gr_phy_write(pphis)
-         CALL histwrite(nid_ins, "phis", itau_w, zx_tmp_2d)
-
-         zx_tmp_2d = gr_phy_write(airephy)
-         CALL histwrite(nid_ins, "aire", itau_w, zx_tmp_2d)
-
-         DO i = 1, klon
-            zx_tmp_fi2d(i) = paprs(i, 1)
-         ENDDO
-         zx_tmp_2d = gr_phy_write(zx_tmp_fi2d)
-         CALL histwrite(nid_ins, "psol", itau_w, zx_tmp_2d)
-
-         DO i = 1, klon
-            zx_tmp_fi2d(i) = rain_fall(i) + snow_fall(i)
-         ENDDO
-         zx_tmp_2d = gr_phy_write(zx_tmp_fi2d)
-         CALL histwrite(nid_ins, "precip", itau_w, zx_tmp_2d)
-
-         DO i = 1, klon
-            zx_tmp_fi2d(i) = rain_lsc(i) + snow_lsc(i)
-         ENDDO
-         zx_tmp_2d = gr_phy_write(zx_tmp_fi2d)
-         CALL histwrite(nid_ins, "plul", itau_w, zx_tmp_2d)
-
-         DO i = 1, klon
-            zx_tmp_fi2d(i) = rain_con(i) + snow_con(i)
-         ENDDO
-         zx_tmp_2d = gr_phy_write(zx_tmp_fi2d)
-         CALL histwrite(nid_ins, "pluc", itau_w, zx_tmp_2d)
-
-         zx_tmp_2d = gr_phy_write(zxtsol)
-         CALL histwrite(nid_ins, "tsol", itau_w, zx_tmp_2d)
-         !ccIM
-         zx_tmp_2d = gr_phy_write(zt2m)
-         CALL histwrite(nid_ins, "t2m", itau_w, zx_tmp_2d)
-
-         zx_tmp_2d = gr_phy_write(zq2m)
-         CALL histwrite(nid_ins, "q2m", itau_w, zx_tmp_2d)
-
-         zx_tmp_2d = gr_phy_write(zu10m)
-         CALL histwrite(nid_ins, "u10m", itau_w, zx_tmp_2d)
-
-         zx_tmp_2d = gr_phy_write(zv10m)
-         CALL histwrite(nid_ins, "v10m", itau_w, zx_tmp_2d)
-
-         zx_tmp_2d = gr_phy_write(snow_fall)
-         CALL histwrite(nid_ins, "snow", itau_w, zx_tmp_2d)
-
-         zx_tmp_2d = gr_phy_write(cdragm)
-         CALL histwrite(nid_ins, "cdrm", itau_w, zx_tmp_2d)
-
-         zx_tmp_2d = gr_phy_write(cdragh)
-         CALL histwrite(nid_ins, "cdrh", itau_w, zx_tmp_2d)
-
-         zx_tmp_2d = gr_phy_write(toplw)
-         CALL histwrite(nid_ins, "topl", itau_w, zx_tmp_2d)
-
-         zx_tmp_2d = gr_phy_write(evap)
-         CALL histwrite(nid_ins, "evap", itau_w, zx_tmp_2d)
-
-         zx_tmp_2d = gr_phy_write(solsw)
-         CALL histwrite(nid_ins, "sols", itau_w, zx_tmp_2d)
-
-         zx_tmp_2d = gr_phy_write(sollw)
-         CALL histwrite(nid_ins, "soll", itau_w, zx_tmp_2d)
-
-         zx_tmp_2d = gr_phy_write(sollwdown)
-         CALL histwrite(nid_ins, "solldown", itau_w, zx_tmp_2d)
-
-         zx_tmp_2d = gr_phy_write(bils)
-         CALL histwrite(nid_ins, "bils", itau_w, zx_tmp_2d)
-
-         zx_tmp_fi2d(1:klon) = - sens(1:klon)
-         ! zx_tmp_2d = gr_phy_write(sens)
-         zx_tmp_2d = gr_phy_write(zx_tmp_fi2d)
-         CALL histwrite(nid_ins, "sens", itau_w, zx_tmp_2d)
-
-         zx_tmp_2d = gr_phy_write(fder)
-         CALL histwrite(nid_ins, "fder", itau_w, zx_tmp_2d)
-
-         zx_tmp_2d = gr_phy_write(d_ts(:, is_oce))
-         CALL histwrite(nid_ins, "dtsvdfo", itau_w, zx_tmp_2d)
-
-         zx_tmp_2d = gr_phy_write(d_ts(:, is_ter))
-         CALL histwrite(nid_ins, "dtsvdft", itau_w, zx_tmp_2d)
-
-         zx_tmp_2d = gr_phy_write(d_ts(:, is_lic))
-         CALL histwrite(nid_ins, "dtsvdfg", itau_w, zx_tmp_2d)
-
-         zx_tmp_2d = gr_phy_write(d_ts(:, is_sic))
-         CALL histwrite(nid_ins, "dtsvdfi", itau_w, zx_tmp_2d)
+         CALL histwrite(nid_ins, "phis", itau_w, gr_phy_write(pphis))
+         CALL histwrite(nid_ins, "aire", itau_w, gr_phy_write(airephy))
+         CALL histwrite(nid_ins, "psol", itau_w, gr_phy_write(paprs(:, 1)))
+         CALL histwrite(nid_ins, "precip", itau_w, &
+              gr_phy_write(rain_fall + snow_fall))
+         CALL histwrite(nid_ins, "plul", itau_w, &
+              gr_phy_write(rain_lsc + snow_lsc))
+         CALL histwrite(nid_ins, "pluc", itau_w, &
+              gr_phy_write(rain_con + snow_con))
+         CALL histwrite(nid_ins, "tsol", itau_w, gr_phy_write(zxtsol))
+         CALL histwrite(nid_ins, "t2m", itau_w, gr_phy_write(zt2m))
+         CALL histwrite(nid_ins, "q2m", itau_w, gr_phy_write(zq2m))
+         CALL histwrite(nid_ins, "u10m", itau_w, gr_phy_write(zu10m))
+         CALL histwrite(nid_ins, "v10m", itau_w, gr_phy_write(zv10m))
+         CALL histwrite(nid_ins, "snow", itau_w, gr_phy_write(snow_fall))
+         CALL histwrite(nid_ins, "cdrm", itau_w, gr_phy_write(cdragm))
+         CALL histwrite(nid_ins, "cdrh", itau_w, gr_phy_write(cdragh))
+         CALL histwrite(nid_ins, "topl", itau_w, gr_phy_write(toplw))
+         CALL histwrite(nid_ins, "evap", itau_w, gr_phy_write(evap))
+         CALL histwrite(nid_ins, "sols", itau_w, gr_phy_write(solsw))
+         CALL histwrite(nid_ins, "soll", itau_w, gr_phy_write(sollw))
+         CALL histwrite(nid_ins, "solldown", itau_w, gr_phy_write(sollwdown))
+         CALL histwrite(nid_ins, "bils", itau_w, gr_phy_write(bils))
+         CALL histwrite(nid_ins, "sens", itau_w, gr_phy_write(- sens))
+         CALL histwrite(nid_ins, "fder", itau_w, gr_phy_write(fder))
+         CALL histwrite(nid_ins, "dtsvdfo", itau_w, &
+              gr_phy_write(d_ts(:, is_oce)))
+         CALL histwrite(nid_ins, "dtsvdft", itau_w, &
+              gr_phy_write(d_ts(:, is_ter)))
+         CALL histwrite(nid_ins, "dtsvdfg", itau_w, &
+              gr_phy_write(d_ts(:, is_lic)))
+         CALL histwrite(nid_ins, "dtsvdfi", itau_w, &
+              gr_phy_write(d_ts(:, is_sic)))
 
          DO nsrf = 1, nbsrf
-            !XXX
-            zx_tmp_fi2d(1 : klon) = pctsrf(1 : klon, nsrf)*100.
-            zx_tmp_2d = gr_phy_write(zx_tmp_fi2d)
             CALL histwrite(nid_ins, "pourc_"//clnsurf(nsrf), itau_w, &
-                 zx_tmp_2d) 
-
-            zx_tmp_fi2d(1 : klon) = pctsrf(1 : klon, nsrf)
-            zx_tmp_2d = gr_phy_write(zx_tmp_fi2d)
+                 gr_phy_write(pctsrf(:, nsrf)*100.))
             CALL histwrite(nid_ins, "fract_"//clnsurf(nsrf), itau_w, &
-                 zx_tmp_2d) 
-
-            zx_tmp_fi2d(1 : klon) = fluxt(1 : klon, 1, nsrf)
-            zx_tmp_2d = gr_phy_write(zx_tmp_fi2d)
+                 gr_phy_write(pctsrf(:, nsrf)))
             CALL histwrite(nid_ins, "sens_"//clnsurf(nsrf), itau_w, &
-                 zx_tmp_2d) 
-
-            zx_tmp_fi2d(1 : klon) = fluxlat(1 : klon, nsrf)
-            zx_tmp_2d = gr_phy_write(zx_tmp_fi2d)
+                 gr_phy_write(fluxt(:, 1, nsrf)))
             CALL histwrite(nid_ins, "lat_"//clnsurf(nsrf), itau_w, &
-                 zx_tmp_2d) 
-
-            zx_tmp_fi2d(1 : klon) = ftsol(1 : klon, nsrf)
-            zx_tmp_2d = gr_phy_write(zx_tmp_fi2d)
+                 gr_phy_write(fluxlat(:, nsrf)))
             CALL histwrite(nid_ins, "tsol_"//clnsurf(nsrf), itau_w, &
-                 zx_tmp_2d) 
-
-            zx_tmp_fi2d(1 : klon) = fluxu(1 : klon, 1, nsrf)
-            zx_tmp_2d = gr_phy_write(zx_tmp_fi2d)
+                 gr_phy_write(ftsol(:, nsrf)))
             CALL histwrite(nid_ins, "taux_"//clnsurf(nsrf), itau_w, &
-                 zx_tmp_2d) 
-
-            zx_tmp_fi2d(1 : klon) = fluxv(1 : klon, 1, nsrf)
-            zx_tmp_2d = gr_phy_write(zx_tmp_fi2d)
+                 gr_phy_write(fluxu(:, 1, nsrf)))
             CALL histwrite(nid_ins, "tauy_"//clnsurf(nsrf), itau_w, &
-                 zx_tmp_2d)
-
-            zx_tmp_fi2d(1 : klon) = frugs(1 : klon, nsrf)
-            zx_tmp_2d = gr_phy_write(zx_tmp_fi2d)
+                 gr_phy_write(fluxv(:, 1, nsrf)))
             CALL histwrite(nid_ins, "rugs_"//clnsurf(nsrf), itau_w, &
-                 zx_tmp_2d) 
-
-            zx_tmp_fi2d(1 : klon) = falbe(:, nsrf)
-            zx_tmp_2d = gr_phy_write(zx_tmp_fi2d)
+                 gr_phy_write(frugs(:, nsrf)))
             CALL histwrite(nid_ins, "albe_"//clnsurf(nsrf), itau_w, &
-                 zx_tmp_2d) 
-
+                 gr_phy_write(falbe(:, nsrf)))
          END DO
-         zx_tmp_2d = gr_phy_write(albsol)
-         CALL histwrite(nid_ins, "albs", itau_w, zx_tmp_2d)
 
-         zx_tmp_2d = gr_phy_write(zxrugs)
-         CALL histwrite(nid_ins, "rugs", itau_w, zx_tmp_2d)
-
-         !HBTM2
-
-         zx_tmp_2d = gr_phy_write(s_pblh)
-         CALL histwrite(nid_ins, "s_pblh", itau_w, zx_tmp_2d)
-
-         zx_tmp_2d = gr_phy_write(s_pblt)
-         CALL histwrite(nid_ins, "s_pblt", itau_w, zx_tmp_2d)
-
-         zx_tmp_2d = gr_phy_write(s_lcl)
-         CALL histwrite(nid_ins, "s_lcl", itau_w, zx_tmp_2d)
-
-         zx_tmp_2d = gr_phy_write(s_capCL)
-         CALL histwrite(nid_ins, "s_capCL", itau_w, zx_tmp_2d)
-
-         zx_tmp_2d = gr_phy_write(s_oliqCL)
-         CALL histwrite(nid_ins, "s_oliqCL", itau_w, zx_tmp_2d)
-
-         zx_tmp_2d = gr_phy_write(s_cteiCL)
-         CALL histwrite(nid_ins, "s_cteiCL", itau_w, zx_tmp_2d)
-
-         zx_tmp_2d = gr_phy_write(s_therm)
-         CALL histwrite(nid_ins, "s_therm", itau_w, zx_tmp_2d)
-
-         zx_tmp_2d = gr_phy_write(s_trmb1)
-         CALL histwrite(nid_ins, "s_trmb1", itau_w, zx_tmp_2d)
-
-         zx_tmp_2d = gr_phy_write(s_trmb2)
-         CALL histwrite(nid_ins, "s_trmb2", itau_w, zx_tmp_2d)
-
-         zx_tmp_2d = gr_phy_write(s_trmb3)
-         CALL histwrite(nid_ins, "s_trmb3", itau_w, zx_tmp_2d)
-
-         if (conv_emanuel) then
-            zx_tmp_2d = gr_phy_write(ema_pct)
-            CALL histwrite(nid_ins, "ptop", itau_w, zx_tmp_2d)
-         end if
-
-         ! Champs 3D:
-
-         zx_tmp_3d = gr_phy_write(t_seri)
-         CALL histwrite(nid_ins, "temp", itau_w, zx_tmp_3d)
-
-         zx_tmp_3d = gr_phy_write(u_seri)
-         CALL histwrite(nid_ins, "vitu", itau_w, zx_tmp_3d)
-
-         zx_tmp_3d = gr_phy_write(v_seri)
-         CALL histwrite(nid_ins, "vitv", itau_w, zx_tmp_3d)
-
-         zx_tmp_3d = gr_phy_write(zphi)
-         CALL histwrite(nid_ins, "geop", itau_w, zx_tmp_3d)
-
-         zx_tmp_3d = gr_phy_write(play)
-         CALL histwrite(nid_ins, "pres", itau_w, zx_tmp_3d)
-
-         zx_tmp_3d = gr_phy_write(d_t_vdf)
-         CALL histwrite(nid_ins, "dtvdf", itau_w, zx_tmp_3d)
-
-         zx_tmp_3d = gr_phy_write(d_q_vdf)
-         CALL histwrite(nid_ins, "dqvdf", itau_w, zx_tmp_3d)
-
-         zx_tmp_3d = gr_phy_write(zx_rh)
-         CALL histwrite(nid_ins, "rhum", itau_w, zx_tmp_3d)
-
+         CALL histwrite(nid_ins, "albs", itau_w, gr_phy_write(albsol))
+         CALL histwrite(nid_ins, "rugs", itau_w, gr_phy_write(zxrugs))
+         CALL histwrite(nid_ins, "s_pblh", itau_w, gr_phy_write(s_pblh))
+         CALL histwrite(nid_ins, "s_pblt", itau_w, gr_phy_write(s_pblt))
+         CALL histwrite(nid_ins, "s_lcl", itau_w, gr_phy_write(s_lcl))
+         CALL histwrite(nid_ins, "s_capCL", itau_w, gr_phy_write(s_capCL))
+         CALL histwrite(nid_ins, "s_oliqCL", itau_w, gr_phy_write(s_oliqCL))
+         CALL histwrite(nid_ins, "s_cteiCL", itau_w, gr_phy_write(s_cteiCL))
+         CALL histwrite(nid_ins, "s_therm", itau_w, gr_phy_write(s_therm))
+         CALL histwrite(nid_ins, "s_trmb1", itau_w, gr_phy_write(s_trmb1))
+         CALL histwrite(nid_ins, "s_trmb2", itau_w, gr_phy_write(s_trmb2))
+         CALL histwrite(nid_ins, "s_trmb3", itau_w, gr_phy_write(s_trmb3))
+         if (conv_emanuel) CALL histwrite(nid_ins, "ptop", itau_w, &
+              gr_phy_write(ema_pct))
+         CALL histwrite(nid_ins, "temp", itau_w, gr_phy_write(t_seri))
+         CALL histwrite(nid_ins, "vitu", itau_w, gr_phy_write(u_seri))
+         CALL histwrite(nid_ins, "vitv", itau_w, gr_phy_write(v_seri))
+         CALL histwrite(nid_ins, "geop", itau_w, gr_phy_write(zphi))
+         CALL histwrite(nid_ins, "pres", itau_w, gr_phy_write(play))
+         CALL histwrite(nid_ins, "dtvdf", itau_w, gr_phy_write(d_t_vdf))
+         CALL histwrite(nid_ins, "dqvdf", itau_w, gr_phy_write(d_q_vdf))
+         CALL histwrite(nid_ins, "rhum", itau_w, gr_phy_write(zx_rh))
          call histsync(nid_ins)
       ENDIF
 
