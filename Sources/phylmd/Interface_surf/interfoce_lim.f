@@ -4,8 +4,7 @@ module interfoce_lim_m
 
 contains
 
-  SUBROUTINE interfoce_lim(itime, dtime, jour, knindex, debut, lmt_sst, &
-       pctsrf_new)
+  SUBROUTINE interfoce_lim(dtime, jour, knindex, debut, lmt_sst, pctsrf_new)
 
     ! lecture conditions limites
     ! Cette routine sert d'interface entre le modèle atmosphérique et
@@ -18,8 +17,8 @@ contains
     USE netcdf, ONLY: nf90_nowrite
     use netcdf95, only: NF95_CLOSE, nf95_get_var, NF95_INQ_VARID, nf95_open
     use nr_util, only: assert
+    use time_phylmdz, only: itap
 
-    integer, intent(IN):: itime ! numero du pas de temps courant
     real, intent(IN):: dtime ! pas de temps de la physique (en s)
     integer, intent(IN):: jour ! jour a lire dans l'annee
 
@@ -65,7 +64,7 @@ contains
     if ((jour - jour_lu) /= 0) deja_lu = .false.
 
     ! Tester d'abord si c'est le moment de lire le fichier
-    if (mod(itime - 1, lmt_pas) == 0 .and. .not. deja_lu) then
+    if (mod(itap - 1, lmt_pas) == 0 .and. .not. deja_lu) then
        call NF95_OPEN ('limit.nc', NF90_NOWRITE, ncid)
 
        ! Fraction "ocean"

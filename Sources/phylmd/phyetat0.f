@@ -8,6 +8,8 @@ module phyetat0_m
   ! latitude and longitude of a point of the scalar grid identified
   ! by a simple index, in degrees
 
+  integer, save:: itau_phy
+
   private klon
 
 contains
@@ -15,14 +17,14 @@ contains
   SUBROUTINE phyetat0(pctsrf, tsol, tsoil, qsurf, qsol, snow, albe, evap, &
        rain_fall, snow_fall, solsw, sollw, fder, radsol, frugs, agesno, zmea, &
        zstd, zsig, zgam, zthe, zpic, zval, t_ancien, q_ancien, ancien_ok, &
-       rnebcon, ratqs, clwcon, run_off_lic_0, sig1, w01, ncid_startphy, &
-       itau_phy)
+       rnebcon, ratqs, clwcon, run_off_lic_0, sig1, w01, ncid_startphy)
 
     ! From phylmd/phyetat0.F, version 1.4 2005/06/03 10:03:07
     ! Author: Z.X. Li (LMD/CNRS)
     ! Date: 1993/08/18
     ! Objet : lecture de l'état initial pour la physique
 
+    USE conf_gcm_m, ONLY: raz_date
     use dimphy, only: zmasq, klev
     USE dimsoil, ONLY : nsoilmx
     USE indicesol, ONLY : epsfra, is_lic, is_oce, is_sic, is_ter, nbsrf
@@ -62,7 +64,7 @@ contains
     real, intent(out):: w01(klon, klev) 
     ! vertical velocity within adiabatic updraft
 
-    integer, intent(out):: ncid_startphy, itau_phy
+    integer, intent(out):: ncid_startphy
 
     ! Local:
     REAL fractint(klon)
@@ -76,7 +78,11 @@ contains
     ! Fichier contenant l'état initial :
     call NF95_OPEN("startphy.nc", NF90_NOWRITE, ncid_startphy)
 
-    call nf95_get_att(ncid_startphy, nf90_global, "itau_phy", itau_phy)
+    IF (raz_date) then
+       itau_phy = 0
+    else
+       call nf95_get_att(ncid_startphy, nf90_global, "itau_phy", itau_phy)
+    end IF
 
     ! Lecture des latitudes (coordonnees):
 

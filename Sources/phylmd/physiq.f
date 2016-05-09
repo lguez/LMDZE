@@ -20,7 +20,7 @@ contains
     use ajsec_m, only: ajsec
     use calltherm_m, only: calltherm
     USE clesphys, ONLY: cdhmax, cdmmax, ecrit_hf, ecrit_ins, ecrit_mth, &
-         ecrit_reg, ecrit_tra, ksta, ksta_ter, ok_kzmin
+         ecrit_reg, ecrit_tra, ksta, ksta_ter, ok_kzmin, ok_instan
     USE clesphys2, ONLY: cycle_diurne, conv_emanuel, nbapp_rad, new_oliq, &
          ok_orodr, ok_orolf
     USE clmain_m, ONLY: clmain
@@ -28,7 +28,7 @@ contains
     use comconst, only: dtphys
     USE comgeomphy, ONLY: airephy
     USE concvl_m, ONLY: concvl
-    USE conf_gcm_m, ONLY: offline, raz_date, day_step, iphysiq
+    USE conf_gcm_m, ONLY: offline, day_step, iphysiq
     USE conf_phys_m, ONLY: conf_phys
     use conflx_m, only: conflx
     USE ctherm, ONLY: iflag_thermals, nsplit_thermals
@@ -43,11 +43,14 @@ contains
     USE fcttre, ONLY: foeew, qsatl, qsats, thermcep
     use fisrtilp_m, only: fisrtilp
     USE hgardfou_m, ONLY: hgardfou
+    USE histsync_m, ONLY: histsync
+    USE histwrite_phy_m, ONLY: histwrite_phy
     USE indicesol, ONLY: clnsurf, epsfra, is_lic, is_oce, is_sic, is_ter, &
          nbsrf
-    USE ini_histins_m, ONLY: ini_histins
+    USE ini_histins_m, ONLY: ini_histins, nid_ins
     use netcdf95, only: NF95_CLOSE
     use newmicro_m, only: newmicro
+    use nr_util, only: assert
     use nuage_m, only: nuage
     USE orbite_m, ONLY: orbite
     USE ozonecm_m, ONLY: ozonecm
@@ -62,6 +65,7 @@ contains
     use readsulfate_preind_m, only: readsulfate_preind
     use yoegwd, only: sugwd
     USE suphec_m, ONLY: rcpd, retv, rg, rlvtt, romega, rsigma, rtt
+    use time_phylmdz, only: itap, increment_itap
     use transp_m, only: transp
     use transp_lay_m, only: transp_lay
     use unit_nml_m, only: unit_nml
@@ -114,13 +118,6 @@ contains
     LOGICAL, PARAMETER:: ok_stratus = .FALSE.
     ! Ajouter artificiellement les stratus
 
-    logical:: ok_journe = .false., ok_mensuel = .true., ok_instan = .false.
-    ! sorties journalieres, mensuelles et instantanees dans les
-    ! fichiers histday, histmth et histins
-
-    LOGICAL ok_region ! sortir le fichier regional
-    PARAMETER (ok_region = .FALSE.)
-
     ! pour phsystoke avec thermiques
     REAL fm_therm(klon, llm + 1)
     REAL entr_therm(klon, llm)
@@ -161,8 +158,6 @@ contains
 
     REAL radsol(klon)
     SAVE radsol ! bilan radiatif au sol calcule par code radiatif
-
-    INTEGER:: itap = 0 ! number of calls to "physiq"
 
     REAL, save:: ftsol(klon, nbsrf) ! skin temperature of surface fraction
 
@@ -210,10 +205,12 @@ contains
     REAL ycoefh(klon, llm) ! coef d'echange pour phytrac
     REAL yu1(klon) ! vents dans la premiere couche U
     REAL yv1(klon) ! vents dans la premiere couche V
-    REAL ffonte(klon, nbsrf) !Flux thermique utilise pour fondre la neige
-    REAL fqcalving(klon, nbsrf) !Flux d'eau "perdue" par la surface
-    ! !et necessaire pour limiter la
-    ! !hauteur de neige, en kg/m2/s
+    REAL ffonte(klon, nbsrf) ! flux thermique utilise pour fondre la neige
+
+    REAL fqcalving(klon, nbsrf)
+    ! flux d'eau "perdue" par la surface et necessaire pour limiter la
+    ! hauteur de neige, en kg/m2/s
+
     REAL zxffonte(klon), zxfqcalving(klon)
 
     REAL pfrac_impa(klon, llm)! Produits des coefs lessivage impaction
@@ -288,14 +285,14 @@ contains
     real, save:: sollwdown(klon) ! downward LW flux at surface
     REAL, save:: topsw0(klon), toplw0(klon), solsw0(klon), sollw0(klon)
     REAL, save:: albpla(klon)
-    REAL fsollw(klon, nbsrf) ! bilan flux IR pour chaque sous surface
-    REAL fsolsw(klon, nbsrf) ! flux solaire absorb. pour chaque sous surface
+    REAL fsollw(klon, nbsrf) ! bilan flux IR pour chaque sous-surface
+    REAL fsolsw(klon, nbsrf) ! flux solaire absorb\'e pour chaque sous-surface
 
     REAL conv_q(klon, llm) ! convergence de l'humidite (kg/kg/s)
     REAL conv_t(klon, llm) ! convergence of temperature (K/s)
 
-    REAL cldl(klon), cldm(klon), cldh(klon) !nuages bas, moyen et haut
-    REAL cldt(klon), cldq(klon) !nuage total, eau liquide integree
+    REAL cldl(klon), cldm(klon), cldh(klon) ! nuages bas, moyen et haut
+    REAL cldt(klon), cldq(klon) ! nuage total, eau liquide integree
 
     REAL zxtsol(klon), zxqsurf(klon), zxsnow(klon), zxfluxlat(klon)
 
@@ -401,8 +398,6 @@ contains
     REAL zustrph(klon), zvstrph(klon)
     REAL aam, torsfc
 
-    INTEGER, SAVE:: nid_ins
-
     REAL ve_lay(klon, llm) ! transport meri. de l'energie a chaque niveau vert.
     REAL vq_lay(klon, llm) ! transport meri. de l'eau a chaque niveau vert.
     REAL ue_lay(klon, llm) ! transport zonal de l'energie a chaque niveau vert.
@@ -435,7 +430,7 @@ contains
     ! SO4 aerosol concentration, in \mu g/m3, pre-industrial value
 
     REAL cldtaupi(klon, llm)
-    ! cloud optical thickness for pre-industrial (pi) aerosols
+    ! cloud optical thickness for pre-industrial aerosols
 
     REAL re(klon, llm) ! Cloud droplet effective radius
     REAL fl(klon, llm) ! denominator of re
@@ -474,11 +469,11 @@ contains
     real zmasse(klon, llm)
     ! (column-density of mass of air in a cell, in kg m-2)
 
-    integer, save:: ncid_startphy, itau_phy
+    integer, save:: ncid_startphy
 
-    namelist /physiq_nml/ ok_journe, ok_mensuel, ok_instan, fact_cldcon, &
-         facttemps, ok_newmicro, iflag_cldcon, ratqsbas, ratqshaut, if_ebil, &
-         ok_ade, ok_aie, bl95_b0, bl95_b1, iflag_thermals, nsplit_thermals
+    namelist /physiq_nml/ fact_cldcon, facttemps, ok_newmicro, &
+         iflag_cldcon, ratqsbas, ratqshaut, if_ebil, ok_ade, ok_aie, bl95_b0, &
+         bl95_b1, iflag_thermals, nsplit_thermals
 
     !----------------------------------------------------------------
 
@@ -535,11 +530,11 @@ contains
        ! Initialiser les compteurs:
 
        frugs = 0.
-       CALL phyetat0(pctsrf, ftsol, ftsoil, fqsurf, qsol, &
-            fsnow, falbe, fevap, rain_fall, snow_fall, solsw, sollw, dlw, &
-            radsol, frugs, agesno, zmea, zstd, zsig, zgam, zthe, zpic, zval, &
-            t_ancien, q_ancien, ancien_ok, rnebcon, ratqs, clwcon, &
-            run_off_lic_0, sig1, w01, ncid_startphy, itau_phy)
+       CALL phyetat0(pctsrf, ftsol, ftsoil, fqsurf, qsol, fsnow, falbe, &
+            fevap, rain_fall, snow_fall, solsw, sollw, dlw, radsol, frugs, &
+            agesno, zmea, zstd, zsig, zgam, zthe, zpic, zval, t_ancien, &
+            q_ancien, ancien_ok, rnebcon, ratqs, clwcon, run_off_lic_0, sig1, &
+            w01, ncid_startphy)
 
        ! ATTENTION : il faudra a terme relire q2 dans l'etat initial
        q2 = 1e-8
@@ -548,11 +543,7 @@ contains
        print *, 'Number of time steps of "physics" per day: ', lmt_pas
 
        radpas = lmt_pas / nbapp_rad
-
-       ! On remet le calendrier a zero
-       IF (raz_date) itau_phy = 0
-
-       CALL printflag(radpas, ok_journe, ok_instan, ok_region)
+       print *, "radpas = ", radpas
 
        ! Initialisation pour le sch\'ema de convection d'Emanuel :
        IF (conv_emanuel) THEN
@@ -575,11 +566,11 @@ contains
 
        ! Initialisation des sorties
 
-       call ini_histins(dtphys, ok_instan, nid_ins, itau_phy)
+       call ini_histins(dtphys)
        CALL ymds2ju(annee_ref, 1, day_ref, 0., date0)
        ! Positionner date0 pour initialisation de ORCHIDEE
        print *, 'physiq date0: ', date0
-       CALL phyredem0(lmt_pas, itau_phy)
+       CALL phyredem0(lmt_pas)
     ENDIF test_firstcal
 
     ! We will modify variables *_seri and we will not touch variables
@@ -635,8 +626,7 @@ contains
     ! Check temperatures:
     CALL hgardfou(t_seri, ftsol)
 
-    ! Incrémenter le compteur de la physique
-    itap = itap + 1
+    call increment_itap
     julien = MOD(dayvrai, 360)
     if (julien == 0) julien = 360
 
@@ -667,7 +657,7 @@ contains
     frugs = MAX(frugs, 0.000015)
     zxrugs = sum(frugs * pctsrf, dim = 2)
 
-    ! Calculs nécessaires au calcul de l'albedo dans l'interface avec
+    ! Calculs n\'ecessaires au calcul de l'albedo dans l'interface avec
     ! la surface.
 
     CALL orbite(REAL(julien), longi, dist)
@@ -693,15 +683,14 @@ contains
 
     ! Couche limite:
 
-    CALL clmain(dtphys, itap, pctsrf, pctsrf_new, t_seri, q_seri, u_seri, &
-         v_seri, julien, mu0, ftsol, cdmmax, cdhmax, ksta, ksta_ter, &
-         ok_kzmin, ftsoil, qsol, paprs, play, fsnow, fqsurf, fevap, falbe, &
-         fluxlat, rain_fall, snow_fall, fsolsw, fsollw, fder, rlat, frugs, &
-         firstcal, agesno, rugoro, d_t_vdf, d_q_vdf, d_u_vdf, d_v_vdf, d_ts, &
-         fluxt, fluxq, fluxu, fluxv, cdragh, cdragm, q2, dsens, devap, &
-         ycoefh, yu1, yv1, t2m, q2m, u10m, v10m, pblh, capCL, oliqCL, cteiCL, &
-         pblT, therm, trmb1, trmb2, trmb3, plcl, fqcalving, ffonte, &
-         run_off_lic_0)
+    CALL clmain(dtphys, pctsrf, pctsrf_new, t_seri, q_seri, u_seri, v_seri, &
+         julien, mu0, ftsol, cdmmax, cdhmax, ksta, ksta_ter, ok_kzmin, &
+         ftsoil, qsol, paprs, play, fsnow, fqsurf, fevap, falbe, fluxlat, &
+         rain_fall, snow_fall, fsolsw, fsollw, fder, rlat, frugs, firstcal, &
+         agesno, rugoro, d_t_vdf, d_q_vdf, d_u_vdf, d_v_vdf, d_ts, fluxt, &
+         fluxq, fluxu, fluxv, cdragh, cdragm, q2, dsens, devap, ycoefh, yu1, &
+         yv1, t2m, q2m, u10m, v10m, pblh, capCL, oliqCL, cteiCL, pblT, therm, &
+         trmb1, trmb2, trmb3, plcl, fqcalving, ffonte, run_off_lic_0)
 
     ! Incr\'ementation des flux
 
@@ -765,12 +754,10 @@ contains
        s_trmb1(i) = 0.
        s_trmb2(i) = 0.
        s_trmb3(i) = 0.
-
-       IF (abs(pctsrf(i, is_ter) + pctsrf(i, is_lic) + pctsrf(i, is_oce) &
-            + pctsrf(i, is_sic) - 1.) > EPSFRA) print *, &
-            'physiq : probl\`eme sous surface au point ', i, &
-            pctsrf(i, 1 : nbsrf)
     ENDDO
+
+    call assert(abs(sum(pctsrf, dim = 2) - 1.) <= EPSFRA, 'physiq: pctsrf')
+
     DO nsrf = 1, nbsrf
        DO i = 1, klon
           ftsol(i, nsrf) = ftsol(i, nsrf) + d_ts(i, nsrf)
@@ -1269,14 +1256,14 @@ contains
          d_qt, d_ec)
 
     ! Calcul des tendances traceurs
-    call phytrac(itap, lmt_pas, julien, time, firstcal, lafin, dtphys, t, &
-         paprs, play, mfu, mfd, pde_u, pen_d, ycoefh, fm_therm, entr_therm, &
-         yu1, yv1, ftsol, pctsrf, frac_impa, frac_nucl, da, phi, mp, upwd, &
-         dnwd, tr_seri, zmasse, ncid_startphy, nid_ins, itau_phy)
+    call phytrac(lmt_pas, julien, time, firstcal, lafin, dtphys, t, paprs, &
+         play, mfu, mfd, pde_u, pen_d, ycoefh, fm_therm, entr_therm, yu1, &
+         yv1, ftsol, pctsrf, frac_impa, frac_nucl, da, phi, mp, upwd, dnwd, &
+         tr_seri, zmasse, ncid_startphy)
 
     IF (offline) call phystokenc(dtphys, t, mfu, mfd, pen_u, pde_u, pen_d, &
          pde_d, fm_therm, entr_therm, ycoefh, yu1, yv1, ftsol, pctsrf, &
-         frac_impa, frac_nucl, pphis, airephy, dtphys, itap)
+         frac_impa, frac_nucl, pphis, airephy, dtphys)
 
     ! Calculer le transport de l'eau et de l'energie (diagnostique)
     CALL transp(paprs, t_seri, q_seri, u_seri, v_seri, zphi, ve, vq, ue, uq)
@@ -1350,7 +1337,68 @@ contains
        ENDDO
     ENDDO
 
-    call write_histins
+    CALL histwrite_phy("phis", pphis)
+    CALL histwrite_phy("aire", airephy)
+    CALL histwrite_phy("psol", paprs(:, 1))
+    CALL histwrite_phy("precip", rain_fall + snow_fall)
+    CALL histwrite_phy("plul", rain_lsc + snow_lsc)
+    CALL histwrite_phy("pluc", rain_con + snow_con)
+    CALL histwrite_phy("tsol", zxtsol)
+    CALL histwrite_phy("t2m", zt2m)
+    CALL histwrite_phy("q2m", zq2m)
+    CALL histwrite_phy("u10m", zu10m)
+    CALL histwrite_phy("v10m", zv10m)
+    CALL histwrite_phy("snow", snow_fall)
+    CALL histwrite_phy("cdrm", cdragm)
+    CALL histwrite_phy("cdrh", cdragh)
+    CALL histwrite_phy("topl", toplw)
+    CALL histwrite_phy("evap", evap)
+    CALL histwrite_phy("sols", solsw)
+    CALL histwrite_phy("soll", sollw)
+    CALL histwrite_phy("solldown", sollwdown)
+    CALL histwrite_phy("bils", bils)
+    CALL histwrite_phy("sens", - sens)
+    CALL histwrite_phy("fder", fder)
+    CALL histwrite_phy("dtsvdfo", d_ts(:, is_oce))
+    CALL histwrite_phy("dtsvdft", d_ts(:, is_ter))
+    CALL histwrite_phy("dtsvdfg", d_ts(:, is_lic))
+    CALL histwrite_phy("dtsvdfi", d_ts(:, is_sic))
+
+    DO nsrf = 1, nbsrf
+       CALL histwrite_phy("pourc_"//clnsurf(nsrf), pctsrf(:, nsrf)*100.)
+       CALL histwrite_phy("fract_"//clnsurf(nsrf), pctsrf(:, nsrf))
+       CALL histwrite_phy("sens_"//clnsurf(nsrf), fluxt(:, 1, nsrf))
+       CALL histwrite_phy("lat_"//clnsurf(nsrf), fluxlat(:, nsrf))
+       CALL histwrite_phy("tsol_"//clnsurf(nsrf), ftsol(:, nsrf))
+       CALL histwrite_phy("taux_"//clnsurf(nsrf), fluxu(:, 1, nsrf))
+       CALL histwrite_phy("tauy_"//clnsurf(nsrf), fluxv(:, 1, nsrf))
+       CALL histwrite_phy("rugs_"//clnsurf(nsrf), frugs(:, nsrf))
+       CALL histwrite_phy("albe_"//clnsurf(nsrf), falbe(:, nsrf))
+    END DO
+
+    CALL histwrite_phy("albs", albsol)
+    CALL histwrite_phy("rugs", zxrugs)
+    CALL histwrite_phy("s_pblh", s_pblh)
+    CALL histwrite_phy("s_pblt", s_pblt)
+    CALL histwrite_phy("s_lcl", s_lcl)
+    CALL histwrite_phy("s_capCL", s_capCL)
+    CALL histwrite_phy("s_oliqCL", s_oliqCL)
+    CALL histwrite_phy("s_cteiCL", s_cteiCL)
+    CALL histwrite_phy("s_therm", s_therm)
+    CALL histwrite_phy("s_trmb1", s_trmb1)
+    CALL histwrite_phy("s_trmb2", s_trmb2)
+    CALL histwrite_phy("s_trmb3", s_trmb3)
+    if (conv_emanuel) CALL histwrite_phy("ptop", ema_pct)
+    CALL histwrite_phy("temp", t_seri)
+    CALL histwrite_phy("vitu", u_seri)
+    CALL histwrite_phy("vitv", v_seri)
+    CALL histwrite_phy("geop", zphi)
+    CALL histwrite_phy("pres", play)
+    CALL histwrite_phy("dtvdf", d_t_vdf)
+    CALL histwrite_phy("dqvdf", d_q_vdf)
+    CALL histwrite_phy("rhum", zx_rh)
+
+    if (ok_instan) call histsync(nid_ins)
 
     IF (lafin) then
        call NF95_CLOSE(ncid_startphy)
@@ -1362,106 +1410,6 @@ contains
     end IF
 
     firstcal = .FALSE.
-
-  contains
-
-    subroutine write_histins
-
-      ! From phylmd/write_histins.h, version 1.2 2005/05/25 13:10:09
-
-      ! Ecriture des sorties
-
-      use gr_phy_write_m, only: gr_phy_write
-      USE histsync_m, ONLY: histsync
-      USE histwrite_m, ONLY: histwrite
-
-      integer itau_w ! pas de temps d'\'ecriture
-
-      !--------------------------------------------------
-
-      IF (ok_instan) THEN
-         itau_w = itau_phy + itap
-         CALL histwrite(nid_ins, "phis", itau_w, gr_phy_write(pphis))
-         CALL histwrite(nid_ins, "aire", itau_w, gr_phy_write(airephy))
-         CALL histwrite(nid_ins, "psol", itau_w, gr_phy_write(paprs(:, 1)))
-         CALL histwrite(nid_ins, "precip", itau_w, &
-              gr_phy_write(rain_fall + snow_fall))
-         CALL histwrite(nid_ins, "plul", itau_w, &
-              gr_phy_write(rain_lsc + snow_lsc))
-         CALL histwrite(nid_ins, "pluc", itau_w, &
-              gr_phy_write(rain_con + snow_con))
-         CALL histwrite(nid_ins, "tsol", itau_w, gr_phy_write(zxtsol))
-         CALL histwrite(nid_ins, "t2m", itau_w, gr_phy_write(zt2m))
-         CALL histwrite(nid_ins, "q2m", itau_w, gr_phy_write(zq2m))
-         CALL histwrite(nid_ins, "u10m", itau_w, gr_phy_write(zu10m))
-         CALL histwrite(nid_ins, "v10m", itau_w, gr_phy_write(zv10m))
-         CALL histwrite(nid_ins, "snow", itau_w, gr_phy_write(snow_fall))
-         CALL histwrite(nid_ins, "cdrm", itau_w, gr_phy_write(cdragm))
-         CALL histwrite(nid_ins, "cdrh", itau_w, gr_phy_write(cdragh))
-         CALL histwrite(nid_ins, "topl", itau_w, gr_phy_write(toplw))
-         CALL histwrite(nid_ins, "evap", itau_w, gr_phy_write(evap))
-         CALL histwrite(nid_ins, "sols", itau_w, gr_phy_write(solsw))
-         CALL histwrite(nid_ins, "soll", itau_w, gr_phy_write(sollw))
-         CALL histwrite(nid_ins, "solldown", itau_w, gr_phy_write(sollwdown))
-         CALL histwrite(nid_ins, "bils", itau_w, gr_phy_write(bils))
-         CALL histwrite(nid_ins, "sens", itau_w, gr_phy_write(- sens))
-         CALL histwrite(nid_ins, "fder", itau_w, gr_phy_write(fder))
-         CALL histwrite(nid_ins, "dtsvdfo", itau_w, &
-              gr_phy_write(d_ts(:, is_oce)))
-         CALL histwrite(nid_ins, "dtsvdft", itau_w, &
-              gr_phy_write(d_ts(:, is_ter)))
-         CALL histwrite(nid_ins, "dtsvdfg", itau_w, &
-              gr_phy_write(d_ts(:, is_lic)))
-         CALL histwrite(nid_ins, "dtsvdfi", itau_w, &
-              gr_phy_write(d_ts(:, is_sic)))
-
-         DO nsrf = 1, nbsrf
-            CALL histwrite(nid_ins, "pourc_"//clnsurf(nsrf), itau_w, &
-                 gr_phy_write(pctsrf(:, nsrf)*100.))
-            CALL histwrite(nid_ins, "fract_"//clnsurf(nsrf), itau_w, &
-                 gr_phy_write(pctsrf(:, nsrf)))
-            CALL histwrite(nid_ins, "sens_"//clnsurf(nsrf), itau_w, &
-                 gr_phy_write(fluxt(:, 1, nsrf)))
-            CALL histwrite(nid_ins, "lat_"//clnsurf(nsrf), itau_w, &
-                 gr_phy_write(fluxlat(:, nsrf)))
-            CALL histwrite(nid_ins, "tsol_"//clnsurf(nsrf), itau_w, &
-                 gr_phy_write(ftsol(:, nsrf)))
-            CALL histwrite(nid_ins, "taux_"//clnsurf(nsrf), itau_w, &
-                 gr_phy_write(fluxu(:, 1, nsrf)))
-            CALL histwrite(nid_ins, "tauy_"//clnsurf(nsrf), itau_w, &
-                 gr_phy_write(fluxv(:, 1, nsrf)))
-            CALL histwrite(nid_ins, "rugs_"//clnsurf(nsrf), itau_w, &
-                 gr_phy_write(frugs(:, nsrf)))
-            CALL histwrite(nid_ins, "albe_"//clnsurf(nsrf), itau_w, &
-                 gr_phy_write(falbe(:, nsrf)))
-         END DO
-
-         CALL histwrite(nid_ins, "albs", itau_w, gr_phy_write(albsol))
-         CALL histwrite(nid_ins, "rugs", itau_w, gr_phy_write(zxrugs))
-         CALL histwrite(nid_ins, "s_pblh", itau_w, gr_phy_write(s_pblh))
-         CALL histwrite(nid_ins, "s_pblt", itau_w, gr_phy_write(s_pblt))
-         CALL histwrite(nid_ins, "s_lcl", itau_w, gr_phy_write(s_lcl))
-         CALL histwrite(nid_ins, "s_capCL", itau_w, gr_phy_write(s_capCL))
-         CALL histwrite(nid_ins, "s_oliqCL", itau_w, gr_phy_write(s_oliqCL))
-         CALL histwrite(nid_ins, "s_cteiCL", itau_w, gr_phy_write(s_cteiCL))
-         CALL histwrite(nid_ins, "s_therm", itau_w, gr_phy_write(s_therm))
-         CALL histwrite(nid_ins, "s_trmb1", itau_w, gr_phy_write(s_trmb1))
-         CALL histwrite(nid_ins, "s_trmb2", itau_w, gr_phy_write(s_trmb2))
-         CALL histwrite(nid_ins, "s_trmb3", itau_w, gr_phy_write(s_trmb3))
-         if (conv_emanuel) CALL histwrite(nid_ins, "ptop", itau_w, &
-              gr_phy_write(ema_pct))
-         CALL histwrite(nid_ins, "temp", itau_w, gr_phy_write(t_seri))
-         CALL histwrite(nid_ins, "vitu", itau_w, gr_phy_write(u_seri))
-         CALL histwrite(nid_ins, "vitv", itau_w, gr_phy_write(v_seri))
-         CALL histwrite(nid_ins, "geop", itau_w, gr_phy_write(zphi))
-         CALL histwrite(nid_ins, "pres", itau_w, gr_phy_write(play))
-         CALL histwrite(nid_ins, "dtvdf", itau_w, gr_phy_write(d_t_vdf))
-         CALL histwrite(nid_ins, "dqvdf", itau_w, gr_phy_write(d_q_vdf))
-         CALL histwrite(nid_ins, "rhum", itau_w, gr_phy_write(zx_rh))
-         call histsync(nid_ins)
-      ENDIF
-
-    end subroutine write_histins
 
   END SUBROUTINE physiq
 

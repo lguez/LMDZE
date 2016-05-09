@@ -1,6 +1,13 @@
+abort_gcm.f
+conf_gcm.f
 dimens_m.f
 dimphy.f
 disvert.f
+errioipsl.f
+histbeg_totreg.f
+histclo.f
+histcom_var.f
+histhori_regular.f
 indicesol.f
 ozonecm.f
 phyetat0.f

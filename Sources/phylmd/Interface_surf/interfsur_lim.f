@@ -4,7 +4,7 @@ module interfsur_lim_m
 
 contains
 
-  SUBROUTINE interfsur_lim(itime, dtime, jour, knindex, debut, albedo, z0_new)
+  SUBROUTINE interfsur_lim(dtime, jour, knindex, debut, albedo, z0_new)
 
     ! Cette routine sert d'interface entre le mod\`ele atmosph\'erique et
     ! un fichier de conditions aux limites.
@@ -14,8 +14,8 @@ contains
     USE dimphy, ONLY: klon
     use netcdf, only: NF90_NOWRITE
     use netcdf95, only: NF95_close, NF95_GET_VAR, NF95_INQ_VARID, NF95_OPEN
+    use time_phylmdz, only: itap
 
-    integer, intent(IN):: itime ! numero du pas de temps courant
     real, intent(IN):: dtime ! pas de temps de la physique (en s)
     integer, intent(IN):: jour ! jour a lire dans l'annee
 
@@ -48,7 +48,7 @@ contains
     knon = size(knindex)
 
     if (debut) then
-       lmt_pas = nint(86400./dtime * 1.0) ! pour une lecture une fois par jour
+       lmt_pas = nint(86400. / dtime) ! pour une lecture une fois par jour
        jour_lu_sur = jour - 1
        allocate(alb_lu(klon))
        allocate(rug_lu(klon))
@@ -57,7 +57,7 @@ contains
     if (jour - jour_lu_sur /= 0) deja_lu_sur = .false.
 
     ! Tester d'abord si c'est le moment de lire le fichier
-    if (mod(itime - 1, lmt_pas) == 0 .and. .not. deja_lu_sur) then
+    if (mod(itap - 1, lmt_pas) == 0 .and. .not. deja_lu_sur) then
        call NF95_OPEN('limit.nc', NF90_NOWRITE, ncid)
 
        ! Lecture Albedo

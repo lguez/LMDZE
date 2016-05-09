@@ -4,13 +4,12 @@ module interfsurf_hq_m
 
 contains
 
-  SUBROUTINE interfsurf_hq(itime, dtime, jour, rmu0, nisurf, knon, knindex, &
-       pctsrf, rlat, debut, nsoilmx, tsoil, qsol, u1_lay, v1_lay, temp_air, &
-       spechum, tq_cdrag, petAcoef, peqAcoef, petBcoef, peqBcoef, &
-       precip_rain, precip_snow, fder, rugos, rugoro, snow, qsurf, tsurf, &
-       p1lay, ps, radsol, evap, fluxsens, fluxlat, dflux_l, dflux_s, &
-       tsurf_new, albedo, z0_new, pctsrf_new, agesno, fqcalving, ffonte, &
-       run_off_lic_0)
+  SUBROUTINE interfsurf_hq(dtime, jour, rmu0, nisurf, knon, knindex, pctsrf, &
+       rlat, debut, nsoilmx, tsoil, qsol, u1_lay, v1_lay, temp_air, spechum, &
+       tq_cdrag, petAcoef, peqAcoef, petBcoef, peqBcoef, precip_rain, &
+       precip_snow, fder, rugos, rugoro, snow, qsurf, tsurf, p1lay, ps, &
+       radsol, evap, fluxsens, fluxlat, dflux_l, dflux_s, tsurf_new, albedo, &
+       z0_new, pctsrf_new, agesno, fqcalving, ffonte, run_off_lic_0)
 
     ! Cette routine sert d'aiguillage entre l'atmosph\`ere et la surface
     ! en g\'en\'eral (sols continentaux, oc\'eans, glaces) pour les flux de
@@ -34,7 +33,6 @@ contains
     use soil_m, only: soil
     USE suphec_m, ONLY: rcpd, rtt
 
-    integer, intent(IN):: itime ! numero du pas de temps
     real, intent(IN):: dtime ! pas de temps de la physique (en s)
     integer, intent(IN):: jour ! jour dans l'annee en cours
     real, intent(IN):: rmu0(klon) ! cosinus de l'angle solaire zenithal
@@ -183,7 +181,7 @@ contains
        ! Read albedo from the file containing boundary conditions then
        ! add the albedo of snow:
 
-       call interfsur_lim(itime, dtime, jour, knindex, debut, albedo, z0_new)
+       call interfsur_lim(dtime, jour, knindex, debut, albedo, z0_new)
 
        ! Calcul snow et qsurf, hydrologie adapt\'ee
        CALL calbeta(nisurf, snow(:knon), qsol(:knon), beta(:knon), &
@@ -222,8 +220,7 @@ contains
     case (is_oce)
        ! Surface "oc\'ean", appel \`a l'interface avec l'oc\'ean
 
-       call interfoce_lim(itime, dtime, jour, knindex, debut, tsurf_temp, &
-            pctsrf_new)
+       call interfoce_lim(dtime, jour, knindex, debut, tsurf_temp, pctsrf_new)
 
        cal = 0.
        beta = 1.
@@ -249,8 +246,7 @@ contains
        ! Surface "glace de mer" appel a l'interface avec l'ocean
 
        ! ! lecture conditions limites
-       CALL interfoce_lim(itime, dtime, jour, knindex, debut, tsurf_new, &
-            pctsrf_new)
+       CALL interfoce_lim(dtime, jour, knindex, debut, tsurf_new, pctsrf_new)
 
        DO ii = 1, knon
           tsurf_new(ii) = tsurf(ii)
@@ -300,11 +296,7 @@ contains
        albedo = alb_neig * zfra + 0.6 * (1. - zfra)
 
        fder = fder + dflux_s + dflux_l
-
-       ! 2eme appel a interfoce pour le cumul et le passage des flux a l'ocean
-
-       z0_new = 0.002
-       z0_new = SQRT(z0_new**2 + rugoro**2)
+       z0_new = SQRT(0.002**2 + rugoro**2)
     case (is_lic)
        if (.not. allocated(run_off_lic)) then
           allocate(run_off_lic(knon))
@@ -348,7 +340,6 @@ contains
 
        ! Remplissage des pourcentages de surface
        pctsrf_new(:, nisurf) = pctsrf(:, nisurf)
-
     case default
        print *, 'Index surface = ', nisurf
        call abort_gcm("interfsurf_hq", 'Index surface non valable')

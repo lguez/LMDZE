@@ -2,6 +2,7 @@ PROGRAM ce0l
 
   ! This program sets the initial and boundary values.
 
+  use comdissnew, only: read_comdissnew
   use conf_gcm_m, only: conf_gcm
   use dimens_m, only: iim, jjm
   use etat0_mod, only: etat0
@@ -20,6 +21,7 @@ PROGRAM ce0l
   call new_unit(unit_nml)
   open(unit_nml, file="used_namelists.txt", status="replace", action="write")
   CALL conf_gcm
+  call read_comdissnew
   call read_serre
   CALL etat0(phis)
   CALL limit

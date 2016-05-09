@@ -7,10 +7,10 @@ module phytrac_m
 
 contains
 
-  SUBROUTINE phytrac(itap, lmt_pas, julien, gmtime, firstcal, lafin, pdtphys, &
+  SUBROUTINE phytrac(lmt_pas, julien, gmtime, firstcal, lafin, pdtphys, &
        t_seri, paprs, pplay, pmfu, pmfd, pde_u, pen_d, coefh, fm_therm, &
        entr_therm, yu1, yv1, ftsol, pctsrf, frac_impa, frac_nucl, da, phi, &
-       mp, upwd, dnwd, tr_seri, zmasse, ncid_startphy, nid_ins, itau_phy)
+       mp, upwd, dnwd, tr_seri, zmasse, ncid_startphy)
 
     ! From phylmd/phytrac.F, version 1.15 2006/02/21 08:08:30 (SVN revision 679)
 
@@ -49,8 +49,8 @@ contains
     use radiornpb_m, only: radiornpb
     use regr_pr_comb_coefoz_m, only: regr_pr_comb_coefoz
     use SUPHEC_M, only: rg
+    use time_phylmdz, only: itap
 
-    integer, intent(in):: itap ! number of calls to "physiq"
     integer, intent(in):: lmt_pas ! number of time steps of "physics" per day
     integer, intent(in):: julien !jour julien, 1 <= julien <= 360
     real, intent(in):: gmtime ! heure de la journ\'ee en fraction de jour
@@ -102,7 +102,7 @@ contains
     real, intent(in):: zmasse(:, :) ! (klon, llm)
     ! (column-density of mass of air in a cell, in kg m-2)
 
-    integer, intent(in):: ncid_startphy, nid_ins, itau_phy
+    integer, intent(in):: ncid_startphy
 
     ! Local:
 
@@ -395,7 +395,7 @@ contains
     ENDIF
 
     ! Ecriture des sorties
-    call write_histrac(lessivage, itap, nid_ins)
+    call write_histrac(lessivage)
 
     if (lafin) then
        call nf95_inq_varid(ncid_restartphy, "trs", varid)
@@ -404,17 +404,17 @@ contains
 
   contains
 
-    subroutine write_histrac(lessivage, itap, nid_ins)
+    subroutine write_histrac(lessivage)
 
       ! From phylmd/write_histrac.h, version 1.9 2006/02/21 08:08:30
 
+      use gr_phy_write_m, only: gr_phy_write
       use histwrite_m, only: histwrite
       use iniadvtrac_m, only: tname
-      use gr_phy_write_m, only: gr_phy_write
+      use ini_histins_m, only: nid_ins
+      use phyetat0_m, only: itau_phy
 
       logical, intent(in):: lessivage
-      integer, intent(in):: itap ! number of calls to "physiq"
-      integer, intent(in):: nid_ins
 
       ! Variables local to the procedure:
       integer it

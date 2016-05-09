@@ -6,7 +6,7 @@ contains
 
   SUBROUTINE phystokenc(pdtphys, pt, pmfu, pmfd, pen_u, pde_u, pen_d, pde_d, &
        pfm_therm, pentr_therm, pcoefh, yu1, yv1, ftsol, pctsrf, frac_impa, &
-       frac_nucl, pphis, paire, dtime, itap)
+       frac_nucl, pphis, paire, dtime)
 
     ! From phylmd/phystokenc.F, version 1.2 2004/06/22 11:45:35
     ! Author: Fr\'ed\'eric Hourdin
@@ -19,6 +19,7 @@ contains
     USE indicesol, ONLY: nbsrf
     use initphysto_m, only: initphysto
     USE dimphy, ONLY: klev, klon
+    use time_phylmdz, only: itap
     USE tracstoke, ONLY: istphy
 
     REAL, INTENT (IN):: pdtphys ! pas d'integration pour la physique (seconde)
@@ -63,7 +64,6 @@ contains
     REAL, INTENT(IN):: pphis(klon)
     real paire(klon)
     REAL, INTENT (IN):: dtime
-    INTEGER, INTENT (IN):: itap
 
     ! Variables local to the procedure:
 
@@ -109,10 +109,8 @@ contains
 
     IF (iadvtr==0) CALL initphysto('phystoke', dtime, dtime*istphy, dtime*istphy, physid)
 
-    i = itap
-    CALL histwrite(physid, 'phis', i, gr_phy_write(pphis))
-    i = itap
-    CALL histwrite(physid, 'aire', i, gr_phy_write(paire))
+    CALL histwrite(physid, 'phis', itap, gr_phy_write(pphis))
+    CALL histwrite(physid, 'aire', itap, gr_phy_write(paire))
     iadvtr = iadvtr + 1
 
     IF (mod(iadvtr, istphy) == 1 .OR. istphy == 1) THEN

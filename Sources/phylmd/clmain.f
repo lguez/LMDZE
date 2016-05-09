@@ -4,14 +4,13 @@ module clmain_m
 
 contains
 
-  SUBROUTINE clmain(dtime, itap, pctsrf, pctsrf_new, t, q, u, v, jour, rmu0, &
-       ts, cdmmax, cdhmax, ksta, ksta_ter, ok_kzmin, ftsoil, qsol, &
-       paprs, pplay, snow, qsurf, evap, falbe, fluxlat, rain_fall, snow_f, &
-       solsw, sollw, fder, rlat, rugos, debut, agesno, rugoro, d_t, d_q, d_u, &
-       d_v, d_ts, flux_t, flux_q, flux_u, flux_v, cdragh, cdragm, q2, &
-       dflux_t, dflux_q, ycoefh, zu1, zv1, t2m, q2m, u10m, v10m, pblh, capcl, &
-       oliqcl, cteicl, pblt, therm, trmb1, trmb2, trmb3, plcl, fqcalving, &
-       ffonte, run_off_lic_0)
+  SUBROUTINE clmain(dtime, pctsrf, pctsrf_new, t, q, u, v, jour, rmu0, ts, &
+       cdmmax, cdhmax, ksta, ksta_ter, ok_kzmin, ftsoil, qsol, paprs, pplay, &
+       snow, qsurf, evap, falbe, fluxlat, rain_fall, snow_f, solsw, sollw, &
+       fder, rlat, rugos, firstcal, agesno, rugoro, d_t, d_q, d_u, d_v, d_ts, &
+       flux_t, flux_q, flux_u, flux_v, cdragh, cdragm, q2, dflux_t, dflux_q, &
+       ycoefh, zu1, zv1, t2m, q2m, u10m, v10m, pblh, capcl, oliqcl, cteicl, &
+       pblt, therm, trmb1, trmb2, trmb3, plcl, fqcalving, ffonte, run_off_lic_0)
 
     ! From phylmd/clmain.F, version 1.6, 2005/11/16 14:47:19
     ! Author: Z. X. Li (LMD/CNRS), date: 1993/08/18
@@ -44,7 +43,6 @@ contains
     use yamada4_m, only: yamada4
 
     REAL, INTENT(IN):: dtime ! interval du temps (secondes)
-    INTEGER, INTENT(IN):: itap ! numero du pas de temps
     REAL, INTENT(inout):: pctsrf(klon, nbsrf)
 
     ! la nouvelle repartition des surfaces sortie de l'interface
@@ -68,7 +66,7 @@ contains
 
     REAL, INTENT(IN):: paprs(klon, klev+1) ! pression a intercouche (Pa)
     REAL, INTENT(IN):: pplay(klon, klev) ! pression au milieu de couche (Pa)
-    REAL snow(klon, nbsrf)
+    REAL, INTENT(inout):: snow(klon, nbsrf)
     REAL qsurf(klon, nbsrf)
     REAL evap(klon, nbsrf)
     REAL, intent(inout):: falbe(klon, nbsrf)
@@ -85,10 +83,9 @@ contains
     REAL, intent(in):: fder(klon)
     REAL, INTENT(IN):: rlat(klon) ! latitude en degr\'es
 
-    REAL rugos(klon, nbsrf)
-    ! rugos----input-R- longeur de rugosite (en m)
+    REAL, intent(inout):: rugos(klon, nbsrf) ! longueur de rugosit\'e (en m)
 
-    LOGICAL, INTENT(IN):: debut
+    LOGICAL, INTENT(IN):: firstcal
     real agesno(klon, nbsrf)
     REAL, INTENT(IN):: rugoro(klon)
 
@@ -116,7 +113,7 @@ contains
     REAL, INTENT(out):: dflux_t(klon), dflux_q(klon)
     ! dflux_t derive du flux sensible
     ! dflux_q derive du flux latent
-    !IM "slab" ocean
+    ! IM "slab" ocean
 
     REAL, intent(out):: ycoefh(klon, klev)
     REAL, intent(out):: zu1(klon)
@@ -124,11 +121,10 @@ contains
     REAL t2m(klon, nbsrf), q2m(klon, nbsrf)
     REAL u10m(klon, nbsrf), v10m(klon, nbsrf)
 
-    ! Ionela Musat cf. Anne Mathieu : pbl, hbtm (Comme les autres
-    ! diagnostics on cumule dans physiq ce qui permet de sortir les
-    ! grandeurs par sous-surface)
-    REAL pblh(klon, nbsrf)
-    ! pblh------- HCL
+    ! Ionela Musat cf. Anne Mathieu : planetary boundary layer, hbtm
+    ! (Comme les autres diagnostics on cumule dans physiq ce qui
+    ! permet de sortir les grandeurs par sous-surface)
+    REAL pblh(klon, nbsrf) ! height of planetary boundary layer
     REAL capcl(klon, nbsrf)
     REAL oliqcl(klon, nbsrf)
     REAL cteicl(klon, nbsrf)
@@ -207,7 +203,7 @@ contains
     ! "pourcentage potentiel" pour tenir compte des \'eventuelles
     ! apparitions ou disparitions de la glace de mer
 
-    REAL zx_alf1, zx_alf2 !valeur ambiante par extrapola.
+    REAL zx_alf1, zx_alf2 ! valeur ambiante par extrapolation
 
     REAL yt2m(klon), yq2m(klon), yu10m(klon)
     REAL yustar(klon)
@@ -443,13 +439,13 @@ contains
                ypplay, ydelp, y_d_v, y_flux_v)
 
           ! calculer la diffusion de "q" et de "h"
-          CALL clqh(dtime, itap, jour, debut, rlat, knon, nsrf, ni(:knon), &
-               pctsrf, ytsoil, yqsol, rmu0, yrugos, yrugoro, yu1, &
-               yv1, coefh(:knon, :), yt, yq, yts, ypaprs, ypplay, ydelp, &
-               yrads, yalb(:knon), ysnow, yqsurf, yrain_f, ysnow_f, yfder, &
-               yfluxlat, pctsrf_new, yagesno(:knon), y_d_t, y_d_q, &
-               y_d_ts(:knon), yz0_new, y_flux_t, y_flux_q, y_dflux_t, &
-               y_dflux_q, y_fqcalving, y_ffonte, y_run_off_lic_0)
+          CALL clqh(dtime, jour, firstcal, rlat, knon, nsrf, ni(:knon), &
+               pctsrf, ytsoil, yqsol, rmu0, yrugos, yrugoro, yu1, yv1, &
+               coefh(:knon, :), yt, yq, yts, ypaprs, ypplay, ydelp, yrads, &
+               yalb(:knon), ysnow, yqsurf, yrain_f, ysnow_f, yfder, yfluxlat, &
+               pctsrf_new, yagesno(:knon), y_d_t, y_d_q, y_d_ts(:knon), &
+               yz0_new, y_flux_t, y_flux_q, y_dflux_t, y_dflux_q, &
+               y_fqcalving, y_ffonte, y_run_off_lic_0)
 
           ! calculer la longueur de rugosite sur ocean
           yrugm = 0.

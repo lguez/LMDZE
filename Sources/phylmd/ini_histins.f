@@ -2,13 +2,15 @@ module ini_histins_m
 
   implicit none
 
+  integer, save:: nid_ins
+
 contains
 
-  subroutine ini_histins(dtime, ok_instan, nid_ins, itau_phy)
+  subroutine ini_histins(dtime)
 
     ! From phylmd/ini_histins.h, v 1.2 2005/05/25 13:10:09
 
-    use clesphys, only: ecrit_ins
+    use clesphys, only: ecrit_ins, ok_instan
     use clesphys2, only: conv_emanuel
     use dimens_m, only: iim, jjm, llm, nqmx
     use dimphy, only: klon
@@ -21,12 +23,10 @@ contains
     use indicesol, only: nbsrf, clnsurf
     use iniadvtrac_m, only: tname, ttext
     use nr_util, only: pi
+    use phyetat0_m, only: itau_phy
     USE ymds2ju_m, only: ymds2ju
 
     REAL, intent(in):: dtime ! pas temporel de la physique (s)
-    logical, intent(in):: ok_instan
-    integer, intent(out):: nid_ins
-    integer, intent(in):: itau_phy
 
     ! Local:
     real zjulian, zsto, zout

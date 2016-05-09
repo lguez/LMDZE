@@ -9,6 +9,7 @@ PROGRAM gcm
   ! l'advection de "q", en modifiant "iadv" dans "traceur.def".
 
   use comconst, only: daysec, dtvr, iniconst
+  use comdissnew, only: read_comdissnew
   use comgeom, only:  aire_2d, inigeom
   use comgeomphy, only: airephy
   use conf_gcm_m, only: day_step, iperiod, iecri, iphysiq, nday, periodav, &
@@ -57,6 +58,7 @@ PROGRAM gcm
   open(unit_nml, file="used_namelists.txt", status="replace", action="write")
 
   CALL conf_gcm
+  call read_comdissnew
 
   print *, "Enter namelist 'main_nml'."
   read (unit=*, nml=main_nml)

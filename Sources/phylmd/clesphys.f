@@ -42,7 +42,72 @@ module clesphys
 
   INTEGER ecrit_ins, ecrit_hf, ecrit_hf2mth, ecrit_day
   INTEGER ecrit_mth, ecrit_tra, ecrit_reg
+  logical:: ok_instan = .false. ! sorties instantanees dans le fichier histins
 
   save
+
+contains
+
+  subroutine read_clesphys
+
+    use unit_nml_m, only: unit_nml
+
+    namelist /clesphys_nml/ solaire, co2_ppm, CH4_ppb, N2O_ppb, CFC11_ppt, &
+         CFC12_ppt, top_height, overlap, cdmmax, cdhmax, ksta, &
+         ksta_ter, ok_kzmin, lev_histhf, lev_histday, lev_histmth, &
+         type_run, ok_isccp, ok_regdyn, lonmin_ins, lonmax_ins, latmin_ins, &
+         latmax_ins, ecrit_ins, ecrit_hf, ecrit_hf2mth, ecrit_day, ecrit_mth, &
+         ecrit_tra, ecrit_reg, ok_instan
+
+    !---------------------------------------------------------
+
+    solaire = 1365. ! AMIP II
+    co2_ppm = 348. ! AMIP II
+    CH4_ppb = 1650.
+    N2O_ppb = 306.
+    CFC11_ppt = 280.
+    CFC12_ppt = 484.
+    top_height = 3
+    overlap = 3
+    cdmmax = 1.3E-3
+    cdhmax = 1.1E-3
+    ksta = 1.0e-10
+    ksta_ter = 1.0e-10
+    ok_kzmin = .true.
+    lev_histhf = 0
+    lev_histday = 1
+    lev_histmth = 2
+    type_run = 'AMIP'
+    ok_isccp = .false.
+    ok_regdyn = .false.
+    lonmin_ins = 100.
+    lonmax_ins = 130.
+    latmin_ins = -20.
+    latmax_ins = 20.
+    ecrit_ins = NINT(86400./48.)
+    ecrit_hf = NINT(86400. *0.25)
+    ecrit_hf2mth = 4*30 ! ecriture mens. a partir de val. inst. toutes les 6h
+    ecrit_day = 86400
+    ecrit_mth = 86400
+    ecrit_tra = 1
+    ecrit_reg = NINT(86400. *0.25) ! 4 fois par jour
+
+    print *, "Enter namelist 'clesphys_nml'."
+    read(unit=*, nml=clesphys_nml)
+    write(unit_nml, nml=clesphys_nml)
+
+    RCO2 = co2_ppm * 1.0e-06 * 44.011/28.97
+    RCH4 = CH4_ppb * 1.0E-09 * 16.043/28.97
+    RN2O = N2O_ppb * 1.0E-09 * 44.013/28.97
+    RCFC11=CFC11_ppt* 1.0E-12 * 137.3686/28.97
+    RCFC12 = CFC12_ppt * 1.0E-12 * 120.9140/28.97
+
+    print *, ' RCO2 = ', RCO2
+    print *, ' RCH4 = ', RCH4
+    print *, ' RN2O = ', RN2O
+    print *, ' RCFC11 = ', RCFC11
+    print *, ' RCFC12 = ', RCFC12
+
+  end subroutine read_clesphys
 
 end module clesphys

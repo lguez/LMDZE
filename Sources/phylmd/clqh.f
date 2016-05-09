@@ -4,12 +4,11 @@ module clqh_m
 
 contains
 
-  SUBROUTINE clqh(dtime, itime, jour, debut, rlat, knon, nisurf, knindex, &
-       pctsrf, tsoil, qsol, rmu0, rugos, rugoro, u1lay, v1lay, coef, &
-       t, q, ts, paprs, pplay, delp, radsol, albedo, snow, qsurf, &
-       precip_rain, precip_snow, fder, fluxlat, pctsrf_new, agesno, d_t, d_q, &
-       d_ts, z0_new, flux_t, flux_q, dflux_s, dflux_l, fqcalving, ffonte, &
-       run_off_lic_0)
+  SUBROUTINE clqh(dtime, jour, debut, rlat, knon, nisurf, knindex, pctsrf, &
+       tsoil, qsol, rmu0, rugos, rugoro, u1lay, v1lay, coef, t, q, ts, paprs, &
+       pplay, delp, radsol, albedo, snow, qsurf, precip_rain, precip_snow, &
+       fder, fluxlat, pctsrf_new, agesno, d_t, d_q, d_ts, z0_new, flux_t, &
+       flux_q, dflux_s, dflux_l, fqcalving, ffonte, run_off_lic_0)
 
     ! Author: Z. X. Li (LMD/CNRS)
     ! Date: 1993/08/18
@@ -23,7 +22,6 @@ contains
     USE suphec_m, ONLY: rcpd, rd, rg, rkappa
 
     REAL, intent(in):: dtime ! intervalle du temps (s)
-    integer, intent(in):: itime
     integer, intent(in):: jour ! jour de l'annee en cours
     logical, intent(in):: debut
     real, intent(in):: rlat(klon)
@@ -55,7 +53,7 @@ contains
     REAL delp(klon, klev) ! epaisseur de couche en pression (Pa)
     REAL radsol(klon) ! ray. net au sol (Solaire+IR) W / m2
     REAL, intent(inout):: albedo(:) ! (knon) albedo de la surface
-    REAL snow(klon) ! hauteur de neige
+    REAL, intent(inout):: snow(klon) ! hauteur de neige
     REAL qsurf(klon) ! humidite de l'air au dessus de la surface
 
     real, intent(in):: precip_rain(klon)
@@ -241,13 +239,12 @@ contains
     spechum(1:knon)=q(1:knon, 1)
     p1lay(1:knon) = pplay(1:knon, 1)
 
-    CALL interfsurf_hq(itime, dtime, jour, rmu0, nisurf, knon, knindex, &
-         pctsrf, rlat, debut, nsoilmx, tsoil, qsol, u1lay, v1lay, temp_air, &
-         spechum, tq_cdrag, petAcoef, peqAcoef, petBcoef, peqBcoef, &
-         precip_rain, precip_snow, fder, rugos, rugoro, snow, qsurf, &
-         ts(:knon), p1lay, psref, radsol, evap, fluxsens, fluxlat, dflux_l, &
-         dflux_s, tsurf_new, albedo, z0_new, pctsrf_new, agesno, fqcalving, &
-         ffonte, run_off_lic_0)
+    CALL interfsurf_hq(dtime, jour, rmu0, nisurf, knon, knindex, pctsrf, &
+         rlat, debut, nsoilmx, tsoil, qsol, u1lay, v1lay, temp_air, spechum, &
+         tq_cdrag, petAcoef, peqAcoef, petBcoef, peqBcoef, precip_rain, &
+         precip_snow, fder, rugos, rugoro, snow, qsurf, ts(:knon), p1lay, &
+         psref, radsol, evap, fluxsens, fluxlat, dflux_l, dflux_s, tsurf_new, &
+         albedo, z0_new, pctsrf_new, agesno, fqcalving, ffonte, run_off_lic_0)
 
     flux_t(:knon, 1) = fluxsens(:knon)
     flux_q(:knon, 1) = - evap(:knon)

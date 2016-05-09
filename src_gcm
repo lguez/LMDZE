@@ -147,6 +147,7 @@ histsync.f
 histvar_seq.f
 histvert.f
 histwrite.f
+histwrite_phy.f
 histwrite_real.f
 indicesol.f
 iniadvtrac.f
@@ -225,7 +226,6 @@ phytrac.f
 pres2lev.f
 press_coefoz.f
 principal_cshift.f
-printflag.f
 qcheck.f
 qminimum.f
 q_sat.f
@@ -265,6 +265,7 @@ swu.f
 tau2alpha.f
 temps.f
 thermcell.f
+time_phylmdz.f
 tourpot.f
 tracstoke.f
 trans_buff.f

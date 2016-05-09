@@ -43,7 +43,7 @@ contains
     use netcdf95, only: nf95_close, nf95_get_var, nf95_gw_var, nf95_put_var, &
          nf95_inq_varid, nf95_open
     use nr_util, only: pi, assert
-    use phyetat0_m, only: rlat, rlon
+    use phyetat0_m, only: rlat, rlon, itau_phy
     use phyredem0_m, only: phyredem0, ncid_restartphy
     use phyredem_m, only: phyredem
     use q_sat_m, only: q_sat
@@ -335,7 +335,8 @@ contains
     w01 = 0.
 
     nday = 0
-    call phyredem0(lmt_pas = day_step / iphysiq, itau_phy = 0)
+    itau_phy = 0 ! side effect
+    call phyredem0(lmt_pas = day_step / iphysiq)
 
     call nf95_inq_varid(ncid_restartphy, "trs", varid)
     call nf95_put_var(ncid_restartphy, varid, null_array)

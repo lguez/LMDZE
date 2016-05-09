@@ -49,7 +49,6 @@ contains
     ! Version du 29/04/97
 
     use abort_gcm_m, only: abort_gcm
-    use comdissnew, only: read_comdissnew
     use unit_nml_m, only: unit_nml
 
     namelist /conf_gcm_nml/ raz_date, nday, day_step, iperiod, iapp_tracvl, &
@@ -70,8 +69,6 @@ contains
     print *, "Enter namelist 'logic_nml'."
     read(unit=*, nml=logic_nml)
     write(unit_nml, nml=logic_nml)
-
-    call read_comdissnew
 
     print *, "Enter namelist 'conf_gcm_nml'."
     read(unit=*, nml=conf_gcm_nml)

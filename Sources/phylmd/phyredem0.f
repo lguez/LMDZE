@@ -6,7 +6,7 @@ module phyredem0_m
 
 contains
 
-  SUBROUTINE phyredem0(lmt_pas, itau_phy)
+  SUBROUTINE phyredem0(lmt_pas)
 
     ! From phylmd/phyredem.F, version 1.3, 2005/05/25 13:10:09
     ! Author: Z. X. Li (LMD/CNRS)
@@ -22,10 +22,9 @@ contains
     USE netcdf, ONLY: nf90_clobber, nf90_global, nf90_float
     USE netcdf95, ONLY: nf95_create, nf95_put_att, nf95_def_dim, &
          nf95_def_var, nf95_enddef, nf95_put_var
-    use phyetat0_m, only: rlat, rlon
+    use phyetat0_m, only: rlat, rlon, itau_phy
 
     INTEGER, intent(in):: lmt_pas ! number of time steps of "physics" per day
-    INTEGER, intent(in):: itau_phy
 
     ! Local:
 

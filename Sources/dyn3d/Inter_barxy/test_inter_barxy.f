@@ -1,6 +1,7 @@
 program test_inter_barxy
 
   use comconst, only: dtvr, daysec, iniconst
+  use comdissnew, only: read_comdissnew
   use comgeom, only: inigeom
   use conf_gcm_m, only: conf_gcm, day_step
   use dimens_m, only: iim, jjm
@@ -32,6 +33,7 @@ program test_inter_barxy
   allocate(var_ana3d(iml_dyn, jml_dyn))
 
   CALL conf_gcm
+  call read_comdissnew
   dtvr = daysec / real(day_step)
   print *, 'dtvr = ', dtvr
   pa = 5e4
