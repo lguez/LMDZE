@@ -41,9 +41,9 @@ contains
 
     ! Local:
     integer ncum
-    integer i, j, il, imax
+    integer i, il, imax
     real tinv, delti
-    real awat, afac, afac1, afac2, bfac
+    real afac, afac1, afac2, bfac
     real pr1, pr2, sigt, b6, c6, revap, tevap, delth
     real amfac, amp2, xf, tf, fac2, ur, sru, fac, d, af, bf
     real ampmax
@@ -86,24 +86,10 @@ contains
        ! and condensed water flux 
 
        ! Calculate detrained precipitation 
-
-       do il = 1, ncum
-          if (i <= inb(il) .and. lwork(il)) then
-             wdtrain(il) = grav * ep(il, i) * m(il, i) * clw(il, i)
-          endif
-       enddo
-
-       if (i > 1) then
-          do j = 1, i - 1
-             do il = 1, ncum
-                if (i <= inb(il) .and. lwork(il)) then
-                   awat = elij(il, j, i) - (1. - ep(il, i)) * clw(il, i)
-                   awat = max(awat, 0.)
-                   wdtrain(il) = wdtrain(il) + grav * awat * ment(il, j, i)
-                endif
-             enddo
-          end do
-       endif
+       forall (il = 1:ncum, inb(il) >= i .and. lwork(il)) wdtrain(il) = grav &
+            * (ep(il, i) * m(il, i) * clw(il, i) &
+            + sum(max(elij(il, :i - 1, i) - (1. - ep(il, i)) * clw(il, i), 0.) &
+            * ment(il, :i - 1, i)))
 
        ! Find rain water and evaporation using provisional 
        ! estimates of qp(i) and qp(i - 1) 
