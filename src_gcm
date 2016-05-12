@@ -6,7 +6,6 @@ addfi.f
 advect.f
 advn.f
 advtrac.f
-aeropt.f
 ajsec.f
 alboc_cd.f
 alboc.f
@@ -121,7 +120,6 @@ fonte_neige.f
 gcm.f
 geopot.f
 getfieldindex.f
-getso4fromfile.f
 grad.f
 gradiv2.f
 gradsdef.f
@@ -236,8 +234,6 @@ radiornpb.f
 radlwsw.f
 radopt.f
 read_reanalyse.f
-readsulfate.f
-readsulfate_preind.f
 reanalyse2nat.f
 regr_pr_av.f
 regr_pr_comb_coefoz.f

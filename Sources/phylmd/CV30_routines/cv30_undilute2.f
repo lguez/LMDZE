@@ -35,7 +35,7 @@ contains
     ! outputs:
     integer, intent(out):: inb(:) ! (ncum)
     ! first model level above the level of neutral buoyancy of the
-    ! parcel (<= nl - 1)
+    ! parcel (1 <= inb <= nl - 1)
 
     real tp(klon, klev), tvp(klon, klev), clw(klon, klev)
     ! condensed water not removed from tvp
@@ -131,8 +131,8 @@ contains
        do i = 1, ncum
           pden = ptcrit - pbcrit
           ep(i, k) = (plcl(i) - p(i, k) - pbcrit) / pden * epmax
-          ep(i, k) = amax1(ep(i, k), 0.0)
-          ep(i, k) = amin1(ep(i, k), epmax)
+          ep(i, k) = max(ep(i, k), 0.0)
+          ep(i, k) = min(ep(i, k), epmax)
           sigp(i, k) = spfac
        end do
     end do

@@ -16,7 +16,6 @@ contains
 
     use aaam_bud_m, only: aaam_bud
     USE abort_gcm_m, ONLY: abort_gcm
-    use aeropt_m, only: aeropt
     use ajsec_m, only: ajsec
     use calltherm_m, only: calltherm
     USE clesphys, ONLY: cdhmax, cdmmax, ecrit_hf, ecrit_ins, ecrit_mth, &
@@ -61,8 +60,6 @@ contains
     USE phytrac_m, ONLY: phytrac
     USE qcheck_m, ONLY: qcheck
     use radlwsw_m, only: radlwsw
-    use readsulfate_m, only: readsulfate
-    use readsulfate_preind_m, only: readsulfate_preind
     use yoegwd, only: sugwd
     USE suphec_m, ONLY: rcpd, retv, rg, rlvtt, romega, rsigma, rtt
     use time_phylmdz, only: itap, increment_itap
@@ -441,8 +438,6 @@ contains
 
     REAL topswad(klon), solswad(klon) ! aerosol direct effect
     REAL topswai(klon), solswai(klon) ! aerosol indirect effect
-
-    REAL aerindex(klon) ! POLDER aerosol index
 
     LOGICAL:: ok_ade = .false. ! apply aerosol direct effect
     LOGICAL:: ok_aie = .false. ! apply aerosol indirect effect
@@ -1108,18 +1103,9 @@ contains
     ENDDO
 
     ! Introduce the aerosol direct and first indirect radiative forcings:
-    IF (ok_ade .OR. ok_aie) THEN
-       ! Get sulfate aerosol distribution :
-       CALL readsulfate(dayvrai, time, firstcal, sulfate)
-       CALL readsulfate_preind(dayvrai, time, firstcal, sulfate_pi)
-
-       CALL aeropt(play, paprs, t_seri, sulfate, rhcl, tau_ae, piz_ae, cg_ae, &
-            aerindex)
-    ELSE
-       tau_ae = 0.
-       piz_ae = 0.
-       cg_ae = 0.
-    ENDIF
+    tau_ae = 0.
+    piz_ae = 0.
+    cg_ae = 0.
 
     ! Param\`etres optiques des nuages et quelques param\`etres pour
     ! diagnostics :

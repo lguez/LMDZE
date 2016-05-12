@@ -257,8 +257,10 @@ contains
 
        ! Unsaturated (precipitating) downdrafts
        CALL cv30_unsat(icb(:ncum), inb(:ncum), t, q, qs, gz, u, v, p, ph, th, &
-            tv, lv, cpn, ep, sigp, clw, m, ment, elij, delt, plcl, mp, &
-            qp(:ncum, :nl), up(:ncum, :nl), vp(:ncum, :nl), wt, water, evap, b)
+            tv, lv, cpn, ep(:ncum, :), sigp(:ncum, :), clw(:ncum, :), &
+            m(:ncum, :), ment(:ncum, :, :), elij(:ncum, :, :), delt, plcl, &
+            mp, qp(:ncum, :nl), up(:ncum, :nl), vp(:ncum, :nl), wt, water, &
+            evap, b)
 
        ! Yield (tendencies, precipitation, variables of interface with
        ! other processes, etc)

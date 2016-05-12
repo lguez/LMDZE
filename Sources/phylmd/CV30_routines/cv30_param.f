@@ -14,7 +14,7 @@ module cv30_param_m
 
   integer, parameter:: nl = klev - 1
   ! Limit for convection. The maximum number of levels to which
-  ! convection can penetrate, plus 1.  nl must be <= KLEV-1.
+  ! convection can penetrate, plus 1. We should have: 2 <= nl <= KLEV - 1.
 
   real sigd ! FRACTIONAL AREA COVERED BY UNSATURATED DNDRAFT 
   real spfac ! FRACTION OF PRECIPITATION FALLING OUTSIDE OF CLOUD 

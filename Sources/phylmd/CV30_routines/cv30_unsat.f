@@ -12,20 +12,26 @@ contains
     use cv_thermo_m, only: cpd, ginv, grav
     USE dimphy, ONLY: klon, klev
 
-    ! inputs:
-    integer, intent(in):: icb(:), inb(:) ! (ncum)
+    integer, intent(in):: icb(:) ! (ncum)
+
+    integer, intent(in):: inb(:) ! (ncum)
+    ! first model level above the level of neutral buoyancy of the
+    ! parcel (1 <= inb <= nl - 1)
+
     real, intent(in):: t(:, :), q(:, :), qs(:, :) ! (klon, klev)
     real, intent(in):: gz(:, :) ! (klon, klev)
     real, intent(in):: u(:, :), v(:, :) ! (klon, klev)
-    real p(klon, klev), ph(klon, klev + 1)
-    real th(klon, klev)
-    real tv(klon, klev)
-    real lv(klon, klev)
-    real cpn(klon, klev)
-    real, intent(in):: ep(klon, klev), sigp(klon, klev), clw(klon, klev)
-    real m(klon, klev), ment(klon, klev, klev), elij(klon, klev, klev)
+    real, intent(in):: p(klon, klev), ph(klon, klev + 1)
+    real, intent(in):: th(klon, klev)
+    real, intent(in):: tv(klon, klev)
+    real, intent(in):: lv(klon, klev)
+    real, intent(in):: cpn(klon, klev)
+    real, intent(in):: ep(:, :), sigp(:, :), clw(:, :) ! (ncum, klev)
+    real, intent(in):: m(:, :) ! (ncum, klev)
+    real, intent(in):: ment(:, :, :) ! (ncum, klev, klev)
+    real, intent(in):: elij(:, :, :) ! (ncum, klev, klev)
     real, intent(in):: delt
-    real plcl(klon)
+    real, intent(in):: plcl(klon)
 
     ! outputs:
     real, intent(out):: mp(klon, klev)
