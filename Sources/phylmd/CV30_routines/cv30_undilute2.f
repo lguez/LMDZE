@@ -4,9 +4,8 @@ module cv30_undilute2_m
 
 contains
 
-  SUBROUTINE cv30_undilute2(ncum, icb, icbs, nk, tnk, qnk, gznk, t, qs, gz, &
-       p, h, tv, lv, pbase, buoybase, plcl, inb, tp, tvp, clw, hp, ep, sigp, &
-       buoy)
+  SUBROUTINE cv30_undilute2(icb, icbs, nk, tnk, qnk, gznk, t, qs, gz, p, h, &
+       tv, lv, pbase, buoybase, plcl, inb, tp, tvp, clw, hp, ep, buoy)
 
     ! Undilute (adiabatic) updraft, second part. Purpose: find the
     ! rest of the lifted parcel temperatures; compute the
@@ -16,13 +15,11 @@ contains
     ! Vertical profile of buoyancy computed here (use of buoybase).
 
     use conema3_m, only: epmax
-    use cv30_param_m, only: dtovsh, minorig, nl, pbcrit, ptcrit, spfac
+    use cv30_param_m, only: minorig, nl
     use cv_thermo_m, only: cl, clmcpv, cpd, cpv, eps, lv0, rrv
     USE dimphy, ONLY: klon, klev
 
-    integer, intent(in):: ncum
-
-    integer, intent(in):: icb(klon), icbs(klon)
+    integer, intent(in):: icb(:), icbs(:) ! (ncum)
     ! icbs is the first level above LCL (may differ from icb)
 
     integer, intent(in):: nk(klon)
@@ -39,10 +36,23 @@ contains
 
     real tp(klon, klev), tvp(klon, klev), clw(klon, klev)
     ! condensed water not removed from tvp
-    real hp(klon, klev), ep(klon, klev), sigp(klon, klev)
+    real hp(klon, klev), ep(klon, klev)
     real buoy(klon, klev)
 
     ! Local:
+
+    integer ncum
+
+    real, parameter:: pbcrit = 150.
+    ! critical cloud depth (mbar) beneath which the precipitation
+    ! efficiency is assumed to be zero
+
+    real, parameter:: ptcrit = 500.
+    ! cloud depth (mbar) above which the precipitation efficiency is
+    ! assumed to be unity
+
+    real, parameter:: dtovsh = - 0.2 ! dT for overshoot
+
     integer i, k
     real tg, qg, ahg, alv, s, tc, es, denom
     real pden
@@ -50,12 +60,13 @@ contains
 
     !---------------------------------------------------------------------
 
+    ncum = size(icb)
+
     ! SOME INITIALIZATIONS
 
     do k = 1, nl
        do i = 1, ncum
-          ep(i, k) = 0.0
-          sigp(i, k) = spfac
+          ep(i, k) = 0.
        end do
     end do
 
@@ -91,7 +102,7 @@ contains
 
              tc = tg - 273.15
              denom = 243.5 + tc
-             denom = MAX(denom, 1.0)
+             denom = MAX(denom, 1.)
 
              es = 6.112 * exp(17.67 * tc / denom)
 
@@ -104,7 +115,7 @@ contains
 
              tc = tg - 273.15
              denom = 243.5 + tc
-             denom = MAX(denom, 1.0)
+             denom = MAX(denom, 1.)
 
              es = 6.112 * exp(17.67 * tc / denom)
 
@@ -117,23 +128,21 @@ contains
                   / (cpd + (cl - cpd) * qnk(i))
 
              clw(i, k) = qnk(i) - qg
-             clw(i, k) = max(0.0, clw(i, k))
+             clw(i, k) = max(0., clw(i, k))
              ! qg utilise au lieu du vrai mixing ratio rg:
              tvp(i, k) = tp(i, k) * (1. + qg / eps - qnk(i)) ! whole thing
           endif
        end do
     end do
 
-    ! SET THE PRECIPITATION EFFICIENCIES AND THE FRACTION OF
-    ! PRECIPITATION FALLING OUTSIDE OF CLOUD
-    ! THESE MAY BE FUNCTIONS OF TP(I), P(I) AND CLW(I)
+    ! SET THE PRECIPITATION EFFICIENCIES
+    ! It MAY BE a FUNCTION OF TP(I), P(I) AND CLW(I)
     do k = 1, nl
        do i = 1, ncum
           pden = ptcrit - pbcrit
           ep(i, k) = (plcl(i) - p(i, k) - pbcrit) / pden * epmax
-          ep(i, k) = max(ep(i, k), 0.0)
+          ep(i, k) = max(ep(i, k), 0.)
           ep(i, k) = min(ep(i, k), epmax)
-          sigp(i, k) = spfac
        end do
     end do
 

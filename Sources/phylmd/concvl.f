@@ -4,7 +4,7 @@ module concvl_m
 
 contains
 
-  SUBROUTINE concvl(dtime, paprs, play, t, q, u, v, sig1, w01, d_t, d_q, d_u, &
+  SUBROUTINE concvl(paprs, play, t, q, u, v, sig1, w01, d_t, d_q, d_u, &
        d_v, rain, kbas, itop_con, upwd, dnwd, dnwd0, ma, cape, iflag, qcondc, &
        pmflxr, da, phi, mp)
 
@@ -13,13 +13,13 @@ contains
     ! Date: 1993 August 18
     ! Objet : schéma de convection d'Emanuel (1991), interface
 
+    use comconst, only: dtphys
     use cv_driver_m, only: cv_driver
     USE dimphy, ONLY: klev, klon
     USE fcttre, ONLY: foeew
     USE suphec_m, ONLY: retv, rtt
     USE yoethf_m, ONLY: r2es
 
-    REAL, INTENT (IN):: dtime ! pas d'integration (s)
     REAL, INTENT (IN):: paprs(klon, klev + 1)
     REAL, INTENT (IN):: play(klon, klev)
     REAL, intent(in):: t(klon, klev) ! temperature (K)
@@ -44,7 +44,7 @@ contains
 
     REAL ma(klon, klev)
     real cape(klon) ! output (J / kg)
-    INTEGER iflag(klon)
+    INTEGER, intent(out):: iflag(klon)
     REAL qcondc(klon, klev)
     REAL pmflxr(klon, klev + 1)
     REAL, intent(inout):: da(klon, klev), phi(klon, klev, klev), mp(klon, klev)
@@ -65,13 +65,13 @@ contains
     END DO
 
     CALL cv_driver(t, q, qs, u, v, play / 100., paprs / 100., iflag, d_t, &
-         d_q, d_u, d_v, rain, pmflxr, sig1, w01, kbas, itop_con, dtime, ma, &
-         upwd, dnwd, dnwd0, qcondc, cape, da, phi, mp)
+         d_q, d_u, d_v, rain, pmflxr, sig1, w01, kbas, itop_con, ma, upwd, &
+         dnwd, dnwd0, qcondc, cape, da, phi, mp)
     rain = rain / 86400.
-    d_t = dtime * d_t
-    d_q = dtime * d_q
-    d_u = dtime * d_u
-    d_v = dtime * d_v
+    d_t = dtphys * d_t
+    d_q = dtphys * d_q
+    d_u = dtphys * d_u
+    d_v = dtphys * d_v
 
   END SUBROUTINE concvl
 

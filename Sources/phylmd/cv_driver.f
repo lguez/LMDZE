@@ -5,7 +5,7 @@ module cv_driver_m
 contains
 
   SUBROUTINE cv_driver(t1, q1, qs1, u1, v1, p1, ph1, iflag1, ft1, fq1, fu1, &
-       fv1, precip1, VPrecip1, sig1, w01, icb1, inb1, delt, Ma1, upwd1, dnwd1, &
+       fv1, precip1, VPrecip1, sig1, w01, icb1, inb1, Ma1, upwd1, dnwd1, &
        dnwd01, qcondc1, cape1, da1, phi1, mp1)
 
     ! From LMDZ4/libf/phylmd/cv_driver.F, version 1.3, 2005/04/15 12:36:17
@@ -14,6 +14,7 @@ contains
 
     ! Several modules corresponding to different physical processes
 
+    use comconst, only: dtphys
     use cv30_closure_m, only: cv30_closure
     use cv30_compress_m, only: cv30_compress
     use cv30_feed_m, only: cv30_feed
@@ -23,6 +24,7 @@ contains
     use cv30_tracer_m, only: cv30_tracer
     use cv30_trigger_m, only: cv30_trigger
     use cv30_uncompress_m, only: cv30_uncompress
+    use cv30_undilute1_m, only: cv30_undilute1
     use cv30_undilute2_m, only: cv30_undilute2
     use cv30_unsat_m, only: cv30_unsat
     use cv30_yield_m, only: cv30_yield
@@ -57,17 +59,17 @@ contains
 
     ! 3: No moist convection because new cbmf is 0 and old cbmf is 0.
 
-    ! 4: No moist convection; atmosphere is not unstable
+    ! 4: No moist convection; atmosphere is not unstable.
 
-    ! 6: No moist convection because ihmin le minorig.
+    ! 6: No moist convection because ihmin <= minorig.
 
     ! 7: No moist convection because unreasonable parcel level
     ! temperature or specific humidity.
 
     ! 8: No moist convection: lifted condensation level is above the
-    ! 200 mb level.
+    ! 200 mbar level.
 
-    ! 9: No moist convection: cloud base is higher then the level NL-1.
+    ! 9: No moist convection: cloud base is higher than the level NL-1.
 
     real, intent(out):: ft1(klon, klev) ! temperature tendency (K/s)
     real, intent(out):: fq1(klon, klev) ! specific humidity tendency (s-1)
@@ -87,8 +89,6 @@ contains
 
     integer, intent(out):: icb1(klon)
     integer, intent(inout):: inb1(klon)
-    real, intent(in):: delt ! the model time step (sec) between calls
-
     real, intent(out):: Ma1(klon, klev) ! mass flux of adiabatic updraft
 
     real, intent(out):: upwd1(klon, klev) 
@@ -131,7 +131,8 @@ contains
 
     ! Compressed fields:
     integer idcum(klon)
-    integer iflag(klon), nk(klon), icb(klon)
+    integer iflag(klon), nk(klon)
+    integer, allocatable:: icb(:) ! (ncum)
     integer nent(klon, klev)
     integer icbs(klon)
     integer inb(klon)
@@ -139,12 +140,13 @@ contains
     real t(klon, klev), q(klon, klev), qs(klon, klev)
     real u(klon, klev), v(klon, klev)
     real gz(klon, klev), h(klon, klev), lv(klon, klev), cpn(klon, klev)
-    real p(klon, klev), ph(klon, klev + 1), tv(klon, klev), tp(klon, klev)
+    real p(klon, klev) ! pressure at full level, in hPa
+    real ph(klon, klev + 1), tv(klon, klev), tp(klon, klev)
     real clw(klon, klev)
     real pbase(klon), buoybase(klon), th(klon, klev)
     real tvp(klon, klev)
     real sig(klon, klev), w0(klon, klev)
-    real hp(klon, klev), ep(klon, klev), sigp(klon, klev)
+    real hp(klon, klev), ep(klon, klev)
     real buoy(klon, klev)
     real cape(klon)
     real m(klon, klev), ment(klon, klev, klev), qent(klon, klev, klev)
@@ -152,7 +154,8 @@ contains
     real ments(klon, klev, klev), qents(klon, klev, klev)
     real sij(klon, klev, klev), elij(klon, klev, klev)
     real qp(klon, klev), up(klon, klev), vp(klon, klev)
-    real wt(klon, klev), water(klon, klev), evap(klon, klev)
+    real wt(klon, klev), water(klon, klev)
+    real, allocatable:: evap(:, :) ! (ncum, nl)
     real, allocatable:: b(:, :) ! (ncum, nl - 1)
     real ft(klon, klev), fq(klon, klev)
     real fu(klon, klev), fv(klon, klev)
@@ -170,11 +173,7 @@ contains
     ! set thermodynamical constants:
     CALL cv_thermo
 
-    ! set convect parameters
-    ! includes microphysical parameters and parameters that
-    ! control the rate of approach to quasi-equilibrium)
-    ! (common cvparam)
-    CALL cv30_param(delt)
+    CALL cv30_param
 
     ! INITIALIZE OUTPUT ARRAYS AND PARAMETERS
 
@@ -198,32 +197,24 @@ contains
        end do
     end do
 
-    do i = 1, klon
-       precip1(i) = 0.
-       iflag1(i) = 0
-       cape1(i) = 0.
-       VPrecip1(i, klev + 1) = 0.
-    end do
+    precip1 = 0.
+    iflag1 = 0
+    cape1 = 0.
+    VPrecip1(:, klev + 1) = 0.
 
     do il = 1, klon
        sig1(il, klev) = sig1(il, klev) + 1.
        sig1(il, klev) = min(sig1(il, klev), 12.1)
     enddo
 
-    ! CALCULATE ARRAYS OF GEOPOTENTIAL, HEAT CAPACITY & STATIC ENERGY
     CALL cv30_prelim(klon, klev, klev + 1, t1, q1, p1, ph1, lv1, cpn1, tv1, &
          gz1, h1, hm1, th1)
-
-    ! CONVECTIVE FEED
-    CALL cv30_feed(klon, klev, t1, q1, qs1, p1, ph1, gz1, nk1, icb1, &
-         icbmax, iflag1, tnk1, qnk1, gznk1, plcl1) ! klev->na
-
-    CALL cv30_undilute1(klon, klev, t1, q1, qs1, gz1, plcl1, p1, nk1, icb1, &
-         tp1, tvp1, clw1, icbs1) ! klev->na
-
-    ! TRIGGERING
-    CALL cv30_trigger(klon, klev, icb1, plcl1, p1, th1, tv1, tvp1, pbase1, &
-         buoybase1, iflag1, sig1, w01) ! klev->na
+    CALL cv30_feed(t1, q1, qs1, p1, ph1, gz1, nk1, icb1, icbmax, iflag1, &
+         tnk1, qnk1, gznk1, plcl1)
+    CALL cv30_undilute1(t1, q1, qs1, gz1, plcl1, p1, nk1, icb1, tp1, tvp1, &
+         clw1, icbs1)
+    CALL cv30_trigger(icb1, plcl1, p1, th1, tv1, tvp1, pbase1, buoybase1, &
+         iflag1, sig1, w01)
 
     ! Moist convective adjustment is necessary
 
@@ -236,40 +227,31 @@ contains
     end do
 
     IF (ncum > 0) THEN
-       allocate(b(ncum, nl - 1))
+       allocate(b(ncum, nl - 1), evap(ncum, nl), icb(ncum))
        CALL cv30_compress(ncum, iflag1, nk1, icb1, icbs1, plcl1, tnk1, qnk1, &
             gznk1, pbase1, buoybase1, t1, q1, qs1, u1, v1, gz1, th1, h1, lv1, &
             cpn1, p1, ph1, tv1, tp1, tvp1, clw1, sig1, w01, iflag, nk, icb, &
             icbs, plcl, tnk, qnk, gznk, pbase, buoybase, t, q, qs, u, v, gz, &
             th, h, lv, cpn, p, ph, tv, tp, tvp, clw, sig, w0)
-       CALL cv30_undilute2(ncum, icb, icbs, nk, tnk, qnk, gznk, t, qs, gz, p, &
-            h, tv, lv, pbase, buoybase, plcl, inb(:ncum), tp, tvp, clw, hp, &
-            ep, sigp, buoy)
-
-       ! CLOSURE
-       CALL cv30_closure(klon, ncum, klev, icb, inb, pbase, p, ph, tv, &
-            buoy, sig, w0, cape, m) ! na->klev
-
-       ! MIXING
-       CALL cv30_mixing(klon, ncum, klev, klev, icb, nk, inb, t, q, qs, u, &
-            v, h, lv, hp, ep, clw, m, sig, ment, qent, uent, vent, nent, &
-            sij, elij, ments, qents)
-
-       ! Unsaturated (precipitating) downdrafts
-       CALL cv30_unsat(icb(:ncum), inb(:ncum), t, q, qs, gz, u, v, p, ph, th, &
-            tv, lv, cpn, ep(:ncum, :), sigp(:ncum, :), clw(:ncum, :), &
-            m(:ncum, :), ment(:ncum, :, :), elij(:ncum, :, :), delt, plcl, &
-            mp, qp(:ncum, :nl), up(:ncum, :nl), vp(:ncum, :nl), wt, water, &
-            evap, b)
-
-       ! Yield (tendencies, precipitation, variables of interface with
-       ! other processes, etc)
-       CALL cv30_yield(icb(:ncum), inb(:ncum), delt, t, q, u, v, gz, p, ph, &
-            h, hp, lv, cpn, th, ep, clw, m, tp, mp, qp, up, vp, wt, &
-            water(:ncum, :nl), evap(:ncum, :nl), b, ment, qent, uent, vent, &
-            nent, elij, sig, tv, tvp, iflag, precip, VPrecip, ft, fq, fu, fv, &
-            upwd, dnwd, dnwd0, ma, mike, tls, tps, qcondc)
-
+       CALL cv30_undilute2(icb, icbs(:ncum), nk, tnk, qnk, gznk, t, qs, gz, &
+            p, h, tv, lv, pbase, buoybase, plcl, inb(:ncum), tp, tvp, clw, &
+            hp, ep, buoy)
+       CALL cv30_closure(icb, inb(:ncum), pbase, p, ph, tv, buoy, sig, w0, &
+            cape, m)
+       CALL cv30_mixing(icb, nk(:ncum), inb(:ncum), t, q, qs, u, v, h, lv, &
+            hp, ep, clw, m, sig, ment, qent, uent, vent, nent, sij, elij, &
+            ments, qents)
+       CALL cv30_unsat(icb, inb(:ncum), t(:ncum, :nl), q(:ncum, :nl), &
+            qs(:ncum, :nl), gz, u, v, p, ph, th(:ncum, :nl - 1), tv, lv, cpn, &
+            ep(:ncum, :), clw(:ncum, :), m(:ncum, :), ment(:ncum, :, :), &
+            elij(:ncum, :, :), dtphys, plcl, mp, qp(:ncum, :nl), &
+            up(:ncum, :nl), vp(:ncum, :nl), wt(:ncum, :nl), &
+            water(:ncum, :nl), evap, b)
+       CALL cv30_yield(icb, inb(:ncum), dtphys, t, q, u, v, gz, p, ph, h, hp, &
+            lv, cpn, th, ep, clw, m, tp, mp, qp, up, vp(:ncum, 2:nl), &
+            wt(:ncum, :nl - 1), water(:ncum, :nl), evap, b, ment, qent, uent, &
+            vent, nent, elij, sig, tv, tvp, iflag, precip, VPrecip, ft, fq, &
+            fu, fv, upwd, dnwd, dnwd0, ma, mike, tls, tps, qcondc)
        CALL cv30_tracer(klon, ncum, klev, ment, sij, da, phi)
 
        ! UNCOMPRESS THE FIELDS

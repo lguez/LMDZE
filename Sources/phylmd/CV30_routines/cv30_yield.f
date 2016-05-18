@@ -9,8 +9,11 @@ contains
        qent, uent, vent, nent, elij, sig, tv, tvp, iflag, precip, VPrecip, &
        ft, fr, fu, fv, upwd, dnwd, dnwd0, ma, mike, tls, tps, qcondc)
 
+    ! Tendencies, precipitation, variables of interface with other
+    ! processes, etc.
+
     use conema3_m, only: iflag_clw
-    use cv30_param_m, only: delta, minorig, nl, sigd
+    use cv30_param_m, only: minorig, nl, sigd
     use cv_thermo_m, only: cl, cpd, cpv, grav, rowl, rrd, rrv
     USE dimphy, ONLY: klev, klon
 
@@ -27,7 +30,8 @@ contains
     real m(klon, klev)
     real tp(klon, klev)
     real mp(klon, klev), rp(klon, klev), up(klon, klev)
-    real vp(klon, klev), wt(klon, klev)
+    real, intent(in):: vp(:, 2:) ! (ncum, 2:nl)
+    real, intent(in):: wt(:, :) ! (ncum, nl - 1)
     real, intent(in):: water(:, :), evap(:, :) ! (ncum, nl)
     real, intent(in):: b(:, :) ! (ncum, nl - 1)
     real ment(klon, klev, klev), qent(klon, klev, klev), uent(klon, klev, klev)
@@ -52,6 +56,7 @@ contains
     real qcondc(klon, klev)
 
     ! Local:
+    real, parameter:: delta = 0.01 ! interface cloud parameterization
     integer ncum
     integer i, k, il, n, j, num1
     real rat, awat, delti

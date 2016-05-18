@@ -818,10 +818,9 @@ contains
        da = 0.
        mp = 0.
        phi = 0.
-       CALL concvl(dtphys, paprs, play, t_seri, q_seri, u_seri, v_seri, sig1, &
-            w01, d_t_con, d_q_con, d_u_con, d_v_con, rain_con, ibas_con, &
-            itop_con, upwd, dnwd, dnwd0, Ma, cape, iflagctrl, qcondc, pmflxr, &
-            da, phi, mp)
+       CALL concvl(paprs, play, t_seri, q_seri, u_seri, v_seri, sig1, w01, &
+            d_t_con, d_q_con, d_u_con, d_v_con, rain_con, ibas_con, itop_con, &
+            upwd, dnwd, dnwd0, Ma, cape, iflagctrl, qcondc, pmflxr, da, phi, mp)
        snow_con = 0.
        clwcon0 = qcondc
        mfu = upwd + dnwd

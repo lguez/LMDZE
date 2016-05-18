@@ -4,100 +4,89 @@ module cv30_feed_m
 
 contains
 
-  SUBROUTINE cv30_feed(len, nd, t, q, qs, p, ph, gz, nk, icb, icbmax, iflag, &
-       tnk, qnk, gznk, plcl)
+  SUBROUTINE cv30_feed(t1, q1, qs1, p1, ph1, gz1, nk1, icb1, icbmax, iflag1, &
+       tnk1, qnk1, gznk1, plcl1)
 
     ! Purpose: convective feed
 
-    ! Main differences with cv_feed:
-    ! - ph added in input
-    ! - here, nk(i) = minorig
-    ! - icb defined differently (plcl compared with ph instead of p)
-
     use cv30_param_m, only: minorig, nl
+    USE dimphy, ONLY: klev, klon
+    use numer_rec_95, only: locate
 
-    integer, intent(in):: len, nd
-    real, intent(in):: t(len, nd)
-    real, intent(in):: q(len, nd), qs(len, nd), p(len, nd)
-    real, intent(in):: ph(len, nd+1)
-    real, intent(in):: gz(len, nd)
+    real, intent(in):: t1(:, :) ! (klon, klev)
+    real, intent(in):: q1(:, :), qs1(:, :), p1(:, :) ! (klon, klev)
+    real, intent(in):: ph1(:, :) ! (klon, klev+1)
+    real, intent(in):: gz1(:, :) ! (klon, klev)
 
     ! outputs:
-    integer, intent(out):: nk(len), icb(len), icbmax
-    integer, intent(inout):: iflag(len)
-    real tnk(len), qnk(len), gznk(len)
-    real, intent(out):: plcl(len)
+    integer, intent(out):: nk1(:), icb1(:) ! (klon)
+    integer, intent(out):: icbmax
+    integer, intent(inout):: iflag1(klon)
+    real tnk1(klon), qnk1(klon), gznk1(klon)
+    real, intent(out):: plcl1(klon)
 
     ! Local:
-    integer i, k
-    real pnk(len), qsnk(len), rh(len), chi(len)
+    integer i
+    real pnk(klon), qsnk(klon), rh(klon), chi(klon)
     real, parameter:: A = 1669., B = 122.
 
     !--------------------------------------------------------------------
 
-    plcl = 0.
+    plcl1 = 0.
 
     ! Origin level of ascending parcels
-
-    do i = 1, len
-       nk(i) = minorig
-    end do
+    nk1 = minorig
 
     ! Check whether parcel level temperature and specific humidity
     ! are reasonable
 
-    do i = 1, len
-       if ((t(i, nk(i)) < 250. .or. q(i, nk(i)) <= 0.) .and. iflag(i) == 0) &
-            iflag(i) = 7
+    do i = 1, klon
+       if (t1(i, nk1(i)) < 250. .or. q1(i, nk1(i)) <= 0.) iflag1(i) = 7
     end do
 
     ! Calculate lifted condensation level of air at parcel origin level
-    ! (within 0.2% of formula of Bolton, Mon. Wea. Rev., 1980)
+    ! (within 0.2 % of formula of Bolton, Mon. Wea. Rev., 1980)
 
-    do i = 1, len
-       if (iflag(i) /= 7) then
-          tnk(i) = t(i, nk(i))
-          qnk(i) = q(i, nk(i))
-          gznk(i) = gz(i, nk(i))
-          pnk(i) = p(i, nk(i))
-          qsnk(i) = qs(i, nk(i))
+    do i = 1, klon
+       if (iflag1(i) /= 7) then
+          tnk1(i) = t1(i, nk1(i))
+          qnk1(i) = q1(i, nk1(i))
+          gznk1(i) = gz1(i, nk1(i))
+          pnk(i) = p1(i, nk1(i))
+          qsnk(i) = qs1(i, nk1(i))
 
-          rh(i) = qnk(i)/qsnk(i)
-          chi(i) = tnk(i)/(A-B*rh(i)-tnk(i))
-          plcl(i) = pnk(i)*(rh(i)**chi(i))
-          if ((plcl(i) < 200. .or. plcl(i) >= 2000.) .and. iflag(i) == 0) &
-               iflag(i) = 8
+          rh(i) = qnk1(i) / qsnk(i)
+          chi(i) = tnk1(i) / (A - B*rh(i) - tnk1(i))
+          plcl1(i) = pnk(i)*(rh(i)**chi(i))
+          if ((plcl1(i) < 200. .or. plcl1(i) >= 2000.) .and. iflag1(i) == 0) &
+               iflag1(i) = 8
        endif
     end do
 
-    ! Calculate first level above lcl (= icb)
+    ! Calculate first level above lcl (= icb1)
 
-    do i = 1, len
-       icb(i) = nl - 1
+    do i = 1, klon
+       if (plcl1(i) <= ph1(i, nl - 2)) then
+          ! Distinguish this case just so that icb1 = nl - 2, not nl =
+          ! 3, for plcl1 exactly == ph1(i, nl - 2). Maybe not useful.
+          icb1(i) = nl - 2
+       else
+          icb1(i) = locate(- ph1(i, 3:nl - 2), - plcl1(i), my_lbound = 3)
+          ! {2 <= icb1(i) <= nl - 3}
+          ! {ph1(i, icb1(i) + 1) < plcl1(i) <= ph1(i, icb1(i))}
+       end if
     end do
 
-    ! La modification consiste \`a comparer plcl \`a ph et non \`a p:
-    ! icb est d\'efini par : ph(icb) < plcl < ph(icb - 1)
-    do k = 3, nl-1 ! modification pour que icb soit supérieur ou égal à 2
-       do i = 1, len
-          if (ph(i, k) < plcl(i)) icb(i) = min(icb(i), k)
-       end do
-    end do
-
-    do i = 1, len
-       if ((icb(i) == nl - 1).and.(iflag(i) == 0)) iflag(i) = 9
-    end do
-
-    do i = 1, len
-       icb(i) = icb(i)-1 ! icb >= 2
+    do i = 1, klon
+       if ((icb1(i) == nl - 2).and.(iflag1(i) == 0)) iflag1(i) = 9
     end do
 
     ! Compute icbmax
 
     icbmax = 2
 
-    do i = 1, len
-       if (iflag(i) < 7) icbmax = max(icbmax, icb(i))
+    do i = 1, klon
+       if (iflag1(i) < 7) icbmax = max(icbmax, icb1(i))
     end do
 
   end SUBROUTINE cv30_feed

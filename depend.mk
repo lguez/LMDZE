@@ -38,7 +38,7 @@ comconst.o : conf_gcm.o
 comdissnew.o : unit_nml_m.o 
 comgeom.o : paramet_m.o dynetat0.o comdissnew.o comconst.o dimens_m.o 
 comgeomphy.o : dimphy.o 
-concvl.o : yoethf.o suphec.o FCTTRE.o dimphy.o cv_driver.o 
+concvl.o : yoethf.o suphec.o FCTTRE.o dimphy.o cv_driver.o comconst.o 
 conf_gcm.o : unit_nml_m.o abort_gcm.o 
 conf_guide.o : unit_nml_m.o dynetat0.o conf_gcm.o comconst.o abort_gcm.o 
 conf_phys.o : YOMCST.o unit_nml_m.o conema3_m.o comfisrtilp.o clesphys2.o clesphys.o 
@@ -48,19 +48,19 @@ convmas.o : filtreg_scal.o paramet_m.o dimens_m.o
 coordij.o : dynetat0.o dimens_m.o 
 covcont.o : comgeom.o paramet_m.o dimens_m.o 
 covnat.o : paramet_m.o comgeom.o 
-cv30_closure.o : cv_thermo.o cv30_param.o 
+cv30_closure.o : dimphy.o cv_thermo.o cv30_param.o 
 cv30_compress.o : dimphy.o cv30_param.o 
-cv30_feed.o : cv30_param.o 
-cv30_mixing.o : cv_thermo.o cv30_param.o 
-cv30_param.o : dimphy.o 
+cv30_feed.o : dimphy.o cv30_param.o 
+cv30_mixing.o : dimphy.o cv_thermo.o cv30_param.o 
+cv30_param.o : comconst.o dimphy.o 
 cv30_prelim.o : cv_thermo.o cv30_param.o 
-cv30_trigger.o : cv30_param.o 
+cv30_trigger.o : dimphy.o cv30_param.o 
 cv30_uncompress.o : dimphy.o cv30_param.o 
-cv30_undilute1.o : cv_thermo.o cv30_param.o 
+cv30_undilute1.o : dimphy.o cv_thermo.o cv30_param.o 
 cv30_undilute2.o : dimphy.o cv_thermo.o cv30_param.o conema3_m.o 
-cv30_unsat.o : dimphy.o cv_thermo.o cv30_param.o 
+cv30_unsat.o : cv_thermo.o cv30_param.o 
 cv30_yield.o : dimphy.o cv_thermo.o cv30_param.o conema3_m.o 
-cv_driver.o : dimphy.o cv_thermo.o cv30_yield.o cv30_unsat.o cv30_undilute2.o cv30_uncompress.o cv30_trigger.o cv30_tracer.o cv30_prelim.o cv30_param.o cv30_mixing.o cv30_feed.o cv30_compress.o cv30_closure.o 
+cv_driver.o : dimphy.o cv_thermo.o cv30_yield.o cv30_unsat.o cv30_undilute2.o cv30_undilute1.o cv30_uncompress.o cv30_trigger.o cv30_tracer.o cv30_prelim.o cv30_param.o cv30_mixing.o cv30_feed.o cv30_compress.o cv30_closure.o comconst.o 
 cv_thermo.o : suphec.o 
 cvltr.o : suphec.o dimphy.o 
 decoop.o : findsep.o errioipsl.o 

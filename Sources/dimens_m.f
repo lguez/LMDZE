@@ -6,7 +6,10 @@ module dimens_m
 
   INTEGER, PARAMETER:: iim = 16 ! number of longitudes
   INTEGER, PARAMETER:: jjm = 12 ! number of latitudes
-  INTEGER, PARAMETER:: llm = 11 ! number of vertical layers
+
+  INTEGER, PARAMETER:: llm = 11
+  ! number of vertical layers, should be >= 7, because of nl in cv30_param_m
+
   INTEGER, PARAMETER:: ndm = 1
   integer, parameter:: nqmx = 5 ! maximum number of tracers
 

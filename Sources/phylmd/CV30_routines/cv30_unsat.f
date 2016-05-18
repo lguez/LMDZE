@@ -5,12 +5,12 @@ module cv30_unsat_m
 contains
 
   SUBROUTINE cv30_unsat(icb, inb, t, q, qs, gz, u, v, p, ph, th, tv, lv, cpn, &
-       ep, sigp, clw, m, ment, elij, delt, plcl, mp, qp, up, vp, wt, water, &
-       evap, b)
+       ep, clw, m, ment, elij, delt, plcl, mp, qp, up, vp, wt, water, evap, b)
+
+    ! Unsaturated (precipitating) downdrafts
 
     use cv30_param_m, only: nl, sigd
     use cv_thermo_m, only: cpd, ginv, grav
-    USE dimphy, ONLY: klon, klev
 
     integer, intent(in):: icb(:) ! (ncum)
 
@@ -18,28 +18,35 @@ contains
     ! first model level above the level of neutral buoyancy of the
     ! parcel (1 <= inb <= nl - 1)
 
-    real, intent(in):: t(:, :), q(:, :), qs(:, :) ! (klon, klev)
+    real, intent(in):: t(:, :), q(:, :), qs(:, :) ! (ncum, nl)
     real, intent(in):: gz(:, :) ! (klon, klev)
     real, intent(in):: u(:, :), v(:, :) ! (klon, klev)
-    real, intent(in):: p(klon, klev), ph(klon, klev + 1)
-    real, intent(in):: th(klon, klev)
-    real, intent(in):: tv(klon, klev)
-    real, intent(in):: lv(klon, klev)
-    real, intent(in):: cpn(klon, klev)
-    real, intent(in):: ep(:, :), sigp(:, :), clw(:, :) ! (ncum, klev)
+    real, intent(in):: p(:, :) ! (klon, klev) pressure at full level, in hPa
+    real, intent(in):: ph(:, :) ! (klon, klev + 1)
+    real, intent(in):: th(:, :) ! (ncum, nl - 1)
+    real, intent(in):: tv(:, :) ! (klon, klev)
+    real, intent(in):: lv(:, :) ! (klon, klev)
+    real, intent(in):: cpn(:, :) ! (klon, klev)
+    real, intent(in):: ep(:, :) ! (ncum, klev)
+    real, intent(in):: clw(:, :) ! (ncum, klev)
     real, intent(in):: m(:, :) ! (ncum, klev)
     real, intent(in):: ment(:, :, :) ! (ncum, klev, klev)
     real, intent(in):: elij(:, :, :) ! (ncum, klev, klev)
     real, intent(in):: delt
-    real, intent(in):: plcl(klon)
+    real, intent(in):: plcl(:) ! (klon)
 
-    ! outputs:
-    real, intent(out):: mp(klon, klev)
+    real, intent(out):: mp(:, :) ! (klon, klev)
     real, intent(out):: qp(:, :), up(:, :), vp(:, :) ! (ncum, nl)
-    real wt(klon, klev), water(klon, klev), evap(klon, klev)
+    real, intent(out):: wt(:, :) ! (ncum, nl)
+    real, intent(out):: water(:, :), evap(:, :) ! (ncum, nl)
     real, intent(out):: b(:, :) ! (ncum, nl - 1)
 
     ! Local:
+
+    real, parameter:: sigp = 0.15
+    ! fraction of precipitation falling outside of cloud, \sig_s in
+    ! Emanuel (1991 928)
+
     integer ncum
     integer i, il, imax
     real tinv, delti
@@ -47,7 +54,7 @@ contains
     real pr1, pr2, sigt, b6, c6, revap, tevap, delth
     real amfac, amp2, xf, tf, fac2, ur, sru, fac, d, af, bf
     real ampmax
-    real lvcp(klon, klev)
+    real lvcp(size(icb), nl) ! (ncum, nl)
     real wdtrain(size(icb)) ! (ncum)
     logical lwork(size(icb)) ! (ncum)
 
@@ -94,7 +101,7 @@ contains
        ! Find rain water and evaporation using provisional 
        ! estimates of qp(i) and qp(i - 1) 
 
-       do il = 1, ncum
+       loop_horizontal: do il = 1, ncum
           if (i <= inb(il) .and. lwork(il)) then
              wt(il, i) = 45.
 
@@ -130,20 +137,21 @@ contains
 
              ! Prise en compte de la variation progressive de sigt dans
              ! les couches icb et icb - 1:
-             ! pour plcl < ph(i + 1), pr1 = 0 et pr2 = 1
-             ! pour plcl > ph(i), pr1 = 1 et pr2 = 0
+             ! pour plcl <= ph(i + 1), pr1 = 0 et pr2 = 1
+             ! pour plcl >= ph(i), pr1 = 1 et pr2 = 0
              ! pour ph(i + 1) < plcl < ph(i), pr1 est la proportion \`a cheval
              ! sur le nuage, et pr2 est la proportion sous la base du
              ! nuage.
-             pr1 = (plcl(il) - ph(il, i + 1)) / (ph(il, i) - ph(il, i + 1))
-             pr1 = max(0., min(1., pr1))
-             pr2 = (ph(il, i) - plcl(il)) / (ph(il, i) - ph(il, i + 1))
-             pr2 = max(0., min(1., pr2))
-             sigt = sigp(il, i) * pr1 + pr2
+             pr1 = max(0., min(1., &
+                  (plcl(il) - ph(il, i + 1)) / (ph(il, i) - ph(il, i + 1))))
+             pr2 = max(0., min(1., &
+                  (ph(il, i) - plcl(il)) / (ph(il, i) - ph(il, i + 1))))
+             sigt = sigp * pr1 + pr2
 
              b6 = bfac * 50. * sigd * (ph(il, i) - ph(il, i + 1)) * sigt * afac
              c6 = water(il, i + 1) + bfac * wdtrain(il) - 50. * sigd * bfac &
                   * (ph(il, i) - ph(il, i + 1)) * evap(il, i + 1)
+
              if (c6 > 0.) then
                 revap = 0.5 * (- b6 + sqrt(b6 * b6 + 4. * c6))
                 evap(il, i) = sigt * afac * revap
@@ -256,7 +264,7 @@ contains
                 qp(il, i) = max(qp(il, i), 0.)
              endif
           endif
-       end do
+       end do loop_horizontal
     end DO downdraft_loop
 
   end SUBROUTINE cv30_unsat

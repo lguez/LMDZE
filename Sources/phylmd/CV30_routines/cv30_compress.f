@@ -14,11 +14,12 @@ contains
 
     use cv30_param_m, only: nl
     USE dimphy, ONLY: klev, klon
+    use nr_util, only: assert
 
     ! inputs:
     integer, intent(in):: ncum
-    integer iflag1(klon), nk1(klon), icb1(klon), icbs1(klon)
-    real plcl1(klon), tnk1(klon), qnk1(klon), gznk1(klon)
+    integer, intent(in):: iflag1(klon), nk1(klon), icb1(klon), icbs1(klon)
+    real, intent(in):: plcl1(klon), tnk1(klon), qnk1(klon), gznk1(klon)
     real pbase1(klon), buoybase1(klon)
     real, intent(in):: t1(klon, klev)
     real, intent(in):: q1(klon, klev), qs1(klon, klev)
@@ -31,7 +32,9 @@ contains
     real sig1(klon, klev), w01(klon, klev)
 
     ! outputs:
-    integer iflag(klon), nk(klon), icb(klon), icbs(klon)
+    integer iflag(klon), nk(klon)
+    integer, intent(out):: icb(:) ! (ncum)
+    integer icbs(klon)
     real plcl(klon), tnk(klon), qnk(klon), gznk(klon)
     real pbase(klon), buoybase(klon)
     real t(klon, klev), q(klon, klev), qs(klon, klev)
@@ -74,12 +77,9 @@ contains
        end do
     end do
 
-    if (nn /= ncum) then
-       print*, 'strange! nn not equal to ncum: ', nn, ncum
-       stop 1
-    endif
-
+    call assert(nn == ncum, "cv30_compress")
     nn=0
+
     do i=1, klon
        if (iflag1(i) == 0) then
           nn=nn+1

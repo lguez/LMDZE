@@ -4,34 +4,37 @@ module cv30_closure_m
 
 contains
 
-  SUBROUTINE cv30_closure(nloc, ncum, nd, icb, inb, pbase, p, ph, tv, buoy, &
-       sig, w0, cape, m)
+  SUBROUTINE cv30_closure(icb, inb, pbase, p, ph, tv, buoy, sig, w0, cape, m)
 
+    ! CLOSURE
     ! Vectorization: S. Bony
 
     use cv30_param_m, only: alpha, beta, dtcrit, minorig, nl
     use cv_thermo_m, only: rrd
+    USE dimphy, ONLY: klev, klon
 
     ! input:
-    integer, intent(in):: ncum, nd, nloc
-    integer, intent(in):: icb(nloc), inb(nloc)
-    real pbase(nloc)
-    real p(nloc, nd), ph(nloc, nd+1)
-    real tv(nloc, nd), buoy(nloc, nd)
+    integer, intent(in):: icb(:), inb(:) ! (ncum)
+    real pbase(klon)
+    real p(klon, klev), ph(klon, klev+1)
+    real tv(klon, klev), buoy(klon, klev)
 
     ! input/output:
-    real sig(nloc, nd), w0(nloc, nd)
+    real sig(klon, klev), w0(klon, klev)
 
     ! output:
-    real cape(nloc)
-    real m(nloc, nd)
+    real cape(klon)
+    real m(klon, klev)
 
     ! Local:
+    integer ncum
     integer i, j, k, icbmax
     real deltap, fac, w, amu
-    real dtmin(nloc, nd), sigold(nloc, nd)
+    real dtmin(klon, klev), sigold(klon, klev)
 
     !-------------------------------------------------------
+
+    ncum = size(icb)
 
     ! Initialization
 
@@ -80,7 +83,7 @@ contains
 
     do k=1, nl-1
        do i=1, ncum
-          if (sig(i, nd) < 1.5.or.sig(i, nd) > 12.0)then
+          if (sig(i, klev) < 1.5.or.sig(i, klev) > 12.0)then
              sig(i, k)=0.0
              w0(i, k)=0.0
           endif
