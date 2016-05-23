@@ -1,7 +1,7 @@
 module cv_thermo_m
 
   ! From LMDZ4/libf/phylmd/cvthermo.h, version 1.1.1.1 2004/05/19 12:53:09
-  ! Thermodynamical constants for convectL
+  ! Thermodynamical constants for cv_driver
 
   implicit none
 
@@ -15,7 +15,7 @@ contains
 
   SUBROUTINE cv_thermo
 
-    ! Set thermodynamical constants for convectL
+    ! Set thermodynamical constants for cv_driver
 
     use SUPHEC_M, only: rcpd, rcpv, rcw, rd, rg, rlvtt, rv
 

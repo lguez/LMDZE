@@ -83,7 +83,7 @@ contains
     real l0(ngrid)
     real sq(ngrid), sqz(ngrid), zz(ngrid, klev+1)
     integer iter
-    real:: ric = 0.195, rifc = 0.191, b1 = 16.6, kap = 0.4
+    real:: ric = 0.195, rifc = 0.191, b1 = 16.6
 
     !-----------------------------------------------------------------------
 
@@ -141,7 +141,7 @@ contains
        enddo
     enddo
 
-    ! Au premier appel, on d\'etermine l et q2 de façon it\'erative.
+    ! Au premier appel, on d\'etermine l et q2 de fa\ccon it\'erative.
     ! It\'eration pour d\'eterminer la longueur de m\'elange
 
     if (first .or. iflag_pbl == 6) then

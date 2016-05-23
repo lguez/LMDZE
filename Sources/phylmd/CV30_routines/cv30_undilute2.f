@@ -27,7 +27,7 @@ contains
     real, intent(in):: t(klon, klev), qs(klon, klev), gz(klon, klev)
     real, intent(in):: p(klon, klev), h(klon, klev)
     real, intent(in):: tv(klon, klev), lv(klon, klev)
-    real, intent(in):: pbase(klon), buoybase(klon), plcl(klon)
+    real, intent(in):: pbase(:), buoybase(:), plcl(:) ! (ncum)
 
     ! outputs:
     integer, intent(out):: inb(:) ! (ncum)

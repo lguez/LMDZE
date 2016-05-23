@@ -13,6 +13,8 @@ contains
     use cv_thermo_m, only: cpd, ginv, grav
 
     integer, intent(in):: icb(:) ! (ncum)
+    ! {2 <= icb <= nl - 3}
+    ! {ph(i, icb(i) + 1) < plcl(i) <= ph(i, icb(i))}
 
     integer, intent(in):: inb(:) ! (ncum)
     ! first model level above the level of neutral buoyancy of the
@@ -22,7 +24,7 @@ contains
     real, intent(in):: gz(:, :) ! (klon, klev)
     real, intent(in):: u(:, :), v(:, :) ! (klon, klev)
     real, intent(in):: p(:, :) ! (klon, klev) pressure at full level, in hPa
-    real, intent(in):: ph(:, :) ! (klon, klev + 1)
+    real, intent(in):: ph(:, :) ! (ncum, klev + 1)
     real, intent(in):: th(:, :) ! (ncum, nl - 1)
     real, intent(in):: tv(:, :) ! (klon, klev)
     real, intent(in):: lv(:, :) ! (klon, klev)
@@ -33,7 +35,7 @@ contains
     real, intent(in):: ment(:, :, :) ! (ncum, klev, klev)
     real, intent(in):: elij(:, :, :) ! (ncum, klev, klev)
     real, intent(in):: delt
-    real, intent(in):: plcl(:) ! (klon)
+    real, intent(in):: plcl(:) ! (ncum)
 
     real, intent(out):: mp(:, :) ! (klon, klev)
     real, intent(out):: qp(:, :), up(:, :), vp(:, :) ! (ncum, nl)

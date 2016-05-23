@@ -9,11 +9,13 @@ contains
        precip1, VPrecip1, sig1, w01, ft1, fq1, fu1, fv1, inb1, Ma1, upwd1, &
        dnwd1, dnwd01, qcondc1, cape1, da1, phi1, mp1)
 
+    ! UNCOMPRESS THE FIELDS
+
     USE cv30_param_m, ONLY: nl
     use dimphy, only: klon, klev
 
     integer, intent(in):: idcum(:) ! (ncum)
-    integer, intent(in):: iflag(klon)
+    integer, intent(in):: iflag(:) ! (ncum)
     real, intent(in):: precip(klon)
     real, intent(in):: VPrecip(klon, klev+1)
     real, intent(in):: sig(klon, klev), w0(klon, klev)
@@ -26,7 +28,7 @@ contains
     real, intent(in):: da(klon, klev), phi(klon, klev, klev), mp(klon, klev)
 
     ! outputs:
-    integer iflag1(klon)
+    integer, intent(out):: iflag1(:) ! (klon)
     real precip1(klon)
     real VPrecip1(klon, klev+1)
     real sig1(klon, klev), w01(klon, klev)
@@ -45,6 +47,7 @@ contains
     !-------------------------------------------------------------------
 
     ncum = size(idcum)
+    iflag1 = 42 ! for non convective points
 
     do  i=1, ncum
        precip1(idcum(i))=precip(i)

@@ -46,7 +46,7 @@ contains
     ! value of PH should be greater than (i.e. at a lower level than)
     ! the first value of the array P1.
 
-    integer, intent(out):: iflag1(klon)
+    integer, intent(out):: iflag1(:) ! (klon)
     ! Flag for Emanuel conditions.
 
     ! 0: Moist convection occurs.
@@ -108,7 +108,6 @@ contains
 
     real da(klon, klev), phi(klon, klev, klev), mp(klon, klev)
     integer i, k, il
-    integer icbmax
     integer nk1(klon)
     integer icbs1(klon)
     real plcl1(klon)
@@ -130,13 +129,14 @@ contains
     integer ncum
 
     ! Compressed fields:
-    integer idcum(klon)
-    integer iflag(klon), nk(klon)
+    integer, allocatable:: idcum(:), iflag(:) ! (ncum)
+    integer nk(klon)
     integer, allocatable:: icb(:) ! (ncum)
     integer nent(klon, klev)
     integer icbs(klon)
     integer inb(klon)
-    real plcl(klon), tnk(klon), qnk(klon), gznk(klon)
+    real, allocatable:: plcl(:) ! (ncum)
+    real tnk(klon), qnk(klon), gznk(klon)
     real t(klon, klev), q(klon, klev), qs(klon, klev)
     real u(klon, klev), v(klon, klev)
     real gz(klon, klev), h(klon, klev), lv(klon, klev), cpn(klon, klev)
@@ -169,10 +169,7 @@ contains
     !-------------------------------------------------------------------
 
     ! SET CONSTANTS AND PARAMETERS
-
-    ! set thermodynamical constants:
     CALL cv_thermo
-
     CALL cv30_param
 
     ! INITIALIZE OUTPUT ARRAYS AND PARAMETERS
@@ -198,7 +195,6 @@ contains
     end do
 
     precip1 = 0.
-    iflag1 = 0
     cape1 = 0.
     VPrecip1(:, klev + 1) = 0.
 
@@ -209,43 +205,38 @@ contains
 
     CALL cv30_prelim(klon, klev, klev + 1, t1, q1, p1, ph1, lv1, cpn1, tv1, &
          gz1, h1, hm1, th1)
-    CALL cv30_feed(t1, q1, qs1, p1, ph1, gz1, nk1, icb1, icbmax, iflag1, &
-         tnk1, qnk1, gznk1, plcl1)
+    CALL cv30_feed(t1, q1, qs1, p1, ph1, gz1, nk1, icb1, iflag1, tnk1, qnk1, &
+         gznk1, plcl1)
     CALL cv30_undilute1(t1, q1, qs1, gz1, plcl1, p1, nk1, icb1, tp1, tvp1, &
          clw1, icbs1)
     CALL cv30_trigger(icb1, plcl1, p1, th1, tv1, tvp1, pbase1, buoybase1, &
          iflag1, sig1, w01)
 
-    ! Moist convective adjustment is necessary
-
-    ncum = 0
-    do i = 1, klon
-       if (iflag1(i) == 0) then
-          ncum = ncum + 1
-          idcum(ncum) = i
-       endif
-    end do
+    ncum = count(iflag1 == 0)
 
     IF (ncum > 0) THEN
-       allocate(b(ncum, nl - 1), evap(ncum, nl), icb(ncum))
-       CALL cv30_compress(ncum, iflag1, nk1, icb1, icbs1, plcl1, tnk1, qnk1, &
-            gznk1, pbase1, buoybase1, t1, q1, qs1, u1, v1, gz1, th1, h1, lv1, &
-            cpn1, p1, ph1, tv1, tp1, tvp1, clw1, sig1, w01, iflag, nk, icb, &
-            icbs, plcl, tnk, qnk, gznk, pbase, buoybase, t, q, qs, u, v, gz, &
-            th, h, lv, cpn, p, ph, tv, tp, tvp, clw, sig, w0)
+       ! Moist convective adjustment is necessary
+       allocate(idcum(ncum), plcl(ncum))
+       allocate(b(ncum, nl - 1), evap(ncum, nl), icb(ncum), iflag(ncum))
+       idcum = pack((/(i, i = 1, klon)/), iflag1 == 0)
+       CALL cv30_compress(iflag1, nk1, icb1, icbs1, plcl1, tnk1, qnk1, gznk1, &
+            pbase1, buoybase1, t1, q1, qs1, u1, v1, gz1, th1, h1, lv1, cpn1, &
+            p1, ph1, tv1, tp1, tvp1, clw1, sig1, w01, nk, icb, icbs, plcl, &
+            tnk, qnk, gznk, pbase, buoybase, t, q, qs, u, v, gz, th, h, lv, &
+            cpn, p, ph, tv, tp, tvp, clw, sig, w0)
        CALL cv30_undilute2(icb, icbs(:ncum), nk, tnk, qnk, gznk, t, qs, gz, &
-            p, h, tv, lv, pbase, buoybase, plcl, inb(:ncum), tp, tvp, clw, &
-            hp, ep, buoy)
-       CALL cv30_closure(icb, inb(:ncum), pbase, p, ph, tv, buoy, sig, w0, &
-            cape, m)
+            p, h, tv, lv, pbase(:ncum), buoybase(:ncum), plcl, inb(:ncum), &
+            tp, tvp, clw, hp, ep, buoy)
+       CALL cv30_closure(icb, inb(:ncum), pbase, p, ph(:ncum, :), tv, buoy, &
+            sig, w0, cape, m)
        CALL cv30_mixing(icb, nk(:ncum), inb(:ncum), t, q, qs, u, v, h, lv, &
             hp, ep, clw, m, sig, ment, qent, uent, vent, nent, sij, elij, &
             ments, qents)
        CALL cv30_unsat(icb, inb(:ncum), t(:ncum, :nl), q(:ncum, :nl), &
-            qs(:ncum, :nl), gz, u, v, p, ph, th(:ncum, :nl - 1), tv, lv, cpn, &
-            ep(:ncum, :), clw(:ncum, :), m(:ncum, :), ment(:ncum, :, :), &
-            elij(:ncum, :, :), dtphys, plcl, mp, qp(:ncum, :nl), &
-            up(:ncum, :nl), vp(:ncum, :nl), wt(:ncum, :nl), &
+            qs(:ncum, :nl), gz, u, v, p, ph(:ncum, :), th(:ncum, :nl - 1), &
+            tv, lv, cpn, ep(:ncum, :), clw(:ncum, :), m(:ncum, :), &
+            ment(:ncum, :, :), elij(:ncum, :, :), dtphys, plcl, mp, &
+            qp(:ncum, :nl), up(:ncum, :nl), vp(:ncum, :nl), wt(:ncum, :nl), &
             water(:ncum, :nl), evap, b)
        CALL cv30_yield(icb, inb(:ncum), dtphys, t, q, u, v, gz, p, ph, h, hp, &
             lv, cpn, th, ep, clw, m, tp, mp, qp, up, vp(:ncum, 2:nl), &
@@ -253,14 +244,10 @@ contains
             vent, nent, elij, sig, tv, tvp, iflag, precip, VPrecip, ft, fq, &
             fu, fv, upwd, dnwd, dnwd0, ma, mike, tls, tps, qcondc)
        CALL cv30_tracer(klon, ncum, klev, ment, sij, da, phi)
-
-       ! UNCOMPRESS THE FIELDS
-       iflag1 = 42 ! for non convective points
-       CALL cv30_uncompress(idcum(:ncum), iflag, precip, VPrecip, sig, w0, &
-            ft, fq, fu, fv, inb, Ma, upwd, dnwd, dnwd0, qcondc, cape, &
-            da, phi, mp, iflag1, precip1, VPrecip1, sig1, w01, ft1, fq1, &
-            fu1, fv1, inb1, Ma1, upwd1, dnwd1, dnwd01, qcondc1, cape1, da1, &
-            phi1, mp1)
+       CALL cv30_uncompress(idcum, iflag, precip, VPrecip, sig, w0, ft, fq, &
+            fu, fv, inb, Ma, upwd, dnwd, dnwd0, qcondc, cape, da, phi, mp, &
+            iflag1, precip1, VPrecip1, sig1, w01, ft1, fq1, fu1, fv1, inb1, &
+            Ma1, upwd1, dnwd1, dnwd01, qcondc1, cape1, da1, phi1, mp1)
     ENDIF
 
   end SUBROUTINE cv_driver

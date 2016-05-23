@@ -41,8 +41,7 @@ contains
     real sig(klon, klev)
     real tv(klon, klev), tvp(klon, klev)
 
-    ! input / output:
-    integer iflag(klon)
+    integer, intent(out):: iflag(:) ! (ncum)
 
     ! outputs:
     real precip(klon)
@@ -72,6 +71,7 @@ contains
     !-------------------------------------------------------------
 
     ncum = size(icb)
+    iflag = 0
 
     ! initialization:
 

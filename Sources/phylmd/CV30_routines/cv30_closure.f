@@ -16,7 +16,8 @@ contains
     ! input:
     integer, intent(in):: icb(:), inb(:) ! (ncum)
     real pbase(klon)
-    real p(klon, klev), ph(klon, klev+1)
+    real p(:, :) ! (klon, klev)
+    real, intent(in):: ph(:, :)  ! (ncum, klev + 1)
     real tv(klon, klev), buoy(klon, klev)
 
     ! input/output:
@@ -50,9 +51,9 @@ contains
 
     do k=1, nl-1
        do i=1, ncum
-          if ((inb(i) < (nl-1)).and.(k >= (inb(i)+1)))then
+          if ((inb(i) < (nl-1)).and.(k >= (inb(i) + 1)))then
              sig(i, k)=beta*sig(i, k) &
-                  +2.*alpha*buoy(i, inb(i))*ABS(buoy(i, inb(i)))
+                  + 2.*alpha*buoy(i, inb(i))*ABS(buoy(i, inb(i)))
              sig(i, k)=AMAX1(sig(i, k), 0.0)
              w0(i, k)=beta*w0(i, k)
           endif
@@ -109,7 +110,7 @@ contains
     do i=1, ncum
        do k=1, nl
           do j=minorig, nl
-             if ((k >= (icb(i)+1)).and.(k <= inb(i)).and. &
+             if ((k >= (icb(i) + 1)).and.(k <= inb(i)).and. &
                   (j >= icb(i)).and.(j <= (k-1)))then
                 dtmin(i, k)=AMIN1(dtmin(i, k), buoy(i, j))
              endif
@@ -117,25 +118,23 @@ contains
        end do
     end do
 
-    ! the interval on which cape is computed starts at pbase :
+    ! The interval on which cape is computed starts at pbase:
 
     do k=1, nl
        do i=1, ncum
-
-          if ((k >= (icb(i)+1)).and.(k <= inb(i))) then
-
+          if ((k >= (icb(i) + 1)).and.(k <= inb(i))) then
              deltap = MIN(pbase(i), ph(i, k-1))-MIN(pbase(i), ph(i, k))
-             cape(i)=cape(i)+rrd*buoy(i, k-1)*deltap/p(i, k-1)
+             cape(i)=cape(i) + rrd*buoy(i, k-1)*deltap/p(i, k-1)
              cape(i)=AMAX1(0.0, cape(i))
              sigold(i, k)=sig(i, k)
 
-             sig(i, k)=beta*sig(i, k)+alpha*dtmin(i, k)*ABS(dtmin(i, k))
+             sig(i, k)=beta*sig(i, k) + alpha*dtmin(i, k)*ABS(dtmin(i, k))
              sig(i, k)=amax1(sig(i, k), 0.0)
              sig(i, k)=amin1(sig(i, k), 0.01)
              fac=AMIN1(((dtcrit-dtmin(i, k))/dtcrit), 1.0)
-             w=(1.-beta)*fac*SQRT(cape(i))+beta*w0(i, k)
-             amu=0.5*(sig(i, k)+sigold(i, k))*w
-             m(i, k)=amu*0.007*p(i, k)*(ph(i, k)-ph(i, k+1))/tv(i, k)
+             w=(1.-beta)*fac*SQRT(cape(i)) + beta*w0(i, k)
+             amu=0.5*(sig(i, k) + sigold(i, k))*w
+             m(i, k)=amu*0.007*p(i, k)*(ph(i, k)-ph(i, k + 1))/tv(i, k)
              w0(i, k)=w
           endif
 
@@ -143,11 +142,11 @@ contains
     end do
 
     do i=1, ncum
-       w0(i, icb(i))=0.5*w0(i, icb(i)+1)
-       m(i, icb(i))=0.5*m(i, icb(i)+1) &
-            *(ph(i, icb(i))-ph(i, icb(i)+1)) &
-            /(ph(i, icb(i)+1)-ph(i, icb(i)+2))
-       sig(i, icb(i))=sig(i, icb(i)+1)
+       w0(i, icb(i))=0.5*w0(i, icb(i) + 1)
+       m(i, icb(i))=0.5*m(i, icb(i) + 1) &
+            *(ph(i, icb(i))-ph(i, icb(i) + 1)) &
+            /(ph(i, icb(i) + 1)-ph(i, icb(i) + 2))
+       sig(i, icb(i))=sig(i, icb(i) + 1)
        sig(i, icb(i)-1)=sig(i, icb(i))
     end do
 
