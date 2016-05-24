@@ -76,13 +76,16 @@ contains
        else
           icb1(i) = locate(- ph1(i, 3:nl - 2), - plcl1(i), my_lbound = 3)
           ! {2 <= icb1(i) <= nl - 3}
-          ! {ph1(i, icb1(i) + 1) < plcl1(i) <= ph1(i, icb1(i))}
+          ! {ph1(i, icb1(i) + 1) < plcl1(i)}
+          ! {plcl1(i) <= ph1(i, icb1(i)) or icb1(i) == 2}
        end if
     end do
 
     where (icb1 == nl - 2 .and. iflag1 == 0) iflag1 = 9
-    ! {(2 <= icb1(i) <= nl - 3 and ph1(i, icb1(i) + 1) < plcl1(i) <=
-    ! ph1(i, icb1(i))) or iflag1 /= 0}
+
+    ! {(2 <= icb1(i) <= nl - 3 and ph1(i, icb1(i) + 1) < plcl1(i) and
+    ! (plcl1(i) <= ph1(i, icb1(i)) or icb1(i) == 2)) or iflag1(i) /=
+    ! 0}
 
   end SUBROUTINE cv30_feed
 

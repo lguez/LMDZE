@@ -14,6 +14,7 @@ contains
 
     use cv30_param_m, only: nl
     USE dimphy, ONLY: klev, klon
+    use nr_util, only: assert
 
     ! inputs:
     integer, intent(in):: iflag1(:), nk1(:), icb1(:), icbs1(:) ! (klon)
@@ -31,11 +32,7 @@ contains
 
     ! outputs:
     integer nk(:) ! (klon)
-
-    integer, intent(out):: icb(:) ! (ncum)
-    ! {2 <= icb <= nl - 3}
-    ! {ph(i, icb(i) + 1) < plcl(i) <= ph(i, icb(i))}
-
+    integer, intent(out):: icb(:) ! (ncum) {2 <= icb <= nl - 3}
     integer icbs(klon)
     real, intent(out):: plcl(:) ! (ncum)
     real tnk(:), qnk(:), gznk(:) ! (klon)
@@ -99,6 +96,12 @@ contains
           icb(nn) = icb1(i)
           icbs(nn) = icbs1(i)
        endif
+    end do
+
+    do i = 1, ncum
+       call assert(2 <= icb(i) .and. icb(i) <= nl - 3 .and. ph(i, icb(i) + 1) &
+            < plcl(i) .and. (plcl(i) <= ph(i, icb(i)) .or. icb(i) == 2), &
+            "cv30_compress")
     end do
 
   end SUBROUTINE cv30_compress

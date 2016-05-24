@@ -14,7 +14,6 @@ contains
 
     integer, intent(in):: icb(:) ! (ncum)
     ! {2 <= icb <= nl - 3}
-    ! {ph(i, icb(i) + 1) < plcl(i) <= ph(i, icb(i))}
 
     integer, intent(in):: inb(:) ! (ncum)
     ! first model level above the level of neutral buoyancy of the
@@ -53,7 +52,7 @@ contains
     integer i, il, imax
     real tinv, delti
     real afac, afac1, afac2, bfac
-    real pr1, pr2, sigt, b6, c6, revap, tevap, delth
+    real pr1, sigt, b6, c6, revap, tevap, delth
     real amfac, amp2, xf, tf, fac2, ur, sru, fac, d, af, bf
     real ampmax
     real lvcp(size(icb), nl) ! (ncum, nl)
@@ -137,18 +136,20 @@ contains
              afac = max(afac, 0.)
              bfac = 1. / (sigd * wt(il, i))
 
-             ! Prise en compte de la variation progressive de sigt dans
-             ! les couches icb et icb - 1:
-             ! pour plcl <= ph(i + 1), pr1 = 0 et pr2 = 1
-             ! pour plcl >= ph(i), pr1 = 1 et pr2 = 0
-             ! pour ph(i + 1) < plcl < ph(i), pr1 est la proportion \`a cheval
-             ! sur le nuage, et pr2 est la proportion sous la base du
-             ! nuage.
-             pr1 = max(0., min(1., &
-                  (plcl(il) - ph(il, i + 1)) / (ph(il, i) - ph(il, i + 1))))
-             pr2 = max(0., min(1., &
-                  (ph(il, i) - plcl(il)) / (ph(il, i) - ph(il, i + 1))))
-             sigt = sigp * pr1 + pr2
+             if (i <= icb(il)) then
+                ! Prise en compte de la variation progressive de sigt dans
+                ! les couches icb et icb - 1 :
+                ! pour plcl <= ph(i + 1), pr1 = 0
+                ! pour plcl >= ph(i), pr1 = 1
+                ! pour ph(i + 1) < plcl < ph(i), pr1 est la proportion
+                ! \`a cheval sur le nuage.
+                pr1 = max(0., min(1., &
+                     (plcl(il) - ph(il, i + 1)) / (ph(il, i) - ph(il, i + 1))))
+                sigt = sigp * pr1 + 1. - pr1
+             else
+                ! {i >= icb(il) + 1}
+                sigt = sigp
+             end if
 
              b6 = bfac * 50. * sigd * (ph(il, i) - ph(il, i + 1)) * sigt * afac
              c6 = water(il, i + 1) + bfac * wdtrain(il) - 50. * sigd * bfac &
