@@ -42,7 +42,9 @@ module suphec_m
   ! specific ideal gas constant for dry air, in J K-1 kg-1
   ! (factor 1e3: conversion from g to kg)
 
-  real, save:: RCPV, RCVD, RCVV
+  real, parameter:: RCPV = 4. * RV ! Cpv, gas phase
+
+  real, save:: RCVD, RCVV
 
   real, parameter:: RCPD = 7. / 2 * RD 
   ! specific heat capacity for dry air, in J K-1 kg-1
@@ -52,7 +54,9 @@ module suphec_m
   real, save:: RETV
 
   ! A1.5, 6 Thermodynamic liquid, solid phases
-  REAL, save:: RCW, RCS
+
+  REAL, parameter:: RCW = RCPV ! LIQUID PHASE Cw
+  real, save:: RCS
 
   ! A1.7 Thermodynamic transition of phase
   REAL, save:: RLMLT
@@ -100,7 +104,6 @@ contains
     ! 5. DEFINE THERMODYNAMIC CONSTANTS, GAS PHASE.
 
     RCVD = RCPD-RD
-    RCPV = 4. * RV
     RCVV = RCPV-RV
     RETV = RV / RD - 1.
     print *, 'Thermodynamics, gas'
@@ -109,16 +112,9 @@ contains
     print *, "rv = ", RV, "J K-1 kg-1"
     print '('' Cpd = '', e13.7)', RCPD
     print '('' Cvd = '', e13.7)', RCVD
-    print '('' Cpv = '', e13.7)', RCPV
     print '('' Cvv = '', e13.7)', RCVV
     print '('' Rd/Cpd = '', e13.7)', RKAPPA
     print '('' Rv / Rd - 1 = '', e13.7)', RETV
-
-    ! 6. DEFINE THERMODYNAMIC CONSTANTS, LIQUID PHASE.
-
-    RCW = RCPV
-    print *, 'Thermodynamic, liquid '
-    print '('' Cw = '', E13.7)', RCW
 
     ! 7. DEFINE THERMODYNAMIC CONSTANTS, SOLID PHASE.
 

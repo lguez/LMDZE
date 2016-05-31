@@ -4,64 +4,66 @@ module cv30_prelim_m
 
 contains
 
-  SUBROUTINE cv30_prelim(len, nd, ndp1, t, q, p, ph, lv, cpn, tv, gz, h, hm, th)
+  SUBROUTINE cv30_prelim(t1, q1, p1, ph1, lv1, cpn1, tv1, gz1, h1, hm1, th1)
 
     USE cv30_param_m, ONLY: nl
-    USE cv_thermo_m, ONLY: cl, clmcpv, cpd, cpv, eps, lv0, rrd, rrv
+    USE cv_thermo_m, ONLY: cl, clmcpv, cpd, cpv, eps, rrd, rrv
+    USE dimphy, ONLY: klev, klon
+    use SUPHEC_M, only: rlvtt
 
     ! Calculate arrays of geopotential, heat capacity and static energy
 
-    integer, intent(in):: len, nd, ndp1
-    real, intent(in):: t(len, nd)
-    real, intent(in):: q(len, nd)
-    real, intent(in):: p(len, nd), ph(len, ndp1)
+    real, intent(in):: t1(klon, klev)
+    real, intent(in):: q1(klon, klev)
+    real, intent(in):: p1(klon, klev), ph1(klon, klev + 1)
 
     ! outputs:
-    real lv(len, nd), cpn(len, nd), tv(len, nd)
-    real gz(len, nd), h(len, nd), hm(len, nd)
-    real th(len, nd)
+    real lv1(klon, klev), cpn1(klon, klev), tv1(klon, klev)
+    real gz1(klon, klev), h1(klon, klev), hm1(klon, klev)
+    real th1(klon, klev) ! potential temperature
 
     ! Local:
     integer k, i
     real rdcp
     real tvx, tvy 
-    real cpx(len, nd)
+    real cpx(klon, klev)
 
     !--------------------------------------------------------------
 
-    do k=1, nl 
-       do i=1, len
-          lv(i, k)= lv0-clmcpv*(t(i, k)-273.15)
-          cpn(i, k)=cpd*(1.0-q(i, k)) + cpv*q(i, k)
-          cpx(i, k)=cpd*(1.0-q(i, k)) + cl*q(i, k)
-          tv(i, k)=t(i, k)*(1.0 + q(i, k)/eps-q(i, k))
-          rdcp=(rrd*(1.-q(i, k)) + q(i, k)*rrv)/cpn(i, k)
-          th(i, k)=t(i, k)*(1000.0/p(i, k))**rdcp
+    do k = 1, nl 
+       do i = 1, klon
+          lv1(i, k) =  rlvtt - clmcpv * (t1(i, k) - 273.15)
+          cpn1(i, k) = cpd * (1. - q1(i, k)) + cpv * q1(i, k)
+          cpx(i, k) = cpd * (1. - q1(i, k)) + cl * q1(i, k)
+          tv1(i, k) = t1(i, k) * (1. + q1(i, k)/eps - q1(i, k))
+          rdcp = (rrd * (1. - q1(i, k)) + q1(i, k) * rrv)/cpn1(i, k)
+          th1(i, k) = t1(i, k) * (1000./p1(i, k))**rdcp
        end do
     end do
 
-    ! gz = phi at the full levels (same as p).
+    ! gz1 = phi at the full levels (same as p1).
 
-    do i=1, len
-       gz(i, 1)=0.0
+    do i = 1, klon
+       gz1(i, 1) = 0.
     end do
 
-    do k=2, nl 
-       do i=1, len
-          tvx=t(i, k)*(1. + q(i, k)/eps-q(i, k))
-          tvy=t(i, k-1)*(1. + q(i, k-1)/eps-q(i, k-1))
-          gz(i, k)=gz(i, k-1) + 0.5*rrd*(tvx + tvy) &
-               *(p(i, k-1)-p(i, k))/ph(i, k)
+    do k = 2, nl 
+       do i = 1, klon
+          tvx = t1(i, k) * (1. + q1(i, k)/eps - q1(i, k))
+          tvy = t1(i, k - 1) * (1. + q1(i, k - 1)/eps - q1(i, k - 1))
+          gz1(i, k) = gz1(i, k - 1) + 0.5 * rrd * (tvx + tvy) &
+               * (p1(i, k - 1) - p1(i, k))/ph1(i, k)
        end do
     end do
 
-    ! h = phi + cpT (dry static energy).
-    ! hm = phi + cp(T-Tbase) + Lq
+    ! h1 = phi + cpT (dry static energy).
+    ! hm1 = phi + cp(T1 - Tbase) + Lq
 
-    do k=1, nl 
-       do i=1, len
-          h(i, k)=gz(i, k) + cpn(i, k)*t(i, k)
-          hm(i, k)=gz(i, k) + cpx(i, k)*(t(i, k)-t(i, 1)) + lv(i, k)*q(i, k)
+    do k = 1, nl 
+       do i = 1, klon
+          h1(i, k) = gz1(i, k) + cpn1(i, k) * t1(i, k)
+          hm1(i, k) = gz1(i, k) + cpx(i, k) * (t1(i, k) - t1(i, 1)) &
+               + lv1(i, k) * q1(i, k)
        end do
     end do
 

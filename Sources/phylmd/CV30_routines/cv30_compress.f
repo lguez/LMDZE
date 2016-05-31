@@ -4,11 +4,11 @@ module cv30_compress_m
 
 contains
 
-  SUBROUTINE cv30_compress(iflag1, nk1, icb1, icbs1, plcl1, tnk1, qnk1, &
-       gznk1, pbase1, buoybase1, t1, q1, qs1, u1, v1, gz1, th1, h1, lv1, cpn1, &
-       p1, ph1, tv1, tp1, tvp1, clw1, sig1, w01, nk, icb, icbs, plcl, tnk, &
-       qnk, gznk, pbase, buoybase, t, q, qs, u, v, gz, th, h, lv, cpn, p, ph, &
-       tv, tp, tvp, clw, sig, w0)
+  SUBROUTINE cv30_compress(iflag1, icb1, icbs1, plcl1, tnk1, qnk1, gznk1, &
+       pbase1, buoybase1, t1, q1, qs1, u1, v1, gz1, th1, h1, lv1, cpn1, p1, &
+       ph1, tv1, tp1, tvp1, clw1, sig1, w01, icb, icbs, plcl, tnk, qnk, gznk, &
+       pbase, buoybase, t, q, qs, u, v, gz, th, h, lv, cpn, p, ph, tv, tp, &
+       tvp, clw, sig, w0)
 
     ! Compress the fields (vectorization over convective gridpoints).
 
@@ -17,7 +17,7 @@ contains
     use nr_util, only: assert
 
     ! inputs:
-    integer, intent(in):: iflag1(:), nk1(:), icb1(:), icbs1(:) ! (klon)
+    integer, intent(in):: iflag1(:), icb1(:), icbs1(:) ! (klon)
     real, intent(in):: plcl1(klon), tnk1(klon), qnk1(klon), gznk1(klon)
     real pbase1(klon), buoybase1(klon)
     real, intent(in):: t1(klon, klev)
@@ -31,7 +31,6 @@ contains
     real sig1(klon, klev), w01(klon, klev)
 
     ! outputs:
-    integer nk(:) ! (klon)
     integer, intent(out):: icb(:) ! (ncum) {2 <= icb <= nl - 3}
     integer icbs(klon)
     real, intent(out):: plcl(:) ! (ncum)
@@ -92,7 +91,6 @@ contains
           tnk(nn) = tnk1(i)
           qnk(nn) = qnk1(i)
           gznk(nn) = gznk1(i)
-          nk(nn) = nk1(i)
           icb(nn) = icb1(i)
           icbs(nn) = icbs1(i)
        endif

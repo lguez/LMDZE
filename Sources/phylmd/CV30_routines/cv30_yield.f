@@ -14,8 +14,9 @@ contains
 
     use conema3_m, only: iflag_clw
     use cv30_param_m, only: minorig, nl, sigd
-    use cv_thermo_m, only: cl, cpd, cpv, grav, rowl, rrd, rrv
+    use cv_thermo_m, only: cl, cpd, cpv, rowl, rrd, rrv
     USE dimphy, ONLY: klev, klon
+    use SUPHEC_M, only: rg
 
     ! inputs:
     integer, intent(in):: icb(:), inb(:) ! (ncum)
@@ -105,7 +106,7 @@ contains
 
     do il = 1, ncum
        if (ep(il, inb(il)) >= 1e-4) precip(il) = wt(il, 1) * sigd &
-            * water(il, 1) * 86400. * 1000. / (rowl * grav)
+            * water(il, 1) * 86400. * 1000. / (rowl * rg)
     enddo
 
     ! CALCULATE VERTICAL PROFILE OF PRECIPITATIONs IN kg / m2 / s ===
@@ -114,7 +115,7 @@ contains
     do k = 1, nl - 1
        do il = 1, ncum
           if (k <= inb(il)) VPrecip(il, k) = wt(il, k) * sigd * water(il, k) &
-               / grav
+               / rg
        end do
     end do
 
@@ -134,43 +135,43 @@ contains
 
     do il = 1, ncum
        ! Consist vect:
-       if (0.01 * grav * work(il) * am(il) >= delti) iflag(il) = 1
+       if (0.01 * rg * work(il) * am(il) >= delti) iflag(il) = 1
 
-       ft(il, 1) = 0.01 * grav * work(il) * am(il) * (t(il, 2) - t(il, 1) &
+       ft(il, 1) = 0.01 * rg * work(il) * am(il) * (t(il, 2) - t(il, 1) &
             + (gz(il, 2) - gz(il, 1)) / cpn(il, 1))
 
        ft(il, 1) = ft(il, 1) - 0.5 * lvcp(il, 1) * sigd * (evap(il, 1) &
             + evap(il, 2))
 
-       ft(il, 1) = ft(il, 1) - 0.009 * grav * sigd * mp(il, 2) &
+       ft(il, 1) = ft(il, 1) - 0.009 * rg * sigd * mp(il, 2) &
             * t(il, 1) * b(il, 1) * work(il)
 
        ft(il, 1) = ft(il, 1) + 0.01 * sigd * wt(il, 1) * (cl - cpd) &
             * water(il, 2) * (t(il, 2) - t(il, 1)) * work(il) / cpn(il, 1)
 
        !jyg1 Correction pour mieux conserver l'eau (conformite avec CONVECT4.3)
-       ! (sb: pour l'instant, on ne fait que le chgt concernant grav, pas evap)
-       fr(il, 1) = 0.01 * grav * mp(il, 2) * (rp(il, 2) - rr(il, 1)) &
+       ! (sb: pour l'instant, on ne fait que le chgt concernant rg, pas evap)
+       fr(il, 1) = 0.01 * rg * mp(il, 2) * (rp(il, 2) - rr(il, 1)) &
             * work(il) + sigd * 0.5 * (evap(il, 1) + evap(il, 2))
        ! + tard : + sigd * evap(il, 1)
 
-       fr(il, 1) = fr(il, 1) + 0.01 * grav * am(il) * (rr(il, 2) - rr(il, 1)) &
+       fr(il, 1) = fr(il, 1) + 0.01 * rg * am(il) * (rr(il, 2) - rr(il, 1)) &
             * work(il)
 
-       fu(il, 1) = fu(il, 1) + 0.01 * grav * work(il) * (mp(il, 2) &
+       fu(il, 1) = fu(il, 1) + 0.01 * rg * work(il) * (mp(il, 2) &
             * (up(il, 2) - u(il, 1)) + am(il) * (u(il, 2) - u(il, 1)))
-       fv(il, 1) = fv(il, 1) + 0.01 * grav * work(il) * (mp(il, 2) &
+       fv(il, 1) = fv(il, 1) + 0.01 * rg * work(il) * (mp(il, 2) &
             * (vp(il, 2) - v(il, 1)) + am(il) * (v(il, 2) - v(il, 1)))
     enddo ! il
 
     do j = 2, nl
        do il = 1, ncum
           if (j <= inb(il)) then
-             fr(il, 1) = fr(il, 1) + 0.01 * grav * work(il) * ment(il, j, 1) &
+             fr(il, 1) = fr(il, 1) + 0.01 * rg * work(il) * ment(il, j, 1) &
                   * (qent(il, j, 1) - rr(il, 1))
-             fu(il, 1) = fu(il, 1) + 0.01 * grav * work(il) * ment(il, j, 1) &
+             fu(il, 1) = fu(il, 1) + 0.01 * rg * work(il) * ment(il, j, 1) &
                   * (uent(il, j, 1) - u(il, 1))
-             fv(il, 1) = fv(il, 1) + 0.01 * grav * work(il) * ment(il, j, 1) &
+             fv(il, 1) = fv(il, 1) + 0.01 * rg * work(il) * ment(il, j, 1) &
                   * (vent(il, j, 1) - v(il, 1))
           endif
        enddo
@@ -227,18 +228,18 @@ contains
                 cpinv = 1.0 / cpn(il, i)
 
                 ! Vecto:
-                if (0.01 * grav * dpinv * amp1(il) >= delti) iflag(il) = 1
+                if (0.01 * rg * dpinv * amp1(il) >= delti) iflag(il) = 1
 
-                ft(il, i) = 0.01 * grav * dpinv * (amp1(il) * (t(il, i + 1) &
+                ft(il, i) = 0.01 * rg * dpinv * (amp1(il) * (t(il, i + 1) &
                      - t(il, i) + (gz(il, i + 1) - gz(il, i)) * cpinv) &
                      - ad(il) * (t(il, i) - t(il, i - 1) + (gz(il, i) &
                      - gz(il, i - 1)) * cpinv)) - 0.5 * sigd * lvcp(il, i) &
                      * (evap(il, i) + evap(il, i + 1))
                 rat = cpn(il, i - 1) * cpinv
-                ft(il, i) = ft(il, i) - 0.009 * grav * sigd * (mp(il, i + 1) &
+                ft(il, i) = ft(il, i) - 0.009 * rg * sigd * (mp(il, i + 1) &
                      * t(il, i) * b(il, i) - mp(il, i) * t(il, i - 1) * rat &
                      * b(il, i - 1)) * dpinv
-                ft(il, i) = ft(il, i) + 0.01 * grav * dpinv * ment(il, i, i) &
+                ft(il, i) = ft(il, i) + 0.01 * rg * dpinv * ment(il, i, i) &
                      * (hp(il, i) - h(il, i) + t(il, i) * (cpv - cpd) &
                      * (rr(il, i) - qent(il, i, i))) * cpinv
 
@@ -246,12 +247,12 @@ contains
                      * water(il, i + 1) * (t(il, i + 1) - t(il, i)) * dpinv &
                      * cpinv
 
-                fr(il, i) = 0.01 * grav * dpinv * (amp1(il) * (rr(il, i + 1) &
+                fr(il, i) = 0.01 * rg * dpinv * (amp1(il) * (rr(il, i + 1) &
                      - rr(il, i)) - ad(il) * (rr(il, i) - rr(il, i - 1)))
-                fu(il, i) = fu(il, i) + 0.01 * grav * dpinv * (amp1(il) &
+                fu(il, i) = fu(il, i) + 0.01 * rg * dpinv * (amp1(il) &
                      * (u(il, i + 1) - u(il, i)) - ad(il) * (u(il, i) &
                      - u(il, i - 1)))
-                fv(il, i) = fv(il, i) + 0.01 * grav * dpinv * (amp1(il) &
+                fv(il, i) = fv(il, i) + 0.01 * rg * dpinv * (amp1(il) &
                      * (v(il, i + 1) - v(il, i)) - ad(il) * (v(il, i) &
                      - v(il, i - 1)))
              endif
@@ -266,11 +267,11 @@ contains
                    awat = elij(il, k, i) - (1. - ep(il, i)) * clw(il, i)
                    awat = amax1(awat, 0.0)
 
-                   fr(il, i) = fr(il, i) + 0.01 * grav * dpinv &
+                   fr(il, i) = fr(il, i) + 0.01 * rg * dpinv &
                         * ment(il, k, i) * (qent(il, k, i) - awat - rr(il, i))
-                   fu(il, i) = fu(il, i) + 0.01 * grav * dpinv &
+                   fu(il, i) = fu(il, i) + 0.01 * rg * dpinv &
                         * ment(il, k, i) * (uent(il, k, i) - u(il, i))
-                   fv(il, i) = fv(il, i) + 0.01 * grav * dpinv &
+                   fv(il, i) = fv(il, i) + 0.01 * rg * dpinv &
                         * ment(il, k, i) * (vent(il, k, i) - v(il, i))
 
                    ! (saturated updrafts resulting from mixing)
@@ -286,11 +287,11 @@ contains
                    dpinv = 1.0 / (ph(il, i) - ph(il, i + 1))
                    cpinv = 1.0 / cpn(il, i)
 
-                   fr(il, i) = fr(il, i) + 0.01 * grav * dpinv &
+                   fr(il, i) = fr(il, i) + 0.01 * rg * dpinv &
                         * ment(il, k, i) * (qent(il, k, i) - rr(il, i))
-                   fu(il, i) = fu(il, i) + 0.01 * grav * dpinv &
+                   fu(il, i) = fu(il, i) + 0.01 * rg * dpinv &
                         * ment(il, k, i) * (uent(il, k, i) - u(il, i))
-                   fv(il, i) = fv(il, i) + 0.01 * grav * dpinv &
+                   fv(il, i) = fv(il, i) + 0.01 * rg * dpinv &
                         * ment(il, k, i) * (vent(il, k, i) - v(il, i))
                 endif
              end do
@@ -304,14 +305,14 @@ contains
                 ! sb: on ne fait pas encore la correction permettant de mieux
                 ! conserver l'eau:
                 fr(il, i) = fr(il, i) + 0.5 * sigd * (evap(il, i) &
-                     + evap(il, i + 1)) + 0.01 * grav * (mp(il, i + 1) &
+                     + evap(il, i + 1)) + 0.01 * rg * (mp(il, i + 1) &
                      * (rp(il, i + 1) - rr(il, i)) - mp(il, i) * (rp(il, i) &
                      - rr(il, i - 1))) * dpinv
 
-                fu(il, i) = fu(il, i) + 0.01 * grav * (mp(il, i + 1) &
+                fu(il, i) = fu(il, i) + 0.01 * rg * (mp(il, i + 1) &
                      * (up(il, i + 1) - u(il, i)) - mp(il, i) * (up(il, i) &
                      - u(il, i - 1))) * dpinv
-                fv(il, i) = fv(il, i) + 0.01 * grav * (mp(il, i + 1) &
+                fv(il, i) = fv(il, i) + 0.01 * rg * (mp(il, i + 1) &
                      * (vp(il, i + 1) - v(il, i)) - mp(il, i) * (vp(il, i) &
                      - v(il, i - 1))) * dpinv
              endif

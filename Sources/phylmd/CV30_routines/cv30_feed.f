@@ -4,10 +4,11 @@ module cv30_feed_m
 
 contains
 
-  SUBROUTINE cv30_feed(t1, q1, qs1, p1, ph1, gz1, nk1, icb1, iflag1, tnk1, &
-       qnk1, gznk1, plcl1)
+  SUBROUTINE cv30_feed(t1, q1, qs1, p1, ph1, gz1, icb1, iflag1, tnk1, qnk1, &
+       gznk1, plcl1)
 
     ! Purpose: convective feed
+    ! Assuming origin level of ascending parcels is minorig.
 
     use cv30_param_m, only: minorig, nl
     USE dimphy, ONLY: klev, klon
@@ -20,18 +21,16 @@ contains
 
     ! outputs:
 
-    integer, intent(out):: nk1(:) ! (klon)
-
     integer, intent(out):: icb1(:) ! (klon)
     ! first level above lcl, 2 <= icb1 <= nl - 2
 
     integer, intent(out):: iflag1(:) ! (klon)
-    real tnk1(klon), qnk1(klon), gznk1(klon)
+    real tnk1(:), qnk1(:), gznk1(:) ! (klon)
     real, intent(out):: plcl1(klon)
 
     ! Local:
     integer i
-    real pnk(klon), qsnk(klon), rh(klon), chi(klon)
+    real qsnk(klon), rh(klon), chi(klon)
     real, parameter:: A = 1669., B = 122.
 
     !--------------------------------------------------------------------
@@ -39,30 +38,24 @@ contains
     iflag1 = 0
     plcl1 = 0.
 
-    ! Origin level of ascending parcels
-    nk1 = minorig
-
     ! Check whether parcel level temperature and specific humidity
     ! are reasonable
-
     do i = 1, klon
-       if (t1(i, nk1(i)) < 250. .or. q1(i, nk1(i)) <= 0.) iflag1(i) = 7
+       if (t1(i, minorig) < 250. .or. q1(i, minorig) <= 0.) iflag1(i) = 7
     end do
 
     ! Calculate lifted condensation level of air at parcel origin level
     ! (within 0.2 % of formula of Bolton, Mon. Wea. Rev., 1980)
-
     do i = 1, klon
        if (iflag1(i) == 0) then
-          tnk1(i) = t1(i, nk1(i))
-          qnk1(i) = q1(i, nk1(i))
-          gznk1(i) = gz1(i, nk1(i))
-          pnk(i) = p1(i, nk1(i))
-          qsnk(i) = qs1(i, nk1(i))
+          tnk1(i) = t1(i, minorig)
+          qnk1(i) = q1(i, minorig)
+          gznk1(i) = gz1(i, minorig)
+          qsnk(i) = qs1(i, minorig)
 
           rh(i) = qnk1(i) / qsnk(i)
-          chi(i) = tnk1(i) / (A - B*rh(i) - tnk1(i))
-          plcl1(i) = pnk(i)*(rh(i)**chi(i))
+          chi(i) = tnk1(i) / (A - B * rh(i) - tnk1(i))
+          plcl1(i) = p1(i, minorig) * (rh(i)**chi(i))
           if (plcl1(i) < 200. .or. plcl1(i) >= 2000.) iflag1(i) = 8
        endif
     end do

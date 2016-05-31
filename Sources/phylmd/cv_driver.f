@@ -108,7 +108,6 @@ contains
 
     real da(klon, klev), phi(klon, klev, klev), mp(klon, klev)
     integer i, k, il
-    integer nk1(klon)
     integer icbs1(klon)
     real plcl1(klon)
     real tnk1(klon)
@@ -130,7 +129,6 @@ contains
 
     ! Compressed fields:
     integer, allocatable:: idcum(:), iflag(:) ! (ncum)
-    integer nk(klon)
     integer, allocatable:: icb(:) ! (ncum)
     integer nent(klon, klev)
     integer icbs(klon)
@@ -203,12 +201,11 @@ contains
        sig1(il, klev) = min(sig1(il, klev), 12.1)
     enddo
 
-    CALL cv30_prelim(klon, klev, klev + 1, t1, q1, p1, ph1, lv1, cpn1, tv1, &
-         gz1, h1, hm1, th1)
-    CALL cv30_feed(t1, q1, qs1, p1, ph1, gz1, nk1, icb1, iflag1, tnk1, qnk1, &
+    CALL cv30_prelim(t1, q1, p1, ph1, lv1, cpn1, tv1, gz1, h1, hm1, th1)
+    CALL cv30_feed(t1, q1, qs1, p1, ph1, gz1, icb1, iflag1, tnk1, qnk1, &
          gznk1, plcl1)
-    CALL cv30_undilute1(t1, q1, qs1, gz1, plcl1, p1, nk1, icb1, tp1, tvp1, &
-         clw1, icbs1)
+    CALL cv30_undilute1(t1, q1, qs1, gz1, plcl1, p1, icb1, tp1, tvp1, clw1, &
+         icbs1)
     CALL cv30_trigger(icb1, plcl1, p1, th1, tv1, tvp1, pbase1, buoybase1, &
          iflag1, sig1, w01)
 
@@ -219,22 +216,22 @@ contains
        allocate(idcum(ncum), plcl(ncum))
        allocate(b(ncum, nl - 1), evap(ncum, nl), icb(ncum), iflag(ncum))
        idcum = pack((/(i, i = 1, klon)/), iflag1 == 0)
-       CALL cv30_compress(iflag1, nk1, icb1, icbs1, plcl1, tnk1, qnk1, gznk1, &
+       CALL cv30_compress(iflag1, icb1, icbs1, plcl1, tnk1, qnk1, gznk1, &
             pbase1, buoybase1, t1, q1, qs1, u1, v1, gz1, th1, h1, lv1, cpn1, &
-            p1, ph1, tv1, tp1, tvp1, clw1, sig1, w01, nk, icb, icbs, plcl, &
-            tnk, qnk, gznk, pbase, buoybase, t, q, qs, u, v, gz, th, h, lv, &
-            cpn, p, ph, tv, tp, tvp, clw, sig, w0)
-       CALL cv30_undilute2(icb, icbs(:ncum), nk, tnk, qnk, gznk, t, qs, gz, &
-            p, h, tv, lv, pbase(:ncum), buoybase(:ncum), plcl, inb(:ncum), &
-            tp, tvp, clw, hp, ep, buoy)
+            p1, ph1, tv1, tp1, tvp1, clw1, sig1, w01, icb, icbs, plcl, tnk, &
+            qnk, gznk, pbase, buoybase, t, q, qs, u, v, gz, th, h, lv, cpn, &
+            p, ph, tv, tp, tvp, clw, sig, w0)
+       CALL cv30_undilute2(icb, icbs(:ncum), tnk, qnk, gznk, t, qs, gz, p, h, &
+            tv, lv, pbase(:ncum), buoybase(:ncum), plcl, inb(:ncum), tp, tvp, &
+            clw, hp, ep, buoy)
        CALL cv30_closure(icb, inb(:ncum), pbase, p, ph(:ncum, :), tv, buoy, &
             sig, w0, cape, m)
-       CALL cv30_mixing(icb, nk(:ncum), inb(:ncum), t, q, qs, u, v, h, lv, &
-            hp, ep, clw, m, sig, ment, qent, uent, vent, nent, sij, elij, &
-            ments, qents)
+       CALL cv30_mixing(icb, inb(:ncum), t, q, qs, u, v, h, lv, hp, ep, clw, &
+            m, sig, ment, qent, uent, vent, nent, sij, elij, ments, qents)
        CALL cv30_unsat(icb, inb(:ncum), t(:ncum, :nl), q(:ncum, :nl), &
-            qs(:ncum, :nl), gz, u, v, p, ph(:ncum, :), th(:ncum, :nl - 1), &
-            tv, lv, cpn, ep(:ncum, :), clw(:ncum, :), m(:ncum, :), &
+            qs(:ncum, :nl), gz, u(:ncum, :nl), v(:ncum, :nl), p, &
+            ph(:ncum, :), th(:ncum, :nl - 1), tv, lv(:ncum, :), &
+            cpn(:ncum, :nl), ep(:ncum, :), clw(:ncum, :), m(:ncum, :), &
             ment(:ncum, :, :), elij(:ncum, :, :), dtphys, plcl, mp, &
             qp(:ncum, :nl), up(:ncum, :nl), vp(:ncum, :nl), wt(:ncum, :nl), &
             water(:ncum, :nl), evap, b)

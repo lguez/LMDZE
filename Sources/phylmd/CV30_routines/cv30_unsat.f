@@ -10,7 +10,8 @@ contains
     ! Unsaturated (precipitating) downdrafts
 
     use cv30_param_m, only: nl, sigd
-    use cv_thermo_m, only: cpd, ginv, grav
+    use cv_thermo_m, only: cpd, ginv
+    use SUPHEC_M, only: rg
 
     integer, intent(in):: icb(:) ! (ncum)
     ! {2 <= icb <= nl - 3}
@@ -21,12 +22,12 @@ contains
 
     real, intent(in):: t(:, :), q(:, :), qs(:, :) ! (ncum, nl)
     real, intent(in):: gz(:, :) ! (klon, klev)
-    real, intent(in):: u(:, :), v(:, :) ! (klon, klev)
+    real, intent(in):: u(:, :), v(:, :) ! (ncum, nl)
     real, intent(in):: p(:, :) ! (klon, klev) pressure at full level, in hPa
     real, intent(in):: ph(:, :) ! (ncum, klev + 1)
     real, intent(in):: th(:, :) ! (ncum, nl - 1)
     real, intent(in):: tv(:, :) ! (klon, klev)
-    real, intent(in):: lv(:, :) ! (klon, klev)
+    real, intent(in):: lv(:, :) ! (ncum, nl)
     real, intent(in):: cpn(:, :) ! (klon, klev)
     real, intent(in):: ep(:, :) ! (ncum, klev)
     real, intent(in):: clw(:, :) ! (ncum, klev)
@@ -37,9 +38,19 @@ contains
     real, intent(in):: plcl(:) ! (ncum)
 
     real, intent(out):: mp(:, :) ! (klon, klev)
+    ! mass flux of the unsaturated downdraft, defined positive downward
+    ! M_p in Emanuel (1991 928)
+
     real, intent(out):: qp(:, :), up(:, :), vp(:, :) ! (ncum, nl)
     real, intent(out):: wt(:, :) ! (ncum, nl)
-    real, intent(out):: water(:, :), evap(:, :) ! (ncum, nl)
+
+    real, intent(out):: water(:, :) ! (ncum, nl)
+    ! precipitation mixing ratio, l_p in Emanuel (1991 928)
+
+    real, intent(out):: evap(:, :) ! (ncum, nl)
+    ! sigt * rate of evaporation of precipitation, in s-1
+    ! \sigma_s E in Emanuel (1991 928)
+
     real, intent(out):: b(:, :) ! (ncum, nl - 1)
 
     ! Local:
@@ -94,7 +105,7 @@ contains
        ! and condensed water flux 
 
        ! Calculate detrained precipitation 
-       forall (il = 1:ncum, inb(il) >= i .and. lwork(il)) wdtrain(il) = grav &
+       forall (il = 1:ncum, inb(il) >= i .and. lwork(il)) wdtrain(il) = rg &
             * (ep(il, i) * m(il, i) * clw(il, i) &
             + sum(max(elij(il, :i - 1, i) - (1. - ep(il, i)) * clw(il, i), 0.) &
             * ment(il, :i - 1, i)))
@@ -212,11 +223,10 @@ contains
 
                    mp(il, i) = max(0., mp(il, i))
 
-                   ! Il y a vraisemblablement une erreur dans la
-                   ! ligne suivante : il faut diviser par (mp(il,
-                   ! i) * sigd * grav) et non par (mp(il, i) + sigd
-                   ! * 0.1).  Et il faut bien revoir les facteurs
-                   ! 100.
+                   ! Il y a vraisemblablement une erreur dans la ligne
+                   ! suivante : il faut diviser par (mp(il, i) * sigd
+                   ! * rg) et non par (mp(il, i) + sigd * 0.1).  Et il
+                   ! faut bien revoir les facteurs 100.
                    b(il, i - 1) = b(il, i) + 100. * (p(il, i - 1) - p(il, i)) &
                         * tevap / (mp(il, i) + sigd * 0.1) - 10. * (th(il, i) &
                         - th(il, i - 1)) * t(il, i) / (lvcp(il, i) * sigd &

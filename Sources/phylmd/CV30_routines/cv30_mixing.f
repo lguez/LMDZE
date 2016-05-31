@@ -4,8 +4,8 @@ module cv30_mixing_m
 
 contains
 
-  SUBROUTINE cv30_mixing(icb, nk, inb, t, rr, rs, u, v, h, lv, hp, ep, clw, &
-       m, sig, ment, qent, uent, vent, nent, sij, elij, ments, qents)
+  SUBROUTINE cv30_mixing(icb, inb, t, rr, rs, u, v, h, lv, hp, ep, clw, m, &
+       sig, ment, qent, uent, vent, nent, sij, elij, ments, qents)
 
     ! MIXING
 
@@ -18,7 +18,7 @@ contains
     USE dimphy, ONLY: klev, klon
 
     ! inputs:
-    integer, intent(in):: icb(:), nk(:), inb(:) ! (ncum)
+    integer, intent(in):: icb(:), inb(:) ! (ncum)
     real t(klon, klev), rr(klon, klev), rs(klon, klev)
     real u(klon, klev), v(klon, klev)
     real h(klon, klev), lv(klon, klev), hp(klon, klev)
@@ -113,9 +113,9 @@ contains
                    qent(il, i, j) = sij(il, i, j) * rr(il, i) + (1. &
                         - sij(il, i, j)) * rti
                    uent(il, i, j) = sij(il, i, j) * u(il, i) + (1. &
-                        - sij(il, i, j)) * u(il, nk(il))
+                        - sij(il, i, j)) * u(il, minorig)
                    vent(il, i, j) = sij(il, i, j) * v(il, i) + (1. &
-                        - sij(il, i, j)) * v(il, nk(il))
+                        - sij(il, i, j)) * v(il, minorig)
                    elij(il, i, j) = altem
                    elij(il, i, j) = amax1(0.0, elij(il, i, j))
                    ment(il, i, j) = m(il, i) / (1. - sij(il, i, j))
@@ -133,9 +133,9 @@ contains
        do il = 1, ncum
           if ((i >= icb(il)).and.(i <= inb(il)).and.(nent(il, i) == 0)) then
              ment(il, i, i) = m(il, i)
-             qent(il, i, i) = rr(il, nk(il)) - ep(il, i) * clw(il, i)
-             uent(il, i, i) = u(il, nk(il))
-             vent(il, i, i) = v(il, nk(il))
+             qent(il, i, i) = rr(il, minorig) - ep(il, i) * clw(il, i)
+             uent(il, i, i) = u(il, minorig)
+             vent(il, i, i) = v(il, minorig)
              elij(il, i, i) = clw(il, i)
              sij(il, i, i) = 0.0
           end if
@@ -280,8 +280,8 @@ contains
              nent(il, i) = 0
              ment(il, i, i) = m(il, i)
              qent(il, i, i) = rr(il, 1) - ep(il, i) * clw(il, i)
-             uent(il, i, i) = u(il, nk(il))
-             vent(il, i, i) = v(il, nk(il))
+             uent(il, i, i) = u(il, minorig)
+             vent(il, i, i) = v(il, minorig)
              elij(il, i, i) = clw(il, i)
              sij(il, i, i) = 0.0
           endif

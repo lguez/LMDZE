@@ -4,8 +4,8 @@ module cv30_undilute2_m
 
 contains
 
-  SUBROUTINE cv30_undilute2(icb, icbs, nk, tnk, qnk, gznk, t, qs, gz, p, h, &
-       tv, lv, pbase, buoybase, plcl, inb, tp, tvp, clw, hp, ep, buoy)
+  SUBROUTINE cv30_undilute2(icb, icbs, tnk, qnk, gznk, t, qs, gz, p, h, tv, &
+       lv, pbase, buoybase, plcl, inb, tp, tvp, clw, hp, ep, buoy)
 
     ! Undilute (adiabatic) updraft, second part. Purpose: find the
     ! rest of the lifted parcel temperatures; compute the
@@ -16,14 +16,14 @@ contains
 
     use conema3_m, only: epmax
     use cv30_param_m, only: minorig, nl
-    use cv_thermo_m, only: cl, clmcpv, cpd, cpv, eps, lv0, rrv
+    use cv_thermo_m, only: cl, clmcpv, cpd, cpv, eps, rrv
     USE dimphy, ONLY: klon, klev
+    use SUPHEC_M, only: rlvtt
 
     integer, intent(in):: icb(:), icbs(:) ! (ncum)
     ! icbs is the first level above LCL (may differ from icb)
 
-    integer, intent(in):: nk(klon)
-    real, intent(in):: tnk(klon), qnk(klon), gznk(klon)
+    real, intent(in):: tnk(:), qnk(:), gznk(:) ! (klon)
     real, intent(in):: t(klon, klev), qs(klon, klev), gz(klon, klev)
     real, intent(in):: p(klon, klev), h(klon, klev)
     real, intent(in):: tv(klon, klev), lv(klon, klev)
@@ -79,7 +79,7 @@ contains
 
     do i = 1, ncum
        ah0(i) = (cpd * (1. - qnk(i)) + cl * qnk(i)) * tnk(i) &
-            + qnk(i) * (lv0 - clmcpv * (tnk(i) - 273.15)) + gznk(i)
+            + qnk(i) * (rlvtt - clmcpv * (tnk(i) - 273.15)) + gznk(i)
     end do
 
     ! Find lifted parcel quantities above cloud base
@@ -89,7 +89,7 @@ contains
           if (k >= (icbs(i) + 1)) then
              tg = t(i, k)
              qg = qs(i, k)
-             alv = lv0 - clmcpv * (t(i, k) - 273.15)
+             alv = rlvtt - clmcpv * (t(i, k) - 273.15)
 
              ! First iteration.
 
@@ -121,7 +121,7 @@ contains
 
              qg = eps * es / (p(i, k) - es * (1. - eps))
 
-             alv = lv0 - clmcpv * (t(i, k) - 273.15)
+             alv = rlvtt - clmcpv * (t(i, k) - 273.15)
 
              ! no approximation:
              tp(i, k) = (ah0(i) - gz(i, k) - alv * qg) &
@@ -197,7 +197,7 @@ contains
 
     do k = minorig + 1, nl
        do i = 1, ncum
-          if (k >= icb(i) .and. k <= inb(i)) hp(i, k) = h(i, nk(i)) &
+          if (k >= icb(i) .and. k <= inb(i)) hp(i, k) = h(i, minorig) &
                + (lv(i, k) + (cpd - cpv) * t(i, k)) * ep(i, k) * clw(i, k)
        end do
     end do

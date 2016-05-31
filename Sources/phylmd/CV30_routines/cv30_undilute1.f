@@ -4,15 +4,15 @@ module cv30_undilute1_m
 
 contains
 
-  SUBROUTINE cv30_undilute1(t1, q1, qs1, gz1, plcl1, p1, nk1, icb1, tp1, &
-       tvp1, clw1, icbs1)
+  SUBROUTINE cv30_undilute1(t1, q1, qs1, gz1, plcl1, p1, icb1, tp1, tvp1, &
+       clw1, icbs1)
 
     ! UNDILUTE (ADIABATIC) UPDRAFT / 1st part
     ! (up through ICB1 + 1)
-    ! Calculates the lifted parcel virtual temperature at nk1, the
+    ! Calculates the lifted parcel virtual temperature at minorig, the
     ! actual temperature, and the adiabatic liquid water content.
 
-    ! Equivalent de TLIFT entre NK1 et ICB1+1 inclus
+    ! Equivalent de TLIFT entre MINORIG et ICB1+1 inclus
 
     ! Differences with convect4:
     ! - icbs1 is the first level above LCL (may differ from icb1)
@@ -22,11 +22,12 @@ contains
     ! - if icbs1=icb1, compute also tp1(icb1+1), tvp1(icb1+1) & clw1(icb1+1)
 
     use cv30_param_m, only: minorig, nl
-    use cv_thermo_m, only: cl, clmcpv, cpd, cpv, eps, lv0, rrv
+    use cv_thermo_m, only: cl, clmcpv, cpd, cpv, eps, rrv
     USE dimphy, ONLY: klev, klon
+    use SUPHEC_M, only: rlvtt
 
     ! inputs:
-    integer, intent(in):: nk1(klon), icb1(klon)
+    integer, intent(in):: icb1(klon)
     real, intent(in):: t1(klon, klev)
     real, intent(in):: q1(klon, klev), qs1(klon, klev), gz1(klon, klev)
     real, intent(in):: p1(klon, klev)
@@ -46,22 +47,22 @@ contains
 
     !-------------------------------------------------------------------
 
-    !  Calculates the lifted parcel virtual temperature at nk1,
+    !  Calculates the lifted parcel virtual temperature at minorig,
     !  the actual temperature, and the adiabatic
     !  liquid water content. The procedure is to solve the equation.
     ! cp*tp1+L*qp+phi=cp*tnk+L*qnk+gznk.
 
     do i=1, klon
-       tnk(i)=t1(i, nk1(i))
-       qnk(i)=q1(i, nk1(i))
-       gznk(i)=gz1(i, nk1(i))
+       tnk(i)=t1(i, minorig)
+       qnk(i)=q1(i, minorig)
+       gznk(i)=gz1(i, minorig)
     end do
 
     ! *** Calculate certain parcel quantities, including static energy ***
 
     do i=1, klon
        ah0(i)=(cpd*(1.-qnk(i))+cl*qnk(i))*tnk(i) &
-            +qnk(i)*(lv0-clmcpv*(tnk(i)-273.15))+gznk(i)
+            +qnk(i)*(rlvtt-clmcpv*(tnk(i)-273.15))+gznk(i)
        cpp(i)=cpd*(1.-qnk(i))+qnk(i)*cpv
        cpinv(i)=1./cpp(i)
     end do
@@ -113,8 +114,8 @@ contains
     do i=1, klon
        tg=ticb(i)
        qg=qsicb(i)
-       !debug alv=lv0-clmcpv*(ticb(i)-t0)
-       alv=lv0-clmcpv*(ticb(i)-273.15)
+       !debug alv=rlvtt-clmcpv*(ticb(i)-t0)
+       alv=rlvtt-clmcpv*(ticb(i)-273.15)
 
        ! First iteration.
 
@@ -147,7 +148,7 @@ contains
 
        qg=eps*es/(p1(i, icbs1(i))-es*(1.-eps))
 
-       alv=lv0-clmcpv*(ticb(i)-273.15)
+       alv=rlvtt-clmcpv*(ticb(i)-273.15)
 
        ! no approximation:
        tp1(i, icbs1(i))=(ah0(i)-gz1(i, icbs1(i))-alv*qg) &
@@ -183,8 +184,8 @@ contains
     do i=1, klon
        tg=ticb(i)
        qg=qsicb(i)
-       !debug alv=lv0-clmcpv*(ticb(i)-t0)
-       alv=lv0-clmcpv*(ticb(i)-273.15)
+       !debug alv=rlvtt-clmcpv*(ticb(i)-t0)
+       alv=rlvtt-clmcpv*(ticb(i)-273.15)
 
        ! First iteration.
 
@@ -218,7 +219,7 @@ contains
 
        qg=eps*es/(p1(i, icb1(i)+1)-es*(1.-eps))
 
-       alv=lv0-clmcpv*(ticb(i)-273.15)
+       alv=rlvtt-clmcpv*(ticb(i)-273.15)
 
        ! no approximation:
        tp1(i, icb1(i)+1)=(ah0(i)-gz1(i, icb1(i)+1)-alv*qg) &
