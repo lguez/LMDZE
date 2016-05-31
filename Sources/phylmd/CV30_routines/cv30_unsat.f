@@ -189,17 +189,15 @@ contains
                 ! difference equation for downdraft theta and mass
                 ! flux from two simultaneous differential equations
 
-                amfac = sigd * sigd * 70. * ph(il, i) &
-                     * (p(il, i - 1) - p(il, i)) &
+                amfac = sigd**2 * 70. * ph(il, i) * (p(il, i - 1) - p(il, i)) &
                      * (th(il, i) - th(il, i - 1)) / (tv(il, i) * th(il, i))
-                amp2 = abs(mp(il, i + 1) * mp(il, i + 1) - mp(il, i) &
-                     * mp(il, i))
+                amp2 = abs(mp(il, i + 1)**2 - mp(il, i)**2)
 
                 if (amp2 > 0.1 * amfac) then
-                   xf = 100. * sigd * sigd * sigd * (ph(il, i) - ph(il, i + 1))
+                   xf = 100. * sigd**3 * (ph(il, i) - ph(il, i + 1))
                    tf = b(il, i) - 5. * (th(il, i) - th(il, i - 1)) &
                         * t(il, i) / (lvcp(il, i) * sigd * th(il, i))
-                   af = xf * tf + mp(il, i + 1) * mp(il, i + 1) * tinv
+                   af = xf * tf + mp(il, i + 1)**2 * tinv
                    bf = 2. * (tinv * mp(il, i + 1))**3 + tinv &
                         * mp(il, i + 1) * xf * tf + 50. * (p(il, i - 1) &
                         - p(il, i)) * xf * tevap
