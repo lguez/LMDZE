@@ -26,39 +26,32 @@ contains
 
     integer, intent(out):: iflag1(:) ! (klon)
     real tnk1(:), qnk1(:), gznk1(:) ! (klon)
-    real, intent(out):: plcl1(klon)
+    real, intent(out):: plcl1(:) ! (klon)
 
     ! Local:
     integer i
-    real qsnk(klon), rh(klon), chi(klon)
+    real rh(klon)
     real, parameter:: A = 1669., B = 122.
 
     !--------------------------------------------------------------------
 
-    iflag1 = 0
-    plcl1 = 0.
-
-    ! Check whether parcel level temperature and specific humidity
-    ! are reasonable
-    do i = 1, klon
-       if (t1(i, minorig) < 250. .or. q1(i, minorig) <= 0.) iflag1(i) = 7
-    end do
-
     ! Calculate lifted condensation level of air at parcel origin level
     ! (within 0.2 % of formula of Bolton, Mon. Wea. Rev., 1980)
-    do i = 1, klon
-       if (iflag1(i) == 0) then
-          tnk1(i) = t1(i, minorig)
-          qnk1(i) = q1(i, minorig)
-          gznk1(i) = gz1(i, minorig)
-          qsnk(i) = qs1(i, minorig)
+    where (t1(:, minorig) >= 250. .and. q1(:, minorig) > 0.)
+       ! Parcel level temperature and specific humidity are reasonable.
+       tnk1 = t1(:, minorig)
+       qnk1 = q1(:, minorig)
+       gznk1 = gz1(:, minorig)
 
-          rh(i) = qnk1(i) / qsnk(i)
-          chi(i) = tnk1(i) / (A - B * rh(i) - tnk1(i))
-          plcl1(i) = p1(i, minorig) * (rh(i)**chi(i))
-          if (plcl1(i) < 200. .or. plcl1(i) >= 2000.) iflag1(i) = 8
-       endif
-    end do
+       rh = qnk1 / qs1(:, minorig)
+       plcl1 = p1(:, minorig) * rh**(tnk1 / (A - B * rh - tnk1))
+       iflag1 = 0
+    elsewhere
+       plcl1 = 0.
+       iflag1 = 7
+    end where
+
+    where (iflag1 == 0 .and. (plcl1 < 200. .or. plcl1 >= 2000.)) iflag1 = 8
 
     ! Compute icb1:
     do i = 1, klon

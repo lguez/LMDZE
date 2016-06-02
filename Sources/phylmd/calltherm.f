@@ -8,6 +8,7 @@ contains
        q_seri, d_u_ajs, d_v_ajs, d_t_ajs, d_q_ajs, fm_therm, entr_therm)
 
     ! From LMDZ4/libf/phylmd/calltherm.F, version 1.2 2004/12/10 11:27:46
+    ! Thermiques
 
     USE dimphy, ONLY: klev, klon
     USE ctherm, ONLY: l_mix_thermals, nsplit_thermals, r_aspect_thermals, &
@@ -15,23 +16,23 @@ contains
     use thermcell_m, only: thermcell
 
     REAL, intent(in):: dtime
-
+    REAL, intent(in):: pplay(klon, klev)
+    REAL, intent(in):: paprs(klon, klev+1)
+    REAL, intent(in):: pphi(klon, klev)
     REAL, intent(inout):: u_seri(klon, klev), v_seri(klon, klev)
     REAL, intent(inout):: t_seri(klon, klev)
-    real q_seri(klon, klev)
-    REAL, intent(in):: paprs(klon, klev+1)
-    REAL, intent(in):: pplay(klon, klev)
-    REAL, intent(in):: pphi(klon, klev)
+    real, intent(inout):: q_seri(klon, klev)
 
     ! Update thermiques
-    REAL d_t_ajs(klon, klev), d_q_ajs(klon, klev)
     REAL d_u_ajs(klon, klev), d_v_ajs(klon, klev)
+    REAL d_t_ajs(klon, klev), d_q_ajs(klon, klev)
     real fm_therm(klon, klev+1), entr_therm(klon, klev)
 
-    ! Variables locales
+    ! Local:
+
     REAL d_t_the(klon, klev), d_q_the(klon, klev)
     REAL d_u_the(klon, klev), d_v_the(klon, klev)
-    !
+
     real, save:: zfm_therm(klon, klev+1), zentr_therm(klon, klev)
     real zdt
 
@@ -48,7 +49,7 @@ contains
     ! tests sur les valeurs negatives de l'eau
     do k=1, klev
        do i=1, klon
-          if (.not.q_seri(i, k).ge.0.) then
+          if (.not.q_seri(i, k) >= 0.) then
              print*, 'WARN eau<0 avant therm i=', i, ' k=', k, ' dq, q', &
                   d_q_the(i, k), q_seri(i, k)
              q_seri(i, k)=1.e-15
@@ -87,7 +88,7 @@ contains
        ! tests sur les valeurs negatives de l'eau
        DO k = 1, klev
           DO i = 1, klon
-             if (.not.q_seri(i, k).ge.0.) then
+             if (.not.q_seri(i, k) >= 0.) then
                 print*, 'WARN eau<0 apres therm i=', i, ' k=', k, ' dq, q', &
                      d_q_the(i, k), q_seri(i, k)
                 q_seri(i, k)=1.e-15

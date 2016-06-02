@@ -21,7 +21,8 @@ contains
     ! inputs:
     integer, intent(in):: icb(:), inb(:) ! (ncum)
     real, intent(in):: delt
-    real t(klon, klev), rr(klon, klev), u(klon, klev), v(klon, klev)
+    real, intent(in):: t(klon, klev), rr(klon, klev)
+    real, intent(in):: u(klon, klev), v(klon, klev)
     real gz(klon, klev)
     real p(klon, klev)
     real ph(klon, klev + 1), h(klon, klev), hp(klon, klev)
@@ -42,9 +43,8 @@ contains
     real sig(klon, klev)
     real tv(klon, klev), tvp(klon, klev)
 
-    integer, intent(out):: iflag(:) ! (ncum)
-
     ! outputs:
+    integer, intent(out):: iflag(:) ! (ncum)
     real precip(klon)
     real VPrecip(klon, klev + 1)
     real ft(klon, klev), fr(klon, klev), fu(klon, klev), fv(klon, klev)
@@ -58,8 +58,8 @@ contains
     ! Local:
     real, parameter:: delta = 0.01 ! interface cloud parameterization
     integer ncum
-    integer i, k, il, n, j, num1
-    real rat, awat, delti
+    integer i, k, il, n, j
+    real awat, delti
     real ax, bx, cx, dx
     real cpinv, rdcp, dpinv
     real lvcp(klon, klev)
@@ -102,7 +102,7 @@ contains
        enddo
     enddo
 
-    ! calculate surface precipitation in mm / day 
+    ! calculate surface precipitation in mm / day
 
     do il = 1, ncum
        if (ep(il, inb(il)) >= 1e-4) precip(il) = wt(il, 1) * sigd &
@@ -119,8 +119,8 @@ contains
        end do
     end do
 
-    ! calculate tendencies of lowest level potential temperature 
-    ! and mixing ratio 
+    ! calculate tendencies of lowest level potential temperature
+    ! and mixing ratio
 
     do il = 1, ncum
        work(il) = 1.0 / (ph(il, 1) - ph(il, 2))
@@ -134,20 +134,14 @@ contains
     enddo
 
     do il = 1, ncum
-       ! Consist vect:
        if (0.01 * rg * work(il) * am(il) >= delti) iflag(il) = 1
 
        ft(il, 1) = 0.01 * rg * work(il) * am(il) * (t(il, 2) - t(il, 1) &
-            + (gz(il, 2) - gz(il, 1)) / cpn(il, 1))
-
-       ft(il, 1) = ft(il, 1) - 0.5 * lvcp(il, 1) * sigd * (evap(il, 1) &
-            + evap(il, 2))
-
-       ft(il, 1) = ft(il, 1) - 0.009 * rg * sigd * mp(il, 2) &
-            * t(il, 1) * b(il, 1) * work(il)
-
-       ft(il, 1) = ft(il, 1) + 0.01 * sigd * wt(il, 1) * (cl - cpd) &
-            * water(il, 2) * (t(il, 2) - t(il, 1)) * work(il) / cpn(il, 1)
+            + (gz(il, 2) - gz(il, 1)) / cpn(il, 1)) - 0.5 * lvcp(il, 1) &
+            * sigd * (evap(il, 1) + evap(il, 2)) - 0.009 * rg * sigd &
+            * mp(il, 2) * t(il, 1) * b(il, 1) * work(il) + 0.01 * sigd &
+            * wt(il, 1) * (cl - cpd) * water(il, 2) * (t(il, 2) - t(il, 1)) &
+            * work(il) / cpn(il, 1)
 
        !jyg1 Correction pour mieux conserver l'eau (conformite avec CONVECT4.3)
        ! (sb: pour l'instant, on ne fait que le chgt concernant rg, pas evap)
@@ -162,7 +156,7 @@ contains
             * (up(il, 2) - u(il, 1)) + am(il) * (u(il, 2) - u(il, 1)))
        fv(il, 1) = fv(il, 1) + 0.01 * rg * work(il) * (mp(il, 2) &
             * (vp(il, 2) - v(il, 1)) + am(il) * (v(il, 2) - v(il, 1)))
-    enddo ! il
+    enddo
 
     do j = 2, nl
        do il = 1, ncum
@@ -177,20 +171,14 @@ contains
        enddo
     enddo
 
-    ! calculate tendencies of potential temperature and mixing ratio 
-    ! at levels above the lowest level 
+    ! calculate tendencies of potential temperature and mixing ratio
+    ! at levels above the lowest level
 
-    ! first find the net saturated updraft and downdraft mass fluxes 
-    ! through each level 
+    ! first find the net saturated updraft and downdraft mass fluxes
+    ! through each level
 
     loop_i: do i = 2, nl - 1
-       num1 = 0
-
-       do il = 1, ncum
-          if (i <= inb(il)) num1 = num1 + 1
-       enddo
-
-       if (num1 > 0) then
+       if (any(inb >= i)) then
           amp1(:ncum) = 0.
           ad(:ncum) = 0.
 
@@ -227,26 +215,20 @@ contains
                 dpinv = 1.0 / (ph(il, i) - ph(il, i + 1))
                 cpinv = 1.0 / cpn(il, i)
 
-                ! Vecto:
                 if (0.01 * rg * dpinv * amp1(il) >= delti) iflag(il) = 1
 
                 ft(il, i) = 0.01 * rg * dpinv * (amp1(il) * (t(il, i + 1) &
                      - t(il, i) + (gz(il, i + 1) - gz(il, i)) * cpinv) &
                      - ad(il) * (t(il, i) - t(il, i - 1) + (gz(il, i) &
                      - gz(il, i - 1)) * cpinv)) - 0.5 * sigd * lvcp(il, i) &
-                     * (evap(il, i) + evap(il, i + 1))
-                rat = cpn(il, i - 1) * cpinv
-                ft(il, i) = ft(il, i) - 0.009 * rg * sigd * (mp(il, i + 1) &
-                     * t(il, i) * b(il, i) - mp(il, i) * t(il, i - 1) * rat &
-                     * b(il, i - 1)) * dpinv
-                ft(il, i) = ft(il, i) + 0.01 * rg * dpinv * ment(il, i, i) &
+                     * (evap(il, i) + evap(il, i + 1)) - 0.009 * rg * sigd &
+                     * (mp(il, i + 1) * t(il, i) * b(il, i) - mp(il, i) &
+                     * t(il, i - 1) * cpn(il, i - 1) * cpinv * b(il, i - 1)) &
+                     * dpinv + 0.01 * rg * dpinv * ment(il, i, i) &
                      * (hp(il, i) - h(il, i) + t(il, i) * (cpv - cpd) &
-                     * (rr(il, i) - qent(il, i, i))) * cpinv
-
-                ft(il, i) = ft(il, i) + 0.01 * sigd * wt(il, i) * (cl - cpd) &
-                     * water(il, i + 1) * (t(il, i + 1) - t(il, i)) * dpinv &
-                     * cpinv
-
+                     * (rr(il, i) - qent(il, i, i))) * cpinv + 0.01 * sigd &
+                     * wt(il, i) * (cl - cpd) * water(il, i + 1) &
+                     * (t(il, i + 1) - t(il, i)) * dpinv * cpinv
                 fr(il, i) = 0.01 * rg * dpinv * (amp1(il) * (rr(il, i + 1) &
                      - rr(il, i)) - ad(il) * (rr(il, i) - rr(il, i - 1)))
                 fu(il, i) = fu(il, i) + 0.01 * rg * dpinv * (amp1(il) &
@@ -346,9 +328,9 @@ contains
        end if
     end do loop_i
 
-    ! move the detrainment at level inb down to level inb - 1 
-    ! in such a way as to preserve the vertically 
-    ! integrated enthalpy and water tendencies 
+    ! move the detrainment at level inb down to level inb - 1
+    ! in such a way as to preserve the vertically
+    ! integrated enthalpy and water tendencies
 
     do il = 1, ncum
        ax = 0.1 * ment(il, inb(il), inb(il)) * (hp(il, inb(il)) &
@@ -383,7 +365,7 @@ contains
 
     end do
 
-    ! homoginize tendencies below cloud base 
+    ! homoginize tendencies below cloud base
 
     do il = 1, ncum
        asum(il) = 0.0
@@ -415,7 +397,7 @@ contains
        enddo
     enddo
 
-    ! reset counter and return 
+    ! reset counter and return
 
     do il = 1, ncum
        sig(il, klev) = 2.0
@@ -481,10 +463,8 @@ contains
        enddo
     enddo
 
-    !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-    ! determination de la variation de flux ascendant entre
-    ! deux niveau non dilue mike
-    !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+    ! D\'etermination de la variation de flux ascendant entre
+    ! deux niveaux non dilu\'es mike
 
     do i = 1, nl
        do il = 1, ncum
@@ -526,10 +506,8 @@ contains
        enddo
     enddo
 
-    !cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-    ! icb represente de niveau ou se trouve la
-    ! base du nuage, et inb le top du nuage
-    !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+    ! icb repr\'esente le niveau o\`u se trouve la base du nuage, et
+    ! inb le sommet du nuage
 
     do i = 1, klev
        DO il = 1, ncum
@@ -540,9 +518,7 @@ contains
        end DO
     enddo
 
-    ! diagnose the in-cloud mixing ratio
-    ! of condensed water
-    !
+    ! Diagnose the in-cloud mixing ratio of condensed water
 
     do i = 1, klev
        do il = 1, ncum

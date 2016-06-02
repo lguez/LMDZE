@@ -115,7 +115,7 @@ contains
     LOGICAL, PARAMETER:: ok_stratus = .FALSE.
     ! Ajouter artificiellement les stratus
 
-    ! pour phsystoke avec thermiques
+    ! pour phystoke avec thermiques
     REAL fm_therm(klon, llm + 1)
     REAL entr_therm(klon, llm)
     real, save:: q2(klon, llm + 1, nbsrf)
@@ -303,7 +303,7 @@ contains
     REAL, PARAMETER:: t_coup = 234.
     REAL zphi(klon, llm)
 
-    ! cf. Anne Mathieu variables pour la couche limite atmosphérique (hbtm)
+    ! cf. Anne Mathieu, variables pour la couche limite atmosphérique (hbtm)
 
     REAL, SAVE:: pblh(klon, nbsrf) ! Hauteur de couche limite
     REAL, SAVE:: plcl(klon, nbsrf) ! Niveau de condensation de la CLA
@@ -411,7 +411,9 @@ contains
     INTEGER:: ip_ebil = 0 ! print level for energy conservation diagnostics
     INTEGER:: if_ebil = 0 ! verbosity for diagnostics of energy conservation
 
-    REAL d_t_ec(klon, llm) ! tendance due \`a la conversion Ec -> E thermique
+    REAL d_t_ec(klon, llm) 
+    ! tendance due \`a la conversion Ec en énergie thermique
+
     REAL ZRCPD
 
     REAL t2m(klon, nbsrf), q2m(klon, nbsrf) ! temperature and humidity at 2 m
@@ -916,7 +918,6 @@ contains
        t_seri = t_seri + d_t_ajs
        q_seri = q_seri + d_q_ajs
     else
-       ! Thermiques
        call calltherm(dtphys, play, paprs, pphi, u_seri, v_seri, t_seri, &
             q_seri, d_u_ajs, d_v_ajs, d_t_ajs, d_q_ajs, fm_therm, entr_therm)
     endif
@@ -1260,7 +1261,7 @@ contains
 
     ! Accumuler les variables a stocker dans les fichiers histoire:
 
-    ! conversion Ec -> E thermique
+    ! conversion Ec en énergie thermique
     DO k = 1, llm
        DO i = 1, klon
           ZRCPD = RCPD * (1. + RVTMP2 * q_seri(i, k))
