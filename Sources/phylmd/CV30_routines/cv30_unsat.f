@@ -10,8 +10,8 @@ contains
     ! Unsaturated (precipitating) downdrafts
 
     use cv30_param_m, only: nl, sigd
-    use cv_thermo_m, only: cpd, ginv
-    use SUPHEC_M, only: rg
+    use cv_thermo_m, only: ginv
+    use SUPHEC_M, only: rg, rcpd
 
     integer, intent(in):: icb(:) ! (ncum)
     ! {2 <= icb <= nl - 3}
@@ -20,15 +20,21 @@ contains
     ! first model level above the level of neutral buoyancy of the
     ! parcel (1 <= inb <= nl - 1)
 
-    real, intent(in):: t(:, :), q(:, :), qs(:, :) ! (ncum, nl)
+    real, intent(in):: t(:, :) ! (ncum, nl) temperature (K)
+    real, intent(in):: q(:, :), qs(:, :) ! (ncum, nl)
     real, intent(in):: gz(:, :) ! (klon, klev)
     real, intent(in):: u(:, :), v(:, :) ! (ncum, nl)
     real, intent(in):: p(:, :) ! (klon, klev) pressure at full level, in hPa
     real, intent(in):: ph(:, :) ! (ncum, klev + 1)
-    real, intent(in):: th(:, :) ! (ncum, nl - 1)
+    real, intent(in):: th(:, :) ! (ncum, nl - 1) potential temperature, in K
     real, intent(in):: tv(:, :) ! (klon, klev)
+
     real, intent(in):: lv(:, :) ! (ncum, nl)
-    real, intent(in):: cpn(:, :) ! (klon, klev)
+    ! specific latent heat of vaporization of water, in J kg-1
+
+    real, intent(in):: cpn(:, :) ! (ncum, nl)
+    ! specific heat capacity at constant pressure of humid air, in J K-1 kg-1
+
     real, intent(in):: ep(:, :) ! (ncum, klev)
     real, intent(in):: clw(:, :) ! (ncum, klev)
     real, intent(in):: m(:, :) ! (ncum, klev)
@@ -37,9 +43,9 @@ contains
     real, intent(in):: delt
     real, intent(in):: plcl(:) ! (ncum)
 
-    real, intent(out):: mp(:, :) ! (klon, klev)
-    ! mass flux of the unsaturated downdraft, defined positive downward
-    ! M_p in Emanuel (1991 928)
+    real, intent(out):: mp(:, :)
+    ! (ncum, nl) Mass flux of the unsaturated downdraft, defined
+    ! positive downward, in kg m-2 s-1.  M_p in Emanuel (1991 928).
 
     real, intent(out):: qp(:, :), up(:, :), vp(:, :) ! (ncum, nl)
     real, intent(out):: wt(:, :) ! (ncum, nl)
@@ -61,12 +67,13 @@ contains
 
     integer ncum
     integer i, il, imax
-    real tinv, delti
+    real, parameter:: tinv = 1. / 3.
+    real  delti
     real afac, afac1, afac2, bfac
     real pr1, sigt, b6, c6, revap, tevap, delth
-    real amfac, amp2, xf, tf, fac2, ur, sru, fac, d, af, bf
+    real xf, tf, fac2, ur, sru, fac, d, af, bf
     real ampmax
-    real lvcp(size(icb), nl) ! (ncum, nl)
+    real lvcp(size(icb), nl) ! (ncum, nl) L_v / C_p, in K
     real wdtrain(size(icb)) ! (ncum)
     logical lwork(size(icb)) ! (ncum)
 
@@ -74,7 +81,6 @@ contains
 
     ncum = size(icb)
     delti = 1. / delt
-    tinv = 1. / 3.
     mp = 0.
     b = 0.
 
@@ -118,7 +124,7 @@ contains
              wt(il, i) = 45.
 
              if (i < inb(il)) then
-                qp(il, i) = qp(il, i + 1) + (cpd * (t(il, i + 1) - t(il, i)) &
+                qp(il, i) = qp(il, i + 1) + (rcpd * (t(il, i + 1) - t(il, i)) &
                      + gz(il, i + 1) - gz(il, i)) / lv(il, i)
                 qp(il, i) = 0.5 * (qp(il, i) + q(il, i))
              endif
@@ -131,7 +137,7 @@ contains
                 afac = p(il, 1) * (qs(il, 1) - qp(il, 1)) &
                      / (1e4 + 2000. * p(il, 1) * qs(il, 1))
              else
-                qp(il, i - 1) = qp(il, i) + (cpd * (t(il, i) - t(il, i - 1)) &
+                qp(il, i - 1) = qp(il, i) + (rcpd * (t(il, i) - t(il, i - 1)) &
                      + gz(il, i) - gz(il, i - 1)) / lv(il, i)
                 qp(il, i - 1) = 0.5 * (qp(il, i - 1) + q(il, i - 1))
                 qp(il, i - 1) = min(qp(il, i - 1), qs(il, i - 1))
@@ -188,12 +194,10 @@ contains
                 ! If hydrostatic assumption fails, solve cubic
                 ! difference equation for downdraft theta and mass
                 ! flux from two simultaneous differential equations
-
-                amfac = sigd**2 * 70. * ph(il, i) * (p(il, i - 1) - p(il, i)) &
-                     * (th(il, i) - th(il, i - 1)) / (tv(il, i) * th(il, i))
-                amp2 = abs(mp(il, i + 1)**2 - mp(il, i)**2)
-
-                if (amp2 > 0.1 * amfac) then
+                if (abs(mp(il, i + 1)**2 - mp(il, i)**2) > 0.1 * sigd**2 &
+                     * 70. * ph(il, i) * (p(il, i - 1) - p(il, i)) &
+                     * (th(il, i) - th(il, i - 1)) / (tv(il, i) * th(il, i))) &
+                     then
                    xf = 100. * sigd**3 * (ph(il, i) - ph(il, i + 1))
                    tf = b(il, i) - 5. * (th(il, i) - th(il, i - 1)) &
                         * t(il, i) / (lvcp(il, i) * sigd * th(il, i))
@@ -214,7 +218,7 @@ contains
                            + sru)**tinv + fac * (abs(0.5 * bf - sru))**tinv
                    else
                       d = atan(2. * sqrt(- ur) / (bf + 1e-28))
-                      if (fac2 < 0.)d = 3.14159 - d
+                      if (fac2 < 0.) d = 3.14159 - d
                       mp(il, i) = mp(il, i + 1) * tinv + 2. * sqrt(af * tinv) &
                            * cos(d * tinv)
                    endif
@@ -225,17 +229,15 @@ contains
                    ! suivante : il faut diviser par (mp(il, i) * sigd
                    ! * rg) et non par (mp(il, i) + sigd * 0.1).  Et il
                    ! faut bien revoir les facteurs 100.
-                   b(il, i - 1) = b(il, i) + 100. * (p(il, i - 1) - p(il, i)) &
-                        * tevap / (mp(il, i) + sigd * 0.1) - 10. * (th(il, i) &
-                        - th(il, i - 1)) * t(il, i) / (lvcp(il, i) * sigd &
-                        * th(il, i))
-                   b(il, i - 1) = max(b(il, i - 1), 0.)
+                   b(il, i - 1) = max(b(il, i) + 100. * (p(il, i - 1) &
+                        - p(il, i)) * tevap / (mp(il, i) + sigd * 0.1) - 10. &
+                        * (th(il, i) - th(il, i - 1)) * t(il, i) &
+                        / (lvcp(il, i) * sigd * th(il, i)), 0.)
                 endif
 
-                ! Limit magnitude of mp(i) to meet CFL condition:
+                ! Limit magnitude of mp to meet CFL condition:
                 ampmax = 2. * (ph(il, i) - ph(il, i + 1)) * delti
-                amp2 = 2. * (ph(il, i - 1) - ph(il, i)) * delti
-                ampmax = min(ampmax, amp2)
+                ampmax = min(ampmax, 2. * (ph(il, i - 1) - ph(il, i)) * delti)
                 mp(il, i) = min(mp(il, i), ampmax)
 
                 ! Force mp to decrease linearly to zero between cloud

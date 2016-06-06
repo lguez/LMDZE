@@ -22,9 +22,9 @@ contains
     ! - if icbs1=icb1, compute also tp1(icb1+1), tvp1(icb1+1) & clw1(icb1+1)
 
     use cv30_param_m, only: minorig, nl
-    use cv_thermo_m, only: cl, clmcpv, cpd, cpv, eps, rrv
+    use cv_thermo_m, only: clmcpv, eps
     USE dimphy, ONLY: klev, klon
-    use SUPHEC_M, only: rlvtt
+    use SUPHEC_M, only: rcw, rlvtt, rcpd, rcpv, rv
 
     ! inputs:
     integer, intent(in):: icb1(klon)
@@ -61,9 +61,9 @@ contains
     ! *** Calculate certain parcel quantities, including static energy ***
 
     do i=1, klon
-       ah0(i)=(cpd*(1.-qnk(i))+cl*qnk(i))*tnk(i) &
+       ah0(i)=(rcpd*(1.-qnk(i))+rcw*qnk(i))*tnk(i) &
             +qnk(i)*(rlvtt-clmcpv*(tnk(i)-273.15))+gznk(i)
-       cpp(i)=cpd*(1.-qnk(i))+qnk(i)*cpv
+       cpp(i)=rcpd*(1.-qnk(i))+qnk(i)*rcpv
        cpinv(i)=1./cpp(i)
     end do
 
@@ -119,11 +119,11 @@ contains
 
        ! First iteration.
 
-       s=cpd*(1.-qnk(i))+cl*qnk(i) &
-            +alv*alv*qg/(rrv*ticb(i)*ticb(i))
+       s=rcpd*(1.-qnk(i))+rcw*qnk(i) &
+            +alv*alv*qg/(rv*ticb(i)*ticb(i))
        s=1./s
 
-       ahg=cpd*tg+(cl-cpd)*qnk(i)*tg+alv*qg+gzicb(i)
+       ahg=rcpd*tg+(rcw-rcpd)*qnk(i)*tg+alv*qg+gzicb(i)
        tg=tg+s*(ah0(i)-ahg)
 
        !debug tc=tg-t0
@@ -136,7 +136,7 @@ contains
 
        ! Second iteration.
 
-       ahg=cpd*tg+(cl-cpd)*qnk(i)*tg+alv*qg+gzicb(i)
+       ahg=rcpd*tg+(rcw-rcpd)*qnk(i)*tg+alv*qg+gzicb(i)
        tg=tg+s*(ah0(i)-ahg)
 
        !debug tc=tg-t0
@@ -152,7 +152,7 @@ contains
 
        ! no approximation:
        tp1(i, icbs1(i))=(ah0(i)-gz1(i, icbs1(i))-alv*qg) &
-            /(cpd+(cl-cpd)*qnk(i))
+            /(rcpd+(rcw-rcpd)*qnk(i))
 
        clw1(i, icbs1(i))=qnk(i)-qg
        clw1(i, icbs1(i))=max(0.0, clw1(i, icbs1(i)))
@@ -189,11 +189,11 @@ contains
 
        ! First iteration.
 
-       s=cpd*(1.-qnk(i))+cl*qnk(i) &
-            +alv*alv*qg/(rrv*ticb(i)*ticb(i))
+       s=rcpd*(1.-qnk(i))+rcw*qnk(i) &
+            +alv*alv*qg/(rv*ticb(i)*ticb(i))
        s=1./s
 
-       ahg=cpd*tg+(cl-cpd)*qnk(i)*tg+alv*qg+gzicb(i)
+       ahg=rcpd*tg+(rcw-rcpd)*qnk(i)*tg+alv*qg+gzicb(i)
        tg=tg+s*(ah0(i)-ahg)
 
        !debug tc=tg-t0
@@ -207,7 +207,7 @@ contains
 
        ! Second iteration.
 
-       ahg=cpd*tg+(cl-cpd)*qnk(i)*tg+alv*qg+gzicb(i)
+       ahg=rcpd*tg+(rcw-rcpd)*qnk(i)*tg+alv*qg+gzicb(i)
        tg=tg+s*(ah0(i)-ahg)
 
        !debug tc=tg-t0
@@ -223,7 +223,7 @@ contains
 
        ! no approximation:
        tp1(i, icb1(i)+1)=(ah0(i)-gz1(i, icb1(i)+1)-alv*qg) &
-            /(cpd+(cl-cpd)*qnk(i))
+            /(rcpd+(rcw-rcpd)*qnk(i))
 
        clw1(i, icb1(i)+1)=qnk(i)-qg
        clw1(i, icb1(i)+1)=max(0.0, clw1(i, icb1(i)+1))

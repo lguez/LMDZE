@@ -5,7 +5,7 @@ module cv30_yield_m
 contains
 
   SUBROUTINE cv30_yield(icb, inb, delt, t, rr, u, v, gz, p, ph, h, hp, lv, &
-       cpn, th, ep, clw, m, tp, mp, rp, up, vp, wt, water, evap, b, ment, &
+       cpn, th, ep, clw, m, tp, mp, qp, up, vp, wt, water, evap, b, ment, &
        qent, uent, vent, nent, elij, sig, tv, tvp, iflag, precip, VPrecip, &
        ft, fr, fu, fv, upwd, dnwd, dnwd0, ma, mike, tls, tps, qcondc)
 
@@ -14,24 +14,35 @@ contains
 
     use conema3_m, only: iflag_clw
     use cv30_param_m, only: minorig, nl, sigd
-    use cv_thermo_m, only: cl, cpd, cpv, rowl, rrd, rrv
+    use cv_thermo_m, only: rowl
     USE dimphy, ONLY: klev, klon
-    use SUPHEC_M, only: rg
+    use SUPHEC_M, only: rg, rcpd, rcw, rcpv, rd, rv
 
     ! inputs:
-    integer, intent(in):: icb(:), inb(:) ! (ncum)
+
+    integer, intent(in):: icb(:)
+
+    integer, intent(in):: inb(:) ! (ncum)
+    ! first model level above the level of neutral buoyancy of the
+    ! parcel (1 <= inb <= nl - 1)
+
     real, intent(in):: delt
     real, intent(in):: t(klon, klev), rr(klon, klev)
     real, intent(in):: u(klon, klev), v(klon, klev)
     real gz(klon, klev)
     real p(klon, klev)
     real ph(klon, klev + 1), h(klon, klev), hp(klon, klev)
-    real lv(klon, klev), cpn(klon, klev)
-    real th(klon, klev)
+    real, intent(in):: lv(:, :) ! (klon, klev)
+
+    real, intent(in):: cpn(:, :) ! (ncum, nl)
+    ! specific heat capacity at constant pressure of humid air, in J K-1 kg-1
+
+    real, intent(in):: th(:, :) ! (ncum, nl)
     real ep(klon, klev), clw(klon, klev)
     real m(klon, klev)
     real tp(klon, klev)
-    real mp(klon, klev), rp(klon, klev), up(klon, klev)
+    real, intent(in):: mp(:, :) ! (ncum, nl)
+    real, intent(in):: qp(:, :), up(:, :) ! (klon, klev)
     real, intent(in):: vp(:, 2:) ! (ncum, 2:nl)
     real, intent(in):: wt(:, :) ! (ncum, nl - 1)
     real, intent(in):: water(:, :), evap(:, :) ! (ncum, nl)
@@ -140,12 +151,12 @@ contains
             + (gz(il, 2) - gz(il, 1)) / cpn(il, 1)) - 0.5 * lvcp(il, 1) &
             * sigd * (evap(il, 1) + evap(il, 2)) - 0.009 * rg * sigd &
             * mp(il, 2) * t(il, 1) * b(il, 1) * work(il) + 0.01 * sigd &
-            * wt(il, 1) * (cl - cpd) * water(il, 2) * (t(il, 2) - t(il, 1)) &
+            * wt(il, 1) * (rcw - rcpd) * water(il, 2) * (t(il, 2) - t(il, 1)) &
             * work(il) / cpn(il, 1)
 
        !jyg1 Correction pour mieux conserver l'eau (conformite avec CONVECT4.3)
        ! (sb: pour l'instant, on ne fait que le chgt concernant rg, pas evap)
-       fr(il, 1) = 0.01 * rg * mp(il, 2) * (rp(il, 2) - rr(il, 1)) &
+       fr(il, 1) = 0.01 * rg * mp(il, 2) * (qp(il, 2) - rr(il, 1)) &
             * work(il) + sigd * 0.5 * (evap(il, 1) + evap(il, 2))
        ! + tard : + sigd * evap(il, 1)
 
@@ -225,9 +236,9 @@ contains
                      * (mp(il, i + 1) * t(il, i) * b(il, i) - mp(il, i) &
                      * t(il, i - 1) * cpn(il, i - 1) * cpinv * b(il, i - 1)) &
                      * dpinv + 0.01 * rg * dpinv * ment(il, i, i) &
-                     * (hp(il, i) - h(il, i) + t(il, i) * (cpv - cpd) &
+                     * (hp(il, i) - h(il, i) + t(il, i) * (rcpv - rcpd) &
                      * (rr(il, i) - qent(il, i, i))) * cpinv + 0.01 * sigd &
-                     * wt(il, i) * (cl - cpd) * water(il, i + 1) &
+                     * wt(il, i) * (rcw - rcpd) * water(il, i + 1) &
                      * (t(il, i + 1) - t(il, i)) * dpinv * cpinv
                 fr(il, i) = 0.01 * rg * dpinv * (amp1(il) * (rr(il, i + 1) &
                      - rr(il, i)) - ad(il) * (rr(il, i) - rr(il, i - 1)))
@@ -288,7 +299,7 @@ contains
                 ! conserver l'eau:
                 fr(il, i) = fr(il, i) + 0.5 * sigd * (evap(il, i) &
                      + evap(il, i + 1)) + 0.01 * rg * (mp(il, i + 1) &
-                     * (rp(il, i + 1) - rr(il, i)) - mp(il, i) * (rp(il, i) &
+                     * (qp(il, i + 1) - rr(il, i)) - mp(il, i) * (qp(il, i) &
                      - rr(il, i - 1))) * dpinv
 
                 fu(il, i) = fu(il, i) + 0.01 * rg * (mp(il, i + 1) &
@@ -334,7 +345,7 @@ contains
 
     do il = 1, ncum
        ax = 0.1 * ment(il, inb(il), inb(il)) * (hp(il, inb(il)) &
-            - h(il, inb(il)) + t(il, inb(il)) * (cpv - cpd) &
+            - h(il, inb(il)) + t(il, inb(il)) * (rcpv - rcpd) &
             * (rr(il, inb(il)) - qent(il, inb(il), inb(il)))) &
             / (cpn(il, inb(il)) * (ph(il, inb(il)) - ph(il, inb(il) + 1)))
        ft(il, inb(il)) = ft(il, inb(il)) - ax
@@ -378,9 +389,9 @@ contains
        do il = 1, ncum
           if (i <= (icb(il) - 1)) then
              asum(il) = asum(il) + ft(il, i) * (ph(il, i) - ph(il, i + 1))
-             bsum(il) = bsum(il) + fr(il, i) * (lv(il, i) + (cl - cpd) &
+             bsum(il) = bsum(il) + fr(il, i) * (lv(il, i) + (rcw - rcpd) &
                   * (t(il, i) - t(il, 1))) * (ph(il, i) - ph(il, i + 1))
-             csum(il) = csum(il) + (lv(il, i) + (cl - cpd) * (t(il, i) &
+             csum(il) = csum(il) + (lv(il, i) + (rcw - rcpd) * (t(il, i) &
                   - t(il, 1))) * (ph(il, i) - ph(il, i + 1))
              dsum(il) = dsum(il) + t(il, i) * (ph(il, i) - ph(il, i + 1)) &
                   / th(il, i)
@@ -511,8 +522,8 @@ contains
 
     do i = 1, klev
        DO il = 1, ncum
-          rdcp = (rrd * (1. - rr(il, i)) - rr(il, i) * rrv) &
-               / (cpd * (1. - rr(il, i)) + rr(il, i) * cpv)
+          rdcp = (rd * (1. - rr(il, i)) - rr(il, i) * rv) &
+               / (rcpd * (1. - rr(il, i)) + rr(il, i) * rcpv)
           tls(il, i) = t(il, i) * (1000.0 / p(il, i))**rdcp
           tps(il, i) = tp(il, i)
        end DO
@@ -544,7 +555,7 @@ contains
           do il = 1, ncum
              if (i >= icb(il) .and. i <= (inb(il) - 1) &
                   .and. j >= icb(il)) then
-                sax(il, i) = sax(il, i) + rrd * (tvp(il, j) - tv(il, j)) &
+                sax(il, i) = sax(il, i) + rd * (tvp(il, j) - tv(il, j)) &
                      * (ph(il, j) - ph(il, j + 1)) / p(il, j)
              endif
           enddo
@@ -562,7 +573,7 @@ contains
 
     do i = 1, nl
        do il = 1, ncum
-          if (wa(il, i) > 0.0) siga(il, i) = mac(il, i) / wa(il, i) * rrd &
+          if (wa(il, i) > 0.0) siga(il, i) = mac(il, i) / wa(il, i) * rd &
                * tvp(il, i) / p(il, i) / 100. / delta
           siga(il, i) = min(siga(il, i), 1.0)
 

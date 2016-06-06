@@ -42,12 +42,14 @@ module suphec_m
   ! specific ideal gas constant for dry air, in J K-1 kg-1
   ! (factor 1e3: conversion from g to kg)
 
-  real, parameter:: RCPV = 4. * RV ! Cpv, gas phase
+  real, parameter:: RCPV = 4. * RV 
+  ! specific heat capacity at constant pressure of water vapor, in J K-1 kg-1
 
-  real, save:: RCVD, RCVV
+  real, save:: RCVD
+  real, save:: RCVV
 
   real, parameter:: RCPD = 7. / 2 * RD 
-  ! specific heat capacity for dry air, in J K-1 kg-1
+  ! specific heat capacity at constant pressure of dry air, in J K-1 kg-1
 
   real, parameter:: RMO3 = 47.9942
   REAL, parameter:: RKAPPA = RD/RCPD
@@ -61,7 +63,10 @@ module suphec_m
   ! A1.7 Thermodynamic transition of phase
   REAL, save:: RLMLT
   real, parameter:: RTT = 273.16
-  real, parameter:: RLVTT = 2.5008E+6
+
+  real, parameter:: RLVTT = 2.5008E+6 
+  ! specific latent heat of vaporization of water at triple point, in J kg-1
+
   real, parameter:: RLSTT = 2.8345E+6
   real, parameter:: RATM = 1e5
 
@@ -127,7 +132,6 @@ contains
     RLMLT = RLSTT-RLVTT
     print *, 'Thermodynamic, transition of phase:'
     print '('' Fusion point = '', E13.7)', RTT
-    print '('' RLvTt = '', E13.7)', RLVTT
     print '('' RLsTt = '', E13.7)', RLSTT
     print '('' RLMlt = '', E13.7)', RLMLT
     print '('' Normal pressure = '', E13.7)', RATM

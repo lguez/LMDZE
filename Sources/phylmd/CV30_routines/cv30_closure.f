@@ -10,8 +10,8 @@ contains
     ! Vectorization: S. Bony
 
     use cv30_param_m, only: alpha, beta, dtcrit, minorig, nl
-    use cv_thermo_m, only: rrd
     USE dimphy, ONLY: klev, klon
+    use suphec_m, only: rd
 
     ! input:
     integer, intent(in):: icb(:), inb(:) ! (ncum)
@@ -124,7 +124,7 @@ contains
        do i=1, ncum
           if ((k >= (icb(i) + 1)).and.(k <= inb(i))) then
              deltap = MIN(pbase(i), ph(i, k-1))-MIN(pbase(i), ph(i, k))
-             cape(i)=cape(i) + rrd*buoy(i, k-1)*deltap/p(i, k-1)
+             cape(i)=cape(i) + rd*buoy(i, k-1)*deltap/p(i, k-1)
              cape(i)=AMAX1(0.0, cape(i))
              sigold(i, k)=sig(i, k)
 

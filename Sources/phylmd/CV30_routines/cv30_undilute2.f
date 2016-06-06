@@ -16,9 +16,9 @@ contains
 
     use conema3_m, only: epmax
     use cv30_param_m, only: minorig, nl
-    use cv_thermo_m, only: cl, clmcpv, cpd, cpv, eps, rrv
+    use cv_thermo_m, only: clmcpv, eps
     USE dimphy, ONLY: klon, klev
-    use SUPHEC_M, only: rlvtt
+    use SUPHEC_M, only: rcw, rlvtt, rcpd, rcpv, rv
 
     integer, intent(in):: icb(:), icbs(:) ! (ncum)
     ! icbs is the first level above LCL (may differ from icb)
@@ -26,7 +26,8 @@ contains
     real, intent(in):: tnk(:), qnk(:), gznk(:) ! (klon)
     real, intent(in):: t(klon, klev), qs(klon, klev), gz(klon, klev)
     real, intent(in):: p(klon, klev), h(klon, klev)
-    real, intent(in):: tv(klon, klev), lv(klon, klev)
+    real, intent(in):: tv(klon, klev)
+    real, intent(in):: lv(:, :) ! (ncum, nl)
     real, intent(in):: pbase(:), buoybase(:), plcl(:) ! (ncum)
 
     ! outputs:
@@ -78,7 +79,7 @@ contains
     ! Calculate certain parcel quantities, including static energy
 
     do i = 1, ncum
-       ah0(i) = (cpd * (1. - qnk(i)) + cl * qnk(i)) * tnk(i) &
+       ah0(i) = (rcpd * (1. - qnk(i)) + rcw * qnk(i)) * tnk(i) &
             + qnk(i) * (rlvtt - clmcpv * (tnk(i) - 273.15)) + gznk(i)
     end do
 
@@ -93,11 +94,11 @@ contains
 
              ! First iteration.
 
-             s = cpd * (1. - qnk(i)) + cl * qnk(i) &
-                  + alv * alv * qg / (rrv * t(i, k) * t(i, k))
+             s = rcpd * (1. - qnk(i)) + rcw * qnk(i) &
+                  + alv * alv * qg / (rv * t(i, k) * t(i, k))
              s = 1. / s
 
-             ahg = cpd * tg + (cl - cpd) * qnk(i) * tg + alv * qg + gz(i, k)
+             ahg = rcpd * tg + (rcw - rcpd) * qnk(i) * tg + alv * qg + gz(i, k)
              tg = tg + s * (ah0(i) - ahg)
 
              tc = tg - 273.15
@@ -110,7 +111,7 @@ contains
 
              ! Second iteration.
 
-             ahg = cpd * tg + (cl - cpd) * qnk(i) * tg + alv * qg + gz(i, k)
+             ahg = rcpd * tg + (rcw - rcpd) * qnk(i) * tg + alv * qg + gz(i, k)
              tg = tg + s * (ah0(i) - ahg)
 
              tc = tg - 273.15
@@ -125,7 +126,7 @@ contains
 
              ! no approximation:
              tp(i, k) = (ah0(i) - gz(i, k) - alv * qg) &
-                  / (cpd + (cl - cpd) * qnk(i))
+                  / (rcpd + (rcw - rcpd) * qnk(i))
 
              clw(i, k) = qnk(i) - qg
              clw(i, k) = max(0., clw(i, k))
@@ -198,7 +199,7 @@ contains
     do k = minorig + 1, nl
        do i = 1, ncum
           if (k >= icb(i) .and. k <= inb(i)) hp(i, k) = h(i, minorig) &
-               + (lv(i, k) + (cpd - cpv) * t(i, k)) * ep(i, k) * clw(i, k)
+               + (lv(i, k) + (rcpd - rcpv) * t(i, k)) * ep(i, k) * clw(i, k)
        end do
     end do
 

@@ -20,7 +20,8 @@ module cv30_param_m
   ! (because of locate in cv30_feed).
 
   real, parameter:: sigd = 0.01 
-  ! fractional area covered by unsaturated downdraft 
+  ! fractional area covered by unsaturated downdraft
+  ! \sigma_d in Emanuel (1991 928)
 
   real, parameter:: dtcrit = - 2.
   ! Critical buoyancy (K) used to adjust the approach to

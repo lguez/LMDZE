@@ -14,14 +14,16 @@ contains
     ! - vectorisation de la partie normalisation des flux (do 789)
 
     use cv30_param_m, only: minorig, nl
-    use cv_thermo_m, only: cpd, cpv, rrv
     USE dimphy, ONLY: klev, klon
+    use suphec_m, only: rcpd, rcpv, rv
 
     ! inputs:
     integer, intent(in):: icb(:), inb(:) ! (ncum)
-    real t(klon, klev), rr(klon, klev), rs(klon, klev)
+    real, intent(in):: t(klon, klev), rr(klon, klev), rs(klon, klev)
     real u(klon, klev), v(klon, klev)
-    real h(klon, klev), lv(klon, klev), hp(klon, klev)
+    real, intent(in):: h(klon, klev)
+    real, intent(in):: lv(:, :) ! (klon, klev)
+    real, intent(in):: hp(klon, klev)
     real ep(klon, klev), clw(klon, klev)
     real m(klon, klev) ! input of convect3
     real sig(klon, klev)
@@ -84,11 +86,11 @@ contains
                   (j >= (icb(il) - 1)).and.(j <= inb(il)))then
 
                 rti = rr(il, 1) - ep(il, i) * clw(il, i)
-                bf2 = 1. + lv(il, j) * lv(il, j) * rs(il, j) / (rrv &
-                     * t(il, j) * t(il, j) * cpd)
-                anum = h(il, j) - hp(il, i) + (cpv - cpd) * t(il, j) * (rti &
+                bf2 = 1. + lv(il, j) * lv(il, j) * rs(il, j) / (rv &
+                     * t(il, j) * t(il, j) * rcpd)
+                anum = h(il, j) - hp(il, i) + (rcpv - rcpd) * t(il, j) * (rti &
                      - rr(il, j))
-                denom = h(il, i) - hp(il, i) + (cpd - cpv) * (rr(il, i) &
+                denom = h(il, i) - hp(il, i) + (rcpd - rcpv) * (rr(il, i) &
                      - rti) * t(il, j)
                 dei = denom
                 if(abs(dei) < 0.01)dei = 0.01
@@ -165,9 +167,9 @@ contains
              lwork(il) = (nent(il, i) /= 0)
              qp = rr(il, 1) - ep(il, i) * clw(il, i)
              anum = h(il, i) - hp(il, i) - lv(il, i) * (qp - rs(il, i)) &
-                  + (cpv - cpd) * t(il, i) * (qp - rr(il, i))
+                  + (rcpv - rcpd) * t(il, i) * (qp - rr(il, i))
              denom = h(il, i) - hp(il, i) + lv(il, i) * (rr(il, i) - qp) &
-                  + (cpd - cpv) * t(il, i) * (rr(il, i) - qp)
+                  + (rcpd - rcpv) * t(il, i) * (rr(il, i) - qp)
              if(abs(denom) < 0.01)denom = 0.01
              scrit(il) = anum / denom
              alt = qp - rs(il, i) + scrit(il) * (rr(il, i) - qp)

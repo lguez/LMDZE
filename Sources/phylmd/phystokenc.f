@@ -42,30 +42,28 @@ contains
     ! flux detraine dans le panache descendant
 
     ! Les Thermiques
-    REAL pfm_therm(klon, klev+1)
-    REAL pentr_therm(klon, klev)
+    REAL, intent(in):: pfm_therm(klon, klev+1)
+    REAL, intent(in):: pentr_therm(klon, klev)
 
     ! Couche limite: 
-
-    REAL pcoefh(klon, klev) ! coeff melange Couche limite
-    REAL yu1(klon)
-    REAL yv1(klon)
+    REAL, intent(in):: pcoefh(klon, klev) ! coeff melange Couche limite
+    REAL, intent(in):: yu1(klon)
+    REAL, intent(in):: yv1(klon)
 
     ! Arguments necessaires pour les sources et puits de traceur 
 
-    REAL ftsol(klon, nbsrf) ! Temperature du sol (surf)(Kelvin)
-    REAL pctsrf(klon, nbsrf) ! Pourcentage de sol f(nature du sol)
+    REAL, intent(in):: ftsol(klon, nbsrf) ! Temperature du sol (surf)(Kelvin)
+    REAL, intent(in):: pctsrf(klon, nbsrf) ! Pourcentage de sol f(nature du sol)
 
-    ! Lessivage: 
-
-    REAL frac_impa(klon, klev)
-    REAL frac_nucl(klon, klev)
+    ! Coefficients de lessivage: 
+    REAL, intent(in):: frac_impa(klon, klev) ! facteur d'impaction
+    REAL, intent(in):: frac_nucl(klon, klev) ! facteur de nucleation
 
     REAL, INTENT(IN):: pphis(klon)
-    real paire(klon)
+    real, intent(in):: paire(klon)
     REAL, INTENT (IN):: dtime
 
-    ! Variables local to the procedure:
+    ! Local:
 
     real t(klon, klev)
     INTEGER, SAVE:: physid
@@ -94,8 +92,6 @@ contains
     REAL dtcum
 
     INTEGER:: iadvtr = 0, irec = 1
-    REAL zmin, zmax
-    LOGICAL ok_sync
 
     SAVE t, mfd, en_u, de_u, en_d, de_d, coefh, dtcum
     SAVE fm_therm, entr_therm
@@ -105,9 +101,8 @@ contains
 
     ! Couche limite: 
 
-    ok_sync = .TRUE.
-
-    IF (iadvtr==0) CALL initphysto('phystoke', dtime, dtime*istphy, dtime*istphy, physid)
+    IF (iadvtr==0) CALL initphysto('phystoke', dtime, dtime * istphy, &
+         dtime * istphy, physid)
 
     CALL histwrite(physid, 'phis', itap, gr_phy_write(pphis))
     CALL histwrite(physid, 'aire', itap, gr_phy_write(paire))
@@ -145,26 +140,26 @@ contains
 
     DO k = 1, klev
        DO i = 1, klon
-          mfu(i, k) = mfu(i, k) + pmfu(i, k)*pdtphys
-          mfd(i, k) = mfd(i, k) + pmfd(i, k)*pdtphys
-          en_u(i, k) = en_u(i, k) + pen_u(i, k)*pdtphys
-          de_u(i, k) = de_u(i, k) + pde_u(i, k)*pdtphys
-          en_d(i, k) = en_d(i, k) + pen_d(i, k)*pdtphys
-          de_d(i, k) = de_d(i, k) + pde_d(i, k)*pdtphys
-          coefh(i, k) = coefh(i, k) + pcoefh(i, k)*pdtphys
-          t(i, k) = t(i, k) + pt(i, k)*pdtphys
-          fm_therm(i, k) = fm_therm(i, k) + pfm_therm(i, k)*pdtphys
-          entr_therm(i, k) = entr_therm(i, k) + pentr_therm(i, k)*pdtphys
+          mfu(i, k) = mfu(i, k) + pmfu(i, k) * pdtphys
+          mfd(i, k) = mfd(i, k) + pmfd(i, k) * pdtphys
+          en_u(i, k) = en_u(i, k) + pen_u(i, k) * pdtphys
+          de_u(i, k) = de_u(i, k) + pde_u(i, k) * pdtphys
+          en_d(i, k) = en_d(i, k) + pen_d(i, k) * pdtphys
+          de_d(i, k) = de_d(i, k) + pde_d(i, k) * pdtphys
+          coefh(i, k) = coefh(i, k) + pcoefh(i, k) * pdtphys
+          t(i, k) = t(i, k) + pt(i, k) * pdtphys
+          fm_therm(i, k) = fm_therm(i, k) + pfm_therm(i, k) * pdtphys
+          entr_therm(i, k) = entr_therm(i, k) + pentr_therm(i, k) * pdtphys
        END DO
     END DO
     DO i = 1, klon
-       pyv1(i) = pyv1(i) + yv1(i)*pdtphys
-       pyu1(i) = pyu1(i) + yu1(i)*pdtphys
+       pyv1(i) = pyv1(i) + yv1(i) * pdtphys
+       pyu1(i) = pyu1(i) + yu1(i) * pdtphys
     END DO
     DO k = 1, nbsrf
        DO i = 1, klon
-          pftsol(i, k) = pftsol(i, k) + ftsol(i, k)*pdtphys
-          ppsrf(i, k) = ppsrf(i, k) + pctsrf(i, k)*pdtphys
+          pftsol(i, k) = pftsol(i, k) + ftsol(i, k) * pdtphys
+          ppsrf(i, k) = ppsrf(i, k) + pctsrf(i, k) * pdtphys
        END DO
     END DO
 
@@ -181,7 +176,6 @@ contains
              en_d(i, k) = en_d(i, k)/dtcum
              de_d(i, k) = de_d(i, k)/dtcum
              coefh(i, k) = coefh(i, k)/dtcum
-             ! Unitel a enlever
              t(i, k) = t(i, k)/dtcum
              fm_therm(i, k) = fm_therm(i, k)/dtcum
              entr_therm(i, k) = entr_therm(i, k)/dtcum
@@ -207,7 +201,7 @@ contains
           END DO
        END DO
 
-       ! ecriture des champs 
+       ! \'Ecriture des champs 
 
        irec = irec + 1
 
@@ -227,7 +221,6 @@ contains
 
        CALL histwrite(physid, 'fm_th', itap, gr_phy_write(fm_therm1))
        CALL histwrite(physid, 'en_th', itap, gr_phy_write(entr_therm))
-       !ccc 
        CALL histwrite(physid, 'frac_impa', itap, gr_phy_write(frac_impa))
        CALL histwrite(physid, 'frac_nucl', itap, gr_phy_write(frac_nucl))
        CALL histwrite(physid, 'pyu1', itap, gr_phy_write(pyu1))
@@ -240,29 +233,8 @@ contains
        CALL histwrite(physid, 'psrf2', itap, gr_phy_write(ppsrf2))
        CALL histwrite(physid, 'psrf3', itap, gr_phy_write(ppsrf3))
        CALL histwrite(physid, 'psrf4', itap, gr_phy_write(ppsrf4))
-       IF (ok_sync) CALL histsync(physid)
 
-       ! Test sur la valeur des coefficients de lessivage 
-
-       zmin = 1E33
-       zmax = -1E33
-       DO k = 1, klev
-          DO i = 1, klon
-             zmax = max(zmax, frac_nucl(i, k))
-             zmin = min(zmin, frac_nucl(i, k))
-          END DO
-       END DO
-       PRINT *, 'coefs de lessivage (min et max)'
-       PRINT *, 'facteur de nucleation ', zmin, zmax
-       zmin = 1E33
-       zmax = -1E33
-       DO k = 1, klev
-          DO i = 1, klon
-             zmax = max(zmax, frac_impa(i, k))
-             zmin = min(zmin, frac_impa(i, k))
-          END DO
-       END DO
-       PRINT *, 'facteur d impaction ', zmin, zmax
+       CALL histsync(physid)
     END IF
 
   END SUBROUTINE phystokenc

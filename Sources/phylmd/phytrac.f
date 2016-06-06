@@ -12,7 +12,9 @@ contains
        entr_therm, yu1, yv1, ftsol, pctsrf, frac_impa, frac_nucl, da, phi, &
        mp, upwd, dnwd, tr_seri, zmasse, ncid_startphy)
 
-    ! From phylmd/phytrac.F, version 1.15 2006/02/21 08:08:30 (SVN revision 679)
+    ! From phylmd/phytrac.F, version 1.15 2006/02/21 08:08:30 (SVN
+    ! revision 679) and phylmd/write_histrac.h, version 1.9 2006/02/21
+    ! 08:08:30
 
     ! Authors: Fr\'ed\'eric Hourdin, Abderrahmane Idelkadi, Marie-Alice
     ! Foujols, Olivia
@@ -35,7 +37,9 @@ contains
     use cvltr_m, only: cvltr
     use dimens_m, only: llm, nqmx
     use dimphy, only: klon
+    use histwrite_phy_m, only: histwrite_phy
     use indicesol, only: nbsrf
+    use iniadvtrac_m, only: tname
     use initrrnpb_m, only: initrrnpb
     use minmaxqfi_m, only: minmaxqfi
     use netcdf, only: NF90_FILL_float
@@ -395,53 +399,21 @@ contains
     ENDIF
 
     ! Ecriture des sorties
-    call write_histrac(lessivage)
+    CALL histwrite_phy("zmasse", zmasse)
+    DO it=1, nqmx - 2
+       CALL histwrite_phy(tname(it+2), tr_seri(:, :, it))
+       if (lessivage) THEN
+          CALL histwrite_phy("fl"//tname(it+2), flestottr(:, :, it))
+       endif
+       CALL histwrite_phy("d_tr_th_"//tname(it+2), d_tr_th(:, :, it))
+       CALL histwrite_phy("d_tr_cv_"//tname(it+2), d_tr_cv(:, :, it))
+       CALL histwrite_phy("d_tr_cl_"//tname(it+2), d_tr_cl(:, :, it))
+    ENDDO
 
     if (lafin) then
        call nf95_inq_varid(ncid_restartphy, "trs", varid)
        call nf95_put_var(ncid_restartphy, varid, trs(:, 1))
     endif
-
-  contains
-
-    subroutine write_histrac(lessivage)
-
-      ! From phylmd/write_histrac.h, version 1.9 2006/02/21 08:08:30
-
-      use gr_phy_write_m, only: gr_phy_write
-      use histwrite_m, only: histwrite
-      use iniadvtrac_m, only: tname
-      use ini_histins_m, only: nid_ins
-      use phyetat0_m, only: itau_phy
-
-      logical, intent(in):: lessivage
-
-      ! Variables local to the procedure:
-      integer it
-      integer itau_w ! pas de temps ecriture
-
-      !-----------------------------------------------------
-
-      itau_w = itau_phy + itap
-
-      CALL histwrite(nid_ins, "zmasse", itau_w, gr_phy_write(zmasse))
-
-      DO it=1, nqmx - 2
-         CALL histwrite(nid_ins, tname(it+2), itau_w, &
-              gr_phy_write(tr_seri(:, :, it)))
-         if (lessivage) THEN
-            CALL histwrite(nid_ins, "fl"//tname(it+2), itau_w, &
-                 gr_phy_write(flestottr(:, :, it)))
-         endif
-         CALL histwrite(nid_ins, "d_tr_th_"//tname(it+2), itau_w, &
-              gr_phy_write(d_tr_th(:, :, it)))
-         CALL histwrite(nid_ins, "d_tr_cv_"//tname(it+2), itau_w, &
-              gr_phy_write(d_tr_cv(:, :, it)))
-         CALL histwrite(nid_ins, "d_tr_cl_"//tname(it+2), itau_w, &
-              gr_phy_write(d_tr_cl(:, :, it)))
-      ENDDO
-
-    end subroutine write_histrac
 
   END SUBROUTINE phytrac
 

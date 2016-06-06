@@ -22,8 +22,11 @@ contains
     USE dimphy, ONLY: klev, klon
 
     integer, intent(in):: icb1(klon)
+    ! first level above LCL, 2 <= icb1 <= nl - 2
+
     real, intent(in):: plcl1(klon), p1(klon, klev)
-    real, intent(in):: th1(klon, klev), tv1(klon, klev), tvp1(klon, klev)
+    real, intent(in):: th1(:, :) ! (klon, nl)
+    real, intent(in):: tv1(klon, klev), tvp1(klon, klev)
 
     real, intent(out):: pbase1(klon), buoybase1(klon)
 

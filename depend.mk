@@ -48,10 +48,10 @@ convmas.o : filtreg_scal.o paramet_m.o dimens_m.o
 coordij.o : dynetat0.o dimens_m.o 
 covcont.o : comgeom.o paramet_m.o dimens_m.o 
 covnat.o : paramet_m.o comgeom.o 
-cv30_closure.o : dimphy.o cv_thermo.o cv30_param.o 
+cv30_closure.o : suphec.o dimphy.o cv30_param.o 
 cv30_compress.o : dimphy.o cv30_param.o 
 cv30_feed.o : dimphy.o cv30_param.o 
-cv30_mixing.o : dimphy.o cv_thermo.o cv30_param.o 
+cv30_mixing.o : suphec.o dimphy.o cv30_param.o 
 cv30_param.o : comconst.o dimphy.o 
 cv30_prelim.o : suphec.o dimphy.o cv_thermo.o cv30_param.o 
 cv30_trigger.o : dimphy.o cv30_param.o 
@@ -60,7 +60,7 @@ cv30_undilute1.o : suphec.o dimphy.o cv_thermo.o cv30_param.o
 cv30_undilute2.o : suphec.o dimphy.o cv_thermo.o cv30_param.o conema3_m.o 
 cv30_unsat.o : suphec.o cv_thermo.o cv30_param.o 
 cv30_yield.o : suphec.o dimphy.o cv_thermo.o cv30_param.o conema3_m.o 
-cv_driver.o : dimphy.o cv_thermo.o cv30_yield.o cv30_unsat.o cv30_undilute2.o cv30_undilute1.o cv30_uncompress.o cv30_trigger.o cv30_tracer.o cv30_prelim.o cv30_param.o cv30_mixing.o cv30_feed.o cv30_compress.o cv30_closure.o comconst.o 
+cv_driver.o : dimphy.o cv30_yield.o cv30_unsat.o cv30_undilute2.o cv30_undilute1.o cv30_uncompress.o cv30_trigger.o cv30_tracer.o cv30_prelim.o cv30_param.o cv30_mixing.o cv30_feed.o cv30_compress.o cv30_closure.o comconst.o 
 cv_thermo.o : suphec.o 
 cvltr.o : suphec.o dimphy.o 
 decoop.o : findsep.o errioipsl.o 
@@ -203,7 +203,7 @@ phyredem.o : phyredem0.o indicesol.o dimphy.o
 phyredem0.o : phyetat0.o indicesol.o dimsoil.o dimphy.o conf_gcm.o 
 physiq.o : zenang.o yoethf.o ymds2ju.o unit_nml_m.o transp_lay.o transp.o time_phylmdz.o suphec.o YOEGWD.o radlwsw.o qcheck.o phytrac.o phystokenc.o phyredem0.o phyredem.o phyetat0.o ozonecm.o orbite.o nuage.o newmicro.o ini_histins.o indicesol.o histwrite_phy.o histsync.o hgardfou.o fisrtilp.o FCTTRE.o dynetat0.o drag_noro.o dimsoil.o dimphy.o dimens_m.o diagphy.o diagetpq.o diagcld2.o ctherm.o conflx.o conf_phys.o conf_gcm.o concvl.o comgeomphy.o comconst.o clouds_gno.o clmain.o clesphys2.o clesphys.o calltherm.o ajsec.o abort_gcm.o aaam_bud.o 
 phystokenc.o : tracstoke.o time_phylmdz.o dimphy.o initphysto.o indicesol.o dimens_m.o histsync.o histwrite.o gr_phy_write.o 
-phytrac.o : ini_histins.o iniadvtrac.o histwrite.o gr_phy_write.o time_phylmdz.o suphec.o regr_pr_comb_coefoz.o radiornpb.o press_coefoz.o phyredem0.o phyetat0.o o3_chem.o nflxtr.o minmaxqfi.o initrrnpb.o indicesol.o dimphy.o dimens_m.o cvltr.o ctherm.o cltracrn.o cltrac.o clesphys2.o clesphys.o abort_gcm.o 
+phytrac.o : time_phylmdz.o suphec.o regr_pr_comb_coefoz.o radiornpb.o press_coefoz.o phyredem0.o phyetat0.o o3_chem.o nflxtr.o minmaxqfi.o initrrnpb.o iniadvtrac.o indicesol.o histwrite_phy.o dimphy.o dimens_m.o cvltr.o ctherm.o cltracrn.o cltrac.o clesphys2.o clesphys.o abort_gcm.o 
 principal_cshift.o : dynetat0.o dimens_m.o 
 qcheck.o : suphec.o dimphy.o comgeomphy.o 
 qminimum.o : paramet_m.o dimens_m.o 

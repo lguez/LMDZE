@@ -20,12 +20,14 @@ contains
     real, intent(in):: VPrecip(klon, klev+1)
     real, intent(in):: sig(klon, klev), w0(klon, klev)
     real, intent(in), dimension(klon, klev):: ft, fq, fu, fv
-    integer, intent(in):: inb(klon)
+    integer, intent(in):: inb(:) ! (ncum)
     real, intent(in):: Ma(klon, klev)
     real, intent(in):: upwd(klon, klev), dnwd(klon, klev), dnwd0(klon, klev)
     real, intent(in):: qcondc(klon, klev)
     real, intent(in):: cape(klon)
-    real, intent(in):: da(klon, klev), phi(klon, klev, klev), mp(klon, klev)
+    real, intent(in):: da(:, :) ! (klon, klev)
+    real, intent(in):: phi(:, :, :) ! (klon, klev, klev)
+    real, intent(in):: mp(:, :) ! (ncum, nl)
 
     ! outputs:
     integer, intent(out):: iflag1(:) ! (klon)

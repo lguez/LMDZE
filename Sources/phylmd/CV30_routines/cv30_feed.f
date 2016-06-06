@@ -22,7 +22,7 @@ contains
     ! outputs:
 
     integer, intent(out):: icb1(:) ! (klon)
-    ! first level above lcl, 2 <= icb1 <= nl - 2
+    ! first level above LCL, 2 <= icb1 <= nl - 2
 
     integer, intent(out):: iflag1(:) ! (klon)
     real tnk1(:), qnk1(:), gznk1(:) ! (klon)
