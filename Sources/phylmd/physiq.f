@@ -32,8 +32,6 @@ contains
     use conflx_m, only: conflx
     USE ctherm, ONLY: iflag_thermals, nsplit_thermals
     use diagcld2_m, only: diagcld2
-    use diagetpq_m, only: diagetpq
-    use diagphy_m, only: diagphy
     USE dimens_m, ONLY: llm, nqmx
     USE dimphy, ONLY: klon
     USE dimsoil, ONLY: nsoilmx
@@ -402,12 +400,6 @@ contains
 
     ! Variables li\'ees au bilan d'\'energie et d'enthalpie :
     REAL ztsol(klon)
-    REAL d_h_vcol, d_qt, d_ec
-    REAL, SAVE:: d_h_vcol_phy
-    REAL zero_v(klon)
-    CHARACTER(LEN = 20) tit
-    INTEGER:: ip_ebil = 0 ! print level for energy conservation diagnostics
-    INTEGER:: if_ebil = 0 ! verbosity for diagnostics of energy conservation
 
     REAL d_t_ec(klon, llm)
     ! tendance due \`a la conversion Ec en énergie thermique
@@ -466,9 +458,9 @@ contains
 
     integer, save:: ncid_startphy
 
-    namelist /physiq_nml/ fact_cldcon, facttemps, ok_newmicro, &
-         iflag_cldcon, ratqsbas, ratqshaut, if_ebil, ok_ade, ok_aie, bl95_b0, &
-         bl95_b1, iflag_thermals, nsplit_thermals
+    namelist /physiq_nml/ fact_cldcon, facttemps, ok_newmicro, iflag_cldcon, &
+         ratqsbas, ratqshaut, ok_ade, ok_aie, bl95_b0, bl95_b1, &
+         iflag_thermals, nsplit_thermals
 
     !----------------------------------------------------------------
 
@@ -517,7 +509,6 @@ contains
        read(unit=*, nml=physiq_nml)
        write(unit_nml, nml=physiq_nml)
 
-       IF (if_ebil >= 1) d_h_vcol_phy = 0.
        call conf_phys
 
        ! Initialiser les compteurs:
@@ -559,8 +550,6 @@ contains
        CALL phyredem0
     ENDIF test_firstcal
 
-    IF (if_ebil >= 1) zero_v = 0.
-
     ! We will modify variables *_seri and we will not touch variables
     ! u, v, t, qx:
     t_seri = t
@@ -571,20 +560,6 @@ contains
     tr_seri = qx(:, :, 3:nqmx)
 
     ztsol = sum(ftsol * pctsrf, dim = 2)
-
-    IF (if_ebil >= 1) THEN
-       tit = 'after dynamics'
-       CALL diagetpq(airephy, tit, ip_ebil, 1, 1, dtphys, t_seri, q_seri, &
-            ql_seri, u_seri, v_seri, paprs, d_h_vcol, d_qt, d_ec)
-       ! Comme les tendances de la physique sont ajout\'es dans la
-       ! dynamique, la variation d'enthalpie par la dynamique devrait
-       ! \^etre \'egale \`a la variation de la physique au pas de temps
-       ! pr\'ec\'edent. Donc la somme de ces 2 variations devrait \^etre
-       ! nulle.
-       call diagphy(airephy, tit, ip_ebil, zero_v, zero_v, zero_v, zero_v, &
-            zero_v, zero_v, zero_v, zero_v, ztsol, d_h_vcol + d_h_vcol_phy, &
-            d_qt, 0.)
-    END IF
 
     ! Diagnostic de la tendance dynamique :
     IF (ancien_ok) THEN
@@ -633,14 +608,6 @@ contains
        ENDDO
     ENDDO
     ql_seri = 0.
-
-    IF (if_ebil >= 2) THEN
-       tit = 'after reevap'
-       CALL diagetpq(airephy, tit, ip_ebil, 2, 1, dtphys, t_seri, q_seri, &
-            ql_seri, u_seri, v_seri, paprs, d_h_vcol, d_qt, d_ec)
-       call diagphy(airephy, tit, ip_ebil, zero_v, zero_v, zero_v, zero_v, &
-            zero_v, zero_v, zero_v, zero_v, ztsol, d_h_vcol, d_qt, d_ec)
-    END IF
 
     frugs = MAX(frugs, 0.000015)
     zxrugs = sum(frugs * pctsrf, dim = 2)
@@ -710,14 +677,6 @@ contains
           v_seri(i, k) = v_seri(i, k) + d_v_vdf(i, k)
        ENDDO
     ENDDO
-
-    IF (if_ebil >= 2) THEN
-       tit = 'after clmain'
-       CALL diagetpq(airephy, tit, ip_ebil, 2, 2, dtphys, t_seri, q_seri, &
-            ql_seri, u_seri, v_seri, paprs, d_h_vcol, d_qt, d_ec)
-       call diagphy(airephy, tit, ip_ebil, zero_v, zero_v, zero_v, zero_v, &
-            sens, evap, zero_v, zero_v, ztsol, d_h_vcol, d_qt, d_ec)
-    END IF
 
     ! Update surface temperature:
 
@@ -859,14 +818,6 @@ contains
        ENDDO
     ENDDO
 
-    IF (if_ebil >= 2) THEN
-       tit = 'after convect'
-       CALL diagetpq(airephy, tit, ip_ebil, 2, 2, dtphys, t_seri, q_seri, &
-            ql_seri, u_seri, v_seri, paprs, d_h_vcol, d_qt, d_ec)
-       call diagphy(airephy, tit, ip_ebil, zero_v, zero_v, zero_v, zero_v, &
-            zero_v, zero_v, rain_con, snow_con, ztsol, d_h_vcol, d_qt, d_ec)
-    END IF
-
     IF (check) THEN
        za = qcheck(paprs, q_seri, ql_seri)
        print *, "aprescon = ", za
@@ -911,12 +862,6 @@ contains
        call calltherm(dtphys, play, paprs, pphi, u_seri, v_seri, t_seri, &
             q_seri, d_u_ajs, d_v_ajs, d_t_ajs, d_q_ajs, fm_therm, entr_therm)
     endif
-
-    IF (if_ebil >= 2) THEN
-       tit = 'after dry_adjust'
-       CALL diagetpq(airephy, tit, ip_ebil, 2, 2, dtphys, t_seri, q_seri, &
-            ql_seri, u_seri, v_seri, paprs, d_h_vcol, d_qt, d_ec)
-    END IF
 
     ! Caclul des ratqs
 
@@ -985,14 +930,6 @@ contains
        zx_t = zx_t / za * dtphys
        print *, "Precip = ", zx_t
     ENDIF
-
-    IF (if_ebil >= 2) THEN
-       tit = 'after fisrt'
-       CALL diagetpq(airephy, tit, ip_ebil, 2, 2, dtphys, t_seri, q_seri, &
-            ql_seri, u_seri, v_seri, paprs, d_h_vcol, d_qt, d_ec)
-       call diagphy(airephy, tit, ip_ebil, zero_v, zero_v, zero_v, zero_v, &
-            zero_v, zero_v, rain_lsc, snow_lsc, ztsol, d_h_vcol, d_qt, d_ec)
-    END IF
 
     ! PRESCRIPTION DES NUAGES POUR LE RAYONNEMENT
 
@@ -1067,10 +1004,6 @@ contains
        snow_fall(i) = snow_con(i) + snow_lsc(i)
     ENDDO
 
-    IF (if_ebil >= 2) CALL diagetpq(airephy, "after diagcld", ip_ebil, 2, 2, &
-         dtphys, t_seri, q_seri, ql_seri, u_seri, v_seri, paprs, d_h_vcol, &
-         d_qt, d_ec)
-
     ! Humidit\'e relative pour diagnostic :
     DO k = 1, llm
        DO i = 1, klon
@@ -1131,14 +1064,6 @@ contains
                / 86400.
        ENDDO
     ENDDO
-
-    IF (if_ebil >= 2) THEN
-       tit = 'after rad'
-       CALL diagetpq(airephy, tit, ip_ebil, 2, 2, dtphys, t_seri, q_seri, &
-            ql_seri, u_seri, v_seri, paprs, d_h_vcol, d_qt, d_ec)
-       call diagphy(airephy, tit, ip_ebil, topsw, toplw, solsw, sollw, &
-            zero_v, zero_v, zero_v, zero_v, ztsol, d_h_vcol, d_qt, d_ec)
-    END IF
 
     ! Calculer l'hydrologie de la surface
     DO i = 1, klon
@@ -1228,10 +1153,6 @@ contains
     CALL aaam_bud(rg, romega, rlat, rlon, pphis, zustrdr, zustrli, zustrph, &
          zvstrdr, zvstrli, zvstrph, paprs, u, v, aam, torsfc)
 
-    IF (if_ebil >= 2) CALL diagetpq(airephy, 'after orography', ip_ebil, 2, &
-         2, dtphys, t_seri, q_seri, ql_seri, u_seri, v_seri, paprs, d_h_vcol, &
-         d_qt, d_ec)
-
     ! Calcul des tendances traceurs
     call phytrac(julien, time, firstcal, lafin, dtphys, t, paprs, play, mfu, &
          mfd, pde_u, pen_d, ycoefh, fm_therm, entr_therm, yu1, yv1, ftsol, &
@@ -1262,19 +1183,6 @@ contains
           d_t_ec(i, k) = d_t_ec(i, k) / dtphys
        END DO
     END DO
-
-    IF (if_ebil >= 1) THEN
-       tit = 'after physic'
-       CALL diagetpq(airephy, tit, ip_ebil, 1, 1, dtphys, t_seri, q_seri, &
-            ql_seri, u_seri, v_seri, paprs, d_h_vcol, d_qt, d_ec)
-       ! Comme les tendances de la physique sont ajoute dans la dynamique,
-       ! on devrait avoir que la variation d'entalpie par la dynamique
-       ! est egale a la variation de la physique au pas de temps precedent.
-       ! Donc la somme de ces 2 variations devrait etre nulle.
-       call diagphy(airephy, tit, ip_ebil, topsw, toplw, solsw, sollw, sens, &
-            evap, rain_fall, snow_fall, ztsol, d_h_vcol, d_qt, d_ec)
-       d_h_vcol_phy = d_h_vcol
-    END IF
 
     ! SORTIES
 

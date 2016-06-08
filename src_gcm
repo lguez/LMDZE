@@ -74,8 +74,6 @@ cv_thermo.f
 decoop.f
 diagcld1.f
 diagcld2.f
-diagetpq.f
-diagphy.f
 dimens_m.f
 dimphy.f
 dimsoil.f
