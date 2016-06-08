@@ -4,10 +4,10 @@ module diagphy_m
 
 contains
 
-  SUBROUTINE diagphy(airephy, tit, iprt, tops, topl, sols, soll, sens, evap, &
-       rain_fall, snow_fall, ts, d_etp_tot, d_qt_tot, d_ec_tot)
+  SUBROUTINE diagphy(airephy, tit, ip_ebil, tops, topl, sols, soll, sens, &
+       evap, rain_fall, snow_fall, ts, d_etp_tot, d_qt_tot, d_ec_tot)
 
-    ! From LMDZ4/libf/phylmd/diagphy.F, version 1.1.1.1 2004/05/19 12:53:08
+    ! From LMDZ4/libf/phylmd/diagphy.F, version 1.1.1.1, 2004/05/19 12:53:08
 
     ! Purpose: compute the thermal flux and the water mass flux at
     ! the atmospheric boundaries. Print them and print the atmospheric
@@ -18,12 +18,9 @@ contains
     USE dimphy, ONLY: klon
     USE suphec_m, ONLY: rcpd, rcpv, rcs, rcw, rlstt, rlvtt
 
-    ! Arguments: 
-
-    ! Input variables
-    real, intent(in):: airephy(klon) ! grid area
+    real, intent(in):: airephy(:) ! (klon) grid area
     CHARACTER(len=15), intent(in):: tit ! comment to be added in PRINT
-    INTEGER, intent(in):: iprt ! PRINT level (<=0 : no PRINT)
+    INTEGER, intent(in):: ip_ebil ! PRINT level (<=0 : no PRINT)
     real, intent(in):: tops(klon) ! SW rad. at TOA (W/m2), positive up
     real, intent(in):: topl(klon) ! LW rad. at TOA (W/m2), positive down
 
@@ -71,7 +68,7 @@ contains
 
     !------------------------------------------------------------------
 
-    IF (iprt >= 1) then
+    IF (ip_ebil >= 1) then
        pas=pas+1
        stops=0.
        stopl=0.
@@ -124,8 +121,8 @@ contains
        print 6666, tit, pas, fs_bound, d_etp_tot, fq_bound, d_qt_tot
        print 6668, tit, pas, d_etp_tot+d_ec_tot-fs_bound, d_qt_tot - fq_bound
 
-       IF (iprt >= 2) print 6667, tit, pas, stops, stopl, ssols, ssoll, ssens, &
-            slat, evap_tot, rain_fall_tot + snow_fall_tot
+       IF (ip_ebil >= 2) print 6667, tit, pas, stops, stopl, ssols, ssoll, &
+            ssens, slat, evap_tot, rain_fall_tot + snow_fall_tot
     end IF
 
 6666 format('Physics flux budget ', a15, 1i6, 2f8.2, 2(1pE13.5))

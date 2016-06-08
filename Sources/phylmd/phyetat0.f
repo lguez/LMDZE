@@ -146,17 +146,15 @@ contains
     fractint = pctsrf(:, is_ter) + pctsrf(:, is_lic)
     DO i = 1 , klon
        IF ( abs(fractint(i) - zmasq(i) ) > EPSFRA ) THEN
-          WRITE(*, *) 'phyetat0: attention fraction terre pas ', &
-               'coherente ', i, zmasq(i), pctsrf(i, is_ter) &
-               , pctsrf(i, is_lic)
+          print *, 'phyetat0: attention fraction terre pas ', &
+               'coherente ', i, zmasq(i), pctsrf(i, is_ter), pctsrf(i, is_lic)
        ENDIF
     END DO
     fractint = pctsrf(:, is_oce) + pctsrf(:, is_sic)
     DO i = 1 , klon
        IF ( abs( fractint(i) - (1. - zmasq(i))) > EPSFRA ) THEN
-          WRITE(*, *) 'phyetat0 attention fraction ocean pas ', &
-               'coherente ', i, zmasq(i) , pctsrf(i, is_oce) &
-               , pctsrf(i, is_sic)
+          print *, 'phyetat0 attention fraction ocean pas ', &
+               'coherente ', i, zmasq(i) , pctsrf(i, is_oce), pctsrf(i, is_sic)
        ENDIF
     END DO
 

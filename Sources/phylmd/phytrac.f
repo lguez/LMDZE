@@ -88,7 +88,7 @@ contains
 
     ! Arguments n\'ecessaires pour les sources et puits de traceur :
     real, intent(in):: ftsol(klon, nbsrf) ! Temperature du sol (surf)(Kelvin)
-    real pctsrf(klon, nbsrf) ! Pourcentage de sol f(nature du sol)
+    real, intent(in):: pctsrf(klon, nbsrf) ! Pourcentage de sol f(nature du sol)
 
     ! Lessivage pour le on-line
     REAL frac_impa(klon, llm) ! fraction d'aerosols impactes

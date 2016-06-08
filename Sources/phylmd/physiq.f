@@ -472,7 +472,6 @@ contains
 
     !----------------------------------------------------------------
 
-    IF (if_ebil >= 1) zero_v = 0.
     IF (nqmx < 2) CALL abort_gcm('physiq', &
          'eaux vapeur et liquide sont indispensables')
 
@@ -512,14 +511,13 @@ contains
        trmb2 =0. ! inhibition
        trmb3 =0. ! Point Omega
 
-       IF (if_ebil >= 1) d_h_vcol_phy = 0.
-
        iflag_thermals = 0
        nsplit_thermals = 1
        print *, "Enter namelist 'physiq_nml'."
        read(unit=*, nml=physiq_nml)
        write(unit_nml, nml=physiq_nml)
 
+       IF (if_ebil >= 1) d_h_vcol_phy = 0.
        call conf_phys
 
        ! Initialiser les compteurs:
@@ -560,6 +558,8 @@ contains
        print *, 'physiq date0: ', date0
        CALL phyredem0
     ENDIF test_firstcal
+
+    IF (if_ebil >= 1) zero_v = 0.
 
     ! We will modify variables *_seri and we will not touch variables
     ! u, v, t, qx:
