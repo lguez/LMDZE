@@ -40,8 +40,7 @@ module clesphys
   ! sorties instantanées tous les pas de temps de la physique,
   ! fichier "histbilKP_ins.nc"
 
-  INTEGER ecrit_ins, ecrit_hf, ecrit_hf2mth, ecrit_day
-  INTEGER ecrit_mth, ecrit_tra, ecrit_reg
+  INTEGER ecrit_ins
   logical:: ok_instan = .false. ! sorties instantanees dans le fichier histins
 
   save
@@ -56,8 +55,7 @@ contains
          CFC12_ppt, top_height, overlap, cdmmax, cdhmax, ksta, &
          ksta_ter, ok_kzmin, lev_histhf, lev_histday, lev_histmth, &
          type_run, ok_isccp, ok_regdyn, lonmin_ins, lonmax_ins, latmin_ins, &
-         latmax_ins, ecrit_ins, ecrit_hf, ecrit_hf2mth, ecrit_day, ecrit_mth, &
-         ecrit_tra, ecrit_reg, ok_instan
+         latmax_ins, ecrit_ins, ok_instan
 
     !---------------------------------------------------------
 
@@ -85,12 +83,6 @@ contains
     latmin_ins = -20.
     latmax_ins = 20.
     ecrit_ins = NINT(86400./48.)
-    ecrit_hf = NINT(86400. *0.25)
-    ecrit_hf2mth = 4*30 ! ecriture mens. a partir de val. inst. toutes les 6h
-    ecrit_day = 86400
-    ecrit_mth = 86400
-    ecrit_tra = 1
-    ecrit_reg = NINT(86400. *0.25) ! 4 fois par jour
 
     print *, "Enter namelist 'clesphys_nml'."
     read(unit=*, nml=clesphys_nml)

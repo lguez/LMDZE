@@ -12,24 +12,22 @@ contains
     ! Routine de traitement de la fonte de la neige dans le cas du traitement
     ! de sol simplifi\'e
 
-    ! LF 03/2001
+    ! Laurent Fairhead, March, 2001
 
     USE fcttre, ONLY: foeew, qsatl, qsats, thermcep
     USE indicesol, ONLY: epsfra, is_lic, is_sic, is_ter
-    USE interface_surf, ONLY: run_off, run_off_lic, tau_calv
+    USE interface_surf, ONLY: run_off_lic, tau_calv
     use nr_util, only: assert_eq
     USE suphec_m, ONLY: rcpd, rday, retv, rlmlt, rlstt, rlvtt, rtt
     USE yoethf_m, ONLY: r2es, r5ies, r5les, rvtmp2
 
     integer, intent(IN):: nisurf ! surface \`a traiter
     real, intent(IN):: dtime ! pas de temps de la physique (en s)
-    real, dimension(:), intent(IN):: tsurf, p1lay, beta, coef1lay ! (knon)
-    ! tsurf temperature de surface
-    ! p1lay pression 1er niveau (milieu de couche)
-    ! beta evap reelle
-    ! coef1lay coefficient d'echange
-    real, dimension(:), intent(IN):: ps ! (knon)
-    ! ps pression au sol
+    real, intent(IN):: tsurf(:) ! (knon) temperature de surface
+    real, intent(IN):: p1lay(:) ! (knon) pression 1er niveau (milieu de couche)
+    real, intent(IN):: beta(:) ! (knon) evap reelle
+    real, intent(IN):: coef1lay(:) ! (knon) coefficient d'echange
+    real, intent(IN):: ps(:) ! (knon) pression au sol
 
     real, intent(IN):: precip_rain(:) ! (knon)
     ! precipitation, liquid water mass flux (kg/m2/s), positive down
@@ -43,30 +41,30 @@ contains
     real, intent(INOUT):: qsol(:) ! (knon)
     ! column-density of water in soil, in kg m-2
 
-    real, dimension(:), intent(IN):: t1lay ! (knon)
-    real, dimension(:), intent(IN):: q1lay ! (knon)
-    real, dimension(:), intent(IN):: u1lay, v1lay ! (knon)
-    real, dimension(:), intent(IN):: petAcoef, peqAcoef ! (knon)
-    ! petAcoef coeff. A de la resolution de la CL pour t
-    ! peqAcoef coeff. A de la resolution de la CL pour q
-    real, dimension(:), intent(IN):: petBcoef, peqBcoef ! (knon)
-    ! petBcoef coeff. B de la resolution de la CL pour t
-    ! peqBcoef coeff. B de la resolution de la CL pour q
+    real, intent(IN):: t1lay(:) ! (knon)
+    real, intent(IN):: q1lay(:) ! (knon)
+    real, intent(IN):: u1lay(:), v1lay(:) ! (knon)
+
+    real, intent(IN):: petAcoef(:), peqAcoef(:) ! (knon)
+    ! coefficients A de la r\'esolution de la couche limite pour t et q
+
+    real, intent(IN):: petBcoef(:), peqBcoef(:) ! (knon)
+    ! coefficients B de la r\'esolution de la couche limite pour t et q
 
     real, intent(INOUT):: tsurf_new(:)
     ! tsurf_new temperature au sol
 
     real, intent(IN):: evap(:) ! (knon)
 
-    ! Flux d'eau "perdue" par la surface et necessaire pour que limiter la
-    ! hauteur de neige, en kg/m2/s
     real, intent(OUT):: fqcalving(:) ! (knon)
+    ! flux d'eau "perdue" par la surface et n\'ecessaire pour limiter la
+    ! hauteur de neige, en kg/m2/s
 
-    ! Flux thermique utiliser pour fondre la neige
     real, intent(OUT):: ffonte(:) ! (knon)
+    ! flux thermique utilis\'é pour fondre la neige
 
-    real, dimension(:), intent(INOUT):: run_off_lic_0 ! (knon)
-    ! run_off_lic_0 run off glacier du pas de temps pr\'ecedent
+    real, intent(INOUT):: run_off_lic_0(:) ! (knon)
+    ! run off glacier du pas de temps pr\'ecedent
 
     ! Local:
 
@@ -131,7 +129,7 @@ contains
 
     bil_eau_s = precip_rain * dtime - (evap(:knon) - snow_evap(:knon)) * dtime
 
-    ! Y'a-t-il fonte de neige?
+    ! Y a-t-il fonte de neige ?
 
     ffonte=0.
     do i = 1, knon
@@ -157,7 +155,6 @@ contains
 
        IF (nisurf == is_ter) then
           qsol(i) = qsol(i) + bil_eau_s(i)
-          run_off(i) = run_off(i) + MAX(qsol(i) - max_eau_sol, 0.)
           qsol(i) = MIN(qsol(i), max_eau_sol)
        else if (nisurf == is_lic) then
           run_off_lic(i) = (coeff_rel * fqcalving(i)) + &

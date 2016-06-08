@@ -29,7 +29,6 @@ contains
     ! with F0 = A + B (Ts(t))
     ! Soilcap = B*dt
 
-    USE dimens_m, only:
     USE indicesol
     USE dimphy
     USE dimsoil
@@ -238,8 +237,13 @@ contains
   contains
 
     real function fz(rk)
-      real rk
+
+      real, intent(in):: rk
+
+      !-----------------------------------------
+
       fz = fz1*(dalph_soil**rk-1.)/(dalph_soil-1.)
+
     end function fz
 
   END SUBROUTINE soil

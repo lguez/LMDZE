@@ -41,6 +41,8 @@ module conf_gcm_m
   ! 1 : physique normale (appel \`a phylmd, phymars...) (default)
   ! 2 : rappel Newtonien pour la temp\'erature + friction au sol
 
+  INTEGER, SAVE:: lmt_pas ! number of time steps of "physics" per day
+
 contains
 
   SUBROUTINE conf_gcm
@@ -79,6 +81,9 @@ contains
 
     IF (MOD(day_step, iphysiq)/= 0) call abort_gcm("conf_gcm", &
          'Il faut choisir un nombre de pas par jour multiple de "iphysiq".')
+
+    lmt_pas = day_step / iphysiq
+    print *, 'Number of time steps of "physics" per day: ', lmt_pas
 
   END SUBROUTINE conf_gcm
 

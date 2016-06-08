@@ -4,12 +4,12 @@ module interfsurf_hq_m
 
 contains
 
-  SUBROUTINE interfsurf_hq(dtime, jour, rmu0, nisurf, knon, knindex, pctsrf, &
-       rlat, debut, nsoilmx, tsoil, qsol, u1_lay, v1_lay, temp_air, spechum, &
+  SUBROUTINE interfsurf_hq(dtime, jour, rmu0, nisurf, knon, knindex, rlat, &
+       debut, nsoilmx, tsoil, qsol, u1_lay, v1_lay, temp_air, spechum, &
        tq_cdrag, petAcoef, peqAcoef, petBcoef, peqBcoef, precip_rain, &
        precip_snow, fder, rugos, rugoro, snow, qsurf, tsurf, p1lay, ps, &
        radsol, evap, fluxsens, fluxlat, dflux_l, dflux_s, tsurf_new, albedo, &
-       z0_new, pctsrf_new, agesno, fqcalving, ffonte, run_off_lic_0)
+       z0_new, pctsrf_new_sic, agesno, fqcalving, ffonte, run_off_lic_0)
 
     ! Cette routine sert d'aiguillage entre l'atmosph\`ere et la surface
     ! en g\'en\'eral (sols continentaux, oc\'eans, glaces) pour les flux de
@@ -27,9 +27,9 @@ contains
     USE dimphy, ONLY: klon
     USE fonte_neige_m, ONLY: fonte_neige
     USE indicesol, ONLY: epsfra, is_lic, is_oce, is_sic, is_ter, nbsrf
-    USE interface_surf, ONLY: run_off, run_off_lic, conf_interface
-    USE interfoce_lim_m, ONLY: interfoce_lim
+    USE interface_surf, ONLY: run_off_lic, conf_interface
     USE interfsur_lim_m, ONLY: interfsur_lim
+    use read_sst_m, only: read_sst
     use soil_m, only: soil
     USE suphec_m, ONLY: rcpd, rtt
 
@@ -41,9 +41,6 @@ contains
 
     integer, intent(in):: knindex(:) ! (knon)
     ! index des points de la surface a traiter
-
-    real, intent(IN):: pctsrf(klon, nbsrf)
-    ! tableau des pourcentages de surface de chaque maille
 
     real, intent(IN):: rlat(klon) ! latitudes
 
@@ -98,8 +95,10 @@ contains
     real, intent(OUT):: tsurf_new(knon) ! temp\'erature au sol
     real, intent(OUT):: albedo(:) ! (knon) albedo
     real, intent(OUT):: z0_new(klon) ! surface roughness
-    real, dimension(klon, nbsrf), intent(OUT):: pctsrf_new
-    ! pctsrf_new nouvelle repartition des surfaces
+
+    real, intent(in):: pctsrf_new_sic(:) ! (klon) 
+    ! nouvelle repartition des surfaces
+
     real, intent(INOUT):: agesno(:) ! (knon)
 
     ! Flux d'eau "perdue" par la surface et n\'ecessaire pour que limiter la
@@ -167,15 +166,6 @@ contains
     case (is_ter)
        ! Surface "terre", appel \`a l'interface avec les sols continentaux
 
-       ! allocation du run-off
-       if (.not. allocated(run_off)) then
-          allocate(run_off(knon))
-          run_off = 0.
-       else if (size(run_off) /= knon) then
-          call abort_gcm("interfsurf_hq", 'Something is wrong: the number of ' &
-               // 'continental points has changed since last call.')
-       endif
-
        ! Calcul age de la neige
 
        ! Read albedo from the file containing boundary conditions then
@@ -184,11 +174,11 @@ contains
        call interfsur_lim(dtime, jour, knindex, debut, albedo, z0_new)
 
        ! Calcul snow et qsurf, hydrologie adapt\'ee
-       CALL calbeta(nisurf, snow(:knon), qsol(:knon), beta(:knon), &
+       CALL calbeta(is_ter, snow(:knon), qsol(:knon), beta(:knon), &
             capsol(:knon), dif_grnd(:knon))
 
        IF (soil_model) THEN
-          CALL soil(dtime, nisurf, knon, snow, tsurf, tsoil, soilcap, soilflux)
+          CALL soil(dtime, is_ter, knon, snow, tsurf, tsoil, soilcap, soilflux)
           cal(1:knon) = RCPD / soilcap(1:knon)
           radsol(1:knon) = radsol(1:knon) + soilflux(:knon)
        ELSE
@@ -202,7 +192,7 @@ contains
             petBcoef(:knon), peqBcoef(:knon), tsurf_new, evap(:knon), &
             fluxlat(:knon), fluxsens(:knon), dflux_s(:knon), dflux_l(:knon))
 
-       CALL fonte_neige(nisurf, dtime, tsurf, p1lay(:knon), beta(:knon), &
+       CALL fonte_neige(is_ter, dtime, tsurf, p1lay(:knon), beta(:knon), &
             tq_cdrag(:knon), ps(:knon), precip_rain(:knon), &
             precip_snow(:knon), snow(:knon), qsol(:knon), temp_air(:knon), &
             spechum(:knon), u1_lay(:knon), v1_lay(:knon), petAcoef(:knon), &
@@ -214,13 +204,10 @@ contains
        zfra = max(0., min(1., snow(:knon) / (snow(:knon) + 10.)))
        albedo = alb_neig * zfra + albedo * (1. - zfra)
        z0_new = sqrt(z0_new**2 + rugoro**2)
-
-       ! Remplissage des pourcentages de surface
-       pctsrf_new(:, nisurf) = pctsrf(:, nisurf)
     case (is_oce)
        ! Surface "oc\'ean", appel \`a l'interface avec l'oc\'ean
 
-       call interfoce_lim(dtime, jour, knindex, debut, tsurf_temp, pctsrf_new)
+       call read_sst(dtime, jour, knindex, debut, tsurf_temp)
 
        cal = 0.
        beta = 1.
@@ -245,23 +232,20 @@ contains
     case (is_sic)
        ! Surface "glace de mer" appel a l'interface avec l'ocean
 
-       ! ! lecture conditions limites
-       CALL interfoce_lim(dtime, jour, knindex, debut, tsurf_new, pctsrf_new)
-
        DO ii = 1, knon
           tsurf_new(ii) = tsurf(ii)
-          IF (pctsrf_new(knindex(ii), nisurf) < EPSFRA) then
+          IF (pctsrf_new_sic(knindex(ii)) < EPSFRA) then
              snow(ii) = 0.
              tsurf_new(ii) = RTT - 1.8
              IF (soil_model) tsoil(ii, :) = RTT - 1.8
           endif
        enddo
 
-       CALL calbeta(nisurf, snow(:knon), qsol(:knon), beta(:knon), &
+       CALL calbeta(is_sic, snow(:knon), qsol(:knon), beta(:knon), &
             capsol(:knon), dif_grnd(:knon))
 
        IF (soil_model) THEN
-          CALL soil(dtime, nisurf, knon, snow, tsurf_new, tsoil, soilcap, &
+          CALL soil(dtime, is_sic, knon, snow, tsurf_new, tsoil, soilcap, &
                soilflux)
           cal(1:knon) = RCPD / soilcap(1:knon)
           radsol(1:knon) = radsol(1:knon) + soilflux(1:knon)
@@ -281,7 +265,7 @@ contains
             petBcoef(:knon), peqBcoef(:knon), tsurf_new, evap(:knon), &
             fluxlat(:knon), fluxsens(:knon), dflux_s(:knon), dflux_l(:knon))
 
-       CALL fonte_neige(nisurf, dtime, tsurf_temp, p1lay(:knon), beta(:knon), &
+       CALL fonte_neige(is_sic, dtime, tsurf_temp, p1lay(:knon), beta(:knon), &
             tq_cdrag(:knon), ps(:knon), precip_rain(:knon), &
             precip_snow(:knon), snow(:knon), qsol(:knon), temp_air(:knon), &
             spechum(:knon), u1_lay(:knon), v1_lay(:knon), petAcoef(:knon), &
@@ -306,7 +290,7 @@ contains
        ! Surface "glacier continentaux" appel a l'interface avec le sol
 
        IF (soil_model) THEN
-          CALL soil(dtime, nisurf, knon, snow, tsurf, tsoil, soilcap, soilflux)
+          CALL soil(dtime, is_lic, knon, snow, tsurf, tsoil, soilcap, soilflux)
           cal(1:knon) = RCPD / soilcap(1:knon)
           radsol(1:knon) = radsol(1:knon) + soilflux(1:knon)
        ELSE
@@ -323,7 +307,7 @@ contains
             petBcoef(:knon), peqBcoef(:knon), tsurf_new, evap(:knon), &
             fluxlat(:knon), fluxsens(:knon), dflux_s(:knon), dflux_l(:knon))
 
-       call fonte_neige(nisurf, dtime, tsurf, p1lay(:knon), beta(:knon), &
+       call fonte_neige(is_lic, dtime, tsurf, p1lay(:knon), beta(:knon), &
             tq_cdrag(:knon), ps(:knon), precip_rain(:knon), &
             precip_snow(:knon), snow(:knon), qsol(:knon), temp_air(:knon), &
             spechum(:knon), u1_lay(:knon), v1_lay(:knon), petAcoef(:knon), &
@@ -337,9 +321,6 @@ contains
 
        ! Rugosite
        z0_new = rugoro
-
-       ! Remplissage des pourcentages de surface
-       pctsrf_new(:, nisurf) = pctsrf(:, nisurf)
     case default
        print *, 'Index surface = ', nisurf
        call abort_gcm("interfsurf_hq", 'Index surface non valable')

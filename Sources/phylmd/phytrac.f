@@ -7,10 +7,10 @@ module phytrac_m
 
 contains
 
-  SUBROUTINE phytrac(lmt_pas, julien, gmtime, firstcal, lafin, pdtphys, &
-       t_seri, paprs, pplay, pmfu, pmfd, pde_u, pen_d, coefh, fm_therm, &
-       entr_therm, yu1, yv1, ftsol, pctsrf, frac_impa, frac_nucl, da, phi, &
-       mp, upwd, dnwd, tr_seri, zmasse, ncid_startphy)
+  SUBROUTINE phytrac(julien, gmtime, firstcal, lafin, pdtphys, t_seri, paprs, &
+       pplay, pmfu, pmfd, pde_u, pen_d, coefh, fm_therm, entr_therm, yu1, &
+       yv1, ftsol, pctsrf, frac_impa, frac_nucl, da, phi, mp, upwd, dnwd, &
+       tr_seri, zmasse, ncid_startphy)
 
     ! From phylmd/phytrac.F, version 1.15 2006/02/21 08:08:30 (SVN
     ! revision 679) and phylmd/write_histrac.h, version 1.9 2006/02/21
@@ -29,10 +29,10 @@ contains
     ! - stockage des moyennes des champs n\'ecessaires en mode traceur off-line 
 
     use abort_gcm_m, only: abort_gcm
-    use clesphys, only: ecrit_tra
     use clesphys2, only: conv_emanuel
     use cltrac_m, only: cltrac
     use cltracrn_m, only: cltracrn
+    USE conf_gcm_m, ONLY: lmt_pas
     use ctherm, only: iflag_thermals
     use cvltr_m, only: cvltr
     use dimens_m, only: llm, nqmx
@@ -55,7 +55,6 @@ contains
     use SUPHEC_M, only: rg
     use time_phylmdz, only: itap
 
-    integer, intent(in):: lmt_pas ! number of time steps of "physics" per day
     integer, intent(in):: julien !jour julien, 1 <= julien <= 360
     real, intent(in):: gmtime ! heure de la journ\'ee en fraction de jour
     logical, intent(in):: firstcal ! first call to "calfis"
@@ -190,7 +189,6 @@ contains
 
     if (firstcal) then
        print *, 'phytrac: pdtphys = ', pdtphys
-       PRINT *, 'Frequency of tracer output: ecrit_tra = ', ecrit_tra
        inirnpb = .true.
 
        ! Initialisation de certaines variables pour le radon et le plomb 

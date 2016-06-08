@@ -4,13 +4,13 @@ module clmain_m
 
 contains
 
-  SUBROUTINE clmain(dtime, pctsrf, pctsrf_new, t, q, u, v, jour, rmu0, ts, &
-       cdmmax, cdhmax, ksta, ksta_ter, ok_kzmin, ftsoil, qsol, paprs, pplay, &
-       snow, qsurf, evap, falbe, fluxlat, rain_fall, snow_f, solsw, sollw, &
-       fder, rlat, rugos, firstcal, agesno, rugoro, d_t, d_q, d_u, d_v, d_ts, &
-       flux_t, flux_q, flux_u, flux_v, cdragh, cdragm, q2, dflux_t, dflux_q, &
-       ycoefh, zu1, zv1, t2m, q2m, u10m, v10m, pblh, capcl, oliqcl, cteicl, &
-       pblt, therm, trmb1, trmb2, trmb3, plcl, fqcalving, ffonte, run_off_lic_0)
+  SUBROUTINE clmain(dtime, pctsrf, t, q, u, v, jour, rmu0, ts, cdmmax, &
+       cdhmax, ksta, ksta_ter, ok_kzmin, ftsoil, qsol, paprs, pplay, snow, &
+       qsurf, evap, falbe, fluxlat, rain_fall, snow_f, solsw, sollw, fder, &
+       rlat, rugos, agesno, rugoro, d_t, d_q, d_u, d_v, d_ts, flux_t, flux_q, &
+       flux_u, flux_v, cdragh, cdragm, q2, dflux_t, dflux_q, ycoefh, zu1, &
+       zv1, t2m, q2m, u10m, v10m, pblh, capcl, oliqcl, cteicl, pblt, therm, &
+       trmb1, trmb2, trmb3, plcl, fqcalving, ffonte, run_off_lic_0)
 
     ! From phylmd/clmain.F, version 1.6, 2005/11/16 14:47:19
     ! Author: Z. X. Li (LMD/CNRS), date: 1993/08/18
@@ -30,23 +30,24 @@ contains
     use clvent_m, only: clvent
     use coefkz_m, only: coefkz
     use coefkzmin_m, only: coefkzmin
-    USE conf_gcm_m, ONLY: prt_level
+    USE conf_gcm_m, ONLY: prt_level, lmt_pas
     USE conf_phys_m, ONLY: iflag_pbl
     USE dimphy, ONLY: klev, klon, zmasq
     USE dimsoil, ONLY: nsoilmx
     use hbtm_m, only: hbtm
     USE indicesol, ONLY: epsfra, is_lic, is_oce, is_sic, is_ter, nbsrf
+    USE interfoce_lim_m, ONLY: interfoce_lim
     use stdlevvar_m, only: stdlevvar
     USE suphec_m, ONLY: rd, rg, rkappa
+    use time_phylmdz, only: itap
     use ustarhb_m, only: ustarhb
     use vdif_kcay_m, only: vdif_kcay
     use yamada4_m, only: yamada4
 
     REAL, INTENT(IN):: dtime ! interval du temps (secondes)
-    REAL, INTENT(inout):: pctsrf(klon, nbsrf)
 
-    ! la nouvelle repartition des surfaces sortie de l'interface
-    REAL, INTENT(out):: pctsrf_new(klon, nbsrf)
+    REAL, INTENT(inout):: pctsrf(klon, nbsrf)
+    ! tableau des pourcentages de surface de chaque maille
 
     REAL, INTENT(IN):: t(klon, klev) ! temperature (K)
     REAL, INTENT(IN):: q(klon, klev) ! vapeur d'eau (kg/kg)
@@ -85,7 +86,6 @@ contains
 
     REAL, intent(inout):: rugos(klon, nbsrf) ! longueur de rugosit\'e (en m)
 
-    LOGICAL, INTENT(IN):: firstcal
     real agesno(klon, nbsrf)
     REAL, INTENT(IN):: rugoro(klon)
 
@@ -145,6 +145,12 @@ contains
     REAL run_off_lic_0(klon)
 
     ! Local:
+
+    LOGICAL:: firstcal = .true.
+
+    ! la nouvelle repartition des surfaces sortie de l'interface
+    REAL, save:: pctsrf_new_oce(klon)
+    REAL, save:: pctsrf_new_sic(klon)
 
     REAL y_fqcalving(klon), y_ffonte(klon)
     real y_run_off_lic_0(klon)
@@ -272,7 +278,6 @@ contains
     yv = 0.
     yt = 0.
     yq = 0.
-    pctsrf_new = 0.
     y_flux_u = 0.
     y_flux_v = 0.
     y_dflux_t = 0.
@@ -295,9 +300,15 @@ contains
     ! peut avoir potentiellement de la glace sur tout le domaine oc\'eanique
     ! (\`a affiner)
 
-    pctsrf_pot = pctsrf
+    pctsrf_pot(:, is_ter) = pctsrf(:, is_ter)
+    pctsrf_pot(:, is_lic) = pctsrf(:, is_lic)
     pctsrf_pot(:, is_oce) = 1. - zmasq
     pctsrf_pot(:, is_sic) = 1. - zmasq
+
+    ! Tester si c'est le moment de lire le fichier:
+    if (mod(itap - 1, lmt_pas) == 0) then
+       CALL interfoce_lim(jour, pctsrf_new_oce, pctsrf_new_sic)
+    endif
 
     ! Boucler sur toutes les sous-fractions du sol:
 
@@ -440,10 +451,10 @@ contains
 
           ! calculer la diffusion de "q" et de "h"
           CALL clqh(dtime, jour, firstcal, rlat, knon, nsrf, ni(:knon), &
-               pctsrf, ytsoil, yqsol, rmu0, yrugos, yrugoro, yu1, yv1, &
+               ytsoil, yqsol, rmu0, yrugos, yrugoro, yu1, yv1, &
                coefh(:knon, :), yt, yq, yts, ypaprs, ypplay, ydelp, yrads, &
                yalb(:knon), ysnow, yqsurf, yrain_f, ysnow_f, yfder, yfluxlat, &
-               pctsrf_new, yagesno(:knon), y_d_t, y_d_q, y_d_ts(:knon), &
+               pctsrf_new_sic, yagesno(:knon), y_d_t, y_d_q, y_d_ts(:knon), &
                yz0_new, y_flux_t, y_flux_q, y_dflux_t, y_dflux_q, &
                y_fqcalving, y_ffonte, y_run_off_lic_0)
 
@@ -600,9 +611,11 @@ contains
     END DO loop_surface
 
     ! On utilise les nouvelles surfaces
-
     rugos(:, is_oce) = rugmer
-    pctsrf = pctsrf_new
+    pctsrf(:, is_oce) = pctsrf_new_oce
+    pctsrf(:, is_sic) = pctsrf_new_sic
+
+    firstcal = .false.
 
   END SUBROUTINE clmain
 

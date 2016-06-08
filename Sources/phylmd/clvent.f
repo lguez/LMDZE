@@ -15,8 +15,7 @@ contains
     USE suphec_m, ONLY: rd, rg
 
     INTEGER knon
-    REAL, intent(in):: dtime
-    ! dtime----input-R- intervalle du temps (en second)
+    REAL, intent(in):: dtime ! intervalle de temps (en s)
 
     REAL u1lay(klon), v1lay(klon)
     ! u1lay----input-R- vent u de la premiere couche (m/s)

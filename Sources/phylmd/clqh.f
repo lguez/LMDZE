@@ -4,10 +4,10 @@ module clqh_m
 
 contains
 
-  SUBROUTINE clqh(dtime, jour, debut, rlat, knon, nisurf, knindex, pctsrf, &
+  SUBROUTINE clqh(dtime, jour, debut, rlat, knon, nisurf, knindex, &
        tsoil, qsol, rmu0, rugos, rugoro, u1lay, v1lay, coef, t, q, ts, paprs, &
        pplay, delp, radsol, albedo, snow, qsurf, precip_rain, precip_snow, &
-       fder, fluxlat, pctsrf_new, agesno, d_t, d_q, d_ts, z0_new, flux_t, &
+       fder, fluxlat, pctsrf_new_sic, agesno, d_t, d_q, d_ts, z0_new, flux_t, &
        flux_q, dflux_s, dflux_l, fqcalving, ffonte, run_off_lic_0)
 
     ! Author: Z. X. Li (LMD/CNRS)
@@ -28,7 +28,7 @@ contains
     INTEGER, intent(in):: knon
     integer, intent(in):: nisurf
     integer, intent(in):: knindex(:) ! (knon)
-    real, intent(in):: pctsrf(klon, nbsrf)
+
     REAL tsoil(klon, nsoilmx)
 
     REAL, intent(inout):: qsol(klon)
@@ -64,7 +64,7 @@ contains
 
     real, intent(inout):: fder(klon)
     real fluxlat(klon)
-    real pctsrf_new(klon, nbsrf)
+    real, intent(in):: pctsrf_new_sic(:) ! (klon)
     REAL, intent(inout):: agesno(:) ! (knon)
     REAL d_t(klon, klev) ! incrementation de "t"
     REAL d_q(klon, klev) ! incrementation de "q"
@@ -239,12 +239,12 @@ contains
     spechum(1:knon)=q(1:knon, 1)
     p1lay(1:knon) = pplay(1:knon, 1)
 
-    CALL interfsurf_hq(dtime, jour, rmu0, nisurf, knon, knindex, pctsrf, &
-         rlat, debut, nsoilmx, tsoil, qsol, u1lay, v1lay, temp_air, spechum, &
-         tq_cdrag, petAcoef, peqAcoef, petBcoef, peqBcoef, precip_rain, &
-         precip_snow, fder, rugos, rugoro, snow, qsurf, ts(:knon), p1lay, &
-         psref, radsol, evap, fluxsens, fluxlat, dflux_l, dflux_s, tsurf_new, &
-         albedo, z0_new, pctsrf_new, agesno, fqcalving, ffonte, run_off_lic_0)
+    CALL interfsurf_hq(dtime, jour, rmu0, nisurf, knon, knindex, rlat, debut, &
+         nsoilmx, tsoil, qsol, u1lay, v1lay, temp_air, spechum, tq_cdrag, &
+         petAcoef, peqAcoef, petBcoef, peqBcoef, precip_rain, precip_snow, &
+         fder, rugos, rugoro, snow, qsurf, ts(:knon), p1lay, psref, radsol, &
+         evap, fluxsens, fluxlat, dflux_l, dflux_s, tsurf_new, albedo, &
+         z0_new, pctsrf_new_sic, agesno, fqcalving, ffonte, run_off_lic_0)
 
     flux_t(:knon, 1) = fluxsens(:knon)
     flux_q(:knon, 1) = - evap(:knon)

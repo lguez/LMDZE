@@ -6,7 +6,7 @@ module phyredem0_m
 
 contains
 
-  SUBROUTINE phyredem0(lmt_pas)
+  SUBROUTINE phyredem0
 
     ! From phylmd/phyredem.F, version 1.3, 2005/05/25 13:10:09
     ! Author: Z. X. Li (LMD/CNRS)
@@ -15,7 +15,7 @@ contains
     ! Objet : \'ecriture de l'\'etat de d\'emarrage ou red\'emarrage
     ! pour la physique
 
-    use conf_gcm_m, only: nday
+    use conf_gcm_m, only: nday, lmt_pas
     USE dimphy, ONLY: klev, klon
     USE dimsoil, ONLY: nsoilmx
     USE indicesol, ONLY: nbsrf
@@ -23,8 +23,6 @@ contains
     USE netcdf95, ONLY: nf95_create, nf95_put_att, nf95_def_dim, &
          nf95_def_var, nf95_enddef, nf95_put_var
     use phyetat0_m, only: rlat, rlon, itau_phy
-
-    INTEGER, intent(in):: lmt_pas ! number of time steps of "physics" per day
 
     ! Local:
 

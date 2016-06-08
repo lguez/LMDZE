@@ -336,7 +336,7 @@ contains
 
     nday = 0
     itau_phy = 0 ! side effect
-    call phyredem0(lmt_pas = day_step / iphysiq)
+    call phyredem0
 
     call nf95_inq_varid(ncid_restartphy, "trs", varid)
     call nf95_put_var(ncid_restartphy, varid, null_array)
