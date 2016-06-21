@@ -7,7 +7,7 @@ contains
   SUBROUTINE cv30_yield(icb, inb, delt, t, rr, u, v, gz, p, ph, h, hp, lv, &
        cpn, th, ep, clw, m, tp, mp, qp, up, vp, wt, water, evap, b, ment, &
        qent, uent, vent, nent, elij, sig, tv, tvp, iflag, precip, VPrecip, &
-       ft, fr, fu, fv, upwd, dnwd, dnwd0, ma, mike, tls, tps, qcondc)
+       ft, fr, fu, fv, upwd, dnwd, ma, mike, tls, tps, qcondc)
 
     ! Tendencies, precipitation, variables of interface with other
     ! processes, etc.
@@ -41,7 +41,11 @@ contains
     real ep(klon, klev), clw(klon, klev)
     real m(klon, klev)
     real tp(klon, klev)
-    real, intent(in):: mp(:, :) ! (ncum, nl)
+
+    real, intent(in):: mp(:, :) ! (ncum, nl) Mass flux of the
+    ! unsaturated downdraft, defined positive downward, in kg m-2
+    ! s-1. M_p in Emanuel (1991 928).
+
     real, intent(in):: qp(:, :), up(:, :) ! (klon, klev)
     real, intent(in):: vp(:, 2:) ! (ncum, 2:nl)
     real, intent(in):: wt(:, :) ! (ncum, nl - 1)
@@ -60,7 +64,6 @@ contains
     real VPrecip(klon, klev + 1)
     real ft(klon, klev), fr(klon, klev), fu(klon, klev), fv(klon, klev)
     real upwd(klon, klev), dnwd(klon, klev)
-    real dnwd0(klon, klev)
     real ma(klon, klev)
     real mike(klon, klev)
     real tls(klon, klev), tps(klon, klev)
@@ -154,7 +157,7 @@ contains
             * wt(il, 1) * (rcw - rcpd) * water(il, 2) * (t(il, 2) - t(il, 1)) &
             * work(il) / cpn(il, 1)
 
-       !jyg1 Correction pour mieux conserver l'eau (conformite avec CONVECT4.3)
+       ! jyg Correction pour mieux conserver l'eau (conformite avec CONVECT4.3)
        ! (sb: pour l'instant, on ne fait que le chgt concernant rg, pas evap)
        fr(il, 1) = 0.01 * rg * mp(il, 2) * (qp(il, 2) - rr(il, 1)) &
             * work(il) + sigd * 0.5 * (evap(il, 1) + evap(il, 2))
@@ -418,17 +421,6 @@ contains
        do il = 1, ncum
           upwd(il, i) = 0.0
           dnwd(il, i) = 0.0
-       enddo
-    enddo
-
-    do i = 1, nl
-       do il = 1, ncum
-          dnwd0(il, i) = - mp(il, i)
-       enddo
-    enddo
-    do i = nl + 1, klev
-       do il = 1, ncum
-          dnwd0(il, i) = 0.
        enddo
     enddo
 

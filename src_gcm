@@ -222,7 +222,6 @@ phytrac.f
 pres2lev.f
 press_coefoz.f
 principal_cshift.f
-qcheck.f
 qminimum.f
 q_sat.f
 raddim.f

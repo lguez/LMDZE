@@ -45,7 +45,7 @@ contains
 
     real, intent(out):: mp(:, :)
     ! (ncum, nl) Mass flux of the unsaturated downdraft, defined
-    ! positive downward, in kg m-2 s-1.  M_p in Emanuel (1991 928).
+    ! positive downward, in kg m-2 s-1. M_p in Emanuel (1991 928).
 
     real, intent(out):: qp(:, :), up(:, :), vp(:, :) ! (ncum, nl)
     real, intent(out):: wt(:, :) ! (ncum, nl)
@@ -70,7 +70,7 @@ contains
     real, parameter:: tinv = 1. / 3.
     real  delti
     real afac, afac1, afac2, bfac
-    real pr1, sigt, b6, c6, revap, tevap, delth
+    real pr1, sigt, b6, c6, revap, tevap
     real xf, tf, fac2, ur, sru, fac, d, af, bf
     real ampmax
     real lvcp(size(icb), nl) ! (ncum, nl) L_v / C_p, in K
@@ -187,9 +187,9 @@ contains
 
              test_above_surface: if (i /= 1) then
                 tevap = max(0., evap(il, i))
-                delth = max(0.001, (th(il, i) - th(il, i - 1)))
                 mp(il, i) = 100. * ginv * lvcp(il, i) * sigd * tevap &
-                     * (p(il, i - 1) - p(il, i)) / delth
+                     * (p(il, i - 1) - p(il, i)) &
+                     / max(0.001, th(il, i) - th(il, i - 1))
 
                 ! If hydrostatic assumption fails, solve cubic
                 ! difference equation for downdraft theta and mass

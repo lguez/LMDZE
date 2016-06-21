@@ -6,7 +6,7 @@ contains
 
   SUBROUTINE cv_driver(t1, q1, qs1, u1, v1, p1, ph1, iflag1, ft1, fq1, fu1, &
        fv1, precip1, VPrecip1, sig1, w01, icb1, inb1, Ma1, upwd1, dnwd1, &
-       dnwd01, qcondc1, cape1, da1, phi1, mp1)
+       qcondc1, cape1, da1, phi1, mp1)
 
     ! From LMDZ4/libf/phylmd/cv_driver.F, version 1.3, 2005/04/15 12:36:17
     ! Main driver for convection
@@ -94,19 +94,26 @@ contains
     ! total upward mass flux (adiabatic + mixed)
 
     real, intent(out):: dnwd1(klon, klev) ! saturated downward mass flux (mixed)
-    real, intent(out):: dnwd01(klon, klev) ! unsaturated downward mass flux
 
     real, intent(out):: qcondc1(klon, klev)
     ! in-cloud mixing ratio of condensed water
 
     real, intent(out):: cape1(klon)
-    real, intent(inout):: da1(klon, klev), phi1(klon, klev, klev)
-    real, intent(inout):: mp1(klon, klev)
+    real, intent(out):: da1(:, :) ! (klon, klev)
+    real, intent(out):: phi1(:, :, :) ! (klon, klev, klev)
+
+    real, intent(out):: mp1(:, :) ! (klon, klev) Mass flux of the
+    ! unsaturated downdraft, defined positive downward, in kg m-2
+    ! s-1. M_p in Emanuel (1991 928).
 
     ! Local:
 
     real da(klon, klev), phi(klon, klev, klev)
-    real, allocatable:: mp(:, :) ! (ncum, nl)
+
+    real, allocatable:: mp(:, :) ! (ncum, nl) Mass flux of the
+    ! unsaturated downdraft, defined positive downward, in kg m-2
+    ! s-1. M_p in Emanuel (1991 928).
+
     integer i, k, il
     integer icbs1(klon)
     real plcl1(klon)
@@ -174,7 +181,7 @@ contains
     real, allocatable:: b(:, :) ! (ncum, nl - 1)
     real ft(klon, klev), fq(klon, klev)
     real fu(klon, klev), fv(klon, klev)
-    real upwd(klon, klev), dnwd(klon, klev), dnwd0(klon, klev)
+    real upwd(klon, klev), dnwd(klon, klev)
     real Ma(klon, klev), mike(klon, klev), tls(klon, klev)
     real tps(klon, klev)
     real precip(klon)
@@ -187,6 +194,10 @@ contains
     CALL cv30_param
 
     ! INITIALIZE OUTPUT ARRAYS AND PARAMETERS
+
+    da1 = 0.
+    mp1 = 0.
+    phi1 = 0.
 
     do k = 1, klev
        do i = 1, klon
@@ -203,7 +214,6 @@ contains
           Ma1(i, k) = 0.
           upwd1(i, k) = 0.
           dnwd1(i, k) = 0.
-          dnwd01(i, k) = 0.
           qcondc1(i, k) = 0.
        end do
     end do
@@ -256,12 +266,12 @@ contains
             lv, cpn, th, ep, clw, m, tp, mp, qp, up, vp(:ncum, 2:nl), &
             wt(:ncum, :nl - 1), water(:ncum, :nl), evap, b, ment, qent, uent, &
             vent, nent, elij, sig, tv, tvp, iflag, precip, VPrecip, ft, fq, &
-            fu, fv, upwd, dnwd, dnwd0, ma, mike, tls, tps, qcondc)
+            fu, fv, upwd, dnwd, ma, mike, tls, tps, qcondc)
        CALL cv30_tracer(klon, ncum, klev, ment, sij, da, phi)
        CALL cv30_uncompress(idcum, iflag, precip, VPrecip, sig, w0, ft, fq, &
-            fu, fv, inb, Ma, upwd, dnwd, dnwd0, qcondc, cape, da, phi, mp, &
-            iflag1, precip1, VPrecip1, sig1, w01, ft1, fq1, fu1, fv1, inb1, &
-            Ma1, upwd1, dnwd1, dnwd01, qcondc1, cape1, da1, phi1, mp1)
+            fu, fv, inb, Ma, upwd, dnwd, qcondc, cape, da, phi, mp, iflag1, &
+            precip1, VPrecip1, sig1, w01, ft1, fq1, fu1, fv1, inb1, Ma1, &
+            upwd1, dnwd1, qcondc1, cape1, da1, phi1, mp1)
     ENDIF
 
   end SUBROUTINE cv_driver

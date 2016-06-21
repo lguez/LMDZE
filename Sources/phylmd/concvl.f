@@ -40,14 +40,19 @@ contains
     ! saturated downdraft mass flux (kg / m2 / s)
 
     real, intent(out):: dnwd0(klon, klev)
-    ! unsaturated downdraft mass flux (kg / m2 / s)
+    ! unsaturated downdraft mass flux, in kg m-2 s-1
 
     REAL ma(klon, klev)
     real cape(klon) ! output (J / kg)
     INTEGER, intent(out):: iflag(klon)
     REAL qcondc(klon, klev)
     REAL pmflxr(klon, klev + 1)
-    REAL, intent(inout):: da(klon, klev), phi(klon, klev, klev), mp(klon, klev)
+    REAL, intent(out):: da(:, :) ! (klon, klev)
+    REAL, intent(out):: phi(:, :, :) ! (klon, klev, klev)
+
+    REAL, intent(out):: mp(:, :) ! (klon, klev) Mass flux of the
+    ! unsaturated downdraft, defined positive downward, in kg m-2
+    ! s-1. M_p in Emanuel (1991 928).
 
     ! Local:
     REAL zx_qs, cor
@@ -66,7 +71,8 @@ contains
 
     CALL cv_driver(t, q, qs, u, v, play / 100., paprs / 100., iflag, d_t, &
          d_q, d_u, d_v, rain, pmflxr, sig1, w01, kbas, itop_con, ma, upwd, &
-         dnwd, dnwd0, qcondc, cape, da, phi, mp)
+         dnwd, qcondc, cape, da, phi, mp)
+    dnwd0 = - mp
     rain = rain / 86400.
     d_t = dtphys * d_t
     d_q = dtphys * d_q

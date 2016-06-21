@@ -56,7 +56,6 @@ contains
     USE phyredem0_m, ONLY: phyredem0
     USE phystokenc_m, ONLY: phystokenc
     USE phytrac_m, ONLY: phytrac
-    USE qcheck_m, ONLY: qcheck
     use radlwsw_m, only: radlwsw
     use yoegwd, only: sugwd
     USE suphec_m, ONLY: rcpd, retv, rg, rlvtt, romega, rsigma, rtt
@@ -107,9 +106,6 @@ contains
 
     LOGICAL:: firstcal = .true.
 
-    LOGICAL, PARAMETER:: check = .FALSE.
-    ! Verifier la conservation du modele en eau
-
     LOGICAL, PARAMETER:: ok_stratus = .FALSE.
     ! Ajouter artificiellement les stratus
 
@@ -129,13 +125,11 @@ contains
 
     real da(klon, llm), phi(klon, llm, llm), mp(klon, llm)
 
-    REAL swdn0(klon, llm + 1), swdn(klon, llm + 1)
-    REAL swup0(klon, llm + 1), swup(klon, llm + 1)
-    SAVE swdn0, swdn, swup0, swup
+    REAL, save:: swdn0(klon, llm + 1), swdn(klon, llm + 1)
+    REAL, save:: swup0(klon, llm + 1), swup(klon, llm + 1)
 
-    REAL lwdn0(klon, llm + 1), lwdn(klon, llm + 1)
-    REAL lwup0(klon, llm + 1), lwup(klon, llm + 1)
-    SAVE lwdn0, lwdn, lwup0, lwup
+    REAL, save:: lwdn0(klon, llm + 1), lwdn(klon, llm + 1)
+    REAL, save:: lwup0(klon, llm + 1), lwup(klon, llm + 1)
 
     ! prw: precipitable water
     real prw(klon)
@@ -151,8 +145,7 @@ contains
     ! Radiative transfer computations are made every "radpas" call to
     ! "physiq".
 
-    REAL radsol(klon)
-    SAVE radsol ! bilan radiatif au sol calcule par code radiatif
+    REAL, save:: radsol(klon) ! bilan radiatif au sol calcule par code radiatif
 
     REAL, save:: ftsol(klon, nbsrf) ! skin temperature of surface fraction
 
@@ -160,8 +153,7 @@ contains
     ! soil temperature of surface fraction
 
     REAL, save:: fevap(klon, nbsrf) ! evaporation
-    REAL fluxlat(klon, nbsrf)
-    SAVE fluxlat
+    REAL, save:: fluxlat(klon, nbsrf)
 
     REAL, save:: fqsurf(klon, nbsrf)
     ! humidite de l'air au contact de la surface
@@ -200,20 +192,22 @@ contains
     REAL ycoefh(klon, llm) ! coef d'echange pour phytrac
     REAL yu1(klon) ! vents dans la premiere couche U
     REAL yv1(klon) ! vents dans la premiere couche V
-    REAL ffonte(klon, nbsrf) ! flux thermique utilise pour fondre la neige
 
-    REAL fqcalving(klon, nbsrf)
+    REAL, save:: ffonte(klon, nbsrf)
+    ! flux thermique utilise pour fondre la neige
+
+    REAL, save:: fqcalving(klon, nbsrf)
     ! flux d'eau "perdue" par la surface et necessaire pour limiter la
     ! hauteur de neige, en kg / m2 / s
 
     REAL zxffonte(klon), zxfqcalving(klon)
 
-    REAL pfrac_impa(klon, llm)! Produits des coefs lessivage impaction
-    save pfrac_impa
-    REAL pfrac_nucl(klon, llm)! Produits des coefs lessivage nucleation
-    save pfrac_nucl
-    REAL pfrac_1nucl(klon, llm)! Produits des coefs lessi nucl (alpha = 1)
-    save pfrac_1nucl
+    REAL, save:: pfrac_impa(klon, llm)! Produits des coefs lessivage impaction
+    REAL, save:: pfrac_nucl(klon, llm)! Produits des coefs lessivage nucleation
+
+    REAL, save:: pfrac_1nucl(klon, llm)
+    ! Produits des coefs lessi nucl (alpha = 1)
+
     REAL frac_impa(klon, llm) ! fractions d'aerosols lessivees (impaction)
     REAL frac_nucl(klon, llm) ! idem (nucleation)
 
@@ -227,8 +221,7 @@ contains
 
     REAL evap(klon), devap(klon) ! evaporation and its derivative
     REAL sens(klon), dsens(klon) ! chaleur sensible et sa derivee
-    REAL dlw(klon) ! derivee infra rouge
-    SAVE dlw
+    REAL, save:: dlw(klon) ! derivee infra rouge
     REAL bils(klon) ! bilan de chaleur au sol
     REAL, save:: fder(klon) ! Derive de flux (sensible et latente)
     REAL ve(klon) ! integr. verticale du transport meri. de l'energie
@@ -287,12 +280,12 @@ contains
     REAL cldl(klon), cldm(klon), cldh(klon) ! nuages bas, moyen et haut
     REAL cldt(klon), cldq(klon) ! nuage total, eau liquide integree
 
-    REAL zxtsol(klon), zxqsurf(klon), zxsnow(klon), zxfluxlat(klon)
+    REAL zxqsurf(klon), zxsnow(klon), zxfluxlat(klon)
 
     REAL dist, mu0(klon), fract(klon)
     real longi
     REAL z_avant(klon), z_apres(klon), z_factor(klon)
-    REAL za, zb
+    REAL zb
     REAL zx_t, zx_qs, zcor
     real zqsat(klon, llm)
     INTEGER i, k, iq, nsrf
@@ -322,8 +315,7 @@ contains
     REAL upwd(klon, llm) ! saturated updraft mass flux
     REAL dnwd(klon, llm) ! saturated downdraft mass flux
     REAL dnwd0(klon, llm) ! unsaturated downdraft mass flux
-    REAL cape(klon) ! CAPE
-    SAVE cape
+    REAL, save:: cape(klon)
 
     INTEGER iflagctrl(klon) ! flag fonctionnement de convect
 
@@ -335,7 +327,7 @@ contains
     ! eva: \'evaporation de l'eau liquide nuageuse
     ! vdf: vertical diffusion in boundary layer
     REAL d_t_con(klon, llm), d_q_con(klon, llm)
-    REAL d_u_con(klon, llm), d_v_con(klon, llm)
+    REAL, save:: d_u_con(klon, llm), d_v_con(klon, llm)
     REAL d_t_lsc(klon, llm), d_q_lsc(klon, llm), d_ql_lsc(klon, llm)
     REAL d_t_ajs(klon, llm), d_q_ajs(klon, llm)
     REAL d_u_ajs(klon, llm), d_v_ajs(klon, llm)
@@ -351,7 +343,8 @@ contains
     INTEGER, save:: ibas_con(klon), itop_con(klon)
     real ema_pct(klon) ! Emanuel pressure at cloud top, in Pa
 
-    REAL rain_con(klon), rain_lsc(klon)
+    REAL, save:: rain_con(klon)
+    real rain_lsc(klon)
     REAL, save:: snow_con(klon) ! neige (mm / s)
     real snow_lsc(klon)
     REAL d_ts(klon, nbsrf)
@@ -397,8 +390,6 @@ contains
     REAL uq_lay(klon, llm) ! transport zonal de l'eau a chaque niveau vert.
 
     real date0
-
-    ! Variables li\'ees au bilan d'\'energie et d'enthalpie :
     REAL ztsol(klon)
 
     REAL d_t_ec(klon, llm)
@@ -406,8 +397,10 @@ contains
 
     REAL ZRCPD
 
-    REAL t2m(klon, nbsrf), q2m(klon, nbsrf) ! temperature and humidity at 2 m
-    REAL u10m(klon, nbsrf), v10m(klon, nbsrf) ! vents a 10 m
+    REAL, save:: t2m(klon, nbsrf), q2m(klon, nbsrf) 
+    ! temperature and humidity at 2 m
+
+    REAL, save:: u10m(klon, nbsrf), v10m(klon, nbsrf) ! vents a 10 m
     REAL zt2m(klon), zq2m(klon) ! temp., hum. 2 m moyenne s/ 1 maille
     REAL zu10m(klon), zv10m(klon) ! vents a 10 m moyennes s/1 maille
 
@@ -428,8 +421,8 @@ contains
     REAL, save:: tau_ae(klon, llm, 2), piz_ae(klon, llm, 2)
     REAL, save:: cg_ae(klon, llm, 2)
 
-    REAL topswad(klon), solswad(klon) ! aerosol direct effect
-    REAL topswai(klon), solswai(klon) ! aerosol indirect effect
+    REAL, save:: topswad(klon), solswad(klon) ! aerosol direct effect
+    REAL, save:: topswai(klon), solswai(klon) ! aerosol indirect effect
 
     LOGICAL:: ok_ade = .false. ! apply aerosol direct effect
     LOGICAL:: ok_aie = .false. ! apply aerosol indirect effect
@@ -438,20 +431,6 @@ contains
     ! Parameters in equation (D) of Boucher and Lohmann (1995, Tellus
     ! B). They link cloud droplet number concentration to aerosol mass
     ! concentration.
-
-    SAVE u10m
-    SAVE v10m
-    SAVE t2m
-    SAVE q2m
-    SAVE ffonte
-    SAVE fqcalving
-    SAVE rain_con
-    SAVE topswai
-    SAVE topswad
-    SAVE solswai
-    SAVE solswad
-    SAVE d_u_con
-    SAVE d_v_con
 
     real zmasse(klon, llm)
     ! (column-density of mass of air in a cell, in kg m-2)
@@ -705,7 +684,7 @@ contains
     call assert(abs(sum(pctsrf, dim = 2) - 1.) <= EPSFRA, 'physiq: pctsrf')
 
     ftsol = ftsol + d_ts
-    zxtsol = sum(ftsol * pctsrf, dim = 2)
+    ztsol = sum(ftsol * pctsrf, dim = 2)
     DO nsrf = 1, nbsrf
        DO i = 1, klon
           zxfluxlat(i) = zxfluxlat(i) + fluxlat(i, nsrf) * pctsrf(i, nsrf)
@@ -730,45 +709,40 @@ contains
        ENDDO
     ENDDO
 
-    ! Si une sous-fraction n'existe pas, elle prend la température moyenne :
+    ! Si une sous-fraction n'existe pas, elle prend la valeur moyenne :
     DO nsrf = 1, nbsrf
        DO i = 1, klon
-          IF (pctsrf(i, nsrf) < epsfra) ftsol(i, nsrf) = zxtsol(i)
-
-          IF (pctsrf(i, nsrf) < epsfra) t2m(i, nsrf) = zt2m(i)
-          IF (pctsrf(i, nsrf) < epsfra) q2m(i, nsrf) = zq2m(i)
-          IF (pctsrf(i, nsrf) < epsfra) u10m(i, nsrf) = zu10m(i)
-          IF (pctsrf(i, nsrf) < epsfra) v10m(i, nsrf) = zv10m(i)
-          IF (pctsrf(i, nsrf) < epsfra) ffonte(i, nsrf) = zxffonte(i)
-          IF (pctsrf(i, nsrf) < epsfra) &
-               fqcalving(i, nsrf) = zxfqcalving(i)
-          IF (pctsrf(i, nsrf) < epsfra) pblh(i, nsrf) = s_pblh(i)
-          IF (pctsrf(i, nsrf) < epsfra) plcl(i, nsrf) = s_lcl(i)
-          IF (pctsrf(i, nsrf) < epsfra) capCL(i, nsrf) = s_capCL(i)
-          IF (pctsrf(i, nsrf) < epsfra) oliqCL(i, nsrf) = s_oliqCL(i)
-          IF (pctsrf(i, nsrf) < epsfra) cteiCL(i, nsrf) = s_cteiCL(i)
-          IF (pctsrf(i, nsrf) < epsfra) pblT(i, nsrf) = s_pblT(i)
-          IF (pctsrf(i, nsrf) < epsfra) therm(i, nsrf) = s_therm(i)
-          IF (pctsrf(i, nsrf) < epsfra) trmb1(i, nsrf) = s_trmb1(i)
-          IF (pctsrf(i, nsrf) < epsfra) trmb2(i, nsrf) = s_trmb2(i)
-          IF (pctsrf(i, nsrf) < epsfra) trmb3(i, nsrf) = s_trmb3(i)
+          IF (pctsrf(i, nsrf) < epsfra) then
+             ftsol(i, nsrf) = ztsol(i)
+             t2m(i, nsrf) = zt2m(i)
+             q2m(i, nsrf) = zq2m(i)
+             u10m(i, nsrf) = zu10m(i)
+             v10m(i, nsrf) = zv10m(i)
+             ffonte(i, nsrf) = zxffonte(i)
+             fqcalving(i, nsrf) = zxfqcalving(i)
+             pblh(i, nsrf) = s_pblh(i)
+             plcl(i, nsrf) = s_lcl(i)
+             capCL(i, nsrf) = s_capCL(i)
+             oliqCL(i, nsrf) = s_oliqCL(i)
+             cteiCL(i, nsrf) = s_cteiCL(i)
+             pblT(i, nsrf) = s_pblT(i)
+             therm(i, nsrf) = s_therm(i)
+             trmb1(i, nsrf) = s_trmb1(i)
+             trmb2(i, nsrf) = s_trmb2(i)
+             trmb3(i, nsrf) = s_trmb3(i)
+          end IF
        ENDDO
     ENDDO
 
     ! Calculer la dérive du flux infrarouge
 
     DO i = 1, klon
-       dlw(i) = - 4. * RSIGMA * zxtsol(i)**3
+       dlw(i) = - 4. * RSIGMA * ztsol(i)**3
     ENDDO
-
-    IF (check) print *, "avantcon = ", qcheck(paprs, q_seri, ql_seri)
 
     ! Appeler la convection
 
     if (conv_emanuel) then
-       da = 0.
-       mp = 0.
-       phi = 0.
        CALL concvl(paprs, play, t_seri, q_seri, u_seri, v_seri, sig1, w01, &
             d_t_con, d_q_con, d_u_con, d_v_con, rain_con, ibas_con, itop_con, &
             upwd, dnwd, dnwd0, Ma, cape, iflagctrl, qcondc, pmflxr, da, phi, mp)
@@ -817,20 +791,6 @@ contains
           v_seri(i, k) = v_seri(i, k) + d_v_con(i, k)
        ENDDO
     ENDDO
-
-    IF (check) THEN
-       za = qcheck(paprs, q_seri, ql_seri)
-       print *, "aprescon = ", za
-       zx_t = 0.
-       za = 0.
-       DO i = 1, klon
-          za = za + airephy(i) / REAL(klon)
-          zx_t = zx_t + (rain_con(i)+ &
-               snow_con(i)) * airephy(i) / REAL(klon)
-       ENDDO
-       zx_t = zx_t / za * dtphys
-       print *, "Precip = ", zx_t
-    ENDIF
 
     IF (.not. conv_emanuel) THEN
        z_apres = sum((q_seri + ql_seri) * zmasse, dim=2)
@@ -917,19 +877,6 @@ contains
           IF (.NOT.new_oliq) cldliq(i, k) = ql_seri(i, k)
        ENDDO
     ENDDO
-    IF (check) THEN
-       za = qcheck(paprs, q_seri, ql_seri)
-       print *, "apresilp = ", za
-       zx_t = 0.
-       za = 0.
-       DO i = 1, klon
-          za = za + airephy(i) / REAL(klon)
-          zx_t = zx_t + (rain_lsc(i) &
-               + snow_lsc(i)) * airephy(i) / REAL(klon)
-       ENDDO
-       zx_t = zx_t / za * dtphys
-       print *, "Precip = ", zx_t
-    ENDIF
 
     ! PRESCRIPTION DES NUAGES POUR LE RAYONNEMENT
 
@@ -1048,7 +995,7 @@ contains
        albsol = sum(falbe * pctsrf, dim = 2)
 
        ! Rayonnement (compatible Arpege-IFS) :
-       CALL radlwsw(dist, mu0, fract, paprs, play, zxtsol, albsol, t_seri, &
+       CALL radlwsw(dist, mu0, fract, paprs, play, ztsol, albsol, t_seri, &
             q_seri, wo, cldfra, cldemi, cldtau, heat, heat0, cool, cool0, &
             radsol, albpla, topsw, toplw, solsw, sollw, sollwdown, topsw0, &
             toplw0, solsw0, sollw0, lwdn0, lwdn, lwup0, lwup, swdn0, swdn, &
@@ -1228,7 +1175,7 @@ contains
     CALL histwrite_phy("precip", rain_fall + snow_fall)
     CALL histwrite_phy("plul", rain_lsc + snow_lsc)
     CALL histwrite_phy("pluc", rain_con + snow_con)
-    CALL histwrite_phy("tsol", zxtsol)
+    CALL histwrite_phy("tsol", ztsol)
     CALL histwrite_phy("t2m", zt2m)
     CALL histwrite_phy("q2m", zq2m)
     CALL histwrite_phy("u10m", zu10m)
