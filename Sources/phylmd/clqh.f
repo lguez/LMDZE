@@ -4,11 +4,11 @@ module clqh_m
 
 contains
 
-  SUBROUTINE clqh(dtime, jour, debut, rlat, knon, nisurf, knindex, &
-       tsoil, qsol, rmu0, rugos, rugoro, u1lay, v1lay, coef, t, q, ts, paprs, &
-       pplay, delp, radsol, albedo, snow, qsurf, precip_rain, precip_snow, &
-       fder, fluxlat, pctsrf_new_sic, agesno, d_t, d_q, d_ts, z0_new, flux_t, &
-       flux_q, dflux_s, dflux_l, fqcalving, ffonte, run_off_lic_0)
+  SUBROUTINE clqh(dtime, jour, debut, rlat, nisurf, knindex, tsoil, qsol, &
+       rmu0, rugos, rugoro, u1lay, v1lay, coef, t, q, ts, paprs, pplay, delp, &
+       radsol, albedo, snow, qsurf, precip_rain, precip_snow, fder, fluxlat, &
+       pctsrf_new_sic, agesno, d_t, d_q, d_ts, z0_new, flux_t, flux_q, &
+       dflux_s, dflux_l, fqcalving, ffonte, run_off_lic_0)
 
     ! Author: Z. X. Li (LMD/CNRS)
     ! Date: 1993/08/18
@@ -25,7 +25,6 @@ contains
     integer, intent(in):: jour ! jour de l'annee en cours
     logical, intent(in):: debut
     real, intent(in):: rlat(klon)
-    INTEGER, intent(in):: knon
     integer, intent(in):: nisurf
     integer, intent(in):: knindex(:) ! (knon)
 
@@ -70,10 +69,14 @@ contains
     REAL d_q(klon, klev) ! incrementation de "q"
     REAL, intent(out):: d_ts(:) ! (knon) incrementation de "ts"
     real z0_new(klon)
-    REAL flux_t(klon, klev) ! (diagnostic) flux de la chaleur
-    ! sensible, flux de Cp*T, positif vers
-    ! le bas: j / (m**2 s) c.a.d.: W / m2
-    REAL flux_q(klon, klev) ! flux de la vapeur d'eau:kg / (m**2 s)
+
+    REAL, intent(out):: flux_t(:) ! (knon)
+    ! (diagnostic) flux de chaleur sensible (Cp T) à la surface,
+    ! positif vers le bas, W / m2
+
+    REAL, intent(out):: flux_q(:) ! (knon)
+    ! flux de la vapeur d'eau à la surface, en kg / (m**2 s)
+
     REAL dflux_s(klon) ! derivee du flux sensible dF / dTs
     REAL dflux_l(klon) ! derivee du flux latent dF / dTs
 
@@ -88,7 +91,8 @@ contains
 
     ! Local:
 
-    REAL evap(klon) ! evaporation au sol
+    INTEGER knon
+    REAL evap(size(knindex)) ! (knon) evaporation au sol
 
     INTEGER i, k
     REAL zx_cq(klon, klev)
@@ -115,11 +119,12 @@ contains
     real petBcoef(klon), peqBcoef(klon)
     real p1lay(klon)
 
-    real fluxsens(klon)
-    real tsurf_new(knon)
+    real tsurf_new(size(knindex)) ! (knon)
     real zzpk
 
     !----------------------------------------------------------------
+
+    knon = size(knindex)
 
     if (iflag_pbl == 1) then
        do k = 3, klev
@@ -157,9 +162,9 @@ contains
 
     DO k = 2, klev
        DO i = 1, knon
-          zx_coef(i, k) = coef(i, k)*RG / (pplay(i, k - 1) - pplay(i, k)) &
-               *(paprs(i, k)*2 / (t(i, k)+t(i, k - 1)) / RD)**2
-          zx_coef(i, k) = zx_coef(i, k) * dtime*RG
+          zx_coef(i, k) = coef(i, k) * RG / (pplay(i, k - 1) - pplay(i, k)) &
+               * (paprs(i, k) * 2 / (t(i, k)+t(i, k - 1)) / RD)**2
+          zx_coef(i, k) = zx_coef(i, k) * dtime * RG
        ENDDO
     ENDDO
 
@@ -168,55 +173,55 @@ contains
     DO k = 2, klev
        DO i = 1, knon
           zdelz = RD * (t(i, k - 1)+t(i, k)) / 2.0 / RG / paprs(i, k) &
-               *(pplay(i, k - 1) - pplay(i, k))
+               * (pplay(i, k - 1) - pplay(i, k))
           z_gamaq(i, k) = gamq(i, k) * zdelz
-          z_gamah(i, k) = gamt(i, k) * zdelz *RCPD * zx_pkh(i, k)
+          z_gamah(i, k) = gamt(i, k) * zdelz * RCPD * zx_pkh(i, k)
        ENDDO
     ENDDO
     DO i = 1, knon
        zx_buf1(i) = zx_coef(i, klev) + delp(i, klev)
-       zx_cq(i, klev) = (local_q(i, klev)*delp(i, klev) &
-            - zx_coef(i, klev)*z_gamaq(i, klev)) / zx_buf1(i)
+       zx_cq(i, klev) = (local_q(i, klev) * delp(i, klev) &
+            - zx_coef(i, klev) * z_gamaq(i, klev)) / zx_buf1(i)
        zx_dq(i, klev) = zx_coef(i, klev) / zx_buf1(i)
 
        zzpk=(pplay(i, klev) / psref(i))**RKAPPA
-       zx_buf2(i) = zzpk*delp(i, klev) + zx_coef(i, klev)
-       zx_ch(i, klev) = (local_h(i, klev)*zzpk*delp(i, klev) &
-            - zx_coef(i, klev)*z_gamah(i, klev)) / zx_buf2(i)
+       zx_buf2(i) = zzpk * delp(i, klev) + zx_coef(i, klev)
+       zx_ch(i, klev) = (local_h(i, klev) * zzpk * delp(i, klev) &
+            - zx_coef(i, klev) * z_gamah(i, klev)) / zx_buf2(i)
        zx_dh(i, klev) = zx_coef(i, klev) / zx_buf2(i)
     ENDDO
     DO k = klev - 1, 2, - 1
        DO i = 1, knon
           zx_buf1(i) = delp(i, k)+zx_coef(i, k) &
-               +zx_coef(i, k+1)*(1. - zx_dq(i, k+1))
-          zx_cq(i, k) = (local_q(i, k)*delp(i, k) &
-               +zx_coef(i, k+1)*zx_cq(i, k+1) &
-               +zx_coef(i, k+1)*z_gamaq(i, k+1) &
-               - zx_coef(i, k)*z_gamaq(i, k)) / zx_buf1(i)
+               +zx_coef(i, k+1) * (1. - zx_dq(i, k+1))
+          zx_cq(i, k) = (local_q(i, k) * delp(i, k) &
+               +zx_coef(i, k+1) * zx_cq(i, k+1) &
+               +zx_coef(i, k+1) * z_gamaq(i, k+1) &
+               - zx_coef(i, k) * z_gamaq(i, k)) / zx_buf1(i)
           zx_dq(i, k) = zx_coef(i, k) / zx_buf1(i)
 
           zzpk=(pplay(i, k) / psref(i))**RKAPPA
-          zx_buf2(i) = zzpk*delp(i, k)+zx_coef(i, k) &
-               +zx_coef(i, k+1)*(1. - zx_dh(i, k+1))
-          zx_ch(i, k) = (local_h(i, k)*zzpk*delp(i, k) &
-               +zx_coef(i, k+1)*zx_ch(i, k+1) &
-               +zx_coef(i, k+1)*z_gamah(i, k+1) &
-               - zx_coef(i, k)*z_gamah(i, k)) / zx_buf2(i)
+          zx_buf2(i) = zzpk * delp(i, k)+zx_coef(i, k) &
+               +zx_coef(i, k+1) * (1. - zx_dh(i, k+1))
+          zx_ch(i, k) = (local_h(i, k) * zzpk * delp(i, k) &
+               +zx_coef(i, k+1) * zx_ch(i, k+1) &
+               +zx_coef(i, k+1) * z_gamah(i, k+1) &
+               - zx_coef(i, k) * z_gamah(i, k)) / zx_buf2(i)
           zx_dh(i, k) = zx_coef(i, k) / zx_buf2(i)
        ENDDO
     ENDDO
 
     DO i = 1, knon
-       zx_buf1(i) = delp(i, 1) + zx_coef(i, 2)*(1. - zx_dq(i, 2))
-       zx_cq(i, 1) = (local_q(i, 1)*delp(i, 1) &
-            +zx_coef(i, 2)*(z_gamaq(i, 2)+zx_cq(i, 2))) &
+       zx_buf1(i) = delp(i, 1) + zx_coef(i, 2) * (1. - zx_dq(i, 2))
+       zx_cq(i, 1) = (local_q(i, 1) * delp(i, 1) &
+            +zx_coef(i, 2) * (z_gamaq(i, 2)+zx_cq(i, 2))) &
             / zx_buf1(i)
        zx_dq(i, 1) = - 1. * RG / zx_buf1(i)
 
        zzpk=(pplay(i, 1) / psref(i))**RKAPPA
-       zx_buf2(i) = zzpk*delp(i, 1) + zx_coef(i, 2)*(1. - zx_dh(i, 2))
-       zx_ch(i, 1) = (local_h(i, 1)*zzpk*delp(i, 1) &
-            +zx_coef(i, 2)*(z_gamah(i, 2)+zx_ch(i, 2))) &
+       zx_buf2(i) = zzpk * delp(i, 1) + zx_coef(i, 2) * (1. - zx_dh(i, 2))
+       zx_ch(i, 1) = (local_h(i, 1) * zzpk * delp(i, 1) &
+            +zx_coef(i, 2) * (z_gamah(i, 2)+zx_ch(i, 2))) &
             / zx_buf2(i)
        zx_dh(i, 1) = - 1. * RG / zx_buf2(i)
     ENDDO
@@ -243,34 +248,21 @@ contains
          nsoilmx, tsoil, qsol, u1lay, v1lay, temp_air, spechum, tq_cdrag, &
          petAcoef, peqAcoef, petBcoef, peqBcoef, precip_rain, precip_snow, &
          fder, rugos, rugoro, snow, qsurf, ts(:knon), p1lay, psref, radsol, &
-         evap, fluxsens, fluxlat, dflux_l, dflux_s, tsurf_new, albedo, &
+         evap, flux_t, fluxlat, dflux_l, dflux_s, tsurf_new, albedo, &
          z0_new, pctsrf_new_sic, agesno, fqcalving, ffonte, run_off_lic_0)
 
-    flux_t(:knon, 1) = fluxsens(:knon)
-    flux_q(:knon, 1) = - evap(:knon)
+    flux_q = - evap
     d_ts = tsurf_new - ts(:knon)
 
     !==== une fois on a zx_h_ts, on peut faire l'iteration ========
     DO i = 1, knon
-       local_h(i, 1) = zx_ch(i, 1) + zx_dh(i, 1)*flux_t(i, 1)*dtime
-       local_q(i, 1) = zx_cq(i, 1) + zx_dq(i, 1)*flux_q(i, 1)*dtime
+       local_h(i, 1) = zx_ch(i, 1) + zx_dh(i, 1) * flux_t(i) * dtime
+       local_q(i, 1) = zx_cq(i, 1) + zx_dq(i, 1) * flux_q(i) * dtime
     ENDDO
     DO k = 2, klev
        DO i = 1, knon
-          local_q(i, k) = zx_cq(i, k) + zx_dq(i, k)*local_q(i, k - 1)
-          local_h(i, k) = zx_ch(i, k) + zx_dh(i, k)*local_h(i, k - 1)
-       ENDDO
-    ENDDO
-
-    !== flux_q est le flux de vapeur d'eau: kg / (m**2 s) positive vers bas
-    !== flux_t est le flux de cpt (energie sensible): j / (m**2 s)
-    DO k = 2, klev
-       DO i = 1, knon
-          flux_q(i, k) = (zx_coef(i, k) / RG / dtime) &
-               * (local_q(i, k) - local_q(i, k - 1)+z_gamaq(i, k))
-          flux_t(i, k) = (zx_coef(i, k) / RG / dtime) &
-               * (local_h(i, k) - local_h(i, k - 1)+z_gamah(i, k)) &
-               / zx_pkh(i, k)
+          local_q(i, k) = zx_cq(i, k) + zx_dq(i, k) * local_q(i, k - 1)
+          local_h(i, k) = zx_ch(i, k) + zx_dh(i, k) * local_h(i, k - 1)
        ENDDO
     ENDDO
 

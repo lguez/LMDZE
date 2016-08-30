@@ -199,8 +199,8 @@ contains
                "rugosite "//clnsurf(nsrf), "-",   &
                iim, (jjm + 1), nhori, 1, 1, 1, -99, &
                "inst(X)", zsto, zout)
-          !XXX
        END DO
+
        CALL histdef(nid_ins, "rugs", "rugosity", "-", &
             iim, (jjm + 1), nhori, 1, 1, 1, -99,  &
             "inst(X)", zsto, zout)
@@ -250,8 +250,13 @@ contains
             iim, (jjm + 1), nhori, 1, 1, 1, -99, &
             "inst(X)", zsto, zout)
 
-       if (conv_emanuel) CALL histdef(nid_ins, "ptop", "cloud top pressure", &
-            "Pa", iim, jjm + 1, nhori, 1, 1, 1, -99, "inst(X)", zsto, zout)
+       if (conv_emanuel) then
+          CALL histdef(nid_ins, "ptop", "cloud top pressure", &
+               "Pa", iim, jjm + 1, nhori, 1, 1, 1, -99, "inst(X)", zsto, zout)
+          CALL histdef(nid_ins, "dnwd0", "unsaturated downdraft", &
+               "kg/m2/s", iim, jjm + 1, nhori, llm, 1, llm, nvert, "inst(X)", &
+               zsto, zout)
+       end if
 
        ! Champs 3D:
 

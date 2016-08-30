@@ -8,7 +8,7 @@ contains
        debut, nsoilmx, tsoil, qsol, u1_lay, v1_lay, temp_air, spechum, &
        tq_cdrag, petAcoef, peqAcoef, petBcoef, peqBcoef, precip_rain, &
        precip_snow, fder, rugos, rugoro, snow, qsurf, tsurf, p1lay, ps, &
-       radsol, evap, fluxsens, fluxlat, dflux_l, dflux_s, tsurf_new, albedo, &
+       radsol, evap, flux_t, fluxlat, dflux_l, dflux_s, tsurf_new, albedo, &
        z0_new, pctsrf_new_sic, agesno, fqcalving, ffonte, run_off_lic_0)
 
     ! Cette routine sert d'aiguillage entre l'atmosph\`ere et la surface
@@ -87,10 +87,9 @@ contains
     REAL, DIMENSION(klon), INTENT(INOUT):: radsol
     ! rayonnement net au sol (LW + SW)
 
-    real, intent(INOUT):: evap(klon) ! evaporation totale
-    real, dimension(klon), intent(OUT):: fluxsens, fluxlat
-    ! fluxsens flux de chaleur sensible
-    ! fluxlat flux de chaleur latente
+    real, intent(OUT):: evap(:) ! (knon) evaporation totale
+    real, intent(OUT):: flux_t(:) ! (knon) flux de chaleur sensible
+    real, dimension(klon), intent(OUT):: fluxlat ! flux de chaleur latente
     real, dimension(klon), intent(OUT):: dflux_l, dflux_s
     real, intent(OUT):: tsurf_new(knon) ! temp\'erature au sol
     real, intent(OUT):: albedo(:) ! (knon) albedo
@@ -189,15 +188,15 @@ contains
             beta(:knon), tq_cdrag(:knon), ps(:knon), qsurf(:knon), &
             radsol(:knon), dif_grnd(:knon), temp_air(:knon), spechum(:knon), &
             u1_lay(:knon), v1_lay(:knon), petAcoef(:knon), peqAcoef(:knon), &
-            petBcoef(:knon), peqBcoef(:knon), tsurf_new, evap(:knon), &
-            fluxlat(:knon), fluxsens(:knon), dflux_s(:knon), dflux_l(:knon))
+            petBcoef(:knon), peqBcoef(:knon), tsurf_new, evap, &
+            fluxlat(:knon), flux_t, dflux_s(:knon), dflux_l(:knon))
 
        CALL fonte_neige(is_ter, dtime, tsurf, p1lay(:knon), beta(:knon), &
             tq_cdrag(:knon), ps(:knon), precip_rain(:knon), &
             precip_snow(:knon), snow(:knon), qsol(:knon), temp_air(:knon), &
             spechum(:knon), u1_lay(:knon), v1_lay(:knon), petAcoef(:knon), &
             peqAcoef(:knon), petBcoef(:knon), peqBcoef(:knon), tsurf_new, &
-            evap(:knon), fqcalving(:knon), ffonte(:knon), run_off_lic_0(:knon))
+            evap, fqcalving(:knon), ffonte(:knon), run_off_lic_0(:knon))
 
        call albsno(dtime, agesno, alb_neig, precip_snow(:knon))
        where (snow(:knon) < 0.0001) agesno = 0.
@@ -217,8 +216,8 @@ contains
             beta(:knon), tq_cdrag(:knon), ps(:knon), qsurf(:knon), &
             radsol(:knon), dif_grnd(:knon), temp_air(:knon), spechum(:knon), &
             u1_lay(:knon), v1_lay(:knon), petAcoef(:knon), peqAcoef(:knon), &
-            petBcoef(:knon), peqBcoef(:knon), tsurf_new, evap(:knon), &
-            fluxlat(:knon), fluxsens(:knon), dflux_s(:knon), dflux_l(:knon))
+            petBcoef(:knon), peqBcoef(:knon), tsurf_new, evap, &
+            fluxlat(:knon), flux_t, dflux_s(:knon), dflux_l(:knon))
        fder = fder + dflux_s + dflux_l
 
        ! Compute the albedo:
@@ -262,15 +261,15 @@ contains
             beta(:knon), tq_cdrag(:knon), ps(:knon), qsurf(:knon), &
             radsol(:knon), dif_grnd(:knon), temp_air(:knon), spechum(:knon), &
             u1_lay(:knon), v1_lay(:knon), petAcoef(:knon), peqAcoef(:knon), &
-            petBcoef(:knon), peqBcoef(:knon), tsurf_new, evap(:knon), &
-            fluxlat(:knon), fluxsens(:knon), dflux_s(:knon), dflux_l(:knon))
+            petBcoef(:knon), peqBcoef(:knon), tsurf_new, evap, &
+            fluxlat(:knon), flux_t, dflux_s(:knon), dflux_l(:knon))
 
        CALL fonte_neige(is_sic, dtime, tsurf_temp, p1lay(:knon), beta(:knon), &
             tq_cdrag(:knon), ps(:knon), precip_rain(:knon), &
             precip_snow(:knon), snow(:knon), qsol(:knon), temp_air(:knon), &
             spechum(:knon), u1_lay(:knon), v1_lay(:knon), petAcoef(:knon), &
             peqAcoef(:knon), petBcoef(:knon), peqBcoef(:knon), tsurf_new, &
-            evap(:knon), fqcalving(:knon), ffonte(:knon), run_off_lic_0(:knon))
+            evap, fqcalving(:knon), ffonte(:knon), run_off_lic_0(:knon))
 
        ! Compute the albedo:
 
@@ -304,15 +303,15 @@ contains
             beta(:knon), tq_cdrag(:knon), ps(:knon), qsurf(:knon), &
             radsol(:knon), dif_grnd(:knon), temp_air(:knon), spechum(:knon), &
             u1_lay(:knon), v1_lay(:knon), petAcoef(:knon), peqAcoef(:knon), &
-            petBcoef(:knon), peqBcoef(:knon), tsurf_new, evap(:knon), &
-            fluxlat(:knon), fluxsens(:knon), dflux_s(:knon), dflux_l(:knon))
+            petBcoef(:knon), peqBcoef(:knon), tsurf_new, evap, &
+            fluxlat(:knon), flux_t, dflux_s(:knon), dflux_l(:knon))
 
        call fonte_neige(is_lic, dtime, tsurf, p1lay(:knon), beta(:knon), &
             tq_cdrag(:knon), ps(:knon), precip_rain(:knon), &
             precip_snow(:knon), snow(:knon), qsol(:knon), temp_air(:knon), &
             spechum(:knon), u1_lay(:knon), v1_lay(:knon), petAcoef(:knon), &
             peqAcoef(:knon), petBcoef(:knon), peqBcoef(:knon), tsurf_new, &
-            evap(:knon), fqcalving(:knon), ffonte(:knon), run_off_lic_0(:knon))
+            evap, fqcalving(:knon), ffonte(:knon), run_off_lic_0(:knon))
 
        ! calcul albedo
        CALL albsno(dtime, agesno, alb_neig, precip_snow(:knon))

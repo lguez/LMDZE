@@ -59,28 +59,28 @@ contains
     lat_sun = asin(sin(longi * pi / 180.) * sin(r_incl * pi / 180.))
     ! Capderou (2003 784, equation 4.49)
 
-    gmtime1 = gmtime*86400.
-    gmtime2 = gmtime*86400. + pdtrad
+    gmtime1 = gmtime * 86400.
+    gmtime2 = gmtime * 86400. + pdtrad
 
     DO i = 1, klon
-       latr = rlat(i)*pi/180.
-       omega = 0.0 ! nuit polaire
-       IF (latr>=(pi/2.-lat_sun) .OR. latr<=(-pi/2.-lat_sun)) THEN
+       latr = rlat(i) * pi / 180.
+       omega = 0. ! nuit polaire
+       IF (latr>=(pi / 2.-lat_sun) .OR. latr<=(-pi / 2.-lat_sun)) THEN
           omega = pi ! journée polaire
        END IF
-       IF (latr<(pi/2.+lat_sun) .AND. latr>(-pi/2.+lat_sun) .AND. &
-            latr<(pi/2.-lat_sun) .AND. latr>(-pi/2.-lat_sun)) THEN
-          omega = -tan(latr)*tan(lat_sun)
+       IF (latr<(pi / 2.+lat_sun) .AND. latr>(-pi / 2.+lat_sun) .AND. &
+            latr<(pi / 2.-lat_sun) .AND. latr>(-pi / 2.-lat_sun)) THEN
+          omega = -tan(latr) * tan(lat_sun)
           omega = acos(omega)
        END IF
 
-       omega1 = gmtime1 + rlon(i)*86400.0/360.0
-       omega1 = omega1/86400.0*twopi
+       omega1 = gmtime1 + rlon(i) * 86400. / 360.
+       omega1 = omega1 / 86400. * twopi
        omega1 = mod(omega1+twopi, twopi)
        omega1 = omega1 - pi
 
-       omega2 = gmtime2 + rlon(i)*86400.0/360.0
-       omega2 = omega2/86400.0*twopi
+       omega2 = gmtime2 + rlon(i) * 86400. / 360.
+       omega2 = omega2 / 86400. * twopi
        omega2 = mod(omega2+twopi, twopi)
        omega2 = omega2 - pi
 
@@ -88,13 +88,13 @@ contains
           ! on est dans la meme journee locale
           IF (omega2<=-omega .OR. omega1>=omega .OR. omega<1E-5) THEN
              ! nuit
-             IF (present(frac)) frac(i) = 0.0
-             mu0(i) = 0.0
+             IF (present(frac)) frac(i) = 0.
+             mu0(i) = 0.
           ELSE
              ! jour + nuit / jour
              omegadeb = max(-omega, omega1)
              omegafin = min(omega, omega2)
-             IF (present(frac)) frac(i) = (omegafin-omegadeb)/(omega2-omega1)
+             IF (present(frac)) frac(i) = (omegafin-omegadeb) / (omega2-omega1)
              mu0(i) = sin(latr) * sin(lat_sun) + cos(latr) * cos(lat_sun) &
                   * (sin(omegafin) - sin(omegadeb)) / (omegafin - omegadeb)
           END IF
@@ -102,8 +102,8 @@ contains
           ! omega1 > omega2, à cheval sur deux journées
           ! entre omega1 et pi
           IF (omega1>=omega) THEN ! nuit
-             zfrac1 = 0.0
-             z1_mu = 0.0
+             zfrac1 = 0.
+             z1_mu = 0.
           ELSE ! jour+nuit
              omegadeb = max(-omega, omega1)
              omegafin = omega
@@ -113,8 +113,8 @@ contains
           END IF
           ! entre -pi et omega2
           IF (omega2<=-omega) THEN ! nuit
-             zfrac2 = 0.0
-             z2_mu = 0.0
+             zfrac2 = 0.
+             z2_mu = 0.
           ELSE ! jour+nuit
              omegadeb = -omega
              omegafin = min(omega, omega2)
@@ -123,8 +123,8 @@ contains
                   * (sin(omegafin) - sin(omegadeb)) / (omegafin - omegadeb)
           END IF
           ! moyenne 
-          IF (present(frac)) frac(i) = (zfrac1+zfrac2)/ (omega2+twopi-omega1)
-          mu0(i) = (zfrac1*z1_mu+zfrac2*z2_mu)/max(zfrac1+zfrac2, 1.E-10)
+          IF (present(frac)) frac(i) = (zfrac1+zfrac2) / (omega2+twopi-omega1)
+          mu0(i) = (zfrac1 * z1_mu+zfrac2 * z2_mu) / max(zfrac1+zfrac2, 1e-10)
        END IF
     END DO
 

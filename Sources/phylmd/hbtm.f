@@ -4,8 +4,8 @@ module HBTM_m
 
 contains
 
-  SUBROUTINE HBTM(knon, paprs, pplay, t2m, q2m, ustar, flux_t, flux_q, u, v, &
-       t, q, pblh, cape, EauLiq, ctei, pblT, therm, trmb1, trmb2, trmb3, plcl)
+  SUBROUTINE HBTM(paprs, pplay, t2m, q2m, ustar, flux_t, flux_q, u, v, t, q, &
+       pblh, cape, EauLiq, ctei, pblT, therm, trmb1, trmb2, trmb3, plcl)
 
     ! D'apr\'es Holstag et Boville et Troen et Mahrt
     ! JAS 47 BLM
@@ -35,9 +35,6 @@ contains
 
     ! Arguments:
 
-    ! nombre de points a calculer
-    INTEGER, intent(in):: knon
-
     ! pression a inter-couche (Pa)
     REAL, intent(in):: paprs(klon, klev+1)
     ! pression au milieu de couche (Pa)
@@ -46,8 +43,8 @@ contains
     ! q a 2 et 10m
     REAL, intent(in):: q2m(klon)
     REAL, intent(in):: ustar(klon)
-    ! Flux
-    REAL, intent(in):: flux_t(klon, klev), flux_q(klon, klev)
+    REAL, intent(in):: flux_t(:), flux_q(:) ! (knon) flux à la surface
+
     ! vitesse U (m/s)
     REAL, intent(in):: u(klon, klev)
     ! vitesse V (m/s)
@@ -71,7 +68,8 @@ contains
     REAL plcl(klon)
 
     ! Local:
-
+    
+    INTEGER knon ! nombre de points a calculer
     INTEGER isommet
     ! limite max sommet pbl
     PARAMETER (isommet=klev)
@@ -150,6 +148,8 @@ contains
 
     !-----------------------------------------------------------------
 
+    knon = size(pblh)
+
     ! initialisations
     q_star = 0
     t_star = 0
@@ -187,8 +187,8 @@ contains
        zxt = t2m(i)
 
        ! convention >0 vers le bas ds lmdz
-       khfs(i) = - flux_t(i, 1)*zxt*Rd / (RCPD*paprs(i, 1))
-       kqfs(i) = - flux_q(i, 1)*zxt*Rd / paprs(i, 1)
+       khfs(i) = - flux_t(i)*zxt*Rd / (RCPD*paprs(i, 1))
+       kqfs(i) = - flux_q(i)*zxt*Rd / paprs(i, 1)
        ! verifier que khfs et kqfs sont bien de la forme w'l'
        heatv(i) = khfs(i) + 0.608*zxt*kqfs(i)
        ! a comparer aussi aux sorties de clqh : flux_T/RoCp et flux_q/RoLv

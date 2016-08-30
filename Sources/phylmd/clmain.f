@@ -98,14 +98,15 @@ contains
 
     REAL, intent(out):: d_ts(klon, nbsrf) ! le changement pour "ts"
 
-    REAL flux_t(klon, klev, nbsrf), flux_q(klon, klev, nbsrf)
-    ! flux_t---output-R- flux de chaleur sensible (CpT) J/m**2/s (W/m**2)
-    !                    (orientation positive vers le bas)
-    ! flux_q---output-R- flux de vapeur d'eau (kg/m**2/s)
+    REAL, intent(out):: flux_t(klon, nbsrf)
+    ! flux de chaleur sensible (Cp T) (W/m2) (orientation positive vers
+    ! le bas) à la surface
 
-    REAL flux_u(klon, klev, nbsrf), flux_v(klon, klev, nbsrf)
-    ! flux_u---output-R- tension du vent X: (kg m/s)/(m**2 s) ou Pascal
-    ! flux_v---output-R- tension du vent Y: (kg m/s)/(m**2 s) ou Pascal
+    REAL, intent(out):: flux_q(klon, nbsrf) 
+    ! flux de vapeur d'eau (kg/m2/s) à la surface
+
+    REAL, intent(out):: flux_u(klon, nbsrf), flux_v(klon, nbsrf)
+    ! tension du vent à la surface, en Pa
 
     REAL, INTENT(out):: cdragh(klon), cdragm(klon)
     real q2(klon, klev+1, nbsrf)
@@ -183,8 +184,8 @@ contains
     REAL y_d_ts(klon)
     REAL y_d_t(klon, klev), y_d_q(klon, klev)
     REAL y_d_u(klon, klev), y_d_v(klon, klev)
-    REAL y_flux_t(klon, klev), y_flux_q(klon, klev)
-    REAL y_flux_u(klon, klev), y_flux_v(klon, klev)
+    REAL y_flux_t(klon), y_flux_q(klon)
+    REAL y_flux_u(klon), y_flux_v(klon)
     REAL y_dflux_t(klon), y_dflux_q(klon)
     REAL coefh(klon, klev), coefm(klon, klev)
     REAL yu(klon, klev), yv(klon, klev)
@@ -278,8 +279,6 @@ contains
     yv = 0.
     yt = 0.
     yq = 0.
-    y_flux_u = 0.
-    y_flux_v = 0.
     y_dflux_t = 0.
     y_dflux_q = 0.
     ytsoil = 999999.
@@ -445,17 +444,17 @@ contains
 
           ! calculer la diffusion des vitesses "u" et "v"
           CALL clvent(knon, dtime, yu1, yv1, coefm(:knon, :), yt, yu, ypaprs, &
-               ypplay, ydelp, y_d_u, y_flux_u)
+               ypplay, ydelp, y_d_u, y_flux_u(:knon))
           CALL clvent(knon, dtime, yu1, yv1, coefm(:knon, :), yt, yv, ypaprs, &
-               ypplay, ydelp, y_d_v, y_flux_v)
+               ypplay, ydelp, y_d_v, y_flux_v(:knon))
 
           ! calculer la diffusion de "q" et de "h"
-          CALL clqh(dtime, jour, firstcal, rlat, knon, nsrf, ni(:knon), &
-               ytsoil, yqsol, rmu0, yrugos, yrugoro, yu1, yv1, &
-               coefh(:knon, :), yt, yq, yts, ypaprs, ypplay, ydelp, yrads, &
-               yalb(:knon), ysnow, yqsurf, yrain_f, ysnow_f, yfder, yfluxlat, &
-               pctsrf_new_sic, yagesno(:knon), y_d_t, y_d_q, y_d_ts(:knon), &
-               yz0_new, y_flux_t, y_flux_q, y_dflux_t, y_dflux_q, &
+          CALL clqh(dtime, jour, firstcal, rlat, nsrf, ni(:knon), ytsoil, &
+               yqsol, rmu0, yrugos, yrugoro, yu1, yv1, coefh(:knon, :), yt, &
+               yq, yts, ypaprs, ypplay, ydelp, yrads, yalb(:knon), ysnow, &
+               yqsurf, yrain_f, ysnow_f, yfder, yfluxlat, pctsrf_new_sic, &
+               yagesno(:knon), y_d_t, y_d_q, y_d_ts(:knon), yz0_new, &
+               y_flux_t(:knon), y_flux_q(:knon), y_dflux_t, y_dflux_q, &
                y_fqcalving, y_ffonte, y_run_off_lic_0)
 
           ! calculer la longueur de rugosite sur ocean
@@ -481,16 +480,20 @@ contains
                 coefm(j, k) = coefm(j, k)*ypct(j)
                 y_d_t(j, k) = y_d_t(j, k)*ypct(j)
                 y_d_q(j, k) = y_d_q(j, k)*ypct(j)
-                flux_t(i, k, nsrf) = y_flux_t(j, k)
-                flux_q(i, k, nsrf) = y_flux_q(j, k)
-                flux_u(i, k, nsrf) = y_flux_u(j, k)
-                flux_v(i, k, nsrf) = y_flux_v(j, k)
                 y_d_u(j, k) = y_d_u(j, k)*ypct(j)
                 y_d_v(j, k) = y_d_v(j, k)*ypct(j)
              END DO
           END DO
 
-          evap(:, nsrf) = -flux_q(:, 1, nsrf)
+          DO j = 1, knon
+             i = ni(j)
+             flux_t(i, nsrf) = y_flux_t(j)
+             flux_q(i, nsrf) = y_flux_q(j)
+             flux_u(i, nsrf) = y_flux_u(j)
+             flux_v(i, nsrf) = y_flux_v(j)
+          END DO
+
+          evap(:, nsrf) = -flux_q(:, nsrf)
 
           falbe(:, nsrf) = 0.
           snow(:, nsrf) = 0.
@@ -583,9 +586,9 @@ contains
 
           END DO
 
-          CALL hbtm(knon, ypaprs, ypplay, yt2m, yq2m, yustar, y_flux_t, &
-               y_flux_q, yu, yv, yt, yq, ypblh(:knon), ycapcl, yoliqcl, &
-               ycteicl, ypblt, ytherm, ytrmb1, ytrmb2, ytrmb3, ylcl)
+          CALL hbtm(ypaprs, ypplay, yt2m, yq2m, yustar, y_flux_t(:knon), &
+               y_flux_q(:knon), yu, yv, yt, yq, ypblh(:knon), ycapcl, &
+               yoliqcl, ycteicl, ypblt, ytherm, ytrmb1, ytrmb2, ytrmb3, ylcl)
 
           DO j = 1, knon
              i = ni(j)

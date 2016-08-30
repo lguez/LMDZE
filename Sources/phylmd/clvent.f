@@ -35,8 +35,10 @@ contains
     ! delp-----input-R- epaisseur de couche (Pa)
     REAL d_ven(klon, klev)
     ! d_ven----output-R- le changement de "ven"
-    REAL flux_v(klon, klev)
-    ! flux_v---output-R- (diagnostic) flux du vent: (kg m/s)/(m**2 s)
+
+    REAL, intent(out):: flux_v(:) ! (knon)
+    ! (diagnostic) flux du vent à la surface, en (kg m/s)/(m**2 s)
+    ! flux_v est le flux de moment angulaire (positif vers bas)
 
     ! Local:
     INTEGER i, k
@@ -98,18 +100,10 @@ contains
        ENDDO
     ENDDO
 
-    ! flux_v est le flux de moment angulaire (positif vers bas) dont
-    ! l'unite est: (kg m/s)/(m**2 s)
     DO i = 1, knon
-       flux_v(i, 1) = zx_coef(i, 1)/(RG*dtime) &
+       flux_v(i) = zx_coef(i, 1)/(RG*dtime) &
             *(local_ven(i, 1)*zx_alf1(i) &
             +local_ven(i, 2)*zx_alf2(i))
-    ENDDO
-    DO k = 2, klev
-       DO i = 1, knon
-          flux_v(i, k) = zx_coef(i, k)/(RG*dtime) &
-               * (local_ven(i, k)-local_ven(i, k-1))
-       ENDDO
     ENDDO
 
     DO k = 1, klev

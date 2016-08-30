@@ -30,10 +30,10 @@ contains
     real, intent(IN):: ps(:) ! (knon) pression au sol
 
     real, intent(IN):: precip_rain(:) ! (knon)
-    ! precipitation, liquid water mass flux (kg/m2/s), positive down
+    ! precipitation, liquid water mass flux (kg / m2 / s), positive down
 
     real, intent(IN):: precip_snow(:) ! (knon)
-    ! precipitation, solid water mass flux (kg/m2/s), positive down
+    ! precipitation, solid water mass flux (kg / m2 / s), positive down
 
     real, intent(INOUT):: snow(:) ! (knon)
     ! column-density of mass of snow, in kg m-2
@@ -58,7 +58,7 @@ contains
 
     real, intent(OUT):: fqcalving(:) ! (knon)
     ! flux d'eau "perdue" par la surface et n\'ecessaire pour limiter la
-    ! hauteur de neige, en kg/m2/s
+    ! hauteur de neige, en kg / m2 / s
 
     real, intent(OUT):: ffonte(:) ! (knon)
     ! flux thermique utilis\'é pour fondre la neige
@@ -70,7 +70,7 @@ contains
 
     integer knon ! nombre de points \`a traiter
     real, parameter:: snow_max=3000.
-    ! Masse maximum de neige (kg/m2). Au dessus de ce seuil, la neige
+    ! Masse maximum de neige (kg / m2). Au dessus de ce seuil, la neige
     ! en exces "s'ecoule" (calving)
 
     integer i
@@ -80,8 +80,8 @@ contains
     REAL bil_eau_s(size(ps)) ! in kg m-2
     real snow_evap(size(ps)) ! in kg m-2 s-1
     real, parameter:: t_coup = 273.15
-    REAL, parameter:: chasno = 3.334E5/(2.3867E6*0.15)
-    REAL, parameter:: chaice = 3.334E5/(2.3867E6*0.15)
+    REAL, parameter:: chasno = 3.334E5 / (2.3867E6*0.15)
+    REAL, parameter:: chaice = 3.334E5 / (2.3867E6*0.15)
     real, parameter:: max_eau_sol = 150. ! in kg m-2
     real coeff_rel
 
@@ -95,16 +95,16 @@ contains
          size(run_off_lic_0)/), "fonte_neige knon")
 
     ! Initialisations
-    coeff_rel = dtime/(tau_calv * rday)
+    coeff_rel = dtime / (tau_calv * rday)
     bil_eau_s = 0.
     DO i = 1, knon
        IF (thermcep) THEN
           zdelta= rtt >= tsurf(i)
           zcvm5 = merge(R5IES*RLSTT, R5LES*RLVTT, zdelta)
           zcvm5 = zcvm5 / RCPD / (1. + RVTMP2*q1lay(i))
-          zx_qs= r2es * FOEEW(tsurf(i), zdelta)/ps(i)
+          zx_qs= r2es * FOEEW(tsurf(i), zdelta) / ps(i)
           zx_qs=MIN(0.5, zx_qs)
-          zcor=1./(1.-retv*zx_qs)
+          zcor=1. / (1.-retv*zx_qs)
           zx_qs=zx_qs*zcor
        ELSE
           IF (tsurf(i) < t_coup) THEN
@@ -135,22 +135,22 @@ contains
     do i = 1, knon
        if ((snow(i) > epsfra .OR. nisurf == is_sic &
             .OR. nisurf == is_lic) .AND. tsurf_new(i) >= RTT) then
-          fq_fonte = MIN(MAX((tsurf_new(i)-RTT)/chasno, 0.), snow(i))
-          ffonte(i) = fq_fonte * RLMLT/dtime
+          fq_fonte = MIN(MAX((tsurf_new(i)-RTT) / chasno, 0.), snow(i))
+          ffonte(i) = fq_fonte * RLMLT / dtime
           snow(i) = max(0., snow(i) - fq_fonte)
           bil_eau_s(i) = bil_eau_s(i) + fq_fonte
           tsurf_new(i) = tsurf_new(i) - fq_fonte * chasno
           !IM cf JLD/ GKtest fonte aussi pour la glace
           IF (nisurf == is_sic .OR. nisurf == is_lic) THEN
-             fq_fonte = MAX((tsurf_new(i)-RTT)/chaice, 0.)
-             ffonte(i) = ffonte(i) + fq_fonte * RLMLT/dtime
+             fq_fonte = MAX((tsurf_new(i)-RTT) / chaice, 0.)
+             ffonte(i) = ffonte(i) + fq_fonte * RLMLT / dtime
              bil_eau_s(i) = bil_eau_s(i) + fq_fonte
              tsurf_new(i) = RTT
           ENDIF
        endif
 
        ! S'il y a une hauteur trop importante de neige, elle s'\'ecoule
-       fqcalving(i) = max(0., snow(i) - snow_max)/dtime
+       fqcalving(i) = max(0., snow(i) - snow_max) / dtime
        snow(i)=min(snow(i), snow_max)
 
        IF (nisurf == is_ter) then
@@ -160,7 +160,7 @@ contains
           run_off_lic(i) = (coeff_rel * fqcalving(i)) + &
                (1. - coeff_rel) * run_off_lic_0(i)
           run_off_lic_0(i) = run_off_lic(i)
-          run_off_lic(i) = run_off_lic(i) + bil_eau_s(i)/dtime
+          run_off_lic(i) = run_off_lic(i) + bil_eau_s(i) / dtime
        endif
     enddo
 

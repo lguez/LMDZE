@@ -219,8 +219,10 @@ contains
 
     REAL rain_tiedtke(klon), snow_tiedtke(klon)
 
-    REAL evap(klon), devap(klon) ! evaporation and its derivative
-    REAL sens(klon), dsens(klon) ! chaleur sensible et sa derivee
+    REAL evap(klon) ! flux d'\'evaporation au sol
+    real devap(klon) ! derivative of the evaporation flux at the surface
+    REAL sens(klon) ! flux de chaleur sensible au sol
+    real dsens(klon) ! derivee du flux de chaleur sensible au sol
     REAL, save:: dlw(klon) ! derivee infra rouge
     REAL bils(klon) ! bilan de chaleur au sol
     REAL, save:: fder(klon) ! Derive de flux (sensible et latente)
@@ -250,15 +252,10 @@ contains
     REAL cldtau(klon, llm) ! epaisseur optique
     REAL cldemi(klon, llm) ! emissivite infrarouge
 
-    REAL fluxq(klon, llm, nbsrf) ! flux turbulent d'humidite
-    REAL fluxt(klon, llm, nbsrf) ! flux turbulent de chaleur
-    REAL fluxu(klon, llm, nbsrf) ! flux turbulent de vitesse u
-    REAL fluxv(klon, llm, nbsrf) ! flux turbulent de vitesse v
-
-    REAL zxfluxt(klon, llm)
-    REAL zxfluxq(klon, llm)
-    REAL zxfluxu(klon, llm)
-    REAL zxfluxv(klon, llm)
+    REAL flux_q(klon, nbsrf) ! flux turbulent d'humidite à la surface
+    REAL flux_t(klon, nbsrf) ! flux turbulent de chaleur à la surface
+    REAL flux_u(klon, nbsrf) ! flux turbulent de vitesse u à la surface
+    REAL flux_v(klon, nbsrf) ! flux turbulent de vitesse v à la surface
 
     ! Le rayonnement n'est pas calcul\'e tous les pas, il faut donc que
     ! les variables soient r\'emanentes.
@@ -314,7 +311,6 @@ contains
 
     REAL upwd(klon, llm) ! saturated updraft mass flux
     REAL dnwd(klon, llm) ! saturated downdraft mass flux
-    REAL dnwd0(klon, llm) ! unsaturated downdraft mass flux
     REAL, save:: cape(klon)
 
     INTEGER iflagctrl(klon) ! flag fonctionnement de convect
@@ -615,38 +611,20 @@ contains
 
     fder = dlw
 
-    ! Couche limite:
-
     CALL clmain(dtphys, pctsrf, t_seri, q_seri, u_seri, v_seri, julien, mu0, &
          ftsol, cdmmax, cdhmax, ksta, ksta_ter, ok_kzmin, ftsoil, qsol, &
          paprs, play, fsnow, fqsurf, fevap, falbe, fluxlat, rain_fall, &
          snow_fall, fsolsw, fsollw, fder, rlat, frugs, agesno, rugoro, &
-         d_t_vdf, d_q_vdf, d_u_vdf, d_v_vdf, d_ts, fluxt, fluxq, fluxu, &
-         fluxv, cdragh, cdragm, q2, dsens, devap, ycoefh, yu1, yv1, t2m, q2m, &
+         d_t_vdf, d_q_vdf, d_u_vdf, d_v_vdf, d_ts, flux_t, flux_q, flux_u, &
+         flux_v, cdragh, cdragm, q2, dsens, devap, ycoefh, yu1, yv1, t2m, q2m, &
          u10m, v10m, pblh, capCL, oliqCL, cteiCL, pblT, therm, trmb1, trmb2, &
          trmb3, plcl, fqcalving, ffonte, run_off_lic_0)
 
     ! Incr\'ementation des flux
 
-    zxfluxt = 0.
-    zxfluxq = 0.
-    zxfluxu = 0.
-    zxfluxv = 0.
-    DO nsrf = 1, nbsrf
-       DO k = 1, llm
-          DO i = 1, klon
-             zxfluxt(i, k) = zxfluxt(i, k) + fluxt(i, k, nsrf) * pctsrf(i, nsrf)
-             zxfluxq(i, k) = zxfluxq(i, k) + fluxq(i, k, nsrf) * pctsrf(i, nsrf)
-             zxfluxu(i, k) = zxfluxu(i, k) + fluxu(i, k, nsrf) * pctsrf(i, nsrf)
-             zxfluxv(i, k) = zxfluxv(i, k) + fluxv(i, k, nsrf) * pctsrf(i, nsrf)
-          END DO
-       END DO
-    END DO
-    DO i = 1, klon
-       sens(i) = - zxfluxt(i, 1) ! flux de chaleur sensible au sol
-       evap(i) = - zxfluxq(i, 1) ! flux d'\'evaporation au sol
-       fder(i) = dlw(i) + dsens(i) + devap(i)
-    ENDDO
+    sens = - sum(flux_t * pctsrf, dim = 2)
+    evap = - sum(flux_q * pctsrf, dim = 2)
+    fder = dlw + dsens + devap
 
     DO k = 1, llm
        DO i = 1, klon
@@ -745,7 +723,7 @@ contains
     if (conv_emanuel) then
        CALL concvl(paprs, play, t_seri, q_seri, u_seri, v_seri, sig1, w01, &
             d_t_con, d_q_con, d_u_con, d_v_con, rain_con, ibas_con, itop_con, &
-            upwd, dnwd, dnwd0, Ma, cape, iflagctrl, qcondc, pmflxr, da, phi, mp)
+            upwd, dnwd, Ma, cape, iflagctrl, qcondc, pmflxr, da, phi, mp)
        snow_con = 0.
        clwcon0 = qcondc
        mfu = upwd + dnwd
@@ -773,7 +751,7 @@ contains
        conv_t = d_t_dyn + d_t_vdf / dtphys
        z_avant = sum((q_seri + ql_seri) * zmasse, dim=2)
        CALL conflx(dtphys, paprs, play, t_seri(:, llm:1:- 1), &
-            q_seri(:, llm:1:- 1), conv_t, conv_q, zxfluxq(:, 1), omega, &
+            q_seri(:, llm:1:- 1), conv_t, conv_q, - evap, omega, &
             d_t_con, d_q_con, rain_con, snow_con, mfu(:, llm:1:- 1), &
             mfd(:, llm:1:- 1), pen_u, pde_u, pen_d, pde_d, kcbot, kctop, &
             kdtop, pmflxr, pmflxs)
@@ -1199,11 +1177,11 @@ contains
     DO nsrf = 1, nbsrf
        CALL histwrite_phy("pourc_"//clnsurf(nsrf), pctsrf(:, nsrf) * 100.)
        CALL histwrite_phy("fract_"//clnsurf(nsrf), pctsrf(:, nsrf))
-       CALL histwrite_phy("sens_"//clnsurf(nsrf), fluxt(:, 1, nsrf))
+       CALL histwrite_phy("sens_"//clnsurf(nsrf), flux_t(:, nsrf))
        CALL histwrite_phy("lat_"//clnsurf(nsrf), fluxlat(:, nsrf))
        CALL histwrite_phy("tsol_"//clnsurf(nsrf), ftsol(:, nsrf))
-       CALL histwrite_phy("taux_"//clnsurf(nsrf), fluxu(:, 1, nsrf))
-       CALL histwrite_phy("tauy_"//clnsurf(nsrf), fluxv(:, 1, nsrf))
+       CALL histwrite_phy("taux_"//clnsurf(nsrf), flux_u(:, nsrf))
+       CALL histwrite_phy("tauy_"//clnsurf(nsrf), flux_v(:, nsrf))
        CALL histwrite_phy("rugs_"//clnsurf(nsrf), frugs(:, nsrf))
        CALL histwrite_phy("albe_"//clnsurf(nsrf), falbe(:, nsrf))
     END DO
@@ -1220,7 +1198,12 @@ contains
     CALL histwrite_phy("s_trmb1", s_trmb1)
     CALL histwrite_phy("s_trmb2", s_trmb2)
     CALL histwrite_phy("s_trmb3", s_trmb3)
-    if (conv_emanuel) CALL histwrite_phy("ptop", ema_pct)
+
+    if (conv_emanuel) then
+       CALL histwrite_phy("ptop", ema_pct)
+       CALL histwrite_phy("dnwd0", - mp)
+    end if
+
     CALL histwrite_phy("temp", t_seri)
     CALL histwrite_phy("vitu", u_seri)
     CALL histwrite_phy("vitv", v_seri)

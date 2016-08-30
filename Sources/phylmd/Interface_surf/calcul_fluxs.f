@@ -6,7 +6,7 @@ contains
 
   SUBROUTINE calcul_fluxs(dtime, tsurf, p1lay, cal, beta, coef1lay, ps, &
        qsurf, radsol, dif_grnd, t1lay, q1lay, u1lay, v1lay, petAcoef, &
-       peqAcoef, petBcoef, peqBcoef, tsurf_new, evap, fluxlat, fluxsens, &
+       peqAcoef, petBcoef, peqBcoef, tsurf_new, evap, fluxlat, flux_t, &
        dflux_s, dflux_l)
 
     ! Cette routine calcule les fluxs en h et q à l'interface et une
@@ -20,30 +20,35 @@ contains
     USE yoethf_m, ONLY: r2es, r5ies, r5les, rvtmp2
 
     real, intent(IN):: dtime
-    real, intent(IN):: tsurf(:) ! (knon) temperature de surface
-    real, intent(IN):: p1lay(:) ! (knon) pression 1er niveau (milieu de couche)
+    real, intent(IN):: tsurf(:) ! (knon) température de surface
+
+    real, intent(IN):: p1lay(:) ! (knon)
+    ! pression première couche (milieu de couche)
+
     real, intent(IN):: cal(:) ! (knon) capacité calorifique du sol
-    real, intent(IN):: beta(:) ! (knon) evap reelle
+    real, intent(IN):: beta(:) ! (knon) évaporation réelle
     real, intent(IN):: coef1lay(:) ! (knon) coefficient d'échange
     real, intent(IN):: ps(:) ! (knon) pression au sol
-    real, intent(OUT):: qsurf(:) ! (knon) humidite de l'air au dessus du sol
-    real, intent(IN):: radsol(:) ! (knon) rayonnement net au sol (LW + SW)
+    real, intent(OUT):: qsurf(:) ! (knon) humidité de l'air au-dessus du sol
+
+    real, intent(IN):: radsol(:) ! (knon)
+    ! rayonnement net au sol (longwave + shortwave)
 
     real, intent(IN):: dif_grnd(:) ! (knon)
-    ! coefficient diffusion vers le sol profond
+    ! coefficient de diffusion vers le sol profond
 
     real, intent(IN):: t1lay(:), q1lay(:), u1lay(:), v1lay(:) ! (knon)
 
     real, intent(IN):: petAcoef(:), peqAcoef(:) ! (knon)
-    ! coefficients A de la résolution de la couche limite pour t et q
+    ! coefficients A de la résolution de la couche limite pour T et q
 
     real, intent(IN):: petBcoef(:), peqBcoef(:) ! (knon)
-    ! coeff. B de la resolution de la CL pour t et q
+    ! coefficients B de la résolution de la couche limite pour t et q
 
     real, intent(OUT):: tsurf_new(:) ! (knon) température au sol
     real, intent(OUT):: evap(:) ! (knon)
 
-    real, intent(OUT):: fluxlat(:), fluxsens(:) ! (knon)
+    real, intent(OUT):: fluxlat(:), flux_t(:) ! (knon)
     ! flux de chaleur latente et sensible
 
     real, intent(OUT):: dflux_s(:), dflux_l(:) ! (knon)
@@ -53,10 +58,9 @@ contains
     ! Local:
     integer i
     integer knon ! nombre de points a traiter
-    real, dimension(size(ps)):: mh, oh, mq, nq, oq
-    real, dimension(size(ps)):: dq_s_dt, coef
-    real qsat(size(ps)) ! qsat en kg/kg
-    real sl(size(ps)) ! chaleur latente d'evaporation ou de sublimation
+    real, dimension(size(ps)):: mh, oh, mq, nq, oq, dq_s_dt, coef ! (knon)
+    real qsat(size(ps)) ! mass fraction
+    real sl(size(ps)) ! chaleur latente d'évaporation ou de sublimation
     logical delta
     real zcor
     real, parameter:: t_grnd = 271.35, t_coup = 273.15
@@ -67,10 +71,10 @@ contains
          size(coef1lay), size(ps), size(qsurf), size(radsol), size(dif_grnd), &
          size(t1lay), size(q1lay), size(u1lay), size(v1lay), size(petAcoef), &
          size(peqAcoef), size(petBcoef), size(peqBcoef), size(tsurf_new), &
-         size(evap), size(fluxlat), size(fluxsens), size(dflux_s), &
+         size(evap), size(fluxlat), size(flux_t), size(dflux_s), &
          size(dflux_l)/), "calcul_fluxs knon")
 
-    ! Traitement humidite du sol
+    ! Traitement de l'humidité du sol
 
     IF (thermcep) THEN
        DO i = 1, knon
@@ -114,7 +118,7 @@ contains
 
     evap = - mq - nq * tsurf_new
     fluxlat = - evap * sl
-    fluxsens = mh + dflux_s * tsurf_new
+    flux_t = mh + dflux_s * tsurf_new
     dflux_l = sl * nq
 
     ! Nouvelle valeur de l'humidité au dessus du sol :
