@@ -15,7 +15,6 @@ contains
     use gr_phy_write_m, only: gr_phy_write
     USE histwrite_m, ONLY: histwrite
     USE histsync_m, ONLY: histsync
-    USE dimens_m, ONLY: iim, jjm
     USE indicesol, ONLY: nbsrf
     use initphysto_m, only: initphysto
     USE dimphy, ONLY: klev, klon

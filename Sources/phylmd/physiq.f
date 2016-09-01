@@ -27,7 +27,7 @@ contains
     use comconst, only: dtphys
     USE comgeomphy, ONLY: airephy
     USE concvl_m, ONLY: concvl
-    USE conf_gcm_m, ONLY: offline, day_step, iphysiq, lmt_pas
+    USE conf_gcm_m, ONLY: offline, lmt_pas
     USE conf_phys_m, ONLY: conf_phys
     use conflx_m, only: conflx
     USE ctherm, ONLY: iflag_thermals, nsplit_thermals
@@ -37,7 +37,7 @@ contains
     USE dimsoil, ONLY: nsoilmx
     use drag_noro_m, only: drag_noro
     use dynetat0_m, only: day_ref, annee_ref
-    USE fcttre, ONLY: foeew, qsatl, qsats, thermcep
+    USE fcttre, ONLY: foeew, qsatl, qsats
     use fisrtilp_m, only: fisrtilp
     USE hgardfou_m, ONLY: hgardfou
     USE histsync_m, ONLY: histsync
@@ -286,7 +286,6 @@ contains
     REAL zx_t, zx_qs, zcor
     real zqsat(klon, llm)
     INTEGER i, k, iq, nsrf
-    REAL, PARAMETER:: t_coup = 234.
     REAL zphi(klon, llm)
 
     ! cf. Anne Mathieu, variables pour la couche limite atmosphérique (hbtm)
@@ -296,7 +295,7 @@ contains
     REAL, SAVE:: capCL(klon, nbsrf) ! CAPE de couche limite
     REAL, SAVE:: oliqCL(klon, nbsrf) ! eau_liqu integree de couche limite
     REAL, SAVE:: cteiCL(klon, nbsrf) ! cloud top instab. crit. couche limite
-    REAL, SAVE:: pblt(klon, nbsrf) ! T a la Hauteur de couche limite
+    REAL, SAVE:: pblt(klon, nbsrf) ! T \`a la hauteur de couche limite
     REAL, SAVE:: therm(klon, nbsrf)
     REAL, SAVE:: trmb1(klon, nbsrf) ! deep_cape
     REAL, SAVE:: trmb2(klon, nbsrf) ! inhibition
@@ -397,8 +396,8 @@ contains
     ! temperature and humidity at 2 m
 
     REAL, save:: u10m(klon, nbsrf), v10m(klon, nbsrf) ! vents a 10 m
-    REAL zt2m(klon), zq2m(klon) ! temp., hum. 2 m moyenne s/ 1 maille
-    REAL zu10m(klon), zv10m(klon) ! vents a 10 m moyennes s/1 maille
+    REAL zt2m(klon), zq2m(klon) ! température, humidité 2 m moyenne sur 1 maille
+    REAL zu10m(klon), zv10m(klon) ! vents a 10 m moyennes sur 1 maille
 
     ! Aerosol effects:
 
@@ -472,7 +471,7 @@ contains
        capCL =0. ! CAPE de couche limite
        oliqCL =0. ! eau_liqu integree de couche limite
        cteiCL =0. ! cloud top instab. crit. couche limite
-       pblt =0. ! T a la Hauteur de couche limite
+       pblt =0.
        therm =0.
        trmb1 =0. ! deep_cape
        trmb2 =0. ! inhibition
@@ -728,12 +727,8 @@ contains
        clwcon0 = qcondc
        mfu = upwd + dnwd
 
-       IF (thermcep) THEN
-          zqsat = MIN(0.5, r2es * FOEEW(t_seri, rtt >= t_seri) / play)
-          zqsat = zqsat / (1. - retv * zqsat)
-       ELSE
-          zqsat = merge(qsats(t_seri), qsatl(t_seri), t_seri < t_coup) / play
-       ENDIF
+       zqsat = MIN(0.5, r2es * FOEEW(t_seri, rtt >= t_seri) / play)
+       zqsat = zqsat / (1. - retv * zqsat)
 
        ! Properties of convective clouds
        clwcon0 = fact_cldcon * clwcon0
@@ -933,18 +928,10 @@ contains
     DO k = 1, llm
        DO i = 1, klon
           zx_t = t_seri(i, k)
-          IF (thermcep) THEN
-             zx_qs = r2es * FOEEW(zx_t, rtt >= zx_t) / play(i, k)
-             zx_qs = MIN(0.5, zx_qs)
-             zcor = 1. / (1. - retv * zx_qs)
-             zx_qs = zx_qs * zcor
-          ELSE
-             IF (zx_t < t_coup) THEN
-                zx_qs = qsats(zx_t) / play(i, k)
-             ELSE
-                zx_qs = qsatl(zx_t) / play(i, k)
-             ENDIF
-          ENDIF
+          zx_qs = r2es * FOEEW(zx_t, rtt >= zx_t) / play(i, k)
+          zx_qs = MIN(0.5, zx_qs)
+          zcor = 1. / (1. - retv * zx_qs)
+          zx_qs = zx_qs * zcor
           zx_rh(i, k) = q_seri(i, k) / zx_qs
           zqsat(i, k) = zx_qs
        ENDDO

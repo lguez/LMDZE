@@ -12,13 +12,13 @@ contains
     ! First author: Z. X. Li (LMD/CNRS), 20 mars 1995
     ! Other authors: Olivier, AA, IM, YM, MAF
 
-    ! Objet : condensation et précipitation stratiforme, schéma de
-    ! nuage, schéma de condensation à grande échelle (pluie).
+    ! Objet : condensation et pr\'ecipitation stratiforme, sch\'ema de
+    ! nuage, sch\'ema de condensation \`a grande \'echelle (pluie).
 
     USE comfisrtilp, ONLY: cld_lc_con, cld_lc_lsc, cld_tau_con, &
          cld_tau_lsc, coef_eva, ffallv_con, ffallv_lsc, iflag_pdf, reevap_ice
     USE dimphy, ONLY: klev, klon
-    USE fcttre, ONLY: dqsatl, dqsats, foede, foeew, qsatl, qsats, thermcep
+    USE fcttre, ONLY: dqsatl, dqsats, foede, foeew, qsatl, qsats
     USE numer_rec_95, ONLY: nr_erf
     USE suphec_m, ONLY: rcpd, rd, retv, rg, rlstt, rlvtt, rtt
     USE yoethf_m, ONLY: r2es, r5ies, r5les, rvtmp2
@@ -122,8 +122,8 @@ contains
        PRINT *, 'fisrtilp, evap_prec:', evap_prec
        PRINT *, 'fisrtilp, cpartiel:', cpartiel
        IF (abs(dtime / real(ninter) - 360.) > 0.001) THEN
-          PRINT *, "fisrtilp : ce n'est pas prévu, voir Z. X. Li", dtime
-          PRINT *, 'Je préfère un sous-intervalle de 6 minutes.'
+          PRINT *, "fisrtilp : ce n'est pas pr\'evu, voir Z. X. Li", dtime
+          PRINT *, "Je pr\'ef\`ere un sous-intervalle de 6 minutes."
        END IF
        appel1er = .FALSE.
 
@@ -217,18 +217,10 @@ contains
           ! Calculer l'evaporation de la precipitation
           DO i = 1, klon
              IF (zrfl(i)>0.) THEN
-                IF (thermcep) THEN
-                   zqs(i) = r2es*foeew(zt(i), rtt >= zt(i))/pplay(i, k)
-                   zqs(i) = min(0.5, zqs(i))
-                   zcor = 1./(1.-retv*zqs(i))
-                   zqs(i) = zqs(i)*zcor
-                ELSE
-                   IF (zt(i)<t_coup) THEN
-                      zqs(i) = qsats(zt(i))/pplay(i, k)
-                   ELSE
-                      zqs(i) = qsatl(zt(i))/pplay(i, k)
-                   END IF
-                END IF
+                zqs(i) = r2es*foeew(zt(i), rtt >= zt(i))/pplay(i, k)
+                zqs(i) = min(0.5, zqs(i))
+                zcor = 1./(1.-retv*zqs(i))
+                zqs(i) = zqs(i)*zcor
                 zqev = max(0.0, (zqs(i)-zq(i))*zneb(i))
                 zqevt = coef_eva*(1.0-zq(i)/zqs(i))*sqrt(zrfl(i))* &
                      (paprs(i, k)-paprs(i, k+1))/pplay(i, k)*zt(i)*rd/rg
@@ -237,7 +229,7 @@ contains
                 zqev = min(zqev, zqevt)
                 zrfln(i) = zrfl(i) - zqev*(paprs(i, k)-paprs(i, k+1))/rg/dtime
 
-                ! pour la glace, on réévapore toute la précip dans la
+                ! pour la glace, on r\'e\'evapore toute la pr\'ecip dans la
                 ! couche du dessous la glace venant de la couche du
                 ! dessus est simplement dans la couche du dessous.
 
@@ -254,28 +246,16 @@ contains
 
        ! Calculer Qs et L/Cp*dQs/dT:
 
-       IF (thermcep) THEN
-          DO i = 1, klon
-             zdelta = rtt >= zt(i)
-             zcvm5 = merge(r5ies*rlstt, r5les*rlvtt, zdelta)
-             zcvm5 = zcvm5/rcpd/(1.0+rvtmp2*zq(i))
-             zqs(i) = r2es*foeew(zt(i), zdelta)/pplay(i, k)
-             zqs(i) = min(0.5, zqs(i))
-             zcor = 1./(1.-retv*zqs(i))
-             zqs(i) = zqs(i)*zcor
-             zdqs(i) = foede(zt(i), zdelta, zcvm5, zqs(i), zcor)
-          END DO
-       ELSE
-          DO i = 1, klon
-             IF (zt(i)<t_coup) THEN
-                zqs(i) = qsats(zt(i))/pplay(i, k)
-                zdqs(i) = dqsats(zt(i), zqs(i))
-             ELSE
-                zqs(i) = qsatl(zt(i))/pplay(i, k)
-                zdqs(i) = dqsatl(zt(i), zqs(i))
-             END IF
-          END DO
-       END IF
+       DO i = 1, klon
+          zdelta = rtt >= zt(i)
+          zcvm5 = merge(r5ies*rlstt, r5les*rlvtt, zdelta)
+          zcvm5 = zcvm5/rcpd/(1.0+rvtmp2*zq(i))
+          zqs(i) = r2es*foeew(zt(i), zdelta)/pplay(i, k)
+          zqs(i) = min(0.5, zqs(i))
+          zcor = 1./(1.-retv*zqs(i))
+          zqs(i) = zqs(i)*zcor
+          zdqs(i) = foede(zt(i), zdelta, zcvm5, zqs(i), zcor)
+       END DO
 
        ! Determiner la condensation partielle et calculer la quantite
        ! de l'eau condensee:
@@ -287,8 +267,8 @@ contains
           ! zqn : eau totale dans le nuage
           ! zcond : eau condensee moyenne dans la maille.
 
-          ! on prend en compte le réchauffement qui diminue
-          ! la partie condensée
+          ! on prend en compte le r\'echauffement qui diminue
+          ! la partie condens\'ee
 
           ! Version avec les ratqs
 
@@ -331,8 +311,8 @@ contains
              IF (rneb(i, k)<=0.0) zqn(i) = 0.0
              IF (rneb(i, k)>=1.0) zqn(i) = zq(i)
              rneb(i, k) = max(0., min(1., rneb(i, k)))
-             ! On ne divise pas par 1 + zdqs pour forcer à avoir l'eau
-             ! prédite par la convection. Attention : il va falloir
+             ! On ne divise pas par 1 + zdqs pour forcer \`a avoir l'eau
+             ! pr\'edite par la convection. Attention : il va falloir
              ! verifier tout ca.
              zcond(i) = max(0., zqn(i)-zqs(i))*rneb(i, k)
              rhcl(i, k) = (zqs(i)+zq(i)-zdelq)/2./zqs(i)
@@ -382,7 +362,7 @@ contains
                    zcl(i) = cld_lc_lsc
                    zct(i) = 1./cld_tau_lsc
                 END IF
-                ! quantité d'eau à élminier.
+                ! quantit\'e d'eau \`a \'elminier.
                 zchau(i) = zct(i)*dtime/real(ninter)*zoliq(i)* &
                      (1.0-exp(-(zoliq(i)/zneb(i)/zcl(i))**2))*(1.-zfice(i))
                 ! meme chose pour la glace.
@@ -485,15 +465,17 @@ contains
 
   contains
 
-    ! vitesse de chute pour crystaux de glace
+    ! vitesse de chute pour cristaux de glace
 
     REAL function fallvs(zzz)
-      REAL zzz
+      REAL, intent(in):: zzz
       fallvs = 3.29/2.0*((zzz)**0.16)*ffallv_lsc
     end function fallvs
 
+    !********************************************************
+
     real function fallvc(zzz)
-      REAL zzz
+      REAL, intent(in):: zzz
       fallvc = 3.29/2.0*((zzz)**0.16)*ffallv_con
     end function fallvc
 

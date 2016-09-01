@@ -17,7 +17,6 @@ contains
     USE conf_phys_m, ONLY: iflag_pbl
     USE dimphy, ONLY: klev, klon
     USE dimsoil, ONLY: nsoilmx
-    USE indicesol, ONLY: nbsrf
     USE interfsurf_hq_m, ONLY: interfsurf_hq
     USE suphec_m, ONLY: rcpd, rd, rg, rkappa
 
@@ -46,7 +45,7 @@ contains
 
     REAL t(klon, klev) ! temperature (K)
     REAL q(klon, klev) ! humidite specifique (kg / kg)
-    REAL, intent(in):: ts(klon) ! temperature du sol (K)
+    REAL, intent(in):: ts(:) ! (knon) temperature du sol (K)
     REAL paprs(klon, klev+1) ! pression a inter-couche (Pa)
     REAL pplay(klon, klev) ! pression au milieu de couche (Pa)
     REAL delp(klon, klev) ! epaisseur de couche en pression (Pa)
@@ -67,7 +66,7 @@ contains
     REAL, intent(inout):: agesno(:) ! (knon)
     REAL d_t(klon, klev) ! incrementation de "t"
     REAL d_q(klon, klev) ! incrementation de "q"
-    REAL, intent(out):: d_ts(:) ! (knon) incrementation de "ts"
+    REAL, intent(out):: d_ts(:) ! (knon) incr\'ementation de "ts"
     real z0_new(klon)
 
     REAL, intent(out):: flux_t(:) ! (knon)
@@ -247,12 +246,12 @@ contains
     CALL interfsurf_hq(dtime, jour, rmu0, nisurf, knon, knindex, rlat, debut, &
          nsoilmx, tsoil, qsol, u1lay, v1lay, temp_air, spechum, tq_cdrag, &
          petAcoef, peqAcoef, petBcoef, peqBcoef, precip_rain, precip_snow, &
-         fder, rugos, rugoro, snow, qsurf, ts(:knon), p1lay, psref, radsol, &
+         fder, rugos, rugoro, snow, qsurf, ts, p1lay, psref, radsol, &
          evap, flux_t, fluxlat, dflux_l, dflux_s, tsurf_new, albedo, &
          z0_new, pctsrf_new_sic, agesno, fqcalving, ffonte, run_off_lic_0)
 
     flux_q = - evap
-    d_ts = tsurf_new - ts(:knon)
+    d_ts = tsurf_new - ts
 
     !==== une fois on a zx_h_ts, on peut faire l'iteration ========
     DO i = 1, knon

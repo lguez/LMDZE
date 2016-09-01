@@ -8,11 +8,12 @@ contains
 
     ! Author: F. Hourdin
 
+    USE comgeom, ONLY: aire
+    USE dimens_m, ONLY: jjm, llm
+    use groupe_m, only: groupe
     USE histwrite_m, ONLY: histwrite
     use initfluxsto_m, only: initfluxsto
-    USE dimens_m, ONLY: jjm, llm
     USE paramet_m, ONLY: iip1, ijmllm, ijp1llm, ip1jm, ip1jmp1
-    USE comgeom, ONLY: aire
     USE tracstoke, ONLY: istdyn, istphy
 
     REAL, intent(in):: pbaru(ip1jmp1, llm), pbarv(ip1jm, llm)
@@ -87,7 +88,6 @@ contains
        ! Traitement des flux de masse avant advection.
        ! 1. Calcul de w
        ! 2. Groupement des mailles pr\`es du p\^ole.
-
        CALL groupe(pbaruc, pbarvc, pbarug, pbarvg, wg)
 
        CALL histwrite(fluxid, 'masse', itau, massem)

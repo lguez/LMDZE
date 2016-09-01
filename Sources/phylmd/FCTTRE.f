@@ -13,8 +13,6 @@ module FCTTRE
 
   implicit none
 
-  LOGICAL, PARAMETER:: thermcep = .TRUE.
-
 contains
 
   elemental REAL function FOEEW(T, ICE)

@@ -4,7 +4,7 @@ module phyredem_m
 
 contains
 
-  SUBROUTINE phyredem(pctsrf, tsol, tsoil, qsurf, qsol, snow, albedo, evap, &
+  SUBROUTINE phyredem(pctsrf, ftsol, ftsoil, qsurf, qsol, snow, albedo, evap, &
        rain_fall, snow_fall, solsw, sollw, fder, radsol, frugs, agesno, zmea, &
        zstd, zsig, zgam, zthe, zpic, zval, t_ancien, q_ancien, rnebcon, &
        ratqs, clwcon, run_off_lic_0, sig1, w01)
@@ -22,8 +22,8 @@ contains
     use phyredem0_m, only: ncid_restartphy
 
     REAL, INTENT(IN):: pctsrf(:, :) ! (klon, nbsrf)
-    REAL, INTENT(IN):: tsol(:, :) ! (klon, nbsrf)
-    REAL, INTENT(IN):: tsoil(:, :, :) ! (klon, nsoilmx, nbsrf)
+    REAL, INTENT(IN):: ftsol(:, :) ! (klon, nbsrf)
+    REAL, INTENT(IN):: ftsoil(:, :, :) ! (klon, nsoilmx, nbsrf)
     REAL, INTENT(IN):: qsurf(:, :) ! (klon, nbsrf)
 
     REAL, intent(in):: qsol(:) ! (klon)
@@ -79,10 +79,10 @@ contains
     call nf95_put_var(ncid_restartphy, varid, pctsrf(:, is_sic))
 
     call nf95_inq_varid(ncid_restartphy, "TS", varid)
-    call nf95_put_var(ncid_restartphy, varid, tsol)
+    call nf95_put_var(ncid_restartphy, varid, ftsol)
 
     call nf95_inq_varid(ncid_restartphy, "Tsoil", varid)
-    call nf95_put_var(ncid_restartphy, varid, tsoil)
+    call nf95_put_var(ncid_restartphy, varid, ftsoil)
 
     call nf95_inq_varid(ncid_restartphy, "QS", varid)
     call nf95_put_var(ncid_restartphy, varid, qsurf)

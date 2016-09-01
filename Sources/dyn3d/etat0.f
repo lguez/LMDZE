@@ -20,7 +20,7 @@ contains
     use caldyn0_m, only: caldyn0
     use comconst, only: cpp, kappa, iniconst
     use comgeom, only: aire_2d, apoln, apols, cu_2d, cv_2d, inigeom
-    use conf_gcm_m, only: nday, day_step, iphysiq
+    use conf_gcm_m, only: nday
     use dimens_m, only: iim, jjm, llm, nqmx
     use dimphy, only: zmasq
     use dimsoil, only: nsoilmx

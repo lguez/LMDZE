@@ -18,6 +18,7 @@ contains
     USE comgeom, ONLY: constang_2d, cu_2d, cv_2d
     use covcont_m, only: covcont
     USE dimens_m, ONLY: iim, jjm, llm
+    use enercin_m, only: enercin
     USE histwrite_m, ONLY: histwrite
     use init_dynzon_m, only: ncum, fileid, znom, ntr, nq, nom
     use massbar_m, only: massbar

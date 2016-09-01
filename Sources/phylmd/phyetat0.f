@@ -14,7 +14,7 @@ module phyetat0_m
 
 contains
 
-  SUBROUTINE phyetat0(pctsrf, tsol, tsoil, qsurf, qsol, snow, albe, evap, &
+  SUBROUTINE phyetat0(pctsrf, ftsol, ftsoil, qsurf, qsol, snow, albe, evap, &
        rain_fall, snow_fall, solsw, sollw, fder, radsol, frugs, agesno, zmea, &
        zstd, zsig, zgam, zthe, zpic, zval, t_ancien, q_ancien, ancien_ok, &
        rnebcon, ratqs, clwcon, run_off_lic_0, sig1, w01, ncid_startphy)
@@ -33,8 +33,8 @@ contains
          nf95_inquire_variable, NF95_OPEN
 
     REAL, intent(out):: pctsrf(klon, nbsrf)
-    REAL, intent(out):: tsol(klon, nbsrf)
-    REAL, intent(out):: tsoil(klon, nsoilmx, nbsrf)
+    REAL, intent(out):: ftsol(klon, nbsrf)
+    REAL, intent(out):: ftsoil(klon, nsoilmx, nbsrf)
     REAL, intent(out):: qsurf(klon, nbsrf)
     REAL, intent(out):: qsol(:) ! (klon)
     REAL, intent(out):: snow(klon, nbsrf)
@@ -162,17 +162,17 @@ contains
     call NF95_INQ_VARID(ncid_startphy, "TS", varid)
     call nf95_inquire_variable(ncid_startphy, varid, ndims = ndims)
     if (ndims == 2) then
-       call NF95_GET_VAR(ncid_startphy, varid, tsol)
+       call NF95_GET_VAR(ncid_startphy, varid, ftsol)
     else
        print *, "Found only one surface type for soil temperature."
-       call nf95_get_var(ncid_startphy, varid, tsol(:, 1))
-       tsol(:, 2:nbsrf) = spread(tsol(:, 1), dim = 2, ncopies = nbsrf - 1)
+       call nf95_get_var(ncid_startphy, varid, ftsol(:, 1))
+       ftsol(:, 2:nbsrf) = spread(ftsol(:, 1), dim = 2, ncopies = nbsrf - 1)
     end if
 
     ! Lecture des temperatures du sol profond:
 
     call NF95_INQ_VARID(ncid_startphy, 'Tsoil', varid)
-    call NF95_GET_VAR(ncid_startphy, varid, tsoil)
+    call NF95_GET_VAR(ncid_startphy, varid, ftsoil)
 
     ! Lecture de l'humidite de l'air juste au dessus du sol:
 

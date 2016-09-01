@@ -24,6 +24,7 @@ contains
     use dudv1_m, only: dudv1
     use dudv2_m, only: dudv2
     USE dynetat0_m, ONLY: day_ini
+    use enercin_m, only: enercin
     use flumass_m, only: flumass
     use massbar_m, only: massbar
     use massbarxy_m, only: massbarxy

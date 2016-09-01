@@ -26,7 +26,7 @@ contains
     use clesphys2, only: soil_model, cycle_diurne
     USE dimphy, ONLY: klon
     USE fonte_neige_m, ONLY: fonte_neige
-    USE indicesol, ONLY: epsfra, is_lic, is_oce, is_sic, is_ter, nbsrf
+    USE indicesol, ONLY: epsfra, is_lic, is_oce, is_sic, is_ter
     USE interface_surf, ONLY: run_off_lic, conf_interface
     USE interfsur_lim_m, ONLY: interfsur_lim
     use read_sst_m, only: read_sst
@@ -91,7 +91,7 @@ contains
     real, intent(OUT):: flux_t(:) ! (knon) flux de chaleur sensible
     real, dimension(klon), intent(OUT):: fluxlat ! flux de chaleur latente
     real, dimension(klon), intent(OUT):: dflux_l, dflux_s
-    real, intent(OUT):: tsurf_new(knon) ! temp\'erature au sol
+    real, intent(OUT):: tsurf_new(:) ! (knon) temp\'erature au sol
     real, intent(OUT):: albedo(:) ! (knon) albedo
     real, intent(OUT):: z0_new(klon) ! surface roughness
 
@@ -113,8 +113,8 @@ contains
     ! run_off_lic_0 runoff glacier du pas de temps precedent
 
     ! Local:
-    REAL soilcap(klon)
-    REAL soilflux(klon)
+    REAL soilcap(knon)
+    REAL soilflux(knon)
     logical:: first_call = .true.
     integer ii
     real, dimension(klon):: cal, beta, dif_grnd, capsol
@@ -177,9 +177,10 @@ contains
             capsol(:knon), dif_grnd(:knon))
 
        IF (soil_model) THEN
-          CALL soil(dtime, is_ter, knon, snow, tsurf, tsoil, soilcap, soilflux)
-          cal(1:knon) = RCPD / soilcap(1:knon)
-          radsol(1:knon) = radsol(1:knon) + soilflux(:knon)
+          CALL soil(dtime, is_ter, snow(:knon), tsurf, tsoil(:knon, :), &
+               soilcap, soilflux)
+          cal(1:knon) = RCPD / soilcap
+          radsol(1:knon) = radsol(1:knon) + soilflux
        ELSE
           cal = RCPD * capsol
        ENDIF
@@ -244,10 +245,10 @@ contains
             capsol(:knon), dif_grnd(:knon))
 
        IF (soil_model) THEN
-          CALL soil(dtime, is_sic, knon, snow, tsurf_new, tsoil, soilcap, &
-               soilflux)
-          cal(1:knon) = RCPD / soilcap(1:knon)
-          radsol(1:knon) = radsol(1:knon) + soilflux(1:knon)
+          CALL soil(dtime, is_sic, snow(:knon), tsurf_new, tsoil(:knon, :), &
+               soilcap, soilflux)
+          cal(1:knon) = RCPD / soilcap
+          radsol(1:knon) = radsol(1:knon) + soilflux
           dif_grnd = 0.
        ELSE
           dif_grnd = 1. / tau_gl
@@ -289,9 +290,10 @@ contains
        ! Surface "glacier continentaux" appel a l'interface avec le sol
 
        IF (soil_model) THEN
-          CALL soil(dtime, is_lic, knon, snow, tsurf, tsoil, soilcap, soilflux)
-          cal(1:knon) = RCPD / soilcap(1:knon)
-          radsol(1:knon) = radsol(1:knon) + soilflux(1:knon)
+          CALL soil(dtime, is_lic, snow(:knon), tsurf, tsoil(:knon, :), &
+               soilcap, soilflux)
+          cal(1:knon) = RCPD / soilcap
+          radsol(1:knon) = radsol(1:knon) + soilflux
        ELSE
           cal = RCPD * calice
           WHERE (snow > 0.) cal = RCPD * calsno

@@ -9,12 +9,12 @@ contains
        peqAcoef, petBcoef, peqBcoef, tsurf_new, evap, fluxlat, flux_t, &
        dflux_s, dflux_l)
 
-    ! Cette routine calcule les fluxs en h et q à l'interface et une
+    ! Cette routine calcule les flux en h et q à l'interface et une
     ! température de surface.
 
     ! L. Fairhead April 2000
 
-    USE fcttre, ONLY: dqsatl, dqsats, foede, foeew, qsatl, qsats, thermcep
+    USE fcttre, ONLY: dqsatl, dqsats, foede, foeew, qsatl, qsats
     use nr_util, only: assert_eq
     USE suphec_m, ONLY: rcpd, rd, retv, rlstt, rlvtt, rtt
     USE yoethf_m, ONLY: r2es, r5ies, r5les, rvtmp2
@@ -49,7 +49,7 @@ contains
     real, intent(OUT):: evap(:) ! (knon)
 
     real, intent(OUT):: fluxlat(:), flux_t(:) ! (knon)
-    ! flux de chaleur latente et sensible
+    ! flux de chaleurs latente et sensible
 
     real, intent(OUT):: dflux_s(:), dflux_l(:) ! (knon)
     ! dérivées des flux de chaleurs sensible et latente par rapport à
@@ -59,11 +59,11 @@ contains
     integer i
     integer knon ! nombre de points a traiter
     real, dimension(size(ps)):: mh, oh, mq, nq, oq, dq_s_dt, coef ! (knon)
-    real qsat(size(ps)) ! mass fraction
-    real sl(size(ps)) ! chaleur latente d'évaporation ou de sublimation
+    real qsat(size(ps)) ! (knon) mass fraction
+    real sl(size(ps)) ! (knon) chaleur latente d'évaporation ou de sublimation
     logical delta
     real zcor
-    real, parameter:: t_grnd = 271.35, t_coup = 273.15
+    real, parameter:: t_grnd = 271.35
 
     !---------------------------------------------------------------------
 
@@ -76,27 +76,15 @@ contains
 
     ! Traitement de l'humidité du sol
 
-    IF (thermcep) THEN
-       DO i = 1, knon
-          delta = rtt >= tsurf(i)
-          qsat(i) = MIN(0.5, r2es * FOEEW(tsurf(i), delta) / ps(i))
-          zcor = 1. / (1. - retv * qsat(i))
-          qsat(i) = qsat(i) * zcor
-          dq_s_dt(i) = RCPD * FOEDE(tsurf(i), delta, merge(R5IES * RLSTT, &
-               R5LES * RLVTT, delta) / RCPD / (1. + RVTMP2 * q1lay(i)), &
-               qsat(i), zcor) / RLVTT
-       ENDDO
-    ELSE
-       DO i = 1, knon
-          IF (tsurf(i) < t_coup) THEN
-             qsat(i) = qsats(tsurf(i)) / ps(i)
-             dq_s_dt(i) = RCPD * dqsats(tsurf(i), qsat(i)) / RLVTT
-          ELSE
-             qsat(i) = qsatl(tsurf(i)) / ps(i)
-             dq_s_dt(i) = RCPD * dqsatl(tsurf(i), qsat(i)) / RLVTT
-          ENDIF
-       ENDDO
-    ENDIF
+    DO i = 1, knon
+       delta = rtt >= tsurf(i)
+       qsat(i) = MIN(0.5, r2es * FOEEW(tsurf(i), delta) / ps(i))
+       zcor = 1. / (1. - retv * qsat(i))
+       qsat(i) = qsat(i) * zcor
+       dq_s_dt(i) = RCPD * FOEDE(tsurf(i), delta, merge(R5IES * RLSTT, &
+            R5LES * RLVTT, delta) / RCPD / (1. + RVTMP2 * q1lay(i)), &
+            qsat(i), zcor) / RLVTT
+    ENDDO
 
     coef = coef1lay * (1. + SQRT(u1lay**2 + v1lay**2)) * p1lay / (RD * t1lay)
     sl = merge(RLSTT, RLVTT, tsurf < RTT)

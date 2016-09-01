@@ -13,7 +13,6 @@ contains
     use clesphys, only: ecrit_ins, ok_instan
     use clesphys2, only: conv_emanuel
     use dimens_m, only: iim, jjm, llm, nqmx
-    use dimphy, only: klon
     use disvert_m, only: presnivs
     use dynetat0_m, only: day_ref, annee_ref, rlatu, rlonv
     USE histbeg_totreg_m, ONLY : histbeg_totreg

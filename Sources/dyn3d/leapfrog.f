@@ -27,6 +27,7 @@ contains
     use dissip_m, only: dissip
     USE dynetat0_m, ONLY: day_ini
     use dynredem1_m, only: dynredem1
+    use enercin_m, only: enercin
     USE exner_hyb_m, ONLY: exner_hyb
     use filtreg_scal_m, only: filtreg_scal
     use fluxstokenc_m, only: fluxstokenc

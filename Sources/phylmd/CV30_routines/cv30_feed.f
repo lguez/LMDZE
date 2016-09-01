@@ -11,7 +11,7 @@ contains
     ! Assuming origin level of ascending parcels is minorig.
 
     use cv30_param_m, only: minorig, nl
-    USE dimphy, ONLY: klev, klon
+    USE dimphy, ONLY: klon
     use numer_rec_95, only: locate
 
     real, intent(in):: t1(:, :) ! (klon, klev)

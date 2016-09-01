@@ -17,6 +17,8 @@ src_test_inifilr := $(shell cat ${makefile_dir}/src_test_inifilr)
 
 sources := $(sort ${src_ce0l} ${src_gcm} ${src_test_ozonecm} ${src_test_inter_barxy} ${src_test_fxhyp} ${src_test_inifilr})
 
+lib_list = numer_rec_95 jumble nr_util netcdf95 netcdff
+
 # 2. Objects and executable files
 
 obj_ce0l := $(src_ce0l:.f=.o)
@@ -31,7 +33,7 @@ execut = ce0l gcm test_ozonecm test_inter_barxy test_fxhyp test_inifilr
 # 3. Compiler-dependent part
 
 mode = debug
-include Compiler_options/${FC}_${mode}.mk
+include ${included_makefile_dir}/${FC}_${mode}.mk
 
 # 4. Rules
 

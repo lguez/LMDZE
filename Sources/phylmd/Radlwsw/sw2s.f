@@ -12,6 +12,7 @@ contains
     USE raddim
     USE radepsi
     use swclr_m, only: swclr
+    use swde_m, only: swde
     use swr_m, only: swr
 
     ! ------------------------------------------------------------------

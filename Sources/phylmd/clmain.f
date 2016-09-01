@@ -4,7 +4,7 @@ module clmain_m
 
 contains
 
-  SUBROUTINE clmain(dtime, pctsrf, t, q, u, v, jour, rmu0, ts, cdmmax, &
+  SUBROUTINE clmain(dtime, pctsrf, t, q, u, v, jour, rmu0, ftsol, cdmmax, &
        cdhmax, ksta, ksta_ter, ok_kzmin, ftsoil, qsol, paprs, pplay, snow, &
        qsurf, evap, falbe, fluxlat, rain_fall, snow_f, solsw, sollw, fder, &
        rlat, rugos, agesno, rugoro, d_t, d_q, d_u, d_v, d_ts, flux_t, flux_q, &
@@ -54,7 +54,7 @@ contains
     REAL, INTENT(IN):: u(klon, klev), v(klon, klev) ! vitesse
     INTEGER, INTENT(IN):: jour ! jour de l'annee en cours
     REAL, intent(in):: rmu0(klon) ! cosinus de l'angle solaire zenithal     
-    REAL, INTENT(IN):: ts(klon, nbsrf) ! temperature du sol (en Kelvin)
+    REAL, INTENT(IN):: ftsol(klon, nbsrf) ! temperature du sol (en Kelvin)
     REAL, INTENT(IN):: cdmmax, cdhmax ! seuils cdrm, cdrh
     REAL, INTENT(IN):: ksta, ksta_ter
     LOGICAL, INTENT(IN):: ok_kzmin
@@ -96,7 +96,7 @@ contains
     REAL, intent(out):: d_u(klon, klev), d_v(klon, klev)
     ! changement pour "u" et "v"
 
-    REAL, intent(out):: d_ts(klon, nbsrf) ! le changement pour "ts"
+    REAL, intent(out):: d_ts(klon, nbsrf) ! le changement pour "ftsol"
 
     REAL, intent(out):: flux_t(klon, nbsrf)
     ! flux de chaleur sensible (Cp T) (W/m2) (orientation positive vers
@@ -155,11 +155,8 @@ contains
 
     REAL y_fqcalving(klon), y_ffonte(klon)
     real y_run_off_lic_0(klon)
-
     REAL rugmer(klon)
-
     REAL ytsoil(klon, nsoilmx)
-
     REAL yts(klon), yrugos(klon), ypct(klon), yz0_new(klon)
     REAL yalb(klon)
     REAL yu1(klon), yv1(klon)
@@ -328,7 +325,7 @@ contains
           DO j = 1, knon
              i = ni(j)
              ypct(j) = pctsrf(i, nsrf)
-             yts(j) = ts(i, nsrf)
+             yts(j) = ftsol(i, nsrf)
              ysnow(j) = snow(i, nsrf)
              yqsurf(j) = qsurf(i, nsrf)
              yalb(j) = falbe(i, nsrf)
@@ -451,11 +448,11 @@ contains
           ! calculer la diffusion de "q" et de "h"
           CALL clqh(dtime, jour, firstcal, rlat, nsrf, ni(:knon), ytsoil, &
                yqsol, rmu0, yrugos, yrugoro, yu1, yv1, coefh(:knon, :), yt, &
-               yq, yts, ypaprs, ypplay, ydelp, yrads, yalb(:knon), ysnow, &
-               yqsurf, yrain_f, ysnow_f, yfder, yfluxlat, pctsrf_new_sic, &
-               yagesno(:knon), y_d_t, y_d_q, y_d_ts(:knon), yz0_new, &
-               y_flux_t(:knon), y_flux_q(:knon), y_dflux_t, y_dflux_q, &
-               y_fqcalving, y_ffonte, y_run_off_lic_0)
+               yq, yts(:knon), ypaprs, ypplay, ydelp, yrads, yalb(:knon), &
+               ysnow, yqsurf, yrain_f, ysnow_f, yfder, yfluxlat, &
+               pctsrf_new_sic, yagesno(:knon), y_d_t, y_d_q, y_d_ts(:knon), &
+               yz0_new, y_flux_t(:knon), y_flux_q(:knon), y_dflux_t, &
+               y_dflux_q, y_fqcalving, y_ffonte, y_run_off_lic_0)
 
           ! calculer la longueur de rugosite sur ocean
           yrugm = 0.

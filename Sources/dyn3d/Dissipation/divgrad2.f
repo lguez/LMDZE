@@ -13,6 +13,7 @@ contains
 
     USE comgeom, ONLY: cuvscvgam2, cvuscugam2, unsair_gam2, unsapolnga2, &
          unsapolsga2
+    use laplacien_gam_m, only: laplacien_gam
     USE laplacien_m, ONLY: laplacien
     USE paramet_m, ONLY: ip1jmp1
 

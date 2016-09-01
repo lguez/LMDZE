@@ -16,6 +16,7 @@ contains
     use divergf_m, only: divergf
     USE filtreg_scal_m, ONLY: filtreg_scal
     use grad_m, only: grad
+    use laplacien_gam_m, only: laplacien_gam
     use laplacien_m, only: laplacien
     use nr_util, only: assert_eq, assert
 

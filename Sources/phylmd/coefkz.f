@@ -16,7 +16,7 @@ contains
     USE dimphy, ONLY: klev, klon
     USE suphec_m, ONLY: rcpd, rd, retv, rg, rkappa, rlstt, rlvtt, rtt
     USE yoethf_m, ONLY: r2es, r5ies, r5les, rvtmp2
-    USE fcttre, ONLY: dqsatl, dqsats, foede, foeew, qsatl, qsats, thermcep
+    USE fcttre, ONLY: dqsatl, dqsats, foede, foeew, qsatl, qsats
     USE conf_phys_m, ONLY: iflag_pbl
     use clcdrag_m, only: clcdrag
 
@@ -56,7 +56,7 @@ contains
     REAL, PARAMETER:: cd = 5.
     REAL, PARAMETER:: clam = 160.
     REAL, PARAMETER:: ratqs = 0.05 ! largeur de distribution de vapeur d'eau
-    
+
     LOGICAL, PARAMETER:: richum = .TRUE.
     ! utilise le nombre de Richardson humide
 
@@ -86,7 +86,6 @@ contains
     REAL zt, zq, zcvm5, zcor, zqs, zfr, zdqs
     logical zdelta
     REAL z2geomf, zalh2, alm2, zscfh, scfm
-    REAL, PARAMETER:: t_coup = 273.15
     REAL gamt(2:klev) ! contre-gradient pour la chaleur sensible: Kelvin/metre
 
     !--------------------------------------------------------------------
@@ -150,24 +149,14 @@ contains
 
           ! calculer Qs et dQs/dT:
 
-          IF (thermcep) THEN
-             zdelta = RTT >=zt
-             zcvm5 = merge(R5IES * RLSTT, R5LES * RLVTT, zdelta) / RCPD &
-                  / (1. + RVTMP2*zq)
-             zqs = R2ES * FOEEW(zt, zdelta) / pplay(i, k)
-             zqs = MIN(0.5, zqs)
-             zcor = 1./(1.-RETV*zqs)
-             zqs = zqs*zcor
-             zdqs = FOEDE(zt, zdelta, zcvm5, zqs, zcor)
-          ELSE
-             IF (zt  <  t_coup) THEN
-                zqs = qsats(zt) / pplay(i, k)
-                zdqs = dqsats(zt, zqs)
-             ELSE
-                zqs = qsatl(zt) / pplay(i, k)
-                zdqs = dqsatl(zt, zqs)
-             ENDIF
-          ENDIF
+          zdelta = RTT >=zt
+          zcvm5 = merge(R5IES * RLSTT, R5LES * RLVTT, zdelta) / RCPD &
+               / (1. + RVTMP2*zq)
+          zqs = R2ES * FOEEW(zt, zdelta) / pplay(i, k)
+          zqs = MIN(0.5, zqs)
+          zcor = 1./(1.-RETV*zqs)
+          zqs = zqs*zcor
+          zdqs = FOEDE(zt, zdelta, zcvm5, zqs, zcor)
 
           ! calculer la fraction nuageuse (processus humide):
 

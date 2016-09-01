@@ -12,6 +12,7 @@ contains
     USE raddim
     USE radepsi
     USE radopt
+    use swde_m, only: swde
 
     ! ------------------------------------------------------------------
     ! PURPOSE.

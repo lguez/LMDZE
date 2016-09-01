@@ -9,7 +9,7 @@ contains
     USE dimphy, ONLY : klev, klon
     USE suphec_m, ONLY : rcpd, rd, retv, rtt
     USE yoethf_m, ONLY : r2es
-    USE fcttre, ONLY : foeew, qsatl, qsats, thermcep
+    USE fcttre, ONLY : foeew, qsatl, qsats
 
     ! Arguments d'entree:
     REAL, intent(in):: paprs(klon, klev+1) ! pression (Pa) a inter-couche
@@ -28,8 +28,6 @@ contains
     PARAMETER (RGAMMAS=0.05)
     REAL CRHL
     PARAMETER (CRHL=0.15)
-    REAL t_coup
-    PARAMETER (t_coup=234.0)
 
     ! Variables locales:
     INTEGER i, k, kb, invb(klon)
@@ -66,18 +64,10 @@ contains
 
     DO i = 1, klon
        kb=invb(i)
-       IF (thermcep) THEN
-          zqs= R2ES*FOEEW(t(i, kb), RTT >= t(i, kb))/pplay(i, kb)
-          zqs=MIN(0.5, zqs)
-          zcor=1./(1.-RETV*zqs)
-          zqs=zqs*zcor
-       ELSE
-          IF (t(i, kb)  <  t_coup) THEN
-             zqs = qsats(t(i, kb)) / pplay(i, kb)
-          ELSE
-             zqs = qsatl(t(i, kb)) / pplay(i, kb)
-          ENDIF
-       ENDIF
+       zqs= R2ES*FOEEW(t(i, kb), RTT >= t(i, kb))/pplay(i, kb)
+       zqs=MIN(0.5, zqs)
+       zcor=1./(1.-RETV*zqs)
+       zqs=zqs*zcor
        zcll = CLOIB * zdthmin(i) + CLOIC
        zcll = MIN(1.0, MAX(0.0, zcll))
        zrhb= q(i, kb)/zqs

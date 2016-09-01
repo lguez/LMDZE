@@ -16,6 +16,7 @@ contains
     use covcont_m, only: covcont
     USE dimens_m, ONLY: iim, jjm, llm
     USE disvert_m, ONLY: ap, bp
+    use enercin_m, only: enercin
     use flumass_m, only: flumass
     use massbar_m, only: massbar
     use massbarxy_m, only: massbarxy

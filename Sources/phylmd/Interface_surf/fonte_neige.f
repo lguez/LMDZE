@@ -14,7 +14,7 @@ contains
 
     ! Laurent Fairhead, March, 2001
 
-    USE fcttre, ONLY: foeew, qsatl, qsats, thermcep
+    USE fcttre, ONLY: foeew, qsatl, qsats
     USE indicesol, ONLY: epsfra, is_lic, is_sic, is_ter
     USE interface_surf, ONLY: run_off_lic, tau_calv
     use nr_util, only: assert_eq
@@ -51,9 +51,7 @@ contains
     real, intent(IN):: petBcoef(:), peqBcoef(:) ! (knon)
     ! coefficients B de la r\'esolution de la couche limite pour t et q
 
-    real, intent(INOUT):: tsurf_new(:)
-    ! tsurf_new temperature au sol
-
+    real, intent(INOUT):: tsurf_new(:) ! (knon) temp\'erature au sol
     real, intent(IN):: evap(:) ! (knon)
 
     real, intent(OUT):: fqcalving(:) ! (knon)
@@ -79,7 +77,6 @@ contains
     real fq_fonte
     REAL bil_eau_s(size(ps)) ! in kg m-2
     real snow_evap(size(ps)) ! in kg m-2 s-1
-    real, parameter:: t_coup = 273.15
     REAL, parameter:: chasno = 3.334E5 / (2.3867E6*0.15)
     REAL, parameter:: chaice = 3.334E5 / (2.3867E6*0.15)
     real, parameter:: max_eau_sol = 150. ! in kg m-2
@@ -98,21 +95,13 @@ contains
     coeff_rel = dtime / (tau_calv * rday)
     bil_eau_s = 0.
     DO i = 1, knon
-       IF (thermcep) THEN
-          zdelta= rtt >= tsurf(i)
-          zcvm5 = merge(R5IES*RLSTT, R5LES*RLVTT, zdelta)
-          zcvm5 = zcvm5 / RCPD / (1. + RVTMP2*q1lay(i))
-          zx_qs= r2es * FOEEW(tsurf(i), zdelta) / ps(i)
-          zx_qs=MIN(0.5, zx_qs)
-          zcor=1. / (1.-retv*zx_qs)
-          zx_qs=zx_qs*zcor
-       ELSE
-          IF (tsurf(i) < t_coup) THEN
-             zx_qs = qsats(tsurf(i)) / ps(i)
-          ELSE
-             zx_qs = qsatl(tsurf(i)) / ps(i)
-          ENDIF
-       ENDIF
+       zdelta= rtt >= tsurf(i)
+       zcvm5 = merge(R5IES*RLSTT, R5LES*RLVTT, zdelta)
+       zcvm5 = zcvm5 / RCPD / (1. + RVTMP2*q1lay(i))
+       zx_qs= r2es * FOEEW(tsurf(i), zdelta) / ps(i)
+       zx_qs=MIN(0.5, zx_qs)
+       zcor=1. / (1. - retv*zx_qs)
+       zx_qs=zx_qs*zcor
     ENDDO
 
     ! Calcul de la temperature de surface
@@ -135,14 +124,14 @@ contains
     do i = 1, knon
        if ((snow(i) > epsfra .OR. nisurf == is_sic &
             .OR. nisurf == is_lic) .AND. tsurf_new(i) >= RTT) then
-          fq_fonte = MIN(MAX((tsurf_new(i)-RTT) / chasno, 0.), snow(i))
+          fq_fonte = MIN(MAX((tsurf_new(i) - RTT) / chasno, 0.), snow(i))
           ffonte(i) = fq_fonte * RLMLT / dtime
           snow(i) = max(0., snow(i) - fq_fonte)
           bil_eau_s(i) = bil_eau_s(i) + fq_fonte
           tsurf_new(i) = tsurf_new(i) - fq_fonte * chasno
           !IM cf JLD/ GKtest fonte aussi pour la glace
           IF (nisurf == is_sic .OR. nisurf == is_lic) THEN
-             fq_fonte = MAX((tsurf_new(i)-RTT) / chaice, 0.)
+             fq_fonte = MAX((tsurf_new(i) - RTT) / chaice, 0.)
              ffonte(i) = ffonte(i) + fq_fonte * RLMLT / dtime
              bil_eau_s(i) = bil_eau_s(i) + fq_fonte
              tsurf_new(i) = RTT

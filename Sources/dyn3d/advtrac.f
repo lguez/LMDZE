@@ -12,6 +12,7 @@ contains
     USE comconst, ONLY : dtvr
     USE conf_gcm_m, ONLY : iapp_tracvl
     USE dimens_m, ONLY : jjm, llm, nqmx
+    use groupe_m, only: groupe
     USE iniadvtrac_m, ONLY : iadv
     use massbar_m, only: massbar
     USE paramet_m, ONLY : iip1, iip2, ijmllm, ijp1llm, ip1jm, ip1jmp1, llmp1
