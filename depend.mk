@@ -8,7 +8,6 @@ advect.o : paramet_m.o dimens_m.o
 advn.o : comgeom.o conf_gcm.o disvert.o comconst.o paramet_m.o dimens_m.o 
 advtrac.o : vlspltqs.o vlsplt.o paramet_m.o massbar.o iniadvtrac.o groupe.o dimens_m.o conf_gcm.o comconst.o 
 ajsec.o : suphec.o dimphy.o 
-alboc.o : YOMCST.o orbite.o 
 bernoui.o : filtreg_scal.o dimens_m.o 
 bilan_dyn.o : paramet_m.o massbar.o init_dynzon.o histwrite.o enercin.o dimens_m.o covcont.o comgeom.o comconst.o 
 buildop.o : decoop.o errioipsl.o 
@@ -149,7 +148,7 @@ integrd.o : qminimum.o paramet_m.o massdair.o disvert.o dimens_m.o comgeom.o
 inter_barxy.o : ord_coordm.o ord_coord.o inter_bary.o inter_barx.o dimens_m.o comgeom.o 
 interface_surf.o : unit_nml_m.o 
 interfsur_lim.o : time_phylmdz.o dimphy.o 
-interfsurf_hq.o : suphec.o soil.o read_sst.o interfsur_lim.o interface_surf.o indicesol.o fonte_neige.o dimphy.o clesphys2.o calcul_fluxs.o calbeta.o albsno.o alboc.o alboc_cd.o abort_gcm.o 
+interfsurf_hq.o : suphec.o soil.o read_sst.o interfsur_lim.o interface_surf.o indicesol.o fonte_neige.o dimphy.o clesphys2.o calcul_fluxs.o calbeta.o albsno.o alboc_cd.o abort_gcm.o 
 invert_zoom_x.o : dynetat0.o dimens_m.o coefpoly.o 
 ioconf_calendar.o : errioipsl.o strlowercase.o calendar.o 
 ioget_calendar.o : ioconf_calendar.o calendar.o 

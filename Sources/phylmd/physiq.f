@@ -20,8 +20,7 @@ contains
     use calltherm_m, only: calltherm
     USE clesphys, ONLY: cdhmax, cdmmax, ecrit_ins, ksta, ksta_ter, ok_kzmin, &
          ok_instan
-    USE clesphys2, ONLY: cycle_diurne, conv_emanuel, nbapp_rad, new_oliq, &
-         ok_orodr, ok_orolf
+    USE clesphys2, ONLY: conv_emanuel, nbapp_rad, new_oliq, ok_orodr, ok_orolf
     USE clmain_m, ONLY: clmain
     use clouds_gno_m, only: clouds_gno
     use comconst, only: dtphys
@@ -589,11 +588,7 @@ contains
     ! la surface.
 
     CALL orbite(REAL(julien), longi, dist)
-    IF (cycle_diurne) THEN
-       CALL zenang(longi, time, dtphys * radpas, mu0, fract)
-    ELSE
-       mu0 = - 999.999
-    ENDIF
+    CALL zenang(longi, time, dtphys * radpas, mu0, fract)
 
     ! Calcul de l'abedo moyen par maille
     albsol = sum(falbe * pctsrf, dim = 2)
@@ -612,11 +607,11 @@ contains
     CALL clmain(dtphys, pctsrf, t_seri, q_seri, u_seri, v_seri, julien, mu0, &
          ftsol, cdmmax, cdhmax, ksta, ksta_ter, ok_kzmin, ftsoil, qsol, &
          paprs, play, fsnow, fqsurf, fevap, falbe, fluxlat, rain_fall, &
-         snow_fall, fsolsw, fsollw, fder, rlat, frugs, agesno, rugoro, &
-         d_t_vdf, d_q_vdf, d_u_vdf, d_v_vdf, d_ts, flux_t, flux_q, flux_u, &
-         flux_v, cdragh, cdragm, q2, dsens, devap, ycoefh, yu1, yv1, t2m, q2m, &
-         u10m, v10m, pblh, capCL, oliqCL, cteiCL, pblT, therm, trmb1, trmb2, &
-         trmb3, plcl, fqcalving, ffonte, run_off_lic_0)
+         snow_fall, fsolsw, fsollw, fder, frugs, agesno, rugoro, d_t_vdf, &
+         d_q_vdf, d_u_vdf, d_v_vdf, d_ts, flux_t, flux_q, flux_u, flux_v, &
+         cdragh, cdragm, q2, dsens, devap, ycoefh, yu1, yv1, t2m, q2m, u10m, &
+         v10m, pblh, capCL, oliqCL, cteiCL, pblT, therm, trmb1, trmb2, trmb3, &
+         plcl, fqcalving, ffonte, run_off_lic_0)
 
     ! Incr\'ementation des flux
 

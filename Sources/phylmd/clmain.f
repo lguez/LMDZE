@@ -7,7 +7,7 @@ contains
   SUBROUTINE clmain(dtime, pctsrf, t, q, u, v, jour, rmu0, ftsol, cdmmax, &
        cdhmax, ksta, ksta_ter, ok_kzmin, ftsoil, qsol, paprs, pplay, snow, &
        qsurf, evap, falbe, fluxlat, rain_fall, snow_f, solsw, sollw, fder, &
-       rlat, rugos, agesno, rugoro, d_t, d_q, d_u, d_v, d_ts, flux_t, flux_q, &
+       rugos, agesno, rugoro, d_t, d_q, d_u, d_v, d_ts, flux_t, flux_q, &
        flux_u, flux_v, cdragh, cdragm, q2, dflux_t, dflux_q, ycoefh, zu1, &
        zv1, t2m, q2m, u10m, v10m, pblh, capcl, oliqcl, cteicl, pblt, therm, &
        trmb1, trmb2, trmb3, plcl, fqcalving, ffonte, run_off_lic_0)
@@ -82,10 +82,7 @@ contains
 
     REAL, INTENT(IN):: solsw(klon, nbsrf), sollw(klon, nbsrf)
     REAL, intent(in):: fder(klon)
-    REAL, INTENT(IN):: rlat(klon) ! latitude en degr\'es
-
     REAL, intent(inout):: rugos(klon, nbsrf) ! longueur de rugosit\'e (en m)
-
     real agesno(klon, nbsrf)
     REAL, INTENT(IN):: rugoro(klon)
 
@@ -440,13 +437,13 @@ contains
                ypplay, ydelp, y_d_v, y_flux_v(:knon))
 
           ! calculer la diffusion de "q" et de "h"
-          CALL clqh(dtime, jour, firstcal, rlat, nsrf, ni(:knon), &
-               ytsoil(:knon, :), yqsol, rmu0, yrugos, yrugoro, yu1, yv1, &
-               coefh(:knon, :), yt, yq, yts(:knon), ypaprs, ypplay, ydelp, &
-               yrads, yalb(:knon), ysnow, yqsurf, yrain_f, ysnow_f, yfder, &
-               yfluxlat, pctsrf_new_sic, yagesno(:knon), y_d_t, y_d_q, &
-               y_d_ts(:knon), yz0_new, y_flux_t(:knon), y_flux_q(:knon), &
-               y_dflux_t, y_dflux_q, y_fqcalving, y_ffonte, y_run_off_lic_0)
+          CALL clqh(dtime, jour, firstcal, nsrf, ni(:knon), ytsoil(:knon, :), &
+               yqsol, rmu0, yrugos, yrugoro, yu1, yv1, coefh(:knon, :), yt, &
+               yq, yts(:knon), ypaprs, ypplay, ydelp, yrads, yalb(:knon), &
+               ysnow, yqsurf, yrain_f, ysnow_f, yfder, yfluxlat, &
+               pctsrf_new_sic, yagesno(:knon), y_d_t, y_d_q, y_d_ts(:knon), &
+               yz0_new, y_flux_t(:knon), y_flux_q(:knon), y_dflux_t, &
+               y_dflux_q, y_fqcalving, y_ffonte, y_run_off_lic_0)
 
           ! calculer la longueur de rugosite sur ocean
           yrugm = 0.

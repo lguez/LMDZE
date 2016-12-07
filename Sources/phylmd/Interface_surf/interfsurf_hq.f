@@ -4,12 +4,12 @@ module interfsurf_hq_m
 
 contains
 
-  SUBROUTINE interfsurf_hq(dtime, jour, rmu0, nisurf, knon, knindex, rlat, &
-       debut, tsoil, qsol, u1_lay, v1_lay, temp_air, spechum, tq_cdrag, &
-       petAcoef, peqAcoef, petBcoef, peqBcoef, precip_rain, precip_snow, &
-       fder, rugos, rugoro, snow, qsurf, tsurf, p1lay, ps, radsol, evap, &
-       flux_t, fluxlat, dflux_l, dflux_s, tsurf_new, albedo, z0_new, &
-       pctsrf_new_sic, agesno, fqcalving, ffonte, run_off_lic_0)
+  SUBROUTINE interfsurf_hq(dtime, jour, rmu0, nisurf, knon, knindex, debut, &
+       tsoil, qsol, u1_lay, v1_lay, temp_air, spechum, tq_cdrag, petAcoef, &
+       peqAcoef, petBcoef, peqBcoef, precip_rain, precip_snow, fder, rugos, &
+       rugoro, snow, qsurf, tsurf, p1lay, ps, radsol, evap, flux_t, fluxlat, &
+       dflux_l, dflux_s, tsurf_new, albedo, z0_new, pctsrf_new_sic, agesno, &
+       fqcalving, ffonte, run_off_lic_0)
 
     ! Cette routine sert d'aiguillage entre l'atmosph\`ere et la surface
     ! en g\'en\'eral (sols continentaux, oc\'eans, glaces) pour les flux de
@@ -19,11 +19,10 @@ contains
 
     USE abort_gcm_m, ONLY: abort_gcm
     use alboc_cd_m, only: alboc_cd
-    use alboc_m, only: alboc
     USE albsno_m, ONLY: albsno
     use calbeta_m, only: calbeta
     USE calcul_fluxs_m, ONLY: calcul_fluxs
-    use clesphys2, only: soil_model, cycle_diurne
+    use clesphys2, only: soil_model
     USE dimphy, ONLY: klon
     USE fonte_neige_m, ONLY: fonte_neige
     USE indicesol, ONLY: epsfra, is_lic, is_oce, is_sic, is_ter
@@ -41,8 +40,6 @@ contains
 
     integer, intent(in):: knindex(:) ! (knon)
     ! index des points de la surface a traiter
-
-    real, intent(IN):: rlat(klon) ! latitudes
 
     logical, intent(IN):: debut ! 1er appel a la physique
     ! (si false calcul simplifie des fluxs sur les continents)
@@ -207,7 +204,6 @@ contains
        ! Surface "oc\'ean", appel \`a l'interface avec l'oc\'ean
 
        call read_sst(dtime, jour, knindex, debut, tsurf_temp)
-
        cal = 0.
        beta = 1.
        dif_grnd = 0.
@@ -219,17 +215,7 @@ contains
             petBcoef(:knon), peqBcoef(:knon), tsurf_new, evap, &
             fluxlat(:knon), flux_t, dflux_s(:knon), dflux_l(:knon))
        fder = fder + dflux_s + dflux_l
-
-       ! Compute the albedo:
-
-       if (cycle_diurne) then
-          albedo = alboc_cd(rmu0(knindex))
-       else
-          albedo = alboc(jour, rlat(knindex))
-       endif
-
-       albedo = albedo * fmagic
-
+       albedo = alboc_cd(rmu0(knindex)) * fmagic
        z0_new = sqrt(rugos**2 + rugoro**2)
     case (is_sic)
        ! Surface "glace de mer" appel a l'interface avec l'ocean

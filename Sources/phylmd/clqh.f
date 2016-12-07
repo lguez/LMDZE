@@ -4,8 +4,8 @@ module clqh_m
 
 contains
 
-  SUBROUTINE clqh(dtime, jour, debut, rlat, nisurf, knindex, tsoil, qsol, &
-       rmu0, rugos, rugoro, u1lay, v1lay, coef, t, q, ts, paprs, pplay, delp, &
+  SUBROUTINE clqh(dtime, jour, debut, nisurf, knindex, tsoil, qsol, rmu0, &
+       rugos, rugoro, u1lay, v1lay, coef, t, q, ts, paprs, pplay, delp, &
        radsol, albedo, snow, qsurf, precip_rain, precip_snow, fder, fluxlat, &
        pctsrf_new_sic, agesno, d_t, d_q, d_ts, z0_new, flux_t, flux_q, &
        dflux_s, dflux_l, fqcalving, ffonte, run_off_lic_0)
@@ -22,7 +22,6 @@ contains
     REAL, intent(in):: dtime ! intervalle du temps (s)
     integer, intent(in):: jour ! jour de l'annee en cours
     logical, intent(in):: debut
-    real, intent(in):: rlat(klon)
     integer, intent(in):: nisurf
     integer, intent(in):: knindex(:) ! (knon)
     REAL, intent(inout):: tsoil(:, :) ! (knon, nsoilmx)
@@ -240,7 +239,7 @@ contains
     spechum(1:knon)=q(1:knon, 1)
     p1lay(1:knon) = pplay(1:knon, 1)
 
-    CALL interfsurf_hq(dtime, jour, rmu0, nisurf, knon, knindex, rlat, debut, &
+    CALL interfsurf_hq(dtime, jour, rmu0, nisurf, knon, knindex, debut, &
          tsoil, qsol, u1lay, v1lay, temp_air, spechum, tq_cdrag, petAcoef, &
          peqAcoef, petBcoef, peqBcoef, precip_rain, precip_snow, fder, rugos, &
          rugoro, snow, qsurf, ts, p1lay, psref, radsol, evap, flux_t, &
