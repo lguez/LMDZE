@@ -156,7 +156,7 @@ SUBROUTINE extrapol(pfild, kxlon, kylat, pmask, norsud, ldper, knbor, pwork)
           DO k = ideb, ifin
             ilon = ix(k)
             jlat = jy(k)
-            pwork(i, j) = pwork(i, j) + pfild(ilon, jlat)*zmask(k)/float( &
+            pwork(i, j) = pwork(i, j) + pfild(ilon, jlat)*zmask(k)/real( &
               inbor)
           END DO
         END IF

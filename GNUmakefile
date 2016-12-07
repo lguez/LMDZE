@@ -33,7 +33,7 @@ execut = ce0l gcm test_ozonecm test_inter_barxy test_fxhyp test_inifilr
 # 3. Compiler-dependent part
 
 mode = debug
-include ${included_makefile_dir}/${FC}_${mode}.mk
+include ${general_compiler_options_dir}/${FC}_${mode}.mk
 
 # 4. Rules
 

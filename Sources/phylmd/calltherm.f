@@ -57,7 +57,7 @@ contains
        enddo
     enddo
 
-    zdt=dtime/float(nsplit_thermals)
+    zdt=dtime/real(nsplit_thermals)
     do isplit = 1, nsplit_thermals
        CALL thermcell(klon, klev, zdt, pplay, paprs, pphi, u_seri, v_seri, &
             t_seri, q_seri, d_u_the, d_v_the, d_t_the, d_q_the, zfm_therm, &
@@ -65,12 +65,12 @@ contains
             tho_thermals)
 
        ! transformation de la derivee en tendance
-       d_t_the=d_t_the*dtime/float(nsplit_thermals)
-       d_u_the=d_u_the*dtime/float(nsplit_thermals)
-       d_v_the=d_v_the*dtime/float(nsplit_thermals)
-       d_q_the=d_q_the*dtime/float(nsplit_thermals)
-       fm_therm=fm_therm +zfm_therm/float(nsplit_thermals)
-       entr_therm=entr_therm +zentr_therm/float(nsplit_thermals)
+       d_t_the=d_t_the*dtime/real(nsplit_thermals)
+       d_u_the=d_u_the*dtime/real(nsplit_thermals)
+       d_v_the=d_v_the*dtime/real(nsplit_thermals)
+       d_q_the=d_q_the*dtime/real(nsplit_thermals)
+       fm_therm=fm_therm +zfm_therm/real(nsplit_thermals)
+       entr_therm=entr_therm +zentr_therm/real(nsplit_thermals)
        fm_therm(:, klev+1)=0.
 
        ! accumulation de la tendance

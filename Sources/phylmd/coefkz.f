@@ -4,40 +4,37 @@ module coefkz_m
 
 contains
 
-  SUBROUTINE coefkz(nsrf, knon, paprs, pplay, ksta, ksta_ter, ts, rugos, u, v, &
-       t, q, qsurf, coefm, coefh)
+  SUBROUTINE coefkz(nsrf, paprs, pplay, ksta, ksta_ter, ts, rugos, u, v, t, &
+       q, qsurf, coefm, coefh)
 
     ! Authors: F. Hourdin, M. Forichon, Z. X. Li (LMD/CNRS)
-    ! date: 1993/09/22
+    ! Date: September 22nd, 1993
     ! Objet : calculer le coefficient de frottement du sol ("Cdrag") et les
     ! coefficients d'échange turbulent dans l'atmosphère.
 
-    USE indicesol, ONLY: is_oce
+    use clcdrag_m, only: clcdrag
+    USE conf_phys_m, ONLY: iflag_pbl
     USE dimphy, ONLY: klev, klon
+    USE fcttre, ONLY: dqsatl, dqsats, foede, foeew, qsatl, qsats
+    USE indicesol, ONLY: is_oce
     USE suphec_m, ONLY: rcpd, rd, retv, rg, rkappa, rlstt, rlvtt, rtt
     USE yoethf_m, ONLY: r2es, r5ies, r5les, rvtmp2
-    USE fcttre, ONLY: dqsatl, dqsats, foede, foeew, qsatl, qsats
-    USE conf_phys_m, ONLY: iflag_pbl
-    use clcdrag_m, only: clcdrag
-
-    ! Arguments:
 
     integer, intent(in):: nsrf ! indicateur de la nature du sol
-    INTEGER, intent(in):: knon ! nombre de points a traiter
 
-    REAL, intent(in):: paprs(klon, klev+1)
+    REAL, intent(in):: paprs(:, :) ! (klon, klev+1)
     ! pression a chaque intercouche (en Pa)
 
-    real, intent(in):: pplay(klon, klev)
+    real, intent(in):: pplay(:, :) ! (klon, klev)
     ! pression au milieu de chaque couche (en Pa)
 
     REAL, intent(in):: ksta, ksta_ter
-    REAL, intent(in):: ts(klon) ! temperature du sol (en Kelvin)
-    REAL, intent(in):: rugos(klon) ! longeur de rugosite (en m)
-    REAL, intent(in):: u(klon, klev), v(klon, klev) ! wind
-    REAL, intent(in):: t(klon, klev) ! temperature (K)
-    real, intent(in):: q(klon, klev) ! vapeur d'eau (kg/kg)
-    real, intent(in):: qsurf(klon) 
+    REAL, intent(in):: ts(:) ! (klon) temperature du sol (en Kelvin)
+    REAL, intent(in):: rugos(:) ! (klon) longeur de rugosite (en m)
+    REAL, intent(in):: u(:, :), v(:, :) ! (klon, klev) wind
+    REAL, intent(in):: t(:, :) ! (klon, klev) temperature (K)
+    real, intent(in):: q(:, :) ! (klon, klev) vapeur d'eau (kg/kg)
+    real, intent(in):: qsurf(:) ! (klon) 
     REAL, intent(out):: coefm(:, :) ! (knon, klev) coefficient, vitesse
 
     real, intent(out):: coefh(:, :) ! (knon, klev) 
@@ -45,7 +42,10 @@ contains
 
     ! Local:
 
-    INTEGER itop(knon) ! numero de couche du sommet de la couche limite
+    INTEGER knon ! nombre de points a traiter
+
+    INTEGER itop(size(coefm, 1))
+    ! (knon) numero de couche du sommet de la couche limite
 
     ! Quelques constantes et options:
 
@@ -89,6 +89,8 @@ contains
     REAL gamt(2:klev) ! contre-gradient pour la chaleur sensible: Kelvin/metre
 
     !--------------------------------------------------------------------
+
+    knon = size(coefm, 1)
 
     ! Prescrire la valeur de contre-gradient
     if (iflag_pbl.eq.1) then

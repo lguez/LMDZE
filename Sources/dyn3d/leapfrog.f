@@ -170,7 +170,7 @@ contains
           CALL filtreg_scal(pkf, direct = .true., intensive = .true.)
        end if
 
-       IF (MOD(itau + 1, iphysiq) == 0 .AND. iflag_phys /= 0) THEN
+       IF (MOD(itau + 1, iphysiq) == 0 .AND. iflag_phys) THEN
           CALL calfis(ucov, vcov, teta, q, p3d, pk, phis, phi, w, dufi, dvfi, &
                dtetafi, dqfi, dayvrai = itau / day_step + day_ini, &
                time = REAL(mod(itau, day_step)) / day_step, &

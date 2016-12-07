@@ -146,7 +146,6 @@ contains
     ! "physiq".
 
     REAL, save:: radsol(klon) ! bilan radiatif au sol calcule par code radiatif
-
     REAL, save:: ftsol(klon, nbsrf) ! skin temperature of surface fraction
 
     REAL, save:: ftsoil(klon, nsoilmx, nbsrf)
@@ -636,55 +635,26 @@ contains
 
     ! Update surface temperature:
 
-    DO i = 1, klon
-       zxfluxlat(i) = 0.
-
-       zt2m(i) = 0.
-       zq2m(i) = 0.
-       zu10m(i) = 0.
-       zv10m(i) = 0.
-       zxffonte(i) = 0.
-       zxfqcalving(i) = 0.
-
-       s_pblh(i) = 0.
-       s_lcl(i) = 0.
-       s_capCL(i) = 0.
-       s_oliqCL(i) = 0.
-       s_cteiCL(i) = 0.
-       s_pblT(i) = 0.
-       s_therm(i) = 0.
-       s_trmb1(i) = 0.
-       s_trmb2(i) = 0.
-       s_trmb3(i) = 0.
-    ENDDO
-
     call assert(abs(sum(pctsrf, dim = 2) - 1.) <= EPSFRA, 'physiq: pctsrf')
-
     ftsol = ftsol + d_ts
     ztsol = sum(ftsol * pctsrf, dim = 2)
-    DO nsrf = 1, nbsrf
-       DO i = 1, klon
-          zxfluxlat(i) = zxfluxlat(i) + fluxlat(i, nsrf) * pctsrf(i, nsrf)
-
-          zt2m(i) = zt2m(i) + t2m(i, nsrf) * pctsrf(i, nsrf)
-          zq2m(i) = zq2m(i) + q2m(i, nsrf) * pctsrf(i, nsrf)
-          zu10m(i) = zu10m(i) + u10m(i, nsrf) * pctsrf(i, nsrf)
-          zv10m(i) = zv10m(i) + v10m(i, nsrf) * pctsrf(i, nsrf)
-          zxffonte(i) = zxffonte(i) + ffonte(i, nsrf) * pctsrf(i, nsrf)
-          zxfqcalving(i) = zxfqcalving(i) + &
-               fqcalving(i, nsrf) * pctsrf(i, nsrf)
-          s_pblh(i) = s_pblh(i) + pblh(i, nsrf) * pctsrf(i, nsrf)
-          s_lcl(i) = s_lcl(i) + plcl(i, nsrf) * pctsrf(i, nsrf)
-          s_capCL(i) = s_capCL(i) + capCL(i, nsrf) * pctsrf(i, nsrf)
-          s_oliqCL(i) = s_oliqCL(i) + oliqCL(i, nsrf) * pctsrf(i, nsrf)
-          s_cteiCL(i) = s_cteiCL(i) + cteiCL(i, nsrf) * pctsrf(i, nsrf)
-          s_pblT(i) = s_pblT(i) + pblT(i, nsrf) * pctsrf(i, nsrf)
-          s_therm(i) = s_therm(i) + therm(i, nsrf) * pctsrf(i, nsrf)
-          s_trmb1(i) = s_trmb1(i) + trmb1(i, nsrf) * pctsrf(i, nsrf)
-          s_trmb2(i) = s_trmb2(i) + trmb2(i, nsrf) * pctsrf(i, nsrf)
-          s_trmb3(i) = s_trmb3(i) + trmb3(i, nsrf) * pctsrf(i, nsrf)
-       ENDDO
-    ENDDO
+    zxfluxlat = sum(fluxlat * pctsrf, dim = 2)
+    zt2m = sum(t2m * pctsrf, dim = 2)
+    zq2m = sum(q2m * pctsrf, dim = 2)
+    zu10m = sum(u10m * pctsrf, dim = 2)
+    zv10m = sum(v10m * pctsrf, dim = 2)
+    zxffonte = sum(ffonte * pctsrf, dim = 2)
+    zxfqcalving = sum(fqcalving * pctsrf, dim = 2)
+    s_pblh = sum(pblh * pctsrf, dim = 2)
+    s_lcl = sum(plcl * pctsrf, dim = 2)
+    s_capCL = sum(capCL * pctsrf, dim = 2)
+    s_oliqCL = sum(oliqCL * pctsrf, dim = 2)
+    s_cteiCL = sum(cteiCL * pctsrf, dim = 2)
+    s_pblT = sum(pblT * pctsrf, dim = 2)
+    s_therm = sum(therm * pctsrf, dim = 2)
+    s_trmb1 = sum(trmb1 * pctsrf, dim = 2)
+    s_trmb2 = sum(trmb2 * pctsrf, dim = 2)
+    s_trmb3 = sum(trmb3 * pctsrf, dim = 2)
 
     ! Si une sous-fraction n'existe pas, elle prend la valeur moyenne :
     DO nsrf = 1, nbsrf
@@ -969,7 +939,6 @@ contains
     ENDIF
 
     ! Ajouter la tendance des rayonnements (tous les pas)
-
     DO k = 1, llm
        DO i = 1, klon
           t_seri(i, k) = t_seri(i, k) + (heat(i, k) - cool(i, k)) * dtphys &
@@ -978,19 +947,10 @@ contains
     ENDDO
 
     ! Calculer l'hydrologie de la surface
-    DO i = 1, klon
-       zxqsurf(i) = 0.
-       zxsnow(i) = 0.
-    ENDDO
-    DO nsrf = 1, nbsrf
-       DO i = 1, klon
-          zxqsurf(i) = zxqsurf(i) + fqsurf(i, nsrf) * pctsrf(i, nsrf)
-          zxsnow(i) = zxsnow(i) + fsnow(i, nsrf) * pctsrf(i, nsrf)
-       ENDDO
-    ENDDO
+    zxqsurf = sum(fqsurf * pctsrf, dim = 2)
+    zxsnow = sum(fsnow * pctsrf, dim = 2)
 
     ! Calculer le bilan du sol et la d\'erive de temp\'erature (couplage)
-
     DO i = 1, klon
        bils(i) = radsol(i) - sens(i) + zxfluxlat(i)
     ENDDO

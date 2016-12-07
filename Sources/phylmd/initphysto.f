@@ -68,7 +68,7 @@ contains
     ! Appel a histvert pour la grille verticale
 
     DO l = 1, llm
-       nivsigs(l) = float(l)
+       nivsigs(l) = real(l)
     END DO
 
     CALL histvert(fileid, 'sig_s', 'Niveaux sigma', 'sigma_level', nivsigs, &

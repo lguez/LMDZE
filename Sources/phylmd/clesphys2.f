@@ -47,7 +47,7 @@ contains
          "read_clesphys2 nbapp_rad")
     call assert(nbapp_rad >= 4 .or. .not. cycle_diurne, &
          "read_clesphys2: minimum 4 calls to radiative transfer per day if " &
-         // "cycle diurne")
+         // "cycle_diurne")
 
   end subroutine read_clesphys2
 

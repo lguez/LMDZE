@@ -20,7 +20,7 @@ contains
     ! dlonid(idat): abscisses des interfaces des mailles donnees
     ! rlonimod(imod): abscisses des interfaces des mailles modele
     ! (L'indice 1 correspond a l'interface mailLE 1 / maille 2)
-    ! (Les abscisses sont exprimées en degres)
+    ! (Les abscisses sont exprim\'ees en degres)
 
     use nr_util, only: assert_eq, pi
 
@@ -36,10 +36,8 @@ contains
     REAL xxid(size(dlonid)+1), xxd(size(dlonid)+1), fdd(size(dlonid)+1)
     REAL fxd(size(dlonid)+1), xchan(size(dlonid)+1), fdchan(size(dlonid)+1)
     REAL xxim(size(rlonimod))
-
     REAL x0, xim0, dx, dxm
-    REAL chmin, chmax
-
+    REAL chmax
     INTEGER imod, idat, i, ichang, id0, id1, nid, idatmax1
 
     !-----------------------------------------------------
@@ -53,7 +51,7 @@ contains
        xxim(imod) = rlonimod(imod)
     ENDDO
 
-    CALL minmax(imodmax, xxim, chmin, chmax)
+    chmax = maxval(xxim)
     IF(chmax < 6.50) THEN
        DO imod = 1, imodmax
           xxim(imod) = xxim(imod) * 180./pi
@@ -72,7 +70,7 @@ contains
        xxd(idat) = dlonid(idat)
     ENDDO
 
-    CALL minmax(idatmax, xxd, chmin, chmax)
+    chmax = maxval(xxd(:idatmax))
     IF(chmax < 6.50) THEN
        DO idat = 1, idatmax
           xxd(idat) = xxd(idat) * 180./pi

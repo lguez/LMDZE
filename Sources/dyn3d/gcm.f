@@ -81,7 +81,7 @@ PROGRAM gcm
   call init_dyn_phy
 
   ! Initialisation de la physique :
-  IF (iflag_phys == 1) THEN
+  IF (iflag_phys) THEN
      airephy = pack(aire_2d, dyn_phy)
      CALL suphec
      call yoethf

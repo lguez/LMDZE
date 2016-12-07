@@ -4,14 +4,13 @@ module swclr_m
 
 contains
 
-  SUBROUTINE swclr(knu, flag_aer, tauae, pizae, cgae, palbp, pdsig, &
-       prayl, psec, pcgaz, ppizaz, pray1, pray2, prefz, prj, prk, prmu0, ptauaz, &
+  SUBROUTINE swclr(knu, flag_aer, tauae, pizae, cgae, palbp, pdsig, prayl, &
+       psec, pcgaz, ppizaz, pray1, pray2, prefz, prj, prk, prmu0, ptauaz, &
        ptra1, ptra2)
-    USE dimens_m
-    USE dimphy
-    USE raddim
-    USE radepsi
-    USE radopt
+    
+    USE raddim, only: kdlon, kflev
+    USE radepsi, only: repsct, zepsec
+    USE radopt, only: novlp
 
     ! ------------------------------------------------------------------
     ! PURPOSE.

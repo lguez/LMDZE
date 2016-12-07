@@ -76,12 +76,12 @@ contains
        ! normalisation
        DO l = 1, llm
           DO ij = 1, ip1jmp1
-             pbaruc(ij, l) = pbaruc(ij, l)/float(istdyn)
-             tetac(ij, l) = tetac(ij, l)/float(istdyn)
-             phic(ij, l) = phic(ij, l)/float(istdyn)
+             pbaruc(ij, l) = pbaruc(ij, l)/real(istdyn)
+             tetac(ij, l) = tetac(ij, l)/real(istdyn)
+             phic(ij, l) = phic(ij, l)/real(istdyn)
           END DO
           DO ij = 1, ip1jm
-             pbarvc(ij, l) = pbarvc(ij, l)/float(istdyn)
+             pbarvc(ij, l) = pbarvc(ij, l)/real(istdyn)
           END DO
        END DO
 

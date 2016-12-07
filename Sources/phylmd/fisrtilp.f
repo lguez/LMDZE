@@ -362,10 +362,10 @@ contains
                    zcl(i) = cld_lc_lsc
                    zct(i) = 1./cld_tau_lsc
                 END IF
-                ! quantit\'e d'eau \`a \'elminier.
+                ! quantit\'e d'eau \`a \'eliminer
                 zchau(i) = zct(i)*dtime/real(ninter)*zoliq(i)* &
                      (1.0-exp(-(zoliq(i)/zneb(i)/zcl(i))**2))*(1.-zfice(i))
-                ! meme chose pour la glace.
+                ! m\^eme chose pour la glace
                 IF (ptconv(i, k)) THEN
                    zfroi(i) = dtime/real(ninter)/zdz(i)*zoliq(i)* &
                         fallvc(zrhol(i))*zfice(i)
@@ -395,7 +395,7 @@ contains
           END IF
        END DO
 
-       ! Calculer les tendances de q et de t:
+       ! Calculer les tendances de q et de t :
        DO i = 1, klon
           d_q(i, k) = zq(i) - q(i, k)
           d_t(i, k) = zt(i) - t(i, k)

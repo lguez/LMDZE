@@ -1,6 +1,5 @@
 aaam_bud.f
 abort_gcm.f
-academic.f
 adaptdt.f
 addfi.f
 advect.f

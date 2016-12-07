@@ -2,7 +2,6 @@ FCTTRE.o : suphec.o yoethf.o
 YOMCST.o : unit_nml_m.o 
 aaam_bud.o : suphec.o dimens_m.o 
 abort_gcm.o : histclo.o 
-academic.o : dimens_m.o 
 adaptdt.o : temps.o comgeom.o conf_gcm.o disvert.o comconst.o paramet_m.o dimens_m.o 
 addfi.o : dimens_m.o comgeom.o comconst.o 
 advect.o : paramet_m.o dimens_m.o 
@@ -26,12 +25,12 @@ cleanstr.o : mathelp.o strlowercase.o
 clesphys.o : unit_nml_m.o 
 clesphys2.o : conf_gcm.o unit_nml_m.o 
 clmain.o : yamada4.o vdif_kcay.o ustarhb.o time_phylmdz.o suphec.o stdlevvar.o interfoce_lim.o indicesol.o hbtm.o dimsoil.o dimphy.o conf_phys.o conf_gcm.o coefkzmin.o coefkz.o clvent.o clqh.o 
-clqh.o : suphec.o interfsurf_hq.o dimsoil.o dimphy.o conf_phys.o 
+clqh.o : suphec.o interfsurf_hq.o dimphy.o conf_phys.o 
 cltrac.o : suphec.o dimphy.o dimens_m.o 
 cltracrn.o : suphec.o dimphy.o indicesol.o 
 clvent.o : suphec.o dimphy.o 
 coefcdrag.o : yoethf.o suphec.o indicesol.o 
-coefkz.o : clcdrag.o conf_phys.o FCTTRE.o yoethf.o suphec.o dimphy.o indicesol.o 
+coefkz.o : yoethf.o suphec.o indicesol.o FCTTRE.o dimphy.o conf_phys.o clcdrag.o 
 coefkz2.o : suphec.o conf_gcm.o dimphy.o indicesol.o dimens_m.o 
 coefkzmin.o : suphec.o dimphy.o 
 comconst.o : conf_gcm.o 
@@ -228,7 +227,7 @@ stdlevvar.o : screenp.o suphec.o coefcdrag.o
 sw.o : sw2s.o sw1s.o suphec.o raddim.o 
 sw1s.o : swr.o swclr.o raddim.o dimphy.o dimens_m.o 
 sw2s.o : swr.o swde.o swclr.o radepsi.o raddim.o dimphy.o dimens_m.o 
-swclr.o : radopt.o radepsi.o raddim.o dimphy.o dimens_m.o 
+swclr.o : radopt.o radepsi.o raddim.o 
 swde.o : raddim.o dimphy.o dimens_m.o 
 swr.o : swde.o radopt.o radepsi.o raddim.o dimphy.o dimens_m.o 
 swtt.o : raddim.o dimphy.o dimens_m.o 

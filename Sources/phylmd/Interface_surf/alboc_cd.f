@@ -4,9 +4,9 @@ module alboc_cd_m
 
 contains
 
-  SUBROUTINE alboc_cd(rmu0, albedo)
+  pure function alboc_cd(rmu0)
 
-    ! From LMDZ4/libf/phylmd/albedo.F, version 1.2 2005/02/07 15:00:52
+    ! From LMDZ4/libf/phylmd/albedo.F, version 1.2, 2005/02/07 15:00:52
 
     ! Author: Z. X. Li (LMD/CNRS)
     ! Date: 1994/06/24
@@ -18,15 +18,12 @@ contains
     ! th\`ese de 3\`eme cycle de Sylvie Joussaume.
 
     REAL, intent(in):: rmu0(:) ! cosinus de l'angle solaire z\'enithal
-    real, intent(out):: albedo(:) ! alb\'edo de surface de l'oc\'ean
-
-    ! Local:
-    REAL, PARAMETER:: fmagic = 1. ! facteur magique pour r\'egler l'alb\'edo
+    real alboc_cd(size(rmu0)) ! alb\'edo de surface de l'oc\'ean
 
     !----------------------------------------------------------
 
-    albedo = max(min(fmagic * 0.058 / (max(rmu0, 0.) + 0.3), 0.6), 0.04)
+    alboc_cd = max(min(0.058 / (max(rmu0, 0.) + 0.3), 0.6), 0.04)
 
-  END SUBROUTINE alboc_cd
+  END function alboc_cd
 
 end module alboc_cd_m

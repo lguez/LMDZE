@@ -35,12 +35,7 @@ module conf_gcm_m
   ! Help = Choix du schema d'integration temporel.
   ! y = pure Matsuno sinon c'est du Matsuno-leapfrog
 
-  INTEGER:: iflag_phys = 1
-  ! contr\^ole l'appel \`a la physique :
-  ! 0 : pas de physique
-  ! 1 : physique normale (appel \`a phylmd, phymars...) (default)
-  ! 2 : rappel Newtonien pour la temp\'erature + friction au sol
-
+  logical:: iflag_phys = .true. ! call parameterizations of physics
   INTEGER, SAVE:: lmt_pas ! number of time steps of "physics" per day
 
 contains

@@ -5,11 +5,11 @@ module interfsurf_hq_m
 contains
 
   SUBROUTINE interfsurf_hq(dtime, jour, rmu0, nisurf, knon, knindex, rlat, &
-       debut, nsoilmx, tsoil, qsol, u1_lay, v1_lay, temp_air, spechum, &
-       tq_cdrag, petAcoef, peqAcoef, petBcoef, peqBcoef, precip_rain, &
-       precip_snow, fder, rugos, rugoro, snow, qsurf, tsurf, p1lay, ps, &
-       radsol, evap, flux_t, fluxlat, dflux_l, dflux_s, tsurf_new, albedo, &
-       z0_new, pctsrf_new_sic, agesno, fqcalving, ffonte, run_off_lic_0)
+       debut, tsoil, qsol, u1_lay, v1_lay, temp_air, spechum, tq_cdrag, &
+       petAcoef, peqAcoef, petBcoef, peqBcoef, precip_rain, precip_snow, &
+       fder, rugos, rugoro, snow, qsurf, tsurf, p1lay, ps, radsol, evap, &
+       flux_t, fluxlat, dflux_l, dflux_s, tsurf_new, albedo, z0_new, &
+       pctsrf_new_sic, agesno, fqcalving, ffonte, run_off_lic_0)
 
     ! Cette routine sert d'aiguillage entre l'atmosph\`ere et la surface
     ! en g\'en\'eral (sols continentaux, oc\'eans, glaces) pour les flux de
@@ -47,8 +47,7 @@ contains
     logical, intent(IN):: debut ! 1er appel a la physique
     ! (si false calcul simplifie des fluxs sur les continents)
 
-    integer, intent(in):: nsoilmx
-    REAL tsoil(klon, nsoilmx)
+    REAL, intent(inout):: tsoil(:, :) ! (knon, nsoilmx)
 
     REAL, intent(INOUT):: qsol(klon)
     ! column-density of water in soil, in kg m-2
@@ -123,6 +122,7 @@ contains
     real tsurf_temp(knon)
     real alb_neig(knon)
     real zfra(knon)
+    REAL, PARAMETER:: fmagic = 1. ! facteur magique pour r\'egler l'alb\'edo
 
     !-------------------------------------------------------------
 
@@ -142,7 +142,7 @@ contains
        if (is_oce > is_sic) then
           print *, 'is_oce = ', is_oce, '> is_sic = ', is_sic
           call abort_gcm("interfsurf_hq", &
-               'L''ocean doit etre traite avant la banquise')
+               "L'ocean doit etre traite avant la banquise")
        endif
 
        first_call = .false.
@@ -177,8 +177,7 @@ contains
             capsol(:knon), dif_grnd(:knon))
 
        IF (soil_model) THEN
-          CALL soil(dtime, is_ter, snow(:knon), tsurf, tsoil(:knon, :), &
-               soilcap, soilflux)
+          CALL soil(dtime, is_ter, snow(:knon), tsurf, tsoil, soilcap, soilflux)
           cal(1:knon) = RCPD / soilcap
           radsol(1:knon) = radsol(1:knon) + soilflux
        ELSE
@@ -222,11 +221,14 @@ contains
        fder = fder + dflux_s + dflux_l
 
        ! Compute the albedo:
+
        if (cycle_diurne) then
-          CALL alboc_cd(rmu0(knindex), albedo)
+          albedo = alboc_cd(rmu0(knindex))
        else
-          CALL alboc(jour, rlat(knindex), albedo)
+          albedo = alboc(jour, rlat(knindex))
        endif
+
+       albedo = albedo * fmagic
 
        z0_new = sqrt(rugos**2 + rugoro**2)
     case (is_sic)
@@ -245,8 +247,8 @@ contains
             capsol(:knon), dif_grnd(:knon))
 
        IF (soil_model) THEN
-          CALL soil(dtime, is_sic, snow(:knon), tsurf_new, tsoil(:knon, :), &
-               soilcap, soilflux)
+          CALL soil(dtime, is_sic, snow(:knon), tsurf_new, tsoil, soilcap, &
+               soilflux)
           cal(1:knon) = RCPD / soilcap
           radsol(1:knon) = radsol(1:knon) + soilflux
           dif_grnd = 0.
@@ -290,8 +292,7 @@ contains
        ! Surface "glacier continentaux" appel a l'interface avec le sol
 
        IF (soil_model) THEN
-          CALL soil(dtime, is_lic, snow(:knon), tsurf, tsoil(:knon, :), &
-               soilcap, soilflux)
+          CALL soil(dtime, is_lic, snow(:knon), tsurf, tsoil, soilcap, soilflux)
           cal(1:knon) = RCPD / soilcap
           radsol(1:knon) = radsol(1:knon) + soilflux
        ELSE
