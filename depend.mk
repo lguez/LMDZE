@@ -38,7 +38,7 @@ comgeom.o : paramet_m.o dynetat0.o comdissnew.o comconst.o dimens_m.o
 comgeomphy.o : dimphy.o 
 concvl.o : yoethf.o suphec.o FCTTRE.o dimphy.o cv_driver.o comconst.o 
 conf_gcm.o : unit_nml_m.o abort_gcm.o 
-conf_guide.o : unit_nml_m.o dynetat0.o conf_gcm.o comconst.o abort_gcm.o 
+conf_guide.o : unit_nml_m.o conf_gcm.o comconst.o abort_gcm.o 
 conf_phys.o : YOMCST.o unit_nml_m.o conema3_m.o comfisrtilp.o clesphys2.o clesphys.o 
 conflx.o : FCTTRE.o yoethf.o suphec.o dimphy.o flxmain.o 
 convflu.o : comgeom.o paramet_m.o dimens_m.o 

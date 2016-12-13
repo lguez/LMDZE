@@ -11,8 +11,6 @@ module conf_guide_m
   REAL:: tau_max_t = 10.
   REAL:: tau_min_q = 0.03
   REAL:: tau_max_q = 10.
-  REAL:: tau_min_p = 0.03
-  REAL:: tau_max_p = 10.
 
   LOGICAL:: ini_anal = .false. ! Initial = analyse
   LOGICAL:: guide_u = .false. ! guidage de u
@@ -20,8 +18,8 @@ module conf_guide_m
   LOGICAL:: guide_t = .false. ! guidage de T
   LOGICAL:: guide_q = .false. ! guidage de q
 
-  logical:: online = .true. ! controle du guide
-  ! hors-ligne: x=x_rea
+  logical:: online = .true. ! contr\^ole du guidage
+  ! hors-ligne: x = x_rea
 
   ! Dans le cas où on n'a les analyses que sur une bande de latitudes :
   REAL, save:: lat_min_guide ! minimum latitude for nudging, in rad
@@ -40,7 +38,6 @@ contains
     use abort_gcm_m, only: abort_gcm
     use comconst, only: daysec, dtvr
     use conf_gcm_m, only: day_step, iperiod
-    use dynetat0_m, only: grossismx, grossismy
     use nr_util, only: assert, pi
     use unit_nml_m, only: unit_nml
 
@@ -51,8 +48,7 @@ contains
 
     namelist /conf_guide_nml/ ini_anal, guide_u, guide_v, guide_t, guide_q, &
          online, tau_min_u, tau_max_u, tau_min_v, tau_max_v, tau_min_t, &
-         tau_max_t, tau_min_q, tau_max_q, tau_min_p, tau_max_p, &
-         lat_min_guide_deg, lat_max_guide_deg
+         tau_max_t, tau_min_q, tau_max_q, lat_min_guide_deg, lat_max_guide_deg
 
     !-----------------------------------------------------------------------
 
@@ -72,16 +68,6 @@ contains
     if (ok_guide .and. online) then
        factt = dtvr * iperiod / daysec
        print *, "factt = ", factt
-       if (abs(grossismx - 1.) >= 0.1 .and. abs(grossismy - 1.) >= 0.1) then
-          if (guide_u) call assert(factt / tau_min_u < 1, &
-               "conf_guide tau_min_u")
-          if (guide_v) call assert(factt / tau_min_v < 1, &
-               "conf_guide tau_min_v")
-          if (guide_t) call assert(factt / tau_min_t < 1, &
-               "conf_guide tau_min_t")
-          if (guide_q) call assert(factt / tau_min_q < 1, &
-               "conf_guide tau_min_q")
-       end if
     end if
 
   end SUBROUTINE conf_guide

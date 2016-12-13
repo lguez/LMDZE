@@ -7,7 +7,7 @@ contains
   SUBROUTINE zenang(longi, gmtime, pdtrad, mu0, frac)
 
     ! Author: O. Boucher (LMD/CNRS), d'après les routines "zenith" et
-    ! "angle" de Z.X. Li
+    ! "angle" de Z. X. Li
 
     ! Date : première version le 13 décembre 1994, revu pour GCM le 30
     ! septembre 1996

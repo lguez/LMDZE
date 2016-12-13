@@ -16,7 +16,7 @@ contains
     real, intent(out):: alpha(:, :) ! (n_lon, n_lat)
 
     ! Local:
-    REAL alphamin, alphamax, xi
+    REAL a_min, a_max, xi
     INTEGER i, j, n_lon, n_lat
 
     !------------------------------------------------------------
@@ -27,15 +27,15 @@ contains
     n_lat = assert_eq(size(alpha, 2), size(dxdy, 2), size(rlat), &
          "tau2alpha n_lat")
 
-    alphamin = factt / taumax
-    alphamax = factt / taumin
+    a_min = factt / taumax
+    a_max = factt / taumin
 
     DO j = 1, n_lat
        IF (lat_min_guide <= rlat(j) .AND. rlat(j) <= lat_max_guide) THEN
           DO i = 1, n_lon
              xi = min(((dxdy_max - dxdy(i, j)) &
                   / (dxdy_max - dxdy_min))**gamma, 1.)
-             alpha(i, j) = xi * alphamin + (1. - xi) * alphamax
+             alpha(i, j) = 1. - exp(- xi * a_min - (1. - xi) * a_max)
           END DO
        ELSE
           alpha(:, j) = 0.

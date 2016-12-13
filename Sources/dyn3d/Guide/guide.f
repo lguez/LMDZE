@@ -1,7 +1,7 @@
 MODULE guide_m
 
-  ! From dyn3d/guide.F, version 1.3 2005/05/25 13:10:09
-  ! and dyn3d/guide.h, version 1.1.1.1 2004/05/19 12:53:06
+  ! From dyn3d/guide.F, version 1.3, 2005/05/25 13:10:09
+  ! and dyn3d/guide.h, version 1.1.1.1, 2004/05/19 12:53:06
 
   IMPLICIT NONE
 
@@ -9,7 +9,7 @@ CONTAINS
 
   SUBROUTINE guide(itau, ucov, vcov, teta, q, ps)
 
-    ! Author: F.Hourdin
+    ! Author: F. Hourdin
 
     USE comconst, ONLY: cpp, kappa
     USE conf_gcm_m, ONLY: day_step
@@ -21,7 +21,7 @@ CONTAINS
     use dynetat0_m, only: grossismx, grossismy, rlatu, rlatv
     USE exner_hyb_m, ONLY: exner_hyb
     use init_tau2alpha_m, only: init_tau2alpha
-    USE paramet_m, ONLY: iip1, jjp1, llmp1
+    USE paramet_m, ONLY: iip1, jjp1
     USE q_sat_m, ONLY: q_sat
     use read_reanalyse_m, only: read_reanalyse
     use tau2alpha_m, only: tau2alpha
@@ -39,19 +39,23 @@ CONTAINS
 
     ! Local:
 
-    ! variables dynamiques pour les réanalyses
+    ! Variables dynamiques pour les réanalyses
 
     REAL, save:: ucovrea1(iim + 1, jjm + 1, llm), vcovrea1(iim + 1, jjm, llm)
-    ! vents covariants reanalyses
+    ! vents covariants r\'eanalyses
 
-    REAL, save:: tetarea1(iim + 1, jjm + 1, llm) ! temp pot reales
-    REAL, save:: qrea1(iim + 1, jjm + 1, llm) ! temp pot reales
+    REAL, save:: tetarea1(iim + 1, jjm + 1, llm)
+    ! potential temperture from reanalysis
+    
+    REAL, save:: qrea1(iim + 1, jjm + 1, llm)
 
     REAL, save:: ucovrea2(iim + 1, jjm + 1, llm), vcovrea2(iim + 1, jjm, llm)
     ! vents covariants reanalyses
 
-    REAL, save:: tetarea2(iim + 1, jjm + 1, llm) ! temp pot reales
-    REAL, save:: qrea2(iim + 1, jjm + 1, llm) ! temp pot reales
+    REAL, save:: tetarea2(iim + 1, jjm + 1, llm)
+    ! potential temperture from reanalysis
+    
+    REAL, save:: qrea2(iim + 1, jjm + 1, llm)
 
     ! alpha détermine la part des injections de données à chaque étape
     ! alpha=0 signifie pas d'injection
@@ -64,7 +68,7 @@ CONTAINS
     REAL tau
 
     ! TEST SUR QSAT
-    REAL p(iim + 1, jjm + 1, llmp1)
+    REAL p(iim + 1, jjm + 1, llm + 1)
     real pk(iim + 1, jjm + 1, llm), pks(iim + 1, jjm + 1)
     REAL qsat(iim + 1, jjm + 1, llm)
 
@@ -76,10 +80,10 @@ CONTAINS
        IF (online) THEN
           IF (abs(grossismx - 1.) < 0.1 .OR. abs(grossismy - 1.) < 0.1) THEN
              ! grille regulière
-             if (guide_u) alpha_u = factt / tau_max_u
-             if (guide_v) alpha_v = factt / tau_max_v
-             if (guide_t) alpha_t = factt / tau_max_t
-             if (guide_q) alpha_q = factt / tau_max_q
+             if (guide_u) alpha_u = 1. - exp(- factt / tau_max_u)
+             if (guide_v) alpha_v = 1. - exp(- factt / tau_max_v)
+             if (guide_t) alpha_t = 1. - exp(- factt / tau_max_t)
+             if (guide_q) alpha_q = 1. - exp(- factt / tau_max_q)
           else
              call init_tau2alpha(dxdys, dxdyu, dxdyv)
 
