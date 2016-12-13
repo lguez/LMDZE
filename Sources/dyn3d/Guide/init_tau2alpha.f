@@ -6,17 +6,16 @@ module init_tau2alpha_m
 
 contains
 
-  SUBROUTINE init_tau2alpha(dxdys, dxdyu, dxdyv)
+  SUBROUTINE init_tau2alpha(dxdys)
 
     USE comgeom, ONLY: cu_2d, cv_2d
-    use conf_guide_m, only: guide_u, guide_v
     use coordij_m, only: coordij
-    USE dimens_m, ONLY: iim, jjm
+    USE dimens_m, ONLY: jjm
     USE dynetat0_m, ONLY: clat, clon, grossismx, grossismy, rlatu
     USE paramet_m, ONLY: iip1, jjp1
     use writefield_m, only: writefield
 
-    REAL, intent(out):: dxdys(iip1, jjp1), dxdyu(iip1, jjp1), dxdyv(iip1, jjm)
+    REAL, intent(out):: dxdys(iip1, jjp1)
 
     ! Local:
     INTEGER i, j, ilon, ilat
@@ -50,23 +49,6 @@ contains
        END DO
     END DO
     CALL writefield("dxdys", dxdys)
-
-    if (guide_u) then
-       DO j = 1, jjp1
-          DO i = 1, iim
-             dxdyu(i, j) = 0.5 * (dxdys(i, j) + dxdys(i + 1, j))
-          END DO
-          dxdyu(iip1, j) = dxdyu(1, j)
-       END DO
-    end if
-
-    if (guide_v) then
-       DO j = 1, jjm
-          DO i = 1, iip1
-             dxdyv(i, j) = 0.5 * (dxdys(i, j) + dxdys(i, j + 1))
-          END DO
-       END DO
-    end if
 
     ! coordonnees du centre du zoom
     CALL coordij(clon, clat, ilon, ilat)

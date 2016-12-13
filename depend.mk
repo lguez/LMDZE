@@ -38,7 +38,7 @@ comgeom.o : paramet_m.o dynetat0.o comdissnew.o comconst.o dimens_m.o
 comgeomphy.o : dimphy.o 
 concvl.o : yoethf.o suphec.o FCTTRE.o dimphy.o cv_driver.o comconst.o 
 conf_gcm.o : unit_nml_m.o abort_gcm.o 
-conf_guide.o : unit_nml_m.o conf_gcm.o comconst.o abort_gcm.o 
+conf_guide.o : writefield.o tau2alpha.o unit_nml_m.o init_tau2alpha.o dynetat0.o conf_gcm.o comconst.o abort_gcm.o dimens_m.o 
 conf_phys.o : YOMCST.o unit_nml_m.o conema3_m.o comfisrtilp.o clesphys2.o clesphys.o 
 conflx.o : FCTTRE.o yoethf.o suphec.o dimphy.o flxmain.o 
 convflu.o : comgeom.o paramet_m.o dimens_m.o 
@@ -115,7 +115,7 @@ grid_noro_m.o : mva9.o dimens_m.o
 grilles_gcm_netcdf_sub.o : start_init_orog_m.o dynetat0.o dimens_m.o comgeom.o comconst.o 
 groupe.o : vitvert.o comgeom.o disvert.o comconst.o paramet_m.o dimens_m.o 
 groupeun.o : comgeom.o comconst.o paramet_m.o dimens_m.o 
-guide.o : writefield.o tau2alpha.o read_reanalyse.o q_sat.o paramet_m.o init_tau2alpha.o exner_hyb.o dynetat0.o disvert.o dimens_m.o conf_guide.o conf_gcm.o comconst.o 
+guide.o : writefield.o read_reanalyse.o q_sat.o exner_hyb.o disvert.o dimens_m.o conf_guide.o conf_gcm.o comconst.o 
 gwprofil.o : YOEGWD.o dimphy.o 
 gwstress.o : YOEGWD.o suphec.o dimphy.o dimens_m.o 
 hbtm.o : FCTTRE.o yoethf.o suphec.o dimphy.o 
@@ -138,7 +138,7 @@ inifgn.o : dynetat0.o dimens_m.o
 inifilr.o : inifilr_hemisph.o inifgn.o dynetat0.o dimens_m.o 
 inifilr_hemisph.o : dimens_m.o 
 init_dynzon.o : ymds2ju.o temps.o histvert.o histend.o histdef.o histbeg_totreg.o dynetat0.o disvert.o dimens_m.o conf_gcm.o 
-init_tau2alpha.o : writefield.o paramet_m.o dynetat0.o dimens_m.o coordij.o conf_guide.o comgeom.o 
+init_tau2alpha.o : writefield.o paramet_m.o dynetat0.o dimens_m.o coordij.o comgeom.o 
 initdynav.o : ymds2ju.o temps.o paramet_m.o iniadvtrac.o histvert.o histend.o histdef.o histbeg_totreg.o dynetat0.o dimens_m.o 
 initfluxsto.o : ymds2ju.o temps.o paramet_m.o histvert.o histsync.o histhori_regular.o histend.o histdef.o histbeg_totreg.o dynetat0.o disvert.o dimens_m.o conf_gcm.o comconst.o 
 inithist.o : ymds2ju.o temps.o paramet_m.o iniadvtrac.o histvert.o histend.o histdef.o histbeg_totreg.o dynetat0.o disvert.o dimens_m.o com_io_dyn.o 
@@ -232,7 +232,7 @@ swr.o : swde.o radopt.o radepsi.o raddim.o dimphy.o dimens_m.o
 swtt.o : raddim.o dimphy.o dimens_m.o 
 swtt1.o : raddim.o dimphy.o dimens_m.o 
 swu.o : radopt.o radepsi.o raddim.o suphec.o clesphys.o dimphy.o dimens_m.o 
-tau2alpha.o : init_tau2alpha.o conf_guide.o 
+tau2alpha.o : init_tau2alpha.o 
 test_disvert.o : exner_hyb.o dimens_m.o disvert.o comconst.o abort_gcm.o 
 test_fxhyp.o : unit_nml_m.o read_serre.o fxhyp.o dimens_m.o 
 test_inifilr.o : read_serre.o unit_nml_m.o inifilr.o fyhyp.o fxhyp.o dynetat0.o dimens_m.o 

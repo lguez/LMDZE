@@ -4,12 +4,19 @@ module tau2alpha_m
 
 contains
 
-  SUBROUTINE tau2alpha(dxdy, rlat, taumin, taumax, alpha)
+  SUBROUTINE tau2alpha(lat_min_guide, lat_max_guide, factt, dxdy, rlat, &
+       taumin, taumax, alpha)
 
-    use conf_guide_m, only: lat_min_guide, lat_max_guide, factt
     use init_tau2alpha_m, only: dxdy_min, dxdy_max, gamma
     USE nr_util, ONLY: assert_eq
 
+    ! Dans le cas où on n'a les analyses que sur une bande de latitudes :
+    REAL, intent(in):: lat_min_guide ! minimum latitude for nudging, in rad
+    real, intent(in):: lat_max_guide ! maximum latitude for nudging, in rad
+
+    REAL, intent(in):: factt
+    ! pas de temps entre deux appels au guidage, en jours
+    
     REAL, intent(in):: dxdy(:, :) ! (n_lon, n_lat)
     REAL, intent(in):: rlat(:) ! (n_lat)
     REAL, intent(in):: taumin, taumax

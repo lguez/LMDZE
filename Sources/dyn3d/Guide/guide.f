@@ -14,17 +14,12 @@ CONTAINS
     USE comconst, ONLY: cpp, kappa
     USE conf_gcm_m, ONLY: day_step
     use conf_guide_m, only: guide_u, guide_v, guide_t, guide_q, ini_anal, &
-         tau_min_u, tau_max_u, tau_min_v, tau_max_v, tau_min_t, tau_max_t, &
-         tau_min_q, tau_max_q, online, factt
+         alpha_u, alpha_v, alpha_t, alpha_q
     USE dimens_m, ONLY: iim, jjm, llm
     USE disvert_m, ONLY: ap, bp, preff
-    use dynetat0_m, only: grossismx, grossismy, rlatu, rlatv
     USE exner_hyb_m, ONLY: exner_hyb
-    use init_tau2alpha_m, only: init_tau2alpha
-    USE paramet_m, ONLY: iip1, jjp1
     USE q_sat_m, ONLY: q_sat
     use read_reanalyse_m, only: read_reanalyse
-    use tau2alpha_m, only: tau2alpha
     use writefield_m, only: writefield
 
     INTEGER, INTENT(IN):: itau
@@ -46,7 +41,7 @@ CONTAINS
 
     REAL, save:: tetarea1(iim + 1, jjm + 1, llm)
     ! potential temperture from reanalysis
-    
+
     REAL, save:: qrea1(iim + 1, jjm + 1, llm)
 
     REAL, save:: ucovrea2(iim + 1, jjm + 1, llm), vcovrea2(iim + 1, jjm, llm)
@@ -54,15 +49,8 @@ CONTAINS
 
     REAL, save:: tetarea2(iim + 1, jjm + 1, llm)
     ! potential temperture from reanalysis
-    
-    REAL, save:: qrea2(iim + 1, jjm + 1, llm)
 
-    ! alpha détermine la part des injections de données à chaque étape
-    ! alpha=0 signifie pas d'injection
-    ! alpha=1 signifie injection totale
-    REAL, save:: alpha_q(iim + 1, jjm + 1)
-    REAL, save:: alpha_t(iim + 1, jjm + 1)
-    REAL, save:: alpha_u(iim + 1, jjm + 1), alpha_v(iim + 1, jjm)
+    REAL, save:: qrea2(iim + 1, jjm + 1, llm)
 
     INTEGER l
     REAL tau
@@ -72,49 +60,9 @@ CONTAINS
     real pk(iim + 1, jjm + 1, llm), pks(iim + 1, jjm + 1)
     REAL qsat(iim + 1, jjm + 1, llm)
 
-    REAL dxdys(iip1, jjp1), dxdyu(iip1, jjp1), dxdyv(iip1, jjm)
-
     !-----------------------------------------------------------------------
 
     IF (itau == 0) THEN
-       IF (online) THEN
-          IF (abs(grossismx - 1.) < 0.1 .OR. abs(grossismy - 1.) < 0.1) THEN
-             ! grille regulière
-             if (guide_u) alpha_u = 1. - exp(- factt / tau_max_u)
-             if (guide_v) alpha_v = 1. - exp(- factt / tau_max_v)
-             if (guide_t) alpha_t = 1. - exp(- factt / tau_max_t)
-             if (guide_q) alpha_q = 1. - exp(- factt / tau_max_q)
-          else
-             call init_tau2alpha(dxdys, dxdyu, dxdyv)
-
-             if (guide_u) then
-                CALL tau2alpha(dxdyu, rlatu, tau_min_u, tau_max_u, alpha_u)
-                CALL writefield("alpha_u", alpha_u)
-             end if
-
-             if (guide_v) then
-                CALL tau2alpha(dxdyv, rlatv, tau_min_v, tau_max_v, alpha_v)
-                CALL writefield("alpha_v", alpha_v)
-             end if
-
-             if (guide_t) then
-                CALL tau2alpha(dxdys, rlatu, tau_min_t, tau_max_t, alpha_t)
-                CALL writefield("alpha_t", alpha_t)
-             end if
-
-             if (guide_q)  then
-                CALL tau2alpha(dxdys, rlatu, tau_min_q, tau_max_q, alpha_q)
-                CALL writefield("alpha_q", alpha_q)
-             end if
-          end IF
-       ELSE
-          ! Cas où on force exactement par les variables analysées
-          if (guide_u) alpha_u = 1.
-          if (guide_v) alpha_v = 1.
-          if (guide_t) alpha_t = 1.
-          if (guide_q) alpha_q = 1.
-       END IF
-
        ! Lecture du premier état des réanalyses :
        CALL read_reanalyse(ps, ucovrea2, vcovrea2, tetarea2, qrea2)
        qrea2 = max(qrea2, 0.1)
