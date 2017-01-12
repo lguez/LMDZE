@@ -25,7 +25,6 @@ contains
     ! 1.The loop on files to synchronise
 
     DO ifile = 1, nb_files
-
        IF (present(file)) THEN
           file_exists = (ifile==file)
        ELSE
@@ -36,7 +35,6 @@ contains
           ncid = ncdf_ids(ifile)
           call nf95_sync(ncid)
        END IF
-
     END DO
 
   END SUBROUTINE histsync

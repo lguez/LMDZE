@@ -57,7 +57,7 @@ contains
     USE phytrac_m, ONLY: phytrac
     use radlwsw_m, only: radlwsw
     use yoegwd, only: sugwd
-    USE suphec_m, ONLY: rcpd, retv, rg, rlvtt, romega, rsigma, rtt
+    USE suphec_m, ONLY: rcpd, retv, rg, rlvtt, romega, rsigma, rtt, rmo3, md
     use time_phylmdz, only: itap, increment_itap
     use transp_m, only: transp
     use transp_lay_m, only: transp_lay
@@ -238,6 +238,7 @@ contains
     REAL, save:: pctsrf(klon, nbsrf) ! percentage of surface
     REAL, save:: albsol(klon) ! albedo du sol total visible
     REAL, SAVE:: wo(klon, llm) ! column density of ozone in a cell, in kDU
+    real, parameter:: dobson_u = 2.1415e-05 ! Dobson unit, in kg m-2
 
     real, save:: clwcon(klon, llm), rnebcon(klon, llm)
     real, save:: clwcon0(klon, llm), rnebcon0(klon, llm)
@@ -566,9 +567,6 @@ contains
     if (julien == 0) julien = 360
 
     forall (k = 1: llm) zmasse(:, k) = (paprs(:, k) - paprs(:, k + 1)) / rg
-
-    ! Prescrire l'ozone :
-    wo = ozonecm(REAL(julien), paprs)
 
     ! \'Evaporation de l'eau liquide nuageuse :
     DO k = 1, llm
@@ -920,6 +918,9 @@ contains
     endif
 
     IF (MOD(itap - 1, radpas) == 0) THEN
+       ! Prescrire l'ozone :
+       wo = ozonecm(REAL(julien), paprs)
+
        ! Appeler le rayonnement mais calculer tout d'abord l'albedo du sol.
        ! Calcul de l'abedo moyen par maille
        albsol = sum(falbe * pctsrf, dim = 2)
@@ -1129,6 +1130,7 @@ contains
     END DO
 
     CALL histwrite_phy("albs", albsol)
+    CALL histwrite_phy("tro3", wo * dobson_u * 1e3 / zmasse / rmo3 * md)
     CALL histwrite_phy("rugs", zxrugs)
     CALL histwrite_phy("s_pblh", s_pblh)
     CALL histwrite_phy("s_pblt", s_pblt)

@@ -27,5 +27,6 @@ PROGRAM ce0l
   CALL limit
   CALL grilles_gcm_netcdf_sub(phis)
   close(unit_nml)
+  print *, "ce0l: done"
 
 END PROGRAM ce0l

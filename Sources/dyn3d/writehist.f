@@ -6,38 +6,26 @@ contains
 
   subroutine writehist(time, vcov, ucov, teta, phi, masse, ps)
 
-    ! From writehist.F 1403 2010-07-01 09:02:53Z
-    ! Écriture du fichier histoire au format IOIPSL
-    ! Appels successifs des routines histwrite
+    ! From writehist.F , revision 1403, 2010-07-01 09:02:53Z
+    ! Écriture du fichier histoire
     ! L. Fairhead, LMD, 03/99
 
+    use covnat_m, only: covnat
     use dimens_m, only: llm
-    use com_io_dyn, only: histid, histvid, histuid
+    use histsync_m, only: histsync
+    use histwrite_m, only: histwrite
+    use inithist_m, only: histid, histvid, histuid
     use paramet_m, only: ip1jm, ip1jmp1
     use temps, only: itau_dyn
-    use histwrite_m, only: histwrite
-    use histsync_m, only: histsync
-    use covnat_m, only: covnat
 
-    ! Entree:
-    ! time: temps de l'ecriture
-    ! vcov: vents v covariants
-    ! ucov: vents u covariants
-    ! teta: temperature potentielle
-    ! phi : geopotentiel instantane
-    ! masse: masse
-    ! ps :pression au sol
+    integer, intent(in):: time ! temps de l'ecriture
+    REAL, intent(in):: vcov(ip1jm, llm), ucov(ip1jmp1, llm) ! vent covariant
+    REAL, intent(in):: teta(ip1jmp1, llm) ! temperature potentielle
+    REAL, intent(in):: phi(ip1jmp1, llm) ! geopotentiel instantane
+    REAL, intent(in):: masse(ip1jmp1, llm)
+    REAL, intent(in):: ps(ip1jmp1) ! pression au sol
 
-    ! Arguments
-
-    REAL vcov(ip1jm, llm), ucov(ip1jmp1, llm) 
-    REAL teta(ip1jmp1, llm), phi(ip1jmp1, llm) 
-    REAL, intent(in):: ps(ip1jmp1), masse(ip1jmp1, llm) 
-    integer time
-
-    ! This routine needs IOIPSL to work
-    ! Variables locales
-
+    ! Local:
     logical ok_sync
     integer itau_w
     REAL vnat(ip1jm, llm), unat(ip1jmp1, llm)

@@ -20,13 +20,12 @@ contains
     use dynetat0_m, only: clat, grossismy, dzoomy, tauy
     use heavyside_m, only: heavyside
 
-    REAL, intent(out):: rlatu(jjm + 1)
-    REAL, intent(out):: rlatv(jjm)
-    real, intent(out):: rlatu2(jjm), yprimu2(jjm), rlatu1(jjm), yprimu1(jjm)
+    REAL, intent(out):: rlatu(:) ! (jjm + 1)
+    REAL, intent(out):: rlatv(:) ! (jjm)
+    real, intent(out):: rlatu2(:), yprimu2(:), rlatu1(:), yprimu1(:) ! (jjm)
 
     ! Local: 
 
-    DOUBLE PRECISION champmin, champmax
     INTEGER, PARAMETER:: nmax=30000, nmax2=2*nmax
     REAL dzoom ! distance totale de la zone du zoom (en radians)
     DOUBLE PRECISION ylat(jjm + 1), yprim(jjm + 1)
@@ -41,12 +40,11 @@ contains
     DOUBLE PRECISION pi, pis2, epsilon, pisjm
     DOUBLE PRECISION yo1, yi, ylon2, ymoy, yprimin
     DOUBLE PRECISION yfi, yf1, ffdy
-    DOUBLE PRECISION ypn, deply, y00
-    SAVE y00, deply
+    DOUBLE PRECISION ypn
+    DOUBLE PRECISION, save::deply, y00
 
-    INTEGER i, j, it, ik, iter, jlat
-    INTEGER jpn, jjpn
-    SAVE jpn
+    INTEGER i, j, it, ik, iter, jlat, jjpn
+    INTEGER, save:: jpn
     DOUBLE PRECISION yi2, heavyy0, heavyy0m
     DOUBLE PRECISION fa(0:nmax2), fb(0:nmax2)
     REAL y0min, y0max
@@ -280,14 +278,6 @@ contains
     DO j = 1, jjm
        ylat(j) = rlatu(j) - rlatu(j + 1)
     END DO
-    champmin = 1e12
-    champmax = -1e12
-    DO j = 1, jjm
-       champmin = min(champmin, ylat(j))
-       champmax = max(champmax, ylat(j))
-    END DO
-    champmin = champmin*180./pi
-    champmax = champmax*180./pi
 
     DO j = 1, jjm
        IF (rlatu1(j) <= rlatu2(j)) THEN
@@ -322,7 +312,7 @@ contains
     ENDDO
 
     print *, 'Latitudes'
-    print 3, champmin, champmax
+    print 3, minval(ylat(:jjm)) *180d0/pi, maxval(ylat(:jjm))*180d0/pi
 
 3   Format(1x, ' Au centre du zoom, la longueur de la maille est', &
          ' d environ ', f0.2, ' degres ', /, &

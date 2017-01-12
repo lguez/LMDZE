@@ -98,7 +98,7 @@ contains
     logical leapf
     real dt ! time step, in s
 
-    REAL p3d(iim + 1, jjm + 1, llm+1) ! pressure at layer interfaces, in Pa
+    REAL p3d(iim + 1, jjm + 1, llm + 1) ! pressure at layer interfaces, in Pa
     ! ("p3d(i, j, l)" is at longitude "rlonv(i)", latitude "rlatu(j)",
     ! for interface "l")
 
@@ -202,7 +202,7 @@ contains
           forall (l = 1: llm)
              teta(:, 1, l) = SUM(aire_2d(:iim, 1) * teta(:iim, 1, l)) &
                   / apoln
-             teta(:, jjm + 1, l) = SUM(aire_2d(:iim, jjm+1) &
+             teta(:, jjm + 1, l) = SUM(aire_2d(:iim, jjm + 1) &
                   * teta(:iim, jjm + 1, l)) / apols
           END forall
        END IF

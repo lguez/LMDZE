@@ -8,14 +8,12 @@ module histwrite_phy_m
 
   implicit none
 
-  INTEGER:: itap = 0 ! number of calls to "physiq"
-
   INTERFACE histwrite_phy
      MODULE PROCEDURE histwrite2d_phy, histwrite3d_phy
   end INTERFACE histwrite_phy
 
   private
-  public itap, histwrite_phy
+  public histwrite_phy
 
 contains
 

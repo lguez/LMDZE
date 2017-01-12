@@ -2,7 +2,7 @@ module conf_gcm_m
 
   IMPLICIT NONE
 
-  INTEGER:: nday = 10 ! nombre de jours d'int\'egration
+  INTEGER:: nday = 1 ! nombre de jours d'int\'egration
   integer:: day_step = 240 ! nombre de pas de temps de la dynamique par jour
   integer:: iperiod = 5 ! periode pour le pas Matsuno (en pas de temps)
 
@@ -46,6 +46,7 @@ contains
     ! Version du 29/04/97
 
     use abort_gcm_m, only: abort_gcm
+    use nr_util, only: assert
     use unit_nml_m, only: unit_nml
 
     namelist /conf_gcm_nml/ raz_date, nday, day_step, iperiod, iapp_tracvl, &
@@ -76,6 +77,9 @@ contains
 
     IF (MOD(day_step, iphysiq)/= 0) call abort_gcm("conf_gcm", &
          'Il faut choisir un nombre de pas par jour multiple de "iphysiq".')
+
+    call assert(mod(iphysiq, iperiod) == 0, &
+         "conf_gcm -- iphysiq must be multiple of iperiod")
 
     lmt_pas = day_step / iphysiq
     print *, 'Number of time steps of "physics" per day: ', lmt_pas

@@ -112,7 +112,6 @@ contains
     RCVV = RCPV-RV
     RETV = RV / RD - 1.
     print *, 'Thermodynamics, gas'
-    print '('' Ozone mass = '', e13.7)', RMO3
     print *, "rd = ", RD, "J K-1 kg-1"
     print *, "rv = ", RV, "J K-1 kg-1"
     print '('' Cpd = '', e13.7)', RCPD

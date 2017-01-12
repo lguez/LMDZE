@@ -52,7 +52,7 @@ contains
     REAL, intent(in):: q(:, :, :, :) ! (iim + 1, jjm + 1, llm, nqmx)
     ! mass fractions of advected fields
 
-    REAL, intent(in):: p3d(:, :, :) ! (iim + 1, jjm + 1, llm+1) 
+    REAL, intent(in):: p3d(:, :, :) ! (iim + 1, jjm + 1, llm + 1) 
     ! pressure at layer interfaces, in Pa
     ! ("p3d(i, j, l)" is at longitude "rlonv(i)", latitude "rlatu(j)",
     ! for interface "l")
@@ -219,7 +219,7 @@ contains
        DO j = 2, jjm
           ig0 = 1 + (j - 2) * iim
           DO i = 1, iim - 1
-             dufi(i, j, l) = 0.5 * (d_u(ig0 + i, l) + d_u(ig0 + i+1, l)) &
+             dufi(i, j, l) = 0.5 * (d_u(ig0 + i, l) + d_u(ig0 + i + 1, l)) &
                   * cu_2d(i, j)
           ENDDO
           dufi(iim, j, l) = 0.5 * (d_u(ig0 + 1, l) + d_u(ig0 + iim, l)) &
@@ -234,7 +234,7 @@ contains
        DO j = 2, jjm - 1
           ig0 = 1 + (j - 2) * iim
           DO i = 1, iim
-             dvfi(i, j, l) = 0.5 * (d_v(ig0 + i, l) + d_v(ig0 + i+iim, l)) &
+             dvfi(i, j, l) = 0.5 * (d_v(ig0 + i, l) + d_v(ig0 + i + iim, l)) &
                   * cv_2d(i, j)
           ENDDO
           dvfi(iim + 1, j, l) = dvfi(1, j, l)

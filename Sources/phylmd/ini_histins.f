@@ -259,6 +259,9 @@ contains
 
        ! Champs 3D:
 
+       CALL histdef(nid_ins, "tro3", "ozone mole fraction", "-", &
+            iim, jjm + 1, nhori, llm, 1, llm, nvert, "inst(X)", zsto, zout)
+
        CALL histdef(nid_ins, "temp", "Temperature", "K", &
             iim, (jjm + 1), nhori, llm, 1, llm, nvert, &
             "inst(X)", zsto, zout)

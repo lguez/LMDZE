@@ -2,6 +2,8 @@ module inithist_m
 
   implicit none
 
+  integer histid, histvid, histuid
+
 contains
 
   subroutine inithist(tstep, nq, t_ops, t_wrt)
@@ -12,7 +14,6 @@ contains
     ! Routine d'initialisation des écritures des fichiers histoires
     ! LMDZ au format IOIPSL.
 
-    USE com_io_dyn, ONLY: histid, histuid, histvid
     USE dimens_m, ONLY: jjm, llm
     USE disvert_m, ONLY: presnivs
     use dynetat0_m, only: day_ref, annee_ref, rlatu, rlatv, rlonu, rlonv

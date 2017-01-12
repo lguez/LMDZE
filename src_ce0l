@@ -17,6 +17,7 @@ covcont.f
 dimens_m.f
 dimphy.f
 dimsoil.f
+dist_sphe.f
 disvert.f
 dynetat0.f
 dynredem0.f
@@ -34,9 +35,9 @@ flumass.f
 fxhyp.f
 fyhyp.f
 geopot.f
-grid_atob.f
 grid_change.f
 grid_noro_m.f
+grille_m.f
 grilles_gcm_netcdf_sub.f
 gr_int_dyn_m.f
 heavyside.f

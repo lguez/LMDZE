@@ -2,9 +2,7 @@ module time_phylmdz
 
   implicit none
 
-  INTEGER:: itap = 0 
-  ! number of calls to "physiq", numero du pas de temps courant
-
+  INTEGER:: itap = 0 ! number of calls to "physiq"
   integer itau_w ! pas de temps d'\'ecriture
 
 contains

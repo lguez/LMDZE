@@ -63,8 +63,8 @@ CONTAINS
     REAL, INTENT(IN):: pdate0 ! the Julian date at which the itau was equal to 0
     REAL, INTENT(IN):: pdeltat ! time step of the counter itau, in seconds
 
-    INTEGER, INTENT(OUT):: fileid ! ID of the netcdf file
     INTEGER, INTENT(OUT):: horiid ! ID of the horizontal grid
+    INTEGER, INTENT(OUT):: fileid ! ID of the netcdf file
 
     ! Variables local to the procedure:
     REAL, DIMENSION(size(lon_1d), size(lat_1d)):: lon, lat

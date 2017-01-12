@@ -4,12 +4,11 @@ module radlwsw_m
 
 contains
 
-  SUBROUTINE radlwsw(dist, mu0, fract, paprs, play, tsol, albedo, &
-       t, q, wo, cldfra, cldemi, cldtaupd, heat, heat0, cool, cool0, radsol, &
-       albpla, topsw, toplw, solsw, sollw, sollwdown, topsw0, toplw0, solsw0, &
-       sollw0, lwdn0, lwdn, lwup0, lwup, swdn0, swdn, swup0, swup, ok_ade, &
-       ok_aie, tau_ae, piz_ae, cg_ae, topswad, solswad, cldtaupi, topswai, &
-       solswai)
+  SUBROUTINE radlwsw(dist, mu0, fract, paprs, play, tsol, albedo, t, q, wo, &
+       cldfra, cldemi, cldtaupd, heat, heat0, cool, cool0, radsol, albpla, &
+       topsw, toplw, solsw, sollw, sollwdown, topsw0, toplw0, solsw0, sollw0, &
+       lwdn0, lwdn, lwup0, lwup, swdn0, swdn, swup0, swup, ok_ade, ok_aie, &
+       tau_ae, piz_ae, cg_ae, topswad, solswad, cldtaupi, topswai, solswai)
 
     ! From LMDZ4/libf/phylmd/radlwsw.F, version 1.4 2005/06/06 13:16:33
     ! Author: Z. X. Li (LMD/CNRS) 
@@ -43,8 +42,6 @@ contains
     use sw_m, only: sw
     USE yoethf_m, ONLY: rvtmp2
         
-    ! Arguments:
-
     real, intent(in):: dist ! distance astronomique terre-soleil
     real, intent(in):: mu0(klon) ! cosinus de l'angle zenithal
     real, intent(in):: fract(klon) ! duree d'ensoleillement normalisee
@@ -53,31 +50,31 @@ contains
     real, intent(in):: tsol(klon) ! temperature du sol (en K)
     real, intent(in):: albedo(klon) ! albedo du sol (entre 0 et 1)
     real, intent(in):: t(klon, klev) ! temperature (K)
-    real q(klon, klev)
-    ! q--------input-R- vapeur d'eau (en kg/kg)
+    real, intent(in):: q(klon, klev) ! vapeur d'eau (en kg/kg)
 
     real, intent(in):: wo(klon, klev)
     ! column-density of ozone in a layer, in kilo-Dobsons
 
-    real cldfra(klon, klev), cldemi(klon, klev)
-    ! cldfra---input-R- fraction nuageuse (entre 0 et 1)
-    ! cldemi---input-R- emissivite des nuages dans l'IR (entre 0 et 1)
+    real, intent(in):: cldfra(klon, klev) ! fraction nuageuse (entre 0 et 1)
 
-    real cldtaupd(klon, klev)
-    ! input-R- epaisseur optique des nuages dans le visible (present-day value)
+    real, intent(in):: cldemi(klon, klev)
+    ! emissivite des nuages dans l'IR (entre 0 et 1)
+
+    real, intent(in):: cldtaupd(klon, klev)
+    ! epaisseur optique des nuages dans le visible (present-day value)
 
     real, intent(out):: heat(klon, klev)
     ! échauffement atmosphérique (visible) (K/jour)
 
-    real heat0(klon, klev)
-    real cool(klon, klev)
-    ! cool-----output-R- refroidissement dans l'IR (K/jour)
-    real cool0(klon, klev)
-    real radsol(klon)
-    ! radsol---output-R- bilan radiatif net au sol (W/m**2) (+ vers le bas)
+    real, intent(out):: heat0(klon, klev)
+    real, intent(out):: cool(klon, klev) ! refroidissement dans l'IR (K/jour)
+    real, intent(out):: cool0(klon, klev)
+
+    real, intent(out):: radsol(klon)
+    ! bilan radiatif net au sol (W/m**2) (+ vers le bas)
+
     real, intent(out):: albpla(klon) ! albedo planetaire (entre 0 et 1)
-    real topsw(klon)
-    ! topsw----output-R- flux solaire net au sommet de l'atm.
+    real, intent(out):: topsw(klon) ! flux solaire net au sommet de l'atm.
 
     real, intent(out):: toplw(klon)
     ! rayonnement infrarouge montant au sommet de l'atmosphère
@@ -88,41 +85,34 @@ contains
     ! rayonnement infrarouge montant à la surface
 
     real, intent(out):: sollwdown(klon)
-    real topsw0(klon)
+    real, intent(out):: topsw0(klon)
     real, intent(out):: toplw0(klon)
-    real solsw0(klon), sollw0(klon)
-    !IM output 3D: SWup, SWdn, LWup, LWdn
-    REAL lwdn0(klon, klev+1), lwdn(klon, klev+1)
-    REAL lwup0(klon, klev+1), lwup(klon, klev+1)
-    REAL swdn0(klon, klev+1), swdn(klon, klev+1)
-    REAL swup0(klon, klev+1), swup(klon, klev+1)
+    real, intent(out):: solsw0(klon), sollw0(klon)
+    REAL, intent(out):: lwdn0(klon, klev+1), lwdn(klon, klev+1)
+    REAL, intent(out):: lwup0(klon, klev+1), lwup(klon, klev+1)
+    REAL, intent(out):: swdn0(klon, klev+1), swdn(klon, klev+1)
+    REAL, intent(out):: swup0(klon, klev+1), swup(klon, klev+1)
 
-    logical ok_ade, ok_aie 
-    ! switches whether to use aerosol direct (indirect) effects or not
-    ! ok_ade---input-L- apply the Aerosol Direct Effect or not?
-    ! ok_aie---input-L- apply the Aerosol Indirect Effect or not?
+    logical, intent(in):: ok_ade ! apply the Aerosol Direct Effect
+    logical, intent(in):: ok_aie ! apply the Aerosol Indirect Effect
 
-    real tau_ae(klon, klev, 2), piz_ae(klon, klev, 2), cg_ae(klon, klev, 2)
-    ! input-R- aerosol optical properties (calculated in aeropt.F)
+    ! aerosol optical properties (calculated in aeropt.F):
+    real, intent(in):: tau_ae(klon, klev, 2), piz_ae(klon, klev, 2)
+    real, intent(in):: cg_ae(klon, klev, 2)
 
-    real topswad(klon), solswad(klon)
-    ! output: aerosol direct forcing at TOA and surface
-    ! topswad---output-R- ray. solaire absorbe au sommet de l'atm. (aerosol dir)
-    ! solswad---output-R- ray. solaire net absorbe a la surface (aerosol dir)
-
-    real cldtaupi(klon, klev)
-    ! cloud optical thickness for pre-industrial aerosol concentrations
-    ! (i.e. with a smaller droplet concentration and thus larger droplet radii)
-    ! -input-R- epaisseur optique des nuages dans le visible
-    ! calculated for pre-industrial (pi) aerosol concentrations,
+    real, intent(out):: topswad(klon), solswad(klon)
+    ! aerosol direct forcing at TOA and surface
+    ! ray. solaire net absorbe
+    
+    real, intent(in):: cldtaupi(klon, klev)
+    ! cloud visible optical thickness for pre-industrial aerosol concentrations
     ! i.e. with smaller droplet concentration, thus larger droplets,
     ! thus generally cdltaupi cldtaupd it is needed for the
     ! diagnostics of the aerosol indirect radiative forcing
 
-    real topswai(klon), solswai(klon)
-    ! output: aerosol indirect forcing atTOA and surface
-    ! topswai---output-R- ray. solaire absorbe au sommet de l'atm. (aerosol ind)
-    ! solswai---output-R- ray. solaire net absorbe a la surface (aerosol ind)
+    real, intent(out):: topswai(klon), solswai(klon)
+    ! aerosol indirect forcing at TOA and surface
+    ! ray. solaire net absorbe
 
     ! Local:
 
@@ -130,7 +120,6 @@ contains
     double precision pizae(kdlon, klev, 2)
     double precision cgae(kdlon, klev, 2)
 
-    !IM output 3D 
     DOUBLE PRECISION ZFSUP(KDLON, KLEV+1)
     DOUBLE PRECISION ZFSDN(KDLON, KLEV+1)
     DOUBLE PRECISION ZFSUP0(KDLON, KLEV+1)

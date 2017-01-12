@@ -33,7 +33,7 @@ contains
     use fxhyp_m, only: fxhyp
     use fyhyp_m, only: fyhyp
     use geopot_m, only: geopot
-    use grid_atob, only: grille_m
+    use grille_m_m, only: grille_m
     use grid_change, only: init_dyn_phy, dyn_phy
     use indicesol, only: is_oce, is_sic, is_ter, is_lic, epsfra
     use iniadvtrac_m, only: iniadvtrac

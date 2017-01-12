@@ -16,7 +16,7 @@ contains
     ! also provided us the code.
 
     ! A. J. Krueger and R. A. Minzner, A Mid-Latitude Ozone Model for the
-    ! 1976 U.S. Standard Atmosphere, J. Geophys. Res., 81, 4477, (1976).
+    ! 1976 U. S. Standard Atmosphere, J. Geophys. Res., 81, 4477, (1976).
 
     ! Keating, G. M. and D. F. Young, 1985: Interim reference models for the
     ! middle atmosphere, Handbook for MAP, vol. 16, 205-229.

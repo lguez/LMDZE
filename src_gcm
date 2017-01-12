@@ -39,7 +39,6 @@ comdissnew.f
 comfisrtilp.f
 comgeom.f
 comgeomphy.f
-com_io_dyn.f
 concvl.f
 conema3_m.f
 conf_gcm.f
