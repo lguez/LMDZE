@@ -14,7 +14,7 @@ contains
 
     ! Vertical profile of buoyancy computed here (use of buoybase).
 
-    use conema3_m, only: epmax
+    use conf_phys_m, only: epmax
     use cv30_param_m, only: minorig, nl
     use cv_thermo_m, only: clmcpv, eps
     USE dimphy, ONLY: klon, klev

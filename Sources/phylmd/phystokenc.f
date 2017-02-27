@@ -8,7 +8,7 @@ contains
        pfm_therm, pentr_therm, pcoefh, yu1, yv1, ftsol, pctsrf, frac_impa, &
        frac_nucl, pphis, paire, dtime)
 
-    ! From phylmd/phystokenc.F, version 1.2 2004/06/22 11:45:35
+    ! From phylmd/phystokenc.F, version 1.2, 2004/06/22 11:45:35
     ! Author: Fr\'ed\'eric Hourdin
     ! Objet : \'ecriture des variables pour transport offline
 

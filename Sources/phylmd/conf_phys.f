@@ -4,6 +4,8 @@ module conf_phys_m
 
   integer:: iflag_pbl = 1 ! for the planetary boundary layer
   REAL:: rad_chau1 = 13., rad_chau2 = 9.
+  real:: epmax = 0.993 ! \'efficacit\'e de pr\'ecipitation
+  integer:: iflag_clw = 0
 
 contains
 
@@ -17,13 +19,12 @@ contains
     use clesphys2, only: read_clesphys2
     USE comfisrtilp, ONLY: cld_lc_con, cld_lc_lsc, cld_tau_con, &
          cld_tau_lsc, coef_eva, ffallv_con, ffallv_lsc, iflag_pdf, reevap_ice
-    USE conema3_m, ONLY: epmax, iflag_clw, ok_adj_ema
     use unit_nml_m, only: unit_nml
     USE yomcst, ONLY: read_YOMCST
 
-    namelist /conf_phys_nml/ epmax, ok_adj_ema, iflag_clw, cld_lc_lsc, &
-         cld_lc_con, cld_tau_lsc, cld_tau_con, ffallv_lsc, ffallv_con, &
-         coef_eva, reevap_ice, iflag_pdf, iflag_pbl
+    namelist /conf_phys_nml/ epmax, iflag_clw, cld_lc_lsc, cld_lc_con, &
+         cld_tau_lsc, cld_tau_con, ffallv_lsc, ffallv_con, coef_eva, &
+         reevap_ice, iflag_pdf, iflag_pbl
 
     namelist /nuagecom/ rad_chau1, rad_chau2
 
@@ -33,9 +34,6 @@ contains
     call read_clesphys2
     call read_YOMCST
 
-    epmax = .993
-    ok_adj_ema = .false.
-    iflag_clw = 0
     cld_lc_lsc = 2.6e-4
     cld_lc_con = 2.6e-4
     cld_tau_lsc = 3600.

@@ -4,7 +4,7 @@ module clmain_m
 
 contains
 
-  SUBROUTINE clmain(dtime, pctsrf, t, q, u, v, jour, rmu0, ftsol, cdmmax, &
+  SUBROUTINE clmain(dtime, pctsrf, t, q, u, v, jour, mu0, ftsol, cdmmax, &
        cdhmax, ksta, ksta_ter, ok_kzmin, ftsoil, qsol, paprs, pplay, snow, &
        qsurf, evap, falbe, fluxlat, rain_fall, snow_f, solsw, sollw, fder, &
        rugos, agesno, rugoro, d_t, d_q, d_u, d_v, d_ts, flux_t, flux_q, &
@@ -53,7 +53,7 @@ contains
     REAL, INTENT(IN):: q(klon, klev) ! vapeur d'eau (kg/kg)
     REAL, INTENT(IN):: u(klon, klev), v(klon, klev) ! vitesse
     INTEGER, INTENT(IN):: jour ! jour de l'annee en cours
-    REAL, intent(in):: rmu0(klon) ! cosinus de l'angle solaire zenithal     
+    REAL, intent(in):: mu0(klon) ! cosinus de l'angle solaire zenithal     
     REAL, INTENT(IN):: ftsol(klon, nbsrf) ! temp\'erature du sol (en K)
     REAL, INTENT(IN):: cdmmax, cdhmax ! seuils cdrm, cdrh
     REAL, INTENT(IN):: ksta, ksta_ter
@@ -438,7 +438,7 @@ contains
 
           ! calculer la diffusion de "q" et de "h"
           CALL clqh(dtime, jour, firstcal, nsrf, ni(:knon), ytsoil(:knon, :), &
-               yqsol, rmu0, yrugos, yrugoro, yu1, yv1, coefh(:knon, :), yt, &
+               yqsol, mu0, yrugos, yrugoro, yu1, yv1, coefh(:knon, :), yt, &
                yq, yts(:knon), ypaprs, ypplay, ydelp, yrads, yalb(:knon), &
                ysnow, yqsurf, yrain_f, ysnow_f, yfder, yfluxlat, &
                pctsrf_new_sic, yagesno(:knon), y_d_t, y_d_q, y_d_ts(:knon), &

@@ -12,7 +12,7 @@ contains
     ! Tendencies, precipitation, variables of interface with other
     ! processes, etc.
 
-    use conema3_m, only: iflag_clw
+    use conf_phys_m, only: iflag_clw
     use cv30_param_m, only: minorig, nl, sigd
     use cv_thermo_m, only: rowl
     USE dimphy, ONLY: klev, klon

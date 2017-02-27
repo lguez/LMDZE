@@ -66,9 +66,11 @@ contains
     real, intent(out):: heat(klon, klev)
     ! échauffement atmosphérique (visible) (K/jour)
 
-    real, intent(out):: heat0(klon, klev)
+    real, intent(out):: heat0(klon, klev) ! chauffage solaire ciel clair
     real, intent(out):: cool(klon, klev) ! refroidissement dans l'IR (K/jour)
+
     real, intent(out):: cool0(klon, klev)
+    ! refroidissement infrarouge ciel clair
 
     real, intent(out):: radsol(klon)
     ! bilan radiatif net au sol (W/m**2) (+ vers le bas)

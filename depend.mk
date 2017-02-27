@@ -39,7 +39,7 @@ comgeomphy.o : dimphy.o
 concvl.o : yoethf.o suphec.o FCTTRE.o dimphy.o cv_driver.o comconst.o 
 conf_gcm.o : unit_nml_m.o abort_gcm.o 
 conf_guide.o : writefield.o unit_nml_m.o tau2alpha.o init_tau2alpha.o dynetat0.o conf_gcm.o comconst.o abort_gcm.o dimens_m.o 
-conf_phys.o : YOMCST.o unit_nml_m.o conema3_m.o comfisrtilp.o clesphys2.o clesphys.o 
+conf_phys.o : YOMCST.o unit_nml_m.o comfisrtilp.o clesphys2.o clesphys.o 
 conflx.o : FCTTRE.o yoethf.o suphec.o dimphy.o flxmain.o 
 convflu.o : comgeom.o paramet_m.o dimens_m.o 
 convmas.o : filtreg_scal.o paramet_m.o dimens_m.o 
@@ -55,9 +55,9 @@ cv30_prelim.o : suphec.o dimphy.o cv_thermo.o cv30_param.o
 cv30_trigger.o : dimphy.o cv30_param.o 
 cv30_uncompress.o : dimphy.o cv30_param.o 
 cv30_undilute1.o : suphec.o dimphy.o cv_thermo.o cv30_param.o 
-cv30_undilute2.o : suphec.o dimphy.o cv_thermo.o cv30_param.o conema3_m.o 
+cv30_undilute2.o : suphec.o dimphy.o cv_thermo.o cv30_param.o conf_phys.o 
 cv30_unsat.o : suphec.o cv_thermo.o cv30_param.o 
-cv30_yield.o : suphec.o dimphy.o cv_thermo.o cv30_param.o conema3_m.o 
+cv30_yield.o : suphec.o dimphy.o cv_thermo.o cv30_param.o conf_phys.o 
 cv_driver.o : dimphy.o cv30_yield.o cv30_unsat.o cv30_undilute2.o cv30_undilute1.o cv30_uncompress.o cv30_trigger.o cv30_tracer.o cv30_prelim.o cv30_param.o cv30_mixing.o cv30_feed.o cv30_compress.o cv30_closure.o comconst.o 
 cv_thermo.o : suphec.o 
 cvltr.o : suphec.o dimphy.o 
@@ -183,7 +183,7 @@ moycum.o : errioipsl.o
 nat2gcm.o : paramet_m.o dimens_m.o comgeom.o comconst.o 
 newmicro.o : suphec.o dimphy.o conf_phys.o 
 nflxtr.o : suphec.o dimphy.o 
-nuage.o : suphec.o dimphy.o dimens_m.o 
+nuage.o : suphec.o dimphy.o 
 nxgrad.o : comgeom.o paramet_m.o dimens_m.o 
 nxgrad_gam.o : comgeom.o paramet_m.o dimens_m.o 
 nxgraro2.o : rotatf.o filtreg_v.o dimens_m.o 
@@ -243,7 +243,7 @@ thermcell.o : suphec.o dimphy.o
 time_phylmdz.o : phyetat0.o 
 tourpot.o : filtreg_v.o dimens_m.o comgeom.o 
 transp.o : suphec.o dimphy.o dimens_m.o 
-transp_lay.o : suphec.o dimphy.o dimens_m.o 
+transp_lay.o : suphec.o dimphy.o 
 ustarhb.o : dimphy.o 
 vdif_kcay.o : yamada.o dimphy.o 
 vitvert.o : paramet_m.o disvert.o dimens_m.o 

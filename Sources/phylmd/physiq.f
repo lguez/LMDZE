@@ -206,7 +206,7 @@ contains
     REAL, save:: pfrac_1nucl(klon, llm)
     ! Produits des coefs lessi nucl (alpha = 1)
 
-    REAL frac_impa(klon, llm) ! fractions d'aerosols lessivees (impaction)
+    REAL frac_impa(klon, llm) ! fraction d'a\'erosols lessiv\'es (impaction)
     REAL frac_nucl(klon, llm) ! idem (nucleation)
 
     REAL, save:: rain_fall(klon)
@@ -387,9 +387,8 @@ contains
     REAL ztsol(klon)
 
     REAL d_t_ec(klon, llm)
-    ! tendance due \`a la conversion Ec en énergie thermique
-
-    REAL ZRCPD
+    ! tendance due \`a la conversion d'\'energie cin\'etique en
+    ! énergie thermique
 
     REAL, save:: t2m(klon, nbsrf), q2m(klon, nbsrf) 
     ! temperature and humidity at 2 m
@@ -1044,8 +1043,7 @@ contains
     ! conversion Ec en énergie thermique
     DO k = 1, llm
        DO i = 1, klon
-          ZRCPD = RCPD * (1. + RVTMP2 * q_seri(i, k))
-          d_t_ec(i, k) = 0.5 / ZRCPD &
+          d_t_ec(i, k) = 0.5 / (RCPD * (1. + RVTMP2 * q_seri(i, k))) &
                * (u(i, k)**2 + v(i, k)**2 - u_seri(i, k)**2 - v_seri(i, k)**2)
           t_seri(i, k) = t_seri(i, k) + d_t_ec(i, k)
           d_t_ec(i, k) = d_t_ec(i, k) / dtphys
@@ -1156,6 +1154,9 @@ contains
     CALL histwrite_phy("dtvdf", d_t_vdf)
     CALL histwrite_phy("dqvdf", d_q_vdf)
     CALL histwrite_phy("rhum", zx_rh)
+    CALL histwrite_phy("d_t_ec", d_t_ec)
+    CALL histwrite_phy("dtsw0", heat0 / 86400.)
+    CALL histwrite_phy("dtlw0", - cool0 / 86400.)
 
     if (ok_instan) call histsync(nid_ins)
 

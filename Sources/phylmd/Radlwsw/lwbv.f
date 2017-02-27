@@ -80,8 +80,8 @@ contains
     INTEGER nuaer, ntraer
     ! ------------------------------------------------------------------
     ! * COMPUTES PLANCK FUNCTIONS:
-    CALL lwb(pdt0, ptave, ptl, zb, pbint, pbsui, zbsur, zbtop, zdbsl, zga, zgb, &
-         zgasur, zgbsur, zgatop, zgbtop)
+    CALL lwb(pdt0, ptave, ptl, zb, pbint, pbsui, zbsur, zbtop, zdbsl, zga, &
+         zgb, zgasur, zgbsur, zgatop, zgbtop)
     ! ------------------------------------------------------------------
     ! * PERFORMS THE VERTICAL INTEGRATION:
     nuaer = nua

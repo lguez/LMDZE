@@ -12,12 +12,12 @@ contains
        yv1, ftsol, pctsrf, frac_impa, frac_nucl, da, phi, mp, upwd, dnwd, &
        tr_seri, zmasse, ncid_startphy)
 
-    ! From phylmd/phytrac.F, version 1.15 2006/02/21 08:08:30 (SVN
-    ! revision 679) and phylmd/write_histrac.h, version 1.9 2006/02/21
-    ! 08:08:30
+    ! From phylmd/phytrac.F, version 1.15, 2006/02/21 08:08:30 (SVN
+    ! revision 679) and phylmd/write_histrac.h, version 1.9,
+    ! 2006/02/21 08:08:30
 
     ! Authors: Fr\'ed\'eric Hourdin, Abderrahmane Idelkadi, Marie-Alice
-    ! Foujols, Olivia
+    ! Foujols
 
     ! Objet : moniteur g\'en\'eral des tendances des traceurs
 
@@ -25,7 +25,7 @@ contains
     ! bien les vrais traceurs, sans la vapeur d'eau ni l'eau liquide.
 
     ! Modifications pour les traceurs :
-    ! - uniformisation des parametrisations dans phytrac
+    ! - uniformisation des param\'etrisations dans phytrac
     ! - stockage des moyennes des champs n\'ecessaires en mode traceur off-line 
 
     use abort_gcm_m, only: abort_gcm
@@ -91,8 +91,8 @@ contains
     real, intent(in):: pctsrf(klon, nbsrf) ! Pourcentage de sol f(nature du sol)
 
     ! Lessivage pour le on-line
-    REAL frac_impa(klon, llm) ! fraction d'aerosols impactes
-    REAL frac_nucl(klon, llm) ! fraction d'aerosols nuclees
+    REAL, intent(in):: frac_impa(klon, llm) ! fraction d'aerosols impactes
+    REAL, intent(in):: frac_nucl(klon, llm) ! fraction d'aerosols nuclees
 
     ! Kerry Emanuel
     real, intent(in):: da(klon, llm), phi(klon, llm, llm), mp(klon, llm)
@@ -166,12 +166,14 @@ contains
     REAL d_tr_th(klon, llm, nqmx - 2) ! la tendance des thermiques
     REAL d_tr_dec(klon, llm, 2) ! la tendance de la decroissance 
     ! ! radioactive du rn - > pb 
-    REAL d_tr_lessi_impa(klon, llm, nqmx - 2) ! la tendance du lessivage 
-    ! ! par impaction
-    REAL d_tr_lessi_nucl(klon, llm, nqmx - 2) ! la tendance du lessivage 
-    ! ! par nucleation 
-    REAL flestottr(klon, llm, nqmx - 2) ! flux de lessivage 
-    ! ! dans chaque couche 
+
+    REAL d_tr_lessi_impa(klon, llm, nqmx - 2)
+    ! tendance du lessivage par impaction
+
+    REAL d_tr_lessi_nucl(klon, llm, nqmx - 2)
+    ! tendance du lessivage par nucleation
+
+    REAL flestottr(klon, llm, nqmx - 2) ! flux de lessivage dans chaque couche 
 
     real ztra_th(klon, llm)
     integer isplit, varid
@@ -179,7 +181,6 @@ contains
     ! Controls:
     logical:: couchelimite = .true.
     logical:: convection = .true.
-    logical:: lessivage = .true.
     logical, save:: inirnpb
 
     !--------------------------------------
@@ -188,7 +189,6 @@ contains
     call assert(shape(tr_seri) == (/klon, llm, nqmx - 2/), "phytrac tr_seri")
 
     if (firstcal) then
-       print *, 'phytrac: pdtphys = ', pdtphys
        inirnpb = .true.
 
        ! Initialisation de certaines variables pour le radon et le plomb 
@@ -349,60 +349,55 @@ contains
 
     ! Calcul de l'effet de la precipitation
 
-    IF (lessivage) THEN
-       d_tr_lessi_nucl = 0. 
-       d_tr_lessi_impa = 0. 
-       flestottr = 0. 
+    d_tr_lessi_nucl = 0. 
+    d_tr_lessi_impa = 0. 
+    flestottr = 0. 
 
-       ! tendance des aerosols nuclees et impactes 
+    ! tendance des aerosols nuclees et impactes 
 
-       DO it = 1, nqmx - 2
-          IF (aerosol(it)) THEN
-             DO k = 1, llm
-                DO i = 1, klon
-                   d_tr_lessi_nucl(i, k, it) = d_tr_lessi_nucl(i, k, it) + &
-                        (1 - frac_nucl(i, k))*tr_seri(i, k, it)
-                   d_tr_lessi_impa(i, k, it) = d_tr_lessi_impa(i, k, it) + &
-                        (1 - frac_impa(i, k))*tr_seri(i, k, it)
-                ENDDO
-             ENDDO
-          ENDIF
-       ENDDO
-
-       ! Mises a jour des traceurs + calcul des flux de lessivage 
-       ! Mise a jour due a l'impaction et a la nucleation
-
-       DO it = 1, nqmx - 2
-          IF (aerosol(it)) THEN
-             DO k = 1, llm
-                DO i = 1, klon
-                   tr_seri(i, k, it) = tr_seri(i, k, it) * frac_impa(i, k) &
-                        * frac_nucl(i, k)
-                ENDDO
-             ENDDO
-          ENDIF
-       ENDDO
-
-       ! Flux lessivage total 
-
-       DO it = 1, nqmx - 2
+    DO it = 1, nqmx - 2
+       IF (aerosol(it)) THEN
           DO k = 1, llm
              DO i = 1, klon
-                flestottr(i, k, it) = flestottr(i, k, it) &
-                     - (d_tr_lessi_nucl(i, k, it) + d_tr_lessi_impa(i, k, it)) &
-                     * (paprs(i, k)-paprs(i, k+1)) / (RG * pdtphys)
+                d_tr_lessi_nucl(i, k, it) = d_tr_lessi_nucl(i, k, it) + &
+                     (1 - frac_nucl(i, k))*tr_seri(i, k, it)
+                d_tr_lessi_impa(i, k, it) = d_tr_lessi_impa(i, k, it) + &
+                     (1 - frac_impa(i, k))*tr_seri(i, k, it)
              ENDDO
           ENDDO
+       ENDIF
+    ENDDO
+
+    ! Mises a jour des traceurs + calcul des flux de lessivage 
+    ! Mise a jour due a l'impaction et a la nucleation
+
+    DO it = 1, nqmx - 2
+       IF (aerosol(it)) THEN
+          DO k = 1, llm
+             DO i = 1, klon
+                tr_seri(i, k, it) = tr_seri(i, k, it) * frac_impa(i, k) &
+                     * frac_nucl(i, k)
+             ENDDO
+          ENDDO
+       ENDIF
+    ENDDO
+
+    ! Flux lessivage total 
+    DO it = 1, nqmx - 2
+       DO k = 1, llm
+          DO i = 1, klon
+             flestottr(i, k, it) = flestottr(i, k, it) &
+                  - (d_tr_lessi_nucl(i, k, it) + d_tr_lessi_impa(i, k, it)) &
+                  * (paprs(i, k)-paprs(i, k+1)) / (RG * pdtphys)
+          ENDDO
        ENDDO
-    ENDIF
+    ENDDO
 
     ! Ecriture des sorties
     CALL histwrite_phy("zmasse", zmasse)
     DO it=1, nqmx - 2
        CALL histwrite_phy(tname(it+2), tr_seri(:, :, it))
-       if (lessivage) THEN
-          CALL histwrite_phy("fl"//tname(it+2), flestottr(:, :, it))
-       endif
+       CALL histwrite_phy("fl"//tname(it+2), flestottr(:, :, it))
        CALL histwrite_phy("d_tr_th_"//tname(it+2), d_tr_th(:, :, it))
        CALL histwrite_phy("d_tr_cv_"//tname(it+2), d_tr_cv(:, :, it))
        CALL histwrite_phy("d_tr_cl_"//tname(it+2), d_tr_cl(:, :, it))

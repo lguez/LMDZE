@@ -8,9 +8,8 @@ contains
        d_ql, rneb, radliq, rain, snow, pfrac_impa, pfrac_nucl, pfrac_1nucl, &
        frac_impa, frac_nucl, prfl, psfl, rhcl)
 
-    ! From phylmd/fisrtilp.F, version 1.2 2004/11/09 16:55:40
+    ! From phylmd/fisrtilp.F, version 1.2, 2004/11/09 16:55:40
     ! First author: Z. X. Li (LMD/CNRS), 20 mars 1995
-    ! Other authors: Olivier, AA, IM, YM, MAF
 
     ! Objet : condensation et pr\'ecipitation stratiforme, sch\'ema de
     ! nuage, sch\'ema de condensation \`a grande \'echelle (pluie).
@@ -22,8 +21,6 @@ contains
     USE numer_rec_95, ONLY: nr_erf
     USE suphec_m, ONLY: rcpd, rd, retv, rg, rlstt, rlvtt, rtt
     USE yoethf_m, ONLY: r2es, r5ies, r5les, rvtmp2
-
-    ! Arguments:
 
     REAL, INTENT (IN):: dtime ! intervalle du temps (s) 
     REAL, INTENT (IN):: paprs(klon, klev+1) ! pression a inter-couche 
@@ -403,8 +400,8 @@ contains
 
        ! Calcul du lessivage stratiforme
        DO i = 1, klon
-          zprec_cond(i) = max(zcond(i)-zoliq(i), 0.0)* &
-               (paprs(i, k)-paprs(i, k+1))/rg
+          zprec_cond(i) = max(zcond(i) - zoliq(i), 0.0) &
+               * (paprs(i, k)-paprs(i, k+1))/rg
           IF (rneb(i, k)>0.0 .AND. zprec_cond(i)>0.) THEN
              ! lessivage nucleation LMD5 dans la couche elle-meme
              IF (t(i, k)>=ztglace) THEN
