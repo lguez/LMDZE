@@ -84,8 +84,11 @@ contains
     ! rayonnement net au sol (LW + SW)
 
     real, intent(OUT):: evap(:) ! (knon) evaporation totale
+
     real, intent(OUT):: flux_t(:) ! (knon) flux de chaleur sensible
-    real, dimension(klon), intent(OUT):: fluxlat ! flux de chaleur latente
+    ! (Cp T) à la surface, positif vers le bas, W / m2
+    
+    real, intent(OUT):: fluxlat(:) ! (knon) flux de chaleur latente
     real, dimension(klon), intent(OUT):: dflux_l, dflux_s
     real, intent(OUT):: tsurf_new(:) ! (knon) temp\'erature au sol
     real, intent(OUT):: albedo(:) ! (knon) albedo
@@ -186,7 +189,7 @@ contains
             radsol(:knon), dif_grnd(:knon), temp_air(:knon), spechum(:knon), &
             u1_lay(:knon), v1_lay(:knon), petAcoef(:knon), peqAcoef(:knon), &
             petBcoef(:knon), peqBcoef(:knon), tsurf_new, evap, &
-            fluxlat(:knon), flux_t, dflux_s(:knon), dflux_l(:knon))
+            fluxlat, flux_t, dflux_s(:knon), dflux_l(:knon))
 
        CALL fonte_neige(is_ter, dtime, tsurf, p1lay(:knon), beta(:knon), &
             tq_cdrag(:knon), ps(:knon), precip_rain(:knon), &
@@ -213,7 +216,7 @@ contains
             radsol(:knon), dif_grnd(:knon), temp_air(:knon), spechum(:knon), &
             u1_lay(:knon), v1_lay(:knon), petAcoef(:knon), peqAcoef(:knon), &
             petBcoef(:knon), peqBcoef(:knon), tsurf_new, evap, &
-            fluxlat(:knon), flux_t, dflux_s(:knon), dflux_l(:knon))
+            fluxlat, flux_t, dflux_s(:knon), dflux_l(:knon))
        fder = fder + dflux_s + dflux_l
        albedo = alboc_cd(rmu0(knindex)) * fmagic
        z0_new = sqrt(rugos**2 + rugoro**2)
@@ -251,7 +254,7 @@ contains
             radsol(:knon), dif_grnd(:knon), temp_air(:knon), spechum(:knon), &
             u1_lay(:knon), v1_lay(:knon), petAcoef(:knon), peqAcoef(:knon), &
             petBcoef(:knon), peqBcoef(:knon), tsurf_new, evap, &
-            fluxlat(:knon), flux_t, dflux_s(:knon), dflux_l(:knon))
+            fluxlat, flux_t, dflux_s(:knon), dflux_l(:knon))
 
        CALL fonte_neige(is_sic, dtime, tsurf_temp, p1lay(:knon), beta(:knon), &
             tq_cdrag(:knon), ps(:knon), precip_rain(:knon), &
@@ -293,7 +296,7 @@ contains
             radsol(:knon), dif_grnd(:knon), temp_air(:knon), spechum(:knon), &
             u1_lay(:knon), v1_lay(:knon), petAcoef(:knon), peqAcoef(:knon), &
             petBcoef(:knon), peqBcoef(:knon), tsurf_new, evap, &
-            fluxlat(:knon), flux_t, dflux_s(:knon), dflux_l(:knon))
+            fluxlat, flux_t, dflux_s(:knon), dflux_l(:knon))
 
        call fonte_neige(is_lic, dtime, tsurf, p1lay(:knon), beta(:knon), &
             tq_cdrag(:knon), ps(:knon), precip_rain(:knon), &

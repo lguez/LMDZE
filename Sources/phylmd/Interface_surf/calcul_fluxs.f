@@ -12,7 +12,7 @@ contains
     ! Cette routine calcule les flux en h et q à l'interface et une
     ! température de surface.
 
-    ! L. Fairhead April 2000
+    ! L. Fairhead, April 2000
 
     USE fcttre, ONLY: dqsatl, dqsats, foede, foeew, qsatl, qsats
     use nr_util, only: assert_eq

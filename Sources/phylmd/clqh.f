@@ -58,7 +58,7 @@ contains
     ! solid water mass flux (kg / m2 / s), positive down
 
     real, intent(inout):: fder(klon)
-    real fluxlat(klon)
+    real, intent(out):: fluxlat(:) ! (knon)
     real, intent(in):: pctsrf_new_sic(:) ! (klon)
     REAL, intent(inout):: agesno(:) ! (knon)
     REAL d_t(klon, klev) ! incrementation de "t"

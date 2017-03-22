@@ -44,8 +44,6 @@ contains
 
     !-------------------------
 
-    print *, "Call sequence information: grille_m"
-
     imdep = assert_eq(size(xdata), size(entree, 1), "grille_m")
     jmdep = assert_eq(size(ydata), size(entree, 2), "grille_m")
     imar = size(x)

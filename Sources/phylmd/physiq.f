@@ -151,7 +151,7 @@ contains
     ! soil temperature of surface fraction
 
     REAL, save:: fevap(klon, nbsrf) ! evaporation
-    REAL, save:: fluxlat(klon, nbsrf)
+    REAL fluxlat(klon, nbsrf)
 
     REAL, save:: fqsurf(klon, nbsrf)
     ! humidite de l'air au contact de la surface

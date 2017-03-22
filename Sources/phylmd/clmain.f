@@ -71,8 +71,7 @@ contains
     REAL qsurf(klon, nbsrf)
     REAL evap(klon, nbsrf)
     REAL, intent(inout):: falbe(klon, nbsrf)
-
-    REAL fluxlat(klon, nbsrf)
+    REAL, intent(out):: fluxlat(:, :) ! (klon, nbsrf)
 
     REAL, intent(in):: rain_fall(klon)
     ! liquid water mass flux (kg/m2/s), positive down
@@ -172,9 +171,7 @@ contains
 
     REAL yfder(klon)
     REAL yrugm(klon), yrads(klon), yrugoro(klon)
-
     REAL yfluxlat(klon)
-
     REAL y_d_ts(klon)
     REAL y_d_t(klon, klev), y_d_q(klon, klev)
     REAL y_d_u(klon, klev), y_d_v(klon, klev)
@@ -277,11 +274,11 @@ contains
     y_dflux_q = 0.
     yrugoro = 0.
     d_ts = 0.
-    yfluxlat = 0.
     flux_t = 0.
     flux_q = 0.
     flux_u = 0.
     flux_v = 0.
+    fluxlat = 0.
     d_t = 0.
     d_q = 0.
     d_u = 0.
@@ -440,7 +437,7 @@ contains
           CALL clqh(dtime, jour, firstcal, nsrf, ni(:knon), ytsoil(:knon, :), &
                yqsol, mu0, yrugos, yrugoro, yu1, yv1, coefh(:knon, :), yt, &
                yq, yts(:knon), ypaprs, ypplay, ydelp, yrads, yalb(:knon), &
-               ysnow, yqsurf, yrain_f, ysnow_f, yfder, yfluxlat, &
+               ysnow, yqsurf, yrain_f, ysnow_f, yfder, yfluxlat(:knon), &
                pctsrf_new_sic, yagesno(:knon), y_d_t, y_d_q, y_d_ts(:knon), &
                yz0_new, y_flux_t(:knon), y_flux_q(:knon), y_dflux_t, &
                y_dflux_q, y_fqcalving, y_ffonte, y_run_off_lic_0)
@@ -473,13 +470,10 @@ contains
              END DO
           END DO
 
-          DO j = 1, knon
-             i = ni(j)
-             flux_t(i, nsrf) = y_flux_t(j)
-             flux_q(i, nsrf) = y_flux_q(j)
-             flux_u(i, nsrf) = y_flux_u(j)
-             flux_v(i, nsrf) = y_flux_v(j)
-          END DO
+          flux_t(ni(:knon), nsrf) = y_flux_t(:knon)
+          flux_q(ni(:knon), nsrf) = y_flux_q(:knon)
+          flux_u(ni(:knon), nsrf) = y_flux_u(:knon)
+          flux_v(ni(:knon), nsrf) = y_flux_v(:knon)
 
           evap(:, nsrf) = -flux_q(:, nsrf)
 
@@ -487,7 +481,6 @@ contains
           snow(:, nsrf) = 0.
           qsurf(:, nsrf) = 0.
           rugos(:, nsrf) = 0.
-          fluxlat(:, nsrf) = 0.
           DO j = 1, knon
              i = ni(j)
              d_ts(i, nsrf) = y_d_ts(j)

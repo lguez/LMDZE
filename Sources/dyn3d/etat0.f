@@ -269,7 +269,7 @@ contains
     ! Ad\'equation avec le maque terre/mer
     WHERE (pctsrf(:, is_lic) < EPSFRA) pctsrf(:, is_lic) = 0.
     WHERE (zmasq < EPSFRA) pctsrf(:, is_lic) = 0.
-    pctsrf(:, is_ter) = zmasq
+    where (zmasq <= EPSFRA) pctsrf(:, is_ter) = zmasq
     where (zmasq > EPSFRA)
        where (pctsrf(:, is_lic) >= zmasq)
           pctsrf(:, is_lic) = zmasq

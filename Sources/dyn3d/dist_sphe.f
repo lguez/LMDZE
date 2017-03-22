@@ -13,6 +13,8 @@ contains
     ! Ce programme calcule la distance minimale (selon le grand cercle)
     ! entre deux points sur la terre
 
+    use nr_util, only: pi
+
     INTEGER, intent(in):: im, jm ! dimensions
     REAL, intent(in):: rf_lon ! longitude du point de reference (degres)
     REAL, intent(in):: rf_lat ! latitude du point de reference (degres)
@@ -23,7 +25,7 @@ contains
     REAL rlon1, rlat1
     REAL rlon2, rlat2
     REAL dist
-    REAL pa, pb, p, pi
+    REAL pa, pb, p
 
     REAL radius
     PARAMETER (radius=6371229.)
@@ -31,11 +33,8 @@ contains
 
     !---------------------------------------------------------------------
 
-    pi = 4.0 * ATAN(1.0)
-
     DO j = 1, jm
        DO i = 1, im
-
           rlon1=rf_lon
           rlat1=rf_lat
           rlon2=rlon(i)
@@ -47,7 +46,6 @@ contains
           dist = ACOS(COS(pa)*COS(pb) + SIN(pa)*SIN(pb)*COS(p))
           dist = radius * dist
           distance(i, j) = dist
-
        end DO
     end DO
 
