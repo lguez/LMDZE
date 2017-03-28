@@ -79,7 +79,7 @@ contains
        snow_evap = 0.
     end where
 
-    bil_eau_s = precip_rain * dtime - (evap - snow_evap) * dtime
+    bil_eau_s = (precip_rain - evap + snow_evap) * dtime
 
     ! Y a-t-il fonte de neige ?
 
