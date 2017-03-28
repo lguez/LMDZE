@@ -156,10 +156,8 @@ contains
     REAL, save:: fqsurf(klon, nbsrf)
     ! humidite de l'air au contact de la surface
 
-    REAL, save:: qsol(klon)
-    ! column-density of water in soil, in kg m-2
-
-    REAL, save:: fsnow(klon, nbsrf) ! epaisseur neigeuse
+    REAL, save:: qsol(klon) ! column-density of water in soil, in kg m-2
+    REAL, save:: fsnow(klon, nbsrf) ! \'epaisseur neigeuse
     REAL, save:: falbe(klon, nbsrf) ! albedo visible par type de surface
 
     ! Param\`etres de l'orographie \`a l'\'echelle sous-maille (OESM) :
@@ -276,7 +274,7 @@ contains
     REAL cldl(klon), cldm(klon), cldh(klon) ! nuages bas, moyen et haut
     REAL cldt(klon), cldq(klon) ! nuage total, eau liquide integree
 
-    REAL zxqsurf(klon), zxsnow(klon), zxfluxlat(klon)
+    REAL zxqsurf(klon), zxfluxlat(klon)
 
     REAL dist, mu0(klon), fract(klon)
     real longi
@@ -943,7 +941,6 @@ contains
 
     ! Calculer l'hydrologie de la surface
     zxqsurf = sum(fqsurf * pctsrf, dim = 2)
-    zxsnow = sum(fsnow * pctsrf, dim = 2)
 
     ! Calculer le bilan du sol et la d\'erive de temp\'erature (couplage)
     DO i = 1, klon
@@ -1157,6 +1154,7 @@ contains
     CALL histwrite_phy("d_t_ec", d_t_ec)
     CALL histwrite_phy("dtsw0", heat0 / 86400.)
     CALL histwrite_phy("dtlw0", - cool0 / 86400.)
+    CALL histwrite_phy("msnow", sum(fsnow * pctsrf, dim = 2))
 
     if (ok_instan) call histsync(nid_ins)
 

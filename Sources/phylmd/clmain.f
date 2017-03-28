@@ -5,7 +5,7 @@ module clmain_m
 contains
 
   SUBROUTINE clmain(dtime, pctsrf, t, q, u, v, jour, mu0, ftsol, cdmmax, &
-       cdhmax, ksta, ksta_ter, ok_kzmin, ftsoil, qsol, paprs, pplay, snow, &
+       cdhmax, ksta, ksta_ter, ok_kzmin, ftsoil, qsol, paprs, pplay, fsnow, &
        qsurf, evap, falbe, fluxlat, rain_fall, snow_f, solsw, sollw, fder, &
        rugos, agesno, rugoro, d_t, d_q, d_u, d_v, d_ts, flux_t, flux_q, &
        flux_u, flux_v, cdragh, cdragm, q2, dflux_t, dflux_q, ycoefh, zu1, &
@@ -67,7 +67,7 @@ contains
 
     REAL, INTENT(IN):: paprs(klon, klev+1) ! pression a intercouche (Pa)
     REAL, INTENT(IN):: pplay(klon, klev) ! pression au milieu de couche (Pa)
-    REAL, INTENT(inout):: snow(klon, nbsrf)
+    REAL, INTENT(inout):: fsnow(:, :) ! (klon, nbsrf) \'epaisseur neigeuse
     REAL qsurf(klon, nbsrf)
     REAL evap(klon, nbsrf)
     REAL, intent(inout):: falbe(klon, nbsrf)
@@ -155,10 +155,12 @@ contains
     REAL ytsoil(klon, nsoilmx)
     REAL yts(klon), yrugos(klon), ypct(klon), yz0_new(klon)
     REAL yalb(klon)
+
     REAL yu1(klon), yv1(klon)
-    ! on rajoute en output yu1 et yv1 qui sont les vents dans
-    ! la premiere couche
-    REAL ysnow(klon), yqsurf(klon), yagesno(klon)
+    ! On ajoute en output yu1 et yv1 qui sont les vents dans
+    ! la premi\`ere couche.
+    
+    REAL snow(klon), yqsurf(klon), yagesno(klon)
 
     real yqsol(klon)
     ! column-density of water in soil, in kg m-2
@@ -254,7 +256,6 @@ contains
     zv1 = 0.
     ypct = 0.
     yts = 0.
-    ysnow = 0.
     yqsurf = 0.
     yrain_f = 0.
     ysnow_f = 0.
@@ -319,7 +320,7 @@ contains
              i = ni(j)
              ypct(j) = pctsrf(i, nsrf)
              yts(j) = ftsol(i, nsrf)
-             ysnow(j) = snow(i, nsrf)
+             snow(j) = fsnow(i, nsrf)
              yqsurf(j) = qsurf(i, nsrf)
              yalb(j) = falbe(i, nsrf)
              yrain_f(j) = rain_fall(i)
@@ -437,7 +438,7 @@ contains
           CALL clqh(dtime, jour, firstcal, nsrf, ni(:knon), ytsoil(:knon, :), &
                yqsol, mu0, yrugos, yrugoro, yu1, yv1, coefh(:knon, :), yt, &
                yq, yts(:knon), ypaprs, ypplay, ydelp, yrads, yalb(:knon), &
-               ysnow, yqsurf, yrain_f, ysnow_f, yfder, yfluxlat(:knon), &
+               snow(:knon), yqsurf, yrain_f, ysnow_f, yfder, yfluxlat(:knon), &
                pctsrf_new_sic, yagesno(:knon), y_d_t, y_d_q, y_d_ts(:knon), &
                yz0_new, y_flux_t(:knon), y_flux_q(:knon), y_dflux_t, &
                y_dflux_q, y_fqcalving, y_ffonte, y_run_off_lic_0)
@@ -478,14 +479,14 @@ contains
           evap(:, nsrf) = -flux_q(:, nsrf)
 
           falbe(:, nsrf) = 0.
-          snow(:, nsrf) = 0.
+          fsnow(:, nsrf) = 0.
           qsurf(:, nsrf) = 0.
           rugos(:, nsrf) = 0.
           DO j = 1, knon
              i = ni(j)
              d_ts(i, nsrf) = y_d_ts(j)
              falbe(i, nsrf) = yalb(j)
-             snow(i, nsrf) = ysnow(j)
+             fsnow(i, nsrf) = snow(j)
              qsurf(i, nsrf) = yqsurf(j)
              rugos(i, nsrf) = yz0_new(j)
              fluxlat(i, nsrf) = yfluxlat(j)
@@ -585,6 +586,8 @@ contains
                 q2(i, k, nsrf) = yq2(j, k)
              END DO
           END DO
+       else
+          fsnow(:, nsrf) = 0.
        end IF if_knon
     END DO loop_surface
 

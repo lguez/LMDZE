@@ -35,7 +35,7 @@ contains
 
     print *, 'Call sequence information: ini_histins'
 
-    IF (ok_instan) THEN
+    test_ok_instan: IF (ok_instan) THEN
        zsto = dtime * ecrit_ins
        zout = dtime * ecrit_ins
        CALL ymds2ju(annee_ref, 1, day_ref, 0.0, zjulian)
@@ -129,6 +129,8 @@ contains
        CALL histdef(nid_ins, "dtsvdfi", "Boundary-layer dTs(g)", "K/s", &
             iim, (jjm + 1), nhori, 1, 1, 1, -99,  &
             "inst(X)", zsto, zout)
+       CALL histdef(nid_ins, "msnow", "surface snow amount", "kg/m2", &
+            iim, jjm + 1, nhori, 1, 1, 1, -99, "inst(X)", zsto, zout)
 
        DO nsrf = 1, nbsrf
           call histdef(nid_ins, "pourc_"//clnsurf(nsrf),  &
@@ -279,7 +281,7 @@ contains
        ENDDO
 
        CALL histend(nid_ins)
-    ENDIF
+    ENDIF test_ok_instan
 
   end subroutine ini_histins
 

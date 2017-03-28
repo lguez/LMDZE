@@ -36,7 +36,10 @@ contains
     REAL, intent(out):: ftsol(klon, nbsrf)
     REAL, intent(out):: ftsoil(klon, nsoilmx, nbsrf)
     REAL, intent(out):: qsurf(klon, nbsrf)
-    REAL, intent(out):: qsol(:) ! (klon)
+
+    REAL, intent(out):: qsol(:)
+    ! (klon) column-density of water in soil, in kg m-2
+
     REAL, intent(out):: snow(klon, nbsrf)
     REAL, intent(out):: albe(klon, nbsrf)
     REAL, intent(out):: evap(klon, nbsrf)
@@ -178,8 +181,6 @@ contains
 
     call NF95_INQ_VARID(ncid_startphy, "QS", varid)
     call nf95_get_var(ncid_startphy, varid, qsurf)
-
-    ! Eau dans le sol (pour le modele de sol "bucket")
 
     ierr = NF90_INQ_VARID(ncid_startphy, "QSOL", varid)
     IF (ierr == NF90_NOERR) THEN

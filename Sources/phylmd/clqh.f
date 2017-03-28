@@ -48,7 +48,7 @@ contains
     REAL delp(klon, klev) ! epaisseur de couche en pression (Pa)
     REAL radsol(klon) ! ray. net au sol (Solaire + IR) W / m2
     REAL, intent(inout):: albedo(:) ! (knon) albedo de la surface
-    REAL, intent(inout):: snow(klon) ! hauteur de neige
+    REAL, intent(inout):: snow(:) ! (knon) ! hauteur de neige
     REAL qsurf(klon) ! humidite de l'air au dessus de la surface
 
     real, intent(in):: precip_rain(klon)
