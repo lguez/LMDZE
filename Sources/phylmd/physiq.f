@@ -234,7 +234,7 @@ contains
 
     INTEGER julien
     REAL, save:: pctsrf(klon, nbsrf) ! percentage of surface
-    REAL, save:: albsol(klon) ! albedo du sol total visible
+    REAL, save:: albsol(klon) ! albedo du sol total, visible, moyen par maille
     REAL, SAVE:: wo(klon, llm) ! column density of ozone in a cell, in kDU
     real, parameter:: dobson_u = 2.1415e-05 ! Dobson unit, in kg m-2
 
@@ -397,26 +397,8 @@ contains
 
     ! Aerosol effects:
 
-    REAL sulfate(klon, llm) ! SO4 aerosol concentration (micro g / m3)
-
-    REAL, save:: sulfate_pi(klon, llm)
-    ! SO4 aerosol concentration, in \mu g / m3, pre-industrial value
-
-    REAL cldtaupi(klon, llm)
-    ! cloud optical thickness for pre-industrial aerosols
-
-    REAL re(klon, llm) ! Cloud droplet effective radius
-    REAL fl(klon, llm) ! denominator of re
-
-    ! Aerosol optical properties
-    REAL, save:: tau_ae(klon, llm, 2), piz_ae(klon, llm, 2)
-    REAL, save:: cg_ae(klon, llm, 2)
-
     REAL, save:: topswad(klon), solswad(klon) ! aerosol direct effect
-    REAL, save:: topswai(klon), solswai(klon) ! aerosol indirect effect
-
     LOGICAL:: ok_ade = .false. ! apply aerosol direct effect
-    LOGICAL:: ok_aie = .false. ! apply aerosol indirect effect
 
     REAL:: bl95_b0 = 2., bl95_b1 = 0.2
     ! Parameters in equation (D) of Boucher and Lohmann (1995, Tellus
@@ -429,8 +411,8 @@ contains
     integer, save:: ncid_startphy
 
     namelist /physiq_nml/ fact_cldcon, facttemps, ok_newmicro, iflag_cldcon, &
-         ratqsbas, ratqshaut, ok_ade, ok_aie, bl95_b0, bl95_b1, &
-         iflag_thermals, nsplit_thermals
+         ratqsbas, ratqshaut, ok_ade, bl95_b0, bl95_b1, iflag_thermals, &
+         nsplit_thermals
 
     !----------------------------------------------------------------
 
@@ -445,23 +427,14 @@ contains
        q2m = 0.
        ffonte = 0.
        fqcalving = 0.
-       piz_ae = 0.
-       tau_ae = 0.
-       cg_ae = 0.
        rain_con = 0.
        snow_con = 0.
-       topswai = 0.
-       topswad = 0.
-       solswai = 0.
-       solswad = 0.
-
        d_u_con = 0.
        d_v_con = 0.
        rnebcon0 = 0.
        clwcon0 = 0.
        rnebcon = 0.
        clwcon = 0.
-
        pblh =0. ! Hauteur de couche limite
        plcl =0. ! Niveau de condensation de la CLA
        capCL =0. ! CAPE de couche limite
@@ -513,7 +486,7 @@ contains
 
        ! Initialisation des sorties
 
-       call ini_histins(dtphys)
+       call ini_histins(dtphys, ok_newmicro)
        CALL ymds2ju(annee_ref, 1, day_ref, 0., date0)
        ! Positionner date0 pour initialisation de ORCHIDEE
        print *, 'physiq date0: ', date0
@@ -584,8 +557,6 @@ contains
 
     CALL orbite(REAL(julien), longi, dist)
     CALL zenang(longi, time, dtphys * radpas, mu0, fract)
-
-    ! Calcul de l'abedo moyen par maille
     albsol = sum(falbe * pctsrf, dim = 2)
 
     ! R\'epartition sous maille des flux longwave et shortwave
@@ -897,38 +868,24 @@ contains
        ENDDO
     ENDDO
 
-    ! Introduce the aerosol direct and first indirect radiative forcings:
-    tau_ae = 0.
-    piz_ae = 0.
-    cg_ae = 0.
-
     ! Param\`etres optiques des nuages et quelques param\`etres pour
     ! diagnostics :
     if (ok_newmicro) then
        CALL newmicro(paprs, play, t_seri, cldliq, cldfra, cldtau, cldemi, &
-            cldh, cldl, cldm, cldt, cldq, flwp, fiwp, flwc, fiwc, ok_aie, &
-            sulfate, sulfate_pi, bl95_b0, bl95_b1, cldtaupi, re, fl)
+            cldh, cldl, cldm, cldt, cldq, flwp, fiwp, flwc, fiwc)
     else
        CALL nuage(paprs, play, t_seri, cldliq, cldfra, cldtau, cldemi, cldh, &
-            cldl, cldm, cldt, cldq, ok_aie, sulfate, sulfate_pi, bl95_b0, &
-            bl95_b1, cldtaupi, re, fl)
+            cldl, cldm, cldt, cldq)
     endif
 
     IF (MOD(itap - 1, radpas) == 0) THEN
-       ! Prescrire l'ozone :
        wo = ozonecm(REAL(julien), paprs)
-
-       ! Appeler le rayonnement mais calculer tout d'abord l'albedo du sol.
-       ! Calcul de l'abedo moyen par maille
        albsol = sum(falbe * pctsrf, dim = 2)
-
-       ! Rayonnement (compatible Arpege-IFS) :
        CALL radlwsw(dist, mu0, fract, paprs, play, ztsol, albsol, t_seri, &
             q_seri, wo, cldfra, cldemi, cldtau, heat, heat0, cool, cool0, &
             radsol, albpla, topsw, toplw, solsw, sollw, sollwdown, topsw0, &
             toplw0, solsw0, sollw0, lwdn0, lwdn, lwup0, lwup, swdn0, swdn, &
-            swup0, swup, ok_ade, ok_aie, tau_ae, piz_ae, cg_ae, topswad, &
-            solswad, cldtaupi, topswai, solswai)
+            swup0, swup, ok_ade, topswad, solswad)
     ENDIF
 
     ! Ajouter la tendance des rayonnements (tous les pas)

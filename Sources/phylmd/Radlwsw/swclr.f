@@ -4,9 +4,8 @@ module swclr_m
 
 contains
 
-  SUBROUTINE swclr(knu, flag_aer, tauae, pizae, cgae, palbp, pdsig, prayl, &
-       psec, pcgaz, ppizaz, pray1, pray2, prefz, prj, prk, prmu0, ptauaz, &
-       ptra1, ptra2)
+  SUBROUTINE swclr(knu, flag_aer, palbp, pdsig, prayl, psec, pcgaz, ppizaz, &
+       pray1, pray2, prefz, prj, prk, prmu0, ptauaz, ptra1, ptra2)
     
     USE raddim, only: kdlon, kflev
     USE radepsi, only: repsct, zepsec
@@ -36,10 +35,7 @@ contains
 
     INTEGER knu
     ! -OB
-    DOUBLE PRECISION flag_aer
-    DOUBLE PRECISION tauae(kdlon, kflev, 2)
-    DOUBLE PRECISION pizae(kdlon, kflev, 2)
-    DOUBLE PRECISION cgae(kdlon, kflev, 2)
+    logical, intent(in):: flag_aer
     DOUBLE PRECISION palbp(kdlon, 2)
     DOUBLE PRECISION pdsig(kdlon, kflev)
     DOUBLE PRECISION prayl(kdlon)
@@ -88,16 +84,14 @@ contains
 
     DO jk = 1, kflev
        DO jl = 1, kdlon
-          ptauaz(jl, jk) = flag_aer*tauae(jl, jk, knu)
-          ppizaz(jl, jk) = flag_aer*pizae(jl, jk, knu)
-          pcgaz(jl, jk) = flag_aer*cgae(jl, jk, knu)
+          ptauaz(jl, jk) = 0d0
+          ppizaz(jl, jk) = 0d0
+          pcgaz(jl, jk) = 0d0
        END DO
 
-       IF (flag_aer>0) THEN
+       IF (flag_aer) THEN
           ! -OB
           DO jl = 1, kdlon
-             ! PCGAZ(JL,JK)=PCGAZ(JL,JK)/PPIZAZ(JL,JK)
-             ! PPIZAZ(JL,JK)=PPIZAZ(JL,JK)/PTAUAZ(JL,JK)
              ztray = prayl(jl)*pdsig(jl, jk)
              zratio = ztray/(ztray+ptauaz(jl,jk))
              zgar = pcgaz(jl, jk)
@@ -114,7 +108,7 @@ contains
              pcgaz(jl, jk) = 0.
              ppizaz(jl, jk) = 1. - repsct
           END DO
-       END IF ! check flag_aer
+       END IF
     END DO
 
     ! ------------------------------------------------------------------

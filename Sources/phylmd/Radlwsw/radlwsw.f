@@ -7,10 +7,10 @@ contains
   SUBROUTINE radlwsw(dist, mu0, fract, paprs, play, tsol, albedo, t, q, wo, &
        cldfra, cldemi, cldtaupd, heat, heat0, cool, cool0, radsol, albpla, &
        topsw, toplw, solsw, sollw, sollwdown, topsw0, toplw0, solsw0, sollw0, &
-       lwdn0, lwdn, lwup0, lwup, swdn0, swdn, swup0, swup, ok_ade, ok_aie, &
-       tau_ae, piz_ae, cg_ae, topswad, solswad, cldtaupi, topswai, solswai)
+       lwdn0, lwdn, lwup0, lwup, swdn0, swdn, swup0, swup, ok_ade, topswad, &
+       solswad)
 
-    ! From LMDZ4/libf/phylmd/radlwsw.F, version 1.4 2005/06/06 13:16:33
+    ! From LMDZ4/libf/phylmd/radlwsw.F, version 1.4, 2005/06/06 13:16:33
     ! Author: Z. X. Li (LMD/CNRS) 
     ! Date: 1996/07/19
 
@@ -19,20 +19,12 @@ contains
 
     ! ATTENTION: swai and swad have to be interpreted in the following manner:
 
-    ! not ok_ade and not ok_aie
+    ! not ok_ade
     ! both are zero
 
-    ! ok_ade and not ok_aie
+    ! ok_ade
     ! aerosol direct forcing is F_{AD} = topsw - topswad
     ! indirect is zero
-
-    ! not ok_ade and ok_aie
-    ! aerosol indirect forcing is F_{AI} = topsw - topswai
-    ! direct is zero
-
-    ! ok_ade and ok_aie
-    ! aerosol indirect forcing is F_{AI} = topsw - topswai
-    ! aerosol direct forcing is F_{AD} = topswai - topswad
 
     USE clesphys, ONLY: solaire
     USE dimphy, ONLY: klev, klon
@@ -41,7 +33,7 @@ contains
     USE suphec_m, ONLY: rg
     use sw_m, only: sw
     USE yoethf_m, ONLY: rvtmp2
-        
+
     real, intent(in):: dist ! distance astronomique terre-soleil
     real, intent(in):: mu0(klon) ! cosinus de l'angle zenithal
     real, intent(in):: fract(klon) ! duree d'ensoleillement normalisee
@@ -96,31 +88,12 @@ contains
     REAL, intent(out):: swup0(klon, klev+1), swup(klon, klev+1)
 
     logical, intent(in):: ok_ade ! apply the Aerosol Direct Effect
-    logical, intent(in):: ok_aie ! apply the Aerosol Indirect Effect
-
-    ! aerosol optical properties (calculated in aeropt.F):
-    real, intent(in):: tau_ae(klon, klev, 2), piz_ae(klon, klev, 2)
-    real, intent(in):: cg_ae(klon, klev, 2)
 
     real, intent(out):: topswad(klon), solswad(klon)
     ! aerosol direct forcing at TOA and surface
-    ! ray. solaire net absorbe
-    
-    real, intent(in):: cldtaupi(klon, klev)
-    ! cloud visible optical thickness for pre-industrial aerosol concentrations
-    ! i.e. with smaller droplet concentration, thus larger droplets,
-    ! thus generally cdltaupi cldtaupd it is needed for the
-    ! diagnostics of the aerosol indirect radiative forcing
-
-    real, intent(out):: topswai(klon), solswai(klon)
-    ! aerosol indirect forcing at TOA and surface
-    ! ray. solaire net absorbe
+    ! rayonnement solaire net absorb\'e
 
     ! Local:
-
-    double precision tauae(kdlon, klev, 2) ! aer opt properties
-    double precision pizae(kdlon, klev, 2)
-    double precision cgae(kdlon, klev, 2)
 
     DOUBLE PRECISION ZFSUP(KDLON, KLEV+1)
     DOUBLE PRECISION ZFSDN(KDLON, KLEV+1)
@@ -179,16 +152,12 @@ contains
 
     !----------------------------------------------------------------------
 
-    tauae = 0.
-    pizae = 0.
-    cgae = 0.
-
     nb_gr = klon / kdlon
     IF (nb_gr * kdlon /= klon) THEN
        PRINT *, "kdlon mauvais :", klon, kdlon, nb_gr
        stop 1
     ENDIF
-    
+
     heat = 0.
     cool = 0.
     heat0 = 0.
@@ -205,12 +174,12 @@ contains
           PALBP(i, 2) = albedo(iof+i)
           ! cf. JLD pour etre en accord avec ORCHIDEE il faut mettre
           ! PEMIS(i) = 0.96
-          PEMIS(i) = 1.0 
+          PEMIS(i) = 1. 
           PVIEW(i) = 1.66
           PPSOL(i) = paprs(iof+i, 1)
           zx_alpha1 = (paprs(iof+i, 1)-play(iof+i, 2))  &
                / (play(iof+i, 1)-play(iof+i, 2))
-          zx_alpha2 = 1.0 - zx_alpha1
+          zx_alpha2 = 1. - zx_alpha1
           PTL(i, 1) = t(iof+i, 1) * zx_alpha1 + t(iof+i, 2) * zx_alpha2
           PTL(i, klev+1) = t(iof+i, klev)
           PDT0(i) = tsol(iof+i) - PTL(i, 1)
@@ -224,18 +193,18 @@ contains
           DO i = 1, kdlon
              PDP(i, k) = paprs(iof+i, k)-paprs(iof+i, k+1)
              PTAVE(i, k) = t(iof+i, k)
-             PWV(i, k) = MAX (q(iof+i, k), 1.0e-12)
+             PWV(i, k) = MAX (q(iof+i, k), 1e-12)
              PQS(i, k) = PWV(i, k)
              POZON(i, k) = wo(iof+i, k) * RG * dobson_u * 1e3 &
                   / (paprs(iof+i, k) - paprs(iof+i, k+1))
              PCLDLD(i, k) = cldfra(iof+i, k)*cldemi(iof+i, k)
              PCLDLU(i, k) = cldfra(iof+i, k)*cldemi(iof+i, k)
              PCLDSW(i, k) = cldfra(iof+i, k)
-             PTAU(i, 1, k) = MAX(cldtaupi(iof+i, k), 1.0e-05)
+             PTAU(i, 1, k) = MAX(cldtaupd(iof+i, k), 1e-05)
              ! (1e-12 serait instable)
-             PTAU(i, 2, k) = MAX(cldtaupi(iof+i, k), 1.0e-05)
+             PTAU(i, 2, k) = MAX(cldtaupd(iof+i, k), 1e-05)
              ! (pour 32-bit machines)
-             POMEGA(i, 1, k) = 0.9999 - 5.0e-04 * EXP(-0.5 * PTAU(i, 1, k))
+             POMEGA(i, 1, k) = 0.9999 - 5e-04 * EXP(-0.5 * PTAU(i, 1, k))
              POMEGA(i, 2, k) = 0.9988 - 2.5e-03 * EXP(-0.05 * PTAU(i, 2, k))
              PCG(i, 1, k) = 0.865
              PCG(i, 2, k) = 0.910
@@ -245,11 +214,11 @@ contains
              ! calculated from present-day aerosol concentrations
              ! whereas the quantities without the "A" at the end are
              ! for pre-industial (natural-only) aerosol concentrations
-             PTAUA(i, 1, k) = MAX(cldtaupd(iof+i, k), 1.0e-05)
+             PTAUA(i, 1, k) = MAX(cldtaupd(iof+i, k), 1e-05)
              ! (1e-12 serait instable)
-             PTAUA(i, 2, k) = MAX(cldtaupd(iof+i, k), 1.0e-05)
+             PTAUA(i, 2, k) = MAX(cldtaupd(iof+i, k), 1e-05)
              ! (pour 32-bit machines)
-             POMEGAA(i, 1, k) = 0.9999 - 5.0e-04 * EXP(-0.5 * PTAUA(i, 1, k))
+             POMEGAA(i, 1, k) = 0.9999 - 5e-04 * EXP(-0.5 * PTAUA(i, 1, k))
              POMEGAA(i, 2, k) = 0.9988 - 2.5e-03 * EXP(-0.05 * PTAUA(i, 2, k))
              !jq-end
           ENDDO
@@ -257,26 +226,15 @@ contains
 
        DO k = 1, klev+1
           DO i = 1, kdlon
-             PPMB(i, k) = paprs(iof+i, k)/100.0
+             PPMB(i, k) = paprs(iof+i, k)/100.
           ENDDO
        ENDDO
 
        DO kk = 1, 5
           DO k = 1, klev
              DO i = 1, kdlon
-                PAER(i, k, kk) = 1.0E-15
+                PAER(i, k, kk) = 1E-15
              ENDDO
-          ENDDO
-       ENDDO
-
-       DO k = 1, klev
-          DO i = 1, kdlon
-             tauae(i, k, 1) = tau_ae(iof+i, k, 1)
-             pizae(i, k, 1) = piz_ae(iof+i, k, 1)
-             cgae(i, k, 1) =cg_ae(iof+i, k, 1)
-             tauae(i, k, 2) = tau_ae(iof+i, k, 2)
-             pizae(i, k, 2) = piz_ae(iof+i, k, 2)
-             cgae(i, k, 2) =cg_ae(iof+i, k, 2)
           ENDDO
        ENDDO
 
@@ -286,8 +244,7 @@ contains
        CALL SW(PSCT, zrmu0, zfract, PPMB, PDP, PPSOL, PALBD, PALBP, PTAVE, &
             PWV, PQS, POZON, PCLDSW, PTAU, POMEGA, PCG, zheat, zheat0, &
             zalbpla, ztopsw, zsolsw, ztopsw0, zsolsw0, ZFSUP, ZFSDN, ZFSUP0, &
-            ZFSDN0, tauae, pizae, cgae, PTAUA, POMEGAA, ztopswad, zsolswad, &
-            ztopswai, zsolswai, ok_ade, ok_aie)
+            ZFSDN0, ztopswad, zsolswad, ztopswai, zsolswai, ok_ade)
 
        DO i = 1, kdlon
           radsol(iof+i) = zsolsw(i) + zsollw(i)
@@ -325,19 +282,8 @@ contains
           ENDDO
        ELSE
           DO i = 1, kdlon
-             topswad(iof+i) = 0.0
-             solswad(iof+i) = 0.0
-          ENDDO
-       ENDIF
-       IF (ok_aie) THEN
-          DO i = 1, kdlon
-             topswai(iof+i) = ztopswai(i)
-             solswai(iof+i) = zsolswai(i)
-          ENDDO
-       ELSE
-          DO i = 1, kdlon
-             topswai(iof+i) = 0.0
-             solswai(iof+i) = 0.0
+             topswad(iof+i) = 0.
+             solswad(iof+i) = 0.
           ENDDO
        ENDIF
 

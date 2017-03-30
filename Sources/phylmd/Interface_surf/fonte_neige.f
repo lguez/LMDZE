@@ -14,7 +14,7 @@ contains
 
     USE fcttre, ONLY: foeew, qsatl, qsats
     USE indicesol, ONLY: epsfra, is_lic, is_sic, is_ter
-    USE interface_surf, ONLY: run_off_lic, tau_calv
+    USE interface_surf, ONLY: tau_calv
     use nr_util, only: assert_eq
     USE suphec_m, ONLY: rday, rlmlt, rtt
 
@@ -61,6 +61,7 @@ contains
     REAL, parameter:: chaice = 3.334E5 / (2.3867E6 * 0.15)
     real, parameter:: max_eau_sol = 150. ! in kg m-2
     real coeff_rel
+    REAL, ALLOCATABLE, SAVE:: run_off_lic(:) ! ruissellement total
 
     !--------------------------------------------------------------------
 
@@ -91,7 +92,7 @@ contains
           snow(i) = max(0., snow(i) - fq_fonte)
           bil_eau_s(i) = bil_eau_s(i) + fq_fonte
           tsurf_new(i) = tsurf_new(i) - fq_fonte * chasno
-          
+
           !IM cf. JLD/ GKtest fonte aussi pour la glace
           IF (nisurf == is_sic .OR. nisurf == is_lic) THEN
              fq_fonte = MAX((tsurf_new(i) - RTT) / chaice, 0.)
@@ -106,17 +107,21 @@ contains
        ! S'il y a une hauteur trop importante de neige, elle s'\'ecoule
        fqcalving(i) = max(0., snow(i) - snow_max) / dtime
        snow(i) = min(snow(i), snow_max)
+    enddo
 
-       IF (nisurf == is_ter) then
-          qsol(i) = qsol(i) + bil_eau_s(i)
-          qsol(i) = MIN(qsol(i), max_eau_sol)
-       else if (nisurf == is_lic) then
+    IF (nisurf == is_ter) then
+       qsol = MIN(qsol + bil_eau_s, max_eau_sol)
+    else if (nisurf == is_lic) then
+       if (.not. allocated(run_off_lic)) allocate(run_off_lic(knon))
+       ! assumes that the fraction of land-ice does not change during the run
+
+       do i = 1, knon
           run_off_lic(i) = (coeff_rel * fqcalving(i)) + &
                (1. - coeff_rel) * run_off_lic_0(i)
           run_off_lic_0(i) = run_off_lic(i)
           run_off_lic(i) = run_off_lic(i) + bil_eau_s(i) / dtime
-       endif
-    enddo
+       enddo
+    endif
 
   END SUBROUTINE fonte_neige
 

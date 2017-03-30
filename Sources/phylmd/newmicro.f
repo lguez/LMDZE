@@ -4,9 +4,8 @@ module newmicro_m
 
 contains
 
-  SUBROUTINE newmicro (paprs, play, t, qlwp, clc, cltau, clemi, cldh, &
-       cldl, cldm, cldt, ctlwp, flwp, fiwp, flwc, fiwc, ok_aie, sulfate, &
-       sulfate_pi, bl95_b0, bl95_b1, cldtaupi, re, fl)
+  SUBROUTINE newmicro (paprs, play, t, qlwp, clc, cltau, clemi, cldh, cldl, &
+       cldm, cldt, ctlwp, flwp, fiwp, flwc, fiwc)
 
     ! From LMDZ4/libf/phylmd/newmicro.F, version 1.2 2004/06/03 09:22:43
 
@@ -16,8 +15,8 @@ contains
 
     USE conf_phys_m, ONLY: rad_chau1, rad_chau2
     USE dimphy, ONLY: klev, klon
-    USE suphec_m, ONLY: rd, rg
-    use nr_util, only: pi
+    USE histwrite_phy_m, ONLY: histwrite_phy
+    USE suphec_m, ONLY: rg
 
     REAL, intent(in):: paprs(:, :) ! (klon, klev+1)
     real, intent(in):: play(:, :) ! (klon, klev)
@@ -36,48 +35,27 @@ contains
     REAL, intent(out):: ctlwp(:) ! (klon)
     REAL, intent(out):: flwp(:), fiwp(:) ! (klon)
     REAL, intent(out):: flwc(:, :), fiwc(:, :) ! (klon, klev)
-    LOGICAL, intent(in):: ok_aie ! apply aerosol indirect effect
 
-    REAL, intent(in):: sulfate(:, :) ! (klon, klev)
-    ! sulfate aerosol mass concentration (micro g m-3)
+    ! Local:
 
-    REAL, intent(in):: sulfate_pi(:, :) ! (klon, klev)
-    ! sulfate aerosol mass concentration (micro g m-3), pre-industrial value
-
-    REAL, intent(in):: bl95_b0, bl95_b1
-    ! Parameters in equation (D) of Boucher and Lohmann (1995, Tellus
-    ! B). They link cloud droplet number concentration to aerosol mass
-    ! concentration.
-
-    REAL, intent(out):: cldtaupi(:, :) ! (klon, klev)
-    ! pre-industrial value of cloud optical thickness, needed for the
-    ! diagnosis of the aerosol indirect radiative forcing (see
-    ! radlwsw)
-
-    REAL, intent(out):: re(:, :) ! (klon, klev)
+    REAL re(klon, klev)
     ! cloud droplet effective radius multiplied by fl (micro m)
 
-    REAL, intent(out):: fl(:, :) ! (klon, klev) 
+    REAL fl(klon, klev) 
     ! Denominator to re, introduced to avoid problems in the averaging
     ! of the output. fl is the fraction of liquid water clouds within
     ! a grid cell.
 
-    ! Local:
-
     REAL, PARAMETER:: cetahb = 0.45, cetamb = 0.8
     INTEGER i, k
     REAL zflwp(klon), fice
-    REAL radius, rad_chaud
+    REAL rad_chaud
     REAL, PARAMETER:: coef_chau = 0.13
     REAL, PARAMETER:: seuil_neb = 0.001, t_glace = 273. - 15.
     real rel, tc, rei, zfiwp(klon)
     real k_ice
     real, parameter:: k_ice0 = 0.005 ! units=m2/g
     real, parameter:: DF = 1.66 ! diffusivity factor
-    REAL cdnc(klon, klev) ! cloud droplet number concentration (m-3)
-
-    REAL cdnc_pi(klon, klev)
-    ! cloud droplet number concentration, pre-industrial value (m-3)
 
     !-----------------------------------------------------------------
 
@@ -87,7 +65,7 @@ contains
        flwp(i) = 0.
        fiwp(i) = 0.
 
-       DO k = 1, klev
+       loop_vertical: DO k = 1, klev
           clc(i, k) = MAX(clc(i, k), seuil_neb)
 
           ! liquid/ice cloud water paths:
@@ -113,45 +91,8 @@ contains
           ! effective cloud droplet radius (microns):
 
           ! for liquid water clouds: 
-          IF (ok_aie) THEN
-             cdnc(i, k) = 10.**(bl95_b0 + bl95_b1 &
-                  * log10(MAX(sulfate(i, k), 1e-4)) + 6.)
-             cdnc_pi(i, k) = 10.**(bl95_b0 + bl95_b1 &
-                  * log10(MAX(sulfate_pi(i, k), 1e-4)) + 6.)
-
-             ! Restrict to interval [20, 1000] cm-3:
-             cdnc(i, k) = MIN(1000e6, MAX(20e6, cdnc(i, k)))
-             cdnc_pi(i, k) = MIN(1000e6, MAX(20e6, cdnc_pi(i, k)))
-
-             ! air density: play(i, k) / (RD * T(i, k)) 
-             ! factor 1.1: derive effective radius from volume-mean radius
-             ! factor 1000 is the water density
-             ! "_chaud" means that this is the CDR for liquid water clouds
-
-             rad_chaud = 1.1 * ((qlwp(i, k) * play(i, k) / (RD * T(i, k))) &
-                  / (4./3. * PI * 1000. * cdnc(i, k)))**(1./3.)
-
-             ! Convert to micro m and set a lower limit:
-             rad_chaud = MAX(rad_chaud * 1e6, 5.) 
-
-             ! Pre-industrial cloud optical thickness
-
-             ! "radius" is calculated as rad_chaud above (plus the 
-             ! ice cloud contribution) but using cdnc_pi instead of
-             ! cdnc.
-             radius = 1.1 * ((qlwp(i, k) * play(i, k) / (RD * T(i, k))) &
-                  / (4./3. * PI * 1000. * cdnc_pi(i, k)))**(1./3.)
-             radius = MAX(radius * 1e6, 5.) 
-
-             tc = t(i, k)-273.15
-             rei = merge(3.5, 0.71 * tc + 61.29, tc <= -81.4)
-             if (zflwp(i) == 0.) radius = 1. 
-             if (zfiwp(i) == 0. .or. rei <= 0.) rei = 1. 
-             cldtaupi(i, k) = 3. / 2. * zflwp(i) / radius &
-                  + zfiwp(i) * (3.448e-03 + 2.431 / rei)
-          else
-             rad_chaud = merge(rad_chau2, rad_chau1, k <= 3)
-          ENDIF
+          rad_chaud = merge(rad_chau2, rad_chau1, k <= 3)
+          
           ! For output diagnostics
 
           ! Cloud droplet effective radius (micro m)
@@ -197,11 +138,8 @@ contains
              clc(i, k) = 0.
              cltau(i, k) = 0.
              clemi(i, k) = 0.
-             cldtaupi(i, k) = 0.
           end if
-
-          IF (.NOT. ok_aie) cldtaupi(i, k) = cltau(i, k) 
-       ENDDO
+       ENDDO loop_vertical
     ENDDO loop_horizontal
 
     ! COMPUTE CLOUD LIQUID PATH AND TOTAL CLOUDINESS
@@ -235,6 +173,9 @@ contains
        cldm(i)=1.-cldm(i)
        cldl(i)=1.-cldl(i)
     ENDDO
+
+    CALL histwrite_phy("re", re)
+    CALL histwrite_phy("fl", fl)
 
   END SUBROUTINE newmicro
 

@@ -181,7 +181,7 @@ mathop.o : mathop2.o errioipsl.o
 minmaxqfi.o : dimphy.o dimens_m.o 
 moycum.o : errioipsl.o 
 nat2gcm.o : paramet_m.o dimens_m.o comgeom.o comconst.o 
-newmicro.o : suphec.o dimphy.o conf_phys.o 
+newmicro.o : suphec.o histwrite_phy.o dimphy.o conf_phys.o 
 nflxtr.o : suphec.o dimphy.o 
 nuage.o : suphec.o dimphy.o 
 nxgrad.o : comgeom.o paramet_m.o dimens_m.o 

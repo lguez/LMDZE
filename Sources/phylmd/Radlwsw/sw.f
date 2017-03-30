@@ -5,10 +5,9 @@ module sw_m
 contains
 
   SUBROUTINE SW(PSCT, PRMU0, PFRAC, PPMB, PDP, PPSOL, PALBD, PALBP, PTAVE, &
-       PWV, PQS, POZON, PCLDSW, PTAU, POMEGA, PCG, PHEAT, PHEAT0, &
-       PALBPLA, PTOPSW, PSOLSW, PTOPSW0, PSOLSW0, ZFSUP, ZFSDN, ZFSUP0, &
-       ZFSDN0, tauae, pizae, cgae, PTAUA, POMEGAA, PTOPSWAD, PSOLSWAD, &
-       PTOPSWAI, PSOLSWAI, ok_ade, ok_aie)
+       PWV, PQS, POZON, PCLDSW, PTAU, POMEGA, PCG, PHEAT, PHEAT0, PALBPLA, &
+       PTOPSW, PSOLSW, PTOPSW0, PSOLSW0, ZFSUP, ZFSDN, ZFSUP0, ZFSDN0, &
+       PTOPSWAD, PSOLSWAD, PTOPSWAI, PSOLSWAI, ok_ade)
 
     ! Purpose.
     ! This routine computes the shortwave radiation fluxes in two
@@ -39,27 +38,21 @@ contains
     ! ARGUMENTS:
 
     DOUBLE PRECISION PSCT ! constante solaire (valeur conseillee: 1370)
-
-    DOUBLE PRECISION PPSOL(KDLON) ! SURFACE PRESSURE (PA)
-    DOUBLE PRECISION PDP(KDLON, KFLEV) ! LAYER THICKNESS (PA)
-    DOUBLE PRECISION PPMB(KDLON, KFLEV+1) ! HALF-LEVEL PRESSURE (MB)
-
     DOUBLE PRECISION PRMU0(KDLON) ! COSINE OF ZENITHAL ANGLE
     DOUBLE PRECISION PFRAC(KDLON) ! fraction de la journee
-
+    DOUBLE PRECISION PPMB(KDLON, KFLEV+1) ! HALF-LEVEL PRESSURE (MB)
+    DOUBLE PRECISION PDP(KDLON, KFLEV) ! LAYER THICKNESS (PA)
+    DOUBLE PRECISION PPSOL(KDLON) ! SURFACE PRESSURE (PA)
+    DOUBLE PRECISION PALBD(KDLON, 2) ! albedo du sol (lumiere diffuse)
+    DOUBLE PRECISION PALBP(KDLON, 2) ! albedo du sol (lumiere parallele)
     DOUBLE PRECISION PTAVE(KDLON, KFLEV) ! LAYER TEMPERATURE (K)
     DOUBLE PRECISION PWV(KDLON, KFLEV) ! SPECIFIC HUMIDITY (KG/KG)
     DOUBLE PRECISION PQS(KDLON, KFLEV) ! SATURATED WATER VAPOUR (KG/KG)
     DOUBLE PRECISION POZON(KDLON, KFLEV) ! OZONE CONCENTRATION (KG/KG)
-
-    DOUBLE PRECISION PALBD(KDLON, 2) ! albedo du sol (lumiere diffuse)
-    DOUBLE PRECISION PALBP(KDLON, 2) ! albedo du sol (lumiere parallele)
-
     DOUBLE PRECISION PCLDSW(KDLON, KFLEV) ! CLOUD FRACTION
     DOUBLE PRECISION PTAU(KDLON, 2, KFLEV) ! CLOUD OPTICAL THICKNESS
-    DOUBLE PRECISION PCG(KDLON, 2, KFLEV) ! ASYMETRY FACTOR
     DOUBLE PRECISION POMEGA(KDLON, 2, KFLEV) ! SINGLE SCATTERING ALBEDO
-
+    DOUBLE PRECISION PCG(KDLON, 2, KFLEV) ! ASYMETRY FACTOR
     DOUBLE PRECISION PHEAT(KDLON, KFLEV) ! SHORTWAVE HEATING (K/DAY)
     DOUBLE PRECISION PHEAT0(KDLON, KFLEV)! SHORTWAVE HEATING (K/DAY) clear-sky
     DOUBLE PRECISION PALBPLA(KDLON) ! PLANETARY ALBEDO
@@ -67,8 +60,26 @@ contains
     DOUBLE PRECISION PSOLSW(KDLON) ! SHORTWAVE FLUX AT SURFACE
     DOUBLE PRECISION PTOPSW0(KDLON) ! SHORTWAVE FLUX AT T.O.A. (CLEAR-SKY)
     DOUBLE PRECISION PSOLSW0(KDLON) ! SHORTWAVE FLUX AT SURFACE (CLEAR-SKY)
+    DOUBLE PRECISION ZFSUP(KDLON, KFLEV+1)
+    DOUBLE PRECISION ZFSDN(KDLON, KFLEV+1)
+    DOUBLE PRECISION ZFSUP0(KDLON, KFLEV+1)
+    DOUBLE PRECISION ZFSDN0(KDLON, KFLEV+1)
 
-    ! LOCAL VARIABLES:
+    DOUBLE PRECISION, intent(out):: PTOPSWAD(KDLON) 
+    ! (diagnosed aerosol forcing)SHORTWAVE FLUX AT T.O.A.(+AEROSOL DIR)
+
+    DOUBLE PRECISION, intent(out):: PSOLSWAD(KDLON) 
+    ! (diagnosed aerosol forcing)SHORTWAVE FLUX AT SURFACE(+AEROSOL DIR)
+
+    DOUBLE PRECISION, intent(out):: PTOPSWAI(KDLON) 
+    ! (diagnosed aerosol forcing)SHORTWAVE FLUX AT T.O.A.(+AEROSOL IND)
+
+    DOUBLE PRECISION, intent(out):: PSOLSWAI(KDLON) 
+    ! (diagnosed aerosol forcing)SHORTWAVE FLUX AT SURFACE(+AEROSOL IND)
+
+    logical, intent(in):: ok_ade ! use aerosol forcings or not?
+
+    ! Local:
 
     DOUBLE PRECISION ZOZ(KDLON, KFLEV)
     DOUBLE PRECISION ZAKI(KDLON, 2) 
@@ -85,11 +96,6 @@ contains
     DOUBLE PRECISION ZUD(KDLON, 5, KFLEV+1)
     DOUBLE PRECISION ZCLDSW0(KDLON, KFLEV)
 
-    DOUBLE PRECISION ZFSUP(KDLON, KFLEV+1)
-    DOUBLE PRECISION ZFSDN(KDLON, KFLEV+1)
-    DOUBLE PRECISION ZFSUP0(KDLON, KFLEV+1)
-    DOUBLE PRECISION ZFSDN0(KDLON, KFLEV+1)
-
     INTEGER inu, jl, jk, i, k, kpl1
 
     INTEGER, PARAMETER:: swpas = 1 ! Every swpas steps, sw is calculated
@@ -97,28 +103,7 @@ contains
     INTEGER:: itapsw = 0
     LOGICAL:: appel1er = .TRUE.
     !jq-Introduced for aerosol forcings
-    double precision, save:: flag_aer
-    logical, intent(in):: ok_ade, ok_aie ! use aerosol forcings or not?
-    double precision tauae(kdlon, kflev, 2) ! aerosol optical properties
-    double precision pizae(kdlon, kflev, 2) 
-    ! aerosol optical properties(see aeropt.F)
-    
-    double precision cgae(kdlon, kflev, 2) !aerosol optical properties -"-
-    DOUBLE PRECISION PTAUA(KDLON, 2, KFLEV) 
-    ! CLOUD OPTICAL THICKNESS (pre-industrial value)
-
-    DOUBLE PRECISION POMEGAA(KDLON, 2, KFLEV) ! SINGLE SCATTERING ALBEDO
-    DOUBLE PRECISION PTOPSWAD(KDLON) 
-    ! (diagnosed aerosol forcing)SHORTWAVE FLUX AT T.O.A.(+AEROSOL DIR)
-
-    DOUBLE PRECISION PSOLSWAD(KDLON) 
-    ! (diagnosed aerosol forcing)SHORTWAVE FLUX AT SURFACE(+AEROSOL DIR)
-
-    DOUBLE PRECISION PTOPSWAI(KDLON) 
-    ! (diagnosed aerosol forcing)SHORTWAVE FLUX AT T.O.A.(+AEROSOL IND)
-
-    DOUBLE PRECISION PSOLSWAI(KDLON) 
-    ! (diagnosed aerosol forcing)SHORTWAVE FLUX AT SURFACE(+AEROSOL IND)
+    logical, save:: flag_aer
 
     !jq - Fluxes including aerosol effects
     DOUBLE PRECISION, save:: ZFSUPAD(KDLON, KFLEV+1)
@@ -132,7 +117,7 @@ contains
     !-------------------------------------------------------------------
 
     if(.not.initialized) then
-       flag_aer=0.
+       flag_aer=.false.
        initialized=.TRUE.
        ZFSUPAD = 0.
        ZFSDNAD = 0.
@@ -160,18 +145,11 @@ contains
             PRMU0, PFRAC, PTAVE, PWV, &
             ZAKI, ZCLD, ZCLEAR, ZDSIG, ZFACT, ZRMU, ZSEC, ZUD)
        INU = 1
-       CALL SW1S(INU, &
-            flag_aer, tauae, pizae, cgae, &
-            PALBD, PALBP, PCG, ZCLD, ZCLEAR, &
-            ZDSIG, POMEGA, ZOZ, ZRMU, ZSEC, PTAU, ZUD, &
-            ZFD, ZFU)
+       CALL SW1S(INU, flag_aer, PALBD, PALBP, PCG, ZCLD, ZCLEAR, ZDSIG, &
+            POMEGA, ZOZ, ZRMU, ZSEC, PTAU, ZUD, ZFD, ZFU)
        INU = 2
-       CALL SW2S(INU, &
-            flag_aer, tauae, pizae, cgae, &
-            ZAKI, PALBD, PALBP, PCG, ZCLD, ZCLEAR, &
-            ZDSIG, POMEGA, ZOZ, ZRMU, ZSEC, PTAU, ZUD, &
-            PWV, PQS, &
-            ZFDOWN, ZFUP)
+       CALL SW2S(INU, flag_aer, ZAKI, PALBD, PALBP, PCG, ZCLD, ZCLEAR, ZDSIG, &
+            POMEGA, ZOZ, ZRMU, ZSEC, PTAU, ZUD, PWV, PQS, ZFDOWN, ZFUP)
        DO JK = 1 , KFLEV+1
           DO JL = 1, KDLON
              ZFSUP0(JL, JK) = (ZFUP(JL, JK) + ZFU(JL, JK)) * ZFACT(JL)
@@ -179,23 +157,16 @@ contains
           ENDDO
        ENDDO
 
-       flag_aer=0.
+       flag_aer= .false.
        CALL SWU(PSCT, PCLDSW, PPMB, PPSOL, &
             PRMU0, PFRAC, PTAVE, PWV, &
             ZAKI, ZCLD, ZCLEAR, ZDSIG, ZFACT, ZRMU, ZSEC, ZUD)
        INU = 1
-       CALL SW1S(INU, &
-            flag_aer, tauae, pizae, cgae, &
-            PALBD, PALBP, PCG, ZCLD, ZCLEAR, &
-            ZDSIG, POMEGA, ZOZ, ZRMU, ZSEC, PTAU, ZUD, &
-            ZFD, ZFU)
+       CALL SW1S(INU, .false., PALBD, PALBP, PCG, ZCLD, ZCLEAR, ZDSIG, &
+            POMEGA, ZOZ, ZRMU, ZSEC, PTAU, ZUD, ZFD, ZFU)
        INU = 2
-       CALL SW2S(INU, &
-            flag_aer, tauae, pizae, cgae, &
-            ZAKI, PALBD, PALBP, PCG, ZCLD, ZCLEAR, &
-            ZDSIG, POMEGA, ZOZ, ZRMU, ZSEC, PTAU, ZUD, &
-            PWV, PQS, &
-            ZFDOWN, ZFUP)
+       CALL SW2S(INU, .false., ZAKI, PALBD, PALBP, PCG, ZCLD, ZCLEAR, ZDSIG, &
+            POMEGA, ZOZ, ZRMU, ZSEC, PTAU, ZUD, PWV, PQS, ZFDOWN, ZFUP)
 
        ! cloudy-sky:
 
@@ -208,56 +179,20 @@ contains
 
        IF (ok_ade) THEN
           ! cloudy-sky + aerosol dir OB
-          flag_aer=1.
-          CALL SWU(PSCT, PCLDSW, PPMB, PPSOL, &
-               PRMU0, PFRAC, PTAVE, PWV, &
-               ZAKI, ZCLD, ZCLEAR, ZDSIG, ZFACT, ZRMU, ZSEC, ZUD)
+          flag_aer= .true.
+          CALL SWU(PSCT, PCLDSW, PPMB, PPSOL, PRMU0, PFRAC, PTAVE, PWV, ZAKI, &
+               ZCLD, ZCLEAR, ZDSIG, ZFACT, ZRMU, ZSEC, ZUD)
           INU = 1
-          CALL SW1S(INU, &
-               flag_aer, tauae, pizae, cgae, &
-               PALBD, PALBP, PCG, ZCLD, ZCLEAR, &
-               ZDSIG, POMEGA, ZOZ, ZRMU, ZSEC, PTAU, ZUD, &
-               ZFD, ZFU)
+          CALL SW1S(INU, .true., PALBD, PALBP, PCG, ZCLD, ZCLEAR, ZDSIG, &
+               POMEGA, ZOZ, ZRMU, ZSEC, PTAU, ZUD, ZFD, ZFU)
           INU = 2
-          CALL SW2S(INU, &
-               flag_aer, tauae, pizae, cgae, &
-               ZAKI, PALBD, PALBP, PCG, ZCLD, ZCLEAR, &
-               ZDSIG, POMEGA, ZOZ, ZRMU, ZSEC, PTAU, ZUD, &
-               PWV, PQS, &
-               ZFDOWN, ZFUP)
+          CALL SW2S(INU, .true., ZAKI, PALBD, PALBP, PCG, ZCLD, ZCLEAR, &
+               ZDSIG, POMEGA, ZOZ, ZRMU, ZSEC, PTAU, ZUD, PWV, PQS, ZFDOWN, &
+               ZFUP)
           DO JK = 1 , KFLEV+1
              DO JL = 1, KDLON
                 ZFSUPAD(JL, JK) = ZFSUP(JL, JK) 
                 ZFSDNAD(JL, JK) = ZFSDN(JL, JK) 
-                ZFSUP(JL, JK) = (ZFUP(JL, JK) + ZFU(JL, JK)) * ZFACT(JL)
-                ZFSDN(JL, JK) = (ZFDOWN(JL, JK) + ZFD(JL, JK)) * ZFACT(JL)
-             ENDDO
-          ENDDO
-       ENDIF
-
-       IF (ok_aie) THEN
-          !jq cloudy-sky + aerosol direct + aerosol indirect
-          flag_aer=1.0
-          CALL SWU(PSCT, PCLDSW, PPMB, PPSOL, &
-               PRMU0, PFRAC, PTAVE, PWV, &
-               ZAKI, ZCLD, ZCLEAR, ZDSIG, ZFACT, ZRMU, ZSEC, ZUD)
-          INU = 1
-          CALL SW1S(INU, &
-               flag_aer, tauae, pizae, cgae, &
-               PALBD, PALBP, PCG, ZCLD, ZCLEAR, &
-               ZDSIG, POMEGAA, ZOZ, ZRMU, ZSEC, PTAUA, ZUD, &
-               ZFD, ZFU)
-          INU = 2
-          CALL SW2S(INU, &
-               flag_aer, tauae, pizae, cgae, &
-               ZAKI, PALBD, PALBP, PCG, ZCLD, ZCLEAR, &
-               ZDSIG, POMEGAA, ZOZ, ZRMU, ZSEC, PTAUA, ZUD, &
-               PWV, PQS, &
-               ZFDOWN, ZFUP)
-          DO JK = 1 , KFLEV+1
-             DO JL = 1, KDLON
-                ZFSUPAI(JL, JK) = ZFSUP(JL, JK) 
-                ZFSDNAI(JL, JK) = ZFSDN(JL, JK) 
                 ZFSUP(JL, JK) = (ZFUP(JL, JK) + ZFU(JL, JK)) * ZFACT(JL)
                 ZFSDN(JL, JK) = (ZFDOWN(JL, JK) + ZFD(JL, JK)) * ZFACT(JL)
              ENDDO

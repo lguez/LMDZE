@@ -4,9 +4,9 @@ module sw2s_m
 
 contains
 
-  SUBROUTINE sw2s(knu, flag_aer, tauae, pizae, cgae, paki, palbd, palbp, &
-       pcg, pcld, pclear, pdsig, pomega, poz, prmu, psec, ptau, pud, &
-       pwv, pqs, pfdown, pfup)
+  SUBROUTINE sw2s(knu, flag_aer, paki, palbd, palbp, pcg, pcld, pclear, &
+       pdsig, pomega, poz, prmu, psec, ptau, pud, pwv, pqs, pfdown, pfup)
+    
     USE dimens_m
     USE dimphy
     USE raddim
@@ -53,10 +53,7 @@ contains
 
     INTEGER knu
     ! -OB
-    DOUBLE PRECISION flag_aer
-    DOUBLE PRECISION tauae(kdlon, kflev, 2)
-    DOUBLE PRECISION pizae(kdlon, kflev, 2)
-    DOUBLE PRECISION cgae(kdlon, kflev, 2)
+    logical, intent(in):: flag_aer
     DOUBLE PRECISION paki(kdlon, 2)
     DOUBLE PRECISION palbd(kdlon, 2)
     DOUBLE PRECISION palbp(kdlon, 2)
@@ -167,9 +164,8 @@ contains
     ! --------------------------------
 
 
-    CALL swclr(knu, flag_aer, tauae, pizae, cgae, palbp, pdsig, zrayl, &
-         psec, zcgaz, zpizaz, zray1, zray2, zrefz, zrj0, zrk0, zrmu0, ztauaz, &
-         ztra1, ztra2)
+    CALL swclr(knu, flag_aer, palbp, pdsig, zrayl, psec, zcgaz, zpizaz, &
+         zray1, zray2, zrefz, zrj0, zrk0, zrmu0, ztauaz, ztra1, ztra2)
 
 
     ! *         2.2   CLOUDY FRACTION OF THE COLUMN

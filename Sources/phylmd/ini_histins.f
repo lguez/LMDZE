@@ -6,7 +6,7 @@ module ini_histins_m
 
 contains
 
-  subroutine ini_histins(dtime)
+  subroutine ini_histins(dtime, ok_newmicro)
 
     ! From phylmd/ini_histins.h, version 1.2, 2005/05/25 13:10:09
 
@@ -26,7 +26,8 @@ contains
     USE ymds2ju_m, only: ymds2ju
 
     REAL, intent(in):: dtime ! pas temporel de la physique (s)
-
+    logical, intent(in):: ok_newmicro
+    
     ! Local:
     real zjulian, zsto, zout
     integer nhori, nvert, nsrf, iq, it
@@ -257,6 +258,14 @@ contains
        CALL histdef(nid_ins, "dtlw0", "CS LW radiation dT", &
             "K/s", iim, jjm + 1, nhori, llm, 1, llm, nvert, "inst(X)", &
             zsto, zout)
+       if (ok_newmicro) then
+          CALL histdef(nid_ins, "re", "cloud droplet effective radius", &
+               "micrometer", iim, jjm + 1, nhori, llm, 1, llm, nvert, &
+               "inst(X)", zsto, zout)
+          CALL histdef(nid_ins, "fl", &
+               "denominator of Cloud droplet effective radius", "", iim, &
+               jjm + 1, nhori, llm, 1, llm, nvert, "inst(X)", zsto, zout)
+       end if
 
        DO it = 1, nqmx - 2
           ! champ 2D

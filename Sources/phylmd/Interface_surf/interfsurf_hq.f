@@ -26,7 +26,7 @@ contains
     USE dimphy, ONLY: klon
     USE fonte_neige_m, ONLY: fonte_neige
     USE indicesol, ONLY: epsfra, is_lic, is_oce, is_sic, is_ter
-    USE interface_surf, ONLY: run_off_lic, conf_interface
+    USE interface_surf, ONLY: conf_interface
     USE interfsur_lim_m, ONLY: interfsur_lim
     use read_sst_m, only: read_sst
     use soil_m, only: soil
@@ -263,11 +263,6 @@ contains
        fder = fder + dflux_s + dflux_l
        z0_new = SQRT(0.002**2 + rugoro**2)
     case (is_lic)
-       if (.not. allocated(run_off_lic)) then
-          allocate(run_off_lic(knon))
-          run_off_lic = 0.
-       endif
-
        ! Surface "glacier continentaux" appel a l'interface avec le sol
 
        IF (soil_model) THEN
