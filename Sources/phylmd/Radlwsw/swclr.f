@@ -4,8 +4,8 @@ module swclr_m
 
 contains
 
-  SUBROUTINE swclr(knu, flag_aer, palbp, pdsig, prayl, psec, pcgaz, ppizaz, &
-       pray1, pray2, prefz, prj, prk, prmu0, ptauaz, ptra1, ptra2)
+  SUBROUTINE swclr(knu, palbp, pdsig, prayl, psec, ppizaz, pray1, pray2, &
+       prefz, prj, prk, prmu0, ptauaz, ptra1, ptra2)
 
     ! PURPOSE.
     ! COMPUTES THE REFLECTIVITY AND TRANSMISSIVITY IN CASE OF
@@ -28,14 +28,11 @@ contains
     ! ARGUMENTS:
 
     INTEGER knu
-    ! -OB
-    logical, intent(in):: flag_aer
     DOUBLE PRECISION palbp(kdlon, 2)
     DOUBLE PRECISION, intent(in):: pdsig(kdlon, kflev)
     DOUBLE PRECISION, intent(in):: prayl(kdlon)
     DOUBLE PRECISION psec(kdlon)
 
-    DOUBLE PRECISION, intent(out):: pcgaz(kdlon, kflev)
     DOUBLE PRECISION, intent(out):: ppizaz(kdlon, kflev)
     DOUBLE PRECISION pray1(kdlon, kflev + 1)
     DOUBLE PRECISION pray2(kdlon, kflev + 1)
@@ -75,20 +72,9 @@ contains
 
     DO jk = 1, kflev
        DO jl = 1, kdlon
-          pcgaz(jl, jk) = 0d0
           ptauaz(jl, jk) = prayl(jl) * pdsig(jl, jk)
+          ppizaz(jl, jk) = 1d0 - repsct
        END DO
-
-       IF (flag_aer) THEN
-          ! -OB
-          DO jl = 1, kdlon
-             ppizaz(jl, jk) = 1d0
-          END DO
-       ELSE
-          DO jl = 1, kdlon
-             ppizaz(jl, jk) = 1d0 - repsct
-          END DO
-       END IF
     END DO
 
     ! 2. TOTAL EFFECTIVE CLOUDINESS ABOVE A GIVEN LEVEL

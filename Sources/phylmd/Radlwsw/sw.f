@@ -103,7 +103,6 @@ contains
     INTEGER:: itapsw = 0
     LOGICAL:: appel1er = .TRUE.
     !jq-Introduced for aerosol forcings
-    logical, save:: flag_aer
 
     !jq - Fluxes including aerosol effects
     DOUBLE PRECISION, save:: ZFSUPAD(KDLON, KFLEV+1)
@@ -117,7 +116,6 @@ contains
     !-------------------------------------------------------------------
 
     if(.not.initialized) then
-       flag_aer=.false.
        initialized=.TRUE.
        ZFSUPAD = 0.
        ZFSDNAD = 0.
@@ -145,11 +143,11 @@ contains
             PRMU0, PFRAC, PTAVE, PWV, &
             ZAKI, ZCLD, ZCLEAR, ZDSIG, ZFACT, ZRMU, ZSEC, ZUD)
        INU = 1
-       CALL SW1S(INU, flag_aer, PALBD, PALBP, PCG, ZCLD, ZCLEAR, ZDSIG, &
-            POMEGA, ZOZ, ZRMU, ZSEC, PTAU, ZUD, ZFD, ZFU)
+       CALL SW1S(INU, PALBD, PALBP, PCG, ZCLD, ZCLEAR, ZDSIG, POMEGA, ZOZ, &
+            ZRMU, ZSEC, PTAU, ZUD, ZFD, ZFU)
        INU = 2
-       CALL SW2S(INU, flag_aer, ZAKI, PALBD, PALBP, PCG, ZCLD, ZCLEAR, ZDSIG, &
-            POMEGA, ZOZ, ZRMU, ZSEC, PTAU, ZUD, PWV, PQS, ZFDOWN, ZFUP)
+       CALL SW2S(INU, ZAKI, PALBD, PALBP, PCG, ZCLD, ZCLEAR, ZDSIG, POMEGA, &
+            ZOZ, ZRMU, ZSEC, PTAU, ZUD, PWV, PQS, ZFDOWN, ZFUP)
        DO JK = 1 , KFLEV+1
           DO JL = 1, KDLON
              ZFSUP0(JL, JK) = (ZFUP(JL, JK) + ZFU(JL, JK)) * ZFACT(JL)
@@ -157,16 +155,15 @@ contains
           ENDDO
        ENDDO
 
-       flag_aer= .false.
        CALL SWU(PSCT, PCLDSW, PPMB, PPSOL, &
             PRMU0, PFRAC, PTAVE, PWV, &
             ZAKI, ZCLD, ZCLEAR, ZDSIG, ZFACT, ZRMU, ZSEC, ZUD)
        INU = 1
-       CALL SW1S(INU, .false., PALBD, PALBP, PCG, ZCLD, ZCLEAR, ZDSIG, &
-            POMEGA, ZOZ, ZRMU, ZSEC, PTAU, ZUD, ZFD, ZFU)
+       CALL SW1S(INU, PALBD, PALBP, PCG, ZCLD, ZCLEAR, ZDSIG, POMEGA, ZOZ, &
+            ZRMU, ZSEC, PTAU, ZUD, ZFD, ZFU)
        INU = 2
-       CALL SW2S(INU, .false., ZAKI, PALBD, PALBP, PCG, ZCLD, ZCLEAR, ZDSIG, &
-            POMEGA, ZOZ, ZRMU, ZSEC, PTAU, ZUD, PWV, PQS, ZFDOWN, ZFUP)
+       CALL SW2S(INU, ZAKI, PALBD, PALBP, PCG, ZCLD, ZCLEAR, ZDSIG, POMEGA, &
+            ZOZ, ZRMU, ZSEC, PTAU, ZUD, PWV, PQS, ZFDOWN, ZFUP)
 
        ! cloudy-sky:
 
@@ -179,16 +176,14 @@ contains
 
        IF (ok_ade) THEN
           ! cloudy-sky + aerosol dir OB
-          flag_aer= .true.
           CALL SWU(PSCT, PCLDSW, PPMB, PPSOL, PRMU0, PFRAC, PTAVE, PWV, ZAKI, &
                ZCLD, ZCLEAR, ZDSIG, ZFACT, ZRMU, ZSEC, ZUD)
           INU = 1
-          CALL SW1S(INU, .true., PALBD, PALBP, PCG, ZCLD, ZCLEAR, ZDSIG, &
-               POMEGA, ZOZ, ZRMU, ZSEC, PTAU, ZUD, ZFD, ZFU)
+          CALL SW1S(INU, PALBD, PALBP, PCG, ZCLD, ZCLEAR, ZDSIG, POMEGA, ZOZ, &
+               ZRMU, ZSEC, PTAU, ZUD, ZFD, ZFU)
           INU = 2
-          CALL SW2S(INU, .true., ZAKI, PALBD, PALBP, PCG, ZCLD, ZCLEAR, &
-               ZDSIG, POMEGA, ZOZ, ZRMU, ZSEC, PTAU, ZUD, PWV, PQS, ZFDOWN, &
-               ZFUP)
+          CALL SW2S(INU, ZAKI, PALBD, PALBP, PCG, ZCLD, ZCLEAR, ZDSIG, &
+               POMEGA, ZOZ, ZRMU, ZSEC, PTAU, ZUD, PWV, PQS, ZFDOWN, ZFUP)
           DO JK = 1 , KFLEV+1
              DO JL = 1, KDLON
                 ZFSUPAD(JL, JK) = ZFSUP(JL, JK) 

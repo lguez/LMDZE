@@ -4,8 +4,8 @@ module sw1s_m
 
 contains
 
-  SUBROUTINE sw1s(knu, flag_aer, palbd, palbp, pcg, pcld, pclear, pdsig, &
-       pomega, poz, prmu, psec, ptau, pud, pfd, pfu)
+  SUBROUTINE sw1s(knu, palbd, palbp, pcg, pcld, pclear, pdsig, pomega, poz, &
+       prmu, psec, ptau, pud, pfd, pfu)
     
     USE dimens_m
     USE dimphy
@@ -46,8 +46,6 @@ contains
     ! * ARGUMENTS:
 
     INTEGER knu
-    ! -OB
-    logical, intent(in):: flag_aer
     DOUBLE PRECISION palbd(kdlon, 2)
     DOUBLE PRECISION palbp(kdlon, 2)
     DOUBLE PRECISION pcg(kdlon, 2, kflev)
@@ -129,14 +127,14 @@ contains
     ! --------------------------------
 
 
-    CALL swclr(knu, flag_aer, palbp, pdsig, zrayl, psec, zcgaz, zpizaz, &
-         zray1, zray2, zrefz, zrj0, zrk0, zrmu0, ztauaz, ztra1, ztra2)
+    CALL swclr(knu, palbp, pdsig, zrayl, psec, zpizaz, zray1, zray2, zrefz, &
+         zrj0, zrk0, zrmu0, ztauaz, ztra1, ztra2)
 
 
     ! *         2.2   CLOUDY FRACTION OF THE COLUMN
     ! -----------------------------
 
-
+    zcgaz = 0d0
     CALL swr(knu, palbd, pcg, pcld, pomega, psec, ptau, zcgaz, &
          zpizaz, zray1, zray2, zrefz, zrj, zrk, zrmue, ztauaz, ztra1, ztra2)
 
