@@ -15,6 +15,4 @@ module radepsi
   double precision, parameter:: ZEPSEC = 1.0d-12
   double precision, parameter:: ZEPSCR = 1.0d-10
 
-  double precision, parameter:: REPSCT=1.0E-10
-
 end module radepsi
