@@ -7,7 +7,7 @@ contains
   SUBROUTINE SW(PSCT, PRMU0, PFRAC, PPMB, PDP, PPSOL, PALBD, PALBP, PTAVE, &
        PWV, PQS, POZON, PCLDSW, PTAU, POMEGA, PCG, PHEAT, PHEAT0, PALBPLA, &
        PTOPSW, PSOLSW, PTOPSW0, PSOLSW0, ZFSUP, ZFSDN, ZFSUP0, ZFSDN0, &
-       PTOPSWAD, PSOLSWAD, PTOPSWAI, PSOLSWAI, ok_ade)
+       PTOPSWAD, PSOLSWAD, ok_ade)
 
     ! Purpose.
     ! This routine computes the shortwave radiation fluxes in two
@@ -34,6 +34,7 @@ contains
     USE suphec_m, ONLY: rcpd, rday, rg
     use sw1s_m, only: sw1s
     use sw2s_m, only: sw2s
+    use swu_m, only: swu
 
     ! ARGUMENTS:
 
@@ -65,26 +66,20 @@ contains
     DOUBLE PRECISION ZFSUP0(KDLON, KFLEV+1)
     DOUBLE PRECISION ZFSDN0(KDLON, KFLEV+1)
 
-    DOUBLE PRECISION, intent(out):: PTOPSWAD(KDLON) 
+    DOUBLE PRECISION, intent(out):: PTOPSWAD(KDLON)
     ! (diagnosed aerosol forcing)SHORTWAVE FLUX AT T.O.A.(+AEROSOL DIR)
 
-    DOUBLE PRECISION, intent(out):: PSOLSWAD(KDLON) 
+    DOUBLE PRECISION, intent(out):: PSOLSWAD(KDLON)
     ! (diagnosed aerosol forcing)SHORTWAVE FLUX AT SURFACE(+AEROSOL DIR)
-
-    DOUBLE PRECISION, intent(out):: PTOPSWAI(KDLON) 
-    ! (diagnosed aerosol forcing)SHORTWAVE FLUX AT T.O.A.(+AEROSOL IND)
-
-    DOUBLE PRECISION, intent(out):: PSOLSWAI(KDLON) 
-    ! (diagnosed aerosol forcing)SHORTWAVE FLUX AT SURFACE(+AEROSOL IND)
 
     logical, intent(in):: ok_ade ! use aerosol forcings or not?
 
     ! Local:
 
     DOUBLE PRECISION ZOZ(KDLON, KFLEV)
-    DOUBLE PRECISION ZAKI(KDLON, 2) 
+    DOUBLE PRECISION ZAKI(KDLON, 2)
     DOUBLE PRECISION ZCLD(KDLON, KFLEV)
-    DOUBLE PRECISION ZCLEAR(KDLON) 
+    DOUBLE PRECISION ZCLEAR(KDLON)
     DOUBLE PRECISION ZDSIG(KDLON, KFLEV)
     DOUBLE PRECISION ZFACT(KDLON)
     DOUBLE PRECISION ZFD(KDLON, KFLEV+1)
@@ -107,8 +102,6 @@ contains
     !jq - Fluxes including aerosol effects
     DOUBLE PRECISION, save:: ZFSUPAD(KDLON, KFLEV+1)
     DOUBLE PRECISION, save:: ZFSDNAD(KDLON, KFLEV+1)
-    DOUBLE PRECISION, save:: ZFSUPAI(KDLON, KFLEV+1)
-    DOUBLE PRECISION, save:: ZFSDNAI(KDLON, KFLEV+1)
 
     logical:: initialized = .false.
     REAL, PARAMETER :: dobson_u = 2.1415E-05 ! Dobson unit, in kg m-2
@@ -119,8 +112,6 @@ contains
        initialized=.TRUE.
        ZFSUPAD = 0.
        ZFSDNAD = 0.
-       ZFSUPAI = 0.
-       ZFSDNAI = 0.
     endif
     !rv
 
@@ -130,8 +121,8 @@ contains
        appel1er = .FALSE.
     ENDIF
 
-    IF (MOD(itapsw, swpas).EQ.0) THEN
-       DO JK = 1 , KFLEV
+    IF (MOD(itapsw, swpas) == 0) THEN
+       DO JK = 1, KFLEV
           DO JL = 1, KDLON
              ZCLDSW0(JL, JK) = 0.0
              ZOZ(JL, JK) = POZON(JL, JK) / (dobson_u * 1E3 * rg) * PDP(JL, JK)
@@ -148,7 +139,7 @@ contains
        INU = 2
        CALL SW2S(INU, ZAKI, PALBD, PALBP, PCG, ZCLD, ZCLEAR, ZDSIG, POMEGA, &
             ZOZ, ZRMU, ZSEC, PTAU, ZUD, PWV, PQS, ZFDOWN, ZFUP)
-       DO JK = 1 , KFLEV+1
+       DO JK = 1, KFLEV+1
           DO JL = 1, KDLON
              ZFSUP0(JL, JK) = (ZFUP(JL, JK) + ZFU(JL, JK)) * ZFACT(JL)
              ZFSDN0(JL, JK) = (ZFDOWN(JL, JK) + ZFD(JL, JK)) * ZFACT(JL)
@@ -167,7 +158,7 @@ contains
 
        ! cloudy-sky:
 
-       DO JK = 1 , KFLEV+1
+       DO JK = 1, KFLEV+1
           DO JL = 1, KDLON
              ZFSUP(JL, JK) = (ZFUP(JL, JK) + ZFU(JL, JK)) * ZFACT(JL)
              ZFSDN(JL, JK) = (ZFDOWN(JL, JK) + ZFD(JL, JK)) * ZFACT(JL)
@@ -184,10 +175,10 @@ contains
           INU = 2
           CALL SW2S(INU, ZAKI, PALBD, PALBP, PCG, ZCLD, ZCLEAR, ZDSIG, &
                POMEGA, ZOZ, ZRMU, ZSEC, PTAU, ZUD, PWV, PQS, ZFDOWN, ZFUP)
-          DO JK = 1 , KFLEV+1
+          DO JK = 1, KFLEV+1
              DO JL = 1, KDLON
-                ZFSUPAD(JL, JK) = ZFSUP(JL, JK) 
-                ZFSDNAD(JL, JK) = ZFSDN(JL, JK) 
+                ZFSUPAD(JL, JK) = ZFSUP(JL, JK)
+                ZFSDNAD(JL, JK) = ZFSDN(JL, JK)
                 ZFSUP(JL, JK) = (ZFUP(JL, JK) + ZFU(JL, JK)) * ZFACT(JL)
                 ZFSDN(JL, JK) = (ZFDOWN(JL, JK) + ZFD(JL, JK)) * ZFACT(JL)
              ENDDO
@@ -220,9 +211,6 @@ contains
 
        PSOLSWAD(i) = ZFSDNAD(i, 1) - ZFSUPAD(i, 1)
        PTOPSWAD(i) = ZFSDNAD(i, KFLEV+1) - ZFSUPAD(i, KFLEV+1)
-
-       PSOLSWAI(i) = ZFSDNAI(i, 1) - ZFSUPAI(i, 1)
-       PTOPSWAI(i) = ZFSDNAI(i, KFLEV+1) - ZFSUPAI(i, KFLEV+1)
     ENDDO
 
   END SUBROUTINE SW

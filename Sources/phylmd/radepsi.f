@@ -1,11 +1,11 @@
 module radepsi
 
-  ! From phylmd/radepsi.h, version 1.1.1.1 2004/05/19 12:53:08
+  ! From phylmd/radepsi.h, version 1.1.1.1, 2004/05/19 12:53:08
 
   implicit none
 
   double precision, parameter:: ZEELOG = 1.D-07
-  ! (1.d-10 (not good for 32-bit machines))
+  ! (1d-10 (not good for 32-bit machines))
 
   double precision, parameter:: ZEPSC  = 1.D-20
   double precision, parameter:: ZEPSCO = 1.D-10

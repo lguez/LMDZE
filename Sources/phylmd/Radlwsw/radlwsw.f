@@ -17,14 +17,9 @@ contains
     ! Objet : interface entre le modèle et les rayonnements solaire et
     ! infrarouge
 
-    ! ATTENTION: swai and swad have to be interpreted in the following manner:
-
-    ! not ok_ade
-    ! both are zero
-
-    ! ok_ade
-    ! aerosol direct forcing is F_{AD} = topsw - topswad
-    ! indirect is zero
+    ! ATTENTION: swad has to be interpreted in the following manner:
+    ! not ok_ade zero
+    ! ok_ade aerosol direct forcing is F_{AD} = topsw - topswad
 
     USE clesphys, ONLY: solaire
     USE dimphy, ONLY: klev, klon
@@ -137,17 +132,9 @@ contains
     DOUBLE PRECISION zznormcp
 
     !jq the following quantities are needed for the aerosol radiative forcings
-
-    DOUBLE PRECISION PTAUA(kdlon, 2, klev)
-    ! present-day value of cloud opt thickness (PTAU is pre-industrial
-    ! value), local use
-
-    DOUBLE PRECISION POMEGAA(kdlon, 2, klev) ! dito for single scatt albedo
-
     DOUBLE PRECISION ztopswad(kdlon), zsolswad(kdlon) 
-    ! Aerosol direct forcing at TOAand surface
+    ! Aerosol direct forcing at TOA and surface
 
-    DOUBLE PRECISION ztopswai(kdlon), zsolswai(kdlon) ! dito, indirect
     real, parameter:: dobson_u = 2.1415e-05 ! Dobson unit, in kg m-2
 
     !----------------------------------------------------------------------
@@ -208,19 +195,6 @@ contains
              POMEGA(i, 2, k) = 0.9988 - 2.5e-03 * EXP(-0.05 * PTAU(i, 2, k))
              PCG(i, 1, k) = 0.865
              PCG(i, 2, k) = 0.910
-
-             ! Introduced for aerosol indirect forcings.  The
-             ! following values use the cloud optical thickness
-             ! calculated from present-day aerosol concentrations
-             ! whereas the quantities without the "A" at the end are
-             ! for pre-industial (natural-only) aerosol concentrations
-             PTAUA(i, 1, k) = MAX(cldtaupd(iof+i, k), 1e-05)
-             ! (1e-12 serait instable)
-             PTAUA(i, 2, k) = MAX(cldtaupd(iof+i, k), 1e-05)
-             ! (pour 32-bit machines)
-             POMEGAA(i, 1, k) = 0.9999 - 5e-04 * EXP(-0.5 * PTAUA(i, 1, k))
-             POMEGAA(i, 2, k) = 0.9988 - 2.5e-03 * EXP(-0.05 * PTAUA(i, 2, k))
-             !jq-end
           ENDDO
        ENDDO
 
@@ -244,7 +218,7 @@ contains
        CALL SW(PSCT, zrmu0, zfract, PPMB, PDP, PPSOL, PALBD, PALBP, PTAVE, &
             PWV, PQS, POZON, PCLDSW, PTAU, POMEGA, PCG, zheat, zheat0, &
             zalbpla, ztopsw, zsolsw, ztopsw0, zsolsw0, ZFSUP, ZFSDN, ZFSUP0, &
-            ZFSDN0, ztopswad, zsolswad, ztopswai, zsolswai, ok_ade)
+            ZFSDN0, ztopswad, zsolswad, ok_ade)
 
        DO i = 1, kdlon
           radsol(iof+i) = zsolsw(i) + zsollw(i)

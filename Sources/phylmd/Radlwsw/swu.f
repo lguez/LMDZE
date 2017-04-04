@@ -1,178 +1,174 @@
-SUBROUTINE swu(psct, pcldsw, ppmb, ppsol, prmu0, pfrac, ptave, pwv, paki, &
-    pcld, pclear, pdsig, pfact, prmu, psec, pud)
+module swu_m
 
-  USE dimens_m
-  USE dimphy
-  USE clesphys
-  USE suphec_m
-  USE raddim
-  USE radepsi
-  USE radopt
   IMPLICIT NONE
 
-  ! * ARGUMENTS:
+contains
 
-  DOUBLE PRECISION psct
-  ! IM ctes ds clesphys.h   DOUBLE PRECISION RCO2
-  DOUBLE PRECISION pcldsw(kdlon, kflev)
-  DOUBLE PRECISION ppmb(kdlon, kflev+1)
-  DOUBLE PRECISION ppsol(kdlon)
-  DOUBLE PRECISION prmu0(kdlon)
-  DOUBLE PRECISION pfrac(kdlon)
-  DOUBLE PRECISION ptave(kdlon, kflev)
-  DOUBLE PRECISION pwv(kdlon, kflev)
+  SUBROUTINE swu(psct, pcldsw, ppmb, ppsol, prmu0, pfrac, ptave, pwv, paki, &
+       pcld, pclear, pdsig, pfact, prmu, psec, pud)
 
-  DOUBLE PRECISION paki(kdlon, 2)
-  DOUBLE PRECISION pcld(kdlon, kflev)
-  DOUBLE PRECISION pclear(kdlon)
-  DOUBLE PRECISION pdsig(kdlon, kflev)
-  DOUBLE PRECISION pfact(kdlon)
-  DOUBLE PRECISION prmu(kdlon)
-  DOUBLE PRECISION psec(kdlon)
-  DOUBLE PRECISION pud(kdlon, 5, kflev+1)
+    USE clesphys, only: rco2
+    USE suphec_m, only: rg
+    USE raddim, only: kdlon, kflev
+    USE radepsi, only: zepscq, zepsec
+    USE radopt, only: novlp
 
-  ! * LOCAL VARIABLES:
+    ! ARGUMENTS:
 
-  INTEGER iind(2)
-  DOUBLE PRECISION zc1j(kdlon, kflev+1)
-  DOUBLE PRECISION zclear(kdlon)
-  DOUBLE PRECISION zcloud(kdlon)
-  DOUBLE PRECISION zn175(kdlon)
-  DOUBLE PRECISION zn190(kdlon)
-  DOUBLE PRECISION zo175(kdlon)
-  DOUBLE PRECISION zo190(kdlon)
-  DOUBLE PRECISION zsign(kdlon)
-  DOUBLE PRECISION zr(kdlon, 2)
-  DOUBLE PRECISION zsigo(kdlon)
-  DOUBLE PRECISION zud(kdlon, 2)
-  DOUBLE PRECISION zrth, zrtu, zwh2o, zdsco2, zdsh2o, zfppw
-  INTEGER jl, jk, jkp1, jkl, ja
+    DOUBLE PRECISION, intent(in):: psct
+    DOUBLE PRECISION, intent(in):: pcldsw(kdlon, kflev)
+    DOUBLE PRECISION, intent(in):: ppmb(kdlon, kflev + 1)
+    DOUBLE PRECISION, intent(in):: ppsol(kdlon)
+    DOUBLE PRECISION, intent(in):: prmu0(kdlon)
+    DOUBLE PRECISION, intent(in):: pfrac(kdlon)
+    DOUBLE PRECISION, intent(in):: ptave(kdlon, kflev)
+    DOUBLE PRECISION, intent(in):: pwv(kdlon, kflev)
 
-  ! * Prescribed Data:
+    DOUBLE PRECISION paki(kdlon, 2)
+    DOUBLE PRECISION pcld(kdlon, kflev)
+    DOUBLE PRECISION pclear(kdlon)
+    DOUBLE PRECISION pdsig(kdlon, kflev)
+    DOUBLE PRECISION pfact(kdlon)
+    DOUBLE PRECISION prmu(kdlon)
+    DOUBLE PRECISION psec(kdlon)
+    DOUBLE PRECISION pud(kdlon, 5, kflev + 1)
 
-  DOUBLE PRECISION zpdh2o, zpdumg
-  SAVE zpdh2o, zpdumg
-  DOUBLE PRECISION zprh2o, zprumg
-  SAVE zprh2o, zprumg
-  DOUBLE PRECISION rtdh2o, rtdumg
-  SAVE rtdh2o, rtdumg
-  DOUBLE PRECISION rth2o, rtumg
-  SAVE rth2o, rtumg
-  DATA zpdh2o, zpdumg/0.8d0, 0.75d0/
-  DATA zprh2o, zprumg/30000.d0, 30000.d0/
-  DATA rtdh2o, rtdumg/0.40d0, 0.375d0/
-  DATA rth2o, rtumg/240.d0, 240.d0/
-  ! ------------------------------------------------------------------
+    ! Local:
 
-  ! *         1.     COMPUTES AMOUNTS OF ABSORBERS
-  ! -----------------------------
+    INTEGER iind(2)
+    DOUBLE PRECISION zc1j(kdlon, kflev + 1)
+    DOUBLE PRECISION zclear(kdlon)
+    DOUBLE PRECISION zcloud(kdlon)
+    DOUBLE PRECISION zn175(kdlon)
+    DOUBLE PRECISION zn190(kdlon)
+    DOUBLE PRECISION zo175(kdlon)
+    DOUBLE PRECISION zo190(kdlon)
+    DOUBLE PRECISION zsign(kdlon)
+    DOUBLE PRECISION zr(kdlon, 2)
+    DOUBLE PRECISION zsigo(kdlon)
+    DOUBLE PRECISION zud(kdlon, 2)
+    DOUBLE PRECISION zrth, zrtu, zwh2o, zdsco2, zdsh2o, zfppw
+    INTEGER jl, jk, jkp1, jkl, ja
 
+    ! Prescribed Data:
 
-  iind(1) = 1
-  iind(2) = 2
+    DOUBLE PRECISION zpdh2o, zpdumg
+    SAVE zpdh2o, zpdumg
+    DOUBLE PRECISION zprh2o, zprumg
+    SAVE zprh2o, zprumg
+    DOUBLE PRECISION rtdh2o, rtdumg
+    SAVE rtdh2o, rtdumg
+    DOUBLE PRECISION rth2o, rtumg
+    SAVE rth2o, rtumg
+    DATA zpdh2o, zpdumg /0.8d0, 0.75d0/
+    DATA zprh2o, zprumg /30000.d0, 30000.d0/
+    DATA rtdh2o, rtdumg /0.40d0, 0.375d0/
+    DATA rth2o, rtumg /240.d0, 240.d0/
 
+    !------------------------------------------------------------------
 
-  ! *         1.1    INITIALIZES QUANTITIES
-  ! ----------------------
+    ! 1. COMPUTES AMOUNTS OF ABSORBERS
 
+    iind(1) = 1
+    iind(2) = 2
 
-  DO jl = 1, kdlon
-    pud(jl, 1, kflev+1) = 0.
-    pud(jl, 2, kflev+1) = 0.
-    pud(jl, 3, kflev+1) = 0.
-    pud(jl, 4, kflev+1) = 0.
-    pud(jl, 5, kflev+1) = 0.
-    pfact(jl) = prmu0(jl)*pfrac(jl)*psct
-    prmu(jl) = sqrt(1224.*prmu0(jl)*prmu0(jl)+1.)/35.
-    psec(jl) = 1./prmu(jl)
-    zc1j(jl, kflev+1) = 0.
-  END DO
+    ! 1.1 INITIALIZES QUANTITIES
 
-  ! *          1.3    AMOUNTS OF ABSORBERS
-  ! --------------------
-
-
-  DO jl = 1, kdlon
-    zud(jl, 1) = 0.
-    zud(jl, 2) = 0.
-    zo175(jl) = ppsol(jl)**(zpdumg+1.)
-    zo190(jl) = ppsol(jl)**(zpdh2o+1.)
-    zsigo(jl) = ppsol(jl)
-    zclear(jl) = 1.
-    zcloud(jl) = 0.
-  END DO
-
-  DO jk = 1, kflev
-    jkp1 = jk + 1
-    jkl = kflev + 1 - jk
     DO jl = 1, kdlon
-      zrth = (rth2o/ptave(jl,jk))**rtdh2o
-      zrtu = (rtumg/ptave(jl,jk))**rtdumg
-      zwh2o = max(pwv(jl,jk), zepscq)
-      zsign(jl) = 100.*ppmb(jl, jkp1)
-      pdsig(jl, jk) = (zsigo(jl)-zsign(jl))/ppsol(jl)
-      zn175(jl) = zsign(jl)**(zpdumg+1.)
-      zn190(jl) = zsign(jl)**(zpdh2o+1.)
-      zdsco2 = zo175(jl) - zn175(jl)
-      zdsh2o = zo190(jl) - zn190(jl)
-      pud(jl, 1, jk) = 1./(10.*rg*(zpdh2o+1.))/(zprh2o**zpdh2o)*zdsh2o*zwh2o* &
-        zrth
-      pud(jl, 2, jk) = 1./(10.*rg*(zpdumg+1.))/(zprumg**zpdumg)*zdsco2*rco2* &
-        zrtu
-      zfppw = 1.6078*zwh2o/(1.+0.608*zwh2o)
-      pud(jl, 4, jk) = pud(jl, 1, jk)*zfppw
-      pud(jl, 5, jk) = pud(jl, 1, jk)*(1.-zfppw)
-      zud(jl, 1) = zud(jl, 1) + pud(jl, 1, jk)
-      zud(jl, 2) = zud(jl, 2) + pud(jl, 2, jk)
-      zsigo(jl) = zsign(jl)
-      zo175(jl) = zn175(jl)
-      zo190(jl) = zn190(jl)
-
-      IF (novlp==1) THEN
-        zclear(jl) = zclear(jl)*(1.-max(pcldsw(jl,jkl),zcloud(jl)))/(1.-min( &
-          zcloud(jl),1.-zepsec))
-        zc1j(jl, jkl) = 1.0 - zclear(jl)
-        zcloud(jl) = pcldsw(jl, jkl)
-      ELSE IF (novlp==2) THEN
-        zcloud(jl) = max(pcldsw(jl,jkl), zcloud(jl))
-        zc1j(jl, jkl) = zcloud(jl)
-      ELSE IF (novlp==3) THEN
-        zclear(jl) = zclear(jl)*(1.-pcldsw(jl,jkl))
-        zcloud(jl) = 1.0 - zclear(jl)
-        zc1j(jl, jkl) = zcloud(jl)
-      END IF
+       pud(jl, 1, kflev + 1) = 0.
+       pud(jl, 2, kflev + 1) = 0.
+       pud(jl, 3, kflev + 1) = 0.
+       pud(jl, 4, kflev + 1) = 0.
+       pud(jl, 5, kflev + 1) = 0.
+       pfact(jl) = prmu0(jl) * pfrac(jl) * psct
+       prmu(jl) = sqrt(1224. * prmu0(jl) * prmu0(jl) + 1.) / 35.
+       psec(jl) = 1. / prmu(jl)
+       zc1j(jl, kflev + 1) = 0.
     END DO
-  END DO
-  DO jl = 1, kdlon
-    pclear(jl) = 1. - zc1j(jl, 1)
-  END DO
-  DO jk = 1, kflev
+
+    ! 1.3 AMOUNTS OF ABSORBERS
+
     DO jl = 1, kdlon
-      IF (pclear(jl)<1.) THEN
-        pcld(jl, jk) = pcldsw(jl, jk)/(1.-pclear(jl))
-      ELSE
-        pcld(jl, jk) = 0.
-      END IF
+       zud(jl, 1) = 0.
+       zud(jl, 2) = 0.
+       zo175(jl) = ppsol(jl)**(zpdumg + 1.)
+       zo190(jl) = ppsol(jl)**(zpdh2o + 1.)
+       zsigo(jl) = ppsol(jl)
+       zclear(jl) = 1.
+       zcloud(jl) = 0.
     END DO
-  END DO
 
+    DO jk = 1, kflev
+       jkp1 = jk + 1
+       jkl = kflev + 1 - jk
+       DO jl = 1, kdlon
+          zrth = (rth2o / ptave(jl, jk))**rtdh2o
+          zrtu = (rtumg / ptave(jl, jk))**rtdumg
+          zwh2o = max(pwv(jl, jk), zepscq)
+          zsign(jl) = 100. * ppmb(jl, jkp1)
+          pdsig(jl, jk) = (zsigo(jl) - zsign(jl)) / ppsol(jl)
+          zn175(jl) = zsign(jl)**(zpdumg + 1.)
+          zn190(jl) = zsign(jl)**(zpdh2o + 1.)
+          zdsco2 = zo175(jl) - zn175(jl)
+          zdsh2o = zo190(jl) - zn190(jl)
+          pud(jl, 1, jk) = 1. / (10. * rg * (zpdh2o + 1.)) / zprh2o**zpdh2o &
+               * zdsh2o * zwh2o * zrth
+          pud(jl, 2, jk) = 1. / (10. * rg * (zpdumg + 1.)) / zprumg**zpdumg &
+               * zdsco2 * rco2 * zrtu
+          zfppw = 1.6078 * zwh2o / (1. + 0.608 * zwh2o)
+          pud(jl, 4, jk) = pud(jl, 1, jk) * zfppw
+          pud(jl, 5, jk) = pud(jl, 1, jk) * (1. - zfppw)
+          zud(jl, 1) = zud(jl, 1) + pud(jl, 1, jk)
+          zud(jl, 2) = zud(jl, 2) + pud(jl, 2, jk)
+          zsigo(jl) = zsign(jl)
+          zo175(jl) = zn175(jl)
+          zo190(jl) = zn190(jl)
 
-  ! *         1.4    COMPUTES CLEAR-SKY GREY ABSORPTION COEFFICIENTS
-  ! -----------------------------------------------
-
-
-  DO ja = 1, 2
+          IF (novlp==1) THEN
+             zclear(jl) = zclear(jl) &
+                  * (1. - max(pcldsw(jl, jkl), zcloud(jl))) &
+                  / (1. - min(zcloud(jl), 1. - zepsec))
+             zc1j(jl, jkl) = 1.0 - zclear(jl)
+             zcloud(jl) = pcldsw(jl, jkl)
+          ELSE IF (novlp==2) THEN
+             zcloud(jl) = max(pcldsw(jl, jkl), zcloud(jl))
+             zc1j(jl, jkl) = zcloud(jl)
+          ELSE IF (novlp==3) THEN
+             zclear(jl) = zclear(jl) * (1. - pcldsw(jl, jkl))
+             zcloud(jl) = 1.0 - zclear(jl)
+             zc1j(jl, jkl) = zcloud(jl)
+          END IF
+       END DO
+    END DO
     DO jl = 1, kdlon
-      zud(jl, ja) = zud(jl, ja)*psec(jl)
+       pclear(jl) = 1. - zc1j(jl, 1)
     END DO
-  END DO
-
-  CALL swtt1(2, 2, iind, zud, zr)
-
-  DO ja = 1, 2
-    DO jl = 1, kdlon
-      paki(jl, ja) = -log(zr(jl,ja))/zud(jl, ja)
+    DO jk = 1, kflev
+       DO jl = 1, kdlon
+          IF (pclear(jl)<1.) THEN
+             pcld(jl, jk) = pcldsw(jl, jk) / (1. - pclear(jl))
+          ELSE
+             pcld(jl, jk) = 0.
+          END IF
+       END DO
     END DO
-  END DO
 
-END SUBROUTINE swu
+    ! 1.4 COMPUTES CLEAR-SKY GREY ABSORPTION COEFFICIENTS
+
+    DO ja = 1, 2
+       DO jl = 1, kdlon
+          zud(jl, ja) = zud(jl, ja) * psec(jl)
+       END DO
+    END DO
+
+    CALL swtt1(2, 2, iind, zud, zr)
+
+    DO ja = 1, 2
+       DO jl = 1, kdlon
+          paki(jl, ja) = - log(zr(jl, ja)) / zud(jl, ja)
+       END DO
+    END DO
+
+  END SUBROUTINE swu
+
+end module swu_m

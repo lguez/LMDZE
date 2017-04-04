@@ -224,7 +224,7 @@ start_init_phys_m.o : inter_barxy.o gr_int_dyn_m.o dynetat0.o dimens_m.o conf_da
 start_inter_3d.o : startdyn.o conf_dat3d.o gr_int_dyn_m.o inter_barxy.o 
 startdyn.o : inter_barxy.o gr_int_dyn_m.o dynetat0.o dimens_m.o conf_dat2d.o comgeom.o 
 stdlevvar.o : screenp.o suphec.o coefcdrag.o 
-sw.o : sw2s.o sw1s.o suphec.o raddim.o 
+sw.o : swu.o sw2s.o sw1s.o suphec.o raddim.o 
 sw1s.o : swr.o swclr.o raddim.o dimphy.o dimens_m.o 
 sw2s.o : swr.o swde.o swclr.o radepsi.o raddim.o dimphy.o dimens_m.o 
 swclr.o : radopt.o radepsi.o raddim.o 
@@ -232,7 +232,7 @@ swde.o : raddim.o dimphy.o dimens_m.o
 swr.o : swde.o radopt.o radepsi.o raddim.o dimphy.o dimens_m.o 
 swtt.o : raddim.o dimphy.o dimens_m.o 
 swtt1.o : raddim.o dimphy.o dimens_m.o 
-swu.o : radopt.o radepsi.o raddim.o suphec.o clesphys.o dimphy.o dimens_m.o 
+swu.o : radopt.o radepsi.o raddim.o suphec.o clesphys.o 
 tau2alpha.o : init_tau2alpha.o 
 test_disvert.o : exner_hyb.o dimens_m.o disvert.o comconst.o abort_gcm.o 
 test_fxhyp.o : unit_nml_m.o read_serre.o fxhyp.o dimens_m.o 
