@@ -139,7 +139,7 @@ contains
        ! PB
        firstsurf(nisurf) = .FALSE.
     ELSE
-       ! Computation of the soil temperatures using the Cgrd and Dgrd
+       ! Computation of the soil temperatures using the Zc and Zd
        ! coefficient computed at the previous time-step:
 
        ! surface temperature
@@ -157,7 +157,7 @@ contains
        END DO
     END IF
 
-    ! Computation of the Cgrd and Dgrd coefficient for the next step:
+    ! Computation of the Zc and Zd coefficient for the next step:
 
     IF (nisurf==is_sic) THEN
        DO ig = 1, knon

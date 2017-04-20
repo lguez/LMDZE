@@ -6,7 +6,7 @@ contains
 
   SUBROUTINE hgardfou(t, ftsol)
 
-    ! From phylmd/hgardfou.F, v 1.1.1.1 2004/05/19 12:53:07
+    ! From phylmd/hgardfou.F, v 1.1.1.1, 2004/05/19 12:53:07
 
     ! This procedure aborts the program if the temperature gets out of range.
 

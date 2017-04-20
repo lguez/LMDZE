@@ -4,10 +4,10 @@ module interfsurf_hq_m
 
 contains
 
-  SUBROUTINE interfsurf_hq(dtime, jour, rmu0, nisurf, knon, knindex, debut, &
+  SUBROUTINE interfsurf_hq(dtime, julien, rmu0, nisurf, knon, knindex, debut, &
        tsoil, qsol, u1_lay, v1_lay, temp_air, spechum, tq_cdrag, petAcoef, &
        peqAcoef, petBcoef, peqBcoef, precip_rain, precip_snow, fder, rugos, &
-       rugoro, snow, qsurf, tsurf, p1lay, ps, radsol, evap, flux_t, fluxlat, &
+       rugoro, snow, qsurf, ts, p1lay, ps, radsol, evap, flux_t, fluxlat, &
        dflux_l, dflux_s, tsurf_new, albedo, z0_new, pctsrf_new_sic, agesno, &
        fqcalving, ffonte, run_off_lic_0)
 
@@ -33,7 +33,7 @@ contains
     USE suphec_m, ONLY: rcpd, rtt
 
     real, intent(IN):: dtime ! pas de temps de la physique (en s)
-    integer, intent(IN):: jour ! jour dans l'annee en cours
+    integer, intent(IN):: julien ! jour dans l'annee en cours
     real, intent(IN):: rmu0(klon) ! cosinus de l'angle solaire zenithal
     integer, intent(IN):: nisurf ! index de la surface a traiter
     integer, intent(IN):: knon ! nombre de points de la surface a traiter
@@ -74,7 +74,7 @@ contains
     real, intent(IN):: rugoro(klon) ! rugosite orographique
     real, intent(INOUT):: snow(:) ! (knon)
     real, intent(INOUT):: qsurf(klon)
-    real, intent(IN):: tsurf(:) ! (knon) temp\'erature de surface
+    real, intent(IN):: ts(:) ! (knon) temp\'erature de surface
     real, intent(IN):: p1lay(klon) ! pression 1er niveau (milieu de couche)
     real, dimension(klon), intent(IN):: ps ! pression au sol
 
@@ -155,7 +155,6 @@ contains
     dif_grnd = 999999.
     capsol = 999999.
     z0_new = 999999.
-    tsurf_new = 999999.
 
     ! Aiguillage vers les differents schemas de surface
 
@@ -168,26 +167,26 @@ contains
        ! Read albedo from the file containing boundary conditions then
        ! add the albedo of snow:
 
-       call interfsur_lim(dtime, jour, knindex, debut, albedo, z0_new)
+       call interfsur_lim(dtime, julien, knindex, debut, albedo, z0_new)
 
        ! Calcul de snow et qsurf, hydrologie adapt\'ee
        CALL calbeta(is_ter, snow, qsol(:knon), beta(:knon), &
             capsol(:knon), dif_grnd(:knon))
 
        IF (soil_model) THEN
-          CALL soil(dtime, is_ter, snow, tsurf, tsoil, soilcap, soilflux)
+          CALL soil(dtime, is_ter, snow, ts, tsoil, soilcap, soilflux)
           cal = RCPD / soilcap
           radsol(1:knon) = radsol(1:knon) + soilflux
        ELSE
           cal = RCPD * capsol(:knon)
        ENDIF
 
-       CALL calcul_fluxs(dtime, tsurf, p1lay(:knon), cal, &
-            beta(:knon), tq_cdrag(:knon), ps(:knon), qsurf(:knon), &
-            radsol(:knon), dif_grnd(:knon), temp_air(:knon), spechum(:knon), &
-            u1_lay(:knon), v1_lay(:knon), petAcoef(:knon), peqAcoef(:knon), &
-            petBcoef(:knon), peqBcoef(:knon), tsurf_new, evap, &
-            fluxlat, flux_t, dflux_s(:knon), dflux_l(:knon))
+       CALL calcul_fluxs(dtime, ts, p1lay(:knon), cal, beta(:knon), &
+            tq_cdrag(:knon), ps(:knon), qsurf(:knon), radsol(:knon), &
+            dif_grnd(:knon), temp_air(:knon), spechum(:knon), u1_lay(:knon), &
+            v1_lay(:knon), petAcoef(:knon), peqAcoef(:knon), petBcoef(:knon), &
+            peqBcoef(:knon), tsurf_new, evap, fluxlat, flux_t, &
+            dflux_s(:knon), dflux_l(:knon))
        CALL fonte_neige(is_ter, dtime, precip_rain(:knon), &
             precip_snow(:knon), snow, qsol(:knon), tsurf_new, evap, &
             fqcalving(:knon), ffonte(:knon), run_off_lic_0(:knon))
@@ -200,7 +199,7 @@ contains
     case (is_oce)
        ! Surface "oc\'ean", appel \`a l'interface avec l'oc\'ean
 
-       call read_sst(dtime, jour, knindex, debut, tsurf_temp)
+       call read_sst(julien, knindex, tsurf_temp)
        cal = 0.
        beta = 1.
        dif_grnd = 0.
@@ -218,11 +217,12 @@ contains
        ! Surface "glace de mer" appel a l'interface avec l'ocean
 
        DO ii = 1, knon
-          tsurf_new(ii) = tsurf(ii)
           IF (pctsrf_new_sic(knindex(ii)) < EPSFRA) then
              snow(ii) = 0.
              tsurf_new(ii) = RTT - 1.8
              IF (soil_model) tsoil(ii, :) = RTT - 1.8
+          else
+             tsurf_new(ii) = ts(ii)
           endif
        enddo
 
@@ -266,7 +266,7 @@ contains
        ! Surface "glacier continentaux" appel a l'interface avec le sol
 
        IF (soil_model) THEN
-          CALL soil(dtime, is_lic, snow, tsurf, tsoil, soilcap, soilflux)
+          CALL soil(dtime, is_lic, snow, ts, tsoil, soilcap, soilflux)
           cal = RCPD / soilcap
           radsol(1:knon) = radsol(1:knon) + soilflux
        ELSE
@@ -276,7 +276,7 @@ contains
        beta = 1.
        dif_grnd = 0.
 
-       call calcul_fluxs(dtime, tsurf, p1lay(:knon), cal, &
+       call calcul_fluxs(dtime, ts, p1lay(:knon), cal, &
             beta(:knon), tq_cdrag(:knon), ps(:knon), qsurf(:knon), &
             radsol(:knon), dif_grnd(:knon), temp_air(:knon), spechum(:knon), &
             u1_lay(:knon), v1_lay(:knon), petAcoef(:knon), peqAcoef(:knon), &

@@ -15,7 +15,7 @@ contains
     use clcdrag_m, only: clcdrag
     USE conf_phys_m, ONLY: iflag_pbl
     USE dimphy, ONLY: klev, klon
-    USE fcttre, ONLY: dqsatl, dqsats, foede, foeew, qsatl, qsats
+    USE fcttre, ONLY: foede, foeew
     USE indicesol, ONLY: is_oce
     USE suphec_m, ONLY: rcpd, rd, retv, rg, rkappa, rlstt, rlvtt, rtt
     USE yoethf_m, ONLY: r2es, r5ies, r5les, rvtmp2
@@ -29,12 +29,12 @@ contains
     ! pression au milieu de chaque couche (en Pa)
 
     REAL, intent(in):: ksta, ksta_ter
-    REAL, intent(in):: ts(:) ! (klon) temperature du sol (en Kelvin)
+    REAL, intent(in):: ts(:) ! (knon) temperature du sol (en Kelvin)
     REAL, intent(in):: rugos(:) ! (klon) longeur de rugosite (en m)
     REAL, intent(in):: u(:, :), v(:, :) ! (klon, klev) wind
     REAL, intent(in):: t(:, :) ! (klon, klev) temperature (K)
     real, intent(in):: q(:, :) ! (klon, klev) vapeur d'eau (kg/kg)
-    real, intent(in):: qsurf(:) ! (klon) 
+    real, intent(in):: qsurf(:) ! (knon) 
     REAL, intent(out):: coefm(:, :) ! (knon, klev) coefficient, vitesse
 
     real, intent(out):: coefh(:, :) ! (knon, klev) 
@@ -133,8 +133,8 @@ contains
        z1(i) = zgeop(i, 1)
     ENDDO
 
-    CALL clcdrag(klon, knon, nsrf, .false., u1, v1, t1, q1, z1, ts, qsurf, &
-         rugos, coefm(:, 1), coefh(:, 1)) 
+    CALL clcdrag(nsrf, u1, v1, t1, q1, z1, ts, qsurf, rugos, coefm(:, 1), &
+         coefh(:, 1)) 
 
     ! Calculer les coefficients turbulents dans l'atmosphere
 

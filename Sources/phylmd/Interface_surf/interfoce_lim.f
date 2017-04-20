@@ -15,7 +15,7 @@ contains
     USE netcdf, ONLY: nf90_nowrite
     use netcdf95, only: NF95_CLOSE, nf95_get_var, NF95_INQ_VARID, nf95_open
 
-    integer, intent(IN):: jour ! jour a lire dans l'annee
+    integer, intent(IN):: jour ! jour \`a lire dans l'ann\'ee
 
     real, intent(out):: pctsrf_new_oce(:), pctsrf_new_sic(:) ! (klon)
     ! sous-maille fractionnelle

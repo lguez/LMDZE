@@ -209,6 +209,9 @@ contains
        CALL histdef(nid_ins, "s_trmb3", "Point Omega (HBTM2)", "m", &
             iim, (jjm + 1), nhori, 1, 1, 1, -99, &
             "inst(X)", zsto, zout)
+       CALL histdef(nid_ins, "qsurf", "Surface Air humidity", "", &
+            iim, (jjm + 1), nhori, 1, 1, 1, -99, &
+            "inst(X)", zsto, zout)
 
        if (conv_emanuel) then
           CALL histdef(nid_ins, "ptop", "cloud top pressure", &
@@ -258,6 +261,7 @@ contains
        CALL histdef(nid_ins, "dtlw0", "CS LW radiation dT", &
             "K/s", iim, jjm + 1, nhori, llm, 1, llm, nvert, "inst(X)", &
             zsto, zout)
+
        if (ok_newmicro) then
           CALL histdef(nid_ins, "re", "cloud droplet effective radius", &
                "micrometer", iim, jjm + 1, nhori, llm, 1, llm, nvert, &

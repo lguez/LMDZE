@@ -28,7 +28,6 @@ contains
     ! From LMDZ4/libf/dyn3d/conf_guide.F, version 1.1.1.1 2004/05/19 12:53:07
     !  Parametres de controle du run:
 
-    use abort_gcm_m, only: abort_gcm
     use comconst, only: daysec, dtvr
     use conf_gcm_m, only: day_step, iperiod
     use dynetat0_m, only: grossismx, grossismy, rlatu, rlatv

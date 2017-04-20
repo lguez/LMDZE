@@ -9,7 +9,7 @@ contains
     USE dimphy, ONLY : klev, klon
     USE suphec_m, ONLY : rcpd, rd, retv, rtt
     USE yoethf_m, ONLY : r2es
-    USE fcttre, ONLY : foeew, qsatl, qsats
+    USE fcttre, ONLY : foeew
 
     ! Arguments d'entree:
     REAL, intent(in):: paprs(klon, klev+1) ! pression (Pa) a inter-couche

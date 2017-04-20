@@ -33,7 +33,6 @@ coefcdrag.f
 coefkz2.f
 coefkz.f
 coefkzmin.f
-coefpoly.f
 comconst.f
 comdissnew.f
 comfisrtilp.f
@@ -127,7 +126,6 @@ guide.f
 gwprofil.f
 gwstress.f
 hbtm.f
-heavyside.f
 hgardfou.f
 histbeg_totreg.f
 histclo.f
@@ -161,12 +159,9 @@ interface_surf.f
 interfoce_lim.f
 interfsurf_hq.f
 interfsur_lim.f
-invert_zoom_x.f
 ioconf_calendar.f
 ioget_calendar.f
 isittime.f
-ismax.f
-ismin.f
 itau2date.f
 ju2ymds.f
 laplacien.f
@@ -217,7 +212,6 @@ phystokenc.f
 phytrac.f
 pres2lev.f
 press_coefoz.f
-principal_cshift.f
 qminimum.f
 q_sat.f
 raddim.f

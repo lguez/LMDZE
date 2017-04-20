@@ -4,7 +4,7 @@ module clmain_m
 
 contains
 
-  SUBROUTINE clmain(dtime, pctsrf, t, q, u, v, jour, mu0, ftsol, cdmmax, &
+  SUBROUTINE clmain(dtime, pctsrf, t, q, u, v, julien, mu0, ftsol, cdmmax, &
        cdhmax, ksta, ksta_ter, ok_kzmin, ftsoil, qsol, paprs, pplay, fsnow, &
        qsurf, evap, falbe, fluxlat, rain_fall, snow_f, solsw, sollw, fder, &
        rugos, agesno, rugoro, d_t, d_q, d_u, d_v, d_ts, flux_t, flux_q, &
@@ -52,7 +52,7 @@ contains
     REAL, INTENT(IN):: t(klon, klev) ! temperature (K)
     REAL, INTENT(IN):: q(klon, klev) ! vapeur d'eau (kg/kg)
     REAL, INTENT(IN):: u(klon, klev), v(klon, klev) ! vitesse
-    INTEGER, INTENT(IN):: jour ! jour de l'annee en cours
+    INTEGER, INTENT(IN):: julien ! jour de l'annee en cours
     REAL, intent(in):: mu0(klon) ! cosinus de l'angle solaire zenithal     
     REAL, INTENT(IN):: ftsol(klon, nbsrf) ! temp\'erature du sol (en K)
     REAL, INTENT(IN):: cdmmax, cdhmax ! seuils cdrm, cdrh
@@ -92,7 +92,7 @@ contains
     REAL, intent(out):: d_u(klon, klev), d_v(klon, klev)
     ! changement pour "u" et "v"
 
-    REAL, intent(out):: d_ts(klon, nbsrf) ! le changement pour ftsol
+    REAL, intent(out):: d_ts(:, :) ! (klon, nbsrf) variation of ftsol
 
     REAL, intent(out):: flux_t(klon, nbsrf)
     ! flux de chaleur sensible (Cp T) (W/m2) (orientation positive vers
@@ -115,7 +115,7 @@ contains
     REAL, intent(out):: ycoefh(klon, klev)
     REAL, intent(out):: zu1(klon)
     REAL zv1(klon)
-    REAL t2m(klon, nbsrf), q2m(klon, nbsrf)
+    REAL, INTENT(inout):: t2m(klon, nbsrf), q2m(klon, nbsrf)
     REAL u10m(klon, nbsrf), v10m(klon, nbsrf)
 
     ! Ionela Musat cf. Anne Mathieu : planetary boundary layer, hbtm
@@ -125,8 +125,7 @@ contains
     REAL capcl(klon, nbsrf)
     REAL oliqcl(klon, nbsrf)
     REAL cteicl(klon, nbsrf)
-    REAL pblt(klon, nbsrf)
-    ! pblT------- T au nveau HCL
+    REAL, INTENT(inout):: pblt(klon, nbsrf) ! T au nveau HCL
     REAL therm(klon, nbsrf)
     REAL trmb1(klon, nbsrf)
     ! trmb1-------deep_cape
@@ -255,7 +254,6 @@ contains
     zu1 = 0.
     zv1 = 0.
     ypct = 0.
-    yts = 0.
     yqsurf = 0.
     yrain_f = 0.
     ysnow_f = 0.
@@ -297,7 +295,7 @@ contains
 
     ! Tester si c'est le moment de lire le fichier:
     if (mod(itap - 1, lmt_pas) == 0) then
-       CALL interfoce_lim(jour, pctsrf_new_oce, pctsrf_new_sic)
+       CALL interfoce_lim(julien, pctsrf_new_oce, pctsrf_new_sic)
     endif
 
     ! Boucler sur toutes les sous-fractions du sol:
@@ -359,8 +357,9 @@ contains
           END DO
 
           ! calculer Cdrag et les coefficients d'echange
-          CALL coefkz(nsrf, ypaprs, ypplay, ksta, ksta_ter, yts, yrugos, yu, &
-               yv, yt, yq, yqsurf, coefm(:knon, :), coefh(:knon, :))
+          CALL coefkz(nsrf, ypaprs, ypplay, ksta, ksta_ter, yts(:knon), &
+               yrugos, yu, yv, yt, yq, yqsurf(:knon), coefm(:knon, :), &
+               coefh(:knon, :))
           IF (iflag_pbl == 1) THEN
              CALL coefkz2(nsrf, knon, ypaprs, ypplay, yt, ycoefm0, ycoefh0)
              coefm(:knon, :) = max(coefm(:knon, :), ycoefm0(:knon, :))
@@ -435,13 +434,14 @@ contains
                ypplay, ydelp, y_d_v, y_flux_v(:knon))
 
           ! calculer la diffusion de "q" et de "h"
-          CALL clqh(dtime, jour, firstcal, nsrf, ni(:knon), ytsoil(:knon, :), &
-               yqsol, mu0, yrugos, yrugoro, yu1, yv1, coefh(:knon, :), yt, &
-               yq, yts(:knon), ypaprs, ypplay, ydelp, yrads, yalb(:knon), &
-               snow(:knon), yqsurf, yrain_f, ysnow_f, yfder, yfluxlat(:knon), &
-               pctsrf_new_sic, yagesno(:knon), y_d_t, y_d_q, y_d_ts(:knon), &
-               yz0_new, y_flux_t(:knon), y_flux_q(:knon), y_dflux_t, &
-               y_dflux_q, y_fqcalving, y_ffonte, y_run_off_lic_0)
+          CALL clqh(dtime, julien, firstcal, nsrf, ni(:knon), &
+               ytsoil(:knon, :), yqsol, mu0, yrugos, yrugoro, yu1, yv1, &
+               coefh(:knon, :), yt, yq, yts(:knon), ypaprs, ypplay, ydelp, &
+               yrads, yalb(:knon), snow(:knon), yqsurf, yrain_f, ysnow_f, &
+               yfder, yfluxlat(:knon), pctsrf_new_sic, yagesno(:knon), y_d_t, &
+               y_d_q, y_d_ts(:knon), yz0_new, y_flux_t(:knon), &
+               y_flux_q(:knon), y_dflux_t, y_dflux_q, y_fqcalving, y_ffonte, &
+               y_run_off_lic_0)
 
           ! calculer la longueur de rugosite sur ocean
           yrugm = 0.

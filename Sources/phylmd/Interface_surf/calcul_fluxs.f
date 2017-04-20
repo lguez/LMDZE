@@ -14,7 +14,7 @@ contains
 
     ! L. Fairhead, April 2000
 
-    USE fcttre, ONLY: dqsatl, dqsats, foede, foeew, qsatl, qsats
+    USE fcttre, ONLY: foede, foeew
     use nr_util, only: assert_eq
     USE suphec_m, ONLY: rcpd, rd, retv, rlstt, rlvtt, rtt
     USE yoethf_m, ONLY: r2es, r5ies, r5les, rvtmp2

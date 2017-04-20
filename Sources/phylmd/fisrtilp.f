@@ -17,7 +17,7 @@ contains
     USE comfisrtilp, ONLY: cld_lc_con, cld_lc_lsc, cld_tau_con, &
          cld_tau_lsc, coef_eva, ffallv_con, ffallv_lsc, iflag_pdf, reevap_ice
     USE dimphy, ONLY: klev, klon
-    USE fcttre, ONLY: dqsatl, dqsats, foede, foeew, qsatl, qsats
+    USE fcttre, ONLY: foede, foeew
     USE numer_rec_95, ONLY: nr_erf
     USE suphec_m, ONLY: rcpd, rd, retv, rg, rlstt, rlvtt, rtt
     USE yoethf_m, ONLY: r2es, r5ies, r5les, rvtmp2

@@ -36,7 +36,7 @@ contains
     USE dimsoil, ONLY: nsoilmx
     use drag_noro_m, only: drag_noro
     use dynetat0_m, only: day_ref, annee_ref
-    USE fcttre, ONLY: foeew, qsatl, qsats
+    USE fcttre, ONLY: foeew
     use fisrtilp_m, only: fisrtilp
     USE hgardfou_m, ONLY: hgardfou
     USE histsync_m, ONLY: histsync
@@ -274,8 +274,7 @@ contains
     REAL cldl(klon), cldm(klon), cldh(klon) ! nuages bas, moyen et haut
     REAL cldt(klon), cldq(klon) ! nuage total, eau liquide integree
 
-    REAL zxqsurf(klon), zxfluxlat(klon)
-
+    REAL zxfluxlat(klon)
     REAL dist, mu0(klon), fract(klon)
     real longi
     REAL z_avant(klon), z_apres(klon), z_factor(klon)
@@ -339,7 +338,7 @@ contains
     real rain_lsc(klon)
     REAL, save:: snow_con(klon) ! neige (mm / s)
     real snow_lsc(klon)
-    REAL d_ts(klon, nbsrf)
+    REAL d_ts(klon, nbsrf) ! variation of ftsol
 
     REAL d_u_vdf(klon, llm), d_v_vdf(klon, llm)
     REAL d_t_vdf(klon, llm), d_q_vdf(klon, llm)
@@ -382,7 +381,7 @@ contains
     REAL uq_lay(klon, llm) ! transport zonal de l'eau a chaque niveau vert.
 
     real date0
-    REAL ztsol(klon)
+    REAL tsol(klon)
 
     REAL d_t_ec(klon, llm)
     ! tendance due \`a la conversion d'\'energie cin\'etique en
@@ -502,7 +501,7 @@ contains
     ql_seri = qx(:, :, iliq)
     tr_seri = qx(:, :, 3:nqmx)
 
-    ztsol = sum(ftsol * pctsrf, dim = 2)
+    tsol = sum(ftsol * pctsrf, dim = 2)
 
     ! Diagnostic de la tendance dynamique :
     IF (ancien_ok) THEN
@@ -563,8 +562,8 @@ contains
     ! R\'epartition du longwave par sous-surface lin\'earis\'ee
 
     forall (nsrf = 1: nbsrf)
-       fsollw(:, nsrf) = sollw + 4. * RSIGMA * ztsol**3 &
-            * (ztsol - ftsol(:, nsrf))
+       fsollw(:, nsrf) = sollw + 4. * RSIGMA * tsol**3 &
+            * (tsol - ftsol(:, nsrf))
        fsolsw(:, nsrf) = solsw * (1. - falbe(:, nsrf)) / (1. - albsol)
     END forall
 
@@ -598,7 +597,7 @@ contains
 
     call assert(abs(sum(pctsrf, dim = 2) - 1.) <= EPSFRA, 'physiq: pctsrf')
     ftsol = ftsol + d_ts
-    ztsol = sum(ftsol * pctsrf, dim = 2)
+    tsol = sum(ftsol * pctsrf, dim = 2)
     zxfluxlat = sum(fluxlat * pctsrf, dim = 2)
     zt2m = sum(t2m * pctsrf, dim = 2)
     zq2m = sum(q2m * pctsrf, dim = 2)
@@ -621,7 +620,7 @@ contains
     DO nsrf = 1, nbsrf
        DO i = 1, klon
           IF (pctsrf(i, nsrf) < epsfra) then
-             ftsol(i, nsrf) = ztsol(i)
+             ftsol(i, nsrf) = tsol(i)
              t2m(i, nsrf) = zt2m(i)
              q2m(i, nsrf) = zq2m(i)
              u10m(i, nsrf) = zu10m(i)
@@ -645,7 +644,7 @@ contains
     ! Calculer la dérive du flux infrarouge
 
     DO i = 1, klon
-       dlw(i) = - 4. * RSIGMA * ztsol(i)**3
+       dlw(i) = - 4. * RSIGMA * tsol(i)**3
     ENDDO
 
     ! Appeler la convection
@@ -881,7 +880,7 @@ contains
     IF (MOD(itap - 1, radpas) == 0) THEN
        wo = ozonecm(REAL(julien), paprs)
        albsol = sum(falbe * pctsrf, dim = 2)
-       CALL radlwsw(dist, mu0, fract, paprs, play, ztsol, albsol, t_seri, &
+       CALL radlwsw(dist, mu0, fract, paprs, play, tsol, albsol, t_seri, &
             q_seri, wo, cldfra, cldemi, cldtau, heat, heat0, cool, cool0, &
             radsol, albpla, topsw, toplw, solsw, sollw, sollwdown, topsw0, &
             toplw0, solsw0, sollw0, lwdn0, lwdn, lwup0, lwup, swdn0, swdn, &
@@ -895,9 +894,6 @@ contains
                / 86400.
        ENDDO
     ENDDO
-
-    ! Calculer l'hydrologie de la surface
-    zxqsurf = sum(fqsurf * pctsrf, dim = 2)
 
     ! Calculer le bilan du sol et la d\'erive de temp\'erature (couplage)
     DO i = 1, klon
@@ -982,7 +978,7 @@ contains
 
     IF (offline) call phystokenc(dtphys, t, mfu, mfd, pen_u, pde_u, pen_d, &
          pde_d, fm_therm, entr_therm, ycoefh, yu1, yv1, ftsol, pctsrf, &
-         frac_impa, frac_nucl, pphis, airephy, dtphys)
+         frac_impa, frac_nucl, pphis, airephy)
 
     ! Calculer le transport de l'eau et de l'energie (diagnostique)
     CALL transp(paprs, t_seri, q_seri, u_seri, v_seri, zphi, ve, vq, ue, uq)
@@ -1048,7 +1044,7 @@ contains
     CALL histwrite_phy("precip", rain_fall + snow_fall)
     CALL histwrite_phy("plul", rain_lsc + snow_lsc)
     CALL histwrite_phy("pluc", rain_con + snow_con)
-    CALL histwrite_phy("tsol", ztsol)
+    CALL histwrite_phy("tsol", tsol)
     CALL histwrite_phy("t2m", zt2m)
     CALL histwrite_phy("q2m", zq2m)
     CALL histwrite_phy("u10m", zu10m)
@@ -1112,6 +1108,7 @@ contains
     CALL histwrite_phy("dtsw0", heat0 / 86400.)
     CALL histwrite_phy("dtlw0", - cool0 / 86400.)
     CALL histwrite_phy("msnow", sum(fsnow * pctsrf, dim = 2))
+    call histwrite_phy("qsurf", sum(fqsurf * pctsrf, dim = 2))
 
     if (ok_instan) call histsync(nid_ins)
 

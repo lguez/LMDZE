@@ -6,7 +6,7 @@ contains
 
   SUBROUTINE phystokenc(pdtphys, pt, pmfu, pmfd, pen_u, pde_u, pen_d, pde_d, &
        pfm_therm, pentr_therm, pcoefh, yu1, yv1, ftsol, pctsrf, frac_impa, &
-       frac_nucl, pphis, paire, dtime)
+       frac_nucl, pphis, paire)
 
     ! From phylmd/phystokenc.F, version 1.2, 2004/06/22 11:45:35
     ! Author: Fr\'ed\'eric Hourdin
@@ -60,7 +60,6 @@ contains
 
     REAL, INTENT(IN):: pphis(klon)
     real, intent(in):: paire(klon)
-    REAL, INTENT (IN):: dtime
 
     ! Local:
 
@@ -100,8 +99,8 @@ contains
 
     ! Couche limite: 
 
-    IF (iadvtr==0) CALL initphysto('phystoke', dtime, dtime * istphy, &
-         dtime * istphy, physid)
+    IF (iadvtr==0) CALL initphysto('phystoke', pdtphys, pdtphys * istphy, &
+         pdtphys * istphy, physid)
 
     CALL histwrite(physid, 'phis', itap, gr_phy_write(pphis))
     CALL histwrite(physid, 'aire', itap, gr_phy_write(paire))

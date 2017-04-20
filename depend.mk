@@ -19,7 +19,7 @@ caldyn0.o : vitvert.o tourpot.o sortvarc.o paramet_m.o massdair.o massbarxy.o ma
 calfis.o : physiq.o grid_change.o dynetat0.o disvert.o dimphy.o dimens_m.o comgeom.o comconst.o 
 calltherm.o : thermcell.o ctherm.o dimphy.o 
 ce0l.o : unit_nml_m.o read_serre.o limit.o grilles_gcm_netcdf_sub.o etat0.o dimens_m.o conf_gcm.o comdissnew.o 
-clcdrag.o : yoethf.o suphec.o indicesol.o 
+clcdrag.o : yoethf.o suphec.o indicesol.o dimphy.o 
 cleanstr.o : mathelp.o strlowercase.o 
 clesphys.o : unit_nml_m.o 
 clesphys2.o : conf_gcm.o unit_nml_m.o 
@@ -38,7 +38,7 @@ comgeom.o : paramet_m.o dynetat0.o comdissnew.o comconst.o dimens_m.o
 comgeomphy.o : dimphy.o 
 concvl.o : yoethf.o suphec.o FCTTRE.o dimphy.o cv_driver.o comconst.o 
 conf_gcm.o : unit_nml_m.o abort_gcm.o 
-conf_guide.o : writefield.o unit_nml_m.o tau2alpha.o init_tau2alpha.o dynetat0.o conf_gcm.o comconst.o abort_gcm.o dimens_m.o 
+conf_guide.o : writefield.o unit_nml_m.o tau2alpha.o init_tau2alpha.o dynetat0.o conf_gcm.o comconst.o dimens_m.o 
 conf_phys.o : YOMCST.o unit_nml_m.o comfisrtilp.o clesphys2.o clesphys.o 
 conflx.o : FCTTRE.o yoethf.o suphec.o dimphy.o flxmain.o 
 convflu.o : comgeom.o paramet_m.o dimens_m.o 
@@ -99,7 +99,7 @@ flxdtdq.o : suphec.o dimphy.o
 flxflux.o : FCTTRE.o yoethf.o suphec.o dimphy.o 
 flxini.o : suphec.o flxadjtq.o dimphy.o 
 flxmain.o : yoethf.o YOECUMF.o suphec.o flxini.o flxflux.o flxdtdq.o flxdlfs.o flxddraf.o flxbase.o flxasc.o dimphy.o 
-fonte_neige.o : suphec.o interface_surf.o indicesol.o FCTTRE.o 
+fonte_neige.o : suphec.o interface_surf.o indicesol.o 
 fxhyp.o : tanh_cautious.o principal_cshift.o invert_zoom_x.o dynetat0.o dimens_m.o 
 fyhyp.o : heavyside.o dynetat0.o dimens_m.o coefpoly.o 
 gcm.o : createnewfield.o yoethf.o unit_nml_m.o tracstoke.o suphec.o leapfrog.o ioconf_calendar.o init_dynzon.o inithist.o initdynav.o inifilr.o inidissip.o iniadvtrac.o histclo.o grid_change.o dynredem0.o dynetat0.o disvert.o dimens_m.o conf_guide.o conf_gcm.o comgeomphy.o comgeom.o comdissnew.o comconst.o 
@@ -207,7 +207,7 @@ radiornpb.o : dimphy.o dimens_m.o
 radlwsw.o : yoethf.o sw.o suphec.o raddim.o lw.o dimphy.o clesphys.o 
 read_reanalyse.o : reanalyse2nat.o paramet_m.o nat2gcm.o dimens_m.o conf_guide.o 
 read_serre.o : unit_nml_m.o dynetat0.o 
-read_sst.o : time_phylmdz.o dimphy.o 
+read_sst.o : time_phylmdz.o dimphy.o conf_gcm.o 
 reanalyse2nat.o : pres2lev.o paramet_m.o massbar.o exner_hyb.o disvert.o dimens_m.o comgeom.o comconst.o 
 regr_lat_time_coefoz.o : dynetat0.o dimens_m.o 
 regr_pr_av.o : press_coefoz.o grid_change.o dimphy.o dimens_m.o 
