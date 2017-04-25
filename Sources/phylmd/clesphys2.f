@@ -4,8 +4,7 @@ module clesphys2
 
   implicit none
 
-  LOGICAL:: soil_model = .TRUE.
-  ! Choix du modele de sol (Thermique ?)
+  LOGICAL:: soil_model = .TRUE. ! choix du mod\`ele de sol (thermique ?)
 
   LOGICAL:: new_oliq = .TRUE.
   ! Permet de mettre en route la nouvelle parametrisation de l'eau liquide

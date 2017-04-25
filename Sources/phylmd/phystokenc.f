@@ -51,7 +51,7 @@ contains
 
     ! Arguments necessaires pour les sources et puits de traceur 
 
-    REAL, intent(in):: ftsol(klon, nbsrf) ! Temperature du sol (surf)(Kelvin)
+    REAL, intent(in):: ftsol(:, :) ! (klon, nbsrf) surface temperature (K)
     REAL, intent(in):: pctsrf(klon, nbsrf) ! Pourcentage de sol f(nature du sol)
 
     ! Coefficients de lessivage: 

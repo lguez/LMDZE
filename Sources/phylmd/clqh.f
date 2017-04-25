@@ -46,7 +46,10 @@ contains
     REAL paprs(klon, klev + 1) ! pression a inter-couche (Pa)
     REAL pplay(klon, klev) ! pression au milieu de couche (Pa)
     REAL delp(klon, klev) ! epaisseur de couche en pression (Pa)
-    REAL radsol(klon) ! ray. net au sol (Solaire + IR) W / m2
+
+    REAL, intent(inout):: radsol(:) ! (knon)
+    ! rayonnement net au sol (Solaire + IR) W / m2
+
     REAL, intent(inout):: albedo(:) ! (knon) albedo de la surface
     REAL, intent(inout):: snow(:) ! (knon) ! hauteur de neige
     REAL qsurf(klon) ! humidite de l'air au dessus de la surface
@@ -57,7 +60,7 @@ contains
     real, intent(in):: precip_snow(klon)
     ! solid water mass flux (kg / m2 / s), positive down
 
-    real, intent(inout):: fder(klon)
+    real, intent(inout):: fder(:) ! (knon)
     real, intent(out):: fluxlat(:) ! (knon)
     real, intent(in):: pctsrf_new_sic(:) ! (klon)
     REAL, intent(inout):: agesno(:) ! (knon)
@@ -73,8 +76,8 @@ contains
     REAL, intent(out):: flux_q(:) ! (knon)
     ! flux de la vapeur d'eau à la surface, en kg / (m**2 s)
 
-    REAL dflux_s(klon) ! derivee du flux sensible dF / dTs
-    REAL dflux_l(klon) ! derivee du flux latent dF / dTs
+    REAL dflux_s(:) ! (knon) derivee du flux sensible dF / dTs
+    REAL dflux_l(:) ! (knon) derivee du flux latent dF / dTs
 
     ! Flux d'eau "perdue" par la surface et n\'ecessaire pour que limiter la
     ! hauteur de neige, en kg / m2 / s
@@ -239,12 +242,12 @@ contains
     spechum(1:knon)=q(1:knon, 1)
     p1lay(1:knon) = pplay(1:knon, 1)
 
-    CALL interfsurf_hq(dtime, julien, rmu0, nisurf, knon, knindex, debut, &
-         tsoil, qsol, u1lay, v1lay, temp_air, spechum, tq_cdrag, petAcoef, &
-         peqAcoef, petBcoef, peqBcoef, precip_rain, precip_snow, fder, rugos, &
-         rugoro, snow, qsurf, ts, p1lay, psref, radsol, evap, flux_t, &
-         fluxlat, dflux_l, dflux_s, tsurf_new, albedo, z0_new, &
-         pctsrf_new_sic, agesno, fqcalving, ffonte, run_off_lic_0)
+    CALL interfsurf_hq(dtime, julien, rmu0, nisurf, knindex, debut, tsoil, &
+         qsol, u1lay, v1lay, temp_air, spechum, tq_cdrag, petAcoef, peqAcoef, &
+         petBcoef, peqBcoef, precip_rain, precip_snow, fder, rugos, rugoro, &
+         snow, qsurf, ts, p1lay, psref, radsol, evap, flux_t, fluxlat, &
+         dflux_l, dflux_s, tsurf_new, albedo, z0_new, pctsrf_new_sic, agesno, &
+         fqcalving, ffonte, run_off_lic_0)
 
     flux_q = - evap
     d_ts = tsurf_new - ts

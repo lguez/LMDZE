@@ -4,7 +4,7 @@ module read_sst_m
 
 contains
 
-  SUBROUTINE read_sst(julien, knindex, lmt_sst)
+  SUBROUTINE read_sst(julien, knindex, tsurf)
 
     ! From interfoce_lim
 
@@ -20,7 +20,7 @@ contains
     integer, intent(in):: knindex(:) ! (knon)
     ! index des points de la surface a traiter
 
-    real, intent(out):: lmt_sst(:) ! (knon)
+    real, intent(out):: tsurf(:) ! (knon)
     ! SST lues dans le fichier de conditions aux limites
 
     ! Local:
@@ -32,7 +32,7 @@ contains
 
     ! --------------------------------------------------
 
-    call assert(size(knindex) == size(lmt_sst), "read_sst knon")
+    call assert(size(knindex) == size(tsurf), "read_sst knon")
 
     ! Tester d'abord si c'est le moment de lire le fichier
     if (mod(itap - 1, lmt_pas) == 0) then
@@ -44,7 +44,7 @@ contains
        call NF95_CLOSE(ncid)
     endif
 
-    lmt_sst = sst_lu(knindex)
+    tsurf = sst_lu(knindex)
 
   END SUBROUTINE read_sst
 

@@ -6,8 +6,8 @@ contains
 
   SUBROUTINE clmain(dtime, pctsrf, t, q, u, v, julien, mu0, ftsol, cdmmax, &
        cdhmax, ksta, ksta_ter, ok_kzmin, ftsoil, qsol, paprs, pplay, fsnow, &
-       qsurf, evap, falbe, fluxlat, rain_fall, snow_f, solsw, sollw, fder, &
-       rugos, agesno, rugoro, d_t, d_q, d_u, d_v, d_ts, flux_t, flux_q, &
+       qsurf, evap, falbe, fluxlat, rain_fall, snow_f, fsolsw, fsollw, fder, &
+       frugs, agesno, rugoro, d_t, d_q, d_u, d_v, d_ts, flux_t, flux_q, &
        flux_u, flux_v, cdragh, cdragm, q2, dflux_t, dflux_q, ycoefh, zu1, &
        zv1, t2m, q2m, u10m, v10m, pblh, capcl, oliqcl, cteicl, pblt, therm, &
        trmb1, trmb2, trmb3, plcl, fqcalving, ffonte, run_off_lic_0)
@@ -54,7 +54,7 @@ contains
     REAL, INTENT(IN):: u(klon, klev), v(klon, klev) ! vitesse
     INTEGER, INTENT(IN):: julien ! jour de l'annee en cours
     REAL, intent(in):: mu0(klon) ! cosinus de l'angle solaire zenithal     
-    REAL, INTENT(IN):: ftsol(klon, nbsrf) ! temp\'erature du sol (en K)
+    REAL, INTENT(IN):: ftsol(:, :) ! (klon, nbsrf) temp\'erature du sol (en K)
     REAL, INTENT(IN):: cdmmax, cdhmax ! seuils cdrm, cdrh
     REAL, INTENT(IN):: ksta, ksta_ter
     LOGICAL, INTENT(IN):: ok_kzmin
@@ -79,9 +79,9 @@ contains
     REAL, intent(in):: snow_f(klon)
     ! solid water mass flux (kg/m2/s), positive down
 
-    REAL, INTENT(IN):: solsw(klon, nbsrf), sollw(klon, nbsrf)
-    REAL, intent(in):: fder(klon)
-    REAL, intent(inout):: rugos(klon, nbsrf) ! longueur de rugosit\'e (en m)
+    REAL, INTENT(IN):: fsolsw(klon, nbsrf), fsollw(klon, nbsrf)
+    REAL, intent(in):: fder(:) ! (klon)
+    REAL, intent(inout):: frugs(klon, nbsrf) ! longueur de rugosit\'e (en m)
     real agesno(klon, nbsrf)
     REAL, INTENT(IN):: rugoro(klon)
 
@@ -257,11 +257,9 @@ contains
     yqsurf = 0.
     yrain_f = 0.
     ysnow_f = 0.
-    yfder = 0.
     yrugos = 0.
     yu1 = 0.
     yv1 = 0.
-    yrads = 0.
     ypaprs = 0.
     ypplay = 0.
     ydelp = 0.
@@ -325,11 +323,11 @@ contains
              ysnow_f(j) = snow_f(i)
              yagesno(j) = agesno(i, nsrf)
              yfder(j) = fder(i)
-             yrugos(j) = rugos(i, nsrf)
+             yrugos(j) = frugs(i, nsrf)
              yrugoro(j) = rugoro(i)
              yu1(j) = u1lay(i)
              yv1(j) = v1lay(i)
-             yrads(j) = solsw(i, nsrf) + sollw(i, nsrf)
+             yrads(j) = fsolsw(i, nsrf) + fsollw(i, nsrf)
              ypaprs(j, klev+1) = paprs(i, klev+1)
              y_run_off_lic_0(j) = run_off_lic_0(i)
           END DO
@@ -437,11 +435,11 @@ contains
           CALL clqh(dtime, julien, firstcal, nsrf, ni(:knon), &
                ytsoil(:knon, :), yqsol, mu0, yrugos, yrugoro, yu1, yv1, &
                coefh(:knon, :), yt, yq, yts(:knon), ypaprs, ypplay, ydelp, &
-               yrads, yalb(:knon), snow(:knon), yqsurf, yrain_f, ysnow_f, &
-               yfder, yfluxlat(:knon), pctsrf_new_sic, yagesno(:knon), y_d_t, &
-               y_d_q, y_d_ts(:knon), yz0_new, y_flux_t(:knon), &
-               y_flux_q(:knon), y_dflux_t, y_dflux_q, y_fqcalving, y_ffonte, &
-               y_run_off_lic_0)
+               yrads(:knon), yalb(:knon), snow(:knon), yqsurf, yrain_f, &
+               ysnow_f, yfder(:knon), yfluxlat(:knon), pctsrf_new_sic, &
+               yagesno(:knon), y_d_t, y_d_q, y_d_ts(:knon), yz0_new, &
+               y_flux_t(:knon), y_flux_q(:knon), y_dflux_t(:knon), &
+               y_dflux_q(:knon), y_fqcalving, y_ffonte, y_run_off_lic_0)
 
           ! calculer la longueur de rugosite sur ocean
           yrugm = 0.
@@ -481,18 +479,18 @@ contains
           falbe(:, nsrf) = 0.
           fsnow(:, nsrf) = 0.
           qsurf(:, nsrf) = 0.
-          rugos(:, nsrf) = 0.
+          frugs(:, nsrf) = 0.
           DO j = 1, knon
              i = ni(j)
              d_ts(i, nsrf) = y_d_ts(j)
              falbe(i, nsrf) = yalb(j)
              fsnow(i, nsrf) = snow(j)
              qsurf(i, nsrf) = yqsurf(j)
-             rugos(i, nsrf) = yz0_new(j)
+             frugs(i, nsrf) = yz0_new(j)
              fluxlat(i, nsrf) = yfluxlat(j)
              IF (nsrf == is_oce) THEN
                 rugmer(i) = yrugm(j)
-                rugos(i, nsrf) = yrugm(j)
+                frugs(i, nsrf) = yrugm(j)
              END IF
              agesno(i, nsrf) = yagesno(j)
              fqcalving(i, nsrf) = y_fqcalving(j)
@@ -540,7 +538,7 @@ contains
              tairsol(j) = yts(j) + y_d_ts(j)
              rugo1(j) = yrugos(j)
              IF (nsrf == is_oce) THEN
-                rugo1(j) = rugos(i, nsrf)
+                rugo1(j) = frugs(i, nsrf)
              END IF
              psfce(j) = ypaprs(j, 1)
              patm(j) = ypplay(j, 1)
@@ -592,7 +590,7 @@ contains
     END DO loop_surface
 
     ! On utilise les nouvelles surfaces
-    rugos(:, is_oce) = rugmer
+    frugs(:, is_oce) = rugmer
     pctsrf(:, is_oce) = pctsrf_new_oce
     pctsrf(:, is_sic) = pctsrf_new_sic
 

@@ -4,7 +4,7 @@ module hgardfou_m
 
 contains
 
-  SUBROUTINE hgardfou(t, ftsol)
+  SUBROUTINE hgardfou(t_seri, ftsol)
 
     ! From phylmd/hgardfou.F, v 1.1.1.1, 2004/05/19 12:53:07
 
@@ -14,7 +14,8 @@ contains
     USE dimphy, ONLY: klev, klon
     use nr_util, only: ifirstloc
 
-    REAL, intent(in):: t(klon, klev), ftsol(klon, nbsrf)
+    REAL, intent(in):: t_seri(:, :) ! (klon, klev)
+    REAL, intent(in):: ftsol(:, :) ! (klon, nbsrf)
 
     ! Variables local to the procedure:
 
@@ -24,10 +25,10 @@ contains
     !----------------------------------------------------------
 
     DO k = 1, klev
-       jbad = ifirstloc(t(:, k) > temp_max .or. t(:, k) < temp_min)
+       jbad = ifirstloc(t_seri(:, k) > temp_max .or. t_seri(:, k) < temp_min)
        if (jbad <= klon) then
           PRINT *, 'hgardfou: temperature out of range'
-          print *, "t(", jbad, ", ", k, ") = ", t(jbad, k)
+          print *, "t_seri(", jbad, ", ", k, ") = ", t_seri(jbad, k)
           stop 1
        end if
     ENDDO
