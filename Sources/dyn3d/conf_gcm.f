@@ -26,8 +26,6 @@ module conf_gcm_m
   integer:: periodav = 1 
   ! time interval between outputs in the dynamical part, in days
 
-  logical:: offline = .FALSE. ! output variables for offline transport
-
   integer:: prt_level = 0 ! niveau d'impression souhait\'e (0 = minimum)
 
   LOGICAL:: purmats= .FALSE.
@@ -49,7 +47,7 @@ contains
     use unit_nml_m, only: unit_nml
 
     namelist /conf_gcm_nml/ raz_date, nday, day_step, iperiod, iapp_tracvl, &
-         iconser, iecri, periodav, iphysiq, offline
+         iconser, iecri, periodav, iphysiq
 
     namelist /iniprint_nml/ prt_level
 

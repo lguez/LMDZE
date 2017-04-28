@@ -32,7 +32,6 @@ PROGRAM gcm
   use leapfrog_m, only: leapfrog
   use netcdf95, only: nf95_close
   use suphec_m, only: suphec
-  use tracstoke, only: istdyn, istphy
   use unit_nml_m, only: unit_nml
   use yoethf_m, only: yoethf
   use createnewfield_m, only: NbField, Ncid
@@ -92,10 +91,6 @@ PROGRAM gcm
   CALL inithist(dtvr, nqmx, t_ops = iecri * daysec, t_wrt = iecri * daysec)
   CALL initdynav(dtvr, nqmx, t_ops = iperiod * dtvr, t_wrt = periodav * daysec)
   call init_dynzon(dt_app = dtvr * iperiod)
-
-  ! Choix des fr\'equences de stockage pour le hors-ligne :
-  istdyn = day_step / 4 ! stockage toutes les 6 h = 1 jour / 4
-  istphy = istdyn / iphysiq     
 
   CALL conf_guide
   CALL leapfrog(ucov, vcov, teta, ps, masse, phis, q)

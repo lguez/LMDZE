@@ -99,7 +99,6 @@ findsep.f
 find_str.f
 fisrtilp.f
 flumass.f
-fluxstokenc.f
 flxadjtq.f
 flxasc.f
 flxbase.f
@@ -148,10 +147,8 @@ inifilr_hemisph.f
 ini_histins.f
 initdynav.f
 init_dynzon.f
-initfluxsto.f
 inithist.f
 initial0.f
-initphysto.f
 initrrnpb.f
 init_tau2alpha.f
 integrd.f
@@ -208,7 +205,6 @@ phyetat0.f
 phyredem0.f
 phyredem.f
 physiq.f
-phystokenc.f
 phytrac.f
 pres2lev.f
 press_coefoz.f
@@ -251,7 +247,6 @@ temps.f
 thermcell.f
 time_phylmdz.f
 tourpot.f
-tracstoke.f
 trans_buff.f
 transp.f
 transp_lay.f

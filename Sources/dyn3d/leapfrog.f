@@ -20,7 +20,7 @@ contains
     USE comgeom, ONLY: aire_2d, apoln, apols
     use covcont_m, only: covcont
     USE disvert_m, ONLY: ap, bp
-    USE conf_gcm_m, ONLY: day_step, iconser, iperiod, iphysiq, nday, offline, &
+    USE conf_gcm_m, ONLY: day_step, iconser, iperiod, iphysiq, nday, &
          iflag_phys, iecri
     USE conf_guide_m, ONLY: ok_guide
     USE dimens_m, ONLY: iim, jjm, llm, nqmx
@@ -30,7 +30,6 @@ contains
     use enercin_m, only: enercin
     USE exner_hyb_m, ONLY: exner_hyb
     use filtreg_scal_m, only: filtreg_scal
-    use fluxstokenc_m, only: fluxstokenc
     use geopot_m, only: geopot
     USE guide_m, ONLY: guide
     use inidissip_m, only: idissip
@@ -138,10 +137,6 @@ contains
             conser = MOD(itau, iconser) == 0)
 
        CALL caladvtrac(q, pbaru, pbarv, p3d, masse, teta, pk)
-
-       ! Stokage du flux de masse pour traceurs offline:
-       IF (offline) CALL fluxstokenc(pbaru, pbarv, masse, teta, phi, phis, &
-            dtvr, itau)
 
        ! Int\'egrations dynamique et traceurs:
        CALL integrd(vcovm1, ucovm1, tetam1, psm1, massem1, dv, dudyn, dteta, &

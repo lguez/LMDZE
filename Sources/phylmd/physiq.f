@@ -26,7 +26,7 @@ contains
     use comconst, only: dtphys
     USE comgeomphy, ONLY: airephy
     USE concvl_m, ONLY: concvl
-    USE conf_gcm_m, ONLY: offline, lmt_pas
+    USE conf_gcm_m, ONLY: lmt_pas
     USE conf_phys_m, ONLY: conf_phys
     use conflx_m, only: conflx
     USE ctherm, ONLY: iflag_thermals, nsplit_thermals
@@ -53,7 +53,6 @@ contains
     USE phyetat0_m, ONLY: phyetat0, rlat, rlon
     USE phyredem_m, ONLY: phyredem
     USE phyredem0_m, ONLY: phyredem0
-    USE phystokenc_m, ONLY: phystokenc
     USE phytrac_m, ONLY: phytrac
     use radlwsw_m, only: radlwsw
     use yoegwd, only: sugwd
@@ -969,10 +968,6 @@ contains
          mfd, pde_u, pen_d, ycoefh, fm_therm, entr_therm, yu1, yv1, ftsol, &
          pctsrf, frac_impa, frac_nucl, da, phi, mp, upwd, dnwd, tr_seri, &
          zmasse, ncid_startphy)
-
-    IF (offline) call phystokenc(dtphys, t, mfu, mfd, pen_u, pde_u, pen_d, &
-         pde_d, fm_therm, entr_therm, ycoefh, yu1, yv1, ftsol, pctsrf, &
-         frac_impa, frac_nucl, pphis, airephy)
 
     ! Calculer le transport de l'eau et de l'energie (diagnostique)
     CALL transp(paprs, t_seri, q_seri, u_seri, v_seri, zphi, ve, vq, ue, uq)
