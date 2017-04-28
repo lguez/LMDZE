@@ -6,11 +6,11 @@ contains
 
   SUBROUTINE clmain(dtime, pctsrf, t, q, u, v, julien, mu0, ftsol, cdmmax, &
        cdhmax, ksta, ksta_ter, ok_kzmin, ftsoil, qsol, paprs, pplay, fsnow, &
-       qsurf, evap, falbe, fluxlat, rain_fall, snow_f, fsolsw, fsollw, fder, &
-       frugs, agesno, rugoro, d_t, d_q, d_u, d_v, d_ts, flux_t, flux_q, &
-       flux_u, flux_v, cdragh, cdragm, q2, dflux_t, dflux_q, ycoefh, zu1, &
-       zv1, t2m, q2m, u10m, v10m, pblh, capcl, oliqcl, cteicl, pblt, therm, &
-       trmb1, trmb2, trmb3, plcl, fqcalving, ffonte, run_off_lic_0)
+       qsurf, evap, falbe, fluxlat, rain_fall, snow_f, fsolsw, fsollw, frugs, &
+       agesno, rugoro, d_t, d_q, d_u, d_v, d_ts, flux_t, flux_q, flux_u, &
+       flux_v, cdragh, cdragm, q2, dflux_t, dflux_q, ycoefh, zu1, zv1, t2m, &
+       q2m, u10m, v10m, pblh, capcl, oliqcl, cteicl, pblt, therm, trmb1, &
+       trmb2, trmb3, plcl, fqcalving, ffonte, run_off_lic_0)
 
     ! From phylmd/clmain.F, version 1.6, 2005/11/16 14:47:19
     ! Author: Z. X. Li (LMD/CNRS), date: 1993/08/18
@@ -80,7 +80,6 @@ contains
     ! solid water mass flux (kg/m2/s), positive down
 
     REAL, INTENT(IN):: fsolsw(klon, nbsrf), fsollw(klon, nbsrf)
-    REAL, intent(in):: fder(:) ! (klon)
     REAL, intent(inout):: frugs(klon, nbsrf) ! longueur de rugosit\'e (en m)
     real agesno(klon, nbsrf)
     REAL, INTENT(IN):: rugoro(klon)
@@ -170,7 +169,6 @@ contains
     REAL ysnow_f(klon)
     ! solid water mass flux (kg/m2/s), positive down
 
-    REAL yfder(klon)
     REAL yrugm(klon), yrads(klon), yrugoro(klon)
     REAL yfluxlat(klon)
     REAL y_d_ts(klon)
@@ -322,7 +320,6 @@ contains
              yrain_f(j) = rain_fall(i)
              ysnow_f(j) = snow_f(i)
              yagesno(j) = agesno(i, nsrf)
-             yfder(j) = fder(i)
              yrugos(j) = frugs(i, nsrf)
              yrugoro(j) = rugoro(i)
              yu1(j) = u1lay(i)
@@ -436,10 +433,10 @@ contains
                ytsoil(:knon, :), yqsol, mu0, yrugos, yrugoro, yu1, yv1, &
                coefh(:knon, :), yt, yq, yts(:knon), ypaprs, ypplay, ydelp, &
                yrads(:knon), yalb(:knon), snow(:knon), yqsurf, yrain_f, &
-               ysnow_f, yfder(:knon), yfluxlat(:knon), pctsrf_new_sic, &
-               yagesno(:knon), y_d_t, y_d_q, y_d_ts(:knon), yz0_new, &
-               y_flux_t(:knon), y_flux_q(:knon), y_dflux_t(:knon), &
-               y_dflux_q(:knon), y_fqcalving, y_ffonte, y_run_off_lic_0)
+               ysnow_f, yfluxlat(:knon), pctsrf_new_sic, yagesno(:knon), &
+               y_d_t, y_d_q, y_d_ts(:knon), yz0_new, y_flux_t(:knon), &
+               y_flux_q(:knon), y_dflux_t(:knon), y_dflux_q(:knon), &
+               y_fqcalving, y_ffonte, y_run_off_lic_0)
 
           ! calculer la longueur de rugosite sur ocean
           yrugm = 0.

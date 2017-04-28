@@ -26,8 +26,7 @@ module conf_gcm_m
   integer:: periodav = 1 
   ! time interval between outputs in the dynamical part, in days
 
-  logical:: offline = .FALSE.
-  ! permet de mettre en route la nouvelle parametrisation de l'eau liquide
+  logical:: offline = .FALSE. ! output variables for offline transport
 
   integer:: prt_level = 0 ! niveau d'impression souhait\'e (0 = minimum)
 

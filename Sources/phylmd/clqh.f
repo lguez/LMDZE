@@ -6,7 +6,7 @@ contains
 
   SUBROUTINE clqh(dtime, julien, debut, nisurf, knindex, tsoil, qsol, rmu0, &
        rugos, rugoro, u1lay, v1lay, coef, t, q, ts, paprs, pplay, delp, &
-       radsol, albedo, snow, qsurf, precip_rain, precip_snow, fder, fluxlat, &
+       radsol, albedo, snow, qsurf, precip_rain, precip_snow, fluxlat, &
        pctsrf_new_sic, agesno, d_t, d_q, d_ts, z0_new, flux_t, flux_q, &
        dflux_s, dflux_l, fqcalving, ffonte, run_off_lic_0)
 
@@ -60,7 +60,6 @@ contains
     real, intent(in):: precip_snow(klon)
     ! solid water mass flux (kg / m2 / s), positive down
 
-    real, intent(inout):: fder(:) ! (knon)
     real, intent(out):: fluxlat(:) ! (knon)
     real, intent(in):: pctsrf_new_sic(:) ! (klon)
     REAL, intent(inout):: agesno(:) ! (knon)
@@ -244,9 +243,9 @@ contains
 
     CALL interfsurf_hq(dtime, julien, rmu0, nisurf, knindex, debut, tsoil, &
          qsol, u1lay, v1lay, temp_air, spechum, tq_cdrag, petAcoef, peqAcoef, &
-         petBcoef, peqBcoef, precip_rain, precip_snow, fder, rugos, rugoro, &
-         snow, qsurf, ts, p1lay, psref, radsol, evap, flux_t, fluxlat, &
-         dflux_l, dflux_s, tsurf_new, albedo, z0_new, pctsrf_new_sic, agesno, &
+         petBcoef, peqBcoef, precip_rain, precip_snow, rugos, rugoro, snow, &
+         qsurf, ts, p1lay, psref, radsol, evap, flux_t, fluxlat, dflux_l, &
+         dflux_s, tsurf_new, albedo, z0_new, pctsrf_new_sic, agesno, &
          fqcalving, ffonte, run_off_lic_0)
 
     flux_q = - evap

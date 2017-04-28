@@ -6,10 +6,10 @@ contains
 
   SUBROUTINE interfsurf_hq(dtime, julien, rmu0, nisurf, knindex, debut, &
        tsoil, qsol, u1_lay, v1_lay, temp_air, spechum, tq_cdrag, petAcoef, &
-       peqAcoef, petBcoef, peqBcoef, precip_rain, precip_snow, fder, rugos, &
-       rugoro, snow, qsurf, ts, p1lay, ps, radsol, evap, flux_t, fluxlat, &
-       dflux_l, dflux_s, tsurf_new, albedo, z0_new, pctsrf_new_sic, agesno, &
-       fqcalving, ffonte, run_off_lic_0)
+       peqAcoef, petBcoef, peqBcoef, precip_rain, precip_snow, rugos, rugoro, &
+       snow, qsurf, ts, p1lay, ps, radsol, evap, flux_t, fluxlat, dflux_l, &
+       dflux_s, tsurf_new, albedo, z0_new, pctsrf_new_sic, agesno, fqcalving, &
+       ffonte, run_off_lic_0)
 
     ! Cette routine sert d'aiguillage entre l'atmosph\`ere et la surface
     ! en g\'en\'eral (sols continentaux, oc\'eans, glaces) pour les flux de
@@ -68,7 +68,6 @@ contains
     real, intent(IN):: precip_snow(klon)
     ! precipitation, solid water mass flux (kg / m2 / s), positive down
 
-    REAL, INTENT(INOUT):: fder(:) ! (knon) derivee des flux (pour le couplage)
     real, intent(IN):: rugos(klon) ! rugosite
     real, intent(IN):: rugoro(klon) ! rugosite orographique
     real, intent(INOUT):: snow(:) ! (knon)
@@ -205,7 +204,6 @@ contains
             v1_lay(:knon), petAcoef(:knon), peqAcoef(:knon), petBcoef(:knon), &
             peqBcoef(:knon), tsurf_new, evap, fluxlat, flux_t, dflux_s, dflux_l)
        agesno = 0.
-       fder = fder + dflux_s + dflux_l
        albedo = alboc_cd(rmu0(knindex)) * fmagic
        z0_new = sqrt(rugos**2 + rugoro**2)
     case (is_sic)
@@ -254,7 +252,6 @@ contains
        zfra = MAX(0., MIN(1., snow / (snow + 10.)))
        albedo = alb_neig * zfra + 0.6 * (1. - zfra)
 
-       fder = fder + dflux_s + dflux_l
        z0_new = SQRT(0.002**2 + rugoro**2)
     case (is_lic)
        ! Surface "glacier continentaux" appel a l'interface avec le sol

@@ -219,9 +219,9 @@ contains
     real devap(klon) ! derivative of the evaporation flux at the surface
     REAL sens(klon) ! flux de chaleur sensible au sol
     real dsens(klon) ! derivee du flux de chaleur sensible au sol
-    REAL, save:: dlw(klon) ! derivee infra rouge
+    REAL, save:: dlw(klon) ! derivative of infra-red flux
     REAL bils(klon) ! bilan de chaleur au sol
-    REAL, save:: fder(klon) ! Derive de flux (sensible et latente)
+    REAL fder(klon) ! Derive de flux (sensible et latente)
     REAL ve(klon) ! integr. verticale du transport meri. de l'energie
     REAL vq(klon) ! integr. verticale du transport meri. de l'eau
     REAL ue(klon) ! integr. verticale du transport zonal de l'energie
@@ -567,16 +567,14 @@ contains
        fsolsw(:, nsrf) = solsw * (1. - falbe(:, nsrf)) / (1. - albsol)
     END forall
 
-    fder = dlw
-
     CALL clmain(dtphys, pctsrf, t_seri, q_seri, u_seri, v_seri, julien, mu0, &
          ftsol, cdmmax, cdhmax, ksta, ksta_ter, ok_kzmin, ftsoil, qsol, &
          paprs, play, fsnow, fqsurf, fevap, falbe, fluxlat, rain_fall, &
-         snow_fall, fsolsw, fsollw, fder, frugs, agesno, rugoro, d_t_vdf, &
-         d_q_vdf, d_u_vdf, d_v_vdf, d_ts, flux_t, flux_q, flux_u, flux_v, &
-         cdragh, cdragm, q2, dsens, devap, ycoefh, yu1, yv1, t2m, q2m, u10m, &
-         v10m, pblh, capCL, oliqCL, cteiCL, pblT, therm, trmb1, trmb2, trmb3, &
-         plcl, fqcalving, ffonte, run_off_lic_0)
+         snow_fall, fsolsw, fsollw, frugs, agesno, rugoro, d_t_vdf, d_q_vdf, &
+         d_u_vdf, d_v_vdf, d_ts, flux_t, flux_q, flux_u, flux_v, cdragh, &
+         cdragm, q2, dsens, devap, ycoefh, yu1, yv1, t2m, q2m, u10m, v10m, &
+         pblh, capCL, oliqCL, cteiCL, pblT, therm, trmb1, trmb2, trmb3, plcl, &
+         fqcalving, ffonte, run_off_lic_0)
 
     ! Incr\'ementation des flux
 
@@ -641,11 +639,7 @@ contains
        ENDDO
     ENDDO
 
-    ! Calculer la dérive du flux infrarouge
-
-    DO i = 1, klon
-       dlw(i) = - 4. * RSIGMA * tsol(i)**3
-    ENDDO
+    dlw = - 4. * RSIGMA * tsol**3
 
     ! Appeler la convection
 
