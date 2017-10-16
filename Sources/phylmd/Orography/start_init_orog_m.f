@@ -53,9 +53,9 @@ CONTAINS
     INTEGER iml_rel
     INTEGER jml_rel
     INTEGER ncid, varid
-    REAL, pointer:: relief(:, :)
+    REAL, ALLOCATABLE:: relief(:, :)
     REAL, ALLOCATABLE:: lon_rad(:), lat_rad(:)
-    REAL, pointer:: lon_ini(:), lat_ini(:)
+    REAL, ALLOCATABLE:: lon_ini(:), lat_ini(:)
 
     !-----------------------------------
 
@@ -92,13 +92,11 @@ CONTAINS
 
     CALL conf_dat2d(lon_ini, lat_ini, lon_rad, lat_rad, relief , &
          interbar=.FALSE.)
-    deallocate(lon_ini, lat_ini) ! pointers
 
     print *, 'Compute all the parameters needed for the gravity wave drag code'
 
     CALL grid_noro(lon_rad, lat_rad, relief, rlonv, rlatu, phis, zmea_2d, &
          zstd_2d, zsig_2d, zgam_2d, zthe_2d, zpic_2d, zval_2d, mask)
-    deallocate(relief) ! pointer
     phis(:, :) = phis(:, :) * 9.81
 
     mask(2:, 1) = mask(1, 1) ! north pole

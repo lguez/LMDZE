@@ -25,7 +25,7 @@ CONTAINS
 
     INTEGER iml_phys, jml_phys, ncid, varid
     REAL, ALLOCATABLE:: lon_rad(:), lat_rad(:)
-    REAL, pointer:: lon_ini(:), lat_ini(:) ! longitude and latitude in rad
+    REAL, ALLOCATABLE:: lon_ini(:), lat_ini(:) ! longitude and latitude in rad
     REAL, ALLOCATABLE:: var_ana(:, :)
     real tmp_var(iim, jjm + 1)
 
@@ -73,7 +73,6 @@ CONTAINS
     qsol_2d = gr_int_dyn(tmp_var)
 
     call nf95_close(ncid)
-    deallocate(lon_ini, lat_ini) ! pointers
 
   END SUBROUTINE start_init_phys
 

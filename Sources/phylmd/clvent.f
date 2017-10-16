@@ -17,9 +17,8 @@ contains
     INTEGER knon
     REAL, intent(in):: dtime ! intervalle de temps (en s)
 
-    REAL u1lay(klon), v1lay(klon)
-    ! u1lay----input-R- vent u de la premiere couche (m/s)
-    ! v1lay----input-R- vent v de la premiere couche (m/s)
+    REAL, intent(in):: u1lay(:), v1lay(:) ! (knon)
+    ! vent de la premiere couche (m/s)
 
     REAL, intent(in):: coef(:, :) ! (knon, klev)
     ! Coefficient d'echange (m**2/s) multiplié par le cisaillement du

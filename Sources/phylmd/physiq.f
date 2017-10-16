@@ -185,8 +185,7 @@ contains
 
     ! Pour phytrac :
     REAL ycoefh(klon, llm) ! coef d'echange pour phytrac
-    REAL yu1(klon) ! vents dans la premiere couche U
-    REAL yv1(klon) ! vents dans la premiere couche V
+    REAL yu1(klon), yv1(klon) ! vent dans la premi\`ere couche
 
     REAL, save:: ffonte(klon, nbsrf)
     ! flux thermique utilise pour fondre la neige
@@ -389,9 +388,11 @@ contains
     REAL, save:: t2m(klon, nbsrf), q2m(klon, nbsrf) 
     ! temperature and humidity at 2 m
 
-    REAL, save:: u10m(klon, nbsrf), v10m(klon, nbsrf) ! vents a 10 m
+    REAL, save:: u10m_srf(klon, nbsrf), v10m_srf(klon, nbsrf)
+    ! composantes du vent \`a 10 m
+    
     REAL zt2m(klon), zq2m(klon) ! température, humidité 2 m moyenne sur 1 maille
-    REAL zu10m(klon), zv10m(klon) ! vents a 10 m moyennes sur 1 maille
+    REAL u10m(klon), v10m(klon) ! vent \`a 10 m moyenn\' sur les sous-surfaces
 
     ! Aerosol effects:
 
@@ -419,8 +420,8 @@ contains
 
     test_firstcal: IF (firstcal) THEN
        ! initialiser
-       u10m = 0.
-       v10m = 0.
+       u10m_srf = 0.
+       v10m_srf = 0.
        t2m = 0.
        q2m = 0.
        ffonte = 0.
@@ -571,9 +572,9 @@ contains
          paprs, play, fsnow, fqsurf, fevap, falbe, fluxlat, rain_fall, &
          snow_fall, fsolsw, fsollw, frugs, agesno, rugoro, d_t_vdf, d_q_vdf, &
          d_u_vdf, d_v_vdf, d_ts, flux_t, flux_q, flux_u, flux_v, cdragh, &
-         cdragm, q2, dsens, devap, ycoefh, yu1, yv1, t2m, q2m, u10m, v10m, &
-         pblh, capCL, oliqCL, cteiCL, pblT, therm, trmb1, trmb2, trmb3, plcl, &
-         fqcalving, ffonte, run_off_lic_0)
+         cdragm, q2, dsens, devap, ycoefh, yu1, yv1, t2m, q2m, u10m_srf, &
+         v10m_srf, pblh, capCL, oliqCL, cteiCL, pblT, therm, trmb1, trmb2, &
+         trmb3, plcl, fqcalving, ffonte, run_off_lic_0)
 
     ! Incr\'ementation des flux
 
@@ -598,8 +599,8 @@ contains
     zxfluxlat = sum(fluxlat * pctsrf, dim = 2)
     zt2m = sum(t2m * pctsrf, dim = 2)
     zq2m = sum(q2m * pctsrf, dim = 2)
-    zu10m = sum(u10m * pctsrf, dim = 2)
-    zv10m = sum(v10m * pctsrf, dim = 2)
+    u10m = sum(u10m_srf * pctsrf, dim = 2)
+    v10m = sum(v10m_srf * pctsrf, dim = 2)
     zxffonte = sum(ffonte * pctsrf, dim = 2)
     zxfqcalving = sum(fqcalving * pctsrf, dim = 2)
     s_pblh = sum(pblh * pctsrf, dim = 2)
@@ -620,8 +621,8 @@ contains
              ftsol(i, nsrf) = tsol(i)
              t2m(i, nsrf) = zt2m(i)
              q2m(i, nsrf) = zq2m(i)
-             u10m(i, nsrf) = zu10m(i)
-             v10m(i, nsrf) = zv10m(i)
+             u10m_srf(i, nsrf) = u10m(i)
+             v10m_srf(i, nsrf) = v10m(i)
              ffonte(i, nsrf) = zxffonte(i)
              fqcalving(i, nsrf) = zxfqcalving(i)
              pblh(i, nsrf) = s_pblh(i)
@@ -1036,8 +1037,8 @@ contains
     CALL histwrite_phy("tsol", tsol)
     CALL histwrite_phy("t2m", zt2m)
     CALL histwrite_phy("q2m", zq2m)
-    CALL histwrite_phy("u10m", zu10m)
-    CALL histwrite_phy("v10m", zv10m)
+    CALL histwrite_phy("u10m", u10m)
+    CALL histwrite_phy("v10m", v10m)
     CALL histwrite_phy("snow", snow_fall)
     CALL histwrite_phy("cdrm", cdragm)
     CALL histwrite_phy("cdrh", cdragh)
@@ -1064,6 +1065,8 @@ contains
        CALL histwrite_phy("tauy_"//clnsurf(nsrf), flux_v(:, nsrf))
        CALL histwrite_phy("rugs_"//clnsurf(nsrf), frugs(:, nsrf))
        CALL histwrite_phy("albe_"//clnsurf(nsrf), falbe(:, nsrf))
+       CALL histwrite_phy("u10m_"//clnsurf(nsrf), u10m_srf(:, nsrf))
+       CALL histwrite_phy("v10m_"//clnsurf(nsrf), v10m_srf(:, nsrf))
     END DO
 
     CALL histwrite_phy("albs", albsol)

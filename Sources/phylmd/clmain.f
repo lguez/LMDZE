@@ -9,8 +9,8 @@ contains
        qsurf, evap, falbe, fluxlat, rain_fall, snow_f, fsolsw, fsollw, frugs, &
        agesno, rugoro, d_t, d_q, d_u, d_v, d_ts, flux_t, flux_q, flux_u, &
        flux_v, cdragh, cdragm, q2, dflux_t, dflux_q, ycoefh, zu1, zv1, t2m, &
-       q2m, u10m, v10m, pblh, capcl, oliqcl, cteicl, pblt, therm, trmb1, &
-       trmb2, trmb3, plcl, fqcalving, ffonte, run_off_lic_0)
+       q2m, u10m_srf, v10m_srf, pblh, capcl, oliqcl, cteicl, pblt, therm, &
+       trmb1, trmb2, trmb3, plcl, fqcalving, ffonte, run_off_lic_0)
 
     ! From phylmd/clmain.F, version 1.6, 2005/11/16 14:47:19
     ! Author: Z. X. Li (LMD/CNRS), date: 1993/08/18
@@ -50,7 +50,7 @@ contains
     ! tableau des pourcentages de surface de chaque maille
 
     REAL, INTENT(IN):: t(klon, klev) ! temperature (K)
-    REAL, INTENT(IN):: q(klon, klev) ! vapeur d'eau (kg/kg)
+    REAL, INTENT(IN):: q(klon, klev) ! vapeur d'eau (kg / kg)
     REAL, INTENT(IN):: u(klon, klev), v(klon, klev) ! vitesse
     INTEGER, INTENT(IN):: julien ! jour de l'annee en cours
     REAL, intent(in):: mu0(klon) ! cosinus de l'angle solaire zenithal     
@@ -62,10 +62,10 @@ contains
     REAL, INTENT(inout):: ftsoil(klon, nsoilmx, nbsrf)
     ! soil temperature of surface fraction
 
-    REAL, INTENT(inout):: qsol(klon)
+    REAL, INTENT(inout):: qsol(:) ! (klon)
     ! column-density of water in soil, in kg m-2
 
-    REAL, INTENT(IN):: paprs(klon, klev+1) ! pression a intercouche (Pa)
+    REAL, INTENT(IN):: paprs(klon, klev + 1) ! pression a intercouche (Pa)
     REAL, INTENT(IN):: pplay(klon, klev) ! pression au milieu de couche (Pa)
     REAL, INTENT(inout):: fsnow(:, :) ! (klon, nbsrf) \'epaisseur neigeuse
     REAL qsurf(klon, nbsrf)
@@ -74,10 +74,10 @@ contains
     REAL, intent(out):: fluxlat(:, :) ! (klon, nbsrf)
 
     REAL, intent(in):: rain_fall(klon)
-    ! liquid water mass flux (kg/m2/s), positive down
+    ! liquid water mass flux (kg / m2 / s), positive down
 
     REAL, intent(in):: snow_f(klon)
-    ! solid water mass flux (kg/m2/s), positive down
+    ! solid water mass flux (kg / m2 / s), positive down
 
     REAL, INTENT(IN):: fsolsw(klon, nbsrf), fsollw(klon, nbsrf)
     REAL, intent(inout):: frugs(klon, nbsrf) ! longueur de rugosit\'e (en m)
@@ -94,17 +94,17 @@ contains
     REAL, intent(out):: d_ts(:, :) ! (klon, nbsrf) variation of ftsol
 
     REAL, intent(out):: flux_t(klon, nbsrf)
-    ! flux de chaleur sensible (Cp T) (W/m2) (orientation positive vers
+    ! flux de chaleur sensible (Cp T) (W / m2) (orientation positive vers
     ! le bas) à la surface
 
     REAL, intent(out):: flux_q(klon, nbsrf) 
-    ! flux de vapeur d'eau (kg/m2/s) à la surface
+    ! flux de vapeur d'eau (kg / m2 / s) à la surface
 
     REAL, intent(out):: flux_u(klon, nbsrf), flux_v(klon, nbsrf)
     ! tension du vent à la surface, en Pa
 
     REAL, INTENT(out):: cdragh(klon), cdragm(klon)
-    real q2(klon, klev+1, nbsrf)
+    real q2(klon, klev + 1, nbsrf)
 
     REAL, INTENT(out):: dflux_t(klon), dflux_q(klon)
     ! dflux_t derive du flux sensible
@@ -112,14 +112,15 @@ contains
     ! IM "slab" ocean
 
     REAL, intent(out):: ycoefh(klon, klev)
-    REAL, intent(out):: zu1(klon)
-    REAL zv1(klon)
+    REAL, intent(out):: zu1(klon), zv1(klon)
     REAL, INTENT(inout):: t2m(klon, nbsrf), q2m(klon, nbsrf)
-    REAL u10m(klon, nbsrf), v10m(klon, nbsrf)
 
-    ! Ionela Musat cf. Anne Mathieu : planetary boundary layer, hbtm
-    ! (Comme les autres diagnostics on cumule dans physiq ce qui
-    ! permet de sortir les grandeurs par sous-surface)
+    REAL, INTENT(inout):: u10m_srf(:, :), v10m_srf(:, :) ! (klon, nbsrf)
+    ! composantes du vent \`a 10m sans spirale d'Ekman
+
+    ! Ionela Musat. Cf. Anne Mathieu : planetary boundary layer, hbtm.
+    ! Comme les autres diagnostics on cumule dans physiq ce qui permet
+    ! de sortir les grandeurs par sous-surface.
     REAL pblh(klon, nbsrf) ! height of planetary boundary layer
     REAL capcl(klon, nbsrf)
     REAL oliqcl(klon, nbsrf)
@@ -136,7 +137,7 @@ contains
     REAL fqcalving(klon, nbsrf), ffonte(klon, nbsrf)
     ! ffonte----Flux thermique utilise pour fondre la neige
     ! fqcalving-Flux d'eau "perdue" par la surface et necessaire pour limiter la
-    !           hauteur de neige, en kg/m2/s
+    !           hauteur de neige, en kg / m2 / s
     REAL run_off_lic_0(klon)
 
     ! Local:
@@ -154,21 +155,13 @@ contains
     REAL yts(klon), yrugos(klon), ypct(klon), yz0_new(klon)
     REAL yalb(klon)
 
-    REAL yu1(klon), yv1(klon)
-    ! On ajoute en output yu1 et yv1 qui sont les vents dans
-    ! la premi\`ere couche.
+    REAL u1lay(klon), v1lay(klon) ! vent dans la premi\`ere couche, pour
+                              ! une sous-surface donnée
     
     REAL snow(klon), yqsurf(klon), yagesno(klon)
-
-    real yqsol(klon)
-    ! column-density of water in soil, in kg m-2
-
-    REAL yrain_f(klon)
-    ! liquid water mass flux (kg/m2/s), positive down
-
-    REAL ysnow_f(klon)
-    ! solid water mass flux (kg/m2/s), positive down
-
+    real yqsol(klon) ! column-density of water in soil, in kg m-2
+    REAL yrain_f(klon) ! liquid water mass flux (kg / m2 / s), positive down
+    REAL ysnow_f(klon) ! solid water mass flux (kg / m2 / s), positive down
     REAL yrugm(klon), yrads(klon), yrugoro(klon)
     REAL yfluxlat(klon)
     REAL y_d_ts(klon)
@@ -180,17 +173,16 @@ contains
     REAL coefh(klon, klev), coefm(klon, klev)
     REAL yu(klon, klev), yv(klon, klev)
     REAL yt(klon, klev), yq(klon, klev)
-    REAL ypaprs(klon, klev+1), ypplay(klon, klev), ydelp(klon, klev)
+    REAL ypaprs(klon, klev + 1), ypplay(klon, klev), ydelp(klon, klev)
 
     REAL ycoefm0(klon, klev), ycoefh0(klon, klev)
 
-    REAL yzlay(klon, klev), yzlev(klon, klev+1), yteta(klon, klev)
-    REAL ykmm(klon, klev+1), ykmn(klon, klev+1)
-    REAL ykmq(klon, klev+1)
-    REAL yq2(klon, klev+1)
-    REAL q2diag(klon, klev+1)
+    REAL yzlay(klon, klev), yzlev(klon, klev + 1), yteta(klon, klev)
+    REAL ykmm(klon, klev + 1), ykmn(klon, klev + 1)
+    REAL ykmq(klon, klev + 1)
+    REAL yq2(klon, klev + 1)
+    REAL q2diag(klon, klev + 1)
 
-    REAL u1lay(klon), v1lay(klon)
     REAL delp(klon, klev)
     INTEGER i, k, nsrf
 
@@ -199,8 +191,6 @@ contains
     REAL pctsrf_pot(klon, nbsrf)
     ! "pourcentage potentiel" pour tenir compte des \'eventuelles
     ! apparitions ou disparitions de la glace de mer
-
-    REAL zx_alf1, zx_alf2 ! valeur ambiante par extrapolation
 
     REAL yt2m(klon), yq2m(klon), yu10m(klon)
     REAL yustar(klon)
@@ -233,14 +223,8 @@ contains
 
     DO k = 1, klev ! epaisseur de couche
        DO i = 1, klon
-          delp(i, k) = paprs(i, k) - paprs(i, k+1)
+          delp(i, k) = paprs(i, k) - paprs(i, k + 1)
        END DO
-    END DO
-    DO i = 1, klon ! vent de la premiere couche
-       zx_alf1 = 1.0
-       zx_alf2 = 1.0 - zx_alf1
-       u1lay(i) = u(i, 1)*zx_alf1 + u(i, 2)*zx_alf2
-       v1lay(i) = v(i, 1)*zx_alf1 + v(i, 2)*zx_alf2
     END DO
 
     ! Initialization:
@@ -256,8 +240,6 @@ contains
     yrain_f = 0.
     ysnow_f = 0.
     yrugos = 0.
-    yu1 = 0.
-    yv1 = 0.
     ypaprs = 0.
     ypplay = 0.
     ydelp = 0.
@@ -322,19 +304,15 @@ contains
              yagesno(j) = agesno(i, nsrf)
              yrugos(j) = frugs(i, nsrf)
              yrugoro(j) = rugoro(i)
-             yu1(j) = u1lay(i)
-             yv1(j) = v1lay(i)
+             u1lay(j) = u(i, 1)
+             v1lay(j) = v(i, 1)
              yrads(j) = fsolsw(i, nsrf) + fsollw(i, nsrf)
-             ypaprs(j, klev+1) = paprs(i, klev+1)
+             ypaprs(j, klev + 1) = paprs(i, klev + 1)
              y_run_off_lic_0(j) = run_off_lic_0(i)
           END DO
 
           ! For continent, copy soil water content
-          IF (nsrf == is_ter) THEN
-             yqsol(:knon) = qsol(ni(:knon))
-          ELSE
-             yqsol = 0.
-          END IF
+          IF (nsrf == is_ter) yqsol(:knon) = qsol(ni(:knon))
 
           ytsoil(:knon, :) = ftsoil(ni(:knon), :, nsrf)
 
@@ -388,14 +366,14 @@ contains
                      * (ypplay(1:knon, k-1) - ypplay(1:knon, k)) / rg
              END DO
              DO k = 1, klev
-                yteta(1:knon, k) = yt(1:knon, k)*(ypaprs(1:knon, 1) &
-                     / ypplay(1:knon, k))**rkappa * (1.+0.61*yq(1:knon, k))
+                yteta(1:knon, k) = yt(1:knon, k) * (ypaprs(1:knon, 1) &
+                     / ypplay(1:knon, k))**rkappa * (1. + 0.61 * yq(1:knon, k))
              END DO
              yzlev(1:knon, 1) = 0.
-             yzlev(:knon, klev+1) = 2. * yzlay(:knon, klev) &
+             yzlev(:knon, klev + 1) = 2. * yzlay(:knon, klev) &
                   - yzlay(:knon, klev - 1)
              DO k = 2, klev
-                yzlev(1:knon, k) = 0.5*(yzlay(1:knon, k)+yzlay(1:knon, k-1))
+                yzlev(1:knon, k) = 0.5 * (yzlay(1:knon, k) + yzlay(1:knon, k-1))
              END DO
              DO k = 1, klev + 1
                 DO j = 1, knon
@@ -423,46 +401,47 @@ contains
           END IF
 
           ! calculer la diffusion des vitesses "u" et "v"
-          CALL clvent(knon, dtime, yu1, yv1, coefm(:knon, :), yt, yu, ypaprs, &
-               ypplay, ydelp, y_d_u, y_flux_u(:knon))
-          CALL clvent(knon, dtime, yu1, yv1, coefm(:knon, :), yt, yv, ypaprs, &
-               ypplay, ydelp, y_d_v, y_flux_v(:knon))
+          CALL clvent(knon, dtime, u1lay(:knon), v1lay(:knon), &
+               coefm(:knon, :), yt, yu, ypaprs, ypplay, ydelp, y_d_u, &
+               y_flux_u(:knon))
+          CALL clvent(knon, dtime, u1lay(:knon), v1lay(:knon), &
+               coefm(:knon, :), yt, yv, ypaprs, ypplay, ydelp, y_d_v, &
+               y_flux_v(:knon))
 
           ! calculer la diffusion de "q" et de "h"
           CALL clqh(dtime, julien, firstcal, nsrf, ni(:knon), &
-               ytsoil(:knon, :), yqsol, mu0, yrugos, yrugoro, yu1, yv1, &
-               coefh(:knon, :), yt, yq, yts(:knon), ypaprs, ypplay, ydelp, &
-               yrads(:knon), yalb(:knon), snow(:knon), yqsurf, yrain_f, &
-               ysnow_f, yfluxlat(:knon), pctsrf_new_sic, yagesno(:knon), &
-               y_d_t, y_d_q, y_d_ts(:knon), yz0_new, y_flux_t(:knon), &
-               y_flux_q(:knon), y_dflux_t(:knon), y_dflux_q(:knon), &
-               y_fqcalving, y_ffonte, y_run_off_lic_0)
+               ytsoil(:knon, :), yqsol(:knon), mu0, yrugos, yrugoro, &
+               u1lay(:knon), v1lay(:knon), coefh(:knon, :), yt, yq, &
+               yts(:knon), ypaprs, ypplay, ydelp, yrads(:knon), yalb(:knon), &
+               snow(:knon), yqsurf, yrain_f, ysnow_f, yfluxlat(:knon), &
+               pctsrf_new_sic, yagesno(:knon), y_d_t, y_d_q, y_d_ts(:knon), &
+               yz0_new, y_flux_t(:knon), y_flux_q(:knon), y_dflux_t(:knon), &
+               y_dflux_q(:knon), y_fqcalving, y_ffonte, y_run_off_lic_0)
 
           ! calculer la longueur de rugosite sur ocean
           yrugm = 0.
           IF (nsrf == is_oce) THEN
              DO j = 1, knon
-                yrugm(j) = 0.018*coefm(j, 1)*(yu1(j)**2+yv1(j)**2)/rg + &
-                     0.11*14E-6/sqrt(coefm(j, 1)*(yu1(j)**2+yv1(j)**2))
+                yrugm(j) = 0.018 * coefm(j, 1) * (u1lay(j)**2 + v1lay(j)**2) &
+                     / rg + 0.11 * 14E-6 &
+                     / sqrt(coefm(j, 1) * (u1lay(j)**2 + v1lay(j)**2))
                 yrugm(j) = max(1.5E-05, yrugm(j))
              END DO
           END IF
           DO j = 1, knon
-             y_dflux_t(j) = y_dflux_t(j)*ypct(j)
-             y_dflux_q(j) = y_dflux_q(j)*ypct(j)
-             yu1(j) = yu1(j)*ypct(j)
-             yv1(j) = yv1(j)*ypct(j)
+             y_dflux_t(j) = y_dflux_t(j) * ypct(j)
+             y_dflux_q(j) = y_dflux_q(j) * ypct(j)
           END DO
 
           DO k = 1, klev
              DO j = 1, knon
                 i = ni(j)
-                coefh(j, k) = coefh(j, k)*ypct(j)
-                coefm(j, k) = coefm(j, k)*ypct(j)
-                y_d_t(j, k) = y_d_t(j, k)*ypct(j)
-                y_d_q(j, k) = y_d_q(j, k)*ypct(j)
-                y_d_u(j, k) = y_d_u(j, k)*ypct(j)
-                y_d_v(j, k) = y_d_v(j, k)*ypct(j)
+                coefh(j, k) = coefh(j, k) * ypct(j)
+                coefm(j, k) = coefm(j, k) * ypct(j)
+                y_d_t(j, k) = y_d_t(j, k) * ypct(j)
+                y_d_q(j, k) = y_d_q(j, k) * ypct(j)
+                y_d_u(j, k) = y_d_u(j, k) * ypct(j)
+                y_d_v(j, k) = y_d_v(j, k) * ypct(j)
              END DO
           END DO
 
@@ -496,8 +475,8 @@ contains
              cdragm(i) = cdragm(i) + coefm(j, 1)
              dflux_t(i) = dflux_t(i) + y_dflux_t(j)
              dflux_q(i) = dflux_q(i) + y_dflux_q(j)
-             zu1(i) = zu1(i) + yu1(j)
-             zv1(i) = zv1(i) + yv1(j)
+             zu1(i) = zu1(i) + u1lay(j) * ypct(j)
+             zv1(i) = zv1(i) + v1lay(j) * ypct(j)
           END DO
           IF (nsrf == is_ter) THEN
              qsol(ni(:knon)) = yqsol(:knon)
@@ -530,8 +509,8 @@ contains
              vmer(j) = yv(j, 1) + y_d_v(j, 1)
              tair1(j) = yt(j, 1) + y_d_t(j, 1)
              qair1(j) = yq(j, 1) + y_d_q(j, 1)
-             zgeo1(j) = rd*tair1(j)/(0.5*(ypaprs(j, 1)+ypplay(j, &
-                  1)))*(ypaprs(j, 1)-ypplay(j, 1))
+             zgeo1(j) = rd * tair1(j) / (0.5 * (ypaprs(j, 1) + ypplay(j, &
+                  1))) * (ypaprs(j, 1)-ypplay(j, 1))
              tairsol(j) = yts(j) + y_d_ts(j)
              rugo1(j) = yrugos(j)
              IF (nsrf == is_oce) THEN
@@ -543,18 +522,19 @@ contains
              qairsol(j) = yqsurf(j)
           END DO
 
-          CALL stdlevvar(klon, knon, nsrf, zxli, uzon, vmer, tair1, qair1, &
-               zgeo1, tairsol, qairsol, rugo1, psfce, patm, yt2m, yq2m, &
-               yt10m, yq10m, yu10m, yustar)
+          CALL stdlevvar(klon, knon, nsrf, zxli, uzon(:knon), vmer(:knon), &
+               tair1, qair1, zgeo1, tairsol, qairsol, rugo1, psfce, patm, &
+               yt2m, yq2m, yt10m, yq10m, yu10m, yustar)
 
           DO j = 1, knon
              i = ni(j)
              t2m(i, nsrf) = yt2m(j)
              q2m(i, nsrf) = yq2m(j)
 
-             ! u10m, v10m : composantes du vent a 10m sans spirale de Ekman
-             u10m(i, nsrf) = (yu10m(j)*uzon(j))/sqrt(uzon(j)**2+vmer(j)**2)
-             v10m(i, nsrf) = (yu10m(j)*vmer(j))/sqrt(uzon(j)**2+vmer(j)**2)
+             u10m_srf(i, nsrf) = (yu10m(j) * uzon(j)) &
+                  / sqrt(uzon(j)**2 + vmer(j)**2)
+             v10m_srf(i, nsrf) = (yu10m(j) * vmer(j)) &
+                  / sqrt(uzon(j)**2 + vmer(j)**2)
           END DO
 
           CALL hbtm(ypaprs, ypplay, yt2m, yq2m, yustar, y_flux_t(:knon), &

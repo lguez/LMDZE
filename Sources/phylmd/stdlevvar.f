@@ -9,10 +9,6 @@ contains
 
     ! From LMDZ4/libf/phylmd/stdlevvar.F90, version 1.3 2005/05/25 13:10:09
 
-    use coefcdrag_m, only: coefcdrag
-    USE suphec_m, ONLY: rg, rkappa
-    use screenp_m, only: screenp
-
     ! Objet : calcul de la température et de l'humidité relative à 2 m
     ! et du module du vent à 10 m à partir des relations de
     ! Dyer-Businger et des équations de Louis.
@@ -21,39 +17,32 @@ contains
 
     ! Author: I. Musat, July 1st, 2002
 
+    use coefcdrag_m, only: coefcdrag
+    USE suphec_m, ONLY: rg, rkappa
+    use screenc_m, only: screenc
+    use screenp_m, only: screenp
+
     INTEGER, intent(in):: klon
     ! dimension de la grille physique (= nb_pts_latitude X nb_pts_longitude)
 
     INTEGER, intent(in):: knon ! nombre de points pour un type de surface
-
-    INTEGER, intent(in):: nsrf
-    ! indice pour le type de surface; voir indicesol.inc
-
+    INTEGER, intent(in):: nsrf ! indice pour le type de surface
     LOGICAL, intent(in):: zxli ! calcul des cdrags selon Laurent Li
-    REAL, dimension(klon), intent(in):: u1 ! vent zonal au 1er niveau du modele
-
-    REAL, dimension(klon), intent(in):: v1 
-    ! vent meridien au 1er niveau du modele
-
-    REAL, dimension(klon), intent(in):: t1 
-    ! temperature de l'air au 1er niveau du modele
-
-    REAL, dimension(klon), intent(in):: q1
-    ! humidite relative au 1er niveau du modele
-
-    REAL, dimension(klon), intent(in):: z1 
-    ! geopotentiel au 1er niveau du modele
-
-    REAL, dimension(klon), intent(in):: ts1 ! temperature de l'air a la surface
-    REAL, dimension(klon), intent(in):: qsurf ! humidite relative a la surface
-    REAL, dimension(klon), intent(in):: rugos ! rugosite
-    REAL, dimension(klon), intent(in):: psol ! pression au sol
-    REAL, dimension(klon), intent(in):: pat1 ! pression au 1er niveau du modele
-    REAL, dimension(klon), intent(out):: t_2m ! temperature de l'air a 2m
-    REAL, dimension(klon), intent(out):: q_2m ! humidite relative a 2m
-    REAL, dimension(klon), intent(out):: t_10m ! temperature de l'air a 10m
-    REAL, dimension(klon), intent(out):: q_10m ! humidite specifique a 10m
-    REAL, dimension(klon), intent(out):: u_10m ! vitesse du vent a 10m
+    REAL, intent(in):: u1(:) ! (knon) vent zonal au 1er niveau du modele
+    REAL, intent(in):: v1(:) ! (knon) vent meridien au 1er niveau du modele
+    REAL, intent(in):: t1 (klon) ! temperature de l'air au 1er niveau du modele
+    REAL, intent(in):: q1(klon) ! humidite relative au 1er niveau du modele
+    REAL, intent(in):: z1 (klon) ! geopotentiel au 1er niveau du modele
+    REAL, intent(in):: ts1(klon) ! temperature de l'air a la surface
+    REAL, intent(in):: qsurf(klon) ! humidite relative a la surface
+    REAL, intent(in):: rugos(klon) ! rugosite
+    REAL, intent(in):: psol(klon) ! pression au sol
+    REAL, intent(in):: pat1(klon) ! pression au 1er niveau du modele
+    REAL, intent(out):: t_2m(klon) ! temperature de l'air a 2m
+    REAL, intent(out):: q_2m(klon) ! humidite relative a 2m
+    REAL, intent(out):: t_10m(klon) ! temperature de l'air a 10m
+    REAL, intent(out):: q_10m(klon) ! humidite specifique a 10m
+    REAL, intent(out):: u_10m(klon) ! vitesse du vent a 10m
     REAL, intent(out):: ustar(klon) ! u*
 
     ! Local:
@@ -168,10 +157,8 @@ contains
     ! First aproximation of variables at zref  
 
     zref = 10.0
-    CALL screenp(klon, knon, speed, tpot, q1, &
-         ts1, qsurf, rugos, lmon, &
-         ustar, testar, qstar, zref, &
-         delu, delte, delq)
+    CALL screenp(klon, knon, speed, tpot, q1, ts1, qsurf, rugos, lmon, ustar, &
+         testar, qstar, zref, delu, delte, delq)
 
     DO i = 1, knon
        u_zref(i) = delu(i)
@@ -186,11 +173,9 @@ contains
 
     DO n = 1, niter
        okri=.TRUE.
-       CALL screenc(klon, knon, nsrf, zxli, &
-            u_zref, temp, q_zref, zref, &
-            ts1, qsurf, rugos, psol, &
-            ustar, testar, qstar, okri, ri1, &
-            pref, delu, delte, delq)
+       CALL screenc(klon, knon, nsrf, zxli, u_zref, temp, q_zref, zref, ts1, &
+            qsurf, rugos, psol, ustar, testar, qstar, okri, ri1, pref, delu, &
+            delte, delq)
 
        DO i = 1, knon
           u_zref(i) = delu(i)
@@ -202,9 +187,7 @@ contains
 
     DO i = 1, knon
        u_zref_c(i) = u_zref(i)
-
        u_10m(i) = u_zref_p(i) * ok_pred(i) + u_zref_c(i) * ok_corr(i)
-
        q_zref_c(i) = q_zref(i)
        temp_c(i) = temp(i)
        t_10m(i) = temp_p(i) * ok_pred(i) + temp_c(i) * ok_corr(i)

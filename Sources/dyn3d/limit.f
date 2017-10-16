@@ -48,7 +48,7 @@ contains
     INTEGER imdep, jmdep, lmdep
 
     REAL, ALLOCATABLE:: dlon(:), dlat(:)
-    REAL, pointer:: dlon_ini(:), dlat_ini(:), timeyear(:)
+    REAL, ALLOCATABLE:: dlon_ini(:), dlat_ini(:), timeyear(:)
     REAL, ALLOCATABLE:: champ(:, :)
     REAL, ALLOCATABLE:: work(:, :)
 
@@ -114,7 +114,7 @@ contains
 
     call NF95_CLOSE(ncid)
 
-    DEALLOCATE(dlon, dlat, champ, dlon_ini, dlat_ini)
+    DEALLOCATE(dlon, dlat, champ)
     allocate(yder(lmdep))
 
     ! Interpolate monthly values to daily values, at each horizontal position:
@@ -128,7 +128,7 @@ contains
        ENDDO
     ENDDO
 
-    deallocate(timeyear, champtime, yder)
+    deallocate(champtime, yder)
     champan(iim + 1, :, :) = champan(1, :, :)
     forall (k = 1:360) phy_rug(:, k) = pack(champan(:, :, k), dyn_phy)
 
@@ -167,7 +167,7 @@ contains
 
     call NF95_CLOSE(ncid)
 
-    DEALLOCATE(dlon, dlat, champ, dlon_ini, dlat_ini)
+    DEALLOCATE(dlon, dlat, champ)
     PRINT *, 'Interpolation temporelle'
     allocate(yder(lmdep))
 
@@ -271,7 +271,7 @@ contains
 
     call NF95_CLOSE(ncid)
 
-    DEALLOCATE(dlon, dlat, champ, dlon_ini, dlat_ini)
+    DEALLOCATE(dlon, dlat, champ)
     allocate(yder(lmdep))
 
     ! interpolation temporelle
@@ -329,7 +329,6 @@ contains
 
     call NF95_CLOSE(ncid)
 
-    deallocate(dlon_ini, dlat_ini)
     allocate(yder(lmdep))
 
     ! interpolation temporelle
@@ -342,7 +341,6 @@ contains
           ENDDO
        ENDDO
     ENDDO
-    deallocate(timeyear)
 
     champan(iim + 1, :, :) = champan(1, :, :)
     forall (k = 1:360) phy_alb(:, k) = pack(champan(:, :, k), dyn_phy)

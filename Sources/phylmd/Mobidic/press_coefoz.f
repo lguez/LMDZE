@@ -2,7 +2,7 @@ module press_coefoz_m
 
   implicit none
 
-  real, pointer, save:: plev(:)
+  real, allocatable, save:: plev(:)
   ! (pressure level of Mobidic input data, converted to Pa, in
   ! ascending order)
 

@@ -26,14 +26,15 @@ contains
     integer, intent(in):: knindex(:) ! (knon)
     REAL, intent(inout):: tsoil(:, :) ! (knon, nsoilmx)
 
-    REAL, intent(inout):: qsol(klon)
+    REAL, intent(inout):: qsol(:) ! (knon)
     ! column-density of water in soil, in kg m-2
 
     real, intent(in):: rmu0(klon) ! cosinus de l'angle solaire zenithal
     real rugos(klon) ! rugosite
     REAL rugoro(klon)
-    REAL u1lay(klon) ! vitesse u de la 1ere couche (m / s)
-    REAL v1lay(klon) ! vitesse v de la 1ere couche (m / s)
+
+    REAL, intent(in):: u1lay(:), v1lay(:) ! (knon)
+    ! vitesse de la 1ere couche (m / s)
 
     REAL, intent(in):: coef(:, :) ! (knon, klev)
     ! Le coefficient d'echange (m**2 / s) multiplie par le cisaillement

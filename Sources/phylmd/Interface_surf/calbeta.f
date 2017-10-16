@@ -4,7 +4,7 @@ module calbeta_m
 
 contains
 
-  SUBROUTINE calbeta(indice, snow, qsol, vbeta, vcal, vdif)
+  SUBROUTINE calbeta(indice, snow, qsol, beta, vcal, vdif)
 
     ! Author: Z. X. Li (LMD/CNRS)
     ! Date: April 14th, 1994
@@ -14,8 +14,12 @@ contains
     USE indicesol, ONLY: is_lic, is_oce, is_sic, is_ter
 
     INTEGER, intent(in):: indice
-    REAL, intent(in):: snow(:), qsol(:) ! (knon)
-    REAL, intent(out):: vbeta(:), vcal(:), vdif(:) ! (knon)
+    REAL, intent(in):: snow(:)
+
+    REAL, intent(in):: qsol(:) ! (knon)
+    ! column-density of water in soil, in kg m-2
+
+    REAL, intent(out):: beta(:), vcal(:), vdif(:) ! (knon)
 
     ! Local:
 
@@ -33,22 +37,22 @@ contains
 
     select case (indice)
     case(is_oce)
-       vbeta = 1.
+       beta = 1.
        vcal = 0.
        vdif = 0.
 
     case (is_sic)
-       vbeta = 1.
+       beta = 1.
        vcal = merge(calsno, calice, snow > 0.)
        vdif = 1. / tau_gl
 
     case (is_ter)
-       vbeta = min(2. * qsol / max_eau_sol, 1.)
+       beta = min(2. * qsol / max_eau_sol, 1.)
        vcal = merge(calsno, calsol, snow > 0.)
        vdif = 0.
 
     case (is_lic)
-       vbeta = 1.
+       beta = 1.
        vcal = merge(calsno, calice, snow > 0.)
        vdif = 0.
     END select

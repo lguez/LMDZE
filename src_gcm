@@ -114,7 +114,6 @@ geopot.f
 getfieldindex.f
 grad.f
 gradiv2.f
-gradsdef.f
 grid_change.f
 groupe.f
 groupeun.f

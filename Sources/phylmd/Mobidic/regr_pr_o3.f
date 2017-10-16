@@ -43,7 +43,7 @@ contains
 
     ! Variables local to the procedure:
 
-    real, pointer:: plev(:)
+    real, allocatable:: plev(:)
     ! (pressure levels of Mobidic data, in Pa, in strictly increasing order)
 
     real, allocatable:: press_in_edg(:)
@@ -83,8 +83,6 @@ contains
     press_in_edg(n_plev + 1) = huge(0.)
     ! (infinity, but any value guaranteed to be greater than the
     ! surface pressure would do)
-
-    deallocate(plev) ! pointer
 
     call nf95_inq_varid(ncid, "r_Mob", varid)
     allocate(r_mob(jjm + 1, n_plev))

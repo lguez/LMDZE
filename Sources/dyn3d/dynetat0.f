@@ -79,7 +79,7 @@ contains
 
     ! Local variables: 
     INTEGER iq
-    REAL, pointer:: tab_cntrl(:) ! tableau des param\`etres du run
+    REAL, allocatable:: tab_cntrl(:) ! tableau des param\`etres du run
     INTEGER ierr, ncid, varid
 
     namelist /dynetat0_nml/ day_ref, annee_ref
@@ -147,8 +147,6 @@ contains
     end if
 
     print *, "day_ini = ", day_ini
-
-    deallocate(tab_cntrl) ! pointer
 
     call NF95_INQ_VARID (ncid, "rlonu", varid)
     call NF95_GET_VAR(ncid, varid, rlonu)

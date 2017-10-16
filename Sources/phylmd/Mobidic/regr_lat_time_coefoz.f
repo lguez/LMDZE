@@ -50,14 +50,14 @@ contains
     integer n_plev ! number of pressure levels in the input data
     integer n_lat! number of latitudes in the input data
 
-    real, pointer:: latitude(:)
+    real, allocatable:: latitude(:)
     ! (of input data, converted to rad, sorted in strictly increasing order)
 
     real, allocatable:: lat_in_edg(:)
     ! (edges of latitude intervals for input data, in rad, in strictly
     ! increasing order)
 
-    real, pointer:: plev(:) ! pressure level of input data
+    real, allocatable:: plev(:) ! pressure level of input data
     logical decr_lat ! decreasing latitude in the input file
 
     real, allocatable:: o3_par_in(:, :, :) ! (n_lat, n_plev, 12)
@@ -167,7 +167,6 @@ contains
     lat_in_edg(1) = - pi / 2
     forall (j = 2:n_lat) lat_in_edg(j) = (latitude(j - 1) + latitude(j)) / 2
     lat_in_edg(n_lat + 1) = pi / 2
-    deallocate(latitude) ! pointer
 
     call nf95_inq_varid(ncid_in, "plev", varid)
     call nf95_gw_var(ncid_in, varid, plev)
@@ -186,8 +185,6 @@ contains
     ! Write remaining coordinate variables:
     call nf95_put_var(ncid_out, varid_time, tmidday)
     call nf95_put_var(ncid_out, varid_plev, plev)
-
-    deallocate(plev) ! pointer
 
     allocate(o3_par_in(n_lat, n_plev, 12))
     allocate(v_regr_lat(jjm + 1, n_plev, 0:13))

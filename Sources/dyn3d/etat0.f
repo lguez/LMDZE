@@ -91,7 +91,7 @@ contains
     ! D\'eclarations pour lecture glace de mer :
     INTEGER iml_lic, jml_lic
     INTEGER ncid, varid
-    REAL, pointer:: dlon_lic(:), dlat_lic(:)
+    REAL, ALLOCATABLE:: dlon_lic(:), dlat_lic(:)
     REAL, ALLOCATABLE:: fraclic(:, :) ! fraction land ice
     REAL flic_tmp(iim + 1, jjm + 1) ! fraction land ice temporary
 
@@ -260,8 +260,6 @@ contains
     flic_tmp(:iim, :) = grille_m(dlon_lic, dlat_lic, fraclic, rlonv(:iim), &
          rlatu)
     flic_tmp(iim + 1, :) = flic_tmp(1, :)
-
-    deallocate(dlon_lic, dlat_lic) ! pointers
 
     ! Passage sur la grille physique
     pctsrf = 0.

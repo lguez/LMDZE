@@ -1,6 +1,6 @@
 module inter_barxy_m
 
-  ! From inter_barxy.F, version 1.1.1.1 2004/05/19 12:53:07
+  ! From inter_barxy.F, version 1.1.1.1, 2004/05/19 12:53:07
 
   implicit none
 
@@ -30,7 +30,7 @@ contains
     ! Si taille de la seconde dim = jjm + 1, on veut interpoler sur les
     ! jjm+1 latitudes rlatu du modele (latitudes des scalaires et de U)
     ! Si taille de la seconde dim = jjm, on veut interpoler sur les
-    ! jjm latitudes rlatv du modèle (latitudes de V)
+    ! jjm latitudes rlatv du mod\`ele (latitudes de V)
 
     ! Local:
 

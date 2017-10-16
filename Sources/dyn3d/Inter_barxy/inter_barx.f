@@ -6,39 +6,37 @@ contains
 
   function inter_barx(dlonid, fdat, rlonimod)
 
-    ! From dyn3d/inter_barx.F, version 1.1.1.1 2004/05/19 12:53:06
+    ! From dyn3d/inter_barx.F, version 1.1.1.1, 2004/05/19 12:53:06
 
     ! Authors: Robert Sadourny, P. Le Van
 
     ! INTERPOLATION BARYCENTRIQUE BASEE SUR LES AIRES
     ! VERSION UNIDIMENSIONNELLE, EN LONGITUDE .
 
-    ! idat : indice du champ de donnees, de 1 a idatmax
-    ! imod : indice du champ du modele, de 1 a imodmax
-    ! fdat(idat) : champ de donnees (entrees)
-    ! inter_barx(imod) : champ du modele (sorties)
-    ! dlonid(idat): abscisses des interfaces des mailles donnees
-    ! rlonimod(imod): abscisses des interfaces des mailles modele
-    ! (L'indice 1 correspond a l'interface mailLE 1 / maille 2)
-    ! (Les abscisses sont exprim\'ees en degres)
-
     use nr_util, only: assert_eq, pi
 
-    REAL, intent(in):: dlonid(:)
-    real, intent(in):: fdat(:)
-    real, intent(in):: rlonimod(:)
+    REAL, intent(in):: dlonid(:) ! (idatmax)
+    ! abscisses des interfaces des mailles donnees
+    
+    real, intent(in):: fdat(:) ! (idatmax) champ de donnees
 
-    real inter_barx(size(rlonimod))
+    real, intent(in):: rlonimod(:) ! (imodmax)
+    ! Abscisses des interfaces des mailles modele. L'indice 1
+    ! correspond a l'interface mailLE 1 / maille 2. Les abscisses sont
+    ! exprim\'ees en degres.
 
-    ! Variables locales 
+    real inter_barx(size(rlonimod)) ! champ du modele
 
+    ! Local: 
     INTEGER idatmax, imodmax
     REAL xxid(size(dlonid)+1), xxd(size(dlonid)+1), fdd(size(dlonid)+1)
     REAL fxd(size(dlonid)+1), xchan(size(dlonid)+1), fdchan(size(dlonid)+1)
     REAL xxim(size(rlonimod))
     REAL x0, xim0, dx, dxm
     REAL chmax
-    INTEGER imod, idat, i, ichang, id0, id1, nid, idatmax1
+    integer idat ! indice du champ de donnees, de 1 a idatmax
+    INTEGER imod ! indice du champ du modele, de 1 a imodmax
+    integer i, ichang, id0, id1, nid, idatmax1
 
     !-----------------------------------------------------
 

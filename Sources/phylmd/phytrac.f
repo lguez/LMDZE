@@ -78,13 +78,8 @@ contains
     REAL pde_u(klon, llm) ! flux detraine dans le panache montant
     REAL pen_d(klon, llm) ! flux entraine dans le panache descendant
     REAL coefh(klon, llm) ! coeff melange couche limite
-
-    ! thermiques:
-    real fm_therm(klon, llm+1), entr_therm(klon, llm)
-
-    ! Couche limite:
-    REAL yu1(klon) ! vents au premier niveau
-    REAL yv1(klon) ! vents au premier niveau
+    real fm_therm(klon, llm+1), entr_therm(klon, llm) ! thermiques
+    REAL, intent(in):: yu1(klon), yv1(klon) ! vent au premier niveau
 
     ! Arguments n\'ecessaires pour les sources et puits de traceur :
     real, intent(in):: ftsol(:, :) ! (klon, nbsrf) surface temperature (K)
@@ -140,14 +135,13 @@ contains
 
     CHARACTER itn
 
-    ! nature du traceur
-
-    logical aerosol(nqmx - 2) ! Nature du traceur
+    logical, save:: aerosol(nqmx - 2) ! Nature du traceur
     ! ! aerosol(it) = true => aerosol 
     ! ! aerosol(it) = false => gaz 
-    logical clsol(nqmx - 2) ! couche limite sol calcul\'ee
-    logical radio(nqmx - 2) ! d\'ecroisssance radioactive
-    save aerosol, clsol, radio
+
+    logical, save:: clsol(nqmx - 2) ! couche limite sol flux
+    ! calcul\'ee, sinon prescrit
+    logical, save:: radio(nqmx - 2) ! d\'ecroisssance radioactive
 
     ! convection tiedtke
     INTEGER i, k, it
@@ -179,9 +173,7 @@ contains
     integer isplit, varid
 
     ! Controls:
-    logical:: couchelimite = .true.
     logical:: convection = .true.
-    logical, save:: inirnpb
 
     !--------------------------------------
 
@@ -189,8 +181,6 @@ contains
     call assert(shape(tr_seri) == (/klon, llm, nqmx - 2/), "phytrac tr_seri")
 
     if (firstcal) then
-       inirnpb = .true.
-
        ! Initialisation de certaines variables pour le radon et le plomb 
        ! Initialisation du traceur dans le sol (couche limite radonique)
        trs(:, 2:) = 0.
@@ -207,26 +197,20 @@ contains
 
        ! Initialisation de la nature des traceurs
 
-       DO it = 1, nqmx - 2
-          aerosol(it) = .FALSE. ! Tous les traceurs sont des gaz par defaut
-          radio(it) = .FALSE. ! par d\'efaut pas de passage par "radiornpb"
-          clsol(it) = .FALSE. ! Par defaut couche limite avec flux prescrit
-       ENDDO
+       aerosol = .FALSE. ! Tous les traceurs sont des gaz par defaut
+       radio = .FALSE. ! par d\'efaut pas de passage par "radiornpb"
 
        if (nqmx >= 5) then
           call press_coefoz ! read input pressure levels for ozone coefficients
        end if
-    ENDIF
 
-    if (inirnpb) THEN
        ! Initialisation du traceur dans le sol (couche limite radonique)
        radio(1)= .true.
        radio(2)= .true.
-       clsol(1)= .true.
-       clsol(2)= .true.
+       clsol(:2)= .true.
+       clsol(3:)= .false.
        aerosol(2) = .TRUE. ! le Pb est un aerosol 
        call initrrnpb(pctsrf, masktr, fshtr, hsoltr, tautr, vdeptr, scavtr)
-       inirnpb=.false.
     endif
 
     if (convection) then
@@ -285,45 +269,43 @@ contains
 
     ! Calcul de l'effet de la couche limite
 
-    if (couchelimite) then
-       DO k = 1, llm
-          DO i = 1, klon
-             delp(i, k) = paprs(i, k)-paprs(i, k+1)
+    DO k = 1, llm
+       DO i = 1, klon
+          delp(i, k) = paprs(i, k)-paprs(i, k+1)
+       ENDDO
+    ENDDO
+
+    ! MAF modif pour tenir compte du cas traceur
+    DO it=1, nqmx - 2
+       if (clsol(it)) then 
+          ! couche limite avec quantite dans le sol calculee
+          CALL cltracrn(it, pdtphys, yu1, yv1, coefh, t_seri, ftsol, &
+               pctsrf, tr_seri(:, :, it), trs(:, it), paprs, pplay, delp, &
+               masktr(1, it), fshtr(1, it), hsoltr(it), tautr(it), &
+               vdeptr(it), rlat, d_tr_cl(1, 1, it), d_trs)
+          DO k = 1, llm
+             DO i = 1, klon
+                tr_seri(i, k, it) = tr_seri(i, k, it) + d_tr_cl(i, k, it)
+             ENDDO
           ENDDO
-       ENDDO
 
-       ! MAF modif pour tenir compte du cas traceur
-       DO it=1, nqmx - 2
-          if (clsol(it)) then 
-             ! couche limite avec quantite dans le sol calculee
-             CALL cltracrn(it, pdtphys, yu1, yv1, coefh, t_seri, ftsol, &
-                  pctsrf, tr_seri(:, :, it), trs(:, it), paprs, pplay, delp, &
-                  masktr(1, it), fshtr(1, it), hsoltr(it), tautr(it), &
-                  vdeptr(it), rlat, d_tr_cl(1, 1, it), d_trs)
-             DO k = 1, llm
-                DO i = 1, klon
-                   tr_seri(i, k, it) = tr_seri(i, k, it) + d_tr_cl(i, k, it)
-                ENDDO
-             ENDDO
+          trs(:, it) = trs(:, it) + d_trs
+       else
+          ! couche limite avec flux prescrit
+          !MAF provisoire source / traceur a creer
+          DO i=1, klon
+             source(i) = 0. ! pas de source, pour l'instant
+          ENDDO
 
-             trs(:, it) = trs(:, it) + d_trs
-          else
-             ! couche limite avec flux prescrit
-             !MAF provisoire source / traceur a creer
-             DO i=1, klon
-                source(i) = 0. ! pas de source, pour l'instant
+          CALL cltrac(pdtphys, coefh, t_seri, tr_seri(:, :, it), source, &
+               paprs, pplay, delp, d_tr_cl(1, 1, it))
+          DO k = 1, llm
+             DO i = 1, klon
+                tr_seri(i, k, it) = tr_seri(i, k, it) + d_tr_cl(i, k, it)
              ENDDO
-
-             CALL cltrac(pdtphys, coefh, t_seri, tr_seri(:, :, it), source, &
-                  paprs, pplay, delp, d_tr_cl(1, 1, it))
-             DO k = 1, llm
-                DO i = 1, klon
-                   tr_seri(i, k, it) = tr_seri(i, k, it) + d_tr_cl(i, k, it)
-                ENDDO
-             ENDDO
-          endif
-       ENDDO
-    endif
+          ENDDO
+       endif
+    ENDDO
 
     ! Calcul de l'effet du puits radioactif
 

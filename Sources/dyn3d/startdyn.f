@@ -5,10 +5,10 @@ MODULE startdyn
 
   INTEGER iml_dyn, jml_dyn, llm_dyn
 
-  REAL, pointer:: lon_ini(:), lat_ini(:)
+  REAL, allocatable:: lon_ini(:), lat_ini(:)
   ! longitude and latitude from the input file, converted to rad
 
-  real, pointer:: levdyn_ini(:)
+  real, allocatable:: levdyn_ini(:)
 
 CONTAINS
 

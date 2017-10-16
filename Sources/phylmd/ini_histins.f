@@ -170,6 +170,14 @@ contains
                "rugosite "//clnsurf(nsrf), "-",   &
                iim, (jjm + 1), nhori, 1, 1, 1, -99, &
                "inst(X)", zsto, zout)
+          call histdef(nid_ins, "u10m_"//clnsurf(nsrf),  &
+               "zonal wind 10 m "//clnsurf(nsrf), "m s-1",   &
+               iim, (jjm + 1), nhori, 1, 1, 1, -99, &
+               "inst(X)", zsto, zout)
+          call histdef(nid_ins, "v10m_"//clnsurf(nsrf),  &
+               "meridional wind 10 m "//clnsurf(nsrf), "m s-1",   &
+               iim, (jjm + 1), nhori, 1, 1, 1, -99, &
+               "inst(X)", zsto, zout)
        END DO
 
        CALL histdef(nid_ins, "rugs", "rugosity", "-", &

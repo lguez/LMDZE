@@ -29,7 +29,7 @@ contains
     ! couverture nuageuse pour le rayonnement (0 \`a 1)
 
     REAL, intent(out):: pcltau(klon, klev) ! \'epaisseur optique des nuages
-    real pclemi(klon, klev) ! pclemi--output-R-emissivite des nuages (0 a 1)
+    real, intent(out):: pclemi(klon, klev) ! \'emissivit\'e des nuages (0 \`a 1)
     REAL pch(klon), pcl(klon), pcm(klon), pct(klon), pctlwp(klon)
 
     ! Local:
@@ -44,8 +44,6 @@ contains
 
     REAL radius, rad_froid, rad_chaud, rad_chau1, rad_chau2
     PARAMETER (rad_chau1=13.0, rad_chau2=9.0, rad_froid=35.0)
-    !cc PARAMETER (rad_chaud=15.0, rad_froid=35.0)
-    ! sintex initial PARAMETER (rad_chaud=10.0, rad_froid=30.0)
     REAL coef, coef_froi, coef_chau
     PARAMETER (coef_chau=0.13, coef_froi=0.09)
     REAL seuil_neb, t_glace

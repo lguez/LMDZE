@@ -30,9 +30,8 @@ contains
 
     REAL, intent(in):: dtime
     ! dtime----input-R- intervalle de temps (en second)
-    REAL u1lay(klon), v1lay(klon)
-    ! u1lay----input-R- vent u de la premiere couche (m/s)
-    ! v1lay----input-R- vent v de la premiere couche (m/s)
+    REAL, intent(in):: u1lay(klon), v1lay(klon) ! vent de la premiere
+                                                ! couche (m/s)
     REAL coef(klon, klev)
     ! coef-----input-R- le coefficient d'echange (m**2/s) l>1
     REAL, intent(in):: t(klon, klev) ! temperature (K)
