@@ -572,15 +572,18 @@ contains
          paprs, play, fsnow, fqsurf, fevap, falbe, fluxlat, rain_fall, &
          snow_fall, fsolsw, fsollw, frugs, agesno, rugoro, d_t_vdf, d_q_vdf, &
          d_u_vdf, d_v_vdf, d_ts, flux_t, flux_q, flux_u, flux_v, cdragh, &
-         cdragm, q2, dsens, devap, ycoefh, yu1, yv1, t2m, q2m, u10m_srf, &
-         v10m_srf, pblh, capCL, oliqCL, cteiCL, pblT, therm, trmb1, trmb2, &
-         trmb3, plcl, fqcalving, ffonte, run_off_lic_0)
+         cdragm, q2, dsens, devap, ycoefh, t2m, q2m, u10m_srf, v10m_srf, &
+         pblh, capCL, oliqCL, cteiCL, pblT, therm, trmb1, trmb2, trmb3, plcl, &
+         fqcalving, ffonte, run_off_lic_0)
 
     ! Incr\'ementation des flux
 
     sens = - sum(flux_t * pctsrf, dim = 2)
     evap = - sum(flux_q * pctsrf, dim = 2)
     fder = dlw + dsens + devap
+
+    yu1 = u_seri(:, 1)
+    yv1 = v_seri(:, 1)
 
     DO k = 1, llm
        DO i = 1, klon

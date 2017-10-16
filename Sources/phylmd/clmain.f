@@ -8,9 +8,9 @@ contains
        cdhmax, ksta, ksta_ter, ok_kzmin, ftsoil, qsol, paprs, pplay, fsnow, &
        qsurf, evap, falbe, fluxlat, rain_fall, snow_f, fsolsw, fsollw, frugs, &
        agesno, rugoro, d_t, d_q, d_u, d_v, d_ts, flux_t, flux_q, flux_u, &
-       flux_v, cdragh, cdragm, q2, dflux_t, dflux_q, ycoefh, zu1, zv1, t2m, &
-       q2m, u10m_srf, v10m_srf, pblh, capcl, oliqcl, cteicl, pblt, therm, &
-       trmb1, trmb2, trmb3, plcl, fqcalving, ffonte, run_off_lic_0)
+       flux_v, cdragh, cdragm, q2, dflux_t, dflux_q, ycoefh, t2m, q2m, &
+       u10m_srf, v10m_srf, pblh, capcl, oliqcl, cteicl, pblt, therm, trmb1, &
+       trmb2, trmb3, plcl, fqcalving, ffonte, run_off_lic_0)
 
     ! From phylmd/clmain.F, version 1.6, 2005/11/16 14:47:19
     ! Author: Z. X. Li (LMD/CNRS), date: 1993/08/18
@@ -20,11 +20,6 @@ contains
     ! de la couche limite pour les traceurs se fait avec "cltrac" et
     ! ne tient pas compte de la diff\'erentiation des sous-fractions
     ! de sol.
-
-    ! Pour pouvoir extraire les coefficients d'\'echanges et le vent
-    ! dans la premi\`ere couche, trois champs ont \'et\'e cr\'e\'es : "ycoefh",
-    ! "zu1" et "zv1". Nous avons moyenn\'e les valeurs de ces trois
-    ! champs sur les quatre sous-surfaces du mod\`ele.
 
     use clqh_m, only: clqh
     use clvent_m, only: clvent
@@ -112,7 +107,10 @@ contains
     ! IM "slab" ocean
 
     REAL, intent(out):: ycoefh(klon, klev)
-    REAL, intent(out):: zu1(klon), zv1(klon)
+    ! Pour pouvoir extraire les coefficients d'\'echange, le champ
+    ! "ycoefh" a \'et\'e cr\'e\'e. Nous avons moyenn\'e les valeurs de
+    ! ce champ sur les quatre sous-surfaces du mod\`ele.
+
     REAL, INTENT(inout):: t2m(klon, nbsrf), q2m(klon, nbsrf)
 
     REAL, INTENT(inout):: u10m_srf(:, :), v10m_srf(:, :) ! (klon, nbsrf)
@@ -233,8 +231,6 @@ contains
     cdragm = 0.
     dflux_t = 0.
     dflux_q = 0.
-    zu1 = 0.
-    zv1 = 0.
     ypct = 0.
     yqsurf = 0.
     yrain_f = 0.
@@ -475,8 +471,6 @@ contains
              cdragm(i) = cdragm(i) + coefm(j, 1)
              dflux_t(i) = dflux_t(i) + y_dflux_t(j)
              dflux_q(i) = dflux_q(i) + y_dflux_q(j)
-             zu1(i) = zu1(i) + u1lay(j) * ypct(j)
-             zv1(i) = zv1(i) + v1lay(j) * ypct(j)
           END DO
           IF (nsrf == is_ter) THEN
              qsol(ni(:knon)) = yqsol(:knon)
