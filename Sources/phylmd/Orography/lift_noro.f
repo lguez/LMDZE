@@ -1,112 +1,112 @@
-    SUBROUTINE lift_noro(nlon,nlev,dtime,paprs,pplay,plat,pmea,pstd,ppic, &
-        ktest,t,u,v,pulow,pvlow,pustr,pvstr,d_t,d_u,d_v)
+module lift_noro_m
 
-      USE dimens_m
-      USE dimphy
-      USE suphec_m
-      IMPLICIT NONE
-!======================================================================
-! Auteur(s): F.Lott (LMD/CNRS) date: 19950201
-! Objet: Frottement de la montagne Interface
-!======================================================================
-! Arguments:
-! dtime---input-R- pas d'integration (s)
-! paprs---input-R-pression pour chaque inter-couche (en Pa)
-! pplay---input-R-pression pour le mileu de chaque couche (en Pa)
-! t-------input-R-temperature (K)
-! u-------input-R-vitesse horizontale (m/s)
-! v-------input-R-vitesse horizontale (m/s)
+  IMPLICIT NONE
 
-! d_t-----output-R-increment de la temperature
-! d_u-----output-R-increment de la vitesse u
-! d_v-----output-R-increment de la vitesse v
-!======================================================================
+contains
 
-! ARGUMENTS
+  SUBROUTINE lift_noro(dtime, paprs, pplay, pmea, pstd, ppic, ktest, t, u, v, &
+       pulow, pvlow, pustr, pvstr, d_t, d_u, d_v)
 
-      INTEGER nlon, nlev
-      REAL, INTENT (IN) :: dtime
-      REAL, INTENT (IN) :: paprs(klon,klev+1)
-      REAL, INTENT (IN) :: pplay(klon,klev)
-      REAL, INTENT (IN) :: plat(nlon)
-      REAL pmea(nlon)
-      REAL, INTENT (IN):: pstd(nlon)
-      REAL ppic(nlon)
-      REAL pulow(nlon), pvlow(nlon), pustr(nlon), pvstr(nlon)
-      REAL, INTENT (IN):: t(nlon,nlev)
-      real, INTENT (IN):: u(nlon,nlev), v(nlon,nlev)
-      REAL d_t(nlon,nlev), d_u(nlon,nlev), d_v(nlon,nlev)
+    ! Author: F.Lott (LMD/CNRS) date: 1995/02/01
+    ! Objet: Frottement de la montagne, interface
 
-      INTEGER i, k, ktest(nlon)
+    USE dimphy, only: klon, klev
+    use phyetat0_m, only: rlat
+    USE suphec_m, only: rd, rg
+    
+    REAL, INTENT (IN) :: dtime
+    ! dtime---input-R- pas d'integration (s)
+    REAL, INTENT (IN) :: paprs(klon, klev + 1)
+    ! paprs---input-R-pression pour chaque inter-couche (en Pa)
+    REAL, INTENT (IN) :: pplay(klon, klev)
+    ! pplay---input-R-pression pour le mileu de chaque couche (en Pa)
+    REAL pmea(klon)
+    REAL, INTENT (IN):: pstd(klon)
+    REAL ppic(klon)
+    integer ktest(klon)
+    REAL, INTENT (IN):: t(klon, klev)
+    ! t-------input-R-temperature (K)
+    real, INTENT (IN):: u(klon, klev), v(klon, klev)
+    ! u-------input-R-vitesse horizontale (m / s)
+    ! v-------input-R-vitesse horizontale (m / s)
+    REAL pulow(klon), pvlow(klon), pustr(klon), pvstr(klon)
+    REAL d_t(klon, klev), d_u(klon, klev), d_v(klon, klev)
+    ! d_t-----output-R-increment de la temperature
+    ! d_u-----output-R-increment de la vitesse u
+    ! d_v-----output-R-increment de la vitesse v
 
-! Variables locales:
+    ! Local:
+    INTEGER i, k
+    REAL zgeom(klon, klev)
+    REAL pdtdt(klon, klev), pdudt(klon, klev), pdvdt(klon, klev)
+    REAL pt(klon, klev), pu(klon, klev), pv(klon, klev)
+    REAL papmf(klon, klev), papmh(klon, klev + 1)
 
-      REAL zgeom(klon,klev)
-      REAL pdtdt(klon,klev), pdudt(klon,klev), pdvdt(klon,klev)
-      REAL pt(klon,klev), pu(klon,klev), pv(klon,klev)
-      REAL papmf(klon,klev), papmh(klon,klev+1)
+    !----------------------------------------------------------------------
 
-! initialiser les variables de sortie (pour securite)
+    ! initialiser les variables de sortie (pour securite)
 
-      DO i = 1, klon
-        pulow(i) = 0.0
-        pvlow(i) = 0.0
-        pustr(i) = 0.0
-        pvstr(i) = 0.0
-      END DO
-      DO k = 1, klev
-        DO i = 1, klon
-          d_t(i,k) = 0.0
-          d_u(i,k) = 0.0
-          d_v(i,k) = 0.0
-          pdudt(i,k) = 0.0
-          pdvdt(i,k) = 0.0
-          pdtdt(i,k) = 0.0
-        END DO
-      END DO
+    DO i = 1, klon
+       pulow(i) = 0.0
+       pvlow(i) = 0.0
+       pustr(i) = 0.0
+       pvstr(i) = 0.0
+    END DO
+    DO k = 1, klev
+       DO i = 1, klon
+          d_t(i, k) = 0.0
+          d_u(i, k) = 0.0
+          d_v(i, k) = 0.0
+          pdudt(i, k) = 0.0
+          pdvdt(i, k) = 0.0
+          pdtdt(i, k) = 0.0
+       END DO
+    END DO
 
-! preparer les variables d'entree (attention: l'ordre des niveaux
-! verticaux augmente du haut vers le bas)
+    ! preparer les variables d'entree (attention: l'ordre des niveaux
+    ! verticaux augmente du haut vers le bas)
 
-      DO k = 1, klev
-        DO i = 1, klon
-          pt(i,k) = t(i,klev-k+1)
-          pu(i,k) = u(i,klev-k+1)
-          pv(i,k) = v(i,klev-k+1)
-          papmf(i,k) = pplay(i,klev-k+1)
-        END DO
-      END DO
-      DO k = 1, klev + 1
-        DO i = 1, klon
-          papmh(i,k) = paprs(i,klev-k+2)
-        END DO
-      END DO
-      DO i = 1, klon
-        zgeom(i,klev) = rd*pt(i,klev)*log(papmh(i,klev+1)/papmf(i,klev))
-      END DO
-      DO k = klev - 1, 1, -1
-        DO i = 1, klon
-          zgeom(i,k) = zgeom(i,k+1) + rd*(pt(i,k)+pt(i,k+1))/2.0*log(papmf(i,k &
-            +1)/papmf(i,k))
-        END DO
-      END DO
+    DO k = 1, klev
+       DO i = 1, klon
+          pt(i, k) = t(i, klev-k + 1)
+          pu(i, k) = u(i, klev-k + 1)
+          pv(i, k) = v(i, klev-k + 1)
+          papmf(i, k) = pplay(i, klev-k + 1)
+       END DO
+    END DO
+    DO k = 1, klev + 1
+       DO i = 1, klon
+          papmh(i, k) = paprs(i, klev-k + 2)
+       END DO
+    END DO
+    DO i = 1, klon
+       zgeom(i, klev) = rd * pt(i, klev) &
+            * log(papmh(i, klev + 1) / papmf(i, klev))
+    END DO
+    DO k = klev - 1, 1, -1
+       DO i = 1, klon
+          zgeom(i, k) = zgeom(i, k + 1) + rd * (pt(i, k) + pt(i, k + 1)) &
+               / 2. * log(papmf(i, k + 1) / papmf(i, k))
+       END DO
+    END DO
 
-! appeler la routine principale
+    ! appeler la routine principale
 
-      CALL orolift(klon,klev,ktest,dtime,papmh,zgeom,pt,pu,pv,plat,pmea,pstd, &
-        ppic,pulow,pvlow,pdudt,pdvdt,pdtdt)
+    CALL orolift(klon, klev, ktest, dtime, papmh, zgeom, pt, pu, pv, rlat, &
+         pmea, pstd, ppic, pulow, pvlow, pdudt, pdvdt, pdtdt)
 
-      DO k = 1, klev
-        DO i = 1, klon
-          d_u(i,klev+1-k) = dtime*pdudt(i,k)
-          d_v(i,klev+1-k) = dtime*pdvdt(i,k)
-          d_t(i,klev+1-k) = dtime*pdtdt(i,k)
-          pustr(i) = pustr(i) & 
-             + pdudt(i,k)*(papmh(i,k+1)-papmh(i,k))/rg
-          pvstr(i) = pvstr(i) & 
-             + pdvdt(i,k)*(papmh(i,k+1)-papmh(i,k))/rg
-        END DO
-      END DO
+    DO k = 1, klev
+       DO i = 1, klon
+          d_u(i, klev + 1-k) = dtime * pdudt(i, k)
+          d_v(i, klev + 1-k) = dtime * pdvdt(i, k)
+          d_t(i, klev + 1-k) = dtime * pdtdt(i, k)
+          pustr(i) = pustr(i) &
+               + pdudt(i, k) * (papmh(i, k + 1)-papmh(i, k)) / rg
+          pvstr(i) = pvstr(i) &
+               + pdvdt(i, k) * (papmh(i, k + 1)-papmh(i, k)) / rg
+       END DO
+    END DO
 
-      RETURN
-    END
+  END SUBROUTINE lift_noro
+
+end module lift_noro_m

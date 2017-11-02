@@ -53,7 +53,7 @@ CONTAINS
     INTEGER iml_rel
     INTEGER jml_rel
     INTEGER ncid, varid
-    REAL, ALLOCATABLE:: relief(:, :)
+    REAL, ALLOCATABLE:: relief(:, :) ! in m
     REAL, ALLOCATABLE:: lon_rad(:), lat_rad(:)
     REAL, ALLOCATABLE:: lon_ini(:), lat_ini(:)
 

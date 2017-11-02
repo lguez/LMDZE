@@ -4,8 +4,8 @@ module aaam_bud_m
 
 contains
 
-  subroutine aaam_bud(rg, ome, plat, plon, phis, dragu, liftu, phyu, dragv, &
-       liftv, phyv, p, u, v, aam, torsfc)
+  subroutine aaam_bud(rg, ome, phis, dragu, liftu, phyu, dragv, liftv, phyv, &
+       p, u, v, aam, torsfc)
 
     ! Author: F. Lott (LMD/CNRS). Date: 2003/10/20. Object: Compute
     ! different terms of the axial AAAM budget and mountain torque.
@@ -14,14 +14,11 @@ contains
 
     USE dimens_m, ONLY : iim, jjm
     use nr_util, only: assert_eq, assert, pi
+    use phyetat0_m, only: rlat, rlon
     USE suphec_m, ONLY: ra
 
     real, intent(in):: rg ! gravity constant
     real, intent(in):: ome ! Earth rotation rate
-
-    REAL, intent(in):: plat(:), plon(:)
-    ! (nlon) latitude and longitude in degrees
-
     real, intent(in):: phis(:) ! (nlon) Geopotential at the ground
     REAL, intent(in):: dragu(:) ! (nlon) orodrag stress (zonal)
     REAL, intent(in):: liftu(:) ! (nlon) orolift stress (zonal)
@@ -58,9 +55,9 @@ contains
 
     !-------------------------------------------------------------------
 
-    call assert(size(plat) == (/size(plon), size(phis), size(dragu), &
-         size(liftu), size(phyu), size(dragv), size(liftv), size(phyv), &
-         size(p, 1), size(u, 1), size(v, 1)/), "aaam_bud nlon")
+    call assert(size(phis) == (/size(dragu), size(liftu), size(phyu), &
+         size(dragv), size(liftv), size(phyv), size(p, 1), size(u, 1), &
+         size(v, 1)/), "aaam_bud nlon")
     nlev = assert_eq(size(p, 2) - 1, size(u, 2), size(v, 2), "aaam_bud nlev")
 
     if (iim + 1 > 801 .or. jjm + 1 > 401) then
@@ -88,7 +85,7 @@ contains
        vb(1, 1) = vb(1, 1) + v(1, k) * (p(1, k) - p(1, k + 1)) / rg
     enddo
 
-    zlat(1) = plat(1) * pi / 180.
+    zlat(1) = rlat(1) * pi / 180.
 
     do i = 1, iim + 1
        zs(i, 1) = phis(1) / rg
@@ -111,8 +108,8 @@ contains
        ssov(iim + 1, j) = dragv(l + 1) + liftv(l + 1)
        blsu(iim + 1, j) = phyu(l + 1) - dragu(l + 1) - liftu(l + 1)
        blsv(iim + 1, j) = phyv(l + 1) - dragv(l + 1) - liftv(l + 1)
-       zlon(iim + 1) = - plon(l + 1) * pi / 180.
-       zlat(j) = plat(l + 1) * pi / 180.
+       zlon(iim + 1) = - rlon(l + 1) * pi / 180.
+       zlat(j) = rlat(l + 1) * pi / 180.
 
        ub(iim + 1, j) = 0.
        vb(iim + 1, j) = 0.
@@ -131,7 +128,7 @@ contains
           ssov(i, j) = dragv(l) + liftv(l)
           blsu(i, j) = phyu(l) - dragu(l) - liftu(l)
           blsv(i, j) = phyv(l) - dragv(l) - liftv(l)
-          zlon(i) = plon(l) * pi / 180.
+          zlon(i) = rlon(l) * pi / 180.
 
           ub(i, j) = 0.
           vb(i, j) = 0.
@@ -151,7 +148,7 @@ contains
        ub(1, jjm + 1) = ub(1, jjm + 1) + u(l, k) * (p(l, k) - p(l, k + 1)) / rg
        vb(1, jjm + 1) = vb(1, jjm + 1) + v(l, k) * (p(l, k) - p(l, k + 1)) / rg
     enddo
-    zlat(jjm + 1) = plat(l) * pi / 180.
+    zlat(jjm + 1) = rlat(l) * pi / 180.
 
     do i = 1, iim + 1
        zs(i, jjm + 1) = phis(l) / rg

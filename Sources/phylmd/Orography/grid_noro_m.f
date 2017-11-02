@@ -36,11 +36,14 @@ contains
     REAL, intent(in):: xdata(:) ! (iusn)
     REAL, intent(in):: ydata(:) ! (jusn)
 
-    REAL, intent(in):: zdata(:, :) ! (iusn, jusn) input field
+    REAL, intent(in):: zdata(:, :) ! (iusn, jusn) input field, in m
     REAL, intent(in):: x(:), y(:) ! coordinates of output field
 
     ! Correlations of US Navy orography gradients:
-    REAL, intent(out):: zphi(:, :) ! (iim + 1, jjm + 1) orography not smoothed
+
+    REAL, intent(out):: zphi(:, :) ! (iim + 1, jjm + 1)
+    ! geoptential height of orography, not smoothed, in m
+    
     real, intent(out):: zmea(:, :) ! (iim + 1, jjm + 1) smoothed orography
     real, intent(out):: zstd(:, :) ! (iim + 1, jjm + 1) Standard deviation
     REAL, intent(out):: zsig(:, :) ! (iim + 1, jjm + 1) Slope
@@ -54,14 +57,14 @@ contains
 
     real, intent(out):: mask(:, :) ! (iim + 1, jjm + 1) fraction of land
 
-    ! Variables local to the procedure:
+    ! Local:
 
     ! In this version it is assumed that the input data come from
     ! the US Navy dataset:
     integer, parameter:: iusn = 2160, jusn = 1080
     integer, parameter:: iext = 216
     REAL xusn(iusn + 2 * iext), yusn(jusn + 2)
-    REAL zusn(iusn + 2 * iext, jusn + 2)
+    REAL zusn(iusn + 2 * iext, jusn + 2) ! in m
 
     ! Intermediate fields (correlations of orography gradient)
     REAL, dimension(iim + 1, jjm + 1):: ztz, zxtzx, zytzy, zxtzy, weight

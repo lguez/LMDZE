@@ -8,49 +8,49 @@ module yamada4_m
 
 contains
 
-  SUBROUTINE yamada4(ngrid, dt, g, zlev, zlay, u, v, teta, cd, q2, km, kn, kq, &
+  SUBROUTINE yamada4(dt, g, zlev, zlay, u, v, teta, cd, q2, km, kn, kq, &
        ustar, iflag_pbl)
 
     ! From LMDZ4/libf/phylmd/yamada4.F, version 1.1 2004/06/22 11:45:36
 
-    use nr_util, only: assert
+    use nr_util, only: assert, assert_eq
     USE dimphy, ONLY: klev
 
-    integer, intent(in):: ngrid
     REAL, intent(in):: dt ! pas de temps
     real, intent(in):: g
 
-    REAL zlev(ngrid, klev+1)
+    REAL zlev(:, :) ! (knon, klev + 1)
     ! altitude \`a chaque niveau (interface inf\'erieure de la couche de
     ! m\^eme indice)
 
-    REAL zlay(ngrid, klev) ! altitude au centre de chaque couche
+    REAL, intent(in):: zlay(:, :) ! (knon, klev) altitude au centre de
+                                  ! chaque couche
 
-    REAL u(ngrid, klev), v(ngrid, klev)
+    REAL, intent(in):: u(:, :), v(:, :) ! (knon, klev)
     ! vitesse au centre de chaque couche (en entr\'ee : la valeur au
     ! d\'ebut du pas de temps)
 
-    REAL, intent(in):: teta(ngrid, klev)
+    REAL, intent(in):: teta(:, :) ! (knon, klev)
     ! temp\'erature potentielle au centre de chaque couche (en entr\'ee :
     ! la valeur au d\'ebut du pas de temps)
 
-    REAL, intent(in):: cd(:) ! (ngrid) cdrag, valeur au d\'ebut du pas de temps
+    REAL, intent(in):: cd(:) ! (knon) cdrag, valeur au d\'ebut du pas de temps
 
-    REAL, intent(inout):: q2(ngrid, klev+1)
+    REAL, intent(inout):: q2(:, :) ! (knon, klev + 1)
     ! $q^2$ au bas de chaque couche 
     ! En entr\'ee : la valeur au d\'ebut du pas de temps ; en sortie : la
     ! valeur \`a la fin du pas de temps.
 
-    REAL km(ngrid, klev+1)
+    REAL km(:, :) ! (knon, klev + 1)
     ! diffusivit\'e turbulente de quantit\'e de mouvement (au bas de
     ! chaque couche) (en sortie : la valeur \`a la fin du pas de temps)
 
-    REAL kn(ngrid, klev+1)
+    REAL kn(:, :) ! (knon, klev + 1)
     ! diffusivit\'e turbulente des scalaires (au bas de chaque couche)
     ! (en sortie : la valeur \`a la fin du pas de temps)
 
-    REAL kq(ngrid, klev+1)
-    real ustar(ngrid)
+    REAL kq(:, :) ! (knon, klev + 1)
+    real, intent(in):: ustar(:) ! (knon)
 
     integer, intent(in):: iflag_pbl
     ! iflag_pbl doit valoir entre 6 et 9
@@ -61,69 +61,83 @@ contains
     ! iflag_pbl = 9 : un test ?
 
     ! Local:
-
-    real kmin, qmin, pblhmin(ngrid), coriol(ngrid)
+    integer knon
+    real kmin, qmin
+    real pblhmin(size(cd)), coriol(size(cd)) ! (knon)
     real qpre
-    REAL unsdz(ngrid, klev)
-    REAL unsdzdec(ngrid, klev+1)
-    REAL kmpre(ngrid, klev+1), tmp2
-    REAL mpre(ngrid, klev+1)
-    real delta(ngrid, klev+1)
-    real aa(ngrid, klev+1), aa1
-    integer, PARAMETER:: nlev = klev+1
+    REAL unsdz(size(zlay, 1), size(zlay, 2)) ! (knon, klev)
+    REAL unsdzdec(size(zlev, 1), size(zlev, 2)) ! (knon, klev + 1)
+    REAL kmpre(size(zlev, 1), size(zlev, 2)) ! (knon, klev + 1)
+    real tmp2
+    REAL mpre(size(zlev, 1), size(zlev, 2)) ! (knon, klev + 1)
+    real delta(size(zlev, 1), size(zlev, 2)) ! (knon, klev + 1)
+    real aa(size(zlev, 1), size(zlev, 2)) ! (knon, klev + 1)
+    real aa1
     logical:: first = .true.
     integer:: ipas = 0
     integer ig, k
     real ri
-    real rif(ngrid, klev+1), sm(ngrid, klev+1), alpha(ngrid, klev)
-    real m2(ngrid, klev+1), dz(ngrid, klev+1), zq, n2(ngrid, klev+1)
-    real dtetadz(ngrid, klev+1)
+    real, dimension(size(zlev, 1), size(zlev, 2)):: rif, sm ! (knon, klev + 1)
+    real alpha(size(zlay, 1), size(zlay, 2)) ! (knon, klev)
+
+    real, dimension(size(zlev, 1), size(zlev, 2)):: m2, dz, n2
+    ! (knon, klev + 1)
+    
+    real zq
+    real dtetadz(size(zlev, 1), size(zlev, 2)) ! (knon, klev + 1)
     real m2cstat, mcstat, kmcstat
-    real l(ngrid, klev+1)
-    real l0(ngrid)
-    real sq(ngrid), sqz(ngrid), zz(ngrid, klev+1)
+    real l(size(zlev, 1), size(zlev, 2)) ! (knon, klev + 1)
+    real l0(size(cd)) ! (knon)
+    real sq(size(cd)), sqz(size(cd)) ! (knon)
+    real zz(size(zlev, 1), size(zlev, 2)) ! (knon, klev + 1)
     integer iter
     real:: ric = 0.195, rifc = 0.191, b1 = 16.6
 
     !-----------------------------------------------------------------------
 
-    call assert(iflag_pbl >= 6 .and. iflag_pbl <= 9, "yamada4")
+    call assert(iflag_pbl >= 6 .and. iflag_pbl <= 9, "yamada4 iflag_pbl")
+    knon = assert_eq([size(zlev, 1), size(zlay, 1), size(u, 1), size(v, 1), &
+         size(teta, 1), size(cd), size(q2, 1), size(km, 1), size(kn, 1), &
+         size(kq, 1)], "yamada4 knon")
+    call assert(klev == [size(zlev, 2) - 1, size(zlay, 2), size(u, 2), &
+         size(v, 2), size(teta, 2), size(q2, 2) - 1, size(km, 2) - 1, &
+         size(kn, 2) - 1, size(kq, 2) - 1], "yamada4 klev")
 
-    ipas = ipas+1
+    ipas = ipas + 1
 
     ! les increments verticaux
-    DO ig = 1, ngrid
-       ! alerte: zlev n'est pas declare a nlev
-       zlev(ig, nlev) = zlay(ig, klev) +(zlay(ig, klev) - zlev(ig, nlev-1))
+    DO ig = 1, knon
+       ! alerte: zlev n'est pas declare a klev + 1
+       zlev(ig, klev + 1) = zlay(ig, klev) + (zlay(ig, klev) - zlev(ig, klev))
     ENDDO
 
     DO k = 1, klev
-       DO ig = 1, ngrid
-          unsdz(ig, k) = 1.E+0/(zlev(ig, k+1)-zlev(ig, k))
+       DO ig = 1, knon
+          unsdz(ig, k) = 1.E+0/(zlev(ig, k + 1)-zlev(ig, k))
        ENDDO
     ENDDO
 
-    DO ig = 1, ngrid
+    DO ig = 1, knon
        unsdzdec(ig, 1) = 1.E+0/(zlay(ig, 1)-zlev(ig, 1))
     ENDDO
 
     DO k = 2, klev
-       DO ig = 1, ngrid
+       DO ig = 1, knon
           unsdzdec(ig, k) = 1.E+0/(zlay(ig, k)-zlay(ig, k-1))
        ENDDO
     ENDDO
 
-    DO ig = 1, ngrid
-       unsdzdec(ig, klev+1) = 1.E+0/(zlev(ig, klev+1)-zlay(ig, klev))
+    DO ig = 1, knon
+       unsdzdec(ig, klev + 1) = 1.E+0/(zlev(ig, klev + 1)-zlay(ig, klev))
     ENDDO
 
     do k = 2, klev
-       do ig = 1, ngrid
+       do ig = 1, knon
           dz(ig, k) = zlay(ig, k)-zlay(ig, k-1)
-          m2(ig, k) = ((u(ig, k)-u(ig, k-1))**2+(v(ig, k)-v(ig, k-1))**2) &
+          m2(ig, k) = ((u(ig, k)-u(ig, k-1))**2 + (v(ig, k)-v(ig, k-1))**2) &
                /(dz(ig, k)*dz(ig, k))
           dtetadz(ig, k) = (teta(ig, k)-teta(ig, k-1))/dz(ig, k)
-          n2(ig, k) = g*2.*dtetadz(ig, k)/(teta(ig, k-1)+teta(ig, k))
+          n2(ig, k) = g*2.*dtetadz(ig, k)/(teta(ig, k-1) + teta(ig, k))
           ri = n2(ig, k)/max(m2(ig, k), 1.e-10)
           if (ri.lt.ric) then
              rif(ig, k) = frif(ri)
@@ -145,23 +159,23 @@ contains
     ! It\'eration pour d\'eterminer la longueur de m\'elange
 
     if (first .or. iflag_pbl == 6) then
-       do ig = 1, ngrid
+       do ig = 1, knon
           l0(ig) = 10.
        enddo
        do k = 2, klev-1
-          do ig = 1, ngrid
+          do ig = 1, knon
              l(ig, k) = l0(ig) * kap * zlev(ig, k) &
                   / (kap * zlev(ig, k) + l0(ig))
           enddo
        enddo
 
        do iter = 1, 10
-          do ig = 1, ngrid
+          do ig = 1, knon
              sq(ig) = 1e-10
              sqz(ig) = 1e-10
           enddo
           do k = 2, klev-1
-             do ig = 1, ngrid
+             do ig = 1, knon
                 q2(ig, k) = l(ig, k)**2 * zz(ig, k)
                 l(ig, k) = fl(zlev(ig, k), l0(ig), q2(ig, k), n2(ig, k))
                 zq = sqrt(q2(ig, k))
@@ -170,7 +184,7 @@ contains
                 sq(ig) = sq(ig) + zq * (zlay(ig, k) - zlay(ig, k-1))
              enddo
           enddo
-          do ig = 1, ngrid
+          do ig = 1, knon
              l0(ig) = 0.2 * sqz(ig) / sq(ig)
           enddo
        enddo
@@ -179,23 +193,23 @@ contains
     ! Calcul de la longueur de melange.
 
     ! Mise a jour de l0
-    do ig = 1, ngrid
+    do ig = 1, knon
        sq(ig) = 1.e-10
        sqz(ig) = 1.e-10
     enddo
     do k = 2, klev-1
-       do ig = 1, ngrid
+       do ig = 1, knon
           zq = sqrt(q2(ig, k))
-          sqz(ig) = sqz(ig)+zq*zlev(ig, k)*(zlay(ig, k)-zlay(ig, k-1))
-          sq(ig) = sq(ig)+zq*(zlay(ig, k)-zlay(ig, k-1))
+          sqz(ig) = sqz(ig) + zq*zlev(ig, k)*(zlay(ig, k)-zlay(ig, k-1))
+          sq(ig) = sq(ig) + zq*(zlay(ig, k)-zlay(ig, k-1))
        enddo
     enddo
-    do ig = 1, ngrid
+    do ig = 1, knon
        l0(ig) = 0.2*sqz(ig)/sq(ig)
     enddo
     ! calcul de l(z)
     do k = 2, klev
-       do ig = 1, ngrid
+       do ig = 1, knon
           l(ig, k) = fl(zlev(ig, k), l0(ig), q2(ig, k), n2(ig, k))
           if (first) then
              q2(ig, k) = l(ig, k)**2 * zz(ig, k)
@@ -206,7 +220,7 @@ contains
     ! Yamada 2.0
     if (iflag_pbl == 6) then
        do k = 2, klev
-          do ig = 1, ngrid
+          do ig = 1, knon
              q2(ig, k) = l(ig, k)**2 * zz(ig, k)
           enddo
        enddo
@@ -215,7 +229,7 @@ contains
 
        ! Calcul de l, km, au pas precedent
        do k = 2, klev
-          do ig = 1, ngrid
+          do ig = 1, knon
              delta(ig, k) = q2(ig, k) / (l(ig, k)**2 * sm(ig, k))
              kmpre(ig, k) = l(ig, k) * sqrt(q2(ig, k)) * sm(ig, k)
              mpre(ig, k) = sqrt(m2(ig, k))
@@ -223,8 +237,8 @@ contains
        enddo
 
        do k = 2, klev-1
-          do ig = 1, ngrid
-             m2cstat = max(alpha(ig, k)*n2(ig, k)+delta(ig, k)/b1, 1.e-12)
+          do ig = 1, knon
+             m2cstat = max(alpha(ig, k)*n2(ig, k) + delta(ig, k)/b1, 1.e-12)
              mcstat = sqrt(m2cstat)
 
              ! puis on ecrit la valeur de q qui annule l'equation de m
@@ -232,21 +246,21 @@ contains
 
              IF (k == 2) THEN
                 kmcstat = 1.E+0 / mcstat &
-                     *(unsdz(ig, k)*kmpre(ig, k+1) &
-                     *mpre(ig, k+1) &
-                     +unsdz(ig, k-1) &
+                     *(unsdz(ig, k)*kmpre(ig, k + 1) &
+                     *mpre(ig, k + 1) &
+                     + unsdz(ig, k-1) &
                      *cd(ig) &
-                     *(sqrt(u(ig, 3)**2+v(ig, 3)**2) &
+                     *(sqrt(u(ig, 3)**2 + v(ig, 3)**2) &
                      -mcstat/unsdzdec(ig, k) &
-                     -mpre(ig, k+1)/unsdzdec(ig, k+1))**2) &
-                     /(unsdz(ig, k)+unsdz(ig, k-1))
+                     -mpre(ig, k + 1)/unsdzdec(ig, k + 1))**2) &
+                     /(unsdz(ig, k) + unsdz(ig, k-1))
              ELSE
                 kmcstat = 1.E+0 / mcstat &
-                     *(unsdz(ig, k)*kmpre(ig, k+1) &
-                     *mpre(ig, k+1) &
-                     +unsdz(ig, k-1)*kmpre(ig, k-1) &
+                     *(unsdz(ig, k)*kmpre(ig, k + 1) &
+                     *mpre(ig, k + 1) &
+                     + unsdz(ig, k-1)*kmpre(ig, k-1) &
                      *mpre(ig, k-1)) &
-                     /(unsdz(ig, k)+unsdz(ig, k-1))
+                     /(unsdz(ig, k) + unsdz(ig, k-1))
              ENDIF
              tmp2 = kmcstat / (sm(ig, k) / q2(ig, k)) /l(ig, k)
              q2(ig, k) = max(tmp2, 1.e-12)**(2./3.)
@@ -257,7 +271,7 @@ contains
 
        ! Calcul de l, km, au pas precedent
        do k = 2, klev
-          do ig = 1, ngrid
+          do ig = 1, knon
              delta(ig, k) = q2(ig, k)/(l(ig, k)**2*sm(ig, k))
              if (delta(ig, k).lt.1.e-20) then
                 delta(ig, k) = 1.e-20
@@ -268,7 +282,7 @@ contains
              qpre = sqrt(q2(ig, k))
              if (iflag_pbl == 8) then
                 if (aa(ig, k).gt.0.) then
-                   q2(ig, k) = (qpre+aa(ig, k)*qpre*qpre)**2
+                   q2(ig, k) = (qpre + aa(ig, k)*qpre*qpre)**2
                 else
                    q2(ig, k) = (qpre/(1.-aa(ig, k)*qpre))**2
                 endif
@@ -287,7 +301,7 @@ contains
 
     ! Calcul des coefficients de m\'elange
     do k = 2, klev
-       do ig = 1, ngrid
+       do ig = 1, knon
           zq = sqrt(q2(ig, k))
           km(ig, k) = l(ig, k)*zq*sm(ig, k)
           kn(ig, k) = km(ig, k)*alpha(ig, k)
@@ -301,14 +315,13 @@ contains
     ! Traitement particulier pour les cas tres stables.
     ! D'apres Holtslag Boville.
 
-    do ig = 1, ngrid
+    do ig = 1, knon
        coriol(ig) = 1.e-4
        pblhmin(ig) = 0.07*ustar(ig)/max(abs(coriol(ig)), 2.546e-5)
     enddo
 
-    print *, 'pblhmin ', pblhmin
     do k = 2, klev
-       do ig = 1, ngrid
+       do ig = 1, knon
           if (teta(ig, 2).gt.teta(ig, 1)) then
              qmin = ustar(ig)*(max(1.-zlev(ig, k)/pblhmin(ig), 0.))**2
              kmin = kap*zlev(ig, k)*qmin
@@ -336,7 +349,7 @@ contains
 
     real, intent(in):: ri
 
-    frif = 0.6588*(ri+0.1776-sqrt(ri*ri-0.3221*ri+0.03156))
+    frif = 0.6588*(ri + 0.1776-sqrt(ri*ri-0.3221*ri + 0.03156))
 
   end function frif
 

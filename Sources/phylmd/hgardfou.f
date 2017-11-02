@@ -10,9 +10,11 @@ contains
 
     ! This procedure aborts the program if the temperature gets out of range.
 
-    USE indicesol, ONLY: nbsrf
+    use abort_gcm_m, only: abort_gcm
+    USE indicesol, ONLY: nbsrf, clnsurf
     USE dimphy, ONLY: klev, klon
     use nr_util, only: ifirstloc
+    use phyetat0_m, only: rlon, rlat
 
     REAL, intent(in):: t_seri(:, :) ! (klon, klev)
     REAL, intent(in):: ftsol(:, :) ! (klon, nbsrf)
@@ -27,9 +29,8 @@ contains
     DO k = 1, klev
        jbad = ifirstloc(t_seri(:, k) > temp_max .or. t_seri(:, k) < temp_min)
        if (jbad <= klon) then
-          PRINT *, 'hgardfou: temperature out of range'
           print *, "t_seri(", jbad, ", ", k, ") = ", t_seri(jbad, k)
-          stop 1
+          call abort_gcm('hgardfou', 'temperature out of range')
        end if
     ENDDO
 
@@ -37,9 +38,12 @@ contains
        jbad = ifirstloc(ftsol(:, nsrf) > temp_max &
             .or. ftsol(:, nsrf) < temp_min)
        if (jbad <= klon) then
-          PRINT *, 'hgardfou: temperature out of range'
-          print *, "ftsol(", jbad, ", ", nsrf, ") = ", ftsol(jbad, nsrf)
-          stop 1
+          print *, "ftsol(position index =", jbad, ", sub-surface index =", &
+               nsrf, ") =", ftsol(jbad, nsrf)
+          print *, "sub-surface name: ", clnsurf(nsrf)
+          print *, "longitude:", rlon(jbad), "degrees east"
+          print *, "latitude:", rlat(jbad), "degrees north"
+          call abort_gcm('hgardfou', 'temperature out of range')
        ENDIF
     ENDDO
 

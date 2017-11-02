@@ -155,8 +155,8 @@ contains
                       ! erfv for v large:
 
                       erfcu(i) = 1.0-NR_ERF(u(i))
-                      ! !!! ATTENTION : rajout d'un seuil pour l'exponentiel
-                      aux(i) = sqrtpi*erfcu(i)*EXP(min(v(i)*v(i), 100.))
+                      ! Attention : ajout d'un seuil pour l'exponentielle
+                      aux(i) = sqrtpi*erfcu(i)*EXP(min(v(i)*v(i), 80.))
                       coeff(i) = 1.0 - 1./2./(v(i)**2.) + 3./4./(v(i)**4.)
                       block(i) = coeff(i) * EXP(-v(i)*v(i)) / v(i) / sqrtpi
                       dist(i) = v(i) * aux(i) / coeff(i) - beta(i)

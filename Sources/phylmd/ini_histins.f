@@ -48,7 +48,7 @@ contains
        CALL histvert(nid_ins, "presnivs", "Vertical levels", "mb", &
             presnivs/100., nvert)
        
-       CALL histdef(nid_ins, "phis", "Surface geop. height", "-", &
+       CALL histdef(nid_ins, "phis", "surface geopotential", "m2 s-2", &
             iim, (jjm + 1), nhori, 1, 1, 1, -99, &
             "once", zsto, zout)
        CALL histdef(nid_ins, "aire", "Grid area", "-", &

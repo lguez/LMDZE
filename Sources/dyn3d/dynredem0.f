@@ -27,7 +27,9 @@ CONTAINS
     use ymds2ju_m, only: ymds2ju
 
     INTEGER, INTENT(IN):: iday_end
-    REAL, INTENT(IN):: phis(:, :)
+
+    REAL, INTENT(IN):: phis(:, :) ! (iim + 1, jjm + 1)
+    ! surface geopotential, in m2 s-2
 
     ! Local:
 
@@ -44,7 +46,7 @@ CONTAINS
     integer varid_controle, varid_rlonu, varid_rlatu, varid_rlonv, varid_rlatv
     integer varid_xprimu, varid_xprimv, varid_xprimm025, varid_xprimp025
     integer varid_rlatu1, varid_rlatu2, varid_yprimu1, varid_yprimu2, varid_ap
-    integer varid_bp, varid_presnivs, varid_phisinit
+    integer varid_bp, varid_presnivs, varid_phis
 
     REAL zjulian, hours
     INTEGER yyears0, jjour0, mmois0
@@ -150,9 +152,10 @@ CONTAINS
 
     ! Geopentiel au sol:
 
-    CALL nf95_def_var(ncid, 'phisinit', nf90_float, &
-         (/idim_rlonv, idim_rlatu/), varid_phisinit)
-    CALL nf95_put_att(ncid, varid_phisinit, 'title', 'Geopotentiel au sol')
+    CALL nf95_def_var(ncid, 'phis', nf90_float, (/idim_rlonv, idim_rlatu/), &
+         varid_phis)
+    CALL nf95_put_att(ncid, varid_phis, 'standard_name', 'surface_geopotential')
+    CALL nf95_put_att(ncid, varid_phis, 'units', 'm2 s-2')
 
     ! Definir les variables pour pouvoir les enregistrer plus tard:
 
@@ -206,7 +209,7 @@ CONTAINS
     CALL nf95_put_var(ncid, varid_ap, ap)
     CALL nf95_put_var(ncid, varid_bp, bp)
     CALL nf95_put_var(ncid, varid_presnivs, presnivs)
-    CALL nf95_put_var(ncid, varid_phisinit, phis)
+    CALL nf95_put_var(ncid, varid_phis, phis)
 
     PRINT *, 'iim, jjm, llm, iday_end', iim, jjm, llm, iday_end
     PRINT *, 'rad, omeg, g, cpp, kappa', rad, omeg, g, cpp, kappa

@@ -19,6 +19,7 @@ contains
     use clesphys2, only: read_clesphys2
     USE comfisrtilp, ONLY: cld_lc_con, cld_lc_lsc, cld_tau_con, &
          cld_tau_lsc, coef_eva, ffallv_con, ffallv_lsc, iflag_pdf, reevap_ice
+    use nr_util, only: assert
     use unit_nml_m, only: unit_nml
     USE yomcst, ONLY: read_YOMCST
 
@@ -48,6 +49,8 @@ contains
     read(unit=*, nml=conf_phys_nml)
     write(unit_nml, nml=conf_phys_nml)
 
+    call assert(iflag_pbl <=2 .or. iflag_pbl >= 6, &
+         "conf_phys: bad value for iflag_pbl")
     call read_clesphys
 
     print *, "Enter namelist 'nuagecom'."

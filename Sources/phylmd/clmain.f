@@ -25,7 +25,7 @@ contains
     use clvent_m, only: clvent
     use coefkz_m, only: coefkz
     use coefkzmin_m, only: coefkzmin
-    USE conf_gcm_m, ONLY: prt_level, lmt_pas
+    USE conf_gcm_m, ONLY: lmt_pas
     USE conf_phys_m, ONLY: iflag_pbl
     USE dimphy, ONLY: klev, klon, zmasq
     USE dimsoil, ONLY: nsoilmx
@@ -152,10 +152,6 @@ contains
     REAL ytsoil(klon, nsoilmx)
     REAL yts(klon), yrugos(klon), ypct(klon), yz0_new(klon)
     REAL yalb(klon)
-
-    REAL u1lay(klon), v1lay(klon) ! vent dans la premi\`ere couche, pour
-                              ! une sous-surface donnée
-    
     REAL snow(klon), yqsurf(klon), yagesno(klon)
     real yqsol(klon) ! column-density of water in soil, in kg m-2
     REAL yrain_f(klon) ! liquid water mass flux (kg / m2 / s), positive down
@@ -175,7 +171,7 @@ contains
 
     REAL ycoefm0(klon, klev), ycoefh0(klon, klev)
 
-    REAL yzlay(klon, klev), yzlev(klon, klev + 1), yteta(klon, klev)
+    REAL yzlay(klon, klev), zlev(klon, klev + 1), yteta(klon, klev)
     REAL ykmm(klon, klev + 1), ykmn(klon, klev + 1)
     REAL ykmq(klon, klev + 1)
     REAL yq2(klon, klev + 1)
@@ -190,8 +186,8 @@ contains
     ! "pourcentage potentiel" pour tenir compte des \'eventuelles
     ! apparitions ou disparitions de la glace de mer
 
-    REAL yt2m(klon), yq2m(klon), yu10m(klon)
-    REAL yustar(klon)
+    REAL yt2m(klon), yq2m(klon), wind10m(klon)
+    REAL ustar(klon)
 
     REAL yt10m(klon), yq10m(klon)
     REAL ypblh(klon)
@@ -204,16 +200,12 @@ contains
     REAL ytrmb1(klon)
     REAL ytrmb2(klon)
     REAL ytrmb3(klon)
-    REAL uzon(klon), vmer(klon)
+    REAL u1(klon), v1(klon)
     REAL tair1(klon), qair1(klon), tairsol(klon)
     REAL psfce(klon), patm(klon)
 
     REAL qairsol(klon), zgeo1(klon)
     REAL rugo1(klon)
-
-    ! utiliser un jeu de fonctions simples               
-    LOGICAL zxli
-    PARAMETER (zxli=.FALSE.)
 
     !------------------------------------------------------------
 
@@ -300,8 +292,6 @@ contains
              yagesno(j) = agesno(i, nsrf)
              yrugos(j) = frugs(i, nsrf)
              yrugoro(j) = rugoro(i)
-             u1lay(j) = u(i, 1)
-             v1lay(j) = v(i, 1)
              yrads(j) = fsolsw(i, nsrf) + fsollw(i, nsrf)
              ypaprs(j, klev + 1) = paprs(i, klev + 1)
              y_run_off_lic_0(j) = run_off_lic_0(i)
@@ -329,6 +319,7 @@ contains
           CALL coefkz(nsrf, ypaprs, ypplay, ksta, ksta_ter, yts(:knon), &
                yrugos, yu, yv, yt, yq, yqsurf(:knon), coefm(:knon, :), &
                coefh(:knon, :))
+          
           IF (iflag_pbl == 1) THEN
              CALL coefkz2(nsrf, knon, ypaprs, ypplay, yt, ycoefm0, ycoefh0)
              coefm(:knon, :) = max(coefm(:knon, :), ycoefm0(:knon, :))
@@ -355,22 +346,27 @@ contains
              yzlay(:knon, 1) = rd * yt(:knon, 1) / (0.5 * (ypaprs(:knon, 1) &
                   + ypplay(:knon, 1))) &
                   * (ypaprs(:knon, 1) - ypplay(:knon, 1)) / rg
+             
              DO k = 2, klev
-                yzlay(1:knon, k) = yzlay(1:knon, k-1) &
+                yzlay(:knon, k) = yzlay(:knon, k-1) &
                      + rd * 0.5 * (yt(1:knon, k-1) + yt(1:knon, k)) &
                      / ypaprs(1:knon, k) &
                      * (ypplay(1:knon, k-1) - ypplay(1:knon, k)) / rg
              END DO
+
              DO k = 1, klev
                 yteta(1:knon, k) = yt(1:knon, k) * (ypaprs(1:knon, 1) &
                      / ypplay(1:knon, k))**rkappa * (1. + 0.61 * yq(1:knon, k))
              END DO
-             yzlev(1:knon, 1) = 0.
-             yzlev(:knon, klev + 1) = 2. * yzlay(:knon, klev) &
+
+             zlev(:knon, 1) = 0.
+             zlev(:knon, klev + 1) = 2. * yzlay(:knon, klev) &
                   - yzlay(:knon, klev - 1)
+
              DO k = 2, klev
-                yzlev(1:knon, k) = 0.5 * (yzlay(1:knon, k) + yzlay(1:knon, k-1))
+                zlev(:knon, k) = 0.5 * (yzlay(:knon, k) + yzlay(:knon, k-1))
              END DO
+
              DO k = 1, klev + 1
                 DO j = 1, knon
                    i = ni(j)
@@ -378,18 +374,19 @@ contains
                 END DO
              END DO
 
-             CALL ustarhb(knon, yu, yv, coefm(:knon, 1), yustar)
-             IF (prt_level > 9) PRINT *, 'USTAR = ', yustar
+             ustar(:knon) = ustarhb(yu(:knon, 1), yv(:knon, 1), coefm(:knon, 1))
 
              ! iflag_pbl peut \^etre utilis\'e comme longueur de m\'elange
 
              IF (iflag_pbl >= 11) THEN
-                CALL vdif_kcay(knon, dtime, rg, ypaprs, yzlev, yzlay, yu, yv, &
-                     yteta, coefm(:knon, 1), yq2, q2diag, ykmm, ykmn, yustar, &
+                CALL vdif_kcay(knon, dtime, rg, zlev, yzlay, yu, yv, yteta, &
+                     coefm(:knon, 1), yq2, q2diag, ykmm, ykmn, ustar(:knon), &
                      iflag_pbl)
              ELSE
-                CALL yamada4(knon, dtime, rg, yzlev, yzlay, yu, yv, yteta, &
-                     coefm(:knon, 1), yq2, ykmm, ykmn, ykmq, yustar, iflag_pbl)
+                CALL yamada4(dtime, rg, zlev(:knon, :), yzlay(:knon, :), &
+                     yu(:knon, :), yv(:knon, :), yteta(:knon, :), &
+                     coefm(:knon, 1), yq2(:knon, :), ykmm(:knon, :), &
+                     ykmn(:knon, :), ykmq(:knon, :), ustar(:knon), iflag_pbl)
              END IF
 
              coefm(:knon, 2:) = ykmm(:knon, 2:klev)
@@ -397,17 +394,17 @@ contains
           END IF
 
           ! calculer la diffusion des vitesses "u" et "v"
-          CALL clvent(knon, dtime, u1lay(:knon), v1lay(:knon), &
+          CALL clvent(knon, dtime, yu(:knon, 1), yv(:knon, 1), &
                coefm(:knon, :), yt, yu, ypaprs, ypplay, ydelp, y_d_u, &
                y_flux_u(:knon))
-          CALL clvent(knon, dtime, u1lay(:knon), v1lay(:knon), &
+          CALL clvent(knon, dtime, yu(:knon, 1), yv(:knon, 1), &
                coefm(:knon, :), yt, yv, ypaprs, ypplay, ydelp, y_d_v, &
                y_flux_v(:knon))
 
           ! calculer la diffusion de "q" et de "h"
           CALL clqh(dtime, julien, firstcal, nsrf, ni(:knon), &
                ytsoil(:knon, :), yqsol(:knon), mu0, yrugos, yrugoro, &
-               u1lay(:knon), v1lay(:knon), coefh(:knon, :), yt, yq, &
+               yu(:knon, 1), yv(:knon, 1), coefh(:knon, :), yt, yq, &
                yts(:knon), ypaprs, ypplay, ydelp, yrads(:knon), yalb(:knon), &
                snow(:knon), yqsurf, yrain_f, ysnow_f, yfluxlat(:knon), &
                pctsrf_new_sic, yagesno(:knon), y_d_t, y_d_q, y_d_ts(:knon), &
@@ -418,9 +415,9 @@ contains
           yrugm = 0.
           IF (nsrf == is_oce) THEN
              DO j = 1, knon
-                yrugm(j) = 0.018 * coefm(j, 1) * (u1lay(j)**2 + v1lay(j)**2) &
+                yrugm(j) = 0.018 * coefm(j, 1) * (yu(j, 1)**2 + yv(j, 1)**2) &
                      / rg + 0.11 * 14E-6 &
-                     / sqrt(coefm(j, 1) * (u1lay(j)**2 + v1lay(j)**2))
+                     / sqrt(coefm(j, 1) * (yu(j, 1)**2 + yv(j, 1)**2))
                 yrugm(j) = max(1.5E-05, yrugm(j))
              END DO
           END IF
@@ -499,8 +496,8 @@ contains
 
           DO j = 1, knon
              i = ni(j)
-             uzon(j) = yu(j, 1) + y_d_u(j, 1)
-             vmer(j) = yv(j, 1) + y_d_v(j, 1)
+             u1(j) = yu(j, 1) + y_d_u(j, 1)
+             v1(j) = yv(j, 1) + y_d_v(j, 1)
              tair1(j) = yt(j, 1) + y_d_t(j, 1)
              qair1(j) = yq(j, 1) + y_d_q(j, 1)
              zgeo1(j) = rd * tair1(j) / (0.5 * (ypaprs(j, 1) + ypplay(j, &
@@ -516,22 +513,22 @@ contains
              qairsol(j) = yqsurf(j)
           END DO
 
-          CALL stdlevvar(klon, knon, nsrf, zxli, uzon(:knon), vmer(:knon), &
-               tair1, qair1, zgeo1, tairsol, qairsol, rugo1, psfce, patm, &
-               yt2m, yq2m, yt10m, yq10m, yu10m, yustar)
+          CALL stdlevvar(klon, knon, nsrf, u1(:knon), v1(:knon), tair1(:knon), &
+               qair1, zgeo1, tairsol, qairsol, rugo1, psfce, patm, yt2m, &
+               yq2m, yt10m, yq10m, wind10m(:knon), ustar)
 
           DO j = 1, knon
              i = ni(j)
              t2m(i, nsrf) = yt2m(j)
              q2m(i, nsrf) = yq2m(j)
 
-             u10m_srf(i, nsrf) = (yu10m(j) * uzon(j)) &
-                  / sqrt(uzon(j)**2 + vmer(j)**2)
-             v10m_srf(i, nsrf) = (yu10m(j) * vmer(j)) &
-                  / sqrt(uzon(j)**2 + vmer(j)**2)
+             u10m_srf(i, nsrf) = (wind10m(j) * u1(j)) &
+                  / sqrt(u1(j)**2 + v1(j)**2)
+             v10m_srf(i, nsrf) = (wind10m(j) * v1(j)) &
+                  / sqrt(u1(j)**2 + v1(j)**2)
           END DO
 
-          CALL hbtm(ypaprs, ypplay, yt2m, yq2m, yustar, y_flux_t(:knon), &
+          CALL hbtm(ypaprs, ypplay, yt2m, yq2m, ustar(:knon), y_flux_t(:knon), &
                y_flux_q(:knon), yu, yv, yt, yq, ypblh(:knon), ycapcl, &
                yoliqcl, ycteicl, ypblt, ytherm, ytrmb1, ytrmb2, ytrmb3, ylcl)
 

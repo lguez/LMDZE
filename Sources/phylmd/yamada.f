@@ -6,10 +6,9 @@ contains
 
   SUBROUTINE yamada(ngrid, g, zlev, zlay, u, v, teta, q2, km, kn)
 
-    ! From LMDZ4/libf/phylmd/yamada.F,v 1.1 2004/06/22 11:45:36
+    ! From LMDZ4/libf/phylmd/yamada.F, version 1.1 2004/06/22 11:45:36
 
-    USE dimens_m
-    USE dimphy
+    USE dimphy, only: klon, klev
     ! .......................................................................
     ! .......................................................................
 
@@ -31,11 +30,11 @@ contains
     ! (en sortie : la valeur a la fin du pas de temps)
 
     ! .......................................................................
-    REAL, INTENT (IN) :: g
+    REAL, INTENT(IN):: g
     REAL zlev(klon, klev+1)
     REAL zlay(klon, klev)
-    REAL u(klon, klev)
-    REAL v(klon, klev)
+    REAL, INTENT(IN):: u(klon, klev)
+    REAL, INTENT(IN):: v(klon, klev)
     REAL teta(klon, klev)
     REAL q2(klon, klev+1)
     REAL km(klon, klev+1)

@@ -4,14 +4,10 @@ module screenc_m
 
 contains
 
-  SUBROUTINE screenc(klon, knon, nsrf, zxli, speed, temp, q_zref, zref, ts, &
-       qsurf, rugos, psol, ustar, testar, qstar, okri, ri1, pref, delu, &
-       delte, delq)
+  SUBROUTINE screenc(klon, knon, nsrf, speed, temp, q_zref, zref, ts, &
+       qsurf, rugos, psol, ustar, testar, qstar, pref, delu, delte, delq)
     
-    use coefcdrag_m, only: coefcdrag
-    use SUPHEC_M
-
-    ! From LMDZ4/libf/phylmd/screenc.F90, version 1.1.1.1 2004/05/19 12:53:09
+    ! From LMDZ4/libf/phylmd/screenc.F90, version 1.1.1.1, 2004/05/19 12:53:09
 
     ! Objet : calcul "correcteur" des anomalies du vent, de la
     ! temp\'erature potentielle et de l'humidit\'e relative au niveau
@@ -23,6 +19,9 @@ contains
 
     ! I. Musat, 01.07.2002
 
+    use coefcdrag_m, only: coefcdrag
+    use SUPHEC_M, only: RG
+
     INTEGER, intent(in):: klon
     ! klon----input-I- dimension de la grille physique (=
     ! nb_pts_latitude X nb_pts_longitude)
@@ -30,8 +29,6 @@ contains
     ! knon----input-I- nombre de points pour un type de surface
     INTEGER, intent(in):: nsrf
     ! nsrf----input-I- indice pour le type de surface; voir indicesol.inc
-    LOGICAL, intent(in):: zxli
-    ! zxli----input-L- TRUE si calcul des cdrags selon Laurent Li
     REAL, dimension(klon), intent(in):: speed, temp, q_zref
     ! speed---input-R- module du vent au 1er niveau du modele
     ! temp----input-R- temperature de l'air au 1er niveau du modele
@@ -47,11 +44,6 @@ contains
     ! ustar---input-R- facteur d'echelle pour le vent
     ! testar--input-R- facteur d'echelle pour la temperature potentielle
     ! qstar---input-R- facteur d'echelle pour l'humidite relative
-    LOGICAL, intent(in):: okri
-    ! okri----input-L- TRUE si on veut tester le nb. Richardson entre la sfce
-    ! et zref par rapport au Ri entre la sfce et la 1ere couche
-    REAL, dimension(klon), intent(in):: ri1
-    ! ri1-----input-R- nb. Richardson entre la surface et la 1ere couche
 
     REAL, dimension(klon), intent(out):: pref
     ! pref----input-R- pression au niveau de reference
@@ -75,13 +67,14 @@ contains
 
     ! Richardson at reference level
 
-    CALL coefcdrag (klon, knon, nsrf, zxli, speed, temp, q_zref, gref, psol, &
-         ts, qsurf, rugos, okri, ri1, cdram, cdrah, cdran, zri1, pref)
+    CALL coefcdrag (knon, nsrf, speed(:knon), temp(:knon), &
+         q_zref(:knon), gref(:knon), psol(:knon), ts, qsurf, rugos, cdram, &
+         cdrah, cdran, zri1, pref)
 
     DO i = 1, knon
-       delu(i) = ustar(i)/sqrt(cdram(i))
-       delte(i)= (testar(i)* sqrt(cdram(i)))/ cdrah(i)
-       delq(i)= (qstar(i)* sqrt(cdram(i)))/ cdrah(i)
+       delu(i) = ustar(i) / sqrt(cdram(i))
+       delte(i) = testar(i) * sqrt(cdram(i)) / cdrah(i)
+       delq(i) = qstar(i) * sqrt(cdram(i)) / cdrah(i)
     ENDDO
 
   END SUBROUTINE screenc

@@ -42,13 +42,12 @@ contains
     REAL, intent(in):: t2m(klon) ! temperature a 2 m
     ! q a 2 et 10m
     REAL, intent(in):: q2m(klon)
-    REAL, intent(in):: ustar(klon)
+    REAL, intent(in):: ustar(:) ! (knon)
     REAL, intent(in):: flux_t(:), flux_q(:) ! (knon) flux à la surface
 
-    ! vitesse U (m/s)
-    REAL, intent(in):: u(klon, klev)
-    ! vitesse V (m/s)
-    REAL, intent(in):: v(klon, klev)
+    REAL, intent(in):: u(klon, klev) ! vitesse U (m/s)
+    REAL, intent(in):: v(klon, klev) ! vitesse V (m/s)
+
     ! temperature (K)
     REAL, intent(in):: t(klon, klev)
     ! vapeur d'eau (kg/kg)

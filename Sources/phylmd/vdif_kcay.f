@@ -4,79 +4,77 @@ module vdif_kcay_m
 
 contains
 
-  SUBROUTINE vdif_kcay(ngrid, dt, g, plev, zlev, zlay, u, v, teta, cd, q2, &
-       q2diag, km, kn, ustar, l_mix)
+  SUBROUTINE vdif_kcay(knon, dt, g, zlev, zlay, u, v, teta, cd, q2, q2diag, &
+       km, kn, ustar, l_mix)
 
-    ! From LMDZ4/libf/phylmd/vdif_kcay.F, version 1.1 2004/06/22 11:45:36
+    ! From LMDZ4/libf/phylmd/vdif_kcay.F, version 1.1, 2004/06/22 11:45:36
 
     USE dimphy, ONLY: klev, klon
     use yamada_m, only: yamada
 
-    INTEGER ngrid
+    INTEGER knon
+    ! knon : nombre de points de grille 
+
+    REAL, intent(in):: dt
     ! dt : pas de temps
+    real, intent(in):: g
     ! g : g
+    REAL zlev(klon, klev+1)
     ! zlev : altitude a chaque niveau (interface inferieure de la couche
     ! de meme indice)
+    REAL zlay(klon, klev)
     ! zlay : altitude au centre de chaque couche
+    REAL, intent(in):: u(klon, klev)
+    REAL, intent(in):: v(klon, klev)
     ! u, v : vitesse au centre de chaque couche
     ! (en entree : la valeur au debut du pas de temps)
+    REAL teta(klon, klev)
     ! teta : temperature potentielle au centre de chaque couche
     ! (en entree : la valeur au debut du pas de temps)
+    REAL, intent(in):: cd (:) ! (knon) cdrag, valeur au debut du pas de temps
+    REAL q2(klon, klev+1)
     ! q2 : $q^2$ au bas de chaque couche
     ! (en entree : la valeur au debut du pas de temps)
     ! (en sortie : la valeur a la fin du pas de temps)
+    REAL q2diag(klon, klev+1)
+    REAL km(klon, klev+1)
     ! km : diffusivite turbulente de quantite de mouvement (au bas de chaque
     ! couche)
     ! (en sortie : la valeur a la fin du pas de temps)
+    REAL kn(klon, klev+1)
     ! kn : diffusivite turbulente des scalaires (au bas de chaque couche)
     ! (en sortie : la valeur a la fin du pas de temps)
-
-    REAL, intent(in):: dt
-    real, intent(in):: g
-    real plev(klon, klev+1)
-    real ustar(klon), snstable
-    REAL zlev(klon, klev+1)
-    REAL zlay(klon, klev)
-    REAL u(klon, klev)
-    REAL v(klon, klev)
-    REAL teta(klon, klev)
-    REAL, intent(in):: cd (:) ! (ngrid) cdrag, valeur au debut du pas de temps
-    REAL q2(klon, klev+1)
-    REAL q2diag(klon, klev+1)
-    REAL km(klon, klev+1)
-    REAL kn(klon, klev+1)
-    real sq(klon), sqz(klon), zq, long0(klon)
-
+    real, intent(in):: ustar(:) ! (knon)
     integer l_mix
 
+    ! Local:
+
+    real snstable
+    real sq(klon), sqz(klon), zq, long0(klon)
+
+    INTEGER nlay, nlev
     ! nlay : nombre de couches 
     ! nlev : nombre de niveaux
-    ! ngrid : nombre de points de grille 
+    REAL unsdz(klon, klev)
     ! unsdz : 1 sur l'epaisseur de couche
+    REAL unsdzdec(klon, klev+1)
     ! unsdzdec : 1 sur la distance entre le centre de la couche et le
     ! centre de la couche inferieure
+    REAL q(klon, klev+1)
     ! q : echelle de vitesse au bas de chaque couche
     ! (valeur a la fin du pas de temps)
 
-    INTEGER nlay, nlev
-    REAL unsdz(klon, klev)
-    REAL unsdzdec(klon, klev+1)
-    REAL q(klon, klev+1)
-
+    REAL kmpre(klon, klev+1)
     ! kmpre : km au debut du pas de temps
+    REAL qcstat
     ! qcstat : q : solution stationnaire du probleme couple
     ! (valeur a la fin du pas de temps)
+    REAL q2cstat
     ! q2cstat : q2 : solution stationnaire du probleme couple
     ! (valeur a la fin du pas de temps)
 
-    REAL kmpre(klon, klev+1)
-    REAL qcstat
-    REAL q2cstat
-    real sss, sssq
-
-    ! long : longueur de melange calculee selon Blackadar
-
     REAL long(klon, klev+1)
+    ! long : longueur de melange calculee selon Blackadar
 
     ! kmq3 : terme en q^3 dans le developpement de km
     ! (valeur au debut du pas de temps)
@@ -190,20 +188,20 @@ contains
 
     ! Initialisation de q2
 
-    call yamada(ngrid, g, zlev, zlay, u, v, teta, q2diag, km, kn)
+    call yamada(knon, g, zlev, zlay, u, v, teta, q2diag, km, kn)
     if (first.and.1.eq.1) then
        first=.false.
        q2=q2diag
     endif
 
     DO ilev=1, nlev
-       DO igrid=1, ngrid 
+       DO igrid=1, knon 
           q2(igrid, ilev)=amax1(q2(igrid, ilev), q2min)
           q(igrid, ilev)=sqrt(q2(igrid, ilev))
        ENDDO
     ENDDO
 
-    DO igrid=1, ngrid 
+    DO igrid=1, knon 
        tmp1=cd(igrid)*(u(igrid, 1)**2+v(igrid, 1)**2)
        q2(igrid, 1)=b1**(2.E+0/3.E+0)*tmp1
        q2(igrid, 1)=amax1(q2(igrid, 1), q2min)
@@ -214,32 +212,32 @@ contains
 
     ! allerte !c
     ! zlev n'est pas declare a nlev !c
-    DO igrid=1, ngrid 
+    DO igrid=1, knon 
        zlev(igrid, nlev)=zlay(igrid, nlay) &
             +( zlay(igrid, nlay) - zlev(igrid, nlev-1) )
     ENDDO
     ! allerte !c
 
     DO ilay=1, nlay
-       DO igrid=1, ngrid 
+       DO igrid=1, knon 
           unsdz(igrid, ilay)=1.E+0/(zlev(igrid, ilay+1)-zlev(igrid, ilay))
        ENDDO
     ENDDO
-    DO igrid=1, ngrid 
+    DO igrid=1, knon 
        unsdzdec(igrid, 1)=1.E+0/(zlay(igrid, 1)-zlev(igrid, 1))
     ENDDO
     DO ilay=2, nlay
-       DO igrid=1, ngrid 
+       DO igrid=1, knon 
           unsdzdec(igrid, ilay)=1.E+0/(zlay(igrid, ilay)-zlay(igrid, ilay-1))
        ENDDO
     ENDDO
-    DO igrid=1, ngrid 
+    DO igrid=1, knon 
        unsdzdec(igrid, nlay+1)=1.E+0/(zlev(igrid, nlay+1)-zlay(igrid, nlay))
     ENDDO
 
     ! le cisaillement et le gradient de temperature
 
-    DO igrid=1, ngrid 
+    DO igrid=1, knon 
        m2(igrid, 1)=(unsdzdec(igrid, 1) &
             *u(igrid, 1))**2 &
             +(unsdzdec(igrid, 1) &
@@ -249,7 +247,7 @@ contains
     ENDDO
 
     DO ilev=2, nlev-1
-       DO igrid=1, ngrid 
+       DO igrid=1, knon 
 
           n2(igrid, ilev)=g*unsdzdec(igrid, ilev) &
                *(teta(igrid, ilev)-teta(igrid, ilev-1)) &
@@ -276,7 +274,7 @@ contains
        ENDDO
     ENDDO
 
-    DO igrid=1, ngrid 
+    DO igrid=1, knon 
        m2(igrid, nlev)=m2(igrid, nlev-1)
        m(igrid, nlev)=m(igrid, nlev-1)
        mpre(igrid, nlev)=m(igrid, nlev)
@@ -285,12 +283,12 @@ contains
     ! calcul des fonctions de stabilite
 
     if (l_mix.eq.4) then
-       DO igrid=1, ngrid 
+       DO igrid=1, knon 
           sqz(igrid)=1.e-10
           sq(igrid)=1.e-10
        ENDDO
        do ilev=2, nlev-1
-          DO igrid=1, ngrid 
+          DO igrid=1, knon 
              zq=sqrt(q2(igrid, ilev))
              sqz(igrid) &
                   =sqz(igrid)+zq*zlev(igrid, ilev) &
@@ -298,7 +296,7 @@ contains
              sq(igrid)=sq(igrid)+zq*(zlay(igrid, ilev)-zlay(igrid, ilev-1))
           ENDDO
        enddo
-       DO igrid=1, ngrid 
+       DO igrid=1, knon 
           long0(igrid)=0.2*sqz(igrid)/sq(igrid)
        ENDDO
     else if (l_mix.eq.3) then
@@ -306,7 +304,7 @@ contains
     endif
 
     DO ilev=2, nlev-1
-       DO igrid=1, ngrid 
+       DO igrid=1, knon 
           tmp1=kappa*(zlev(igrid, ilev)-zlev(igrid, 1))
           if (l_mix.ge.10) then
              long(igrid, ilev)=l_mix
@@ -372,22 +370,20 @@ contains
           ! Correction pour les couches stables.
           ! Schema repris de JHoltzlag Boville, lui meme venant de...
 
-          if (1.eq.1) then
-             snstable=1.-zlev(igrid, ilev) &
-                  /(700.*max(ustar(igrid), 0.0001))
-             snstable=1.-zlev(igrid, ilev)/400.
-             snstable=max(snstable, 0.)
-             snstable=snstable*snstable
+          snstable=1.-zlev(igrid, ilev) &
+               /(700.*max(ustar(igrid), 0.0001))
+          snstable=1.-zlev(igrid, ilev)/400.
+          snstable=max(snstable, 0.)
+          snstable=snstable*snstable
 
-             if (sn(igrid, ilev).lt.snstable) then
-                sn(igrid, ilev)=snstable
-                snq2(igrid, ilev)=0.
-             endif
+          if (sn(igrid, ilev).lt.snstable) then
+             sn(igrid, ilev)=snstable
+             snq2(igrid, ilev)=0.
+          endif
 
-             if (sm(igrid, ilev).lt.snstable) then
-                sm(igrid, ilev)=snstable
-                smq2(igrid, ilev)=0.
-             endif
+          if (sm(igrid, ilev).lt.snstable) then
+             sm(igrid, ilev)=snstable
+             smq2(igrid, ilev)=0.
           endif
 
           ! sn : coefficient de stabilite pour n
@@ -397,14 +393,14 @@ contains
 
     ! calcul de km et kn au debut du pas de temps
 
-    DO igrid=1, ngrid 
+    DO igrid=1, knon 
        kn(igrid, 1)=knmin
        km(igrid, 1)=kmmin
        kmpre(igrid, 1)=km(igrid, 1)
     ENDDO
 
     DO ilev=2, nlev-1
-       DO igrid=1, ngrid 
+       DO igrid=1, knon 
           kn(igrid, ilev)=long(igrid, ilev)*q(igrid, ilev) &
                *sn(igrid, ilev)
           km(igrid, ilev)=long(igrid, ilev)*q(igrid, ilev) &
@@ -413,7 +409,7 @@ contains
        ENDDO
     ENDDO
 
-    DO igrid=1, ngrid 
+    DO igrid=1, knon 
        kn(igrid, nlev)=kn(igrid, nlev-1)
        km(igrid, nlev)=km(igrid, nlev-1)
        kmpre(igrid, nlev)=km(igrid, nlev)
@@ -422,7 +418,7 @@ contains
     ! boucle sur les niveaux 2 a nlev-1
 
     DO ilev=2, nlev-1
-       DO igrid=1, ngrid 
+       DO igrid=1, knon 
           ! calcul des termes sources et puits de l'equation de q2
 
           knq3=kn(igrid, ilev)*snq2(igrid, ilev) &
@@ -521,7 +517,7 @@ contains
        end DO
     end DO
 
-    DO igrid=1, ngrid 
+    DO igrid=1, knon 
        kn(igrid, 1)=knmin
        km(igrid, 1)=kmmin
        q2(igrid, nlev)=q2(igrid, nlev-1)
@@ -531,60 +527,46 @@ contains
     ENDDO
 
     ! CALCUL DE LA DIFFUSION VERTICALE DE Q2
-    if (1.eq.1) then
-       do ilev=2, klev-1
-          sss=sss+plev(1, ilev-1)-plev(1, ilev+1)
-          sssq=sssq+(plev(1, ilev-1)-plev(1, ilev+1))*q2(1, ilev)
+    do ilev=1, nlev
+       do igrid=1, knon
+          q2(igrid, ilev)=max(q2(igrid, ilev), q2min)
+          q(igrid, ilev)=sqrt(q2(igrid, ilev))
+
+          ! calcul final de kn et km
+
+          gn=-long(igrid, ilev)**2 / q2(igrid, ilev) &
+               * n2(igrid, ilev)
+          IF (gn.lt.gnmin) gn=gnmin
+          IF (gn.gt.gnmax) gn=gnmax
+          sn(igrid, ilev)=cn1/(1.E+0 +cn2*gn)
+          sm(igrid, ilev)= &
+               (cm1+cm2*gn) &
+               /( (1.E+0 +cm3*gn)*(1.E+0 +cm4*gn) )
+          ! Correction pour les couches stables.
+          ! Schema repris de JHoltzlag Boville, lui meme venant de...
+
+          snstable=1.-zlev(igrid, ilev) &
+               /(700.*max(ustar(igrid), 0.0001))
+          snstable=1.-zlev(igrid, ilev)/400.
+          snstable=max(snstable, 0.)
+          snstable=snstable*snstable
+
+          if (sn(igrid, ilev).lt.snstable) then
+             sn(igrid, ilev)=snstable
+             snq2(igrid, ilev)=0.
+          endif
+
+          if (sm(igrid, ilev).lt.snstable) then
+             sm(igrid, ilev)=snstable
+             smq2(igrid, ilev)=0.
+          endif
+
+          ! sn : coefficient de stabilite pour n
+          kn(igrid, ilev)=long(igrid, ilev)*q(igrid, ilev) &
+               *sn(igrid, ilev)
+          km(igrid, ilev)=long(igrid, ilev)*q(igrid, ilev)
        enddo
-       do ilev=2, klev-1
-          sss=sss+plev(1, ilev-1)-plev(1, ilev+1)
-          sssq=sssq+(plev(1, ilev-1)-plev(1, ilev+1))*q2(1, ilev)
-       enddo
-       print*, 'Q2moy apres', sssq/sss
-
-       do ilev=1, nlev
-          do igrid=1, ngrid
-             q2(igrid, ilev)=max(q2(igrid, ilev), q2min)
-             q(igrid, ilev)=sqrt(q2(igrid, ilev))
-
-             ! calcul final de kn et km
-
-             gn=-long(igrid, ilev)**2 / q2(igrid, ilev) &
-                  * n2(igrid, ilev)
-             IF (gn.lt.gnmin) gn=gnmin
-             IF (gn.gt.gnmax) gn=gnmax
-             sn(igrid, ilev)=cn1/(1.E+0 +cn2*gn)
-             sm(igrid, ilev)= &
-                  (cm1+cm2*gn) &
-                  /( (1.E+0 +cm3*gn)*(1.E+0 +cm4*gn) )
-             ! Correction pour les couches stables.
-             ! Schema repris de JHoltzlag Boville, lui meme venant de...
-
-             if (1.eq.1) then
-                snstable=1.-zlev(igrid, ilev) &
-                     /(700.*max(ustar(igrid), 0.0001))
-                snstable=1.-zlev(igrid, ilev)/400.
-                snstable=max(snstable, 0.)
-                snstable=snstable*snstable
-
-                if (sn(igrid, ilev).lt.snstable) then
-                   sn(igrid, ilev)=snstable
-                   snq2(igrid, ilev)=0.
-                endif
-
-                if (sm(igrid, ilev).lt.snstable) then
-                   sm(igrid, ilev)=snstable
-                   smq2(igrid, ilev)=0.
-                endif
-             endif
-
-             ! sn : coefficient de stabilite pour n
-             kn(igrid, ilev)=long(igrid, ilev)*q(igrid, ilev) &
-                  *sn(igrid, ilev)
-             km(igrid, ilev)=long(igrid, ilev)*q(igrid, ilev)
-          enddo
-       enddo
-    endif
+    enddo
 
   END SUBROUTINE vdif_kcay
 

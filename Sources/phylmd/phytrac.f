@@ -79,7 +79,7 @@ contains
     REAL pen_d(klon, llm) ! flux entraine dans le panache descendant
     REAL coefh(klon, llm) ! coeff melange couche limite
     real fm_therm(klon, llm+1), entr_therm(klon, llm) ! thermiques
-    REAL, intent(in):: yu1(klon), yv1(klon) ! vent au premier niveau
+    REAL, intent(in):: yu1(:), yv1(:) ! (klon) vent au premier niveau
 
     ! Arguments n\'ecessaires pour les sources et puits de traceur :
     real, intent(in):: ftsol(:, :) ! (klon, nbsrf) surface temperature (K)

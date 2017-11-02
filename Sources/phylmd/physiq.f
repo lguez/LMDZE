@@ -44,13 +44,14 @@ contains
     USE indicesol, ONLY: clnsurf, epsfra, is_lic, is_oce, is_sic, is_ter, &
          nbsrf
     USE ini_histins_m, ONLY: ini_histins, nid_ins
+    use lift_noro_m, only: lift_noro
     use netcdf95, only: NF95_CLOSE
     use newmicro_m, only: newmicro
     use nr_util, only: assert
     use nuage_m, only: nuage
     USE orbite_m, ONLY: orbite
     USE ozonecm_m, ONLY: ozonecm
-    USE phyetat0_m, ONLY: phyetat0, rlat, rlon
+    USE phyetat0_m, ONLY: phyetat0
     USE phyredem_m, ONLY: phyredem
     USE phyredem0_m, ONLY: phyredem0
     USE phytrac_m, ONLY: phytrac
@@ -183,9 +184,7 @@ contains
     REAL cdragh(klon) ! drag coefficient pour T and Q
     REAL cdragm(klon) ! drag coefficient pour vent
 
-    ! Pour phytrac :
     REAL ycoefh(klon, llm) ! coef d'echange pour phytrac
-    REAL yu1(klon), yv1(klon) ! vent dans la premi\`ere couche
 
     REAL, save:: ffonte(klon, nbsrf)
     ! flux thermique utilise pour fondre la neige
@@ -582,9 +581,6 @@ contains
     evap = - sum(flux_q * pctsrf, dim = 2)
     fder = dlw + dsens + devap
 
-    yu1 = u_seri(:, 1)
-    yv1 = v_seri(:, 1)
-
     DO k = 1, llm
        DO i = 1, klon
           t_seri(i, k) = t_seri(i, k) + d_t_vdf(i, k)
@@ -935,9 +931,9 @@ contains
           ENDIF
        ENDDO
 
-       CALL lift_noro(klon, llm, dtphys, paprs, play, rlat, zmea, zstd, zpic, &
-            itest, t_seri, u_seri, v_seri, zulow, zvlow, zustrli, zvstrli, &
-            d_t_lif, d_u_lif, d_v_lif)
+       CALL lift_noro(dtphys, paprs, play, zmea, zstd, zpic, itest, t_seri, &
+            u_seri, v_seri, zulow, zvlow, zustrli, zvstrli, d_t_lif, &
+            d_u_lif, d_v_lif)
 
        ! Ajout des tendances :
        DO k = 1, llm
@@ -964,14 +960,14 @@ contains
        ENDDO
     ENDDO
 
-    CALL aaam_bud(rg, romega, rlat, rlon, pphis, zustrdr, zustrli, zustrph, &
-         zvstrdr, zvstrli, zvstrph, paprs, u, v, aam, torsfc)
+    CALL aaam_bud(rg, romega, pphis, zustrdr, zustrli, zustrph, zvstrdr, &
+         zvstrli, zvstrph, paprs, u, v, aam, torsfc)
 
     ! Calcul des tendances traceurs
     call phytrac(julien, time, firstcal, lafin, dtphys, t, paprs, play, mfu, &
-         mfd, pde_u, pen_d, ycoefh, fm_therm, entr_therm, yu1, yv1, ftsol, &
-         pctsrf, frac_impa, frac_nucl, da, phi, mp, upwd, dnwd, tr_seri, &
-         zmasse, ncid_startphy)
+         mfd, pde_u, pen_d, ycoefh, fm_therm, entr_therm, u(:, 1), v(:, 1), &
+         ftsol, pctsrf, frac_impa, frac_nucl, da, phi, mp, upwd, dnwd, &
+         tr_seri, zmasse, ncid_startphy)
 
     ! Calculer le transport de l'eau et de l'energie (diagnostique)
     CALL transp(paprs, t_seri, q_seri, u_seri, v_seri, zphi, ve, vq, ue, uq)

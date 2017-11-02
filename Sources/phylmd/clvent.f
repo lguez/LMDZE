@@ -25,7 +25,7 @@ contains
     ! vent (dV/dz). La première valeur indique la valeur de Cdrag (sans
     ! unité).
 
-    REAL t(klon, klev), ven(klon, klev)
+    REAL, intent(in):: t(klon, klev), ven(klon, klev)
     ! t--------input-R- temperature (K)
     ! ven------input-R- vitesse horizontale (m/s)
     REAL paprs(klon, klev+1), pplay(klon, klev), delp(klon, klev)
