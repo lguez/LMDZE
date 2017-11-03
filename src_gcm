@@ -251,7 +251,6 @@ transp.f
 transp_lay.f
 unit_nml_m.f
 ustarhb.f
-vdif_kcay.f
 vitvert.f
 vlsplt.f
 vlspltqs.f
@@ -264,7 +263,6 @@ writedynav.f
 writefield.f
 writehist.f
 yamada4.f
-yamada.f
 ymds2ju.f
 YOECUMF.f
 YOEGWD.f

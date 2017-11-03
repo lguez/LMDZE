@@ -23,7 +23,7 @@ clcdrag.o : yoethf.o suphec.o indicesol.o dimphy.o
 cleanstr.o : mathelp.o strlowercase.o 
 clesphys.o : unit_nml_m.o 
 clesphys2.o : conf_gcm.o unit_nml_m.o 
-clmain.o : yamada4.o vdif_kcay.o ustarhb.o time_phylmdz.o suphec.o stdlevvar.o interfoce_lim.o indicesol.o hbtm.o dimsoil.o dimphy.o conf_phys.o conf_gcm.o coefkzmin.o coefkz.o clvent.o clqh.o 
+clmain.o : yamada4.o ustarhb.o time_phylmdz.o suphec.o stdlevvar.o interfoce_lim.o indicesol.o hbtm.o dimsoil.o dimphy.o conf_phys.o conf_gcm.o coefkzmin.o coefkz.o clvent.o clqh.o 
 clqh.o : suphec.o interfsurf_hq.o dimphy.o conf_phys.o 
 cltrac.o : suphec.o dimphy.o dimens_m.o 
 cltracrn.o : suphec.o dimphy.o indicesol.o 
@@ -241,7 +241,6 @@ time_phylmdz.o : phyetat0.o
 tourpot.o : filtreg_v.o dimens_m.o comgeom.o 
 transp.o : suphec.o dimphy.o dimens_m.o 
 transp_lay.o : suphec.o dimphy.o 
-vdif_kcay.o : yamada.o dimphy.o 
 vitvert.o : paramet_m.o disvert.o dimens_m.o 
 vlsplt.o : vlx.o paramet_m.o dimens_m.o 
 vlspltqs.o : suphec.o comconst.o paramet_m.o FCTTRE.o dimens_m.o 
@@ -253,7 +252,6 @@ vlz.o : conf_gcm.o disvert.o comconst.o paramet_m.o dimens_m.o
 writedynav.o : temps.o paramet_m.o initdynav.o iniadvtrac.o histwrite.o histsync.o dimens_m.o covnat.o comconst.o 
 writefield.o : getfieldindex.o createnewfield.o 
 writehist.o : temps.o paramet_m.o inithist.o histwrite.o histsync.o dimens_m.o covnat.o 
-yamada.o : dimphy.o 
 yamada4.o : dimphy.o 
 ymds2ju.o : ioconf_calendar.o calendar.o 
 yoethf.o : suphec.o 

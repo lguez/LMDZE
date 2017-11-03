@@ -49,7 +49,7 @@ contains
     read(unit=*, nml=conf_phys_nml)
     write(unit_nml, nml=conf_phys_nml)
 
-    call assert(iflag_pbl <=2 .or. iflag_pbl >= 6, &
+    call assert(any(iflag_pbl == [0, 1, 6, 8, 9]), &
          "conf_phys: bad value for iflag_pbl")
     call read_clesphys
 

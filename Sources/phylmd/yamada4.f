@@ -53,11 +53,10 @@ contains
     real, intent(in):: ustar(:) ! (knon)
 
     integer, intent(in):: iflag_pbl
-    ! iflag_pbl doit valoir entre 6 et 9
+    ! iflag_pbl doit valoir 6, 8 ou 9
     ! l = 6, on prend syst\'ematiquement une longueur d'\'equilibre
-    ! iflag_pbl = 6 : MY 2.0
-    ! iflag_pbl = 7 : MY 2.0.Fournier
-    ! iflag_pbl = 8 : MY 2.5
+    ! iflag_pbl = 6 : Mellor and Yamada 2.0
+    ! iflag_pbl = 8 : Mellor and Yamada 2.5
     ! iflag_pbl = 9 : un test ?
 
     ! Local:
@@ -67,9 +66,6 @@ contains
     real qpre
     REAL unsdz(size(zlay, 1), size(zlay, 2)) ! (knon, klev)
     REAL unsdzdec(size(zlev, 1), size(zlev, 2)) ! (knon, klev + 1)
-    REAL kmpre(size(zlev, 1), size(zlev, 2)) ! (knon, klev + 1)
-    real tmp2
-    REAL mpre(size(zlev, 1), size(zlev, 2)) ! (knon, klev + 1)
     real delta(size(zlev, 1), size(zlev, 2)) ! (knon, klev + 1)
     real aa(size(zlev, 1), size(zlev, 2)) ! (knon, klev + 1)
     real aa1
@@ -85,7 +81,6 @@ contains
     
     real zq
     real dtetadz(size(zlev, 1), size(zlev, 2)) ! (knon, klev + 1)
-    real m2cstat, mcstat, kmcstat
     real l(size(zlev, 1), size(zlev, 2)) ! (knon, klev + 1)
     real l0(size(cd)) ! (knon)
     real sq(size(cd)), sqz(size(cd)) ! (knon)
@@ -95,7 +90,7 @@ contains
 
     !-----------------------------------------------------------------------
 
-    call assert(iflag_pbl >= 6 .and. iflag_pbl <= 9, "yamada4 iflag_pbl")
+    call assert(any(iflag_pbl == [6, 8, 9]), "yamada4 iflag_pbl")
     knon = assert_eq([size(zlev, 1), size(zlay, 1), size(u, 1), size(v, 1), &
          size(teta, 1), size(cd), size(q2, 1), size(km, 1), size(kn, 1), &
          size(kq, 1)], "yamada4 knon")
@@ -217,53 +212,11 @@ contains
        enddo
     enddo
 
-    ! Yamada 2.0
     if (iflag_pbl == 6) then
+       ! Yamada 2.0
        do k = 2, klev
           do ig = 1, knon
              q2(ig, k) = l(ig, k)**2 * zz(ig, k)
-          enddo
-       enddo
-    else if (iflag_pbl == 7) then
-       ! Yamada 2.Fournier
-
-       ! Calcul de l, km, au pas precedent
-       do k = 2, klev
-          do ig = 1, knon
-             delta(ig, k) = q2(ig, k) / (l(ig, k)**2 * sm(ig, k))
-             kmpre(ig, k) = l(ig, k) * sqrt(q2(ig, k)) * sm(ig, k)
-             mpre(ig, k) = sqrt(m2(ig, k))
-          enddo
-       enddo
-
-       do k = 2, klev-1
-          do ig = 1, knon
-             m2cstat = max(alpha(ig, k)*n2(ig, k) + delta(ig, k)/b1, 1.e-12)
-             mcstat = sqrt(m2cstat)
-
-             ! puis on ecrit la valeur de q qui annule l'equation de m
-             ! supposee en q3
-
-             IF (k == 2) THEN
-                kmcstat = 1.E+0 / mcstat &
-                     *(unsdz(ig, k)*kmpre(ig, k + 1) &
-                     *mpre(ig, k + 1) &
-                     + unsdz(ig, k-1) &
-                     *cd(ig) &
-                     *(sqrt(u(ig, 3)**2 + v(ig, 3)**2) &
-                     -mcstat/unsdzdec(ig, k) &
-                     -mpre(ig, k + 1)/unsdzdec(ig, k + 1))**2) &
-                     /(unsdz(ig, k) + unsdz(ig, k-1))
-             ELSE
-                kmcstat = 1.E+0 / mcstat &
-                     *(unsdz(ig, k)*kmpre(ig, k + 1) &
-                     *mpre(ig, k + 1) &
-                     + unsdz(ig, k-1)*kmpre(ig, k-1) &
-                     *mpre(ig, k-1)) &
-                     /(unsdz(ig, k) + unsdz(ig, k-1))
-             ENDIF
-             tmp2 = kmcstat / (sm(ig, k) / q2(ig, k)) /l(ig, k)
-             q2(ig, k) = max(tmp2, 1.e-12)**(2./3.)
           enddo
        enddo
     else if (iflag_pbl >= 8) then

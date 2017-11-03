@@ -36,7 +36,6 @@ contains
     USE suphec_m, ONLY: rd, rg, rkappa
     use time_phylmdz, only: itap
     use ustarhb_m, only: ustarhb
-    use vdif_kcay_m, only: vdif_kcay
     use yamada4_m, only: yamada4
 
     REAL, INTENT(IN):: dtime ! interval du temps (secondes)
@@ -168,18 +167,13 @@ contains
     REAL yu(klon, klev), yv(klon, klev)
     REAL yt(klon, klev), yq(klon, klev)
     REAL ypaprs(klon, klev + 1), ypplay(klon, klev), ydelp(klon, klev)
-
     REAL ycoefm0(klon, klev), ycoefh0(klon, klev)
-
     REAL yzlay(klon, klev), zlev(klon, klev + 1), yteta(klon, klev)
     REAL ykmm(klon, klev + 1), ykmn(klon, klev + 1)
     REAL ykmq(klon, klev + 1)
     REAL yq2(klon, klev + 1)
-    REAL q2diag(klon, klev + 1)
-
     REAL delp(klon, klev)
     INTEGER i, k, nsrf
-
     INTEGER ni(klon), knon, j
 
     REAL pctsrf_pot(klon, nbsrf)
@@ -319,7 +313,7 @@ contains
           CALL coefkz(nsrf, ypaprs, ypplay, ksta, ksta_ter, yts(:knon), &
                yrugos, yu, yv, yt, yq, yqsurf(:knon), coefm(:knon, :), &
                coefh(:knon, :))
-          
+
           IF (iflag_pbl == 1) THEN
              CALL coefkz2(nsrf, knon, ypaprs, ypplay, yt, ycoefm0, ycoefh0)
              coefm(:knon, :) = max(coefm(:knon, :), ycoefm0(:knon, :))
@@ -340,13 +334,13 @@ contains
              coefh(:knon, :) = max(coefh(:knon, :), ycoefh0(:knon, :))
           END IF
 
-          IF (iflag_pbl >= 3) THEN
+          IF (iflag_pbl >= 6) THEN
              ! Mellor et Yamada adapt\'e \`a Mars, Richard Fournier et
              ! Fr\'ed\'eric Hourdin
              yzlay(:knon, 1) = rd * yt(:knon, 1) / (0.5 * (ypaprs(:knon, 1) &
                   + ypplay(:knon, 1))) &
                   * (ypaprs(:knon, 1) - ypplay(:knon, 1)) / rg
-             
+
              DO k = 2, klev
                 yzlay(:knon, k) = yzlay(:knon, k-1) &
                      + rd * 0.5 * (yt(1:knon, k-1) + yt(1:knon, k)) &
@@ -378,16 +372,10 @@ contains
 
              ! iflag_pbl peut \^etre utilis\'e comme longueur de m\'elange
 
-             IF (iflag_pbl >= 11) THEN
-                CALL vdif_kcay(knon, dtime, rg, zlev, yzlay, yu, yv, yteta, &
-                     coefm(:knon, 1), yq2, q2diag, ykmm, ykmn, ustar(:knon), &
-                     iflag_pbl)
-             ELSE
-                CALL yamada4(dtime, rg, zlev(:knon, :), yzlay(:knon, :), &
-                     yu(:knon, :), yv(:knon, :), yteta(:knon, :), &
-                     coefm(:knon, 1), yq2(:knon, :), ykmm(:knon, :), &
-                     ykmn(:knon, :), ykmq(:knon, :), ustar(:knon), iflag_pbl)
-             END IF
+             CALL yamada4(dtime, rg, zlev(:knon, :), yzlay(:knon, :), &
+                  yu(:knon, :), yv(:knon, :), yteta(:knon, :), &
+                  coefm(:knon, 1), yq2(:knon, :), ykmm(:knon, :), &
+                  ykmn(:knon, :), ykmq(:knon, :), ustar(:knon), iflag_pbl)
 
              coefm(:knon, 2:) = ykmm(:knon, 2:klev)
              coefh(:knon, 2:) = ykmn(:knon, 2:klev)

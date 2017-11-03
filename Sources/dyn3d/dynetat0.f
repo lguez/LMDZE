@@ -184,7 +184,7 @@ contains
     CALL nf95_inq_varid(ncid, 'yprimu2', varid)
     CALL nf95_get_var(ncid, varid, yprimu2)
 
-    call NF95_INQ_VARID (ncid, "phisinit", varid)
+    call NF95_INQ_VARID (ncid, "phis", varid)
     call NF95_GET_VAR(ncid, varid, phis)
 
     call NF95_INQ_VARID (ncid, "ucov", varid)
