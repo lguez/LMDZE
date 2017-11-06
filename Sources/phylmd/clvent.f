@@ -4,8 +4,8 @@ module clvent_m
 
 contains
 
-  SUBROUTINE clvent(dtime, u1lay, v1lay, coef, t, ven, paprs, pplay, delp, &
-       d_ven, flux_v)
+  SUBROUTINE clvent(dtime, u1lay, v1lay, coef, cdrag, t, ven, paprs, pplay, &
+       delp, d_ven, flux_v)
 
     ! Author: Z. X. Li (LMD/CNRS)
     ! Date: 1993/08/18
@@ -20,10 +20,11 @@ contains
     REAL, intent(in):: u1lay(:), v1lay(:) ! (knon)
     ! vent de la premiere couche (m/s)
 
-    REAL, intent(in):: coef(:, :) ! (knon, klev)
+    REAL, intent(in):: coef(:, 2:) ! (knon, 2:klev)
     ! Coefficient d'echange (m**2/s) multiplié par le cisaillement du
-    ! vent (dV/dz). La première valeur indique la valeur de Cdrag (sans
-    ! unité).
+    ! vent (dV/dz)
+
+    REAL, intent(in):: cdrag(:) ! (knon) sans unité
 
     REAL, intent(in):: t(:, :) ! (knon, klev) ! temperature (K)
     REAL, intent(in):: ven(:, :) ! (knon, klev) vitesse horizontale (m/s)
@@ -53,7 +54,7 @@ contains
     local_ven = ven
 
     DO i = 1, knon
-       zx_coef(i, 1) = coef(i, 1) * (1. + SQRT(u1lay(i)**2 + v1lay(i)**2)) &
+       zx_coef(i, 1) = cdrag(i) * (1. + SQRT(u1lay(i)**2 + v1lay(i)**2)) &
             * pplay(i, 1) / (RD * t(i, 1)) * dtime * RG
     ENDDO
 

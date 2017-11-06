@@ -377,12 +377,12 @@ contains
              coefh(:knon, 2:) = ykmn(:knon, 2:klev)
           END IF
 
-          CALL clvent(dtime, yu(:knon, 1), yv(:knon, 1), coefm(:knon, :), &
-               yt(:knon, :), yu(:knon, :), ypaprs(:knon, :), &
+          CALL clvent(dtime, yu(:knon, 1), yv(:knon, 1), coefm(:knon, 2:), &
+               coefm(:knon, 1), yt(:knon, :), yu(:knon, :), ypaprs(:knon, :), &
                ypplay(:knon, :), ydelp(:knon, :), y_d_u(:knon, :), &
                y_flux_u(:knon))
-          CALL clvent(dtime, yu(:knon, 1), yv(:knon, 1), coefm(:knon, :), &
-               yt(:knon, :), yv(:knon, :), ypaprs(:knon, :), &
+          CALL clvent(dtime, yu(:knon, 1), yv(:knon, 1), coefm(:knon, 2:), &
+               coefm(:knon, 1), yt(:knon, :), yv(:knon, :), ypaprs(:knon, :), &
                ypplay(:knon, :), ydelp(:knon, :), y_d_v(:knon, :), &
                y_flux_v(:knon))
 
