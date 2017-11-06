@@ -77,7 +77,7 @@ contains
 
     REAL pde_u(klon, llm) ! flux detraine dans le panache montant
     REAL pen_d(klon, llm) ! flux entraine dans le panache descendant
-    REAL coefh(klon, llm) ! coeff melange couche limite
+    REAL coefh(:, :) ! (klon, llm) coeff melange couche limite
     real fm_therm(klon, llm+1), entr_therm(klon, llm) ! thermiques
     REAL, intent(in):: yu1(:), yv1(:) ! (klon) vent au premier niveau
 
@@ -297,7 +297,7 @@ contains
              source(i) = 0. ! pas de source, pour l'instant
           ENDDO
 
-          CALL cltrac(pdtphys, coefh, t_seri, tr_seri(:, :, it), source, &
+          CALL cltrac(pdtphys, coefh(:, 2:llm), t_seri, tr_seri(:, :, it), source, &
                paprs, pplay, delp, d_tr_cl(1, 1, it))
           DO k = 1, llm
              DO i = 1, klon

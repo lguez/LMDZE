@@ -243,7 +243,7 @@ contains
     p1lay(1:knon) = pplay(1:knon, 1)
 
     CALL interfsurf_hq(dtime, julien, rmu0, nisurf, knindex, debut, tsoil, &
-         qsol, u1lay, v1lay, temp_air, spechum, tq_cdrag, petAcoef, peqAcoef, &
+         qsol, u1lay, v1lay, temp_air, spechum, tq_cdrag(:knon), petAcoef, peqAcoef, &
          petBcoef, peqBcoef, precip_rain, precip_snow, rugos, rugoro, snow, &
          qsurf, ts, p1lay, psref, radsol, evap, flux_t, fluxlat, dflux_l, &
          dflux_s, tsurf_new, albedo, z0_new, pctsrf_new_sic, agesno, &

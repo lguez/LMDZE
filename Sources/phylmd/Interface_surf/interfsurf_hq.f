@@ -53,7 +53,7 @@ contains
     real, dimension(klon), intent(IN):: temp_air, spechum
     ! temp_air temperature de l'air 1ere couche
     ! spechum humidite specifique 1ere couche
-    real, dimension(klon), intent(INOUT):: tq_cdrag ! coefficient d'echange
+    real, intent(IN):: tq_cdrag(:) ! (knon) coefficient d'echange
 
     real, dimension(klon), intent(IN):: petAcoef, peqAcoef
     ! coefficients A de la r\'esolution de la couche limite pour t et q
@@ -175,7 +175,7 @@ contains
           cal = RCPD * capsol(:knon)
        ENDIF
 
-       CALL calcul_fluxs(dtime, ts, p1lay(:knon), cal, beta, tq_cdrag(:knon), &
+       CALL calcul_fluxs(dtime, ts, p1lay(:knon), cal, beta, tq_cdrag, &
             ps(:knon), qsurf(:knon), radsol, dif_grnd(:knon), &
             temp_air(:knon), spechum(:knon), u1_lay, v1_lay, &
             petAcoef(:knon), peqAcoef(:knon), petBcoef(:knon), &
@@ -197,7 +197,7 @@ contains
        beta = 1.
        dif_grnd = 0.
        call calcul_fluxs(dtime, tsurf, p1lay(:knon), cal, beta, &
-            tq_cdrag(:knon), ps(:knon), qsurf(:knon), radsol, &
+            tq_cdrag, ps(:knon), qsurf(:knon), radsol, &
             dif_grnd(:knon), temp_air(:knon), spechum(:knon), u1_lay, &
             v1_lay, petAcoef(:knon), peqAcoef(:knon), petBcoef(:knon), &
             peqBcoef(:knon), tsurf_new, evap, fluxlat, flux_t, dflux_s, dflux_l)
@@ -234,7 +234,7 @@ contains
        beta = 1.
 
        CALL calcul_fluxs(dtime, tsurf, p1lay(:knon), cal, beta, &
-            tq_cdrag(:knon), ps(:knon), qsurf(:knon), radsol, &
+            tq_cdrag, ps(:knon), qsurf(:knon), radsol, &
             dif_grnd(:knon), temp_air(:knon), spechum(:knon), u1_lay, &
             v1_lay, petAcoef(:knon), peqAcoef(:knon), petBcoef(:knon), &
             peqBcoef(:knon), tsurf_new, evap, fluxlat, flux_t, dflux_s, dflux_l)
@@ -264,7 +264,7 @@ contains
        beta = 1.
        dif_grnd = 0.
 
-       call calcul_fluxs(dtime, ts, p1lay(:knon), cal, beta, tq_cdrag(:knon), &
+       call calcul_fluxs(dtime, ts, p1lay(:knon), cal, beta, tq_cdrag, &
             ps(:knon), qsurf(:knon), radsol, dif_grnd(:knon), &
             temp_air(:knon), spechum(:knon), u1_lay, v1_lay, &
             petAcoef(:knon), peqAcoef(:knon), petBcoef(:knon), &

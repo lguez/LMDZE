@@ -31,7 +31,7 @@ contains
     ! flux_tr--output-R- flux de tr
     ! ======================================================================
     REAL, INTENT (IN) :: dtime
-    REAL coef(klon, klev)
+    REAL coef(:, 2:) ! (klon, 2:klev)
     REAL, INTENT (IN) :: t(klon, klev) ! temperature (K)
     REAL tr(klon, klev)
     REAL, INTENT (IN) :: paprs(klon, klev+1)
