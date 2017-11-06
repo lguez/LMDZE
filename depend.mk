@@ -252,7 +252,7 @@ vlz.o : conf_gcm.o disvert.o comconst.o paramet_m.o dimens_m.o
 writedynav.o : temps.o paramet_m.o initdynav.o iniadvtrac.o histwrite.o histsync.o dimens_m.o covnat.o comconst.o 
 writefield.o : getfieldindex.o createnewfield.o 
 writehist.o : temps.o paramet_m.o inithist.o histwrite.o histsync.o dimens_m.o covnat.o 
-yamada4.o : dimphy.o 
+yamada4.o : dimphy.o conf_phys.o 
 ymds2ju.o : ioconf_calendar.o calendar.o 
 yoethf.o : suphec.o 
 zenang.o : phyetat0.o YOMCST.o dimphy.o 

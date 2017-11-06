@@ -8,13 +8,13 @@ module yamada4_m
 
 contains
 
-  SUBROUTINE yamada4(dt, g, zlev, zlay, u, v, teta, cd, q2, km, kn, kq, &
-       ustar, iflag_pbl)
+  SUBROUTINE yamada4(dt, g, zlev, zlay, u, v, teta, cd, q2, km, kn, kq, ustar)
 
     ! From LMDZ4/libf/phylmd/yamada4.F, version 1.1 2004/06/22 11:45:36
 
-    use nr_util, only: assert, assert_eq
+    USE conf_phys_m, ONLY: iflag_pbl
     USE dimphy, ONLY: klev
+    use nr_util, only: assert, assert_eq
 
     REAL, intent(in):: dt ! pas de temps
     real, intent(in):: g
@@ -51,13 +51,6 @@ contains
 
     REAL kq(:, :) ! (knon, klev + 1)
     real, intent(in):: ustar(:) ! (knon)
-
-    integer, intent(in):: iflag_pbl
-    ! iflag_pbl doit valoir 6, 8 ou 9
-    ! l = 6, on prend syst\'ematiquement une longueur d'\'equilibre
-    ! iflag_pbl = 6 : Mellor and Yamada 2.0
-    ! iflag_pbl = 8 : Mellor and Yamada 2.5
-    ! iflag_pbl = 9 : un test ?
 
     ! Local:
     integer knon

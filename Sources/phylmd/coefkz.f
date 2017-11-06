@@ -43,9 +43,8 @@ contains
     ! Local:
 
     INTEGER knon ! nombre de points a traiter
-
-    INTEGER itop(size(coefm, 1))
-    ! (knon) numero de couche du sommet de la couche limite
+    INTEGER itop(size(coefm, 1)) ! (knon) numero de couche du sommet
+                                 ! de la couche limite
 
     ! Quelques constantes et options:
 

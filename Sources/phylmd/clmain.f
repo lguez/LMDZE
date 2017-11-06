@@ -95,7 +95,7 @@ contains
     ! flux de vapeur d'eau (kg / m2 / s) à la surface
 
     REAL, intent(out):: flux_u(klon, nbsrf), flux_v(klon, nbsrf)
-    ! tension du vent à la surface, en Pa
+    ! tension du vent (flux turbulent de vent) à la surface, en Pa
 
     REAL, INTENT(out):: cdragh(klon), cdragm(klon)
     real q2(klon, klev + 1, nbsrf)
@@ -369,24 +369,21 @@ contains
              END DO
 
              ustar(:knon) = ustarhb(yu(:knon, 1), yv(:knon, 1), coefm(:knon, 1))
-
-             ! iflag_pbl peut \^etre utilis\'e comme longueur de m\'elange
-
              CALL yamada4(dtime, rg, zlev(:knon, :), yzlay(:knon, :), &
                   yu(:knon, :), yv(:knon, :), yteta(:knon, :), &
                   coefm(:knon, 1), yq2(:knon, :), ykmm(:knon, :), &
-                  ykmn(:knon, :), ykmq(:knon, :), ustar(:knon), iflag_pbl)
-
+                  ykmn(:knon, :), ykmq(:knon, :), ustar(:knon))
              coefm(:knon, 2:) = ykmm(:knon, 2:klev)
              coefh(:knon, 2:) = ykmn(:knon, 2:klev)
           END IF
 
-          ! calculer la diffusion des vitesses "u" et "v"
-          CALL clvent(knon, dtime, yu(:knon, 1), yv(:knon, 1), &
-               coefm(:knon, :), yt, yu, ypaprs, ypplay, ydelp, y_d_u, &
+          CALL clvent(dtime, yu(:knon, 1), yv(:knon, 1), coefm(:knon, :), &
+               yt(:knon, :), yu(:knon, :), ypaprs(:knon, :), &
+               ypplay(:knon, :), ydelp(:knon, :), y_d_u(:knon, :), &
                y_flux_u(:knon))
-          CALL clvent(knon, dtime, yu(:knon, 1), yv(:knon, 1), &
-               coefm(:knon, :), yt, yv, ypaprs, ypplay, ydelp, y_d_v, &
+          CALL clvent(dtime, yu(:knon, 1), yv(:knon, 1), coefm(:knon, :), &
+               yt(:knon, :), yv(:knon, :), ypaprs(:knon, :), &
+               ypplay(:knon, :), ydelp(:knon, :), y_d_v(:knon, :), &
                y_flux_v(:knon))
 
           ! calculer la diffusion de "q" et de "h"

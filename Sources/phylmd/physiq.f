@@ -248,8 +248,9 @@ contains
 
     REAL flux_q(klon, nbsrf) ! flux turbulent d'humidite à la surface
     REAL flux_t(klon, nbsrf) ! flux turbulent de chaleur à la surface
-    REAL flux_u(klon, nbsrf) ! flux turbulent de vitesse u à la surface
-    REAL flux_v(klon, nbsrf) ! flux turbulent de vitesse v à la surface
+
+    REAL flux_u(klon, nbsrf), flux_v(klon, nbsrf)
+    ! tension du vent (flux turbulent de vent) à la surface, en Pa
 
     ! Le rayonnement n'est pas calcul\'e tous les pas, il faut donc que
     ! les variables soient r\'emanentes.
@@ -369,7 +370,6 @@ contains
 
     REAL zustrdr(klon), zvstrdr(klon)
     REAL zustrli(klon), zvstrli(klon)
-    REAL zustrph(klon), zvstrph(klon)
     REAL aam, torsfc
 
     REAL ve_lay(klon, llm) ! transport meri. de l'energie a chaque niveau vert.
@@ -945,23 +945,10 @@ contains
        ENDDO
     ENDIF
 
-    ! Stress n\'ecessaires : toute la physique
-
-    DO i = 1, klon
-       zustrph(i) = 0.
-       zvstrph(i) = 0.
-    ENDDO
-    DO k = 1, llm
-       DO i = 1, klon
-          zustrph(i) = zustrph(i) + (u_seri(i, k) - u(i, k)) / dtphys &
-               * zmasse(i, k)
-          zvstrph(i) = zvstrph(i) + (v_seri(i, k) - v(i, k)) / dtphys &
-               * zmasse(i, k)
-       ENDDO
-    ENDDO
-
-    CALL aaam_bud(rg, romega, pphis, zustrdr, zustrli, zustrph, zvstrdr, &
-         zvstrli, zvstrph, paprs, u, v, aam, torsfc)
+    CALL aaam_bud(rg, romega, pphis, zustrdr, zustrli, &
+         sum((u_seri - u) / dtphys * zmasse, dim = 2), zvstrdr, &
+         zvstrli, sum((v_seri - v) / dtphys * zmasse, dim = 2), paprs, u, v, &
+         aam, torsfc)
 
     ! Calcul des tendances traceurs
     call phytrac(julien, time, firstcal, lafin, dtphys, t, paprs, play, mfu, &

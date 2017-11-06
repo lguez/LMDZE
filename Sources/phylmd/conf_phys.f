@@ -2,7 +2,10 @@ module conf_phys_m
 
   implicit none
 
-  integer:: iflag_pbl = 1 ! for the planetary boundary layer
+  integer, protected:: iflag_pbl = 1 ! for the planetary boundary layer
+  ! 6 : Mellor and Yamada 2.0
+  ! 8 : Mellor and Yamada 2.5
+
   REAL:: rad_chau1 = 13., rad_chau2 = 9.
   real:: epmax = 0.993 ! \'efficacit\'e de pr\'ecipitation
   integer:: iflag_clw = 0

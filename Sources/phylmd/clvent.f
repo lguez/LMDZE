@@ -4,17 +4,17 @@ module clvent_m
 
 contains
 
-  SUBROUTINE clvent(knon, dtime, u1lay, v1lay, coef, t, ven, paprs, pplay, &
-       delp, d_ven, flux_v)
+  SUBROUTINE clvent(dtime, u1lay, v1lay, coef, t, ven, paprs, pplay, delp, &
+       d_ven, flux_v)
 
     ! Author: Z. X. Li (LMD/CNRS)
     ! Date: 1993/08/18
     ! Objet : diffusion verticale de la vitesse
 
-    USE dimphy, ONLY: klev, klon
+    USE dimphy, ONLY: klev
+    use nr_util, only: assert_eq
     USE suphec_m, ONLY: rd, rg
 
-    INTEGER knon
     REAL, intent(in):: dtime ! intervalle de temps (en s)
 
     REAL, intent(in):: u1lay(:), v1lay(:) ! (knon)
@@ -25,43 +25,36 @@ contains
     ! vent (dV/dz). La première valeur indique la valeur de Cdrag (sans
     ! unité).
 
-    REAL, intent(in):: t(klon, klev), ven(klon, klev)
-    ! t--------input-R- temperature (K)
-    ! ven------input-R- vitesse horizontale (m/s)
-    REAL paprs(klon, klev+1), pplay(klon, klev), delp(klon, klev)
-    ! paprs----input-R- pression a inter-couche (Pa)
-    ! pplay----input-R- pression au milieu de couche (Pa)
-    ! delp-----input-R- epaisseur de couche (Pa)
-    REAL d_ven(klon, klev)
-    ! d_ven----output-R- le changement de "ven"
+    REAL, intent(in):: t(:, :) ! (knon, klev) ! temperature (K)
+    REAL, intent(in):: ven(:, :) ! (knon, klev) vitesse horizontale (m/s)
+    REAL, intent(in):: paprs(:, :) ! (knon, klev+1) pression a inter-couche (Pa)
+    real, intent(in):: pplay(:, :) ! (knon, klev) pression au milieu
+                                   ! de couche (Pa)
+    real, intent(in):: delp(:, :) ! (knon, klev) epaisseur de couche (Pa)
+    REAL, intent(out):: d_ven(:, :) ! (knon, klev) ! le changement de "ven"
 
     REAL, intent(out):: flux_v(:) ! (knon)
     ! (diagnostic) flux du vent à la surface, en (kg m/s)/(m**2 s)
     ! flux_v est le flux de moment angulaire (positif vers bas)
 
     ! Local:
-    INTEGER i, k
-    REAL zx_cv(klon, 2:klev)
-    REAL zx_dv(klon, 2:klev)
-    REAL zx_buf(klon)
-    REAL zx_coef(klon, klev)
-    REAL local_ven(klon, klev)
-    REAL zx_alf1(klon), zx_alf2(klon)
+    INTEGER knon, i, k
+    REAL zx_cv(size(u1lay), 2:klev) ! (knon, 2:klev)
+    REAL zx_dv(size(u1lay), 2:klev) ! (knon, 2:klev)
+    REAL zx_buf(size(u1lay)) ! (knon)
+    REAL zx_coef(size(u1lay), klev) ! (knon, klev)
+    REAL local_ven(size(u1lay), klev) ! (knon, klev)
 
     !------------------------------------------------------------------
 
-    DO k = 1, klev
-       DO i = 1, knon
-          local_ven(i, k) = ven(i, k)
-       ENDDO
-    ENDDO
+    knon = assert_eq([size(u1lay), size(v1lay), size(coef, 1), size(t, 1), &
+         size(ven, 1), size(paprs, 1), size(pplay, 1), size(delp, 1), &
+         size(d_ven, 1), size(flux_v)], "clvent knon")
+    local_ven = ven
 
     DO i = 1, knon
-       zx_alf1(i) = 1.0
-       zx_alf2(i) = 1.0 - zx_alf1(i)
        zx_coef(i, 1) = coef(i, 1) * (1. + SQRT(u1lay(i)**2 + v1lay(i)**2)) &
-            * pplay(i, 1) / (RD * t(i, 1))
-       zx_coef(i, 1) = zx_coef(i, 1) * dtime * RG
+            * pplay(i, 1) / (RD * t(i, 1)) * dtime * RG
     ENDDO
 
     DO k = 2, klev
@@ -73,9 +66,9 @@ contains
     ENDDO
 
     DO i = 1, knon
-       zx_buf(i) = delp(i, 1) + zx_coef(i, 1)*zx_alf1(i)+zx_coef(i, 2)
+       zx_buf(i) = delp(i, 1) + zx_coef(i, 1)+zx_coef(i, 2)
        zx_cv(i, 2) = local_ven(i, 1)*delp(i, 1) / zx_buf(i)
-       zx_dv(i, 2) = (zx_coef(i, 2)-zx_alf2(i)*zx_coef(i, 1)) &
+       zx_dv(i, 2) = zx_coef(i, 2) &
             /zx_buf(i)
     ENDDO
     DO k = 3, klev
@@ -101,8 +94,7 @@ contains
 
     DO i = 1, knon
        flux_v(i) = zx_coef(i, 1)/(RG*dtime) &
-            *(local_ven(i, 1)*zx_alf1(i) &
-            +local_ven(i, 2)*zx_alf2(i))
+            *local_ven(i, 1)
     ENDDO
 
     DO k = 1, klev
