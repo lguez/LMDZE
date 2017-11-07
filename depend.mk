@@ -23,7 +23,7 @@ clcdrag.o : yoethf.o suphec.o indicesol.o dimphy.o
 cleanstr.o : mathelp.o strlowercase.o 
 clesphys.o : unit_nml_m.o 
 clesphys2.o : conf_gcm.o unit_nml_m.o 
-clmain.o : yamada4.o ustarhb.o time_phylmdz.o suphec.o stdlevvar.o interfoce_lim.o indicesol.o hbtm.o dimsoil.o dimphy.o conf_phys.o conf_gcm.o coefkzmin.o coefkz.o clvent.o clqh.o 
+clmain.o : yamada4.o ustarhb.o time_phylmdz.o suphec.o stdlevvar.o interfoce_lim.o indicesol.o hbtm.o dimsoil.o dimphy.o conf_phys.o conf_gcm.o coefkz2.o coefkzmin.o coefkz.o clvent.o clqh.o 
 clqh.o : suphec.o interfsurf_hq.o dimphy.o conf_phys.o 
 cltrac.o : suphec.o dimphy.o dimens_m.o 
 cltracrn.o : suphec.o dimphy.o indicesol.o 

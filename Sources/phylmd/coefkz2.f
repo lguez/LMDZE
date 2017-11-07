@@ -1,4 +1,10 @@
-SUBROUTINE coefkz2(nsrf, knon, paprs, pplay, t, pcfm, pcfh)
+module coefkz2_m
+  
+  IMPLICIT none
+
+contains
+
+  SUBROUTINE coefkz2(nsrf, knon, paprs, pplay, t, pcfm, pcfh)
 
   ! J'introduit un peu de diffusion sauf dans les endroits
   ! ou une forte inversion est presente
@@ -9,8 +15,6 @@ SUBROUTINE coefkz2(nsrf, knon, paprs, pplay, t, pcfm, pcfh)
   use dimphy
   use conf_gcm_m
   use SUPHEC_M
-
-  IMPLICIT none
 
   ! Arguments:
   ! nsrf-----input-I- indicateur de la nature du sol
@@ -91,3 +95,5 @@ SUBROUTINE coefkz2(nsrf, knon, paprs, pplay, t, pcfm, pcfh)
   ENDDO
 
 END SUBROUTINE coefkz2
+
+end module coefkz2_m

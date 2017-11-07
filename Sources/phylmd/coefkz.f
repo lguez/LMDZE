@@ -5,7 +5,7 @@ module coefkz_m
 contains
 
   SUBROUTINE coefkz(nsrf, paprs, pplay, ksta, ksta_ter, ts, rugos, u, v, t, &
-       q, qsurf, coefm, coefh)
+       q, qsurf, coefm, coefh, ycdragm, ycdragh)
 
     ! Authors: F. Hourdin, M. Forichon, Z. X. Li (LMD/CNRS)
     ! Date: September 22nd, 1993
@@ -35,10 +35,12 @@ contains
     REAL, intent(in):: t(:, :) ! (klon, klev) temperature (K)
     real, intent(in):: q(:, :) ! (klon, klev) vapeur d'eau (kg/kg)
     real, intent(in):: qsurf(:) ! (knon) 
-    REAL, intent(out):: coefm(:, :) ! (knon, klev) coefficient, vitesse
+    REAL, intent(out):: coefm(:, 2:) ! (knon, 2:klev) coefficient, vitesse
 
-    real, intent(out):: coefh(:, :) ! (knon, klev) 
+    real, intent(out):: coefh(:, 2:) ! (knon, 2:klev) 
     ! coefficient, chaleur et humidité
+
+    real, intent(out):: ycdragm(:), ycdragh(:) ! (knon)
 
     ! Local:
 
@@ -132,8 +134,7 @@ contains
        z1(i) = zgeop(i, 1)
     ENDDO
 
-    CALL clcdrag(nsrf, u1, v1, t1, q1, z1, ts, qsurf, rugos, coefm(:, 1), &
-         coefh(:, 1)) 
+    CALL clcdrag(nsrf, u1, v1, t1, q1, z1, ts, qsurf, rugos, ycdragm, ycdragh) 
 
     ! Calculer les coefficients turbulents dans l'atmosphere
 

@@ -25,6 +25,7 @@ contains
     use clvent_m, only: clvent
     use coefkz_m, only: coefkz
     use coefkzmin_m, only: coefkzmin
+    use coefkz2_m, only: coefkz2
     USE conf_gcm_m, ONLY: lmt_pas
     USE conf_phys_m, ONLY: iflag_pbl
     USE dimphy, ONLY: klev, klon, zmasq
@@ -311,8 +312,8 @@ contains
 
           ! calculer Cdrag et les coefficients d'echange
           CALL coefkz(nsrf, ypaprs, ypplay, ksta, ksta_ter, yts(:knon), &
-               yrugos, yu, yv, yt, yq, yqsurf(:knon), coefm(:knon, :), &
-               coefh(:knon, :))
+               yrugos, yu, yv, yt, yq, yqsurf(:knon), coefm(:knon, 2:), &
+               coefh(:knon, 2:), coefm(:knon, 1), coefh(:knon, 1))
 
           IF (iflag_pbl == 1) THEN
              CALL coefkz2(nsrf, knon, ypaprs, ypplay, yt, ycoefm0, ycoefh0)
@@ -329,7 +330,7 @@ contains
           IF (ok_kzmin) THEN
              ! Calcul d'une diffusion minimale pour les conditions tres stables
              CALL coefkzmin(knon, ypaprs, ypplay, yu, yv, yt, yq, &
-                  coefm(:knon, 1), ycoefm0, ycoefh0)
+                  coefm(:knon, 1), ycoefm0(:knon, 2:), ycoefh0(:knon, 2:))
              coefm(:knon, :) = max(coefm(:knon, :), ycoefm0(:knon, :))
              coefh(:knon, :) = max(coefh(:knon, :), ycoefh0(:knon, :))
           END IF

@@ -21,12 +21,12 @@ contains
     REAL, intent(in):: yq(klon, klev)
     REAL, intent(in):: ycoefm(:) ! (ngrid) drag coefficient
 
-    REAL, intent(inout):: km(klon, klev)
+    REAL, intent(inout):: km(:, 2:) ! (knon, 2:klev)
     ! coefficient de diffusion turbulente de quantité de mouvement (au
     ! bas de chaque couche) (en sortie : la valeur à la fin du pas de
     ! temps), m2 s-1
 
-    REAL, intent(inout):: kn(klon, klev)
+    REAL, intent(inout):: kn(:, 2:) ! (knon, 2:klev)
     ! coefficient de diffusion turbulente des scalaires (au bas de
     ! chaque couche) (en sortie : la valeur à la fin du pas de temps), m2 s-1
 
