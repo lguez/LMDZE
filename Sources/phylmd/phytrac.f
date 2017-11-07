@@ -279,10 +279,10 @@ contains
     DO it=1, nqmx - 2
        if (clsol(it)) then 
           ! couche limite avec quantite dans le sol calculee
-          CALL cltracrn(it, pdtphys, yu1, yv1, coefh, t_seri, ftsol, &
-               pctsrf, tr_seri(:, :, it), trs(:, it), paprs, pplay, delp, &
-               masktr(1, it), fshtr(1, it), hsoltr(it), tautr(it), &
-               vdeptr(it), rlat, d_tr_cl(1, 1, it), d_trs)
+          CALL cltracrn(it, pdtphys, yu1, yv1, coefh(:, 2:llm), coefh(:, 1), &
+               t_seri, ftsol, pctsrf, tr_seri(:, :, it), trs(:, it), paprs, &
+               pplay, delp, masktr(1, it), fshtr(1, it), hsoltr(it), &
+               tautr(it), vdeptr(it), rlat, d_tr_cl(1, 1, it), d_trs)
           DO k = 1, llm
              DO i = 1, klon
                 tr_seri(i, k, it) = tr_seri(i, k, it) + d_tr_cl(i, k, it)

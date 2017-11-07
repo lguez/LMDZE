@@ -4,9 +4,9 @@ module cltracrn_m
 
 contains 
 
-  SUBROUTINE cltracrn(itr, dtime, u1lay, v1lay, coef, t, ftsol, pctsrf, tr, &
-       trs, paprs, pplay, delp, masktr, fshtr, hsoltr, tautr, vdeptr, lat, &
-       d_tr, d_trs)
+  SUBROUTINE cltracrn(itr, dtime, u1lay, v1lay, coef, cdragh, t, ftsol, &
+       pctsrf, tr, trs, paprs, pplay, delp, masktr, fshtr, hsoltr, tautr, &
+       vdeptr, lat, d_tr, d_trs)
 
     ! From phylmd/cltracrn.F, version 1.2 2005/05/25 13:10:09
 
@@ -32,8 +32,9 @@ contains
     ! dtime----input-R- intervalle de temps (en second)
     REAL, intent(in):: u1lay(klon), v1lay(klon) ! vent de la premiere
                                                 ! couche (m/s)
-    REAL coef(klon, klev)
+    REAL coef(:, 2:) ! (klon, 2:klev)
     ! coef-----input-R- le coefficient d'echange (m**2/s) l>1
+    real cdragh(:) ! klon
     REAL, intent(in):: t(klon, klev) ! temperature (K)
     real, intent(in):: ftsol(klon, nbsrf), pctsrf(klon, nbsrf) 
     ! ftsol----input-R- temperature du sol (en Kelvin)
@@ -115,7 +116,7 @@ contains
     ENDDO
 
     DO i = 1, klon
-       zx_coef(i, 1) = coef(i, 1) &
+       zx_coef(i, 1) = cdragh(i) &
             * (1.0+SQRT(u1lay(i)**2+v1lay(i)**2)) &
             * pplay(i, 1)/(RD*t(i, 1))
        zx_coef(i, 1) = zx_coef(i, 1) * dtime*RG
