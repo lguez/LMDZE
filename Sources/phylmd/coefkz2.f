@@ -32,7 +32,7 @@ contains
     REAL paprs(klon, klev+1), pplay(klon, klev)
     REAL t(klon, klev)
 
-    REAL, intent(out):: pcfm(:, :), pcfh(:, :) ! (knon, klev)
+    REAL, intent(out):: pcfm(:, 2:), pcfh(:, 2:) ! (knon, 2:klev)
 
     ! Quelques constantes et options:
 
@@ -54,7 +54,7 @@ contains
     !----------------------------------------------------------
 
     ! Initialiser les sorties
-    DO k = 1, klev
+    DO k = 2, klev
        DO i = 1, knon
           pcfm(i, k) = 0.0
           pcfh(i, k) = 0.0

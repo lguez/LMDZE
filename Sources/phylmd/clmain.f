@@ -316,8 +316,10 @@ contains
                coefh(:knon, 2:), coefm(:knon, 1), coefh(:knon, 1))
 
           IF (iflag_pbl == 1) THEN
-             CALL coefkz2(nsrf, knon, ypaprs, ypplay, yt, ycoefm0(:knon, :), &
-                  ycoefh0(:knon, :))
+             CALL coefkz2(nsrf, knon, ypaprs, ypplay, yt, ycoefm0(:knon, 2:), &
+                  ycoefh0(:knon, 2:))
+             ycoefm0(:knon, 1) = 0.
+             ycoefh0(:knon, 1) = 0.
              coefm(:knon, :) = max(coefm(:knon, :), ycoefm0(:knon, :))
              coefh(:knon, :) = max(coefh(:knon, :), ycoefh0(:knon, :))
           END IF
