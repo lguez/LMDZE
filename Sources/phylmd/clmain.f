@@ -106,7 +106,7 @@ contains
     ! dflux_q derive du flux latent
     ! IM "slab" ocean
 
-    REAL, intent(out):: ycoefh(klon, klev)
+    REAL, intent(out):: ycoefh(:, :) ! (klon, klev)
     ! Pour pouvoir extraire les coefficients d'\'echange, le champ
     ! "ycoefh" a \'et\'e cr\'e\'e. Nous avons moyenn\'e les valeurs de
     ! ce champ sur les quatre sous-surfaces du mod\`ele.
@@ -164,7 +164,8 @@ contains
     REAL y_flux_t(klon), y_flux_q(klon)
     REAL y_flux_u(klon), y_flux_v(klon)
     REAL y_dflux_t(klon), y_dflux_q(klon)
-    REAL coefh(klon, klev), coefm(klon, klev)
+    REAL coefh(klon, 2:klev), coefm(klon, 2:klev)
+    real ycdragh(klon), ycdragm(klon)
     REAL yu(klon, klev), yv(klon, klev)
     REAL yt(klon, klev), yq(klon, klev)
     REAL ypaprs(klon, klev + 1), ypplay(klon, klev), ydelp(klon, klev)
@@ -312,30 +313,34 @@ contains
 
           ! calculer Cdrag et les coefficients d'echange
           CALL coefkz(nsrf, ypaprs, ypplay, ksta, ksta_ter, yts(:knon), &
-               yrugos, yu, yv, yt, yq, yqsurf(:knon), coefm(:knon, 2:), &
-               coefh(:knon, 2:), coefm(:knon, 1), coefh(:knon, 1))
+               yrugos, yu, yv, yt, yq, yqsurf(:knon), coefm(:knon, :), &
+               coefh(:knon, :), ycdragm(:knon), ycdragh(:knon))
 
           IF (iflag_pbl == 1) THEN
              CALL coefkz2(nsrf, knon, ypaprs, ypplay, yt, ycoefm0(:knon, 2:), &
                   ycoefh0(:knon, 2:))
              ycoefm0(:knon, 1) = 0.
              ycoefh0(:knon, 1) = 0.
-             coefm(:knon, :) = max(coefm(:knon, :), ycoefm0(:knon, :))
-             coefh(:knon, :) = max(coefh(:knon, :), ycoefh0(:knon, :))
+             coefm(:knon, :) = max(coefm(:knon, :), ycoefm0(:knon, 2:))
+             coefh(:knon, :) = max(coefh(:knon, :), ycoefh0(:knon, 2:))
+             ycdragm(:knon) = max(ycdragm(:knon), ycoefm0(:knon, 1))
+             ycdragh(:knon) = max(ycdragh(:knon), ycoefh0(:knon, 1))
           END IF
 
-          ! on met un seuil pour coefm et coefh
+          ! on met un seuil pour ycdragm et ycdragh
           IF (nsrf == is_oce) THEN
-             coefm(:knon, 1) = min(coefm(:knon, 1), cdmmax)
-             coefh(:knon, 1) = min(coefh(:knon, 1), cdhmax)
+             ycdragm(:knon) = min(ycdragm(:knon), cdmmax)
+             ycdragh(:knon) = min(ycdragh(:knon), cdhmax)
           END IF
 
           IF (ok_kzmin) THEN
              ! Calcul d'une diffusion minimale pour les conditions tres stables
              CALL coefkzmin(knon, ypaprs, ypplay, yu, yv, yt, yq, &
-                  coefm(:knon, 1), ycoefm0(:knon, 2:), ycoefh0(:knon, 2:))
-             coefm(:knon, :) = max(coefm(:knon, :), ycoefm0(:knon, :))
-             coefh(:knon, :) = max(coefh(:knon, :), ycoefh0(:knon, :))
+                  ycdragm(:knon), ycoefm0(:knon, 2:), ycoefh0(:knon, 2:))
+             coefm(:knon, :) = max(coefm(:knon, :), ycoefm0(:knon, 2:))
+             coefh(:knon, :) = max(coefh(:knon, :), ycoefh0(:knon, 2:))
+             ycdragm(:knon) = max(ycdragm(:knon), ycoefm0(:knon, 1))
+             ycdragh(:knon) = max(ycdragh(:knon), ycoefh0(:knon, 1))
           END IF
 
           IF (iflag_pbl >= 6) THEN
@@ -372,28 +377,28 @@ contains
                 END DO
              END DO
 
-             ustar(:knon) = ustarhb(yu(:knon, 1), yv(:knon, 1), coefm(:knon, 1))
+             ustar(:knon) = ustarhb(yu(:knon, 1), yv(:knon, 1), ycdragm(:knon))
              CALL yamada4(dtime, rg, zlev(:knon, :), yzlay(:knon, :), &
                   yu(:knon, :), yv(:knon, :), yteta(:knon, :), &
-                  coefm(:knon, 1), yq2(:knon, :), ykmm(:knon, :), &
+                  ycdragm(:knon), yq2(:knon, :), ykmm(:knon, :), &
                   ykmn(:knon, :), ykmq(:knon, :), ustar(:knon))
              coefm(:knon, 2:) = ykmm(:knon, 2:klev)
              coefh(:knon, 2:) = ykmn(:knon, 2:klev)
           END IF
 
-          CALL clvent(dtime, yu(:knon, 1), yv(:knon, 1), coefm(:knon, 2:), &
-               coefm(:knon, 1), yt(:knon, :), yu(:knon, :), ypaprs(:knon, :), &
+          CALL clvent(dtime, yu(:knon, 1), yv(:knon, 1), coefm(:knon, :), &
+               ycdragm(:knon), yt(:knon, :), yu(:knon, :), ypaprs(:knon, :), &
                ypplay(:knon, :), ydelp(:knon, :), y_d_u(:knon, :), &
                y_flux_u(:knon))
-          CALL clvent(dtime, yu(:knon, 1), yv(:knon, 1), coefm(:knon, 2:), &
-               coefm(:knon, 1), yt(:knon, :), yv(:knon, :), ypaprs(:knon, :), &
+          CALL clvent(dtime, yu(:knon, 1), yv(:knon, 1), coefm(:knon, :), &
+               ycdragm(:knon), yt(:knon, :), yv(:knon, :), ypaprs(:knon, :), &
                ypplay(:knon, :), ydelp(:knon, :), y_d_v(:knon, :), &
                y_flux_v(:knon))
 
           ! calculer la diffusion de "q" et de "h"
           CALL clqh(dtime, julien, firstcal, nsrf, ni(:knon), &
                ytsoil(:knon, :), yqsol(:knon), mu0, yrugos, yrugoro, &
-               yu(:knon, 1), yv(:knon, 1), coefh(:knon, 2:), coefh(:knon, 1), &
+               yu(:knon, 1), yv(:knon, 1), coefh(:knon, :), ycdragh(:knon), &
                yt, yq, yts(:knon), ypaprs, ypplay, ydelp, yrads(:knon), &
                yalb(:knon), snow(:knon), yqsurf, yrain_f, ysnow_f, &
                yfluxlat(:knon), pctsrf_new_sic, yagesno(:knon), y_d_t, y_d_q, &
@@ -405,9 +410,9 @@ contains
           yrugm = 0.
           IF (nsrf == is_oce) THEN
              DO j = 1, knon
-                yrugm(j) = 0.018 * coefm(j, 1) * (yu(j, 1)**2 + yv(j, 1)**2) &
+                yrugm(j) = 0.018 * ycdragm(j) * (yu(j, 1)**2 + yv(j, 1)**2) &
                      / rg + 0.11 * 14E-6 &
-                     / sqrt(coefm(j, 1) * (yu(j, 1)**2 + yv(j, 1)**2))
+                     / sqrt(ycdragm(j) * (yu(j, 1)**2 + yv(j, 1)**2))
                 yrugm(j) = max(1.5E-05, yrugm(j))
              END DO
           END IF
@@ -416,11 +421,21 @@ contains
              y_dflux_q(j) = y_dflux_q(j) * ypct(j)
           END DO
 
-          DO k = 1, klev
+          DO k = 2, klev
              DO j = 1, knon
                 i = ni(j)
                 coefh(j, k) = coefh(j, k) * ypct(j)
                 coefm(j, k) = coefm(j, k) * ypct(j)
+             END DO
+          END DO
+          DO j = 1, knon
+             i = ni(j)
+             ycdragh(j) = ycdragh(j) * ypct(j)
+             ycdragm(j) = ycdragm(j) * ypct(j)
+          END DO
+          DO k = 1, klev
+             DO j = 1, knon
+                i = ni(j)
                 y_d_t(j, k) = y_d_t(j, k) * ypct(j)
                 y_d_q(j, k) = y_d_q(j, k) * ypct(j)
                 y_d_u(j, k) = y_d_u(j, k) * ypct(j)
@@ -454,8 +469,8 @@ contains
              agesno(i, nsrf) = yagesno(j)
              fqcalving(i, nsrf) = y_fqcalving(j)
              ffonte(i, nsrf) = y_ffonte(j)
-             cdragh(i) = cdragh(i) + coefh(j, 1)
-             cdragm(i) = cdragm(i) + coefm(j, 1)
+             cdragh(i) = cdragh(i) + ycdragh(j)
+             cdragm(i) = cdragm(i) + ycdragm(j)
              dflux_t(i) = dflux_t(i) + y_dflux_t(j)
              dflux_q(i) = dflux_q(i) + y_dflux_q(j)
           END DO
@@ -478,8 +493,19 @@ contains
                 d_q(i, k) = d_q(i, k) + y_d_q(j, k)
                 d_u(i, k) = d_u(i, k) + y_d_u(j, k)
                 d_v(i, k) = d_v(i, k) + y_d_v(j, k)
+             END DO
+          END DO
+          
+          DO j = 1, knon
+             i = ni(j)
+             DO k = 2, klev
                 ycoefh(i, k) = ycoefh(i, k) + coefh(j, k)
              END DO
+          END DO
+
+          DO j = 1, knon
+             i = ni(j)
+             ycoefh(i, 1) = ycoefh(i, 1) + ycdragh(j)
           END DO
 
           ! diagnostic t, q a 2m et u, v a 10m
