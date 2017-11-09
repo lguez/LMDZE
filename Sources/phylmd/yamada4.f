@@ -8,7 +8,7 @@ module yamada4_m
 
 contains
 
-  SUBROUTINE yamada4(dt, g, zlev, zlay, u, v, teta, cd, q2, km, kn, kq, ustar)
+  SUBROUTINE yamada4(dt, g, zlev, zlay, u, v, teta, q2, km, kn, ustar)
 
     ! From LMDZ4/libf/phylmd/yamada4.F, version 1.1 2004/06/22 11:45:36
 
@@ -34,8 +34,6 @@ contains
     ! temp\'erature potentielle au centre de chaque couche (en entr\'ee :
     ! la valeur au d\'ebut du pas de temps)
 
-    REAL, intent(in):: cd(:) ! (knon) cdrag, valeur au d\'ebut du pas de temps
-
     REAL, intent(inout):: q2(:, :) ! (knon, klev + 1)
     ! $q^2$ au bas de chaque couche 
     ! En entr\'ee : la valeur au d\'ebut du pas de temps ; en sortie : la
@@ -49,13 +47,12 @@ contains
     ! diffusivit\'e turbulente des scalaires (au bas de chaque couche)
     ! (en sortie : la valeur \`a la fin du pas de temps)
 
-    REAL kq(:, :) ! (knon, klev + 1)
     real, intent(in):: ustar(:) ! (knon)
 
     ! Local:
     integer knon
     real kmin, qmin
-    real pblhmin(size(cd)), coriol(size(cd)) ! (knon)
+    real pblhmin(size(ustar)), coriol(size(ustar)) ! (knon)
     real qpre
     REAL unsdz(size(zlay, 1), size(zlay, 2)) ! (knon, klev)
     REAL unsdzdec(size(zlev, 1), size(zlev, 2)) ! (knon, klev + 1)
@@ -75,8 +72,8 @@ contains
     real zq
     real dtetadz(size(zlev, 1), size(zlev, 2)) ! (knon, klev + 1)
     real l(size(zlev, 1), size(zlev, 2)) ! (knon, klev + 1)
-    real l0(size(cd)) ! (knon)
-    real sq(size(cd)), sqz(size(cd)) ! (knon)
+    real l0(size(ustar)) ! (knon)
+    real sq(size(ustar)), sqz(size(ustar)) ! (knon)
     real zz(size(zlev, 1), size(zlev, 2)) ! (knon, klev + 1)
     integer iter
     real:: ric = 0.195, rifc = 0.191, b1 = 16.6
@@ -85,11 +82,11 @@ contains
 
     call assert(any(iflag_pbl == [6, 8, 9]), "yamada4 iflag_pbl")
     knon = assert_eq([size(zlev, 1), size(zlay, 1), size(u, 1), size(v, 1), &
-         size(teta, 1), size(cd), size(q2, 1), size(km, 1), size(kn, 1), &
-         size(kq, 1)], "yamada4 knon")
+         size(teta, 1), size(ustar), size(q2, 1), size(km, 1), size(kn, 1)], &
+         "yamada4 knon")
     call assert(klev == [size(zlev, 2) - 1, size(zlay, 2), size(u, 2), &
          size(v, 2), size(teta, 2), size(q2, 2) - 1, size(km, 2) - 1, &
-         size(kn, 2) - 1, size(kq, 2) - 1], "yamada4 klev")
+         size(kn, 2) - 1], "yamada4 klev")
 
     ipas = ipas + 1
 
@@ -251,7 +248,6 @@ contains
           zq = sqrt(q2(ig, k))
           km(ig, k) = l(ig, k)*zq*sm(ig, k)
           kn(ig, k) = km(ig, k)*alpha(ig, k)
-          kq(ig, k) = l(ig, k)*zq*0.2
        enddo
     enddo
 
@@ -277,7 +273,6 @@ contains
           if (kn(ig, k).lt.kmin.or.km(ig, k).lt.kmin) then
              kn(ig, k) = kmin
              km(ig, k) = kmin
-             kq(ig, k) = kmin
              ! la longueur de melange est suposee etre l = kap z
              ! K = l q Sm d'ou q2 = (K/l Sm)**2
              q2(ig, k) = (qmin/sm(ig, k))**2

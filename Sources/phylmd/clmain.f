@@ -172,7 +172,6 @@ contains
     REAL ycoefm0(klon, klev), ycoefh0(klon, klev)
     REAL yzlay(klon, klev), zlev(klon, klev + 1), yteta(klon, klev)
     REAL ykmm(klon, klev + 1), ykmn(klon, klev + 1)
-    REAL ykmq(klon, klev + 1)
     REAL yq2(klon, klev + 1)
     REAL delp(klon, klev)
     INTEGER i, k, nsrf
@@ -323,8 +322,8 @@ contains
              ycoefh0(:knon, 1) = 0.
              coefm(:knon, :) = max(coefm(:knon, :), ycoefm0(:knon, 2:))
              coefh(:knon, :) = max(coefh(:knon, :), ycoefh0(:knon, 2:))
-             ycdragm(:knon) = max(ycdragm(:knon), ycoefm0(:knon, 1))
-             ycdragh(:knon) = max(ycdragh(:knon), ycoefh0(:knon, 1))
+             ycdragm(:knon) = max(ycdragm(:knon), 0.)
+             ycdragh(:knon) = max(ycdragh(:knon), 0.)
           END IF
 
           ! on met un seuil pour ycdragm et ycdragh
@@ -379,11 +378,10 @@ contains
 
              ustar(:knon) = ustarhb(yu(:knon, 1), yv(:knon, 1), ycdragm(:knon))
              CALL yamada4(dtime, rg, zlev(:knon, :), yzlay(:knon, :), &
-                  yu(:knon, :), yv(:knon, :), yteta(:knon, :), &
-                  ycdragm(:knon), yq2(:knon, :), ykmm(:knon, :), &
-                  ykmn(:knon, :), ykmq(:knon, :), ustar(:knon))
-             coefm(:knon, 2:) = ykmm(:knon, 2:klev)
-             coefh(:knon, 2:) = ykmn(:knon, 2:klev)
+                  yu(:knon, :), yv(:knon, :), yteta(:knon, :), yq2(:knon, :), &
+                  ykmm(:knon, :), ykmn(:knon, :), ustar(:knon))
+             coefm(:knon, :) = ykmm(:knon, 2:klev)
+             coefh(:knon, :) = ykmn(:knon, 2:klev)
           END IF
 
           CALL clvent(dtime, yu(:knon, 1), yv(:knon, 1), coefm(:knon, :), &

@@ -12,7 +12,7 @@ contains
     ! Couche limite non-locale. Adaptation du code du CCM3.
     ! Code non test\'e, donc \`a ne pas utiliser.
 
-    ! Nonlocal scheme that determines eddy diffusivities based on a
+    ! Non-local scheme that determines eddy diffusivities based on a
     ! diagnosed boundary layer height and a turbulent velocity scale.
     ! Also countergradient effects for heat and moisture are included.
 
