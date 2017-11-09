@@ -393,12 +393,13 @@ contains
           ! calculer la diffusion de "q" et de "h"
           CALL clqh(dtime, julien, firstcal, nsrf, ni(:knon), &
                ytsoil(:knon, :), yqsol(:knon), mu0, yrugos, yrugoro, &
-               yu(:knon, 1), yv(:knon, 1), coefh(:knon, :), yt, yq, &
-               yts(:knon), ypaprs, ypplay, ydelp, yrads(:knon), yalb(:knon), &
-               snow(:knon), yqsurf, yrain_f, ysnow_f, yfluxlat(:knon), &
-               pctsrf_new_sic, yagesno(:knon), y_d_t, y_d_q, y_d_ts(:knon), &
-               yz0_new, y_flux_t(:knon), y_flux_q(:knon), y_dflux_t(:knon), &
-               y_dflux_q(:knon), y_fqcalving, y_ffonte, y_run_off_lic_0)
+               yu(:knon, 1), yv(:knon, 1), coefh(:knon, 2:), coefh(:knon, 1), &
+               yt, yq, yts(:knon), ypaprs, ypplay, ydelp, yrads(:knon), &
+               yalb(:knon), snow(:knon), yqsurf, yrain_f, ysnow_f, &
+               yfluxlat(:knon), pctsrf_new_sic, yagesno(:knon), y_d_t, y_d_q, &
+               y_d_ts(:knon), yz0_new, y_flux_t(:knon), y_flux_q(:knon), &
+               y_dflux_t(:knon), y_dflux_q(:knon), y_fqcalving, y_ffonte, &
+               y_run_off_lic_0)
 
           ! calculer la longueur de rugosite sur ocean
           yrugm = 0.

@@ -5,8 +5,8 @@ module clqh_m
 contains
 
   SUBROUTINE clqh(dtime, julien, debut, nisurf, knindex, tsoil, qsol, rmu0, &
-       rugos, rugoro, u1lay, v1lay, coef, t, q, ts, paprs, pplay, delp, &
-       radsol, albedo, snow, qsurf, precip_rain, precip_snow, fluxlat, &
+       rugos, rugoro, u1lay, v1lay, coef, tq_cdrag, t, q, ts, paprs, pplay, &
+       delp, radsol, albedo, snow, qsurf, precip_rain, precip_snow, fluxlat, &
        pctsrf_new_sic, agesno, d_t, d_q, d_ts, z0_new, flux_t, flux_q, &
        dflux_s, dflux_l, fqcalving, ffonte, run_off_lic_0)
 
@@ -36,10 +36,11 @@ contains
     REAL, intent(in):: u1lay(:), v1lay(:) ! (knon)
     ! vitesse de la 1ere couche (m / s)
 
-    REAL, intent(in):: coef(:, :) ! (knon, klev)
+    REAL, intent(in):: coef(:, 2:) ! (knon, 2:klev)
     ! Le coefficient d'echange (m**2 / s) multiplie par le cisaillement
-    ! du vent (dV / dz). La premiere valeur indique la valeur de Cdrag
-    ! (sans unite).
+    ! du vent (dV / dz)
+
+    REAL, intent(in):: tq_cdrag(:) ! (knon) sans unite
 
     REAL t(klon, klev) ! temperature (K)
     REAL q(klon, klev) ! humidite specifique (kg / kg)
@@ -114,7 +115,7 @@ contains
     REAL zdelz
 
     real temp_air(klon), spechum(klon)
-    real tq_cdrag(klon), petAcoef(klon), peqAcoef(klon)
+    real petAcoef(klon), peqAcoef(klon)
     real petBcoef(klon), peqBcoef(klon)
     real p1lay(klon)
 
@@ -237,7 +238,6 @@ contains
     peqAcoef(1:knon) = zx_cq(1:knon, 1)
     petBcoef(1:knon) = zx_dh(1:knon, 1)
     peqBcoef(1:knon) = zx_dq(1:knon, 1)
-    tq_cdrag(1:knon) =coef(:knon, 1)
     temp_air(1:knon) =t(1:knon, 1)
     spechum(1:knon)=q(1:knon, 1)
     p1lay(1:knon) = pplay(1:knon, 1)
