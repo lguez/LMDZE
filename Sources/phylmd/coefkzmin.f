@@ -4,7 +4,7 @@ module coefkzmin_m
 
 contains
 
-  SUBROUTINE coefkzmin(ngrid, ypaprs, ypplay, yu, yv, yt, yq, ycoefm, km, kn)
+  SUBROUTINE coefkzmin(knon, ypaprs, ypplay, yu, yv, yt, yq, ycoefm, kn)
 
     ! From LMDZ4/libf/phylmd/coefkzmin.F, version 1.1.1.1 2004/05/19 12:53:08
 
@@ -14,34 +14,30 @@ contains
     USE dimphy, ONLY: klev, klon
     USE suphec_m, ONLY: rd, rg, rkappa
 
-    integer, intent(in):: ngrid
+    integer, intent(in):: knon
     REAL, intent(in):: ypaprs(klon, klev+1), ypplay(klon, klev)
     REAL, intent(in):: yu(klon, klev), yv(klon, klev) ! wind, in m s-1
     REAL, intent(in):: yt(klon, klev) ! temperature, in K
     REAL, intent(in):: yq(klon, klev)
-    REAL, intent(in):: ycoefm(:) ! (ngrid) drag coefficient
+    REAL, intent(in):: ycoefm(:) ! (knon) drag coefficient
 
-    REAL, intent(inout):: km(:, 2:) ! (knon, 2:klev)
-    ! coefficient de diffusion turbulente de quantité de mouvement (au
-    ! bas de chaque couche) (en sortie : la valeur à la fin du pas de
-    ! temps), m2 s-1
-
-    REAL, intent(inout):: kn(:, 2:) ! (knon, 2:klev)
-    ! coefficient de diffusion turbulente des scalaires (au bas de
-    ! chaque couche) (en sortie : la valeur à la fin du pas de temps), m2 s-1
+    REAL, intent(out):: kn(:, 2:) ! (knon, 2:klev) coefficient de
+    ! diffusion turbulente de la quantité de mouvement et des
+    ! scalaires (au bas de chaque couche) (en sortie : la valeur à la
+    ! fin du pas de temps), m2 s-1
 
     ! Local:
 
-    real ustar(ngrid) ! u*
-    real zlay(ngrid, klev) ! in m
+    real ustar(knon) ! u*
+    real zlay(knon, klev) ! in m
     integer i, k
-    real pblhmin(ngrid)
+    real pblhmin(knon)
     real, parameter:: coriol = 1e-4
 
-    REAL zlev(ngrid, 2: klev)
+    REAL zlev(knon, 2: klev)
     ! altitude at level (interface between layer with same index), in m
 
-    REAL teta(ngrid, klev)
+    REAL teta(knon, klev)
     ! température potentielle au centre de chaque couche (la valeur au
     ! debut du pas de temps)
 
@@ -51,20 +47,20 @@ contains
 
     ! Debut de la partie qui doit etre incluse a terme dans clmain.
 
-    do i = 1, ngrid
+    do i = 1, knon
        zlay(i, 1) = RD * yt(i, 1) * 2 / (ypaprs(i, 1) + ypplay(i, 1)) &
             * (ypaprs(i, 1) - ypplay(i, 1)) / RG
     enddo
 
     do k = 2, klev
-       do i = 1, ngrid
+       do i = 1, knon
           zlay(i, k) = zlay(i, k-1) + RD * 0.5 * (yt(i, k - 1) + yt(i, k)) &
                / ypaprs(i, k) * (ypplay(i, k - 1) - ypplay(i, k)) / RG
        enddo
     enddo
 
     do k=1, klev
-       do i = 1, ngrid
+       do i = 1, knon
           ! Attention : on passe la temperature potentielle virtuelle
           ! pour le calcul de K.
           teta(i, k) = yt(i, k) * (ypaprs(i, 1) / ypplay(i, k))**rkappa &
@@ -73,7 +69,7 @@ contains
     enddo
 
     forall (k = 2: klev) zlev(:, k) = 0.5 * (zlay(:, k) + zlay(:, k-1))
-    ustar = SQRT(ycoefm * (yu(:ngrid, 1)**2 + yv(:ngrid, 1)**2))
+    ustar = SQRT(ycoefm * (yu(:knon, 1)**2 + yv(:knon, 1)**2))
 
     ! Fin de la partie qui doit être incluse à terme dans clmain
 
@@ -87,14 +83,13 @@ contains
     pblhmin = 0.07 * ustar / coriol
 
     do k = 2, klev
-       do i = 1, ngrid
+       do i = 1, knon
           if (teta(i, 2) > teta(i, 1)) then
              kn(i, k) = kap * zlev(i, k) * ustar(i) &
                   * (max(1. - zlev(i, k) / pblhmin(i), 0.))**2
           else
              kn(i, k) = 0. ! min n'est utilisé que pour les SL stables
           endif
-          km(i, k) = kn(i, k)
        enddo
     enddo
 

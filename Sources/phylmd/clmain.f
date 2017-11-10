@@ -335,11 +335,10 @@ contains
           IF (ok_kzmin) THEN
              ! Calcul d'une diffusion minimale pour les conditions tres stables
              CALL coefkzmin(knon, ypaprs, ypplay, yu, yv, yt, yq, &
-                  ycdragm(:knon), ycoefm0(:knon, 2:), ycoefh0(:knon, 2:))
+                  ycdragm(:knon), ycoefh0(:knon, 2:))
+             ycoefm0(:knon, 2:) = ycoefh0(:knon, 2:)
              coefm(:knon, :) = max(coefm(:knon, :), ycoefm0(:knon, 2:))
              coefh(:knon, :) = max(coefh(:knon, :), ycoefh0(:knon, 2:))
-             ycdragm(:knon) = max(ycdragm(:knon), ycoefm0(:knon, 1))
-             ycdragh(:knon) = max(ycdragh(:knon), ycoefh0(:knon, 1))
           END IF
 
           IF (iflag_pbl >= 6) THEN
