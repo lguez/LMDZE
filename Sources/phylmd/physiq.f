@@ -184,7 +184,7 @@ contains
     REAL cdragh(klon) ! drag coefficient pour T and Q
     REAL cdragm(klon) ! drag coefficient pour vent
 
-    REAL ycoefh(klon, llm) ! coef d'echange pour phytrac
+    REAL ycoefh(klon, 2:llm) ! coef d'echange pour phytrac
 
     REAL, save:: ffonte(klon, nbsrf)
     ! flux thermique utilise pour fondre la neige
@@ -952,9 +952,9 @@ contains
 
     ! Calcul des tendances traceurs
     call phytrac(julien, time, firstcal, lafin, dtphys, t, paprs, play, mfu, &
-         mfd, pde_u, pen_d, ycoefh(:, 2:), ycoefh(:, 1), fm_therm, entr_therm, u(:, 1), v(:, 1), &
-         ftsol, pctsrf, frac_impa, frac_nucl, da, phi, mp, upwd, dnwd, &
-         tr_seri, zmasse, ncid_startphy)
+         mfd, pde_u, pen_d, ycoefh, cdragh, fm_therm, entr_therm, u(:, 1), &
+         v(:, 1), ftsol, pctsrf, frac_impa, frac_nucl, da, phi, mp, upwd, &
+         dnwd, tr_seri, zmasse, ncid_startphy)
 
     ! Calculer le transport de l'eau et de l'energie (diagnostique)
     CALL transp(paprs, t_seri, q_seri, u_seri, v_seri, zphi, ve, vq, ue, uq)

@@ -106,7 +106,7 @@ contains
     ! dflux_q derive du flux latent
     ! IM "slab" ocean
 
-    REAL, intent(out):: ycoefh(:, :) ! (klon, klev)
+    REAL, intent(out):: ycoefh(:, 2:) ! (klon, 2:klev)
     ! Pour pouvoir extraire les coefficients d'\'echange, le champ
     ! "ycoefh" a \'et\'e cr\'e\'e. Nous avons moyenn\'e les valeurs de
     ! ce champ sur les quatre sous-surfaces du mod\`ele.
@@ -490,9 +490,8 @@ contains
                 d_v(i, k) = d_v(i, k) + y_d_v(j, k)
              END DO
           END DO
-          
-          ycoefh(ni(:knon), 2:) = ycoefh(ni(:knon), 2:) + coefh(:knon, :)
-          ycoefh(ni(:knon), 1) = ycoefh(ni(:knon), 1) + ycdragh(:knon)
+
+          ycoefh(ni(:knon), :) = ycoefh(ni(:knon), :) + coefh(:knon, :)
 
           ! diagnostic t, q a 2m et u, v a 10m
 
