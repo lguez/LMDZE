@@ -8,7 +8,7 @@ module phytrac_m
 contains
 
   SUBROUTINE phytrac(julien, gmtime, firstcal, lafin, pdtphys, t_seri, paprs, &
-       pplay, pmfu, pmfd, pde_u, pen_d, coefh, fm_therm, entr_therm, yu1, &
+       pplay, pmfu, pmfd, pde_u, pen_d, coefh, cdragh, fm_therm, entr_therm, yu1, &
        yv1, ftsol, pctsrf, frac_impa, frac_nucl, da, phi, mp, upwd, dnwd, &
        tr_seri, zmasse, ncid_startphy)
 
@@ -77,7 +77,8 @@ contains
 
     REAL pde_u(klon, llm) ! flux detraine dans le panache montant
     REAL pen_d(klon, llm) ! flux entraine dans le panache descendant
-    REAL coefh(:, :) ! (klon, llm) coeff melange couche limite
+    REAL coefh(:, 2:) ! (klon, 2:llm) coeff melange couche limite
+    real cdragh(:) ! (klon)
     real fm_therm(klon, llm+1), entr_therm(klon, llm) ! thermiques
     REAL, intent(in):: yu1(:), yv1(:) ! (klon) vent au premier niveau
 
@@ -279,10 +280,10 @@ contains
     DO it=1, nqmx - 2
        if (clsol(it)) then 
           ! couche limite avec quantite dans le sol calculee
-          CALL cltracrn(it, pdtphys, yu1, yv1, coefh(:, 2:llm), coefh(:, 1), &
-               t_seri, ftsol, pctsrf, tr_seri(:, :, it), trs(:, it), paprs, &
-               pplay, delp, masktr(1, it), fshtr(1, it), hsoltr(it), &
-               tautr(it), vdeptr(it), rlat, d_tr_cl(1, 1, it), d_trs)
+          CALL cltracrn(it, pdtphys, yu1, yv1, coefh, cdragh, t_seri, ftsol, &
+               pctsrf, tr_seri(:, :, it), trs(:, it), paprs, pplay, delp, &
+               masktr(1, it), fshtr(1, it), hsoltr(it), tautr(it), &
+               vdeptr(it), rlat, d_tr_cl(1, 1, it), d_trs)
           DO k = 1, llm
              DO i = 1, klon
                 tr_seri(i, k, it) = tr_seri(i, k, it) + d_tr_cl(i, k, it)
@@ -297,7 +298,7 @@ contains
              source(i) = 0. ! pas de source, pour l'instant
           ENDDO
 
-          CALL cltrac(pdtphys, coefh(:, 2:llm), t_seri, tr_seri(:, :, it), source, &
+          CALL cltrac(pdtphys, coefh, t_seri, tr_seri(:, :, it), source, &
                paprs, pplay, delp, d_tr_cl(1, 1, it))
           DO k = 1, llm
              DO i = 1, klon

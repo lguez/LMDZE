@@ -952,7 +952,7 @@ contains
 
     ! Calcul des tendances traceurs
     call phytrac(julien, time, firstcal, lafin, dtphys, t, paprs, play, mfu, &
-         mfd, pde_u, pen_d, ycoefh, fm_therm, entr_therm, u(:, 1), v(:, 1), &
+         mfd, pde_u, pen_d, ycoefh(:, 2:), ycoefh(:, 1), fm_therm, entr_therm, u(:, 1), v(:, 1), &
          ftsol, pctsrf, frac_impa, frac_nucl, da, phi, mp, upwd, dnwd, &
          tr_seri, zmasse, ncid_startphy)
 

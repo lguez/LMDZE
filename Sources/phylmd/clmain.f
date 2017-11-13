@@ -491,17 +491,8 @@ contains
              END DO
           END DO
           
-          DO j = 1, knon
-             i = ni(j)
-             DO k = 2, klev
-                ycoefh(i, k) = ycoefh(i, k) + coefh(j, k)
-             END DO
-          END DO
-
-          DO j = 1, knon
-             i = ni(j)
-             ycoefh(i, 1) = ycoefh(i, 1) + ycdragh(j)
-          END DO
+          ycoefh(ni(:knon), 2:) = ycoefh(ni(:knon), 2:) + coefh(:knon, :)
+          ycoefh(ni(:knon), 1) = ycoefh(ni(:knon), 1) + ycdragh(:knon)
 
           ! diagnostic t, q a 2m et u, v a 10m
 
