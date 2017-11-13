@@ -169,7 +169,7 @@ contains
     REAL yu(klon, klev), yv(klon, klev)
     REAL yt(klon, klev), yq(klon, klev)
     REAL ypaprs(klon, klev + 1), ypplay(klon, klev), ydelp(klon, klev)
-    REAL ycoefm0(klon, klev), ycoefh0(klon, klev)
+    REAL ycoefm0(klon, 2:klev), ycoefh0(klon, 2:klev)
     REAL yzlay(klon, klev), zlev(klon, klev + 1), yteta(klon, klev)
     REAL ykmm(klon, klev + 1), ykmn(klon, klev + 1)
     REAL yq2(klon, klev + 1)
@@ -316,12 +316,10 @@ contains
                coefh(:knon, :), ycdragm(:knon), ycdragh(:knon))
 
           IF (iflag_pbl == 1) THEN
-             CALL coefkz2(nsrf, knon, ypaprs, ypplay, yt, ycoefm0(:knon, 2:), &
-                  ycoefh0(:knon, 2:))
-             ycoefm0(:knon, 1) = 0.
-             ycoefh0(:knon, 1) = 0.
-             coefm(:knon, :) = max(coefm(:knon, :), ycoefm0(:knon, 2:))
-             coefh(:knon, :) = max(coefh(:knon, :), ycoefh0(:knon, 2:))
+             CALL coefkz2(nsrf, knon, ypaprs, ypplay, yt, ycoefm0(:knon, :), &
+                  ycoefh0(:knon, :))
+             coefm(:knon, :) = max(coefm(:knon, :), ycoefm0(:knon, :))
+             coefh(:knon, :) = max(coefh(:knon, :), ycoefh0(:knon, :))
              ycdragm(:knon) = max(ycdragm(:knon), 0.)
              ycdragh(:knon) = max(ycdragh(:knon), 0.)
           END IF
@@ -335,10 +333,10 @@ contains
           IF (ok_kzmin) THEN
              ! Calcul d'une diffusion minimale pour les conditions tres stables
              CALL coefkzmin(knon, ypaprs, ypplay, yu, yv, yt, yq, &
-                  ycdragm(:knon), ycoefh0(:knon, 2:))
-             ycoefm0(:knon, 2:) = ycoefh0(:knon, 2:)
-             coefm(:knon, :) = max(coefm(:knon, :), ycoefm0(:knon, 2:))
-             coefh(:knon, :) = max(coefh(:knon, :), ycoefh0(:knon, 2:))
+                  ycdragm(:knon), ycoefh0(:knon, :))
+             ycoefm0(:knon, :) = ycoefh0(:knon, :)
+             coefm(:knon, :) = max(coefm(:knon, :), ycoefm0(:knon, :))
+             coefh(:knon, :) = max(coefh(:knon, :), ycoefh0(:knon, :))
           END IF
 
           IF (iflag_pbl >= 6) THEN
