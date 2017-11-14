@@ -310,7 +310,6 @@ contains
              END DO
           END DO
 
-          ! calculer Cdrag et les coefficients d'echange
           CALL coefkz(nsrf, ypaprs, ypplay, ksta, ksta_ter, yts(:knon), &
                yrugos, yu, yv, yt, yq, yqsurf(:knon), coefm(:knon, :), &
                coefh(:knon, :), ycdragm(:knon), ycdragh(:knon))
@@ -416,18 +415,6 @@ contains
              y_dflux_q(j) = y_dflux_q(j) * ypct(j)
           END DO
 
-          DO k = 2, klev
-             DO j = 1, knon
-                i = ni(j)
-                coefh(j, k) = coefh(j, k) * ypct(j)
-                coefm(j, k) = coefm(j, k) * ypct(j)
-             END DO
-          END DO
-          DO j = 1, knon
-             i = ni(j)
-             ycdragh(j) = ycdragh(j) * ypct(j)
-             ycdragm(j) = ycdragm(j) * ypct(j)
-          END DO
           DO k = 1, klev
              DO j = 1, knon
                 i = ni(j)
@@ -464,8 +451,8 @@ contains
              agesno(i, nsrf) = yagesno(j)
              fqcalving(i, nsrf) = y_fqcalving(j)
              ffonte(i, nsrf) = y_ffonte(j)
-             cdragh(i) = cdragh(i) + ycdragh(j)
-             cdragm(i) = cdragm(i) + ycdragm(j)
+             cdragh(i) = cdragh(i) + ycdragh(j) * ypct(j)
+             cdragm(i) = cdragm(i) + ycdragm(j) * ypct(j)
              dflux_t(i) = dflux_t(i) + y_dflux_t(j)
              dflux_q(i) = dflux_q(i) + y_dflux_q(j)
           END DO
@@ -491,7 +478,8 @@ contains
              END DO
           END DO
 
-          ycoefh(ni(:knon), :) = ycoefh(ni(:knon), :) + coefh(:knon, :)
+          forall (k = 2:klev) ycoefh(ni(:knon), k) &
+               = ycoefh(ni(:knon), k) + coefh(:knon, k) * ypct(:knon)
 
           ! diagnostic t, q a 2m et u, v a 10m
 
