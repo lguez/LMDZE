@@ -26,15 +26,13 @@ contains
 
     ! Local:
     INTEGER i
-    REAL zxmod, taux, tauy
+    REAL wind
 
     !---------------------------------------------------------------
 
     DO i = 1, size(u)
-       zxmod = 1. + SQRT(u(i)**2 + v(i)**2)
-       taux = u(i) * zxmod * cd_m(i)
-       tauy = v(i) * zxmod * cd_m(i)
-       ustarhb(i) = SQRT(taux**2 + tauy**2)
+       wind = SQRT(u(i)**2 + v(i)**2)
+       ustarhb(i) = wind * (1 + wind) * cd_m(i)
     ENDDO
 
   end function ustarhb
