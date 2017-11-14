@@ -184,7 +184,7 @@ contains
     REAL cdragh(klon) ! drag coefficient pour T and Q
     REAL cdragm(klon) ! drag coefficient pour vent
 
-    REAL ycoefh(klon, 2:llm) ! coef d'echange pour phytrac
+    REAL coefh(klon, 2:llm) ! coef d'echange pour phytrac
 
     REAL, save:: ffonte(klon, nbsrf)
     ! flux thermique utilise pour fondre la neige
@@ -571,7 +571,7 @@ contains
          paprs, play, fsnow, fqsurf, fevap, falbe, fluxlat, rain_fall, &
          snow_fall, fsolsw, fsollw, frugs, agesno, rugoro, d_t_vdf, d_q_vdf, &
          d_u_vdf, d_v_vdf, d_ts, flux_t, flux_q, flux_u, flux_v, cdragh, &
-         cdragm, q2, dsens, devap, ycoefh, t2m, q2m, u10m_srf, v10m_srf, &
+         cdragm, q2, dsens, devap, coefh, t2m, q2m, u10m_srf, v10m_srf, &
          pblh, capCL, oliqCL, cteiCL, pblT, therm, trmb1, trmb2, trmb3, plcl, &
          fqcalving, ffonte, run_off_lic_0)
 
@@ -952,7 +952,7 @@ contains
 
     ! Calcul des tendances traceurs
     call phytrac(julien, time, firstcal, lafin, dtphys, t, paprs, play, mfu, &
-         mfd, pde_u, pen_d, ycoefh, cdragh, fm_therm, entr_therm, u(:, 1), &
+         mfd, pde_u, pen_d, coefh, cdragh, fm_therm, entr_therm, u(:, 1), &
          v(:, 1), ftsol, pctsrf, frac_impa, frac_nucl, da, phi, mp, upwd, &
          dnwd, tr_seri, zmasse, ncid_startphy)
 

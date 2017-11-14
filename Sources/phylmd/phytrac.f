@@ -8,8 +8,8 @@ module phytrac_m
 contains
 
   SUBROUTINE phytrac(julien, gmtime, firstcal, lafin, pdtphys, t_seri, paprs, &
-       pplay, pmfu, pmfd, pde_u, pen_d, coefh, cdragh, fm_therm, entr_therm, yu1, &
-       yv1, ftsol, pctsrf, frac_impa, frac_nucl, da, phi, mp, upwd, dnwd, &
+       pplay, pmfu, pmfd, pde_u, pen_d, coefh, cdragh, fm_therm, entr_therm, &
+       yu1, yv1, ftsol, pctsrf, frac_impa, frac_nucl, da, phi, mp, upwd, dnwd, &
        tr_seri, zmasse, ncid_startphy)
 
     ! From phylmd/phytrac.F, version 1.15, 2006/02/21 08:08:30 (SVN
