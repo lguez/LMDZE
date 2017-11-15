@@ -40,9 +40,10 @@ contains
     ! qsurf---input-R- humidite relative a la surface
     ! rugos---input-R- rugosite
     ! psol----input-R- pression au sol
-    REAL, dimension(klon), intent(in):: ustar, testar, qstar
-    ! ustar---input-R- facteur d'echelle pour le vent
+    REAL, intent(in):: ustar(:) ! (knon) facteur d'\'echelle pour le vent
+    REAL, dimension(klon), intent(in):: testar
     ! testar--input-R- facteur d'echelle pour la temperature potentielle
+    REAL, dimension(klon), intent(in):: qstar
     ! qstar---input-R- facteur d'echelle pour l'humidite relative
 
     REAL, dimension(klon), intent(out):: pref
@@ -67,9 +68,9 @@ contains
 
     ! Richardson at reference level
 
-    CALL coefcdrag (knon, nsrf, speed(:knon), temp(:knon), &
-         q_zref(:knon), gref(:knon), psol(:knon), ts, qsurf, rugos, cdram, &
-         cdrah, cdran, zri1, pref)
+    CALL coefcdrag(nsrf, speed(:knon), temp(:knon), q_zref(:knon), &
+         gref(:knon), psol(:knon), ts, qsurf, rugos, cdram, cdrah, cdran, &
+         zri1, pref)
 
     DO i = 1, knon
        delu(i) = ustar(i) / sqrt(cdram(i))

@@ -39,11 +39,11 @@ contains
     ! En entr\'ee : la valeur au d\'ebut du pas de temps ; en sortie : la
     ! valeur \`a la fin du pas de temps.
 
-    REAL km(:, :) ! (knon, klev + 1)
+    REAL, intent(out):: km(:, 2:) ! (knon, 2:klev)
     ! diffusivit\'e turbulente de quantit\'e de mouvement (au bas de
     ! chaque couche) (en sortie : la valeur \`a la fin du pas de temps)
 
-    REAL kn(:, :) ! (knon, klev + 1)
+    REAL, intent(out):: kn(:, 2:) ! (knon, 2:klev)
     ! diffusivit\'e turbulente des scalaires (au bas de chaque couche)
     ! (en sortie : la valeur \`a la fin du pas de temps)
 
@@ -85,8 +85,8 @@ contains
          size(teta, 1), size(ustar), size(q2, 1), size(km, 1), size(kn, 1)], &
          "yamada4 knon")
     call assert(klev == [size(zlev, 2) - 1, size(zlay, 2), size(u, 2), &
-         size(v, 2), size(teta, 2), size(q2, 2) - 1, size(km, 2) - 1, &
-         size(kn, 2) - 1], "yamada4 klev")
+         size(v, 2), size(teta, 2), size(q2, 2) - 1, size(km, 2) + 1, &
+         size(kn, 2) + 1], "yamada4 klev")
 
     ipas = ipas + 1
 

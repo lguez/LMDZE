@@ -15,7 +15,7 @@ contains
     ! \`a la surface (pour theta et q) \`a partir des relations de
     ! Dyer-Businger.
 
-    ! Reference: Hess, Colman et McAvaney (1995)
+    ! Reference: Hess, Colman and McAvaney (1995)
 
     ! I. Musat, 01.07.2002
 
@@ -23,19 +23,24 @@ contains
 
     INTEGER, intent(in):: knon
     ! knon----input-I- nombre de points pour un type de surface
-    REAL, dimension(klon), intent(in):: speed, tair, qair
+    REAL, dimension(klon), intent(in):: speed
     ! speed---input-R- module du vent au 1er niveau du modele
+    REAL, dimension(klon), intent(in):: tair
     ! tair----input-R- temperature de l'air au 1er niveau du modele
+    REAL, dimension(klon), intent(in):: qair
     ! qair----input-R- humidite relative au 1er niveau du modele
-    REAL, dimension(klon), intent(in):: ts, qsurf, rugos
+    REAL, dimension(klon), intent(in):: ts
     ! ts------input-R- temperature de l'air a la surface
+    REAL, dimension(klon), intent(in):: qsurf
     ! qsurf---input-R- humidite relative a la surface
+    REAL, dimension(klon), intent(in):: rugos
     ! rugos---input-R- rugosite
     DOUBLE PRECISION, dimension(klon), intent(in):: lmon
     ! lmon----input-R- longueur de Monin-Obukov
-    REAL, dimension(klon), intent(in):: ustar, testar, qstar
-    ! ustar---input-R- facteur d'echelle pour le vent
+    REAL, intent(in):: ustar(:) ! (knon) facteur d'\'echelle pour le vent
+    REAL, dimension(klon), intent(in):: testar
     ! testar--input-R- facteur d'echelle pour la temperature potentielle
+    REAL, dimension(klon), intent(in):: qstar
     ! qstar---input-R- facteur d'echelle pour l'humidite relative
     REAL, intent(in):: zref
     ! zref----input-R- altitude de reference

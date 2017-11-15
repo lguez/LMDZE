@@ -43,7 +43,7 @@ contains
     REAL, intent(out):: t_10m(klon) ! temperature de l'air a 10m
     REAL, intent(out):: q_10m(klon) ! humidite specifique a 10m
     REAL, intent(out):: wind10m(:) ! (knon) norme du vent \`a 10m
-    REAL, intent(out):: ustar(klon) ! u*
+    REAL, intent(out):: ustar(:) ! (knon) u*
 
     ! Local:
     REAL, PARAMETER:: RKAR = 0.4 ! constante de von Karman
@@ -72,9 +72,8 @@ contains
        ri1(i) = 0.0
     ENDDO
 
-    CALL coefcdrag(knon, nsrf, speed(:knon), t1(:knon), q1(:knon), &
-         z1(:knon), psol(:knon), ts1, qsurf, rugos, cdram, cdrah, cdran, &
-         zri1, pref) 
+    CALL coefcdrag(nsrf, speed(:knon), t1(:knon), q1(:knon), z1(:knon), &
+         psol(:knon), ts1, qsurf, rugos, cdram, cdrah, cdran, zri1, pref) 
 
     ! Star variables 
 

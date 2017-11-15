@@ -19,10 +19,10 @@ contains
 
     INTEGER, intent(in):: nsrf ! indice pour le type de surface
 
-    REAL, intent(in), dimension(klon):: u, v, t, q
-    ! u-------input-R- vent zonal au 1er niveau du modele
-    ! v-------input-R- vent meridien au 1er niveau du modele
+    REAL, intent(in):: u(:), v(:) ! (klon) vent au 1er niveau du mod\`ele
+    REAL, intent(in), dimension(klon):: t
     ! t-------input-R- temperature de l'air au 1er niveau du modele
+    REAL, intent(in), dimension(klon):: q
     ! q-------input-R- humidite de l'air au 1er niveau du modele
 
     REAL, intent(in):: zgeop(klon) ! géopotentiel au 1er niveau du modèle

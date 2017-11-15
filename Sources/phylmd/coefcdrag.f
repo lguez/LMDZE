@@ -1,11 +1,11 @@
 module coefcdrag_m
 
-  IMPLICIT none
+  IMPLICIT NONE
 
 contains
 
-  SUBROUTINE coefcdrag (knon, nsrf, speed, t, q, zgeop, psol, ts, qsurf, &
-       rugos, cdram, cdrah, cdran, zri1, pref)
+  SUBROUTINE coefcdrag (nsrf, speed, t, q, zgeop, psol, ts, qsurf, rugos, &
+       cdram, cdrah, cdran, zri1, pref)
 
     ! From LMDZ4/libf/phylmd/coefcdrag.F90, version 1.1.1.1, 2004/05/19 12:53:07
 
@@ -20,8 +20,7 @@ contains
     use SUPHEC_M, only: rd, retv, rg, rkappa
     use dimphy, only: klon
 
-    INTEGER, intent(in) :: knon, nsrf
-    ! knon----input-I- nombre de points pour un type de surface
+    INTEGER, intent(in) :: nsrf
     ! nsrf----input-I- indice pour le type de surface; voir indicesol.inc
     REAL, intent(in) :: speed(:), t(:), q(:), zgeop(:), psol(:) ! (knon)
     ! speed---input-R- module du vent au 1er niveau du modele
@@ -52,7 +51,7 @@ contains
 
     !-------------------------------------------------------------------------
 
-    DO i = 1, knon
+    DO i = 1, size(speed)
        zdphi(i) = zgeop(i)
        zdu2(i) = speed(i)**2
        pref(i) = exp(log(psol(i)) - zdphi(i)/(RD*t(i)* &
@@ -94,18 +93,6 @@ contains
                **(1./1.25)
        ENDIF
     END DO
-
-  contains
-
-    REAL function fsta(x)
-      real x
-      fsta = 1.0 / (1.0+10.0*x*(1+8.0*x))
-    end function fsta
-
-    REAL function fins(x)
-      real x
-      fins = SQRT(1.0-18.0*x)
-    end function fins
 
   END SUBROUTINE coefcdrag
 

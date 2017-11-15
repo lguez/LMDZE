@@ -171,7 +171,6 @@ contains
     REAL ypaprs(klon, klev + 1), ypplay(klon, klev), ydelp(klon, klev)
     REAL ycoefm0(klon, 2:klev), ycoefh0(klon, 2:klev)
     REAL yzlay(klon, klev), zlev(klon, klev + 1), yteta(klon, klev)
-    REAL ykmm(klon, klev + 1), ykmn(klon, klev + 1)
     REAL yq2(klon, klev + 1)
     REAL delp(klon, klev)
     INTEGER i, k, nsrf
@@ -375,9 +374,7 @@ contains
              ustar(:knon) = ustarhb(yu(:knon, 1), yv(:knon, 1), ycdragm(:knon))
              CALL yamada4(dtime, rg, zlev(:knon, :), yzlay(:knon, :), &
                   yu(:knon, :), yv(:knon, :), yteta(:knon, :), yq2(:knon, :), &
-                  ykmm(:knon, :), ykmn(:knon, :), ustar(:knon))
-             ycoefm(:knon, :) = ykmm(:knon, 2:klev)
-             ycoefh(:knon, :) = ykmn(:knon, 2:klev)
+                  ycoefm(:knon, :), ycoefh(:knon, :), ustar(:knon))
           END IF
 
           CALL clvent(dtime, yu(:knon, 1), yv(:knon, 1), ycoefm(:knon, :), &
@@ -504,7 +501,7 @@ contains
 
           CALL stdlevvar(klon, knon, nsrf, u1(:knon), v1(:knon), tair1(:knon), &
                qair1, zgeo1, tairsol, qairsol, rugo1, psfce, patm, yt2m, &
-               yq2m, yt10m, yq10m, wind10m(:knon), ustar)
+               yq2m, yt10m, yq10m, wind10m(:knon), ustar(:knon))
 
           DO j = 1, knon
              i = ni(j)
