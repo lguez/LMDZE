@@ -94,7 +94,6 @@ CONTAINS
          interbar=.FALSE.)
 
     print *, 'Compute all the parameters needed for the gravity wave drag code'
-
     CALL grid_noro(lon_rad, lat_rad, relief, rlonv, rlatu, phis, zmea_2d, &
          zstd_2d, zsig_2d, zgam_2d, zthe_2d, zpic_2d, zval_2d, mask)
     phis(:, :) = phis(:, :) * 9.81

@@ -9,10 +9,10 @@ contains
        pvph, ppsi, pzdep, pulow, pvlow, ptheta, pgamma, pmea, ppic, pval, pnu, &
        pd1, pd2, pdmod)
 
-    ! *gwsetup*
-    ! interface from *orodrag*
-    ! see ecmwf research department documentation of the "i.f.s."
-    ! modifications f.lott for the new-gwdrag scheme november 1993
+    ! gwsetup
+    ! Interface from orodrag.
+    ! See ECMWF research department documentation of the I.F.S.
+    ! Modifications F. Lott for the new-gwdrag scheme, november 1993.
 
     USE dimens_m
     USE dimphy

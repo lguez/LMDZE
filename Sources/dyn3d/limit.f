@@ -9,8 +9,8 @@ contains
     ! Authors: L. Fairhead, Z. X. Li, P. Le Van
 
     ! This subroutine creates files containing boundary conditions.
-    ! It uses files with climatological data.
-    ! Both grids must be regular.
+    ! It uses files with climatological data.  Both grids must be
+    ! regular.
 
     use conf_dat2d_m, only: conf_dat2d
     use dimens_m, only: iim, jjm
@@ -26,11 +26,12 @@ contains
          NF95_PUT_VAR
     use netcdf, only: NF90_CLOBBER, NF90_FLOAT, NF90_GLOBAL, NF90_NOWRITE, &
          NF90_UNLIMITED
+    use nr_util, only: assert
     use numer_rec_95, only: spline, splint
     use start_init_orog_m, only: mask
     use unit_nml_m, only: unit_nml
 
-    ! Variables local to the procedure:
+    ! Local:
 
     LOGICAL:: extrap = .FALSE.
     ! (extrapolation de donn\'ees, comme pour les SST lorsque le fichier
@@ -247,30 +248,24 @@ contains
     call nf95_inq_dimid(ncid, "time", dimid)
     call NF95_INQuire_DIMension(ncid, dimid, nclen=lmdep)
     print *, 'lmdep = ', lmdep
-    !PM28/02/2002 : nouvelle coord temporelle fichiers AMIP pas en jours
-    !        Ici on suppose qu'on a 12 mois (de 30 jours).
-    IF (lmdep /= 12) stop 'Unknown AMIP file: not 12 months?'
+    ! Ici on suppose qu'on a 12 mois (de 30 jours).
+    call assert(lmdep == 12, 'limit: AMIP file does not contain 12 months')
 
     ALLOCATE(champ(imdep, jmdep), champtime(iim, jjm + 1, lmdep))
-    IF(extrap)  THEN
-       ALLOCATE(work(imdep, jmdep))
-    ENDIF
+    IF (extrap) ALLOCATE(work(imdep, jmdep))
     ALLOCATE(dlon(imdep), dlat(jmdep))
     call NF95_INQ_VARID(ncid, 'tosbcs', varid)
 
     DO l = 1, lmdep
        call NF95_GET_VAR(ncid, varid, champ, start=(/1, 1, l/))
        CALL conf_dat2d(dlon_ini, dlat_ini, dlon, dlat, champ)
-       IF (extrap) THEN
-          CALL extrapol(champ, imdep, jmdep, 999999., .TRUE., .TRUE., 2, work)
-       ENDIF
-
+       IF (extrap) &
+            CALL extrapol(champ, imdep, jmdep, 999999., .TRUE., .TRUE., 2, work)
        CALL inter_barxy(dlon, dlat(:jmdep -1), champ, rlonu(:iim), rlatv, &
             champtime(:, :, l))
     ENDDO
 
     call NF95_CLOSE(ncid)
-
     DEALLOCATE(dlon, dlat, champ)
     allocate(yder(lmdep))
 
@@ -289,15 +284,18 @@ contains
     champan(iim + 1, :, :) = champan(1, :, :)
 
     !IM14/03/2002 : SST amipbc greater then 271.38
-    PRINT *, 'SUB. limit_netcdf.F IM : SST Amipbc >= 271.38 '
+    PRINT *, 'limit: SST Amipbc >= 271.38 '
+
     DO k = 1, 360
        DO j = 1, jjm + 1
           DO i = 1, iim
-             champan(i, j, k) = amax1(champan(i, j, k), 271.38)
+             champan(i, j, k) = max(champan(i, j, k), 271.38)
           ENDDO
+          
           champan(iim + 1, j, k) = champan(1, j, k)
        ENDDO
     ENDDO
+    
     forall (k = 1:360) phy_sst(:, k) = pack(champan(:, :, k), dyn_phy)
 
     PRINT *, "Traitement de l'albedo..."

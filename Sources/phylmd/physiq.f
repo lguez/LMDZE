@@ -170,7 +170,7 @@ contains
     REAL, save:: zval(klon) ! Minimum de l'OESM
     REAL, save:: rugoro(klon) ! longueur de rugosite de l'OESM
     REAL zulow(klon), zvlow(klon)
-    INTEGER igwd, itest(klon)
+    INTEGER ktest(klon)
 
     REAL, save:: agesno(klon, nbsrf) ! age de la neige
     REAL, save:: run_off_lic_0(klon)
@@ -897,18 +897,16 @@ contains
 
     IF (ok_orodr) THEN
        ! S\'election des points pour lesquels le sch\'ema est actif :
-       igwd = 0
        DO i = 1, klon
-          itest(i) = 0
+          ktest(i) = 0
           IF (zpic(i) - zmea(i) > 100. .AND. zstd(i) > 10.) THEN
-             itest(i) = 1
-             igwd = igwd + 1
+             ktest(i) = 1
           ENDIF
        ENDDO
 
-       CALL drag_noro(klon, llm, dtphys, paprs, play, zmea, zstd, zsig, zgam, &
-            zthe, zpic, zval, itest, t_seri, u_seri, v_seri, zulow, zvlow, &
-            zustrdr, zvstrdr, d_t_oro, d_u_oro, d_v_oro)
+       CALL drag_noro(dtphys, paprs, play, zmea, zstd, zsig, zgam, zthe, &
+            zpic, zval, ktest, t_seri, u_seri, v_seri, zulow, zvlow, zustrdr, &
+            zvstrdr, d_t_oro, d_u_oro, d_v_oro)
 
        ! ajout des tendances
        DO k = 1, llm
@@ -922,16 +920,14 @@ contains
 
     IF (ok_orolf) THEN
        ! S\'election des points pour lesquels le sch\'ema est actif :
-       igwd = 0
        DO i = 1, klon
-          itest(i) = 0
+          ktest(i) = 0
           IF (zpic(i) - zmea(i) > 100.) THEN
-             itest(i) = 1
-             igwd = igwd + 1
+             ktest(i) = 1
           ENDIF
        ENDDO
 
-       CALL lift_noro(dtphys, paprs, play, zmea, zstd, zpic, itest, t_seri, &
+       CALL lift_noro(dtphys, paprs, play, zmea, zstd, zpic, ktest, t_seri, &
             u_seri, v_seri, zulow, zvlow, zustrli, zvstrli, d_t_lif, &
             d_u_lif, d_v_lif)
 

@@ -20,8 +20,6 @@ contains
     !-------------------------------------------------
 
     ! Default values:
-    clon_deg = 0.
-    clat_deg = 0.
     grossismx = 1.
     grossismy = 1.
     dzoomx = 0.2
