@@ -327,6 +327,17 @@ contains
                yq(:knon, 1), zgeop(:knon, 1), yts(:knon), yqsurf(:knon), &
                yrugos(:knon), ycdragm(:knon), ycdragh(:knon)) 
 
+          IF (iflag_pbl == 1) THEN
+             ycdragm(:knon) = max(ycdragm(:knon), 0.)
+             ycdragh(:knon) = max(ycdragh(:knon), 0.)
+          end IF
+          
+          ! on met un seuil pour ycdragm et ycdragh
+          IF (nsrf == is_oce) THEN
+             ycdragm(:knon) = min(ycdragm(:knon), cdmmax)
+             ycdragh(:knon) = min(ycdragh(:knon), cdhmax)
+          END IF
+
           CALL coefkz(nsrf, ypaprs(:knon, :), ypplay(:knon, :), ksta, &
                ksta_ter, yts(:knon), yu(:knon, :), yv(:knon, :), yt(:knon, :), &
                yq(:knon, :), zgeop(:knon, :), ycoefm(:knon, :), &
@@ -337,14 +348,6 @@ contains
                   ycoefh0(:knon, :))
              ycoefm(:knon, :) = max(ycoefm(:knon, :), ycoefm0(:knon, :))
              ycoefh(:knon, :) = max(ycoefh(:knon, :), ycoefh0(:knon, :))
-             ycdragm(:knon) = max(ycdragm(:knon), 0.)
-             ycdragh(:knon) = max(ycdragh(:knon), 0.)
-          END IF
-
-          ! on met un seuil pour ycdragm et ycdragh
-          IF (nsrf == is_oce) THEN
-             ycdragm(:knon) = min(ycdragm(:knon), cdmmax)
-             ycdragh(:knon) = min(ycdragh(:knon), cdhmax)
           END IF
 
           IF (ok_kzmin) THEN

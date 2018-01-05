@@ -4,8 +4,8 @@ module coefkz_m
 
 contains
 
-  SUBROUTINE coefkz(nsrf, paprs, pplay, ksta, ksta_ter, ts, u, v, t, q, &
-       zgeop, coefm, coefh)
+  SUBROUTINE coefkz(nsrf, paprs, pplay, ksta, ksta_ter, ts, u, v, t, q, zgeop, &
+       coefm, coefh)
 
     ! Authors: F. Hourdin, M. Forichon, Z. X. Li (LMD/CNRS)
     ! Date: September 22nd, 1993
