@@ -29,6 +29,7 @@ clqh.f
 cltrac.f
 cltracrn.f
 clvent.f
+coef_diff_turb.f
 coefcdrag.f
 coefkz2.f
 coefkz.f

@@ -4,8 +4,7 @@ module coefkz_m
 
 contains
 
-  SUBROUTINE coefkz(nsrf, paprs, pplay, ksta, ksta_ter, ts, u, v, t, q, zgeop, &
-       coefm, coefh)
+  SUBROUTINE coefkz(nsrf, paprs, pplay, ts, u, v, t, q, zgeop, coefm, coefh)
 
     ! Authors: F. Hourdin, M. Forichon, Z. X. Li (LMD/CNRS)
     ! Date: September 22nd, 1993
@@ -13,6 +12,7 @@ contains
     ! Objet : calculer les coefficients d'échange turbulent dans
     ! l'atmosphère.
 
+    USE clesphys, ONLY: ksta, ksta_ter
     USE conf_phys_m, ONLY: iflag_pbl
     USE dimphy, ONLY: klev
     USE fcttre, ONLY: foede, foeew
@@ -28,7 +28,6 @@ contains
     real, intent(in):: pplay(:, :) ! (knon, klev)
     ! pression au milieu de chaque couche (en Pa)
 
-    REAL, intent(in):: ksta, ksta_ter
     REAL, intent(in):: ts(:) ! (knon) temperature du sol (en Kelvin)
     REAL, intent(in):: u(:, :), v(:, :) ! (knon, klev) wind
     REAL, intent(in):: t(:, :) ! (knon, klev) temperature (K)

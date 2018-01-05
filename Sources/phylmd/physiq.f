@@ -18,8 +18,7 @@ contains
     USE abort_gcm_m, ONLY: abort_gcm
     use ajsec_m, only: ajsec
     use calltherm_m, only: calltherm
-    USE clesphys, ONLY: cdhmax, cdmmax, ecrit_ins, ksta, ksta_ter, ok_kzmin, &
-         ok_instan
+    USE clesphys, ONLY: cdhmax, cdmmax, ecrit_ins, ok_instan
     USE clesphys2, ONLY: conv_emanuel, nbapp_rad, new_oliq, ok_orodr, ok_orolf
     USE clmain_m, ONLY: clmain
     use clouds_gno_m, only: clouds_gno
@@ -567,13 +566,12 @@ contains
     END forall
 
     CALL clmain(dtphys, pctsrf, t_seri, q_seri, u_seri, v_seri, julien, mu0, &
-         ftsol, cdmmax, cdhmax, ksta, ksta_ter, ok_kzmin, ftsoil, qsol, &
-         paprs, play, fsnow, fqsurf, fevap, falbe, fluxlat, rain_fall, &
-         snow_fall, fsolsw, fsollw, frugs, agesno, rugoro, d_t_vdf, d_q_vdf, &
-         d_u_vdf, d_v_vdf, d_ts, flux_t, flux_q, flux_u, flux_v, cdragh, &
-         cdragm, q2, dsens, devap, coefh, t2m, q2m, u10m_srf, v10m_srf, &
-         pblh, capCL, oliqCL, cteiCL, pblT, therm, trmb1, trmb2, trmb3, plcl, &
-         fqcalving, ffonte, run_off_lic_0)
+         ftsol, cdmmax, cdhmax, ftsoil, qsol, paprs, play, fsnow, fqsurf, &
+         fevap, falbe, fluxlat, rain_fall, snow_fall, fsolsw, fsollw, frugs, &
+         agesno, rugoro, d_t_vdf, d_q_vdf, d_u_vdf, d_v_vdf, d_ts, flux_t, &
+         flux_q, flux_u, flux_v, cdragh, cdragm, q2, dsens, devap, coefh, t2m, &
+         q2m, u10m_srf, v10m_srf, pblh, capCL, oliqCL, cteiCL, pblT, therm, &
+         trmb1, trmb2, trmb3, plcl, fqcalving, ffonte, run_off_lic_0)
 
     ! Incr\'ementation des flux
 

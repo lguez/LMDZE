@@ -5,12 +5,12 @@ module clmain_m
 contains
 
   SUBROUTINE clmain(dtime, pctsrf, t, q, u, v, julien, mu0, ftsol, cdmmax, &
-       cdhmax, ksta, ksta_ter, ok_kzmin, ftsoil, qsol, paprs, pplay, fsnow, &
-       qsurf, evap, falbe, fluxlat, rain_fall, snow_f, fsolsw, fsollw, frugs, &
-       agesno, rugoro, d_t, d_q, d_u, d_v, d_ts, flux_t, flux_q, flux_u, &
-       flux_v, cdragh, cdragm, q2, dflux_t, dflux_q, coefh, t2m, q2m, &
-       u10m_srf, v10m_srf, pblh, capcl, oliqcl, cteicl, pblt, therm, trmb1, &
-       trmb2, trmb3, plcl, fqcalving, ffonte, run_off_lic_0)
+       cdhmax, ftsoil, qsol, paprs, pplay, fsnow, qsurf, evap, falbe, fluxlat, &
+       rain_fall, snow_f, fsolsw, fsollw, frugs, agesno, rugoro, d_t, d_q, &
+       d_u, d_v, d_ts, flux_t, flux_q, flux_u, flux_v, cdragh, cdragm, q2, &
+       dflux_t, dflux_q, coefh, t2m, q2m, u10m_srf, v10m_srf, pblh, capcl, &
+       oliqcl, cteicl, pblt, therm, trmb1, trmb2, trmb3, plcl, fqcalving, &
+       ffonte, run_off_lic_0)
 
     ! From phylmd/clmain.F, version 1.6, 2005/11/16 14:47:19
     ! Author: Z. X. Li (LMD/CNRS), date: 1993/08/18
@@ -24,9 +24,7 @@ contains
     use clcdrag_m, only: clcdrag
     use clqh_m, only: clqh
     use clvent_m, only: clvent
-    use coefkz_m, only: coefkz
-    use coefkzmin_m, only: coefkzmin
-    use coefkz2_m, only: coefkz2
+    use coef_diff_turb_m, only: coef_diff_turb
     USE conf_gcm_m, ONLY: lmt_pas
     USE conf_phys_m, ONLY: iflag_pbl
     USE dimphy, ONLY: klev, klon, zmasq
@@ -35,10 +33,8 @@ contains
     USE indicesol, ONLY: epsfra, is_lic, is_oce, is_sic, is_ter, nbsrf
     USE interfoce_lim_m, ONLY: interfoce_lim
     use stdlevvar_m, only: stdlevvar
-    USE suphec_m, ONLY: rd, rg, rkappa
+    USE suphec_m, ONLY: rd, rg
     use time_phylmdz, only: itap
-    use ustarhb_m, only: ustarhb
-    use yamada4_m, only: yamada4
 
     REAL, INTENT(IN):: dtime ! interval du temps (secondes)
 
@@ -52,8 +48,6 @@ contains
     REAL, intent(in):: mu0(klon) ! cosinus de l'angle solaire zenithal     
     REAL, INTENT(IN):: ftsol(:, :) ! (klon, nbsrf) temp\'erature du sol (en K)
     REAL, INTENT(IN):: cdmmax, cdhmax ! seuils cdrm, cdrh
-    REAL, INTENT(IN):: ksta, ksta_ter
-    LOGICAL, INTENT(IN):: ok_kzmin
 
     REAL, INTENT(inout):: ftsoil(klon, nsoilmx, nbsrf)
     ! soil temperature of surface fraction
@@ -171,8 +165,6 @@ contains
     REAL yu(klon, klev), yv(klon, klev)
     REAL yt(klon, klev), yq(klon, klev)
     REAL ypaprs(klon, klev + 1), ypplay(klon, klev), ydelp(klon, klev)
-    REAL ycoefm0(klon, 2:klev), ycoefh0(klon, 2:klev)
-    REAL yzlay(klon, klev), zlev(klon, klev + 1), yteta(klon, klev)
     REAL yq2(klon, klev + 1)
     REAL delp(klon, klev)
     INTEGER i, k, nsrf
@@ -331,73 +323,25 @@ contains
              ycdragm(:knon) = max(ycdragm(:knon), 0.)
              ycdragh(:knon) = max(ycdragh(:knon), 0.)
           end IF
-          
+
           ! on met un seuil pour ycdragm et ycdragh
           IF (nsrf == is_oce) THEN
              ycdragm(:knon) = min(ycdragm(:knon), cdmmax)
              ycdragh(:knon) = min(ycdragh(:knon), cdhmax)
           END IF
 
-          CALL coefkz(nsrf, ypaprs(:knon, :), ypplay(:knon, :), ksta, &
-               ksta_ter, yts(:knon), yu(:knon, :), yv(:knon, :), yt(:knon, :), &
-               yq(:knon, :), zgeop(:knon, :), ycoefm(:knon, :), &
-               ycoefh(:knon, :))
-
-          IF (iflag_pbl == 1) THEN
-             CALL coefkz2(nsrf, knon, ypaprs, ypplay, yt, ycoefm0(:knon, :), &
-                  ycoefh0(:knon, :))
-             ycoefm(:knon, :) = max(ycoefm(:knon, :), ycoefm0(:knon, :))
-             ycoefh(:knon, :) = max(ycoefh(:knon, :), ycoefh0(:knon, :))
-          END IF
-
-          IF (ok_kzmin) THEN
-             ! Calcul d'une diffusion minimale pour les conditions tres stables
-             CALL coefkzmin(knon, ypaprs, ypplay, yu, yv, yt, yq, &
-                  ycdragm(:knon), ycoefh0(:knon, :))
-             ycoefm0(:knon, :) = ycoefh0(:knon, :)
-             ycoefm(:knon, :) = max(ycoefm(:knon, :), ycoefm0(:knon, :))
-             ycoefh(:knon, :) = max(ycoefh(:knon, :), ycoefh0(:knon, :))
-          END IF
-
-          IF (iflag_pbl >= 6) THEN
-             ! Mellor et Yamada adapt\'e \`a Mars, Richard Fournier et
-             ! Fr\'ed\'eric Hourdin
-             yzlay(:knon, 1) = rd * yt(:knon, 1) / (0.5 * (ypaprs(:knon, 1) &
-                  + ypplay(:knon, 1))) &
-                  * (ypaprs(:knon, 1) - ypplay(:knon, 1)) / rg
-
-             DO k = 2, klev
-                yzlay(:knon, k) = yzlay(:knon, k-1) &
-                     + rd * 0.5 * (yt(1:knon, k-1) + yt(1:knon, k)) &
-                     / ypaprs(1:knon, k) &
-                     * (ypplay(1:knon, k-1) - ypplay(1:knon, k)) / rg
-             END DO
-
-             DO k = 1, klev
-                yteta(1:knon, k) = yt(1:knon, k) * (ypaprs(1:knon, 1) &
-                     / ypplay(1:knon, k))**rkappa * (1. + 0.61 * yq(1:knon, k))
-             END DO
-
-             zlev(:knon, 1) = 0.
-             zlev(:knon, klev + 1) = 2. * yzlay(:knon, klev) &
-                  - yzlay(:knon, klev - 1)
-
-             DO k = 2, klev
-                zlev(:knon, k) = 0.5 * (yzlay(:knon, k) + yzlay(:knon, k-1))
-             END DO
-
+          IF (iflag_pbl >= 6) then
              DO k = 1, klev + 1
                 DO j = 1, knon
                    i = ni(j)
                    yq2(j, k) = q2(i, k, nsrf)
                 END DO
              END DO
+          end IF
 
-             ustar(:knon) = ustarhb(yu(:knon, 1), yv(:knon, 1), ycdragm(:knon))
-             CALL yamada4(dtime, rg, zlev(:knon, :), yzlay(:knon, :), &
-                  yu(:knon, :), yv(:knon, :), yteta(:knon, :), yq2(:knon, :), &
-                  ycoefm(:knon, :), ycoefh(:knon, :), ustar(:knon))
-          END IF
+          call coef_diff_turb(dtime, nsrf, ni(:knon), ypaprs, ypplay, yu, yv, &
+               yq, yt, yts, ycdragm, zgeop(:knon, :), ycoefm(:knon, :), &
+               ycoefh(:knon, :), yq2)
 
           CALL clvent(dtime, yu(:knon, 1), yv(:knon, 1), ycoefm(:knon, :), &
                ycdragm(:knon), yt(:knon, :), yu(:knon, :), ypaprs(:knon, :), &
