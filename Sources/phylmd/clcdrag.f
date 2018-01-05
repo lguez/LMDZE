@@ -12,45 +12,49 @@ contains
     ! chaleur sensible et latente (pcfh).
     ! Calculer le frottement au sol (Cdrag)
 
-    USE dimphy, ONLY: klon
     USE indicesol, ONLY: is_oce
+    use nr_util, only: assert_eq
     USE suphec_m, ONLY: rcpd, retv, rg
     USE yoethf_m, ONLY: rvtmp2
 
     INTEGER, intent(in):: nsrf ! indice pour le type de surface
 
-    REAL, intent(in):: u(:), v(:) ! (klon) vent au 1er niveau du mod\`ele
-    REAL, intent(in), dimension(klon):: t
-    ! t-------input-R- temperature de l'air au 1er niveau du modele
-    REAL, intent(in), dimension(klon):: q
-    ! q-------input-R- humidite de l'air au 1er niveau du modele
+    REAL, intent(in):: u(:), v(:) ! (knon) vent au 1er niveau du mod\`ele
 
-    REAL, intent(in):: zgeop(klon) ! géopotentiel au 1er niveau du modèle
+    REAL, intent(in):: t(:) ! (knon)
+    ! temperature de l'air au 1er niveau du modele
+
+    REAL, intent(in):: q(:) ! (knon) ! humidite de l'air au 1er niveau du modele
+    REAL, intent(in):: zgeop(:) ! (knon) géopotentiel au 1er niveau du modèle
     REAL, intent(in):: ts(:) ! (knon) temperature de l'air a la surface
     REAL, intent(in):: qsurf(:) ! (knon) humidite de l'air a la surface
-    REAL, intent(in):: rugos(klon) ! rugosit\'e
+    REAL, intent(in):: rugos(:) ! (knon) rugosit\'e
+    REAL, intent(out):: pcfm(:) ! (knon) cdrag pour le moment 
 
-    REAL, intent(out):: pcfm(:), pcfh(:) ! (knon)
-    ! pcfm---output-R- cdrag pour le moment 
-    ! pcfh---output-R- cdrag pour les flux de chaleur latente et sensible
+    REAL, intent(out):: pcfh(:) ! (knon)
+    ! cdrag pour les flux de chaleur latente et sensible
 
     ! Local:
 
     ! Quelques constantes et options:
-    REAL, PARAMETER:: ckap=0.40, cb=5.0, cc=5.0, cd=5.0, cepdu2=(0.1)**2
+    REAL, PARAMETER:: ckap=0.40, cb=5.0, cc=5.0, cd=5.0, cepdu2=0.1**2
 
-    INTEGER:: i
+    INTEGER:: i, knon
     REAL:: zdu2, ztsolv, ztvd, zscf
     REAL:: zucf, zcr
     REAL:: friv, frih
-    REAL, dimension(klon):: zcfm1, zcfm2
-    REAL, dimension(klon):: zcfh1, zcfh2
-    REAL, dimension(klon):: zcdn
-    REAL, dimension(klon):: zri
+    REAL, dimension(size(u)):: zcfm1, zcfm2
+    REAL, dimension(size(u)):: zcfh1, zcfh2
+    REAL, dimension(size(u)):: zcdn
+    REAL, dimension(size(u)):: zri
 
     !--------------------------------------------------------------------
 
-    DO i = 1, size(pcfm)
+    knon = assert_eq([size(u), size(v), size(t), size(q), size(zgeop), &
+         size(ts), size(qsurf), size(rugos), size(pcfm), size(pcfh), &
+         size(pcfm)], "clcdrag knon")
+    
+    DO i = 1, knon
        zdu2 = max(cepdu2,u(i)**2+v(i)**2)
        ztsolv = ts(i) * (1.0+RETV*qsurf(i))
        ztvd = (t(i)+zgeop(i)/RCPD/(1.+RVTMP2*q(i))) &

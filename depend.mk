@@ -19,17 +19,17 @@ caldyn0.o : vitvert.o tourpot.o sortvarc.o paramet_m.o massdair.o massbarxy.o ma
 calfis.o : physiq.o grid_change.o dynetat0.o disvert.o dimphy.o dimens_m.o comgeom.o comconst.o 
 calltherm.o : thermcell.o ctherm.o dimphy.o 
 ce0l.o : unit_nml_m.o read_serre.o limit.o grilles_gcm_netcdf_sub.o etat0.o dimens_m.o conf_gcm.o comdissnew.o 
-clcdrag.o : yoethf.o suphec.o indicesol.o dimphy.o 
+clcdrag.o : yoethf.o suphec.o indicesol.o 
 cleanstr.o : mathelp.o strlowercase.o 
 clesphys.o : unit_nml_m.o 
 clesphys2.o : conf_gcm.o unit_nml_m.o 
-clmain.o : yamada4.o ustarhb.o time_phylmdz.o suphec.o stdlevvar.o interfoce_lim.o indicesol.o hbtm.o dimsoil.o dimphy.o conf_phys.o conf_gcm.o coefkz2.o coefkzmin.o coefkz.o clvent.o clqh.o 
+clmain.o : yamada4.o ustarhb.o time_phylmdz.o suphec.o stdlevvar.o interfoce_lim.o indicesol.o hbtm.o dimsoil.o dimphy.o conf_phys.o conf_gcm.o coefkz2.o coefkzmin.o coefkz.o clvent.o clqh.o clcdrag.o 
 clqh.o : suphec.o interfsurf_hq.o dimphy.o conf_phys.o 
 cltrac.o : suphec.o dimphy.o dimens_m.o 
 cltracrn.o : suphec.o dimphy.o indicesol.o 
 clvent.o : suphec.o dimphy.o 
 coefcdrag.o : dimphy.o suphec.o indicesol.o 
-coefkz.o : yoethf.o suphec.o indicesol.o FCTTRE.o dimphy.o conf_phys.o clcdrag.o 
+coefkz.o : yoethf.o suphec.o indicesol.o FCTTRE.o dimphy.o conf_phys.o 
 coefkz2.o : suphec.o conf_gcm.o dimphy.o indicesol.o dimens_m.o 
 coefkzmin.o : suphec.o dimphy.o 
 comconst.o : conf_gcm.o 

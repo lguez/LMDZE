@@ -21,6 +21,7 @@ contains
     ! ne tient pas compte de la diff\'erentiation des sous-fractions
     ! de sol.
 
+    use clcdrag_m, only: clcdrag
     use clqh_m, only: clqh
     use clvent_m, only: clvent
     use coefkz_m, only: coefkz
@@ -150,7 +151,8 @@ contains
     real y_run_off_lic_0(klon)
     REAL rugmer(klon)
     REAL ytsoil(klon, nsoilmx)
-    REAL yts(klon), yrugos(klon), ypct(klon), yz0_new(klon)
+    REAL yts(klon), ypct(klon), yz0_new(klon)
+    real yrugos(klon) ! longeur de rugosite (en m)
     REAL yalb(klon)
     REAL snow(klon), yqsurf(klon), yagesno(klon)
     real yqsol(klon) ! column-density of water in soil, in kg m-2
@@ -200,6 +202,7 @@ contains
 
     REAL qairsol(klon), zgeo1(klon)
     REAL rugo1(klon)
+    REAL zgeop(klon, klev)
 
     !------------------------------------------------------------
 
@@ -309,9 +312,25 @@ contains
              END DO
           END DO
 
-          CALL coefkz(nsrf, ypaprs, ypplay, ksta, ksta_ter, yts(:knon), &
-               yrugos, yu, yv, yt, yq, yqsurf(:knon), ycoefm(:knon, :), &
-               ycoefh(:knon, :), ycdragm(:knon), ycdragh(:knon))
+          ! Calculer les géopotentiels de chaque couche:
+
+          zgeop(:knon, 1) = RD * yt(:knon, 1) / (0.5 * (ypaprs(:knon, 1) &
+               + ypplay(:knon, 1))) * (ypaprs(:knon, 1) - ypplay(:knon, 1))
+
+          DO k = 2, klev
+             zgeop(:knon, k) = zgeop(:knon, k - 1) + RD * 0.5 &
+                  * (yt(:knon, k - 1) + yt(:knon, k)) / ypaprs(:knon, k) &
+                  * (ypplay(:knon, k - 1) - ypplay(:knon, k))
+          ENDDO
+
+          CALL clcdrag(nsrf, yu(:knon, 1), yv(:knon, 1), yt(:knon, 1), &
+               yq(:knon, 1), zgeop(:knon, 1), yts(:knon), yqsurf(:knon), &
+               yrugos(:knon), ycdragm(:knon), ycdragh(:knon)) 
+
+          CALL coefkz(nsrf, ypaprs(:knon, :), ypplay(:knon, :), ksta, &
+               ksta_ter, yts(:knon), yu(:knon, :), yv(:knon, :), yt(:knon, :), &
+               yq(:knon, :), zgeop(:knon, :), ycoefm(:knon, :), &
+               ycoefh(:knon, :))
 
           IF (iflag_pbl == 1) THEN
              CALL coefkz2(nsrf, knon, ypaprs, ypplay, yt, ycoefm0(:knon, :), &

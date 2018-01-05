@@ -28,9 +28,10 @@ contains
 
     ! Arguments:
 
-    INTEGER knon, nsrf
-    REAL paprs(klon, klev+1), pplay(klon, klev)
-    REAL t(klon, klev)
+    INTEGER knon
+    integer, intent(in):: nsrf
+    REAL, intent(in):: paprs(klon, klev+1), pplay(klon, klev)
+    REAL, intent(in):: t(klon, klev)
 
     REAL, intent(out):: pcfm(:, 2:), pcfh(:, 2:) ! (knon, 2:klev)
 
