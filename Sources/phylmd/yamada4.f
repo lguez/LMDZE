@@ -8,16 +8,16 @@ module yamada4_m
 
 contains
 
-  SUBROUTINE yamada4(dt, g, zlev, zlay, u, v, teta, q2, km, kn, ustar)
+  SUBROUTINE yamada4(dt, zlev, zlay, u, v, teta, q2, km, kn, ustar)
 
     ! From LMDZ4/libf/phylmd/yamada4.F, version 1.1 2004/06/22 11:45:36
 
     USE conf_phys_m, ONLY: iflag_pbl
     USE dimphy, ONLY: klev
     use nr_util, only: assert, assert_eq
+    USE suphec_m, ONLY: rg
 
     REAL, intent(in):: dt ! pas de temps
-    real, intent(in):: g
 
     REAL zlev(:, :) ! (knon, klev + 1)
     ! altitude \`a chaque niveau (interface inf\'erieure de la couche de
@@ -122,7 +122,7 @@ contains
           m2(ig, k) = ((u(ig, k)-u(ig, k-1))**2 + (v(ig, k)-v(ig, k-1))**2) &
                /(dz(ig, k)*dz(ig, k))
           dtetadz(ig, k) = (teta(ig, k)-teta(ig, k-1))/dz(ig, k)
-          n2(ig, k) = g*2.*dtetadz(ig, k)/(teta(ig, k-1) + teta(ig, k))
+          n2(ig, k) = rg*2.*dtetadz(ig, k)/(teta(ig, k-1) + teta(ig, k))
           ri = n2(ig, k)/max(m2(ig, k), 1.e-10)
           if (ri.lt.ric) then
              rif(ig, k) = frif(ri)

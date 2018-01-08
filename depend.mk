@@ -31,7 +31,7 @@ clvent.o : suphec.o dimphy.o
 coef_diff_turb.o : yamada4.o ustarhb.o suphec.o dimphy.o conf_phys.o coefkz2.o coefkzmin.o coefkz.o clesphys.o 
 coefcdrag.o : dimphy.o suphec.o indicesol.o 
 coefkz.o : yoethf.o suphec.o indicesol.o FCTTRE.o dimphy.o conf_phys.o clesphys.o 
-coefkz2.o : suphec.o conf_gcm.o dimphy.o indicesol.o dimens_m.o 
+coefkz2.o : suphec.o dimphy.o indicesol.o 
 coefkzmin.o : suphec.o dimphy.o 
 comconst.o : conf_gcm.o 
 comdissnew.o : unit_nml_m.o 
@@ -253,7 +253,7 @@ vlz.o : conf_gcm.o disvert.o comconst.o paramet_m.o dimens_m.o
 writedynav.o : temps.o paramet_m.o initdynav.o iniadvtrac.o histwrite.o histsync.o dimens_m.o covnat.o comconst.o 
 writefield.o : getfieldindex.o createnewfield.o 
 writehist.o : temps.o paramet_m.o inithist.o histwrite.o histsync.o dimens_m.o covnat.o 
-yamada4.o : dimphy.o conf_phys.o 
+yamada4.o : suphec.o dimphy.o conf_phys.o 
 ymds2ju.o : ioconf_calendar.o calendar.o 
 yoethf.o : suphec.o 
 zenang.o : phyetat0.o YOMCST.o dimphy.o 

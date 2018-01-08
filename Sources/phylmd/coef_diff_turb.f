@@ -4,15 +4,18 @@ module coef_diff_turb_m
 
 contains
 
-  subroutine coef_diff_turb(dtime, nsrf, ni, ypaprs, ypplay, yu, yv, yq, yt, &
-       yts, ycdragm, zgeop, ycoefm, ycoefh, yq2)
+  subroutine coef_diff_turb(dtime, nsrf, ni, paprs, pplay, u, v, q, t, ts, &
+       cdragm, zgeop, coefm, coefh, q2)
+
+    ! Computes coefficients for turbulent diffusion in the atmosphere.
 
     USE clesphys, ONLY: ok_kzmin
     use coefkz_m, only: coefkz
     use coefkzmin_m, only: coefkzmin
     use coefkz2_m, only: coefkz2
     USE conf_phys_m, ONLY: iflag_pbl
-    USE dimphy, ONLY: klev, klon
+    USE dimphy, ONLY: klev
+    use nr_util, only: assert
     USE suphec_m, ONLY: rd, rg, rkappa
     use ustarhb_m, only: ustarhb
     use yamada4_m, only: yamada4
@@ -20,78 +23,73 @@ contains
     REAL, INTENT(IN):: dtime ! interval du temps (secondes)
     INTEGER, INTENT(IN):: nsrf
     INTEGER, INTENT(IN):: ni(:) ! (knon)
-    REAL, INTENT(IN):: ypaprs(:, :) ! (klon, klev + 1)
-    REAL, INTENT(IN):: ypplay(:, :) ! (klon, klev)
-    REAL, INTENT(IN), dimension(:, :):: yu, yv, yq, yt ! (klon, klev)
-    REAL, INTENT(IN):: yts(:), ycdragm(:) ! (knon)
+    REAL, INTENT(IN):: paprs(:, :) ! (knon, klev + 1)
+    REAL, INTENT(IN):: pplay(:, :) ! (knon, klev)
+    REAL, INTENT(IN), dimension(:, :):: u, v, q, t ! (knon, klev)
+    REAL, INTENT(IN):: ts(:), cdragm(:) ! (knon)
     REAL, INTENT(IN):: zgeop(:, :) ! (knon, klev)
-    REAL, intent(out):: ycoefm(:, 2:) ! (knon, 2:klev) coefficient, vitesse
+    REAL, intent(out):: coefm(:, 2:) ! (knon, 2:klev) coefficient, vitesse
 
-    real, intent(out):: ycoefh(:, 2:) ! (knon, 2:klev) 
+    real, intent(out):: coefh(:, 2:) ! (knon, 2:klev) 
     ! coefficient, chaleur et humidité
 
-    real, intent(inout):: yq2(:, :) ! (klon, klev + 1)
+    real, intent(inout):: q2(:, :) ! (knon, klev + 1)
 
     ! Local:
-    REAL ycoefm0(klon, 2:klev), ycoefh0(klon, 2:klev)
-    REAL yzlay(klon, klev), zlev(klon, klev + 1), yteta(klon, klev)
-    REAL ustar(klon)
-    integer k, knon
+    REAL coefm0(size(ni), 2:klev), coefh0(size(ni), 2:klev) ! (knon, 2:klev)
+    REAL zlay(size(ni), klev), teta(size(ni), klev) ! (knon, klev)
+    real zlev(size(ni), klev + 1) ! (knon, klev + 1)
+    REAL ustar(size(ni)) ! (knon)
+    integer k
 
     !-------------------------------------------------------------------------
 
-    knon = size(ni)
-    CALL coefkz(nsrf, ypaprs(:knon, :), ypplay(:knon, :), yts(:knon), &
-         yu(:knon, :), yv(:knon, :), yt(:knon, :), yq(:knon, :), zgeop, &
-         ycoefm, ycoefh)
+    call assert(size(ni) == [size(paprs, 1), size(pplay, 1), size(u, 1), &
+         size(v, 1), size(q, 1), size(t, 1), size(ts), size(cdragm), &
+         size(zgeop, 1), size(coefm, 1), size(coefh, 1), size(q2, 1)], &
+         "coef_diff_turb knon")
+    
+    CALL coefkz(nsrf, paprs, pplay, ts, u, v, t, q, zgeop, coefm, coefh)
 
     IF (iflag_pbl == 1) THEN
-       CALL coefkz2(nsrf, knon, ypaprs, ypplay, yt, ycoefm0(:knon, :), &
-            ycoefh0(:knon, :))
-       ycoefm = max(ycoefm, ycoefm0(:knon, :))
-       ycoefh = max(ycoefh, ycoefh0(:knon, :))
+       CALL coefkz2(nsrf, paprs, pplay, t, coefm0, coefh0)
+       coefm = max(coefm, coefm0)
+       coefh = max(coefh, coefh0)
     END IF
 
     IF (ok_kzmin) THEN
        ! Calcul d'une diffusion minimale pour les conditions tres stables
-       CALL coefkzmin(knon, ypaprs, ypplay, yu, yv, yt, yq, ycdragm(:knon), &
-            ycoefh0(:knon, :))
-       ycoefm0(:knon, :) = ycoefh0(:knon, :)
-       ycoefm = max(ycoefm, ycoefm0(:knon, :))
-       ycoefh = max(ycoefh, ycoefh0(:knon, :))
+       CALL coefkzmin(paprs, pplay, u, v, t, q, cdragm, coefh0)
+       coefm0 = coefh0
+       coefm = max(coefm, coefm0)
+       coefh = max(coefh, coefh0)
     END IF
 
     IF (iflag_pbl >= 6) THEN
        ! Mellor et Yamada adapt\'e \`a Mars, Richard Fournier et
        ! Fr\'ed\'eric Hourdin
-       yzlay(:knon, 1) = rd * yt(:knon, 1) / (0.5 * (ypaprs(:knon, 1) &
-            + ypplay(:knon, 1))) &
-            * (ypaprs(:knon, 1) - ypplay(:knon, 1)) / rg
+       zlay(:, 1) = rd * t(:, 1) / (0.5 * (paprs(:, 1) &
+            + pplay(:, 1))) * (paprs(:, 1) - pplay(:, 1)) / rg
 
        DO k = 2, klev
-          yzlay(:knon, k) = yzlay(:knon, k-1) &
-               + rd * 0.5 * (yt(1:knon, k-1) + yt(1:knon, k)) &
-               / ypaprs(1:knon, k) &
-               * (ypplay(1:knon, k-1) - ypplay(1:knon, k)) / rg
+          zlay(:, k) = zlay(:, k-1) + rd * 0.5 * (t(:, k-1) + t(:, k)) &
+               / paprs(:, k) * (pplay(:, k-1) - pplay(:, k)) / rg
        END DO
 
        DO k = 1, klev
-          yteta(1:knon, k) = yt(1:knon, k) * (ypaprs(1:knon, 1) &
-               / ypplay(1:knon, k))**rkappa * (1. + 0.61 * yq(1:knon, k))
+          teta(:, k) = t(:, k) * (paprs(:, 1) / pplay(:, k))**rkappa &
+               * (1. + 0.61 * q(:, k))
        END DO
 
-       zlev(:knon, 1) = 0.
-       zlev(:knon, klev + 1) = 2. * yzlay(:knon, klev) &
-            - yzlay(:knon, klev - 1)
+       zlev(:, 1) = 0.
+       zlev(:, klev + 1) = 2. * zlay(:, klev) - zlay(:, klev - 1)
 
        DO k = 2, klev
-          zlev(:knon, k) = 0.5 * (yzlay(:knon, k) + yzlay(:knon, k-1))
+          zlev(:, k) = 0.5 * (zlay(:, k) + zlay(:, k-1))
        END DO
 
-       ustar(:knon) = ustarhb(yu(:knon, 1), yv(:knon, 1), ycdragm(:knon))
-       CALL yamada4(dtime, rg, zlev(:knon, :), yzlay(:knon, :), &
-            yu(:knon, :), yv(:knon, :), yteta(:knon, :), yq2(:knon, :), &
-            ycoefm, ycoefh, ustar(:knon))
+       ustar = ustarhb(u(:, 1), v(:, 1), cdragm)
+       CALL yamada4(dtime, zlev, zlay, u, v, teta, q2, coefm, coefh, ustar)
     END IF
 
   end subroutine coef_diff_turb

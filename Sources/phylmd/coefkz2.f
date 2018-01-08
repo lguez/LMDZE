@@ -4,37 +4,33 @@ module coefkz2_m
 
 contains
 
-  SUBROUTINE coefkz2(nsrf, knon, paprs, pplay, t, pcfm, pcfh)
+  SUBROUTINE coefkz2(nsrf, paprs, pplay, t, pcfm, pcfh)
 
-    ! J'introduit un peu de diffusion sauf dans les endroits
-    ! ou une forte inversion est presente
-    ! On peut dire qu'il represente la convection peu profonde
+    ! J'introduit un peu de diffusion sauf dans les endroits o\`u une
+    ! forte inversion est pr\'esente. On peut dire que la diffusion
+    ! repr\'esente la convection peu profonde.
 
-    use dimens_m
-    use indicesol
-    use dimphy
-    use conf_gcm_m
-    use SUPHEC_M
+    use indicesol, only: is_oce
+    use dimphy, only: klev
+    use SUPHEC_M, only: RCPD, rd
 
-    ! Arguments:
-    ! nsrf-----input-I- indicateur de la nature du sol
-    ! knon-----input-I- nombre de points a traiter
-    ! paprs----input-R- pression a chaque intercouche (en Pa)
-    ! pplay----input-R- pression au milieu de chaque couche (en Pa)
-    ! t--------input-R- temperature (K)
+    integer, intent(in):: nsrf ! indicateur de la nature du sol
 
-    ! pcfm-----output-R- coefficients a calculer (vitesse)
-    ! pcfh-----output-R- coefficients a calculer (chaleur et humidite)
+    REAL, intent(in):: paprs(:, :) ! (knon, klev+1)
+    ! pression a chaque intercouche (en Pa)
 
-    ! Arguments:
+    REAL, intent(in):: pplay(:, :) ! (knon, klev)
+    ! pression au milieu de chaque couche (en Pa)
+    
+    REAL, intent(in):: t(:, :) ! (knon, klev) temperature (K)
 
-    INTEGER knon
-    integer, intent(in):: nsrf
-    REAL, intent(in):: paprs(klon, klev+1), pplay(klon, klev)
-    REAL, intent(in):: t(klon, klev)
+    REAL, intent(out):: pcfm(:, 2:) ! (knon, 2:klev) coefficient vitesse
 
-    REAL, intent(out):: pcfm(:, 2:), pcfh(:, 2:) ! (knon, 2:klev)
+    REAL, intent(out):: pcfh(:, 2:) ! (knon, 2:klev)
+    ! coefficient chaleur et humidite)
 
+    ! Local:
+    
     ! Quelques constantes et options:
 
     REAL prandtl
@@ -46,14 +42,17 @@ contains
     REAL seuil ! au-dela l'inversion est consideree trop faible
     PARAMETER (seuil=-0.02)
 
-    ! Variables locales:
-
-    INTEGER i, k, invb(knon)
-    REAL zl2(knon)
-    REAL zdthmin(knon), zdthdp
+    INTEGER knon ! nombre de points a traiter
+    INTEGER i, k
+    INTEGER invb(size(paprs, 1)) ! (knon)
+    REAL zl2(size(paprs, 1)) ! (knon)
+    REAL zdthmin(size(paprs, 1)) ! (knon)
+    real zdthdp
 
     !----------------------------------------------------------
 
+    knon = size(paprs, 1)
+    
     ! Initialiser les sorties
     DO k = 2, klev
        DO i = 1, knon

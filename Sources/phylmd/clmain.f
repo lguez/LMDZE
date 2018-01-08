@@ -339,9 +339,10 @@ contains
              END DO
           end IF
 
-          call coef_diff_turb(dtime, nsrf, ni(:knon), ypaprs, ypplay, yu, yv, &
-               yq, yt, yts, ycdragm, zgeop(:knon, :), ycoefm(:knon, :), &
-               ycoefh(:knon, :), yq2)
+          call coef_diff_turb(dtime, nsrf, ni(:knon), ypaprs(:knon, :), &
+               ypplay(:knon, :), yu(:knon, :), yv(:knon, :), yq(:knon, :), &
+               yt(:knon, :), yts(:knon), ycdragm(:knon), zgeop(:knon, :), &
+               ycoefm(:knon, :), ycoefh(:knon, :), yq2(:knon, :))
 
           CALL clvent(dtime, yu(:knon, 1), yv(:knon, 1), ycoefm(:knon, :), &
                ycdragm(:knon), yt(:knon, :), yu(:knon, :), ypaprs(:knon, :), &

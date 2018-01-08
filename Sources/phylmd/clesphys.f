@@ -16,9 +16,9 @@ module clesphys
   REAL:: cdmmax = 1.3E-3, cdhmax = 1.1E-3 ! seuils cdrm, cdrh
   
   REAL:: ksta = 1.0e-10, ksta_ter = 1.0e-10
-  ! param\`etres stabilit\'e sur terre et en dehors
+  ! param\`etres de stabilit\'e sur terre et en dehors
 
-  LOGICAL:: ok_kzmin  = .true.! calcul Kzmin dans la couche limite de surface
+  LOGICAL:: ok_kzmin  = .true.! calcul de Kzmin dans la couche limite de surface
   INTEGER, save:: ecrit_ins
   logical:: ok_instan = .false. ! sorties instantanees dans le fichier histins
 
