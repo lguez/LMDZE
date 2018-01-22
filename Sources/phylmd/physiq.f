@@ -290,14 +290,10 @@ contains
     REAL, SAVE:: cteiCL(klon, nbsrf) ! cloud top instab. crit. couche limite
     REAL, SAVE:: pblt(klon, nbsrf) ! T \`a la hauteur de couche limite
     REAL, SAVE:: therm(klon, nbsrf)
-    REAL, SAVE:: trmb1(klon, nbsrf) ! deep_cape
-    REAL, SAVE:: trmb2(klon, nbsrf) ! inhibition
-    REAL, SAVE:: trmb3(klon, nbsrf) ! Point Omega
     ! Grandeurs de sorties
     REAL s_pblh(klon), s_lcl(klon), s_capCL(klon)
     REAL s_oliqCL(klon), s_cteiCL(klon), s_pblt(klon)
-    REAL s_therm(klon), s_trmb1(klon), s_trmb2(klon)
-    REAL s_trmb3(klon)
+    REAL s_therm(klon)
 
     ! Variables pour la convection de K. Emanuel :
 
@@ -439,9 +435,6 @@ contains
        cteiCL =0. ! cloud top instab. crit. couche limite
        pblt =0.
        therm =0.
-       trmb1 =0. ! deep_cape
-       trmb2 =0. ! inhibition
-       trmb3 =0. ! Point Omega
 
        iflag_thermals = 0
        nsplit_thermals = 1
@@ -571,7 +564,7 @@ contains
          agesno, rugoro, d_t_vdf, d_q_vdf, d_u_vdf, d_v_vdf, d_ts, flux_t, &
          flux_q, flux_u, flux_v, cdragh, cdragm, q2, dsens, devap, coefh, t2m, &
          q2m, u10m_srf, v10m_srf, pblh, capCL, oliqCL, cteiCL, pblT, therm, &
-         trmb1, trmb2, trmb3, plcl, fqcalving, ffonte, run_off_lic_0)
+         plcl, fqcalving, ffonte, run_off_lic_0)
 
     ! Incr\'ementation des flux
 
@@ -607,9 +600,6 @@ contains
     s_cteiCL = sum(cteiCL * pctsrf, dim = 2)
     s_pblT = sum(pblT * pctsrf, dim = 2)
     s_therm = sum(therm * pctsrf, dim = 2)
-    s_trmb1 = sum(trmb1 * pctsrf, dim = 2)
-    s_trmb2 = sum(trmb2 * pctsrf, dim = 2)
-    s_trmb3 = sum(trmb3 * pctsrf, dim = 2)
 
     ! Si une sous-fraction n'existe pas, elle prend la valeur moyenne :
     DO nsrf = 1, nbsrf
@@ -629,9 +619,6 @@ contains
              cteiCL(i, nsrf) = s_cteiCL(i)
              pblT(i, nsrf) = s_pblT(i)
              therm(i, nsrf) = s_therm(i)
-             trmb1(i, nsrf) = s_trmb1(i)
-             trmb2(i, nsrf) = s_trmb2(i)
-             trmb3(i, nsrf) = s_trmb3(i)
           end IF
        ENDDO
     ENDDO
@@ -667,10 +654,9 @@ contains
        conv_t = d_t_dyn + d_t_vdf / dtphys
        z_avant = sum((q_seri + ql_seri) * zmasse, dim=2)
        CALL conflx(dtphys, paprs, play, t_seri(:, llm:1:- 1), &
-            q_seri(:, llm:1:- 1), conv_t, conv_q, - evap, omega, &
-            d_t_con, d_q_con, rain_con, snow_con, mfu(:, llm:1:- 1), &
-            mfd(:, llm:1:- 1), pen_u, pde_u, pen_d, pde_d, kcbot, kctop, &
-            kdtop, pmflxr, pmflxs)
+            q_seri(:, llm:1:- 1), conv_t, conv_q, - evap, omega, d_t_con, &
+            d_q_con, rain_con, snow_con, mfu(:, llm:1:- 1), mfd(:, llm:1:- 1), &
+            pen_u, pde_u, pen_d, pde_d, kcbot, kctop, kdtop, pmflxr, pmflxs)
        WHERE (rain_con < 0.) rain_con = 0.
        WHERE (snow_con < 0.) snow_con = 0.
        ibas_con = llm + 1 - kcbot
@@ -1059,9 +1045,6 @@ contains
     CALL histwrite_phy("s_oliqCL", s_oliqCL)
     CALL histwrite_phy("s_cteiCL", s_cteiCL)
     CALL histwrite_phy("s_therm", s_therm)
-    CALL histwrite_phy("s_trmb1", s_trmb1)
-    CALL histwrite_phy("s_trmb2", s_trmb2)
-    CALL histwrite_phy("s_trmb3", s_trmb3)
 
     if (conv_emanuel) then
        CALL histwrite_phy("ptop", ema_pct)

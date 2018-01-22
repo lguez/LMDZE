@@ -75,7 +75,7 @@ contains
     ! Tendances dynamiques
     REAL dv((iim + 1) * jjm, llm), dudyn(iim + 1, jjm + 1, llm)
     REAL dteta(iim + 1, jjm + 1, llm)
-    real dp((iim + 1) * (jjm + 1))
+    real dp(iim + 1, jjm + 1)
 
     ! Tendances de la dissipation :
     REAL dvdis(iim + 1, jjm, llm), dudis(iim + 1, jjm + 1, llm)

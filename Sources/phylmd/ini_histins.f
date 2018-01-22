@@ -208,15 +208,6 @@ contains
        CALL histdef(nid_ins, "s_therm", "Exces du thermique", "K", &
             iim, (jjm + 1), nhori, 1, 1, 1, -99, &
             "inst(X)", zsto, zout)
-       CALL histdef(nid_ins, "s_trmb1", "deep_cape(HBTM2)", "J/m2", &
-            iim, (jjm + 1), nhori, 1, 1, 1, -99, &
-            "inst(X)", zsto, zout)
-       CALL histdef(nid_ins, "s_trmb2", "inhibition (HBTM2)", "J/m2", &
-            iim, (jjm + 1), nhori, 1, 1, 1, -99, &
-            "inst(X)", zsto, zout)
-       CALL histdef(nid_ins, "s_trmb3", "Point Omega (HBTM2)", "m", &
-            iim, (jjm + 1), nhori, 1, 1, 1, -99, &
-            "inst(X)", zsto, zout)
        CALL histdef(nid_ins, "qsurf", "Surface Air humidity", "", &
             iim, (jjm + 1), nhori, 1, 1, 1, -99, &
             "inst(X)", zsto, zout)

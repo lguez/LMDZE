@@ -14,7 +14,7 @@ contains
     use advect_m, only: advect
     use bernoui_m, only: bernoui
     USE comconst, ONLY: daysec, dtvr
-    USE comgeom, ONLY: airesurg, constang_2d
+    USE comgeom, ONLY: airesurg_2d, constang_2d
     USE conf_gcm_m, ONLY: day_step
     use convmas_m, only: convmas
     use covcont_m, only: covcont
@@ -47,9 +47,10 @@ contains
     REAL dudyn(:, :, :) ! (iim + 1, jjm + 1, llm)
     real dv((iim + 1) * jjm, llm)
     REAL, INTENT(out):: dteta(:, :, :) ! (iim + 1, jjm + 1, llm)
-    real, INTENT(out):: dp(ip1jmp1)
+    real, INTENT(out):: dp(:, :) ! (iim + 1, jjm + 1)
     REAL, INTENT(out):: w(:, :, :) ! (iim + 1, jjm + 1, llm)
-    REAL, intent(out):: pbaru(ip1jmp1, llm), pbarv((iim + 1) * jjm, llm)
+    REAL, intent(out):: pbaru(:, :, :) ! (iim + 1, jjm + 1, llm)
+    REAL, intent(out):: pbarv(:, :, :) ! (iim + 1, jjm, llm)
     LOGICAL, INTENT(IN):: conser
 
     ! Local:
@@ -57,7 +58,7 @@ contains
     REAL ang_3d(iim + 1, jjm + 1, llm), p(ip1jmp1, llmp1)
     REAL massebx(ip1jmp1, llm), masseby((iim + 1) * jjm, llm)
     REAL vorpot(iim + 1, jjm, llm)
-    real ecin(iim + 1, jjm + 1, llm), convm(ip1jmp1, llm)
+    real ecin(iim + 1, jjm + 1, llm), convm(iim + 1, jjm + 1, llm)
     REAL bern(iim + 1, jjm + 1, llm)
     REAL massebxy(iim + 1, jjm, llm)
     INTEGER ij, l
@@ -73,8 +74,8 @@ contains
     CALL flumass(massebx, masseby, vcont, ucont, pbaru, pbarv)
     CALL dteta1(teta, pbaru, pbarv, dteta)
     CALL convmas(pbaru, pbarv, convm)
-    dp = convm(:, 1) / airesurg
-    CALL vitvert(convm, w)
+    dp = convm(:, :, 1) / airesurg_2d
+    w = vitvert(convm)
     CALL tourpot(vcov, ucov, massebxy, vorpot)
     CALL dudv1(vorpot, pbaru, pbarv, dudyn(:, 2: jjm, :), dv)
     CALL enercin(vcov, ucov, vcont, ucont, ecin)

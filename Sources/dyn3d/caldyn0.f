@@ -11,7 +11,7 @@ contains
     ! Objet : calcul des tendances dynamiques
 
     use bernoui_m, only: bernoui
-    USE comgeom, ONLY: airesurg
+    USE comgeom, ONLY: airesurg_2d
     use convmas_m, only: convmas
     use covcont_m, only: covcont
     USE dimens_m, ONLY: iim, jjm, llm
@@ -42,8 +42,8 @@ contains
     REAL p(ip1jmp1, llmp1)
     REAL massebx(ip1jmp1, llm), masseby((iim + 1) * jjm, llm)
     REAL vorpot(iim + 1, jjm, llm)
-    real ecin(iim + 1, jjm + 1, llm), convm(ip1jmp1, llm)
-    REAL massebxy(iim + 1, jjm, llm), dp(ip1jmp1)
+    real ecin(iim + 1, jjm + 1, llm), convm(iim + 1, jjm + 1, llm)
+    REAL massebxy(iim + 1, jjm, llm), dp(iim + 1, jjm + 1)
     INTEGER l
 
     !-----------------------------------------------------------------------
@@ -57,8 +57,8 @@ contains
     CALL massbarxy(masse, massebxy)
     CALL flumass(massebx, masseby, vcont, ucont, pbaru, pbarv)
     CALL convmas(pbaru, pbarv, convm)
-    dp = convm(:, 1) / airesurg
-    CALL vitvert(convm, w)
+    dp = convm(:, :, 1) / airesurg_2d
+    w = vitvert(convm)
     CALL tourpot(vcov, ucov, massebxy, vorpot)
     CALL enercin(vcov, ucov, vcont, ucont, ecin)
     CALL sortvarc(ucov, teta, ps, masse, pk, phis, vorpot, phi, &

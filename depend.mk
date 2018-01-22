@@ -242,7 +242,7 @@ time_phylmdz.o : phyetat0.o
 tourpot.o : filtreg_v.o dimens_m.o comgeom.o 
 transp.o : suphec.o dimphy.o dimens_m.o 
 transp_lay.o : suphec.o dimphy.o 
-vitvert.o : paramet_m.o disvert.o dimens_m.o 
+vitvert.o : disvert.o dimens_m.o 
 vlsplt.o : vlx.o paramet_m.o dimens_m.o 
 vlspltqs.o : suphec.o comconst.o paramet_m.o FCTTRE.o dimens_m.o 
 vlx.o : paramet_m.o dimens_m.o 

@@ -88,7 +88,7 @@ contains
        END DO
     END DO
 
-    CALL vitvert(zconvmm, wm)
+    wm = vitvert(zconvmm)
 
   END SUBROUTINE groupe
 

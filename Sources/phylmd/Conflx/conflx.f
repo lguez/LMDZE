@@ -4,7 +4,7 @@ module conflx_m
 
 contains
 
-  SUBROUTINE conflx(dtime, pres_h, pres_f, t, q, con_t, con_q, qhfl, w, &
+  SUBROUTINE conflx(dtime, pres_h, pres_f, t, q, con_t, con_q, qhfl, omega, &
        d_t, d_q, rain, snow, mfu, mfd, pen_u, pde_u, pen_d, pde_d, kcbot, &
        kctop, kdtop, pmflxr, pmflxs)
 
@@ -39,7 +39,7 @@ contains
     ! (klon, klev) convergence de l'eau vapeur (g/g/s)
 
     REAL, intent(in):: qhfl(:) ! (klon) evaporation (negative vers haut) mm/s
-    REAL, intent(in):: w(:, :) ! (klon, klev) vitesse verticale (Pa/s)
+    REAL, intent(in):: omega(:, :) ! (klon, klev) vitesse verticale (Pa/s)
 
     REAL, intent(out):: d_t(:, :) ! (klon, klev) incrementation de temperature
     REAL, intent(out):: d_q(:, :) ! (klon, klev) incrementation d'humidite
@@ -113,7 +113,7 @@ contains
        DO i = 1, klon
           paprsf(i, k) = pres_f(i, klev-k + 1)
           paprs(i, k) = pres_h(i, klev + 1-k + 1)
-          pvervel(i, k) = w(i, klev + 1-k)
+          pvervel(i, k) = omega(i, klev + 1-k)
           zcvgt(i, k) = con_t(i, klev-k + 1)
           zcvgq(i, k) = con_q(i, klev-k + 1)
 

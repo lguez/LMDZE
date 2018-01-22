@@ -5,7 +5,7 @@ module HBTM_m
 contains
 
   SUBROUTINE HBTM(paprs, pplay, t2m, q2m, ustar, flux_t, flux_q, u, v, t, q, &
-       pblh, cape, EauLiq, ctei, pblT, therm, trmb1, trmb2, trmb3, plcl)
+       pblh, cape, EauLiq, ctei, pblT, therm, plcl)
 
     ! D'apr\'es Holstag et Boville et Troen et Mahrt
     ! JAS 47 BLM
@@ -63,7 +63,6 @@ contains
     REAL pblT(klon)
     ! thermal virtual temperature excess
     REAL therm(klon)
-    REAL trmb1(klon), trmb2(klon), trmb3(klon)
     REAL plcl(klon)
 
     ! Local:
@@ -206,9 +205,6 @@ contains
        plcl(i) = 6000.
        ! Lambda = -u*^3 / (alpha.g.kvon.<w'Theta'v>
        obklen(i) = -t(i, 1)*ustar(i)**3/(RG*vk*heatv(i))
-       trmb1(i) = 0.
-       trmb2(i) = 0.
-       trmb3(i) = 0.
     ENDDO
 
     ! PBL height calculation: Search for level of pbl. Scan upward

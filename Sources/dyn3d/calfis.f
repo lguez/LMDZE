@@ -181,7 +181,6 @@ contains
 
     forall(l = 1: llm) v(:, l) = pack(zvfi(:, :, l), dyn_phy)
 
-    ! Appel de la physique :
     CALL physiq(lafin, dayvrai, time, paprs, play, pphi, pphis, u, v, t, qx, &
          omega, d_u, d_v, d_t, d_qx)
 

@@ -16,7 +16,7 @@ contains
     ! Objet: calcul de la convergence du flux de masse aux niveaux p
 
     ! Le calcul se fait de haut en bas, la convergence de masse au
-    ! niveau p(llm+1) est égale à 0 et n'est pas stockée dans le
+    ! niveau p(llm + 1) est égale à 0 et n'est pas stockée dans le
     ! tableau convm.
 
     REAL, INTENT(IN):: pbaru(ip1jmp1, llm), pbarv(ip1jm, llm)
@@ -35,7 +35,7 @@ contains
 
     ! Intégration de la convergence de masse de haut en bas :
     DO l = llmm1, 1, -1
-       convm(:, :, l) = convm(:, :, l) + convm(:, :, l+1)
+       convm(:, :, l) = convm(:, :, l) + convm(:, :, l + 1)
     END DO
 
   END SUBROUTINE convmas

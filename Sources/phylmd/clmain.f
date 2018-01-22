@@ -9,8 +9,7 @@ contains
        rain_fall, snow_f, fsolsw, fsollw, frugs, agesno, rugoro, d_t, d_q, &
        d_u, d_v, d_ts, flux_t, flux_q, flux_u, flux_v, cdragh, cdragm, q2, &
        dflux_t, dflux_q, coefh, t2m, q2m, u10m_srf, v10m_srf, pblh, capcl, &
-       oliqcl, cteicl, pblt, therm, trmb1, trmb2, trmb3, plcl, fqcalving, &
-       ffonte, run_off_lic_0)
+       oliqcl, cteicl, pblt, therm, plcl, fqcalving, ffonte, run_off_lic_0)
 
     ! From phylmd/clmain.F, version 1.6, 2005/11/16 14:47:19
     ! Author: Z. X. Li (LMD/CNRS), date: 1993/08/18
@@ -120,12 +119,6 @@ contains
     REAL cteicl(klon, nbsrf)
     REAL, INTENT(inout):: pblt(klon, nbsrf) ! T au nveau HCL
     REAL therm(klon, nbsrf)
-    REAL trmb1(klon, nbsrf)
-    ! trmb1-------deep_cape
-    REAL trmb2(klon, nbsrf)
-    ! trmb2--------inhibition
-    REAL trmb3(klon, nbsrf)
-    ! trmb3-------Point Omega
     REAL plcl(klon, nbsrf)
     REAL fqcalving(klon, nbsrf), ffonte(klon, nbsrf)
     ! ffonte----Flux thermique utilise pour fondre la neige
@@ -185,9 +178,6 @@ contains
     REAL ycteicl(klon)
     REAL ypblt(klon)
     REAL ytherm(klon)
-    REAL ytrmb1(klon)
-    REAL ytrmb2(klon)
-    REAL ytrmb3(klon)
     REAL u1(klon), v1(klon)
     REAL tair1(klon), qair1(klon), tairsol(klon)
     REAL psfce(klon), patm(klon)
@@ -483,7 +473,7 @@ contains
 
           CALL hbtm(ypaprs, ypplay, yt2m, yq2m, ustar(:knon), y_flux_t(:knon), &
                y_flux_q(:knon), yu, yv, yt, yq, ypblh(:knon), ycapcl, &
-               yoliqcl, ycteicl, ypblt, ytherm, ytrmb1, ytrmb2, ytrmb3, ylcl)
+               yoliqcl, ycteicl, ypblt, ytherm, ylcl)
 
           DO j = 1, knon
              i = ni(j)
@@ -494,9 +484,6 @@ contains
              cteicl(i, nsrf) = ycteicl(j)
              pblt(i, nsrf) = ypblt(j)
              therm(i, nsrf) = ytherm(j)
-             trmb1(i, nsrf) = ytrmb1(j)
-             trmb2(i, nsrf) = ytrmb2(j)
-             trmb3(i, nsrf) = ytrmb3(j)
           END DO
 
           DO j = 1, knon
