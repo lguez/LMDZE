@@ -60,7 +60,7 @@ contains
     real:: vert_z0hig = 80. ! height at which resolution reaches dz
     real:: vert_h_hig = 20. ! width of the transition
 
-    real, pointer:: p(:) ! (llm + 1) pressure (in hPa)
+    real, allocatable:: p(:) ! (llm + 1) pressure (in hPa)
 
     namelist /disvert_nml/vert_sampling, vert_scale, vert_dzmin, vert_dzlow, &
          vert_z0low, vert_dzmid, vert_z0mid, vert_h_mid, vert_dzhig, &
@@ -125,7 +125,7 @@ contains
        p = preff * EXP(- zz(2:) / vert_scale)
        ya = pa / preff
        s(2: llm) = hybrid(p)
-       deallocate(p) ! pointer
+
        call compute_ab
 
     case("read_hybrid")
