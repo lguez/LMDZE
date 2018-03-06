@@ -35,7 +35,7 @@ contains
     logical, intent(in):: resetvarc
 
     ! Local:
-    REAL vor(iim + 1, jjm), bernf(iim + 1, jjm + 1, llm), ztotl(llm)
+    REAL bernf(iim + 1, jjm + 1, llm)
     REAL etotl(llm), stotl(llm), rmsvl(llm), angl(llm), ge(iim + 1, jjm + 1)
     REAL cosphi(2:jjm)
     REAL radsg, radomeg
@@ -50,7 +50,7 @@ contains
 
     ! Calcul  de  rmsdpdt
     ge = dp * dp
-    rmsdpdt = sum(ge) - sum(ge(1, :))
+    rmsdpdt = sum(ge(:iim, :))
     rmsdpdt = daysec * 1.E-2 * sqrt(rmsdpdt / (iim * jjp1))
     bernf = bern
     CALL filtreg_scal(bernf, direct = .false., intensive = .false.)
@@ -63,28 +63,25 @@ contains
     ! Calcul  de l'energie, de l'enstrophie, de l'entropie et de rmsv
 
     DO l = 1, llm
-       vor = vorpot(:, :, l)**2 * massebxy(:, :, l)
-       ztotl(l) = sum(vor) - sum(vor(1, :))
-
        ge = masse(:, :, l) * (phis + teta(:, :, l) * pk(:, :, l) &
             + bernf(:, :, l) - phi(:, :, l))
-       etotl(l) = sum(ge) - sum(ge(1, :))
+       etotl(l) = sum(ge(:iim, :))
 
        ge = masse(:, :, l) * teta(:, :, l)
-       stotl(l) = sum(ge) - sum(ge(1, :))
+       stotl(l) = sum(ge(:iim, :))
 
        ge = masse(:, :, l) * max(bernf(:, :, l) - phi(:, :, l), 0.)
-       rmsvl(l) = 2. * (sum(ge) - sum(ge(1, :)))
+       rmsvl(l) = 2. * sum(ge(:iim, :))
 
        forall (j = 2:jjm) ge(:, j) = (ucov(:, j, l) / cu_2d(:, j) &
             + radomeg * cosphi(j)) * masse(:, j, l) * cosphi(j)
-       angl(l) = radsg * (sum(ge(:, 2:jjm)) - sum(ge(1, 2:jjm)))
+       angl(l) = radsg * sum(ge(:iim, 2:jjm))
     END DO
 
     ge = ps * aire_2d
-    ptot = sum(ge) - sum(ge(1, :))
+    ptot = sum(ge(:iim, :))
     etot = sum(etotl)
-    ztot = sum(ztotl)
+    ztot = sum(vorpot(:iim, :, :)**2 * massebxy(:iim, :, :))
     stot = sum(stotl)
     rmsv = sum(rmsvl)
     ang = sum(angl)
