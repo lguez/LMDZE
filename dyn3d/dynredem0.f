@@ -16,8 +16,8 @@ CONTAINS
     USE disvert_m, ONLY: ap, bp, pa, preff, presnivs
     use dynetat0_m, only: day_ref, annee_ref, clat, clon, dzoomx, dzoomy, &
          grossismx, grossismy, taux, tauy, rlatu, rlatv, rlonu, rlonv, rlatu1, &
-         rlatu2, yprimu1, yprimu2, xprimp025, xprimm025, xprimu, xprimv
-    USE ener, ONLY: ang0, etot0, ptot0, stot0, ztot0
+         rlatu2, yprimu1, yprimu2, xprimp025, xprimm025, xprimu, xprimv, ang0, &
+         etot0, ptot0, stot0, ztot0
     USE iniadvtrac_m, ONLY: tname, ttext
     USE ju2ymds_m, ONLY: ju2ymds
     USE netcdf, ONLY: nf90_clobber, nf90_float, nf90_global, nf90_unlimited

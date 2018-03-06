@@ -89,7 +89,6 @@ dynetat0.f
 dynredem0.f
 dynredem1.f
 enercin.f
-ener.f
 errioipsl.f
 exner_hyb.f
 FCTTRE.f

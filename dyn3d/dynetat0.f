@@ -45,6 +45,7 @@ module dynetat0_m
 
   REAL xprimm025(iim + 1), xprimp025(iim + 1)
   REAL rlatu1(jjm), rlatu2(jjm), yprimu1(jjm), yprimu2(jjm)
+  REAL ang0, etot0, ptot0, ztot0, stot0
 
   save
 
@@ -60,7 +61,6 @@ contains
     use conf_gcm_m, only: raz_date
     use dimens_m, only: iim, jjm, llm, nqmx
     use disvert_m, only: pa
-    use ener, only: etot0, ang0, ptot0, stot0, ztot0
     use iniadvtrac_m, only: tname
     use netcdf, only: NF90_NOWRITE, NF90_NOERR
     use netcdf95, only: NF95_GET_VAR, nf95_open, nf95_inq_varid, NF95_CLOSE, &

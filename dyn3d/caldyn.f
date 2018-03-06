@@ -23,14 +23,14 @@ contains
     use dteta1_m, only: dteta1
     use dudv1_m, only: dudv1
     use dudv2_m, only: dudv2
-    USE dynetat0_m, ONLY: day_ini
+    USE dynetat0_m, ONLY: day_ini, ang0, etot0, ptot0, stot0, ztot0
     use enercin_m, only: enercin
     use flumass_m, only: flumass
     use massbar_m, only: massbar
     use massbarxy_m, only: massbarxy
     use massdair_m, only: massdair
     USE paramet_m, ONLY: iip1, ip1jmp1, jjp1, llmp1
-    use sortvarc_m, only: sortvarc, ang, etot, ptot, rmsdpdt, rmsv, stot, ztot
+    use sortvarc_m, only: sortvarc
     use tourpot_m, only: tourpot
     use vitvert_m, only: vitvert
 
@@ -63,6 +63,7 @@ contains
     REAL massebxy(iim + 1, jjm, llm)
     INTEGER ij, l
     real heure, time
+    real ang, etot, ptot, ztot, stot, rmsdpdt, rmsv
 
     !-----------------------------------------------------------------------
 
@@ -99,13 +100,15 @@ contains
     ! Sorties éventuelles des variables de contrôle :
     IF (conser) then
        CALL sortvarc(ucov, teta, ps, masse, pk, phis, vorpot, phi, bern, dp, &
-            resetvarc = .false.)
+            ang, etot, ptot, ztot, stot, rmsdpdt, rmsv)
+
        time = real(itau) / day_step
        heure = mod(itau * dtvr / daysec, 1.) * 24.
        IF (abs(heure-24.) <= 1e-4) heure = 0.
 
        PRINT 3500, itau, int(day_ini + time), heure, time
-       PRINT 4000, ptot, rmsdpdt, etot, ztot, stot, rmsv, ang
+       PRINT 4000, ptot / ptot0, rmsdpdt, etot / etot0, ztot / ztot0, &
+            stot / stot0, sqrt(rmsv / ptot), ang / ang0
     end IF
 
 3500 FORMAT (4X, 'pas', I7, 5X, 'jour', i5, 1X, 'heure', F5.1, 4X, 'date', &

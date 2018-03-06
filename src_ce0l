@@ -23,7 +23,6 @@ dynetat0.f
 dynredem0.f
 dynredem1.f
 enercin.f
-ener.f
 errioipsl.f
 etat0.f
 exner_hyb.f

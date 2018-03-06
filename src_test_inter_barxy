@@ -7,7 +7,6 @@ conf_gcm.f
 dimens_m.f
 disvert.f
 dynetat0.f
-ener.f
 errioipsl.f
 fxhyp.f
 fyhyp.f

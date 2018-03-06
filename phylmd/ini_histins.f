@@ -196,8 +196,9 @@ contains
        CALL histdef(nid_ins, "s_lcl", "Condensation level", "m", &
             iim, (jjm + 1), nhori, 1, 1, 1, -99, &
             "inst(X)", zsto, zout)
-       CALL histdef(nid_ins, "s_capCL", "Conv avlbl pot ener for ABL", "J/m2", &
-            iim, (jjm + 1), nhori, 1, 1, 1, -99, &
+       CALL histdef(nid_ins, "s_capCL", &
+            "Convective available potential energy for atmospheric boundary " &
+            // "layer", "J/m2", iim, (jjm + 1), nhori, 1, 1, 1, -99, &
             "inst(X)", zsto, zout)
        CALL histdef(nid_ins, "s_oliqCL", "Liq Water in BL", "kg/m2", &
             iim, (jjm + 1), nhori, 1, 1, 1, -99, &

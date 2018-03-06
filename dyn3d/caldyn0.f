@@ -16,6 +16,7 @@ contains
     use covcont_m, only: covcont
     USE dimens_m, ONLY: iim, jjm, llm
     USE disvert_m, ONLY: ap, bp
+    use dynetat0_m, only: ang0, etot0, ptot0, stot0, ztot0
     use enercin_m, only: enercin
     use flumass_m, only: flumass
     use massbar_m, only: massbar
@@ -45,6 +46,7 @@ contains
     real ecin(iim + 1, jjm + 1, llm), convm(iim + 1, jjm + 1, llm)
     REAL massebxy(iim + 1, jjm, llm), dp(iim + 1, jjm + 1)
     INTEGER l
+    real ang, etot, ptot, ztot, stot, rmsdpdt, rmsv
 
     !-----------------------------------------------------------------------
 
@@ -62,7 +64,17 @@ contains
     CALL tourpot(vcov, ucov, massebxy, vorpot)
     CALL enercin(vcov, ucov, vcont, ucont, ecin)
     CALL sortvarc(ucov, teta, ps, masse, pk, phis, vorpot, phi, &
-         bernoui(phi, ecin), dp, resetvarc = .true.)
+         bernoui(phi, ecin), dp, ang, etot, ptot, ztot, stot, rmsdpdt, rmsv)
+    PRINT *, 'ptot = ', ptot
+    PRINT *, 'etot = ', etot
+    PRINT *, 'ztot = ', ztot
+    PRINT *, 'stot = ', stot
+    PRINT *, 'ang = ', ang
+    etot0 = etot
+    ptot0 = ptot
+    ztot0 = ztot
+    stot0 = stot
+    ang0  = ang
 
   END SUBROUTINE caldyn0
 

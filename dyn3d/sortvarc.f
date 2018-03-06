@@ -2,12 +2,10 @@ module sortvarc_m
 
   IMPLICIT NONE
 
-  real, save:: ang, etot, ptot, ztot, stot, rmsdpdt, rmsv
-
 contains
 
   SUBROUTINE sortvarc(ucov, teta, ps, masse, pk, phis, vorpot, phi, bern, dp, &
-       resetvarc)
+       ang, etot, ptot, ztot, stot, rmsdpdt, rmsv)
 
     ! From dyn3d/sortvarc.F, version 1.1.1.1, 2004/05/19 12:53:07
     ! Author: P. Le Van
@@ -17,7 +15,6 @@ contains
     USE comgeom, ONLY: aire_2d, cu_2d
     USE dimens_m, ONLY: iim, jjm, llm
     use dynetat0_m, ONLY: rlatu
-    USE ener, ONLY: ang0, etot0, ptot0, stot0, ztot0
     use filtreg_scal_m, only: filtreg_scal
     use massbarxy_m, only: massbarxy
     USE paramet_m, ONLY: jjp1
@@ -32,7 +29,7 @@ contains
     REAL, intent(in):: phi(iim + 1, jjm + 1, llm)
     real, intent(in):: bern(iim + 1, jjm + 1, llm)
     REAL, intent(in):: dp(iim + 1, jjm + 1)
-    logical, intent(in):: resetvarc
+    real, intent(out):: ang, etot, ptot, ztot, stot, rmsdpdt, rmsv
 
     ! Local:
     REAL bernf(iim + 1, jjm + 1, llm)
@@ -80,29 +77,6 @@ contains
     stot = sum(masse(:iim, :, :) * teta(:iim, :, :))
     rmsv = 2. &
          * sum(masse(:iim, :, :) * max(bernf(:iim, :, :) - phi(:iim, :, :), 0.))
-
-    IF (resetvarc .or. ptot0 == 0.) then
-       print *, 'sortvarc: recomputed initial values.'
-       etot0 = etot
-       ptot0 = ptot
-       ztot0 = ztot
-       stot0 = stot
-       ang0  = ang
-       PRINT *, 'ptot0 = ', ptot0
-       PRINT *, 'etot0 = ', etot0
-       PRINT *, 'ztot0 = ', ztot0
-       PRINT *, 'stot0 = ', stot0
-       PRINT *, 'ang0 = ', ang0
-    END IF
-
-    IF (.not. resetvarc) then
-       etot = etot / etot0
-       rmsv = sqrt(rmsv / ptot)
-       ptot = ptot / ptot0
-       ztot = ztot / ztot0
-       stot = stot / stot0
-       ang = ang / ang0
-    end IF
 
   END SUBROUTINE sortvarc
 
