@@ -6,7 +6,7 @@
 
 makefile_dir = .
 
-VPATH := ${makefile_dir}/Sources $(addprefix ${makefile_dir}/Sources/, $(shell cat ${makefile_dir}/directories))
+VPATH := ${makefile_dir} $(addprefix ${makefile_dir}/, $(shell cat ${makefile_dir}/directories))
 
 src_ce0l := $(shell cat ${makefile_dir}/src_ce0l)
 src_gcm := $(shell cat ${makefile_dir}/src_gcm)

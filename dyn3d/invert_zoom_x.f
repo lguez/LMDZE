@@ -32,7 +32,7 @@ contains
     integer i, it
 
     DOUBLE PRECISION xvrai(iim), Gvrai(iim) 
-    ! intermediary variables because xlon and xprim are simple precision
+    ! intermediary variables because xlon and xprim are single precision
 
     !------------------------------------------------------------------
 
