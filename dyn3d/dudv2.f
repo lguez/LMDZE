@@ -20,8 +20,7 @@ contains
     REAL, INTENT(IN):: teta(ip1jmp1, llm)
     REAL, INTENT(IN):: pkf(ip1jmp1, llm)
     real, INTENT(IN):: bern(ip1jmp1, llm)
-    real du(ip1jmp1, llm), dv(ip1jm, llm)
-    ! du et dv sont des arguments de sortie pour le s-pg
+    real, intent(inout):: du(ip1jmp1, llm), dv(ip1jm, llm)
 
     ! Local:
     INTEGER l, ij

@@ -63,7 +63,7 @@ contains
     REAL phi(iim + 1, jjm + 1, llm) ! geopotential
     REAL w(iim + 1, jjm + 1, llm) ! vitesse verticale
 
-    ! Variables dynamiques intermediaire pour le transport
+    ! Variables dynamiques interm\'ediaires pour le transport
     ! Flux de masse :
     REAL pbaru(iim + 1, jjm + 1, llm), pbarv(iim + 1, jjm, llm)
 
@@ -73,7 +73,7 @@ contains
     REAL massem1(iim + 1, jjm + 1, llm)
 
     ! Tendances dynamiques
-    REAL dv((iim + 1) * jjm, llm), dudyn(iim + 1, jjm + 1, llm)
+    REAL dv((iim + 1) * jjm, llm), du(iim + 1, jjm + 1, llm)
     REAL dteta(iim + 1, jjm + 1, llm)
     real dp(iim + 1, jjm + 1)
 
@@ -133,13 +133,13 @@ contains
        ! Calcul des tendances dynamiques:
        CALL geopot(teta, pk, pks, phis, phi)
        CALL caldyn(itau, ucov, vcov, teta, ps, masse, pk, pkf, phis, phi, &
-            dudyn, dv, dteta, dp, w, pbaru, pbarv, &
+            du, dv, dteta, dp, w, pbaru, pbarv, &
             conser = MOD(itau, iconser) == 0)
 
        CALL caladvtrac(q, pbaru, pbarv, p3d, masse, teta, pk)
 
        ! Int\'egrations dynamique et traceurs:
-       CALL integrd(vcovm1, ucovm1, tetam1, psm1, massem1, dv, dudyn, dteta, &
+       CALL integrd(vcovm1, ucovm1, tetam1, psm1, massem1, dv, du, dteta, &
             dp, vcov, ucov, teta, q(:, :, :, :2), ps, masse, dt, leapf)
 
        forall (l = 1: llm + 1) p3d(:, :, l) = ap(l) + bp(l) * ps
@@ -152,10 +152,10 @@ contains
           ! Calcul des tendances dynamiques:
           CALL geopot(teta, pk, pks, phis, phi)
           CALL caldyn(itau + 1, ucov, vcov, teta, ps, masse, pk, pkf, phis, &
-               phi, dudyn, dv, dteta, dp, w, pbaru, pbarv, conser = .false.)
+               phi, du, dv, dteta, dp, w, pbaru, pbarv, conser = .false.)
 
           ! integrations dynamique et traceurs:
-          CALL integrd(vcovm1, ucovm1, tetam1, psm1, massem1, dv, dudyn, &
+          CALL integrd(vcovm1, ucovm1, tetam1, psm1, massem1, dv, du, &
                dteta, dp, vcov, ucov, teta, q(:, :, :, :2), ps, masse, dtvr, &
                leapf=.false.)
 
@@ -221,7 +221,7 @@ contains
     ! Calcul des tendances dynamiques:
     CALL geopot(teta, pk, pks, phis, phi)
     CALL caldyn(itaufin, ucov, vcov, teta, ps, masse, pk, pkf, phis, phi, &
-         dudyn, dv, dteta, dp, w, pbaru, pbarv, &
+         du, dv, dteta, dp, w, pbaru, pbarv, &
          conser = MOD(itaufin, iconser) == 0)
 
   END SUBROUTINE leapfrog

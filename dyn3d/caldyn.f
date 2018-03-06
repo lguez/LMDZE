@@ -5,7 +5,7 @@ module caldyn_m
 contains
 
   SUBROUTINE caldyn(itau, ucov, vcov, teta, ps, masse, pk, pkf, phis, phi, &
-       dudyn, dv, dteta, dp, w, pbaru, pbarv, conser)
+       du, dv, dteta, dp, w, pbaru, pbarv, conser)
 
     ! From dyn3d/caldyn.F, version 1.1.1.1, 2004/05/19 12:53:06
     ! Author: P. Le Van
@@ -44,7 +44,7 @@ contains
     REAL, INTENT(IN):: pkf(ip1jmp1, llm)
     REAL, INTENT(IN):: phis(ip1jmp1)
     REAL, INTENT(IN):: phi(iim + 1, jjm + 1, llm)
-    REAL dudyn(:, :, :) ! (iim + 1, jjm + 1, llm)
+    REAL du(:, :, :) ! (iim + 1, jjm + 1, llm)
     real dv((iim + 1) * jjm, llm)
     REAL, INTENT(out):: dteta(:, :, :) ! (iim + 1, jjm + 1, llm)
     real, INTENT(out):: dp(:, :) ! (iim + 1, jjm + 1)
@@ -78,13 +78,13 @@ contains
     dp = convm(:, :, 1) / airesurg_2d
     w = vitvert(convm)
     CALL tourpot(vcov, ucov, massebxy, vorpot)
-    CALL dudv1(vorpot, pbaru, pbarv, dudyn(:, 2: jjm, :), dv)
+    CALL dudv1(vorpot, pbaru, pbarv, du(:, 2: jjm, :), dv)
     CALL enercin(vcov, ucov, vcont, ucont, ecin)
     bern = bernoui(phi, ecin)
-    CALL dudv2(teta, pkf, bern, dudyn, dv)
+    CALL dudv2(teta, pkf, bern, du, dv)
 
     forall (l = 1: llm) ang_3d(:, :, l) = ucov(:, :, l) + constang_2d
-    CALL advect(ang_3d, vcov, teta, w, massebx, masseby, dudyn, dv, dteta)
+    CALL advect(ang_3d, vcov, teta, w, massebx, masseby, du, dv, dteta)
 
     ! Warning problème de périodicité de dv sur les PC Linux. Problème
     ! d'arrondi probablement. Observé sur le code compilé avec pgf90
