@@ -36,7 +36,7 @@ contains
 
     ! Local:
     REAL bernf(iim + 1, jjm + 1, llm)
-    REAL etotl(llm), stotl(llm), rmsvl(llm), angl(llm), ge(iim, 2:jjm)
+    REAL etotl(llm), angl(llm), ge(iim, 2:jjm)
     REAL cosphi(2:jjm)
     REAL radsg, radomeg
     REAL massebxy(iim + 1, jjm, llm)
@@ -46,39 +46,40 @@ contains
 
     PRINT *, "Call sequence information: sortvarc"
 
-    CALL massbarxy(masse, massebxy)
+    rmsdpdt = daysec * 0.01 * sqrt(sum(dp(:iim, :)**2) / (iim * jjp1))
 
-    ! Calcul  de  rmsdpdt
-    rmsdpdt = sum(dp(:iim, :)**2)
-    rmsdpdt = daysec * 1.E-2 * sqrt(rmsdpdt / (iim * jjp1))
-    bernf = bern
-    CALL filtreg_scal(bernf, direct = .false., intensive = .false.)
-
-    ! Calcul du moment  angulaire
-    radsg = rad/g
+    ! Calcul du moment  angulaire :
+    
+    radsg = rad / g
     radomeg = rad * omeg
     cosphi = cos(rlatu(2:jjm))
 
-    ! Calcul  de l'energie, de l'enstrophie, de l'entropie et de rmsv
-
     DO l = 1, llm
-       etotl(l) = sum(masse(:iim, :, l) * (phis(:iim, :) + teta(:iim, :, l) &
-            * pk(:iim, :, l) + bernf(:iim, :, l) - phi(:iim, :, l)))
-       stotl(l) = sum(masse(:iim, :, l) * teta(:iim, :, l))
-       rmsvl(l) = 2. * sum(masse(:iim, :, l) &
-            * max(bernf(:iim, :, l) - phi(:iim, :, l), 0.))
-
        forall (j = 2:jjm) ge(:, j) = (ucov(:iim, j, l) / cu_2d(:iim, j) &
             + radomeg * cosphi(j)) * masse(:iim, j, l) * cosphi(j)
        angl(l) = radsg * sum(ge)
     END DO
 
-    ptot = sum(ps(:iim, :) * aire_2d(:iim, :))
-    etot = sum(etotl)
-    ztot = sum(vorpot(:iim, :, :)**2 * massebxy(:iim, :, :))
-    stot = sum(stotl)
-    rmsv = sum(rmsvl)
     ang = sum(angl)
+
+    ! Calcul  de l'energie, de l'enstrophie, de l'entropie et de rmsv :
+
+    bernf = bern
+    CALL filtreg_scal(bernf, direct = .false., intensive = .false.)
+
+    ptot = sum(ps(:iim, :) * aire_2d(:iim, :))
+
+    forall (l = 1:llm) etotl(l) = sum(masse(:iim, :, l) * (phis(:iim, :) &
+         + teta(:iim, :, l) * pk(:iim, :, l) + bernf(:iim, :, l) &
+         - phi(:iim, :, l)))
+    etot = sum(etotl)
+
+    CALL massbarxy(masse, massebxy)
+    ztot = sum(vorpot(:iim, :, :)**2 * massebxy(:iim, :, :))
+
+    stot = sum(masse(:iim, :, :) * teta(:iim, :, :))
+    rmsv = 2. &
+         * sum(masse(:iim, :, :) * max(bernf(:iim, :, :) - phi(:iim, :, :), 0.))
 
     IF (resetvarc .or. ptot0 == 0.) then
        print *, 'sortvarc: recomputed initial values.'
@@ -95,12 +96,12 @@ contains
     END IF
 
     IF (.not. resetvarc) then
-       etot = etot/etot0
-       rmsv = sqrt(rmsv/ptot)
-       ptot = ptot/ptot0
-       ztot = ztot/ztot0
-       stot = stot/stot0
-       ang = ang/ang0
+       etot = etot / etot0
+       rmsv = sqrt(rmsv / ptot)
+       ptot = ptot / ptot0
+       ztot = ztot / ztot0
+       stot = stot / stot0
+       ang = ang / ang0
     end IF
 
   END SUBROUTINE sortvarc
