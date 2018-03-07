@@ -66,7 +66,9 @@ contains
          llm, zvertiid, 'inst(X)', t_ops, t_wrt)
     call histdef(histvid, 'v', 'vent v', 'm/s', iip1, jjm, vhoriid, llm, 1, &
          llm, zvertiid, 'inst(X)', t_ops, t_wrt)
-    call histdef(histid, 'teta', 'temperature potentielle', '-', iip1, jjp1, &
+    call histdef(histid, 'temp', 'temperature', 'K', iip1, jjp1, &
+         thoriid, llm, 1, llm, zvertiid, 'inst(X)', t_ops, t_wrt)
+    call histdef(histid, 'theta', 'temperature potentielle', 'K', iip1, jjp1, &
          thoriid, llm, 1, llm, zvertiid, 'inst(X)', t_ops, t_wrt)
     call histdef(histid, 'phi', 'geopotentiel', '-', iip1, jjp1, thoriid, &
          llm, 1, llm, zvertiid, 'inst(X)', t_ops, t_wrt)
@@ -80,8 +82,6 @@ contains
     call histdef(histid, 'masse', 'masse', 'kg', iip1, jjp1, thoriid, llm, 1, &
          llm, zvertiid, 'inst(X)', t_ops, t_wrt)
     call histdef(histid, 'ps', 'pression naturelle au sol', 'Pa', iip1, jjp1, &
-         thoriid, 1, 1, 1, -99, 'inst(X)', t_ops, t_wrt)
-    call histdef(histid, 'phis', 'geopotentiel au sol', '-', iip1, jjp1, &
          thoriid, 1, 1, 1, -99, 'inst(X)', t_ops, t_wrt)
 
     call histend(histid)

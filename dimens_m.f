@@ -10,7 +10,6 @@ module dimens_m
   INTEGER, PARAMETER:: llm = 11
   ! number of vertical layers, should be >= 7, because of nl in cv30_param_m
 
-  INTEGER, PARAMETER:: ndm = 1
   integer, parameter:: nqmx = 5 ! maximum number of tracers
 
 end module dimens_m

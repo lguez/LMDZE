@@ -13,7 +13,7 @@ contains
 
     ! Authors: F. Hourdin, Phu Le Van
 
-    ! Objet : calcul des composantes naturelles à partir des
+    ! Objet : calcul des composantes naturelles du vent  à partir des
     ! composantes covariantes.
 
     INTEGER, intent(in):: klevel

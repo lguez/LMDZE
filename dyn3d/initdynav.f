@@ -26,7 +26,7 @@ contains
     USE temps, ONLY: itau_dyn
     use ymds2ju_m, ONLY: ymds2ju
 
-    real, intent(in):: tstep ! fréquence d'écriture
+    real, intent(in):: tstep ! durée du pas de temps en secondes
     integer, intent(in):: nq ! nombre de traceurs
     real, intent(in):: t_ops ! fréquence de l'opération pour IOIPSL
     real, intent(in):: t_wrt ! fréquence d'écriture sur le fichier
@@ -67,8 +67,6 @@ contains
          1, 1, -99, 'ave(X)', t_ops, t_wrt)
     call histdef(histaveid, 'ps', 'pression naturelle au sol', 'Pa', iip1, &
          jjp1, horiid, 1, 1, 1, -99, 'ave(X)', t_ops, t_wrt)
-    call histdef(histaveid, 'phis', 'geopotentiel au sol', '-', iip1, jjp1, &
-         horiid, 1, 1, 1, -99, 'ave(X)', t_ops, t_wrt)
 
     call histend(histaveid)
 

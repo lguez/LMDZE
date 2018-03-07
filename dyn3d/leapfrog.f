@@ -204,7 +204,7 @@ contains
 
        IF (MOD(itau + 1, iperiod) == 0) THEN
           ! \'Ecriture du fichier histoire moyenne:
-          CALL writedynav(vcov, ucov, teta, pk, phi, q, masse, ps, phis, &
+          CALL writedynav(vcov, ucov, teta, pk, phi, q, masse, ps, &
                time = itau + 1)
           call bilan_dyn(ps, masse, pk, pbaru, pbarv, teta, phi, ucov, vcov, &
                q(:, :, :, 1))
@@ -212,7 +212,7 @@ contains
 
        IF (MOD(itau + 1, iecri * day_step) == 0) THEN
           CALL geopot(teta, pk, pks, phis, phi)
-          CALL writehist(itau, vcov, ucov, teta, phi, masse, ps)
+          CALL writehist(vcov, ucov, teta, pk, phi, q, masse, ps, itau)
        END IF
     end do time_integration
 
