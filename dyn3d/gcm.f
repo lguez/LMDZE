@@ -12,8 +12,8 @@ PROGRAM gcm
   use comdissnew, only: read_comdissnew
   use comgeom, only:  aire_2d, inigeom
   use comgeomphy, only: airephy
-  use conf_gcm_m, only: day_step, iperiod, iecri, iphysiq, nday, periodav, &
-       conf_gcm, iflag_phys
+  use conf_gcm_m, only: day_step, iperiod, iecri, iphysiq, nday, conf_gcm, &
+       iflag_phys
   use conf_guide_m, only: conf_guide
   use dimens_m, only: iim, jjm, llm, nqmx
   USE disvert_m, ONLY : disvert
@@ -24,7 +24,6 @@ PROGRAM gcm
   use iniadvtrac_m, only: iniadvtrac
   use inidissip_m, only: inidissip
   use inifilr_m, only: inifilr
-  use initdynav_m, only: initdynav
   use inithist_m, only: inithist
   use init_dynzon_m, only: init_dynzon
   USE ioconf_calendar_m, only: ioconf_calendar
@@ -89,7 +88,6 @@ PROGRAM gcm
   ! Initialisation des entr\'ees-sorties :
   CALL dynredem0(day_ini + nday, phis)
   CALL inithist(dtvr, nqmx, t_ops = iecri * daysec, t_wrt = iecri * daysec)
-  CALL initdynav(dtvr, nqmx, t_ops = iperiod * dtvr, t_wrt = periodav * daysec)
   call init_dynzon(dt_app = dtvr * iperiod)
 
   CALL conf_guide

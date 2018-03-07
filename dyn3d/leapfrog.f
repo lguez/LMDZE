@@ -36,7 +36,6 @@ contains
     use integrd_m, only: integrd
     use nr_util, only: assert
     USE temps, ONLY: itau_dyn
-    use writedynav_m, only: writedynav
     use writehist_m, only: writehist
 
     ! Variables dynamiques:
@@ -203,9 +202,6 @@ contains
        END IF
 
        IF (MOD(itau + 1, iperiod) == 0) THEN
-          ! \'Ecriture du fichier histoire moyenne:
-          CALL writedynav(vcov, ucov, teta, pk, phi, q, masse, ps, &
-               time = itau + 1)
           call bilan_dyn(ps, masse, pk, pbaru, pbarv, teta, phi, ucov, vcov, &
                q(:, :, :, 1))
        ENDIF

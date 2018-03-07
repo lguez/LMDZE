@@ -43,12 +43,12 @@ contains
 
     call assert([size(vcov, 1), size(ucov, 1), size(teta, 1), size(phi, 1), &
          size(pk, 1), size(ps, 1), size(masse, 1)] == size(q, 1), &
-         "writedynav iim")
+         "writehist iim")
     call assert([size(vcov, 2) + 1, size(ucov, 2), size(teta, 2), &
          size(phi, 2), size(pk, 2), size(ps, 2), size(masse, 2)] &
-         == size(q, 2), "writedynav jjm")
+         == size(q, 2), "writehist jjm")
     call assert([size(vcov, 3), size(ucov, 3), size(teta, 3), size(phi, 3), &
-         size(pk, 3), size(masse, 3), size(q, 3)] == llm, "writedynav llm")
+         size(pk, 3), size(masse, 3), size(q, 3)] == llm, "writehist llm")
 
     itau_w = itau_dyn + time
     call covnat(llm, ucov, vcov, unat, vnat)

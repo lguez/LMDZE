@@ -144,7 +144,6 @@ inifgn.f
 inifilr.f
 inifilr_hemisph.f
 ini_histins.f
-initdynav.f
 init_dynzon.f
 inithist.f
 initial0.f
@@ -259,7 +258,6 @@ vlxqs.f
 vly.f
 vlyqs.f
 vlz.f
-writedynav.f
 writefield.f
 writehist.f
 yamada4.f
