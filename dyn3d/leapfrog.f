@@ -206,9 +206,10 @@ contains
                q(:, :, :, 1))
        ENDIF
 
-       IF (MOD(itau + 1, iecri * day_step) == 0) THEN
+       IF (MOD(itau + 1, iecri) == 0) THEN
           CALL geopot(teta, pk, pks, phis, phi)
-          CALL writehist(vcov, ucov, teta, pk, phi, q, masse, ps, itau)
+          CALL writehist(vcov, ucov, teta, pk, phi, q, masse, ps, &
+               itau_w = itau_dyn + itau + 1)
        END IF
     end do time_integration
 

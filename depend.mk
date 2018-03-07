@@ -140,7 +140,7 @@ inifilr.o : inifilr_hemisph.o inifgn.o dynetat0.o dimens_m.o
 inifilr_hemisph.o : dimens_m.o 
 init_dynzon.o : ymds2ju.o temps.o histvert.o histend.o histdef.o histbeg_totreg.o dynetat0.o disvert.o dimens_m.o conf_gcm.o 
 init_tau2alpha.o : writefield.o paramet_m.o dynetat0.o dimens_m.o coordij.o comgeom.o 
-inithist.o : ymds2ju.o temps.o paramet_m.o iniadvtrac.o histvert.o histend.o histdef.o histbeg_totreg.o dynetat0.o disvert.o dimens_m.o 
+inithist.o : ymds2ju.o temps.o paramet_m.o iniadvtrac.o histvert.o histend.o histdef.o histbeg_totreg.o dynetat0.o disvert.o dimens_m.o comconst.o 
 initrrnpb.o : indicesol.o dimphy.o dimens_m.o 
 integrd.o : qminimum.o paramet_m.o massdair.o disvert.o dimens_m.o comgeom.o 
 inter_barxy.o : ord_coordm.o ord_coord.o inter_bary.o inter_barx.o dimens_m.o comgeom.o 
@@ -250,7 +250,7 @@ vly.o : paramet_m.o dynetat0.o disvert.o dimens_m.o conf_gcm.o comgeom.o comcons
 vlyqs.o : paramet_m.o dynetat0.o comgeom.o conf_gcm.o disvert.o dimens_m.o comconst.o 
 vlz.o : conf_gcm.o disvert.o comconst.o paramet_m.o dimens_m.o 
 writefield.o : getfieldindex.o createnewfield.o 
-writehist.o : temps.o paramet_m.o inithist.o iniadvtrac.o histwrite.o histsync.o dimens_m.o covnat.o comconst.o 
+writehist.o : paramet_m.o inithist.o iniadvtrac.o histwrite.o histsync.o dimens_m.o covnat.o comconst.o 
 yamada4.o : suphec.o dimphy.o conf_phys.o 
 ymds2ju.o : ioconf_calendar.o calendar.o 
 yoethf.o : suphec.o 

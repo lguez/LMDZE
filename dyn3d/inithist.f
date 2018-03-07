@@ -6,7 +6,7 @@ module inithist_m
 
 contains
 
-  subroutine inithist(tstep, nq, t_ops, t_wrt)
+  subroutine inithist(t_ops, t_wrt)
 
     ! From inithist.F, version 1.1.1.1, 2004/05/19 12:53:05
     ! L. Fairhead, LMD, 03/99
@@ -14,7 +14,8 @@ contains
     ! Routine d'initialisation des écritures des fichiers histoires au
     ! format IOIPSL.
 
-    USE dimens_m, ONLY: jjm, llm
+    use comconst, only: dtvr
+    USE dimens_m, ONLY: jjm, llm, nqmx
     USE disvert_m, ONLY: presnivs
     use dynetat0_m, only: day_ref, annee_ref, rlatu, rlatv, rlonu, rlonv
     use histbeg_totreg_m, only: histbeg_totreg
@@ -27,8 +28,6 @@ contains
     USE temps, ONLY: itau_dyn
     use ymds2ju_m, ONLY: ymds2ju
 
-    real, intent(in):: tstep ! durée du pas de temps en secondes
-    integer, intent(in):: nq ! nombre de traceurs
     real, intent(in):: t_ops ! fréquence de l'opération pour IOIPSL
     real, intent(in):: t_wrt ! fréquence d'écriture sur le fichier
 
@@ -43,17 +42,17 @@ contains
     CALL ymds2ju(annee_ref, 1, day_ref, 0., julian)
 
     call histbeg_totreg("dyn_histu.nc", rlonu * 180. / pi, rlatu * 180. / pi, &
-         1, iip1, 1, jjp1, itau_dyn, julian, tstep, uhoriid, histuid)
+         1, iip1, 1, jjp1, itau_dyn, julian, dtvr, uhoriid, histuid)
 
     ! Creation du fichier histoire pour la grille en V (oblige pour l'instant,
     ! IOIPSL ne permet pas de grilles avec des nombres de point differents dans
     ! un meme fichier)
 
     call histbeg_totreg('dyn_histv.nc', rlonv * 180. / pi, rlatv * 180. / pi, &
-         1, iip1, 1, jjm, itau_dyn, julian, tstep, vhoriid, histvid)
+         1, iip1, 1, jjm, itau_dyn, julian, dtvr, vhoriid, histvid)
 
     call histbeg_totreg("dyn_hist.nc", rlonv * 180. / pi, rlatu * 180. / pi, &
-         1, iip1, 1, jjp1, itau_dyn, julian, tstep, thoriid, histid)
+         1, iip1, 1, jjp1, itau_dyn, julian, dtvr, thoriid, histid)
 
     call histvert(histid, 'presnivs', 'Niveaux pression', 'mb', presnivs/100., &
          zvertiid, 'down')
@@ -74,7 +73,7 @@ contains
          llm, 1, llm, zvertiid, 'inst(X)', t_ops, t_wrt)
 
     ! Traceurs
-    DO iq = 1, nq
+    DO iq = 1, nqmx
        call histdef(histid, ttext(iq), ttext(iq), '-', iip1, jjp1, thoriid, &
             llm, 1, llm, zvertiid, 'inst(X)', t_ops, t_wrt)
     enddo

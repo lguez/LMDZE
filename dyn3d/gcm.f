@@ -8,7 +8,7 @@ PROGRAM gcm
   ! "divgrad2", "nxgraro2"). Possibilit\'e de choisir le sch\'ema pour
   ! l'advection de "q", en modifiant "iadv" dans "traceur.def".
 
-  use comconst, only: daysec, dtvr, iniconst
+  use comconst, only: dtvr, iniconst
   use comdissnew, only: read_comdissnew
   use comgeom, only:  aire_2d, inigeom
   use comgeomphy, only: airephy
@@ -87,7 +87,7 @@ PROGRAM gcm
 
   ! Initialisation des entr\'ees-sorties :
   CALL dynredem0(day_ini + nday, phis)
-  CALL inithist(dtvr, nqmx, t_ops = iecri * daysec, t_wrt = iecri * daysec)
+  CALL inithist(t_ops = iecri * dtvr, t_wrt = iecri * dtvr)
   call init_dynzon(dt_app = dtvr * iperiod)
 
   CALL conf_guide

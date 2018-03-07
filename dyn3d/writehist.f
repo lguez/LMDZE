@@ -4,7 +4,7 @@ module writehist_m
 
 contains
 
-  subroutine writehist(vcov, ucov, teta, pk, phi, q, masse, ps, time)
+  subroutine writehist(vcov, ucov, teta, pk, phi, q, masse, ps, itau_w)
 
     ! From writehist.F, revision 1403, 2010-07-01 09:02:53
     ! Écriture du fichier histoire au format IOIPSL
@@ -19,7 +19,6 @@ contains
     use inithist_m, only: histid, histvid, histuid
     use nr_util, only: assert
     use paramet_m, only: ip1jm, ip1jmp1
-    use temps, only: itau_dyn
 
     ! Vent covariant :
     REAL, intent(in):: vcov(:, :, :) ! (iim + 1, jjm, llm)
@@ -33,10 +32,10 @@ contains
     REAL, intent(in):: q(:, :, :, :) ! (iim + 1, jjm + 1, llm, nqmx) traceurs
     real, intent(in):: masse(:, :, :) ! (iim + 1, jjm + 1, llm)
     REAL, intent(in):: ps(:, :) ! (iim + 1, jjm + 1) pression au sol
-    integer, intent(in):: time ! temps de l'ecriture
+    integer, intent(in):: itau_w ! temps de l'ecriture
 
     ! Local:
-    integer iq, itau_w
+    integer iq
     REAL vnat(ip1jm, llm), unat(ip1jmp1, llm)
 
     !---------------------------------------------------------------------
@@ -50,7 +49,6 @@ contains
     call assert([size(vcov, 3), size(ucov, 3), size(teta, 3), size(phi, 3), &
          size(pk, 3), size(masse, 3), size(q, 3)] == llm, "writehist llm")
 
-    itau_w = itau_dyn + time
     call covnat(llm, ucov, vcov, unat, vnat)
 
     call histwrite(histuid, 'u', itau_w, unat)
