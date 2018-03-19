@@ -18,7 +18,7 @@ contains
     use dynetat0_m, only: rlonu, rlatv
     use etat0_mod, only: pctsrf
     use grid_change, only: dyn_phy
-    use indicesol, only: epsfra, nbsrf, is_ter, is_oce, is_lic, is_sic
+    use indicesol, only: epsfra, is_ter, is_oce, is_lic, is_sic
     use inter_barxy_m, only: inter_barxy
     use netcdf95, only: NF95_CLOSE, NF95_CREATE, NF95_DEF_DIM, nf95_def_var, &
          nf95_enddef, nf95_get_var, nf95_gw_var, nf95_inq_dimid, &
@@ -37,13 +37,8 @@ contains
     ! (extrapolation de donn\'ees, comme pour les SST lorsque le fichier
     ! ne contient pas uniquement des points oc\'eaniques)
 
-    REAL phy_alb(klon, 360)
-    REAL phy_sst(klon, 360)
     REAL phy_bil(klon, 360)
-    REAL phy_rug(klon, 360)
     REAL phy_ice(klon)
-
-    real pctsrf_t(klon, nbsrf, 360) ! composition of the surface
 
     ! Pour le champ de d\'epart:
     INTEGER imdep, jmdep, lmdep
@@ -60,15 +55,15 @@ contains
     ! Pour l'inteprolation verticale :
     REAL, allocatable:: yder(:)
 
-    INTEGER nid, ndim, ntim
-    INTEGER id_tim
+    INTEGER ndim, ntim
+    INTEGER varid_time
     INTEGER id_SST, id_BILS, id_RUG, id_ALB
     INTEGER id_FOCE, id_FSIC, id_FTER, id_FLIC
 
     INTEGER i, j, k, l
-    INTEGER ncid, varid, dimid
+    INTEGER ncid, ncid_limit, varid, dimid
 
-    REAL, parameter:: tmidmonth(12) = (/(15. + 30. * i, i = 0, 11)/)
+    REAL, parameter:: tmidmonth(12) = [(15. + 30. * i, i = 0, 11)]
 
     namelist /limit_nml/extrap
 
@@ -80,6 +75,54 @@ contains
     read(unit=*, nml=limit_nml)
     write(unit_nml, nml=limit_nml)
 
+    call NF95_CREATE("limit.nc", NF90_CLOBBER, ncid_limit)
+
+    call NF95_PUT_ATT(ncid_limit, NF90_GLOBAL, "title", &
+         "Fichier conditions aux limites")
+    call NF95_DEF_DIM(ncid_limit, "points_physiques", klon, ndim)
+    call NF95_DEF_DIM(ncid_limit, "time", NF90_UNLIMITED, ntim)
+
+    call NF95_DEF_VAR(ncid_limit, "TEMPS", NF90_FLOAT, ntim, varid_time)
+    call NF95_PUT_ATT(ncid_limit, varid_time, "title", "Jour dans l annee")
+
+    call NF95_DEF_VAR(ncid_limit, "FOCE", NF90_FLOAT, dimids=[ndim, ntim], &
+         varid=id_foce)
+    call NF95_PUT_ATT(ncid_limit, id_FOCE, "title", "Fraction ocean")
+
+    call NF95_DEF_VAR(ncid_limit, "FSIC", NF90_FLOAT, dimids=[ndim, ntim], &
+         varid=id_FSIC)
+    call NF95_PUT_ATT(ncid_limit, id_FSIC, "title", "Fraction glace de mer")
+
+    call NF95_DEF_VAR(ncid_limit, "FTER", NF90_FLOAT, dimids=[ndim, ntim], &
+         varid=id_FTER)
+    call NF95_PUT_ATT(ncid_limit, id_FTER, "title", "Fraction terre")
+
+    call NF95_DEF_VAR(ncid_limit, "FLIC", NF90_FLOAT, dimids=[ndim, ntim], &
+         varid=id_FLIC)
+    call NF95_PUT_ATT(ncid_limit, id_FLIC, "title", "Fraction land ice")
+
+    call NF95_DEF_VAR(ncid_limit, "SST", NF90_FLOAT, dimids=[ndim, ntim], &
+         varid=id_SST)
+    call NF95_PUT_ATT(ncid_limit, id_SST, "title",  &
+         "Temperature superficielle de la mer")
+
+    call NF95_DEF_VAR(ncid_limit, "BILS", NF90_FLOAT, dimids=[ndim, ntim], &
+         varid=id_BILS)
+    call NF95_PUT_ATT(ncid_limit, id_BILS, "title", &
+         "Reference flux de chaleur au sol")
+
+    call NF95_DEF_VAR(ncid_limit, "ALB", NF90_FLOAT, dimids=[ndim, ntim], &
+         varid=id_ALB)
+    call NF95_PUT_ATT(ncid_limit, id_ALB, "title", "Albedo a la surface")
+
+    call NF95_DEF_VAR(ncid_limit, "RUG", NF90_FLOAT, dimids=[ndim, ntim], &
+         varid=id_RUG)
+    call NF95_PUT_ATT(ncid_limit, id_RUG, "title", "Rugosite")
+
+    call NF95_ENDDEF(ncid_limit)
+
+    call NF95_PUT_VAR(ncid_limit, varid_time, [(k, k = 1, 360)])
+    
     PRINT *, 'Processing rugosity...'
 
     call NF95_OPEN('Rugos.nc', NF90_NOWRITE, ncid)
@@ -105,7 +148,7 @@ contains
     ! Read the primary variable day by day and regrid horizontally,
     ! result in "champtime":
     DO  l = 1, lmdep
-       call NF95_GET_VAR(ncid, varid, champ, start=(/1, 1, l/))
+       call NF95_GET_VAR(ncid, varid, champ, start=[1, 1, l])
        CALL conf_dat2d(dlon_ini, dlat_ini, dlon, dlat, champ)
        CALL inter_barxy(dlon, dlat(:jmdep -1), LOG(champ), rlonu(:iim), &
             rlatv, champtime(:, :, l))
@@ -131,9 +174,11 @@ contains
 
     deallocate(champtime, yder)
     champan(iim + 1, :, :) = champan(1, :, :)
-    forall (k = 1:360) phy_rug(:, k) = pack(champan(:, :, k), dyn_phy)
 
-    ! Process sea ice:
+    DO k = 1, 360
+       call NF95_PUT_VAR(ncid_limit, id_RUG, pack(champan(:, :, k), dyn_phy), &
+            start=[1, k])
+    ENDDO
 
     PRINT *, 'Processing sea ice...'
     call NF95_OPEN('amipbc_sic_1x1.nc', NF90_NOWRITE, ncid)
@@ -160,7 +205,7 @@ contains
     ALLOCATE(dlon(imdep), dlat(jmdep))
     call NF95_INQ_VARID(ncid, 'sicbcs', varid)
     DO l = 1, lmdep
-       call NF95_GET_VAR(ncid, varid, champ, start=(/1, 1, l/))
+       call NF95_GET_VAR(ncid, varid, champ, start=[1, 1, l])
        CALL conf_dat2d(dlon_ini, dlat_ini, dlon, dlat, champ)
        CALL inter_barxy(dlon, dlat(:jmdep -1), champ, rlonu(:iim), rlatv, &
             champtime(:, :, l))
@@ -197,43 +242,45 @@ contains
        ! PB en attendant de mettre fraction de terre
        WHERE (phy_ice < EPSFRA) phy_ice = 0.
 
-       pctsrf_t(:, is_ter, k) = pctsrf(:, is_ter)
-       pctsrf_t(:, is_lic, k) = pctsrf(:, is_lic)
-       pctsrf_t(:, is_sic, k) = max(phy_ice - pctsrf_t(:, is_lic, k), 0.)
+       pctsrf(:, is_sic) = max(phy_ice - pctsrf(:, is_lic), 0.)
        ! Il y a des cas o\`u il y a de la glace dans landiceref et
        ! pas dans AMIP
        WHERE (1. - zmasq < EPSFRA)
-          pctsrf_t(:, is_sic, k) = 0.
-          pctsrf_t(:, is_oce, k) = 0.
+          pctsrf(:, is_sic) = 0.
+          pctsrf(:, is_oce) = 0.
        elsewhere
-          where (pctsrf_t(:, is_sic, k) >= 1 - zmasq)
-             pctsrf_t(:, is_sic, k) = 1. - zmasq
-             pctsrf_t(:, is_oce, k) = 0.
+          where (pctsrf(:, is_sic) >= 1 - zmasq)
+             pctsrf(:, is_sic) = 1. - zmasq
+             pctsrf(:, is_oce) = 0.
           ELSEwhere
-             pctsrf_t(:, is_oce, k) = 1. - zmasq - pctsrf_t(:, is_sic, k)
-             where (pctsrf_t(:, is_oce, k) < EPSFRA)
-                pctsrf_t(:, is_oce, k) = 0.
-                pctsrf_t(:, is_sic, k) = 1 - zmasq
+             pctsrf(:, is_oce) = 1. - zmasq - pctsrf(:, is_sic)
+             where (pctsrf(:, is_oce) < EPSFRA)
+                pctsrf(:, is_oce) = 0.
+                pctsrf(:, is_sic) = 1 - zmasq
              end where
           end where
        end where
 
        DO i = 1, klon
-          if (pctsrf_t(i, is_oce, k) < 0.) then
-             print *, 'Bad surface fraction: pctsrf_t(', i, &
-                  ', is_oce, ', k, ') = ', pctsrf_t(i, is_oce, k)
+          if (pctsrf(i, is_oce) < 0.) then
+             print *, "k = ", k
+             print *, 'Bad surface fraction: pctsrf(', i, ', is_oce) = ', &
+                  pctsrf(i, is_oce)
           ENDIF
-          IF (abs(pctsrf_t(i, is_ter, k) + pctsrf_t(i, is_lic, k) &
-               + pctsrf_t(i, is_oce, k) + pctsrf_t(i, is_sic, k) - 1.) &
-               > EPSFRA) THEN 
+          IF (abs(sum(pctsrf(i, :)) - 1.) > EPSFRA) THEN 
+             print *, "k = ", k
              print *, 'Bad surface fraction:'
-             print *, "pctsrf_t(", i, ", :, ", k, ") = ", &
-                  pctsrf_t(i, :, k)
+             print *, "pctsrf(", i, ", :) = ", pctsrf(i, :)
              print *, "phy_ice(", i, ") = ", phy_ice(i)
           ENDIF
        END DO
-    ENDDO
 
+       call NF95_PUT_VAR(ncid_limit, id_FOCE, pctsrf(:, is_oce), start=[1, k])
+       call NF95_PUT_VAR(ncid_limit, id_FSIC, pctsrf(:, is_sic), start=[1, k])
+       call NF95_PUT_VAR(ncid_limit, id_FTER, pctsrf(:, is_ter), start=[1, k])
+       call NF95_PUT_VAR(ncid_limit, id_FLIC, pctsrf(:, is_lic), start=[1, k])
+    end DO
+    
     PRINT *, 'Traitement de la sst'
     call NF95_OPEN('amipbc_sst_1x1.nc', NF90_NOWRITE, ncid)
 
@@ -257,7 +304,7 @@ contains
     call NF95_INQ_VARID(ncid, 'tosbcs', varid)
 
     DO l = 1, lmdep
-       call NF95_GET_VAR(ncid, varid, champ, start=(/1, 1, l/))
+       call NF95_GET_VAR(ncid, varid, champ, start=[1, 1, l])
        CALL conf_dat2d(dlon_ini, dlat_ini, dlon, dlat, champ)
        IF (extrap) &
             CALL extrapol(champ, imdep, jmdep, 999999., .TRUE., .TRUE., 2, work)
@@ -296,7 +343,10 @@ contains
        ENDDO
     ENDDO
     
-    forall (k = 1:360) phy_sst(:, k) = pack(champan(:, :, k), dyn_phy)
+    DO k = 1, 360
+       call NF95_PUT_VAR(ncid_limit, id_SST, pack(champan(:, :, k), dyn_phy), &
+            start=[1, k])
+    end DO
 
     PRINT *, "Traitement de l'albedo..."
     call NF95_OPEN('Albedo.nc', NF90_NOWRITE, ncid)
@@ -319,7 +369,7 @@ contains
 
     DO l = 1, lmdep
        PRINT *, "timeyear(", l, ") =", timeyear(l)
-       call NF95_GET_VAR(ncid, varid, champ, start=(/1, 1, l/))
+       call NF95_GET_VAR(ncid, varid, champ, start=[1, 1, l])
        CALL conf_dat2d(dlon_ini, dlat_ini, dlon, dlat, champ)
        CALL inter_barxy(dlon, dlat(:jmdep-1), champ, rlonu(:iim), rlatv, &
             champtime(:, :, l))
@@ -341,74 +391,16 @@ contains
     ENDDO
 
     champan(iim + 1, :, :) = champan(1, :, :)
-    forall (k = 1:360) phy_alb(:, k) = pack(champan(:, :, k), dyn_phy)
 
     DO k = 1, 360
-       DO i = 1, klon
-          phy_bil(i, k) = 0.0
-       ENDDO
-    ENDDO
+       call NF95_PUT_VAR(ncid_limit, id_ALB, pack(champan(:, :, k), dyn_phy), &
+            start=[1, k])
+    end DO
 
-    PRINT *, 'Ecriture du fichier limit.nc...'
+    phy_bil = 0.
+    call NF95_PUT_VAR(ncid_limit, id_BILS, phy_bil)
 
-    call NF95_CREATE("limit.nc", NF90_CLOBBER, nid)
-
-    call NF95_PUT_ATT(nid, NF90_GLOBAL, "title", &
-         "Fichier conditions aux limites")
-    call NF95_DEF_DIM(nid, "points_physiques", klon, ndim)
-    call NF95_DEF_DIM(nid, "time", NF90_UNLIMITED, ntim)
-
-    call NF95_DEF_VAR(nid, "TEMPS", NF90_FLOAT, ntim, id_tim)
-    call NF95_PUT_ATT(nid, id_tim, "title", "Jour dans l annee")
-
-    call NF95_DEF_VAR(nid, "FOCE", NF90_FLOAT, dimids=(/ndim, ntim/), &
-         varid=id_foce)
-    call NF95_PUT_ATT(nid, id_FOCE, "title", "Fraction ocean")
-
-    call NF95_DEF_VAR(nid, "FSIC", NF90_FLOAT, dimids=(/ndim, ntim/), &
-         varid=id_FSIC)
-    call NF95_PUT_ATT(nid, id_FSIC, "title", "Fraction glace de mer")
-
-    call NF95_DEF_VAR(nid, "FTER", NF90_FLOAT, dimids=(/ndim, ntim/), &
-         varid=id_FTER)
-    call NF95_PUT_ATT(nid, id_FTER, "title", "Fraction terre")
-
-    call NF95_DEF_VAR(nid, "FLIC", NF90_FLOAT, dimids=(/ndim, ntim/), &
-         varid=id_FLIC)
-    call NF95_PUT_ATT(nid, id_FLIC, "title", "Fraction land ice")
-
-    call NF95_DEF_VAR(nid, "SST", NF90_FLOAT, dimids=(/ndim, ntim/), &
-         varid=id_SST)
-    call NF95_PUT_ATT(nid, id_SST, "title",  &
-         "Temperature superficielle de la mer")
-
-    call NF95_DEF_VAR(nid, "BILS", NF90_FLOAT, dimids=(/ndim, ntim/), &
-         varid=id_BILS)
-    call NF95_PUT_ATT(nid, id_BILS, "title", "Reference flux de chaleur au sol")
-
-    call NF95_DEF_VAR(nid, "ALB", NF90_FLOAT, dimids=(/ndim, ntim/), &
-         varid=id_ALB)
-    call NF95_PUT_ATT(nid, id_ALB, "title", "Albedo a la surface")
-
-    call NF95_DEF_VAR(nid, "RUG", NF90_FLOAT, dimids=(/ndim, ntim/), &
-         varid=id_RUG)
-    call NF95_PUT_ATT(nid, id_RUG, "title", "Rugosite")
-
-    call NF95_ENDDEF(nid)
-
-    DO k = 1, 360
-       call NF95_PUT_VAR(nid, id_tim, REAL(k), (/k/))
-       call NF95_PUT_VAR(nid, id_FOCE, pctsrf_t(:, is_oce, k), start=(/1, k/))
-       call NF95_PUT_VAR(nid, id_FSIC, pctsrf_t(:, is_sic, k), start=(/1, k/))
-       call NF95_PUT_VAR(nid, id_FTER, pctsrf_t(:, is_ter, k), start=(/1, k/))
-       call NF95_PUT_VAR(nid, id_FLIC, pctsrf_t(:, is_lic, k), start=(/1, k/))
-       call NF95_PUT_VAR(nid, id_SST, phy_sst(:, k), start=(/1, k/))
-       call NF95_PUT_VAR(nid, id_BILS, phy_bil(:, k), start=(/1, k/))
-       call NF95_PUT_VAR(nid, id_ALB, phy_alb(:, k), start=(/1, k/))
-       call NF95_PUT_VAR(nid, id_RUG, phy_rug(:, k), start=(/1, k/))
-    ENDDO
-
-    call NF95_CLOSE(nid)
+    call NF95_CLOSE(ncid_limit)
 
   END SUBROUTINE limit
 
