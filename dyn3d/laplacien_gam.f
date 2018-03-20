@@ -19,7 +19,7 @@ contains
     ! divgra     est  un argument  de sortie pour le s-prog
 
     USE comgeom
-    USE dimens_m
+    USE dimensions
     use diverg_gam_m, only: diverg_gam
     USE grad_m, ONLY: grad
     USE paramet_m

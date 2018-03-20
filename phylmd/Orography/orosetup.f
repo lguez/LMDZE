@@ -14,7 +14,7 @@ contains
     ! See ECMWF research department documentation of the I.F.S.
     ! Modifications F. Lott for the new-gwdrag scheme, november 1993.
 
-    USE dimens_m
+    USE dimensions
     USE dimphy
     use nr_util, only: pi
     USE suphec_m

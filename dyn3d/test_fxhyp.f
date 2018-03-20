@@ -1,6 +1,6 @@
 program test_fxhyp
 
-  USE dimens_m, ONLY: iim
+  USE dimensions, ONLY: iim
   use fxhyp_m, only: fxhyp
   use jumble, only: new_unit
   use read_serre_m, only: read_serre

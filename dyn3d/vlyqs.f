@@ -12,7 +12,7 @@
 !   --------------------------------------------------------------------
 !
       use comconst
-      use dimens_m
+      use dimensions
       use disvert_m
       use conf_gcm_m
       use comgeom, only: aire, apoln, apols

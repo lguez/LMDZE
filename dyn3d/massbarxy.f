@@ -12,7 +12,7 @@ contains
     ! Authors: P. Le Van, F. Hourdin.
 
     USE comgeom, ONLY: alpha1, alpha2, alpha3, alpha4
-    USE dimens_m, ONLY: iim, llm
+    USE dimensions, ONLY: iim, llm
     USE paramet_m, ONLY: iip1, iip2, ip1jm, ip1jmp1
 
     REAL, intent(in):: masse(ip1jmp1, llm)

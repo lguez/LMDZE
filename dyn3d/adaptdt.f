@@ -4,7 +4,7 @@
 
 SUBROUTINE adaptdt(dtbon, n, pbaru, masse)
 
-  USE dimens_m
+  USE dimensions
   USE paramet_m
   USE comconst
   USE disvert_m

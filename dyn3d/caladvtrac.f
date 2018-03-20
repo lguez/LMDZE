@@ -15,7 +15,7 @@ contains
 
     use advtrac_m, only: advtrac
     use conf_gcm_m, only: iapp_tracvl
-    use dimens_m, only: iim, jjm, llm
+    use dimensions, only: iim, jjm, llm
     use paramet_m, only: ip1jmp1
     use qminimum_m, only: qminimum
 

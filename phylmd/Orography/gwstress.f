@@ -45,7 +45,7 @@ contains
     !     f. lott put the new gwd on ifs      22/11/93
 
     !-----------------------------------------------------------------------
-    USE dimens_m
+    USE dimensions
     USE dimphy
     USE suphec_m
     USE yoegwd

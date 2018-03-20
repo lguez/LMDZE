@@ -13,7 +13,7 @@ contains
     ! Calcule le rotationnel à tous les niveaux d'un vecteur de
     ! composantes covariantes x et y.
 
-    USE dimens_m
+    USE dimensions
     USE paramet_m
     USE comgeom
     USE filtreg_v_m, ONLY: filtreg_v

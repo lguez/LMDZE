@@ -1,7 +1,7 @@
       SUBROUTINE LWB(PDT0,PTAVE,PTL &
         , PB,PBINT,PBSUIN,PBSUR,PBTOP,PDBSL &
         , PGA,PGB,PGASUR,PGBSUR,PGATOP,PGBTOP)
-      use dimens_m
+      use dimensions
       use dimphy
       use raddim
             use raddimlw

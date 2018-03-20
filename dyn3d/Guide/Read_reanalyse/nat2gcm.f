@@ -11,7 +11,7 @@ contains
 
     use comconst, only: cpp
     use comgeom, only: cu_2d, cv_2d
-    use dimens_m, only: iim, jjm, llm
+    use dimensions, only: iim, jjm, llm
     use paramet_m, only: iip1, jjp1
 
     real, intent(in):: pk(iip1, jjp1, llm)

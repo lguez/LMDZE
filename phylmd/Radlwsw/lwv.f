@@ -7,7 +7,7 @@ contains
   SUBROUTINE lwv(kuaer, ktraer, klim, pabcu, pb, pbint, pbsuin, pbsur, pbtop, &
        pdbsl, pemis, ppmb, pga, pgb, pgasur, pgbsur, pgatop, pgbtop, &
        pcntrb, pcts, pfluc)
-    USE dimens_m
+    USE dimensions
     USE dimphy
     use lwvd_m, only: lwvd
     use lwvn_m, only: lwvn

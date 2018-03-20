@@ -4,7 +4,7 @@ PROGRAM ce0l
 
   use comdissnew, only: read_comdissnew
   use conf_gcm_m, only: conf_gcm
-  use dimens_m, only: iim, jjm
+  use dimensions, only: iim, jjm
   use etat0_mod, only: etat0
   use grilles_gcm_netcdf_sub_m, only: grilles_gcm_netcdf_sub
   use jumble, only: new_unit

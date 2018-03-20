@@ -7,7 +7,7 @@ contains
   SUBROUTINE sw1s(knu, palbd, palbp, pcg, pcld, pclear, pdsig, pomega, poz, &
        prmu, psec, ptau, pud, pfd, pfu)
     
-    USE dimens_m
+    USE dimensions
     USE dimphy
     USE raddim
     use swclr_m, only: swclr

@@ -8,7 +8,7 @@ contains
        pum1, pvm1, pmea, pstd, psig, pgamma, ptheta, ppic, pval, pulow, &
        pvlow, pvom, pvol, pte)
 
-    USE dimens_m
+    USE dimensions
     USE dimphy
     use gwstress_m, only: gwstress
     USE suphec_m

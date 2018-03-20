@@ -1,6 +1,6 @@
 SUBROUTINE lwc(klim, pcldld, pcldlu, pemis, pfluc, pbint, pbsuin, pcts, &
     pcntrb, pflux)
-  USE dimens_m
+  USE dimensions
   USE dimphy
   USE raddim
   USE radepsi

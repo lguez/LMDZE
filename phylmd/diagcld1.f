@@ -1,6 +1,6 @@
       SUBROUTINE diagcld1(paprs,pplay,rain,snow,kbot,ktop, &
                          diafra,dialiq)
-      use dimens_m
+      use dimensions
       use dimphy
       use SUPHEC_M
       IMPLICIT none

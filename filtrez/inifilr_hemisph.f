@@ -9,7 +9,7 @@ contains
 
     ! See notes.
 
-    USE dimens_m, ONLY : iim
+    USE dimensions, ONLY : iim
     use nr_util, only: pi, ifirstloc
 
     real, intent(in):: rlat(:) ! (n_lat)

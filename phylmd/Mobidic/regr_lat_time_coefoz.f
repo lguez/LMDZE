@@ -36,7 +36,7 @@ contains
     ! -- time increases from January to December (even though we do
     ! not use values of the input time coordinate).
 
-    use dimens_m, only: jjm
+    use dimensions, only: jjm
     use dynetat0_m, only: rlatv
     use nr_util, only: pi
     use numer_rec_95, only: regr3_lint, regr1_conserv, slopes
@@ -235,7 +235,7 @@ contains
     ! This subroutine creates the NetCDF output file, defines
     ! dimensions and variables, and writes one of the coordinate variables.
 
-    use dimens_m, only: jjm
+    use dimensions, only: jjm
     use dynetat0_m, only: rlatu
     use netcdf, only: nf90_clobber, nf90_float, nf90_copy_att, nf90_global
     use netcdf95, only: nf95_create, nf95_def_dim, nf95_def_var, &

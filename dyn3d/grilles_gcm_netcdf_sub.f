@@ -11,7 +11,7 @@ contains
 
     USE comconst, ONLY: g
     USE comgeom, ONLY: aire_2d
-    USE dimens_m, ONLY: iim, jjm
+    USE dimensions, ONLY: iim, jjm
     use dynetat0_m, only: rlatu, rlatv, rlonu, rlonv
     USE netcdf, ONLY: nf90_clobber, nf90_float, nf90_int
     USE netcdf95, ONLY: nf95_close, nf95_create, nf95_def_dim, nf95_def_var, &

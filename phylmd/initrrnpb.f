@@ -11,7 +11,7 @@ contains
     ! Authors: AA + CG (LGGE/CNRS) Date June 24th, 1994
     ! Objet : initialisation des constantes des traceurs
 
-    use dimens_m, only: nqmx
+    use dimensions, only: nqmx
     USE dimphy, ONLY: klon
     USE indicesol, ONLY: nbsrf
     use nr_util, only: assert

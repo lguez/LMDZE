@@ -14,7 +14,7 @@ contains
     ! du terme "- gradient de la fonction de Bernouilli". Ces termes
     ! sont ajoutés à d(ucov)/dt et à d(vcov)/dt.
 
-    USE dimens_m, ONLY: iim, llm
+    USE dimensions, ONLY: iim, llm
     USE paramet_m, ONLY: iip1, iip2, ip1jm, ip1jmp1
 
     REAL, INTENT(IN):: teta(ip1jmp1, llm)

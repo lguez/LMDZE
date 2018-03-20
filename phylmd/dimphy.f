@@ -1,6 +1,6 @@
 module dimphy
 
-  use dimens_m, only: iim, jjm, llm
+  use dimensions, only: iim, jjm, llm
 
   implicit none
 

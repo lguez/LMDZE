@@ -15,7 +15,7 @@ contains
     ! sigma(1): vitvert(i, j, 1) = 0. At top-level sigma(llm + 1), vertical
     ! speed is 0 too and is not stored in vitvert.
     
-    USE dimens_m, ONLY : llm
+    USE dimensions, ONLY : llm
     USE disvert_m, ONLY : bp
 
     real, intent(in):: convm(:, :, :) ! (iim + 1, jjm + 1, llm)

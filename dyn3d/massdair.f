@@ -12,7 +12,7 @@ contains
     ! Authors: P. Le Van, F. Hourdin
 
     USE comgeom, ONLY: airesurg_2d
-    USE dimens_m, ONLY: iim, jjm, llm
+    USE dimensions, ONLY: iim, jjm, llm
 
     REAL, intent(in):: p(iim + 1, jjm + 1, llm + 1)
     ! aux interfaces des llm couches

@@ -1,6 +1,6 @@
 module conf_guide_m
 
-  USE dimens_m, ONLY: iim, jjm
+  USE dimensions, ONLY: iim, jjm
 
   IMPLICIT NONE
 

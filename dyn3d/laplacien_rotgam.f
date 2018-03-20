@@ -12,7 +12,7 @@ SUBROUTINE laplacien_rotgam(klevel, rotin, rotout)
   ! klevel et teta  sont des arguments  d'entree pour le s-prog
   ! divgra     est  un argument  de sortie pour le s-prog
 
-  USE dimens_m
+  USE dimensions
   USE paramet_m
   USE comgeom
   IMPLICIT NONE

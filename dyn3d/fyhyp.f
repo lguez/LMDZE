@@ -16,7 +16,7 @@ contains
     ! Il vaut mieux avoir : grossismy * dzoom < pi / 2
 
     use coefpoly_m, only: coefpoly, a0, a1, a2, a3
-    USE dimens_m, only: jjm
+    USE dimensions, only: jjm
     use dynetat0_m, only: clat, grossismy, dzoomy, tauy
     use heavyside_m, only: heavyside
 

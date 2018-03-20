@@ -28,7 +28,7 @@ contains
     ! haut des couches, "pk(:, :, l)" donn\'e par la relation (2), pour
     ! l = 2 \`a l = llm.
 
-    use dimens_m, only: llm
+    use dimensions, only: llm
     use comconst, only: kappa, cpp
     use disvert_m, only: preff
 

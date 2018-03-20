@@ -11,7 +11,7 @@ contains
     ! Objet : filtre matriciel longitudinal, avec les matrices pr\'ecalcul\'ees
     ! pour l'op\'erateur filtre. 
 
-    USE dimens_m, ONLY: iim, jjm
+    USE dimensions, ONLY: iim, jjm
     use filtreg_hemisph_m, only: filtreg_hemisph
     USE inifgn_m, ONLY: sddv, unsddv
     use inifilr_m, only: jfiltnu, jfiltsu, matriceun, matriceus, matrinvn, &

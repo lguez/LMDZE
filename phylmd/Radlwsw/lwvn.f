@@ -5,7 +5,7 @@ module lwvn_m
 contains
 
   SUBROUTINE lwvn(kuaer, pabcu, pdbsl, pga, pgb, padjd, padju, pcntrb, pdbdt)
-    USE dimens_m
+    USE dimensions
     USE dimphy
     USE raddim
     USE raddimlw

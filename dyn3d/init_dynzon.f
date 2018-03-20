@@ -16,7 +16,7 @@ contains
     ! From LMDZ4/libf/dyn3d/bilan_dyn.F, version 1.5 2005/03/16 10:12:17
 
     USE conf_gcm_m, ONLY: day_step, iperiod, periodav
-    USE dimens_m, ONLY: jjm, llm
+    USE dimensions, ONLY: jjm, llm
     USE disvert_m, ONLY: presnivs
     use dynetat0_m, only: day_ref, annee_ref, rlatv
     USE histbeg_totreg_m, ONLY: histbeg_totreg

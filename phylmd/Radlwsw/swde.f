@@ -5,7 +5,7 @@ module swde_m
 contains
 
   SUBROUTINE swde(pgg, pref, prmuz, pto1, pw, pre1, pre2, ptr1, ptr2)
-    USE dimens_m
+    USE dimensions
     USE dimphy
     USE raddim
     ! ------------------------------------------------------------------

@@ -13,7 +13,7 @@ contains
     ! regular.
 
     use conf_dat2d_m, only: conf_dat2d
-    use dimens_m, only: iim, jjm
+    use dimensions, only: iim, jjm
     use dimphy, only: klon, zmasq
     use dynetat0_m, only: rlonu, rlatv
     use etat0_mod, only: pctsrf

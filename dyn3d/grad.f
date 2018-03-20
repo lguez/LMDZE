@@ -11,7 +11,7 @@ contains
 
     ! Calcul des composantes covariantes en x et y du gradient de g.
 
-    USE dimens_m, ONLY: iim, jjm
+    USE dimensions, ONLY: iim, jjm
 
     INTEGER, intent(in):: klevel
     REAL, intent(in):: g(iim + 1, jjm + 1, klevel)

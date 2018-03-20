@@ -17,7 +17,7 @@ contains
     ! x et y...
     ! x et y  etant des composantes covariantes   ...
     ! *********************************************************************
-    USE dimens_m
+    USE dimensions
     USE paramet_m
     USE comgeom
 

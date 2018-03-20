@@ -1,6 +1,6 @@
 abort_gcm.f
 conf_gcm.f
-dimens_m.f
+dimensions.f
 dimphy.f
 disvert.f
 errioipsl.f

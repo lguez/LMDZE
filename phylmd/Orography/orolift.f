@@ -17,7 +17,7 @@
 !     -------
 !     F.LOTT  LMD 22/11/95
 
-      USE dimens_m
+      USE dimensions
       USE dimphy
       USE suphec_m
       USE yoegwd

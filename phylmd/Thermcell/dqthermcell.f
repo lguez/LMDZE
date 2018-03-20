@@ -1,7 +1,7 @@
 
       subroutine dqthermcell(ngrid,nlay,ptimestep,fm,entr,masse &
           ,q,dq,qa)
-      use dimens_m
+      use dimensions
       use dimphy
       implicit none
 

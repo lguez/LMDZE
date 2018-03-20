@@ -7,7 +7,7 @@ contains
   SUBROUTINE sw2s(knu, paki, palbd, palbp, pcg, pcld, pclear, pdsig, pomega, &
        poz, prmu, psec, ptau, pud, pwv, pqs, pfdown, pfup)
     
-    USE dimens_m
+    USE dimensions
     USE dimphy
     USE raddim
     USE radepsi

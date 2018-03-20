@@ -21,7 +21,7 @@ contains
     use comconst, only: cpp, kappa, iniconst
     use comgeom, only: aire_2d, apoln, apols, cu_2d, cv_2d, inigeom
     use conf_gcm_m, only: nday
-    use dimens_m, only: iim, jjm, llm, nqmx
+    use dimensions, only: iim, jjm, llm, nqmx
     use dimphy, only: zmasq
     use dimsoil, only: nsoilmx
     use disvert_m, only: ap, bp, preff, pa, disvert

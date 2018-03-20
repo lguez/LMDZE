@@ -12,7 +12,7 @@ contains
 
     ! Objet : calcul de la fonction de Bernouilli aux niveaux s.
  
-    USE dimens_m, ONLY: iim, jjm, llm
+    USE dimensions, ONLY: iim, jjm, llm
     USE filtreg_scal_m, ONLY: filtreg_scal
 
     REAL, INTENT(IN):: phi(:, :, :), ecin (:, :, :) ! (iim + 1, jjm + 1, llm)

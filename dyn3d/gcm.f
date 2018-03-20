@@ -15,7 +15,7 @@ PROGRAM gcm
   use conf_gcm_m, only: day_step, iperiod, iecri, iphysiq, nday, conf_gcm, &
        iflag_phys
   use conf_guide_m, only: conf_guide
-  use dimens_m, only: iim, jjm, llm, nqmx
+  use dimensions, only: iim, jjm, llm, nqmx
   USE disvert_m, ONLY : disvert
   use dynetat0_m, only: dynetat0, day_ini
   use dynredem0_m, only: dynredem0

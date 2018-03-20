@@ -18,7 +18,7 @@ contains
     ! remarque, le wm est recalcule a partir des pbaru pbarv et on n'a    
     ! donc pas besoin de w en entree.
 
-    USE dimens_m
+    USE dimensions
     USE paramet_m
     USE comconst
     USE disvert_m

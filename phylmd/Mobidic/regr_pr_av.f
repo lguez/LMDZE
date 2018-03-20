@@ -23,7 +23,7 @@ contains
     ! The target vertical LMDZ grid is the grid of layer boundaries.
     ! Regridding in pressure is done by averaging a step function of pressure.
 
-    use dimens_m, only: iim, jjm, llm
+    use dimensions, only: iim, jjm, llm
     use dimphy, only: klon
     use grid_change, only: gr_dyn_phy
     use netcdf95, only: nf95_inq_varid, nf95_get_var

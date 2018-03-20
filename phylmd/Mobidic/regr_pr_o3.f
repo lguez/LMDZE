@@ -22,7 +22,7 @@ contains
     ! We assume that, in the input file, the pressure levels are in
     ! hPa and strictly increasing.
 
-    use dimens_m, only: iim, jjm, llm
+    use dimensions, only: iim, jjm, llm
     use dynetat0_m, only: day_ref
     use grid_change, only: dyn_phy
     use netcdf, only:  nf90_nowrite, nf90_get_var

@@ -25,7 +25,7 @@ SUBROUTINE gr_v_scal(nx, x_v, x_scal)
   ! -------
 
   ! =======================================================================
-  USE dimens_m
+  USE dimensions
   USE paramet_m
   USE comgeom
   IMPLICIT NONE

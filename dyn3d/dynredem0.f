@@ -12,7 +12,7 @@ CONTAINS
     ! \'Ecriture du fichier de red\'emarrage au format NetCDF (initialisation)
 
     USE comconst, ONLY: cpp, daysec, dtvr, g, kappa, omeg, rad
-    USE dimens_m, ONLY: iim, jjm, llm, nqmx
+    USE dimensions, ONLY: iim, jjm, llm, nqmx
     USE disvert_m, ONLY: ap, bp, pa, preff, presnivs
     use dynetat0_m, only: day_ref, annee_ref, clat, clon, dzoomx, dzoomy, &
          grossismx, grossismy, taux, tauy, rlatu, rlatv, rlonu, rlonv, rlatu1, &

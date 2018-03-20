@@ -1,7 +1,7 @@
       subroutine dvthermcell2(ngrid,nlay,ptimestep,fm,entr,masse &
           ,fraca,larga &
           ,u,v,du,dv,ua,va)
-      use dimens_m
+      use dimensions
       use dimphy
       implicit none
 

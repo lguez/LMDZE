@@ -14,7 +14,7 @@ contains
     USE comgeom, ONLY: airesurg_2d
     use convmas_m, only: convmas
     use covcont_m, only: covcont
-    USE dimens_m, ONLY: iim, jjm, llm
+    USE dimensions, ONLY: iim, jjm, llm
     USE disvert_m, ONLY: ap, bp
     use dynetat0_m, only: ang0, etot0, ptot0, stot0, ztot0
     use enercin_m, only: enercin

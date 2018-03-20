@@ -13,7 +13,7 @@ SUBROUTINE laplacien_rot(klevel, rotin, rotout, ghx, ghy)
   ! klevel et rotin  sont des arguments  d'entree pour le s-prog
   ! rotout           est  un argument  de sortie pour le s-prog
 
-  USE dimens_m
+  USE dimensions
   USE paramet_m
   USE comgeom
   USE filtreg_v_m, ONLY: filtreg_v

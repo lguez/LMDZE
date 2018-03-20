@@ -1,6 +1,6 @@
 module inifgn_m
 
-  use dimens_m, only: iim
+  use dimensions, only: iim
 
   IMPLICIT NONE
 
@@ -23,7 +23,7 @@ contains
     ! Computes the eigenvalues and eigenvectors of the discrete analog
     ! of the second derivative with respect to longitude.
 
-    USE dimens_m, ONLY: iim
+    USE dimensions, ONLY: iim
     USE dynetat0_m, ONLY: xprimu, xprimv
     use jumble, only: new_unit
     use numer_rec_95, only: jacobi, eigsrt

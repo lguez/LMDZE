@@ -35,7 +35,7 @@ contains
     USE conf_gcm_m, ONLY: lmt_pas
     use ctherm, only: iflag_thermals
     use cvltr_m, only: cvltr
-    use dimens_m, only: llm, nqmx
+    use dimensions, only: llm, nqmx
     use dimphy, only: klon
     use histwrite_phy_m, only: histwrite_phy
     use indicesol, only: nbsrf

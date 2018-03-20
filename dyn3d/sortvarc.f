@@ -13,7 +13,7 @@ contains
 
     USE comconst, ONLY: daysec, g, omeg, rad
     USE comgeom, ONLY: aire_2d, cu_2d
-    USE dimens_m, ONLY: iim, jjm, llm
+    USE dimensions, ONLY: iim, jjm, llm
     use dynetat0_m, ONLY: rlatu
     use filtreg_scal_m, only: filtreg_scal
     use massbarxy_m, only: massbarxy

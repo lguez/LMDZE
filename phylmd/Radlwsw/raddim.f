@@ -2,7 +2,7 @@ module raddim
 
   ! From phylmd/raddim.*.h, version 1.1.1.1, 2004/05/19 12:53:08
 
-  use dimens_m, only: llm
+  use dimensions, only: llm
   use dimphy, only: klon
 
   implicit none

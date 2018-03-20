@@ -28,7 +28,7 @@ contains
     ! the US Navy gridpoint area and the surface of the model gridpoint
     ! area. See "grid_noto.txt".
 
-    use dimens_m, only: iim, jjm
+    use dimensions, only: iim, jjm
     use mva9_m, only: mva9
     use nr_util, only: assert, pi
 

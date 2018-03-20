@@ -5,7 +5,7 @@ module lwvd_m
 contains
 
   SUBROUTINE lwvd(ktraer, pabcu, pdbdt, pga, pgb, pcntrb, pdisd, pdisu)
-    USE dimens_m
+    USE dimensions
     USE dimphy
     USE raddim
     USE raddimlw

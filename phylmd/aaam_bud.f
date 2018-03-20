@@ -12,7 +12,7 @@ contains
     ! Only valid for regular rectangular grids. Should be called after
     ! "lift_noro".
 
-    USE dimens_m, ONLY : iim, jjm
+    USE dimensions, ONLY : iim, jjm
     use nr_util, only: assert_eq, assert, pi
     use phyetat0_m, only: rlat, rlon
     USE suphec_m, ONLY: ra

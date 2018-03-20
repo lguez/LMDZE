@@ -17,7 +17,7 @@ contains
 
     use nr_util, only: assert, pi
     use dimphy, only: klon
-    use dimens_m, only: llm
+    use dimensions, only: llm
     use regr_pr_comb_coefoz_m, only: c_Mob, a4_mass, a2, r_het_interm
     use orbite_m, only: orbite
     use zenang_m, only: zenang
@@ -110,7 +110,7 @@ contains
 
     use regr_pr_comb_coefoz_m, only: a6_mass
     use nr_util, only: assert
-    use dimens_m, only: llm
+    use dimensions, only: llm
     use dimphy, only: klon
 
     real, intent(in):: q(:, :) ! mass fraction of ozone

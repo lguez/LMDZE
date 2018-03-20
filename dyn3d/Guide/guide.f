@@ -15,7 +15,7 @@ CONTAINS
     USE conf_gcm_m, ONLY: day_step
     use conf_guide_m, only: guide_u, guide_v, guide_t, guide_q, ini_anal, &
          alpha_u, alpha_v, alpha_t, alpha_q
-    USE dimens_m, ONLY: iim, jjm, llm
+    USE dimensions, ONLY: iim, jjm, llm
     USE disvert_m, ONLY: ap, bp, preff
     USE exner_hyb_m, ONLY: exner_hyb
     USE q_sat_m, ONLY: q_sat

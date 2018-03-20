@@ -32,7 +32,7 @@ contains
 
     use comconst, only: kappa, cpp, g
     use comgeom, only: apoln, cu_2d, cv_2d, unsaire_2d, apols
-    use dimens_m, only: iim, jjm, llm, nqmx
+    use dimensions, only: iim, jjm, llm, nqmx
     use dimphy, only: klon
     use disvert_m, only: preff
     use dynetat0_m, only: rlonu, rlonv

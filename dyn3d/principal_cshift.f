@@ -10,7 +10,7 @@ contains
     ! so that xlon is in ascending order. Make the same cshift on
     ! xprimm.
 
-    USE dimens_m, ONLY: iim
+    USE dimensions, ONLY: iim
     use dynetat0_m, only: clon
     use nr_util, only: twopi
 

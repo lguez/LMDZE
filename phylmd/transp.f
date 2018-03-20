@@ -8,7 +8,7 @@ contains
 
     ! From LMDZ4/libf/phylmd/transp.F,v 1.1.1.1 2004/05/19 12:53:09
 
-    USE dimens_m
+    USE dimensions
     USE dimphy
     USE suphec_m
     ! ======================================================================

@@ -12,7 +12,7 @@ contains
     ! Matrix filter on longitudes. Matrices have already been
     ! computed. On v grid, direct filter only.
 
-    USE dimens_m, ONLY: iim, jjm
+    USE dimensions, ONLY: iim, jjm
     use filtreg_hemisph_m, only: filtreg_hemisph
     USE inifgn_m, ONLY: sddu, unsddu
     use inifilr_m, only: jfiltnv, jfiltsv, matricevn, matricevs

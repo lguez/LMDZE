@@ -1,6 +1,6 @@
 module gr_phy_write_m
 
-  use dimens_m, only: iim, jjm
+  use dimensions, only: iim, jjm
   use dimphy, only: klon
 
   IMPLICIT none

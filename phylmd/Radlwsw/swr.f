@@ -7,7 +7,7 @@ contains
   SUBROUTINE swr(knu, palbd, pcg, pcld, pomega, psec, ptau, &
        pcgaz, ppizaz, pray1, pray2, prefz, prj, prk, prmue, ptauaz, ptra1, &
        ptra2)
-    USE dimens_m
+    USE dimensions
     USE dimphy
     USE raddim
     USE radepsi

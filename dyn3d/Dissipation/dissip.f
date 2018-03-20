@@ -12,7 +12,7 @@ contains
     ! Avec opérateurs star : gradiv2, divgrad2, nxgraro2
 
     USE comdissnew, ONLY: nitergdiv, nitergrot, niterh
-    USE dimens_m, ONLY: iim, jjm, llm
+    USE dimensions, ONLY: iim, jjm, llm
     use divgrad2_m, only: divgrad2
     use gradiv2_m, only: gradiv2
     USE inidissip_m, ONLY: dtdiss, tetah, tetaudiv, tetaurot, cdivu, crot, cdivh

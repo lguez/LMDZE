@@ -6,7 +6,7 @@ module iniadvtrac_m
   ! iq = 2 pour l'eau liquide
   ! et \'eventuellement iq = 3, ..., nqmx pour les autres traceurs
 
-  use dimens_m, only: nqmx
+  use dimensions, only: nqmx
 
   implicit none
 

@@ -6,7 +6,7 @@ contains
 
   subroutine filtreg_hemisph(champ, sdd, matri)
 
-    USE dimens_m, ONLY: iim
+    USE dimensions, ONLY: iim
 
     REAL, intent(inout):: champ(:, :, :) ! (iim + 1, :, :)
     REAL, intent(in):: sdd(:) ! (iim) xprim[uv]^{\pm 1/2}

@@ -9,7 +9,7 @@ contains
     ! From dyn3d/dynredem.F, version 1.2, 2004/06/22 11:45:30
     ! Ecriture du fichier de red\'emarrage au format NetCDF
 
-    USE dimens_m, ONLY: iim, jjm, llm, nqmx
+    USE dimensions, ONLY: iim, jjm, llm, nqmx
     use dynredem0_m, only: ncid
     USE iniadvtrac_m, ONLY: tname
     use netcdf95, only: nf95_close, nf95_inq_varid, nf95_put_var

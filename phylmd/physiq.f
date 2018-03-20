@@ -30,7 +30,7 @@ contains
     use conflx_m, only: conflx
     USE ctherm, ONLY: iflag_thermals, nsplit_thermals
     use diagcld2_m, only: diagcld2
-    USE dimens_m, ONLY: llm, nqmx
+    USE dimensions, ONLY: llm, nqmx
     USE dimphy, ONLY: klon
     USE dimsoil, ONLY: nsoilmx
     use drag_noro_m, only: drag_noro

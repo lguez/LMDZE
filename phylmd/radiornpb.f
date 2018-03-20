@@ -16,7 +16,7 @@ contains
     ! Le pas de temps "pdtphys" est supposé beaucoup plus petit que la
     ! constante de temps de décroissance.
 
-    use dimens_m, only: llm, nqmx
+    use dimensions, only: llm, nqmx
     use dimphy, only: klon
     use nr_util, only: assert
 

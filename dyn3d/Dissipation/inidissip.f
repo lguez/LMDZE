@@ -1,6 +1,6 @@
 module inidissip_m
 
-  use dimens_m, only: llm
+  use dimensions, only: llm
 
   IMPLICIT NONE
 
@@ -25,7 +25,7 @@ contains
          tetatemp
     USE disvert_m, ONLY: preff, presnivs
     USE conf_gcm_m, ONLY: iperiod
-    USE dimens_m, ONLY: iim, jjm
+    USE dimensions, ONLY: iim, jjm
     use divgrad2_m, only: divgrad2
     use filtreg_scal_m, only: filtreg_scal
     use filtreg_v_m, only: filtreg_v

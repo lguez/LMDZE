@@ -1,6 +1,6 @@
 module grid_change
 
-  use dimens_m, only: iim, jjm
+  use dimensions, only: iim, jjm
 
   IMPLICIT NONE
 

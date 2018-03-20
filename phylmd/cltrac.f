@@ -8,7 +8,7 @@ contains
 
     ! From LMDZ4/libf/phylmd/cltrac.F,v 1.1.1.1 2004/05/19 12:53:07
 
-    USE dimens_m
+    USE dimensions
     USE dimphy
     USE suphec_m
     ! ======================================================================

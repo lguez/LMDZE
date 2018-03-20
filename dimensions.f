@@ -1,4 +1,4 @@
-module dimens_m
+module dimensions
 
   ! Model dimensions.
 
@@ -12,4 +12,4 @@ module dimens_m
 
   integer, parameter:: nqmx = 5 ! maximum number of tracers
 
-end module dimens_m
+end module dimensions

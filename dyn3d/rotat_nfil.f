@@ -13,7 +13,7 @@ SUBROUTINE rotat_nfil(klevel, x, y, rot)
   ! klevel, x  et y   sont des arguments d'entree pour le s-prog
   ! rot          est  un argument  de sortie pour le s-prog
 
-  USE dimens_m
+  USE dimensions
   USE paramet_m
   USE comgeom
   IMPLICIT NONE

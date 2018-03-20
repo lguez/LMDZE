@@ -12,7 +12,7 @@ SUBROUTINE nxgrad(klevel, rot, x, y)
   ! rot          est un argument  d'entree pour le s-prog
   ! x  et y    sont des arguments de sortie pour le s-prog
 
-  USE dimens_m
+  USE dimensions
   USE paramet_m
   USE comgeom
   IMPLICIT NONE

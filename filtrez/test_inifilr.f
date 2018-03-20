@@ -1,6 +1,6 @@
 program test_inifilr
 
-  use dimens_m, only: iim, jjm
+  use dimensions, only: iim, jjm
   use dynetat0_m, only: xprimp025, xprimm025, rlatu1, rlatu2, rlatu, rlatv, &
        yprimu1, yprimu2, rlonu, rlonv, xprimu, xprimv
   use fxhyp_m, only: fxhyp

@@ -1,6 +1,6 @@
 module regr_pr_comb_coefoz_m
 
-  use dimens_m, only: llm
+  use dimensions, only: llm
   use dimphy, only: klon
 
   implicit none

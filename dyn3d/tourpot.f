@@ -12,7 +12,7 @@ contains
     ! Objet : calcul du tourbillon potentiel
 
     USE comgeom, ONLY: fext_2d
-    USE dimens_m, ONLY: iim, jjm, llm
+    USE dimensions, ONLY: iim, jjm, llm
     use filtreg_v_m, only: filtreg_v
 
     REAL, intent(in):: vcov(:, :, :) ! (iim + 1, jjm, llm)

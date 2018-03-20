@@ -8,7 +8,7 @@ contains
 
     ! From LMDZ4/libf/dyn3d/covcont.F, version 1.1.1.1 2004/05/19 12:53:07
 
-    USE dimens_m
+    USE dimensions
     USE paramet_m
     USE comgeom
     ! =======================================================================

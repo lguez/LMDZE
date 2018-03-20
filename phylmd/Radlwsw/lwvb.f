@@ -1,7 +1,7 @@
 SUBROUTINE lwvb(kuaer, ktraer, klim, pabcu, padjd, padju, pb, pbint, pbsui, &
     pbsur, pbtop, pdisd, pdisu, pemis, ppmb, pga, pgb, pgasur, pgbsur, &
     pgatop, pgbtop, pcts, pfluc)
-  USE dimens_m
+  USE dimensions
   USE dimphy
   USE raddim
   USE radopt

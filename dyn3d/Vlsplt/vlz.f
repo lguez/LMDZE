@@ -10,7 +10,7 @@
 !
 !
 !   ----------------------------------------------------------------
-      use dimens_m
+      use dimensions
       use paramet_m
       use comconst
       use disvert_m

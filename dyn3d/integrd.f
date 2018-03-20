@@ -12,7 +12,7 @@ contains
     ! Objet: incrémentation des tendances dynamiques
 
     USE comgeom, ONLY : aire, aire_2d, apoln, apols
-    USE dimens_m, ONLY : iim, jjm, llm
+    USE dimensions, ONLY : iim, jjm, llm
     USE disvert_m, ONLY : ap, bp
     use massdair_m, only: massdair
     use nr_util, only: assert

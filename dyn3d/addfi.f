@@ -12,7 +12,7 @@ contains
 
     USE comconst, ONLY: dtphys
     USE comgeom, ONLY: aire, apoln, apols
-    USE dimens_m, ONLY: iim, jjm, llm, nqmx
+    USE dimensions, ONLY: iim, jjm, llm, nqmx
 
     ! First and second components of the covariant velocity:
     REAL, intent(inout):: ucov((iim + 1) * (jjm + 1), llm)

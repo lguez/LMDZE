@@ -39,7 +39,7 @@ contains
     ! (stretching coefficient) is set equal to zero for the regular
     ! grid case.
 
-    USE dimens_m, ONLY : iim, jjm
+    USE dimensions, ONLY : iim, jjm
     USE dynetat0_m, ONLY : rlatu, rlatv, xprimu, grossismx
     use inifgn_m, only: inifgn
     use inifilr_hemisph_m, only: inifilr_hemisph

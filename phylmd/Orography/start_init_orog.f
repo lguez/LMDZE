@@ -3,7 +3,7 @@ MODULE start_init_orog_m
   ! From startvar.F, version 1.4
   ! 2006/01/27 15:14:22 Fairhead
 
-  use dimens_m, only: iim, jjm
+  use dimensions, only: iim, jjm
 
   IMPLICIT NONE
 

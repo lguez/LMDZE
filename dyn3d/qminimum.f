@@ -11,7 +11,7 @@ contains
     ! Objet : traiter les valeurs trop petites (même négatives) pour
     ! l'eau vapeur et l'eau liquide
 
-    USE dimens_m, ONLY: llm
+    USE dimensions, ONLY: llm
     USE paramet_m, ONLY: ip1jmp1
 
     INTEGER, intent(in):: nq

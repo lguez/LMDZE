@@ -15,7 +15,7 @@ contains
     ! format IOIPSL.
 
     use comconst, only: dtvr
-    USE dimens_m, ONLY: jjm, llm, nqmx
+    USE dimensions, ONLY: jjm, llm, nqmx
     USE disvert_m, ONLY: presnivs
     use dynetat0_m, only: day_ref, annee_ref, rlatu, rlatv, rlonu, rlonv
     use histbeg_totreg_m, only: histbeg_totreg

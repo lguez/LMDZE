@@ -12,7 +12,7 @@ contains
   subroutine invert_zoom_x(beta, xf, xtild, G, xlon, xprim, xuv)
 
     use coefpoly_m, only: coefpoly, a1, a2, a3
-    USE dimens_m, ONLY: iim
+    USE dimensions, ONLY: iim
     use dynetat0_m, only: clon, grossismx
     use nr_util, only: pi_d, twopi_d
     use numer_rec_95, only: hunt, rtsafe

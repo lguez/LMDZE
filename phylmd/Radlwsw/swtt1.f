@@ -1,5 +1,5 @@
 SUBROUTINE swtt1(knu, kabs, kind, pu, ptr)
-  USE dimens_m
+  USE dimensions
   USE dimphy
   USE raddim
   IMPLICIT NONE

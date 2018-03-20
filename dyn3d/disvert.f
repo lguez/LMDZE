@@ -1,6 +1,6 @@
 module disvert_m
 
-  use dimens_m, only: llm
+  use dimensions, only: llm
 
   implicit none
 

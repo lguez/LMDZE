@@ -10,7 +10,7 @@ contains
     ! P. Le Van
     ! Calcul de div(grad) de teta.
 
-    use dimens_m, only: iim, jjm
+    use dimensions, only: iim, jjm
     use divergf_m, only: divergf
     use filtreg_scal_m, only: filtreg_scal
     use grad_m, only: grad

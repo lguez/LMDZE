@@ -14,7 +14,7 @@ contains
     ! composantes x et y. x et y sont des composantes covariantes.
 
     USE comgeom, ONLY: apoln, apols, cuvsurcv_2d, cvusurcu_2d, unsaire_2d
-    USE dimens_m, ONLY: iim, jjm
+    USE dimensions, ONLY: iim, jjm
     USE filtreg_scal_m, ONLY: filtreg_scal
 
     INTEGER, intent(in):: klevel

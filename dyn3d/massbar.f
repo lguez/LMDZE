@@ -13,7 +13,7 @@ contains
     ! maille. Cf. "inigeom.txt" et "massbar.txt".
 
     USE comgeom, ONLY: alpha1p2, alpha1p4, alpha2p3, alpha3p4
-    USE dimens_m, ONLY: iim, llm
+    USE dimensions, ONLY: iim, llm
     USE paramet_m, ONLY: iip1, ip1jm, ip1jmp1
 
     REAL, intent(in):: masse(ip1jmp1, llm)

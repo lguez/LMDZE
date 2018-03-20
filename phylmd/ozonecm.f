@@ -21,7 +21,7 @@ contains
     ! Keating, G. M. and D. F. Young, 1985: Interim reference models for the
     ! middle atmosphere, Handbook for MAP, vol. 16, 205-229.
 
-    use dimens_m, only: llm
+    use dimensions, only: llm
     USE dimphy, ONLY : klon
     use nr_util, only: assert, pi
     use phyetat0_m, only: rlat

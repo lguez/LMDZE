@@ -4,7 +4,7 @@ program test_inter_barxy
   use comdissnew, only: read_comdissnew
   use comgeom, only: inigeom
   use conf_gcm_m, only: conf_gcm, day_step
-  use dimens_m, only: iim, jjm
+  use dimensions, only: iim, jjm
   USE dynetat0_m, only: rlonu, rlatv
   use disvert_m, only: pa
   use inter_barxy_m, only: inter_barxy

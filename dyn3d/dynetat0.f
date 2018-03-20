@@ -1,6 +1,6 @@
 module dynetat0_m
 
-  use dimens_m, only: iim, jjm
+  use dimensions, only: iim, jjm
 
   IMPLICIT NONE
 
@@ -59,7 +59,7 @@ contains
 
     use comconst, only: dtvr
     use conf_gcm_m, only: raz_date
-    use dimens_m, only: iim, jjm, llm, nqmx
+    use dimensions, only: iim, jjm, llm, nqmx
     use disvert_m, only: pa
     use iniadvtrac_m, only: tname
     use netcdf, only: NF90_NOWRITE, NF90_NOERR

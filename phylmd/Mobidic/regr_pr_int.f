@@ -24,7 +24,7 @@ contains
     ! LMDZ mid-layers does. Therefore, the values on the LMDZ grid do
     ! depend on longitude. Regridding is by linear interpolation.
 
-    use dimens_m, only: iim, jjm, llm
+    use dimensions, only: iim, jjm, llm
     use dimphy, only: klon
     use grid_change, only: gr_dyn_phy
     use netcdf95, only: nf95_inq_varid, nf95_get_var

@@ -13,7 +13,7 @@ contains
     ! Objet: calcul du terme de rotation. Ce terme est ajouté à
     ! d(ucov)/dt et à d(vcov)/dt.
 
-    USE dimens_m, ONLY: iim, jjm, llm
+    USE dimensions, ONLY: iim, jjm, llm
     USE paramet_m, ONLY: iip1, iip2, ip1jm, ip1jmp1
 
     REAL, intent(in):: vorpot(ip1jm, llm)

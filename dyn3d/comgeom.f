@@ -1,6 +1,6 @@
 module comgeom
 
-  use dimens_m, only: iim, jjm
+  use dimensions, only: iim, jjm
 
   implicit none
 

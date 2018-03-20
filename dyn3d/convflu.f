@@ -9,7 +9,7 @@ SUBROUTINE convflu( xflu,yflu,nbniv,convfl )
 
   ! nbniv   est le nombre de niveaux vert. de  xflu et de yflu.
 
-  use dimens_m
+  use dimensions
   use paramet_m
   use comgeom
 

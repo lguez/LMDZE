@@ -12,7 +12,7 @@ contains
 
     USE comconst, ONLY: cpp, kappa
     USE comgeom, ONLY: aireu_2d, airev_2d, aire_2d
-    USE dimens_m, ONLY: jjm, llm
+    USE dimensions, ONLY: jjm, llm
     USE disvert_m, ONLY: ap, bp, preff
     USE exner_hyb_m, ONLY: exner_hyb
     use massbar_m, only: massbar

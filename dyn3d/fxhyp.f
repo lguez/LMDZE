@@ -17,7 +17,7 @@ contains
     ! Le premier point scalaire pour une grille regulière (grossismx =
     ! 1) avec clon = 0 est à - 180 degrés.
 
-    USE dimens_m, ONLY: iim
+    USE dimensions, ONLY: iim
     use dynetat0_m, only: clon, grossismx, dzoomx, taux
     use invert_zoom_x_m, only: invert_zoom_x, nmax
     use nr_util, only: pi, pi_d, twopi, twopi_d, arth

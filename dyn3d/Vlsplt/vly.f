@@ -11,7 +11,7 @@
       use comconst
       use comgeom, only: aire
       use conf_gcm_m
-      use dimens_m
+      use dimensions
       use disvert_m
       USE dynetat0_m, only: rlonv, rlonu
       USE nr_util, ONLY : pi

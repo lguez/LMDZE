@@ -11,7 +11,7 @@ contains
     ! Author: P. Le Van
 
     use comgeom, only: aire_2d, apoln, apols
-    use dimens_m, only: iim, jjm
+    use dimensions, only: iim, jjm
     use inter_barx_m, only: inter_barx
     use inter_bary_m, only: inter_bary
     use nr_util, only: assert_eq, assert

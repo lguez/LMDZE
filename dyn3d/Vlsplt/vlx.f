@@ -10,7 +10,7 @@ contains
 
     ! Sch\'ema d'advection "pseudo-amont".
 
-    use dimens_m, only: iim, llm
+    use dimensions, only: iim, llm
     use paramet_m, only: ip1jmp1, iip1, iip2, ip1jm
 
     REAL, intent(inout):: q(ip1jmp1, llm)

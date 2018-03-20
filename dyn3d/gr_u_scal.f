@@ -25,7 +25,7 @@ SUBROUTINE gr_u_scal(nx, x_u, x_scal)
   ! -------
 
   ! =======================================================================
-  USE dimens_m
+  USE dimensions
   USE paramet_m
   USE comgeom
   IMPLICIT NONE

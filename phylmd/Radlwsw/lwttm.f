@@ -1,5 +1,5 @@
 SUBROUTINE lwttm(pga, pgb, puu1, puu2, ptt)
-  USE dimens_m
+  USE dimensions
   USE dimphy
   USE raddim
   USE raddimlw

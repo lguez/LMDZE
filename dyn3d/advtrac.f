@@ -11,7 +11,7 @@ contains
 
     USE comconst, ONLY : dtvr
     USE conf_gcm_m, ONLY : iapp_tracvl
-    USE dimens_m, ONLY : jjm, llm, nqmx
+    USE dimensions, ONLY : jjm, llm, nqmx
     use groupe_m, only: groupe
     USE iniadvtrac_m, ONLY : iadv
     use massbar_m, only: massbar

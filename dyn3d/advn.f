@@ -15,7 +15,7 @@ SUBROUTINE advn(q, masse, w, pbaru, pbarv, pdt, mode)
   ! pdt pas de temps
 
   ! --------------------------------------------------------------------
-  USE dimens_m
+  USE dimensions
   USE paramet_m
   USE comconst
   USE disvert_m
@@ -123,7 +123,7 @@ SUBROUTINE advnqx(q, qg, qd)
   ! Auteurs:   Calcul des valeurs de q aux point u.
 
   ! --------------------------------------------------------------------
-  USE dimens_m
+  USE dimensions
   USE paramet_m
   USE conf_gcm_m
   IMPLICIT NONE
@@ -238,7 +238,7 @@ SUBROUTINE advnqy(q, qs, qn)
   ! Auteurs:   Calcul des valeurs de q aux point v.
 
   ! --------------------------------------------------------------------
-  USE dimens_m
+  USE dimensions
   USE paramet_m
   USE conf_gcm_m
   IMPLICIT NONE
@@ -334,7 +334,7 @@ SUBROUTINE advnqz(q, qh, qb)
   ! Auteurs:   Calcul des valeurs de q aux point v.
 
   ! --------------------------------------------------------------------
-  USE dimens_m
+  USE dimensions
   USE paramet_m
   USE conf_gcm_m
   IMPLICIT NONE
@@ -456,7 +456,7 @@ SUBROUTINE advnx(q, qg, qd, masse, u_m, mode)
 
 
   ! --------------------------------------------------------------------
-  USE dimens_m
+  USE dimensions
   USE paramet_m
   USE comconst
   USE disvert_m
@@ -695,7 +695,7 @@ SUBROUTINE advny(q, qs, qn, masse, v_m)
 
 
   ! --------------------------------------------------------------------
-  USE dimens_m
+  USE dimensions
   USE paramet_m
   USE comgeom
   USE conf_gcm_m
@@ -809,7 +809,7 @@ SUBROUTINE advnz(q, qh, qb, masse, w_m)
 
 
   ! --------------------------------------------------------------------
-  USE dimens_m
+  USE dimensions
   USE paramet_m
   USE comgeom
   USE conf_gcm_m

@@ -3,7 +3,7 @@
 ! 12:53:07 lmdzadmin Exp $
 
 SUBROUTINE groupeun(jjmax, llmax, q)
-  USE dimens_m
+  USE dimensions
   USE paramet_m
   USE comconst
   USE comgeom

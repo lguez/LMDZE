@@ -11,7 +11,7 @@ contains
     ! Objet : calcul des termes d'advection verticale pour u, v, teta.
     ! Ces termes sont ajoutés à du, dv, dteta.
 
-    USE dimens_m, ONLY : iim, llm
+    USE dimensions, ONLY : iim, llm
     USE paramet_m, ONLY : iip1, iip2, ip1jm, ip1jmp1
 
     REAL, intent(in):: ucov(ip1jmp1, llm), vcov(ip1jm, llm)

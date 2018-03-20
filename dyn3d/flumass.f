@@ -12,7 +12,7 @@ contains
     ! Objet: calcul du flux de masse aux niveaux s 
 
     USE comgeom, ONLY: aire, aireu
-    USE dimens_m, ONLY: iim, llm
+    USE dimensions, ONLY: iim, llm
     USE paramet_m, ONLY: iip1, iip2, ip1jm, ip1jmi1, ip1jmp1
 
     REAL, intent(in):: massebx(ip1jmp1, llm), masseby(ip1jm, llm)

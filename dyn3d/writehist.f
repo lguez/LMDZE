@@ -12,7 +12,7 @@ contains
 
     USE comconst, ONLY: cpp
     use covnat_m, only: covnat
-    use dimens_m, only: llm
+    use dimensions, only: llm
     use histsync_m, only: histsync
     use histwrite_m, only: histwrite
     use iniadvtrac_m, only: ttext

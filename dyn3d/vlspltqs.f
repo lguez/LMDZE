@@ -24,7 +24,7 @@ contains
     ! teta température potentielle, p pression aux interfaces,
     ! pk exner au milieu des couches nécessaire pour calculer Qsat
 
-    USE dimens_m, ONLY : iim, llm
+    USE dimensions, ONLY : iim, llm
     use FCTTRE, only: foeew
     USE paramet_m, ONLY : iip1, iip2, ijp1llm, ip1jm, ip1jmp1, llmp1
     USE comconst, ONLY : cpp

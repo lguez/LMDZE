@@ -6,7 +6,7 @@ program test_ozonecm
   ! latitude-pressure grid, and writes the values to a NetCDF file.
   ! The pressure grid is "presnivs" from "disvert".
 
-  use dimens_m, only: jjm, llm
+  use dimensions, only: jjm, llm
   USE dimphy, ONLY : klon
   use disvert_m, only: pa, disvert, ap, bp, preff, presnivs
   use jumble, only: new_unit

@@ -11,7 +11,7 @@ contains
     ! Objet : calcul du géopotentiel aux milieux des couches
     ! L'intégration se fait de bas en haut.
 
-    USE dimens_m, ONLY: iim, jjm, llm
+    USE dimensions, ONLY: iim, jjm, llm
     use nr_util, only: assert
 
     REAL, INTENT(IN):: teta(:, :, :) ! (iim + 1, jjm + 1, llm)

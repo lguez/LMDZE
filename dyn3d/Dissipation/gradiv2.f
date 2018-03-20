@@ -12,7 +12,7 @@ contains
 
     USE comgeom, ONLY: cuvscvgam1, cvuscugam1, unsair_gam1, unsapolnga1, &
          unsapolsga1
-    USE dimens_m, ONLY: iim, jjm
+    USE dimensions, ONLY: iim, jjm
     use divergf_m, only: divergf
     USE filtreg_scal_m, ONLY: filtreg_scal
     use grad_m, only: grad

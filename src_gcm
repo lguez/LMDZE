@@ -70,7 +70,7 @@ cv_thermo.f
 decoop.f
 diagcld1.f
 diagcld2.f
-dimens_m.f
+dimensions.f
 dimphy.f
 dimsoil.f
 dissip.f
