@@ -6,13 +6,13 @@ contains
 
   SUBROUTINE conf_dat3d(xd, yd, zd, xf, yf, zf, champd)
 
-    ! From dyn3d/conf_dat3d.F, version 1.1.1.1 2004/05/19 12:53:05
+    ! From dyn3d/conf_dat3d.F, version 1.1.1.1, 2004/05/19 12:53:05
 
-    ! Author : P. Le Van
+    ! Author: P. Le Van
 
-    ! Ce sous-programme configure le champ de données 3D 'champd' pour
-    ! que la longitude varie de - pi à pi, la latitude de pi/2 à
-    ! - pi/2 et pour que la coordonnée pression soit décroissante.
+    ! Ce sous-programme configure le champ de donn\'ees 3D 'champd' pour
+    ! que la longitude varie de - pi \`a pi, la latitude de pi/2 \`a
+    ! - pi/2 et pour que la coordonn\'ee pression soit d\'ecroissante.
 
     use nr_util, only: assert_eq, pi
 
@@ -42,7 +42,7 @@ contains
     ELSE IF (xd(1) >= -0.5 .AND. xd(lons) <= 2 * pi+0.5) THEN
        invlon    = .TRUE.
     ELSE
-       print *, 'Problème sur les longitudes des données'
+       print *, "Probl\`eme sur les longitudes des donn\'ees"
        stop 1
     ENDIF
 
@@ -50,7 +50,7 @@ contains
     rlatmax = MAX(yd(1), yd(lats))
 
     IF (rlatmin < -pi / 2 - 0.5 .or. rlatmax > pi / 2 + 0.5) THEN
-       print *, ' Problème sur les latitudes des données'
+       print *, "Probl\`eme sur les latitudes des donn\'ees"
        stop 1
     ENDIF
 
@@ -58,7 +58,7 @@ contains
     yf(:) = yd(:)
 
     IF (invlon) THEN
-       ! On tourne les longitudes pour avoir - pi  à pi
+       ! On tourne les longitudes pour avoir - pi  \`a pi
        DO i=1, lons
           IF (xf(i) >  pi) exit
        ENDDO

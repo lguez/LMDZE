@@ -90,7 +90,7 @@ contains
     sl = merge(RLSTT, RLVTT, tsurf < RTT)
 
     ! Q
-    oq = 1. - (beta * coef * peqBcoef * dtime)
+    oq = 1. - beta * coef * peqBcoef * dtime
     mq = beta * coef * (peqAcoef - qsat + dq_s_dt * tsurf) / oq
     nq = beta * coef * (- 1. * dq_s_dt) / oq
 

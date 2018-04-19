@@ -53,7 +53,7 @@ module suphec_m
 
   real, parameter:: RMO3 = 47.9942
   REAL, parameter:: RKAPPA = RD/RCPD
-  real, save:: RETV
+  real, parameter:: RETV = RV / RD - 1.
 
   ! A1.5, 6 Thermodynamic liquid, solid phases
 
@@ -110,7 +110,6 @@ contains
 
     RCVD = RCPD-RD
     RCVV = RCPV-RV
-    RETV = RV / RD - 1.
     print *, 'Thermodynamics, gas'
     print *, "rd = ", RD, "J K-1 kg-1"
     print *, "rv = ", RV, "J K-1 kg-1"

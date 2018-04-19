@@ -12,8 +12,7 @@ PROGRAM gcm
   use comdissnew, only: read_comdissnew
   use comgeom, only:  aire_2d, inigeom
   use comgeomphy, only: airephy
-  use conf_gcm_m, only: day_step, iperiod, iecri, iphysiq, nday, conf_gcm, &
-       iflag_phys
+  use conf_gcm_m, only: day_step, iperiod, iphysiq, nday, conf_gcm, iflag_phys
   use conf_guide_m, only: conf_guide
   use dimensions, only: iim, jjm, llm, nqmx
   USE disvert_m, ONLY : disvert
@@ -32,7 +31,6 @@ PROGRAM gcm
   use netcdf95, only: nf95_close
   use suphec_m, only: suphec
   use unit_nml_m, only: unit_nml
-  use yoethf_m, only: yoethf
   use createnewfield_m, only: NbField, Ncid
 
   IMPLICIT NONE
@@ -82,12 +80,11 @@ PROGRAM gcm
   IF (iflag_phys) THEN
      airephy = pack(aire_2d, dyn_phy)
      CALL suphec
-     call yoethf
   ENDIF
 
   ! Initialisation des entr\'ees-sorties :
   CALL dynredem0(day_ini + nday, phis)
-  CALL inithist(t_ops = iecri * dtvr, t_wrt = iecri * dtvr)
+  CALL inithist(t_ops = dtvr, t_wrt = dtvr)
   call init_dynzon(dt_app = dtvr * iperiod)
 
   CALL conf_guide

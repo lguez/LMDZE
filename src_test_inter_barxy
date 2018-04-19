@@ -4,7 +4,7 @@ comconst.f
 comdissnew.f
 comgeom.f
 conf_gcm.f
-dimensions.f
+dimensions.F
 disvert.f
 dynetat0.f
 errioipsl.f

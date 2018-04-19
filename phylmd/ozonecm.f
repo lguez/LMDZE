@@ -22,16 +22,15 @@ contains
     ! middle atmosphere, Handbook for MAP, vol. 16, 205-229.
 
     use dimensions, only: llm
-    USE dimphy, ONLY : klon
     use nr_util, only: assert, pi
     use phyetat0_m, only: rlat
 
     REAL, INTENT (IN) :: rjour
 
-    REAL, INTENT (IN) :: paprs(:, :) ! (klon, llm+1)
+    REAL, INTENT (IN) :: paprs(:, :) ! (klon, llm + 1)
     ! pression pour chaque inter-couche, en Pa
 
-    REAL ozonecm(klon, llm)
+    REAL ozonecm(size(paprs, 1), llm) ! (klon, llm)
     ! "ozonecm(j, k)" is the column-density of ozone in cell "(j, k)", that is
     ! between interface "k" and interface "k + 1", in kDU.
 
@@ -40,7 +39,7 @@ contains
     REAL tozon ! equivalent pressure of ozone above interface "k", in Pa
     INTEGER i, k
 
-    REAL field(llm+1)
+    REAL field(llm + 1)
     ! "field(k)" is the column-density of ozone between interface
     ! "k" and the top of the atmosphere (interface "llm + 1"), in kDU.
 
@@ -53,13 +52,13 @@ contains
 
     !----------------------------------------------------------
 
-    call assert(shape(paprs) == (/klon, llm + 1/), "ozonecm")
+    call assert(size(paprs, 2) == llm + 1, "ozonecm")
 
     sint = sin(2 * pi * (rjour + 15.) / an)
     cost = cos(2 * pi * (rjour + 15.) / an)
     field(llm + 1) = 0.
 
-    DO i = 1, klon
+    DO i = 1, size(paprs, 1)
        slat = sin(pi / 180. * rlat(i))
        slat2 = slat * slat
        gms = 0.0531 + sint * (- 0.001595 + 0.009443 * slat) + cost &

@@ -6,25 +6,25 @@ contains
 
   SUBROUTINE divgrad2(klevel, h, deltapres, lh, divgra, cdivh)
 
-    ! From LMDZ4/libf/dyn3d/divgrad2.F, version 1.1.1.1 2004/05/19 12:53:06
+    ! From LMDZ4/libf/dyn3d/divgrad2.F, version 1.1.1.1, 2004/05/19 12:53:06
     ! P. Le Van
 
     ! Calcul de div(grad) de (pext * h)
 
     USE comgeom, ONLY: cuvscvgam2, cvuscugam2, unsair_gam2, unsapolnga2, &
          unsapolsga2
+    use dimensions, only: iim, jjm
     use laplacien_gam_m, only: laplacien_gam
     USE laplacien_m, ONLY: laplacien
-    USE paramet_m, ONLY: ip1jmp1
 
     INTEGER, intent(in):: klevel
-    REAL, intent(in):: h(ip1jmp1, klevel), deltapres(ip1jmp1, klevel)
+    REAL, intent(in), dimension(iim + 1, jjm + 1, klevel):: h, deltapres
     integer, intent(in):: lh
-    REAL, intent(out):: divgra(ip1jmp1, klevel)
+    REAL, intent(out):: divgra(iim + 1, jjm + 1, klevel)
     real, intent(in):: cdivh
 
     ! Variables locales
-    REAL sqrtps(ip1jmp1, klevel)
+    REAL sqrtps(iim + 1, jjm + 1, klevel)
     INTEGER iter
 
     !-----------------------------------------------------------------

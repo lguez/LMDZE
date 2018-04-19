@@ -6,16 +6,16 @@ module inidissip_m
 
   private llm
 
-  REAL dtdiss ! in s
-  integer idissip ! période de la dissipation (en pas de temps)
-  real tetaudiv(llm), tetaurot(llm), tetah(llm) ! in s-1
-  real cdivu, crot, cdivh
+  REAL, protected:: dtdiss ! in s
+  integer, protected:: idissip ! période de la dissipation (en pas de temps)
+  real, protected:: tetaudiv(llm), tetaurot(llm), tetah(llm) ! in s-1
+  real, protected:: cdivu, crot, cdivh
 
 contains
 
   SUBROUTINE inidissip
 
-    ! From dyn3d/inidissip.F, version 1.1.1.1 2004/05/19 12:53:06
+    ! From dyn3d/inidissip.F, version 1.1.1.1, 2004/05/19 12:53:06
 
     ! Initialisation de la dissipation horizontale. Calcul des valeurs
     ! propres des opérateurs par méthode itérative.
@@ -23,9 +23,9 @@ contains
     USE comconst, ONLY: dtvr
     use comdissnew, only: nitergdiv, nitergrot, niterh, tetagdiv, tetagrot, &
          tetatemp
-    USE disvert_m, ONLY: preff, presnivs
     USE conf_gcm_m, ONLY: iperiod
     USE dimensions, ONLY: iim, jjm
+    USE disvert_m, ONLY: preff, presnivs
     use divgrad2_m, only: divgrad2
     use filtreg_scal_m, only: filtreg_scal
     use filtreg_v_m, only: filtreg_v
@@ -33,7 +33,7 @@ contains
     use jumble, only: new_unit
     use nxgraro2_m, only: nxgraro2
 
-    ! Variables local to the procedure:
+    ! Local:
     REAL zvert(llm), max_zvert ! no dimension
     REAL, dimension(iim + 1, jjm + 1, 1):: zh, zu, gx, divgra, deltap
     real zv(iim + 1, jjm, 1), gy(iim + 1, jjm, 1)
@@ -45,7 +45,7 @@ contains
 
     PRINT *, 'Call sequence information: inidissip'
     call random_seed(size=seed_size)
-    call random_seed(put=(/(1, ii = 1, seed_size)/))
+    call random_seed(put=[(1, ii = 1, seed_size)])
 
     PRINT *, 'Calcul des valeurs propres de divgrad'
     deltap = 1.
@@ -80,7 +80,7 @@ contains
     cdivu = 1. / zllm
     PRINT *, 'cdivu = ', cdivu
 
-    PRINT *, 'Calcul des valeurs propres de nxgrarot'
+    PRINT *, 'Calcul des valeurs propres de nxgraro2'
     call random_number(zu)
     zu = zu - 0.5
     CALL filtreg_scal(zu, direct = .true., intensive = .true.)
@@ -89,7 +89,7 @@ contains
     CALL filtreg_v(zv, intensive = .true.)
 
     DO l = 1, 50
-       CALL nxgraro2(zu, zv, nitergrot, gx, gy, -1.)
+       CALL nxgraro2(zu, zv, nitergrot, gx, gy, crot = - 1.)
        zllm = max(abs(maxval(gx)), abs(maxval(gy)))
        zu = gx / zllm
        zv = gy / zllm

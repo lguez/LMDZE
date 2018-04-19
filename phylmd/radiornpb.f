@@ -6,29 +6,32 @@ contains
 
   function radiornpb(tr_seri, pdtphys, tautr)
 
-    ! From phylmd/radiornpb.F, v 1.2 2005/05/25 13:10:09
+    ! From phylmd/radiornpb.F, version 1.2, 2005/05/25 13:10:09
 
-    ! Auteurs: AA + CG (LGGE/CNRS) Date 24-06-94
-    ! Objet: Decroissance radioactive d'un traceur dans l'atmosphere
-    !G 24 06 94 : Pour un traceur, le radon
-    !G 16 12 94 : Plus un 2eme traceur, le 210Pb. Le radon decroit en plomb.
+    ! Auteurs : AA + Christophe Genthon (LGGE/CNRS)
+    ! Date: June 1994
+    ! Objet: d\'ecroissance radioactive d'un traceur dans l'atmosph\`ere
 
-    ! Le pas de temps "pdtphys" est supposé beaucoup plus petit que la
-    ! constante de temps de décroissance.
+    ! Pour un traceur, le radon. Plus un deuxi\`eme traceur, le 210
+    ! Pb. Le radon d\'ecro\^it en plomb. Le pas de temps "pdtphys" est
+    ! suppos\'e beaucoup plus petit que la constante de temps de
+    ! d\'ecroissance.
 
     use dimensions, only: llm, nqmx
     use dimphy, only: klon
     use nr_util, only: assert
 
-    REAL, intent(in):: tr_seri(:, :, :), pdtphys, tautr(:)
+    REAL, intent(in):: tr_seri(:, :, :) ! (klon, llm, nqmx - 2)
+    REAL, intent(in):: pdtphys
+    REAL, intent(in):: tautr(:) ! (nqmx - 2)
     real radiornpb(klon, llm, 2)
 
-    ! Variable local to the procedure:
+    ! Local:
     INTEGER it
 
     !-----------------------------------------------
 
-    call assert(shape(tr_seri) == (/klon, llm, nqmx - 2/), "radiornpb tr_seri")
+    call assert(shape(tr_seri) == [klon, llm, nqmx - 2], "radiornpb tr_seri")
     call assert(size(tautr) == nqmx - 2, "radiornpb tautr")
 
     DO it = 1, 2
@@ -39,7 +42,7 @@ contains
        END IF
     END DO
 
-    !G161294 : Cas particulier radon 1 => plomb 2
+    ! Cas particulier radon 1 => plomb 2
     radiornpb(:, :, 2) = radiornpb(:, :, 2) - radiornpb(:, :, 1)
 
   END function radiornpb

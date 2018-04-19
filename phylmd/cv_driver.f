@@ -186,7 +186,7 @@ contains
     real tps(klon, klev)
     real precip(klon)
     real VPrecip(klon, klev + 1)
-    real qcondc(klon, klev) ! cld
+    real qcondc(klon, klev) ! cloud
 
     !-------------------------------------------------------------------
 

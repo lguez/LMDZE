@@ -10,22 +10,22 @@ contains
 
     ! Authors: Robert Sadourny, P. Le Van
 
-    ! INTERPOLATION BARYCENTRIQUE BASEE SUR LES AIRES
-    ! VERSION UNIDIMENSIONNELLE, EN LONGITUDE .
+    ! Interpolation barycentrique bas\'ee sur les aires. Version
+    ! unidimensionnelle, en longitude.
 
     use nr_util, only: assert_eq, pi
 
     REAL, intent(in):: dlonid(:) ! (idatmax)
-    ! abscisses des interfaces des mailles donnees
+    ! abscisses des interfaces des mailles donn\'ees
     
-    real, intent(in):: fdat(:) ! (idatmax) champ de donnees
+    real, intent(in):: fdat(:) ! (idatmax) champ de donn\'ees
 
     real, intent(in):: rlonimod(:) ! (imodmax)
-    ! Abscisses des interfaces des mailles modele. L'indice 1
-    ! correspond a l'interface mailLE 1 / maille 2. Les abscisses sont
+    ! Abscisses des interfaces des mailles mod\`ele. L'indice 1
+    ! correspond a l'interface maille 1 / maille 2. Les abscisses sont
     ! exprim\'ees en degres.
 
-    real inter_barx(size(rlonimod)) ! champ du modele
+    real inter_barx(size(rlonimod)) ! champ du mod\`ele
 
     ! Local: 
     INTEGER idatmax, imodmax
@@ -43,8 +43,8 @@ contains
     idatmax = assert_eq(size(dlonid), size(fdat), "inter_barx idatmax")
     imodmax = size(rlonimod)
 
-    ! REDEFINITION DE L'ORIGINE DES ABSCISSES
-    ! A L'INTERFACE OUEST DE LA PREMIERE MAILLE DU MODELE
+    ! Red\'efinition de l'origine des abscisses \`a l'interface ouest de
+    ! la premi\`ere maille du mod\`ele
     DO imod = 1, imodmax
        xxim(imod) = rlonimod(imod)
     ENDDO
@@ -86,7 +86,7 @@ contains
     ENDDO
     IF (xxd(i) < xxd(i-1)) THEN
        ichang = i
-       ! *** reorganisation des longitudes entre 0. et 360. degres ****
+       ! R\'eorganisation des longitudes entre 0 et 360 degr\'es
        nid = idatmax - ichang +1
        DO i = 1, nid
           xchan (i) = xxd(i+ichang -1)
@@ -102,9 +102,8 @@ contains
        ENDDO
     end IF
 
-    ! translation des champs de donnees par rapport
-    ! a la nouvelle origine, avec redondance de la
-    ! maille a cheval sur les bords
+    ! Translation des champs de donn\'ees par rapport \`a la nouvelle
+    ! origine, avec redondance de la maille \`a cheval sur les bords
 
     id0 = 0
     id1 = 0
@@ -149,11 +148,11 @@ contains
     xxid(idatmax1) = xxid(1) + 360.
     fxd (idatmax1) = fxd(1)
 
-    ! initialisation du champ du modele
+    ! Initialisation du champ du mod\`ele
 
     inter_barx(:) = 0.
 
-    ! iteration
+    ! Iteration
 
     x0 = xim0
     dxm = 0.

@@ -3,7 +3,7 @@ coefpoly.f
 comconst.f
 comdissnew.f
 conf_gcm.f
-dimensions.f
+dimensions.F
 disvert.f
 dynetat0.f
 errioipsl.f

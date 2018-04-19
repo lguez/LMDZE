@@ -119,21 +119,20 @@ contains
 
     REAL, save:: trs(klon, nqmx - 2) ! Concentration de traceur dans le sol
 
-    REAL masktr(klon, nqmx - 2) ! Masque reservoir de sol traceur
+    REAL, save:: masktr(klon, nqmx - 2) ! Masque reservoir de sol traceur
     ! Masque de l'echange avec la surface
     ! (1 = reservoir) ou (possible => 1)
-    SAVE masktr
-    REAL fshtr(klon, nqmx - 2) ! Flux surfacique dans le reservoir de sol
-    SAVE fshtr
-    REAL hsoltr(nqmx - 2) ! Epaisseur equivalente du reservoir de sol
-    SAVE hsoltr
-    REAL tautr(nqmx - 2) ! Constante de decroissance radioactive
-    SAVE tautr
-    REAL vdeptr(nqmx - 2) ! Vitesse de depot sec dans la couche Brownienne
-    SAVE vdeptr
-    REAL scavtr(nqmx - 2) ! Coefficient de lessivage
-    SAVE scavtr
+    
+    REAL, save:: fshtr(klon, nqmx - 2)
+    ! Flux surfacique dans le reservoir de sol
+    
+    REAL, save:: hsoltr(nqmx - 2) ! Epaisseur equivalente du reservoir de sol
+    REAL, save:: tautr(nqmx - 2) ! constante de d\'ecroissance radioactive
 
+    REAL, save:: vdeptr(nqmx - 2)
+    ! Vitesse de depot sec dans la couche Brownienne
+
+    REAL, save:: scavtr(nqmx - 2) ! Coefficient de lessivage
     CHARACTER itn
 
     logical, save:: aerosol(nqmx - 2) ! Nature du traceur

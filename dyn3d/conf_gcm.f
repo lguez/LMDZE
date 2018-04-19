@@ -13,9 +13,6 @@ module conf_gcm_m
   integer:: iconser = 240
   ! number of time steps between output of control variables
 
-  integer:: iecri = 1
-  ! number of time steps of dynamics between outputs to "dyn_hist*.nc"
-
   integer:: iphysiq = 5
   ! number of time steps of dynamics between calls to physics
 
@@ -48,7 +45,7 @@ contains
     use unit_nml_m, only: unit_nml
 
     namelist /conf_gcm_nml/ raz_date, nday, day_step, iperiod, iapp_tracvl, &
-         iconser, iecri, periodav, iphysiq
+         iconser, periodav, iphysiq
 
     namelist /iniprint_nml/ prt_level
 

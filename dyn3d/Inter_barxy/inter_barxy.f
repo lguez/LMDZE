@@ -19,12 +19,12 @@ contains
     use ord_coordm_m, only: ord_coordm
 
     REAL, intent(in):: dlonid(:)
-    ! (longitude from input file, in rad, from -pi to pi)
+    ! longitude from input file, in rad, from -pi to pi
 
     REAL, intent(in):: dlatid(:), champ(:, :), rlonimod(:)
 
     REAL, intent(in):: rlatimod(:)
-    ! (latitude angle, in degrees or rad, in strictly decreasing order)
+    ! latitude angle, in degrees or rad, in strictly decreasing order
 
     real, intent(out):: champint(:, :)
     ! Si taille de la seconde dim = jjm + 1, on veut interpoler sur les
@@ -45,8 +45,7 @@ contains
 
     !-----------------------------------
 
-    jnterfd = assert_eq(size(champ, 2) - 1, size(dlatid), &
-         "inter_barxy jnterfd")
+    jnterfd = assert_eq(size(champ, 2) - 1, size(dlatid), "inter_barxy jnterfd")
     jmods = size(champint, 2)
     call assert(size(champ, 1) == size(dlonid), "inter_barxy size(champ, 1)")
     call assert((/size(rlonimod), size(champint, 1)/) == iim, &

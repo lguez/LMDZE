@@ -17,6 +17,7 @@ SUBROUTINE laplacien_rot(klevel, rotin, rotout, ghx, ghy)
   USE paramet_m
   USE comgeom
   USE filtreg_v_m, ONLY: filtreg_v
+  use nxgrad_m, only: nxgrad
   use rotatf_m, only: rotatf
 
   IMPLICIT NONE

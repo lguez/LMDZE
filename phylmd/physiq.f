@@ -176,7 +176,6 @@ contains
 
     ! Variables li\'ees \`a la convection d'Emanuel :
     REAL, save:: Ma(klon, llm) ! undilute upward mass flux
-    REAL, save:: qcondc(klon, llm) ! in-cld water content from convect
     REAL, save:: sig1(klon, llm), w01(klon, llm)
 
     ! Variables pour la couche limite (Alain Lahellec) :
@@ -237,7 +236,7 @@ contains
     real, save:: clwcon(klon, llm), rnebcon(klon, llm)
     real, save:: clwcon0(klon, llm), rnebcon0(klon, llm)
 
-    REAL rhcl(klon, llm) ! humiditi relative ciel clair
+    REAL rhcl(klon, llm) ! humidit\'e relative ciel clair
     REAL dialiq(klon, llm) ! eau liquide nuageuse
     REAL diafra(klon, llm) ! fraction nuageuse
     REAL cldliq(klon, llm) ! eau liquide nuageuse
@@ -372,7 +371,6 @@ contains
     REAL ue_lay(klon, llm) ! transport zonal de l'energie a chaque niveau vert.
     REAL uq_lay(klon, llm) ! transport zonal de l'eau a chaque niveau vert.
 
-    real date0
     REAL tsol(klon)
 
     REAL d_t_ec(klon, llm)
@@ -477,9 +475,6 @@ contains
        ! Initialisation des sorties
 
        call ini_histins(dtphys, ok_newmicro)
-       CALL ymds2ju(annee_ref, 1, day_ref, 0., date0)
-       ! Positionner date0 pour initialisation de ORCHIDEE
-       print *, 'physiq date0: ', date0
        CALL phyredem0
     ENDIF test_firstcal
 
@@ -630,9 +625,8 @@ contains
     if (conv_emanuel) then
        CALL concvl(paprs, play, t_seri, q_seri, u_seri, v_seri, sig1, w01, &
             d_t_con, d_q_con, d_u_con, d_v_con, rain_con, ibas_con, itop_con, &
-            upwd, dnwd, Ma, cape, iflagctrl, qcondc, pmflxr, da, phi, mp)
+            upwd, dnwd, Ma, cape, iflagctrl, clwcon0, pmflxr, da, phi, mp)
        snow_con = 0.
-       clwcon0 = qcondc
        mfu = upwd + dnwd
 
        zqsat = MIN(0.5, r2es * FOEEW(t_seri, rtt >= t_seri) / play)
@@ -705,9 +699,9 @@ contains
 
     ! Caclul des ratqs
 
-    ! ratqs convectifs \`a l'ancienne en fonction de (q(z = 0) - q) / q
-    ! on \'ecrase le tableau ratqsc calcul\'e par clouds_gno
     if (iflag_cldcon == 1) then
+       ! ratqs convectifs \`a l'ancienne en fonction de (q(z = 0) - q) / q
+       ! on \'ecrase le tableau ratqsc calcul\'e par clouds_gno
        do k = 1, llm
           do i = 1, klon
              if(ptconv(i, k)) then
@@ -741,10 +735,9 @@ contains
        ratqs = ratqss
     endif
 
-    CALL fisrtilp(dtphys, paprs, play, t_seri, q_seri, ptconv, ratqs, &
-         d_t_lsc, d_q_lsc, d_ql_lsc, rneb, cldliq, rain_lsc, snow_lsc, &
-         pfrac_impa, pfrac_nucl, pfrac_1nucl, frac_impa, frac_nucl, prfl, &
-         psfl, rhcl)
+    CALL fisrtilp(dtphys, paprs, play, t_seri, q_seri, ptconv, ratqs, d_t_lsc, &
+         d_q_lsc, d_ql_lsc, rneb, cldliq, rain_lsc, snow_lsc, pfrac_impa, &
+         pfrac_nucl, pfrac_1nucl, frac_impa, frac_nucl, prfl, psfl, rhcl)
 
     WHERE (rain_lsc < 0) rain_lsc = 0.
     WHERE (snow_lsc < 0) snow_lsc = 0.

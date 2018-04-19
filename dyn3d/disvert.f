@@ -14,7 +14,7 @@ module disvert_m
   ! half-level, between layers "l" and "l-1"
 
   real, save:: presnivs(llm)
-  ! pressions approximatives des milieux de couches, en Pa
+  ! approximate full level pressure for a reference surface pressure, in Pa
 
   real, parameter:: preff = 101325. ! in Pa
   real y, ya ! for the hybrid function
@@ -45,22 +45,23 @@ contains
     real zz(llm) ! in km
 
     character(len=20):: vert_sampling = "tropo"
-    ! Allowed values: "tropo", "param", "strato", "read_hybrid", "read_pressure"
+    ! Allowed values: "tropo", "strato_custom", "strato",
+    ! "read_hybrid", "read_pressure".
 
     ! These variables are used only in the case vert_sampling ==
-    ! "param", and all are in km:
+    ! "strato_custom", and all are in km:
     real:: vert_scale = 7. ! scale height
-    real:: vert_dzmin = 0.02 ! width of first layer
+    real:: vert_dzmin = 0.017 ! width of first layer
     real:: vert_dzlow = 1. ! dz in the low atmosphere
-    real:: vert_z0low = 8. ! height at which resolution reaches dzlow
-    real:: vert_dzmid = 3. ! dz in the mid atmosphere
+    real:: vert_z0low = 8.7 ! height at which resolution reaches dzlow
+    real:: vert_dzmid = 2. ! dz in the mid atmosphere
     real:: vert_z0mid = 70. ! height at which resolution reaches dzmid
     real:: vert_h_mid = 20. ! width of the transition
     real:: vert_dzhig = 11. ! dz in the high atmosphere
-    real:: vert_z0hig = 80. ! height at which resolution reaches dz
+    real:: vert_z0hig = 75. ! height at which resolution reaches dz
     real:: vert_h_hig = 20. ! width of the transition
 
-    real, allocatable:: p(:) ! (llm + 1) pressure (in hPa)
+    real, allocatable:: p(:) ! (2:llm or llm + 1) pressure (in hPa)
 
     namelist /disvert_nml/vert_sampling, vert_scale, vert_dzmin, vert_dzlow, &
          vert_z0low, vert_dzmid, vert_z0mid, vert_h_mid, vert_dzhig, &
@@ -81,7 +82,7 @@ contains
     select case (vert_sampling)
 
     case ("tropo")
-       ! with llm = 19 for CMIP 3
+       ! with llm = 19 and dsigmin = 1 for CMIP 3
 
        forall (l = 1: llm) ds(l) &
             = dsigmin + 7. * SIN(pi * (REAL(l) - 0.5) / real(llm + 1))**2
@@ -94,7 +95,7 @@ contains
        call compute_ab
 
     case ("strato")
-       ! with llm = 39 and dsigmin = 0.3 for CMIP5 
+       ! with llm = 39 and dsigmin = 0.3 for CMIP5
 
        forall (l = 1: llm) x(l) = pi * (l - 0.5) / (llm + 1)
 
@@ -107,7 +108,7 @@ contains
 
        call compute_ab
 
-    case ("param")
+    case ("strato_custom")
        ! with llm = 79 for CMIP 6
 
        zz(1) = 0.

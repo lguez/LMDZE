@@ -17,17 +17,18 @@ src_test_inifilr := $(shell cat ${makefile_dir}/src_test_inifilr)
 
 sources := $(sort ${src_ce0l} ${src_gcm} ${src_test_ozonecm} ${src_test_inter_barxy} ${src_test_fxhyp} ${src_test_inifilr})
 
+cpp_macros = CPP_IIM=16,CPP_JJM=12,CPP_LLM=79
 lib_list = numer_rec_95 jumble nr_util netcdf95 netcdff
 
 # 2. Objects and executable files
 
-obj_ce0l := $(src_ce0l:.f=.o)
-obj_gcm := $(src_gcm:.f=.o)
-obj_test_ozonecm := $(src_test_ozonecm:.f=.o)
-obj_test_inter_barxy := $(src_test_inter_barxy:.f=.o)
-obj_test_fxhyp := $(src_test_fxhyp:.f=.o)
-obj_test_inifilr := $(src_test_inifilr:.f=.o)
-objects := $(sources:.f=.o)
+obj_ce0l := $(addsuffix .o, $(basename ${src_ce0l}))
+obj_gcm := $(addsuffix .o, $(basename ${src_gcm}))
+obj_test_ozonecm := $(addsuffix .o, $(basename ${src_test_ozonecm}))
+obj_test_inter_barxy := $(addsuffix .o, $(basename ${src_test_inter_barxy}))
+obj_test_fxhyp := $(addsuffix .o, $(basename ${src_test_fxhyp}))
+obj_test_inifilr := $(addsuffix .o, $(basename ${src_test_inifilr}))
+objects := $(addsuffix .o, $(basename ${sources}))
 execut = ce0l gcm test_ozonecm test_inter_barxy test_fxhyp test_inifilr
 
 # 3. Compiler-dependent part
@@ -39,6 +40,15 @@ include ${general_compiler_options_dir}/${FC}_${mode}.mk
 
 SHELL = bash
 LINK.o = $(FC) $(LDFLAGS) $(TARGET_ARCH)
+
+%.o: %.f
+	@echo "Building $@..."
+	@$(COMPILE.f) $(OUTPUT_OPTION) $<
+
+%: %.o
+	@echo "Linking $@..."
+	@$(LINK.o) $^ $(LOADLIBES) $(LDLIBS) -o $@
+
 .DELETE_ON_ERROR:
 .PHONY: all clean clobber depend
 all: ${execut} log
@@ -64,7 +74,7 @@ clobber: clean
 log:
 	hostname >$@
 	${FC} ${version_flag} >>$@ 2>&1
-	echo -e "\nFC = ${FC}\n\nFFLAGS = ${FFLAGS}\n\nLDLIBS = ${LDLIBS}\n\nLDFLAGS = ${LDFLAGS}" >>$@
+	@echo -e "\nFC = ${FC}\n\nFFLAGS = ${FFLAGS}\n\nLDLIBS = ${LDLIBS}\n\nLDFLAGS = ${LDFLAGS}" >>$@
 
 ifeq ($(findstring $(MAKECMDGOALS), clobber depend),)
 include ${makefile_dir}/depend.mk

@@ -27,8 +27,8 @@ contains
 
   function gr_fi_dyn(pfi)
 
-    ! From gr_fi_dyn.F, version 1.1.1.1 2004/05/19 12:53:05
-    ! Passage d'un champ de la grille physique \`a la grille dynamique
+    ! From gr_fi_dyn.F, version 1.1.1.1, 2004/05/19 12:53:05
+    ! Passage d'un champ de la grille physique \`a la grille dynamique.
 
     use dimphy, only: klon
 

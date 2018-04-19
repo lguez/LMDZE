@@ -22,9 +22,7 @@ contains
     use jumble, only: new_unit
 
     integer i, unit, l
-
     integer, parameter:: ngrid = 8
-
     real p(ngrid, 1, llm + 1) ! pressure at half-level, in Pa
     real z(llm) ! pressure-altitude at half-level (km)
     real pks(ngrid, 1) ! exner function at the surface, in J K-1 kg-1 
@@ -37,19 +35,21 @@ contains
 
     print *, "Call sequence information: test_disvert"
 
-    ps(:, 1) = (/(5e4 + delta_ps * i, i = 0, ngrid - 2), preff/)
+    ps(:, 1) = [(5e4 + delta_ps * i, i = 0, ngrid - 2), preff]
     forall (l = 1: llm + 1) p(:, 1, l) = ap(l) + bp(l) * ps(:, 1)
     call exner_hyb(ps, p, pks, pk)
     p_lay = preff * (pk(:, 1, :) / cpp)**(1. / kappa)
 
-    ! Write distribution for the reference surface pressure (index ngrid):
+    ! Write distribution for the reference surface pressure (which is
+    ! surface pressure at index ngrid):
 
     z = 7. * log(preff / p(ngrid, 1, :llm))
     call new_unit(unit)
 
     open(unit, file="half_level.csv", status="replace", action="write")
-    ! Title line:
-    write(unit, fmt=*) '"ap (hPa)" "bp" "s" "pressure (hPa)" "z (km)"'
+    ! Title lines:
+    write(unit, fmt=*) 'hPa "" "" hPa km'
+    write(unit, fmt=*) 'ap bp s pressure z'
     do l = 1, llm
        write(unit, fmt=*) ap(l) / 100., bp(l), s(l), p(ngrid, 1, l) / 100., z(l)
     end do
@@ -57,15 +57,18 @@ contains
     print *, 'The file "half_level.csv" has been created.'
 
     open(unit, file="full_level.csv", status="replace", action="write")
-    ! Title line:
-    write(unit, fmt=*) &
-         '"pressure (hPa)" "z (km)" "presnivs (hPa)" "delta z (km)"'
+    ! Title lines:
+    write(unit, fmt=*) '"pressure at full level from Exner function for a ', &
+         'reference surface pressure" altitude "approximate pressure at ', &
+         'full level for a reference surface pressure" "layer thickness"'
+    write(unit, fmt=*) 'hPa km hPa km'
+    write(unit, fmt=*) 'p_lay z presnivs delta_z'
     do l = 1, llm - 1
        write(unit, fmt=*) p_lay(ngrid, l) / 100., &
             7. * log(preff / p_lay(ngrid, l)), presnivs(l) / 100., z(l+1) - z(l)
     end do
     write(unit, fmt=*) p_lay(ngrid, llm) / 100., &
-         7. * log(preff / p_lay(ngrid, llm)), presnivs(llm) / 100.
+         7. * log(preff / p_lay(ngrid, llm)), presnivs(llm) / 100., "NaN"
     close(unit)
     print *, 'The file "full_level.csv" has been created.'
 

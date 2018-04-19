@@ -1,12 +1,14 @@
 program test_inter_barxy
 
-  use comconst, only: dtvr, daysec, iniconst
+  use comconst, only: iniconst
   use comdissnew, only: read_comdissnew
   use comgeom, only: inigeom
-  use conf_gcm_m, only: conf_gcm, day_step
+  use conf_gcm_m, only: conf_gcm
   use dimensions, only: iim, jjm
-  USE dynetat0_m, only: rlonu, rlatv
-  use disvert_m, only: pa
+  USE dynetat0_m, only: rlonu, rlatv, rlatu, rlatu1, rlatu2, rlonv, xprimm025, &
+       xprimp025, xprimu, xprimv, yprimu1, yprimu2
+  use fxhyp_m, only: fxhyp
+  use fyhyp_m, only: fyhyp
   use inter_barxy_m, only: inter_barxy
   USE nr_util, ONLY : pi
   use read_serre_m, only: read_serre
@@ -34,11 +36,14 @@ program test_inter_barxy
 
   CALL conf_gcm
   call read_comdissnew
-  dtvr = daysec / real(day_step)
-  print *, 'dtvr = ', dtvr
-  pa = 5e4
   CALL iniconst
   call read_serre
+  CALL fyhyp(rlatu, rlatv, rlatu2, yprimu2, rlatu1, yprimu1)
+  CALL fxhyp(xprimm025, rlonv, xprimv, rlonu, xprimu, xprimp025)
+
+  rlatu(1) = pi / 2.
+  rlatu(jjm + 1) = -rlatu(1)
+
   CALL inigeom
 
   lon_ini = - pi + 2 * pi / iml_dyn * (/(i, i = 0, iml_dyn - 1)/)

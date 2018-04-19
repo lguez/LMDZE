@@ -9,7 +9,7 @@ contains
     ! From dyn3d/leapfrog.F, version 1.6, 2005/04/13 08:58:34 revision 616
     ! Authors: P. Le Van, L. Fairhead, F. Hourdin
 
-    ! Intégration temporelle du modèle : Matsuno-leapfrog scheme.
+    ! Int\'egration temporelle du mod\`ele : Matsuno-leapfrog scheme.
 
     use addfi_m, only: addfi
     use bilan_dyn_m, only: bilan_dyn
@@ -20,8 +20,7 @@ contains
     USE comgeom, ONLY: aire_2d, apoln, apols
     use covcont_m, only: covcont
     USE disvert_m, ONLY: ap, bp
-    USE conf_gcm_m, ONLY: day_step, iconser, iperiod, iphysiq, nday, &
-         iflag_phys, iecri
+    USE conf_gcm_m, ONLY: day_step, iconser, iperiod, iphysiq, nday, iflag_phys
     USE conf_guide_m, ONLY: ok_guide
     USE dimensions, ONLY: iim, jjm, llm, nqmx
     use dissip_m, only: dissip
@@ -116,6 +115,7 @@ contains
 
     time_integration: do itau = 0, itaufin - 1
        leapf = mod(itau, iperiod) /= 0
+       
        if (leapf) then
           dt = 2 * dtvr
        else
@@ -131,15 +131,14 @@ contains
 
        ! Calcul des tendances dynamiques:
        CALL geopot(teta, pk, pks, phis, phi)
-       CALL caldyn(itau, ucov, vcov, teta, ps, masse, pk, pkf, phis, phi, &
-            du, dv, dteta, dp, w, pbaru, pbarv, &
-            conser = MOD(itau, iconser) == 0)
+       CALL caldyn(itau, ucov, vcov, teta, ps, masse, pk, pkf, phis, phi, du, &
+            dv, dteta, dp, w, pbaru, pbarv, conser = MOD(itau, iconser) == 0)
 
        CALL caladvtrac(q, pbaru, pbarv, p3d, masse, teta, pk)
 
        ! Int\'egrations dynamique et traceurs:
-       CALL integrd(vcovm1, ucovm1, tetam1, psm1, massem1, dv, du, dteta, &
-            dp, vcov, ucov, teta, q(:, :, :, :2), ps, masse, dt, leapf)
+       CALL integrd(vcovm1, ucovm1, tetam1, psm1, massem1, dv, du, dteta, dp, &
+            vcov, ucov, teta, q(:, :, :, :2), ps, masse, dt, leapf)
 
        forall (l = 1: llm + 1) p3d(:, :, l) = ap(l) + bp(l) * ps
        CALL exner_hyb(ps, p3d, pks, pk)
@@ -154,8 +153,8 @@ contains
                phi, du, dv, dteta, dp, w, pbaru, pbarv, conser = .false.)
 
           ! integrations dynamique et traceurs:
-          CALL integrd(vcovm1, ucovm1, tetam1, psm1, massem1, dv, du, &
-               dteta, dp, vcov, ucov, teta, q(:, :, :, :2), ps, masse, dtvr, &
+          CALL integrd(vcovm1, ucovm1, tetam1, psm1, massem1, dv, du, dteta, &
+               dp, vcov, ucov, teta, q(:, :, :, :2), ps, masse, dtvr, &
                leapf=.false.)
 
           forall (l = 1: llm + 1) p3d(:, :, l) = ap(l) + bp(l) * ps
@@ -194,8 +193,7 @@ contains
 
           ! Calcul de la valeur moyenne aux p\^oles :
           forall (l = 1: llm)
-             teta(:, 1, l) = SUM(aire_2d(:iim, 1) * teta(:iim, 1, l)) &
-                  / apoln
+             teta(:, 1, l) = SUM(aire_2d(:iim, 1) * teta(:iim, 1, l)) / apoln
              teta(:, jjm + 1, l) = SUM(aire_2d(:iim, jjm + 1) &
                   * teta(:iim, jjm + 1, l)) / apols
           END forall
@@ -206,20 +204,17 @@ contains
                q(:, :, :, 1))
        ENDIF
 
-       IF (MOD(itau + 1, iecri) == 0) THEN
-          CALL geopot(teta, pk, pks, phis, phi)
-          CALL writehist(vcov, ucov, teta, pk, phi, q, masse, ps, &
-               itau_w = itau_dyn + itau + 1)
-       END IF
+       CALL geopot(teta, pk, pks, phis, phi)
+       CALL writehist(vcov, ucov, teta, pk, phi, q, masse, ps, &
+            itau_w = itau_dyn + itau + 1)
     end do time_integration
 
     CALL dynredem1(vcov, ucov, teta, q, masse, ps, itau = itau_dyn + itaufin)
 
     ! Calcul des tendances dynamiques:
     CALL geopot(teta, pk, pks, phis, phi)
-    CALL caldyn(itaufin, ucov, vcov, teta, ps, masse, pk, pkf, phis, phi, &
-         du, dv, dteta, dp, w, pbaru, pbarv, &
-         conser = MOD(itaufin, iconser) == 0)
+    CALL caldyn(itaufin, ucov, vcov, teta, ps, masse, pk, pkf, phis, phi, du, &
+         dv, dteta, dp, w, pbaru, pbarv, conser = MOD(itaufin, iconser) == 0)
 
   END SUBROUTINE leapfrog
 

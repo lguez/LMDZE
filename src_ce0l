@@ -14,7 +14,7 @@ conf_gcm.f
 convflu.f
 convmas.f
 covcont.f
-dimensions.f
+dimensions.F
 dimphy.f
 dimsoil.f
 dist_sphe.f

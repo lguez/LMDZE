@@ -18,8 +18,8 @@ contains
     use startdyn, only: IML_DYN, JML_DYN, LLM_DYN, LAT_INI, LEVDYN_INI, LON_INI
 
     CHARACTER(len=*), intent(in):: varname
-    REAL, intent(in):: lon_in2(:) ! (iml)
-    REAL, intent(in):: lat_in2(:)
+    REAL, intent(in):: lon_in2(:) ! (iml) longitude, in rad
+    REAL, intent(in):: lat_in2(:) ! latitude, in rad
     REAL, intent(in):: pls_in(:, :, :) ! (iml, jml, lml)
     REAL, intent(out):: var3d(:, :, :) ! (iml, jml, lml)
 
