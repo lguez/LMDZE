@@ -20,7 +20,6 @@ contains
     USE abort_gcm_m, ONLY: abort_gcm
     use alboc_cd_m, only: alboc_cd
     USE albsno_m, ONLY: albsno
-    use calbeta_m, only: calbeta
     USE calcul_fluxs_m, ONLY: calcul_fluxs
     USE dimphy, ONLY: klon
     USE fonte_neige_m, ONLY: fonte_neige
@@ -108,11 +107,12 @@ contains
     integer ii
     real cal(size(knindex)) ! (knon)
     real beta(size(knindex)) ! (knon) evap reelle
-    real dif_grnd(klon), capsol(klon)
+    real dif_grnd(klon)
     real tsurf(size(knindex)) ! (knon)
     real alb_neig(size(knindex)) ! (knon)
     real zfra(size(knindex)) ! (knon)
     REAL, PARAMETER:: fmagic = 1. ! facteur magique pour r\'egler l'alb\'edo
+    REAL, PARAMETER:: max_eau_sol = 150. ! in kg m-2
 
     !-------------------------------------------------------------
 
@@ -145,7 +145,6 @@ contains
     ffonte(1:knon) = 0.
     fqcalving(1:knon) = 0.
     dif_grnd = 999999.
-    capsol = 999999.
     z0_new = 999999.
 
     ! Aiguillage vers les differents schemas de surface
@@ -161,9 +160,8 @@ contains
 
        call interfsur_lim(dtime, julien, knindex, debut, albedo, z0_new)
 
-       ! Calcul de snow et qsurf, hydrologie adapt\'ee
-       CALL calbeta(is_ter, snow, qsol, beta, capsol(:knon), dif_grnd(:knon))
-
+       beta = min(2. * qsol / max_eau_sol, 1.)
+       dif_grnd(:knon) = 0.
        CALL soil(dtime, is_ter, snow, ts, tsoil, soilcap, soilflux)
        cal = RCPD / soilcap
 
@@ -209,7 +207,6 @@ contains
           endif
        enddo
 
-       CALL calbeta(is_sic, snow, qsol, beta, capsol(:knon), dif_grnd(:knon))
        CALL soil(dtime, is_sic, snow, tsurf_new, tsoil, soilcap, soilflux)
        cal = RCPD / soilcap
        dif_grnd = 0.
