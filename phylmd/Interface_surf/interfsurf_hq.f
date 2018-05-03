@@ -22,7 +22,6 @@ contains
     USE albsno_m, ONLY: albsno
     use calbeta_m, only: calbeta
     USE calcul_fluxs_m, ONLY: calcul_fluxs
-    use clesphys2, only: soil_model
     USE dimphy, ONLY: klon
     USE fonte_neige_m, ONLY: fonte_neige
     USE indicesol, ONLY: epsfra, is_lic, is_oce, is_sic, is_ter
@@ -74,12 +73,12 @@ contains
     real, intent(IN):: ts(:) ! (knon) temp\'erature de surface
     real, intent(IN):: p1lay(klon) ! pression 1er niveau (milieu de couche)
     real, dimension(klon), intent(IN):: ps ! pression au sol
-    REAL, INTENT(INOUT):: radsol(:) ! (knon) rayonnement net au sol (LW + SW)
+    REAL, INTENT(IN):: radsol(:) ! (knon) rayonnement net au sol (LW + SW)
     real, intent(OUT):: evap(:) ! (knon) evaporation totale
 
     real, intent(OUT):: flux_t(:) ! (knon) flux de chaleur sensible
     ! (Cp T) à la surface, positif vers le bas, W / m2
-    
+
     real, intent(OUT):: fluxlat(:) ! (knon) flux de chaleur latente
     real, intent(OUT):: dflux_l(:), dflux_s(:) ! (knon)
     real, intent(OUT):: tsurf_new(:) ! (knon) temp\'erature au sol
@@ -110,8 +109,6 @@ contains
     real cal(size(knindex)) ! (knon)
     real beta(size(knindex)) ! (knon) evap reelle
     real dif_grnd(klon), capsol(klon)
-    real, parameter:: calice = 1. / (5.1444e6 * 0.15), tau_gl = 86400. * 5.
-    real, parameter:: calsno = 1. / (2.3867e6 * 0.15)
     real tsurf(size(knindex)) ! (knon)
     real alb_neig(size(knindex)) ! (knon)
     real zfra(size(knindex)) ! (knon)
@@ -120,7 +117,7 @@ contains
     !-------------------------------------------------------------
 
     knon = size(knindex)
-    
+
     ! On doit commencer par appeler les schemas de surfaces continentales
     ! car l'ocean a besoin du ruissellement qui est y calcule
 
@@ -167,16 +164,11 @@ contains
        ! Calcul de snow et qsurf, hydrologie adapt\'ee
        CALL calbeta(is_ter, snow, qsol, beta, capsol(:knon), dif_grnd(:knon))
 
-       IF (soil_model) THEN
-          CALL soil(dtime, is_ter, snow, ts, tsoil, soilcap, soilflux)
-          cal = RCPD / soilcap
-          radsol = radsol + soilflux
-       ELSE
-          cal = RCPD * capsol(:knon)
-       ENDIF
+       CALL soil(dtime, is_ter, snow, ts, tsoil, soilcap, soilflux)
+       cal = RCPD / soilcap
 
        CALL calcul_fluxs(dtime, ts, p1lay(:knon), cal, beta, tq_cdrag, &
-            ps(:knon), qsurf(:knon), radsol, dif_grnd(:knon), &
+            ps(:knon), qsurf(:knon), radsol + soilflux, dif_grnd(:knon), &
             temp_air(:knon), spechum(:knon), u1_lay, v1_lay, &
             petAcoef(:knon), peqAcoef(:knon), petBcoef(:knon), &
             peqBcoef(:knon), tsurf_new, evap, fluxlat, flux_t, dflux_s, dflux_l)
@@ -211,30 +203,21 @@ contains
           IF (pctsrf_new_sic(knindex(ii)) < EPSFRA) then
              snow(ii) = 0.
              tsurf_new(ii) = RTT - 1.8
-             IF (soil_model) tsoil(ii, :) = RTT - 1.8
+             tsoil(ii, :) = RTT - 1.8
           else
              tsurf_new(ii) = ts(ii)
           endif
        enddo
 
        CALL calbeta(is_sic, snow, qsol, beta, capsol(:knon), dif_grnd(:knon))
-
-       IF (soil_model) THEN
-          CALL soil(dtime, is_sic, snow, tsurf_new, tsoil, soilcap, &
-               soilflux)
-          cal = RCPD / soilcap
-          radsol = radsol + soilflux
-          dif_grnd = 0.
-       ELSE
-          dif_grnd = 1. / tau_gl
-          cal = RCPD * calice
-          WHERE (snow > 0.) cal = RCPD * calsno
-       ENDIF
+       CALL soil(dtime, is_sic, snow, tsurf_new, tsoil, soilcap, soilflux)
+       cal = RCPD / soilcap
+       dif_grnd = 0.
        tsurf = tsurf_new
        beta = 1.
 
        CALL calcul_fluxs(dtime, tsurf, p1lay(:knon), cal, beta, &
-            tq_cdrag, ps(:knon), qsurf(:knon), radsol, &
+            tq_cdrag, ps(:knon), qsurf(:knon), radsol + soilflux, &
             dif_grnd(:knon), temp_air(:knon), spechum(:knon), u1_lay, &
             v1_lay, petAcoef(:knon), peqAcoef(:knon), petBcoef(:knon), &
             peqBcoef(:knon), tsurf_new, evap, fluxlat, flux_t, dflux_s, dflux_l)
@@ -253,19 +236,13 @@ contains
     case (is_lic)
        ! Surface "glacier continentaux" appel a l'interface avec le sol
 
-       IF (soil_model) THEN
-          CALL soil(dtime, is_lic, snow, ts, tsoil, soilcap, soilflux)
-          cal = RCPD / soilcap
-          radsol = radsol + soilflux
-       ELSE
-          cal = RCPD * calice
-          WHERE (snow > 0.) cal = RCPD * calsno
-       ENDIF
+       CALL soil(dtime, is_lic, snow, ts, tsoil, soilcap, soilflux)
+       cal = RCPD / soilcap
        beta = 1.
        dif_grnd = 0.
 
        call calcul_fluxs(dtime, ts, p1lay(:knon), cal, beta, tq_cdrag, &
-            ps(:knon), qsurf(:knon), radsol, dif_grnd(:knon), &
+            ps(:knon), qsurf(:knon), radsol + soilflux, dif_grnd(:knon), &
             temp_air(:knon), spechum(:knon), u1_lay, v1_lay, &
             petAcoef(:knon), peqAcoef(:knon), petBcoef(:knon), &
             peqBcoef(:knon), tsurf_new, evap, fluxlat, flux_t, dflux_s, dflux_l)

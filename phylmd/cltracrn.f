@@ -107,7 +107,7 @@ contains
 
     local_trs = trs
 
-    ! Attention si dans clmain zx_alf1(i) = 1.
+    ! Attention si dans pbl_surface zx_alf1(i) = 1.
     ! Il doit y avoir coherence (donc la meme chose ici)
 
     DO i = 1, klon

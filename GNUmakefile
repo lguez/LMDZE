@@ -17,7 +17,7 @@ src_test_inifilr := $(shell cat ${makefile_dir}/src_test_inifilr)
 
 sources := $(sort ${src_ce0l} ${src_gcm} ${src_test_ozonecm} ${src_test_inter_barxy} ${src_test_fxhyp} ${src_test_inifilr})
 
-cpp_macros = CPP_IIM=16,CPP_JJM=12,CPP_LLM=79
+cpp_macros = CPP_IIM=16,CPP_JJM=12,CPP_LLM=11
 lib_list = numer_rec_95 jumble nr_util netcdf95 netcdff
 
 # 2. Objects and executable files

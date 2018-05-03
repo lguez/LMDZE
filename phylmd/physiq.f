@@ -20,7 +20,7 @@ contains
     use calltherm_m, only: calltherm
     USE clesphys, ONLY: cdhmax, cdmmax, ecrit_ins, ok_instan
     USE clesphys2, ONLY: conv_emanuel, nbapp_rad, new_oliq, ok_orodr, ok_orolf
-    USE clmain_m, ONLY: clmain
+    USE pbl_surface_m, ONLY: pbl_surface
     use clouds_gno_m, only: clouds_gno
     use comconst, only: dtphys
     USE comgeomphy, ONLY: airephy
@@ -553,8 +553,8 @@ contains
        fsolsw(:, nsrf) = solsw * (1. - falbe(:, nsrf)) / (1. - albsol)
     END forall
 
-    CALL clmain(dtphys, pctsrf, t_seri, q_seri, u_seri, v_seri, julien, mu0, &
-         ftsol, cdmmax, cdhmax, ftsoil, qsol, paprs, play, fsnow, fqsurf, &
+    CALL pbl_surface(dtphys, pctsrf, t_seri, q_seri, u_seri, v_seri, julien, &
+         mu0, ftsol, cdmmax, cdhmax, ftsoil, qsol, paprs, play, fsnow, fqsurf, &
          fevap, falbe, fluxlat, rain_fall, snow_fall, fsolsw, fsollw, frugs, &
          agesno, rugoro, d_t_vdf, d_q_vdf, d_u_vdf, d_v_vdf, d_ts, flux_t, &
          flux_q, flux_u, flux_v, cdragh, cdragm, q2, dsens, devap, coefh, t2m, &

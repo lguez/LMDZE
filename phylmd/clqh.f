@@ -49,7 +49,7 @@ contains
     REAL pplay(klon, klev) ! pression au milieu de couche (Pa)
     REAL delp(klon, klev) ! epaisseur de couche en pression (Pa)
 
-    REAL, intent(inout):: radsol(:) ! (knon)
+    REAL, intent(in):: radsol(:) ! (knon)
     ! rayonnement net au sol (Solaire + IR) W / m2
 
     REAL, intent(inout):: albedo(:) ! (knon) albedo de la surface

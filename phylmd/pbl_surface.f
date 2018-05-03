@@ -1,14 +1,14 @@
-module clmain_m
+module pbl_surface_m
 
   IMPLICIT NONE
 
 contains
 
-  SUBROUTINE clmain(dtime, pctsrf, t, q, u, v, julien, mu0, ftsol, cdmmax, &
-       cdhmax, ftsoil, qsol, paprs, pplay, fsnow, qsurf, evap, falbe, fluxlat, &
-       rain_fall, snow_f, fsolsw, fsollw, frugs, agesno, rugoro, d_t, d_q, &
-       d_u, d_v, d_ts, flux_t, flux_q, flux_u, flux_v, cdragh, cdragm, q2, &
-       dflux_t, dflux_q, coefh, t2m, q2m, u10m_srf, v10m_srf, pblh, capcl, &
+  SUBROUTINE pbl_surface(dtime, pctsrf, t, q, u, v, julien, mu0, ftsol, &
+       cdmmax, cdhmax, ftsoil, qsol, paprs, pplay, fsnow, qsurf, evap, falbe, &
+       fluxlat, rain_fall, snow_f, fsolsw, fsollw, frugs, agesno, rugoro, d_t, &
+       d_q, d_u, d_v, d_ts, flux_t, flux_q, flux_u, flux_v, cdragh, cdragm, &
+       q2, dflux_t, dflux_q, coefh, t2m, q2m, u10m_srf, v10m_srf, pblh, capcl, &
        oliqcl, cteicl, pblt, therm, plcl, fqcalving, ffonte, run_off_lic_0)
 
     ! From phylmd/clmain.F, version 1.6, 2005/11/16 14:47:19
@@ -504,6 +504,6 @@ contains
 
     firstcal = .false.
 
-  END SUBROUTINE clmain
+  END SUBROUTINE pbl_surface
 
-end module clmain_m
+end module pbl_surface_m

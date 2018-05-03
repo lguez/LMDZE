@@ -4,8 +4,6 @@ module clesphys2
 
   implicit none
 
-  LOGICAL:: soil_model = .TRUE. ! choix du mod\`ele de sol (thermique ?)
-
   LOGICAL:: new_oliq = .TRUE.
   ! Permet de mettre en route la nouvelle parametrisation de l'eau liquide
 
@@ -30,8 +28,8 @@ contains
     use nr_util, only: assert
     use conf_gcm_m, only: day_step, iphysiq
 
-    namelist /clesphys2_nml/soil_model, new_oliq, ok_orodr, ok_orolf, &
-         ok_limitvrai, nbapp_rad, conv_emanuel
+    namelist /clesphys2_nml/new_oliq, ok_orodr, ok_orolf, ok_limitvrai, &
+         nbapp_rad, conv_emanuel
 
     !------------------------------------
 

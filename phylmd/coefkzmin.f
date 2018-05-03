@@ -48,7 +48,7 @@ contains
 
     knon = size(ypaprs, 1)
     
-    ! Debut de la partie qui doit etre incluse a terme dans clmain.
+    ! Debut de la partie qui doit etre incluse a terme dans pbl_surface.
 
     do i = 1, knon
        zlay(i, 1) = RD * yt(i, 1) * 2 / (ypaprs(i, 1) + ypplay(i, 1)) &
@@ -74,7 +74,7 @@ contains
     forall (k = 2: klev) zlev(:, k) = 0.5 * (zlay(:, k) + zlay(:, k-1))
     ustar = SQRT(ycoefm * (yu(:, 1)**2 + yv(:, 1)**2))
 
-    ! Fin de la partie qui doit être incluse à terme dans clmain
+    ! Fin de la partie qui doit être incluse à terme dans pbl_surface
 
     ! Cette routine est ecrite pour avoir en entree ustar, teta et zlev
     ! Ici, on a inclus le calcul de ces trois variables dans la routine
