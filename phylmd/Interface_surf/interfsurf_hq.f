@@ -113,6 +113,7 @@ contains
     real zfra(size(knindex)) ! (knon)
     REAL, PARAMETER:: fmagic = 1. ! facteur magique pour r\'egler l'alb\'edo
     REAL, PARAMETER:: max_eau_sol = 150. ! in kg m-2
+    REAL, PARAMETER:: tau_gl = 86400. * 5.
 
     !-------------------------------------------------------------
 
@@ -209,7 +210,7 @@ contains
 
        CALL soil(dtime, is_sic, snow, tsurf_new, tsoil, soilcap, soilflux)
        cal = RCPD / soilcap
-       dif_grnd = 0.
+       dif_grnd = 1. / tau_gl
        tsurf = tsurf_new
        beta = 1.
 
