@@ -57,7 +57,7 @@ contains
 
     ! Local:
     INTEGER i
-    REAL, dimension(klon):: cdram, cdrah, gref
+    REAL, dimension(knon):: cdram, cdrah, gref
 
     !------------------------------------------------------------------------- 
 
@@ -68,7 +68,8 @@ contains
     ! Richardson at reference level
 
     CALL coefcdrag(nsrf, speed(:knon), temp(:knon), q_zref(:knon), &
-         gref(:knon), psol(:knon), ts, qsurf, rugos, cdram, cdrah, pref)
+         gref(:knon), psol(:knon), ts(:knon), qsurf(:knon), rugos(:knon), &
+         cdram, cdrah, pref)
 
     DO i = 1, knon
        delu(i) = ustar(i) / sqrt(cdram(i))

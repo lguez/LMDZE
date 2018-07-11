@@ -53,7 +53,7 @@ contains
     REAL, dimension(klon):: speed
     ! tpot : temperature potentielle
     REAL, dimension(klon):: tpot
-    REAL cdram(klon), cdrah(klon)
+    REAL cdram(size(u1)), cdrah(size(u1))
     REAL, dimension(klon):: testar, qstar
     REAL, dimension(klon):: zdte, zdq 
     ! lmon : longueur de Monin-Obukhov selon Hess, Colman and McAvaney 
@@ -73,7 +73,7 @@ contains
     ENDDO
 
     CALL coefcdrag(nsrf, speed(:knon), t1(:knon), q1(:knon), z1(:knon), &
-         psol(:knon), ts1, qsurf, rugos, cdram, cdrah) 
+         psol(:knon), ts1(:knon), qsurf(:knon), rugos(:knon), cdram, cdrah) 
 
     ! Star variables 
 

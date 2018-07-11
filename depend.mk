@@ -18,7 +18,7 @@ caldyn0.o : vitvert.o tourpot.o sortvarc.o paramet_m.o massdair.o massbarxy.o ma
 calfis.o : physiq.o grid_change.o dynetat0.o disvert.o dimphy.o dimensions.o comgeom.o comconst.o 
 calltherm.o : thermcell.o ctherm.o dimphy.o 
 ce0l.o : unit_nml_m.o read_serre.o limit.o grilles_gcm_netcdf_sub.o etat0.o dimensions.o conf_gcm.o comdissnew.o 
-clcdrag.o : yoethf.o suphec.o indicesol.o 
+clcdrag.o : yoethf.o suphec.o indicesol.o clesphys.o 
 cleanstr.o : mathelp.o strlowercase.o 
 clesphys.o : unit_nml_m.o 
 clesphys2.o : conf_gcm.o unit_nml_m.o 
@@ -27,7 +27,7 @@ cltrac.o : suphec.o dimphy.o
 cltracrn.o : suphec.o dimphy.o indicesol.o 
 clvent.o : suphec.o dimphy.o 
 coef_diff_turb.o : yamada4.o ustarhb.o suphec.o dimphy.o conf_phys.o coefkz2.o coefkzmin.o coefkz.o clesphys.o 
-coefcdrag.o : yoethf.o dimphy.o suphec.o indicesol.o clesphys.o 
+coefcdrag.o : yoethf.o suphec.o indicesol.o clesphys.o 
 coefkz.o : yoethf.o suphec.o indicesol.o FCTTRE.o dimphy.o conf_phys.o clesphys.o 
 coefkz2.o : suphec.o dimphy.o indicesol.o 
 coefkzmin.o : suphec.o dimphy.o 
