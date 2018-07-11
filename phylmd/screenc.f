@@ -46,8 +46,7 @@ contains
     REAL, dimension(klon), intent(in):: qstar
     ! qstar---input-R- facteur d'echelle pour l'humidite relative
 
-    REAL, dimension(klon), intent(out):: pref
-    ! pref----input-R- pression au niveau de reference
+    REAL, intent(out):: pref(:) ! (knon) pression au niveau de reference
     REAL, dimension(klon), intent(out):: delu
     ! delu----input-R- anomalie du vent par rapport au 1er niveau
     REAL, dimension(klon), intent(out):: delte
@@ -58,7 +57,7 @@ contains
 
     ! Local:
     INTEGER i
-    REAL, dimension(klon):: cdram, cdrah, cdran, zri1, gref
+    REAL, dimension(klon):: cdram, cdrah, gref
 
     !------------------------------------------------------------------------- 
 
@@ -69,8 +68,7 @@ contains
     ! Richardson at reference level
 
     CALL coefcdrag(nsrf, speed(:knon), temp(:knon), q_zref(:knon), &
-         gref(:knon), psol(:knon), ts, qsurf, rugos, cdram, cdrah, cdran, &
-         zri1, pref)
+         gref(:knon), psol(:knon), ts, qsurf, rugos, cdram, cdrah, pref)
 
     DO i = 1, knon
        delu(i) = ustar(i) / sqrt(cdram(i))

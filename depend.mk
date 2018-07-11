@@ -219,7 +219,7 @@ start_init_orog.o : indicesol.o grid_noro_m.o dynetat0.o conf_dat2d.o dimensions
 start_init_phys_m.o : inter_barxy.o gr_int_dyn_m.o dynetat0.o dimensions.o conf_dat2d.o 
 start_inter_3d.o : startdyn.o conf_dat3d.o gr_int_dyn_m.o inter_barxy.o 
 startdyn.o : inter_barxy.o gr_int_dyn_m.o dynetat0.o dimensions.o conf_dat2d.o comgeom.o 
-stdlevvar.o : screenp.o screenc.o suphec.o coefcdrag.o 
+stdlevvar.o : screenp.o screenc.o suphec.o dimphy.o coefcdrag.o 
 sw.o : swu.o sw2s.o sw1s.o suphec.o raddim.o 
 sw1s.o : swr.o swclr.o raddim.o dimphy.o dimensions.o 
 sw2s.o : swr.o swde.o swclr.o radepsi.o raddim.o dimphy.o dimensions.o 

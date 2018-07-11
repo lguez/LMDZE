@@ -4,7 +4,8 @@ module clcdrag_m
 
 contains
 
-  SUBROUTINE clcdrag(nsrf, speed, t, q, zgeop, ts, qsurf, rugos, pcfm, pcfh)
+  SUBROUTINE clcdrag(nsrf, speed, t, q, zgeop, psol, ts, qsurf, rugos, pcfm, &
+       pcfh, pref)
 
     ! From LMDZ4/libf/phylmd/clcdrag.F90, version 1.1.1.1, 2004/05/19 12:53:07
 
@@ -27,6 +28,7 @@ contains
 
     REAL, intent(in):: q(:) ! (knon) ! humidite de l'air au 1er niveau du modele
     REAL, intent(in):: zgeop(:) ! (knon) géopotentiel au 1er niveau du modèle
+    REAL, intent(in) :: psol(:) ! (knon) pression au sol
     REAL, intent(in):: ts(:) ! (knon) temperature de l'air a la surface
     REAL, intent(in):: qsurf(:) ! (knon) humidite de l'air a la surface
     REAL, intent(in):: rugos(:) ! (knon) rugosit\'e
@@ -34,6 +36,8 @@ contains
 
     REAL, intent(out):: pcfh(:) ! (knon)
     ! drag coefficient pour les flux de chaleur latente et sensible
+
+    REAL, intent(out), optional:: pref(:) ! (knon) pression au niveau zgeop/RG
 
     ! Local:
 

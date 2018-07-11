@@ -306,8 +306,9 @@ contains
           ENDDO
 
           CALL clcdrag(nsrf, sqrt(yu(:knon, 1)**2 + yv(:knon, 1)**2), &
-               yt(:knon, 1), yq(:knon, 1), zgeop(:knon, 1), yts(:knon), &
-               yqsurf(:knon), yrugos(:knon), ycdragm(:knon), ycdragh(:knon)) 
+               yt(:knon, 1), yq(:knon, 1), zgeop(:knon, 1), ypaprs(:knon, 1), &
+               yts(:knon), yqsurf(:knon), yrugos(:knon), ycdragm(:knon), &
+               ycdragh(:knon)) 
 
           IF (iflag_pbl == 1) THEN
              ycdragm(:knon) = max(ycdragm(:knon), 0.)
@@ -456,9 +457,9 @@ contains
              qairsol(j) = yqsurf(j)
           END DO
 
-          CALL stdlevvar(klon, knon, nsrf, u1(:knon), v1(:knon), tair1(:knon), &
-               qair1, zgeo1, tairsol, qairsol, rugo1, psfce, patm, yt2m, &
-               yq2m, yt10m, yq10m, wind10m(:knon), ustar(:knon))
+          CALL stdlevvar(nsrf, u1(:knon), v1(:knon), tair1(:knon), qair1, &
+               zgeo1, tairsol, qairsol, rugo1, psfce, patm, yt2m, yq2m, yt10m, &
+               yq10m, wind10m(:knon), ustar(:knon))
 
           DO j = 1, knon
              i = ni(j)
