@@ -27,7 +27,7 @@ cltrac.o : suphec.o dimphy.o
 cltracrn.o : suphec.o dimphy.o indicesol.o 
 clvent.o : suphec.o dimphy.o 
 coef_diff_turb.o : yamada4.o ustarhb.o suphec.o dimphy.o conf_phys.o coefkz2.o coefkzmin.o coefkz.o clesphys.o 
-coefcdrag.o : dimphy.o suphec.o indicesol.o 
+coefcdrag.o : yoethf.o dimphy.o suphec.o indicesol.o clesphys.o 
 coefkz.o : yoethf.o suphec.o indicesol.o FCTTRE.o dimphy.o conf_phys.o clesphys.o 
 coefkz2.o : suphec.o dimphy.o indicesol.o 
 coefkzmin.o : suphec.o dimphy.o 

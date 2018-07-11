@@ -15,10 +15,12 @@ contains
 
     ! I. Musat, 01.07.2002
 
+    use clesphys, only: f_cdrag_oce, f_cdrag_ter
     use indicesol, only: is_oce
     use nr_util, only: assert_eq
-    use SUPHEC_M, only: rd, retv, rg, rkappa
+    use SUPHEC_M, only: rcpd, rd, retv, rg
     use dimphy, only: klon
+    USE yoethf_m, ONLY: rvtmp2
 
     INTEGER, intent(in) :: nsrf
     ! nsrf----input-I- indice pour le type de surface; voir indicesol.inc
@@ -61,11 +63,10 @@ contains
        pref_local(i) = exp(log(psol(i)) - zgeop(i)/(RD*t(i)* &
             (1.+ RETV * max(q(i), 0.0))))
        ztsolv(i) = ts(i)
-       ztvd(i) = t(i) * (psol(i)/pref_local(i))**RKAPPA
+       ztvd(i) = (t(i)+zgeop(i)/RCPD/(1.+RVTMP2*q(i))) *(1.+RETV*q(i)) 
        trm0(i) = 1. + RETV * max(qsurf(i), 0.0)
        trm1(i) = 1. + RETV * max(q(i), 0.0)
        ztsolv(i) = ztsolv(i) * trm0(i)
-       ztvd(i) = ztvd(i) * trm1(i)
        zri1(i) = zgeop(i)*(ztvd(i)-ztsolv(i))/(zdu2(i)*ztvd(i))
        cdran(i) = (CKAP/log(1.+zgeop(i)/(RG*rugos(i))))**2
 
@@ -77,7 +78,8 @@ contains
           friv(i) = max(1. / (1.+2.*CB*zri1(i)/ zscf(i)), 0.1)
           zcfm1(i) = cdran(i) * friv(i)
           frih(i) = max(1./ (1.+3.*CB*zri1(i)*zscf(i)), 0.1)
-          zcfh1(i) = cdran(i) * frih(i)
+          zcfh1(i) = f_cdrag_ter * cdran(i) * frih(i) 
+          IF (nsrf == is_oce) zcfh1(i) = f_cdrag_oce * cdran(i) * frih(i)
           pcfm(i) = zcfm1(i)
           pcfh(i) = zcfh1(i)
        ELSE
@@ -85,7 +87,7 @@ contains
           zucf(i) = 1./(1.+3.0*CB*CC*cdran(i)*SQRT(ABS(zri1(i)) &
                *(1.0+zgeop(i)/(RG*rugos(i)))))
           zcfm2(i) = cdran(i)*max((1.-2.0*CB*zri1(i)*zucf(i)), 0.1)
-          zcfh2(i) = cdran(i)*max((1.-3.0*CB*zri1(i)*zucf(i)), 0.1)
+          zcfh2(i) = f_cdrag_ter * cdran(i)*max((1.-3.0*CB*zri1(i)*zucf(i)), 0.1)
           pcfm(i) = zcfm2(i)
           pcfh(i) = zcfh2(i)
 
@@ -93,7 +95,7 @@ contains
 
           zcr(i) = (0.0016/(cdran(i)*SQRT(zdu2(i))))*ABS(ztvd(i)-ztsolv(i)) &
                **(1./3.)
-          IF (nsrf == is_oce) pcfh(i) = cdran(i)*(1.0+zcr(i)**1.25) **(1./1.25)
+          IF (nsrf == is_oce) pcfh(i) = f_cdrag_oce * cdran(i)*(1.0+zcr(i)**1.25) **(1./1.25)
        ENDIF
     END DO
 

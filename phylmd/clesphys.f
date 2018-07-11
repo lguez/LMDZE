@@ -21,6 +21,7 @@ module clesphys
   LOGICAL:: ok_kzmin  = .true.! calcul de Kzmin dans la couche limite de surface
   INTEGER, save:: ecrit_ins
   logical:: ok_instan = .false. ! sorties instantanees dans le fichier histins
+  real:: f_cdrag_ter = 1., f_cdrag_oce = 0.8 ! surface drag coefficients
 
 contains
 
@@ -30,7 +31,7 @@ contains
 
     namelist /clesphys_nml/ solaire, co2_ppm, CH4_ppb, N2O_ppb, CFC11_ppt, &
          CFC12_ppt, cdmmax, cdhmax, ksta, ksta_ter, ok_kzmin, ecrit_ins, &
-         ok_instan
+         ok_instan, f_cdrag_ter, f_cdrag_oce
 
     !---------------------------------------------------------
 
