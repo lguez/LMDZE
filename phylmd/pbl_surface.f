@@ -305,9 +305,9 @@ contains
                   * (ypplay(:knon, k - 1) - ypplay(:knon, k))
           ENDDO
 
-          CALL clcdrag(nsrf, yu(:knon, 1), yv(:knon, 1), yt(:knon, 1), &
-               yq(:knon, 1), zgeop(:knon, 1), yts(:knon), yqsurf(:knon), &
-               yrugos(:knon), ycdragm(:knon), ycdragh(:knon)) 
+          CALL clcdrag(nsrf, sqrt(yu(:knon, 1)**2 + yv(:knon, 1)**2), &
+               yt(:knon, 1), yq(:knon, 1), zgeop(:knon, 1), yts(:knon), &
+               yqsurf(:knon), yrugos(:knon), ycdragm(:knon), ycdragh(:knon)) 
 
           IF (iflag_pbl == 1) THEN
              ycdragm(:knon) = max(ycdragm(:knon), 0.)

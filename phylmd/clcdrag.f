@@ -4,13 +4,13 @@ module clcdrag_m
 
 contains
 
-  SUBROUTINE clcdrag(nsrf, u, v, t, q, zgeop, ts, qsurf, rugos, pcfm, pcfh)
+  SUBROUTINE clcdrag(nsrf, speed, t, q, zgeop, ts, qsurf, rugos, pcfm, pcfh)
 
     ! From LMDZ4/libf/phylmd/clcdrag.F90, version 1.1.1.1, 2004/05/19 12:53:07
 
     ! Objet : calcul des cdrags pour le moment (pcfm) et les flux de
     ! chaleur sensible et latente (pcfh).
-    ! Calculer le frottement au sol (Cdrag)
+    ! Calculer le frottement au sol (drag coefficient)
 
     USE indicesol, ONLY: is_oce
     use nr_util, only: assert_eq
@@ -19,7 +19,8 @@ contains
 
     INTEGER, intent(in):: nsrf ! indice pour le type de surface
 
-    REAL, intent(in):: u(:), v(:) ! (knon) vent au 1er niveau du mod\`ele
+    REAL, intent(in):: speed(:) ! (knon)
+    ! norm of the wind at the first model layer
 
     REAL, intent(in):: t(:) ! (knon)
     ! temperature de l'air au 1er niveau du modele
@@ -29,10 +30,10 @@ contains
     REAL, intent(in):: ts(:) ! (knon) temperature de l'air a la surface
     REAL, intent(in):: qsurf(:) ! (knon) humidite de l'air a la surface
     REAL, intent(in):: rugos(:) ! (knon) rugosit\'e
-    REAL, intent(out):: pcfm(:) ! (knon) cdrag pour le moment 
+    REAL, intent(out):: pcfm(:) ! (knon) drag coefficient pour le moment 
 
     REAL, intent(out):: pcfh(:) ! (knon)
-    ! cdrag pour les flux de chaleur latente et sensible
+    ! drag coefficient pour les flux de chaleur latente et sensible
 
     ! Local:
 
@@ -43,19 +44,19 @@ contains
     REAL:: zdu2, ztsolv, ztvd, zscf
     REAL:: zucf, zcr
     REAL:: friv, frih
-    REAL, dimension(size(u)):: zcfm1, zcfm2
-    REAL, dimension(size(u)):: zcfh1, zcfh2
-    REAL, dimension(size(u)):: zcdn
-    REAL, dimension(size(u)):: zri
+    REAL, dimension(size(speed)):: zcfm1, zcfm2
+    REAL, dimension(size(speed)):: zcfh1, zcfh2
+    REAL, dimension(size(speed)):: zcdn
+    REAL, dimension(size(speed)):: zri
 
     !--------------------------------------------------------------------
 
-    knon = assert_eq([size(u), size(v), size(t), size(q), size(zgeop), &
-         size(ts), size(qsurf), size(rugos), size(pcfm), size(pcfh), &
-         size(pcfm)], "clcdrag knon")
+    knon = assert_eq([size(speed), size(t), size(q), size(zgeop), size(ts), &
+         size(qsurf), size(rugos), size(pcfm), size(pcfh), size(pcfm)], &
+         "clcdrag knon")
     
     DO i = 1, knon
-       zdu2 = max(cepdu2,u(i)**2+v(i)**2)
+       zdu2 = max(cepdu2,speed(i)**2)
        ztsolv = ts(i) * (1.0+RETV*qsurf(i))
        ztvd = (t(i)+zgeop(i)/RCPD/(1.+RVTMP2*q(i))) &
             *(1.+RETV*q(i))

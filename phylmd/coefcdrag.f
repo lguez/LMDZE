@@ -10,9 +10,10 @@ contains
     ! From LMDZ4/libf/phylmd/coefcdrag.F90, version 1.1.1.1, 2004/05/19 12:53:07
 
     ! Objet : calcul des cdrags pour le moment (cdram) et les flux de
-    ! chaleur sensible et latente (cdrah), du cdrag neutre (cdran), du
-    ! nombre de Richardson entre la surface et le niveau de reference
-    ! (zri1) et de la pression au niveau de reference (pref).
+    ! chaleur sensible et latente (cdrah), du drag coefficient neutre
+    ! (cdran), du nombre de Richardson entre la surface et le niveau
+    ! de reference (zri1) et de la pression au niveau de reference
+    ! (pref).
 
     ! I. Musat, 01.07.2002
 
@@ -34,9 +35,9 @@ contains
     ! rugos---input-R- rugosite
 
     REAL, dimension(klon), intent(out) :: cdram, cdrah, cdran, zri1, pref
-    ! cdram--output-R- cdrag pour le moment
-    ! cdrah--output-R- cdrag pour les flux de chaleur latente et sensible
-    ! cdran--output-R- cdrag neutre
+    ! cdram--output-R- drag coefficient pour le moment
+    ! cdrah--output-R- drag coefficient pour les flux de chaleur latente et sensible
+    ! cdran--output-R- drag coefficient neutre
     ! zri1---output-R- nb. Richardson entre la surface et la couche zgeop/RG
     ! pref---output-R- pression au niveau zgeop/RG
 
