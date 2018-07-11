@@ -20,7 +20,7 @@ contains
     ! ne tient pas compte de la diff\'erentiation des sous-fractions
     ! de sol.
 
-    use clcdrag_m, only: clcdrag
+    use cdrag_m, only: cdrag
     use clqh_m, only: clqh
     use clvent_m, only: clvent
     use coef_diff_turb_m, only: coef_diff_turb
@@ -305,7 +305,7 @@ contains
                   * (ypplay(:knon, k - 1) - ypplay(:knon, k))
           ENDDO
 
-          CALL clcdrag(nsrf, sqrt(yu(:knon, 1)**2 + yv(:knon, 1)**2), &
+          CALL cdrag(nsrf, sqrt(yu(:knon, 1)**2 + yv(:knon, 1)**2), &
                yt(:knon, 1), yq(:knon, 1), zgeop(:knon, 1), ypaprs(:knon, 1), &
                yts(:knon), yqsurf(:knon), yrugos(:knon), ycdragm(:knon), &
                ycdragh(:knon)) 

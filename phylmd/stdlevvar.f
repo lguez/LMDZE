@@ -19,7 +19,7 @@ contains
 
     use nr_util, only: assert_eq
 
-    use coefcdrag_m, only: coefcdrag
+    use cdrag_m, only: cdrag
     USE dimphy, ONLY: klon
     USE suphec_m, ONLY: rg, rkappa
     use screenc_m, only: screenc
@@ -72,7 +72,7 @@ contains
        speed(i)=SQRT(u1(i)**2+v1(i)**2)
     ENDDO
 
-    CALL coefcdrag(nsrf, speed(:knon), t1(:knon), q1(:knon), z1(:knon), &
+    CALL cdrag(nsrf, speed(:knon), t1(:knon), q1(:knon), z1(:knon), &
          psol(:knon), ts1(:knon), qsurf(:knon), rugos(:knon), cdram, cdrah) 
 
     ! Star variables 

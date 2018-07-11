@@ -18,7 +18,7 @@ calendar.f
 calfis.f
 calltherm.f
 chem.f
-clcdrag.f
+cdrag.f
 cleanstr.f
 clesphys2.f
 clesphys.f
@@ -29,7 +29,6 @@ cltrac.f
 cltracrn.f
 clvent.f
 coef_diff_turb.f
-coefcdrag.f
 coefkz2.f
 coefkz.f
 coefkzmin.f

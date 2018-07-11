@@ -19,7 +19,7 @@ contains
 
     ! I. Musat, 01.07.2002
 
-    use coefcdrag_m, only: coefcdrag
+    use cdrag_m, only: cdrag
     use SUPHEC_M, only: RG
 
     INTEGER, intent(in):: klon
@@ -67,9 +67,8 @@ contains
 
     ! Richardson at reference level
 
-    CALL coefcdrag(nsrf, speed(:knon), temp(:knon), q_zref(:knon), &
-         gref(:knon), psol(:knon), ts(:knon), qsurf(:knon), rugos(:knon), &
-         cdram, cdrah, pref)
+    CALL cdrag(nsrf, speed(:knon), temp(:knon), q_zref(:knon), gref(:knon), &
+         psol(:knon), ts(:knon), qsurf(:knon), rugos(:knon), cdram, cdrah, pref)
 
     DO i = 1, knon
        delu(i) = ustar(i) / sqrt(cdram(i))

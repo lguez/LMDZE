@@ -1,13 +1,15 @@
-module clcdrag_m
+module cdrag_m
 
   IMPLICIT NONE
 
 contains
 
-  SUBROUTINE clcdrag(nsrf, speed, t, q, zgeop, psol, ts, qsurf, rugos, pcfm, &
+  SUBROUTINE cdrag(nsrf, speed, t, q, zgeop, psol, ts, qsurf, rugos, pcfm, &
        pcfh, pref)
 
-    ! From LMDZ4/libf/phylmd/clcdrag.F90, version 1.1.1.1, 2004/05/19 12:53:07
+    ! From LMDZ4/libf/phylmd/clcdrag.F90 and
+    ! LMDZ4/libf/phylmd/coefcdrag.F90, version 1.1.1.1, 2004/05/19
+    ! 12:53:07
 
     ! Objet : calcul des drag coefficients au sol pour le moment et
     ! les flux de chaleur sensible et latente et calcul de la pression
@@ -60,7 +62,7 @@ contains
 
     knon = assert_eq([size(speed), size(t), size(q), size(zgeop), size(ts), &
          size(qsurf), size(rugos), size(pcfm), size(pcfh), size(pcfm)], &
-         "clcdrag knon")
+         "cdrag knon")
     
     DO i = 1, knon
        zdu2 = max(cepdu2, speed(i)**2)
@@ -100,6 +102,6 @@ contains
     if (present(pref)) &
          pref = exp(log(psol) - zgeop / (RD * t * (1. + RETV * max(q, 0.))))
 
-  END SUBROUTINE clcdrag
+  END SUBROUTINE cdrag
 
-end module clcdrag_m
+end module cdrag_m
