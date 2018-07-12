@@ -265,3 +265,6 @@ YOEGWD.f
 yoethf.f
 YOMCST.f
 zenang.f
+heavyside.f
+coefpoly.f
+tanh_cautious.f

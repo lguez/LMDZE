@@ -31,8 +31,6 @@ filtreg_hemisph.f
 filtreg_scal.f
 filtreg_v.f
 flumass.f
-fxhyp.f
-fyhyp.f
 geopot.f
 grid_change.f
 grid_noro_m.f
@@ -52,7 +50,6 @@ inifilr_hemisph.f
 inter_barx.f
 inter_barxy.f
 inter_bary.f
-invert_zoom_x.f
 ioconf_calendar.f
 ju2ymds.f
 limit.f
@@ -67,7 +64,6 @@ paramet_m.f
 phyetat0.f
 phyredem.f
 phyredem0.f
-principal_cshift.f
 q_sat.f
 regr_lat_time_coefoz.f
 regr_pr_o3.f

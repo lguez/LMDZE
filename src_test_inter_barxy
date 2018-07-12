@@ -8,8 +8,6 @@ dimensions.F
 disvert.f
 dynetat0.f
 errioipsl.f
-fxhyp.f
-fyhyp.f
 heavyside.f
 histbeg_totreg.f
 histclo.f
@@ -19,11 +17,9 @@ iniadvtrac.f
 inter_barx.f
 inter_barxy.f
 inter_bary.f
-invert_zoom_x.f
 minmax.f
 ord_coord.f
 ord_coordm.f
-principal_cshift.f
 tanh_cautious.f
 temps.f
 test_inter_barxy.f

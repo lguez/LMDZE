@@ -1,10 +1,7 @@
 program test_inifilr
 
   use dimensions, only: iim, jjm
-  use dynetat0_m, only: xprimp025, xprimm025, rlatu1, rlatu2, rlatu, rlatv, &
-       yprimu1, yprimu2, rlonu, rlonv, xprimu, xprimv, read_serre
-  use fxhyp_m, only: fxhyp
-  use fyhyp_m, only: fyhyp
+  use dynetat0_m, only: rlatu, rlatv, read_serre, fyhyp, fxhyp
   use inifilr_m, only: inifilr, jfiltnu, jfiltnv, jfiltsu, jfiltsv, &
        matriceun, matrinvn, matricevn, matriceus, matrinvs, matricevs
   use netcdf, only: NF90_CLOBBER, NF90_FLOAT
@@ -25,12 +22,8 @@ program test_inifilr
   call set_unit_nml
   open(unit_nml, file="used_namelists.txt", status="replace", action="write")
   call read_serre
-
-  CALL fyhyp(rlatu, rlatv, rlatu2, yprimu2, rlatu1, yprimu1)
-  CALL fxhyp(xprimm025, rlonv, xprimv, rlonu, xprimu, xprimp025)
-  rlatu(1) = pi / 2.
-  rlatu(jjm + 1) = -rlatu(1)
-
+  CALL fyhyp
+  CALL fxhyp
   CALL inifilr
   close(unit_nml)
 

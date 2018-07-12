@@ -5,10 +5,7 @@ program test_inter_barxy
   use comgeom, only: inigeom
   use conf_gcm_m, only: conf_gcm
   use dimensions, only: iim, jjm
-  USE dynetat0_m, only: rlonu, rlatv, rlatu, rlatu1, rlatu2, rlonv, xprimm025, &
-       xprimp025, xprimu, xprimv, yprimu1, yprimu2, read_serre
-  use fxhyp_m, only: fxhyp
-  use fyhyp_m, only: fyhyp
+  USE dynetat0_m, only: rlonu, rlatv, read_serre, fyhyp, fxhyp
   use inter_barxy_m, only: inter_barxy
   USE nr_util, ONLY : pi
 
@@ -37,12 +34,8 @@ program test_inter_barxy
   call read_comdissnew
   CALL iniconst
   call read_serre
-  CALL fyhyp(rlatu, rlatv, rlatu2, yprimu2, rlatu1, yprimu1)
-  CALL fxhyp(xprimm025, rlonv, xprimv, rlonu, xprimu, xprimp025)
-
-  rlatu(1) = pi / 2.
-  rlatu(jjm + 1) = -rlatu(1)
-
+  CALL fyhyp
+  CALL fxhyp
   CALL inigeom
 
   lon_ini = - pi + 2 * pi / iml_dyn * (/(i, i = 0, iml_dyn - 1)/)

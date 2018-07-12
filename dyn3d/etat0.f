@@ -16,13 +16,11 @@ contains
     use dimphy, only: klon
     use dimsoil, only: nsoilmx
     use disvert_m, only: ap, bp, preff, pa, disvert
-    use dynetat0_m, only: day_ref, annee_ref, xprimp025, xprimm025, rlatu1, &
-         rlatu2, rlatu, rlatv, yprimu1, yprimu2, rlonu, rlonv, xprimu, xprimv
+    use dynetat0_m, only: day_ref, annee_ref, rlatu, rlatv, rlonu, rlonv, &
+         fyhyp, fxhyp
     use dynredem0_m, only: dynredem0
     use dynredem1_m, only: dynredem1
     use exner_hyb_m, only: exner_hyb
-    use fxhyp_m, only: fxhyp
-    use fyhyp_m, only: fyhyp
     use geopot_m, only: geopot
     use grille_m_m, only: grille_m
     use grid_change, only: init_dyn_phy, dyn_phy
@@ -125,13 +123,8 @@ contains
     pa = 5e4
     CALL disvert
     call test_disvert
-
-    CALL fyhyp(rlatu, rlatv, rlatu2, yprimu2, rlatu1, yprimu1)
-    CALL fxhyp(xprimm025, rlonv, xprimv, rlonu, xprimu, xprimp025)
-
-    rlatu(1) = pi / 2.
-    rlatu(jjm + 1) = -rlatu(1)
-
+    CALL fyhyp
+    CALL fxhyp
     CALL inigeom
     CALL inifilr
 
