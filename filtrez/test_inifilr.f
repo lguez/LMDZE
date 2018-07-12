@@ -2,18 +2,16 @@ program test_inifilr
 
   use dimensions, only: iim, jjm
   use dynetat0_m, only: xprimp025, xprimm025, rlatu1, rlatu2, rlatu, rlatv, &
-       yprimu1, yprimu2, rlonu, rlonv, xprimu, xprimv
+       yprimu1, yprimu2, rlonu, rlonv, xprimu, xprimv, read_serre
   use fxhyp_m, only: fxhyp
   use fyhyp_m, only: fyhyp
   use inifilr_m, only: inifilr, jfiltnu, jfiltnv, jfiltsu, jfiltsv, &
        matriceun, matrinvn, matricevn, matriceus, matrinvs, matricevs
-  use jumble, only: new_unit
   use netcdf, only: NF90_CLOBBER, NF90_FLOAT
   use netcdf95, only: nf95_create, NF95_DEF_DIM, NF95_DEF_VAR, NF95_ENDDEF, &
        NF95_PUT_VAR, NF95_CLOSE, nf95_put_att
   use nr_util, only: pi
-  use unit_nml_m, only: unit_nml
-  use read_serre_m, only: read_serre
+  use unit_nml_m, only: unit_nml, set_unit_nml
 
   IMPLICIT NONE
 
@@ -24,7 +22,7 @@ program test_inifilr
 
   !-----------------------------------------------------------------------
 
-  call new_unit(unit_nml)
+  call set_unit_nml
   open(unit_nml, file="used_namelists.txt", status="replace", action="write")
   call read_serre
 

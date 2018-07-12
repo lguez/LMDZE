@@ -9,6 +9,7 @@ module phyetat0_m
   ! by a simple index, in degrees
 
   integer, save:: itau_phy
+  REAL, save:: zmasq(KLON) ! fraction of land
 
   private klon
 
@@ -25,7 +26,7 @@ contains
     ! Objet : lecture de l'état initial pour la physique
 
     USE conf_gcm_m, ONLY: raz_date
-    use dimphy, only: zmasq, klev
+    use dimphy, only: klev
     USE dimsoil, ONLY : nsoilmx
     USE indicesol, ONLY : epsfra, is_lic, is_oce, is_sic, is_ter, nbsrf
     use netcdf, only: nf90_global, nf90_inq_varid, NF90_NOERR, NF90_NOWRITE

@@ -4,7 +4,7 @@ module limit_mod
 
 contains
 
-  SUBROUTINE limit
+  SUBROUTINE limit(pctsrf)
 
     ! Authors: L. Fairhead, Z. X. Li, P. Le Van
 
@@ -14,9 +14,8 @@ contains
 
     use conf_dat2d_m, only: conf_dat2d
     use dimensions, only: iim, jjm
-    use dimphy, only: klon, zmasq
+    use dimphy, only: klon
     use dynetat0_m, only: rlonu, rlatv
-    use etat0_mod, only: pctsrf
     use grid_change, only: dyn_phy
     use indicesol, only: epsfra, is_ter, is_oce, is_lic, is_sic
     use inter_barxy_m, only: inter_barxy
@@ -28,8 +27,13 @@ contains
          NF90_UNLIMITED
     use nr_util, only: assert
     use numer_rec_95, only: spline, splint
+    use phyetat0_m, only: zmasq
     use start_init_orog_m, only: mask
     use unit_nml_m, only: unit_nml
+
+    REAL, intent(inout):: pctsrf(:, :) ! (klon, nbsrf)
+    ! "pctsrf(i, :)" is the composition of the surface at horizontal
+    ! position "i".
 
     ! Local:
 

@@ -26,11 +26,12 @@ contains
     use coef_diff_turb_m, only: coef_diff_turb
     USE conf_gcm_m, ONLY: lmt_pas
     USE conf_phys_m, ONLY: iflag_pbl
-    USE dimphy, ONLY: klev, klon, zmasq
+    USE dimphy, ONLY: klev, klon
     USE dimsoil, ONLY: nsoilmx
     use hbtm_m, only: hbtm
     USE indicesol, ONLY: epsfra, is_lic, is_oce, is_sic, is_ter, nbsrf
     USE interfoce_lim_m, ONLY: interfoce_lim
+    use phyetat0_m, only: zmasq
     use stdlevvar_m, only: stdlevvar
     USE suphec_m, ONLY: rd, rg
     use time_phylmdz, only: itap

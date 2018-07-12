@@ -9,14 +9,13 @@ program test_ozonecm
   use dimensions, only: jjm, llm
   USE dimphy, ONLY : klon
   use disvert_m, only: pa, disvert, ap, bp, preff, presnivs
-  use jumble, only: new_unit
   use ozonecm_m, only: ozonecm
   use phyetat0_m, only: rlat
   use nr_util, only: arth, assert
   use netcdf95, only: nf95_create, nf95_def_dim, nf95_def_var, nf95_put_att, &
        nf95_enddef, nf95_put_var, nf95_close
   use netcdf, only: nf90_clobber, nf90_float, nf90_global
-  use unit_nml_m, only: unit_nml
+  use unit_nml_m, only: unit_nml, set_unit_nml
 
   implicit none
 
@@ -35,7 +34,7 @@ program test_ozonecm
 
   call assert(klon == jjm + 1, "test_ozonecm: iim should be 1")
 
-  call new_unit(unit_nml)
+  call set_unit_nml
   open(unit_nml, file="used_namelists.txt", status="replace", action="write")
 
   pa = 5e4

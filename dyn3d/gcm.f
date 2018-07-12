@@ -26,11 +26,10 @@ PROGRAM gcm
   use inithist_m, only: inithist
   use init_dynzon_m, only: init_dynzon
   USE ioconf_calendar_m, only: ioconf_calendar
-  use jumble, only: new_unit
   use leapfrog_m, only: leapfrog
   use netcdf95, only: nf95_close
   use suphec_m, only: suphec
-  use unit_nml_m, only: unit_nml
+  use unit_nml_m, only: unit_nml, set_unit_nml
   use createnewfield_m, only: NbField, Ncid
 
   IMPLICIT NONE
@@ -50,7 +49,7 @@ PROGRAM gcm
 
   !------------------------------------------------------------
 
-  call new_unit(unit_nml)
+  call set_unit_nml
   open(unit_nml, file="used_namelists.txt", status="replace", action="write")
 
   CALL conf_gcm

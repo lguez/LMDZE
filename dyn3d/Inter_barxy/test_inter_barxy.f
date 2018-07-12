@@ -6,12 +6,11 @@ program test_inter_barxy
   use conf_gcm_m, only: conf_gcm
   use dimensions, only: iim, jjm
   USE dynetat0_m, only: rlonu, rlatv, rlatu, rlatu1, rlatu2, rlonv, xprimm025, &
-       xprimp025, xprimu, xprimv, yprimu1, yprimu2
+       xprimp025, xprimu, xprimv, yprimu1, yprimu2, read_serre
   use fxhyp_m, only: fxhyp
   use fyhyp_m, only: fyhyp
   use inter_barxy_m, only: inter_barxy
   USE nr_util, ONLY : pi
-  use read_serre_m, only: read_serre
 
   implicit none
 

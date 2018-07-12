@@ -15,7 +15,6 @@ histhori_regular.f
 iniadvtrac.f
 invert_zoom_x.f
 principal_cshift.f
-read_serre.f
 tanh_cautious.f
 temps.f
 test_fxhyp.f

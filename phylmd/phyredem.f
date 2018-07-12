@@ -16,9 +16,10 @@ contains
     ! Objet : \'ecriture de l'\'etat de d\'emarrage ou red\'emarrage
     ! pour la physique
 
-    USE dimphy, ONLY: klev, klon, zmasq
+    USE dimphy, ONLY: klev, klon
     USE indicesol, ONLY: is_lic, is_oce, is_sic, is_ter, nbsrf
     USE netcdf95, ONLY: nf95_inq_varid, nf95_put_var, nf95_close
+    use phyetat0_m, only: zmasq
     use phyredem0_m, only: ncid_restartphy
 
     REAL, INTENT(IN):: pctsrf(:, :) ! (klon, nbsrf)

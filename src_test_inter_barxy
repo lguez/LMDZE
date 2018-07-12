@@ -24,7 +24,6 @@ minmax.f
 ord_coord.f
 ord_coordm.f
 principal_cshift.f
-read_serre.f
 tanh_cautious.f
 temps.f
 test_inter_barxy.f

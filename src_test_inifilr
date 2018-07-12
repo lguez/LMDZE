@@ -20,7 +20,6 @@ inifilr.f
 inifilr_hemisph.f
 invert_zoom_x.f
 principal_cshift.f
-read_serre.f
 tanh_cautious.f
 temps.f
 test_inifilr.f

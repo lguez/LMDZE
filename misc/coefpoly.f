@@ -2,7 +2,7 @@ module coefpoly_m
 
   IMPLICIT NONE
 
-  DOUBLE PRECISION a0, a1, a2, a3
+  DOUBLE PRECISION, protected:: a0, a1, a2, a3
 
 contains
 

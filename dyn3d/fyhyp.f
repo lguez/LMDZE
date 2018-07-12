@@ -58,8 +58,6 @@ contains
     pisjm = pi/real(jjm)
     epsilon = 1e-3
     dzoom = dzoomy*pi
-    print *, 'yzoom(rad), grossismy, tauy, dzoom (rad):'
-    print *, clat, grossismy, tauy, dzoom
 
     DO i = 0, nmax2
        yt(i) = -pis2 + real(i)*pi/nmax2

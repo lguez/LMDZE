@@ -15,6 +15,5 @@ module dimphy
   ! klon pour le pole sud)
 
   INTEGER, PARAMETER:: KLEV = llm
-  REAL, save:: zmasq(KLON) ! fraction of land
 
 end module dimphy

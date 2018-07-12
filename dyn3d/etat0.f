@@ -1,19 +1,10 @@
-module etat0_mod
-
-  use indicesol, only: nbsrf
-  use dimphy, only: klon
+module etat0_m
 
   IMPLICIT NONE
 
-  REAL pctsrf(klon, nbsrf)
-  ! ("pctsrf(i, :)" is the composition of the surface at horizontal
-  ! position "i")
-
-  private nbsrf, klon
-
 contains
 
-  SUBROUTINE etat0(phis)
+  SUBROUTINE etat0(phis, pctsrf)
 
     ! From "etat0_netcdf.F", version 1.3, 2005/05/25 13:10:09
 
@@ -22,7 +13,7 @@ contains
     use comgeom, only: aire_2d, apoln, apols, cu_2d, cv_2d, inigeom
     use conf_gcm_m, only: nday
     use dimensions, only: iim, jjm, llm, nqmx
-    use dimphy, only: zmasq
+    use dimphy, only: klon
     use dimsoil, only: nsoilmx
     use disvert_m, only: ap, bp, preff, pa, disvert
     use dynetat0_m, only: day_ref, annee_ref, xprimp025, xprimm025, rlatu1, &
@@ -35,7 +26,7 @@ contains
     use geopot_m, only: geopot
     use grille_m_m, only: grille_m
     use grid_change, only: init_dyn_phy, dyn_phy
-    use indicesol, only: is_oce, is_sic, is_ter, is_lic, epsfra
+    use indicesol, only: is_oce, is_sic, is_ter, is_lic, epsfra, nbsrf
     use iniadvtrac_m, only: iniadvtrac
     use inifilr_m, only: inifilr
     use massdair_m, only: massdair
@@ -43,7 +34,7 @@ contains
     use netcdf95, only: nf95_close, nf95_get_var, nf95_gw_var, nf95_put_var, &
          nf95_inq_varid, nf95_open
     use nr_util, only: pi, assert
-    use phyetat0_m, only: rlat, rlon, itau_phy
+    use phyetat0_m, only: rlat, rlon, itau_phy, zmasq
     use phyredem0_m, only: phyredem0, ncid_restartphy
     use phyredem_m, only: phyredem
     use q_sat_m, only: q_sat
@@ -58,6 +49,10 @@ contains
 
     REAL, intent(out):: phis(:, :) ! (iim + 1, jjm + 1)
     ! surface geopotential, in m2 s-2
+
+    REAL, intent(out):: pctsrf(:, :) ! (klon, nbsrf)
+    ! "pctsrf(i, :)" is the composition of the surface at horizontal
+    ! position "i".
 
     ! Local:
 
@@ -347,4 +342,4 @@ contains
 
   END SUBROUTINE etat0
 
-end module etat0_mod
+end module etat0_m
