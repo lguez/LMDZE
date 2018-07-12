@@ -4,12 +4,12 @@ module phyetat0_m
 
   IMPLICIT none
 
-  REAL, save:: rlat(klon), rlon(klon)
+  REAL, save, protected:: rlat(klon), rlon(klon)
   ! latitude and longitude of a point of the scalar grid identified
   ! by a simple index, in degrees
 
-  integer, save:: itau_phy
-  REAL, save:: zmasq(KLON) ! fraction of land
+  integer, save, protected:: itau_phy
+  REAL, save, protected:: zmasq(KLON) ! fraction of land
 
   private klon
 
@@ -356,5 +356,33 @@ contains
     call nf95_get_var(ncid_startphy, varid, w01)
 
   END SUBROUTINE phyetat0
+
+  !*********************************************************************
+
+  subroutine phyetat0_new
+
+    use nr_util, only: pi
+
+    use dimensions, only: iim, jjm
+    use dynetat0_m, only: rlatu, rlonv
+    use grid_change, only: dyn_phy
+    USE start_init_orog_m, only: mask
+    
+    !-------------------------------------------------------------------------
+    
+    rlat(1) = 90.
+    rlat(2:klon-1) = pack(spread(rlatu(2:jjm), 1, iim), .true.) * 180. / pi
+    ! (with conversion to degrees)
+    rlat(klon) = - 90.
+
+    rlon(1) = 0.
+    rlon(2:klon-1) = pack(spread(rlonv(:iim), 2, jjm - 1), .true.) * 180. / pi
+    ! (with conversion to degrees)
+    rlon(klon) = 0.
+
+    zmasq = pack(mask, dyn_phy)
+    itau_phy = 0
+
+  end subroutine phyetat0_new
 
 end module phyetat0_m

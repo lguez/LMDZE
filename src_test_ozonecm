@@ -13,3 +13,15 @@ ozonecm.f
 phyetat0.f
 test_ozonecm.f
 unit_nml_m.f
+dynetat0.f
+start_init_orog.f
+grid_change.f
+coefpoly.f
+tanh_cautious.f
+heavyside.f
+comconst.f
+temps.f
+iniadvtrac.f
+conf_dat2d.f
+grid_noro.f
+mva9.f

@@ -1,20 +1,23 @@
 program test_ozonecm
 
-  ! This is a program in Fortran 95.
+  ! This is a program in Fortran 2003.
 
   ! This program computes values of ozone abundance from Royer, on a
   ! latitude-pressure grid, and writes the values to a NetCDF file.
   ! The pressure grid is "presnivs" from "disvert".
 
-  use dimensions, only: jjm, llm
-  USE dimphy, ONLY : klon
-  use disvert_m, only: pa, disvert, ap, bp, preff, presnivs
-  use ozonecm_m, only: ozonecm
-  use phyetat0_m, only: rlat
   use nr_util, only: arth, assert
   use netcdf95, only: nf95_create, nf95_def_dim, nf95_def_var, nf95_put_att, &
        nf95_enddef, nf95_put_var, nf95_close
   use netcdf, only: nf90_clobber, nf90_float, nf90_global
+
+  use dimensions, only: jjm, llm
+  USE dimphy, ONLY : klon
+  USE dimsoil, ONLY : nsoilmx
+  use disvert_m, only: pa, disvert, ap, bp, preff, presnivs
+  USE indicesol, ONLY : nbsrf
+  use ozonecm_m, only: ozonecm
+  use phyetat0_m, only: rlat, phyetat0
   use unit_nml_m, only: unit_nml, set_unit_nml
 
   implicit none
@@ -25,6 +28,40 @@ program test_ozonecm
   integer julien, k
   real, parameter:: RG = 9.80665 ! acceleration of gravity, in m s-2
   real, parameter:: dobson_u = 2.1415e-05 ! Dobson unit, in kg m-2
+
+  REAL pctsrf(klon, nbsrf)
+  REAL ftsol(klon, nbsrf)
+  REAL ftsoil(klon, nsoilmx, nbsrf)
+  REAL qsurf(klon, nbsrf)
+  REAL qsol(klon) ! column-density of water in soil, in kg m-2
+  REAL snow(klon, nbsrf)
+  REAL albe(klon, nbsrf)
+  REAL evap(klon, nbsrf)
+  REAL rain_fall(klon)
+  REAL snow_fall(klon)
+  real solsw(klon)
+  REAL sollw(klon)
+  real fder(klon)
+  REAL radsol(klon)
+  REAL frugs(klon, nbsrf)
+  REAL agesno(klon, nbsrf)
+  REAL zmea(klon)
+  REAL zstd(klon)
+  REAL zsig(klon)
+  REAL zgam(klon)
+  REAL zthe(klon)
+  REAL zpic(klon)
+  REAL zval(klon)
+  REAL t_ancien(klon, llm), q_ancien(klon, llm)
+  LOGICAL ancien_ok
+  real rnebcon(klon, llm), ratqs(klon, llm)
+  REAL clwcon(klon, llm), run_off_lic_0(klon)
+  real sig1(klon, llm) ! section adiabatic updraft
+
+  real w01(klon, llm) 
+  ! vertical velocity within adiabatic updraft
+
+  integer ncid_startphy
 
   ! For NetCDF:
   integer ncid, dimid_time, dimid_plev, dimid_latitude
@@ -40,7 +77,10 @@ program test_ozonecm
   pa = 5e4
   call disvert
   p = ap + bp * preff
-  rlat = arth(-90., 180. / jjm, jjm + 1)
+  call phyetat0(pctsrf, ftsol, ftsoil, qsurf, qsol, snow, albe, evap, &
+       rain_fall, snow_fall, solsw, sollw, fder, radsol, frugs, agesno, zmea, &
+       zstd, zsig, zgam, zthe, zpic, zval, t_ancien, q_ancien, ancien_ok, &
+       rnebcon, ratqs, clwcon, run_off_lic_0, sig1, w01, ncid_startphy)
 
   do julien = 1, 360
      wo(:, :, julien) = ozonecm(REAL(julien), spread(p, dim=1, ncopies=jjm+1))

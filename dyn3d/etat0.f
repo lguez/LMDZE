@@ -32,14 +32,14 @@ contains
     use netcdf95, only: nf95_close, nf95_get_var, nf95_gw_var, nf95_put_var, &
          nf95_inq_varid, nf95_open
     use nr_util, only: pi, assert
-    use phyetat0_m, only: rlat, rlon, itau_phy, zmasq
+    use phyetat0_m, only: zmasq, phyetat0_new
     use phyredem0_m, only: phyredem0, ncid_restartphy
     use phyredem_m, only: phyredem
     use q_sat_m, only: q_sat
     use regr_lat_time_coefoz_m, only: regr_lat_time_coefoz
     use regr_pr_o3_m, only: regr_pr_o3
     use startdyn, only: start_init_dyn
-    USE start_init_orog_m, only: start_init_orog, mask
+    USE start_init_orog_m, only: start_init_orog
     use start_init_phys_m, only: start_init_phys
     use start_inter_3d_m, only: start_inter_3d
     use test_disvert_m, only: test_disvert
@@ -127,22 +127,10 @@ contains
     CALL fxhyp
     CALL inigeom
     CALL inifilr
-
-    rlat(1) = 90.
-    rlat(2:klon-1) = pack(spread(rlatu(2:jjm), 1, iim), .true.) * 180. / pi
-    ! (with conversion to degrees)
-    rlat(klon) = - 90.
-
-    rlon(1) = 0.
-    rlon(2:klon-1) = pack(spread(rlonv(:iim), 2, jjm - 1), .true.) * 180. / pi
-    ! (with conversion to degrees)
-    rlon(klon) = 0.
-
     call start_init_orog(phis, zmea_2d, zstd_2d, zsig_2d, zgam_2d, zthe_2d, &
          zpic_2d, zval_2d) ! also compute "mask"
     call init_dyn_phy ! define the mask "dyn_phy" for distinct grid points
-    zmasq = pack(mask, dyn_phy)
-    PRINT *, 'Masque construit'
+    call phyetat0_new
 
     call start_init_phys(tsol_2d, qsol_2d)
     CALL start_init_dyn(tsol_2d, phis, ps)
@@ -321,7 +309,6 @@ contains
     w01 = 0.
 
     nday = 0
-    itau_phy = 0 ! side effect
     call phyredem0
 
     call nf95_inq_varid(ncid_restartphy, "trs", varid)

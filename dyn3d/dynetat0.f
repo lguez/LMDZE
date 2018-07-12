@@ -29,15 +29,16 @@ module dynetat0_m
   real, protected:: taux, tauy
   ! raideur de la transition de l'int\'erieur \`a l'ext\'erieur du zoom
   
-  real rlatu(jjm + 1)
+  real, protected:: rlatu(jjm + 1)
   ! latitudes of points of the "scalar" and "u" grid, in rad
 
-  real rlatv(jjm) 
+  real, protected:: rlatv(jjm) 
   ! latitudes of points of the "v" grid, in rad, in decreasing order
 
-  real rlonu(iim + 1) ! longitudes of points of the "u" grid, in rad
+  real, protected:: rlonu(iim + 1)
+  ! longitudes of points of the "u" grid, in rad
 
-  real rlonv(iim + 1)
+  real, protected:: rlonv(iim + 1)
   ! longitudes of points of the "scalar" and "v" grid, in rad
 
   real, protected:: xprimu(iim + 1), xprimv(iim + 1)
@@ -593,8 +594,9 @@ contains
     ! Le premier point scalaire pour une grille regulière (grossismx =
     ! 1) avec clon = 0 est à - 180 degrés.
 
+    use nr_util, only: pi, pi_d, twopi, twopi_d, arth, assert, rad_to_deg
+
     USE dimensions, ONLY: iim
-    use nr_util, only: pi, pi_d, twopi, twopi_d, arth
     use tanh_cautious_m, only: tanh_cautious
 
     ! Local:
@@ -680,10 +682,8 @@ contains
              is2 = is2 + 1
           end do
 
-          if (rlonm025(is2) < - pi) then
-             print *, 'Rlonm025 plus petit que - pi !'
-             STOP 1
-          end if
+          call assert(rlonm025(is2) >= - pi, &
+               "fxhyp -- rlonm025 should be >= - pi")
        ELSE
           is2 = iim
 
@@ -704,8 +704,8 @@ contains
     call principal_cshift(is2, rlonp025, xprimp025)
 
     forall (i = 1: iim) d_rlonv(i) = rlonv(i + 1) - rlonv(i)
-    print *, "Minimum longitude step:", MINval(d_rlonv) * 180. / pi, "degrees"
-    print *, "Maximum longitude step:", MAXval(d_rlonv) * 180. / pi, "degrees"
+    print *, "Minimum longitude step:", MINval(d_rlonv) * rad_to_deg, "degrees"
+    print *, "Maximum longitude step:", MAXval(d_rlonv) * rad_to_deg, "degrees"
 
     ! Check that rlonm025 <= rlonv <= rlonp025 <= rlonu:
     DO i = 1, iim + 1
@@ -738,8 +738,9 @@ contains
     ! so that xlon is in ascending order. Make the same cshift on
     ! xprimm. Use clon.
 
-    USE dimensions, ONLY: iim
     use nr_util, only: twopi
+
+    USE dimensions, ONLY: iim
 
     integer, intent(in):: is2
     real, intent(inout):: xlon(:), xprimm(:) ! (iim + 1)
