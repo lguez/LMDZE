@@ -355,9 +355,10 @@ contains
                yt(:knon, :), yq(:knon, :), yts(:knon), ypaprs(:knon, :), &
                ypplay(:knon, :), ydelp, yrads(:knon), yalb(:knon), &
                snow(:knon), yqsurf, yrain_f, ysnow_f, yfluxlat(:knon), &
-               pctsrf_new_sic, yagesno(:knon), y_d_t, y_d_q, y_d_ts(:knon), &
-               yz0_new, y_flux_t(:knon), y_flux_q(:knon), y_dflux_t(:knon), &
-               y_dflux_q(:knon), y_fqcalving(:knon), y_ffonte, y_run_off_lic_0)
+               pctsrf_new_sic, yagesno(:knon), y_d_t(:knon, :), &
+               y_d_q(:knon, :), y_d_ts(:knon), yz0_new, y_flux_t(:knon), &
+               y_flux_q(:knon), y_dflux_t(:knon), y_dflux_q(:knon), &
+               y_fqcalving(:knon), y_ffonte, y_run_off_lic_0)
 
           ! calculer la longueur de rugosite sur ocean
           yrugm = 0.

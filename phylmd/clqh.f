@@ -70,8 +70,8 @@ contains
     real, intent(out):: fluxlat(:) ! (knon)
     real, intent(in):: pctsrf_new_sic(:) ! (klon)
     REAL, intent(inout):: agesno(:) ! (knon)
-    REAL d_t(klon, klev) ! incrementation de "t"
-    REAL d_q(klon, klev) ! incrementation de "q"
+    REAL, intent(out):: d_t(:, :) ! (knon, klev) incrementation de "t"
+    REAL, intent(out):: d_q(:, :) ! (knon, klev) incrementation de "q"
     REAL, intent(out):: d_ts(:) ! (knon) variation of surface temperature
     real z0_new(klon)
 
@@ -95,12 +95,10 @@ contains
     REAL run_off_lic_0(klon)! runof glacier au pas de temps precedent
 
     ! Local:
-
     INTEGER knon
     REAL evap(size(knindex)) ! (knon) evaporation au sol
-
     INTEGER i, k
-    REAL cq(klon, klev), dq(klon, klev), zx_ch(klon, klev), zx_dh(klon, klev)
+    REAL, dimension(size(knindex), klev):: cq, dq, ch, dh ! (knon, klev)
     REAL buf1(klon), buf2(klon)
     REAL zx_coef(size(knindex), 2:klev) ! (knon, 2:klev)
     REAL h(size(knindex), klev) ! (knon, klev) enthalpie potentielle
@@ -115,10 +113,6 @@ contains
     ! contre-gradient pour la chaleur sensible, en K m-1
 
     REAL gamah(size(knindex), 2:klev) ! (knon, 2:klev)
-    real temp_air(klon), spechum(klon)
-    real petAcoef(klon), peqAcoef(klon)
-    real petBcoef(klon), peqBcoef(klon)
-    real p1lay(klon)
     real tsurf_new(size(knindex)) ! (knon)
     real zzpk
 
@@ -143,7 +137,6 @@ contains
          * (paprs(:, k) * 2 / (t(:, k) + t(:, k - 1)) / RD)**2 * dtime * RG
 
     ! Preparer les flux lies aux contre-gardients
-
     forall (k = 2:klev) gamah(:, k) = gamt(:, k) * (RD * (t(:, k - 1) &
          + t(:, k)) / 2. / RG / paprs(:, k) * (pplay(:, k - 1) - pplay(:, k))) &
          * RCPD * (psref(:) / paprs(:, k))**RKAPPA
@@ -155,9 +148,9 @@ contains
 
        zzpk=(pplay(i, klev) / psref(i))**RKAPPA
        buf2(i) = zzpk * delp(i, klev) + zx_coef(i, klev)
-       zx_ch(i, klev) = (h(i, klev) * zzpk * delp(i, klev) &
+       ch(i, klev) = (h(i, klev) * zzpk * delp(i, klev) &
             - zx_coef(i, klev) * gamah(i, klev)) / buf2(i)
-       zx_dh(i, klev) = zx_coef(i, klev) / buf2(i)
+       dh(i, klev) = zx_coef(i, klev) / buf2(i)
     ENDDO
 
     DO k = klev - 1, 2, - 1
@@ -170,12 +163,12 @@ contains
 
           zzpk=(pplay(i, k) / psref(i))**RKAPPA
           buf2(i) = zzpk * delp(i, k) + zx_coef(i, k) &
-               + zx_coef(i, k + 1) * (1. - zx_dh(i, k + 1))
-          zx_ch(i, k) = (h(i, k) * zzpk * delp(i, k) &
-               + zx_coef(i, k + 1) * zx_ch(i, k + 1) &
+               + zx_coef(i, k + 1) * (1. - dh(i, k + 1))
+          ch(i, k) = (h(i, k) * zzpk * delp(i, k) &
+               + zx_coef(i, k + 1) * ch(i, k + 1) &
                + zx_coef(i, k + 1) * gamah(i, k + 1) &
                - zx_coef(i, k) * gamah(i, k)) / buf2(i)
-          zx_dh(i, k) = zx_coef(i, k) / buf2(i)
+          dh(i, k) = zx_coef(i, k) / buf2(i)
        ENDDO
     ENDDO
 
@@ -186,55 +179,32 @@ contains
        dq(i, 1) = - 1. * RG / buf1(i)
 
        zzpk=(pplay(i, 1) / psref(i))**RKAPPA
-       buf2(i) = zzpk * delp(i, 1) + zx_coef(i, 2) * (1. - zx_dh(i, 2))
-       zx_ch(i, 1) = (h(i, 1) * zzpk * delp(i, 1) &
-            + zx_coef(i, 2) * (gamah(i, 2) + zx_ch(i, 2))) / buf2(i)
-       zx_dh(i, 1) = - 1. * RG / buf2(i)
+       buf2(i) = zzpk * delp(i, 1) + zx_coef(i, 2) * (1. - dh(i, 2))
+       ch(i, 1) = (h(i, 1) * zzpk * delp(i, 1) &
+            + zx_coef(i, 2) * (gamah(i, 2) + ch(i, 2))) / buf2(i)
+       dh(i, 1) = - 1. * RG / buf2(i)
     ENDDO
 
-    ! Initialisation
-    petAcoef =0. 
-    peqAcoef = 0.
-    petBcoef =0.
-    peqBcoef = 0.
-    p1lay =0.
-
-    petAcoef(1:knon) = zx_ch(1:knon, 1)
-    peqAcoef(1:knon) = cq(1:knon, 1)
-    petBcoef(1:knon) = zx_dh(1:knon, 1)
-    peqBcoef(1:knon) = dq(1:knon, 1)
-    temp_air(1:knon) = t(:, 1)
-    spechum(1:knon) = q(:, 1)
-    p1lay(1:knon) = pplay(:, 1)
-
     CALL interfsurf_hq(dtime, julien, rmu0, nisurf, knindex, debut, tsoil, &
-         qsol, u1lay, v1lay, temp_air, spechum, tq_cdrag(:knon), petAcoef, &
-         peqAcoef, petBcoef, peqBcoef, precip_rain, precip_snow, rugos, &
-         rugoro, snow, qsurf, ts, p1lay, psref, radsol, evap, flux_t, fluxlat, &
-         dflux_l, dflux_s, tsurf_new, albedo, z0_new, pctsrf_new_sic, agesno, &
-         fqcalving, ffonte, run_off_lic_0)
+         qsol, u1lay, v1lay, t(:, 1), q(:, 1), tq_cdrag(:knon), ch(:, 1), &
+         cq(:, 1), dh(:, 1), dq(:, 1), precip_rain, precip_snow, rugos, &
+         rugoro, snow, qsurf, ts, pplay(:, 1), psref, radsol, evap, flux_t, &
+         fluxlat, dflux_l, dflux_s, tsurf_new, albedo, z0_new, pctsrf_new_sic, &
+         agesno, fqcalving, ffonte, run_off_lic_0)
 
     flux_q = - evap
     d_ts = tsurf_new - ts
 
-    DO i = 1, knon
-       h(i, 1) = zx_ch(i, 1) + zx_dh(i, 1) * flux_t(i) * dtime
-       local_q(i, 1) = cq(i, 1) + dq(i, 1) * flux_q(i) * dtime
-    ENDDO
+    h(:, 1) = ch(:, 1) + dh(:, 1) * flux_t * dtime
+    local_q(:, 1) = cq(:, 1) + dq(:, 1) * flux_q * dtime
+
     DO k = 2, klev
-       DO i = 1, knon
-          local_q(i, k) = cq(i, k) + dq(i, k) * local_q(i, k - 1)
-          h(i, k) = zx_ch(i, k) + zx_dh(i, k) * h(i, k - 1)
-       ENDDO
+       h(:, k) = ch(:, k) + dh(:, k) * h(:, k - 1)
+       local_q(:, k) = cq(:, k) + dq(:, k) * local_q(:, k - 1)
     ENDDO
 
-    ! Calcul des tendances
-    DO k = 1, klev
-       DO i = 1, knon
-          d_t(i, k) = h(i, k) / pkf(i, k) / RCPD - t(i, k)
-          d_q(i, k) = local_q(i, k) - q(i, k)
-       ENDDO
-    ENDDO
+    d_t = h / pkf / RCPD - t
+    d_q = local_q - q
 
   END SUBROUTINE clqh
 

@@ -48,15 +48,14 @@ contains
 
     real, intent(IN):: u1_lay(:), v1_lay(:) ! (knon) vitesse 1ere couche
 
-    real, dimension(klon), intent(IN):: temp_air, spechum
-    ! temp_air temperature de l'air 1ere couche
-    ! spechum humidite specifique 1ere couche
+    real, intent(IN):: temp_air(:) ! (knon) temperature de l'air 1ere couche
+    real, intent(IN):: spechum(:) ! (knon) humidite specifique 1ere couche
     real, intent(IN):: tq_cdrag(:) ! (knon) coefficient d'echange
 
-    real, dimension(klon), intent(IN):: petAcoef, peqAcoef
+    real, intent(IN):: petAcoef(:), peqAcoef(:) ! (knon)
     ! coefficients A de la r\'esolution de la couche limite pour t et q
 
-    real, dimension(klon), intent(IN):: petBcoef, peqBcoef
+    real, intent(IN):: petBcoef(:), peqBcoef(:) ! (knon)
     ! coefficients B de la r\'esolution de la couche limite pour t et q
 
     real, intent(IN):: precip_rain(klon)
@@ -70,7 +69,7 @@ contains
     real, intent(INOUT):: snow(:) ! (knon)
     real, intent(INOUT):: qsurf(klon)
     real, intent(IN):: ts(:) ! (knon) temp\'erature de surface
-    real, intent(IN):: p1lay(klon) ! pression 1er niveau (milieu de couche)
+    real, intent(IN):: p1lay(:) ! (knon) pression 1er niveau (milieu de couche)
     real, intent(IN):: ps(:) ! (knon) pression au sol
     REAL, INTENT(IN):: radsol(:) ! (knon) rayonnement net au sol (LW + SW)
     real, intent(OUT):: evap(:) ! (knon) evaporation totale
@@ -165,11 +164,10 @@ contains
        CALL soil(dtime, is_ter, snow, ts, tsoil, soilcap, soilflux)
        cal = RCPD / soilcap
 
-       CALL calcul_fluxs(dtime, ts, p1lay(:knon), cal, beta, tq_cdrag, ps, &
-            qsurf(:knon), radsol + soilflux, dif_grnd(:knon), temp_air(:knon), &
-            spechum(:knon), u1_lay, v1_lay, petAcoef(:knon), peqAcoef(:knon), &
-            petBcoef(:knon), peqBcoef(:knon), tsurf_new, evap, fluxlat, &
-            flux_t, dflux_s, dflux_l)
+       CALL calcul_fluxs(dtime, ts, p1lay, cal, beta, tq_cdrag, ps, &
+            qsurf(:knon), radsol + soilflux, dif_grnd(:knon), temp_air, &
+            spechum, u1_lay, v1_lay, petAcoef, peqAcoef, petBcoef, &
+            peqBcoef, tsurf_new, evap, fluxlat, flux_t, dflux_s, dflux_l)
        CALL fonte_neige(is_ter, dtime, precip_rain(:knon), precip_snow(:knon), &
             snow, qsol, tsurf_new, evap, fqcalving, ffonte(:knon), &
             run_off_lic_0(:knon))
@@ -186,11 +184,10 @@ contains
        cal = 0.
        beta = 1.
        dif_grnd = 0.
-       call calcul_fluxs(dtime, tsurf, p1lay(:knon), cal, beta, tq_cdrag, ps, &
-            qsurf(:knon), radsol, dif_grnd(:knon), temp_air(:knon), &
-            spechum(:knon), u1_lay, v1_lay, petAcoef(:knon), peqAcoef(:knon), &
-            petBcoef(:knon), peqBcoef(:knon), tsurf_new, evap, fluxlat, &
-            flux_t, dflux_s, dflux_l)
+       call calcul_fluxs(dtime, tsurf, p1lay, cal, beta, tq_cdrag, ps, &
+            qsurf(:knon), radsol, dif_grnd(:knon), temp_air, spechum, u1_lay, &
+            v1_lay, petAcoef, peqAcoef, petBcoef, peqBcoef, tsurf_new, evap, &
+            fluxlat, flux_t, dflux_s, dflux_l)
        agesno = 0.
        albedo = alboc_cd(rmu0(knindex)) * fmagic
        z0_new = sqrt(rugos**2 + rugoro**2)
@@ -214,11 +211,10 @@ contains
        tsurf = tsurf_new
        beta = 1.
 
-       CALL calcul_fluxs(dtime, tsurf, p1lay(:knon), cal, beta, tq_cdrag, ps, &
-            qsurf(:knon), radsol + soilflux, dif_grnd(:knon), temp_air(:knon), &
-            spechum(:knon), u1_lay, v1_lay, petAcoef(:knon), peqAcoef(:knon), &
-            petBcoef(:knon), peqBcoef(:knon), tsurf_new, evap, fluxlat, &
-            flux_t, dflux_s, dflux_l)
+       CALL calcul_fluxs(dtime, tsurf, p1lay, cal, beta, tq_cdrag, ps, &
+            qsurf(:knon), radsol + soilflux, dif_grnd(:knon), temp_air, &
+            spechum, u1_lay, v1_lay, petAcoef, peqAcoef, petBcoef, &
+            peqBcoef, tsurf_new, evap, fluxlat, flux_t, dflux_s, dflux_l)
        CALL fonte_neige(is_sic, dtime, precip_rain(:knon), &
             precip_snow(:knon), snow, qsol, tsurf_new, evap, &
             fqcalving, ffonte(:knon), run_off_lic_0(:knon))
@@ -239,11 +235,10 @@ contains
        beta = 1.
        dif_grnd = 0.
 
-       call calcul_fluxs(dtime, ts, p1lay(:knon), cal, beta, tq_cdrag, ps, &
-            qsurf(:knon), radsol + soilflux, dif_grnd(:knon), temp_air(:knon), &
-            spechum(:knon), u1_lay, v1_lay, petAcoef(:knon), peqAcoef(:knon), &
-            petBcoef(:knon), peqBcoef(:knon), tsurf_new, evap, fluxlat, &
-            flux_t, dflux_s, dflux_l)
+       call calcul_fluxs(dtime, ts, p1lay, cal, beta, tq_cdrag, ps, &
+            qsurf(:knon), radsol + soilflux, dif_grnd(:knon), temp_air, &
+            spechum, u1_lay, v1_lay, petAcoef, peqAcoef, petBcoef, &
+            peqBcoef, tsurf_new, evap, fluxlat, flux_t, dflux_s, dflux_l)
        call fonte_neige(is_lic, dtime, precip_rain(:knon), &
             precip_snow(:knon), snow, qsol, tsurf_new, evap, &
             fqcalving, ffonte(:knon), run_off_lic_0(:knon))
