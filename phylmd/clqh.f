@@ -98,9 +98,9 @@ contains
     REAL run_off_lic_0(klon)! runof glacier au pas de temps precedent
 
     ! Local:
-    INTEGER knon
+
+    INTEGER knon, k
     REAL evap(size(knindex)) ! (knon) evaporation au sol
-    INTEGER i, k
     REAL, dimension(size(knindex), klev):: cq, dq, ch, dh ! (knon, klev)
     REAL buf1(size(knindex)), buf2(size(knindex))
     REAL zx_coef(size(knindex), 2:klev) ! (knon, 2:klev)
@@ -143,45 +143,39 @@ contains
          + t(:, k)) / 2. / RG / paprs(:, k) * (pplay(:, k - 1) - pplay(:, k))) &
          * RCPD * (psref / paprs(:, k))**RKAPPA
 
-    DO i = 1, knon
-       buf1(i) = zx_coef(i, klev) + delp(i, klev)
-       cq(i, klev) = q(i, klev) * delp(i, klev) / buf1(i)
-       dq(i, klev) = zx_coef(i, klev) / buf1(i)
+    buf1 = zx_coef(:, klev) + delp(:, klev)
+    cq(:, klev) = q(:, klev) * delp(:, klev) / buf1
+    dq(:, klev) = zx_coef(:, klev) / buf1
 
-       buf2(i) = delp(i, klev) / pkf(i, klev) + zx_coef(i, klev)
-       ch(i, klev) = (h(i, klev) / pkf(i, klev) * delp(i, klev) &
-            - zx_coef(i, klev) * gamah(i, klev)) / buf2(i)
-       dh(i, klev) = zx_coef(i, klev) / buf2(i)
-    ENDDO
+    buf2 = delp(:, klev) / pkf(:, klev) + zx_coef(:, klev)
+    ch(:, klev) = (h(:, klev) / pkf(:, klev) * delp(:, klev) &
+         - zx_coef(:, klev) * gamah(:, klev)) / buf2
+    dh(:, klev) = zx_coef(:, klev) / buf2
 
     DO k = klev - 1, 2, - 1
-       DO i = 1, knon
-          buf1(i) = delp(i, k) + zx_coef(i, k) &
-               + zx_coef(i, k + 1) * (1. - dq(i, k + 1))
-          cq(i, k) = (q(i, k) * delp(i, k) &
-               + zx_coef(i, k + 1) * cq(i, k + 1)) / buf1(i)
-          dq(i, k) = zx_coef(i, k) / buf1(i)
+       buf1 = delp(:, k) + zx_coef(:, k) &
+            + zx_coef(:, k + 1) * (1. - dq(:, k + 1))
+       cq(:, k) = (q(:, k) * delp(:, k) &
+            + zx_coef(:, k + 1) * cq(:, k + 1)) / buf1
+       dq(:, k) = zx_coef(:, k) / buf1
 
-          buf2(i) = delp(i, k) / pkf(i, k) + zx_coef(i, k) &
-               + zx_coef(i, k + 1) * (1. - dh(i, k + 1))
-          ch(i, k) = (h(i, k) / pkf(i, k) * delp(i, k) &
-               + zx_coef(i, k + 1) * ch(i, k + 1) &
-               + zx_coef(i, k + 1) * gamah(i, k + 1) &
-               - zx_coef(i, k) * gamah(i, k)) / buf2(i)
-          dh(i, k) = zx_coef(i, k) / buf2(i)
-       ENDDO
+       buf2 = delp(:, k) / pkf(:, k) + zx_coef(:, k) &
+            + zx_coef(:, k + 1) * (1. - dh(:, k + 1))
+       ch(:, k) = (h(:, k) / pkf(:, k) * delp(:, k) &
+            + zx_coef(:, k + 1) * ch(:, k + 1) &
+            + zx_coef(:, k + 1) * gamah(:, k + 1) &
+            - zx_coef(:, k) * gamah(:, k)) / buf2
+       dh(:, k) = zx_coef(:, k) / buf2
     ENDDO
 
-    DO i = 1, knon
-       buf1(i) = delp(i, 1) + zx_coef(i, 2) * (1. - dq(i, 2))
-       cq(i, 1) = (q(i, 1) * delp(i, 1) + zx_coef(i, 2) * cq(i, 2)) / buf1(i)
-       dq(i, 1) = - 1. * RG / buf1(i)
+    buf1 = delp(:, 1) + zx_coef(:, 2) * (1. - dq(:, 2))
+    cq(:, 1) = (q(:, 1) * delp(:, 1) + zx_coef(:, 2) * cq(:, 2)) / buf1
+    dq(:, 1) = - 1. * RG / buf1
 
-       buf2(i) = delp(i, 1) / pkf(i, 1) + zx_coef(i, 2) * (1. - dh(i, 2))
-       ch(i, 1) = (h(i, 1) / pkf(i, 1) * delp(i, 1) &
-            + zx_coef(i, 2) * (gamah(i, 2) + ch(i, 2))) / buf2(i)
-       dh(i, 1) = - 1. * RG / buf2(i)
-    ENDDO
+    buf2 = delp(:, 1) / pkf(:, 1) + zx_coef(:, 2) * (1. - dh(:, 2))
+    ch(:, 1) = (h(:, 1) / pkf(:, 1) * delp(:, 1) &
+         + zx_coef(:, 2) * (gamah(:, 2) + ch(:, 2))) / buf2
+    dh(:, 1) = - 1. * RG / buf2
 
     CALL interfsurf_hq(dtime, julien, rmu0, nisurf, knindex, debut, tsoil, &
          qsol, u1lay, v1lay, t(:, 1), q(:, 1), tq_cdrag(:knon), ch(:, 1), &
