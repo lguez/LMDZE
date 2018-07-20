@@ -24,7 +24,7 @@ contains
 
     logical, intent(IN):: debut ! premier appel \`a la physique (initialisation)
     real, intent(out):: albedo(:) ! (knon) albedo lu
-    real, intent(out):: z0_new(:) ! (klon) longueur de rugosit\'e lue
+    real, intent(out):: z0_new(:) ! (knon) longueur de rugosit\'e lue
 
     ! Local:
 
@@ -75,8 +75,7 @@ contains
 
     ! Recopie des variables dans les champs de sortie
     albedo = alb_lu(knindex)
-    z0_new(:knon) = rug_lu(knindex)
-    z0_new(knon + 1:) = 999999.
+    z0_new = rug_lu(knindex)
 
   END SUBROUTINE interfsur_lim
 

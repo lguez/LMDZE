@@ -30,8 +30,8 @@ contains
     ! column-density of water in soil, in kg m-2
 
     real, intent(in):: rmu0(klon) ! cosinus de l'angle solaire zenithal
-    real rugos(klon) ! rugosite
-    REAL rugoro(klon)
+    real, intent(in):: rugos(:) ! (knon) rugosite
+    REAL, intent(in):: rugoro(:) ! (knon)
 
     REAL, intent(in):: u1lay(:), v1lay(:) ! (knon)
     ! vitesse de la 1ere couche (m / s)
@@ -73,7 +73,7 @@ contains
     REAL, intent(out):: d_t(:, :) ! (knon, klev) incrementation de "t"
     REAL, intent(out):: d_q(:, :) ! (knon, klev) incrementation de "q"
     REAL, intent(out):: d_ts(:) ! (knon) variation of surface temperature
-    real z0_new(klon)
+    real, intent(out):: z0_new(:) ! (knon)
 
     REAL, intent(out):: flux_t(:) ! (knon)
     ! (diagnostic) flux de chaleur sensible (Cp T) à la surface,

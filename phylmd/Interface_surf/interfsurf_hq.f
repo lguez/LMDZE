@@ -64,8 +64,8 @@ contains
     real, intent(IN):: precip_snow(klon)
     ! precipitation, solid water mass flux (kg / m2 / s), positive down
 
-    real, intent(IN):: rugos(klon) ! rugosite
-    real, intent(IN):: rugoro(klon) ! rugosite orographique
+    real, intent(IN):: rugos(:) ! (knon) rugosite
+    real, intent(IN):: rugoro(:) ! (knon) rugosite orographique
     real, intent(INOUT):: snow(:) ! (knon)
     real, intent(INOUT):: qsurf(klon)
     real, intent(IN):: ts(:) ! (knon) temp\'erature de surface
@@ -81,19 +81,19 @@ contains
     real, intent(OUT):: dflux_l(:), dflux_s(:) ! (knon)
     real, intent(OUT):: tsurf_new(:) ! (knon) temp\'erature au sol
     real, intent(OUT):: albedo(:) ! (knon) albedo
-    real, intent(OUT):: z0_new(klon) ! surface roughness
+    real, intent(OUT):: z0_new(:) ! (knon) surface roughness
 
     real, intent(in):: pctsrf_new_sic(:) ! (klon) 
     ! nouvelle repartition des surfaces
 
     real, intent(INOUT):: agesno(:) ! (knon)
 
+    real, intent(OUT):: fqcalving(:) ! (knon)
     ! Flux d'eau "perdue" par la surface et n\'ecessaire pour limiter la
     ! hauteur de neige, en kg / m2 / s
-    real, intent(OUT):: fqcalving(:) ! (knon)
 
-    ! Flux thermique utiliser pour fondre la neige
     real, dimension(klon), intent(INOUT):: ffonte
+    ! Flux thermique utiliser pour fondre la neige
 
     real, dimension(klon), intent(INOUT):: run_off_lic_0
     ! run_off_lic_0 runoff glacier du pas de temps precedent
@@ -144,7 +144,6 @@ contains
 
     ffonte(1:knon) = 0.
     dif_grnd = 999999.
-    z0_new = 999999.
 
     ! Aiguillage vers les differents schemas de surface
 
