@@ -217,8 +217,6 @@ contains
     yv = 0.
     yt = 0.
     yq = 0.
-    y_dflux_t = 0.
-    y_dflux_q = 0.
     yrugoro = 0.
     d_ts = 0.
     flux_t = 0.
@@ -353,16 +351,18 @@ contains
                ytsoil(:knon, :), yqsol(:knon), mu0, yrugos(:knon), &
                yrugoro(:knon), yu(:knon, 1), yv(:knon, 1), ycoefh(:knon, :), &
                ycdragh(:knon), yt(:knon, :), yq(:knon, :), yts(:knon), &
-               ypaprs(:knon, :), ypplay(:knon, :), ydelp, yrads(:knon), &
-               yalb(:knon), snow(:knon), yqsurf, yrain_f, ysnow_f, &
-               yfluxlat(:knon), pctsrf_new_sic, yagesno(:knon), &
+               ypaprs(:knon, :), ypplay(:knon, :), ydelp(:knon, :), &
+               yrads(:knon), yalb(:knon), snow(:knon), yqsurf(:knon), yrain_f, &
+               ysnow_f, yfluxlat(:knon), pctsrf_new_sic, yagesno(:knon), &
                y_d_t(:knon, :), y_d_q(:knon, :), y_d_ts(:knon), &
                yz0_new(:knon), y_flux_t(:knon), y_flux_q(:knon), &
                y_dflux_t(:knon), y_dflux_q(:knon), y_fqcalving(:knon), &
                y_ffonte, y_run_off_lic_0)
 
           ! calculer la longueur de rugosite sur ocean
+
           yrugm = 0.
+
           IF (nsrf == is_oce) THEN
              DO j = 1, knon
                 yrugm(j) = 0.018 * ycdragm(j) * (yu(j, 1)**2 + yv(j, 1)**2) &
@@ -371,10 +371,6 @@ contains
                 yrugm(j) = max(1.5E-05, yrugm(j))
              END DO
           END IF
-          DO j = 1, knon
-             y_dflux_t(j) = y_dflux_t(j) * ypct(j)
-             y_dflux_q(j) = y_dflux_q(j) * ypct(j)
-          END DO
 
           DO k = 1, klev
              DO j = 1, knon
@@ -414,8 +410,8 @@ contains
              ffonte(i, nsrf) = y_ffonte(j)
              cdragh(i) = cdragh(i) + ycdragh(j) * ypct(j)
              cdragm(i) = cdragm(i) + ycdragm(j) * ypct(j)
-             dflux_t(i) = dflux_t(i) + y_dflux_t(j)
-             dflux_q(i) = dflux_q(i) + y_dflux_q(j)
+             dflux_t(i) = dflux_t(i) + y_dflux_t(j) * ypct(j)
+             dflux_q(i) = dflux_q(i) + y_dflux_q(j) * ypct(j)
           END DO
           IF (nsrf == is_ter) THEN
              qsol(ni(:knon)) = yqsol(:knon)

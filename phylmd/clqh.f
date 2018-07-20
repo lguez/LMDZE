@@ -52,14 +52,17 @@ contains
     REAL, intent(in):: pplay(:, :) ! (knon, klev)
     ! pression au milieu de couche (Pa)
 
-    REAL delp(klon, klev) ! epaisseur de couche en pression (Pa)
+    REAL, intent(in):: delp(:, :) ! (knon, klev)
+    ! epaisseur de couche en pression (Pa)
 
     REAL, intent(in):: radsol(:) ! (knon)
     ! rayonnement net au sol (Solaire + IR) W / m2
 
     REAL, intent(inout):: albedo(:) ! (knon) albedo de la surface
     REAL, intent(inout):: snow(:) ! (knon) ! hauteur de neige
-    REAL qsurf(klon) ! humidite de l'air au dessus de la surface
+
+    REAL, intent(out):: qsurf(:) ! (knon)
+    ! humidite de l'air au dessus de la surface
 
     real, intent(in):: precip_rain(klon)
     ! liquid water mass flux (kg / m2 / s), positive down
@@ -82,8 +85,8 @@ contains
     REAL, intent(out):: flux_q(:) ! (knon)
     ! flux de la vapeur d'eau à la surface, en kg / (m**2 s)
 
-    REAL dflux_s(:) ! (knon) derivee du flux sensible dF / dTs
-    REAL dflux_l(:) ! (knon) derivee du flux latent dF / dTs
+    REAL, intent(out):: dflux_s(:) ! (knon) derivee du flux sensible dF / dTs
+    REAL, intent(out):: dflux_l(:) ! (knon) derivee du flux latent dF / dTs
 
     REAL, intent(out):: fqcalving(:) ! (knon)
     ! Flux d'eau "perdue" par la surface et n\'ecessaire pour que limiter la
@@ -99,7 +102,7 @@ contains
     REAL evap(size(knindex)) ! (knon) evaporation au sol
     INTEGER i, k
     REAL, dimension(size(knindex), klev):: cq, dq, ch, dh ! (knon, klev)
-    REAL buf1(klon), buf2(klon)
+    REAL buf1(size(knindex)), buf2(size(knindex))
     REAL zx_coef(size(knindex), 2:klev) ! (knon, 2:klev)
     REAL h(size(knindex), klev) ! (knon, klev) enthalpie potentielle
     REAL local_q(size(knindex), klev) ! (knon, klev)
