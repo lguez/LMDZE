@@ -8,15 +8,17 @@ contains
 
     ! From dyn3d/dissip.F, version 1.1.1.1 2004/05/19 12:53:05
     ! Author: P. Le Van
-    ! Objet : calcul de la dissipation horizontale
-    ! Avec opérateurs star : gradiv2, divgrad2, nxgraro2
+    
+    ! Objet : calcul de la dissipation horizontale. Avec op\'erateurs
+    ! star : gradiv2, divgrad2, nxgraro2.
+
+    use nr_util, only: assert
 
     USE comdissnew, ONLY: nitergdiv, nitergrot, niterh
     USE dimensions, ONLY: iim, jjm, llm
     use divgrad2_m, only: divgrad2
     use gradiv2_m, only: gradiv2
     USE inidissip_m, ONLY: dtdiss, tetah, tetaudiv, tetaurot, cdivu, crot, cdivh
-    use nr_util, only: assert
     use nxgraro2_m, only: nxgraro2
 
     REAL, intent(in):: vcov(:, :, :) ! (iim + 1, jjm, llm)
@@ -54,7 +56,7 @@ contains
        dv(:, :, l) = - tedt(l) * gdy(:, :, l)
     END forall
 
-    ! Calcul de la partie n X grad(rot) :
+    ! Calcul de la partie n \wedge grad(rot) :
     CALL nxgraro2(ucov, vcov, nitergrot, gdx, gdy, crot)
     tedt = tetaurot * dtdiss
     forall (l = 1: llm)

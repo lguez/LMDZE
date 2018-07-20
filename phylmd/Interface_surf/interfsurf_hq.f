@@ -91,7 +91,7 @@ contains
 
     ! Flux d'eau "perdue" par la surface et n\'ecessaire pour limiter la
     ! hauteur de neige, en kg / m2 / s
-    real, dimension(klon), intent(INOUT):: fqcalving
+    real, intent(OUT):: fqcalving(:) ! (knon)
 
     ! Flux thermique utiliser pour fondre la neige
     real, dimension(klon), intent(INOUT):: ffonte
@@ -144,7 +144,6 @@ contains
     ! Initialisations diverses
 
     ffonte(1:knon) = 0.
-    fqcalving(1:knon) = 0.
     dif_grnd = 999999.
     z0_new = 999999.
 
@@ -173,7 +172,7 @@ contains
             peqBcoef(:knon), tsurf_new, evap, fluxlat, flux_t, dflux_s, dflux_l)
        CALL fonte_neige(is_ter, dtime, precip_rain(:knon), &
             precip_snow(:knon), snow, qsol, tsurf_new, evap, &
-            fqcalving(:knon), ffonte(:knon), run_off_lic_0(:knon))
+            fqcalving, ffonte(:knon), run_off_lic_0(:knon))
 
        call albsno(dtime, agesno, alb_neig, precip_snow(:knon))
        where (snow < 0.0001) agesno = 0.
@@ -195,6 +194,7 @@ contains
        agesno = 0.
        albedo = alboc_cd(rmu0(knindex)) * fmagic
        z0_new = sqrt(rugos**2 + rugoro**2)
+       fqcalving = 0.
     case (is_sic)
        ! Surface "glace de mer" appel a l'interface avec l'ocean
 
@@ -221,7 +221,7 @@ contains
             peqBcoef(:knon), tsurf_new, evap, fluxlat, flux_t, dflux_s, dflux_l)
        CALL fonte_neige(is_sic, dtime, precip_rain(:knon), &
             precip_snow(:knon), snow, qsol, tsurf_new, evap, &
-            fqcalving(:knon), ffonte(:knon), run_off_lic_0(:knon))
+            fqcalving, ffonte(:knon), run_off_lic_0(:knon))
 
        ! Compute the albedo:
 
@@ -246,7 +246,7 @@ contains
             peqBcoef(:knon), tsurf_new, evap, fluxlat, flux_t, dflux_s, dflux_l)
        call fonte_neige(is_lic, dtime, precip_rain(:knon), &
             precip_snow(:knon), snow, qsol, tsurf_new, evap, &
-            fqcalving(:knon), ffonte(:knon), run_off_lic_0(:knon))
+            fqcalving, ffonte(:knon), run_off_lic_0(:knon))
 
        ! calcul albedo
        CALL albsno(dtime, agesno, alb_neig, precip_snow(:knon))

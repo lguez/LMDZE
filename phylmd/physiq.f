@@ -187,11 +187,11 @@ contains
     REAL, save:: ffonte(klon, nbsrf)
     ! flux thermique utilise pour fondre la neige
 
-    REAL, save:: fqcalving(klon, nbsrf)
-    ! flux d'eau "perdue" par la surface et necessaire pour limiter la
-    ! hauteur de neige, en kg / m2 / s
+    REAL fqcalving(klon, nbsrf)
+    ! flux d'eau "perdue" par la surface et n\'ecessaire pour limiter
+    ! la hauteur de neige, en kg / m2 / s
 
-    REAL zxffonte(klon), zxfqcalving(klon)
+    REAL zxffonte(klon)
 
     REAL, save:: pfrac_impa(klon, llm)! Produits des coefs lessivage impaction
     REAL, save:: pfrac_nucl(klon, llm)! Produits des coefs lessivage nucleation
@@ -417,7 +417,6 @@ contains
        t2m = 0.
        q2m = 0.
        ffonte = 0.
-       fqcalving = 0.
        rain_con = 0.
        snow_con = 0.
        d_u_con = 0.
@@ -587,7 +586,6 @@ contains
     u10m = sum(u10m_srf * pctsrf, dim = 2)
     v10m = sum(v10m_srf * pctsrf, dim = 2)
     zxffonte = sum(ffonte * pctsrf, dim = 2)
-    zxfqcalving = sum(fqcalving * pctsrf, dim = 2)
     s_pblh = sum(pblh * pctsrf, dim = 2)
     s_lcl = sum(plcl * pctsrf, dim = 2)
     s_capCL = sum(capCL * pctsrf, dim = 2)
@@ -606,7 +604,6 @@ contains
              u10m_srf(i, nsrf) = u10m(i)
              v10m_srf(i, nsrf) = v10m(i)
              ffonte(i, nsrf) = zxffonte(i)
-             fqcalving(i, nsrf) = zxfqcalving(i)
              pblh(i, nsrf) = s_pblh(i)
              plcl(i, nsrf) = s_lcl(i)
              capCL(i, nsrf) = s_capCL(i)
@@ -1013,6 +1010,7 @@ contains
     CALL histwrite_phy("dtsvdft", d_ts(:, is_ter))
     CALL histwrite_phy("dtsvdfg", d_ts(:, is_lic))
     CALL histwrite_phy("dtsvdfi", d_ts(:, is_sic))
+    CALL histwrite_phy("zxfqcalving", sum(fqcalving * pctsrf, dim = 2))
 
     DO nsrf = 1, nbsrf
        CALL histwrite_phy("pourc_"//clnsurf(nsrf), pctsrf(:, nsrf) * 100.)

@@ -12,7 +12,7 @@ contains
        oliqcl, cteicl, pblt, therm, plcl, fqcalving, ffonte, run_off_lic_0)
 
     ! From phylmd/clmain.F, version 1.6, 2005/11/16 14:47:19
-    ! Author: Z. X. Li (LMD/CNRS), date: 1993/08/18
+    ! Author: Z. X. Li (LMD/CNRS), date: 1993 Aug. 18th
     ! Objet : interface de couche limite (diffusion verticale)
 
     ! Tout ce qui a trait aux traceurs est dans "phytrac". Le calcul
@@ -74,9 +74,8 @@ contains
     real agesno(klon, nbsrf)
     REAL, INTENT(IN):: rugoro(klon)
 
-    REAL d_t(klon, klev), d_q(klon, klev)
-    ! d_t------output-R- le changement pour "t"
-    ! d_q------output-R- le changement pour "q"
+    REAL, intent(out):: d_t(klon, klev), d_q(klon, klev)
+    ! changement pour t et q
 
     REAL, intent(out):: d_u(klon, klev), d_v(klon, klev)
     ! changement pour "u" et "v"
@@ -121,10 +120,13 @@ contains
     REAL, INTENT(inout):: pblt(klon, nbsrf) ! T au nveau HCL
     REAL therm(klon, nbsrf)
     REAL plcl(klon, nbsrf)
-    REAL fqcalving(klon, nbsrf), ffonte(klon, nbsrf)
+
+    REAL, intent(out):: fqcalving(klon, nbsrf)
+    ! flux d'eau "perdue" par la surface et necessaire pour limiter la
+    ! hauteur de neige, en kg / m2 / s
+
+    real ffonte(klon, nbsrf)
     ! ffonte----Flux thermique utilise pour fondre la neige
-    ! fqcalving-Flux d'eau "perdue" par la surface et necessaire pour limiter la
-    !           hauteur de neige, en kg / m2 / s
     REAL run_off_lic_0(klon)
 
     ! Local:
@@ -229,6 +231,7 @@ contains
     d_u = 0.
     d_v = 0.
     coefh = 0.
+    fqcalving = 0.
 
     ! Initialisation des "pourcentages potentiels". On consid\`ere ici qu'on
     ! peut avoir potentiellement de la glace sur tout le domaine oc\'eanique
@@ -353,8 +356,8 @@ contains
                yalb(:knon), snow(:knon), yqsurf, yrain_f, ysnow_f, &
                yfluxlat(:knon), pctsrf_new_sic, yagesno(:knon), y_d_t, y_d_q, &
                y_d_ts(:knon), yz0_new, y_flux_t(:knon), y_flux_q(:knon), &
-               y_dflux_t(:knon), y_dflux_q(:knon), y_fqcalving, y_ffonte, &
-               y_run_off_lic_0)
+               y_dflux_t(:knon), y_dflux_q(:knon), y_fqcalving(:knon), &
+               y_ffonte, y_run_off_lic_0)
 
           ! calculer la longueur de rugosite sur ocean
           yrugm = 0.

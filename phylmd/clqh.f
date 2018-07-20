@@ -11,7 +11,7 @@ contains
        dflux_s, dflux_l, fqcalving, ffonte, run_off_lic_0)
 
     ! Author: Z. X. Li (LMD/CNRS)
-    ! Date: 1993/08/18
+    ! Date: 1993 Aug. 18th
     ! Objet : diffusion verticale de "q" et de "h"
 
     USE conf_phys_m, ONLY: iflag_pbl
@@ -80,12 +80,12 @@ contains
     REAL dflux_s(:) ! (knon) derivee du flux sensible dF / dTs
     REAL dflux_l(:) ! (knon) derivee du flux latent dF / dTs
 
+    REAL, intent(out):: fqcalving(:) ! (knon)
     ! Flux d'eau "perdue" par la surface et n\'ecessaire pour que limiter la
     ! hauteur de neige, en kg / m2 / s
-    REAL fqcalving(klon)
 
-    ! Flux thermique utiliser pour fondre la neige
     REAL ffonte(klon)
+    ! Flux thermique utiliser pour fondre la neige
 
     REAL run_off_lic_0(klon)! runof glacier au pas de temps precedent
 
@@ -107,10 +107,12 @@ contains
     REAL psref(klon) ! pression de reference pour temperature potent.
     REAL zx_pkh(klon, klev), zx_pkf(klon, klev)
 
-    ! contre-gradient pour la vapeur d'eau: (kg / kg) / metre
-    REAL gamq(klon, 2:klev)
-    ! contre-gradient pour la chaleur sensible: Kelvin / metre
-    REAL gamt(klon, 2:klev)
+    REAL gamq(size(knindex), 2:klev) ! (knon, 2:klev)
+    ! contre-gradient pour la vapeur d'eau, en m-1
+
+    REAL gamt(size(knindex), 2:klev) ! (knon, 2:klev)
+    ! contre-gradient pour la chaleur sensible, en K m-1
+
     REAL z_gamaq(klon, 2:klev), z_gamah(klon, 2:klev)
     REAL zdelz
 
@@ -126,28 +128,17 @@ contains
 
     knon = size(knindex)
 
+    gamq= 0.
+
     if (iflag_pbl == 1) then
-       do k = 3, klev
-          do i = 1, knon
-             gamq(i, k)= 0.0
-             gamt(i, k)= - 1.0e-03
-          enddo
-       enddo
-       do i = 1, knon
-          gamq(i, 2) = 0.0
-          gamt(i, 2) = - 2.5e-03
-       enddo
+       gamt(:, 2) = - 2.5e-3
+       gamt(:, 3:)= - 1e-3
     else
-       do k = 2, klev
-          do i = 1, knon
-             gamq(i, k) = 0.0
-             gamt(i, k) = 0.0
-          enddo
-       enddo
+       gamt = 0.
     endif
 
     DO i = 1, knon
-       psref(i) = paprs(i, 1) !pression de reference est celle au sol
+       psref(i) = paprs(i, 1) ! pression de reference est celle au sol
     ENDDO
     DO k = 1, klev
        DO i = 1, knon
@@ -178,6 +169,7 @@ contains
           z_gamah(i, k) = gamt(i, k) * zdelz * RCPD * zx_pkh(i, k)
        ENDDO
     ENDDO
+
     DO i = 1, knon
        zx_buf1(i) = zx_coef(i, klev) + delp(i, klev)
        zx_cq(i, klev) = (local_q(i, klev) * delp(i, klev) &
@@ -190,6 +182,7 @@ contains
             - zx_coef(i, klev) * z_gamah(i, klev)) / zx_buf2(i)
        zx_dh(i, klev) = zx_coef(i, klev) / zx_buf2(i)
     ENDDO
+
     DO k = klev - 1, 2, - 1
        DO i = 1, knon
           zx_buf1(i) = delp(i, k) + zx_coef(i, k) &
@@ -223,9 +216,6 @@ contains
             + zx_coef(i, 2) * (z_gamah(i, 2) + zx_ch(i, 2))) / zx_buf2(i)
        zx_dh(i, 1) = - 1. * RG / zx_buf2(i)
     ENDDO
-
-    ! Appel \`a interfsurf (appel g\'en\'erique) routine d'interface
-    ! avec la surface
 
     ! Initialisation
     petAcoef =0. 

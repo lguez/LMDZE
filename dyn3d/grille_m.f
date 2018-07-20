@@ -1,24 +1,24 @@
 module grille_m_m
 
-  ! From grid_atob.F, v 1.1.1.1, 2004/05/19 12:53:05
-
   IMPLICIT none
 
 contains
 
   function grille_m(xdata, ydata, entree, x, y)
 
+    ! From grid_atob.F, v 1.1.1.1, 2004/05/19 12:53:05
+    
     ! Z. X. Li (1er avril 1994) (voir aussi A. Harzallah et L. Fairhead)
 
     ! M\'ethode na\"ive pour transformer un champ d'une grille fine \`a une
     ! grille grossi\`ere. Je consid\`ere que les nouveaux points occupent
     ! une zone adjacente qui comprend un ou plusieurs anciens points.
 
-    ! Aucune pond\'eration n'est consid\'er\'ee (voir
-    ! grille_p). Cf. grille_m.txt.
+    ! Aucune pond\'eration n'est consid\'er\'ee. Cf. grille_m.txt.
+
+    use nr_util, only: assert_eq
 
     use  dist_sphe_m, only: dist_sphe
-    use nr_util, only: assert_eq
 
     ! Coordonn\'ees :
     REAL, intent(in):: xdata(:) ! (imdep)

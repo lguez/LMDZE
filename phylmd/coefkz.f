@@ -35,7 +35,7 @@ contains
     REAL, intent(in):: zgeop(:, :) ! (knon, klev)
     REAL, intent(out):: coefm(:, 2:) ! (knon, 2:klev) coefficient, vitesse
 
-    real, intent(out):: coefh(:, 2:) ! (knon, 2:klev) 
+    real, intent(out):: coefh(:, 2:) ! (knon, 2:klev)
     ! coefficient, chaleur et humidité
 
     ! Local:
@@ -87,7 +87,7 @@ contains
     knon = size(ts)
 
     ! Prescrire la valeur de contre-gradient
-    if (iflag_pbl.eq.1) then
+    if (iflag_pbl == 1) then
        DO k = 3, klev
           gamt(k) = - 1E-3
        ENDDO
@@ -98,7 +98,7 @@ contains
        ENDDO
     ENDIF
 
-    IF (nsrf .NE. is_oce ) THEN
+    IF (nsrf /= is_oce) THEN
        kstable = ksta_ter
     ELSE
        kstable = ksta
@@ -134,16 +134,16 @@ contains
           zfr = MAX(0.0, MIN(1.0, zfr))
           IF (.NOT.richum) zfr = 0.0
 
-          !  calculer le nombre de Richardson:
+          ! calculer le nombre de Richardson:
 
           IF (tvirtu) THEN
              ztvd = (t(i, k) &
                   + zdphi/RCPD/(1. + RVTMP2 * zq) &
-                  * ((1. - zfr) + zfr * (1. + RLVTT * zqs/RD/zt)/(1. + zdqs) ) &
+                  * ((1. - zfr) + zfr * (1. + RLVTT * zqs/RD/zt)/(1. + zdqs)) &
                   ) * (1. + RETV * q(i, k))
              ztvu = (t(i, k - 1) &
                   - zdphi/RCPD/(1. + RVTMP2 * zq) &
-                  * ((1. - zfr) + zfr * (1. + RLVTT * zqs/RD/zt)/(1. + zdqs) ) &
+                  * ((1. - zfr) + zfr * (1. + RLVTT * zqs/RD/zt)/(1. + zdqs)) &
                   ) * (1. + RETV * q(i, k - 1))
              ri(i) = zmgeom(i) * (ztvd - ztvu)/(zdu2 * 0.5 * (ztvd + ztvu))
              ri(i) = ri(i) &
@@ -189,7 +189,7 @@ contains
              ENDIF
           ELSE
              l2(i) = (mixlen * MAX(0.0, (paprs(i, k) - paprs(i, itop(i) + 1)) &
-                  /(paprs(i, 2) - paprs(i, itop(i) + 1)) ))**2
+                  /(paprs(i, 2) - paprs(i, itop(i) + 1))))**2
              coefm(i, k) = sqrt(max(cdn**2 * (ric - ri(i)) / ric, kstable))
              coefm(i, k) = l2(i) * coefm(i, k)
              coefh(i, k) = coefm(i, k) / prandtl ! h et m different

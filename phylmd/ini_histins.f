@@ -132,6 +132,8 @@ contains
             "inst(X)", zsto, zout)
        CALL histdef(nid_ins, "msnow", "surface snow amount", "kg/m2", &
             iim, jjm + 1, nhori, 1, 1, 1, -99, "inst(X)", zsto, zout)
+       CALL histdef(nid_ins, "zxfqcalving", "ice calving", "kg m-2 s-1", &
+            iim, jjm + 1, nhori, 1, 1, 1, -99, "inst(X)", zsto, zout)
 
        DO nsrf = 1, nbsrf
           call histdef(nid_ins, "pourc_"//clnsurf(nsrf),  &

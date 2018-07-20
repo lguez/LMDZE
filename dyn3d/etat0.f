@@ -237,10 +237,11 @@ contains
          rlatu)
     flic_tmp(iim + 1, :) = flic_tmp(1, :)
 
-    ! Passage sur la grille physique
+    ! Passage sur la grille physique :
     pctsrf = 0.
     pctsrf(:, is_lic) = pack(flic_tmp, dyn_phy)
-    ! Ad\'equation avec le maque terre/mer
+    
+    ! Ad\'equation avec le maque terre/mer :
     WHERE (pctsrf(:, is_lic) < EPSFRA) pctsrf(:, is_lic) = 0.
     WHERE (zmasq < EPSFRA) pctsrf(:, is_lic) = 0.
     where (zmasq <= EPSFRA) pctsrf(:, is_ter) = zmasq
