@@ -117,7 +117,6 @@ contains
 
     REAL gamah(size(knindex), 2:klev) ! (knon, 2:klev)
     real tsurf_new(size(knindex)) ! (knon)
-    real zzpk
 
     !----------------------------------------------------------------
 
@@ -142,16 +141,15 @@ contains
     ! Preparer les flux lies aux contre-gardients
     forall (k = 2:klev) gamah(:, k) = gamt(:, k) * (RD * (t(:, k - 1) &
          + t(:, k)) / 2. / RG / paprs(:, k) * (pplay(:, k - 1) - pplay(:, k))) &
-         * RCPD * (psref(:) / paprs(:, k))**RKAPPA
+         * RCPD * (psref / paprs(:, k))**RKAPPA
 
     DO i = 1, knon
        buf1(i) = zx_coef(i, klev) + delp(i, klev)
        cq(i, klev) = q(i, klev) * delp(i, klev) / buf1(i)
        dq(i, klev) = zx_coef(i, klev) / buf1(i)
 
-       zzpk=(pplay(i, klev) / psref(i))**RKAPPA
-       buf2(i) = zzpk * delp(i, klev) + zx_coef(i, klev)
-       ch(i, klev) = (h(i, klev) * zzpk * delp(i, klev) &
+       buf2(i) = delp(i, klev) / pkf(i, klev) + zx_coef(i, klev)
+       ch(i, klev) = (h(i, klev) / pkf(i, klev) * delp(i, klev) &
             - zx_coef(i, klev) * gamah(i, klev)) / buf2(i)
        dh(i, klev) = zx_coef(i, klev) / buf2(i)
     ENDDO
@@ -164,10 +162,9 @@ contains
                + zx_coef(i, k + 1) * cq(i, k + 1)) / buf1(i)
           dq(i, k) = zx_coef(i, k) / buf1(i)
 
-          zzpk=(pplay(i, k) / psref(i))**RKAPPA
-          buf2(i) = zzpk * delp(i, k) + zx_coef(i, k) &
+          buf2(i) = delp(i, k) / pkf(i, k) + zx_coef(i, k) &
                + zx_coef(i, k + 1) * (1. - dh(i, k + 1))
-          ch(i, k) = (h(i, k) * zzpk * delp(i, k) &
+          ch(i, k) = (h(i, k) / pkf(i, k) * delp(i, k) &
                + zx_coef(i, k + 1) * ch(i, k + 1) &
                + zx_coef(i, k + 1) * gamah(i, k + 1) &
                - zx_coef(i, k) * gamah(i, k)) / buf2(i)
@@ -177,13 +174,11 @@ contains
 
     DO i = 1, knon
        buf1(i) = delp(i, 1) + zx_coef(i, 2) * (1. - dq(i, 2))
-       cq(i, 1) = (q(i, 1) * delp(i, 1) &
-            + zx_coef(i, 2) * cq(i, 2)) / buf1(i)
+       cq(i, 1) = (q(i, 1) * delp(i, 1) + zx_coef(i, 2) * cq(i, 2)) / buf1(i)
        dq(i, 1) = - 1. * RG / buf1(i)
 
-       zzpk=(pplay(i, 1) / psref(i))**RKAPPA
-       buf2(i) = zzpk * delp(i, 1) + zx_coef(i, 2) * (1. - dh(i, 2))
-       ch(i, 1) = (h(i, 1) * zzpk * delp(i, 1) &
+       buf2(i) = delp(i, 1) / pkf(i, 1) + zx_coef(i, 2) * (1. - dh(i, 2))
+       ch(i, 1) = (h(i, 1) / pkf(i, 1) * delp(i, 1) &
             + zx_coef(i, 2) * (gamah(i, 2) + ch(i, 2))) / buf2(i)
        dh(i, 1) = - 1. * RG / buf2(i)
     ENDDO
