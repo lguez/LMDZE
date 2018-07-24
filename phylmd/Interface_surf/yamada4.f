@@ -8,7 +8,7 @@ module yamada4_m
 
 contains
 
-  SUBROUTINE yamada4(dt, zlev, zlay, u, v, teta, q2, km, kn, ustar)
+  SUBROUTINE yamada4(dt, zlev, zlay, u, v, teta, q2, coefm, coefh, ustar)
 
     ! From LMDZ4/libf/phylmd/yamada4.F, version 1.1 2004/06/22 11:45:36
 
@@ -39,11 +39,11 @@ contains
     ! En entr\'ee : la valeur au d\'ebut du pas de temps ; en sortie : la
     ! valeur \`a la fin du pas de temps.
 
-    REAL, intent(out):: km(:, 2:) ! (knon, 2:klev)
+    REAL, intent(out):: coefm(:, 2:) ! (knon, 2:klev)
     ! diffusivit\'e turbulente de quantit\'e de mouvement (au bas de
     ! chaque couche) (en sortie : la valeur \`a la fin du pas de temps)
 
-    REAL, intent(out):: kn(:, 2:) ! (knon, 2:klev)
+    REAL, intent(out):: coefh(:, 2:) ! (knon, 2:klev)
     ! diffusivit\'e turbulente des scalaires (au bas de chaque couche)
     ! (en sortie : la valeur \`a la fin du pas de temps)
 
@@ -82,11 +82,11 @@ contains
 
     call assert(any(iflag_pbl == [6, 8, 9]), "yamada4 iflag_pbl")
     knon = assert_eq([size(zlev, 1), size(zlay, 1), size(u, 1), size(v, 1), &
-         size(teta, 1), size(ustar), size(q2, 1), size(km, 1), size(kn, 1)], &
-         "yamada4 knon")
+         size(teta, 1), size(ustar), size(q2, 1), size(coefm, 1), &
+         size(coefh, 1)], "yamada4 knon")
     call assert(klev == [size(zlev, 2) - 1, size(zlay, 2), size(u, 2), &
-         size(v, 2), size(teta, 2), size(q2, 2) - 1, size(km, 2) + 1, &
-         size(kn, 2) + 1], "yamada4 klev")
+         size(v, 2), size(teta, 2), size(q2, 2) - 1, size(coefm, 2) + 1, &
+         size(coefh, 2) + 1], "yamada4 klev")
 
     ipas = ipas + 1
 
@@ -212,14 +212,14 @@ contains
     else if (iflag_pbl >= 8) then
        ! Yamada 2.5 a la Didi
 
-       ! Calcul de l, km, au pas precedent
+       ! Calcul de l, coefm, au pas precedent
        do k = 2, klev
           do ig = 1, knon
              delta(ig, k) = q2(ig, k)/(l(ig, k)**2*sm(ig, k))
              if (delta(ig, k).lt.1.e-20) then
                 delta(ig, k) = 1.e-20
              endif
-             km(ig, k) = l(ig, k)*sqrt(q2(ig, k))*sm(ig, k)
+             coefm(ig, k) = l(ig, k)*sqrt(q2(ig, k))*sm(ig, k)
              aa1 = (m2(ig, k)*(1.-rif(ig, k))-delta(ig, k)/b1)
              aa(ig, k) = aa1*dt/(delta(ig, k)*l(ig, k))
              qpre = sqrt(q2(ig, k))
@@ -246,8 +246,8 @@ contains
     do k = 2, klev
        do ig = 1, knon
           zq = sqrt(q2(ig, k))
-          km(ig, k) = l(ig, k)*zq*sm(ig, k)
-          kn(ig, k) = km(ig, k)*alpha(ig, k)
+          coefm(ig, k) = l(ig, k)*zq*sm(ig, k)
+          coefh(ig, k) = coefm(ig, k)*alpha(ig, k)
        enddo
     enddo
 
@@ -270,9 +270,9 @@ contains
           else
              kmin = -1. ! kmin n'est utilise que pour les SL stables.
           endif
-          if (kn(ig, k).lt.kmin.or.km(ig, k).lt.kmin) then
-             kn(ig, k) = kmin
-             km(ig, k) = kmin
+          if (coefh(ig, k).lt.kmin.or.coefm(ig, k).lt.kmin) then
+             coefh(ig, k) = kmin
+             coefm(ig, k) = kmin
              ! la longueur de melange est suposee etre l = kap z
              ! K = l q Sm d'ou q2 = (K/l Sm)**2
              q2(ig, k) = (qmin/sm(ig, k))**2

@@ -469,10 +469,7 @@ contains
           rugoro = 0.
        ENDIF
 
-       ecrit_ins = NINT(ecrit_ins / dtphys)
-
        ! Initialisation des sorties
-
        call ini_histins(dtphys, ok_newmicro)
        CALL phyredem0
     ENDIF test_firstcal

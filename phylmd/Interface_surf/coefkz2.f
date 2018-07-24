@@ -4,7 +4,7 @@ module coefkz2_m
 
 contains
 
-  SUBROUTINE coefkz2(nsrf, paprs, pplay, t, pcfm, pcfh)
+  SUBROUTINE coefkz2(nsrf, paprs, pplay, t, coefm, coefh)
 
     ! J'introduit un peu de diffusion sauf dans les endroits o\`u une
     ! forte inversion est pr\'esente. On peut dire que la diffusion
@@ -24,9 +24,9 @@ contains
     
     REAL, intent(in):: t(:, :) ! (knon, klev) temperature (K)
 
-    REAL, intent(out):: pcfm(:, 2:) ! (knon, 2:klev) coefficient vitesse
+    REAL, intent(out):: coefm(:, 2:) ! (knon, 2:klev) coefficient vitesse
 
-    REAL, intent(out):: pcfh(:, 2:) ! (knon, 2:klev)
+    REAL, intent(out):: coefh(:, 2:) ! (knon, 2:klev)
     ! coefficient chaleur et humidite)
 
     ! Local:
@@ -56,8 +56,8 @@ contains
     ! Initialiser les sorties
     DO k = 2, klev
        DO i = 1, knon
-          pcfm(i, k) = 0.0
-          pcfh(i, k) = 0.0
+          coefm(i, k) = 0.0
+          coefh(i, k) = 0.0
        ENDDO
     ENDDO
 
@@ -88,8 +88,8 @@ contains
                ((invb(i).EQ.klev) .OR. (zdthmin(i) > seuil))) THEN
              zl2(i)=(mixlen*MAX(0.0, (paprs(i, k)-paprs(i, klev+1)) &
                   /(paprs(i, 2)-paprs(i, klev+1))))**2
-             pcfm(i, k)= zl2(i)* kstable
-             pcfh(i, k) = pcfm(i, k) /prandtl ! h et m different
+             coefm(i, k)= zl2(i)* kstable
+             coefh(i, k) = coefm(i, k) /prandtl ! h et m different
           ENDIF
        ENDDO
     ENDDO

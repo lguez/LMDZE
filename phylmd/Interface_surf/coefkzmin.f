@@ -4,7 +4,7 @@ module coefkzmin_m
 
 contains
 
-  SUBROUTINE coefkzmin(ypaprs, ypplay, yu, yv, yt, yq, ycoefm, kn)
+  SUBROUTINE coefkzmin(ypaprs, ypplay, yu, yv, yt, yq, cdragm, coefh)
 
     ! From LMDZ4/libf/phylmd/coefkzmin.F, version 1.1.1.1, 2004/05/19 12:53:08
 
@@ -19,9 +19,9 @@ contains
     REAL, intent(in):: yu(:, :), yv(:, :) ! (knon, klev) wind, in m s-1
     REAL, intent(in):: yt(:, :) ! (knon, klev) temperature, in K
     REAL, intent(in):: yq(:, :) ! (knon, klev)
-    REAL, intent(in):: ycoefm(:) ! (knon) drag coefficient
+    REAL, intent(in):: cdragm(:) ! (knon) drag coefficient
 
-    REAL, intent(out):: kn(:, 2:) ! (knon, 2:klev) coefficient de
+    REAL, intent(out):: coefh(:, 2:) ! (knon, 2:klev) coefficient de
     ! diffusion turbulente de la quantité de mouvement et des
     ! scalaires (au bas de chaque couche) (en sortie : la valeur à la
     ! fin du pas de temps), m2 s-1
@@ -72,7 +72,7 @@ contains
     enddo
 
     forall (k = 2: klev) zlev(:, k) = 0.5 * (zlay(:, k) + zlay(:, k-1))
-    ustar = SQRT(ycoefm * (yu(:, 1)**2 + yv(:, 1)**2))
+    ustar = SQRT(cdragm * (yu(:, 1)**2 + yv(:, 1)**2))
 
     ! Fin de la partie qui doit être incluse à terme dans pbl_surface
 
@@ -88,10 +88,10 @@ contains
     do k = 2, klev
        do i = 1, knon
           if (teta(i, 2) > teta(i, 1)) then
-             kn(i, k) = kap * zlev(i, k) * ustar(i) &
+             coefh(i, k) = kap * zlev(i, k) * ustar(i) &
                   * (max(1. - zlev(i, k) / pblhmin(i), 0.))**2
           else
-             kn(i, k) = 0. ! min n'est utilisé que pour les SL stables
+             coefh(i, k) = 0. ! min n'est utilisé que pour les SL stables
           endif
        enddo
     enddo

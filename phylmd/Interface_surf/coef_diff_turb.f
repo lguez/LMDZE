@@ -9,13 +9,14 @@ contains
 
     ! Computes coefficients for turbulent diffusion in the atmosphere.
 
+    use nr_util, only: assert
+
     USE clesphys, ONLY: ok_kzmin
     use coefkz_m, only: coefkz
     use coefkzmin_m, only: coefkzmin
     use coefkz2_m, only: coefkz2
     USE conf_phys_m, ONLY: iflag_pbl
     USE dimphy, ONLY: klev
-    use nr_util, only: assert
     USE suphec_m, ONLY: rd, rg, rkappa
     use ustarhb_m, only: ustarhb
     use yamada4_m, only: yamada4
@@ -39,7 +40,6 @@ contains
     REAL coefm0(size(ni), 2:klev), coefh0(size(ni), 2:klev) ! (knon, 2:klev)
     REAL zlay(size(ni), klev), teta(size(ni), klev) ! (knon, klev)
     real zlev(size(ni), klev + 1) ! (knon, klev + 1)
-    REAL ustar(size(ni)) ! (knon)
     integer k
 
     !-------------------------------------------------------------------------
@@ -60,8 +60,7 @@ contains
     IF (ok_kzmin) THEN
        ! Calcul d'une diffusion minimale pour les conditions tres stables
        CALL coefkzmin(paprs, pplay, u, v, t, q, cdragm, coefh0)
-       coefm0 = coefh0
-       coefm = max(coefm, coefm0)
+       coefm = max(coefm, coefh0)
        coefh = max(coefh, coefh0)
     END IF
 
@@ -76,20 +75,15 @@ contains
                / paprs(:, k) * (pplay(:, k-1) - pplay(:, k)) / rg
        END DO
 
-       DO k = 1, klev
-          teta(:, k) = t(:, k) * (paprs(:, 1) / pplay(:, k))**rkappa &
-               * (1. + 0.61 * q(:, k))
-       END DO
+       forall (k = 1:klev) teta(:, k) = t(:, k) &
+            * (paprs(:, 1) / pplay(:, k))**rkappa * (1. + 0.61 * q(:, k))
 
        zlev(:, 1) = 0.
        zlev(:, klev + 1) = 2. * zlay(:, klev) - zlay(:, klev - 1)
+       forall (k = 2:klev) zlev(:, k) = 0.5 * (zlay(:, k) + zlay(:, k-1))
 
-       DO k = 2, klev
-          zlev(:, k) = 0.5 * (zlay(:, k) + zlay(:, k-1))
-       END DO
-
-       ustar = ustarhb(u(:, 1), v(:, 1), cdragm)
-       CALL yamada4(dtime, zlev, zlay, u, v, teta, q2, coefm, coefh, ustar)
+       CALL yamada4(dtime, zlev, zlay, u, v, teta, q2, coefm, coefh, &
+            ustarhb(u(:, 1), v(:, 1), cdragm))
     END IF
 
   end subroutine coef_diff_turb
