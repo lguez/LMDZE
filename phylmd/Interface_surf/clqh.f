@@ -134,9 +134,9 @@ contains
     h = RCPD * t * pkf
 
     ! Convertir les coefficients en variables convenables au calcul:
-    forall (k = 2:klev) zx_coef(:, k) = coef(:, k) * RG &
+    forall (k = 2:klev) zx_coef(:, k) = coef(:, k) &
          / (pplay(:, k - 1) - pplay(:, k)) &
-         * (paprs(:, k) * 2 / (t(:, k) + t(:, k - 1)) / RD)**2 * dtime * RG
+         * (paprs(:, k) * 2 / (t(:, k) + t(:, k - 1)) / RD)**2 * dtime * RG**2
 
     ! Preparer les flux lies aux contre-gardients
     forall (k = 2:klev) gamah(:, k) = gamt(:, k) * (RD * (t(:, k - 1) &
