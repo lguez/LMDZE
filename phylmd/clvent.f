@@ -11,8 +11,9 @@ contains
     ! Date: 1993/08/18
     ! Objet : diffusion verticale de la vitesse
 
-    USE dimphy, ONLY: klev
     use nr_util, only: assert
+
+    USE dimphy, ONLY: klev
     USE suphec_m, ONLY: rd, rg
 
     REAL, intent(in):: dtime ! intervalle de temps (en s)
