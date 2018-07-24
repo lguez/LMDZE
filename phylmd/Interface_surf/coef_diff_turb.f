@@ -48,21 +48,6 @@ contains
          size(v, 1), size(q, 1), size(t, 1), size(ts), size(cdragm), &
          size(zgeop, 1), size(coefm, 1), size(coefh, 1), size(q2, 1)], &
          "coef_diff_turb knon")
-    
-    CALL coefkz(nsrf, paprs, pplay, ts, u, v, t, q, zgeop, coefm, coefh)
-
-    IF (iflag_pbl == 1) THEN
-       CALL coefkz2(nsrf, paprs, pplay, t, coefm0, coefh0)
-       coefm = max(coefm, coefm0)
-       coefh = max(coefh, coefh0)
-    END IF
-
-    IF (ok_kzmin) THEN
-       ! Calcul d'une diffusion minimale pour les conditions tres stables
-       CALL coefkzmin(paprs, pplay, u, v, t, q, cdragm, coefh0)
-       coefm = max(coefm, coefh0)
-       coefh = max(coefh, coefh0)
-    END IF
 
     IF (iflag_pbl >= 6) THEN
        ! Mellor et Yamada adapt\'e \`a Mars, Richard Fournier et
@@ -84,6 +69,21 @@ contains
 
        CALL yamada4(dtime, zlev, zlay, u, v, teta, q2, coefm, coefh, &
             ustarhb(u(:, 1), v(:, 1), cdragm))
+    else
+       CALL coefkz(nsrf, paprs, pplay, ts, u, v, t, q, zgeop, coefm, coefh)
+
+       IF (iflag_pbl == 1) THEN
+          CALL coefkz2(nsrf, paprs, pplay, t, coefm0, coefh0)
+          coefm = max(coefm, coefm0)
+          coefh = max(coefh, coefh0)
+       END IF
+
+       IF (ok_kzmin) THEN
+          ! Calcul d'une diffusion minimale pour les conditions tres stables
+          CALL coefkzmin(paprs, pplay, u, v, t, q, cdragm, coefh0)
+          coefm = max(coefm, coefh0)
+          coefh = max(coefh, coefh0)
+       END IF
     END IF
 
   end subroutine coef_diff_turb
