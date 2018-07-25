@@ -17,10 +17,14 @@ contains
 
     ! Ionela MUSAT, July, 1st, 2002
 
-    ! Louis, J. F., Tiedtke, M. and Geleyn, J. F., 1982: `A short
+    ! Louis, J. F., Tiedtke, M. and Geleyn, J. F., 1982. A short
     ! history of the operational PBL parametrization at
-    ! ECMWF'. Workshop on boundary layer parametrization, November
+    ! ECMWF. Workshop on boundary layer parametrization, November
     ! 1981, ECMWF, Reading, England. Page: 19. Equations in Table 1.
+
+    ! Miller, M. J., A. C. M. Beljaars, T. N. Palmer, 1992. The
+    ! sensitivity of the ECMWF model to the parameterization of
+    ! evaporation from the tropical oceans. J. Climate, 5:418-434.
 
     use nr_util, only: assert_eq
 
@@ -55,7 +59,7 @@ contains
 
     ! Local:
 
-    REAL, PARAMETER:: ckap = 0.40, cb = 5., cc = 5., cd = 5., cepdu2 = 0.1**2
+    REAL, PARAMETER:: ckap = 0.4, cb = 5., cc = 5., cd = 5., cepdu2 = 0.1**2
     real, parameter:: f_ri_cd_min = 0.1
     INTEGER i, knon
     REAL zdu2, ztsolv, ztvd, zscf, zucf
@@ -68,8 +72,7 @@ contains
     !-------------------------------------------------------------------------
 
     knon = assert_eq([size(speed), size(t), size(q), size(zgeop), size(ts), &
-         size(qsurf), size(rugos), size(cdragm), size(cdragh)], &
-         "cdrag knon")
+         size(qsurf), size(rugos), size(cdragm), size(cdragh)], "cdrag knon")
 
     DO i = 1, knon
        zdu2 = max(cepdu2, speed(i)**2)
@@ -79,16 +82,7 @@ contains
        zri = zgeop(i) * (ztvd - ztsolv) / (zdu2 * ztvd)
        zcdn = (ckap / log(1. + zgeop(i) / (RG * rugos(i))))**2
 
-       IF (zri > 0.) THEN
-          ! Situation stable. Pour \'eviter les incoh\'erences dans
-          ! les cas tr\`es stables, on limite zri \`a 20. Cf Hess et
-          ! al. (1995).
-          zri = min(20., zri)
-          zscf = SQRT(1. + cd * ABS(zri))
-          cdragm(i) = zcdn * max(1. / (1. + 2. * CB * zri / zscf), f_ri_cd_min)
-          cdragh(i) = merge(f_cdrag_oce, f_cdrag_ter, nsrf == is_oce) * zcdn &
-               * max(1. / (1. + 3. * CB * zri * zscf), f_ri_cd_min)
-       ELSE
+       IF (zri < 0.) THEN
           ! situation instable
           zucf = 1. / (1. + 3. * cb * cc * zcdn &
                * SQRT(ABS(zri) * (1. + zgeop(i) / (RG * rugos(i)))))
@@ -103,6 +97,15 @@ contains
              cdragh(i) = f_cdrag_ter * zcdn &
                   * max((1. - 3. * cb * zri * zucf), f_ri_cd_min)
           end IF
+       ELSE
+          ! Situation stable. Pour \'eviter les incoh\'erences dans
+          ! les cas tr\`es stables, on limite zri \`a 20. Cf Hess et
+          ! al. (1995).
+          zri = min(20., zri)
+          zscf = SQRT(1. + cd * ABS(zri))
+          cdragm(i) = zcdn * max(1. / (1. + 2. * CB * zri / zscf), f_ri_cd_min)
+          cdragh(i) = merge(f_cdrag_oce, f_cdrag_ter, nsrf == is_oce) * zcdn &
+               * max(1. / (1. + 3. * CB * zri * zscf), f_ri_cd_min)
        ENDIF
     END DO
 
