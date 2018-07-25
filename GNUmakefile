@@ -33,24 +33,10 @@ execut = ce0l gcm test_ozonecm test_inter_barxy test_fxhyp test_inifilr
 
 # 3. Compiler-dependent part
 
-mode = debug
-include ${general_compiler_options_dir}/${FC}_${mode}.mk
+include ${general_compiler_options_dir}/settings.mk
 
 # 4. Rules
 
-SHELL = bash
-LINK.o = $(FC) $(LDFLAGS) $(TARGET_ARCH)
-
-%.o: %.f
-	@echo "Building $@..."
-	@$(COMPILE.f) $(OUTPUT_OPTION) $<
-
-%: %.o
-	@echo "Linking $@..."
-	@$(LINK.o) $^ $(LOADLIBES) $(LDLIBS) -o $@
-
-.DELETE_ON_ERROR:
-.PHONY: all clean clobber depend
 all: ${execut} log
 ce0l: ${obj_ce0l}
 gcm: ${obj_gcm}
@@ -62,19 +48,11 @@ test_inifilr: ${obj_test_inifilr}
 depend ${makefile_dir}/depend.mk:
 	makedepf90 -free -Wmissing -Wconfused $(addprefix -I, ${VPATH}) -nosrc $(addprefix -u , netcdf numer_rec_95 netcdf95 nr_util jumble) ${sources} >${makefile_dir}/depend.mk
 
-TAGS: ${sources}
-	ctags -e --language-force=fortran $^
-
 clean:
 	rm -f ${execut} ${objects} log
 
 clobber: clean
 	rm -f *.mod ${makefile_dir}/depend.mk TAGS
-
-log:
-	hostname >$@
-	${FC} ${version_flag} >>$@ 2>&1
-	@echo -e "\nFC = ${FC}\n\nFFLAGS = ${FFLAGS}\n\nLDLIBS = ${LDLIBS}\n\nLDFLAGS = ${LDFLAGS}" >>$@
 
 ifeq ($(findstring $(MAKECMDGOALS), clobber depend),)
 include ${makefile_dir}/depend.mk
