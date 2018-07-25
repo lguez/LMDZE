@@ -215,7 +215,6 @@ contains
     ydelp = 0.
     yu = 0.
     yv = 0.
-    yt = 0.
     yq = 0.
     yrugoro = 0.
     d_ts = 0.
@@ -475,8 +474,8 @@ contains
           END DO
 
           CALL hbtm(ypaprs, ypplay, yt2m, yq2m, ustar(:knon), y_flux_t(:knon), &
-               y_flux_q(:knon), yu, yv, yt, yq, ypblh(:knon), ycapcl, &
-               yoliqcl, ycteicl, ypblt, ytherm, ylcl)
+               y_flux_q(:knon), yu, yv, yt(:knon, :), yq, ypblh(:knon), &
+               ycapcl, yoliqcl, ycteicl, ypblt, ytherm, ylcl)
 
           DO j = 1, knon
              i = ni(j)

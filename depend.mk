@@ -141,7 +141,7 @@ integrd.o : qminimum.o paramet_m.o massdair.o disvert.o dimensions.o comgeom.o
 inter_barxy.o : ord_coordm.o ord_coord.o inter_bary.o inter_barx.o dimensions.o comgeom.o 
 interface_surf.o : unit_nml_m.o 
 interfsur_lim.o : time_phylmdz.o dimphy.o 
-interfsurf_hq.o : suphec.o soil.o read_sst.o interfsur_lim.o interface_surf.o indicesol.o fonte_neige.o dimphy.o calcul_fluxs.o albsno.o alboc_cd.o abort_gcm.o 
+interfsurf_hq.o : suphec.o soil.o limit_read_sst.o interfsur_lim.o interface_surf.o indicesol.o fonte_neige.o dimphy.o calcul_fluxs.o albsno.o alboc_cd.o abort_gcm.o 
 ioconf_calendar.o : errioipsl.o strlowercase.o calendar.o 
 ioget_calendar.o : ioconf_calendar.o calendar.o 
 isittime.o : ymds2ju.o ju2ymds.o itau2date.o calendar.o 
@@ -154,6 +154,7 @@ laplacien_rotgam.o : comgeom.o paramet_m.o dimensions.o
 leapfrog.o : writehist.o temps.o integrd.o inidissip.o guide.o geopot.o filtreg_scal.o exner_hyb.o enercin.o dynredem1.o dynetat0.o dissip.o dimensions.o conf_guide.o conf_gcm.o disvert.o covcont.o comgeom.o comconst.o calfis.o caldyn.o caladvtrac.o bilan_dyn.o addfi.o 
 lift_noro.o : suphec.o phyetat0.o dimphy.o 
 limit.o : unit_nml_m.o start_init_orog.o phyetat0.o inter_barxy.o indicesol.o grid_change.o dynetat0.o dimphy.o dimensions.o conf_dat2d.o 
+limit_read_sst.o : time_phylmdz.o dimphy.o conf_gcm.o 
 lw.o : suphec.o raddimlw.o raddim.o lwu.o lwbv.o 
 lwb.o : raddimlw.o raddim.o dimphy.o dimensions.o 
 lwbv.o : raddimlw.o raddim.o suphec.o lwv.o dimphy.o dimensions.o 
@@ -196,7 +197,6 @@ raddim.o : dimphy.o dimensions.o
 radiornpb.o : dimphy.o dimensions.o 
 radlwsw.o : yoethf.o sw.o suphec.o raddim.o lw.o dimphy.o clesphys.o 
 read_reanalyse.o : reanalyse2nat.o paramet_m.o nat2gcm.o dimensions.o conf_guide.o 
-read_sst.o : time_phylmdz.o dimphy.o conf_gcm.o 
 reanalyse2nat.o : pres2lev.o paramet_m.o massbar.o exner_hyb.o disvert.o dimensions.o comgeom.o comconst.o 
 regr_lat_time_coefoz.o : dynetat0.o dimensions.o 
 regr_pr_av.o : press_coefoz.o grid_change.o dimphy.o dimensions.o 

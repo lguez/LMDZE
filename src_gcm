@@ -213,7 +213,7 @@ radiornpb.f
 radlwsw.f
 radopt.f
 read_reanalyse.f
-read_sst.f
+limit_read_sst.f
 reanalyse2nat.f
 regr_pr_av.f
 regr_pr_comb_coefoz.f

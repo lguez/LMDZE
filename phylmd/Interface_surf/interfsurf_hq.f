@@ -26,7 +26,7 @@ contains
     USE indicesol, ONLY: epsfra, is_lic, is_oce, is_sic, is_ter
     USE interface_surf, ONLY: conf_interface
     USE interfsur_lim_m, ONLY: interfsur_lim
-    use read_sst_m, only: read_sst
+    use limit_read_sst_m, only: limit_read_sst
     use soil_m, only: soil
     USE suphec_m, ONLY: rcpd, rtt
 
@@ -179,7 +179,7 @@ contains
     case (is_oce)
        ! Surface "oc\'ean", appel \`a l'interface avec l'oc\'ean
 
-       call read_sst(julien, knindex, tsurf)
+       call limit_read_sst(julien, knindex, tsurf)
        cal = 0.
        beta = 1.
        dif_grnd = 0.

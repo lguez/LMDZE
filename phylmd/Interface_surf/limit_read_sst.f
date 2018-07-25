@@ -1,10 +1,10 @@
-module read_sst_m
+module limit_read_sst_m
 
   implicit none
 
 contains
 
-  SUBROUTINE read_sst(julien, knindex, tsurf)
+  SUBROUTINE limit_read_sst(julien, knindex, tsurf)
 
     ! From interfoce_lim
 
@@ -34,7 +34,7 @@ contains
 
     ! --------------------------------------------------
 
-    call assert(size(knindex) == size(tsurf), "read_sst knon")
+    call assert(size(knindex) == size(tsurf), "limit_read_sst knon")
 
     ! Tester d'abord si c'est le moment de lire le fichier
     if (mod(itap - 1, lmt_pas) == 0) then
@@ -48,6 +48,6 @@ contains
 
     tsurf = sst_lu(knindex)
 
-  END SUBROUTINE read_sst
+  END SUBROUTINE limit_read_sst
 
-end module read_sst_m
+end module limit_read_sst_m

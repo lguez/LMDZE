@@ -49,7 +49,7 @@ contains
     REAL, intent(in):: v(klon, klev) ! vitesse V (m/s)
 
     ! temperature (K)
-    REAL, intent(in):: t(klon, klev)
+    REAL, intent(in):: t(:, :) ! (knon, klev)
     ! vapeur d'eau (kg/kg)
     REAL, intent(in):: q(klon, klev)
 
