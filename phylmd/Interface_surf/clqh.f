@@ -15,9 +15,9 @@ contains
     ! Objet : diffusion verticale de "q" et de "h"
 
     use climb_hq_down_m, only: climb_hq_down
+    use climb_hq_up_m, only: climb_hq_up
     USE dimphy, ONLY: klev, klon
     USE interfsurf_hq_m, ONLY: interfsurf_hq
-    USE suphec_m, ONLY: rcpd
 
     REAL, intent(in):: dtime ! intervalle du temps (s)
     integer, intent(in):: julien ! jour de l'annee en cours
@@ -99,11 +99,8 @@ contains
 
     ! Local:
 
-    INTEGER k
     REAL evap(size(knindex)) ! (knon) evaporation au sol
     REAL, dimension(size(knindex), klev):: cq, dq, ch, dh ! (knon, klev)
-    REAL h(size(knindex), klev) ! (knon, klev) enthalpie potentielle
-    REAL local_q(size(knindex), klev) ! (knon, klev)
     REAL pkf(size(knindex), klev) ! (knon, klev)
     real tsurf_new(size(knindex)) ! (knon)
 
@@ -117,20 +114,9 @@ contains
          qsurf, ts, pplay(:, 1), paprs(:, 1), radsol, evap, flux_t, fluxlat, &
          dflux_l, dflux_s, tsurf_new, albedo, z0_new, pctsrf_new_sic, agesno, &
          fqcalving, ffonte, run_off_lic_0)
-
     flux_q = - evap
     d_ts = tsurf_new - ts
-
-    h(:, 1) = ch(:, 1) + dh(:, 1) * flux_t * dtime
-    local_q(:, 1) = cq(:, 1) + dq(:, 1) * flux_q * dtime
-
-    DO k = 2, klev
-       h(:, k) = ch(:, k) + dh(:, k) * h(:, k - 1)
-       local_q(:, k) = cq(:, k) + dq(:, k) * local_q(:, k - 1)
-    ENDDO
-
-    d_t = h / pkf / RCPD - t
-    d_q = local_q - q
+    call climb_hq_up(d_t, d_q, cq, dq, ch, dh, flux_t, flux_q, dtime, pkf, t, q)
 
   END SUBROUTINE clqh
 
