@@ -6,12 +6,13 @@ module ini_histins_m
 
 contains
 
-  subroutine ini_histins(dtime, ok_newmicro)
+  subroutine ini_histins(ok_newmicro)
 
     ! From phylmd/ini_histins.h, version 1.2, 2005/05/25 13:10:09
 
     use clesphys, only: ecrit_ins, ok_instan
     use clesphys2, only: conv_emanuel
+    use comconst, only: dtphys
     use dimensions, only: iim, jjm, llm, nqmx
     use disvert_m, only: presnivs
     use dynetat0_m, only: day_ref, annee_ref, rlatu, rlonv
@@ -25,7 +26,6 @@ contains
     use phyetat0_m, only: itau_phy
     USE ymds2ju_m, only: ymds2ju
 
-    REAL, intent(in):: dtime ! pas temporel de la physique (s)
     logical, intent(in):: ok_newmicro
     
     ! Local:
@@ -37,12 +37,12 @@ contains
     print *, 'Call sequence information: ini_histins'
 
     test_ok_instan: IF (ok_instan) THEN
-       zsto = dtime * ecrit_ins
-       zout = dtime * ecrit_ins
+       zsto = dtphys * ecrit_ins
+       zout = dtphys * ecrit_ins
        CALL ymds2ju(annee_ref, 1, day_ref, 0.0, zjulian)
        CALL histbeg_totreg("histins", rlonv(:iim) / pi * 180., &
             rlatu / pi * 180., 1, iim, &
-            1, jjm + 1, itau_phy, zjulian, dtime, nhori, nid_ins)
+            1, jjm + 1, itau_phy, zjulian, dtphys, nhori, nid_ins)
        print *, 'itau_phy = ', itau_phy
        print *, "zjulian = ", zjulian
        CALL histvert(nid_ins, "presnivs", "Vertical levels", "mb", &

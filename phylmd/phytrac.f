@@ -7,9 +7,9 @@ module phytrac_m
 
 contains
 
-  SUBROUTINE phytrac(julien, gmtime, firstcal, lafin, pdtphys, t_seri, paprs, &
-       pplay, pmfu, pmfd, pde_u, pen_d, coefh, cdragh, fm_therm, entr_therm, &
-       yu1, yv1, ftsol, pctsrf, frac_impa, frac_nucl, da, phi, mp, upwd, dnwd, &
+  SUBROUTINE phytrac(julien, gmtime, firstcal, lafin, t_seri, paprs, pplay, &
+       pmfu, pmfd, pde_u, pen_d, coefh, cdragh, fm_therm, entr_therm, yu1, &
+       yv1, ftsol, pctsrf, frac_impa, frac_nucl, da, phi, mp, upwd, dnwd, &
        tr_seri, zmasse, ncid_startphy)
 
     ! From phylmd/phytrac.F, version 1.15, 2006/02/21 08:08:30 (SVN
@@ -32,6 +32,7 @@ contains
     use clesphys2, only: conv_emanuel
     use cltrac_m, only: cltrac
     use cltracrn_m, only: cltracrn
+    use comconst, only: dtphys
     USE conf_gcm_m, ONLY: lmt_pas
     use ctherm, only: iflag_thermals
     use cvltr_m, only: cvltr
@@ -59,7 +60,6 @@ contains
     real, intent(in):: gmtime ! heure de la journ\'ee en fraction de jour
     logical, intent(in):: firstcal ! first call to "calfis"
     logical, intent(in):: lafin ! fin de la physique
-    real, intent(in):: pdtphys ! pas d'integration pour la physique (s)
     real, intent(in):: t_seri(klon, llm) ! temperature, in K
 
     real, intent(in):: paprs(klon, llm+1)
@@ -217,10 +217,10 @@ contains
        ! Calcul de l'effet de la convection
        DO it=1, nqmx - 2
           if (conv_emanuel) then
-             call cvltr(pdtphys, da, phi, mp, paprs, tr_seri(:, :, it), upwd, &
+             call cvltr(dtphys, da, phi, mp, paprs, tr_seri(:, :, it), upwd, &
                   dnwd, d_tr_cv(:, :, it))
           else
-             CALL nflxtr(pdtphys, pmfu, pmfd, pde_u, pen_d, paprs, &
+             CALL nflxtr(dtphys, pmfu, pmfd, pde_u, pen_d, paprs, &
                   tr_seri(:, :, it), d_tr_cv(:, :, it))
           endif
 
@@ -252,13 +252,13 @@ contains
        DO it=1, nqmx - 2
           do isplit=1, nsplit
              ! Thermiques 
-             call dqthermcell(klon, llm, pdtphys/nsplit &
+             call dqthermcell(klon, llm, dtphys/nsplit &
                   , fm_therm, entr_therm, zmasse &
                   , tr_seri(1:klon, 1:llm, it), d_tr, ztra_th)
 
              do k=1, llm
                 do i=1, klon
-                   d_tr(i, k)=pdtphys*d_tr(i, k)/nsplit
+                   d_tr(i, k)=dtphys*d_tr(i, k)/nsplit
                    d_tr_th(i, k, it)=d_tr_th(i, k, it)+d_tr(i, k)
                    tr_seri(i, k, it)=max(tr_seri(i, k, it)+d_tr(i, k), 0.)
                 enddo
@@ -279,7 +279,7 @@ contains
     DO it=1, nqmx - 2
        if (clsol(it)) then 
           ! couche limite avec quantite dans le sol calculee
-          CALL cltracrn(it, pdtphys, yu1, yv1, coefh, cdragh, t_seri, ftsol, &
+          CALL cltracrn(it, dtphys, yu1, yv1, coefh, cdragh, t_seri, ftsol, &
                pctsrf, tr_seri(:, :, it), trs(:, it), paprs, pplay, delp, &
                masktr(1, it), fshtr(1, it), hsoltr(it), tautr(it), &
                vdeptr(it), rlat, d_tr_cl(1, 1, it), d_trs)
@@ -297,7 +297,7 @@ contains
              source(i) = 0. ! pas de source, pour l'instant
           ENDDO
 
-          CALL cltrac(pdtphys, coefh, t_seri, tr_seri(:, :, it), source, &
+          CALL cltrac(dtphys, coefh, t_seri, tr_seri(:, :, it), source, &
                paprs, pplay, delp, d_tr_cl(1, 1, it))
           DO k = 1, llm
              DO i = 1, klon
@@ -311,7 +311,7 @@ contains
 
     ! MAF il faudrait faire une modification pour passer dans radiornpb 
     ! si radio=true
-    d_tr_dec = radiornpb(tr_seri, pdtphys, tautr)
+    d_tr_dec = radiornpb(tr_seri, dtphys, tautr)
     DO it = 1, nqmx - 2
        if (radio(it)) then
           tr_seri(:, :, it) = tr_seri(:, :, it) + d_tr_dec(:, :, it)
@@ -326,7 +326,7 @@ contains
           ! Once per day, update the coefficients for ozone chemistry:
           call regr_pr_comb_coefoz(julien, paprs, pplay)
        end if
-       call o3_chem(julien, gmtime, t_seri, zmasse, pdtphys, tr_seri(:, :, 3))
+       call o3_chem(julien, gmtime, t_seri, zmasse, dtphys, tr_seri(:, :, 3))
     end if
 
     ! Calcul de l'effet de la precipitation
@@ -370,7 +370,7 @@ contains
           DO i = 1, klon
              flestottr(i, k, it) = flestottr(i, k, it) &
                   - (d_tr_lessi_nucl(i, k, it) + d_tr_lessi_impa(i, k, it)) &
-                  * (paprs(i, k)-paprs(i, k+1)) / (RG * pdtphys)
+                  * (paprs(i, k)-paprs(i, k+1)) / (RG * dtphys)
           ENDDO
        ENDDO
     ENDDO

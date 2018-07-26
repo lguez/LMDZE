@@ -4,18 +4,18 @@ module calltherm_m
 
 contains
 
-  subroutine calltherm(dtime, pplay, paprs, pphi, u_seri, v_seri, t_seri, &
-       q_seri, d_u_ajs, d_v_ajs, d_t_ajs, d_q_ajs, fm_therm, entr_therm)
+  subroutine calltherm(pplay, paprs, pphi, u_seri, v_seri, t_seri, q_seri, &
+       d_u_ajs, d_v_ajs, d_t_ajs, d_q_ajs, fm_therm, entr_therm)
 
     ! From LMDZ4/libf/phylmd/calltherm.F, version 1.2 2004/12/10 11:27:46
     ! Thermiques
 
-    USE dimphy, ONLY: klev, klon
+    use comconst, only: dtphys
     USE ctherm, ONLY: l_mix_thermals, nsplit_thermals, r_aspect_thermals, &
          tho_thermals, w2di_thermals
+    USE dimphy, ONLY: klev, klon
     use thermcell_m, only: thermcell
 
-    REAL, intent(in):: dtime
     REAL, intent(in):: pplay(klon, klev)
     REAL, intent(in):: paprs(klon, klev+1)
     REAL, intent(in):: pphi(klon, klev)
@@ -57,7 +57,7 @@ contains
        enddo
     enddo
 
-    zdt=dtime/real(nsplit_thermals)
+    zdt=dtphys/real(nsplit_thermals)
     do isplit = 1, nsplit_thermals
        CALL thermcell(klon, klev, zdt, pplay, paprs, pphi, u_seri, v_seri, &
             t_seri, q_seri, d_u_the, d_v_the, d_t_the, d_q_the, zfm_therm, &
@@ -65,10 +65,10 @@ contains
             tho_thermals)
 
        ! transformation de la derivee en tendance
-       d_t_the=d_t_the*dtime/real(nsplit_thermals)
-       d_u_the=d_u_the*dtime/real(nsplit_thermals)
-       d_v_the=d_v_the*dtime/real(nsplit_thermals)
-       d_q_the=d_q_the*dtime/real(nsplit_thermals)
+       d_t_the=d_t_the*dtphys/real(nsplit_thermals)
+       d_u_the=d_u_the*dtphys/real(nsplit_thermals)
+       d_v_the=d_v_the*dtphys/real(nsplit_thermals)
+       d_q_the=d_q_the*dtphys/real(nsplit_thermals)
        fm_therm=fm_therm +zfm_therm/real(nsplit_thermals)
        entr_therm=entr_therm +zentr_therm/real(nsplit_thermals)
        fm_therm(:, klev+1)=0.

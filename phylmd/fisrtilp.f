@@ -4,9 +4,9 @@ module fisrtilp_m
 
 contains
 
-  SUBROUTINE fisrtilp(dtime, paprs, pplay, t, q, ptconv, ratqs, d_t, d_q, &
-       d_ql, rneb, radliq, rain, snow, pfrac_impa, pfrac_nucl, pfrac_1nucl, &
-       frac_impa, frac_nucl, prfl, psfl, rhcl)
+  SUBROUTINE fisrtilp(paprs, pplay, t, q, ptconv, ratqs, d_t, d_q, d_ql, rneb, &
+       radliq, rain, snow, pfrac_impa, pfrac_nucl, pfrac_1nucl, frac_impa, &
+       frac_nucl, prfl, psfl, rhcl)
 
     ! From phylmd/fisrtilp.F, version 1.2, 2004/11/09 16:55:40
     ! First author: Z. X. Li (LMD/CNRS), 20 mars 1995
@@ -14,15 +14,16 @@ contains
     ! Objet : condensation et pr\'ecipitation stratiforme, sch\'ema de
     ! nuage, sch\'ema de condensation \`a grande \'echelle (pluie).
 
+    USE numer_rec_95, ONLY: nr_erf
+
+    use comconst, only: dtphys
     USE comfisrtilp, ONLY: cld_lc_con, cld_lc_lsc, cld_tau_con, &
          cld_tau_lsc, coef_eva, ffallv_con, ffallv_lsc, iflag_pdf, reevap_ice
     USE dimphy, ONLY: klev, klon
     USE fcttre, ONLY: foede, foeew
-    USE numer_rec_95, ONLY: nr_erf
     USE suphec_m, ONLY: rcpd, rd, retv, rg, rlstt, rlvtt, rtt
     USE yoethf_m, ONLY: r2es, r5ies, r5les, rvtmp2
 
-    REAL, INTENT (IN):: dtime ! intervalle du temps (s) 
     REAL, INTENT (IN):: paprs(klon, klev+1) ! pression a inter-couche 
     REAL, INTENT (IN):: pplay(klon, klev) ! pression au milieu de couche
     REAL, INTENT (IN):: t(klon, klev) ! temperature (K)
@@ -118,8 +119,8 @@ contains
        PRINT *, 'fisrtilp, ninter:', ninter
        PRINT *, 'fisrtilp, evap_prec:', evap_prec
        PRINT *, 'fisrtilp, cpartiel:', cpartiel
-       IF (abs(dtime / real(ninter) - 360.) > 0.001) THEN
-          PRINT *, "fisrtilp : ce n'est pas pr\'evu, voir Z. X. Li", dtime
+       IF (abs(dtphys / real(ninter) - 360.) > 0.001) THEN
+          PRINT *, "fisrtilp : ce n'est pas pr\'evu, voir Z. X. Li", dtphys
           PRINT *, "Je pr\'ef\`ere un sous-intervalle de 6 minutes."
        END IF
        appel1er = .FALSE.
@@ -204,9 +205,9 @@ contains
              zmair = (paprs(i, k)-paprs(i, k+1))/rg
              zcpair = rcpd*(1.0+rvtmp2*zq(i))
              zcpeau = rcpd*rvtmp2
-             zt(i) = ((t(i, k + 1) + d_t(i, k + 1)) * zrfl(i) * dtime &
+             zt(i) = ((t(i, k + 1) + d_t(i, k + 1)) * zrfl(i) * dtphys &
                   * zcpeau + zmair * zcpair* zt(i)) &
-                  / (zmair * zcpair + zrfl(i) * dtime * zcpeau)
+                  / (zmair * zcpair + zrfl(i) * dtphys * zcpeau)
           END IF
        END DO
 
@@ -221,10 +222,10 @@ contains
                 zqev = max(0.0, (zqs(i)-zq(i))*zneb(i))
                 zqevt = coef_eva*(1.0-zq(i)/zqs(i))*sqrt(zrfl(i))* &
                      (paprs(i, k)-paprs(i, k+1))/pplay(i, k)*zt(i)*rd/rg
-                zqevt = max(0.0, min(zqevt, zrfl(i)))*rg*dtime/ &
+                zqevt = max(0.0, min(zqevt, zrfl(i)))*rg*dtphys/ &
                      (paprs(i, k)-paprs(i, k+1))
                 zqev = min(zqev, zqevt)
-                zrfln(i) = zrfl(i) - zqev*(paprs(i, k)-paprs(i, k+1))/rg/dtime
+                zrfln(i) = zrfl(i) - zqev*(paprs(i, k)-paprs(i, k+1))/rg/dtphys
 
                 ! pour la glace, on r\'e\'evapore toute la pr\'ecip dans la
                 ! couche du dessous la glace venant de la couche du
@@ -233,9 +234,9 @@ contains
                 IF (zt(i)<t_coup .AND. reevap_ice) zrfln(i) = 0.
 
                 zq(i) = zq(i) - (zrfln(i)-zrfl(i))*(rg/(paprs(i, k)-paprs(i, &
-                     k+1)))*dtime
+                     k+1)))*dtphys
                 zt(i) = zt(i) + (zrfln(i)-zrfl(i))*(rg/(paprs(i, k)-paprs(i, &
-                     k+1)))*dtime*rlvtt/rcpd/(1.0+rvtmp2*zq(i))
+                     k+1)))*dtphys*rlvtt/rcpd/(1.0+rvtmp2*zq(i))
                 zrfl(i) = zrfln(i)
              END IF
           END DO
@@ -360,14 +361,14 @@ contains
                    zct(i) = 1./cld_tau_lsc
                 END IF
                 ! quantit\'e d'eau \`a \'eliminer
-                zchau(i) = zct(i)*dtime/real(ninter)*zoliq(i)* &
+                zchau(i) = zct(i)*dtphys/real(ninter)*zoliq(i)* &
                      (1.0-exp(-(zoliq(i)/zneb(i)/zcl(i))**2))*(1.-zfice(i))
                 ! m\^eme chose pour la glace
                 IF (ptconv(i, k)) THEN
-                   zfroi(i) = dtime/real(ninter)/zdz(i)*zoliq(i)* &
+                   zfroi(i) = dtphys/real(ninter)/zdz(i)*zoliq(i)* &
                         fallvc(zrhol(i))*zfice(i)
                 ELSE
-                   zfroi(i) = dtime/real(ninter)/zdz(i)*zoliq(i)* &
+                   zfroi(i) = dtphys/real(ninter)/zdz(i)*zoliq(i)* &
                         fallvs(zrhol(i))*zfice(i)
                 END IF
                 ztot(i) = zchau(i) + zfroi(i)
@@ -383,7 +384,7 @@ contains
           IF (rneb(i, k)>0.0) THEN
              d_ql(i, k) = zoliq(i)
              zrfl(i) = zrfl(i) + max(zcond(i) - zoliq(i), 0.) &
-                  * (paprs(i, k) - paprs(i, k + 1)) / (rg * dtime)
+                  * (paprs(i, k) - paprs(i, k + 1)) / (rg * dtphys)
           END IF
           IF (zt(i)<rtt) THEN
              psfl(i, k) = zrfl(i)
@@ -455,7 +456,7 @@ contains
        DO i = 1, klon
           zcpair = rcpd*(1.0+rvtmp2*(q(i, k)+d_q(i, k)))
           zmair = (paprs(i, k)-paprs(i, k+1))/rg
-          zm_solid = (prfl(i, k)-prfl(i, k+1)+psfl(i, k)-psfl(i, k+1))*dtime
+          zm_solid = (prfl(i, k)-prfl(i, k+1)+psfl(i, k)-psfl(i, k+1))*dtphys
           d_t(i, k) = d_t(i, k) + zlh_solid(i)*zm_solid/(zcpair*zmair)
        END DO
     END DO

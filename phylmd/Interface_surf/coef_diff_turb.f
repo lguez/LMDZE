@@ -4,14 +4,15 @@ module coef_diff_turb_m
 
 contains
 
-  subroutine coef_diff_turb(dtime, nsrf, ni, paprs, pplay, u, v, q, t, ts, &
-       cdragm, zgeop, coefm, coefh, q2)
+  subroutine coef_diff_turb(nsrf, ni, paprs, pplay, u, v, q, t, ts, cdragm, &
+       zgeop, coefm, coefh, q2)
 
     ! Computes coefficients for turbulent diffusion in the atmosphere.
 
     use nr_util, only: assert
 
     USE clesphys, ONLY: ok_kzmin
+    use comconst, only: dtphys
     use coefkz_m, only: coefkz
     use coefkzmin_m, only: coefkzmin
     use coefkz2_m, only: coefkz2
@@ -21,7 +22,6 @@ contains
     use ustarhb_m, only: ustarhb
     use yamada4_m, only: yamada4
 
-    REAL, INTENT(IN):: dtime ! interval du temps (secondes)
     INTEGER, INTENT(IN):: nsrf
     INTEGER, INTENT(IN):: ni(:) ! (knon)
     REAL, INTENT(IN):: paprs(:, :) ! (knon, klev + 1)
@@ -67,7 +67,7 @@ contains
        zlev(:, klev + 1) = 2. * zlay(:, klev) - zlay(:, klev - 1)
        forall (k = 2:klev) zlev(:, k) = 0.5 * (zlay(:, k) + zlay(:, k-1))
 
-       CALL yamada4(dtime, zlev, zlay, u, v, teta, q2, coefm, coefh, &
+       CALL yamada4(dtphys, zlev, zlay, u, v, teta, q2, coefm, coefh, &
             ustarhb(u(:, 1), v(:, 1), cdragm))
     else
        CALL coefkz(nsrf, paprs, pplay, ts, u, v, t, q, zgeop, coefm, coefh)

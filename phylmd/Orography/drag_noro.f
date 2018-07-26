@@ -4,19 +4,19 @@ module drag_noro_m
 
 contains
 
-  SUBROUTINE drag_noro(dtime, paprs, pplay, pmea, pstd, psig, pgam, pthe, &
-       ppic, pval, ktest, t, u, v, pulow, pvlow, pustr, pvstr, d_t, d_u, d_v)
+  SUBROUTINE drag_noro(paprs, pplay, pmea, pstd, psig, pgam, pthe, ppic, pval, &
+       ktest, t, u, v, pulow, pvlow, pustr, pvstr, d_t, d_u, d_v)
 
     ! From LMDZ4/libf/phylmd/orografi.F, version 1.4 2005/12/01 11:27:29
 
     ! Author: F. Lott (LMD/CNRS). Date: 1995/02/01.
     ! Objet : frottement de la montagne, interface.
 
+    use comconst, only: dtphys
     USE dimphy, ONLY: klev, klon
     use orodrag_m, only: orodrag
     USE suphec_m, ONLY: rd, rg
 
-    REAL, INTENT (IN):: dtime ! pas d'int\'egration (s)
     REAL, INTENT (IN):: paprs(klon, klev+1) ! pression pour chaque
                                              ! inter-couche (en Pa)
     REAL, INTENT (IN):: pplay(klon, klev) ! pression pour le mileu de
@@ -90,15 +90,15 @@ contains
 
     ! Appeler la routine principale
 
-    CALL orodrag(klon, klev, ktest, dtime, papmh, papmf, zgeom, pt, pu, pv, &
+    CALL orodrag(klon, klev, ktest, dtphys, papmh, papmf, zgeom, pt, pu, pv, &
          pmea, pstd, psig, pgam, pthe, ppic, pval, pulow, pvlow, pdudt, &
          pdvdt, pdtdt)
 
     DO k = 1, klev
        DO i = 1, klon
-          d_u(i, klev+1-k) = dtime*pdudt(i, k)
-          d_v(i, klev+1-k) = dtime*pdvdt(i, k)
-          d_t(i, klev+1-k) = dtime*pdtdt(i, k)
+          d_u(i, klev+1-k) = dtphys*pdudt(i, k)
+          d_v(i, klev+1-k) = dtphys*pdvdt(i, k)
+          d_t(i, klev+1-k) = dtphys*pdtdt(i, k)
           pustr(i) = pustr(i) &
                + pdudt(i, k)*(papmh(i, k+1)-papmh(i, k))/rg
           pvstr(i) = pvstr(i) &

@@ -470,7 +470,7 @@ contains
        ENDIF
 
        ! Initialisation des sorties
-       call ini_histins(dtphys, ok_newmicro)
+       call ini_histins(ok_newmicro)
        CALL phyredem0
     ENDIF test_firstcal
 
@@ -549,8 +549,8 @@ contains
        fsolsw(:, nsrf) = solsw * (1. - falbe(:, nsrf)) / (1. - albsol)
     END forall
 
-    CALL pbl_surface(dtphys, pctsrf, t_seri, q_seri, u_seri, v_seri, julien, &
-         mu0, ftsol, cdmmax, cdhmax, ftsoil, qsol, paprs, play, fsnow, fqsurf, &
+    CALL pbl_surface(pctsrf, t_seri, q_seri, u_seri, v_seri, julien, mu0, &
+         ftsol, cdmmax, cdhmax, ftsoil, qsol, paprs, play, fsnow, fqsurf, &
          fevap, falbe, fluxlat, rain_fall, snow_fall, fsolsw, fsollw, frugs, &
          agesno, rugoro, d_t_vdf, d_q_vdf, d_u_vdf, d_v_vdf, d_ts, flux_t, &
          flux_q, flux_u, flux_v, cdragh, cdragm, q2, dsens, devap, coefh, t2m, &
@@ -641,10 +641,10 @@ contains
        conv_q = d_q_dyn + d_q_vdf / dtphys
        conv_t = d_t_dyn + d_t_vdf / dtphys
        z_avant = sum((q_seri + ql_seri) * zmasse, dim=2)
-       CALL conflx(dtphys, paprs, play, t_seri(:, llm:1:- 1), &
-            q_seri(:, llm:1:- 1), conv_t, conv_q, - evap, omega, d_t_con, &
-            d_q_con, rain_con, snow_con, mfu(:, llm:1:- 1), mfd(:, llm:1:- 1), &
-            pen_u, pde_u, pen_d, pde_d, kcbot, kctop, kdtop, pmflxr, pmflxs)
+       CALL conflx(paprs, play, t_seri(:, llm:1:- 1), q_seri(:, llm:1:- 1), &
+            conv_t, conv_q, - evap, omega, d_t_con, d_q_con, rain_con, &
+            snow_con, mfu(:, llm:1:- 1), mfd(:, llm:1:- 1), pen_u, pde_u, &
+            pen_d, pde_d, kcbot, kctop, kdtop, pmflxr, pmflxs)
        WHERE (rain_con < 0.) rain_con = 0.
        WHERE (snow_con < 0.) snow_con = 0.
        ibas_con = llm + 1 - kcbot
@@ -687,8 +687,8 @@ contains
        t_seri = t_seri + d_t_ajs
        q_seri = q_seri + d_q_ajs
     else
-       call calltherm(dtphys, play, paprs, pphi, u_seri, v_seri, t_seri, &
-            q_seri, d_u_ajs, d_v_ajs, d_t_ajs, d_q_ajs, fm_therm, entr_therm)
+       call calltherm(play, paprs, pphi, u_seri, v_seri, t_seri, q_seri, &
+            d_u_ajs, d_v_ajs, d_t_ajs, d_q_ajs, fm_therm, entr_therm)
     endif
 
     ! Caclul des ratqs
@@ -729,7 +729,7 @@ contains
        ratqs = ratqss
     endif
 
-    CALL fisrtilp(dtphys, paprs, play, t_seri, q_seri, ptconv, ratqs, d_t_lsc, &
+    CALL fisrtilp(paprs, play, t_seri, q_seri, ptconv, ratqs, d_t_lsc, &
          d_q_lsc, d_ql_lsc, rneb, cldliq, rain_lsc, snow_lsc, pfrac_impa, &
          pfrac_nucl, pfrac_1nucl, frac_impa, frac_nucl, prfl, psfl, rhcl)
 
@@ -875,9 +875,9 @@ contains
           ENDIF
        ENDDO
 
-       CALL drag_noro(dtphys, paprs, play, zmea, zstd, zsig, zgam, zthe, &
-            zpic, zval, ktest, t_seri, u_seri, v_seri, zulow, zvlow, zustrdr, &
-            zvstrdr, d_t_oro, d_u_oro, d_v_oro)
+       CALL drag_noro(paprs, play, zmea, zstd, zsig, zgam, zthe, zpic, zval, &
+            ktest, t_seri, u_seri, v_seri, zulow, zvlow, zustrdr, zvstrdr, &
+            d_t_oro, d_u_oro, d_v_oro)
 
        ! ajout des tendances
        DO k = 1, llm
@@ -898,9 +898,8 @@ contains
           ENDIF
        ENDDO
 
-       CALL lift_noro(dtphys, paprs, play, zmea, zstd, zpic, ktest, t_seri, &
-            u_seri, v_seri, zulow, zvlow, zustrli, zvstrli, d_t_lif, &
-            d_u_lif, d_v_lif)
+       CALL lift_noro(paprs, play, zmea, zstd, zpic, ktest, t_seri, u_seri, &
+            v_seri, zulow, zvlow, zustrli, zvstrli, d_t_lif, d_u_lif, d_v_lif)
 
        ! Ajout des tendances :
        DO k = 1, llm
@@ -918,10 +917,10 @@ contains
          aam, torsfc)
 
     ! Calcul des tendances traceurs
-    call phytrac(julien, time, firstcal, lafin, dtphys, t, paprs, play, mfu, &
-         mfd, pde_u, pen_d, coefh, cdragh, fm_therm, entr_therm, u(:, 1), &
-         v(:, 1), ftsol, pctsrf, frac_impa, frac_nucl, da, phi, mp, upwd, &
-         dnwd, tr_seri, zmasse, ncid_startphy)
+    call phytrac(julien, time, firstcal, lafin, t, paprs, play, mfu, mfd, &
+         pde_u, pen_d, coefh, cdragh, fm_therm, entr_therm, u(:, 1), v(:, 1), &
+         ftsol, pctsrf, frac_impa, frac_nucl, da, phi, mp, upwd, dnwd, &
+         tr_seri, zmasse, ncid_startphy)
 
     ! Calculer le transport de l'eau et de l'energie (diagnostique)
     CALL transp(paprs, t_seri, q_seri, u_seri, v_seri, zphi, ve, vq, ue, uq)

@@ -4,9 +4,9 @@ module conflx_m
 
 contains
 
-  SUBROUTINE conflx(dtime, pres_h, pres_f, t, q, con_t, con_q, qhfl, omega, &
-       d_t, d_q, rain, snow, mfu, mfd, pen_u, pde_u, pen_d, pde_d, kcbot, &
-       kctop, kdtop, pmflxr, pmflxs)
+  SUBROUTINE conflx(pres_h, pres_f, t, q, con_t, con_q, qhfl, omega, d_t, d_q, &
+       rain, snow, mfu, mfd, pen_u, pde_u, pen_d, pde_d, kcbot, kctop, kdtop, &
+       pmflxr, pmflxs)
 
     ! From LMDZ4/libf/phylmd/conflx.F, version 1.1.1.1 2004/05/19 12:53:08
 
@@ -20,13 +20,13 @@ contains
     ! par Olivier Boucher et Alexandre Armengaud pour le mélange et le
     ! lessivage des traceurs passifs.
 
-    use flxmain_m, only: flxmain
+    use comconst, only: dtphys
     USE dimphy, ONLY: klev, klon
+    USE fcttre, ONLY: foeew
+    use flxmain_m, only: flxmain
     USE suphec_m, ONLY: rd, retv, rtt
     USE yoethf_m, ONLY: r2es
-    USE fcttre, ONLY: foeew
 
-    REAL, intent(in):: dtime ! pas d'integration (s)
     REAL, intent(in):: pres_h(:, :) ! (klon, klev + 1) pression half-level (Pa)
     REAL, intent(in):: pres_f(:, :) ! (klon, klev) pression full-level (Pa)
     REAL, intent(in):: t(:, :) ! (klon, klev) temperature (K)
@@ -137,7 +137,7 @@ contains
     ENDDO
 
     ! Appeler la routine principale :
-    CALL flxmain(dtime, t, q, qsen, qhfl, paprsf, paprs, zgeom, land, &
+    CALL flxmain(dtphys, t, q, qsen, qhfl, paprsf, paprs, zgeom, land, &
          zcvgt, zcvgq, pvervel, rain, snow, kcbot, kctop, kdtop, mfu, mfd, &
          zen_u, zde_u, zen_d, zde_d, d_t_bis, d_q_bis, zmflxr, zmflxs)
 
@@ -146,8 +146,8 @@ contains
     ! la convection des traceurs.
     DO k = 1, klev
        DO i = 1, klon
-          d_q(i, klev + 1-k) = dtime*d_q_bis(i, k)
-          d_t(i, klev + 1-k) = dtime*d_t_bis(i, k)
+          d_q(i, klev + 1-k) = dtphys*d_q_bis(i, k)
+          d_t(i, klev + 1-k) = dtphys*d_t_bis(i, k)
        ENDDO
     ENDDO
 

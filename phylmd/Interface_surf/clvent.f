@@ -4,8 +4,8 @@ module clvent_m
 
 contains
 
-  SUBROUTINE clvent(dtime, u1lay, v1lay, coef, cdrag, t, ven, paprs, pplay, &
-       delp, d_ven, flux_v)
+  SUBROUTINE clvent(u1lay, v1lay, coef, cdrag, t, ven, paprs, pplay, delp, &
+       d_ven, flux_v)
 
     ! Author: Z. X. Li (LMD/CNRS)
     ! Date: 1993/08/18
@@ -13,10 +13,9 @@ contains
 
     use nr_util, only: assert
 
+    use comconst, only: dtphys
     USE dimphy, ONLY: klev
     USE suphec_m, ONLY: rd, rg
-
-    REAL, intent(in):: dtime ! intervalle de temps (en s)
 
     REAL, intent(in):: u1lay(:), v1lay(:) ! (knon)
     ! vent de la premiere couche (m / s)
@@ -54,11 +53,11 @@ contains
          size(d_ven, 1), size(flux_v)], "clvent knon")
 
     zx_coef(:, 1) = cdrag * (1. + SQRT(u1lay**2 + v1lay**2)) * pplay(:, 1) &
-         / (RD * t(:, 1)) * dtime * RG
+         / (RD * t(:, 1)) * dtphys * RG
 
     DO k = 2, klev
        zx_coef(:, k) = coef(:, k) * RG / (pplay(:, k - 1) - pplay(:, k)) &
-            * (paprs(:, k) * 2 / (t(:, k) + t(:, k - 1)) / RD)**2 * dtime * RG
+            * (paprs(:, k) * 2 / (t(:, k) + t(:, k - 1)) / RD)**2 * dtphys * RG
     ENDDO
 
     zx_buf = delp(:, 1) + zx_coef(:, 1) + zx_coef(:, 2)
@@ -82,7 +81,7 @@ contains
        local_ven(:, k) = zx_cv(:, k + 1) + zx_dv(:, k + 1) * local_ven(:, k + 1)
     ENDDO
 
-    flux_v = zx_coef(:, 1) / (RG * dtime) * local_ven(:, 1)
+    flux_v = zx_coef(:, 1) / (RG * dtphys) * local_ven(:, 1)
     d_ven = local_ven - ven
 
   END SUBROUTINE clvent

@@ -44,14 +44,10 @@ contains
     REAL, intent(in):: q2m(klon)
     REAL, intent(in):: ustar(:) ! (knon)
     REAL, intent(in):: flux_t(:), flux_q(:) ! (knon) flux à la surface
-
-    REAL, intent(in):: u(klon, klev) ! vitesse U (m/s)
-    REAL, intent(in):: v(klon, klev) ! vitesse V (m/s)
-
-    ! temperature (K)
-    REAL, intent(in):: t(:, :) ! (knon, klev)
-    ! vapeur d'eau (kg/kg)
-    REAL, intent(in):: q(klon, klev)
+    REAL, intent(in):: u(:, :) ! (knon, klev) vitesse U (m/s)
+    REAL, intent(in):: v(:, :) ! (knon, klev) vitesse V (m/s)
+    REAL, intent(in):: t(:, :) ! (knon, klev) temperature (K)
+    REAL, intent(in):: q(:, :) ! (knon, klev) vapeur d'eau (kg/kg)
 
     REAL, intent(out):: pblh(:) ! (knon)
     ! Cape du thermique

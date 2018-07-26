@@ -4,9 +4,9 @@ module clqh_m
 
 contains
 
-  SUBROUTINE clqh(dtime, julien, debut, nisurf, knindex, tsoil, qsol, rmu0, &
-       rugos, rugoro, u1lay, v1lay, coef, tq_cdrag, t, q, ts, paprs, pplay, &
-       delp, radsol, albedo, snow, qsurf, precip_rain, precip_snow, fluxlat, &
+  SUBROUTINE clqh(julien, debut, nisurf, knindex, tsoil, qsol, rmu0, rugos, &
+       rugoro, u1lay, v1lay, coef, tq_cdrag, t, q, ts, paprs, pplay, delp, &
+       radsol, albedo, snow, qsurf, precip_rain, precip_snow, fluxlat, &
        pctsrf_new_sic, agesno, d_t, d_q, d_ts, z0_new, flux_t, flux_q, &
        dflux_s, dflux_l, fqcalving, ffonte, run_off_lic_0)
 
@@ -16,11 +16,11 @@ contains
 
     use climb_hq_down_m, only: climb_hq_down
     use climb_hq_up_m, only: climb_hq_up
+    use comconst, only: dtphys
     USE dimphy, ONLY: klev, klon
     USE interfsurf_hq_m, ONLY: interfsurf_hq
     USE suphec_m, ONLY: rkappa
 
-    REAL, intent(in):: dtime ! intervalle du temps (s)
     integer, intent(in):: julien ! jour de l'annee en cours
     logical, intent(in):: debut
     integer, intent(in):: nisurf
@@ -111,9 +111,9 @@ contains
     forall (k = 1:klev) pkf(:, k) = (paprs(:, 1) / pplay(:, k))**RKAPPA
     ! (La pression de r\'ef\'erence est celle au sol.)
 
-    call climb_hq_down(pkf, cq, dq, ch, dh, paprs, pplay, t, coef, dtime, &
+    call climb_hq_down(pkf, cq, dq, ch, dh, paprs, pplay, t, coef, dtphys, &
          delp, q)
-    CALL interfsurf_hq(dtime, julien, rmu0, nisurf, knindex, debut, tsoil, &
+    CALL interfsurf_hq(dtphys, julien, rmu0, nisurf, knindex, debut, tsoil, &
          qsol, u1lay, v1lay, t(:, 1), q(:, 1), tq_cdrag, ch(:, 1), cq(:, 1), &
          dh(:, 1), dq(:, 1), precip_rain, precip_snow, rugos, rugoro, snow, &
          qsurf, ts, pplay(:, 1), paprs(:, 1), radsol, evap, flux_t, fluxlat, &
@@ -121,7 +121,8 @@ contains
          fqcalving, ffonte, run_off_lic_0)
     flux_q = - evap
     d_ts = tsurf_new - ts
-    call climb_hq_up(d_t, d_q, cq, dq, ch, dh, flux_t, flux_q, dtime, pkf, t, q)
+    call climb_hq_up(d_t, d_q, cq, dq, ch, dh, flux_t, flux_q, dtphys, pkf, t, &
+         q)
 
   END SUBROUTINE clqh
 

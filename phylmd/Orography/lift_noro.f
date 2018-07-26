@@ -4,18 +4,17 @@ module lift_noro_m
 
 contains
 
-  SUBROUTINE lift_noro(dtime, paprs, pplay, pmea, pstd, ppic, ktest, t, u, v, &
-       pulow, pvlow, pustr, pvstr, d_t, d_u, d_v)
+  SUBROUTINE lift_noro(paprs, pplay, pmea, pstd, ppic, ktest, t, u, v, pulow, &
+       pvlow, pustr, pvstr, d_t, d_u, d_v)
 
     ! Author: F.Lott (LMD/CNRS) date: 1995/02/01
     ! Objet: Frottement de la montagne, interface
 
+    use comconst, only: dtphys
     USE dimphy, only: klon, klev
     use phyetat0_m, only: rlat
     USE suphec_m, only: rd, rg
     
-    REAL, INTENT (IN) :: dtime
-    ! dtime---input-R- pas d'integration (s)
     REAL, INTENT (IN) :: paprs(klon, klev + 1)
     ! paprs---input-R-pression pour chaque inter-couche (en Pa)
     REAL, INTENT (IN) :: pplay(klon, klev)
@@ -92,14 +91,14 @@ contains
 
     ! appeler la routine principale
 
-    CALL orolift(klon, klev, ktest, dtime, papmh, zgeom, pt, pu, pv, rlat, &
+    CALL orolift(klon, klev, ktest, dtphys, papmh, zgeom, pt, pu, pv, rlat, &
          pmea, pstd, ppic, pulow, pvlow, pdudt, pdvdt, pdtdt)
 
     DO k = 1, klev
        DO i = 1, klon
-          d_u(i, klev + 1-k) = dtime * pdudt(i, k)
-          d_v(i, klev + 1-k) = dtime * pdvdt(i, k)
-          d_t(i, klev + 1-k) = dtime * pdtdt(i, k)
+          d_u(i, klev + 1-k) = dtphys * pdudt(i, k)
+          d_v(i, klev + 1-k) = dtphys * pdvdt(i, k)
+          d_t(i, klev + 1-k) = dtphys * pdtdt(i, k)
           pustr(i) = pustr(i) &
                + pdudt(i, k) * (papmh(i, k + 1)-papmh(i, k)) / rg
           pvstr(i) = pvstr(i) &

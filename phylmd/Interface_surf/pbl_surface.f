@@ -4,11 +4,11 @@ module pbl_surface_m
 
 contains
 
-  SUBROUTINE pbl_surface(dtime, pctsrf, t, q, u, v, julien, mu0, ftsol, &
-       cdmmax, cdhmax, ftsoil, qsol, paprs, pplay, fsnow, qsurf, evap, falbe, &
-       fluxlat, rain_fall, snow_f, fsolsw, fsollw, frugs, agesno, rugoro, d_t, &
-       d_q, d_u, d_v, d_ts, flux_t, flux_q, flux_u, flux_v, cdragh, cdragm, &
-       q2, dflux_t, dflux_q, coefh, t2m, q2m, u10m_srf, v10m_srf, pblh, capcl, &
+  SUBROUTINE pbl_surface(pctsrf, t, q, u, v, julien, mu0, ftsol, cdmmax, &
+       cdhmax, ftsoil, qsol, paprs, pplay, fsnow, qsurf, evap, falbe, fluxlat, &
+       rain_fall, snow_f, fsolsw, fsollw, frugs, agesno, rugoro, d_t, d_q, &
+       d_u, d_v, d_ts, flux_t, flux_q, flux_u, flux_v, cdragh, cdragm, q2, &
+       dflux_t, dflux_q, coefh, t2m, q2m, u10m_srf, v10m_srf, pblh, capcl, &
        oliqcl, cteicl, pblt, therm, plcl, fqcalving, ffonte, run_off_lic_0)
 
     ! From phylmd/clmain.F, version 1.6, 2005/11/16 14:47:19
@@ -35,8 +35,6 @@ contains
     use stdlevvar_m, only: stdlevvar
     USE suphec_m, ONLY: rd, rg
     use time_phylmdz, only: itap
-
-    REAL, INTENT(IN):: dtime ! interval du temps (secondes)
 
     REAL, INTENT(inout):: pctsrf(klon, nbsrf)
     ! tableau des pourcentages de surface de chaque maille
@@ -74,7 +72,7 @@ contains
     real agesno(klon, nbsrf)
     REAL, INTENT(IN):: rugoro(klon)
 
-    REAL, intent(out):: d_t(klon, klev), d_q(klon, klev)
+    REAL, intent(out):: d_t(:, :), d_q(:, :) ! (klon, klev)
     ! changement pour t et q
 
     REAL, intent(out):: d_u(klon, klev), d_v(klon, klev)
@@ -213,9 +211,6 @@ contains
     ypaprs = 0.
     ypplay = 0.
     ydelp = 0.
-    yu = 0.
-    yv = 0.
-    yq = 0.
     yrugoro = 0.
     d_ts = 0.
     flux_t = 0.
@@ -331,31 +326,30 @@ contains
              END DO
           end IF
 
-          call coef_diff_turb(dtime, nsrf, ni(:knon), ypaprs(:knon, :), &
+          call coef_diff_turb(nsrf, ni(:knon), ypaprs(:knon, :), &
                ypplay(:knon, :), yu(:knon, :), yv(:knon, :), yq(:knon, :), &
                yt(:knon, :), yts(:knon), ycdragm(:knon), zgeop(:knon, :), &
                ycoefm(:knon, :), ycoefh(:knon, :), yq2(:knon, :))
 
-          CALL clvent(dtime, yu(:knon, 1), yv(:knon, 1), ycoefm(:knon, :), &
+          CALL clvent(yu(:knon, 1), yv(:knon, 1), ycoefm(:knon, :), &
                ycdragm(:knon), yt(:knon, :), yu(:knon, :), ypaprs(:knon, :), &
                ypplay(:knon, :), ydelp(:knon, :), y_d_u(:knon, :), &
                y_flux_u(:knon))
-          CALL clvent(dtime, yu(:knon, 1), yv(:knon, 1), ycoefm(:knon, :), &
+          CALL clvent(yu(:knon, 1), yv(:knon, 1), ycoefm(:knon, :), &
                ycdragm(:knon), yt(:knon, :), yv(:knon, :), ypaprs(:knon, :), &
                ypplay(:knon, :), ydelp(:knon, :), y_d_v(:knon, :), &
                y_flux_v(:knon))
 
-          CALL clqh(dtime, julien, firstcal, nsrf, ni(:knon), &
-               ytsoil(:knon, :), yqsol(:knon), mu0, yrugos(:knon), &
-               yrugoro(:knon), yu(:knon, 1), yv(:knon, 1), ycoefh(:knon, :), &
-               ycdragh(:knon), yt(:knon, :), yq(:knon, :), yts(:knon), &
-               ypaprs(:knon, :), ypplay(:knon, :), ydelp(:knon, :), &
-               yrads(:knon), yalb(:knon), snow(:knon), yqsurf(:knon), yrain_f, &
-               ysnow_f, yfluxlat(:knon), pctsrf_new_sic, yagesno(:knon), &
-               y_d_t(:knon, :), y_d_q(:knon, :), y_d_ts(:knon), &
-               yz0_new(:knon), y_flux_t(:knon), y_flux_q(:knon), &
-               y_dflux_t(:knon), y_dflux_q(:knon), y_fqcalving(:knon), &
-               y_ffonte, y_run_off_lic_0)
+          CALL clqh(julien, firstcal, nsrf, ni(:knon), ytsoil(:knon, :), &
+               yqsol(:knon), mu0, yrugos(:knon), yrugoro(:knon), yu(:knon, 1), &
+               yv(:knon, 1), ycoefh(:knon, :), ycdragh(:knon), yt(:knon, :), &
+               yq(:knon, :), yts(:knon), ypaprs(:knon, :), ypplay(:knon, :), &
+               ydelp(:knon, :), yrads(:knon), yalb(:knon), snow(:knon), &
+               yqsurf(:knon), yrain_f, ysnow_f, yfluxlat(:knon), &
+               pctsrf_new_sic, yagesno(:knon), y_d_t(:knon, :), &
+               y_d_q(:knon, :), y_d_ts(:knon), yz0_new(:knon), &
+               y_flux_t(:knon), y_flux_q(:knon), y_dflux_t(:knon), &
+               y_dflux_q(:knon), y_fqcalving(:knon), y_ffonte, y_run_off_lic_0)
 
           ! calculer la longueur de rugosite sur ocean
 
@@ -473,8 +467,9 @@ contains
           END DO
 
           CALL hbtm(ypaprs, ypplay, yt2m, yq2m, ustar(:knon), y_flux_t(:knon), &
-               y_flux_q(:knon), yu, yv, yt(:knon, :), yq, ypblh(:knon), &
-               ycapcl, yoliqcl, ycteicl, ypblt, ytherm, ylcl)
+               y_flux_q(:knon), yu(:knon, :), yv(:knon, :), yt(:knon, :), &
+               yq(:knon, :), ypblh(:knon), ycapcl, yoliqcl, ycteicl, ypblt, &
+               ytherm, ylcl)
 
           DO j = 1, knon
              i = ni(j)
