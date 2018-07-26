@@ -61,14 +61,6 @@ contains
     call NF95_PUT_ATT(ncid, varid_latv, 'units', 'degrees_north')
     call NF95_PUT_ATT(ncid, varid_latv, 'long_name', 'Latitude en v')
 
-    call NF95_DEF_VAR(ncid, 'grille_u', NF90_FLOAT, (/dimid_lonu, &
-         dimid_latu/), varid)
-    call NF95_PUT_ATT(ncid, varid, 'long_name', 'Grille aux points u')
-
-    call NF95_DEF_VAR(ncid, 'grille_v', NF90_FLOAT, (/dimid_lonv, &
-         dimid_latv/), varid)
-    call NF95_PUT_ATT(ncid, varid, 'long_name', 'Grille aux points v')
-
     call NF95_DEF_VAR(ncid, 'grille_s', NF90_FLOAT, (/dimid_lonv, &
          dimid_latu/), varid)
     call NF95_PUT_ATT(ncid, varid, 'long_name', 'Grille aux points scalaires')

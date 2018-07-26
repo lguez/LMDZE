@@ -99,7 +99,7 @@ contains
 
     ! Local:
 
-    INTEGER knon, k
+    INTEGER k
     REAL evap(size(knindex)) ! (knon) evaporation au sol
     REAL, dimension(size(knindex), klev):: cq, dq, ch, dh ! (knon, klev)
     REAL buf1(size(knindex)), buf2(size(knindex))
@@ -120,15 +120,6 @@ contains
 
     !----------------------------------------------------------------
 
-    knon = size(knindex)
-
-    if (iflag_pbl == 1) then
-       gamt(:, 2) = - 2.5e-3
-       gamt(:, 3:)= - 1e-3
-    else
-       gamt = 0.
-    endif
-
     psref = paprs(:, 1) ! pression de reference est celle au sol
     forall (k = 1:klev) pkf(:, k) = (psref / pplay(:, k))**RKAPPA
     h = RCPD * t * pkf
@@ -139,9 +130,16 @@ contains
          * (paprs(:, k) * 2 / (t(:, k) + t(:, k - 1)) / RD)**2 * dtime * RG**2
 
     ! Preparer les flux lies aux contre-gardients
-    forall (k = 2:klev) gamah(:, k) = gamt(:, k) * (RD * (t(:, k - 1) &
-         + t(:, k)) / 2. / RG / paprs(:, k) * (pplay(:, k - 1) - pplay(:, k))) &
-         * RCPD * (psref / paprs(:, k))**RKAPPA
+
+    if (iflag_pbl == 1) then
+       gamt(:, 2) = - 2.5e-3
+       gamt(:, 3:)= - 1e-3
+       forall (k = 2:klev) gamah(:, k) = gamt(:, k) * (RD * (t(:, k - 1) &
+            + t(:, k)) / 2. / RG / paprs(:, k) * (pplay(:, k - 1) &
+            - pplay(:, k))) * RCPD * (psref / paprs(:, k))**RKAPPA
+    else
+       gamah = 0.
+    endif
 
     buf1 = zx_coef(:, klev) + delp(:, klev)
     cq(:, klev) = q(:, klev) * delp(:, klev) / buf1
@@ -178,11 +176,11 @@ contains
     dh(:, 1) = - 1. * RG / buf2
 
     CALL interfsurf_hq(dtime, julien, rmu0, nisurf, knindex, debut, tsoil, &
-         qsol, u1lay, v1lay, t(:, 1), q(:, 1), tq_cdrag(:knon), ch(:, 1), &
-         cq(:, 1), dh(:, 1), dq(:, 1), precip_rain, precip_snow, rugos, &
-         rugoro, snow, qsurf, ts, pplay(:, 1), psref, radsol, evap, flux_t, &
-         fluxlat, dflux_l, dflux_s, tsurf_new, albedo, z0_new, pctsrf_new_sic, &
-         agesno, fqcalving, ffonte, run_off_lic_0)
+         qsol, u1lay, v1lay, t(:, 1), q(:, 1), tq_cdrag, ch(:, 1), cq(:, 1), &
+         dh(:, 1), dq(:, 1), precip_rain, precip_snow, rugos, rugoro, snow, &
+         qsurf, ts, pplay(:, 1), psref, radsol, evap, flux_t, fluxlat, &
+         dflux_l, dflux_s, tsurf_new, albedo, z0_new, pctsrf_new_sic, agesno, &
+         fqcalving, ffonte, run_off_lic_0)
 
     flux_q = - evap
     d_ts = tsurf_new - ts
