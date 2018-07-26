@@ -22,7 +22,8 @@ ce0l.o : unit_nml_m.o limit.o indicesol.o grilles_gcm_netcdf_sub.o etat0.o dynet
 cleanstr.o : mathelp.o strlowercase.o 
 clesphys.o : unit_nml_m.o 
 clesphys2.o : conf_gcm.o unit_nml_m.o 
-clqh.o : suphec.o interfsurf_hq.o dimphy.o conf_phys.o 
+climb_hq_down.o : suphec.o dimphy.o conf_phys.o 
+clqh.o : suphec.o interfsurf_hq.o dimphy.o climb_hq_down.o 
 cltrac.o : suphec.o dimphy.o 
 cltracrn.o : suphec.o dimphy.o indicesol.o 
 clvent.o : suphec.o dimphy.o 

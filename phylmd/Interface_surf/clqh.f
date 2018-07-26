@@ -14,10 +14,10 @@ contains
     ! Date: 1993 Aug. 18th
     ! Objet : diffusion verticale de "q" et de "h"
 
-    USE conf_phys_m, ONLY: iflag_pbl
+    use climb_hq_down_m, only: climb_hq_down
     USE dimphy, ONLY: klev, klon
     USE interfsurf_hq_m, ONLY: interfsurf_hq
-    USE suphec_m, ONLY: rcpd, rd, rg, rkappa
+    USE suphec_m, ONLY: rcpd
 
     REAL, intent(in):: dtime ! intervalle du temps (s)
     integer, intent(in):: julien ! jour de l'annee en cours
@@ -102,83 +102,19 @@ contains
     INTEGER k
     REAL evap(size(knindex)) ! (knon) evaporation au sol
     REAL, dimension(size(knindex), klev):: cq, dq, ch, dh ! (knon, klev)
-    REAL buf1(size(knindex)), buf2(size(knindex))
-    REAL zx_coef(size(knindex), 2:klev) ! (knon, 2:klev)
     REAL h(size(knindex), klev) ! (knon, klev) enthalpie potentielle
     REAL local_q(size(knindex), klev) ! (knon, klev)
-
-    REAL psref(size(knindex)) ! (knon)
-    ! pression de reference pour temperature potentielle
-
     REAL pkf(size(knindex), klev) ! (knon, klev)
-
-    REAL gamt(size(knindex), 2:klev) ! (knon, 2:klev)
-    ! contre-gradient pour la chaleur sensible, en K m-1
-
-    REAL gamah(size(knindex), 2:klev) ! (knon, 2:klev)
     real tsurf_new(size(knindex)) ! (knon)
 
     !----------------------------------------------------------------
 
-    psref = paprs(:, 1) ! pression de reference est celle au sol
-    forall (k = 1:klev) pkf(:, k) = (psref / pplay(:, k))**RKAPPA
-    h = RCPD * t * pkf
-
-    ! Convertir les coefficients en variables convenables au calcul:
-    forall (k = 2:klev) zx_coef(:, k) = coef(:, k) &
-         / (pplay(:, k - 1) - pplay(:, k)) &
-         * (paprs(:, k) * 2 / (t(:, k) + t(:, k - 1)) / RD)**2 * dtime * RG**2
-
-    ! Preparer les flux lies aux contre-gardients
-
-    if (iflag_pbl == 1) then
-       gamt(:, 2) = - 2.5e-3
-       gamt(:, 3:)= - 1e-3
-       forall (k = 2:klev) gamah(:, k) = gamt(:, k) * (RD * (t(:, k - 1) &
-            + t(:, k)) / 2. / RG / paprs(:, k) * (pplay(:, k - 1) &
-            - pplay(:, k))) * RCPD * (psref / paprs(:, k))**RKAPPA
-    else
-       gamah = 0.
-    endif
-
-    buf1 = zx_coef(:, klev) + delp(:, klev)
-    cq(:, klev) = q(:, klev) * delp(:, klev) / buf1
-    dq(:, klev) = zx_coef(:, klev) / buf1
-
-    buf2 = delp(:, klev) / pkf(:, klev) + zx_coef(:, klev)
-    ch(:, klev) = (h(:, klev) / pkf(:, klev) * delp(:, klev) &
-         - zx_coef(:, klev) * gamah(:, klev)) / buf2
-    dh(:, klev) = zx_coef(:, klev) / buf2
-
-    DO k = klev - 1, 2, - 1
-       buf1 = delp(:, k) + zx_coef(:, k) &
-            + zx_coef(:, k + 1) * (1. - dq(:, k + 1))
-       cq(:, k) = (q(:, k) * delp(:, k) &
-            + zx_coef(:, k + 1) * cq(:, k + 1)) / buf1
-       dq(:, k) = zx_coef(:, k) / buf1
-
-       buf2 = delp(:, k) / pkf(:, k) + zx_coef(:, k) &
-            + zx_coef(:, k + 1) * (1. - dh(:, k + 1))
-       ch(:, k) = (h(:, k) / pkf(:, k) * delp(:, k) &
-            + zx_coef(:, k + 1) * ch(:, k + 1) &
-            + zx_coef(:, k + 1) * gamah(:, k + 1) &
-            - zx_coef(:, k) * gamah(:, k)) / buf2
-       dh(:, k) = zx_coef(:, k) / buf2
-    ENDDO
-
-    buf1 = delp(:, 1) + zx_coef(:, 2) * (1. - dq(:, 2))
-    cq(:, 1) = (q(:, 1) * delp(:, 1) + zx_coef(:, 2) * cq(:, 2)) / buf1
-    dq(:, 1) = - 1. * RG / buf1
-
-    buf2 = delp(:, 1) / pkf(:, 1) + zx_coef(:, 2) * (1. - dh(:, 2))
-    ch(:, 1) = (h(:, 1) / pkf(:, 1) * delp(:, 1) &
-         + zx_coef(:, 2) * (gamah(:, 2) + ch(:, 2))) / buf2
-    dh(:, 1) = - 1. * RG / buf2
-
+    call climb_hq_down(pkf, cq, dq, ch, dh, paprs, pplay, t, coef, dtime, &
+       delp, q)
     CALL interfsurf_hq(dtime, julien, rmu0, nisurf, knindex, debut, tsoil, &
          qsol, u1lay, v1lay, t(:, 1), q(:, 1), tq_cdrag, ch(:, 1), cq(:, 1), &
          dh(:, 1), dq(:, 1), precip_rain, precip_snow, rugos, rugoro, snow, &
-         qsurf, ts, pplay(:, 1), psref, radsol, evap, flux_t, fluxlat, &
+         qsurf, ts, pplay(:, 1), paprs(:, 1), radsol, evap, flux_t, fluxlat, &
          dflux_l, dflux_s, tsurf_new, albedo, z0_new, pctsrf_new_sic, agesno, &
          fqcalving, ffonte, run_off_lic_0)
 
