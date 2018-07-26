@@ -13,7 +13,7 @@ contains
     ! Laurent Fairhead, March, 2001
 
     USE indicesol, ONLY: epsfra, is_lic, is_sic, is_ter
-    USE interface_surf, ONLY: tau_calv
+    USE conf_interface_m, ONLY: tau_calv
     use nr_util, only: assert_eq
     USE suphec_m, ONLY: rday, rlmlt, rtt
 

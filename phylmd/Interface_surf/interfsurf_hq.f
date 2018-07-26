@@ -24,7 +24,7 @@ contains
     USE dimphy, ONLY: klon
     USE fonte_neige_m, ONLY: fonte_neige
     USE indicesol, ONLY: epsfra, is_lic, is_oce, is_sic, is_ter
-    USE interface_surf, ONLY: conf_interface
+    USE conf_interface_m, ONLY: conf_interface
     USE interfsur_lim_m, ONLY: interfsur_lim
     use limit_read_sst_m, only: limit_read_sst
     use soil_m, only: soil

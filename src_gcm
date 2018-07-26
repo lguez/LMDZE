@@ -148,7 +148,7 @@ initial0.f
 initrrnpb.f
 init_tau2alpha.f
 integrd.f
-interface_surf.f
+conf_interface.f
 interfoce_lim.f
 interfsurf_hq.f
 interfsur_lim.f

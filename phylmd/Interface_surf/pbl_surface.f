@@ -345,7 +345,6 @@ contains
                ypplay(:knon, :), ydelp(:knon, :), y_d_v(:knon, :), &
                y_flux_v(:knon))
 
-          ! calculer la diffusion de "q" et de "h"
           CALL clqh(dtime, julien, firstcal, nsrf, ni(:knon), &
                ytsoil(:knon, :), yqsol(:knon), mu0, yrugos(:knon), &
                yrugoro(:knon), yu(:knon, 1), yv(:knon, 1), ycoefh(:knon, :), &

@@ -24,7 +24,7 @@ clesphys.o : unit_nml_m.o
 clesphys2.o : conf_gcm.o unit_nml_m.o 
 climb_hq_down.o : suphec.o dimphy.o conf_phys.o 
 climb_hq_up.o : suphec.o dimphy.o 
-clqh.o : interfsurf_hq.o dimphy.o climb_hq_up.o climb_hq_down.o 
+clqh.o : suphec.o interfsurf_hq.o dimphy.o climb_hq_up.o climb_hq_down.o 
 cltrac.o : suphec.o dimphy.o 
 cltracrn.o : suphec.o dimphy.o indicesol.o 
 clvent.o : suphec.o dimphy.o 
@@ -39,6 +39,7 @@ comgeomphy.o : dimphy.o
 concvl.o : yoethf.o suphec.o FCTTRE.o dimphy.o cv_driver.o comconst.o 
 conf_gcm.o : unit_nml_m.o abort_gcm.o 
 conf_guide.o : writefield.o unit_nml_m.o tau2alpha.o init_tau2alpha.o dynetat0.o conf_gcm.o comconst.o dimensions.o 
+conf_interface.o : unit_nml_m.o 
 conf_phys.o : YOMCST.o unit_nml_m.o comfisrtilp.o clesphys2.o clesphys.o 
 conflx.o : FCTTRE.o yoethf.o suphec.o dimphy.o flxmain.o 
 convflu.o : comgeom.o paramet_m.o dimensions.o 
@@ -98,7 +99,7 @@ flxdtdq.o : suphec.o dimphy.o
 flxflux.o : FCTTRE.o yoethf.o suphec.o dimphy.o 
 flxini.o : suphec.o flxadjtq.o dimphy.o 
 flxmain.o : yoethf.o YOECUMF.o suphec.o flxini.o flxflux.o flxdtdq.o flxdlfs.o flxddraf.o flxbase.o flxasc.o dimphy.o 
-fonte_neige.o : suphec.o interface_surf.o indicesol.o 
+fonte_neige.o : suphec.o conf_interface.o indicesol.o 
 gcm.o : createnewfield.o unit_nml_m.o suphec.o leapfrog.o ioconf_calendar.o init_dynzon.o inithist.o inifilr.o inidissip.o iniadvtrac.o histclo.o grid_change.o dynredem0.o dynetat0.o disvert.o dimensions.o conf_guide.o conf_gcm.o comgeomphy.o comgeom.o comdissnew.o comconst.o 
 geopot.o : dimensions.o 
 getfieldindex.o : createnewfield.o 
@@ -141,9 +142,8 @@ inithist.o : ymds2ju.o temps.o paramet_m.o iniadvtrac.o histvert.o histend.o his
 initrrnpb.o : dimphy.o 
 integrd.o : qminimum.o paramet_m.o massdair.o disvert.o dimensions.o comgeom.o 
 inter_barxy.o : ord_coordm.o ord_coord.o inter_bary.o inter_barx.o dimensions.o comgeom.o 
-interface_surf.o : unit_nml_m.o 
 interfsur_lim.o : time_phylmdz.o dimphy.o 
-interfsurf_hq.o : suphec.o soil.o limit_read_sst.o interfsur_lim.o interface_surf.o indicesol.o fonte_neige.o dimphy.o calcul_fluxs.o albsno.o alboc_cd.o abort_gcm.o 
+interfsurf_hq.o : suphec.o soil.o limit_read_sst.o interfsur_lim.o conf_interface.o indicesol.o fonte_neige.o dimphy.o calcul_fluxs.o albsno.o alboc_cd.o abort_gcm.o 
 ioconf_calendar.o : errioipsl.o strlowercase.o calendar.o 
 ioget_calendar.o : ioconf_calendar.o calendar.o 
 isittime.o : ymds2ju.o ju2ymds.o itau2date.o calendar.o 

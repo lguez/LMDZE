@@ -18,6 +18,7 @@ contains
     use climb_hq_up_m, only: climb_hq_up
     USE dimphy, ONLY: klev, klon
     USE interfsurf_hq_m, ONLY: interfsurf_hq
+    USE suphec_m, ONLY: rkappa
 
     REAL, intent(in):: dtime ! intervalle du temps (s)
     integer, intent(in):: julien ! jour de l'annee en cours
@@ -99,6 +100,7 @@ contains
 
     ! Local:
 
+    INTEGER k
     REAL evap(size(knindex)) ! (knon) evaporation au sol
     REAL, dimension(size(knindex), klev):: cq, dq, ch, dh ! (knon, klev)
     REAL pkf(size(knindex), klev) ! (knon, klev)
@@ -106,8 +108,11 @@ contains
 
     !----------------------------------------------------------------
 
+    forall (k = 1:klev) pkf(:, k) = (paprs(:, 1) / pplay(:, k))**RKAPPA
+    ! (La pression de r\'ef\'erence est celle au sol.)
+
     call climb_hq_down(pkf, cq, dq, ch, dh, paprs, pplay, t, coef, dtime, &
-       delp, q)
+         delp, q)
     CALL interfsurf_hq(dtime, julien, rmu0, nisurf, knindex, debut, tsoil, &
          qsol, u1lay, v1lay, t(:, 1), q(:, 1), tq_cdrag, ch(:, 1), cq(:, 1), &
          dh(:, 1), dq(:, 1), precip_rain, precip_snow, rugos, rugoro, snow, &

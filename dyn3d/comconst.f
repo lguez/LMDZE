@@ -1,13 +1,13 @@
 module comconst
 
-  use nr_util, only: pi
+  use nr_util, only: twopi
 
   implicit none
 
   real, parameter:: daysec = 86400. ! number of seconds per day
 
-  REAL dtvr ! time step for dynamics, in s
-  REAL dtphys ! time step for physics, in s
+  REAL, protected:: dtvr ! time step for dynamics, in s
+  REAL, protected:: dtphys ! time step for physics, in s
 
   real, parameter:: rad = 6371229. ! radius of the Earth (in m)
 
@@ -21,10 +21,10 @@ module comconst
 
   real, parameter:: g = 9.8 ! acceleration of gravity (in m s-2)
 
-  real, parameter:: omeg = 2 * pi / daysec
+  real, parameter:: omeg = twopi / daysec
   ! angular speed of rotation of the Earth (in rad s-1)
 
-  private pi
+  private twopi
 
 contains
 

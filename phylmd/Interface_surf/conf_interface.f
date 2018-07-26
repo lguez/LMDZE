@@ -1,4 +1,4 @@
-MODULE interface_surf
+MODULE conf_interface_m
 
   ! From phylmd/interface_surf.F90, version 1.8 2005/05/25 13:10:09
   ! L. Fairhead, LMD, february 2000
@@ -30,4 +30,4 @@ contains
 
   end subroutine conf_interface
 
-END MODULE interface_surf
+END MODULE conf_interface_m

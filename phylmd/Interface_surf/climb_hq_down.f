@@ -11,7 +11,8 @@ contains
     USE dimphy, ONLY: klev
     USE suphec_m, ONLY: rcpd, rd, rg, rkappa
 
-    REAL, intent(out), dimension(:, :):: pkf, cq, dq, ch, dh ! (knon, klev)
+    REAL, intent(in):: pkf(:, :) ! (knon, klev)
+    REAL, intent(out), dimension(:, :):: cq, dq, ch, dh ! (knon, klev)
 
     REAL, intent(in):: paprs(:, :) ! (knon, klev + 1)
     ! pression a inter-couche (Pa)
@@ -45,9 +46,6 @@ contains
     REAL buf1(size(paprs, 1)), buf2(size(paprs, 1))
 
     !----------------------------------------------------------------
-
-    forall (k = 1:klev) pkf(:, k) = (paprs(:, 1) / pplay(:, k))**RKAPPA
-    ! (La pression de r\'ef\'erence est celle au sol.)
 
     h = RCPD * t * pkf
 
