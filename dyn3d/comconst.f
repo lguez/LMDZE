@@ -44,9 +44,7 @@ contains
 
     print *, 'dtvr = ', dtvr
     print *, 'dtphys = ', dtphys
-    PRINT *, 'cpp = ', cpp
     PRINT *, 'R = ', r
-    PRINT *, 'kappa = ', kappa
 
   END SUBROUTINE iniconst
 

@@ -4,12 +4,11 @@ module interfsurf_hq_m
 
 contains
 
-  SUBROUTINE interfsurf_hq(dtime, julien, rmu0, nisurf, knindex, debut, &
-       tsoil, qsol, u1_lay, v1_lay, temp_air, spechum, tq_cdrag, petAcoef, &
-       peqAcoef, petBcoef, peqBcoef, precip_rain, precip_snow, rugos, rugoro, &
-       snow, qsurf, ts, p1lay, ps, radsol, evap, flux_t, fluxlat, dflux_l, &
-       dflux_s, tsurf_new, albedo, z0_new, pctsrf_new_sic, agesno, fqcalving, &
-       ffonte, run_off_lic_0)
+  SUBROUTINE interfsurf_hq(julien, rmu0, nisurf, knindex, debut, tsoil, qsol, &
+       u1_lay, v1_lay, temp_air, spechum, tq_cdrag, tAcoef, qAcoef, tBcoef, &
+       qBcoef, precip_rain, precip_snow, rugos, rugoro, snow, qsurf, ts, &
+       p1lay, ps, radsol, evap, flux_t, fluxlat, dflux_l, dflux_s, tsurf_new, &
+       albedo, z0_new, pctsrf_new_sic, agesno, fqcalving, ffonte, run_off_lic_0)
 
     ! Cette routine sert d'aiguillage entre l'atmosph\`ere et la surface
     ! en g\'en\'eral (sols continentaux, oc\'eans, glaces) pour les flux de
@@ -30,7 +29,6 @@ contains
     use soil_m, only: soil
     USE suphec_m, ONLY: rcpd, rtt
 
-    real, intent(IN):: dtime ! pas de temps de la physique (en s)
     integer, intent(IN):: julien ! jour dans l'annee en cours
     real, intent(IN):: rmu0(klon) ! cosinus de l'angle solaire zenithal
     integer, intent(IN):: nisurf ! index de la surface a traiter
@@ -52,10 +50,10 @@ contains
     real, intent(IN):: spechum(:) ! (knon) humidite specifique 1ere couche
     real, intent(IN):: tq_cdrag(:) ! (knon) coefficient d'echange
 
-    real, intent(IN):: petAcoef(:), peqAcoef(:) ! (knon)
+    real, intent(IN):: tAcoef(:), qAcoef(:) ! (knon)
     ! coefficients A de la r\'esolution de la couche limite pour t et q
 
-    real, intent(IN):: petBcoef(:), peqBcoef(:) ! (knon)
+    real, intent(IN):: tBcoef(:), qBcoef(:) ! (knon)
     ! coefficients B de la r\'esolution de la couche limite pour t et q
 
     real, intent(IN):: precip_rain(klon)
@@ -118,8 +116,8 @@ contains
 
     knon = size(knindex)
 
-    ! On doit commencer par appeler les schemas de surfaces continentales
-    ! car l'ocean a besoin du ruissellement qui est y calcule
+    ! On doit commencer par appeler les sch\'emas de surfaces
+    ! continentales car l'oc\'ean a besoin du ruissellement.
 
     if (first_call) then
        call conf_interface
@@ -128,13 +126,13 @@ contains
           print *, ' nisurf = ', nisurf, ' /= is_ter = ', is_ter
           print *, 'or on doit commencer par les surfaces continentales'
           call abort_gcm("interfsurf_hq", &
-               'On doit commencer par les surfaces continentales')
+               'On doit commencer par les surfaces continentales.')
        endif
 
        if (is_oce > is_sic) then
           print *, 'is_oce = ', is_oce, '> is_sic = ', is_sic
           call abort_gcm("interfsurf_hq", &
-               "L'ocean doit etre traite avant la banquise")
+               "L'oc\'ean doit \^etre trait\'e avant la banquise.")
        endif
 
        first_call = .false.
@@ -156,22 +154,22 @@ contains
        ! Read albedo from the file containing boundary conditions then
        ! add the albedo of snow:
 
-       call interfsur_lim(dtime, julien, knindex, debut, albedo, z0_new)
+       call interfsur_lim(julien, knindex, debut, albedo, z0_new)
 
        beta = min(2. * qsol / max_eau_sol, 1.)
        dif_grnd(:knon) = 0.
-       CALL soil(dtime, is_ter, snow, ts, tsoil, soilcap, soilflux)
+       CALL soil(is_ter, snow, ts, tsoil, soilcap, soilflux)
        cal = RCPD / soilcap
 
-       CALL calcul_fluxs(dtime, ts, p1lay, cal, beta, tq_cdrag, ps, qsurf, &
+       CALL calcul_fluxs(ts, p1lay, cal, beta, tq_cdrag, ps, qsurf, &
             radsol + soilflux, dif_grnd(:knon), temp_air, spechum, u1_lay, &
-            v1_lay, petAcoef, peqAcoef, petBcoef, peqBcoef, tsurf_new, evap, &
-            fluxlat, flux_t, dflux_s, dflux_l)
-       CALL fonte_neige(is_ter, dtime, precip_rain(:knon), precip_snow(:knon), &
-            snow, qsol, tsurf_new, evap, fqcalving, ffonte(:knon), &
+            v1_lay, tAcoef, qAcoef, tBcoef, qBcoef, tsurf_new, evap, fluxlat, &
+            flux_t, dflux_s, dflux_l)
+       CALL fonte_neige(is_ter, precip_rain(:knon), precip_snow(:knon), snow, &
+            qsol, tsurf_new, evap, fqcalving, ffonte(:knon), &
             run_off_lic_0(:knon))
 
-       call albsno(dtime, agesno, alb_neig, precip_snow(:knon))
+       call albsno(agesno, alb_neig, precip_snow(:knon))
        where (snow < 0.0001) agesno = 0.
        zfra = max(0., min(1., snow / (snow + 10.)))
        albedo = alb_neig * zfra + albedo * (1. - zfra)
@@ -183,10 +181,10 @@ contains
        cal = 0.
        beta = 1.
        dif_grnd = 0.
-       call calcul_fluxs(dtime, tsurf, p1lay, cal, beta, tq_cdrag, ps, qsurf, &
-            radsol, dif_grnd(:knon), temp_air, spechum, u1_lay, v1_lay, &
-            petAcoef, peqAcoef, petBcoef, peqBcoef, tsurf_new, evap, fluxlat, &
-            flux_t, dflux_s, dflux_l)
+       call calcul_fluxs(tsurf, p1lay, cal, beta, tq_cdrag, ps, qsurf, radsol, &
+            dif_grnd(:knon), temp_air, spechum, u1_lay, v1_lay, tAcoef, &
+            qAcoef, tBcoef, qBcoef, tsurf_new, evap, fluxlat, flux_t, dflux_s, &
+            dflux_l)
        agesno = 0.
        albedo = alboc_cd(rmu0(knindex)) * fmagic
        z0_new = sqrt(rugos**2 + rugoro**2)
@@ -204,23 +202,23 @@ contains
           endif
        enddo
 
-       CALL soil(dtime, is_sic, snow, tsurf_new, tsoil, soilcap, soilflux)
+       CALL soil(is_sic, snow, tsurf_new, tsoil, soilcap, soilflux)
        cal = RCPD / soilcap
        dif_grnd = 1. / tau_gl
        tsurf = tsurf_new
        beta = 1.
 
-       CALL calcul_fluxs(dtime, tsurf, p1lay, cal, beta, tq_cdrag, ps, qsurf, &
+       CALL calcul_fluxs(tsurf, p1lay, cal, beta, tq_cdrag, ps, qsurf, &
             radsol + soilflux, dif_grnd(:knon), temp_air, spechum, u1_lay, &
-            v1_lay, petAcoef, peqAcoef, petBcoef, peqBcoef, tsurf_new, evap, &
-            fluxlat, flux_t, dflux_s, dflux_l)
-       CALL fonte_neige(is_sic, dtime, precip_rain(:knon), &
-            precip_snow(:knon), snow, qsol, tsurf_new, evap, &
-            fqcalving, ffonte(:knon), run_off_lic_0(:knon))
+            v1_lay, tAcoef, qAcoef, tBcoef, qBcoef, tsurf_new, evap, fluxlat, &
+            flux_t, dflux_s, dflux_l)
+       CALL fonte_neige(is_sic, precip_rain(:knon), precip_snow(:knon), snow, &
+            qsol, tsurf_new, evap, fqcalving, ffonte(:knon), &
+            run_off_lic_0(:knon))
 
        ! Compute the albedo:
 
-       CALL albsno(dtime, agesno, alb_neig, precip_snow(:knon))
+       CALL albsno(agesno, alb_neig, precip_snow(:knon))
        WHERE (snow < 0.0001) agesno = 0.
        zfra = MAX(0., MIN(1., snow / (snow + 10.)))
        albedo = alb_neig * zfra + 0.6 * (1. - zfra)
@@ -229,21 +227,21 @@ contains
     case (is_lic)
        ! Surface "glacier continentaux" appel a l'interface avec le sol
 
-       CALL soil(dtime, is_lic, snow, ts, tsoil, soilcap, soilflux)
+       CALL soil(is_lic, snow, ts, tsoil, soilcap, soilflux)
        cal = RCPD / soilcap
        beta = 1.
        dif_grnd = 0.
 
-       call calcul_fluxs(dtime, ts, p1lay, cal, beta, tq_cdrag, ps, qsurf, &
+       call calcul_fluxs(ts, p1lay, cal, beta, tq_cdrag, ps, qsurf, &
             radsol + soilflux, dif_grnd(:knon), temp_air, spechum, u1_lay, &
-            v1_lay, petAcoef, peqAcoef, petBcoef, peqBcoef, tsurf_new, evap, &
-            fluxlat, flux_t, dflux_s, dflux_l)
-       call fonte_neige(is_lic, dtime, precip_rain(:knon), &
-            precip_snow(:knon), snow, qsol, tsurf_new, evap, &
-            fqcalving, ffonte(:knon), run_off_lic_0(:knon))
+            v1_lay, tAcoef, qAcoef, tBcoef, qBcoef, tsurf_new, evap, fluxlat, &
+            flux_t, dflux_s, dflux_l)
+       call fonte_neige(is_lic, precip_rain(:knon), precip_snow(:knon), snow, &
+            qsol, tsurf_new, evap, fqcalving, ffonte(:knon), &
+            run_off_lic_0(:knon))
 
        ! calcul albedo
-       CALL albsno(dtime, agesno, alb_neig, precip_snow(:knon))
+       CALL albsno(agesno, alb_neig, precip_snow(:knon))
        WHERE (snow < 0.0001) agesno = 0.
        albedo = 0.77
 

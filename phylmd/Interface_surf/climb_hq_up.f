@@ -4,9 +4,9 @@ module climb_hq_up_m
 
 contains
 
-  subroutine climb_hq_up(d_t, d_q, cq, dq, ch, dh, flux_t, flux_q, dtime, pkf, &
-       t, q)
+  subroutine climb_hq_up(d_t, d_q, cq, dq, ch, dh, flux_t, flux_q, pkf, t, q)
 
+    use comconst, only: dtphys
     USE dimphy, ONLY: klev
     USE suphec_m, ONLY: rcpd
 
@@ -21,7 +21,6 @@ contains
     REAL, intent(out):: flux_q(:) ! (knon)
     ! flux de la vapeur d'eau à la surface, en kg / (m**2 s)
 
-    REAL, intent(in):: dtime ! intervalle du temps (s)
     REAL, intent(in):: pkf(:, :) ! (knon, klev)
     REAL, intent(in):: t(:, :) ! (knon, klev) temperature (K)
     REAL, intent(in):: q(:, :) ! (knon, klev) humidite specifique (kg / kg)
@@ -33,8 +32,8 @@ contains
 
     !----------------------------------------------------------------------
 
-    h(:, 1) = ch(:, 1) + dh(:, 1) * flux_t * dtime
-    local_q(:, 1) = cq(:, 1) + dq(:, 1) * flux_q * dtime
+    h(:, 1) = ch(:, 1) + dh(:, 1) * flux_t * dtphys
+    local_q(:, 1) = cq(:, 1) + dq(:, 1) * flux_q * dtphys
 
     DO k = 2, klev
        h(:, k) = ch(:, k) + dh(:, k) * h(:, k - 1)

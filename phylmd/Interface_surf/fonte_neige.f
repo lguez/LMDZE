@@ -4,7 +4,7 @@ module fonte_neige_m
 
 contains
 
-  SUBROUTINE fonte_neige(nisurf, dtime, precip_rain, precip_snow, snow, qsol, &
+  SUBROUTINE fonte_neige(nisurf, precip_rain, precip_snow, snow, qsol, &
        tsurf_new, evap, fqcalving, ffonte, run_off_lic_0)
 
     ! Routine de traitement de la fonte de la neige dans le cas du traitement
@@ -12,13 +12,13 @@ contains
 
     ! Laurent Fairhead, March, 2001
 
+    use comconst, only: dtphys
     USE indicesol, ONLY: epsfra, is_lic, is_sic, is_ter
     USE conf_interface_m, ONLY: tau_calv
     use nr_util, only: assert_eq
     USE suphec_m, ONLY: rday, rlmlt, rtt
 
     integer, intent(IN):: nisurf ! surface \`a traiter
-    real, intent(IN):: dtime ! pas de temps de la physique (en s)
 
     real, intent(IN):: precip_rain(:) ! (knon)
     ! precipitation, liquid water mass flux (kg / m2 / s), positive down
@@ -68,18 +68,18 @@ contains
          size(qsol), size(tsurf_new), size(evap), size(fqcalving), &
          size(ffonte), size(run_off_lic_0)/), "fonte_neige knon")
 
-    coeff_rel = dtime / (tau_calv * rday)
-    WHERE (precip_snow > 0.) snow = snow + precip_snow * dtime
+    coeff_rel = dtphys / (tau_calv * rday)
+    WHERE (precip_snow > 0.) snow = snow + precip_snow * dtphys
 
     WHERE (evap > 0.)
-       snow_evap = MIN(snow / dtime, evap)
-       snow = snow - snow_evap * dtime
+       snow_evap = MIN(snow / dtphys, evap)
+       snow = snow - snow_evap * dtphys
        snow = MAX(0., snow)
     elsewhere
        snow_evap = 0.
     end where
 
-    bil_eau_s = (precip_rain - evap + snow_evap) * dtime
+    bil_eau_s = (precip_rain - evap + snow_evap) * dtphys
 
     ! Y a-t-il fonte de neige ?
 
@@ -87,7 +87,7 @@ contains
        if ((snow(i) > epsfra .OR. nisurf == is_sic &
             .OR. nisurf == is_lic) .AND. tsurf_new(i) >= RTT) then
           fq_fonte = MIN(MAX((tsurf_new(i) - RTT) / chasno, 0.), snow(i))
-          ffonte(i) = fq_fonte * RLMLT / dtime
+          ffonte(i) = fq_fonte * RLMLT / dtphys
           snow(i) = max(0., snow(i) - fq_fonte)
           bil_eau_s(i) = bil_eau_s(i) + fq_fonte
           tsurf_new(i) = tsurf_new(i) - fq_fonte * chasno
@@ -95,7 +95,7 @@ contains
           !IM cf. JLD/ GKtest fonte aussi pour la glace
           IF (nisurf == is_sic .OR. nisurf == is_lic) THEN
              fq_fonte = MAX((tsurf_new(i) - RTT) / chaice, 0.)
-             ffonte(i) = ffonte(i) + fq_fonte * RLMLT / dtime
+             ffonte(i) = ffonte(i) + fq_fonte * RLMLT / dtphys
              bil_eau_s(i) = bil_eau_s(i) + fq_fonte
              tsurf_new(i) = RTT
           ENDIF
@@ -104,7 +104,7 @@ contains
        endif
 
        ! S'il y a une hauteur trop importante de neige, elle s'\'ecoule
-       fqcalving(i) = max(0., snow(i) - snow_max) / dtime
+       fqcalving(i) = max(0., snow(i) - snow_max) / dtphys
        snow(i) = min(snow(i), snow_max)
     enddo
 
@@ -118,7 +118,7 @@ contains
           run_off_lic(i) = (coeff_rel * fqcalving(i)) + &
                (1. - coeff_rel) * run_off_lic_0(i)
           run_off_lic_0(i) = run_off_lic(i)
-          run_off_lic(i) = run_off_lic(i) + bil_eau_s(i) / dtime
+          run_off_lic(i) = run_off_lic(i) + bil_eau_s(i) / dtphys
        enddo
     endif
 

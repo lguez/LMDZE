@@ -4,7 +4,7 @@ module soil_m
 
 contains
 
-  SUBROUTINE soil(dtime, nisurf, snow, tsurf, tsoil, soilcap, soilflux)
+  SUBROUTINE soil(nisurf, snow, tsurf, tsoil, soilcap, soilflux)
 
     ! From LMDZ4/libf/phylmd/soil.F, version 1.1.1.1, 2004/05/19
 
@@ -31,12 +31,12 @@ contains
     ! F0 = A + B (Ts(t))
     ! Soilcap = B * dt
 
+    use comconst, only: dtphys
     USE indicesol, only: nbsrf, is_lic, is_oce, is_sic, is_ter
     USE dimphy, only: klon
     USE dimsoil, only: nsoilmx
     USE suphec_m, only: rtt
 
-    REAL, intent(in):: dtime ! physical timestep (s)
     INTEGER, intent(in):: nisurf ! sub-surface index
     REAL, intent(in):: snow(:) ! (knon)
     REAL, intent(in):: tsurf(:) ! (knon) surface temperature at time-step t (K)
@@ -166,7 +166,7 @@ contains
     END IF
 
     DO jk = 1, nsoilmx
-       zdz2(jk) = dz2(jk) / dtime
+       zdz2(jk) = dz2(jk) / dtphys
     END DO
 
     DO ig = 1, knon
@@ -193,11 +193,11 @@ contains
        soilflux(ig) = ztherm_i(ig) * dz1(1) * (zc(ig, 1, nisurf) + (zd(ig, 1, &
             nisurf) - 1.) * tsoil(ig, 1))
        soilcap(ig) = ztherm_i(ig) * (dz2(1) &
-            + dtime * (1. - zd(ig, 1, nisurf)) * dz1(1))
+            + dtphys * (1. - zd(ig, 1, nisurf)) * dz1(1))
        z1(ig, nisurf) = lambda * (1. - zd(ig, 1, nisurf)) + 1.
        soilcap(ig) = soilcap(ig) / z1(ig, nisurf)
        soilflux(ig) = soilflux(ig) + soilcap(ig) * (tsoil(ig, 1) &
-            * z1(ig, nisurf) - lambda * zc(ig, 1, nisurf) - tsurf(ig)) / dtime
+            * z1(ig, nisurf) - lambda * zc(ig, 1, nisurf) - tsurf(ig)) / dtphys
     END DO
 
   contains

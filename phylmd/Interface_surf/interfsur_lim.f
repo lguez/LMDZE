@@ -4,19 +4,19 @@ module interfsur_lim_m
 
 contains
 
-  SUBROUTINE interfsur_lim(dtime, jour, knindex, debut, albedo, z0_new)
+  SUBROUTINE interfsur_lim(jour, knindex, debut, albedo, z0_new)
 
     ! Cette routine sert d'interface entre le mod\`ele atmosph\'erique et
     ! un fichier de conditions aux limites.
 
     ! Laurent FAIRHEAD, February 2000
 
+    use comconst, only: dtphys
     USE dimphy, ONLY: klon
     use netcdf, only: NF90_NOWRITE
     use netcdf95, only: NF95_close, NF95_GET_VAR, NF95_INQ_VARID, NF95_OPEN
     use time_phylmdz, only: itap
 
-    real, intent(IN):: dtime ! pas de temps de la physique (en s)
     integer, intent(IN):: jour ! jour a lire dans l'annee
 
     integer, intent(in):: knindex(:) ! (knon)
@@ -48,7 +48,7 @@ contains
     knon = size(knindex)
 
     if (debut) then
-       lmt_pas = nint(86400. / dtime) ! pour une lecture une fois par jour
+       lmt_pas = nint(86400. / dtphys) ! pour une lecture une fois par jour
        jour_lu_sur = jour - 1
        allocate(alb_lu(klon))
        allocate(rug_lu(klon))

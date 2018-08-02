@@ -16,7 +16,6 @@ contains
 
     use climb_hq_down_m, only: climb_hq_down
     use climb_hq_up_m, only: climb_hq_up
-    use comconst, only: dtphys
     USE dimphy, ONLY: klev, klon
     USE interfsurf_hq_m, ONLY: interfsurf_hq
     USE suphec_m, ONLY: rkappa
@@ -111,18 +110,16 @@ contains
     forall (k = 1:klev) pkf(:, k) = (paprs(:, 1) / pplay(:, k))**RKAPPA
     ! (La pression de r\'ef\'erence est celle au sol.)
 
-    call climb_hq_down(pkf, cq, dq, ch, dh, paprs, pplay, t, coef, dtphys, &
-         delp, q)
-    CALL interfsurf_hq(dtphys, julien, rmu0, nisurf, knindex, debut, tsoil, &
-         qsol, u1lay, v1lay, t(:, 1), q(:, 1), tq_cdrag, ch(:, 1), cq(:, 1), &
+    call climb_hq_down(pkf, cq, dq, ch, dh, paprs, pplay, t, coef, delp, q)
+    CALL interfsurf_hq(julien, rmu0, nisurf, knindex, debut, tsoil, qsol, &
+         u1lay, v1lay, t(:, 1), q(:, 1), tq_cdrag, ch(:, 1), cq(:, 1), &
          dh(:, 1), dq(:, 1), precip_rain, precip_snow, rugos, rugoro, snow, &
          qsurf, ts, pplay(:, 1), paprs(:, 1), radsol, evap, flux_t, fluxlat, &
          dflux_l, dflux_s, tsurf_new, albedo, z0_new, pctsrf_new_sic, agesno, &
          fqcalving, ffonte, run_off_lic_0)
     flux_q = - evap
     d_ts = tsurf_new - ts
-    call climb_hq_up(d_t, d_q, cq, dq, ch, dh, flux_t, flux_q, dtphys, pkf, t, &
-         q)
+    call climb_hq_up(d_t, d_q, cq, dq, ch, dh, flux_t, flux_q, pkf, t, q)
 
   END SUBROUTINE clqh
 

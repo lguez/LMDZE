@@ -4,9 +4,9 @@ module climb_hq_down_m
 
 contains
 
-  subroutine climb_hq_down(pkf, cq, dq, ch, dh, paprs, pplay, t, coef, dtime, &
-       delp, q)
+  subroutine climb_hq_down(pkf, cq, dq, ch, dh, paprs, pplay, t, coef, delp, q)
 
+    use comconst, only: dtphys
     USE conf_phys_m, ONLY: iflag_pbl
     USE dimphy, ONLY: klev
     USE suphec_m, ONLY: rcpd, rd, rg, rkappa
@@ -25,8 +25,6 @@ contains
     REAL, intent(in):: coef(:, 2:) ! (knon, 2:klev)
     ! Le coefficient d'echange (m**2 / s) multiplie par le cisaillement
     ! du vent (dV / dz)
-
-    REAL, intent(in):: dtime ! intervalle du temps (s)
 
     REAL, intent(in):: delp(:, :) ! (knon, klev)
     ! epaisseur de couche en pression (Pa)
@@ -52,7 +50,7 @@ contains
     ! Convertir les coefficients en variables convenables au calcul:
     forall (k = 2:klev) zx_coef(:, k) = coef(:, k) &
          / (pplay(:, k - 1) - pplay(:, k)) &
-         * (paprs(:, k) * 2 / (t(:, k) + t(:, k - 1)) / RD)**2 * dtime * RG**2
+         * (paprs(:, k) * 2 / (t(:, k) + t(:, k - 1)) / RD)**2 * dtphys * RG**2
 
     ! Preparer les flux lies aux contre-gardients
 

@@ -8,11 +8,12 @@ advect.o : paramet_m.o dimensions.o
 advn.o : comgeom.o conf_gcm.o disvert.o comconst.o paramet_m.o dimensions.o 
 advtrac.o : vlspltqs.o vlsplt.o paramet_m.o massbar.o iniadvtrac.o groupe.o dimensions.o conf_gcm.o comconst.o 
 ajsec.o : suphec.o dimphy.o 
+albsno.o : comconst.o 
 bernoui.o : filtreg_scal.o dimensions.o 
 bilan_dyn.o : paramet_m.o massbar.o init_dynzon.o histwrite.o enercin.o dimensions.o covcont.o comgeom.o comconst.o 
 buildop.o : decoop.o errioipsl.o 
 caladvtrac.o : qminimum.o paramet_m.o dimensions.o conf_gcm.o advtrac.o 
-calcul_fluxs.o : yoethf.o suphec.o FCTTRE.o 
+calcul_fluxs.o : yoethf.o suphec.o FCTTRE.o comconst.o 
 caldyn.o : vitvert.o tourpot.o sortvarc.o paramet_m.o massdair.o massbarxy.o massbar.o flumass.o enercin.o dynetat0.o dudv2.o dudv1.o dteta1.o disvert.o dimensions.o covcont.o convmas.o conf_gcm.o comgeom.o comconst.o bernoui.o advect.o 
 caldyn0.o : vitvert.o tourpot.o sortvarc.o paramet_m.o massdair.o massbarxy.o massbar.o flumass.o enercin.o dynetat0.o disvert.o dimensions.o covcont.o convmas.o comgeom.o bernoui.o 
 calfis.o : physiq.o grid_change.o dynetat0.o disvert.o dimphy.o dimensions.o comgeom.o comconst.o 
@@ -22,9 +23,9 @@ ce0l.o : unit_nml_m.o limit.o indicesol.o grilles_gcm_netcdf_sub.o etat0.o dynet
 cleanstr.o : mathelp.o strlowercase.o 
 clesphys.o : unit_nml_m.o 
 clesphys2.o : conf_gcm.o unit_nml_m.o 
-climb_hq_down.o : suphec.o dimphy.o conf_phys.o 
-climb_hq_up.o : suphec.o dimphy.o 
-clqh.o : suphec.o interfsurf_hq.o dimphy.o comconst.o climb_hq_up.o climb_hq_down.o 
+climb_hq_down.o : suphec.o dimphy.o conf_phys.o comconst.o 
+climb_hq_up.o : suphec.o dimphy.o comconst.o 
+clqh.o : suphec.o interfsurf_hq.o dimphy.o climb_hq_up.o climb_hq_down.o 
 cltrac.o : suphec.o dimphy.o 
 cltracrn.o : suphec.o dimphy.o indicesol.o 
 clvent.o : suphec.o dimphy.o comconst.o 
@@ -99,7 +100,7 @@ flxdtdq.o : suphec.o dimphy.o
 flxflux.o : FCTTRE.o yoethf.o suphec.o dimphy.o 
 flxini.o : suphec.o flxadjtq.o dimphy.o 
 flxmain.o : yoethf.o YOECUMF.o suphec.o flxini.o flxflux.o flxdtdq.o flxdlfs.o flxddraf.o flxbase.o flxasc.o dimphy.o 
-fonte_neige.o : suphec.o conf_interface.o indicesol.o 
+fonte_neige.o : suphec.o conf_interface.o indicesol.o comconst.o 
 gcm.o : createnewfield.o unit_nml_m.o suphec.o leapfrog.o ioconf_calendar.o init_dynzon.o inithist.o inifilr.o inidissip.o iniadvtrac.o histclo.o grid_change.o dynredem0.o dynetat0.o disvert.o dimensions.o conf_guide.o conf_gcm.o comgeomphy.o comgeom.o comdissnew.o comconst.o 
 geopot.o : dimensions.o 
 getfieldindex.o : createnewfield.o 
@@ -142,7 +143,7 @@ inithist.o : ymds2ju.o temps.o paramet_m.o iniadvtrac.o histvert.o histend.o his
 initrrnpb.o : dimphy.o 
 integrd.o : qminimum.o paramet_m.o massdair.o disvert.o dimensions.o comgeom.o 
 inter_barxy.o : ord_coordm.o ord_coord.o inter_bary.o inter_barx.o dimensions.o comgeom.o 
-interfsur_lim.o : time_phylmdz.o dimphy.o 
+interfsur_lim.o : time_phylmdz.o dimphy.o comconst.o 
 interfsurf_hq.o : suphec.o soil.o limit_read_sst.o interfsur_lim.o conf_interface.o indicesol.o fonte_neige.o dimphy.o calcul_fluxs.o albsno.o alboc_cd.o abort_gcm.o 
 ioconf_calendar.o : errioipsl.o strlowercase.o calendar.o 
 ioget_calendar.o : ioconf_calendar.o calendar.o 
@@ -209,7 +210,7 @@ rotat_nfil.o : comgeom.o paramet_m.o dimensions.o
 rotatf.o : filtreg_v.o comgeom.o paramet_m.o dimensions.o 
 screenc.o : suphec.o cdrag.o 
 screenp.o : dimphy.o 
-soil.o : suphec.o dimsoil.o dimphy.o indicesol.o 
+soil.o : suphec.o dimsoil.o dimphy.o indicesol.o comconst.o 
 sortvarc.o : paramet_m.o massbarxy.o filtreg_scal.o dynetat0.o dimensions.o comgeom.o comconst.o 
 start_init_orog.o : indicesol.o grid_noro.o dynetat0.o conf_dat2d.o dimensions.o 
 start_init_phys_m.o : inter_barxy.o gr_int_dyn_m.o dynetat0.o dimensions.o conf_dat2d.o 

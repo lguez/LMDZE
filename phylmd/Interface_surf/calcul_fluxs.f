@@ -4,9 +4,9 @@ module calcul_fluxs_m
 
 contains
 
-  SUBROUTINE calcul_fluxs(dtime, tsurf, p1lay, cal, beta, coef1lay, ps, qsurf, &
-       radsol, dif_grnd, t1lay, q1lay, u1lay, v1lay, petAcoef, peqAcoef, &
-       petBcoef, peqBcoef, tsurf_new, evap, fluxlat, flux_t, dflux_s, dflux_l)
+  SUBROUTINE calcul_fluxs(tsurf, p1lay, cal, beta, coef1lay, ps, qsurf, &
+       radsol, dif_grnd, t1lay, q1lay, u1lay, v1lay, tAcoef, qAcoef, tBcoef, &
+       qBcoef, tsurf_new, evap, fluxlat, flux_t, dflux_s, dflux_l)
 
     ! Cette routine calcule les flux en h et q à l'interface et une
     ! température de surface.
@@ -16,13 +16,14 @@ contains
     ! Note that, if cal = 0, beta = 1 and dif_grnd = 0, then tsurf_new
     ! = tsurf and qsurf = qsat.
 
+    ! Libraries:
     use nr_util, only: assert_eq
 
+    use comconst, only: dtphys
     USE fcttre, ONLY: foede, foeew
     USE suphec_m, ONLY: rcpd, rd, retv, rlstt, rlvtt, rtt
     USE yoethf_m, ONLY: r2es, r5ies, r5les, rvtmp2
 
-    real, intent(IN):: dtime
     real, intent(IN):: tsurf(:) ! (knon) température de surface
 
     real, intent(IN):: p1lay(:) ! (knon)
@@ -42,10 +43,10 @@ contains
 
     real, intent(IN):: t1lay(:), q1lay(:), u1lay(:), v1lay(:) ! (knon)
 
-    real, intent(IN):: petAcoef(:), peqAcoef(:) ! (knon)
+    real, intent(IN):: tAcoef(:), qAcoef(:) ! (knon)
     ! coefficients A de la résolution de la couche limite pour T et q
 
-    real, intent(IN):: petBcoef(:), peqBcoef(:) ! (knon)
+    real, intent(IN):: tBcoef(:), qBcoef(:) ! (knon)
     ! coefficients B de la résolution de la couche limite pour t et q
 
     real, intent(OUT):: tsurf_new(:) ! (knon) température au sol
@@ -72,8 +73,8 @@ contains
 
     knon = assert_eq([size(tsurf), size(p1lay), size(cal), size(beta), &
          size(coef1lay), size(ps), size(qsurf), size(radsol), size(dif_grnd), &
-         size(t1lay), size(q1lay), size(u1lay), size(v1lay), size(petAcoef), &
-         size(peqAcoef), size(petBcoef), size(peqBcoef), size(tsurf_new), &
+         size(t1lay), size(q1lay), size(u1lay), size(v1lay), size(tAcoef), &
+         size(qAcoef), size(tBcoef), size(qBcoef), size(tsurf_new), &
          size(evap), size(fluxlat), size(flux_t), size(dflux_s), &
          size(dflux_l)], "calcul_fluxs knon")
 
@@ -93,23 +94,23 @@ contains
     sl = merge(RLSTT, RLVTT, tsurf < RTT)
 
     ! Q
-    oq = 1. - beta * coef * peqBcoef * dtime
-    mq = beta * coef * (peqAcoef - qsat + dq_s_dt * tsurf) / oq
+    oq = 1. - beta * coef * qBcoef * dtphys
+    mq = beta * coef * (qAcoef - qsat + dq_s_dt * tsurf) / oq
     nq = - beta * coef * dq_s_dt / oq
 
     ! H
-    oh = 1. - coef * petBcoef * dtime
-    mh = coef * petAcoef / oh
+    oh = 1. - coef * tBcoef * dtphys
+    mh = coef * tAcoef / oh
     dflux_s = - coef * RCPD / oh
 
-    tsurf_new = (tsurf + cal / RCPD * dtime * (radsol + mh + sl * mq) &
-         + dif_grnd * t_grnd * dtime) / (1. - dtime * cal / RCPD * (dflux_s &
-         + sl * nq) + dtime * dif_grnd)
+    tsurf_new = (tsurf + cal / RCPD * dtphys * (radsol + mh + sl * mq) &
+         + dif_grnd * t_grnd * dtphys) / (1. - dtphys * cal / RCPD * (dflux_s &
+         + sl * nq) + dtphys * dif_grnd)
     evap = - mq - nq * tsurf_new
     fluxlat = - evap * sl
     flux_t = mh + dflux_s * tsurf_new
     dflux_l = sl * nq
-    qsurf = (peqAcoef - peqBcoef * evap * dtime) * (1. - beta) + beta * (qsat &
+    qsurf = (qAcoef - qBcoef * evap * dtphys) * (1. - beta) + beta * (qsat &
          + dq_s_dt * (tsurf_new - tsurf))
 
   END SUBROUTINE calcul_fluxs
