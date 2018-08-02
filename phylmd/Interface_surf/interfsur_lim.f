@@ -4,14 +4,14 @@ module interfsur_lim_m
 
 contains
 
-  SUBROUTINE interfsur_lim(jour, knindex, debut, albedo, z0_new)
+  SUBROUTINE interfsur_lim(jour, knindex, albedo, z0_new)
 
     ! Cette routine sert d'interface entre le mod\`ele atmosph\'erique et
     ! un fichier de conditions aux limites.
 
     ! Laurent FAIRHEAD, February 2000
 
-    use comconst, only: dtphys
+    use conf_gcm_m, only: lmt_pas
     USE dimphy, ONLY: klon
     use netcdf, only: NF90_NOWRITE
     use netcdf95, only: NF95_close, NF95_GET_VAR, NF95_INQ_VARID, NF95_OPEN
@@ -22,37 +22,22 @@ contains
     integer, intent(in):: knindex(:) ! (knon)
     ! index des points de la surface \`a traiter
 
-    logical, intent(IN):: debut ! premier appel \`a la physique (initialisation)
     real, intent(out):: albedo(:) ! (knon) albedo lu
     real, intent(out):: z0_new(:) ! (knon) longueur de rugosit\'e lue
 
     ! Local:
 
-    integer knon ! nombre de points dans le domaine a traiter
-
-    integer, save:: lmt_pas ! frequence de lecture des conditions limites
-    ! (en pas de physique)
-
     logical, save:: deja_lu_sur
     ! jour \`a lire d\'ej\`a lu pour une surface pr\'ec\'edente
 
-    integer, save:: jour_lu_sur
+    integer:: jour_lu_sur = - 1
 
     ! Champs lus dans le fichier de conditions aux limites :
-    real, allocatable, save:: alb_lu(:), rug_lu(:)
+    real, save:: alb_lu(klon), rug_lu(klon)
 
     integer ncid, varid
 
     !------------------------------------------------------------
-
-    knon = size(knindex)
-
-    if (debut) then
-       lmt_pas = nint(86400. / dtphys) ! pour une lecture une fois par jour
-       jour_lu_sur = jour - 1
-       allocate(alb_lu(klon))
-       allocate(rug_lu(klon))
-    endif
 
     if (jour - jour_lu_sur /= 0) deja_lu_sur = .false.
 

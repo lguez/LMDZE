@@ -20,6 +20,7 @@ contains
     use calltherm_m, only: calltherm
     USE clesphys, ONLY: cdhmax, cdmmax, ecrit_ins, ok_instan
     USE clesphys2, ONLY: conv_emanuel, nbapp_rad, new_oliq, ok_orodr, ok_orolf
+    USE conf_interface_m, ONLY: conf_interface
     USE pbl_surface_m, ONLY: pbl_surface
     use clouds_gno_m, only: clouds_gno
     use comconst, only: dtphys
@@ -472,6 +473,7 @@ contains
        ! Initialisation des sorties
        call ini_histins(ok_newmicro)
        CALL phyredem0
+       call conf_interface
     ENDIF test_firstcal
 
     ! We will modify variables *_seri and we will not touch variables

@@ -3,35 +3,40 @@ module conf_gcm_m
   IMPLICIT NONE
 
   INTEGER:: nday = 1 ! nombre de jours d'int\'egration
-  integer:: day_step = 240 ! nombre de pas de temps de la dynamique par jour
-  integer:: iperiod = 5 ! periode pour le pas Matsuno (en pas de temps)
 
-  integer:: iapp_tracvl = 5
+  integer, protected:: day_step = 240
+  ! nombre de pas de temps de la dynamique par jour
+
+  integer, protected:: iperiod = 5
+  ! periode pour le pas Matsuno (en pas de temps)
+
+  integer, protected:: iapp_tracvl = 5
   ! Should normally be equal to "iperiod"
   ! frequence du groupement des flux (en pas de temps) 
 
-  integer:: iconser = 240
+  integer, protected:: iconser = 240
   ! number of time steps between output of control variables
 
-  integer:: iphysiq = 5
+  integer, protected:: iphysiq = 5
   ! number of time steps of dynamics between calls to physics
 
-  logical:: raz_date = .false.
+  logical, protected:: raz_date = .false.
   ! prise en compte de la date initiale de la namelist et remise \`a
   ! z\'ero des compteurs de pas de temps (sinon on garde la date du
   ! fichier restart)
 
-  integer:: periodav = 1 
+  integer, protected:: periodav = 1 
   ! time interval between outputs in the dynamical part, in days
 
-  integer:: prt_level = 0 ! niveau d'impression souhait\'e (0 = minimum)
+  integer, protected:: prt_level = 0
+  ! niveau d'impression souhait\'e (0 = minimum)
 
-  LOGICAL:: purmats= .FALSE.
+  LOGICAL, protected:: purmats= .FALSE.
   ! Help = Choix du schema d'integration temporel.
   ! y = pure Matsuno sinon c'est du Matsuno-leapfrog
 
-  logical:: iflag_phys = .true. ! call parameterizations of physics
-  INTEGER, SAVE:: lmt_pas ! number of time steps of "physics" per day
+  logical, protected:: iflag_phys = .true. ! call parameterizations of physics
+  INTEGER, SAVE, protected:: lmt_pas ! number of time steps of "physics" per day
 
 contains
 

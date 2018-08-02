@@ -5,7 +5,7 @@ module fonte_neige_m
 contains
 
   SUBROUTINE fonte_neige(nisurf, precip_rain, precip_snow, snow, qsol, &
-       tsurf_new, evap, fqcalving, ffonte, run_off_lic_0)
+       tsurf_new, evap, fqcalving, ffonte, run_off_lic_0, run_off_lic)
 
     ! Routine de traitement de la fonte de la neige dans le cas du traitement
     ! de sol simplifi\'e
@@ -45,6 +45,8 @@ contains
     real, intent(INOUT):: run_off_lic_0(:) ! (knon)
     ! run off glacier du pas de temps pr\'ecedent
 
+    REAL, intent(OUT):: run_off_lic(:) ! (knon) ruissellement total
+
     ! Local:
 
     integer knon ! nombre de points \`a traiter
@@ -60,7 +62,6 @@ contains
     REAL, parameter:: chaice = 3.334E5 / (2.3867E6 * 0.15)
     real, parameter:: max_eau_sol = 150. ! in kg m-2
     real coeff_rel
-    REAL run_off_lic(size(precip_rain)) ! (knon) ruissellement total
 
     !--------------------------------------------------------------------
 

@@ -29,6 +29,7 @@ contains
     USE dimphy, ONLY: klev, klon
     USE dimsoil, ONLY: nsoilmx
     use hbtm_m, only: hbtm
+    USE histwrite_phy_m, ONLY: histwrite_phy
     USE indicesol, ONLY: epsfra, is_lic, is_oce, is_sic, is_ter, nbsrf
     USE interfoce_lim_m, ONLY: interfoce_lim
     use phyetat0_m, only: zmasq
@@ -123,20 +124,18 @@ contains
     ! flux d'eau "perdue" par la surface et necessaire pour limiter la
     ! hauteur de neige, en kg / m2 / s
 
-    real ffonte(klon, nbsrf)
-    ! ffonte----Flux thermique utilise pour fondre la neige
+    real ffonte(klon, nbsrf) ! flux thermique utilise pour fondre la neige
     REAL, intent(inout):: run_off_lic_0(:) ! (klon)
 
     ! Local:
-
-    LOGICAL:: firstcal = .true.
 
     ! la nouvelle repartition des surfaces sortie de l'interface
     REAL, save:: pctsrf_new_oce(klon)
     REAL, save:: pctsrf_new_sic(klon)
 
     REAL y_fqcalving(klon), y_ffonte(klon)
-    real y_run_off_lic_0(klon)
+    real y_run_off_lic_0(klon), y_run_off_lic(klon)
+    REAL run_off_lic(klon) ! ruissellement total
     REAL rugmer(klon)
     REAL ytsoil(klon, nsoilmx)
     REAL yts(klon), ypct(klon), yz0_new(klon)
@@ -224,10 +223,11 @@ contains
     d_v = 0.
     coefh = 0.
     fqcalving = 0.
+    run_off_lic = 0.
 
     ! Initialisation des "pourcentages potentiels". On consid\`ere ici qu'on
     ! peut avoir potentiellement de la glace sur tout le domaine oc\'eanique
-    ! (\`a affiner)
+    ! (\`a affiner).
 
     pctsrf_pot(:, is_ter) = pctsrf(:, is_ter)
     pctsrf_pot(:, is_lic) = pctsrf(:, is_lic)
@@ -340,17 +340,17 @@ contains
                ypplay(:knon, :), ydelp(:knon, :), y_d_v(:knon, :), &
                y_flux_v(:knon))
 
-          CALL clqh(julien, firstcal, nsrf, ni(:knon), ytsoil(:knon, :), &
-               yqsol(:knon), mu0(ni(:knon)), yrugos(:knon), yrugoro(:knon), &
-               yu(:knon, 1), yv(:knon, 1), ycoefh(:knon, :), ycdragh(:knon), &
-               yt(:knon, :), yq(:knon, :), yts(:knon), ypaprs(:knon, :), &
-               ypplay(:knon, :), ydelp(:knon, :), yrads(:knon), yalb(:knon), &
-               snow(:knon), yqsurf(:knon), yrain_f(:knon), ysnow_f(:knon), &
-               yfluxlat(:knon), pctsrf_new_sic(ni(:knon)), yagesno(:knon), &
-               y_d_t(:knon, :), y_d_q(:knon, :), y_d_ts(:knon), &
-               yz0_new(:knon), y_flux_t(:knon), y_flux_q(:knon), &
-               y_dflux_t(:knon), y_dflux_q(:knon), y_fqcalving(:knon), &
-               y_ffonte(:knon), y_run_off_lic_0(:knon))
+          CALL clqh(julien, nsrf, ni(:knon), ytsoil(:knon, :), yqsol(:knon), &
+               mu0(ni(:knon)), yrugos(:knon), yrugoro(:knon), yu(:knon, 1), &
+               yv(:knon, 1), ycoefh(:knon, :), ycdragh(:knon), yt(:knon, :), &
+               yq(:knon, :), yts(:knon), ypaprs(:knon, :), ypplay(:knon, :), &
+               ydelp(:knon, :), yrads(:knon), yalb(:knon), snow(:knon), &
+               yqsurf(:knon), yrain_f(:knon), ysnow_f(:knon), yfluxlat(:knon), &
+               pctsrf_new_sic(ni(:knon)), yagesno(:knon), y_d_t(:knon, :), &
+               y_d_q(:knon, :), y_d_ts(:knon), yz0_new(:knon), &
+               y_flux_t(:knon), y_flux_q(:knon), y_dflux_t(:knon), &
+               y_dflux_q(:knon), y_fqcalving(:knon), y_ffonte(:knon), &
+               y_run_off_lic_0(:knon), y_run_off_lic(:knon))
 
           ! calculer la longueur de rugosite sur ocean
 
@@ -412,6 +412,7 @@ contains
              DO j = 1, knon
                 i = ni(j)
                 run_off_lic_0(i) = y_run_off_lic_0(j)
+                run_off_lic(i) = y_run_off_lic(j)
              END DO
           END IF
 
@@ -499,7 +500,7 @@ contains
     pctsrf(:, is_oce) = pctsrf_new_oce
     pctsrf(:, is_sic) = pctsrf_new_sic
 
-    firstcal = .false.
+    CALL histwrite_phy("run_off_lic", run_off_lic)
 
   END SUBROUTINE pbl_surface
 

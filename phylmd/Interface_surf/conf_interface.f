@@ -5,7 +5,7 @@ MODULE conf_interface_m
 
   IMPLICIT none
 
-  REAL, save :: tau_calv 
+  REAL, save, protected:: tau_calv 
   ! temps de relaxation pour la fonte des glaciers, en jours
 
 contains
