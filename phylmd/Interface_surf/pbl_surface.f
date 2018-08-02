@@ -125,7 +125,7 @@ contains
 
     real ffonte(klon, nbsrf)
     ! ffonte----Flux thermique utilise pour fondre la neige
-    REAL run_off_lic_0(klon)
+    REAL, intent(inout):: run_off_lic_0(:) ! (klon)
 
     ! Local:
 
@@ -341,15 +341,16 @@ contains
                y_flux_v(:knon))
 
           CALL clqh(julien, firstcal, nsrf, ni(:knon), ytsoil(:knon, :), &
-               yqsol(:knon), mu0, yrugos(:knon), yrugoro(:knon), yu(:knon, 1), &
-               yv(:knon, 1), ycoefh(:knon, :), ycdragh(:knon), yt(:knon, :), &
-               yq(:knon, :), yts(:knon), ypaprs(:knon, :), ypplay(:knon, :), &
-               ydelp(:knon, :), yrads(:knon), yalb(:knon), snow(:knon), &
-               yqsurf(:knon), yrain_f, ysnow_f, yfluxlat(:knon), &
-               pctsrf_new_sic, yagesno(:knon), y_d_t(:knon, :), &
-               y_d_q(:knon, :), y_d_ts(:knon), yz0_new(:knon), &
-               y_flux_t(:knon), y_flux_q(:knon), y_dflux_t(:knon), &
-               y_dflux_q(:knon), y_fqcalving(:knon), y_ffonte, y_run_off_lic_0)
+               yqsol(:knon), mu0(ni(:knon)), yrugos(:knon), yrugoro(:knon), &
+               yu(:knon, 1), yv(:knon, 1), ycoefh(:knon, :), ycdragh(:knon), &
+               yt(:knon, :), yq(:knon, :), yts(:knon), ypaprs(:knon, :), &
+               ypplay(:knon, :), ydelp(:knon, :), yrads(:knon), yalb(:knon), &
+               snow(:knon), yqsurf(:knon), yrain_f(:knon), ysnow_f(:knon), &
+               yfluxlat(:knon), pctsrf_new_sic(ni(:knon)), yagesno(:knon), &
+               y_d_t(:knon, :), y_d_q(:knon, :), y_d_ts(:knon), &
+               yz0_new(:knon), y_flux_t(:knon), y_flux_q(:knon), &
+               y_dflux_t(:knon), y_dflux_q(:knon), y_fqcalving(:knon), &
+               y_ffonte(:knon), y_run_off_lic_0(:knon))
 
           ! calculer la longueur de rugosite sur ocean
 

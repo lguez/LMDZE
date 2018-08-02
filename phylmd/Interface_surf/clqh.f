@@ -4,7 +4,7 @@ module clqh_m
 
 contains
 
-  SUBROUTINE clqh(julien, debut, nisurf, knindex, tsoil, qsol, rmu0, rugos, &
+  SUBROUTINE clqh(julien, debut, nisurf, knindex, tsoil, qsol, mu0, rugos, &
        rugoro, u1lay, v1lay, coef, tq_cdrag, t, q, ts, paprs, pplay, delp, &
        radsol, albedo, snow, qsurf, precip_rain, precip_snow, fluxlat, &
        pctsrf_new_sic, agesno, d_t, d_q, d_ts, z0_new, flux_t, flux_q, &
@@ -16,7 +16,7 @@ contains
 
     use climb_hq_down_m, only: climb_hq_down
     use climb_hq_up_m, only: climb_hq_up
-    USE dimphy, ONLY: klev, klon
+    USE dimphy, ONLY: klev
     USE interfsurf_hq_m, ONLY: interfsurf_hq
     USE suphec_m, ONLY: rkappa
 
@@ -29,7 +29,7 @@ contains
     REAL, intent(inout):: qsol(:) ! (knon)
     ! column-density of water in soil, in kg m-2
 
-    real, intent(in):: rmu0(klon) ! cosinus de l'angle solaire zenithal
+    real, intent(in):: mu0(:) ! (knon) cosinus de l'angle solaire zenithal
     real, intent(in):: rugos(:) ! (knon) rugosite
     REAL, intent(in):: rugoro(:) ! (knon)
 
@@ -64,14 +64,14 @@ contains
     REAL, intent(out):: qsurf(:) ! (knon)
     ! humidite de l'air au dessus de la surface
 
-    real, intent(in):: precip_rain(klon)
+    real, intent(in):: precip_rain(:) ! (knon)
     ! liquid water mass flux (kg / m2 / s), positive down
 
-    real, intent(in):: precip_snow(klon)
+    real, intent(in):: precip_snow(:) ! (knon)
     ! solid water mass flux (kg / m2 / s), positive down
 
     real, intent(out):: fluxlat(:) ! (knon)
-    real, intent(in):: pctsrf_new_sic(:) ! (klon)
+    real, intent(in):: pctsrf_new_sic(:) ! (knon)
     REAL, intent(inout):: agesno(:) ! (knon)
     REAL, intent(out):: d_t(:, :) ! (knon, klev) incrementation de "t"
     REAL, intent(out):: d_q(:, :) ! (knon, klev) incrementation de "q"
@@ -92,10 +92,11 @@ contains
     ! Flux d'eau "perdue" par la surface et n\'ecessaire pour que limiter la
     ! hauteur de neige, en kg / m2 / s
 
-    REAL ffonte(klon)
-    ! Flux thermique utiliser pour fondre la neige
-
-    REAL run_off_lic_0(klon)! runof glacier au pas de temps precedent
+    REAL, intent(out):: ffonte(:) ! (knon)
+    ! flux thermique utilis\'e pour fondre la neige
+    
+    REAL, intent(inout):: run_off_lic_0(:) ! (knon)
+    ! run-off glacier au pas de temps precedent
 
     ! Local:
 
@@ -111,7 +112,7 @@ contains
     ! (La pression de r\'ef\'erence est celle au sol.)
 
     call climb_hq_down(pkf, cq, dq, ch, dh, paprs, pplay, t, coef, delp, q)
-    CALL interfsurf_hq(julien, rmu0, nisurf, knindex, debut, tsoil, qsol, &
+    CALL interfsurf_hq(julien, mu0, nisurf, knindex, debut, tsoil, qsol, &
          u1lay, v1lay, t(:, 1), q(:, 1), tq_cdrag, ch(:, 1), cq(:, 1), &
          dh(:, 1), dq(:, 1), precip_rain, precip_snow, rugos, rugoro, snow, &
          qsurf, ts, pplay(:, 1), paprs(:, 1), radsol, evap, flux_t, fluxlat, &

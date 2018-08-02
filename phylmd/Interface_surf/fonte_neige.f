@@ -60,7 +60,7 @@ contains
     REAL, parameter:: chaice = 3.334E5 / (2.3867E6 * 0.15)
     real, parameter:: max_eau_sol = 150. ! in kg m-2
     real coeff_rel
-    REAL, ALLOCATABLE, SAVE:: run_off_lic(:) ! ruissellement total
+    REAL run_off_lic(size(precip_rain)) ! (knon) ruissellement total
 
     !--------------------------------------------------------------------
 
@@ -111,14 +111,10 @@ contains
     IF (nisurf == is_ter) then
        qsol = MIN(qsol + bil_eau_s, max_eau_sol)
     else if (nisurf == is_lic) then
-       if (.not. allocated(run_off_lic)) allocate(run_off_lic(knon))
-       ! assumes that the fraction of land-ice does not change during the run
-
        do i = 1, knon
-          run_off_lic(i) = (coeff_rel * fqcalving(i)) + &
+          run_off_lic_0(i) = (coeff_rel * fqcalving(i)) + &
                (1. - coeff_rel) * run_off_lic_0(i)
-          run_off_lic_0(i) = run_off_lic(i)
-          run_off_lic(i) = run_off_lic(i) + bil_eau_s(i) / dtphys
+          run_off_lic(i) = run_off_lic_0(i) + bil_eau_s(i) / dtphys
        enddo
     endif
 

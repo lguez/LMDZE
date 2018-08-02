@@ -5,8 +5,8 @@ module calcul_fluxs_m
 contains
 
   SUBROUTINE calcul_fluxs(tsurf, p1lay, cal, beta, coef1lay, ps, qsurf, &
-       radsol, dif_grnd, t1lay, q1lay, u1lay, v1lay, tAcoef, qAcoef, tBcoef, &
-       qBcoef, tsurf_new, evap, fluxlat, flux_t, dflux_s, dflux_l)
+       radsol, t1lay, q1lay, u1lay, v1lay, tAcoef, qAcoef, tBcoef, &
+       qBcoef, tsurf_new, evap, fluxlat, flux_t, dflux_s, dflux_l, dif_grnd)
 
     ! Cette routine calcule les flux en h et q à l'interface et une
     ! température de surface.
@@ -38,9 +38,7 @@ contains
     real, intent(IN):: radsol(:) ! (knon)
     ! rayonnement net au sol (longwave + shortwave)
 
-    real, intent(IN):: dif_grnd(:) ! (knon)
-    ! coefficient de diffusion vers le sol profond
-
+    real, intent(IN):: dif_grnd ! coefficient de diffusion vers le sol profond
     real, intent(IN):: t1lay(:), q1lay(:), u1lay(:), v1lay(:) ! (knon)
 
     real, intent(IN):: tAcoef(:), qAcoef(:) ! (knon)
@@ -72,11 +70,11 @@ contains
     !---------------------------------------------------------------------
 
     knon = assert_eq([size(tsurf), size(p1lay), size(cal), size(beta), &
-         size(coef1lay), size(ps), size(qsurf), size(radsol), size(dif_grnd), &
-         size(t1lay), size(q1lay), size(u1lay), size(v1lay), size(tAcoef), &
-         size(qAcoef), size(tBcoef), size(qBcoef), size(tsurf_new), &
-         size(evap), size(fluxlat), size(flux_t), size(dflux_s), &
-         size(dflux_l)], "calcul_fluxs knon")
+         size(coef1lay), size(ps), size(qsurf), size(radsol), size(t1lay), &
+         size(q1lay), size(u1lay), size(v1lay), size(tAcoef), size(qAcoef), &
+         size(tBcoef), size(qBcoef), size(tsurf_new), size(evap), &
+         size(fluxlat), size(flux_t), size(dflux_s), size(dflux_l)], &
+         "calcul_fluxs knon")
 
     ! Traitement de l'humidité du sol
 
