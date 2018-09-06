@@ -5,8 +5,8 @@ module pbl_surface_m
 contains
 
   SUBROUTINE pbl_surface(pctsrf, t, q, u, v, julien, mu0, ftsol, cdmmax, &
-       cdhmax, ftsoil, qsol, paprs, pplay, fsnow, qsurf, evap, falbe, fluxlat, &
-       rain_fall, snow_f, fsolsw, fsollw, frugs, agesno, rugoro, d_t, d_q, &
+       cdhmax, ftsoil, qsol, paprs, pplay, fsnow, qsurf, falbe, fluxlat, &
+       rain_fall, snow_fall, fsolsw, fsollw, frugs, agesno, rugoro, d_t, d_q, &
        d_u, d_v, d_ts, flux_t, flux_q, flux_u, flux_v, cdragh, cdragm, q2, &
        dflux_t, dflux_q, coefh, t2m, q2m, u10m_srf, v10m_srf, pblh, capcl, &
        oliqcl, cteicl, pblt, therm, plcl, fqcalving, ffonte, run_off_lic_0)
@@ -58,15 +58,14 @@ contains
     REAL, INTENT(IN):: paprs(klon, klev + 1) ! pression a intercouche (Pa)
     REAL, INTENT(IN):: pplay(klon, klev) ! pression au milieu de couche (Pa)
     REAL, INTENT(inout):: fsnow(:, :) ! (klon, nbsrf) \'epaisseur neigeuse
-    REAL qsurf(klon, nbsrf)
-    REAL evap(klon, nbsrf)
+    REAL, INTENT(inout):: qsurf(klon, nbsrf)
     REAL, intent(inout):: falbe(klon, nbsrf)
     REAL, intent(out):: fluxlat(:, :) ! (klon, nbsrf)
 
     REAL, intent(in):: rain_fall(klon)
     ! liquid water mass flux (kg / m2 / s), positive down
 
-    REAL, intent(in):: snow_f(klon)
+    REAL, intent(in):: snow_fall(klon)
     ! solid water mass flux (kg / m2 / s), positive down
 
     REAL, INTENT(IN):: fsolsw(klon, nbsrf), fsollw(klon, nbsrf)
@@ -181,8 +180,7 @@ contains
     REAL u1(klon), v1(klon)
     REAL tair1(klon), qair1(klon), tairsol(klon)
     REAL psfce(klon), patm(klon)
-
-    REAL qairsol(klon), zgeo1(klon)
+    REAL zgeo1(klon)
     REAL rugo1(klon)
     REAL zgeop(klon, klev)
 
@@ -203,7 +201,6 @@ contains
     dflux_t = 0.
     dflux_q = 0.
     ypct = 0.
-    yqsurf = 0.
     yrain_f = 0.
     ysnow_f = 0.
     yrugos = 0.
@@ -265,7 +262,7 @@ contains
              yqsurf(j) = qsurf(i, nsrf)
              yalb(j) = falbe(i, nsrf)
              yrain_f(j) = rain_fall(i)
-             ysnow_f(j) = snow_f(i)
+             ysnow_f(j) = snow_fall(i)
              yagesno(j) = agesno(i, nsrf)
              yrugos(j) = frugs(i, nsrf)
              yrugoro(j) = rugoro(i)
@@ -374,8 +371,6 @@ contains
           flux_u(ni(:knon), nsrf) = y_flux_u(:knon)
           flux_v(ni(:knon), nsrf) = y_flux_v(:knon)
 
-          evap(:, nsrf) = -flux_q(:, nsrf)
-
           falbe(:, nsrf) = 0.
           fsnow(:, nsrf) = 0.
           qsurf(:, nsrf) = 0.
@@ -443,13 +438,11 @@ contains
              END IF
              psfce(j) = ypaprs(j, 1)
              patm(j) = ypplay(j, 1)
-
-             qairsol(j) = yqsurf(j)
           END DO
 
           CALL stdlevvar(nsrf, u1(:knon), v1(:knon), tair1(:knon), qair1, &
-               zgeo1, tairsol, qairsol, rugo1, psfce, patm, yt2m, yq2m, yt10m, &
-               yq10m, wind10m(:knon), ustar(:knon))
+               zgeo1, tairsol, yqsurf(:knon), rugo1, psfce, patm, yt2m, yq2m, &
+               yt10m, yq10m, wind10m(:knon), ustar(:knon))
 
           DO j = 1, knon
              i = ni(j)

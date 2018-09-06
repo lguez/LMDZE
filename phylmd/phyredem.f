@@ -4,7 +4,7 @@ module phyredem_m
 
 contains
 
-  SUBROUTINE phyredem(pctsrf, ftsol, ftsoil, qsurf, qsol, snow, albedo, evap, &
+  SUBROUTINE phyredem(pctsrf, ftsol, ftsoil, qsurf, qsol, snow, albedo, &
        rain_fall, snow_fall, solsw, sollw, fder, radsol, frugs, agesno, zmea, &
        zstd, zsig, zgam, zthe, zpic, zval, t_ancien, q_ancien, rnebcon, &
        ratqs, clwcon, run_off_lic_0, sig1, w01)
@@ -32,7 +32,6 @@ contains
 
     REAL, INTENT(IN):: snow(klon, nbsrf)
     REAL, INTENT(IN):: albedo(klon, nbsrf)
-    REAL, INTENT(IN):: evap(klon, nbsrf)
     REAL, INTENT(IN):: rain_fall(klon)
     REAL, INTENT(IN):: snow_fall(klon)
     REAL, INTENT(IN):: solsw(klon)
@@ -93,9 +92,6 @@ contains
 
     call nf95_inq_varid(ncid_restartphy, "ALBE", varid)
     call nf95_put_var(ncid_restartphy, varid, albedo)
-
-    call nf95_inq_varid(ncid_restartphy, "EVAP", varid)
-    call nf95_put_var(ncid_restartphy, varid, evap)
 
     call nf95_inq_varid(ncid_restartphy, "SNOW", varid)
     call nf95_put_var(ncid_restartphy, varid, snow)

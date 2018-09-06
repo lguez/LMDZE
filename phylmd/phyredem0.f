@@ -86,10 +86,6 @@ contains
          (/idim2, dimid_nbsrf/), varid)
     call nf95_put_att(ncid_restartphy, varid, 'title', 'albedo de surface')
 
-    call nf95_def_var(ncid_restartphy, 'EVAP', nf90_float, &
-         (/idim2, dimid_nbsrf/), varid)
-    call nf95_put_att(ncid_restartphy, varid, 'title', 'Evaporation de surface')
-
     call nf95_def_var(ncid_restartphy, 'SNOW', nf90_float, &
          (/idim2, dimid_nbsrf/), varid)
     call nf95_put_att(ncid_restartphy, varid, 'title', 'Neige de surface')

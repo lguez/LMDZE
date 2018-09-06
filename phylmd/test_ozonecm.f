@@ -36,7 +36,6 @@ program test_ozonecm
   REAL qsol(klon) ! column-density of water in soil, in kg m-2
   REAL snow(klon, nbsrf)
   REAL albe(klon, nbsrf)
-  REAL evap(klon, nbsrf)
   REAL rain_fall(klon)
   REAL snow_fall(klon)
   real solsw(klon)
@@ -77,10 +76,10 @@ program test_ozonecm
   pa = 5e4
   call disvert
   p = ap + bp * preff
-  call phyetat0(pctsrf, ftsol, ftsoil, qsurf, qsol, snow, albe, evap, &
-       rain_fall, snow_fall, solsw, sollw, fder, radsol, frugs, agesno, zmea, &
-       zstd, zsig, zgam, zthe, zpic, zval, t_ancien, q_ancien, ancien_ok, &
-       rnebcon, ratqs, clwcon, run_off_lic_0, sig1, w01, ncid_startphy)
+  call phyetat0(pctsrf, ftsol, ftsoil, qsurf, qsol, snow, albe, rain_fall, &
+       snow_fall, solsw, sollw, fder, radsol, frugs, agesno, zmea, zstd, zsig, &
+       zgam, zthe, zpic, zval, t_ancien, q_ancien, ancien_ok, rnebcon, ratqs, &
+       clwcon, run_off_lic_0, sig1, w01, ncid_startphy)
 
   do julien = 1, 360
      wo(:, :, julien) = ozonecm(REAL(julien), spread(p, dim=1, ncopies=jjm+1))

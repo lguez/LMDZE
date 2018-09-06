@@ -15,7 +15,7 @@ module phyetat0_m
 
 contains
 
-  SUBROUTINE phyetat0(pctsrf, ftsol, ftsoil, qsurf, qsol, snow, albe, evap, &
+  SUBROUTINE phyetat0(pctsrf, ftsol, ftsoil, qsurf, qsol, snow, albe, &
        rain_fall, snow_fall, solsw, sollw, fder, radsol, frugs, agesno, zmea, &
        zstd, zsig, zgam, zthe, zpic, zval, t_ancien, q_ancien, ancien_ok, &
        rnebcon, ratqs, clwcon, run_off_lic_0, sig1, w01, ncid_startphy)
@@ -43,7 +43,6 @@ contains
 
     REAL, intent(out):: snow(klon, nbsrf)
     REAL, intent(out):: albe(klon, nbsrf)
-    REAL, intent(out):: evap(klon, nbsrf)
     REAL, intent(out):: rain_fall(klon)
     REAL, intent(out):: snow_fall(klon)
     real, intent(out):: solsw(klon)
@@ -201,11 +200,6 @@ contains
 
     call NF95_INQ_VARID(ncid_startphy, "ALBE", varid)
     call nf95_get_var(ncid_startphy, varid, albe)
-
-    ! Lecture de evaporation: 
-
-    call NF95_INQ_VARID(ncid_startphy, "EVAP", varid)
-    call nf95_get_var(ncid_startphy, varid, evap)
 
     ! Lecture precipitation liquide:
 

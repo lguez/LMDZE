@@ -33,7 +33,7 @@ contains
     REAL, intent(in):: q1(klon) ! humidite relative au 1er niveau du modele
     REAL, intent(in):: z1 (klon) ! geopotentiel au 1er niveau du modele
     REAL, intent(in):: ts1(klon) ! temperature de l'air a la surface
-    REAL, intent(in):: qsurf(klon) ! humidite relative a la surface
+    REAL, intent(in):: qsurf(:) ! (knon) humidite relative a la surface
     REAL, intent(in):: rugos(klon) ! rugosite
     REAL, intent(in):: psol(klon) ! pression au sol
     REAL, intent(in):: pat1(klon) ! pression au 1er niveau du modele
@@ -73,7 +73,7 @@ contains
     ENDDO
 
     CALL cdrag(nsrf, speed(:knon), t1(:knon), q1(:knon), z1(:knon), &
-         psol(:knon), ts1(:knon), qsurf(:knon), rugos(:knon), cdram, cdrah) 
+         psol(:knon), ts1(:knon), qsurf, rugos(:knon), cdram, cdrah) 
 
     ! Star variables 
 

@@ -150,7 +150,6 @@ contains
     REAL, save:: ftsoil(klon, nsoilmx, nbsrf)
     ! soil temperature of surface fraction
 
-    REAL, save:: fevap(klon, nbsrf) ! evaporation
     REAL fluxlat(klon, nbsrf)
 
     REAL, save:: fqsurf(klon, nbsrf)
@@ -446,10 +445,10 @@ contains
 
        frugs = 0.
        CALL phyetat0(pctsrf, ftsol, ftsoil, fqsurf, qsol, fsnow, falbe, &
-            fevap, rain_fall, snow_fall, solsw, sollw, dlw, radsol, frugs, &
-            agesno, zmea, zstd, zsig, zgam, zthe, zpic, zval, t_ancien, &
-            q_ancien, ancien_ok, rnebcon, ratqs, clwcon, run_off_lic_0, sig1, &
-            w01, ncid_startphy)
+            rain_fall, snow_fall, solsw, sollw, dlw, radsol, frugs, agesno, &
+            zmea, zstd, zsig, zgam, zthe, zpic, zval, t_ancien, q_ancien, &
+            ancien_ok, rnebcon, ratqs, clwcon, run_off_lic_0, sig1, w01, &
+            ncid_startphy)
 
        ! ATTENTION : il faudra a terme relire q2 dans l'etat initial
        q2 = 1e-8
@@ -553,11 +552,11 @@ contains
 
     CALL pbl_surface(pctsrf, t_seri, q_seri, u_seri, v_seri, julien, mu0, &
          ftsol, cdmmax, cdhmax, ftsoil, qsol, paprs, play, fsnow, fqsurf, &
-         fevap, falbe, fluxlat, rain_fall, snow_fall, fsolsw, fsollw, frugs, &
-         agesno, rugoro, d_t_vdf, d_q_vdf, d_u_vdf, d_v_vdf, d_ts, flux_t, &
-         flux_q, flux_u, flux_v, cdragh, cdragm, q2, dflux_t, dflux_q, coefh, &
-         t2m, q2m, u10m_srf, v10m_srf, pblh, capCL, oliqCL, cteiCL, pblT, &
-         therm, plcl, fqcalving, ffonte, run_off_lic_0)
+         falbe, fluxlat, rain_fall, snow_fall, fsolsw, fsollw, frugs, agesno, &
+         rugoro, d_t_vdf, d_q_vdf, d_u_vdf, d_v_vdf, d_ts, flux_t, flux_q, &
+         flux_u, flux_v, cdragh, cdragm, q2, dflux_t, dflux_q, coefh, t2m, &
+         q2m, u10m_srf, v10m_srf, pblh, capCL, oliqCL, cteiCL, pblT, therm, &
+         plcl, fqcalving, ffonte, run_off_lic_0)
 
     ! Incr\'ementation des flux
 
@@ -1056,11 +1055,10 @@ contains
 
     IF (lafin) then
        call NF95_CLOSE(ncid_startphy)
-       CALL phyredem(pctsrf, ftsol, ftsoil, fqsurf, qsol, &
-            fsnow, falbe, fevap, rain_fall, snow_fall, solsw, sollw, dlw, &
-            radsol, frugs, agesno, zmea, zstd, zsig, zgam, zthe, zpic, zval, &
-            t_ancien, q_ancien, rnebcon, ratqs, clwcon, run_off_lic_0, sig1, &
-            w01)
+       CALL phyredem(pctsrf, ftsol, ftsoil, fqsurf, qsol, fsnow, falbe, &
+            rain_fall, snow_fall, solsw, sollw, dlw, radsol, frugs, agesno, &
+            zmea, zstd, zsig, zgam, zthe, zpic, zval, t_ancien, q_ancien, &
+            rnebcon, ratqs, clwcon, run_off_lic_0, sig1, w01)
     end IF
 
     firstcal = .FALSE.

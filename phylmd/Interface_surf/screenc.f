@@ -29,16 +29,20 @@ contains
     ! knon----input-I- nombre de points pour un type de surface
     INTEGER, intent(in):: nsrf
     ! nsrf----input-I- indice pour le type de surface; voir indicesol.inc
-    REAL, dimension(klon), intent(in):: speed, temp, q_zref
+    REAL, dimension(klon), intent(in):: speed
     ! speed---input-R- module du vent au 1er niveau du modele
+    REAL, dimension(klon), intent(in):: temp
     ! temp----input-R- temperature de l'air au 1er niveau du modele
+    REAL, dimension(klon), intent(in):: q_zref
     ! q_zref--input-R- humidite relative au 1er niveau du modele
     REAL, intent(in):: zref
     ! zref----input-R- altitude de reference
-    REAL, dimension(klon), intent(in):: ts, qsurf, rugos, psol
+    REAL, dimension(klon), intent(in):: ts
     ! ts------input-R- temperature de l'air a la surface
-    ! qsurf---input-R- humidite relative a la surface
+    REAL, intent(in):: qsurf(:) ! (knon) humidite relative a la surface
+    REAL, dimension(klon), intent(in):: rugos
     ! rugos---input-R- rugosite
+    REAL, dimension(klon), intent(in):: psol
     ! psol----input-R- pression au sol
     REAL, intent(in):: ustar(:) ! (knon) facteur d'\'echelle pour le vent
     REAL, dimension(klon), intent(in):: testar
@@ -68,7 +72,7 @@ contains
     ! Richardson at reference level
 
     CALL cdrag(nsrf, speed(:knon), temp(:knon), q_zref(:knon), gref(:knon), &
-         psol(:knon), ts(:knon), qsurf(:knon), rugos(:knon), cdram, cdrah, pref)
+         psol(:knon), ts(:knon), qsurf, rugos(:knon), cdram, cdrah, pref)
 
     DO i = 1, knon
        delu(i) = ustar(i) / sqrt(cdram(i))

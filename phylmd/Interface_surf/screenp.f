@@ -17,42 +17,32 @@ contains
 
     ! Reference: Hess, Colman and McAvaney (1995)
 
-    ! I. Musat, 01.07.2002
+    ! I. Musat, July 2002
 
     use dimphy, only: klon
 
-    INTEGER, intent(in):: knon
-    ! knon----input-I- nombre de points pour un type de surface
-    REAL, dimension(klon), intent(in):: speed
-    ! speed---input-R- module du vent au 1er niveau du modele
-    REAL, dimension(klon), intent(in):: tair
-    ! tair----input-R- temperature de l'air au 1er niveau du modele
-    REAL, dimension(klon), intent(in):: qair
-    ! qair----input-R- humidite relative au 1er niveau du modele
-    REAL, dimension(klon), intent(in):: ts
-    ! ts------input-R- temperature de l'air a la surface
-    REAL, dimension(klon), intent(in):: qsurf
-    ! qsurf---input-R- humidite relative a la surface
-    REAL, dimension(klon), intent(in):: rugos
-    ! rugos---input-R- rugosite
-    DOUBLE PRECISION, dimension(klon), intent(in):: lmon
-    ! lmon----input-R- longueur de Monin-Obukov
+    INTEGER, intent(in):: knon ! nombre de points pour un type de surface
+    REAL, intent(in):: speed(klon) ! module du vent au 1er niveau du modele
+    REAL, intent(in):: tair(klon) ! temperature de l'air au 1er niveau du modele
+    REAL, intent(in):: qair(klon) ! humidite relative au 1er niveau du modele
+    REAL, intent(in):: ts(klon) ! temperature de l'air a la surface
+    REAL, intent(in):: qsurf(:) ! (knon) humidite relative a la surface
+    REAL, intent(in):: rugos(klon) ! rugosite
+    DOUBLE PRECISION, intent(in):: lmon(klon) ! longueur de Monin-Obukov
     REAL, intent(in):: ustar(:) ! (knon) facteur d'\'echelle pour le vent
-    REAL, dimension(klon), intent(in):: testar
-    ! testar--input-R- facteur d'echelle pour la temperature potentielle
-    REAL, dimension(klon), intent(in):: qstar
-    ! qstar---input-R- facteur d'echelle pour l'humidite relative
-    REAL, intent(in):: zref
-    ! zref----input-R- altitude de reference
 
-    REAL, dimension(klon), intent(out):: delu
-    ! delu----input-R- anomalie du vent par rapport au 1er niveau
+    REAL, intent(in):: testar(klon)
+    ! facteur d'echelle pour la temperature potentielle
 
-    REAL, dimension(klon), intent(out):: delte
+    REAL, intent(in):: qstar(klon) ! facteur d'echelle pour l'humidite relative
+    REAL, intent(in):: zref ! altitude de reference
+    REAL, intent(out):: delu(klon) ! anomalie du vent par rapport au 1er niveau
+
+    REAL, intent(out):: delte(klon)
     ! anomalie de la temperature potentielle par rapport a la surface
 
-    REAL, dimension(klon), intent(out):: delq
-    ! delq----input-R- anomalie de l'humidite relative par rapport a la surface
+    REAL, intent(out):: delq(klon)
+    ! anomalie de l'humidite relative par rapport a la surface
 
     ! Local:
     REAL, PARAMETER:: RKAR=0.40
