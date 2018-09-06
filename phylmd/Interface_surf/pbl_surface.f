@@ -242,9 +242,11 @@ contains
     ! Boucler sur toutes les sous-fractions du sol:
 
     loop_surface: DO nsrf = 1, nbsrf
-       ! Chercher les indices :
+       ! Define ni and knon:
+       
        ni = 0
        knon = 0
+
        DO i = 1, klon
           ! Pour d\'eterminer le domaine \`a traiter, on utilise les surfaces
           ! "potentielles"
@@ -317,20 +319,12 @@ contains
              ycdragh(:knon) = min(ycdragh(:knon), cdhmax)
           END IF
 
-          IF (iflag_pbl >= 6) then
-             DO k = 1, klev + 1
-                DO j = 1, knon
-                   i = ni(j)
-                   yq2(j, k) = q2(i, k, nsrf)
-                END DO
-             END DO
-          end IF
-
+          IF (iflag_pbl >= 6) yq2(:knon, :) = q2(ni(:knon), :, nsrf)
           call coef_diff_turb(nsrf, ni(:knon), ypaprs(:knon, :), &
                ypplay(:knon, :), yu(:knon, :), yv(:knon, :), yq(:knon, :), &
                yt(:knon, :), yts(:knon), ycdragm(:knon), zgeop(:knon, :), &
                ycoefm(:knon, :), ycoefh(:knon, :), yq2(:knon, :))
-
+          
           CALL clvent(yu(:knon, 1), yv(:knon, 1), ycoefm(:knon, :), &
                ycdragm(:knon), yt(:knon, :), yu(:knon, :), ypaprs(:knon, :), &
                ypplay(:knon, :), ydelp(:knon, :), y_d_u(:knon, :), &
@@ -484,12 +478,7 @@ contains
              therm(i, nsrf) = ytherm(j)
           END DO
 
-          DO j = 1, knon
-             DO k = 1, klev + 1
-                i = ni(j)
-                q2(i, k, nsrf) = yq2(j, k)
-             END DO
-          END DO
+          IF (iflag_pbl >= 6) q2(ni(:knon), :, nsrf) = yq2(:knon, :)
        else
           fsnow(:, nsrf) = 0.
        end IF if_knon

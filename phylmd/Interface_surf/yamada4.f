@@ -20,7 +20,7 @@ contains
     USE dimphy, ONLY: klev
     USE suphec_m, ONLY: rg
 
-    REAL zlev(:, :) ! (knon, klev + 1)
+    REAL, intent(in):: zlev(:, :) ! (knon, klev + 1)
     ! altitude \`a chaque niveau (interface inf\'erieure de la couche de
     ! m\^eme indice)
 
@@ -51,6 +51,7 @@ contains
     real, intent(in):: ustar(:) ! (knon)
 
     ! Local:
+    
     integer knon
     real kmin, qmin
     real pblhmin(size(ustar)), coriol(size(ustar)) ! (knon)
@@ -59,9 +60,7 @@ contains
     REAL unsdzdec(size(zlev, 1), size(zlev, 2)) ! (knon, klev + 1)
     real delta(size(zlev, 1), size(zlev, 2)) ! (knon, klev + 1)
     real aa(size(zlev, 1), size(zlev, 2)) ! (knon, klev + 1)
-    real aa1
     logical:: first = .true.
-    integer:: ipas = 0
     integer ig, k
     real ri
     real, dimension(size(zlev, 1), size(zlev, 2)):: rif, sm ! (knon, klev + 1)
@@ -89,13 +88,7 @@ contains
          size(v, 2), size(teta, 2), size(q2, 2) - 1, size(coefm, 2) + 1, &
          size(coefh, 2) + 1], "yamada4 klev")
 
-    ipas = ipas + 1
-
     ! les increments verticaux
-    DO ig = 1, knon
-       ! alerte: zlev n'est pas declare a klev + 1
-       zlev(ig, klev + 1) = zlay(ig, klev) + (zlay(ig, klev) - zlev(ig, klev))
-    ENDDO
 
     DO k = 1, klev
        DO ig = 1, knon
@@ -221,8 +214,7 @@ contains
                 delta(ig, k) = 1.e-20
              endif
              coefm(ig, k) = l(ig, k)*sqrt(q2(ig, k))*sm(ig, k)
-             aa1 = (m2(ig, k)*(1.-rif(ig, k))-delta(ig, k)/b1)
-             aa(ig, k) = aa1*dtphys/(delta(ig, k)*l(ig, k))
+             aa(ig, k) = (m2(ig, k)*(1.-rif(ig, k))-delta(ig, k)/b1)*dtphys/(delta(ig, k)*l(ig, k))
              qpre = sqrt(q2(ig, k))
              if (iflag_pbl == 8) then
                 if (aa(ig, k).gt.0.) then
@@ -287,7 +279,7 @@ contains
 
   !*******************************************************************
 
-  real function frif(ri)
+  pure real function frif(ri)
 
     real, intent(in):: ri
 
@@ -297,7 +289,7 @@ contains
 
   !*******************************************************************
 
-  real function falpha(ri)
+  pure real function falpha(ri)
 
     real, intent(in):: ri
 
@@ -307,7 +299,7 @@ contains
 
   !*******************************************************************
 
-  real function fsm(ri)
+  pure real function fsm(ri)
 
     real, intent(in):: ri
 
@@ -317,7 +309,7 @@ contains
 
   !*******************************************************************
 
-  real function fl(zzz, zl0, zq2, zn2)
+  pure real function fl(zzz, zl0, zq2, zn2)
 
     real, intent(in):: zzz, zl0, zq2, zn2
 

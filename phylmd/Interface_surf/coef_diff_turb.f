@@ -64,7 +64,7 @@ contains
 
        zlev(:, 1) = 0.
        forall (k = 2:klev) zlev(:, k) = 0.5 * (zlay(:, k) + zlay(:, k-1))
-       zlev(:, klev + 1) = 2. * zlay(:, klev) - zlay(:, klev - 1)
+       zlev(:, klev + 1) = 2. * zlay(:, klev) - zlev(:, klev)
 
        CALL yamada4(zlev, zlay, u, v, teta, q2, coefm, coefh, &
             ustarhb(u(:, 1), v(:, 1), cdragm))
