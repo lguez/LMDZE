@@ -51,9 +51,6 @@ depend ${makefile_dir}/depend.mk:
 clean:
 	rm -f ${execut} ${objects} log
 
-clobber: clean
-	rm -f *.mod ${makefile_dir}/depend.mk TAGS
-
 ifeq ($(findstring $(MAKECMDGOALS), clobber depend),)
 include ${makefile_dir}/depend.mk
 endif

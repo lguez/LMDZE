@@ -12,7 +12,8 @@ contains
        oliqcl, cteicl, pblt, therm, plcl, fqcalving, ffonte, run_off_lic_0)
 
     ! From phylmd/clmain.F, version 1.6, 2005/11/16 14:47:19
-    ! Author: Z. X. Li (LMD/CNRS), date: 1993 Aug. 18th
+    ! Author: Z. X. Li (LMD/CNRS)
+    ! Date: Aug. 18th, 1993
     ! Objet : interface de couche limite (diffusion verticale)
 
     ! Tout ce qui a trait aux traceurs est dans "phytrac". Le calcul
@@ -82,8 +83,8 @@ contains
     REAL, intent(out):: d_ts(:, :) ! (klon, nbsrf) variation of ftsol
 
     REAL, intent(out):: flux_t(klon, nbsrf)
-    ! flux de chaleur sensible (Cp T) (W / m2) (orientation positive vers
-    ! le bas) à la surface
+    ! flux de chaleur sensible (c_p T) (W / m2) (orientation positive
+    ! vers le bas) à la surface
 
     REAL, intent(out):: flux_q(klon, nbsrf) 
     ! flux de vapeur d'eau (kg / m2 / s) à la surface
@@ -94,10 +95,9 @@ contains
     REAL, INTENT(out):: cdragh(klon), cdragm(klon)
     real q2(klon, klev + 1, nbsrf)
 
-    REAL, INTENT(out):: dflux_t(klon), dflux_q(klon)
-    ! dflux_t derive du flux sensible
-    ! dflux_q derive du flux latent
-    ! IM "slab" ocean
+    ! Ocean slab:
+    REAL, INTENT(out):: dflux_t(klon) ! derive du flux sensible
+    REAL, INTENT(out):: dflux_q(klon) ! derive du flux latent
 
     REAL, intent(out):: coefh(:, 2:) ! (klon, 2:klev)
     ! Pour pouvoir extraire les coefficients d'\'echange, le champ

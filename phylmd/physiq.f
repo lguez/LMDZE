@@ -212,9 +212,9 @@ contains
     REAL rain_tiedtke(klon), snow_tiedtke(klon)
 
     REAL evap(klon) ! flux d'\'evaporation au sol
-    real devap(klon) ! derivative of the evaporation flux at the surface
+    real dflux_q(klon) ! derivative of the evaporation flux at the surface
     REAL sens(klon) ! flux de chaleur sensible au sol
-    real dsens(klon) ! derivee du flux de chaleur sensible au sol
+    real dflux_t(klon) ! derivee du flux de chaleur sensible au sol
     REAL, save:: dlw(klon) ! derivative of infra-red flux
     REAL bils(klon) ! bilan de chaleur au sol
     REAL fder(klon) ! Derive de flux (sensible et latente)
@@ -555,15 +555,15 @@ contains
          ftsol, cdmmax, cdhmax, ftsoil, qsol, paprs, play, fsnow, fqsurf, &
          fevap, falbe, fluxlat, rain_fall, snow_fall, fsolsw, fsollw, frugs, &
          agesno, rugoro, d_t_vdf, d_q_vdf, d_u_vdf, d_v_vdf, d_ts, flux_t, &
-         flux_q, flux_u, flux_v, cdragh, cdragm, q2, dsens, devap, coefh, t2m, &
-         q2m, u10m_srf, v10m_srf, pblh, capCL, oliqCL, cteiCL, pblT, therm, &
-         plcl, fqcalving, ffonte, run_off_lic_0)
+         flux_q, flux_u, flux_v, cdragh, cdragm, q2, dflux_t, dflux_q, coefh, &
+         t2m, q2m, u10m_srf, v10m_srf, pblh, capCL, oliqCL, cteiCL, pblT, &
+         therm, plcl, fqcalving, ffonte, run_off_lic_0)
 
     ! Incr\'ementation des flux
 
     sens = - sum(flux_t * pctsrf, dim = 2)
     evap = - sum(flux_q * pctsrf, dim = 2)
-    fder = dlw + dsens + devap
+    fder = dlw + dflux_t + dflux_q
 
     DO k = 1, llm
        DO i = 1, klon
@@ -574,10 +574,8 @@ contains
        ENDDO
     ENDDO
 
-    ! Update surface temperature:
-
     call assert(abs(sum(pctsrf, dim = 2) - 1.) <= EPSFRA, 'physiq: pctsrf')
-    ftsol = ftsol + d_ts
+    ftsol = ftsol + d_ts ! update surface temperature
     tsol = sum(ftsol * pctsrf, dim = 2)
     zxfluxlat = sum(fluxlat * pctsrf, dim = 2)
     zt2m = sum(t2m * pctsrf, dim = 2)

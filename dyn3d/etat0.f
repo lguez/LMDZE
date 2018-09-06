@@ -309,7 +309,7 @@ contains
     sig1 = 0.
     w01 = 0.
 
-    nday = 0
+    nday = 0 ! side effect
     call phyredem0
 
     call nf95_inq_varid(ncid_restartphy, "trs", varid)

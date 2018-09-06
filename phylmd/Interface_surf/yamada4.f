@@ -8,16 +8,17 @@ module yamada4_m
 
 contains
 
-  SUBROUTINE yamada4(dt, zlev, zlay, u, v, teta, q2, coefm, coefh, ustar)
+  SUBROUTINE yamada4(zlev, zlay, u, v, teta, q2, coefm, coefh, ustar)
 
     ! From LMDZ4/libf/phylmd/yamada4.F, version 1.1 2004/06/22 11:45:36
 
+    ! Library:
+    use nr_util, only: assert, assert_eq
+
+    use comconst, only: dtphys
     USE conf_phys_m, ONLY: iflag_pbl
     USE dimphy, ONLY: klev
-    use nr_util, only: assert, assert_eq
     USE suphec_m, ONLY: rg
-
-    REAL, intent(in):: dt ! pas de temps
 
     REAL zlev(:, :) ! (knon, klev + 1)
     ! altitude \`a chaque niveau (interface inf\'erieure de la couche de
@@ -221,7 +222,7 @@ contains
              endif
              coefm(ig, k) = l(ig, k)*sqrt(q2(ig, k))*sm(ig, k)
              aa1 = (m2(ig, k)*(1.-rif(ig, k))-delta(ig, k)/b1)
-             aa(ig, k) = aa1*dt/(delta(ig, k)*l(ig, k))
+             aa(ig, k) = aa1*dtphys/(delta(ig, k)*l(ig, k))
              qpre = sqrt(q2(ig, k))
              if (iflag_pbl == 8) then
                 if (aa(ig, k).gt.0.) then

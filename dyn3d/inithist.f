@@ -69,7 +69,7 @@ contains
          thoriid, llm, 1, llm, zvertiid, 'inst(X)', t_ops, t_wrt)
     call histdef(histid, 'theta', 'temperature potentielle', 'K', iip1, jjp1, &
          thoriid, llm, 1, llm, zvertiid, 'inst(X)', t_ops, t_wrt)
-    call histdef(histid, 'phi', 'geopotentiel', '-', iip1, jjp1, thoriid, &
+    call histdef(histid, 'phi', 'geopotential', 'm2 s-2', iip1, jjp1, thoriid, &
          llm, 1, llm, zvertiid, 'inst(X)', t_ops, t_wrt)
 
     ! Traceurs
