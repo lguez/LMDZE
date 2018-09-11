@@ -261,8 +261,6 @@ contains
     real, save:: sollwdown(klon) ! downward LW flux at surface
     REAL, save:: topsw0(klon), toplw0(klon), solsw0(klon), sollw0(klon)
     REAL, save:: albpla(klon)
-    REAL fsollw(klon, nbsrf) ! bilan flux IR pour chaque sous-surface
-    REAL fsolsw(klon, nbsrf) ! flux solaire absorb\'e pour chaque sous-surface
 
     REAL conv_q(klon, llm) ! convergence de l'humidite (kg / kg / s)
     REAL conv_t(klon, llm) ! convergence of temperature (K / s)
@@ -537,24 +535,14 @@ contains
 
     CALL orbite(REAL(julien), longi, dist)
     CALL zenang(longi, time, dtphys * radpas, mu0, fract)
-    albsol = sum(falbe * pctsrf, dim = 2)
-
-    ! R\'epartition sous maille des flux longwave et shortwave
-    ! R\'epartition du longwave par sous-surface lin\'earis\'ee
-
-    forall (nsrf = 1: nbsrf)
-       fsollw(:, nsrf) = sollw + 4. * RSIGMA * tsol**3 &
-            * (tsol - ftsol(:, nsrf))
-       fsolsw(:, nsrf) = solsw * (1. - falbe(:, nsrf)) / (1. - albsol)
-    END forall
 
     CALL pbl_surface(pctsrf, t_seri, q_seri, u_seri, v_seri, julien, mu0, &
          ftsol, cdmmax, cdhmax, ftsoil, qsol, paprs, play, fsnow, fqsurf, &
-         falbe, fluxlat, rain_fall, snow_fall, fsolsw, fsollw, frugs, agesno, &
-         rugoro, d_t_vdf, d_q_vdf, d_u_vdf, d_v_vdf, d_ts, flux_t, flux_q, &
-         flux_u, flux_v, cdragh, cdragm, q2, dflux_t, dflux_q, coefh, t2m, &
-         q2m, u10m_srf, v10m_srf, pblh, capCL, oliqCL, cteiCL, pblT, therm, &
-         plcl, fqcalving, ffonte, run_off_lic_0)
+         falbe, fluxlat, rain_fall, snow_fall, frugs, agesno, rugoro, d_t_vdf, &
+         d_q_vdf, d_u_vdf, d_v_vdf, d_ts, flux_t, flux_q, flux_u, flux_v, &
+         cdragh, cdragm, q2, dflux_t, dflux_q, coefh, t2m, q2m, u10m_srf, &
+         v10m_srf, pblh, capCL, oliqCL, cteiCL, pblT, therm, plcl, fqcalving, &
+         ffonte, run_off_lic_0, albsol, sollw, solsw, tsol)
 
     ! Incr\'ementation des flux
 

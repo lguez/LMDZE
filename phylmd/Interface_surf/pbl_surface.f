@@ -6,10 +6,11 @@ contains
 
   SUBROUTINE pbl_surface(pctsrf, t, q, u, v, julien, mu0, ftsol, cdmmax, &
        cdhmax, ftsoil, qsol, paprs, pplay, fsnow, qsurf, falbe, fluxlat, &
-       rain_fall, snow_fall, fsolsw, fsollw, frugs, agesno, rugoro, d_t, d_q, &
-       d_u, d_v, d_ts, flux_t, flux_q, flux_u, flux_v, cdragh, cdragm, q2, &
-       dflux_t, dflux_q, coefh, t2m, q2m, u10m_srf, v10m_srf, pblh, capcl, &
-       oliqcl, cteicl, pblt, therm, plcl, fqcalving, ffonte, run_off_lic_0)
+       rain_fall, snow_fall, frugs, agesno, rugoro, d_t, d_q, d_u, d_v, d_ts, &
+       flux_t, flux_q, flux_u, flux_v, cdragh, cdragm, q2, dflux_t, dflux_q, &
+       coefh, t2m, q2m, u10m_srf, v10m_srf, pblh, capcl, oliqcl, cteicl, pblt, &
+       therm, plcl, fqcalving, ffonte, run_off_lic_0, albsol, sollw, solsw, &
+       tsol)
 
     ! From phylmd/clmain.F, version 1.6, 2005/11/16 14:47:19
     ! Author: Z. X. Li (LMD/CNRS)
@@ -35,7 +36,7 @@ contains
     USE interfoce_lim_m, ONLY: interfoce_lim
     use phyetat0_m, only: zmasq
     use stdlevvar_m, only: stdlevvar
-    USE suphec_m, ONLY: rd, rg
+    USE suphec_m, ONLY: rd, rg, rsigma
     use time_phylmdz, only: itap
 
     REAL, INTENT(inout):: pctsrf(klon, nbsrf)
@@ -68,7 +69,6 @@ contains
     REAL, intent(in):: snow_fall(klon)
     ! solid water mass flux (kg / m2 / s), positive down
 
-    REAL, INTENT(IN):: fsolsw(klon, nbsrf), fsollw(klon, nbsrf)
     REAL, intent(inout):: frugs(klon, nbsrf) ! longueur de rugosit\'e (en m)
     real agesno(klon, nbsrf)
     REAL, INTENT(IN):: rugoro(klon)
@@ -126,7 +126,19 @@ contains
     real ffonte(klon, nbsrf) ! flux thermique utilise pour fondre la neige
     REAL, intent(inout):: run_off_lic_0(:) ! (klon)
 
+    REAL, intent(out):: albsol(:) ! (klon)
+    ! albedo du sol total, visible, moyen par maille
+
+    REAL, intent(in):: sollw(:) ! (klon)
+    ! rayonnement infrarouge montant \`a la surface
+    
+    REAL, intent(in):: solsw(:) ! (klon)
+    REAL, intent(in):: tsol(:) ! (klon)
+
     ! Local:
+
+    REAL fsollw(klon, nbsrf) ! bilan flux IR pour chaque sous-surface
+    REAL fsolsw(klon, nbsrf) ! flux solaire absorb\'e pour chaque sous-surface
 
     ! la nouvelle repartition des surfaces sortie de l'interface
     REAL, save:: pctsrf_new_oce(klon)
@@ -185,6 +197,17 @@ contains
     REAL zgeop(klon, klev)
 
     !------------------------------------------------------------
+
+    albsol = sum(falbe * pctsrf, dim = 2)
+
+    ! R\'epartition sous maille des flux longwave et shortwave
+    ! R\'epartition du longwave par sous-surface lin\'earis\'ee
+
+    forall (nsrf = 1:nbsrf)
+       fsollw(:, nsrf) = sollw + 4. * RSIGMA * tsol**3 &
+            * (tsol - ftsol(:, nsrf))
+       fsolsw(:, nsrf) = solsw * (1. - falbe(:, nsrf)) / (1. - albsol)
+    END forall
 
     ytherm = 0.
 
