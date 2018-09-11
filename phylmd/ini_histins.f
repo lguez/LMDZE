@@ -48,87 +48,88 @@ contains
        CALL histvert(nid_ins, "presnivs", "Vertical levels", "mb", &
             presnivs/100., nvert)
        
+        ! Once:
        CALL histdef(nid_ins, "phis", "surface geopotential", "m2 s-2", &
-            iim, (jjm + 1), nhori, 1, 1, 1, -99, &
+            iim, jjm + 1, nhori, 1, 1, 1, -99, &
             "once", zsto, zout)
        CALL histdef(nid_ins, "aire", "Grid area", "-", &
-            iim, (jjm + 1), nhori, 1, 1, 1, -99, &
+            iim, jjm + 1, nhori, 1, 1, 1, -99, &
             "once", zsto, zout)
 
        ! Champs 2D:
 
        CALL histdef(nid_ins, "tsol", "Surface Temperature", "K", &
-            iim, (jjm + 1), nhori, 1, 1, 1, -99,  &
+            iim, jjm + 1, nhori, 1, 1, 1, -99,  &
             "inst(X)", zsto, zout)
        CALL histdef(nid_ins, "t2m", "Temperature 2m", "K", &
-            iim, (jjm + 1), nhori, 1, 1, 1, -99, &
+            iim, jjm + 1, nhori, 1, 1, 1, -99, &
             "inst(X)", zsto, zout)
        CALL histdef(nid_ins, "q2m", "Specific humidity 2m", "Kg/Kg", &
-            iim, (jjm + 1), nhori, 1, 1, 1, -99, &
+            iim, jjm + 1, nhori, 1, 1, 1, -99, &
             "inst(X)", zsto, zout)
        CALL histdef(nid_ins, "u10m", "Vent zonal 10m", "m/s", &
-            iim, (jjm + 1), nhori, 1, 1, 1, -99, &
+            iim, jjm + 1, nhori, 1, 1, 1, -99, &
             "inst(X)", zsto, zout)
        CALL histdef(nid_ins, "v10m", "Vent meridien 10m", "m/s", &
-            iim, (jjm + 1), nhori, 1, 1, 1, -99, &
+            iim, jjm + 1, nhori, 1, 1, 1, -99, &
             "inst(X)", zsto, zout)
        CALL histdef(nid_ins, "psol", "Surface Pressure", "Pa", &
-            iim, (jjm + 1), nhori, 1, 1, 1, -99, &
+            iim, jjm + 1, nhori, 1, 1, 1, -99, &
             "inst(X)", zsto, zout)
        CALL histdef(nid_ins, "plul", "Large-scale Precip.", "mm/day", &
-            iim, (jjm + 1), nhori, 1, 1, 1, -99, &
+            iim, jjm + 1, nhori, 1, 1, 1, -99, &
             "inst(X)", zsto, zout)
        CALL histdef(nid_ins, "pluc", "Convective Precip.", "mm/day", &
-            iim, (jjm + 1), nhori, 1, 1, 1, -99, &
+            iim, jjm + 1, nhori, 1, 1, 1, -99, &
             "inst(X)", zsto, zout)
        CALL histdef(nid_ins, "cdrm", "Momentum drag coef.", "-", &
-            iim, (jjm + 1), nhori, 1, 1, 1, -99,  &
+            iim, jjm + 1, nhori, 1, 1, 1, -99,  &
             "inst(X)", zsto, zout)
        CALL histdef(nid_ins, "cdrh", "Heat drag coef.", "-", &
-            iim, (jjm + 1), nhori, 1, 1, 1, -99,  &
+            iim, jjm + 1, nhori, 1, 1, 1, -99,  &
             "inst(X)", zsto, zout)
        CALL histdef(nid_ins, "precip", "Precipitation Totale liq+sol",  &
             "kg/(s*m2)", &
-            iim, (jjm + 1), nhori, 1, 1, 1, -99,  &
+            iim, jjm + 1, nhori, 1, 1, 1, -99,  &
             "inst(X)", zsto, zout)
        CALL histdef(nid_ins, "snow", "Snow fall", "kg/(s*m2)", &
-            iim, (jjm + 1), nhori, 1, 1, 1, -99,  &
+            iim, jjm + 1, nhori, 1, 1, 1, -99,  &
             "inst(X)", zsto, zout)
        CALL histdef(nid_ins, "topl", "OLR", "W/m2", &
-            iim, (jjm + 1), nhori, 1, 1, 1, -99, &
+            iim, jjm + 1, nhori, 1, 1, 1, -99, &
             "inst(X)", zsto, zout)
        CALL histdef(nid_ins, "evap", "Evaporation", "kg/(s*m2)", &
-            iim, (jjm + 1), nhori, 1, 1, 1, -99,  &
+            iim, jjm + 1, nhori, 1, 1, 1, -99,  &
             "inst(X)", zsto, zout)
        CALL histdef(nid_ins, "sols", "Solar rad. at surf.", "W/m2", &
-            iim, (jjm + 1), nhori, 1, 1, 1, -99,  &
+            iim, jjm + 1, nhori, 1, 1, 1, -99,  &
             "inst(X)", zsto, zout)
        CALL histdef(nid_ins, "soll", "IR rad. at surface", "W/m2", &
-            iim, (jjm + 1), nhori, 1, 1, 1, -99,  &
+            iim, jjm + 1, nhori, 1, 1, 1, -99,  &
             "inst(X)", zsto, zout)
        CALL histdef(nid_ins, "solldown", "Down. IR rad. at surface",  &
-            "W/m2", iim, (jjm + 1), nhori, 1, 1, 1, -99,  &
+            "W/m2", iim, jjm + 1, nhori, 1, 1, 1, -99,  &
             "inst(X)", zsto, zout)
        CALL histdef(nid_ins, "bils", "Surf. total heat flux", "W/m2", &
-            iim, (jjm + 1), nhori, 1, 1, 1, -99,  &
+            iim, jjm + 1, nhori, 1, 1, 1, -99,  &
             "inst(X)", zsto, zout)
        CALL histdef(nid_ins, "sens", "Sensible heat flux", "W/m2", &
-            iim, (jjm + 1), nhori, 1, 1, 1, -99,  &
+            iim, jjm + 1, nhori, 1, 1, 1, -99,  &
             "inst(X)", zsto, zout)
        CALL histdef(nid_ins, "fder", "Heat flux derivation", "W/m2", &
-            iim, (jjm + 1), nhori, 1, 1, 1, -99,  &
+            iim, jjm + 1, nhori, 1, 1, 1, -99,  &
             "inst(X)", zsto, zout)
        CALL histdef(nid_ins, "dtsvdfo", "Boundary-layer dTs(o)", "K/s", &
-            iim, (jjm + 1), nhori, 1, 1, 1, -99,  &
+            iim, jjm + 1, nhori, 1, 1, 1, -99,  &
             "inst(X)", zsto, zout)
        CALL histdef(nid_ins, "dtsvdft", "Boundary-layer dTs(t)", "K/s", &
-            iim, (jjm + 1), nhori, 1, 1, 1, -99,  &
+            iim, jjm + 1, nhori, 1, 1, 1, -99,  &
             "inst(X)", zsto, zout)
        CALL histdef(nid_ins, "dtsvdfg", "Boundary-layer dTs(g)", "K/s", &
-            iim, (jjm + 1), nhori, 1, 1, 1, -99,  &
+            iim, jjm + 1, nhori, 1, 1, 1, -99,  &
             "inst(X)", zsto, zout)
        CALL histdef(nid_ins, "dtsvdfi", "Boundary-layer dTs(g)", "K/s", &
-            iim, (jjm + 1), nhori, 1, 1, 1, -99,  &
+            iim, jjm + 1, nhori, 1, 1, 1, -99,  &
             "inst(X)", zsto, zout)
        CALL histdef(nid_ins, "msnow", "surface snow amount", "kg/m2", &
             iim, jjm + 1, nhori, 1, 1, 1, -99, "inst(X)", zsto, zout)
@@ -137,85 +138,87 @@ contains
        CALL histdef(nid_ins, "run_off_lic", "land ice melt to ocean", &
             "kg m-2 s-1", iim, jjm + 1, nhori, 1, 1, 1, -99, "inst(X)", zsto, &
             zout)
+       CALL histdef(nid_ins, "flat", "latent heat flux", "W m-2", iim, &
+            jjm + 1, nhori, 1, 1, 1, -99, "inst(X)", zsto, zout)
 
        DO nsrf = 1, nbsrf
           call histdef(nid_ins, "pourc_"//clnsurf(nsrf),  &
                "% "//clnsurf(nsrf), "%",   &
-               iim, (jjm + 1), nhori, 1, 1, 1, -99, &
+               iim, jjm + 1, nhori, 1, 1, 1, -99, &
                "inst(X)", zsto, zout)
           call histdef(nid_ins, "fract_"//clnsurf(nsrf),  &
                "Fraction "//clnsurf(nsrf), "1",   &
-               iim, (jjm + 1), nhori, 1, 1, 1, -99, &
+               iim, jjm + 1, nhori, 1, 1, 1, -99, &
                "inst(X)", zsto, zout)
           call histdef(nid_ins, "sens_"//clnsurf(nsrf),  &
                "Sensible heat flux "//clnsurf(nsrf), "W/m2",   &
-               iim, (jjm + 1), nhori, 1, 1, 1, -99, &
+               iim, jjm + 1, nhori, 1, 1, 1, -99, &
                "inst(X)", zsto, zout)
           call histdef(nid_ins, "tsol_"//clnsurf(nsrf),  &
                "Surface Temperature"//clnsurf(nsrf), "W/m2",   &
-               iim, (jjm + 1), nhori, 1, 1, 1, -99, &
+               iim, jjm + 1, nhori, 1, 1, 1, -99, &
                "inst(X)", zsto, zout)
           call histdef(nid_ins, "lat_"//clnsurf(nsrf),  &
                "Latent heat flux "//clnsurf(nsrf), "W/m2",   &
-               iim, (jjm + 1), nhori, 1, 1, 1, -99, &
+               iim, jjm + 1, nhori, 1, 1, 1, -99, &
                "inst(X)", zsto, zout)
           call histdef(nid_ins, "taux_"//clnsurf(nsrf),  &
                "Zonal wind stress"//clnsurf(nsrf), "Pa", &
-               iim, (jjm + 1), nhori, 1, 1, 1, -99, &
+               iim, jjm + 1, nhori, 1, 1, 1, -99, &
                "inst(X)", zsto, zout)
           call histdef(nid_ins, "tauy_"//clnsurf(nsrf),  &
                "Meridional xind stress "//clnsurf(nsrf), "Pa",   &
-               iim, (jjm + 1), nhori, 1, 1, 1, -99, &
+               iim, jjm + 1, nhori, 1, 1, 1, -99, &
                "inst(X)", zsto, zout)
           call histdef(nid_ins, "albe_"//clnsurf(nsrf),  &
                "Albedo "//clnsurf(nsrf), "-",   &
-               iim, (jjm + 1), nhori, 1, 1, 1, -99, &
+               iim, jjm + 1, nhori, 1, 1, 1, -99, &
                "inst(X)", zsto, zout)
           call histdef(nid_ins, "rugs_"//clnsurf(nsrf),  &
                "rugosite "//clnsurf(nsrf), "-",   &
-               iim, (jjm + 1), nhori, 1, 1, 1, -99, &
+               iim, jjm + 1, nhori, 1, 1, 1, -99, &
                "inst(X)", zsto, zout)
           call histdef(nid_ins, "u10m_"//clnsurf(nsrf),  &
                "zonal wind 10 m "//clnsurf(nsrf), "m s-1",   &
-               iim, (jjm + 1), nhori, 1, 1, 1, -99, &
+               iim, jjm + 1, nhori, 1, 1, 1, -99, &
                "inst(X)", zsto, zout)
           call histdef(nid_ins, "v10m_"//clnsurf(nsrf),  &
                "meridional wind 10 m "//clnsurf(nsrf), "m s-1",   &
-               iim, (jjm + 1), nhori, 1, 1, 1, -99, &
+               iim, jjm + 1, nhori, 1, 1, 1, -99, &
                "inst(X)", zsto, zout)
        END DO
 
        CALL histdef(nid_ins, "rugs", "rugosity", "-", &
-            iim, (jjm + 1), nhori, 1, 1, 1, -99,  &
+            iim, jjm + 1, nhori, 1, 1, 1, -99,  &
             "inst(X)", zsto, zout)
        CALL histdef(nid_ins, "albs", "Surface albedo", "-", &
-            iim, (jjm + 1), nhori, 1, 1, 1, -99,  &
+            iim, jjm + 1, nhori, 1, 1, 1, -99,  &
             "inst(X)", zsto, zout)
        CALL histdef(nid_ins, "s_pblh", "Boundary Layer Height", "m", &
-            iim, (jjm + 1), nhori, 1, 1, 1, -99, &
+            iim, jjm + 1, nhori, 1, 1, 1, -99, &
             "inst(X)", zsto, zout)
        CALL histdef(nid_ins, "s_pblt", "T at Boundary Layer Height",  &
             "K", &
-            iim, (jjm + 1), nhori, 1, 1, 1, -99, &
+            iim, jjm + 1, nhori, 1, 1, 1, -99, &
             "inst(X)", zsto, zout)
        CALL histdef(nid_ins, "s_lcl", "Condensation level", "m", &
-            iim, (jjm + 1), nhori, 1, 1, 1, -99, &
+            iim, jjm + 1, nhori, 1, 1, 1, -99, &
             "inst(X)", zsto, zout)
        CALL histdef(nid_ins, "s_capCL", &
             "Convective available potential energy for atmospheric boundary " &
-            // "layer", "J/m2", iim, (jjm + 1), nhori, 1, 1, 1, -99, &
+            // "layer", "J/m2", iim, jjm + 1, nhori, 1, 1, 1, -99, &
             "inst(X)", zsto, zout)
        CALL histdef(nid_ins, "s_oliqCL", "Liq Water in BL", "kg/m2", &
-            iim, (jjm + 1), nhori, 1, 1, 1, -99, &
+            iim, jjm + 1, nhori, 1, 1, 1, -99, &
             "inst(X)", zsto, zout)
        CALL histdef(nid_ins, "s_cteiCL", "Instability criteria (ABL)", "K", &
-            iim, (jjm + 1), nhori, 1, 1, 1, -99, &
+            iim, jjm + 1, nhori, 1, 1, 1, -99, &
             "inst(X)", zsto, zout)
        CALL histdef(nid_ins, "s_therm", "Exces du thermique", "K", &
-            iim, (jjm + 1), nhori, 1, 1, 1, -99, &
+            iim, jjm + 1, nhori, 1, 1, 1, -99, &
             "inst(X)", zsto, zout)
        CALL histdef(nid_ins, "qsurf", "Surface Air humidity", "", &
-            iim, (jjm + 1), nhori, 1, 1, 1, -99, &
+            iim, jjm + 1, nhori, 1, 1, 1, -99, &
             "inst(X)", zsto, zout)
 
        if (conv_emanuel) then
@@ -231,25 +234,25 @@ contains
        CALL histdef(nid_ins, "tro3", "ozone mole fraction", "-", &
             iim, jjm + 1, nhori, llm, 1, llm, nvert, "inst(X)", zsto, zout)
        CALL histdef(nid_ins, "temp", "Temperature", "K", &
-            iim, (jjm + 1), nhori, llm, 1, llm, nvert, &
+            iim, jjm + 1, nhori, llm, 1, llm, nvert, &
             "inst(X)", zsto, zout)
        CALL histdef(nid_ins, "vitu", "Zonal wind", "m/s", &
-            iim, (jjm + 1), nhori, llm, 1, llm, nvert, &
+            iim, jjm + 1, nhori, llm, 1, llm, nvert, &
             "inst(X)", zsto, zout)
        CALL histdef(nid_ins, "vitv", "Merid wind", "m/s", &
-            iim, (jjm + 1), nhori, llm, 1, llm, nvert, &
+            iim, jjm + 1, nhori, llm, 1, llm, nvert, &
             "inst(X)", zsto, zout)
        CALL histdef(nid_ins, "geop", "Geopotential height", "m", &
-            iim, (jjm + 1), nhori, llm, 1, llm, nvert, &
+            iim, jjm + 1, nhori, llm, 1, llm, nvert, &
             "inst(X)", zsto, zout)
        CALL histdef(nid_ins, "pres", "Air pressure", "Pa", &
-            iim, (jjm + 1), nhori, llm, 1, llm, nvert, &
+            iim, jjm + 1, nhori, llm, 1, llm, nvert, &
             "inst(X)", zsto, zout)
        CALL histdef(nid_ins, "dtvdf", "Boundary-layer dT", "K/s", &
-            iim, (jjm + 1), nhori, llm, 1, llm, nvert, &
+            iim, jjm + 1, nhori, llm, 1, llm, nvert, &
             "inst(X)", zsto, zout)
        CALL histdef(nid_ins, "dqvdf", "Boundary-layer dQ", "Kg/Kg/s", &
-            iim, (jjm + 1), nhori, llm, 1, llm, nvert, &
+            iim, jjm + 1, nhori, llm, 1, llm, nvert, &
             "inst(X)", zsto, zout)
        CALL histdef(nid_ins, "zmasse", "column density of air in cell", &
             "kg m-2", iim, jjm + 1, nhori, llm, 1, llm, nvert, "inst(X)", &
