@@ -326,9 +326,9 @@ contains
     INTEGER, save:: ibas_con(klon), itop_con(klon)
     real ema_pct(klon) ! Emanuel pressure at cloud top, in Pa
 
-    REAL, save:: rain_con(klon)
+    REAL rain_con(klon)
     real rain_lsc(klon)
-    REAL, save:: snow_con(klon) ! neige (mm / s)
+    REAL snow_con(klon) ! neige (mm / s)
     real snow_lsc(klon)
     REAL d_ts(klon, nbsrf) ! variation of ftsol
 
@@ -417,8 +417,6 @@ contains
        t2m = 0.
        q2m = 0.
        ffonte = 0.
-       rain_con = 0.
-       snow_con = 0.
        d_u_con = 0.
        d_v_con = 0.
        rnebcon0 = 0.

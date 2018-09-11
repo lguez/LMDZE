@@ -4,7 +4,7 @@ module fonte_neige_m
 
 contains
 
-  SUBROUTINE fonte_neige(nisurf, precip_rain, precip_snow, snow, qsol, &
+  SUBROUTINE fonte_neige(nisurf, rain_fall, snow_fall, snow, qsol, &
        tsurf_new, evap, fqcalving, ffonte, run_off_lic_0, run_off_lic)
 
     ! Routine de traitement de la fonte de la neige dans le cas du traitement
@@ -12,18 +12,20 @@ contains
 
     ! Laurent Fairhead, March, 2001
 
+    ! Library:
+    use nr_util, only: assert_eq
+
     use comconst, only: dtphys
     USE indicesol, ONLY: epsfra, is_lic, is_sic, is_ter
     USE conf_interface_m, ONLY: tau_calv
-    use nr_util, only: assert_eq
     USE suphec_m, ONLY: rday, rlmlt, rtt
 
     integer, intent(IN):: nisurf ! surface \`a traiter
 
-    real, intent(IN):: precip_rain(:) ! (knon)
+    real, intent(IN):: rain_fall(:) ! (knon)
     ! precipitation, liquid water mass flux (kg / m2 / s), positive down
 
-    real, intent(IN):: precip_snow(:) ! (knon)
+    real, intent(IN):: snow_fall(:) ! (knon)
     ! precipitation, solid water mass flux (kg / m2 / s), positive down
 
     real, intent(INOUT):: snow(:) ! (knon)
@@ -50,14 +52,15 @@ contains
     ! Local:
 
     integer knon ! nombre de points \`a traiter
-    real, parameter:: snow_max=3000.
+    
+    real, parameter:: snow_max = 3000.
     ! Masse maximum de neige (kg / m2). Au dessus de ce seuil, la neige
     ! en exces "s'\'ecoule" (calving).
 
     integer i
     real fq_fonte
-    REAL bil_eau_s(size(precip_rain)) ! (knon) in kg m-2
-    real snow_evap(size(precip_rain)) ! (knon) in kg m-2 s-1
+    REAL bil_eau_s(size(rain_fall)) ! (knon) in kg m-2
+    real snow_evap(size(rain_fall)) ! (knon) in kg m-2 s-1
     REAL, parameter:: chasno = 3.334E5 / (2.3867E6 * 0.15)
     REAL, parameter:: chaice = 3.334E5 / (2.3867E6 * 0.15)
     real, parameter:: max_eau_sol = 150. ! in kg m-2
@@ -65,12 +68,12 @@ contains
 
     !--------------------------------------------------------------------
 
-    knon = assert_eq((/size(precip_rain), size(precip_snow), size(snow), &
+    knon = assert_eq((/size(rain_fall), size(snow_fall), size(snow), &
          size(qsol), size(tsurf_new), size(evap), size(fqcalving), &
          size(ffonte), size(run_off_lic_0)/), "fonte_neige knon")
 
     coeff_rel = dtphys / (tau_calv * rday)
-    WHERE (precip_snow > 0.) snow = snow + precip_snow * dtphys
+    WHERE (snow_fall > 0.) snow = snow + snow_fall * dtphys
 
     WHERE (evap > 0.)
        snow_evap = MIN(snow / dtphys, evap)
@@ -80,7 +83,7 @@ contains
        snow_evap = 0.
     end where
 
-    bil_eau_s = (precip_rain - evap + snow_evap) * dtphys
+    bil_eau_s = (rain_fall - evap + snow_evap) * dtphys
 
     ! Y a-t-il fonte de neige ?
 

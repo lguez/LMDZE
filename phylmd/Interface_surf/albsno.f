@@ -6,13 +6,13 @@ module albsno_m
 
 contains
 
-  SUBROUTINE albsno(agesno, alb_neig, precip_snow)
+  SUBROUTINE albsno(agesno, alb_neig, snow_fall)
 
     use comconst, only: dtphys
 
     REAL, intent(inout):: agesno(:) ! (knon)
     real, intent(out):: alb_neig(:) ! (knon)
-    real, intent(in):: precip_snow(:) !(knon)
+    real, intent(in):: snow_fall(:) !(knon)
 
     !------------------------------------------------------------------------
 
@@ -21,7 +21,7 @@ contains
 
     ! Modulation en fonction de l'\^age de la neige :
     agesno = max((agesno + (1. - agesno / 50.) * dtphys / 86400.) &
-         * EXP(- MAX(0., precip_snow) * dtphys / 0.3), 0.)
+         * EXP(- MAX(0., snow_fall) * dtphys / 0.3), 0.)
 
   END SUBROUTINE albsno
 

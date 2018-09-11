@@ -6,7 +6,7 @@ contains
 
   SUBROUTINE clqh(julien, nisurf, knindex, tsoil, qsol, mu0, rugos, rugoro, &
        u1lay, v1lay, coef, tq_cdrag, t, q, ts, paprs, pplay, delp, radsol, &
-       albedo, snow, qsurf, precip_rain, precip_snow, fluxlat, pctsrf_new_sic, &
+       albedo, snow, qsurf, rain_fall, snow_fall, fluxlat, pctsrf_new_sic, &
        agesno, d_t, d_q, d_ts, z0_new, flux_t, flux_q, dflux_s, dflux_l, &
        fqcalving, ffonte, run_off_lic_0, run_off_lic)
 
@@ -63,10 +63,10 @@ contains
     REAL, intent(out):: qsurf(:) ! (knon)
     ! humidite de l'air au dessus de la surface
 
-    real, intent(in):: precip_rain(:) ! (knon)
+    real, intent(in):: rain_fall(:) ! (knon)
     ! liquid water mass flux (kg / m2 / s), positive down
 
-    real, intent(in):: precip_snow(:) ! (knon)
+    real, intent(in):: snow_fall(:) ! (knon)
     ! solid water mass flux (kg / m2 / s), positive down
 
     real, intent(out):: fluxlat(:) ! (knon)
@@ -115,7 +115,7 @@ contains
     call climb_hq_down(pkf, cq, dq, ch, dh, paprs, pplay, t, coef, delp, q)
     CALL interfsurf_hq(julien, mu0, nisurf, knindex, tsoil, qsol, u1lay, &
          v1lay, t(:, 1), q(:, 1), tq_cdrag, ch(:, 1), cq(:, 1), dh(:, 1), &
-         dq(:, 1), precip_rain, precip_snow, rugos, rugoro, snow, qsurf, ts, &
+         dq(:, 1), rain_fall, snow_fall, rugos, rugoro, snow, qsurf, ts, &
          pplay(:, 1), paprs(:, 1), radsol, evap, flux_t, fluxlat, dflux_l, &
          dflux_s, tsurf_new, albedo, z0_new, pctsrf_new_sic, agesno, &
          fqcalving, ffonte, run_off_lic_0, run_off_lic)

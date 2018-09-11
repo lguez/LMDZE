@@ -6,7 +6,7 @@ contains
 
   SUBROUTINE interfsurf_hq(julien, mu0, nisurf, knindex, tsoil, qsol, u1_lay, &
        v1_lay, temp_air, spechum, tq_cdrag, tAcoef, qAcoef, tBcoef, qBcoef, &
-       precip_rain, precip_snow, rugos, rugoro, snow, qsurf, ts, p1lay, ps, &
+       rain_fall, snow_fall, rugos, rugoro, snow, qsurf, ts, p1lay, ps, &
        radsol, evap, flux_t, fluxlat, dflux_l, dflux_s, tsurf_new, albedo, &
        z0_new, pctsrf_new_sic, agesno, fqcalving, ffonte, run_off_lic_0, &
        run_off_lic)
@@ -52,10 +52,10 @@ contains
     real, intent(IN):: tBcoef(:), qBcoef(:) ! (knon)
     ! coefficients B de la r\'esolution de la couche limite pour t et q
 
-    real, intent(IN):: precip_rain(:) ! (knon)
+    real, intent(IN):: rain_fall(:) ! (knon)
     ! precipitation, liquid water mass flux (kg / m2 / s), positive down
 
-    real, intent(IN):: precip_snow(:) ! (knon)
+    real, intent(IN):: snow_fall(:) ! (knon)
     ! precipitation, solid water mass flux (kg / m2 / s), positive down
 
     real, intent(IN):: rugos(:) ! (knon) rugosite
@@ -128,10 +128,10 @@ contains
             radsol + soilflux, temp_air, spechum, u1_lay, v1_lay, tAcoef, &
             qAcoef, tBcoef, qBcoef, tsurf_new, evap, fluxlat, flux_t, dflux_s, &
             dflux_l, dif_grnd = 0.)
-       CALL fonte_neige(is_ter, precip_rain, precip_snow, snow, qsol, &
+       CALL fonte_neige(is_ter, rain_fall, snow_fall, snow, qsol, &
             tsurf_new, evap, fqcalving, ffonte, run_off_lic_0, run_off_lic)
 
-       call albsno(agesno, alb_neig, precip_snow)
+       call albsno(agesno, alb_neig, snow_fall)
        where (snow < 0.0001) agesno = 0.
        zfra = max(0., min(1., snow / (snow + 10.)))
        albedo = alb_neig * zfra + albedo * (1. - zfra)
@@ -171,12 +171,12 @@ contains
             radsol + soilflux, temp_air, spechum, u1_lay, v1_lay, tAcoef, &
             qAcoef, tBcoef, qBcoef, tsurf_new, evap, fluxlat, flux_t, dflux_s, &
             dflux_l, dif_grnd = 1. / tau_gl)
-       CALL fonte_neige(is_sic, precip_rain, precip_snow, snow, qsol, &
+       CALL fonte_neige(is_sic, rain_fall, snow_fall, snow, qsol, &
             tsurf_new, evap, fqcalving, ffonte, run_off_lic_0, run_off_lic)
 
        ! Compute the albedo:
 
-       CALL albsno(agesno, alb_neig, precip_snow)
+       CALL albsno(agesno, alb_neig, snow_fall)
        WHERE (snow < 0.0001) agesno = 0.
        zfra = MAX(0., MIN(1., snow / (snow + 10.)))
        albedo = alb_neig * zfra + 0.6 * (1. - zfra)
@@ -192,11 +192,11 @@ contains
             radsol + soilflux, temp_air, spechum, u1_lay, v1_lay, tAcoef, &
             qAcoef, tBcoef, qBcoef, tsurf_new, evap, fluxlat, flux_t, dflux_s, &
             dflux_l, dif_grnd = 0.)
-       call fonte_neige(is_lic, precip_rain, precip_snow, snow, qsol, &
+       call fonte_neige(is_lic, rain_fall, snow_fall, snow, qsol, &
             tsurf_new, evap, fqcalving, ffonte, run_off_lic_0, run_off_lic)
 
        ! calcul albedo
-       CALL albsno(agesno, alb_neig, precip_snow)
+       CALL albsno(agesno, alb_neig, snow_fall)
        WHERE (snow < 0.0001) agesno = 0.
        albedo = 0.77
 
