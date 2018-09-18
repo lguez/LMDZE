@@ -130,7 +130,7 @@ contains
     ! albedo du sol total, visible, moyen par maille
 
     REAL, intent(in):: sollw(:) ! (klon)
-    ! rayonnement infrarouge montant \`a la surface
+    ! surface net downward longwave flux, in W m-2
     
     REAL, intent(in):: solsw(:) ! (klon)
     REAL, intent(in):: tsol(:) ! (klon)
@@ -156,7 +156,7 @@ contains
     real yqsol(klon) ! column-density of water in soil, in kg m-2
     REAL yrain_fall(klon) ! liquid water mass flux (kg / m2 / s), positive down
     REAL ysnow_fall(klon) ! solid water mass flux (kg / m2 / s), positive down
-    REAL yrugm(klon), yrads(klon), yrugoro(klon)
+    REAL yrugm(klon), radsol(klon), yrugoro(klon)
     REAL yfluxlat(klon)
     REAL y_d_ts(klon)
     REAL y_d_t(klon, klev), y_d_q(klon, klev)
@@ -287,7 +287,7 @@ contains
              yagesno(j) = agesno(i, nsrf)
              yrugos(j) = frugs(i, nsrf)
              yrugoro(j) = rugoro(i)
-             yrads(j) = fsolsw(i, nsrf) + fsollw(i, nsrf)
+             radsol(j) = fsolsw(i, nsrf) + fsollw(i, nsrf)
              ypaprs(j, klev + 1) = paprs(i, klev + 1)
              y_run_off_lic_0(j) = run_off_lic_0(i)
           END DO
@@ -356,7 +356,7 @@ contains
                mu0(ni(:knon)), yrugos(:knon), yrugoro(:knon), yu(:knon, 1), &
                yv(:knon, 1), ycoefh(:knon, :), ycdragh(:knon), yt(:knon, :), &
                yq(:knon, :), yts(:knon), ypaprs(:knon, :), ypplay(:knon, :), &
-               ydelp(:knon, :), yrads(:knon), yalb(:knon), snow(:knon), &
+               ydelp(:knon, :), radsol(:knon), yalb(:knon), snow(:knon), &
                yqsurf(:knon), yrain_fall(:knon), ysnow_fall(:knon), &
                yfluxlat(:knon), pctsrf_new_sic(ni(:knon)), yagesno(:knon), &
                y_d_t(:knon, :), y_d_q(:knon, :), y_d_ts(:knon), &

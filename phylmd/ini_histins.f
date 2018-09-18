@@ -104,9 +104,8 @@ contains
        CALL histdef(nid_ins, "sols", "Solar rad. at surf.", "W/m2", &
             iim, jjm + 1, nhori, 1, 1, 1, -99,  &
             "inst(X)", zsto, zout)
-       CALL histdef(nid_ins, "soll", "IR rad. at surface", "W/m2", &
-            iim, jjm + 1, nhori, 1, 1, 1, -99,  &
-            "inst(X)", zsto, zout)
+       CALL histdef(nid_ins, "rls", "surface net downward longwave flux", &
+            "W/m2", iim, jjm + 1, nhori, 1, 1, 1, -99, "inst(X)", zsto, zout)
        CALL histdef(nid_ins, "solldown", "Down. IR rad. at surface",  &
             "W/m2", iim, jjm + 1, nhori, 1, 1, 1, -99,  &
             "inst(X)", zsto, zout)

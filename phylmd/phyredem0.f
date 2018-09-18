@@ -100,7 +100,7 @@ contains
 
     call nf95_def_var(ncid_restartphy, 'sollw', nf90_float, idim2, varid)
     call nf95_put_att(ncid_restartphy, varid, 'title', &
-         'Rayonnement IF a la surface')
+         'Rayonnement IR a la surface')
 
     call nf95_def_var(ncid_restartphy, 'fder', nf90_float, idim2, varid)
     call nf95_put_att(ncid_restartphy, varid, 'title', 'Derive de flux')

@@ -5,7 +5,7 @@ module clqh_m
 contains
 
   SUBROUTINE clqh(julien, nisurf, knindex, tsoil, qsol, mu0, rugos, rugoro, &
-       u1lay, v1lay, coef, tq_cdrag, t, q, ts, paprs, pplay, delp, radsol, &
+       u1lay, v1lay, coef, cdragh, t, q, ts, paprs, pplay, delp, radsol, &
        albedo, snow, qsurf, rain_fall, snow_fall, fluxlat, pctsrf_new_sic, &
        agesno, d_t, d_q, d_ts, z0_new, flux_t, flux_q, dflux_s, dflux_l, &
        fqcalving, ffonte, run_off_lic_0, run_off_lic)
@@ -39,7 +39,7 @@ contains
     ! Le coefficient d'echange (m**2 / s) multiplie par le cisaillement
     ! du vent (dV / dz)
 
-    REAL, intent(in):: tq_cdrag(:) ! (knon) sans unite
+    REAL, intent(in):: cdragh(:) ! (knon) sans unite
 
     REAL, intent(in):: t(:, :) ! (knon, klev) temperature (K)
     REAL, intent(in):: q(:, :) ! (knon, klev) humidite specifique (kg / kg)
@@ -55,7 +55,7 @@ contains
     ! epaisseur de couche en pression (Pa)
 
     REAL, intent(in):: radsol(:) ! (knon)
-    ! rayonnement net au sol (Solaire + IR) W / m2
+    ! surface net downward radiative flux, in W / m2
 
     REAL, intent(inout):: albedo(:) ! (knon) albedo de la surface
     REAL, intent(inout):: snow(:) ! (knon) ! hauteur de neige
@@ -114,7 +114,7 @@ contains
 
     call climb_hq_down(pkf, cq, dq, ch, dh, paprs, pplay, t, coef, delp, q)
     CALL interfsurf_hq(julien, mu0, nisurf, knindex, tsoil, qsol, u1lay, &
-         v1lay, t(:, 1), q(:, 1), tq_cdrag, ch(:, 1), cq(:, 1), dh(:, 1), &
+         v1lay, t(:, 1), q(:, 1), cdragh, ch(:, 1), cq(:, 1), dh(:, 1), &
          dq(:, 1), rain_fall, snow_fall, rugos, rugoro, snow, qsurf, ts, &
          pplay(:, 1), paprs(:, 1), radsol, evap, flux_t, fluxlat, dflux_l, &
          dflux_s, tsurf_new, albedo, z0_new, pctsrf_new_sic, agesno, &

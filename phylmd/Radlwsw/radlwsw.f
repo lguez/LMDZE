@@ -60,7 +60,7 @@ contains
     ! refroidissement infrarouge ciel clair
 
     real, intent(out):: radsol(klon)
-    ! bilan radiatif net au sol (W/m**2) (+ vers le bas)
+    ! bilan radiatif net au sol (W/m**2), positif vers le bas
 
     real, intent(out):: albpla(klon) ! albedo planetaire (entre 0 et 1)
     real, intent(out):: topsw(klon) ! flux solaire net au sommet de l'atm.
@@ -71,7 +71,7 @@ contains
     real, intent(out):: solsw(klon) ! flux solaire net à la surface
 
     real, intent(out):: sollw(klon)
-    ! rayonnement infrarouge montant à la surface
+    ! rayonnement infrarouge net à la surface
 
     real, intent(out):: sollwdown(klon)
     real, intent(out):: topsw0(klon)

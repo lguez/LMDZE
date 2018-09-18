@@ -4,7 +4,7 @@ module calcul_fluxs_m
 
 contains
 
-  SUBROUTINE calcul_fluxs(tsurf, p1lay, cal, beta, coef1lay, ps, qsurf, &
+  SUBROUTINE calcul_fluxs(tsurf, p1lay, cal, beta, cdragh, ps, qsurf, &
        radsol, t1lay, q1lay, u1lay, v1lay, tAcoef, qAcoef, tBcoef, &
        qBcoef, tsurf_new, evap, fluxlat, flux_t, dflux_s, dflux_l, dif_grnd)
 
@@ -31,7 +31,7 @@ contains
 
     real, intent(IN):: cal(:) ! (knon) capacité calorifique du sol
     real, intent(IN):: beta(:) ! (knon) évaporation réelle
-    real, intent(IN):: coef1lay(:) ! (knon) coefficient d'échange
+    real, intent(IN):: cdragh(:) ! (knon) coefficient d'échange
     real, intent(IN):: ps(:) ! (knon) pression au sol
     real, intent(OUT):: qsurf(:) ! (knon) humidité de l'air au-dessus du sol
 
@@ -66,11 +66,12 @@ contains
     logical delta
     real zcor
     real, parameter:: t_grnd = 271.35
+    real, parameter:: min_wind_speed = 1. ! in m s-1
 
     !---------------------------------------------------------------------
 
     knon = assert_eq([size(tsurf), size(p1lay), size(cal), size(beta), &
-         size(coef1lay), size(ps), size(qsurf), size(radsol), size(t1lay), &
+         size(cdragh), size(ps), size(qsurf), size(radsol), size(t1lay), &
          size(q1lay), size(u1lay), size(v1lay), size(tAcoef), size(qAcoef), &
          size(tBcoef), size(qBcoef), size(tsurf_new), size(evap), &
          size(fluxlat), size(flux_t), size(dflux_s), size(dflux_l)], &
@@ -88,7 +89,8 @@ contains
             qsat(i), zcor) / RLVTT
     ENDDO
 
-    coef = coef1lay * (1. + SQRT(u1lay**2 + v1lay**2)) * p1lay / (RD * t1lay)
+    coef = cdragh * (min_wind_speed + SQRT(u1lay**2 + v1lay**2)) * p1lay &
+         / (RD * t1lay)
     sl = merge(RLSTT, RLVTT, tsurf < RTT)
 
     ! Q

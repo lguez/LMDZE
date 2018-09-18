@@ -144,7 +144,9 @@ contains
     ! Radiative transfer computations are made every "radpas" call to
     ! "physiq".
 
-    REAL, save:: radsol(klon) ! bilan radiatif au sol calcule par code radiatif
+    REAL, save:: radsol(klon)
+    ! bilan radiatif net au sol (W/m2), positif vers le bas
+    
     REAL, save:: ftsol(klon, nbsrf) ! skin temperature of surface fraction
 
     REAL, save:: ftsoil(klon, nsoilmx, nbsrf)
@@ -257,7 +259,8 @@ contains
     REAL, save:: cool(klon, llm) ! refroidissement infrarouge
     REAL, save:: cool0(klon, llm) ! refroidissement infrarouge ciel clair
     REAL, save:: topsw(klon), toplw(klon), solsw(klon)
-    REAL, save:: sollw(klon) ! rayonnement infrarouge montant \`a la surface
+
+    REAL, save:: sollw(klon) ! surface net downward longwave flux, in W m-2
     real, save:: sollwdown(klon) ! downward LW flux at surface
     REAL, save:: topsw0(klon), toplw0(klon), solsw0(klon), sollw0(klon)
     REAL, save:: albpla(klon)
@@ -982,7 +985,7 @@ contains
     CALL histwrite_phy("topl", toplw)
     CALL histwrite_phy("evap", evap)
     CALL histwrite_phy("sols", solsw)
-    CALL histwrite_phy("soll", sollw)
+    CALL histwrite_phy("rls", sollw)
     CALL histwrite_phy("solldown", sollwdown)
     CALL histwrite_phy("bils", bils)
     CALL histwrite_phy("sens", - sens)

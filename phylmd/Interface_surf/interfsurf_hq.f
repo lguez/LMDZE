@@ -4,8 +4,8 @@ module interfsurf_hq_m
 
 contains
 
-  SUBROUTINE interfsurf_hq(julien, mu0, nisurf, knindex, tsoil, qsol, u1_lay, &
-       v1_lay, temp_air, spechum, tq_cdrag, tAcoef, qAcoef, tBcoef, qBcoef, &
+  SUBROUTINE interfsurf_hq(julien, mu0, nisurf, knindex, tsoil, qsol, u1lay, &
+       v1lay, temp_air, spechum, cdragh, tAcoef, qAcoef, tBcoef, qBcoef, &
        rain_fall, snow_fall, rugos, rugoro, snow, qsurf, ts, p1lay, ps, &
        radsol, evap, flux_t, fluxlat, dflux_l, dflux_s, tsurf_new, albedo, &
        z0_new, pctsrf_new_sic, agesno, fqcalving, ffonte, run_off_lic_0, &
@@ -40,11 +40,11 @@ contains
     REAL, intent(INOUT):: qsol(:) ! (knon)
     ! column-density of water in soil, in kg m-2
 
-    real, intent(IN):: u1_lay(:), v1_lay(:) ! (knon) vitesse 1ere couche
+    real, intent(IN):: u1lay(:), v1lay(:) ! (knon) vitesse 1ere couche
 
     real, intent(IN):: temp_air(:) ! (knon) temperature de l'air 1ere couche
     real, intent(IN):: spechum(:) ! (knon) humidite specifique 1ere couche
-    real, intent(IN):: tq_cdrag(:) ! (knon) coefficient d'echange
+    real, intent(IN):: cdragh(:) ! (knon) coefficient d'echange
 
     real, intent(IN):: tAcoef(:), qAcoef(:) ! (knon)
     ! coefficients A de la r\'esolution de la couche limite pour t et q
@@ -65,7 +65,10 @@ contains
     real, intent(IN):: ts(:) ! (knon) temp\'erature de surface
     real, intent(IN):: p1lay(:) ! (knon) pression 1er niveau (milieu de couche)
     real, intent(IN):: ps(:) ! (knon) pression au sol
-    REAL, INTENT(IN):: radsol(:) ! (knon) rayonnement net au sol (LW + SW)
+
+    REAL, INTENT(IN):: radsol(:) ! (knon)
+    ! surface net downward radiative flux, in W / m2
+
     real, intent(OUT):: evap(:) ! (knon) evaporation totale
 
     real, intent(OUT):: flux_t(:) ! (knon) flux de chaleur sensible
@@ -124,8 +127,8 @@ contains
        CALL soil(is_ter, snow, ts, tsoil, soilcap, soilflux)
        cal = RCPD / soilcap
 
-       CALL calcul_fluxs(ts, p1lay, cal, beta, tq_cdrag, ps, qsurf, &
-            radsol + soilflux, temp_air, spechum, u1_lay, v1_lay, tAcoef, &
+       CALL calcul_fluxs(ts, p1lay, cal, beta, cdragh, ps, qsurf, &
+            radsol + soilflux, temp_air, spechum, u1lay, v1lay, tAcoef, &
             qAcoef, tBcoef, qBcoef, tsurf_new, evap, fluxlat, flux_t, dflux_s, &
             dflux_l, dif_grnd = 0.)
        CALL fonte_neige(is_ter, rain_fall, snow_fall, snow, qsol, &
@@ -143,8 +146,8 @@ contains
        call limit_read_sst(julien, knindex, tsurf)
        cal = 0.
        beta = 1.
-       call calcul_fluxs(tsurf, p1lay, cal, beta, tq_cdrag, ps, qsurf, radsol, &
-            temp_air, spechum, u1_lay, v1_lay, tAcoef, qAcoef, tBcoef, qBcoef, &
+       call calcul_fluxs(tsurf, p1lay, cal, beta, cdragh, ps, qsurf, radsol, &
+            temp_air, spechum, u1lay, v1lay, tAcoef, qAcoef, tBcoef, qBcoef, &
             tsurf_new, evap, fluxlat, flux_t, dflux_s, dflux_l, dif_grnd = 0.)
        agesno = 0.
        albedo = alboc_cd(mu0) * fmagic
@@ -167,8 +170,8 @@ contains
        cal = RCPD / soilcap
        tsurf = tsurf_new
        beta = 1.
-       CALL calcul_fluxs(tsurf, p1lay, cal, beta, tq_cdrag, ps, qsurf, &
-            radsol + soilflux, temp_air, spechum, u1_lay, v1_lay, tAcoef, &
+       CALL calcul_fluxs(tsurf, p1lay, cal, beta, cdragh, ps, qsurf, &
+            radsol + soilflux, temp_air, spechum, u1lay, v1lay, tAcoef, &
             qAcoef, tBcoef, qBcoef, tsurf_new, evap, fluxlat, flux_t, dflux_s, &
             dflux_l, dif_grnd = 1. / tau_gl)
        CALL fonte_neige(is_sic, rain_fall, snow_fall, snow, qsol, &
@@ -188,8 +191,8 @@ contains
        CALL soil(is_lic, snow, ts, tsoil, soilcap, soilflux)
        cal = RCPD / soilcap
        beta = 1.
-       call calcul_fluxs(ts, p1lay, cal, beta, tq_cdrag, ps, qsurf, &
-            radsol + soilflux, temp_air, spechum, u1_lay, v1_lay, tAcoef, &
+       call calcul_fluxs(ts, p1lay, cal, beta, cdragh, ps, qsurf, &
+            radsol + soilflux, temp_air, spechum, u1lay, v1lay, tAcoef, &
             qAcoef, tBcoef, qBcoef, tsurf_new, evap, fluxlat, flux_t, dflux_s, &
             dflux_l, dif_grnd = 0.)
        call fonte_neige(is_lic, rain_fall, snow_fall, snow, qsol, &
