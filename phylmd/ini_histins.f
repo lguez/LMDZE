@@ -141,10 +141,6 @@ contains
             jjm + 1, nhori, 1, 1, 1, -99, "inst(X)", zsto, zout)
 
        DO nsrf = 1, nbsrf
-          call histdef(nid_ins, "pourc_"//clnsurf(nsrf),  &
-               "% "//clnsurf(nsrf), "%",   &
-               iim, jjm + 1, nhori, 1, 1, 1, -99, &
-               "inst(X)", zsto, zout)
           call histdef(nid_ins, "fract_"//clnsurf(nsrf),  &
                "Fraction "//clnsurf(nsrf), "1",   &
                iim, jjm + 1, nhori, 1, 1, 1, -99, &

@@ -247,7 +247,10 @@ contains
     REAL cldemi(klon, llm) ! emissivite infrarouge
 
     REAL flux_q(klon, nbsrf) ! flux turbulent d'humidite à la surface
-    REAL flux_t(klon, nbsrf) ! flux turbulent de chaleur à la surface
+
+    REAL flux_t(klon, nbsrf)
+    ! flux de chaleur sensible (c_p T) (W / m2) (orientation positive
+    ! vers le bas) à la surface
 
     REAL flux_u(klon, nbsrf), flux_v(klon, nbsrf)
     ! tension du vent (flux turbulent de vent) à la surface, en Pa
@@ -549,7 +552,7 @@ contains
 
     ! Incr\'ementation des flux
 
-    sens = - sum(flux_t * pctsrf, dim = 2)
+    sens = sum(flux_t * pctsrf, dim = 2)
     evap = - sum(flux_q * pctsrf, dim = 2)
     fder = dlw + dflux_t + dflux_q
 
@@ -849,7 +852,7 @@ contains
 
     ! Calculer le bilan du sol et la d\'erive de temp\'erature (couplage)
     DO i = 1, klon
-       bils(i) = radsol(i) - sens(i) + zxfluxlat(i)
+       bils(i) = radsol(i) + sens(i) + zxfluxlat(i)
     ENDDO
 
     ! Param\'etrisation de l'orographie \`a l'\'echelle sous-maille :
@@ -988,7 +991,7 @@ contains
     CALL histwrite_phy("rls", sollw)
     CALL histwrite_phy("solldown", sollwdown)
     CALL histwrite_phy("bils", bils)
-    CALL histwrite_phy("sens", - sens)
+    CALL histwrite_phy("sens", sens)
     CALL histwrite_phy("fder", fder)
     CALL histwrite_phy("dtsvdfo", d_ts(:, is_oce))
     CALL histwrite_phy("dtsvdft", d_ts(:, is_ter))
@@ -1021,7 +1024,6 @@ contains
     call histwrite_phy("flat", zxfluxlat)
 
     DO nsrf = 1, nbsrf
-       CALL histwrite_phy("pourc_"//clnsurf(nsrf), pctsrf(:, nsrf) * 100.)
        CALL histwrite_phy("fract_"//clnsurf(nsrf), pctsrf(:, nsrf))
        CALL histwrite_phy("sens_"//clnsurf(nsrf), flux_t(:, nsrf))
        CALL histwrite_phy("lat_"//clnsurf(nsrf), fluxlat(:, nsrf))

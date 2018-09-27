@@ -5,7 +5,7 @@ module pbl_surface_m
 contains
 
   SUBROUTINE pbl_surface(pctsrf, t, q, u, v, julien, mu0, ftsol, cdmmax, &
-       cdhmax, ftsoil, qsol, paprs, pplay, fsnow, qsurf, falbe, fluxlat, &
+       cdhmax, ftsoil, qsol, paprs, play, fsnow, fqsurf, falbe, fluxlat, &
        rain_fall, snow_fall, frugs, agesno, rugoro, d_t, d_q, d_u, d_v, d_ts, &
        flux_t, flux_q, flux_u, flux_v, cdragh, cdragm, q2, dflux_t, dflux_q, &
        coefh, t2m, q2m, u10m_srf, v10m_srf, pblh, capcl, oliqcl, cteicl, pblt, &
@@ -40,7 +40,7 @@ contains
     use time_phylmdz, only: itap
 
     REAL, INTENT(inout):: pctsrf(klon, nbsrf)
-    ! tableau des pourcentages de surface de chaque maille
+    ! pourcentages de surface de chaque maille
 
     REAL, INTENT(IN):: t(klon, klev) ! temperature (K)
     REAL, INTENT(IN):: q(klon, klev) ! vapeur d'eau (kg / kg)
@@ -57,9 +57,9 @@ contains
     ! column-density of water in soil, in kg m-2
 
     REAL, INTENT(IN):: paprs(klon, klev + 1) ! pression a intercouche (Pa)
-    REAL, INTENT(IN):: pplay(klon, klev) ! pression au milieu de couche (Pa)
+    REAL, INTENT(IN):: play(klon, klev) ! pression au milieu de couche (Pa)
     REAL, INTENT(inout):: fsnow(:, :) ! (klon, nbsrf) \'epaisseur neigeuse
-    REAL, INTENT(inout):: qsurf(klon, nbsrf)
+    REAL, INTENT(inout):: fqsurf(klon, nbsrf)
     REAL, intent(inout):: falbe(klon, nbsrf)
     REAL, intent(out):: fluxlat(:, :) ! (klon, nbsrf)
 
@@ -88,7 +88,7 @@ contains
     REAL, intent(out):: flux_q(klon, nbsrf) 
     ! flux de vapeur d'eau (kg / m2 / s) à la surface
 
-    REAL, intent(out):: flux_u(klon, nbsrf), flux_v(klon, nbsrf)
+    REAL, intent(out):: flux_u(:, :), flux_v(:, :) ! (klon, nbsrf)
     ! tension du vent (flux turbulent de vent) à la surface, en Pa
 
     REAL, INTENT(out):: cdragh(klon), cdragm(klon)
@@ -131,8 +131,10 @@ contains
 
     REAL, intent(in):: sollw(:) ! (klon)
     ! surface net downward longwave flux, in W m-2
-    
+
     REAL, intent(in):: solsw(:) ! (klon)
+    ! surface net downward shortwave flux, in W m-2
+
     REAL, intent(in):: tsol(:) ! (klon)
 
     ! Local:
@@ -149,7 +151,7 @@ contains
     REAL run_off_lic(klon) ! ruissellement total
     REAL rugmer(klon)
     REAL ytsoil(klon, nsoilmx)
-    REAL yts(klon), ypct(klon), yz0_new(klon)
+    REAL yts(klon), ypctsrf(klon), yz0_new(klon)
     real yrugos(klon) ! longueur de rugosite (en m)
     REAL yalb(klon)
     REAL snow(klon), yqsurf(klon), yagesno(klon)
@@ -223,7 +225,6 @@ contains
     cdragm = 0.
     dflux_t = 0.
     dflux_q = 0.
-    ypct = 0.
     yrugos = 0.
     ypaprs = 0.
     ypplay = 0.
@@ -261,7 +262,7 @@ contains
 
     loop_surface: DO nsrf = 1, nbsrf
        ! Define ni and knon:
-       
+
        ni = 0
        knon = 0
 
@@ -275,22 +276,19 @@ contains
        END DO
 
        if_knon: IF (knon /= 0) then
-          DO j = 1, knon
-             i = ni(j)
-             ypct(j) = pctsrf(i, nsrf)
-             yts(j) = ftsol(i, nsrf)
-             snow(j) = fsnow(i, nsrf)
-             yqsurf(j) = qsurf(i, nsrf)
-             yalb(j) = falbe(i, nsrf)
-             yrain_fall(j) = rain_fall(i)
-             ysnow_fall(j) = snow_fall(i)
-             yagesno(j) = agesno(i, nsrf)
-             yrugos(j) = frugs(i, nsrf)
-             yrugoro(j) = rugoro(i)
-             radsol(j) = fsolsw(i, nsrf) + fsollw(i, nsrf)
-             ypaprs(j, klev + 1) = paprs(i, klev + 1)
-             y_run_off_lic_0(j) = run_off_lic_0(i)
-          END DO
+          ypctsrf(:knon) = pctsrf(ni(:knon), nsrf)
+          yts(:knon) = ftsol(ni(:knon), nsrf)
+          snow(:knon) = fsnow(ni(:knon), nsrf)
+          yqsurf(:knon) = fqsurf(ni(:knon), nsrf)
+          yalb(:knon) = falbe(ni(:knon), nsrf)
+          yrain_fall(:knon) = rain_fall(ni(:knon))
+          ysnow_fall(:knon) = snow_fall(ni(:knon))
+          yagesno(:knon) = agesno(ni(:knon), nsrf)
+          yrugos(:knon) = frugs(ni(:knon), nsrf)
+          yrugoro(:knon) = rugoro(ni(:knon))
+          radsol(:knon) = fsolsw(ni(:knon), nsrf) + fsollw(ni(:knon), nsrf)
+          ypaprs(:knon, klev + 1) = paprs(ni(:knon), klev + 1)
+          y_run_off_lic_0(:knon) = run_off_lic_0(ni(:knon))
 
           ! For continent, copy soil water content
           IF (nsrf == is_ter) yqsol(:knon) = qsol(ni(:knon))
@@ -301,7 +299,7 @@ contains
              DO j = 1, knon
                 i = ni(j)
                 ypaprs(j, k) = paprs(i, k)
-                ypplay(j, k) = pplay(i, k)
+                ypplay(j, k) = play(i, k)
                 ydelp(j, k) = delp(i, k)
                 yu(j, k) = u(i, k)
                 yv(j, k) = v(i, k)
@@ -342,7 +340,7 @@ contains
                ypplay(:knon, :), yu(:knon, :), yv(:knon, :), yq(:knon, :), &
                yt(:knon, :), yts(:knon), ycdragm(:knon), zgeop(:knon, :), &
                ycoefm(:knon, :), ycoefh(:knon, :), yq2(:knon, :))
-          
+
           CALL clvent(yu(:knon, 1), yv(:knon, 1), ycoefm(:knon, :), &
                ycdragm(:knon), yt(:knon, :), yu(:knon, :), ypaprs(:knon, :), &
                ypplay(:knon, :), ydelp(:knon, :), y_d_u(:knon, :), &
@@ -380,10 +378,10 @@ contains
           DO k = 1, klev
              DO j = 1, knon
                 i = ni(j)
-                y_d_t(j, k) = y_d_t(j, k) * ypct(j)
-                y_d_q(j, k) = y_d_q(j, k) * ypct(j)
-                y_d_u(j, k) = y_d_u(j, k) * ypct(j)
-                y_d_v(j, k) = y_d_v(j, k) * ypct(j)
+                y_d_t(j, k) = y_d_t(j, k) * ypctsrf(j)
+                y_d_q(j, k) = y_d_q(j, k) * ypctsrf(j)
+                y_d_u(j, k) = y_d_u(j, k) * ypctsrf(j)
+                y_d_v(j, k) = y_d_v(j, k) * ypctsrf(j)
              END DO
           END DO
 
@@ -394,14 +392,14 @@ contains
 
           falbe(:, nsrf) = 0.
           fsnow(:, nsrf) = 0.
-          qsurf(:, nsrf) = 0.
+          fqsurf(:, nsrf) = 0.
           frugs(:, nsrf) = 0.
           DO j = 1, knon
              i = ni(j)
              d_ts(i, nsrf) = y_d_ts(j)
              falbe(i, nsrf) = yalb(j)
              fsnow(i, nsrf) = snow(j)
-             qsurf(i, nsrf) = yqsurf(j)
+             fqsurf(i, nsrf) = yqsurf(j)
              frugs(i, nsrf) = yz0_new(j)
              fluxlat(i, nsrf) = yfluxlat(j)
              IF (nsrf == is_oce) THEN
@@ -411,10 +409,10 @@ contains
              agesno(i, nsrf) = yagesno(j)
              fqcalving(i, nsrf) = y_fqcalving(j)
              ffonte(i, nsrf) = y_ffonte(j)
-             cdragh(i) = cdragh(i) + ycdragh(j) * ypct(j)
-             cdragm(i) = cdragm(i) + ycdragm(j) * ypct(j)
-             dflux_t(i) = dflux_t(i) + y_dflux_t(j) * ypct(j)
-             dflux_q(i) = dflux_q(i) + y_dflux_q(j) * ypct(j)
+             cdragh(i) = cdragh(i) + ycdragh(j) * ypctsrf(j)
+             cdragm(i) = cdragm(i) + ycdragm(j) * ypctsrf(j)
+             dflux_t(i) = dflux_t(i) + y_dflux_t(j) * ypctsrf(j)
+             dflux_q(i) = dflux_q(i) + y_dflux_q(j) * ypctsrf(j)
           END DO
           IF (nsrf == is_ter) THEN
              qsol(ni(:knon)) = yqsol(:knon)
@@ -440,7 +438,7 @@ contains
           END DO
 
           forall (k = 2:klev) coefh(ni(:knon), k) &
-               = coefh(ni(:knon), k) + ycoefh(:knon, k) * ypct(:knon)
+               = coefh(ni(:knon), k) + ycoefh(:knon, k) * ypctsrf(:knon)
 
           ! diagnostic t, q a 2m et u, v a 10m
 

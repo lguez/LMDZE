@@ -355,7 +355,7 @@ contains
 
   subroutine phyetat0_new
 
-    use nr_util, only: pi
+    use nr_util, only: rad_to_deg
 
     use dimensions, only: iim, jjm
     use dynetat0_m, only: rlatu, rlonv
@@ -365,13 +365,11 @@ contains
     !-------------------------------------------------------------------------
     
     rlat(1) = 90.
-    rlat(2:klon-1) = pack(spread(rlatu(2:jjm), 1, iim), .true.) * 180. / pi
-    ! (with conversion to degrees)
+    rlat(2:klon-1) = pack(spread(rlatu(2:jjm), 1, iim), .true.) * rad_to_deg
     rlat(klon) = - 90.
 
     rlon(1) = 0.
-    rlon(2:klon-1) = pack(spread(rlonv(:iim), 2, jjm - 1), .true.) * 180. / pi
-    ! (with conversion to degrees)
+    rlon(2:klon-1) = pack(spread(rlonv(:iim), 2, jjm - 1), .true.) * rad_to_deg
     rlon(klon) = 0.
 
     zmasq = pack(mask, dyn_phy)

@@ -11,6 +11,7 @@ contains
     ! Date: 1993/08/18
     ! Objet : diffusion verticale de la vitesse
 
+    ! Library:
     use nr_util, only: assert
 
     use comconst, only: dtphys
@@ -55,10 +56,9 @@ contains
     zx_coef(:, 1) = cdrag * (1. + SQRT(u1lay**2 + v1lay**2)) * pplay(:, 1) &
          / (RD * t(:, 1)) * dtphys * RG
 
-    DO k = 2, klev
-       zx_coef(:, k) = coef(:, k) * RG / (pplay(:, k - 1) - pplay(:, k)) &
-            * (paprs(:, k) * 2 / (t(:, k) + t(:, k - 1)) / RD)**2 * dtphys * RG
-    ENDDO
+    forall (k = 2:klev) zx_coef(:, k) = coef(:, k) * RG / (pplay(:, k - 1) &
+         - pplay(:, k)) * (paprs(:, k) * 2 / (t(:, k) + t(:, k - 1)) / RD)**2 &
+         * dtphys * RG
 
     zx_buf = delp(:, 1) + zx_coef(:, 1) + zx_coef(:, 2)
     zx_cv(:, 2) = ven(:, 1) * delp(:, 1) / zx_buf

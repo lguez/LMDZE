@@ -36,7 +36,7 @@ contains
     real, intent(OUT):: qsurf(:) ! (knon) humidité de l'air au-dessus du sol
 
     real, intent(IN):: radsol(:) ! (knon)
-    ! rayonnement net au sol (longwave + shortwave)
+    ! net downward radiative (longwave + shortwave) flux at the surface
 
     real, intent(IN):: dif_grnd ! coefficient de diffusion vers le sol profond
     real, intent(IN):: t1lay(:), q1lay(:), u1lay(:), v1lay(:) ! (knon)
