@@ -147,7 +147,7 @@ contains
     REAL, save:: radsol(klon)
     ! bilan radiatif net au sol (W/m2), positif vers le bas
     
-    REAL, save:: ftsol(klon, nbsrf) ! skin temperature of surface fraction
+    REAL, save:: ftsol(klon, nbsrf) ! skin temperature of surface fraction, in K
 
     REAL, save:: ftsoil(klon, nsoilmx, nbsrf)
     ! soil temperature of surface fraction

@@ -106,43 +106,8 @@ contains
 
     ! initialisation des sous-surfaces
 
-    pctsrf = 0.
-
-    ! fraction de terre
-
-    ierr = NF90_INQ_VARID(ncid_startphy, "FTER", varid)
-    IF (ierr == NF90_NOERR) THEN
-       call nf95_get_var(ncid_startphy, varid, pctsrf(:, is_ter))
-    else
-       PRINT *, 'phyetat0: Le champ <FTER> est absent'
-    ENDIF
-
-    ! fraction de glace de terre
-
-    ierr = NF90_INQ_VARID(ncid_startphy, "FLIC", varid)
-    IF (ierr == NF90_NOERR) THEN
-       call nf95_get_var(ncid_startphy, varid, pctsrf(:, is_lic))
-    else
-       PRINT *, 'phyetat0: Le champ <FLIC> est absent'
-    ENDIF
-
-    ! fraction d'ocean
-
-    ierr = NF90_INQ_VARID(ncid_startphy, "FOCE", varid)
-    IF (ierr == NF90_NOERR) THEN
-       call nf95_get_var(ncid_startphy, varid, pctsrf(:, is_oce))
-    else
-       PRINT *, 'phyetat0: Le champ <FOCE> est absent'
-    ENDIF
-
-    ! fraction glace de mer
-
-    ierr = NF90_INQ_VARID(ncid_startphy, "FSIC", varid)
-    IF (ierr == NF90_NOERR) THEN
-       call nf95_get_var(ncid_startphy, varid, pctsrf(:, is_sic))
-    else
-       PRINT *, 'phyetat0: Le champ <FSIC> est absent'
-    ENDIF
+    call NF95_INQ_VARID(ncid_startphy, "pctsrf", varid)
+    call nf95_get_var(ncid_startphy, varid, pctsrf)
 
     ! Verification de l'adequation entre le masque et les sous-surfaces
 

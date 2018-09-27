@@ -17,7 +17,7 @@ contains
     ! pour la physique
 
     USE dimphy, ONLY: klev, klon
-    USE indicesol, ONLY: is_lic, is_oce, is_sic, is_ter, nbsrf
+    USE indicesol, ONLY: is_oce, nbsrf
     USE netcdf95, ONLY: nf95_inq_varid, nf95_put_var, nf95_close
     use phyetat0_m, only: zmasq
     use phyredem0_m, only: ncid_restartphy
@@ -66,17 +66,8 @@ contains
     call nf95_inq_varid(ncid_restartphy, "masque", varid)
     call nf95_put_var(ncid_restartphy, varid, zmasq)
 
-    call nf95_inq_varid(ncid_restartphy, "FTER", varid)
-    call nf95_put_var(ncid_restartphy, varid, pctsrf(:, is_ter))
-
-    call nf95_inq_varid(ncid_restartphy, "FLIC", varid)
-    call nf95_put_var(ncid_restartphy, varid, pctsrf(:, is_lic))
-
-    call nf95_inq_varid(ncid_restartphy, "FOCE", varid)
-    call nf95_put_var(ncid_restartphy, varid, pctsrf(:, is_oce))
-
-    call nf95_inq_varid(ncid_restartphy, "FSIC", varid)
-    call nf95_put_var(ncid_restartphy, varid, pctsrf(:, is_sic))
+    call nf95_inq_varid(ncid_restartphy, "pctsrf", varid)
+    call nf95_put_var(ncid_restartphy, varid, pctsrf)
 
     call nf95_inq_varid(ncid_restartphy, "TS", varid)
     call nf95_put_var(ncid_restartphy, varid, ftsol)

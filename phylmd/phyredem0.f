@@ -54,40 +54,31 @@ contains
 
     ! Fractions de chaque sous-surface
 
-    call nf95_def_var(ncid_restartphy, 'FTER', nf90_float, idim2, varid)
-    call nf95_put_att(ncid_restartphy, varid, 'title', 'fraction de continent')
-
-    call nf95_def_var(ncid_restartphy, 'FLIC', nf90_float, idim2, varid)
-    call nf95_put_att(ncid_restartphy, varid, 'title', &
-         'fraction glace de terre')
-
-    call nf95_def_var(ncid_restartphy, 'FOCE', nf90_float, idim2, varid)
-    call nf95_put_att(ncid_restartphy, varid, 'title', 'fraction ocean')
-
-    call nf95_def_var(ncid_restartphy, 'FSIC', nf90_float, idim2, varid)
-    call nf95_put_att(ncid_restartphy, varid, 'title', 'fraction glace mer')
+    call nf95_def_var(ncid_restartphy, 'pctsrf', nf90_float, &
+         [idim2, dimid_nbsrf], varid)
+    call nf95_put_att(ncid_restartphy, varid, 'title', 'surface fraction')
 
     call nf95_def_var(ncid_restartphy, 'TS', nf90_float, &
-         (/idim2, dimid_nbsrf/), varid)
+         [idim2, dimid_nbsrf], varid)
     call nf95_put_att(ncid_restartphy, varid, 'title', 'surface temperature')
 
     call nf95_def_var(ncid_restartphy, 'Tsoil', nf90_float, &
-         (/idim2, dimid_nsoilmx, dimid_nbsrf/), varid)
+         [idim2, dimid_nsoilmx, dimid_nbsrf], varid)
     call nf95_put_att(ncid_restartphy, varid, 'title', 'soil temperature')
 
     call nf95_def_var(ncid_restartphy, 'QS', nf90_float, &
-         (/idim2, dimid_nbsrf/), varid)
+         [idim2, dimid_nbsrf], varid)
     call nf95_put_att(ncid_restartphy, varid, 'title', 'Humidite de surface')
 
     call nf95_def_var(ncid_restartphy, 'QSOL', nf90_float, idim2, varid)
     call nf95_put_att(ncid_restartphy, varid, 'title', 'Eau dans le sol (mm)')
 
     call nf95_def_var(ncid_restartphy, 'ALBE', nf90_float, &
-         (/idim2, dimid_nbsrf/), varid)
+         [idim2, dimid_nbsrf], varid)
     call nf95_put_att(ncid_restartphy, varid, 'title', 'albedo de surface')
 
     call nf95_def_var(ncid_restartphy, 'SNOW', nf90_float, &
-         (/idim2, dimid_nbsrf/), varid)
+         [idim2, dimid_nbsrf], varid)
     call nf95_put_att(ncid_restartphy, varid, 'title', 'Neige de surface')
 
     call nf95_def_var(ncid_restartphy, 'RADS', nf90_float, idim2, varid)
@@ -112,11 +103,11 @@ contains
     call nf95_put_att(ncid_restartphy, varid, 'title', 'precipitation solide')
 
     call nf95_def_var(ncid_restartphy, 'RUG', nf90_float, &
-         (/idim2, dimid_nbsrf/), varid)
+         [idim2, dimid_nbsrf], varid)
     call nf95_put_att(ncid_restartphy, varid, 'title', 'rugosite de surface')
 
     call nf95_def_var(ncid_restartphy, 'AGESNO', nf90_float, &
-         (/idim2, dimid_nbsrf/), varid)
+         [idim2, dimid_nbsrf], varid)
     call nf95_put_att(ncid_restartphy, varid, 'title', &
          'Age de la neige surface')
 
@@ -128,9 +119,9 @@ contains
     call nf95_def_var(ncid_restartphy, 'ZPIC', nf90_float, idim2, varid)
     call nf95_def_var(ncid_restartphy, 'ZVAL', nf90_float, idim2, varid)
     call nf95_def_var(ncid_restartphy, 'TANCIEN', nf90_float, &
-         (/idim2, idim3/), varid)
+         [idim2, idim3], varid)
     call nf95_def_var(ncid_restartphy, 'QANCIEN', nf90_float, &
-         (/idim2, idim3/), varid)
+         [idim2, idim3], varid)
 
     call nf95_def_var(ncid_restartphy, 'RUGMER', nf90_float, idim2, varid)
     call nf95_put_att(ncid_restartphy, varid, 'title', &
@@ -148,12 +139,12 @@ contains
     call nf95_def_var(ncid_restartphy, 'RUNOFFLIC0', nf90_float, idim2, varid)
     call nf95_put_att(ncid_restartphy, varid, 'title', 'Runofflic0')
 
-    call nf95_def_var(ncid_restartphy, 'sig1', nf90_float, (/idim2, idim3/), &
+    call nf95_def_var(ncid_restartphy, 'sig1', nf90_float, [idim2, idim3], &
          varid)
     call nf95_put_att(ncid_restartphy, varid, 'long_name', &
          'section adiabatic updraft')
 
-    call nf95_def_var(ncid_restartphy, 'w01', nf90_float, (/idim2, idim3/), &
+    call nf95_def_var(ncid_restartphy, 'w01', nf90_float, [idim2, idim3], &
          varid)
     call nf95_put_att(ncid_restartphy, varid, 'long_name', &
          'vertical velocity within adiabatic updraft')

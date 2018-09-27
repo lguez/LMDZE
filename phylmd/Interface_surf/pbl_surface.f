@@ -47,7 +47,10 @@ contains
     REAL, INTENT(IN):: u(klon, klev), v(klon, klev) ! vitesse
     INTEGER, INTENT(IN):: julien ! jour de l'annee en cours
     REAL, intent(in):: mu0(klon) ! cosinus de l'angle solaire zenithal     
-    REAL, INTENT(IN):: ftsol(:, :) ! (klon, nbsrf) temp\'erature du sol (en K)
+
+    REAL, INTENT(IN):: ftsol(:, :) ! (klon, nbsrf)
+    ! skin temperature of surface fraction, in K
+
     REAL, INTENT(IN):: cdmmax, cdhmax ! seuils cdrm, cdrh
 
     REAL, INTENT(inout):: ftsoil(klon, nsoilmx, nbsrf)
