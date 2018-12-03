@@ -64,7 +64,9 @@ contains
     REAL, INTENT(inout):: fsnow(:, :) ! (klon, nbsrf) \'epaisseur neigeuse
     REAL, INTENT(inout):: fqsurf(klon, nbsrf)
     REAL, intent(inout):: falbe(klon, nbsrf)
+
     REAL, intent(out):: fluxlat(:, :) ! (klon, nbsrf)
+    ! flux de chaleur latente, en W m-2
 
     REAL, intent(in):: rain_fall(klon)
     ! liquid water mass flux (kg / m2 / s), positive down

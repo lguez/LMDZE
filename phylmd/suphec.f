@@ -1,6 +1,6 @@
 module suphec_m
 
-  use nr_util, only: pi
+  use nr_util, only: pi, twoPI
 
   implicit none
 
@@ -12,13 +12,13 @@ module suphec_m
 
   ! A1.1 Astronomical constants
 
-  REAL ROMEGA
   real, parameter:: RDAY = 86400.
 
   REAL, parameter:: RSIYEA = 365.25 * RDAY * 2. * PI / 6.283076
   ! sideral year, in s
 
   REAL, parameter:: RSIDAY = RDAY / (1. + RDAY / RSIYEA) ! sideral day, in s
+  REAL, parameter:: ROMEGA = twoPI / RSIDAY
 
   ! A1.2 Geoide
   real, parameter:: RG = 9.80665 ! acceleration of gravity, in m s-2
@@ -45,12 +45,15 @@ module suphec_m
   real, parameter:: RCPV = 4. * RV 
   ! specific heat capacity at constant pressure of water vapor, in J K-1 kg-1
 
-  real, save:: RCVD
-  real, save:: RCVV
+  real, parameter:: RCVV = RCPV - RV
+  ! specific heat capacity at constant volume of water vapor, in J K-1 kg-1
 
   real, parameter:: RCPD = 7. / 2 * RD 
   ! specific heat capacity at constant pressure of dry air, in J K-1 kg-1
 
+  real, parameter:: RCVD = RCPD - RD
+  ! specific heat capacity at constant volume of dry air, in J K-1 kg-1
+  
   real, parameter:: RMO3 = 47.9942
   REAL, parameter:: RKAPPA = RD/RCPD
   real, parameter:: RETV = RV / RD - 1.
@@ -88,29 +91,17 @@ contains
 
     PRINT *, 'Call sequence information: suphec'
 
-    ! 2. DEFINE ASTRONOMICAL CONSTANTS
-
-    ROMEGA = 2.*PI/RSIDAY
-
     print *, 'Astronomical constants '
     print '('' omega = '', E13.7, '' s-1'')', ROMEGA
 
-    ! 3. DEFINE GEOIDE.
-
-    print *, ' Geoide '
+    print *, 'Geoid:'
     print '('' Gravity = '', E13.7, '' m s-2'')', RG
     print '('' Earth radius = '', E13.7, '' m'')', RA
 
-    ! 4. DEFINE RADIATION CONSTANTS.
-
-    print *, ' Radiation '
+    print *, 'Radiation constants:'
     print '('' Stefan-Bol. = '', E13.7, '' W m-2 K-4'')', RSIGMA
 
-    ! 5. DEFINE THERMODYNAMIC CONSTANTS, GAS PHASE.
-
-    RCVD = RCPD-RD
-    RCVV = RCPV-RV
-    print *, 'Thermodynamics, gas'
+    print *, 'Thermodynamical constants, gas phase:'
     print *, "rd = ", RD, "J K-1 kg-1"
     print *, "rv = ", RV, "J K-1 kg-1"
     print '('' Cpd = '', e13.7)', RCPD

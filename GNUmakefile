@@ -2,11 +2,12 @@
 
 # This makefile builds LMDZE.
 
+makefile_dir = .
+include ${general_compiler_options_dir}/settings.mk
+
 # 1. Source files
 
-makefile_dir = .
-
-VPATH := ${makefile_dir} $(addprefix ${makefile_dir}/, $(shell cat ${makefile_dir}/directories))
+VPATH += $(addprefix ${makefile_dir}/, $(shell cat ${makefile_dir}/directories))
 
 src_ce0l := $(shell cat ${makefile_dir}/src_ce0l)
 src_gcm := $(shell cat ${makefile_dir}/src_gcm)
@@ -31,11 +32,7 @@ obj_test_inifilr := $(addsuffix .o, $(basename ${src_test_inifilr}))
 objects := $(addsuffix .o, $(basename ${sources}))
 execut = ce0l gcm test_ozonecm test_inter_barxy test_fxhyp test_inifilr
 
-# 3. Compiler-dependent part
-
-include ${general_compiler_options_dir}/settings.mk
-
-# 4. Rules
+# 3. Rules
 
 all: ${execut} log
 ce0l: ${obj_ce0l}

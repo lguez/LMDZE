@@ -587,9 +587,9 @@ contains
     ! using clon, grossismx, dzoomx, taux.
     
     ! Calcule les longitudes et dérivées dans la grille du GCM pour
-    ! une fonction x_f(\tilde x) à dérivée tangente hyperbolique.
+    ! une fonction $x_f(\tilde x)$ à dérivée tangente hyperbolique.
 
-    ! Il vaut mieux avoir : grossismx \times delta < pi
+    ! Il vaut mieux avoir : grossismx $\times$ delta < pi
 
     ! Le premier point scalaire pour une grille regulière (grossismx =
     ! 1) avec clon = 0 est à - 180 degrés.
@@ -736,7 +736,7 @@ contains
 
     ! Add or subtract 2 pi so that xlon is near [-pi, pi], then cshift
     ! so that xlon is in ascending order. Make the same cshift on
-    ! xprimm. Use clon.
+    ! xprimm. Use clon. In this module to avoid circular dependency.
 
     use nr_util, only: twopi
 
@@ -770,7 +770,7 @@ contains
 
   subroutine invert_zoom_x(beta, xf, xtild, G, xlon, xprim, xuv)
 
-    ! Using clon and grossismx.
+    ! Using clon and grossismx. In this module to avoid circular dependency.
 
     use coefpoly_m, only: coefpoly, a1, a2, a3
     USE dimensions, ONLY: iim

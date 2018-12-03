@@ -42,11 +42,11 @@ contains
     REAL, intent(in):: cdragh(:) ! (knon) sans unite
 
     REAL, intent(in):: t(:, :) ! (knon, klev) temperature (K)
-    REAL, intent(in):: q(:, :) ! (knon, klev) humidite specifique (kg / kg)
+    REAL, intent(in):: q(:, :) ! (knon, klev) humidit\'e sp\'ecifique
     REAL, intent(in):: ts(:) ! (knon) temperature du sol (K)
 
     REAL, intent(in):: paprs(:, :) ! (knon, klev + 1)
-    ! pression a inter-couche (Pa)
+    ! pression \`a l'inter-couche (Pa)
 
     REAL, intent(in):: pplay(:, :) ! (knon, klev)
     ! pression au milieu de couche (Pa)
@@ -69,7 +69,7 @@ contains
     real, intent(in):: snow_fall(:) ! (knon)
     ! solid water mass flux (kg / m2 / s), positive down
 
-    real, intent(out):: fluxlat(:) ! (knon)
+    real, intent(out):: fluxlat(:) ! (knon) flux de chaleur latente, en W m-2
     real, intent(in):: pctsrf_new_sic(:) ! (knon)
     REAL, intent(inout):: agesno(:) ! (knon)
     REAL, intent(out):: d_t(:, :) ! (knon, klev) incrementation de "t"

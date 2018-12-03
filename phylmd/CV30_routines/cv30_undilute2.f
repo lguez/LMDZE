@@ -16,7 +16,7 @@ contains
 
     use conf_phys_m, only: epmax
     use cv30_param_m, only: minorig, nl
-    use cv_thermo_m, only: clmcpv, eps
+    use cv_thermo, only: clmcpv, eps
     USE dimphy, ONLY: klon, klev
     use SUPHEC_M, only: rcw, rlvtt, rcpd, rcpv, rv
 

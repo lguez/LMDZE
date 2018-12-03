@@ -25,7 +25,7 @@ contains
     ! Coefficient d'echange (m**2 / s) multiplié par le cisaillement du
     ! vent (dV / dz)
 
-    REAL, intent(in):: cdrag(:) ! (knon) sans unité
+    REAL, intent(in):: cdrag(:) ! (knon) sans dimension
     REAL, intent(in):: t(:, :) ! (knon, klev) ! temperature (K)
     REAL, intent(in):: ven(:, :) ! (knon, klev) vitesse horizontale (m / s)
     REAL, intent(in):: paprs(:, :) ! (knon, klev + 1) pression a
@@ -33,19 +33,21 @@ contains
     real, intent(in):: pplay(:, :) ! (knon, klev) pression au milieu
     ! de couche (Pa)
     real, intent(in):: delp(:, :) ! (knon, klev) epaisseur de couche (Pa)
-    REAL, intent(out):: d_ven(:, :) ! (knon, klev) ! le changement de "ven"
+
+    REAL, intent(out):: d_ven(:, :) ! (knon, klev)
+    ! le changement de "ven", en m s-1
 
     REAL, intent(out):: flux_v(:) ! (knon)
-    ! (diagnostic) flux du vent à la surface, en (kg m / s) / (m**2 s)
-    ! flux_v est le flux de moment angulaire (positif vers bas)
+    ! (diagnostic) stress du vent à la surface, en Pa
+    ! flux_v est le flux de quantité de mouvement (positif vers bas)
 
     ! Local:
     INTEGER k
     REAL zx_cv(size(u1lay), 2:klev) ! (knon, 2:klev)
     REAL zx_dv(size(u1lay), 2:klev) ! (knon, 2:klev)
     REAL zx_buf(size(u1lay)) ! (knon)
-    REAL zx_coef(size(u1lay), klev) ! (knon, klev)
-    REAL local_ven(size(u1lay), klev) ! (knon, klev)
+    REAL zx_coef(size(u1lay), klev) ! (knon, klev) in Pa
+    REAL local_ven(size(u1lay), klev) ! (knon, klev) in m s-1
 
     !------------------------------------------------------------------
 

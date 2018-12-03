@@ -7,7 +7,7 @@ contains
   SUBROUTINE cv30_prelim(t1, q1, p1, ph1, lv1, cpn1, tv1, gz1, h1, hm1, th1)
 
     USE cv30_param_m, ONLY: nl
-    USE cv_thermo_m, ONLY: clmcpv, eps
+    USE cv_thermo, ONLY: clmcpv, eps
     USE dimphy, ONLY: klev, klon
     use SUPHEC_M, only: rcw, rlvtt, rcpd, rcpv, rd, rv
 

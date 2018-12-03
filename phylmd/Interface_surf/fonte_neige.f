@@ -8,7 +8,7 @@ contains
        tsurf_new, evap, fqcalving, ffonte, run_off_lic_0, run_off_lic)
 
     ! Routine de traitement de la fonte de la neige dans le cas du traitement
-    ! de sol simplifi\'e
+    ! de sol simplifi\'e.
 
     ! Laurent Fairhead, March, 2001
 
@@ -88,8 +88,8 @@ contains
     ! Y a-t-il fonte de neige ?
 
     do i = 1, knon
-       if ((snow(i) > epsfra .OR. nisurf == is_sic &
-            .OR. nisurf == is_lic) .AND. tsurf_new(i) >= RTT) then
+       if ((snow(i) > epsfra .OR. nisurf == is_sic .OR. nisurf == is_lic) &
+            .AND. tsurf_new(i) >= RTT) then
           fq_fonte = MIN(MAX((tsurf_new(i) - RTT) / chasno, 0.), snow(i))
           ffonte(i) = fq_fonte * RLMLT / dtphys
           snow(i) = max(0., snow(i) - fq_fonte)

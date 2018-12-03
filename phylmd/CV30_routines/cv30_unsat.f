@@ -10,7 +10,7 @@ contains
     ! Unsaturated (precipitating) downdrafts
 
     use cv30_param_m, only: nl, sigd
-    use cv_thermo_m, only: ginv
+    use cv_thermo, only: ginv
     use SUPHEC_M, only: rg, rcpd
 
     integer, intent(in):: icb(:) ! (ncum)

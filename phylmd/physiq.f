@@ -152,7 +152,7 @@ contains
     REAL, save:: ftsoil(klon, nsoilmx, nbsrf)
     ! soil temperature of surface fraction
 
-    REAL fluxlat(klon, nbsrf)
+    REAL fluxlat(klon, nbsrf) ! flux de chaleur latente, en W m-2
 
     REAL, save:: fqsurf(klon, nbsrf)
     ! humidite de l'air au contact de la surface

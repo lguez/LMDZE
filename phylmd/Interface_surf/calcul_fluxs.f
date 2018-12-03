@@ -4,9 +4,9 @@ module calcul_fluxs_m
 
 contains
 
-  SUBROUTINE calcul_fluxs(tsurf, p1lay, cal, beta, cdragh, ps, qsurf, &
-       radsol, t1lay, q1lay, u1lay, v1lay, tAcoef, qAcoef, tBcoef, &
-       qBcoef, tsurf_new, evap, fluxlat, flux_t, dflux_s, dflux_l, dif_grnd)
+  SUBROUTINE calcul_fluxs(tsurf, p1lay, cal, beta, cdragh, ps, qsurf, radsol, &
+       t1lay, q1lay, u1lay, v1lay, tAcoef, qAcoef, tBcoef, qBcoef, tsurf_new, &
+       evap, fluxlat, flux_t, dflux_s, dflux_l, dif_grnd)
 
     ! Cette routine calcule les flux en h et q à l'interface et une
     ! température de surface.
@@ -32,7 +32,7 @@ contains
     real, intent(IN):: cal(:) ! (knon) capacité calorifique du sol
     real, intent(IN):: beta(:) ! (knon) évaporation réelle
     real, intent(IN):: cdragh(:) ! (knon) coefficient d'échange
-    real, intent(IN):: ps(:) ! (knon) pression au sol
+    real, intent(IN):: ps(:) ! (knon) pression au sol, en Pa
     real, intent(OUT):: qsurf(:) ! (knon) humidité de l'air au-dessus du sol
 
     real, intent(IN):: radsol(:) ! (knon)
@@ -51,7 +51,7 @@ contains
     real, intent(OUT):: evap(:) ! (knon)
 
     real, intent(OUT):: fluxlat(:), flux_t(:) ! (knon)
-    ! flux de chaleurs latente et sensible
+    ! flux de chaleurs latente et sensible, en W m-2
 
     real, intent(OUT):: dflux_s(:), dflux_l(:) ! (knon)
     ! dérivées des flux de chaleurs sensible et latente par rapport à

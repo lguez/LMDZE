@@ -22,7 +22,7 @@ contains
     ! - if icbs1=icb1, compute also tp1(icb1+1), tvp1(icb1+1) & clw1(icb1+1)
 
     use cv30_param_m, only: minorig, nl
-    use cv_thermo_m, only: clmcpv, eps
+    use cv_thermo, only: clmcpv, eps
     USE dimphy, ONLY: klev, klon
     use SUPHEC_M, only: rcw, rlvtt, rcpd, rcpv, rv
 

@@ -1,4 +1,4 @@
-module cv_thermo_m
+module cv_thermo
 
   ! From LMDZ4/libf/phylmd/cvthermo.h, version 1.1.1.1 2004/05/19 12:53:09
   ! Thermodynamical constants for cv_driver
@@ -16,4 +16,4 @@ module cv_thermo_m
 
   private rd, rg, rcpd, rcpv, rcw, rv
 
-end module cv_thermo_m
+end module cv_thermo
