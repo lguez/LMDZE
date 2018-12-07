@@ -27,9 +27,6 @@ contains
 
     ! Local:
 
-    logical, save:: deja_lu_sur
-    ! jour \`a lire d\'ej\`a lu pour une surface pr\'ec\'edente
-
     integer:: jour_lu_sur = - 1
 
     ! Champs lus dans le fichier de conditions aux limites :
@@ -39,10 +36,8 @@ contains
 
     !------------------------------------------------------------
 
-    if (jour - jour_lu_sur /= 0) deja_lu_sur = .false.
-
     ! Tester d'abord si c'est le moment de lire le fichier
-    if (mod(itap - 1, lmt_pas) == 0 .and. .not. deja_lu_sur) then
+    if (mod(itap - 1, lmt_pas) == 0 .and. jour /= jour_lu_sur) then
        call NF95_OPEN('limit.nc', NF90_NOWRITE, ncid)
 
        ! Lecture Albedo
@@ -54,7 +49,6 @@ contains
        call NF95_GET_VAR(ncid, varid, rug_lu, start=(/1, jour/))
 
        call NF95_CLOSE(ncid)
-       deja_lu_sur = .true.
        jour_lu_sur = jour
     endif
 

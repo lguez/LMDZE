@@ -6,7 +6,7 @@ module dynetat0_m
 
   private iim, jjm, principal_cshift, invert_zoom_x, funcd
 
-  INTEGER day_ini 
+  INTEGER, protected:: day_ini 
   ! day number at the beginning of the run, based at value 1 on
   ! January 1st of annee_ref
 

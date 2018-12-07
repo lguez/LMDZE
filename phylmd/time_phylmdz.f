@@ -2,8 +2,8 @@ module time_phylmdz
 
   implicit none
 
-  INTEGER:: itap = 0 ! number of calls to "physiq"
-  integer itau_w ! pas de temps d'\'ecriture
+  INTEGER, protected:: itap = 0 ! number of calls to "physiq"
+  integer, protected:: itau_w ! pas de temps d'\'ecriture
 
 contains
 
