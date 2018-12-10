@@ -13,6 +13,8 @@ histclo.f
 histcom_var.f
 histhori_regular.f
 iniadvtrac.f
+invert_zoom_x.f
+principal_cshift.f
 tanh_cautious.f
 test_fxhyp.f
 unit_nml_m.f

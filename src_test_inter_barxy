@@ -18,9 +18,11 @@ iniadvtrac.f
 inter_barx.f
 inter_barxy.f
 inter_bary.f
+invert_zoom_x.f
 minmax.f
 ord_coord.f
 ord_coordm.f
+principal_cshift.f
 tanh_cautious.f
 test_inter_barxy.f
 unit_nml_m.f

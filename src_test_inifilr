@@ -17,6 +17,8 @@ iniadvtrac.f
 inifgn.f
 inifilr.f
 inifilr_hemisph.f
+invert_zoom_x.f
+principal_cshift.f
 tanh_cautious.f
 test_inifilr.f
 unit_nml_m.f

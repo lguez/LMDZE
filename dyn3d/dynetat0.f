@@ -4,7 +4,7 @@ module dynetat0_m
 
   IMPLICIT NONE
 
-  private iim, jjm, principal_cshift, invert_zoom_x, funcd
+  private iim, jjm
 
   INTEGER, protected, save:: day_ini 
   ! day number at the beginning of the run, based at value 1 on
@@ -29,7 +29,6 @@ module dynetat0_m
   REAL, protected, save:: rlatu1(jjm), rlatu2(jjm), yprimu1(jjm), yprimu2(jjm)
   REAL, save:: ang0, etot0, ptot0, ztot0, stot0
   INTEGER, PARAMETER, private:: nmax = 30000
-  DOUBLE PRECISION, private, save:: abs_y
   INTEGER, save:: itau_dyn
 
 contains
@@ -194,7 +193,7 @@ contains
 
     ! Local: 
 
-    INTEGER, PARAMETER:: nmax=30000, nmax2=2*nmax
+    INTEGER, PARAMETER:: nmax2 = 2 * nmax
     REAL dzoom ! distance totale de la zone du zoom (en radians)
     DOUBLE PRECISION ylat(jjm + 1), yprim(jjm + 1)
     DOUBLE PRECISION yuv
@@ -511,6 +510,8 @@ contains
 
     USE dimensions, ONLY: iim
     use dynetat0_chosen_m, only: clon, grossismx, dzoomx, taux
+    use invert_zoom_x_m, only: invert_zoom_x
+    use principal_cshift_m, only: principal_cshift
     use tanh_cautious_m, only: tanh_cautious
 
     ! Local:
@@ -643,132 +644,5 @@ contains
     END DO
 
   END SUBROUTINE fxhyp
-
-  !********************************************************************
-
-  subroutine principal_cshift(is2, xlon, xprimm)
-
-    ! Add or subtract 2 pi so that xlon is near [-pi, pi], then cshift
-    ! so that xlon is in ascending order. Make the same cshift on
-    ! xprimm. In this module to avoid circular dependency.
-
-    use nr_util, only: twopi
-
-    use dynetat0_chosen_m, only: clon
-    USE dimensions, ONLY: iim
-
-    integer, intent(in):: is2
-    real, intent(inout):: xlon(:), xprimm(:) ! (iim + 1)
-
-    !-----------------------------------------------------
-
-    if (is2 /= 0) then
-       IF (clon <= 0.) THEN
-          IF (is2 /= 1) THEN
-             xlon(:is2 - 1) = xlon(:is2 - 1) + twopi
-             xlon(:iim) = cshift(xlon(:iim), shift = is2 - 1)
-             xprimm(:iim) = cshift(xprimm(:iim), shift = is2 - 1)
-          END IF
-       else
-          xlon(is2 + 1:iim) = xlon(is2 + 1:iim) - twopi
-          xlon(:iim) = cshift(xlon(:iim), shift = is2)
-          xprimm(:iim) = cshift(xprimm(:iim), shift = is2)
-       end IF
-    end if
-
-    xlon(iim + 1) = xlon(1) + twopi
-    xprimm(iim + 1) = xprimm(1)
-
-  end subroutine principal_cshift
-
-  !**********************************************************************
-
-  subroutine invert_zoom_x(beta, xf, xtild, G, xlon, xprim, xuv)
-
-    ! In this module to avoid circular dependency.
-
-    use coefpoly_m, only: coefpoly, a1, a2, a3
-    use dynetat0_chosen_m, only: clon, grossismx
-    USE dimensions, ONLY: iim
-    use nr_util, only: pi_d, twopi_d
-    use numer_rec_95, only: hunt, rtsafe
-
-    DOUBLE PRECISION, intent(in):: beta, Xf(0:), xtild(0:), G(0:) ! (0:nmax)
-
-    real, intent(out):: xlon(:), xprim(:) ! (iim)
-
-    DOUBLE PRECISION, intent(in):: xuv
-    ! between - 0.25 and 0.5
-    ! 0. si calcul aux points scalaires 
-    ! 0.5 si calcul aux points U
-
-    ! Local:
-    DOUBLE PRECISION Y
-    DOUBLE PRECISION h ! step of the uniform grid
-    integer i, it
-
-    DOUBLE PRECISION xvrai(iim), Gvrai(iim) 
-    ! intermediary variables because xlon and xprim are single precision
-
-    !------------------------------------------------------------------
-
-    print *, "Call sequence information: invert_zoom_x"
-    it = 0 ! initial guess
-    h = twopi_d / iim
-
-    DO i = 1, iim
-       Y = - pi_d + (i + xuv - 0.75d0) * h
-       ! - pi <= y < pi
-       abs_y = abs(y)
-
-       ! Distinguish boundaries in order to avoid roundoff error.
-       ! funcd should be exactly equal to 0 at xtild(it) or xtild(it +
-       ! 1) and could be very small with the wrong sign so rtsafe
-       ! would fail.
-       if (abs_y == 0d0) then
-          xvrai(i) = 0d0
-          gvrai(i) = grossismx
-       else if (abs_y == pi_d) then
-          xvrai(i) = pi_d
-          gvrai(i) = 2d0 * beta - grossismx
-       else
-          call hunt(xf, abs_y, it, my_lbound = 0)
-          ! {0 <= it <= nmax - 1}
-
-          ! Calcul de xvrai(i) et Gvrai(i)
-          CALL coefpoly(Xf(it), Xf(it + 1), G(it), G(it + 1), xtild(it), &
-               xtild(it + 1))
-          xvrai(i) = rtsafe(funcd, xtild(it), xtild(it + 1), xacc = 1d-6)
-          Gvrai(i) = a1 + xvrai(i) * (2d0 * a2 + xvrai(i) * 3d0 * a3)
-       end if
-
-       if (y < 0d0) xvrai(i) = - xvrai(i)
-    end DO
-
-    DO i = 1, iim -1
-       IF (xvrai(i + 1) < xvrai(i)) THEN
-          print *, 'xvrai(', i + 1, ') < xvrai(', i, ')'
-          STOP 1
-       END IF
-    END DO
-
-    xlon = xvrai + clon
-    xprim = h / Gvrai
-
-  end subroutine invert_zoom_x
-
-  !**********************************************************************
-
-  SUBROUTINE funcd(x, fval, fderiv)
-
-    use coefpoly_m, only: a0, a1, a2, a3
-
-    DOUBLE PRECISION, INTENT(IN):: x
-    DOUBLE PRECISION, INTENT(OUT):: fval, fderiv
-
-    fval = a0 + x * (a1 + x * (a2 + x * a3)) - abs_y
-    fderiv = a1 + x * (2d0 * a2 + x * 3d0 * a3)
-
-  END SUBROUTINE funcd
 
 end module dynetat0_m
