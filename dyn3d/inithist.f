@@ -17,7 +17,8 @@ contains
     use comconst, only: dtvr
     USE dimensions, ONLY: jjm, llm, nqmx
     USE disvert_m, ONLY: presnivs
-    use dynetat0_m, only: day_ref, annee_ref, rlatu, rlatv, rlonu, rlonv
+    use dynetat0_m, only: itau_dyn, rlatu, rlatv, rlonu, rlonv
+    USE dynetat0_chosen_m, ONLY: day_ref, annee_ref
     use histbeg_totreg_m, only: histbeg_totreg
     USE histdef_m, ONLY: histdef
     USE histend_m, ONLY: histend
@@ -25,7 +26,6 @@ contains
     USE iniadvtrac_m, ONLY: ttext
     USE nr_util, ONLY: pi
     USE paramet_m, ONLY: iip1, jjp1
-    USE temps, ONLY: itau_dyn
     use ymds2ju_m, ONLY: ymds2ju
 
     real, intent(in):: t_ops ! fréquence de l'opération pour IOIPSL

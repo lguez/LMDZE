@@ -23,10 +23,10 @@ contains
     ! hPa and strictly increasing.
 
     use dimensions, only: iim, jjm, llm
-    use dynetat0_m, only: day_ref
+    use dynetat0_chosen_m, only: day_ref
     use grid_change, only: dyn_phy
-    use netcdf, only:  nf90_nowrite, nf90_get_var
-    use netcdf95, only: nf95_open, nf95_close, nf95_inq_varid, handle_err, &
+    use netcdf, only:  nf90_nowrite
+    use netcdf95, only: nf95_open, nf95_close, nf95_inq_varid, nf95_get_var, &
          nf95_gw_var
     use nr_util, only: assert
     use numer_rec_95, only: regr1_step_av
@@ -50,7 +50,7 @@ contains
     ! (edges of pressure intervals for Mobidic data, in Pa, in strictly
     ! increasing order)
 
-    integer ncid, varid, ncerr ! for NetCDF
+    integer ncid, varid ! for NetCDF
     integer n_plev ! number of pressure levels in Mobidic data
     integer i, j
 
@@ -88,8 +88,7 @@ contains
     allocate(r_mob(jjm + 1, n_plev))
 
     ! Get data at the right day from the input file:
-    ncerr = nf90_get_var(ncid, varid, r_mob, start=(/1, 1, day_ref/))
-    call handle_err("nf90_get_var r_Mob", ncerr)
+    call nf95_get_var(ncid, varid, r_mob, start=(/1, 1, day_ref/))
     ! Latitudes are in increasing order in the input file while
     ! "rlatu" is in decreasing order so we need to invert order:
     r_mob = r_mob(jjm+1:1:-1, :)

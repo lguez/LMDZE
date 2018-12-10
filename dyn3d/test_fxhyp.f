@@ -1,7 +1,8 @@
 program test_fxhyp
 
-  use dynetat0_m, only: read_serre, fxhyp, xprimm025, rlonv, xprimv, rlonu, &
-       xprimu, xprimp025
+  use dynetat0_m, only: fxhyp, xprimm025, rlonv, xprimv, rlonu, xprimu, &
+       xprimp025
+  use dynetat0_chosen_m, only: read_serre
   use unit_nml_m, only: unit_nml, set_unit_nml
 
   implicit none

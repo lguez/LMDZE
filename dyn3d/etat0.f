@@ -15,9 +15,9 @@ contains
     use dimensions, only: iim, jjm, llm, nqmx
     use dimphy, only: klon
     use dimsoil, only: nsoilmx
-    use disvert_m, only: ap, bp, preff, pa, disvert
-    use dynetat0_m, only: day_ref, annee_ref, rlatu, rlatv, rlonu, rlonv, &
-         fyhyp, fxhyp
+    use disvert_m, only: ap, bp, preff, disvert
+    use dynetat0_m, only: rlatu, rlatv, rlonu, rlonv, fyhyp, fxhyp
+    use dynetat0_chosen_m, only: day_ref
     use dynredem0_m, only: dynredem0
     use dynredem1_m, only: dynredem1
     use exner_hyb_m, only: exner_hyb
@@ -43,7 +43,6 @@ contains
     use start_init_phys_m, only: start_init_phys
     use start_inter_3d_m, only: start_inter_3d
     use test_disvert_m, only: test_disvert
-    use unit_nml_m, only: unit_nml
 
     REAL, intent(out):: phis(:, :) ! (iim + 1, jjm + 1)
     ! surface geopotential, in m2 s-2
@@ -106,21 +105,14 @@ contains
     ! ("p3d(i, j, l)" is at longitude "rlonv(i)", latitude "rlatu(j)",
     ! for interface "l")
 
-    namelist /etat0_nml/ day_ref, annee_ref
-
     !---------------------------------
 
     print *, "Call sequence information: etat0"
-
-    print *, "Enter namelist 'etat0_nml'."
-    read(unit=*, nml=etat0_nml)
-    write(unit_nml, nml=etat0_nml)
 
     CALL iniconst
 
     ! Construct a grid:
 
-    pa = 5e4
     CALL disvert
     call test_disvert
     CALL fyhyp

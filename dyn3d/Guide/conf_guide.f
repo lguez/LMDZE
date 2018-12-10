@@ -30,7 +30,8 @@ contains
 
     use comconst, only: daysec, dtvr
     use conf_gcm_m, only: day_step, iperiod
-    use dynetat0_m, only: grossismx, grossismy, rlatu, rlatv
+    use dynetat0_m, only: rlatu, rlatv
+    use dynetat0_chosen_m, only: grossismx, grossismy
     use init_tau2alpha_m, only: init_tau2alpha
     use nr_util, only: assert, pi
     use tau2alpha_m, only: tau2alpha

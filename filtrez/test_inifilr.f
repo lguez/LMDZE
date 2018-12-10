@@ -1,7 +1,8 @@
 program test_inifilr
 
   use dimensions, only: iim, jjm
-  use dynetat0_m, only: rlatu, rlatv, read_serre, fyhyp, fxhyp
+  use dynetat0_m, only: rlatu, rlatv, fyhyp, fxhyp
+  use dynetat0_chosen_m, only: read_serre
   use inifilr_m, only: inifilr, jfiltnu, jfiltnv, jfiltsu, jfiltsv, &
        matriceun, matrinvn, matricevn, matriceus, matrinvs, matricevs
   use netcdf, only: NF90_CLOBBER, NF90_FLOAT

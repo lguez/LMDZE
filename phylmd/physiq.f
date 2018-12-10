@@ -35,7 +35,7 @@ contains
     USE dimphy, ONLY: klon
     USE dimsoil, ONLY: nsoilmx
     use drag_noro_m, only: drag_noro
-    use dynetat0_m, only: day_ref, annee_ref
+    use dynetat0_chosen_m, only: day_ref, annee_ref
     USE fcttre, ONLY: foeew
     use fisrtilp_m, only: fisrtilp
     USE hgardfou_m, ONLY: hgardfou

@@ -3,6 +3,7 @@ conf_gcm.f
 dimensions.F
 dimphy.f
 disvert.f
+dynetat0_chosen.f
 errioipsl.f
 histbeg_totreg.f
 histclo.f
@@ -20,7 +21,6 @@ coefpoly.f
 tanh_cautious.f
 heavyside.f
 comconst.f
-temps.f
 iniadvtrac.f
 conf_dat2d.f
 grid_noro.f

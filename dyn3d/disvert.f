@@ -6,7 +6,7 @@ module disvert_m
 
   private llm, hybrid, funcd, y, ya, compute_ab
 
-  real, save:: ap(llm+1), pa ! in Pa
+  real, save:: ap(llm+1) ! in Pa
   real, save:: bp(llm+1)
 
   REAL s(llm+1)
@@ -30,8 +30,11 @@ contains
     ! variables "ap", "bp", "presnivs". "pa" should be defined before
     ! this procedure is called.
 
+    ! Libraries:
     use jumble, only: read_column, new_unit
     use nr_util, only: pi, assert
+    
+    use dynetat0_chosen_m, only: pa
     use unit_nml_m, only: unit_nml
 
     ! Local:
@@ -172,6 +175,8 @@ contains
   !**********************************************************
 
   subroutine compute_ab
+
+    use dynetat0_chosen_m, only: pa
 
     ! Calcul de "ap" et "bp".
 

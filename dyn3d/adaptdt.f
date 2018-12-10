@@ -11,7 +11,7 @@ SUBROUTINE adaptdt(dtbon, n, pbaru, masse)
   USE conf_gcm_m
   USE conf_gcm_m
   USE comgeom
-  USE temps
+
   IMPLICIT NONE
 
 

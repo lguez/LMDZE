@@ -17,6 +17,7 @@ PROGRAM gcm
   use dimensions, only: iim, jjm, llm, nqmx
   USE disvert_m, ONLY : disvert
   use dynetat0_m, only: dynetat0, day_ini
+  use dynetat0_chosen_m, only: dynetat0_chosen
   use dynredem0_m, only: dynredem0
   use grid_change, only: dyn_phy, init_dyn_phy
   use histclo_m, only: histclo
@@ -68,6 +69,7 @@ PROGRAM gcm
 
   call iniadvtrac
   CALL iniconst
+  CALL dynetat0_chosen
   CALL dynetat0(vcov, ucov, teta, q, masse, ps, phis)
   CALL disvert
   CALL inigeom ! initialisation de la g\'eometrie

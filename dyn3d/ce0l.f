@@ -6,7 +6,7 @@ PROGRAM ce0l
   use conf_gcm_m, only: conf_gcm
   use dimensions, only: iim, jjm
   use dimphy, only: klon
-  use dynetat0_m, only: read_serre
+  use dynetat0_chosen_m, only: read_serre
   use etat0_m, only: etat0
   use grilles_gcm_netcdf_sub_m, only: grilles_gcm_netcdf_sub
   use indicesol, only: nbsrf

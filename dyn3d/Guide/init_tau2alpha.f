@@ -11,7 +11,8 @@ contains
     USE comgeom, ONLY: cu_2d, cv_2d
     use coordij_m, only: coordij
     USE dimensions, ONLY: jjm
-    USE dynetat0_m, ONLY: clat, clon, grossismx, grossismy, rlatu
+    USE dynetat0_m, ONLY: rlatu
+    USE dynetat0_chosen_m, ONLY: clat, clon, grossismx, grossismy
     USE paramet_m, ONLY: iip1, jjp1
     use writefield_m, only: writefield
 

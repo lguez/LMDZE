@@ -39,12 +39,15 @@ contains
     ! (stretching coefficient) is set equal to zero for the regular
     ! grid case.
 
-    USE dimensions, ONLY : iim, jjm
-    USE dynetat0_m, ONLY : rlatu, rlatv, xprimu, grossismx
-    use inifgn_m, only: inifgn
-    use inifilr_hemisph_m, only: inifilr_hemisph
+    ! Libraries:
     use jumble, only: new_unit
     use nr_util, only: pi, ifirstloc, assert
+
+    USE dimensions, ONLY: iim, jjm
+    USE dynetat0_m, ONLY: rlatu, rlatv, xprimu
+    USE dynetat0_chosen_m, ONLY: grossismx
+    use inifgn_m, only: inifgn
+    use inifilr_hemisph_m, only: inifilr_hemisph
 
     ! Local:
 

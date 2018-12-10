@@ -13,11 +13,12 @@ CONTAINS
 
     USE comconst, ONLY: cpp, daysec, dtvr, g, kappa, omeg, rad
     USE dimensions, ONLY: iim, jjm, llm, nqmx
-    USE disvert_m, ONLY: ap, bp, pa, preff, presnivs
-    use dynetat0_m, only: day_ref, annee_ref, clat, clon, dzoomx, dzoomy, &
-         grossismx, grossismy, taux, tauy, rlatu, rlatv, rlonu, rlonv, rlatu1, &
-         rlatu2, yprimu1, yprimu2, xprimp025, xprimm025, xprimu, xprimv, ang0, &
-         etot0, ptot0, stot0, ztot0
+    USE disvert_m, ONLY: ap, bp, preff, presnivs
+    use dynetat0_m, only: rlatu, rlatv, rlonu, rlonv, rlatu1, rlatu2, yprimu1, &
+         yprimu2, xprimp025, xprimm025, xprimu, xprimv, ang0, etot0, ptot0, &
+         stot0, ztot0
+    use dynetat0_chosen_m, only: pa, day_ref, annee_ref, clat, clon, dzoomx, &
+         dzoomy, grossismx, grossismy, taux, tauy
     USE iniadvtrac_m, ONLY: tname, ttext
     USE ju2ymds_m, ONLY: ju2ymds
     USE netcdf, ONLY: nf90_clobber, nf90_float, nf90_global, nf90_unlimited

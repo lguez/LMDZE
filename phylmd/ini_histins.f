@@ -15,7 +15,8 @@ contains
     use comconst, only: dtphys
     use dimensions, only: iim, jjm, llm, nqmx
     use disvert_m, only: presnivs
-    use dynetat0_m, only: day_ref, annee_ref, rlatu, rlonv
+    use dynetat0_m, only: rlatu, rlonv
+    use dynetat0_chosen_m, only: day_ref, annee_ref
     USE histbeg_totreg_m, ONLY : histbeg_totreg
     USE histdef_m, ONLY : histdef
     USE histend_m, ONLY : histend

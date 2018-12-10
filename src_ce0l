@@ -20,6 +20,7 @@ dimsoil.f
 dist_sphe.f
 disvert.f
 dynetat0.f
+dynetat0_chosen.f
 dynredem0.f
 dynredem1.f
 enercin.f
@@ -75,7 +76,6 @@ start_init_phys_m.f
 start_inter_3d.f
 strlowercase.f
 tanh_cautious.f
-temps.f
 test_disvert.f
 tourpot.f
 unit_nml_m.f

@@ -14,7 +14,8 @@ program test_ozonecm
   use dimensions, only: jjm, llm
   USE dimphy, ONLY : klon
   USE dimsoil, ONLY : nsoilmx
-  use disvert_m, only: pa, disvert, ap, bp, preff, presnivs
+  use disvert_m, only: disvert, ap, bp, preff, presnivs
+  use dynetat0_chosen_m, only: read_serre
   USE indicesol, ONLY : nbsrf
   use ozonecm_m, only: ozonecm
   use phyetat0_m, only: rlat, phyetat0
@@ -73,7 +74,7 @@ program test_ozonecm
   call set_unit_nml
   open(unit_nml, file="used_namelists.txt", status="replace", action="write")
 
-  pa = 5e4
+  call read_serre
   call disvert
   p = ap + bp * preff
   call phyetat0(pctsrf, ftsol, ftsoil, qsurf, qsol, snow, albe, rain_fall, &

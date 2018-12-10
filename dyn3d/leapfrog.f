@@ -24,7 +24,7 @@ contains
     USE conf_guide_m, ONLY: ok_guide
     USE dimensions, ONLY: iim, jjm, llm, nqmx
     use dissip_m, only: dissip
-    USE dynetat0_m, ONLY: day_ini
+    USE dynetat0_m, ONLY: day_ini, itau_dyn
     use dynredem1_m, only: dynredem1
     use enercin_m, only: enercin
     USE exner_hyb_m, ONLY: exner_hyb
@@ -34,7 +34,6 @@ contains
     use inidissip_m, only: idissip
     use integrd_m, only: integrd
     use nr_util, only: assert
-    USE temps, ONLY: itau_dyn
     use writehist_m, only: writehist
 
     ! Variables dynamiques:

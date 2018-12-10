@@ -84,6 +84,7 @@ dudv1.f
 dudv2.f
 dvthermcell2.f
 dynetat0.f
+dynetat0_chosen.f
 dynredem0.f
 dynredem1.f
 enercin.f
@@ -239,7 +240,6 @@ swtt1.f
 swtt.f
 swu.f
 tau2alpha.f
-temps.f
 thermcell.f
 time_phylmdz.f
 tourpot.f

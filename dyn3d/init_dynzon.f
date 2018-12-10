@@ -18,13 +18,13 @@ contains
     USE conf_gcm_m, ONLY: day_step, iperiod, periodav
     USE dimensions, ONLY: jjm, llm
     USE disvert_m, ONLY: presnivs
-    use dynetat0_m, only: day_ref, annee_ref, rlatv
+    use dynetat0_m, only: rlatv, itau_dyn
+    use dynetat0_chosen_m, only: day_ref, annee_ref
     USE histbeg_totreg_m, ONLY: histbeg_totreg
     USE histdef_m, ONLY: histdef
     USE histend_m, ONLY: histend
     USE histvert_m, ONLY: histvert
     USE nr_util, ONLY: pi
-    USE temps, ONLY: itau_dyn
     USE ymds2ju_m, ONLY: ymds2ju
 
     real, intent(in):: dt_app

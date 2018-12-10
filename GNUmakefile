@@ -2,12 +2,9 @@
 
 # This makefile builds LMDZE.
 
-makefile_dir = .
-include ${general_compiler_options_dir}/settings.mk
-
 # 1. Source files
 
-VPATH += $(addprefix ${makefile_dir}/, $(shell cat ${makefile_dir}/directories))
+makefile_dir = .
 
 src_ce0l := $(shell cat ${makefile_dir}/src_ce0l)
 src_gcm := $(shell cat ${makefile_dir}/src_gcm)
@@ -18,6 +15,9 @@ src_test_inifilr := $(shell cat ${makefile_dir}/src_test_inifilr)
 
 sources := $(sort ${src_ce0l} ${src_gcm} ${src_test_ozonecm} ${src_test_inter_barxy} ${src_test_fxhyp} ${src_test_inifilr})
 
+include ${general_compiler_options_dir}/settings.mk
+
+VPATH += $(addprefix ${makefile_dir}/, $(shell cat ${makefile_dir}/directories))
 cpp_macros = CPP_IIM=16,CPP_JJM=12,CPP_LLM=11
 lib_list = numer_rec_95 jumble nr_util netcdf95 netcdff
 

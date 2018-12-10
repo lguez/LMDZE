@@ -7,6 +7,7 @@ conf_gcm.f
 dimensions.F
 disvert.f
 dynetat0.f
+dynetat0_chosen.f
 errioipsl.f
 heavyside.f
 histbeg_totreg.f
@@ -21,6 +22,5 @@ minmax.f
 ord_coord.f
 ord_coordm.f
 tanh_cautious.f
-temps.f
 test_inter_barxy.f
 unit_nml_m.f

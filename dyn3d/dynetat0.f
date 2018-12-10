@@ -6,51 +6,31 @@ module dynetat0_m
 
   private iim, jjm, principal_cshift, invert_zoom_x, funcd
 
-  INTEGER, protected:: day_ini 
+  INTEGER, protected, save:: day_ini 
   ! day number at the beginning of the run, based at value 1 on
   ! January 1st of annee_ref
 
-  integer:: day_ref = 1 ! jour de l'ann\'ee de l'\'etat initial
-  ! (= 350 si 20 d\'ecembre par exemple)
-
-  integer:: annee_ref = 1998 ! Annee de l'etat initial (avec 4 chiffres)
-
-  REAL, protected:: clon ! longitude of the center of the zoom, in rad
-  real, protected:: clat ! latitude of the center of the zoom, in rad
-
-  real, protected:: grossismx, grossismy
-  ! facteurs de grossissement du zoom, selon la longitude et la latitude
-  ! = 2 si 2 fois, = 3 si 3 fois, etc.
-
-  real, protected:: dzoomx, dzoomy
-  ! extensions en longitude et latitude de la zone du zoom (fractions
-  ! de la zone totale)
-
-  real, protected:: taux, tauy
-  ! raideur de la transition de l'int\'erieur \`a l'ext\'erieur du zoom
-  
-  real, protected:: rlatu(jjm + 1)
+  real, protected, save:: rlatu(jjm + 1)
   ! latitudes of points of the "scalar" and "u" grid, in rad
 
-  real, protected:: rlatv(jjm) 
+  real, protected, save:: rlatv(jjm) 
   ! latitudes of points of the "v" grid, in rad, in decreasing order
 
-  real, protected:: rlonu(iim + 1)
+  real, protected, save:: rlonu(iim + 1)
   ! longitudes of points of the "u" grid, in rad
 
-  real, protected:: rlonv(iim + 1)
+  real, protected, save:: rlonv(iim + 1)
   ! longitudes of points of the "scalar" and "v" grid, in rad
 
-  real, protected:: xprimu(iim + 1), xprimv(iim + 1)
+  real, protected, save:: xprimu(iim + 1), xprimv(iim + 1)
   ! 2 pi / iim * (derivative of the longitudinal zoom function)(rlon[uv])
 
-  REAL, protected:: xprimm025(iim + 1), xprimp025(iim + 1)
-  REAL, protected:: rlatu1(jjm), rlatu2(jjm), yprimu1(jjm), yprimu2(jjm)
-  REAL ang0, etot0, ptot0, ztot0, stot0
+  REAL, protected, save:: xprimm025(iim + 1), xprimp025(iim + 1)
+  REAL, protected, save:: rlatu1(jjm), rlatu2(jjm), yprimu1(jjm), yprimu2(jjm)
+  REAL, save:: ang0, etot0, ptot0, ztot0, stot0
   INTEGER, PARAMETER, private:: nmax = 30000
-  DOUBLE PRECISION, private:: abs_y
-
-  save
+  DOUBLE PRECISION, private, save:: abs_y
+  INTEGER, save:: itau_dyn
 
 contains
 
@@ -60,17 +40,16 @@ contains
     ! Authors: P. Le Van, L. Fairhead
     ! This procedure reads the initial state of the atmosphere.
 
-    use comconst, only: dtvr
-    use conf_gcm_m, only: raz_date
-    use dimensions, only: iim, jjm, llm, nqmx
-    use disvert_m, only: pa
-    use iniadvtrac_m, only: tname
+    ! Libraries:
     use netcdf, only: NF90_NOWRITE, NF90_NOERR
     use netcdf95, only: NF95_GET_VAR, nf95_open, nf95_inq_varid, NF95_CLOSE, &
          NF95_Gw_VAR
     use nr_util, only: assert
-    use temps, only: itau_dyn
-    use unit_nml_m, only: unit_nml
+
+    use conf_gcm_m, only: raz_date
+    use dimensions, only: iim, jjm, llm, nqmx
+    use dynetat0_chosen_m, only: day_ref
+    use iniadvtrac_m, only: tname
 
     REAL, intent(out):: vcov(: , :, :) ! (iim + 1, jjm, llm)
     REAL, intent(out):: ucov(:, :, :) ! (iim + 1, jjm + 1, llm)
@@ -84,8 +63,6 @@ contains
     INTEGER iq
     REAL, allocatable:: tab_cntrl(:) ! tableau des param\`etres du run
     INTEGER ierr, ncid, varid
-
-    namelist /dynetat0_nml/ day_ref, annee_ref
 
     !-----------------------------------------------------------------------
 
@@ -106,45 +83,17 @@ contains
     call nf95_inq_varid(ncid, "controle", varid)
     call NF95_Gw_VAR(ncid, varid, tab_cntrl)
 
-    call assert(int(tab_cntrl(1)) == iim, "dynetat0 tab_cntrl iim") 
-    call assert(int(tab_cntrl(2)) == jjm, "dynetat0 tab_cntrl jjm") 
-    call assert(int(tab_cntrl(3)) == llm, "dynetat0 tab_cntrl llm") 
-
-    IF (dtvr /= tab_cntrl(12)) THEN
-       print *, 'Warning: the time steps from day_step and "start.nc" ' // &
-            'are different.'
-       print *, 'dtvr from day_step: ', dtvr
-       print *, 'dtvr from "start.nc": ', tab_cntrl(12)
-       print *, 'Using the value from day_step.'
-    ENDIF
-
     etot0 = tab_cntrl(13)
     ptot0 = tab_cntrl(14)
     ztot0 = tab_cntrl(15)
     stot0 = tab_cntrl(16)
     ang0 = tab_cntrl(17)
-    pa = tab_cntrl(18)
-
-    clon = tab_cntrl(20)
-    clat = tab_cntrl(21)
-    grossismx = tab_cntrl(22)
-    grossismy = tab_cntrl(23)
-    dzoomx = tab_cntrl(25)
-    dzoomy = tab_cntrl(26)
-    taux = tab_cntrl(28)
-    tauy = tab_cntrl(29)
-
-    print *, "Enter namelist 'dynetat0_nml'."
-    read(unit=*, nml=dynetat0_nml)
-    write(unit_nml, nml=dynetat0_nml)
 
     if (raz_date) then
-       print *, 'Resetting the date, using the namelist.'
+       print *, 'Resetting the date.'
        day_ini = day_ref
        itau_dyn = 0
     else
-       day_ref = tab_cntrl(4)
-       annee_ref = tab_cntrl(5)
        itau_dyn = tab_cntrl(31)
        day_ini = tab_cntrl(30)
     end if
@@ -225,49 +174,13 @@ contains
 
   !********************************************************************
 
-  subroutine read_serre
-
-    use unit_nml_m, only: unit_nml
-    use nr_util, only: assert, pi
-
-    REAL:: clon_deg = 0. ! longitude of the center of the zoom, in degrees
-    real:: clat_deg = 0. ! latitude of the center of the zoom, in degrees
-
-    namelist /serre_nml/ clon_deg, clat_deg, grossismx, grossismy, dzoomx, &
-         dzoomy, taux, tauy
-
-    !-------------------------------------------------
-
-    ! Default values:
-    grossismx = 1.
-    grossismy = 1.
-    dzoomx = 0.2
-    dzoomy = 0.2
-    taux = 3.
-    tauy = 3. 
-
-    print *, "Enter namelist 'serre_nml'."
-    read(unit=*, nml=serre_nml)
-    write(unit_nml, nml=serre_nml)
-
-    call assert(grossismx >= 1. .and. grossismy >= 1., "read_serre grossism")
-    call assert(dzoomx > 0., dzoomx < 1., dzoomy < 1., &
-         "read_serre dzoomx dzoomy")
-    clon = clon_deg / 180. * pi
-    clat = clat_deg / 180. * pi
-
-  end subroutine read_serre
-
-  !********************************************************************
-
   SUBROUTINE fyhyp
 
     ! From LMDZ4/libf/dyn3d/fyhyp.F, version 1.2, 2005/06/03 09:11:32
 
     ! Author: P. Le Van, from analysis by R. Sadourny 
 
-    ! Define rlatu, rlatv, rlatu2, yprimu2, rlatu1, yprimu1, using
-    ! clat, grossismy, dzoomy, tauy.
+    ! Define rlatu, rlatv, rlatu2, yprimu2, rlatu1, yprimu1.
     
     ! Calcule les latitudes et dérivées dans la grille du GCM pour une
     ! fonction f(y) à dérivée tangente hyperbolique.
@@ -276,6 +189,7 @@ contains
 
     use coefpoly_m, only: coefpoly, a0, a1, a2, a3
     USE dimensions, only: jjm
+    use dynetat0_chosen_m, only: clat, grossismy, dzoomy, tauy
     use heavyside_m, only: heavyside
 
     ! Local: 
@@ -583,8 +497,7 @@ contains
     ! From LMDZ4/libf/dyn3d/fxhyp.F, version 1.2, 2005/06/03 09:11:32
     ! Author: P. Le Van, from formulas by R. Sadourny
 
-    ! Compute xprimm025, rlonv, xprimv, rlonu, xprimu, xprimp025,
-    ! using clon, grossismx, dzoomx, taux.
+    ! Compute xprimm025, rlonv, xprimv, rlonu, xprimu, xprimp025.
     
     ! Calcule les longitudes et dérivées dans la grille du GCM pour
     ! une fonction $x_f(\tilde x)$ à dérivée tangente hyperbolique.
@@ -597,6 +510,7 @@ contains
     use nr_util, only: pi, pi_d, twopi, twopi_d, arth, assert, rad_to_deg
 
     USE dimensions, ONLY: iim
+    use dynetat0_chosen_m, only: clon, grossismx, dzoomx, taux
     use tanh_cautious_m, only: tanh_cautious
 
     ! Local:
@@ -736,10 +650,11 @@ contains
 
     ! Add or subtract 2 pi so that xlon is near [-pi, pi], then cshift
     ! so that xlon is in ascending order. Make the same cshift on
-    ! xprimm. Use clon. In this module to avoid circular dependency.
+    ! xprimm. In this module to avoid circular dependency.
 
     use nr_util, only: twopi
 
+    use dynetat0_chosen_m, only: clon
     USE dimensions, ONLY: iim
 
     integer, intent(in):: is2
@@ -770,9 +685,10 @@ contains
 
   subroutine invert_zoom_x(beta, xf, xtild, G, xlon, xprim, xuv)
 
-    ! Using clon and grossismx. In this module to avoid circular dependency.
+    ! In this module to avoid circular dependency.
 
     use coefpoly_m, only: coefpoly, a1, a2, a3
+    use dynetat0_chosen_m, only: clon, grossismx
     USE dimensions, ONLY: iim
     use nr_util, only: pi_d, twopi_d
     use numer_rec_95, only: hunt, rtsafe

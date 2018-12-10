@@ -5,7 +5,8 @@ program test_inter_barxy
   use comgeom, only: inigeom
   use conf_gcm_m, only: conf_gcm
   use dimensions, only: iim, jjm
-  USE dynetat0_m, only: rlonu, rlatv, read_serre, fyhyp, fxhyp
+  USE dynetat0_m, only: rlonu, rlatv, fyhyp, fxhyp
+  use dynetat0_chosen_m, only: read_serre
   use inter_barxy_m, only: inter_barxy
   USE nr_util, ONLY : pi
 
