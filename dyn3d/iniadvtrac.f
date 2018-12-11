@@ -12,12 +12,14 @@ module iniadvtrac_m
 
   private nqmx
 
-  INTEGER iadv(nqmx) ! indice du sch\'ema d'advection pour l'eau et les traceurs
+  INTEGER, protected:: iadv(nqmx)
+  ! indice du sch\'ema d'advection pour l'eau et les traceurs
 
-  character(len=10) tname(nqmx)
+  character(len = 10), protected:: tname(nqmx)
   ! nom du traceur pour fichiers restart et historiques
 
-  character(len=13) ttext(nqmx) ! nom long du traceur pour sorties
+  character(len = 13), protected:: ttext(nqmx)
+  ! nom long du traceur pour sorties
 
 contains
 
@@ -35,7 +37,7 @@ contains
     use jumble, only: new_unit
 
     ! Local:
-    character(len=3) descrq(0:14)
+    character(len = 3) descrq(0:14)
     integer iq, iostat, nq_local, unit
 
     integer, parameter:: allowed_adv(5) = (/0, 10, 12, 13, 14/)
@@ -50,24 +52,24 @@ contains
     print *, "Call sequence information: iniadvtrac"
 
     ! Initializations:
-    descrq(0)=''
-    descrq(10)='VL1'
-    descrq(12)='FH1'
-    descrq(13)='FH2'
-    descrq(14)='VLH'
+    descrq(0) = ''
+    descrq(10) = 'VL1'
+    descrq(12) = 'FH1'
+    descrq(13) = 'FH2'
+    descrq(14) = 'VLH'
 
     ! Choix du sch\'ema pour l'advection dans fichier "traceur.def"
     call new_unit(unit)
-    open(unit, file='traceur.def', status='old', action="read", &
-         position="rewind", iostat=iostat)
+    open(unit, file = 'traceur.def', status = 'old', action = "read", &
+         position = "rewind", iostat = iostat)
     if (iostat == 0) then
        print *, 'Ouverture de "traceur.def" ok'
-       read(unit, fmt=*) nq_local
+       read(unit, fmt = *) nq_local
        print *, 'nombre de traceurs ', nq_local
        call assert(nq_local == nqmx, "iniadvtrac nq_local")
 
-       do iq=1, nqmx
-          read(unit, fmt=*) iadv(iq), tname(iq)
+       do iq = 1, nqmx
+          read(unit, fmt = *) iadv(iq), tname(iq)
           if (.not. any(iadv(iq) == allowed_adv)) then
              print *, "bad number for advection scheme"
              stop 1
@@ -91,7 +93,7 @@ contains
     ! \`A partir du nom court du traceur et du sch\'ema d'advection, on
     ! d\'etermine le nom long :
     do iq = 1, nqmx
-       ttext(iq)=trim(tname(iq)) // descrq(iadv(iq))
+       ttext(iq) = trim(tname(iq)) // descrq(iadv(iq))
     end do
 
   END subroutine iniadvtrac
