@@ -9,7 +9,7 @@ module YOMCST
 
   REAL:: R_ecc = 0.016715 ! excentricité
   real:: R_peri = 102.7 ! équinoxe
-  real:: R_incl = 23.441 ! inclinaison
+  real:: R_incl = 23.441 ! inclinaison, en degr\'es
 
 contains
 
