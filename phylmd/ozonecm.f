@@ -71,9 +71,9 @@ contains
        bsec = 2650. + 5000. * slat2
        a = 4. * bsec**1.5 * ppm**1.5 * (1. + (bsec / ps)**1.5) &
             / (bsec**1.5 + ppm**1.5)**2
-       aprim = max(0., (2.666666 * (1.74E-5 - 7.5E-6 * slat2 &
-            - 1.7E-6 * cost * slat) * ppm - a * gms) / (1. - a))
-       asec = max(0., (gms - aprim) * (1. + (bsec / ps)**1.5))
+       asec = max(0., (gms - max(0., (2.666666 * (1.74E-5 - 7.5E-6 * slat2 &
+            - 1.7E-6 * cost * slat) * ppm - a * gms) / (1. - a))) &
+            * (1. + (bsec / ps)**1.5))
        aprim = gms - asec / (1. + (bsec / ps)**1.5)
 
        DO k = 1, llm
