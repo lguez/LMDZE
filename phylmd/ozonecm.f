@@ -16,12 +16,13 @@ contains
     ! also provided us the code.
 
     ! A. J. Krueger and R. A. Minzner, A Mid-Latitude Ozone Model for the
-    ! 1976 U. S. Standard Atmosphere, J. Geophys. Res., 81, 4477, (1976).
+    ! 1976 U. S. Standard Atmosphere, J. Geophys. Res., 81, 4477 (1976).
 
-    ! Keating, G. M. and D. F. Young, 1985: Interim reference models for the
-    ! middle atmosphere, Handbook for MAP, vol. 16, 205-229.
+    ! Keating, G. M. and D. F. Young, 1985: Interim reference ozone
+    ! models for the middle atmosphere, Handbook for MAP, vol. 16,
+    ! 205-229.
 
-    use nr_util, only: assert, pi
+    use nr_util, only: assert, twopi, deg_to_rad
 
     use dimensions, only: llm
     use phyetat0_m, only: rlat
@@ -55,12 +56,12 @@ contains
 
     call assert(size(paprs, 2) == llm + 1, "ozonecm")
 
-    sint = sin(2 * pi * (rjour + 15.) / an)
-    cost = cos(2 * pi * (rjour + 15.) / an)
+    sint = sin(twopi * (rjour + 15.) / an)
+    cost = cos(twopi * (rjour + 15.) / an)
     field(llm + 1) = 0.
 
     DO i = 1, size(paprs, 1)
-       slat = sin(pi / 180. * rlat(i))
+       slat = sin(deg_to_rad * rlat(i))
        slat2 = slat * slat
        gms = 0.0531 + sint * (- 0.001595 + 0.009443 * slat) + cost &
             * (- 0.001344 - 0.00346 * slat) + slat2 * (0.056222 + slat2 &
