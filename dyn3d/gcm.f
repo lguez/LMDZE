@@ -21,7 +21,7 @@ PROGRAM gcm
   use dynredem0_m, only: dynredem0
   use grid_change, only: dyn_phy, init_dyn_phy
   use histclo_m, only: histclo
-  use iniadvtrac_m, only: iniadvtrac
+  use infotrac_init_m, only: infotrac_init
   use inidissip_m, only: inidissip
   use inifilr_m, only: inifilr
   use inithist_m, only: inithist
@@ -67,7 +67,7 @@ PROGRAM gcm
      call ioconf_calendar('360d')
   endif
 
-  call iniadvtrac
+  call infotrac_init
   CALL iniconst
   CALL dynetat0_chosen
   CALL dynetat0(vcov, ucov, teta, q, masse, ps, phis)

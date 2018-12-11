@@ -17,7 +17,7 @@ histclo.f
 histcom_var.f
 histhori_regular.f
 indicesol.f
-iniadvtrac.f
+infotrac_init.f
 invert_zoom_x.f
 mva9.f
 ozonecm.f

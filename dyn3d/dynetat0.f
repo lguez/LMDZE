@@ -48,7 +48,7 @@ contains
     use conf_gcm_m, only: raz_date
     use dimensions, only: iim, jjm, llm, nqmx
     use dynetat0_chosen_m, only: day_ref
-    use iniadvtrac_m, only: tname
+    use infotrac_init_m, only: tname
 
     REAL, intent(out):: vcov(: , :, :) ! (iim + 1, jjm, llm)
     REAL, intent(out):: ucov(:, :, :) ! (iim + 1, jjm + 1, llm)

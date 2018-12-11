@@ -12,7 +12,7 @@ histbeg_totreg.f
 histclo.f
 histcom_var.f
 histhori_regular.f
-iniadvtrac.f
+infotrac_init.f
 invert_zoom_x.f
 principal_cshift.f
 tanh_cautious.f

@@ -15,7 +15,7 @@ contains
     use dimensions, only: llm
     use histsync_m, only: histsync
     use histwrite_m, only: histwrite
-    use iniadvtrac_m, only: ttext
+    use infotrac_init_m, only: ttext
     use inithist_m, only: histid, histvid, histuid
     use nr_util, only: assert
     use paramet_m, only: ip1jm, ip1jmp1

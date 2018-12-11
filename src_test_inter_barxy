@@ -14,7 +14,7 @@ histbeg_totreg.f
 histclo.f
 histcom_var.f
 histhori_regular.f
-iniadvtrac.f
+infotrac_init.f
 inter_barx.f
 inter_barxy.f
 inter_bary.f

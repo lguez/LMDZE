@@ -11,7 +11,7 @@ contains
 
     USE dimensions, ONLY: iim, jjm, llm, nqmx
     use dynredem0_m, only: ncid
-    USE iniadvtrac_m, ONLY: tname
+    USE infotrac_init_m, ONLY: tname
     use netcdf95, only: nf95_close, nf95_inq_varid, nf95_put_var
     use nr_util, only: assert
 

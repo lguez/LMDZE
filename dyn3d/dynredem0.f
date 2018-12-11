@@ -19,7 +19,7 @@ CONTAINS
          stot0, ztot0
     use dynetat0_chosen_m, only: pa, day_ref, annee_ref, clat, clon, dzoomx, &
          dzoomy, grossismx, grossismy, taux, tauy
-    USE iniadvtrac_m, ONLY: tname, ttext
+    USE infotrac_init_m, ONLY: tname, ttext
     USE ju2ymds_m, ONLY: ju2ymds
     USE netcdf, ONLY: nf90_clobber, nf90_float, nf90_global, nf90_unlimited
     USE netcdf95, ONLY: nf95_create, nf95_def_dim, nf95_def_var, nf95_enddef, &

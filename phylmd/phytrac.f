@@ -40,7 +40,7 @@ contains
     use dimphy, only: klon
     use histwrite_phy_m, only: histwrite_phy
     use indicesol, only: nbsrf
-    use iniadvtrac_m, only: tname
+    use infotrac_init_m, only: tname
     use initrrnpb_m, only: initrrnpb
     use minmaxqfi_m, only: minmaxqfi
     use netcdf, only: NF90_FILL_float

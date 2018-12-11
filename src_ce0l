@@ -44,7 +44,7 @@ histclo.f
 histcom_var.f
 histhori_regular.f
 indicesol.f
-iniadvtrac.f
+infotrac_init.f
 inifgn.f
 inifilr.f
 inifilr_hemisph.f

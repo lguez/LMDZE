@@ -23,7 +23,7 @@ contains
     USE histdef_m, ONLY: histdef
     USE histend_m, ONLY: histend
     USE histvert_m, ONLY: histvert
-    USE iniadvtrac_m, ONLY: ttext
+    USE infotrac_init_m, ONLY: ttext
     USE nr_util, ONLY: pi
     USE paramet_m, ONLY: iip1, jjp1
     use ymds2ju_m, ONLY: ymds2ju

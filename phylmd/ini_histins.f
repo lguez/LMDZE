@@ -22,7 +22,7 @@ contains
     USE histend_m, ONLY : histend
     USE histvert_m, ONLY : histvert
     use indicesol, only: nbsrf, clnsurf
-    use iniadvtrac_m, only: tname, ttext
+    use infotrac_init_m, only: tname, ttext
     use nr_util, only: pi
     use phyetat0_m, only: itau_phy
     USE ymds2ju_m, only: ymds2ju

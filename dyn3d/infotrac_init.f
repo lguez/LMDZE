@@ -1,4 +1,4 @@
-module iniadvtrac_m
+module infotrac_init_m
 
   ! From advtrac.h, version 1.1.1.1 2004/05/19 12:53:06
 
@@ -23,7 +23,7 @@ module iniadvtrac_m
 
 contains
 
-  subroutine iniadvtrac
+  subroutine infotrac_init
 
     ! From dyn3d/iniadvtrac.F, version 1.3 2005/04/13 08:58:34
 
@@ -49,7 +49,7 @@ contains
 
     !-----------------------------------------------------------------------
 
-    print *, "Call sequence information: iniadvtrac"
+    print *, "Call sequence information: infotrac_init"
 
     ! Initializations:
     descrq(0) = ''
@@ -66,7 +66,7 @@ contains
        print *, 'Ouverture de "traceur.def" ok'
        read(unit, fmt = *) nq_local
        print *, 'nombre de traceurs ', nq_local
-       call assert(nq_local == nqmx, "iniadvtrac nq_local")
+       call assert(nq_local == nqmx, "infotrac_init nq_local")
 
        do iq = 1, nqmx
           read(unit, fmt = *) iadv(iq), tname(iq)
@@ -79,7 +79,7 @@ contains
     else
        print *, 'Could not open "traceur.def".'
        print *, 'Using default values.'
-       call assert(nqmx == 4, "iniadvtrac nqmx")
+       call assert(nqmx == 4, "infotrac_init nqmx")
        iadv(:4) = (/14, 10, 10, 10/)
        tname(1) = 'H2Ov'
        tname(2) = 'H2Ol'
@@ -96,6 +96,6 @@ contains
        ttext(iq) = trim(tname(iq)) // descrq(iadv(iq))
     end do
 
-  END subroutine iniadvtrac
+  END subroutine infotrac_init
 
-end module iniadvtrac_m
+end module infotrac_init_m
