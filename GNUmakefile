@@ -12,8 +12,9 @@ src_test_ozonecm := $(shell cat ${makefile_dir}/src_test_ozonecm)
 src_test_inter_barxy := $(shell cat ${makefile_dir}/src_test_inter_barxy)
 src_test_fxhyp := $(shell cat ${makefile_dir}/src_test_fxhyp)
 src_test_inifilr := $(shell cat ${makefile_dir}/src_test_inifilr)
+src_test_orbite = test_orbite.f orbite.f YOMCST.f unit_nml_m.f
 
-sources := $(sort ${src_ce0l} ${src_gcm} ${src_test_ozonecm} ${src_test_inter_barxy} ${src_test_fxhyp} ${src_test_inifilr})
+sources := $(sort ${src_ce0l} ${src_gcm} ${src_test_ozonecm} ${src_test_inter_barxy} ${src_test_fxhyp} ${src_test_inifilr} ${src_test_orbite})
 
 include ${general_compiler_options_dir}/settings.mk
 
@@ -29,8 +30,9 @@ obj_test_ozonecm := $(addsuffix .o, $(basename ${src_test_ozonecm}))
 obj_test_inter_barxy := $(addsuffix .o, $(basename ${src_test_inter_barxy}))
 obj_test_fxhyp := $(addsuffix .o, $(basename ${src_test_fxhyp}))
 obj_test_inifilr := $(addsuffix .o, $(basename ${src_test_inifilr}))
+obj_test_orbite := $(addsuffix .o, $(basename ${src_test_orbite}))
 objects := $(addsuffix .o, $(basename ${sources}))
-execut = ce0l gcm test_ozonecm test_inter_barxy test_fxhyp test_inifilr
+execut = ce0l gcm test_ozonecm test_inter_barxy test_fxhyp test_inifilr test_orbite
 
 # 3. Rules
 
@@ -41,6 +43,7 @@ test_ozonecm: ${obj_test_ozonecm}
 test_inter_barxy: ${obj_test_inter_barxy}
 test_fxhyp: ${obj_test_fxhyp}
 test_inifilr: ${obj_test_inifilr}
+test_orbite: ${obj_test_orbite}
 
 depend ${makefile_dir}/depend.mk:
 	makedepf90 -free -Wmissing -Wconfused $(addprefix -I, ${VPATH}) -nosrc $(addprefix -u , netcdf numer_rec_95 netcdf95 nr_util jumble) ${sources} >${makefile_dir}/depend.mk

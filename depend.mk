@@ -234,6 +234,7 @@ test_disvert.o : exner_hyb.o dimensions.o disvert.o comconst.o abort_gcm.o
 test_fxhyp.o : unit_nml_m.o dynetat0_chosen.o dynetat0.o 
 test_inifilr.o : unit_nml_m.o inifilr.o dynetat0_chosen.o dynetat0.o dimensions.o 
 test_inter_barxy.o : inter_barxy.o dynetat0_chosen.o dynetat0.o dimensions.o conf_gcm.o comgeom.o comdissnew.o comconst.o 
+test_orbite.o : orbite.o 
 test_ozonecm.o : unit_nml_m.o phyetat0.o ozonecm.o indicesol.o dynetat0_chosen.o disvert.o dimsoil.o dimphy.o dimensions.o 
 thermcell.o : suphec.o dimphy.o 
 time_phylmdz.o : phyetat0.o 
