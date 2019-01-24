@@ -48,6 +48,7 @@ convmas.o : filtreg_scal.o paramet_m.o dimensions.o
 coordij.o : dynetat0.o dimensions.o 
 covcont.o : comgeom.o paramet_m.o dimensions.o 
 covnat.o : paramet_m.o comgeom.o 
+ctherm.o : unit_nml_m.o 
 cv30_closure.o : suphec.o dimphy.o cv30_param.o 
 cv30_compress.o : dimphy.o cv30_param.o 
 cv30_feed.o : dimphy.o cv30_param.o 

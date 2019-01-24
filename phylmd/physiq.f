@@ -29,7 +29,7 @@ contains
     USE conf_gcm_m, ONLY: lmt_pas
     USE conf_phys_m, ONLY: conf_phys
     use conflx_m, only: conflx
-    USE ctherm, ONLY: iflag_thermals, nsplit_thermals
+    USE ctherm_m, ONLY: iflag_thermals, ctherm
     use diagcld2_m, only: diagcld2
     USE dimensions, ONLY: llm, nqmx
     USE dimphy, ONLY: klon
@@ -279,7 +279,7 @@ contains
     real longi
     REAL z_avant(klon), z_apres(klon), z_factor(klon)
     REAL zb
-    REAL zx_t, zx_qs, zcor
+    REAL zx_qs, zcor
     real zqsat(klon, llm)
     INTEGER i, k, iq, nsrf
     REAL zphi(klon, llm)
@@ -406,8 +406,7 @@ contains
     integer, save:: ncid_startphy
 
     namelist /physiq_nml/ fact_cldcon, facttemps, ok_newmicro, iflag_cldcon, &
-         ratqsbas, ratqshaut, ok_ade, bl95_b0, bl95_b1, iflag_thermals, &
-         nsplit_thermals
+         ratqsbas, ratqshaut, ok_ade, bl95_b0, bl95_b1
 
     !----------------------------------------------------------------
 
@@ -435,12 +434,11 @@ contains
        pblt =0.
        therm =0.
 
-       iflag_thermals = 0
-       nsplit_thermals = 1
        print *, "Enter namelist 'physiq_nml'."
        read(unit=*, nml=physiq_nml)
        write(unit_nml, nml=physiq_nml)
 
+       call ctherm
        call conf_phys
 
        ! Initialiser les compteurs:
@@ -672,13 +670,13 @@ contains
     fm_therm = 0.
     entr_therm = 0.
 
-    if (iflag_thermals == 0) then
+    if (iflag_thermals) then
+       call calltherm(play, paprs, pphi, u_seri, v_seri, t_seri, q_seri, &
+            d_u_ajs, d_v_ajs, d_t_ajs, d_q_ajs, fm_therm, entr_therm)
+    else
        CALL ajsec(paprs, play, t_seri, q_seri, d_t_ajs, d_q_ajs)
        t_seri = t_seri + d_t_ajs
        q_seri = q_seri + d_q_ajs
-    else
-       call calltherm(play, paprs, pphi, u_seri, v_seri, t_seri, q_seri, &
-            d_u_ajs, d_v_ajs, d_t_ajs, d_q_ajs, fm_therm, entr_therm)
     endif
 
     ! Caclul des ratqs
@@ -811,8 +809,7 @@ contains
     ! Humidit\'e relative pour diagnostic :
     DO k = 1, llm
        DO i = 1, klon
-          zx_t = t_seri(i, k)
-          zx_qs = r2es * FOEEW(zx_t, rtt >= zx_t) / play(i, k)
+          zx_qs = r2es * FOEEW(t_seri(i, k), rtt >= t_seri(i, k)) / play(i, k)
           zx_qs = MIN(0.5, zx_qs)
           zcor = 1. / (1. - retv * zx_qs)
           zx_qs = zx_qs * zcor

@@ -34,7 +34,7 @@ contains
     use cltracrn_m, only: cltracrn
     use comconst, only: dtphys
     USE conf_gcm_m, ONLY: lmt_pas
-    use ctherm, only: iflag_thermals
+    use ctherm_m, only: iflag_thermals
     use cvltr_m, only: cvltr
     use dimensions, only: llm, nqmx
     use dimphy, only: klon
@@ -247,7 +247,7 @@ contains
        enddo
     enddo
 
-    if (iflag_thermals > 0) then
+    if (iflag_thermals) then
        nsplit=10
        DO it=1, nqmx - 2
           do isplit=1, nsplit

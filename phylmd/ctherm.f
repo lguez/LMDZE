@@ -1,11 +1,24 @@
-module ctherm
+module ctherm_m
 
   implicit none
 
-  integer, save:: iflag_thermals, nsplit_thermals
-  real:: r_aspect_thermals = 4.
-  real:: l_mix_thermals = 10.
-  real:: tho_thermals = 0.
-  integer:: w2di_thermals = 0
+  logical, protected:: iflag_thermals = .false.
+  integer, protected:: nsplit_thermals = 1
 
-end module ctherm
+contains
+
+  subroutine ctherm
+
+    use unit_nml_m, only: unit_nml
+
+    namelist /ctherm_nml/ iflag_thermals, nsplit_thermals
+
+    !--------------------------------------------------------------------
+
+    print *, "Enter namelist 'ctherm_nml'."
+    read(unit=*, nml=ctherm_nml)
+    write(unit_nml, nml=ctherm_nml)
+
+  end subroutine ctherm
+
+end module ctherm_m

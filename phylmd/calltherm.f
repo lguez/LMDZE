@@ -12,8 +12,7 @@ contains
     ! Thermiques.
 
     use comconst, only: dtphys
-    USE ctherm, ONLY: l_mix_thermals, nsplit_thermals, r_aspect_thermals, &
-         tho_thermals, w2di_thermals
+    USE ctherm_m, ONLY: nsplit_thermals
     USE dimphy, ONLY: klev, klon
     use thermcell_m, only: thermcell
 
@@ -62,8 +61,7 @@ contains
     do isplit = 1, nsplit_thermals
        CALL thermcell(klon, klev, zdt, pplay, paprs, pphi, u_seri, v_seri, &
             t_seri, q_seri, d_u_the, d_v_the, d_t_the, d_q_the, zfm_therm, &
-            zentr_therm, r_aspect_thermals, l_mix_thermals, w2di_thermals, &
-            tho_thermals)
+            zentr_therm)
 
        ! transformation de la derivee en tendance
        d_t_the=d_t_the*dtphys/real(nsplit_thermals)

@@ -5,8 +5,7 @@ module thermcell_m
 contains
 
   SUBROUTINE thermcell(ngrid, nlay, ptimestep, pplay, pplev, pphi, pu, pv, pt, &
-       po, pduadj, pdvadj, pdtadj, pdoadj, fm0, entr0, r_aspect, l_mix, w2di, &
-       tho)
+       po, pduadj, pdvadj, pdtadj, pdoadj, fm0, entr0)
 
     ! Calcul du transport vertical dans la couche limite en pr\'esence
     ! de "thermiques" explicitement repr\'esent\'es. R\'ecriture \`a partir
@@ -25,9 +24,8 @@ contains
 
     ! arguments:
 
-    INTEGER ngrid, nlay, w2di
-    real tho
-    real ptimestep, l_mix, r_aspect
+    INTEGER ngrid, nlay
+    real ptimestep
     REAL, intent(in):: pt(ngrid, nlay)
     real pdtadj(ngrid, nlay)
     REAL, intent(in):: pu(ngrid, nlay)
@@ -86,6 +84,11 @@ contains
     real entr_star_tot(klon), entr_star2(klon)
     real f(klon)
     real zlevinter(klon)
+
+    real, parameter:: r_aspect = 4.
+    real, parameter:: l_mix = 10.
+    real, parameter:: tho = 0.
+    integer, parameter:: w2di = 0
 
     EXTERNAL SCOPY
 
