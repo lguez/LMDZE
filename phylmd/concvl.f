@@ -27,7 +27,7 @@ contains
     real, INTENT (IN):: u(klon, klev), v(klon, klev)
     REAL, intent(inout):: sig1(klon, klev), w01(klon, klev)
     REAL, intent(out):: d_t(klon, klev)
-    REAL, intent(out):: d_q(klon, klev) ! increment de la vapeur d'eau
+    REAL, intent(out):: d_q(klon, klev) ! incr\'ement de la vapeur d'eau
     REAL, intent(out):: d_u(klon, klev), d_v(klon, klev)
     REAL, intent(out):: rain(klon) ! pluie (mm / s)
     INTEGER, intent(out):: kbas(klon)

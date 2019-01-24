@@ -16,6 +16,11 @@ src_test_orbite = test_orbite.f orbite.f YOMCST.f unit_nml_m.f
 
 sources := $(sort ${src_ce0l} ${src_gcm} ${src_test_ozonecm} ${src_test_inter_barxy} ${src_test_fxhyp} ${src_test_inifilr} ${src_test_orbite})
 
+netcdf95_dir = ${HOME}/Compil_prod/NetCDF95_gfortran_debug
+nr_util_dir = ${HOME}/Compil_prod/NR_util_gfortran_debug
+numer_rec_95_dir = ${HOME}/Compil_prod/Numer_Rec_95_gfortran_debug
+jumble_dir = ${HOME}/Compil_prod/Jumble_gfortran_debug
+
 include ${general_compiler_options_dir}/settings.mk
 
 VPATH += $(addprefix ${makefile_dir}/, $(shell cat ${makefile_dir}/directories))

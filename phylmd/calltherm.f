@@ -8,7 +8,8 @@ contains
        d_u_ajs, d_v_ajs, d_t_ajs, d_q_ajs, fm_therm, entr_therm)
 
     ! From LMDZ4/libf/phylmd/calltherm.F, version 1.2 2004/12/10 11:27:46
-    ! Thermiques
+
+    ! Thermiques.
 
     use comconst, only: dtphys
     USE ctherm, ONLY: l_mix_thermals, nsplit_thermals, r_aspect_thermals, &

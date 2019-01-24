@@ -673,7 +673,6 @@ contains
     entr_therm = 0.
 
     if (iflag_thermals == 0) then
-       ! Ajustement sec
        CALL ajsec(paprs, play, t_seri, q_seri, d_t_ajs, d_q_ajs)
        t_seri = t_seri + d_t_ajs
        q_seri = q_seri + d_q_ajs

@@ -27,7 +27,7 @@ module cv30_param_m
   ! Critical buoyancy (K) used to adjust the approach to
   ! quasi-equilibrium. It must be < 0.
 
-  real beta, alpha
+  real, protected:: beta, alpha
   ! Parameters that control the rate of approach to quasi-equilibrium
   ! (their standard values are 1. and 0.96, respectively) (beta must
   ! be less than or equal to 1).
