@@ -9,7 +9,7 @@ module phyetat0_m
   ! by a simple index, in degrees
 
   integer, save, protected:: itau_phy
-  REAL, save, protected:: zmasq(KLON) ! fraction of land
+  REAL, save, protected:: masque(KLON) ! fraction of land
 
   private klon
 
@@ -100,7 +100,7 @@ contains
     ! Lecture du masque terre mer
 
     call NF95_INQ_VARID(ncid_startphy, "masque", varid)
-    call nf95_get_var(ncid_startphy, varid, zmasq)
+    call nf95_get_var(ncid_startphy, varid, masque)
 
     ! Lecture des fractions pour chaque sous-surface
 
@@ -113,16 +113,16 @@ contains
 
     fractint = pctsrf(:, is_ter) + pctsrf(:, is_lic)
     DO i = 1 , klon
-       IF ( abs(fractint(i) - zmasq(i) ) > EPSFRA ) THEN
+       IF ( abs(fractint(i) - masque(i) ) > EPSFRA ) THEN
           print *, 'phyetat0: attention fraction terre pas ', &
-               'coherente ', i, zmasq(i), pctsrf(i, is_ter), pctsrf(i, is_lic)
+               'coherente ', i, masque(i), pctsrf(i, is_ter), pctsrf(i, is_lic)
        ENDIF
     END DO
     fractint = pctsrf(:, is_oce) + pctsrf(:, is_sic)
     DO i = 1 , klon
-       IF ( abs( fractint(i) - (1. - zmasq(i))) > EPSFRA ) THEN
+       IF ( abs( fractint(i) - (1. - masque(i))) > EPSFRA ) THEN
           print *, 'phyetat0 attention fraction ocean pas ', &
-               'coherente ', i, zmasq(i) , pctsrf(i, is_oce), pctsrf(i, is_sic)
+               'coherente ', i, masque(i) , pctsrf(i, is_oce), pctsrf(i, is_sic)
        ENDIF
     END DO
 
@@ -337,7 +337,7 @@ contains
     rlon(2:klon-1) = pack(spread(rlonv(:iim), 2, jjm - 1), .true.) * rad_to_deg
     rlon(klon) = 0.
 
-    zmasq = pack(mask, dyn_phy)
+    masque = pack(mask, dyn_phy)
     itau_phy = 0
 
   end subroutine phyetat0_new

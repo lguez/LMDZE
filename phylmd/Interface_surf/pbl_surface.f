@@ -34,7 +34,7 @@ contains
     USE histwrite_phy_m, ONLY: histwrite_phy
     USE indicesol, ONLY: epsfra, is_lic, is_oce, is_sic, is_ter, nbsrf
     USE interfoce_lim_m, ONLY: interfoce_lim
-    use phyetat0_m, only: zmasq
+    use phyetat0_m, only: masque
     use stdlevvar_m, only: stdlevvar
     USE suphec_m, ONLY: rd, rg, rsigma
     use time_phylmdz, only: itap
@@ -90,7 +90,7 @@ contains
     ! flux de chaleur sensible (c_p T) (W / m2) (orientation positive
     ! vers le bas) à la surface
 
-    REAL, intent(out):: flux_q(klon, nbsrf) 
+    REAL, intent(out):: flux_q(klon, nbsrf)
     ! flux de vapeur d'eau (kg / m2 / s) à la surface
 
     REAL, intent(out):: flux_u(:, :), flux_v(:, :) ! (klon, nbsrf)
@@ -255,8 +255,8 @@ contains
 
     pctsrf_pot(:, is_ter) = pctsrf(:, is_ter)
     pctsrf_pot(:, is_lic) = pctsrf(:, is_lic)
-    pctsrf_pot(:, is_oce) = 1. - zmasq
-    pctsrf_pot(:, is_sic) = 1. - zmasq
+    pctsrf_pot(:, is_oce) = 1. - masque
+    pctsrf_pot(:, is_sic) = 1. - masque
 
     ! Tester si c'est le moment de lire le fichier:
     if (mod(itap - 1, lmt_pas) == 0) then

@@ -4,7 +4,7 @@ module thermcell_m
 
 contains
 
-  SUBROUTINE thermcell(ngrid, nlay, ptimestep, pplay, pplev, pphi, pu, pv, pt, &
+  SUBROUTINE thermcell(ngrid, nlay, ptimestep, pplay, pplev, pphi, u, v, pt, &
        po, pduadj, pdvadj, pdtadj, pdoadj, fm0, entr0)
 
     ! Calcul du transport vertical dans la couche limite en pr\'esence
@@ -22,26 +22,26 @@ contains
     USE dimphy, ONLY : klev, klon
     USE suphec_m, ONLY : rd, rg, rkappa
 
-    ! arguments:
-
     INTEGER ngrid, nlay
     real ptimestep
-    REAL, intent(in):: pt(ngrid, nlay)
-    real pdtadj(ngrid, nlay)
-    REAL, intent(in):: pu(ngrid, nlay)
-    real pduadj(ngrid, nlay)
-    REAL, intent(in):: pv(ngrid, nlay)
-    real pdvadj(ngrid, nlay)
-    REAL po(ngrid, nlay), pdoadj(ngrid, nlay)
     REAL, intent(in):: pplay(ngrid, nlay)
     real, intent(in):: pplev(ngrid, nlay+1)
     real, intent(in):: pphi(ngrid, nlay)
+    REAL, intent(in):: u(ngrid, nlay)
+    REAL, intent(in):: v(ngrid, nlay)
+    REAL, intent(in):: pt(ngrid, nlay)
+    REAL po(ngrid, nlay)
+    real pduadj(ngrid, nlay)
+    real pdvadj(ngrid, nlay)
+    real pdtadj(ngrid, nlay)
+    real pdoadj(ngrid, nlay)
+    real fm0(klon, klev+1), entr0(klon, klev)
 
+    ! Local:
+    
     integer idetr
     save idetr
     data idetr/3/
-
-    ! local:
 
     INTEGER ig, k, l, lmaxa(klon), lmix(klon)
     ! CR: on remplace lmax(klon, klev+1)
@@ -75,7 +75,7 @@ contains
     real xxx(klon, klev+1)
     real larg_cons(klon, klev+1)
     real larg_detr(klon, klev+1)
-    real fm0(klon, klev+1), entr0(klon, klev), detr(klon, klev)
+    real detr(klon, klev)
     real fm(klon, klev+1), entr(klon, klev)
     real fmc(klon, klev+1)
 
@@ -111,8 +111,8 @@ contains
        DO ig=1, ngrid
           zpspsk(ig, l)=(pplay(ig, l)/pplev(ig, 1))**RKAPPA
           zh(ig, l)=pt(ig, l)/zpspsk(ig, l)
-          zu(ig, l)=pu(ig, l)
-          zv(ig, l)=pv(ig, l)
+          zu(ig, l)=u(ig, l)
+          zv(ig, l)=v(ig, l)
           zo(ig, l)=po(ig, l)
           ztv(ig, l)=zh(ig, l)*(1.+0.61*zo(ig, l))
        end DO

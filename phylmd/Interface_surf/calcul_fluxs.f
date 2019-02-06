@@ -85,8 +85,8 @@ contains
        zcor = 1. / (1. - retv * qsat(i))
        qsat(i) = qsat(i) * zcor
        dq_s_dt(i) = RCPD * FOEDE(tsurf(i), delta, merge(R5IES * RLSTT, &
-            R5LES * RLVTT, delta) / RCPD / (1. + RVTMP2 * q1lay(i)), &
-            qsat(i), zcor) / RLVTT
+            R5LES * RLVTT, delta) / RCPD / (1. + RVTMP2 * q1lay(i)), qsat(i), &
+            zcor) / RLVTT
     ENDDO
 
     coef = cdragh * (min_wind_speed + SQRT(u1lay**2 + v1lay**2)) * p1lay &

@@ -32,7 +32,7 @@ contains
 
   !******************************************
 
-  REAL function FOEDE(T, ICE, P5ARG, QS, PCOARG)
+  pure REAL function FOEDE(T, ICE, P5ARG, QS, PCOARG)
 
     use yoethf_m, only: R4LES, R4IES
 

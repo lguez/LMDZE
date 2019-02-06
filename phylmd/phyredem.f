@@ -19,7 +19,7 @@ contains
     USE dimphy, ONLY: klev, klon
     USE indicesol, ONLY: is_oce, nbsrf
     USE netcdf95, ONLY: nf95_inq_varid, nf95_put_var, nf95_close
-    use phyetat0_m, only: zmasq
+    use phyetat0_m, only: masque
     use phyredem0_m, only: ncid_restartphy
 
     REAL, INTENT(IN):: pctsrf(:, :) ! (klon, nbsrf)
@@ -64,7 +64,7 @@ contains
     PRINT *, 'Call sequence information: phyredem'
 
     call nf95_inq_varid(ncid_restartphy, "masque", varid)
-    call nf95_put_var(ncid_restartphy, varid, zmasq)
+    call nf95_put_var(ncid_restartphy, varid, masque)
 
     call nf95_inq_varid(ncid_restartphy, "pctsrf", varid)
     call nf95_put_var(ncid_restartphy, varid, pctsrf)

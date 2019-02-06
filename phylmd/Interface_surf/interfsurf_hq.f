@@ -131,8 +131,8 @@ contains
        cal = RCPD / soilcap
 
        CALL calcul_fluxs(ts, p1lay, cal, beta, cdragh, ps, qsurf, &
-            radsol + soilflux, temp_air, q1lay, u1lay, v1lay, tAcoef, &
-            qAcoef, tBcoef, qBcoef, tsurf_new, evap, fluxlat, flux_t, dflux_s, &
+            radsol + soilflux, temp_air, q1lay, u1lay, v1lay, tAcoef, qAcoef, &
+            tBcoef, qBcoef, tsurf_new, evap, fluxlat, flux_t, dflux_s, &
             dflux_l, dif_grnd = 0.)
        CALL fonte_neige(is_ter, rain_fall, snow_fall, snow, qsol, &
             tsurf_new, evap, fqcalving, ffonte, run_off_lic_0, run_off_lic)
@@ -162,20 +162,19 @@ contains
        DO ii = 1, size(knindex)
           IF (pctsrf_new_sic(ii) < EPSFRA) then
              snow(ii) = 0.
-             tsurf_new(ii) = RTT - 1.8
+             tsurf(ii) = RTT - 1.8
              tsoil(ii, :) = RTT - 1.8
           else
-             tsurf_new(ii) = ts(ii)
+             tsurf(ii) = ts(ii)
           endif
        enddo
 
-       CALL soil(is_sic, snow, tsurf_new, tsoil, soilcap, soilflux)
+       CALL soil(is_sic, snow, tsurf, tsoil, soilcap, soilflux)
        cal = RCPD / soilcap
-       tsurf = tsurf_new
        beta = 1.
        CALL calcul_fluxs(tsurf, p1lay, cal, beta, cdragh, ps, qsurf, &
-            radsol + soilflux, temp_air, q1lay, u1lay, v1lay, tAcoef, &
-            qAcoef, tBcoef, qBcoef, tsurf_new, evap, fluxlat, flux_t, dflux_s, &
+            radsol + soilflux, temp_air, q1lay, u1lay, v1lay, tAcoef, qAcoef, &
+            tBcoef, qBcoef, tsurf_new, evap, fluxlat, flux_t, dflux_s, &
             dflux_l, dif_grnd = 1. / tau_gl)
        CALL fonte_neige(is_sic, rain_fall, snow_fall, snow, qsol, &
             tsurf_new, evap, fqcalving, ffonte, run_off_lic_0, run_off_lic)
@@ -189,14 +188,14 @@ contains
 
        z0_new = SQRT(0.002**2 + rugoro**2)
     case (is_lic)
-       ! Surface "glacier continentaux" appel a l'interface avec le sol
+       ! Surface "glacier continentaux" appel \`a l'interface avec le sol
 
        CALL soil(is_lic, snow, ts, tsoil, soilcap, soilflux)
        cal = RCPD / soilcap
        beta = 1.
        call calcul_fluxs(ts, p1lay, cal, beta, cdragh, ps, qsurf, &
-            radsol + soilflux, temp_air, q1lay, u1lay, v1lay, tAcoef, &
-            qAcoef, tBcoef, qBcoef, tsurf_new, evap, fluxlat, flux_t, dflux_s, &
+            radsol + soilflux, temp_air, q1lay, u1lay, v1lay, tAcoef, qAcoef, &
+            tBcoef, qBcoef, tsurf_new, evap, fluxlat, flux_t, dflux_s, &
             dflux_l, dif_grnd = 0.)
        call fonte_neige(is_lic, rain_fall, snow_fall, snow, qsol, &
             tsurf_new, evap, fqcalving, ffonte, run_off_lic_0, run_off_lic)

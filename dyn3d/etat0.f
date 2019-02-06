@@ -32,7 +32,7 @@ contains
     use netcdf95, only: nf95_close, nf95_get_var, nf95_gw_var, nf95_put_var, &
          nf95_inq_varid, nf95_open
     use nr_util, only: pi, assert
-    use phyetat0_m, only: zmasq, phyetat0_new
+    use phyetat0_m, only: masque, phyetat0_new
     use phyredem0_m, only: phyredem0, ncid_restartphy
     use phyredem_m, only: phyredem
     use q_sat_m, only: q_sat
@@ -84,7 +84,7 @@ contains
     INTEGER iml_lic, jml_lic
     INTEGER ncid, varid
     REAL, ALLOCATABLE:: dlon_lic(:), dlat_lic(:)
-    REAL, ALLOCATABLE:: fraclic(:, :) ! fraction land ice
+    REAL, ALLOCATABLE:: landice(:, :) ! fraction land ice
     REAL flic_tmp(iim + 1, jjm + 1) ! fraction land ice temporary
 
     INTEGER l, ji
@@ -207,8 +207,8 @@ contains
     jml_lic = size(dlat_lic)
 
     call nf95_inq_varid(ncid, 'landice', varid)
-    ALLOCATE(fraclic(iml_lic, jml_lic))
-    call nf95_get_var(ncid, varid, fraclic)
+    ALLOCATE(landice(iml_lic, jml_lic))
+    call nf95_get_var(ncid, varid, landice)
 
     call nf95_close(ncid)
 
@@ -225,7 +225,7 @@ contains
        dlat_lic = dlat_lic * pi/ 180.
     ENDIF
 
-    flic_tmp(:iim, :) = grille_m(dlon_lic, dlat_lic, fraclic, rlonv(:iim), &
+    flic_tmp(:iim, :) = grille_m(dlon_lic, dlat_lic, landice, rlonv(:iim), &
          rlatu)
     flic_tmp(iim + 1, :) = flic_tmp(1, :)
 
@@ -235,24 +235,24 @@ contains
     
     ! Ad\'equation avec le maque terre/mer :
     WHERE (pctsrf(:, is_lic) < EPSFRA) pctsrf(:, is_lic) = 0.
-    WHERE (zmasq < EPSFRA) pctsrf(:, is_lic) = 0.
-    where (zmasq <= EPSFRA) pctsrf(:, is_ter) = zmasq
-    where (zmasq > EPSFRA)
-       where (pctsrf(:, is_lic) >= zmasq)
-          pctsrf(:, is_lic) = zmasq
+    WHERE (masque < EPSFRA) pctsrf(:, is_lic) = 0.
+    where (masque <= EPSFRA) pctsrf(:, is_ter) = masque
+    where (masque > EPSFRA)
+       where (pctsrf(:, is_lic) >= masque)
+          pctsrf(:, is_lic) = masque
           pctsrf(:, is_ter) = 0.
        elsewhere
-          pctsrf(:, is_ter) = zmasq - pctsrf(:, is_lic)
+          pctsrf(:, is_ter) = masque - pctsrf(:, is_lic)
           where (pctsrf(:, is_ter) < EPSFRA)
              pctsrf(:, is_ter) = 0.
-             pctsrf(:, is_lic) = zmasq
+             pctsrf(:, is_lic) = masque
           end where
        end where
     end where
 
     ! Sous-surface oc\'ean et glace de mer (pour d\'emarrer on met glace
     ! de mer \`a 0) :
-    pctsrf(:, is_oce) = 1. - zmasq
+    pctsrf(:, is_oce) = 1. - masque
     WHERE (pctsrf(:, is_oce) < EPSFRA) pctsrf(:, is_oce) = 0.
 
     ! V\'erification que la somme des sous-surfaces vaut 1 :

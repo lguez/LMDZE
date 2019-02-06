@@ -145,7 +145,8 @@ contains
     ! "physiq".
 
     REAL, save:: radsol(klon)
-    ! bilan radiatif net au sol (W/m2), positif vers le bas
+    ! Bilan radiatif net au sol (W/m2), positif vers le bas. Must be
+    ! saved because radlwsw is not called at every time step.
     
     REAL, save:: ftsol(klon, nbsrf) ! skin temperature of surface fraction, in K
 
@@ -914,8 +915,8 @@ contains
 
     ! diag. bilKP
 
-    CALL transp_lay(paprs, t_seri, q_seri, u_seri, v_seri, zphi, &
-         ve_lay, vq_lay, ue_lay, uq_lay)
+    CALL transp_lay(paprs, t_seri, q_seri, u_seri, v_seri, zphi, ve_lay, &
+         vq_lay, ue_lay, uq_lay)
 
     ! Accumuler les variables a stocker dans les fichiers histoire:
 

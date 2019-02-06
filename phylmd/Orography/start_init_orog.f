@@ -90,8 +90,8 @@ CONTAINS
     ALLOCATE(lon_rad(iml_rel))
     ALLOCATE(lat_rad(jml_rel))
 
-    CALL conf_dat2d(lon_ini, lat_ini, lon_rad, lat_rad, relief , &
-         interbar=.FALSE.)
+    CALL conf_dat2d(lon_ini, lat_ini, lon_rad, lat_rad, relief, &
+         interbar = .FALSE.)
 
     print *, 'Compute all the parameters needed for the gravity wave drag code'
     CALL grid_noro(lon_rad, lat_rad, relief, rlonv, rlatu, phis, zmea_2d, &

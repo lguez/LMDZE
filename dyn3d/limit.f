@@ -27,7 +27,7 @@ contains
          NF90_UNLIMITED
     use nr_util, only: assert
     use numer_rec_95, only: spline, splint
-    use phyetat0_m, only: zmasq
+    use phyetat0_m, only: masque
     use start_init_orog_m, only: mask
     use unit_nml_m, only: unit_nml
 
@@ -249,18 +249,18 @@ contains
        pctsrf(:, is_sic) = max(phy_ice - pctsrf(:, is_lic), 0.)
        ! Il y a des cas o\`u il y a de la glace dans landiceref et
        ! pas dans AMIP
-       WHERE (1. - zmasq < EPSFRA)
+       WHERE (1. - masque < EPSFRA)
           pctsrf(:, is_sic) = 0.
           pctsrf(:, is_oce) = 0.
        elsewhere
-          where (pctsrf(:, is_sic) >= 1 - zmasq)
-             pctsrf(:, is_sic) = 1. - zmasq
+          where (pctsrf(:, is_sic) >= 1 - masque)
+             pctsrf(:, is_sic) = 1. - masque
              pctsrf(:, is_oce) = 0.
           ELSEwhere
-             pctsrf(:, is_oce) = 1. - zmasq - pctsrf(:, is_sic)
+             pctsrf(:, is_oce) = 1. - masque - pctsrf(:, is_sic)
              where (pctsrf(:, is_oce) < EPSFRA)
                 pctsrf(:, is_oce) = 0.
-                pctsrf(:, is_sic) = 1 - zmasq
+                pctsrf(:, is_sic) = 1 - masque
              end where
           end where
        end where
