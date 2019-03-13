@@ -219,7 +219,7 @@ contains
     real dflux_t(klon) ! derivee du flux de chaleur sensible au sol
     REAL, save:: dlw(klon) ! derivative of infra-red flux
     REAL bils(klon) ! bilan de chaleur au sol
-    REAL fder(klon) ! Derive de flux (sensible et latente)
+    REAL fder(klon) ! d\'erive de flux (sensible et latente)
     REAL ve(klon) ! integr. verticale du transport meri. de l'energie
     REAL vq(klon) ! integr. verticale du transport meri. de l'eau
     REAL ue(klon) ! integr. verticale du transport zonal de l'energie
@@ -265,7 +265,7 @@ contains
     REAL, save:: topsw(klon), toplw(klon), solsw(klon)
 
     REAL, save:: sollw(klon) ! surface net downward longwave flux, in W m-2
-    real, save:: sollwdown(klon) ! downward LW flux at surface
+    real, save:: sollwdown(klon) ! downwelling longwave flux at surface
     REAL, save:: topsw0(klon), toplw0(klon), solsw0(klon), sollw0(klon)
     REAL, save:: albpla(klon)
 
@@ -655,7 +655,7 @@ contains
        z_factor = (z_avant - (rain_con + snow_con) * dtphys) / z_apres
        DO k = 1, llm
           DO i = 1, klon
-             IF (z_factor(i) > 1. + 1E-8 .OR. z_factor(i) < 1. - 1E-8) THEN
+             IF (z_factor(i) /= 1.) THEN
                 q_seri(i, k) = q_seri(i, k) * z_factor(i)
              ENDIF
           ENDDO

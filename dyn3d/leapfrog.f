@@ -36,7 +36,6 @@ contains
     use nr_util, only: assert
     use writehist_m, only: writehist
 
-    ! Variables dynamiques:
     REAL, intent(inout):: ucov(:, :, :) ! (iim + 1, jjm + 1, llm) vent covariant
     REAL, intent(inout):: vcov(:, :, :) ! (iim + 1, jjm, llm) ! vent covariant
 
@@ -51,8 +50,6 @@ contains
     ! mass fractions of advected fields
 
     ! Local:
-
-    ! Variables dynamiques:
 
     REAL pks(iim + 1, jjm + 1) ! exner au sol
     REAL pk(iim + 1, jjm + 1, llm) ! exner au milieu des couches
