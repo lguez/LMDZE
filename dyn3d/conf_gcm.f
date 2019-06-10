@@ -15,7 +15,7 @@ module conf_gcm_m
   ! frequence du groupement des flux (en pas de temps) 
 
   integer, protected:: iconser = 240
-  ! number of time steps between output of control variables
+  ! number of time steps of dynamics between output of control variables
 
   integer, protected:: iphysiq = 5
   ! number of time steps of dynamics between calls to physics

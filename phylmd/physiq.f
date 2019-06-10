@@ -1016,6 +1016,7 @@ contains
     CALL histwrite_phy("d_t_ec", d_t_ec)
     CALL histwrite_phy("dtsw0", heat0 / 86400.)
     CALL histwrite_phy("dtlw0", - cool0 / 86400.)
+    call histwrite_phy("pmflxr", pmflxr(:, :llm))
     CALL histwrite_phy("msnow", sum(fsnow * pctsrf, dim = 2))
     call histwrite_phy("qsurf", sum(fqsurf * pctsrf, dim = 2))
     call histwrite_phy("flat", zxfluxlat)

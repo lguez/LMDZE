@@ -33,7 +33,7 @@ contains
     use netcdf95, only: nf95_get_att, nf95_get_var, nf95_inq_varid, &
          nf95_inquire_variable, NF95_OPEN
 
-    REAL, intent(out):: pctsrf(klon, nbsrf)
+    REAL, intent(out):: pctsrf(:, :) ! (klon, nbsrf)
     REAL, intent(out):: ftsol(klon, nbsrf)
     REAL, intent(out):: ftsoil(klon, nsoilmx, nbsrf)
     REAL, intent(out):: qsurf(klon, nbsrf)
@@ -70,7 +70,6 @@ contains
     integer, intent(out):: ncid_startphy
 
     ! Local:
-    REAL fractint(klon)
     INTEGER varid, ndims
     INTEGER ierr, i
 
@@ -111,18 +110,20 @@ contains
 
     ! Verification de l'adequation entre le masque et les sous-surfaces
 
-    fractint = pctsrf(:, is_ter) + pctsrf(:, is_lic)
     DO i = 1 , klon
-       IF ( abs(fractint(i) - masque(i) ) > EPSFRA ) THEN
-          print *, 'phyetat0: attention fraction terre pas ', &
-               'coherente ', i, masque(i), pctsrf(i, is_ter), pctsrf(i, is_lic)
+       IF (abs(pctsrf(i, is_ter) + pctsrf(i, is_lic) - masque(i)) > EPSFRA) THEN
+          print *, &
+               'phyetat0: pctsrf does not agree with masque for continents', &
+               i, masque(i), pctsrf(i, is_ter), pctsrf(i, is_lic)
        ENDIF
     END DO
-    fractint = pctsrf(:, is_oce) + pctsrf(:, is_sic)
+
     DO i = 1 , klon
-       IF ( abs( fractint(i) - (1. - masque(i))) > EPSFRA ) THEN
-          print *, 'phyetat0 attention fraction ocean pas ', &
-               'coherente ', i, masque(i) , pctsrf(i, is_oce), pctsrf(i, is_sic)
+       IF (abs(pctsrf(i, is_oce) + pctsrf(i, is_sic) - (1. - masque(i))) &
+            > EPSFRA) THEN
+          print *, 'phyetat0: pctsrf does not agree with masque for ocean ', &
+               'and sea-ice', i, masque(i) , pctsrf(i, is_oce), &
+               pctsrf(i, is_sic)
        ENDIF
     END DO
 

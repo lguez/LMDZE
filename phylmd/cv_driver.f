@@ -5,7 +5,7 @@ module cv_driver_m
 contains
 
   SUBROUTINE cv_driver(t1, q1, qs1, u1, v1, p1, ph1, iflag1, ft1, fq1, fu1, &
-       fv1, precip1, VPrecip1, sig1, w01, icb1, inb1, Ma1, upwd1, dnwd1, &
+       fv1, rain, VPrecip1, sig1, w01, icb1, inb1, Ma1, upwd1, dnwd1, &
        qcondc1, cape1, da1, phi1, mp1)
 
     ! From LMDZ4/libf/phylmd/cv_driver.F, version 1.3, 2005/04/15 12:36:17
@@ -76,7 +76,7 @@ contains
     real, intent(out):: fu1(klon, klev), fv1(klon, klev)
     ! forcing (tendency) of zonal and meridional velocity (m/s^2)
 
-    real, intent(out):: precip1(klon) ! convective precipitation rate (mm/day)
+    real, intent(out):: rain(klon) ! convective precipitation rate (mm/day)
 
     real, intent(out):: VPrecip1(klon, klev + 1)
     ! vertical profile of convective precipitation (kg/m2/s)
@@ -218,7 +218,7 @@ contains
        end do
     end do
 
-    precip1 = 0.
+    rain = 0.
     cape1 = 0.
     VPrecip1(:, klev + 1) = 0.
 
@@ -270,7 +270,7 @@ contains
        CALL cv30_tracer(klon, ncum, klev, ment, sij, da, phi)
        CALL cv30_uncompress(idcum, iflag, precip, VPrecip, sig, w0, ft, fq, &
             fu, fv, inb, Ma, upwd, dnwd, qcondc, cape, da, phi, mp, iflag1, &
-            precip1, VPrecip1, sig1, w01, ft1, fq1, fu1, fv1, inb1, Ma1, &
+            rain, VPrecip1, sig1, w01, ft1, fq1, fu1, fv1, inb1, Ma1, &
             upwd1, dnwd1, qcondc1, cape1, da1, phi1, mp1)
     ENDIF
 

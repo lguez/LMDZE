@@ -16,18 +16,84 @@ src_test_orbite = test_orbite.f orbite.f YOMCST.f unit_nml_m.f
 
 sources := $(sort ${src_ce0l} ${src_gcm} ${src_test_ozonecm} ${src_test_inter_barxy} ${src_test_fxhyp} ${src_test_inifilr} ${src_test_orbite})
 
-netcdf95_dir = ${HOME}/Compil_prod/NetCDF95_gfortran_debug
-nr_util_dir = ${HOME}/Compil_prod/NR_util_gfortran_debug
-numer_rec_95_dir = ${HOME}/Compil_prod/Numer_Rec_95_gfortran_debug
-jumble_dir = ${HOME}/Compil_prod/Jumble_gfortran_debug
+netcdf95_dir = ${HOME}/build/Libraries_debug/NetCDF95
+nr_util_dir = ${HOME}/build/Libraries_debug/NR_util
+numer_rec_95_dir = ${HOME}/build/Libraries_debug/Numer_Rec_95
+jumble_dir = ${HOME}/build/Libraries_debug/Jumble
 
-include ${general_compiler_options_dir}/settings.mk
+VPATH := ${makefile_dir}
+
+# 2. Compiler-dependent part
+
+mode = debug
+
+comma:= ,
+empty:=
+space:= $(empty) $(empty)
+CPPFLAGS = $(addprefix -D, $(subst ${comma},${space},${cpp_macros}))
+
+inc_dir_list = ${HOME}/build/Libraries_debug/modules /usr/include
+
+lib_dir_list = ${contour_531_dir} ${fortrangis_dir} ${geometry_dir} ${gpc_f_dir} ${jumble_dir} ${netcdf95_dir} ${nr_util_dir} ${numer_rec_95_dir} ${shapelib_03_dir} ${water_dir} ${HOME}/.local/lib
+
+# Include flags:
+FFLAGS := $(addprefix -I, ${inc_dir_list})
+
+# Fortran language options:
+FFLAGS += -ffree-form -std=f2003
+
+# Error and warning options:
+FFLAGS += -fmax-errors=1 -pedantic -Wall -Wcharacter-truncation -Wunused-parameter -Wno-conversion -Wno-integer-division
+
+# Debugging options:
+FFLAGS += -fbacktrace -g -ffpe-trap=invalid,zero,overflow
+
+# Code generation options:
+FFLAGS += -fcheck=bounds,do,mem,pointer,recursion -fpic -finit-real=nan
+
+# Optimization options:
+FFLAGS += -O0
+
+LDLIBS = $(addprefix -L, ${lib_dir_list}) $(addprefix -l, ${lib_list})
+version_flag = --version
+
+# 3. General rules
+
+SHELL = bash
+
+%: %.o
+	@echo "Linking $@..."
+	$(LINK.o) $^ $(LOADLIBES) $(LDLIBS) -o $@
+
+%.o: %.f
+	@echo "Building $@..."
+	$(COMPILE.f) $(OUTPUT_OPTION) $<
+
+%: %.f
+	@echo "Compiling and linking $@..."
+	$(LINK.f) $^ $(LOADLIBES) $(LDLIBS) -o $@
+
+LINK.o = $(FC) $(LDFLAGS) $(TARGET_ARCH)
+.DELETE_ON_ERROR:
+.PHONY: all clean clobber depend
+all: log
+
+TAGS: ${sources}
+	ctags -e --language-force=fortran $^
+
+log:
+	hostname >$@
+	${FC} ${version_flag} >>$@ 2>&1
+	@echo -e "\nFC = ${FC}\n\nCPPFLAGS = ${CPPFLAGS}\n\nFFLAGS = ${FFLAGS}\n\nLDLIBS = ${LDLIBS}\n\nLDFLAGS = ${LDFLAGS}\n\nldflags_lib_dyn = ${ldflags_lib_dyn}" >>$@
+
+clobber: clean
+	rm -f *.mod ${makefile_dir}/depend.mk TAGS
 
 VPATH += $(addprefix ${makefile_dir}/, $(shell cat ${makefile_dir}/directories))
 cpp_macros = CPP_IIM=16,CPP_JJM=12,CPP_LLM=11
 lib_list = numer_rec_95 jumble nr_util netcdf95 netcdff
 
-# 2. Objects and executable files
+# 4. Objects and executable files
 
 obj_ce0l := $(addsuffix .o, $(basename ${src_ce0l}))
 obj_gcm := $(addsuffix .o, $(basename ${src_gcm}))
@@ -39,7 +105,7 @@ obj_test_orbite := $(addsuffix .o, $(basename ${src_test_orbite}))
 objects := $(addsuffix .o, $(basename ${sources}))
 execut = ce0l gcm test_ozonecm test_inter_barxy test_fxhyp test_inifilr test_orbite
 
-# 3. Rules
+# 5. Specific rules
 
 all: ${execut} log
 ce0l: ${obj_ce0l}

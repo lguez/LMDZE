@@ -190,9 +190,8 @@ contains
                    weighx = MAX(0., min(zbordest, zbordoue, zlenx))
                    IF (weighx /= 0) THEN
                       num_tot(ii, jj) = num_tot(ii, jj) + 1.
-                      if (zusn(i, j) >= 1.) then
-                         num_lan(ii, jj) = num_lan(ii, jj) + 1.
-                      end if
+                      if (zusn(i, j) >= 1.) &
+                           num_lan(ii, jj) = num_lan(ii, jj) + 1.
                       weight(ii, jj) = weight(ii, jj) + weighx * weighy
                       zxtzx(ii, jj) = zxtzx(ii, jj) &
                            + zxtzxusn(i, j) * weighx * weighy

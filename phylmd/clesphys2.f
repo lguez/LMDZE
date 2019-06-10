@@ -4,21 +4,22 @@ module clesphys2
 
   implicit none
 
-  LOGICAL:: new_oliq = .TRUE.
+  LOGICAL, protected:: new_oliq = .TRUE.
   ! Permet de mettre en route la nouvelle parametrisation de l'eau liquide
 
   ! Pour l'orographie:
-  LOGICAL:: ok_orodr = .TRUE.
-  LOGICAL:: ok_orolf = .TRUE.
+  LOGICAL, protected:: ok_orodr = .TRUE.
+  LOGICAL, protected:: ok_orolf = .TRUE.
 
-  LOGICAL:: ok_limitvrai = .FALSE.
+  LOGICAL, protected:: ok_limitvrai = .FALSE.
   ! On peut forcer le modele a lire le fichier SST de la bonne
   ! annee.
 
-  INTEGER:: nbapp_rad = 12
+  INTEGER, protected:: nbapp_rad = 12
   ! nombre d'appels des routines de rayonnements par jour
 
-  logical:: conv_emanuel = .true. ! convection scheme of Emanuel, else Tiedtke
+  logical, protected:: conv_emanuel = .true.
+  ! convection scheme of Emanuel, else Tiedtke
 
 contains
 

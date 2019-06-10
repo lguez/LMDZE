@@ -43,7 +43,7 @@ contains
     real cape(klon) ! output (J / kg)
     INTEGER, intent(out):: iflag(klon)
     REAL, intent(out):: qcondc(klon, klev) ! in-cloud water content
-    REAL pmflxr(klon, klev + 1)
+    REAL, intent(out):: pmflxr(klon, klev + 1)
     REAL, intent(out):: da(:, :) ! (klon, klev)
     REAL, intent(out):: phi(:, :, :) ! (klon, klev, klev)
 

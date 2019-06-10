@@ -39,7 +39,7 @@ contains
     USE suphec_m, ONLY: rd, rg, rsigma
     use time_phylmdz, only: itap
 
-    REAL, INTENT(inout):: pctsrf(klon, nbsrf)
+    REAL, INTENT(inout):: pctsrf(:, :) ! (klon, nbsrf)
     ! pourcentages de surface de chaque maille
 
     REAL, INTENT(IN):: t(klon, klev) ! temperature (K)

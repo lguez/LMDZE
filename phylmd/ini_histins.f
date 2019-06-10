@@ -265,6 +265,8 @@ contains
        CALL histdef(nid_ins, "dtlw0", "CS LW radiation dT", &
             "K/s", iim, jjm + 1, nhori, llm, 1, llm, nvert, "inst(X)", &
             zsto, zout)
+       CALL histdef(nid_ins, "pmflxr", "convective precipitation liquid", "", &
+            iim, jjm + 1, nhori, llm, 1, llm, nvert, "inst(X)", zsto, zout)
 
        if (ok_newmicro) then
           CALL histdef(nid_ins, "re", "cloud droplet effective radius", &
