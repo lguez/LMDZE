@@ -12,7 +12,7 @@ src_test_ozonecm := $(shell cat ${makefile_dir}/src_test_ozonecm)
 src_test_inter_barxy := $(shell cat ${makefile_dir}/src_test_inter_barxy)
 src_test_fxhyp := $(shell cat ${makefile_dir}/src_test_fxhyp)
 src_test_inifilr := $(shell cat ${makefile_dir}/src_test_inifilr)
-src_test_orbite = test_orbite.f orbite.f YOMCST.f unit_nml_m.f
+src_test_orbite = test_orbite.f90 orbite.f90 YOMCST.f90 unit_nml_m.f90
 
 sources := $(sort ${src_ce0l} ${src_gcm} ${src_test_ozonecm} ${src_test_inter_barxy} ${src_test_fxhyp} ${src_test_inifilr} ${src_test_orbite})
 
@@ -40,7 +40,7 @@ lib_dir_list = ${contour_531_dir} ${fortrangis_dir} ${geometry_dir} ${gpc_f_dir}
 FFLAGS := $(addprefix -I, ${inc_dir_list})
 
 # Fortran language options:
-FFLAGS += -ffree-form -std=f2003
+FFLAGS += -std=f2003
 
 # Error and warning options:
 FFLAGS += -fmax-errors=1 -pedantic -Wall -Wcharacter-truncation -Wunused-parameter -Wno-conversion -Wno-integer-division
@@ -65,13 +65,13 @@ SHELL = bash
 	@echo "Linking $@..."
 	$(LINK.o) $^ $(LOADLIBES) $(LDLIBS) -o $@
 
-%.o: %.f
+%.o: %.f90
 	@echo "Building $@..."
 	$(COMPILE.f) $(OUTPUT_OPTION) $<
 
-%: %.f
-	@echo "Compiling and linking $@..."
-	$(LINK.f) $^ $(LOADLIBES) $(LDLIBS) -o $@
+%.o: %.F90
+	@echo "Building $@..."
+	$(COMPILE.F) $(OUTPUT_OPTION) $<
 
 LINK.o = $(FC) $(LDFLAGS) $(TARGET_ARCH)
 .DELETE_ON_ERROR:
@@ -117,7 +117,7 @@ test_inifilr: ${obj_test_inifilr}
 test_orbite: ${obj_test_orbite}
 
 depend ${makefile_dir}/depend.mk:
-	makedepf90 -free -Wmissing -Wconfused $(addprefix -I, ${VPATH}) -nosrc $(addprefix -u , netcdf numer_rec_95 netcdf95 nr_util jumble) ${sources} >${makefile_dir}/depend.mk
+	makedepf90 -Wmissing -Wconfused $(addprefix -I, ${VPATH}) -nosrc $(addprefix -u , netcdf numer_rec_95 netcdf95 nr_util jumble) ${sources} >${makefile_dir}/depend.mk
 
 clean:
 	rm -f ${execut} ${objects} log
