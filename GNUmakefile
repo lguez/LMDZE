@@ -69,10 +69,6 @@ SHELL = bash
 	@echo "Building $@..."
 	$(COMPILE.f) $(OUTPUT_OPTION) $<
 
-%.o: %.F90
-	@echo "Building $@..."
-	$(COMPILE.F) $(OUTPUT_OPTION) $<
-
 LINK.o = $(FC) $(LDFLAGS) $(TARGET_ARCH)
 .DELETE_ON_ERROR:
 .PHONY: all clean clobber depend
