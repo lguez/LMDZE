@@ -6,7 +6,7 @@ contains
 
   SUBROUTINE pbl_surface(pctsrf, t, q, u, v, julien, mu0, ftsol, cdmmax, &
        cdhmax, ftsoil, qsol, paprs, play, fsnow, fqsurf, falbe, fluxlat, &
-       rain_fall, snow_fall, frugs, agesno, rugoro, d_t, d_q, d_u, d_v, d_ts, &
+       rain_fall, snow_fall, frugs, agesno, rugoro, d_t, d_q, d_u, d_v, &
        flux_t, flux_q, flux_u, flux_v, cdragh, cdragm, q2, dflux_t, dflux_q, &
        coefh, t2m, q2m, u10m_srf, v10m_srf, pblh, capcl, oliqcl, cteicl, pblt, &
        therm, plcl, fqcalving, ffonte, run_off_lic_0, albsol, sollw, solsw, &
@@ -48,7 +48,7 @@ contains
     INTEGER, INTENT(IN):: julien ! jour de l'annee en cours
     REAL, intent(in):: mu0(klon) ! cosinus de l'angle solaire zenithal     
 
-    REAL, INTENT(IN):: ftsol(:, :) ! (klon, nbsrf)
+    REAL, INTENT(INout):: ftsol(:, :) ! (klon, nbsrf)
     ! skin temperature of surface fraction, in K
 
     REAL, INTENT(IN):: cdmmax, cdhmax ! seuils cdrm, cdrh
@@ -83,8 +83,6 @@ contains
 
     REAL, intent(out):: d_u(klon, klev), d_v(klon, klev)
     ! changement pour "u" et "v"
-
-    REAL, intent(out):: d_ts(:, :) ! (klon, nbsrf) variation of ftsol
 
     REAL, intent(out):: flux_t(klon, nbsrf)
     ! flux de chaleur sensible (c_p T) (W / m2) (orientation positive
@@ -144,6 +142,7 @@ contains
 
     ! Local:
 
+    REAL d_ts(klon, nbsrf) ! variation of ftsol
     REAL fsollw(klon, nbsrf) ! bilan flux IR pour chaque sous-surface
     REAL fsolsw(klon, nbsrf) ! flux solaire absorb\'e pour chaque sous-surface
 
@@ -507,6 +506,11 @@ contains
     pctsrf(:, is_sic) = pctsrf_new_sic
 
     CALL histwrite_phy("run_off_lic", run_off_lic)
+    ftsol = ftsol + d_ts ! update surface temperature
+    CALL histwrite_phy("dtsvdfo", d_ts(:, is_oce))
+    CALL histwrite_phy("dtsvdft", d_ts(:, is_ter))
+    CALL histwrite_phy("dtsvdfg", d_ts(:, is_lic))
+    CALL histwrite_phy("dtsvdfi", d_ts(:, is_sic))
 
   END SUBROUTINE pbl_surface
 

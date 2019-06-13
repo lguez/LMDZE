@@ -41,8 +41,7 @@ contains
     USE hgardfou_m, ONLY: hgardfou
     USE histsync_m, ONLY: histsync
     USE histwrite_phy_m, ONLY: histwrite_phy
-    USE indicesol, ONLY: clnsurf, epsfra, is_lic, is_oce, is_sic, is_ter, &
-         nbsrf
+    USE indicesol, ONLY: clnsurf, epsfra, nbsrf
     USE ini_histins_m, ONLY: ini_histins, nid_ins
     use lift_noro_m, only: lift_noro
     use netcdf95, only: NF95_CLOSE
@@ -335,7 +334,6 @@ contains
     real rain_lsc(klon)
     REAL snow_con(klon) ! neige (mm / s)
     real snow_lsc(klon)
-    REAL d_ts(klon, nbsrf) ! variation of ftsol
 
     REAL d_u_vdf(klon, llm), d_v_vdf(klon, llm)
     REAL d_t_vdf(klon, llm), d_q_vdf(klon, llm)
@@ -544,10 +542,10 @@ contains
     CALL pbl_surface(pctsrf, t_seri, q_seri, u_seri, v_seri, julien, mu0, &
          ftsol, cdmmax, cdhmax, ftsoil, qsol, paprs, play, fsnow, fqsurf, &
          falbe, fluxlat, rain_fall, snow_fall, frugs, agesno, rugoro, d_t_vdf, &
-         d_q_vdf, d_u_vdf, d_v_vdf, d_ts, flux_t, flux_q, flux_u, flux_v, &
-         cdragh, cdragm, q2, dflux_t, dflux_q, coefh, t2m, q2m, u10m_srf, &
-         v10m_srf, pblh, capCL, oliqCL, cteiCL, pblT, therm, plcl, fqcalving, &
-         ffonte, run_off_lic_0, albsol, sollw, solsw, tsol)
+         d_q_vdf, d_u_vdf, d_v_vdf, flux_t, flux_q, flux_u, flux_v, cdragh, &
+         cdragm, q2, dflux_t, dflux_q, coefh, t2m, q2m, u10m_srf, v10m_srf, &
+         pblh, capCL, oliqCL, cteiCL, pblT, therm, plcl, fqcalving, ffonte, &
+         run_off_lic_0, albsol, sollw, solsw, tsol)
 
     ! Incr\'ementation des flux
 
@@ -565,7 +563,6 @@ contains
     ENDDO
 
     call assert(abs(sum(pctsrf, dim = 2) - 1.) <= EPSFRA, 'physiq: pctsrf')
-    ftsol = ftsol + d_ts ! update surface temperature
     tsol = sum(ftsol * pctsrf, dim = 2)
     zxfluxlat = sum(fluxlat * pctsrf, dim = 2)
     zt2m = sum(t2m * pctsrf, dim = 2)
@@ -990,10 +987,6 @@ contains
     CALL histwrite_phy("bils", bils)
     CALL histwrite_phy("sens", sens)
     CALL histwrite_phy("fder", fder)
-    CALL histwrite_phy("dtsvdfo", d_ts(:, is_oce))
-    CALL histwrite_phy("dtsvdft", d_ts(:, is_ter))
-    CALL histwrite_phy("dtsvdfg", d_ts(:, is_lic))
-    CALL histwrite_phy("dtsvdfi", d_ts(:, is_sic))
     CALL histwrite_phy("zxfqcalving", sum(fqcalving * pctsrf, dim = 2))
     CALL histwrite_phy("albs", albsol)
     CALL histwrite_phy("tro3", wo * dobson_u * 1e3 / zmasse / rmo3 * md)
