@@ -10,7 +10,7 @@ contains
 
     use comconst, only: dtphys
 
-    REAL, intent(inout):: agesno(:) ! (knon)
+    REAL, intent(inout):: agesno(:) ! (knon) age of snow, in days
     real, intent(out):: alb_neig(:) ! (knon)
     real, intent(in):: snow_fall(:) !(knon)
 
@@ -20,8 +20,8 @@ contains
     alb_neig = 0.55 + 0.3 * EXP(- agesno / 5.)
 
     ! Modulation en fonction de l'\^age de la neige :
-    agesno = max((agesno + (1. - agesno / 50.) * dtphys / 86400.) &
-         * EXP(- MAX(0., snow_fall) * dtphys / 0.3), 0.)
+    agesno = (agesno + (1. - agesno / 50.) * dtphys / 86400.) &
+         * EXP(- snow_fall * dtphys / 0.3)
 
   END SUBROUTINE albsno
 

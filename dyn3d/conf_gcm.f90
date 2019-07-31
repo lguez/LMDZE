@@ -18,7 +18,8 @@ module conf_gcm_m
   ! number of time steps of dynamics between output of control variables
 
   integer, protected:: iphysiq = 5
-  ! number of time steps of dynamics between calls to physics
+  ! Number of time steps of dynamics between calls to physics. Must be
+  ! >= 1. 1 means one call to physics at each time step of dynamics.
 
   logical, protected:: raz_date = .false.
   ! prise en compte de la date initiale de la namelist et remise \`a
@@ -71,6 +72,10 @@ contains
     print *, "Enter namelist 'conf_gcm_nml'."
     read(unit=*, nml=conf_gcm_nml)
     write(unit_nml, nml=conf_gcm_nml)
+
+    if (iphysiq <= 0 .or. iperiod <= 0 .or. day_step <= 0) &
+         call abort_gcm("conf_gcm", &
+         "iphysiq <= 0 or iperiod <= 0 or day_step <= 0")
 
     IF (MOD(day_step, iperiod) /= 0) call abort_gcm("conf_gcm", &
          'Il faut choisir un nombre de pas par jour multiple de "iperiod".')

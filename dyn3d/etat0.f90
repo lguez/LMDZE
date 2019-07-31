@@ -63,7 +63,7 @@ contains
 
     real qsat(iim + 1, jjm + 1, llm) ! mass fraction of saturating water vapor
     REAL qsolsrf(klon, nbsrf), fsnow(klon, nbsrf) 
-    REAL albe(klon, nbsrf)
+    REAL falbe(klon, nbsrf)
     REAL tsoil(klon, nsoilmx, nbsrf) 
     REAL null_array(klon)
     REAL solsw(klon), sollw(klon)
@@ -278,10 +278,10 @@ contains
 
     ! Initialisations :
     fsnow = 0.
-    albe(:, is_ter) = 0.08
-    albe(:, is_lic) = 0.6
-    albe(:, is_oce) = 0.5
-    albe(:, is_sic) = 0.6
+    falbe(:, is_ter) = 0.08
+    falbe(:, is_lic) = 0.6
+    falbe(:, is_oce) = 0.5
+    falbe(:, is_sic) = 0.6
     qsolsrf = 150.
     tsoil = spread(spread(pack(tsol_2d, dyn_phy), 2, nsoilmx), 3, nbsrf)
     solsw = 165.
@@ -307,7 +307,7 @@ contains
     call nf95_put_var(ncid_restartphy, varid, null_array)
 
     call phyredem(pctsrf, tsoil(:, 1, :), tsoil, qsolsrf, &
-         pack(qsol_2d, dyn_phy), fsnow, albe, null_array, null_array, solsw, &
+         pack(qsol_2d, dyn_phy), fsnow, falbe, null_array, null_array, solsw, &
          sollw, null_array, null_array, frugs, agesno, zmea, zstd, zsig, zgam, &
          zthe, zpic, zval, t_ancien, q_ancien, rnebcon, ratqs, clwcon, &
          null_array, sig1, w01)
