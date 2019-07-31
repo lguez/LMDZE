@@ -61,7 +61,10 @@ contains
 
     REAL, INTENT(IN):: paprs(klon, klev + 1) ! pression a intercouche (Pa)
     REAL, INTENT(IN):: play(klon, klev) ! pression au milieu de couche (Pa)
-    REAL, INTENT(inout):: fsnow(:, :) ! (klon, nbsrf) \'epaisseur neigeuse
+
+    REAL, INTENT(inout):: fsnow(:, :) ! (klon, nbsrf)
+    ! column-density of mass of snow, in kg m-2
+
     REAL, INTENT(inout):: fqsurf(klon, nbsrf)
     REAL, intent(inout):: falbe(klon, nbsrf)
 
@@ -75,7 +78,7 @@ contains
     ! solid water mass flux (kg / m2 / s), positive down
 
     REAL, intent(inout):: frugs(klon, nbsrf) ! longueur de rugosit\'e (en m)
-    real agesno(klon, nbsrf)
+    real, intent(inout):: agesno(:, :) ! (klon, nbsrf)
     REAL, INTENT(IN):: rugoro(klon)
 
     REAL, intent(out):: d_t(:, :), d_q(:, :) ! (klon, klev)
@@ -158,7 +161,8 @@ contains
     REAL yts(klon), ypctsrf(klon), yz0_new(klon)
     real yrugos(klon) ! longueur de rugosite (en m)
     REAL yalb(klon)
-    REAL snow(klon), yqsurf(klon), yagesno(klon)
+    REAL snow(klon) ! column-density of mass of snow, in kg m-2
+    real yqsurf(klon), yagesno(klon)
     real yqsol(klon) ! column-density of water in soil, in kg m-2
     REAL yrain_fall(klon) ! liquid water mass flux (kg / m2 / s), positive down
     REAL ysnow_fall(klon) ! solid water mass flux (kg / m2 / s), positive down

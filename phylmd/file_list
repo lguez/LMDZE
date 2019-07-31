@@ -33,7 +33,6 @@ ozonecm.f90
 phyetat0.f90
 phyredem0.f90
 phyredem.f90
-physiq.f~
 physiq.f90
 phytrac.f90
 radepsi.f90

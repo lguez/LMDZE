@@ -4,7 +4,7 @@ module phyredem_m
 
 contains
 
-  SUBROUTINE phyredem(pctsrf, ftsol, ftsoil, qsurf, qsol, snow, albedo, &
+  SUBROUTINE phyredem(pctsrf, ftsol, ftsoil, qsurf, qsol, fsnow, albedo, &
        rain_fall, snow_fall, solsw, sollw, fder, radsol, frugs, agesno, zmea, &
        zstd, zsig, zgam, zthe, zpic, zval, t_ancien, q_ancien, rnebcon, &
        ratqs, clwcon, run_off_lic_0, sig1, w01)
@@ -30,7 +30,7 @@ contains
     REAL, intent(in):: qsol(:) ! (klon)
     ! column-density of water in soil, in kg m-2
 
-    REAL, INTENT(IN):: snow(klon, nbsrf)
+    REAL, INTENT(IN):: fsnow(:, :) ! (klon, nbsrf)
     REAL, INTENT(IN):: albedo(klon, nbsrf)
     REAL, INTENT(IN):: rain_fall(klon)
     REAL, INTENT(IN):: snow_fall(klon)
@@ -85,7 +85,7 @@ contains
     call nf95_put_var(ncid_restartphy, varid, albedo)
 
     call nf95_inq_varid(ncid_restartphy, "SNOW", varid)
-    call nf95_put_var(ncid_restartphy, varid, snow)
+    call nf95_put_var(ncid_restartphy, varid, fsnow)
 
     call nf95_inq_varid(ncid_restartphy, "RADS", varid)
     call nf95_put_var(ncid_restartphy, varid, radsol)

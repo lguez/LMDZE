@@ -78,17 +78,17 @@ contains
     IF (nisurf==is_sic) THEN
        DO ig = 1, knon
           ztherm_i(ig) = iice
-          IF (snow(ig) > 0.0) ztherm_i(ig) = isno
+          IF (snow(ig) > 0.) ztherm_i(ig) = isno
        END DO
     ELSE IF (nisurf==is_lic) THEN
        DO ig = 1, knon
           ztherm_i(ig) = iice
-          IF (snow(ig) > 0.0) ztherm_i(ig) = isno
+          IF (snow(ig) > 0.) ztherm_i(ig) = isno
        END DO
     ELSE IF (nisurf==is_ter) THEN
        DO ig = 1, knon
           ztherm_i(ig) = isol
-          IF (snow(ig) > 0.0) ztherm_i(ig) = isno
+          IF (snow(ig) > 0.) ztherm_i(ig) = isno
        END DO
     ELSE IF (nisurf==is_oce) THEN
        DO ig = 1, knon

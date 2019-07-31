@@ -26,7 +26,7 @@ set(CPP_IIM 16 CACHE STRING "iim, number of longitudes")
 target_compile_definitions(LMDZE_objects PRIVATE CPP_IIM=${CPP_IIM})
 message(STATUS "Set iim to ${CPP_IIM}")
 
-set(CPP_JJM 16 CACHE STRING "jjm, number of latitudes")
+set(CPP_JJM 12 CACHE STRING "jjm, number of latitudes")
 target_compile_definitions(LMDZE_objects PRIVATE CPP_JJM=${CPP_JJM})
 message(STATUS "Set jjm to ${CPP_JJM}")
 

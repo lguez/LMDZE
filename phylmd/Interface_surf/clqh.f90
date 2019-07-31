@@ -58,7 +58,9 @@ contains
     ! surface net downward radiative flux, in W / m2
 
     REAL, intent(inout):: albedo(:) ! (knon) albedo de la surface
-    REAL, intent(inout):: snow(:) ! (knon) ! hauteur de neige
+
+    REAL, intent(inout):: snow(:) ! (knon)
+    ! column-density of mass of snow, in kg m-2
 
     REAL, intent(out):: qsurf(:) ! (knon)
     ! humidite de l'air au dessus de la surface

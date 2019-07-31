@@ -63,7 +63,10 @@ contains
 
     real, intent(IN):: rugos(:) ! (knon) rugosite
     real, intent(IN):: rugoro(:) ! (knon) rugosite orographique
+
     real, intent(INOUT):: snow(:) ! (knon)
+    ! column-density of mass of snow, in kg m-2
+    
     real, intent(OUT):: qsurf(:) ! (knon)
     real, intent(IN):: ts(:) ! (knon) temp\'erature de surface
     real, intent(IN):: p1lay(:) ! (knon) pression 1er niveau (milieu de couche)
@@ -108,7 +111,7 @@ contains
     real beta(size(knindex)) ! (knon) evap reelle
     real tsurf(size(knindex)) ! (knon)
     real alb_neig(size(knindex)) ! (knon)
-    real zfra(size(knindex)) ! (knon)
+    real zfra(size(knindex)) ! (knon) fraction of surface covered by snow
     REAL, PARAMETER:: fmagic = 1. ! facteur magique pour r\'egler l'alb\'edo
     REAL, PARAMETER:: max_eau_sol = 150. ! in kg m-2
     REAL, PARAMETER:: tau_gl = 86400. * 5.
@@ -138,8 +141,8 @@ contains
             tsurf_new, evap, fqcalving, ffonte, run_off_lic_0, run_off_lic)
 
        call albsno(agesno, alb_neig, snow_fall)
-       where (snow < 0.0001) agesno = 0.
-       zfra = max(0., min(1., snow / (snow + 10.)))
+       where (snow < 1e-4) agesno = 0.
+       zfra = snow / (snow + 10.)
        albedo = alb_neig * zfra + albedo * (1. - zfra)
        z0_new = sqrt(z0_new**2 + rugoro**2)
     case (is_oce)
@@ -182,8 +185,8 @@ contains
        ! Compute the albedo:
 
        CALL albsno(agesno, alb_neig, snow_fall)
-       WHERE (snow < 0.0001) agesno = 0.
-       zfra = MAX(0., MIN(1., snow / (snow + 10.)))
+       WHERE (snow < 1e-4) agesno = 0.
+       zfra = snow / (snow + 10.)
        albedo = alb_neig * zfra + 0.6 * (1. - zfra)
 
        z0_new = SQRT(0.002**2 + rugoro**2)
@@ -202,7 +205,7 @@ contains
 
        ! calcul albedo
        CALL albsno(agesno, alb_neig, snow_fall)
-       WHERE (snow < 0.0001) agesno = 0.
+       WHERE (snow < 1e-4) agesno = 0.
        albedo = 0.77
 
        ! Rugosite

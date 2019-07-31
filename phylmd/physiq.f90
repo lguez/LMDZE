@@ -158,7 +158,10 @@ contains
     ! humidite de l'air au contact de la surface
 
     REAL, save:: qsol(klon) ! column-density of water in soil, in kg m-2
-    REAL, save:: fsnow(klon, nbsrf) ! \'epaisseur neigeuse
+
+    REAL, save:: fsnow(klon, nbsrf)
+    ! column-density of mass of snow at the surface, in kg m-2
+
     REAL, save:: falbe(klon, nbsrf) ! albedo visible par type de surface
 
     ! Param\`etres de l'orographie \`a l'\'echelle sous-maille (OESM) :
@@ -217,7 +220,6 @@ contains
     REAL sens(klon) ! flux de chaleur sensible au sol
     real dflux_t(klon) ! derivee du flux de chaleur sensible au sol
     REAL, save:: dlw(klon) ! derivative of infra-red flux
-    REAL bils(klon) ! bilan de chaleur au sol
     REAL fder(klon) ! d\'erive de flux (sensible et latente)
     REAL ve(klon) ! integr. verticale du transport meri. de l'energie
     REAL vq(klon) ! integr. verticale du transport meri. de l'eau
@@ -844,11 +846,6 @@ contains
        ENDDO
     ENDDO
 
-    ! Calculer le bilan du sol et la d\'erive de temp\'erature (couplage)
-    DO i = 1, klon
-       bils(i) = radsol(i) + sens(i) + zxfluxlat(i)
-    ENDDO
-
     ! Param\'etrisation de l'orographie \`a l'\'echelle sous-maille :
 
     IF (ok_orodr) THEN
@@ -984,7 +981,7 @@ contains
     CALL histwrite_phy("sols", solsw)
     CALL histwrite_phy("rls", sollw)
     CALL histwrite_phy("solldown", sollwdown)
-    CALL histwrite_phy("bils", bils)
+    CALL histwrite_phy("bils", radsol + sens + zxfluxlat)
     CALL histwrite_phy("sens", sens)
     CALL histwrite_phy("fder", fder)
     CALL histwrite_phy("zxfqcalving", sum(fqcalving * pctsrf, dim = 2))
