@@ -53,7 +53,7 @@ contains
     real, intent(in):: b(:, :) ! (ncum, nl - 1)
     real ment(klon, klev, klev), qent(klon, klev, klev), uent(klon, klev, klev)
     real vent(klon, klev, klev)
-    integer nent(klon, klev)
+    integer, intent(in):: nent(:, 2:) ! (ncum, 2:nl - 1)
     real elij(klon, klev, klev)
     real sig(klon, klev)
     real tv(klon, klev), tvp(klon, klev)

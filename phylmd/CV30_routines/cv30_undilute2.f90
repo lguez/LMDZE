@@ -20,7 +20,9 @@ contains
     USE dimphy, ONLY: klon, klev
     use SUPHEC_M, only: rcw, rlvtt, rcpd, rcpv, rv
 
-    integer, intent(in):: icb(:), icbs(:) ! (ncum)
+    integer, intent(in):: icb(:) ! (ncum) {2 <= icb <= nl - 3}
+
+    integer, intent(in):: icbs(:) ! (ncum)
     ! icbs is the first level above LCL (may differ from icb)
 
     real, intent(in):: tnk(:), qnk(:), gznk(:) ! (klon)

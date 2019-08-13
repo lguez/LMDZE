@@ -65,7 +65,7 @@ contains
     real, intent(IN):: rugoro(:) ! (knon) rugosite orographique
 
     real, intent(INOUT):: snow(:) ! (knon)
-    ! column-density of mass of snow, in kg m-2
+    ! column-density of mass of snow at the surface, in kg m-2
     
     real, intent(OUT):: qsurf(:) ! (knon)
     real, intent(IN):: ts(:) ! (knon) temp\'erature de surface
@@ -146,7 +146,7 @@ contains
        albedo = alb_neig * zfra + albedo * (1. - zfra)
        z0_new = sqrt(z0_new**2 + rugoro**2)
     case (is_oce)
-       ! Surface "oc\'ean", appel \`a l'interface avec l'oc\'ean
+       ! Surface oc\'ean, appel \`a l'interface avec l'oc\'ean
 
        ffonte = 0.
        call limit_read_sst(julien, knindex, tsurf)
@@ -160,7 +160,7 @@ contains
        z0_new = sqrt(rugos**2 + rugoro**2)
        fqcalving = 0.
     case (is_sic)
-       ! Surface "glace de mer" appel a l'interface avec l'ocean
+       ! Surface glace de mer
 
        DO ii = 1, size(knindex)
           IF (pctsrf_new_sic(ii) < EPSFRA) then
@@ -191,7 +191,7 @@ contains
 
        z0_new = SQRT(0.002**2 + rugoro**2)
     case (is_lic)
-       ! Surface "glacier continentaux" appel \`a l'interface avec le sol
+       ! Surface "glaciers continentaux" appel \`a l'interface avec le sol
 
        CALL soil(is_lic, snow, ts, tsoil, soilcap, soilflux)
        cal = RCPD / soilcap

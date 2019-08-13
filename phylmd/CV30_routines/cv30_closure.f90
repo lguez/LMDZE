@@ -14,7 +14,8 @@ contains
     use suphec_m, only: rd
 
     ! input:
-    integer, intent(in):: icb(:), inb(:) ! (ncum)
+    integer, intent(in):: icb(:) ! (ncum) {2 <= icb <= nl - 3}
+    integer, intent(in):: inb(:) ! (ncum)
     real pbase(klon)
     real p(:, :) ! (klon, klev)
     real, intent(in):: ph(:, :)  ! (ncum, klev + 1)

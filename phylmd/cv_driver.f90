@@ -142,7 +142,7 @@ contains
     ! Compressed fields:
     integer, allocatable:: idcum(:), iflag(:) ! (ncum)
     integer, allocatable:: icb(:) ! (ncum)
-    integer nent(klon, klev)
+    integer, allocatable:: nent(:, :) ! (ncum, 2:nl - 1)
     integer icbs(klon)
 
     integer, allocatable:: inb(:) ! (ncum)
@@ -242,6 +242,7 @@ contains
        allocate(idcum(ncum), plcl(ncum), inb(ncum))
        allocate(b(ncum, nl - 1), evap(ncum, nl), icb(ncum), iflag(ncum))
        allocate(th(ncum, nl), lv(ncum, nl), cpn(ncum, nl), mp(ncum, nl))
+       allocate(nent(ncum, 2:nl - 1))
        idcum = pack((/(i, i = 1, klon)/), iflag1 == 0)
        CALL cv30_compress(idcum, iflag1, icb1, icbs1, plcl1, tnk1, qnk1, &
             gznk1, pbase1, buoybase1, t1, q1, qs1, u1, v1, gz1, th1, h1, lv1, &
@@ -251,11 +252,10 @@ contains
        CALL cv30_undilute2(icb, icbs(:ncum), tnk, qnk, gznk, t, qs, gz, p, h, &
             tv, lv, pbase(:ncum), buoybase(:ncum), plcl, inb, tp, tvp, &
             clw, hp, ep, buoy)
-       CALL cv30_closure(icb, inb, pbase, p, ph(:ncum, :), tv, buoy, &
-            sig, w0, cape, m)
-       CALL cv30_mixing(icb, inb, t, q, qs, u, v, h, lv, &
-            hp, ep, clw, m, sig, ment, qent, uent, vent, nent, sij, elij, &
-            ments, qents)
+       CALL cv30_closure(icb, inb, pbase, p, ph(:ncum, :), tv, buoy, sig, w0, &
+            cape, m)
+       CALL cv30_mixing(icb, inb, t, q, qs, u, v, h, lv, hp, ep, clw, m, sig, &
+            ment, qent, uent, vent, nent, sij, elij, ments, qents)
        CALL cv30_unsat(icb, inb, t(:ncum, :nl), q(:ncum, :nl), &
             qs(:ncum, :nl), gz, u(:ncum, :nl), v(:ncum, :nl), p, &
             ph(:ncum, :), th(:ncum, :nl - 1), tv, lv, cpn, ep(:ncum, :), &

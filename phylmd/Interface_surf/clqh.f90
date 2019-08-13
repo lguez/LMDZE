@@ -60,7 +60,7 @@ contains
     REAL, intent(inout):: albedo(:) ! (knon) albedo de la surface
 
     REAL, intent(inout):: snow(:) ! (knon)
-    ! column-density of mass of snow, in kg m-2
+    ! column-density of mass of snow at the surface, in kg m-2
 
     REAL, intent(out):: qsurf(:) ! (knon)
     ! humidite de l'air au dessus de la surface

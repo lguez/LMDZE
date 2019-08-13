@@ -18,7 +18,13 @@ contains
     use suphec_m, only: rcpd, rcpv, rv
 
     ! inputs:
-    integer, intent(in):: icb(:), inb(:) ! (ncum)
+
+    integer, intent(in):: icb(:) ! (ncum) {2 <= icb <= nl - 3}
+
+    integer, intent(in):: inb(:) ! (ncum)
+    ! first model level above the level of neutral buoyancy of the
+    ! parcel (1 <= inb <= nl - 1)
+
     real, intent(in):: t(klon, klev), rr(klon, klev), rs(klon, klev)
     real u(klon, klev), v(klon, klev)
     real, intent(in):: h(klon, klev)
@@ -31,7 +37,7 @@ contains
     ! outputs:
     real ment(klon, klev, klev), qent(klon, klev, klev)
     real uent(klon, klev, klev), vent(klon, klev, klev)
-    integer nent(klon, klev)
+    integer, intent(out):: nent(:, 2:) ! (ncum, 2:nl - 1)
     real sij(klon, klev, klev), elij(klon, klev, klev)
     real ments(klon, klev, klev), qents(klon, klev, klev)
 
@@ -52,11 +58,7 @@ contains
 
     ! INITIALIZE VARIOUS ARRAYS USED IN THE COMPUTATIONS
 
-    do j = 1, nl
-       do i = 1, ncum
-          nent(i, j) = 0
-       end do
-    end do
+    nent = 0
 
     do j = 1, nl
        do k = 1, nl
@@ -125,7 +127,7 @@ contains
                 end if
                 sij(il, i, j) = amax1(0.0, sij(il, i, j))
                 sij(il, i, j) = amin1(1.0, sij(il, i, j))
-             endif ! new
+             endif
           end do
        end do
 
@@ -133,13 +135,15 @@ contains
        ! at that level and calculate detrained air flux and properties
 
        do il = 1, ncum
-          if ((i >= icb(il)).and.(i <= inb(il)).and.(nent(il, i) == 0)) then
-             ment(il, i, i) = m(il, i)
-             qent(il, i, i) = rr(il, minorig) - ep(il, i) * clw(il, i)
-             uent(il, i, i) = u(il, minorig)
-             vent(il, i, i) = v(il, minorig)
-             elij(il, i, i) = clw(il, i)
-             sij(il, i, i) = 0.0
+          if (i >= icb(il) .and. i <= inb(il)) then
+             if (nent(il, i) == 0) then
+                ment(il, i, i) = m(il, i)
+                qent(il, i, i) = rr(il, minorig) - ep(il, i) * clw(il, i)
+                uent(il, i, i) = u(il, minorig)
+                vent(il, i, i) = v(il, minorig)
+                elij(il, i, i) = clw(il, i)
+                sij(il, i, i) = 0.0
+             end if
           end if
        end do
     end do

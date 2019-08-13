@@ -29,7 +29,7 @@ contains
     ! precipitation, solid water mass flux (kg / m2 / s), positive down
 
     real, intent(INOUT):: snow(:) ! (knon)
-    ! column-density of mass of snow, in kg m-2
+    ! column-density of mass of snow at the surface, in kg m-2
 
     real, intent(INOUT):: qsol(:) ! (knon)
     ! column-density of water in soil, in kg m-2

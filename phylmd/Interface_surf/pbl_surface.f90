@@ -63,7 +63,7 @@ contains
     REAL, INTENT(IN):: play(klon, klev) ! pression au milieu de couche (Pa)
 
     REAL, INTENT(inout):: fsnow(:, :) ! (klon, nbsrf)
-    ! column-density of mass of snow, in kg m-2
+    ! column-density of mass of snow at the surface, in kg m-2
 
     REAL, INTENT(inout):: fqsurf(klon, nbsrf)
     REAL, intent(inout):: falbe(klon, nbsrf)
@@ -161,7 +161,7 @@ contains
     REAL yts(klon), ypctsrf(klon), yz0_new(klon)
     real yrugos(klon) ! longueur de rugosite (en m)
     REAL yalb(klon)
-    REAL snow(klon) ! column-density of mass of snow, in kg m-2
+    REAL snow(klon) ! column-density of mass of snow at the surface, in kg m-2
     real yqsurf(klon), yagesno(klon)
     real yqsol(klon) ! column-density of water in soil, in kg m-2
     REAL yrain_fall(klon) ! liquid water mass flux (kg / m2 / s), positive down
