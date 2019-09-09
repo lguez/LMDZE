@@ -23,16 +23,13 @@ set(library_list ${netcdf95_LIBRARY} ${netcdff_LIBRARY}
 add_library(LMDZE_objects OBJECT dimensions.F90)
 
 set(CPP_IIM 16 CACHE STRING "iim, number of longitudes")
-target_compile_definitions(LMDZE_objects PRIVATE CPP_IIM=${CPP_IIM})
-message(STATUS "Set iim to ${CPP_IIM}")
-
 set(CPP_JJM 12 CACHE STRING "jjm, number of latitudes")
-target_compile_definitions(LMDZE_objects PRIVATE CPP_JJM=${CPP_JJM})
-message(STATUS "Set jjm to ${CPP_JJM}")
-
 set(CPP_LLM 11 CACHE STRING "llm, number of vertical levels")
-target_compile_definitions(LMDZE_objects PRIVATE CPP_LLM=${CPP_LLM})
-message(STATUS "Set llm to ${CPP_LLM}")
+
+message(STATUS "Set iim to ${CPP_IIM}, jjm to ${CPP_JJM}, llm to ${CPP_LLM}")
+
+target_compile_definitions(LMDZE_objects PRIVATE CPP_IIM=${CPP_IIM}
+  CPP_JJM=${CPP_JJM} CPP_LLM=${CPP_LLM})
 
 target_include_directories(LMDZE_objects PRIVATE ${netcdff_INCLUDE_DIR}
   ${netcdf95_INCLUDE_DIR})

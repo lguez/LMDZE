@@ -34,7 +34,7 @@ CPPFLAGS = $(addprefix -D, $(subst ${comma},${space},${cpp_macros}))
 
 inc_dir_list = ${HOME}/build/Libraries_debug/modules /usr/include
 
-lib_dir_list = ${contour_531_dir} ${fortrangis_dir} ${geometry_dir} ${gpc_f_dir} ${jumble_dir} ${netcdf95_dir} ${nr_util_dir} ${numer_rec_95_dir} ${shapelib_03_dir} ${water_dir} ${HOME}/.local/lib
+lib_dir_list = ${jumble_dir} ${netcdf95_dir} ${nr_util_dir} ${numer_rec_95_dir}
 
 # Include flags:
 FFLAGS := $(addprefix -I, ${inc_dir_list})
