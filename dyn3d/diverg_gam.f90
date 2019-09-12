@@ -7,25 +7,18 @@ contains
   SUBROUTINE diverg_gam(klevel, cuvscvgam, cvuscugam, unsairegam, unsapolnga, &
        unsapolsga, x, y, div)
 
-    ! $Header: /home/cvsroot/LMDZ4/libf/dyn3d/diverg_gam.F,v 1.1.1.1 2004/05/19
-    ! 12:53:05 lmdzadmin Exp $
+    ! From LMDZ4/libf/dyn3d/diverg_gam.F, version 1.1.1.1 2004/05/19
+    ! 12:53:05
 
-    ! P. Le Van
+    ! Author: P. Le Van
 
-    ! *********************************************************************
-    ! ... calcule la divergence a tous les niveaux d'1 vecteur de compos.
-    ! x et y...
-    ! x et y  etant des composantes covariantes   ...
-    ! *********************************************************************
-    USE dimensions
-    USE paramet_m
-    USE comgeom
+    ! Calcule la divergence \`a tous les niveaux d'un vecteur de
+    ! composantes covariantes x et y.
 
-    ! x  et  y  sont des arguments  d'entree pour le s-prog
+    USE dimensions, only: iim
+    USE paramet_m, only: ip1jmp1, ip1jm, iip1, iip2, ip1jmi1
+
     ! div      est  un argument  de sortie pour le s-prog
-
-
-    ! ---------------------------------------------------------------------
 
     ! ATTENTION : pendant ce s-pg , ne pas toucher au COMMON/scratch/  .
 
@@ -34,19 +27,18 @@ contains
     ! ..........          variables en arguments    ...................
 
     INTEGER, INTENT (IN) :: klevel
-    REAL x(ip1jmp1, klevel), y(ip1jm, klevel), div(ip1jmp1, klevel)
     REAL cuvscvgam(ip1jm), cvuscugam(ip1jmp1), unsairegam(ip1jmp1)
     REAL unsapolnga, unsapolsga
+    REAL, intent(in):: x(ip1jmp1, klevel), y(ip1jm, klevel)
+    real div(ip1jmp1, klevel)
 
     ! ...............     variables  locales   .........................
 
     REAL aiy1(iip1), aiy2(iip1)
     REAL sumypn, sumyps
     INTEGER l, ij
+
     ! ...................................................................
-
-    REAL ssum
-
 
     DO l = 1, klevel
 
@@ -70,8 +62,8 @@ contains
           aiy1(ij) = cuvscvgam(ij)*y(ij, l)
           aiy2(ij) = cuvscvgam(ij+ip1jmi1)*y(ij+ip1jmi1, l)
        END DO
-       sumypn = ssum(iim, aiy1, 1)*unsapolnga
-       sumyps = ssum(iim, aiy2, 1)*unsapolsga
+       sumypn = sum(aiy1(:iim)) * unsapolnga
+       sumyps = sum(aiy2(:iim)) * unsapolsga
 
        DO ij = 1, iip1
           div(ij, l) = -sumypn
