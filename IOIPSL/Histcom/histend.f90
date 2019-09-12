@@ -33,7 +33,7 @@ contains
     INTEGER dims(4), dim_cnt
     INTEGER year, month, day, hours, minutes
     REAL sec
-    REAL rtime0
+    double precision rtime0
     CHARACTER(len=20) tname, tunit
     CHARACTER(len=42) str30
     CHARACTER(len=80) ttitle

@@ -4,7 +4,7 @@ module ju2ymds_m
 
 contains
 
-  SUBROUTINE ju2ymds (julian, year, month, day, sec)
+  SUBROUTINE ju2ymds(julian, year, month, day, sec)
 
     ! This subroutine computes from the julian day the year,
     ! month, day and seconds
@@ -15,39 +15,31 @@ contains
 
     ! See also: http://www.magnet.ch/serendipity/hermetic/cal_stud/jdn.htm
 
-    ! In the case of the Gregorian calendar we have chosen to use
-    ! the Lilian day numbers. This is the day counter which starts
-    ! on the 15th October 1582. This is the day at which Pope
-    ! Gregory XIII introduced the Gregorian calendar.
-    ! Compared to the true Julian calendar, which starts some 7980
-    ! years ago, the Lilian days are smaler and are dealt with easily
-    ! on 32 bit machines. With the true Julian days you can only the
-    ! fraction of the day in the real part to a precision of a 1/4 of
-    ! a day with 32 bits.
+    ! In the case of the Gregorian calendar we have chosen to use the
+    ! Lilian day numbers. This is the day counter which starts on the
+    ! 15th October 1582. This is the day at which Pope Gregory XIII
+    ! introduced the Gregorian calendar.  Compared to the true Julian
+    ! calendar, which starts some 7980 years ago, the Lilian days are
+    ! smaller and are dealt with easily on 32 bit machines. With the
+    ! true Julian days you can only compute the fraction of the day in
+    ! the real part to a precision of a 1/4 of a day with 32 bits.
 
     use calendar, only: un_jour, lock_unan
     use ioconf_calendar_m, only: mon_len, un_an
 
-    REAL, INTENT(IN):: julian
+    double precision, INTENT(IN):: julian
     INTEGER, INTENT(OUT):: year, month, day
-    REAL, INTENT(OUT):: sec
+    REAL, INTENT(OUT), optional:: sec
 
     ! Local:
     INTEGER l, n, i, jd, j, d, m, y, ml
-    INTEGER add_day
 
     !--------------------------------------------------------------------
 
     jd = INT(julian)
-    sec = (julian - jd) * un_jour
+    if (present(sec)) sec = (julian - jd) * un_jour
 
     lock_unan = .TRUE.
-
-    IF (sec > un_jour) THEN
-       add_day = INT(sec / un_jour)
-       sec = sec - add_day * un_jour
-       jd = jd+add_day
-    ENDIF
 
     ! Gregorian
     IF ( (un_an > 365.0).AND.(un_an < 366.0) ) THEN

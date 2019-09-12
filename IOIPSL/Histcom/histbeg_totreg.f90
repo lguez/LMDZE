@@ -19,7 +19,8 @@ MODULE histbeg_totreg_m
   IMPLICIT NONE
 
   INTEGER:: nb_files = 0
-  REAL, DIMENSION(nb_files_max), SAVE:: date0, deltat
+  double precision, SAVE:: date0(nb_files_max)
+  REAL, SAVE:: deltat(nb_files_max)
   LOGICAL:: regular(nb_files_max) = .TRUE.
 
   private nb_files_max
@@ -60,7 +61,7 @@ CONTAINS
     INTEGER, INTENT(IN):: szy ! size of the slab of data in Y
 
     INTEGER, INTENT(IN):: pitau0 ! time step at which the history tape starts
-    REAL, INTENT(IN):: pdate0 ! the Julian date at which the itau was equal to 0
+    double precision, INTENT(IN):: pdate0 ! the Julian date at which the itau was equal to 0
     REAL, INTENT(IN):: pdeltat ! time step of the counter itau, in seconds
 
     INTEGER, INTENT(OUT):: horiid ! ID of the horizontal grid

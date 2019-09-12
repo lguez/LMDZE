@@ -24,18 +24,18 @@ contains
 
     use calendar
     use itau2date_m
-    use ju2ymds_m
-    use ymds2ju_m
+    use ju2ymds_m, only: ju2ymds
+    use ymds2ju_m, only: ymds2ju
 
     INTEGER, INTENT(IN):: itau
-    REAL, INTENT(IN):: date0
+    double precision, INTENT(IN):: date0
     REAL, INTENT(IN):: dt, freq
     INTEGER, INTENT(IN):: last_action, last_check
     LOGICAL, INTENT(OUT):: do_action
 
     REAL:: dt_action, dt_check
-    REAL:: date_last_act, date_next_check, date_next_act, &
-         &        date_now, date_mp1, date_mpf
+    double precision date_last_act, date_now, date_mpf, date_mp1
+    double precision date_next_check, date_next_act
     INTEGER:: year, month, monthp1, day, next_check_itau, next_act_itau
     INTEGER:: yearp, dayp
     REAL:: sec, secp
@@ -117,7 +117,7 @@ contains
                 WRITE(*, *) &
                      &         'ACT-TIME: itau, next_act_itau, next_check_itau: ', &
                      &         itau, next_act_itau, next_check_itau
-                CALL ju2ymds (date_now, year, month, day, sec)
+                CALL ju2ymds(date_now, year, month, day, sec)
                 WRITE(*, *) 'ACT-TIME: y, m, d, s: ', year, month, day, sec
                 WRITE(*, *) &
                      &         'ACT-TIME: date_mp1, date_mpf: ', date_mp1, date_mpf

@@ -46,7 +46,7 @@ contains
     ! Initialisation du fichier contenant les moyennes zonales.
 
     integer horiid, vertiid
-    real julian
+    double precision julian
     real rlong(jjm), rlatg(jjm)
 
     !-----------------------------------------------------------------

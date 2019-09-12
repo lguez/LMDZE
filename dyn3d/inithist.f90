@@ -32,7 +32,7 @@ contains
     real, intent(in):: t_wrt ! fréquence d'écriture sur le fichier
 
     ! Local:
-    real julian
+    double precision julian
     integer iq
     integer uhoriid, vhoriid, thoriid, zvertiid
 

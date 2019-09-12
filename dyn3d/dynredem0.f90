@@ -49,16 +49,16 @@ CONTAINS
     integer varid_rlatu1, varid_rlatu2, varid_yprimu1, varid_yprimu2, varid_ap
     integer varid_bp, varid_presnivs, varid_phis
 
-    REAL zjulian, hours
-    INTEGER yyears0, jjour0, mmois0
+    double precision julian
+    INTEGER year, day, month
     CHARACTER(len=30) unites
 
     !-----------------------------------------------------------------------
 
     PRINT *, 'Call sequence information: dynredem0'
 
-    CALL ymds2ju(annee_ref, 1, iday_end, 0., zjulian)
-    CALL ju2ymds(zjulian, yyears0, mmois0, jjour0, hours)
+    CALL ymds2ju(annee_ref, 1, iday_end, 0., julian)
+    CALL ju2ymds(julian, year, month, day)
 
     tab_cntrl(1) = iim
     tab_cntrl(2) = jjm
@@ -162,7 +162,7 @@ CONTAINS
 
     CALL nf95_def_var(ncid, 'temps', nf90_float, dimid_temps, varid)
     CALL nf95_put_att(ncid, varid, 'title', 'Temps de simulation')
-    WRITE(unites, fmt = 200) yyears0, mmois0, jjour0
+    WRITE(unites, fmt = 200) year, month, day
 200 FORMAT ('days since ', I4, '-', I2.2, '-', I2.2, ' 00:00:00')
     CALL nf95_put_att(ncid, varid, 'units', unites)
 

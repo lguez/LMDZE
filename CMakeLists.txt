@@ -38,5 +38,6 @@ foreach(my_dir dyn3d filtrez IOIPSL misc phylmd)
   include(${my_dir}/CMakeLists.txt)
 endforeach(my_dir)
 
+set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR})
 include(ConfigureCompilerFlags)
 include(TAGS)

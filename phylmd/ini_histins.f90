@@ -30,7 +30,8 @@ contains
     logical, intent(in):: ok_newmicro
     
     ! Local:
-    real zjulian, zsto, zout
+    double precision julian
+    real zsto, zout
     integer nhori, nvert, nsrf, iq, it
 
     !-------------------------------------------------------------------
@@ -40,12 +41,12 @@ contains
     test_ok_instan: IF (ok_instan) THEN
        zsto = dtphys * ecrit_ins
        zout = dtphys * ecrit_ins
-       CALL ymds2ju(annee_ref, 1, day_ref, 0.0, zjulian)
+       CALL ymds2ju(annee_ref, 1, day_ref, 0.0, julian)
        CALL histbeg_totreg("histins", rlonv(:iim) / pi * 180., &
             rlatu / pi * 180., 1, iim, &
-            1, jjm + 1, itau_phy, zjulian, dtphys, nhori, nid_ins)
+            1, jjm + 1, itau_phy, julian, dtphys, nhori, nid_ins)
        print *, 'itau_phy = ', itau_phy
-       print *, "zjulian = ", zjulian
+       print *, "julian = ", julian
        CALL histvert(nid_ins, "presnivs", "Vertical levels", "mb", &
             presnivs/100., nvert)
        
