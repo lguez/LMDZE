@@ -47,7 +47,6 @@ contains
     use netcdf95, only: NF95_CLOSE
     use newmicro_m, only: newmicro
     use nr_util, only: assert
-    use nuage_m, only: nuage
     USE orbite_m, ONLY: orbite
     USE ozonecm_m, ONLY: ozonecm
     USE phyetat0_m, ONLY: phyetat0
@@ -352,7 +351,6 @@ contains
     ! Param\`etres li\'es au nouveau sch\'ema de nuages :
     real:: fact_cldcon = 0.375
     real:: facttemps = 1.e-4
-    logical:: ok_newmicro = .true.
     real facteur
 
     integer:: iflag_cldcon = 1
@@ -406,8 +404,8 @@ contains
 
     integer, save:: ncid_startphy
 
-    namelist /physiq_nml/ fact_cldcon, facttemps, ok_newmicro, iflag_cldcon, &
-         ratqsbas, ratqshaut, ok_ade, bl95_b0, bl95_b1
+    namelist /physiq_nml/ fact_cldcon, facttemps, iflag_cldcon, ratqsbas, &
+         ratqshaut, ok_ade, bl95_b0, bl95_b1
 
     !----------------------------------------------------------------
 
@@ -471,7 +469,7 @@ contains
        ENDIF
 
        ! Initialisation des sorties
-       call ini_histins(ok_newmicro)
+       call ini_histins
        CALL phyredem0
        call conf_interface
     ENDIF test_firstcal
@@ -820,13 +818,8 @@ contains
 
     ! Param\`etres optiques des nuages et quelques param\`etres pour
     ! diagnostics :
-    if (ok_newmicro) then
-       CALL newmicro(paprs, play, t_seri, cldliq, cldfra, cldtau, cldemi, &
-            cldh, cldl, cldm, cldt, cldq, flwp, fiwp, flwc, fiwc)
-    else
-       CALL nuage(paprs, play, t_seri, cldliq, cldfra, cldtau, cldemi, cldh, &
-            cldl, cldm, cldt, cldq)
-    endif
+    CALL newmicro(paprs, play, t_seri, cldliq, cldfra, cldtau, cldemi, cldh, &
+         cldl, cldm, cldt, cldq, flwp, fiwp, flwc, fiwc)
 
     IF (MOD(itap - 1, radpas) == 0) THEN
        wo = ozonecm(REAL(julien), paprs)

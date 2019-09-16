@@ -6,7 +6,7 @@ module ini_histins_m
 
 contains
 
-  subroutine ini_histins(ok_newmicro)
+  subroutine ini_histins
 
     ! From phylmd/ini_histins.h, version 1.2, 2005/05/25 13:10:09
 
@@ -27,8 +27,6 @@ contains
     use phyetat0_m, only: itau_phy
     USE ymds2ju_m, only: ymds2ju
 
-    logical, intent(in):: ok_newmicro
-    
     ! Local:
     double precision julian
     real zsto, zout
@@ -49,8 +47,8 @@ contains
        print *, "julian = ", julian
        CALL histvert(nid_ins, "presnivs", "Vertical levels", "mb", &
             presnivs/100., nvert)
-       
-        ! Once:
+
+       ! Once:
        CALL histdef(nid_ins, "phis", "surface geopotential", "m2 s-2", &
             iim, jjm + 1, nhori, 1, 1, 1, -99, &
             "once", zsto, zout)
@@ -268,15 +266,12 @@ contains
             zsto, zout)
        CALL histdef(nid_ins, "pmflxr", "convective precipitation liquid", "", &
             iim, jjm + 1, nhori, llm, 1, llm, nvert, "inst(X)", zsto, zout)
-
-       if (ok_newmicro) then
-          CALL histdef(nid_ins, "re", "cloud droplet effective radius", &
-               "micrometer", iim, jjm + 1, nhori, llm, 1, llm, nvert, &
-               "inst(X)", zsto, zout)
-          CALL histdef(nid_ins, "fl", &
-               "denominator of cloud droplet effective radius", "", iim, &
-               jjm + 1, nhori, llm, 1, llm, nvert, "inst(X)", zsto, zout)
-       end if
+       CALL histdef(nid_ins, "re", "cloud droplet effective radius", &
+            "micrometer", iim, jjm + 1, nhori, llm, 1, llm, nvert, &
+            "inst(X)", zsto, zout)
+       CALL histdef(nid_ins, "fl", &
+            "denominator of cloud droplet effective radius", "", iim, &
+            jjm + 1, nhori, llm, 1, llm, nvert, "inst(X)", zsto, zout)
 
        DO it = 1, nqmx - 2
           ! champ 2D
