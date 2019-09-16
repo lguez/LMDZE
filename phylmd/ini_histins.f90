@@ -274,7 +274,7 @@ contains
                "micrometer", iim, jjm + 1, nhori, llm, 1, llm, nvert, &
                "inst(X)", zsto, zout)
           CALL histdef(nid_ins, "fl", &
-               "denominator of Cloud droplet effective radius", "", iim, &
+               "denominator of cloud droplet effective radius", "", iim, &
                jjm + 1, nhori, llm, 1, llm, nvert, "inst(X)", zsto, zout)
        end if
 

@@ -5,7 +5,7 @@ module radlwsw_m
 contains
 
   SUBROUTINE radlwsw(dist, mu0, fract, paprs, play, tsol, albedo, t, q, wo, &
-       cldfra, cldemi, cldtaupd, heat, heat0, cool, cool0, radsol, albpla, &
+       cldfra, cldemi, cldtau, heat, heat0, cool, cool0, radsol, albpla, &
        topsw, toplw, solsw, sollw, sollwdown, topsw0, toplw0, solsw0, sollw0, &
        lwdn0, lwdn, lwup0, lwup, swdn0, swdn, swup0, swup, ok_ade, topswad, &
        solswad)
@@ -47,8 +47,8 @@ contains
     real, intent(in):: cldemi(klon, klev)
     ! emissivite des nuages dans l'IR (entre 0 et 1)
 
-    real, intent(in):: cldtaupd(klon, klev)
-    ! epaisseur optique des nuages dans le visible (present-day value)
+    real, intent(in):: cldtau(klon, klev)
+    ! \'epaisseur optique des nuages dans le visible (present-day value)
 
     real, intent(out):: heat(klon, klev)
     ! échauffement atmosphérique (visible) (K/jour)
@@ -187,9 +187,9 @@ contains
              PCLDLD(i, k) = cldfra(iof+i, k)*cldemi(iof+i, k)
              PCLDLU(i, k) = cldfra(iof+i, k)*cldemi(iof+i, k)
              PCLDSW(i, k) = cldfra(iof+i, k)
-             PTAU(i, 1, k) = MAX(cldtaupd(iof+i, k), 1e-05)
+             PTAU(i, 1, k) = MAX(cldtau(iof+i, k), 1e-05)
              ! (1e-12 serait instable)
-             PTAU(i, 2, k) = MAX(cldtaupd(iof+i, k), 1e-05)
+             PTAU(i, 2, k) = MAX(cldtau(iof+i, k), 1e-05)
              ! (pour 32-bit machines)
              POMEGA(i, 1, k) = 0.9999 - 5e-04 * EXP(-0.5 * PTAU(i, 1, k))
              POMEGA(i, 2, k) = 0.9988 - 2.5e-03 * EXP(-0.05 * PTAU(i, 2, k))

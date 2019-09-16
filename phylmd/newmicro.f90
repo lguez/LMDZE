@@ -4,14 +4,14 @@ module newmicro_m
 
 contains
 
-  SUBROUTINE newmicro (paprs, play, t, qlwp, clc, cltau, clemi, cldh, cldl, &
+  SUBROUTINE newmicro (paprs, play, t, qlwp, clc, cldtau, clemi, cldh, cldl, &
        cldm, cldt, ctlwp, flwp, fiwp, flwc, fiwc)
 
     ! From LMDZ4/libf/phylmd/newmicro.F, version 1.2 2004/06/03 09:22:43
 
     ! Authors: Z. X. Li (LMD/CNRS), Johannes Quaas
     ! Date: 1993/09/10
-    ! Objet: calcul de l'épaisseur optique et de l'émissivité des nuages.
+    ! Objet: calcul de l'\'epaisseur optique et de l'\'emissivit\'e des nuages.
 
     USE conf_phys_m, ONLY: rad_chau1, rad_chau2
     USE dimphy, ONLY: klev, klon
@@ -23,13 +23,16 @@ contains
     REAL, intent(in):: t(:, :) ! (klon, klev) temperature
 
     REAL, intent(in):: qlwp(:, :) ! (klon, klev)
-    ! eau liquide nuageuse dans l'atmosphère (kg/kg)
+    ! eau liquide nuageuse dans l'atmosphère (kg / kg)
 
     REAL, intent(inout):: clc(:, :) ! (klon, klev)
     ! couverture nuageuse pour le rayonnement (0 à 1)
 
-    REAL, intent(out):: cltau(:, :) ! (klon, klev)  épaisseur optique des nuages
-    REAL, intent(out):: clemi(:, :) ! (klon, klev) émissivité des nuages (0 à 1)
+    REAL, intent(out):: cldtau(:, :) ! (klon, klev)
+    ! \'epaisseur optique des nuages
+    
+    REAL, intent(out):: clemi(:, :) ! (klon, klev)
+    ! \'emissivit\'e des nuages (0 à 1)
 
     REAL, intent(out):: cldh(:), cldl(:), cldm(:), cldt(:) ! (klon)
     REAL, intent(out):: ctlwp(:) ! (klon)
@@ -48,18 +51,19 @@ contains
 
     REAL, PARAMETER:: cetahb = 0.45, cetamb = 0.8
     INTEGER i, k
-    REAL zflwp(klon), fice
+    REAL zflwp
+    real fice ! fraction of ice in cloud
     REAL rad_chaud
     REAL, PARAMETER:: coef_chau = 0.13
-    REAL, PARAMETER:: seuil_neb = 0.001, t_glace = 273. - 15.
-    real rel, tc, rei, zfiwp(klon)
+    REAL, PARAMETER:: seuil_neb = 0.001, t_glace = 258.
+    real rel, tc, rei, zfiwp
     real k_ice
-    real, parameter:: k_ice0 = 0.005 ! units=m2/g
+    real, parameter:: k_ice0 = 0.005 ! units=m2 / g
     real, parameter:: DF = 1.66 ! diffusivity factor
 
     !-----------------------------------------------------------------
 
-    ! Calculer l'épaisseur optique et l'émissivité des nuages
+    ! Calculer l'\'epaisseur optique et l'\'emissivit\'e des nuages
 
     loop_horizontal: DO i = 1, klon
        flwp(i) = 0.
@@ -70,12 +74,13 @@ contains
 
           ! liquid/ice cloud water paths:
 
+          ! Linear transition:
           fice = 1. - (t(i, k) - t_glace) / (273.13 - t_glace)
           fice = MIN(MAX(fice, 0.), 1.)
 
-          zflwp(i) = 1000. * (1. - fice) * qlwp(i, k) / clc(i, k) &
+          zflwp = 1000. * (1. - fice) * qlwp(i, k) / clc(i, k) &
                * (paprs(i, k) - paprs(i, k + 1)) / RG
-          zfiwp(i) = 1000. * fice * qlwp(i, k) / clc(i, k) &
+          zfiwp = 1000. * fice * qlwp(i, k) / clc(i, k) &
                * (paprs(i, k) - paprs(i, k + 1)) / RG
 
           flwp(i) = flwp(i) &
@@ -114,15 +119,13 @@ contains
           tc = t(i, k)-273.15
           rei = merge(3.5, 0.71 * tc + 61.29, tc <= -81.4)
 
-          ! cloud optical thickness:
-
-          ! (for liquid clouds, traditional formula, 
-          ! for ice clouds, Ebert & Curry (1992)) 
-
-          if (zflwp(i) == 0.) rel = 1. 
-          if (zfiwp(i) == 0. .or. rei <= 0.) rei = 1. 
-          cltau(i, k) = 3./2. * (zflwp(i)/rel) &
-               + zfiwp(i) * (3.448e-03 + 2.431/rei)
+          ! Cloud optical thickness:
+          ! (for liquid clouds, traditional formula, for ice clouds,
+          ! Ebert and Curry (1992))
+          if (zflwp == 0.) rel = 1. 
+          if (zfiwp == 0. .or. rei <= 0.) rei = 1. 
+          cldtau(i, k) = 3. / 2. * (zflwp / rel) &
+               + zfiwp * (3.448e-03 + 2.431 / rei)
 
           ! cloud infrared emissivity:
 
@@ -132,11 +135,11 @@ contains
           ! Ebert and Curry (1992) formula as used by Kiehl & Zender (1995):
           k_ice = k_ice0 + 1. / rei
 
-          clemi(i, k) = 1. - EXP(- coef_chau * zflwp(i) - DF * k_ice * zfiwp(i))
+          clemi(i, k) = 1. - EXP(- coef_chau * zflwp - DF * k_ice * zfiwp)
 
           if (clc(i, k) <= seuil_neb) then
              clc(i, k) = 0.
-             cltau(i, k) = 0.
+             cldtau(i, k) = 0.
              clemi(i, k) = 0.
           end if
        ENDDO loop_vertical

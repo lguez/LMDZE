@@ -4,7 +4,7 @@ module nuage_m
 
 contains
 
-  SUBROUTINE nuage (paprs, pplay, t, pqlwp, pclc, pcltau, pclemi, pch, pcl, &
+  SUBROUTINE nuage (paprs, pplay, t, pqlwp, pclc, cldtau, pclemi, pch, pcl, &
        pcm, pct, pctlwp)
 
     ! From LMDZ4/libf/phylmd/nuage.F, version 1.1.1.1, 2004/05/19 12:53:07
@@ -28,7 +28,7 @@ contains
     REAL, intent(inout):: pclc(klon, klev)
     ! couverture nuageuse pour le rayonnement (0 \`a 1)
 
-    REAL, intent(out):: pcltau(klon, klev) ! \'epaisseur optique des nuages
+    REAL, intent(out):: cldtau(klon, klev) ! \'epaisseur optique des nuages
     real, intent(out):: pclemi(klon, klev) ! \'emissivit\'e des nuages (0 \`a 1)
     REAL pch(klon), pcl(klon), pcm(klon), pct(klon), pctlwp(klon)
 
@@ -69,11 +69,11 @@ contains
 
           radius = rad_chaud * (1.-zfice) + rad_froid * zfice
           coef = coef_chau * (1.-zfice) + coef_froi * zfice
-          pcltau(i, k) = 3.0/2.0 * zflwp / radius
+          cldtau(i, k) = 3.0/2.0 * zflwp / radius
           pclemi(i, k) = 1.0 - EXP(- coef * zflwp)
           lo = (pclc(i, k) <= seuil_neb)
           IF (lo) pclc(i, k) = 0.0
-          IF (lo) pcltau(i, k) = 0.0
+          IF (lo) cldtau(i, k) = 0.0
           IF (lo) pclemi(i, k) = 0.0
        END DO
     END DO

@@ -245,8 +245,8 @@ contains
     REAL diafra(klon, llm) ! fraction nuageuse
     REAL cldliq(klon, llm) ! eau liquide nuageuse
     REAL cldfra(klon, llm) ! fraction nuageuse
-    REAL cldtau(klon, llm) ! epaisseur optique
-    REAL cldemi(klon, llm) ! emissivite infrarouge
+    REAL cldtau(klon, llm) ! \'epaisseur optique
+    REAL cldemi(klon, llm) ! \'emissivit\'e infrarouge
 
     REAL flux_q(klon, nbsrf) ! flux turbulent d'humidite à la surface
 
@@ -349,7 +349,7 @@ contains
     real ratqss(klon, llm), ratqsc(klon, llm)
     real:: ratqsbas = 0.01, ratqshaut = 0.3
 
-    ! Parametres lies au nouveau schema de nuages (SB, PDF)
+    ! Param\`etres li\'es au nouveau sch\'ema de nuages :
     real:: fact_cldcon = 0.375
     real:: facttemps = 1.e-4
     logical:: ok_newmicro = .true.
