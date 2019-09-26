@@ -4,17 +4,17 @@ module advect_m
 
 contains
 
-  SUBROUTINE advect(ucov, vcov, teta, w, massebx, masseby, du, dv, dteta)
+  SUBROUTINE advect(ang_3d, vcov, teta, w, massebx, masseby, du, dv, dteta)
 
     ! From dyn3d/advect.F, version 1.1.1.1, 2004/05/19 12:53:06
     ! Authors: P. Le Van , F. Hourdin
     ! Objet : calcul des termes d'advection verticale pour u, v, teta.
-    ! Ces termes sont ajoutés à du, dv, dteta.
+    ! Ces termes sont ajout\'es \`a du, dv, dteta.
 
-    USE dimensions, ONLY : iim, llm
-    USE paramet_m, ONLY : iip1, iip2, ip1jm, ip1jmp1
+    USE dimensions, ONLY: iim, llm
+    USE paramet_m, ONLY: iip1, iip2, ip1jm, ip1jmp1
 
-    REAL, intent(in):: ucov(ip1jmp1, llm), vcov(ip1jm, llm)
+    REAL, intent(in):: ang_3d(ip1jmp1, llm), vcov(ip1jm, llm)
     real, intent(in):: teta(ip1jmp1, llm)
     real, INTENT (IN):: w(ip1jmp1, llm)
     REAL, intent(in):: massebx(ip1jmp1, llm), masseby(ip1jm, llm)
@@ -27,12 +27,12 @@ contains
 
     !-----------------------------------------------------------------------
 
-    ! 2. Calculs preliminaires :
+    ! Calculs preliminaires :
 
     ! Calcul de \bar{u}^{yy}
     DO l = 1, llm
        DO ij = iip2, ip1jmp1
-          uav(ij, l) = 0.25*(ucov(ij, l)+ucov(ij-iip1, l))
+          uav(ij, l) = 0.25*(ang_3d(ij, l)+ang_3d(ij-iip1, l))
        END DO
        DO ij = iip2, ip1jm
           uav(ij, l) = uav(ij, l) + uav(ij+iip1, l)
@@ -68,7 +68,7 @@ contains
        ! calcul pour "du"
        DO ij = iip2, ip1jm - 1
           ww = wsur2(ij) + wsur2(ij+1)
-          uu = 0.5*(ucov(ij, l)+ucov(ij, l+1))
+          uu = 0.5*(ang_3d(ij, l)+ang_3d(ij, l+1))
           du(ij, l) = du(ij, l) - ww*(uu-uav(ij, l))/massebx(ij, l)
           du(ij, l+1) = du(ij, l+1) + ww*(uu-uav(ij, l+1))/massebx(ij, l+1)
        END DO

@@ -9,14 +9,14 @@ contains
     ! From libf/dyn3d/vitvert.F, version 1.1.1.1, 2004/05/19 12:53:05
     ! Authors: P. Le Van, F. Hourdin
 
-    ! Purpose: Compute vertical speed at sigma levels.
+    ! Purpose: compute vertical speed at sigma levels.
 
     ! Vertical speed is oriented from bottom to top. At ground-level
     ! sigma(1): vitvert(i, j, 1) = 0. At top-level sigma(llm + 1), vertical
     ! speed is 0 too and is not stored in vitvert.
     
-    USE dimensions, ONLY : llm
-    USE disvert_m, ONLY : bp
+    USE dimensions, ONLY: llm
+    USE disvert_m, ONLY: bp
 
     real, intent(in):: convm(:, :, :) ! (iim + 1, jjm + 1, llm)
     REAL vitvert(size(convm, 1), size(convm, 2), size(convm, 3))

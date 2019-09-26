@@ -4,7 +4,7 @@ module newmicro_m
 
 contains
 
-  SUBROUTINE newmicro (paprs, play, t, qlwp, clc, cldtau, clemi, cldh, cldl, &
+  SUBROUTINE newmicro (paprs, play, t, cldliq, clc, cldtau, clemi, cldh, cldl, &
        cldm, cldt, ctlwp, flwp, fiwp, flwc, fiwc)
 
     ! From LMDZ4/libf/phylmd/newmicro.F, version 1.2 2004/06/03 09:22:43
@@ -19,11 +19,13 @@ contains
     USE suphec_m, ONLY: rg
 
     REAL, intent(in):: paprs(:, :) ! (klon, klev+1)
+    ! pression pour chaque inter-couche, en Pa
+
     real, intent(in):: play(:, :) ! (klon, klev)
     REAL, intent(in):: t(:, :) ! (klon, klev) temperature
 
-    REAL, intent(in):: qlwp(:, :) ! (klon, klev)
-    ! eau liquide nuageuse dans l'atmosphère (kg / kg)
+    REAL, intent(in):: cldliq(:, :) ! (klon, klev)
+    ! mass fraction of liquid water in atmosphere
 
     REAL, intent(inout):: clc(:, :) ! (klon, klev)
     ! couverture nuageuse pour le rayonnement (0 à 1)
@@ -56,7 +58,7 @@ contains
     REAL rad_chaud
     REAL, PARAMETER:: coef_chau = 0.13
     REAL, PARAMETER:: seuil_neb = 0.001, t_glace = 258.
-    real rel, tc, rei, zfiwp
+    real tc, rei, zfiwp
     real k_ice
     real, parameter:: k_ice0 = 0.005 ! units=m2 / g
     real, parameter:: DF = 1.66 ! diffusivity factor
@@ -78,19 +80,19 @@ contains
           fice = 1. - (t(i, k) - t_glace) / (273.13 - t_glace)
           fice = MIN(MAX(fice, 0.), 1.)
 
-          zflwp = 1000. * (1. - fice) * qlwp(i, k) / clc(i, k) &
+          zflwp = 1000. * (1. - fice) * cldliq(i, k) / clc(i, k) &
                * (paprs(i, k) - paprs(i, k + 1)) / RG
-          zfiwp = 1000. * fice * qlwp(i, k) / clc(i, k) &
+          zfiwp = 1000. * fice * cldliq(i, k) / clc(i, k) &
                * (paprs(i, k) - paprs(i, k + 1)) / RG
 
-          flwp(i) = flwp(i) &
-               + (1. - fice) * qlwp(i, k) * (paprs(i, k) - paprs(i, k + 1)) / RG
+          flwp(i) = flwp(i) + (1. - fice) * cldliq(i, k) &
+               * (paprs(i, k) - paprs(i, k + 1)) / RG
           fiwp(i) = fiwp(i) &
-               + fice * qlwp(i, k) * (paprs(i, k) - paprs(i, k + 1)) / RG
+               + fice * cldliq(i, k) * (paprs(i, k) - paprs(i, k + 1)) / RG
 
           ! Total Liquid/Ice water content
-          flwc(i, k) = (1.-fice) * qlwp(i, k)
-          fiwc(i, k) = fice * qlwp(i, k)
+          flwc(i, k) = (1.-fice) * cldliq(i, k)
+          fiwc(i, k) = fice * cldliq(i, k)
           ! In-Cloud Liquid/Ice water content
 
           ! effective cloud droplet radius (microns):
@@ -111,7 +113,6 @@ contains
           fl(i, k) = clc(i, k) * (1.-fice) 
           re(i, k) = rad_chaud * fl(i, k)
 
-          rel = rad_chaud
           ! for ice clouds: as a function of the ambiant temperature
           ! (formula used by Iacobellis and Somerville (2000), with an 
           ! asymptotical value of 3.5 microns at T<-81.4 C added to be 
@@ -119,12 +120,11 @@ contains
           tc = t(i, k)-273.15
           rei = merge(3.5, 0.71 * tc + 61.29, tc <= -81.4)
 
-          ! Cloud optical thickness:
-          ! (for liquid clouds, traditional formula, for ice clouds,
-          ! Ebert and Curry (1992))
-          if (zflwp == 0.) rel = 1. 
+          ! Cloud optical thickness. For liquid clouds, traditional
+          ! formula (e. g. Liou 2002 k0795 § 8.4.5.2). For ice clouds,
+          ! Ebert and Curry (1992).
           if (zfiwp == 0. .or. rei <= 0.) rei = 1. 
-          cldtau(i, k) = 3. / 2. * (zflwp / rel) &
+          cldtau(i, k) = 3. / 2. * zflwp / rad_chaud &
                + zfiwp * (3.448e-03 + 2.431 / rei)
 
           ! cloud infrared emissivity:
@@ -158,7 +158,7 @@ contains
     DO k = klev, 1, -1
        DO i = 1, klon
           ctlwp(i) = ctlwp(i) &
-               + qlwp(i, k) * (paprs(i, k) - paprs(i, k + 1)) / RG
+               + cldliq(i, k) * (paprs(i, k) - paprs(i, k + 1)) / RG
           cldt(i) = cldt(i) * (1.-clc(i, k))
           if (play(i, k) <= cetahb * paprs(i, 1)) &
                cldh(i) = cldh(i) * (1. - clc(i, k))

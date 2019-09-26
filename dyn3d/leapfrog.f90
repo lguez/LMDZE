@@ -55,7 +55,7 @@ contains
     REAL pk(iim + 1, jjm + 1, llm) ! exner au milieu des couches
     REAL pkf(iim + 1, jjm + 1, llm) ! exner filtr\'e au milieu des couches
     REAL phi(iim + 1, jjm + 1, llm) ! geopotential
-    REAL w(iim + 1, jjm + 1, llm) ! vitesse verticale
+    REAL w(iim + 1, jjm + 1, llm) ! vertical mass flux, in kg / s
 
     ! Variables dynamiques interm\'ediaires pour le transport
     ! Flux de masse :

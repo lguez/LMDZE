@@ -62,7 +62,9 @@ contains
 
     REAL, intent(in):: phis(:, :) ! (iim + 1, jjm + 1)
     REAL, intent(in):: phi(:, :, :) ! (iim + 1, jjm + 1, llm)
-    REAL, intent(in):: w(:, :, :) ! (iim + 1, jjm + 1, llm) in kg / s
+
+    REAL, intent(in):: w(:, :, :) ! (iim + 1, jjm + 1, llm)
+    ! vertical mass flux, in kg / s
 
     REAL, intent(out):: dufi(:, :, :) ! (iim + 1, jjm + 1, llm)
     ! tendency for the covariant zonal velocity (m2 s-2)

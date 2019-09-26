@@ -5,7 +5,7 @@ module fisrtilp_m
 contains
 
   SUBROUTINE fisrtilp(paprs, pplay, t, q, ptconv, ratqs, d_t, d_q, d_ql, rneb, &
-       radliq, rain, snow, pfrac_impa, pfrac_nucl, pfrac_1nucl, frac_impa, &
+       cldliq, rain, snow, pfrac_impa, pfrac_nucl, pfrac_1nucl, frac_impa, &
        frac_nucl, prfl, psfl, rhcl)
 
     ! From phylmd/fisrtilp.F, version 1.2, 2004/11/09 16:55:40
@@ -38,7 +38,7 @@ contains
     REAL, INTENT (out):: d_ql(klon, klev) ! incrementation de l'eau liquide
     REAL, INTENT (out):: rneb(klon, klev) ! fraction nuageuse
 
-    REAL, INTENT (out):: radliq(klon, klev)
+    REAL, INTENT (out):: cldliq(klon, klev)
     ! eau liquide utilisee dans rayonnement
 
     REAL, INTENT (out):: rain(klon) ! pluies (mm/s)
@@ -166,7 +166,7 @@ contains
           d_q(i, k) = 0.0
           d_ql(i, k) = 0.0
           rneb(i, k) = 0.0
-          radliq(i, k) = 0.0
+          cldliq(i, k) = 0.0
           frac_nucl(i, k) = 1.
           frac_impa(i, k) = 1.
        END DO
@@ -344,7 +344,7 @@ contains
              zfice(i) = min(max(zfice(i), 0.0), 1.0)
              zfice(i) = zfice(i)**nexpo
              zneb(i) = max(rneb(i, k), seuil_neb)
-             radliq(i, k) = zoliq(i)/real(ninter+1)
+             cldliq(i, k) = zoliq(i)/real(ninter+1)
           END IF
        END DO
 
@@ -375,7 +375,7 @@ contains
                 IF (zneb(i)==seuil_neb) ztot(i) = 0.0
                 ztot(i) = min(max(ztot(i), 0.0), zoliq(i))
                 zoliq(i) = max(zoliq(i)-ztot(i), 0.0)
-                radliq(i, k) = radliq(i, k) + zoliq(i)/real(ninter+1)
+                cldliq(i, k) = cldliq(i, k) + zoliq(i)/real(ninter+1)
              END IF
           END DO
        END DO

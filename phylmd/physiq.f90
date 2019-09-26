@@ -727,7 +727,7 @@ contains
           q_seri(i, k) = q_seri(i, k) + d_q_lsc(i, k)
           ql_seri(i, k) = ql_seri(i, k) + d_ql_lsc(i, k)
           cldfra(i, k) = rneb(i, k)
-          IF (.NOT.new_oliq) cldliq(i, k) = ql_seri(i, k)
+          IF (.NOT. new_oliq) cldliq(i, k) = ql_seri(i, k)
        ENDDO
     ENDDO
 
