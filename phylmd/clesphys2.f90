@@ -4,9 +4,6 @@ module clesphys2
 
   implicit none
 
-  LOGICAL, protected:: new_oliq = .TRUE.
-  ! Permet de mettre en route la nouvelle parametrisation de l'eau liquide
-
   ! Pour l'orographie:
   LOGICAL, protected:: ok_orodr = .TRUE.
   LOGICAL, protected:: ok_orolf = .TRUE.
@@ -29,8 +26,8 @@ contains
     use nr_util, only: assert
     use conf_gcm_m, only: day_step, iphysiq
 
-    namelist /clesphys2_nml/new_oliq, ok_orodr, ok_orolf, ok_limitvrai, &
-         nbapp_rad, conv_emanuel
+    namelist /clesphys2_nml/ok_orodr, ok_orolf, ok_limitvrai, nbapp_rad, &
+         conv_emanuel
 
     !------------------------------------
 

@@ -38,6 +38,7 @@ contains
     use cvltr_m, only: cvltr
     use dimensions, only: llm, nqmx
     use dimphy, only: klon
+    use dqthermcell_m, only: dqthermcell
     use histwrite_phy_m, only: histwrite_phy
     use indicesol, only: nbsrf
     use infotrac_init_m, only: tname

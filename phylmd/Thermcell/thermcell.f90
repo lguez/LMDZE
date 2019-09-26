@@ -20,6 +20,7 @@ contains
     ! 4. un d\'etra\^inement
 
     USE dimphy, ONLY : klev, klon
+    use dqthermcell_m, only: dqthermcell
     USE suphec_m, ONLY : rd, rg, rkappa
 
     INTEGER ngrid, nlay

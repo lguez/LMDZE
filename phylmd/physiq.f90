@@ -19,7 +19,7 @@ contains
     use ajsec_m, only: ajsec
     use calltherm_m, only: calltherm
     USE clesphys, ONLY: cdhmax, cdmmax, ecrit_ins, ok_instan
-    USE clesphys2, ONLY: conv_emanuel, nbapp_rad, new_oliq, ok_orodr, ok_orolf
+    USE clesphys2, ONLY: conv_emanuel, nbapp_rad, ok_orodr, ok_orolf
     USE conf_interface_m, ONLY: conf_interface
     USE pbl_surface_m, ONLY: pbl_surface
     use clouds_gno_m, only: clouds_gno
@@ -102,9 +102,6 @@ contains
     ! Local:
 
     LOGICAL:: firstcal = .true.
-
-    LOGICAL, PARAMETER:: ok_stratus = .FALSE.
-    ! Ajouter artificiellement les stratus
 
     ! pour phystoke avec thermiques
     REAL fm_therm(klon, llm + 1)
@@ -727,7 +724,6 @@ contains
           q_seri(i, k) = q_seri(i, k) + d_q_lsc(i, k)
           ql_seri(i, k) = ql_seri(i, k) + d_ql_lsc(i, k)
           cldfra(i, k) = rneb(i, k)
-          IF (.NOT. new_oliq) cldliq(i, k) = ql_seri(i, k)
        ENDDO
     ENDDO
 
@@ -782,20 +778,6 @@ contains
        ! On prend la somme des fractions nuageuses et des contenus en eau
        cldfra = min(max(cldfra, rnebcon), 1.)
        cldliq = cldliq + rnebcon * clwcon
-    ENDIF
-
-    ! 2. Nuages stratiformes
-
-    IF (ok_stratus) THEN
-       CALL diagcld2(paprs, play, t_seri, q_seri, diafra, dialiq)
-       DO k = 1, llm
-          DO i = 1, klon
-             IF (diafra(i, k) > cldfra(i, k)) THEN
-                cldliq(i, k) = dialiq(i, k)
-                cldfra(i, k) = diafra(i, k)
-             ENDIF
-          ENDDO
-       ENDDO
     ENDIF
 
     ! Precipitation totale
