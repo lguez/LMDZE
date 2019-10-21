@@ -27,6 +27,6 @@ add_executable(test_ozonecm $<TARGET_OBJECTS:LMDZE_objects>
   ${CMAKE_CURRENT_LIST_DIR}/test_ozonecm.f90)
 
 target_include_directories(test_ozonecm PRIVATE ${nr_util_INCLUDE_DIR}
-  ${netcdff_INCLUDE_DIR})
+  ${netcdff_INCLUDE_DIR} ${netcdf95_INCLUDE_DIR})
 
 target_link_libraries(test_ozonecm ${library_list})

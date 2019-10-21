@@ -31,8 +31,9 @@ message(STATUS "Set iim to ${CPP_IIM}, jjm to ${CPP_JJM}, llm to ${CPP_LLM}")
 target_compile_definitions(LMDZE_objects PRIVATE CPP_IIM=${CPP_IIM}
   CPP_JJM=${CPP_JJM} CPP_LLM=${CPP_LLM})
 
-target_include_directories(LMDZE_objects PRIVATE ${netcdff_INCLUDE_DIR}
-  ${netcdf95_INCLUDE_DIR})
+target_include_directories(LMDZE_objects PRIVATE
+  ${netcdff_INCLUDE_DIR} ${netcdf95_INCLUDE_DIR} ${jumble_INCLUDE_DIR}
+  ${nr_util_INCLUDE_DIR} ${numer_rec_95_INCLUDE_DIR})
 
 foreach(my_dir dyn3d filtrez IOIPSL misc phylmd)
   include(${my_dir}/CMakeLists.txt)

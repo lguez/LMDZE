@@ -7,7 +7,7 @@ contains
   SUBROUTINE stdlevvar(nsrf, u1, v1, t1, q1, z1, ts1, qsurf, rugos, psol, &
        pat1, t_2m, q_2m, t_10m, q_10m, wind10m, ustar)
 
-    ! From LMDZ4/libf/phylmd/stdlevvar.F90, version 1.3, 2005/05/25 13:10:09
+    ! From LMDZ4/libf/phylmd/stdlevvar.F90, version 1.3, 2005 May 25th
 
     ! Objet : calcul de la température et de l'humidité relative à 2 m
     ! et du module du vent à 10 m à partir des relations de
@@ -17,6 +17,7 @@ contains
 
     ! Author: I. Musat, July 1st, 2002
 
+    ! Library:
     use nr_util, only: assert_eq
 
     use cdrag_m, only: cdrag
@@ -60,7 +61,7 @@ contains
     DOUBLE PRECISION, dimension(klon):: lmon
     REAL, dimension(klon):: delu, delte, delq
     REAL, dimension(klon):: u_zref, te_zref, q_zref 
-    REAL, dimension(klon):: temp
+    REAL temp(size(u1)) ! (knon)
     real pref(size(u1)) ! (knon)
 
     !------------------------------------------------------------------------- 

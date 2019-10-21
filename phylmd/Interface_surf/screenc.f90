@@ -31,8 +31,10 @@ contains
     ! nsrf----input-I- indice pour le type de surface; voir indicesol.inc
     REAL, dimension(klon), intent(in):: speed
     ! speed---input-R- module du vent au 1er niveau du modele
-    REAL, dimension(klon), intent(in):: temp
-    ! temp----input-R- temperature de l'air au 1er niveau du modele
+
+    REAL, intent(in):: temp(:) ! (knon)
+    ! temperature de l'air au 1er niveau du modele
+
     REAL, dimension(klon), intent(in):: q_zref
     ! q_zref--input-R- humidite relative au 1er niveau du modele
     REAL, intent(in):: zref
@@ -69,8 +71,8 @@ contains
 
     ! Richardson at reference level
 
-    CALL cdrag(nsrf, speed(:knon), temp(:knon), q_zref(:knon), gref, psol, ts, &
-         qsurf, rugos(:knon), cdram, cdrah, pref)
+    CALL cdrag(nsrf, speed(:knon), temp, q_zref(:knon), gref, psol, ts, qsurf, &
+         rugos(:knon), cdram, cdrah, pref)
 
     DO i = 1, knon
        delu(i) = ustar(i) / sqrt(cdram(i))

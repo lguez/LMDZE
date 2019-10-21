@@ -8,12 +8,11 @@ contains
        cdragh, pref)
 
     ! From LMDZ4/libf/phylmd/clcdrag.F90 and
-    ! LMDZ4/libf/phylmd/coefcdrag.F90, version 1.1.1.1, 2004/05/19
-    ! 12:53:07
+    ! LMDZ4/libf/phylmd/coefcdrag.F90, version 1.1.1.1, 2004 May 19th
 
     ! Objet : calcul des drag coefficients au sol pour le moment et
     ! les flux de chaleurs sensible et latente et calcul de la
-    ! pression au niveau de reference.
+    ! pression au niveau de r\'ef\'erence.
 
     ! Ionela MUSAT, July, 1st, 2002
 
@@ -26,6 +25,7 @@ contains
     ! sensitivity of the ECMWF model to the parameterization of
     ! evaporation from the tropical oceans. J. Climate, 5:418-434.
 
+    ! Library:
     use nr_util, only: assert_eq
 
     use clesphys, only: f_cdrag_oce, f_cdrag_ter
