@@ -5,10 +5,9 @@ module swde_m
 contains
 
   SUBROUTINE swde(pgg, pref, prmuz, pto1, pw, pre1, pre2, ptr1, ptr2)
-    USE dimensions
-    USE dimphy
-    USE raddim
-    ! ------------------------------------------------------------------
+    
+    USE raddim, only: kdlon
+
     ! PURPOSE.
     ! --------
     ! COMPUTES THE REFLECTIVITY AND TRANSMISSIVITY OF A CLOUDY
@@ -126,9 +125,8 @@ contains
        zri0d = zc1b*zexkm + zc2b*zexkp - zalpha*zexmu0
        zri1d = zrp*(zc1b*zexkm-zc2b*zexkp) - zbeta*zexmu0
        ptr2(jl) = zexmu0 + (zri0d+zdt*zri1d)/prmuz(jl)
-
     END DO
-    RETURN
+
   END SUBROUTINE swde
 
 end module swde_m

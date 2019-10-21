@@ -63,7 +63,7 @@ contains
     real, parameter:: f_ri_cd_min = 0.1
     INTEGER i, knon
     REAL zdu2, ztsolv, ztvd, zscf, zucf
-    real zcdn ! drag coefficient neutre
+    real cdn ! drag coefficient neutre
 
     REAL zri
     ! nombre de Richardson entre la surface et le niveau de reference
@@ -80,21 +80,21 @@ contains
        ztvd = (t(i) + zgeop(i) / RCPD / (1. + RVTMP2 * q(i))) &
             * (1. + RETV * q(i))
        zri = zgeop(i) * (ztvd - ztsolv) / (zdu2 * ztvd)
-       zcdn = (ckap / log(1. + zgeop(i) / (RG * rugos(i))))**2
+       cdn = (ckap / log(1. + zgeop(i) / (RG * rugos(i))))**2
 
        IF (zri < 0.) THEN
           ! situation instable
-          zucf = 1. / (1. + 3. * cb * cc * zcdn &
+          zucf = 1. / (1. + 3. * cb * cc * cdn &
                * SQRT(ABS(zri) * (1. + zgeop(i) / (RG * rugos(i)))))
-          cdragm(i) = zcdn * max((1. - 2. * cb * zri * zucf), f_ri_cd_min)
+          cdragm(i) = cdn * max((1. - 2. * cb * zri * zucf), f_ri_cd_min)
 
           IF (nsrf == is_oce) then
              ! Cf. Miller et al. (1992).
-             cdragh(i) = f_cdrag_oce * zcdn * (1. + ((0.0016 &
-                  / (zcdn * SQRT(zdu2))) * ABS(ztvd - ztsolv)**(1. &
+             cdragh(i) = f_cdrag_oce * cdn * (1. + ((0.0016 / (cdn &
+                  * SQRT(zdu2))) * ABS(ztvd - ztsolv)**(1. &
                   / 3.))**1.25)**(1. / 1.25)
           else
-             cdragh(i) = f_cdrag_ter * zcdn &
+             cdragh(i) = f_cdrag_ter * cdn &
                   * max((1. - 3. * cb * zri * zucf), f_ri_cd_min)
           end IF
        ELSE
@@ -103,8 +103,8 @@ contains
           ! al. (1995).
           zri = min(20., zri)
           zscf = SQRT(1. + cd * ABS(zri))
-          cdragm(i) = zcdn * max(1. / (1. + 2. * CB * zri / zscf), f_ri_cd_min)
-          cdragh(i) = merge(f_cdrag_oce, f_cdrag_ter, nsrf == is_oce) * zcdn &
+          cdragm(i) = cdn * max(1. / (1. + 2. * CB * zri / zscf), f_ri_cd_min)
+          cdragh(i) = merge(f_cdrag_oce, f_cdrag_ter, nsrf == is_oce) * cdn &
                * max(1. / (1. + 3. * CB * zri * zscf), f_ri_cd_min)
        ENDIF
     END DO

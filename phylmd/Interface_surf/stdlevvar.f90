@@ -30,13 +30,13 @@ contains
     REAL, intent(in):: v1(:) ! (knon) vent meridien au 1er niveau du modele
     REAL, intent(in):: t1(:) ! (knon) temperature de l'air au 1er
                              ! niveau du modele
-    REAL, intent(in):: q1(klon) ! humidite relative au 1er niveau du modele
-    REAL, intent(in):: z1 (klon) ! geopotentiel au 1er niveau du modele
-    REAL, intent(in):: ts1(klon) ! temperature de l'air a la surface
+    REAL, intent(in):: q1(:) ! (knon) humidite relative au 1er niveau du modele
+    REAL, intent(in):: z1(:) ! (knon) geopotentiel au 1er niveau du modele
+    REAL, intent(in):: ts1(:) ! (knon) temperature de l'air a la surface
     REAL, intent(in):: qsurf(:) ! (knon) humidit\'e relative \`a la surface
     REAL, intent(in):: rugos(klon) ! rugosite
-    REAL, intent(in):: psol(klon) ! pression au sol
-    REAL, intent(in):: pat1(klon) ! pression au 1er niveau du modele
+    REAL, intent(in):: psol(:) ! (knon) pression au sol
+    REAL, intent(in):: pat1(:) ! (knon) pression au 1er niveau du modele
     REAL, intent(out):: t_2m(klon) ! temperature de l'air a 2m
     REAL, intent(out):: q_2m(klon) ! humidite relative a 2m
     REAL, intent(out):: t_10m(klon) ! temperature de l'air a 10m
@@ -72,8 +72,8 @@ contains
        speed(i)=SQRT(u1(i)**2+v1(i)**2)
     ENDDO
 
-    CALL cdrag(nsrf, speed(:knon), t1(:knon), q1(:knon), z1(:knon), &
-         psol(:knon), ts1(:knon), qsurf, rugos(:knon), cdram, cdrah) 
+    CALL cdrag(nsrf, speed(:knon), t1, q1, z1, psol, ts1, qsurf, &
+         rugos(:knon), cdram, cdrah) 
 
     ! Star variables 
 
@@ -106,8 +106,8 @@ contains
     ! corrector calculation ; see Hess & McAvaney, 1995
 
     DO n = 1, niter
-       CALL screenc(klon, knon, nsrf, u_zref, temp, q_zref, zref, ts1, &
-            qsurf, rugos, psol, ustar, testar, qstar, pref, delu, delte, delq) 
+       CALL screenc(klon, knon, nsrf, u_zref, temp, q_zref, zref, ts1, qsurf, &
+            rugos, psol, ustar, testar, qstar, pref, delu, delte, delq) 
 
        DO i = 1, knon
           u_zref(i) = delu(i)
@@ -143,8 +143,8 @@ contains
     ! corrector ; see Hess & McAvaney, 1995
 
     DO n = 1, niter
-       CALL screenc(klon, knon, nsrf, u_zref, temp, q_zref, zref, ts1, &
-            qsurf, rugos, psol, ustar, testar, qstar, pref, delu, delte, delq)
+       CALL screenc(klon, knon, nsrf, u_zref, temp, q_zref, zref, ts1, qsurf, &
+            rugos, psol, ustar, testar, qstar, pref, delu, delte, delq)
 
        DO i = 1, knon
           u_zref(i) = delu(i)

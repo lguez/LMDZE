@@ -37,13 +37,11 @@ contains
     ! q_zref--input-R- humidite relative au 1er niveau du modele
     REAL, intent(in):: zref
     ! zref----input-R- altitude de reference
-    REAL, dimension(klon), intent(in):: ts
-    ! ts------input-R- temperature de l'air a la surface
+    REAL, intent(in):: ts(:) ! (knon) temperature de l'air a la surface
     REAL, intent(in):: qsurf(:) ! (knon) humidite relative a la surface
     REAL, dimension(klon), intent(in):: rugos
     ! rugos---input-R- rugosite
-    REAL, dimension(klon), intent(in):: psol
-    ! psol----input-R- pression au sol
+    REAL, intent(in):: psol(:) ! (knon) pression au sol
     REAL, intent(in):: ustar(:) ! (knon) facteur d'\'echelle pour le vent
     REAL, dimension(klon), intent(in):: testar
     ! testar--input-R- facteur d'echelle pour la temperature potentielle
@@ -71,8 +69,8 @@ contains
 
     ! Richardson at reference level
 
-    CALL cdrag(nsrf, speed(:knon), temp(:knon), q_zref(:knon), gref(:knon), &
-         psol(:knon), ts(:knon), qsurf, rugos(:knon), cdram, cdrah, pref)
+    CALL cdrag(nsrf, speed(:knon), temp(:knon), q_zref(:knon), gref, psol, ts, &
+         qsurf, rugos(:knon), cdram, cdrah, pref)
 
     DO i = 1, knon
        delu(i) = ustar(i) / sqrt(cdram(i))

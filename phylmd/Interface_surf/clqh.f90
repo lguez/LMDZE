@@ -41,7 +41,7 @@ contains
 
     REAL, intent(in):: cdragh(:) ! (knon) sans unite
 
-    REAL, intent(in):: t(:, :) ! (knon, klev) temperature (K)
+    REAL, intent(in):: t(:, :) ! (knon, klev) air temperature, in K
     REAL, intent(in):: q(:, :) ! (knon, klev) humidit\'e sp\'ecifique
     REAL, intent(in):: ts(:) ! (knon) temperature du sol (K)
 
@@ -74,7 +74,7 @@ contains
     real, intent(out):: fluxlat(:) ! (knon) flux de chaleur latente, en W m-2
     real, intent(in):: pctsrf_new_sic(:) ! (knon)
     REAL, intent(inout):: agesno(:) ! (knon)
-    REAL, intent(out):: d_t(:, :) ! (knon, klev) incrementation de "t"
+    REAL, intent(out):: d_t(:, :) ! (knon, klev) variation of air temperature t
     REAL, intent(out):: d_q(:, :) ! (knon, klev) incrementation de "q"
     REAL, intent(out):: d_ts(:) ! (knon) variation of surface temperature
     real, intent(out):: z0_new(:) ! (knon)

@@ -24,8 +24,11 @@ contains
     INTEGER, intent(in):: knon ! nombre de points pour un type de surface
     REAL, intent(in):: speed(klon) ! module du vent au 1er niveau du modele
     REAL, intent(in):: tair(klon) ! temperature de l'air au 1er niveau du modele
-    REAL, intent(in):: qair(klon) ! humidite relative au 1er niveau du modele
-    REAL, intent(in):: ts(klon) ! temperature de l'air a la surface
+
+    REAL, intent(in):: qair(:) ! (knon)
+    ! humidite relative au 1er niveau du modele
+
+    REAL, intent(in):: ts(:) ! (knon) temperature de l'air a la surface
     REAL, intent(in):: qsurf(:) ! (knon) humidite relative a la surface
     REAL, intent(in):: rugos(klon) ! rugosite
     DOUBLE PRECISION, intent(in):: lmon(klon) ! longueur de Monin-Obukov

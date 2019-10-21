@@ -108,7 +108,7 @@ contains
     print '('' Cvd = '', e13.7)', RCVD
     print '('' Cvv = '', e13.7)', RCVV
     print '('' Rd/Cpd = '', e13.7)', RKAPPA
-    print '('' Rv / Rd - 1 = '', e13.7)', RETV
+    print *, 'Rv / Rd - 1 = ', RETV
 
     ! 7. DEFINE THERMODYNAMIC CONSTANTS, SOLID PHASE.
 

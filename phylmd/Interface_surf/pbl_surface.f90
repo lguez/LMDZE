@@ -4,13 +4,13 @@ module pbl_surface_m
 
 contains
 
-  SUBROUTINE pbl_surface(pctsrf, t, q, u, v, julien, mu0, ftsol, cdmmax, &
-       cdhmax, ftsoil, qsol, paprs, play, fsnow, fqsurf, falbe, fluxlat, &
-       rain_fall, snow_fall, frugs, agesno, rugoro, d_t, d_q, d_u, d_v, &
-       flux_t, flux_q, flux_u, flux_v, cdragh, cdragm, q2, dflux_t, dflux_q, &
-       coefh, t2m, q2m, u10m_srf, v10m_srf, pblh, capcl, oliqcl, cteicl, pblt, &
-       therm, plcl, fqcalving, ffonte, run_off_lic_0, albsol, sollw, solsw, &
-       tsol)
+  SUBROUTINE pbl_surface(pctsrf, t_seri, q_seri, u, v, julien, mu0, ftsol, &
+       cdmmax, cdhmax, ftsoil, qsol, paprs, play, fsnow, fqsurf, falbe, &
+       fluxlat, rain_fall, snow_fall, frugs, agesno, rugoro, d_t, d_q, d_u, &
+       d_v, flux_t, flux_q, flux_u, flux_v, cdragh, cdragm, q2, dflux_t, &
+       dflux_q, coefh, t2m, q2m, u10m_srf, v10m_srf, pblh, capcl, oliqcl, &
+       cteicl, pblt, therm, plcl, fqcalving, ffonte, run_off_lic_0, albsol, &
+       sollw, solsw, tsol)
 
     ! From phylmd/clmain.F, version 1.6, 2005/11/16 14:47:19
     ! Author: Z. X. Li (LMD/CNRS)
@@ -42,8 +42,8 @@ contains
     REAL, INTENT(inout):: pctsrf(:, :) ! (klon, nbsrf)
     ! pourcentages de surface de chaque maille
 
-    REAL, INTENT(IN):: t(klon, klev) ! temperature (K)
-    REAL, INTENT(IN):: q(klon, klev) ! vapeur d'eau (kg / kg)
+    REAL, INTENT(IN):: t_seri(:, :) ! (klon, klev) air temperature, in K
+    REAL, INTENT(IN):: q_seri(:, :) ! (klon, klev) mass fraction of water vapor
     REAL, INTENT(IN):: u(klon, klev), v(klon, klev) ! vitesse
     INTEGER, INTENT(IN):: julien ! jour de l'annee en cours
     REAL, intent(in):: mu0(klon) ! cosinus de l'angle solaire zenithal     
@@ -82,7 +82,7 @@ contains
     REAL, INTENT(IN):: rugoro(klon)
 
     REAL, intent(out):: d_t(:, :), d_q(:, :) ! (klon, klev)
-    ! changement pour t et q
+    ! changement pour t_seri et q_seri
 
     REAL, intent(out):: d_u(klon, klev), d_v(klon, klev)
     ! changement pour "u" et "v"
@@ -121,7 +121,7 @@ contains
     REAL capcl(klon, nbsrf)
     REAL oliqcl(klon, nbsrf)
     REAL cteicl(klon, nbsrf)
-    REAL, INTENT(inout):: pblt(klon, nbsrf) ! T au nveau HCL
+    REAL, INTENT(inout):: pblt(klon, nbsrf) ! temp\'erature au nveau HCL
     REAL therm(klon, nbsrf)
     REAL plcl(klon, nbsrf)
 
@@ -159,7 +159,7 @@ contains
     REAL rugmer(klon)
     REAL ytsoil(klon, nsoilmx)
     REAL yts(klon), ypctsrf(klon), yz0_new(klon)
-    real yrugos(klon) ! longueur de rugosite (en m)
+    real yrugos(klon) ! longueur de rugosit\'e, en m
     REAL yalb(klon)
     REAL snow(klon) ! column-density of mass of snow at the surface, in kg m-2
     real yqsurf(klon), yagesno(klon)
@@ -200,9 +200,7 @@ contains
     REAL ypblt(klon)
     REAL ytherm(klon)
     REAL u1(klon), v1(klon)
-    REAL tair1(klon), qair1(klon), tairsol(klon)
-    REAL psfce(klon), patm(klon)
-    REAL zgeo1(klon)
+    REAL tair1(klon)
     REAL rugo1(klon)
     REAL zgeop(klon, klev)
 
@@ -233,7 +231,6 @@ contains
     cdragm = 0.
     dflux_t = 0.
     dflux_q = 0.
-    yrugos = 0.
     ypaprs = 0.
     ypplay = 0.
     ydelp = 0.
@@ -311,8 +308,8 @@ contains
                 ydelp(j, k) = delp(i, k)
                 yu(j, k) = u(i, k)
                 yv(j, k) = v(i, k)
-                yt(j, k) = t(i, k)
-                yq(j, k) = q(i, k)
+                yt(j, k) = t_seri(i, k)
+                yq(j, k) = q_seri(i, k)
              END DO
           END DO
 
@@ -337,8 +334,8 @@ contains
              ycdragh(:knon) = max(ycdragh(:knon), 0.)
           end IF
 
-          ! on met un seuil pour ycdragm et ycdragh
           IF (nsrf == is_oce) THEN
+             ! On met un seuil pour ycdragm et ycdragh :
              ycdragm(:knon) = min(ycdragm(:knon), cdmmax)
              ycdragh(:knon) = min(ycdragh(:knon), cdhmax)
           END IF
@@ -385,7 +382,6 @@ contains
 
           DO k = 1, klev
              DO j = 1, knon
-                i = ni(j)
                 y_d_t(j, k) = y_d_t(j, k) * ypctsrf(j)
                 y_d_q(j, k) = y_d_q(j, k) * ypctsrf(j)
                 y_d_u(j, k) = y_d_u(j, k) * ypctsrf(j)
@@ -448,28 +444,25 @@ contains
           forall (k = 2:klev) coefh(ni(:knon), k) &
                = coefh(ni(:knon), k) + ycoefh(:knon, k) * ypctsrf(:knon)
 
-          ! diagnostic t, q a 2m et u, v a 10m
+          ! Diagnostic temp\'erature, q \`a 2 m et u, v \`a 10 m:
 
-          DO j = 1, knon
-             i = ni(j)
-             u1(j) = yu(j, 1) + y_d_u(j, 1)
-             v1(j) = yv(j, 1) + y_d_v(j, 1)
-             tair1(j) = yt(j, 1) + y_d_t(j, 1)
-             qair1(j) = yq(j, 1) + y_d_q(j, 1)
-             zgeo1(j) = rd * tair1(j) / (0.5 * (ypaprs(j, 1) + ypplay(j, &
-                  1))) * (ypaprs(j, 1)-ypplay(j, 1))
-             tairsol(j) = yts(j) + y_d_ts(j)
-             rugo1(j) = yrugos(j)
-             IF (nsrf == is_oce) THEN
-                rugo1(j) = frugs(i, nsrf)
-             END IF
-             psfce(j) = ypaprs(j, 1)
-             patm(j) = ypplay(j, 1)
-          END DO
+          u1(:knon) = yu(:knon, 1) + y_d_u(:knon, 1)
+          v1(:knon) = yv(:knon, 1) + y_d_v(:knon, 1)
+          tair1(:knon) = yt(:knon, 1) + y_d_t(:knon, 1)
 
-          CALL stdlevvar(nsrf, u1(:knon), v1(:knon), tair1(:knon), qair1, &
-               zgeo1, tairsol, yqsurf(:knon), rugo1, psfce, patm, yt2m, yq2m, &
-               yt10m, yq10m, wind10m(:knon), ustar(:knon))
+          IF (nsrf == is_oce) THEN
+             rugo1(:knon) = frugs(ni(:knon), is_oce)
+          else
+             rugo1(:knon) = yrugos(:knon)
+          END IF
+
+          CALL stdlevvar(nsrf, u1(:knon), v1(:knon), tair1(:knon), &
+               yq(:knon, 1) + y_d_q(:knon, 1), rd * tair1(:knon) &
+               / (0.5 * (ypaprs(:knon, 1) + ypplay(:knon, 1))) &
+               * (ypaprs(:knon, 1) - ypplay(:knon, 1)), &
+               yts(:knon) + y_d_ts(:knon), yqsurf(:knon), rugo1, &
+               ypaprs(:knon, 1), ypplay(:knon, 1), yt2m, yq2m, yt10m, yq10m, &
+               wind10m(:knon), ustar(:knon))
 
           DO j = 1, knon
              i = ni(j)

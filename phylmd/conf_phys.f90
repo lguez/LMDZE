@@ -7,6 +7,8 @@ module conf_phys_m
   ! 8 : Mellor and Yamada 2.5
 
   REAL, protected:: rad_chau1 = 13., rad_chau2 = 9.
+  ! effective radii of liquid cloud droplets, in micrometers
+  
   real:: epmax = 0.993 ! \'efficacit\'e de pr\'ecipitation
   integer:: iflag_clw = 0
 

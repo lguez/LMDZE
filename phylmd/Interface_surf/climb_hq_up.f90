@@ -10,7 +10,7 @@ contains
     USE dimphy, ONLY: klev
     USE suphec_m, ONLY: rcpd
 
-    REAL, intent(out):: d_t(:, :) ! (knon, klev) incrementation de "t"
+    REAL, intent(out):: d_t(:, :) ! (knon, klev) variation of air temperature t
     REAL, intent(out):: d_q(:, :) ! (knon, klev) incrementation de "q"
     REAL, intent(in), dimension(:, :):: cq, dq, ch, dh ! (knon, klev)
 

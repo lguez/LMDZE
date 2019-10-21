@@ -39,7 +39,8 @@ contains
     ! net downward radiative (longwave + shortwave) flux at the surface
 
     real, intent(IN):: dif_grnd ! coefficient de diffusion vers le sol profond
-    real, intent(IN):: t1lay(:), q1lay(:), u1lay(:), v1lay(:) ! (knon)
+    real, intent(IN):: t1lay(:) ! (knon) temp\'erature de l'air 1\`ere couche
+    real, intent(IN):: q1lay(:), u1lay(:), v1lay(:) ! (knon)
 
     real, intent(IN):: tAcoef(:), qAcoef(:) ! (knon)
     ! coefficients A de la résolution de la couche limite pour T et q

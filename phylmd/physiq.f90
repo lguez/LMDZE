@@ -30,7 +30,6 @@ contains
     USE conf_phys_m, ONLY: conf_phys
     use conflx_m, only: conflx
     USE ctherm_m, ONLY: iflag_thermals, ctherm
-    use diagcld2_m, only: diagcld2
     USE dimensions, ONLY: llm, nqmx
     USE dimphy, ONLY: klon
     USE dimsoil, ONLY: nsoilmx
@@ -355,7 +354,8 @@ contains
 
     ! Variables pour effectuer les appels en s\'erie :
 
-    REAL t_seri(klon, llm), q_seri(klon, llm)
+    REAL t_seri(klon, llm)
+    real q_seri(klon, llm) ! mass fraction of water vapor
     REAL ql_seri(klon, llm)
     REAL u_seri(klon, llm), v_seri(klon, llm)
     REAL tr_seri(klon, llm, nqmx - 2)

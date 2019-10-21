@@ -4,17 +4,14 @@ module swr_m
 
 contains
 
-  SUBROUTINE swr(knu, palbd, pcg, pcld, pomega, psec, ptau, &
-       pcgaz, ppizaz, pray1, pray2, prefz, prj, prk, prmue, ptauaz, ptra1, &
-       ptra2)
-    USE dimensions
-    USE dimphy
-    USE raddim
-    USE radepsi
-    USE radopt
+  SUBROUTINE swr(knu, palbd, pcg, pcld, pomega, psec, ptau, pcgaz, ppizaz, &
+       pray1, pray2, prefz, prj, prk, prmue, ptauaz, ptra1, ptra2)
+
+    USE raddim, only: kdlon, kflev
+    USE radepsi, only: zepsec
+    USE radopt, only: novlp
     use swde_m, only: swde
 
-    ! ------------------------------------------------------------------
     ! PURPOSE.
     ! --------
     ! COMPUTES THE REFLECTIVITY AND TRANSMISSIVITY IN CASE OF

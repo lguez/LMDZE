@@ -131,7 +131,7 @@ contains
     DOUBLE PRECISION zsolsw0(kdlon), zsollw0(kdlon)
     DOUBLE PRECISION zznormcp
 
-    !jq the following quantities are needed for the aerosol radiative forcings
+    ! The following quantities are needed for the aerosol radiative forcings:
     DOUBLE PRECISION ztopswad(kdlon), zsolswad(kdlon) 
     ! Aerosol direct forcing at TOA and surface
 

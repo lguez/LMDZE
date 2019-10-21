@@ -53,9 +53,9 @@ contains
 
     REAL, PARAMETER:: cetahb = 0.45, cetamb = 0.8
     INTEGER i, k
-    REAL zflwp
+    REAL zflwp ! liquid water path, in micrometers
     real fice ! fraction of ice in cloud
-    REAL rad_chaud
+    REAL rad_chaud ! effective radius of liquid cloud droplets, in micrometers
     REAL, PARAMETER:: coef_chau = 0.13
     REAL, PARAMETER:: seuil_neb = 0.001, t_glace = 258.
     real tc, rei, zfiwp
