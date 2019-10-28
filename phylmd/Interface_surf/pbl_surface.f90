@@ -4,8 +4,8 @@ module pbl_surface_m
 
 contains
 
-  SUBROUTINE pbl_surface(pctsrf, t_seri, q_seri, u, v, julien, mu0, ftsol, &
-       cdmmax, cdhmax, ftsoil, qsol, paprs, play, fsnow, fqsurf, falbe, &
+  SUBROUTINE pbl_surface(pctsrf, t_seri, q_seri, u_seri, v_seri, julien, mu0, &
+       ftsol, cdmmax, cdhmax, ftsoil, qsol, paprs, play, fsnow, fqsurf, falbe, &
        fluxlat, rain_fall, snow_fall, frugs, agesno, rugoro, d_t, d_q, d_u, &
        d_v, flux_t, flux_q, flux_u, flux_v, cdragh, cdragm, q2, dflux_t, &
        dflux_q, coefh, t2m, q2m, u10m_srf, v10m_srf, pblh, capcl, oliqcl, &
@@ -44,7 +44,7 @@ contains
 
     REAL, INTENT(IN):: t_seri(:, :) ! (klon, klev) air temperature, in K
     REAL, INTENT(IN):: q_seri(:, :) ! (klon, klev) mass fraction of water vapor
-    REAL, INTENT(IN):: u(klon, klev), v(klon, klev) ! vitesse
+    REAL, INTENT(IN):: u_seri(:, :), v_seri(:, :) ! (klon, klev) wind, in m s -1
     INTEGER, INTENT(IN):: julien ! jour de l'annee en cours
     REAL, intent(in):: mu0(klon) ! cosinus de l'angle solaire zenithal     
 
@@ -85,7 +85,7 @@ contains
     ! changement pour t_seri et q_seri
 
     REAL, intent(out):: d_u(klon, klev), d_v(klon, klev)
-    ! changement pour "u" et "v"
+    ! changement pour "u_seri" et "v_seri"
 
     REAL, intent(out):: flux_t(klon, nbsrf)
     ! flux de chaleur sensible (c_p T) (W / m2) (orientation positive
@@ -121,7 +121,7 @@ contains
     REAL capcl(klon, nbsrf)
     REAL oliqcl(klon, nbsrf)
     REAL cteicl(klon, nbsrf)
-    REAL, INTENT(inout):: pblt(klon, nbsrf) ! temp\'erature au nveau HCL
+    REAL, INTENT(inout):: pblt(:, :) ! (klon, nbsrf) temp\'erature au nveau HCL
     REAL therm(klon, nbsrf)
     REAL plcl(klon, nbsrf)
 
@@ -306,8 +306,8 @@ contains
                 ypaprs(j, k) = paprs(i, k)
                 ypplay(j, k) = play(i, k)
                 ydelp(j, k) = delp(i, k)
-                yu(j, k) = u(i, k)
-                yv(j, k) = v(i, k)
+                yu(j, k) = u_seri(i, k)
+                yv(j, k) = v_seri(i, k)
                 yt(j, k) = t_seri(i, k)
                 yq(j, k) = q_seri(i, k)
              END DO

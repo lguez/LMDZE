@@ -272,6 +272,10 @@ contains
        CALL histdef(nid_ins, "fl", &
             "denominator of cloud droplet effective radius", "", iim, &
             jjm + 1, nhori, llm, 1, llm, nvert, "inst(X)", zsto, zout)
+       CALL histdef(nid_ins, "rld", "LW downward radiation", "W m-2", iim, &
+            jjm + 1, nhori, llm, 1, llm, nvert, "inst(X)", zsto, zout)
+       CALL histdef(nid_ins, "rldcs", "LW CS downward radiation", "W m-2", &
+            iim, jjm + 1, nhori, llm, 1, llm, nvert, "inst(X)", zsto, zout)
 
        DO it = 1, nqmx - 2
           ! champ 2D

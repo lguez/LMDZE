@@ -130,7 +130,7 @@ contains
        PTOPLW0(i) = ZFLUC(i, 1, KFLEV+1) + ZFLUC(i, 2, KFLEV+1)
        psollwdown(i) = -ZFLUX(i, 2, 1)
 
-       !IM attention aux signes !; LWtop >0, LWdn < 0
+       ! Attention aux signes : LWtop > 0, LWdn < 0
        DO k = 1, KFLEV+1
           plwup(i, k) = ZFLUX(i, 1, k)
           plwup0(i, k) = ZFLUC(i, 1, k)

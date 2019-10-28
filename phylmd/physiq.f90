@@ -14,6 +14,10 @@ contains
 
     ! This is the main procedure for the "physics" part of the program.
 
+    ! Libraries:
+    use netcdf95, only: NF95_CLOSE
+    use nr_util, only: assert
+
     use aaam_bud_m, only: aaam_bud
     USE abort_gcm_m, ONLY: abort_gcm
     use ajsec_m, only: ajsec
@@ -43,9 +47,7 @@ contains
     USE indicesol, ONLY: clnsurf, epsfra, nbsrf
     USE ini_histins_m, ONLY: ini_histins, nid_ins
     use lift_noro_m, only: lift_noro
-    use netcdf95, only: NF95_CLOSE
     use newmicro_m, only: newmicro
-    use nr_util, only: assert
     USE orbite_m, ONLY: orbite
     USE ozonecm_m, ONLY: ozonecm
     USE phyetat0_m, ONLY: phyetat0
@@ -80,11 +82,8 @@ contains
     ! géopotentiel de chaque couche (référence sol)
 
     REAL, intent(in):: pphis(:) ! (klon) géopotentiel du sol
-
-    REAL, intent(in):: u(:, :) ! (klon, llm)
-    ! vitesse dans la direction X (de O a E) en m / s
-
-    REAL, intent(in):: v(:, :) ! (klon, llm) vitesse Y (de S a N) en m / s
+    REAL, intent(in):: u(:, :) ! (klon, llm) zonal wind, in m / s
+    REAL, intent(in):: v(:, :) ! (klon, llm) meridional wind, in m / s
     REAL, intent(in):: t(:, :) ! (klon, llm) temperature (K)
 
     REAL, intent(in):: qx(:, :, :) ! (klon, llm, nqmx)
@@ -357,7 +356,7 @@ contains
     REAL t_seri(klon, llm)
     real q_seri(klon, llm) ! mass fraction of water vapor
     REAL ql_seri(klon, llm)
-    REAL u_seri(klon, llm), v_seri(klon, llm)
+    REAL u_seri(klon, llm), v_seri(klon, llm) ! wind, in m s-1
     REAL tr_seri(klon, llm, nqmx - 2)
 
     REAL zx_rh(klon, llm)
@@ -985,6 +984,8 @@ contains
     CALL histwrite_phy("msnow", sum(fsnow * pctsrf, dim = 2))
     call histwrite_phy("qsurf", sum(fqsurf * pctsrf, dim = 2))
     call histwrite_phy("flat", zxfluxlat)
+    call histwrite_phy("rld", lwdn)
+    call histwrite_phy("rldcs", lwdn0)
 
     DO nsrf = 1, nbsrf
        CALL histwrite_phy("fract_"//clnsurf(nsrf), pctsrf(:, nsrf))

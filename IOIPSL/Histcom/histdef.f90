@@ -31,10 +31,10 @@ contains
     USE ioget_calendar_m, ONLY: ioget_calendar_real
 
     INTEGER, INTENT(IN):: fileid
-    ! (ID of the file the variable should be archived in)
+    ! ID of the file the variable should be archived in
 
     CHARACTER(len=*), INTENT(IN):: varname
-    ! (name of the variable, short and easy to remember)
+    ! name of the variable, short and easy to remember
 
     CHARACTER(len=*), INTENT(IN):: ptitle ! full name of the variable
     CHARACTER(len=*), INTENT(IN):: unit ! units of the variable
@@ -49,24 +49,24 @@ contains
     ! The next two arguments give the vertical zoom to use.
 
     INTEGER, INTENT(IN):: pzsize
-    ! (Size in Z direction (If 1 then no axis is declared for this
-    ! variable and zid is not used)
+    ! Size in Z direction. (If 1 then no axis is declared for this
+    ! variable and zid is not used.)
 
-    INTEGER, INTENT(IN):: oriz ! Off set of the zoom
+    INTEGER, INTENT(IN):: oriz ! Offset of the zoom
     INTEGER, INTENT(IN):: szz ! Size of the zoom
 
     INTEGER, INTENT(IN):: zid
-    ! (ID of the vertical axis to use. It has to have the size of the zoom.)
+    ! ID of the vertical axis to use. It has to have the size of the zoom.
 
     CHARACTER(len=*), INTENT(IN):: opp
     ! Operation to be performed. The following options exist today:
-    ! inst: keeps instantaneous values for writting
+    ! inst: keeps instantaneous values for writing
     ! ave: Computes the average from call between writes
 
     REAL, INTENT(IN):: pfreq_opp ! Frequency of this operation (in seconds)
 
     REAL, INTENT(IN):: pfreq_wrt
-    ! (Frequency at which the variable should be written, in seconds)
+    ! Frequency at which the variable should be written, in seconds
 
     ! Local:
 
@@ -309,7 +309,7 @@ contains
           WRITE (str71, &
                '("should be the same, this was not case for variable ", a)') &
                trim(tmp_name)
-          str72 = 'PATCH: The smalest frequency of both is used'
+          str72 = 'PATCH: The smallest frequency of both is used'
           CALL histerr(2, 'histdef', str70, str71, str72)
           IF (test_fopp<test_fwrt) THEN
              freq_opp(fileid, iv) = pfreq_opp

@@ -13,7 +13,8 @@ contains
     ! Fairhead
 
     ! Compute the parameters of the sub-grid scale orography scheme as
-    ! described in Lott and Miller (1997) and Lott (1999).
+    ! described in Lott and Miller (1997) and Lott (1999). Compute
+    ! all the parameters needed for the gravity wave drag code.
 
     ! Target points are on a rectangular grid:
     ! jjm + 1 latitudes including North and South Poles;

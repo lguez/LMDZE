@@ -1,7 +1,6 @@
 MODULE start_init_phys_m
 
-  ! From startvar.F, version 1.4
-  ! 2006/01/27 15:14:22 Fairhead
+  ! From startvar.F, version 1.4 2006/01/27
 
   IMPLICIT NONE
 
@@ -9,20 +8,24 @@ CONTAINS
 
   SUBROUTINE start_init_phys(tsol_2d, qsol_2d)
 
-    use conf_dat2d_m, only: conf_dat2d
-    use dimensions, only: iim, jjm
-    use dynetat0_m, only: rlonu, rlatv
-    use gr_int_dyn_m, only: gr_int_dyn
-    use inter_barxy_m, only: inter_barxy
+    ! Libraries:
     use netcdf, only: nf90_nowrite
     use netcdf95, only: nf95_open, nf95_close, nf95_get_var, nf95_inq_varid, &
          nf95_gw_var, find_coord
     use nr_util, only: assert, pi
 
-    REAL, intent(out):: tsol_2d(:, :), qsol_2d(:, :) ! (iim + 1, jjm + 1)
+    use conf_dat2d_m, only: conf_dat2d
+    use dimensions, only: iim, jjm
+    use dynetat0_m, only: rlonu, rlatv
+    use gr_int_dyn_m, only: gr_int_dyn
+    use inter_barxy_m, only: inter_barxy
 
-    ! Variables local to the procedure:
+    REAL, intent(out):: tsol_2d(:, :)
+    ! both soil temperature and surface temperature, in K
+    
+    REAL, intent(out):: qsol_2d(:, :) ! (iim + 1, jjm + 1)
 
+    ! Local:
     INTEGER iml_phys, jml_phys, ncid, varid
     REAL, ALLOCATABLE:: lon_rad(:), lat_rad(:)
     REAL, ALLOCATABLE:: lon_ini(:), lat_ini(:) ! longitude and latitude in rad

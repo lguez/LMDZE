@@ -1,7 +1,7 @@
 MODULE start_init_orog_m
 
   ! From startvar.F, version 1.4
-  ! 2006/01/27 15:14:22 Fairhead
+  ! 2006/01/27
 
   use dimensions, only: iim, jjm
 
@@ -92,8 +92,6 @@ CONTAINS
 
     CALL conf_dat2d(lon_ini, lat_ini, lon_rad, lat_rad, relief, &
          interbar = .FALSE.)
-
-    print *, 'Compute all the parameters needed for the gravity wave drag code'
     CALL grid_noro(lon_rad, lat_rad, relief, rlonv, rlatu, phis, zmea_2d, &
          zstd_2d, zsig_2d, zgam_2d, zthe_2d, zpic_2d, zval_2d, mask)
     phis(:, :) = phis(:, :) * 9.81

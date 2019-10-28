@@ -36,7 +36,7 @@ contains
     INTEGER, intent(in):: nsrf ! indice pour le type de surface
 
     REAL, intent(in):: speed(:) ! (knon)
-    ! norm of the wind at the first model level
+    ! norm of the wind in the first model layer, in m s-1
 
     REAL, intent(in):: t(:) ! (knon)
     ! temperature de l'air au 1er niveau du modele
@@ -50,22 +50,24 @@ contains
     REAL, intent(in):: ts(:) ! (knon) temperature de l'air a la surface
     REAL, intent(in):: qsurf(:) ! (knon) humidite de l'air a la surface
     REAL, intent(in):: rugos(:) ! (knon) rugosit\'e
-    REAL, intent(out):: cdragm(:) ! (knon) drag coefficient pour le moment 
+    REAL, intent(out):: cdragm(:) ! (knon) drag coefficient for momentum
 
     REAL, intent(out):: cdragh(:) ! (knon)
-    ! drag coefficient pour les flux de chaleur latente et sensible
+    ! drag coefficient for latent and sensible heat fluxes
 
     REAL, intent(out), optional:: pref(:) ! (knon) pression au niveau zgeop / RG
 
     ! Local:
 
-    REAL, PARAMETER:: ckap = 0.4, cb = 5., cc = 5., cd = 5., cepdu2 = 0.1**2
+    REAL, PARAMETER:: ckap = 0.4, cb = 5., cc = 5., cd = 5.
+    REAL, PARAMETER:: cepdu2 = 0.1**2 ! in m2 s-2
     real, parameter:: f_ri_cd_min = 0.1
     INTEGER i, knon
-    REAL zdu2, ztsolv, ztvd, zscf, zucf
-    real cdn ! drag coefficient neutre
+    REAL du2 ! in m2 s-2
+    real tsolv, tvd, zscf, zucf
+    real cdn ! drag coefficient for neutral conditions
 
-    REAL zri
+    REAL ri
     ! nombre de Richardson entre la surface et le niveau de reference
     ! zgeop / RG
 
@@ -75,42 +77,42 @@ contains
          size(qsurf), size(rugos), size(cdragm), size(cdragh)], "cdrag knon")
 
     DO i = 1, knon
-       zdu2 = max(cepdu2, speed(i)**2)
-       ztsolv = ts(i) * (1. + RETV * max(qsurf(i), 0.))
-       ztvd = (t(i) + zgeop(i) / RCPD / (1. + RVTMP2 * q(i))) &
+       du2 = max(cepdu2, speed(i)**2)
+       tsolv = ts(i) * (1. + RETV * max(qsurf(i), 0.))
+       tvd = (t(i) + zgeop(i) / RCPD / (1. + RVTMP2 * q(i))) &
             * (1. + RETV * q(i))
-       zri = zgeop(i) * (ztvd - ztsolv) / (zdu2 * ztvd)
+       ri = zgeop(i) * (tvd - tsolv) / (du2 * tvd)
        cdn = (ckap / log(1. + zgeop(i) / (RG * rugos(i))))**2
 
-       IF (zri < 0.) THEN
-          ! situation instable
+       IF (ri < 0.) THEN
+          ! Situation instable
           zucf = 1. / (1. + 3. * cb * cc * cdn &
-               * SQRT(ABS(zri) * (1. + zgeop(i) / (RG * rugos(i)))))
-          cdragm(i) = cdn * max((1. - 2. * cb * zri * zucf), f_ri_cd_min)
+               * SQRT(ABS(ri) * (1. + zgeop(i) / (RG * rugos(i)))))
+          cdragm(i) = cdn * max((1. - 2. * cb * ri * zucf), f_ri_cd_min)
 
           IF (nsrf == is_oce) then
-             ! Cf. Miller et al. (1992).
+             ! Cf. Miller et al. (1992)
              cdragh(i) = f_cdrag_oce * cdn * (1. + ((0.0016 / (cdn &
-                  * SQRT(zdu2))) * ABS(ztvd - ztsolv)**(1. &
-                  / 3.))**1.25)**(1. / 1.25)
+                  * SQRT(du2))) &
+                  * ABS(tvd - tsolv)**(1. / 3.))**1.25)**(1. / 1.25)
           else
              cdragh(i) = f_cdrag_ter * cdn &
-                  * max((1. - 3. * cb * zri * zucf), f_ri_cd_min)
+                  * max((1. - 3. * cb * ri * zucf), f_ri_cd_min)
           end IF
        ELSE
           ! Situation stable. Pour \'eviter les incoh\'erences dans
-          ! les cas tr\`es stables, on limite zri \`a 20. Cf Hess et
+          ! les cas tr\`es stables, on limite ri \`a 20. Cf Hess et
           ! al. (1995).
-          zri = min(20., zri)
-          zscf = SQRT(1. + cd * ABS(zri))
-          cdragm(i) = cdn * max(1. / (1. + 2. * CB * zri / zscf), f_ri_cd_min)
+          ri = min(20., ri)
+          zscf = SQRT(1. + cd * ABS(ri))
+          cdragm(i) = cdn * max(1. / (1. + 2. * CB * ri / zscf), f_ri_cd_min)
           cdragh(i) = merge(f_cdrag_oce, f_cdrag_ter, nsrf == is_oce) * cdn &
-               * max(1. / (1. + 3. * CB * zri * zscf), f_ri_cd_min)
+               * max(1. / (1. + 3. * CB * ri * zscf), f_ri_cd_min)
        ENDIF
     END DO
 
     if (present(pref)) &
-         pref = exp(log(psol) - zgeop / (RD * t * (1. + RETV * max(q, 0.))))
+         pref = psol * exp(- zgeop / (RD * t * (1. + RETV * max(q, 0.))))
 
   END SUBROUTINE cdrag
 
