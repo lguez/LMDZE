@@ -34,6 +34,7 @@ contains
     USE conf_phys_m, ONLY: conf_phys
     use conflx_m, only: conflx
     USE ctherm_m, ONLY: iflag_thermals, ctherm
+    use diagcld1_m, only: diagcld1
     USE dimensions, ONLY: llm, nqmx
     USE dimphy, ONLY: klon
     USE dimsoil, ONLY: nsoilmx

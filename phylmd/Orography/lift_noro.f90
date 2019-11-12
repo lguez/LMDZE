@@ -12,6 +12,7 @@ contains
 
     use comconst, only: dtphys
     USE dimphy, only: klon, klev
+    use orolift_m, only: orolift
     use phyetat0_m, only: rlat
     USE suphec_m, only: rd, rg
     

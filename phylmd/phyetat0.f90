@@ -27,7 +27,6 @@ contains
 
     USE conf_gcm_m, ONLY: raz_date
     use dimphy, only: klev
-    USE dimsoil, ONLY : nsoilmx
     USE indicesol, ONLY : epsfra, is_lic, is_oce, is_sic, is_ter, nbsrf
     use netcdf, only: nf90_global, nf90_inq_varid, NF90_NOERR, NF90_NOWRITE
     use netcdf95, only: nf95_get_att, nf95_get_var, nf95_inq_varid, &
@@ -35,7 +34,7 @@ contains
 
     REAL, intent(out):: pctsrf(:, :) ! (klon, nbsrf)
     REAL, intent(out):: ftsol(klon, nbsrf)
-    REAL, intent(out):: ftsoil(klon, nsoilmx, nbsrf)
+    REAL, intent(out):: ftsoil(:, :, :) ! (klon, nsoilmx, nbsrf)
     REAL, intent(out):: qsurf(klon, nbsrf)
 
     REAL, intent(out):: qsol(:)

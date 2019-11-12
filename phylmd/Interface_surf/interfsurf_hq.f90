@@ -165,7 +165,7 @@ contains
           IF (pctsrf_new_sic(ii) < EPSFRA) then
              snow(ii) = 0.
              tsurf(ii) = RTT - 1.8
-             tsoil(ii, :) = RTT - 1.8
+             tsoil(ii, :) = tsurf(ii)
           else
              tsurf(ii) = ts(ii)
           endif

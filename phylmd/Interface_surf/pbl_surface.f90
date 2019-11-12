@@ -53,7 +53,7 @@ contains
 
     REAL, INTENT(IN):: cdmmax, cdhmax ! seuils cdrm, cdrh
 
-    REAL, INTENT(inout):: ftsoil(klon, nsoilmx, nbsrf)
+    REAL, INTENT(inout):: ftsoil(:, :, :) ! (klon, nsoilmx, nbsrf)
     ! soil temperature of surface fraction
 
     REAL, INTENT(inout):: qsol(:) ! (klon)

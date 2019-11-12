@@ -64,7 +64,7 @@ contains
     real qsat(iim + 1, jjm + 1, llm) ! mass fraction of saturating water vapor
     REAL qsolsrf(klon, nbsrf), fsnow(klon, nbsrf) 
     REAL falbe(klon, nbsrf)
-    REAL tsoil(klon, nsoilmx, nbsrf) 
+    REAL ftsoil(klon, nsoilmx, nbsrf) 
     REAL null_array(klon)
     REAL solsw(klon), sollw(klon)
     !IM "slab" ocean
@@ -72,7 +72,11 @@ contains
     REAL rugmer(klon)
     real, dimension(iim + 1, jjm + 1):: zmea_2d, zstd_2d, zsig_2d, zgam_2d
     real, dimension(iim + 1, jjm + 1):: zthe_2d, zpic_2d, zval_2d
-    real, dimension(iim + 1, jjm + 1):: tsol_2d, qsol_2d, ps
+
+    real tsol_2d(iim + 1, jjm + 1)
+    ! both soil temperature and surface temperature, in K
+
+    real, dimension(iim + 1, jjm + 1):: qsol_2d, ps
     REAL zmea(klon), zstd(klon)
     REAL zsig(klon), zgam(klon)
     REAL zthe(klon)
@@ -283,7 +287,7 @@ contains
     falbe(:, is_oce) = 0.5
     falbe(:, is_sic) = 0.6
     qsolsrf = 150.
-    tsoil = spread(spread(pack(tsol_2d, dyn_phy), 2, nsoilmx), 3, nbsrf)
+    ftsoil = spread(spread(pack(tsol_2d, dyn_phy), 2, nsoilmx), 3, nbsrf)
     solsw = 165.
     sollw = -53.
     t_ancien = 273.15
@@ -306,7 +310,7 @@ contains
     call nf95_inq_varid(ncid_restartphy, "trs", varid)
     call nf95_put_var(ncid_restartphy, varid, null_array)
 
-    call phyredem(pctsrf, tsoil(:, 1, :), tsoil, qsolsrf, &
+    call phyredem(pctsrf, ftsoil(:, 1, :), ftsoil, qsolsrf, &
          pack(qsol_2d, dyn_phy), fsnow, falbe, null_array, null_array, solsw, &
          sollw, null_array, null_array, frugs, agesno, zmea, zstd, zsig, zgam, &
          zthe, zpic, zval, t_ancien, q_ancien, rnebcon, ratqs, clwcon, &

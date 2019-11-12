@@ -37,7 +37,7 @@ contains
     REAL ghy(ip1jm, klevel), ghx(ip1jmp1, klevel)
     ! ......................................................
 
-    CALL scopy(ip1jmp1*klevel, teta, 1, divgra, 1)
+    divgra = teta
     CALL grad(klevel, divgra, ghx, ghy)
     CALL diverg_gam(klevel, cuvsga, cvusga, unsaigam, unsapolnga, unsapolsga, &
          ghx, ghy, divgra)

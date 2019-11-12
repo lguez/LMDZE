@@ -2,6 +2,8 @@ module soil_m
 
   IMPLICIT NONE
 
+  private fz
+
 contains
 
   SUBROUTINE soil(nisurf, snow, tsurf, tsoil, soilcap, soilflux)
@@ -31,18 +33,21 @@ contains
     ! F0 = A + B (Ts(t))
     ! Soilcap = B * dt
 
+    ! Libraries:
+    use jumble, only: new_unit
+
     use comconst, only: dtphys
-    USE indicesol, only: nbsrf, is_lic, is_oce, is_sic, is_ter
     USE dimphy, only: klon
     USE dimsoil, only: nsoilmx
+    USE indicesol, only: nbsrf, is_lic, is_oce, is_sic, is_ter
     USE suphec_m, only: rtt
 
-    INTEGER, intent(in):: nisurf ! sub-surface index
+    INTEGER, intent(in):: nisurf ! surface type index
     REAL, intent(in):: snow(:) ! (knon)
     REAL, intent(in):: tsurf(:) ! (knon) surface temperature at time-step t (K)
 
     real, intent(inout):: tsoil(:, :) ! (knon, nsoilmx)
-    ! temperature inside the ground (K)
+    ! temperature inside the ground (K), layer 1 nearest to the surface
 
     REAL, intent(out):: soilcap(:) ! (knon)
     ! specific heat per unit surface (W m-2 s K-1)
@@ -51,104 +56,117 @@ contains
     ! surface diffusive flux from ground (W m-2)
 
     ! Local:
-
-    INTEGER knon, ig, jk
+    INTEGER knon, ig, jk, unit
     REAL zdz2(nsoilmx)
     real z1(size(tsurf), nbsrf) ! (knon, nbsrf)
-    REAL min_period, dalph_soil
+    REAL min_period ! in s
+    real dalph_soil ! rapport entre les \'epaisseurs de 2 couches successives
     REAL ztherm_i(size(tsurf)) ! (knon)
     REAL, save:: dz1(nsoilmx), dz2(nsoilmx)
     REAL, save:: zc(klon, nsoilmx, nbsrf), zd(klon, nsoilmx, nbsrf)
     REAL, save:: lambda
     LOGICAL:: firstsurf(nbsrf) = .TRUE.
-    REAL:: isol = 2000., isno = 2000., iice = 2000.
-
-    ! Depths:
-    REAL rk, fz1, rk1, rk2
+    REAL, parameter:: isol = 2000., isno = 2000., iice = 2000.
+    REAL rk, fz1, rk1, rk2 ! depths
 
     !-----------------------------------------------------------------------
 
     knon = size(tsurf)
 
     ! Calcul de l'inertie thermique. On initialise \`a iice m\^eme
-    ! au-dessus d'un point de mer au cas o\`u le point de mer devienne
-    ! point de glace au pas suivant. On corrige si on a un point de
-    ! terre avec ou sans glace.
+    ! au-dessus d'un point de mer pour le cas o\`u le point de mer
+    ! deviendrait point de glace au pas suivant. On corrige si on a un
+    ! point de terre avec ou sans glace.
 
-    IF (nisurf==is_sic) THEN
+    select case (nisurf)
+    case (is_sic)
+       DO ig = 1, knon
+          IF (snow(ig) > 0.) then
+             ztherm_i(ig) = isno
+          else
+             ztherm_i(ig) = iice
+          end IF
+       END DO
+    case (is_lic)
+       DO ig = 1, knon
+          IF (snow(ig) > 0.) then
+             ztherm_i(ig) = isno
+          else
+             ztherm_i(ig) = iice
+          end IF
+       END DO
+    case (is_ter)
+       DO ig = 1, knon
+          IF (snow(ig) > 0.) then
+             ztherm_i(ig) = isno
+          else
+             ztherm_i(ig) = isol
+          end IF
+       END DO
+    case (is_oce)
        DO ig = 1, knon
           ztherm_i(ig) = iice
-          IF (snow(ig) > 0.) ztherm_i(ig) = isno
        END DO
-    ELSE IF (nisurf==is_lic) THEN
-       DO ig = 1, knon
-          ztherm_i(ig) = iice
-          IF (snow(ig) > 0.) ztherm_i(ig) = isno
-       END DO
-    ELSE IF (nisurf==is_ter) THEN
-       DO ig = 1, knon
-          ztherm_i(ig) = isol
-          IF (snow(ig) > 0.) ztherm_i(ig) = isno
-       END DO
-    ELSE IF (nisurf==is_oce) THEN
-       DO ig = 1, knon
-          ztherm_i(ig) = iice
-       END DO
-    ELSE
-       PRINT *, 'valeur d indice non prevue', nisurf
+    case default
+       PRINT *, 'soil: unexpected subscript value:', nisurf
        STOP 1
-    END IF
+    END select
 
     IF (firstsurf(nisurf)) THEN
        ! ground levels
        ! grnd=z / l where l is the skin depth of the diurnal cycle:
 
-       min_period = 1800. ! en secondes
-       dalph_soil = 2. ! rapport entre les epaisseurs de 2 couches succ.
-
-       OPEN(99, FILE='soil.def', STATUS='old', FORM='formatted', ERR=9999)
-       READ(99, *) min_period
-       READ(99, *) dalph_soil
+       min_period = 1800.
+       dalph_soil = 2.
+       call new_unit(unit)
+       OPEN(unit, FILE = 'soil.def', STATUS = 'old', action = "read", &
+            position = 'rewind', ERR = 9999)
+       READ(unit, fmt = *) min_period
+       READ(unit, fmt = *) dalph_soil
        PRINT *, 'Discretization for the soil model'
        PRINT *, 'First level e-folding depth', min_period, ' dalph', &
             dalph_soil
-       CLOSE(99)
+       CLOSE(unit)
 9999   CONTINUE
 
-       ! la premiere couche represente un dixieme de cycle diurne
+       ! La premi\`ere couche repr\'esente un dixi\`eme de cycle diurne :
        fz1 = sqrt(min_period / 3.14)
 
        DO jk = 1, nsoilmx
           rk1 = jk
           rk2 = jk - 1
-          dz2(jk) = fz(rk1) - fz(rk2)
+          dz2(jk) = fz(rk1, dalph_soil, fz1) - fz(rk2, dalph_soil, fz1)
        END DO
+
        DO jk = 1, nsoilmx - 1
           rk1 = jk + .5
           rk2 = jk - .5
-          dz1(jk) = 1. / (fz(rk1) - fz(rk2))
+          dz1(jk) = 1. / (fz(rk1, dalph_soil, fz1) - fz(rk2, dalph_soil, fz1))
        END DO
-       lambda = fz(.5) * dz1(1)
+
+       lambda = fz(.5, dalph_soil, fz1) * dz1(1)
        PRINT *, 'full layers, intermediate layers (seconds)'
+
        DO jk = 1, nsoilmx
           rk = jk
           rk1 = jk + .5
           rk2 = jk - .5
-          PRINT *, 'fz=', fz(rk1) * fz(rk2) * 3.14, fz(rk) * fz(rk) * 3.14
+          PRINT *, 'fz=', fz(rk1, dalph_soil, fz1) * fz(rk2, dalph_soil, fz1) &
+               * 3.14, fz(rk, dalph_soil, fz1) * fz(rk, dalph_soil, fz1) * 3.14
        END DO
-       ! PB
+
        firstsurf(nisurf) = .FALSE.
     ELSE
        ! Computation of the soil temperatures using the Zc and Zd
        ! coefficient computed at the previous time-step:
 
-       ! surface temperature
+       ! Surface temperature:
        DO ig = 1, knon
           tsoil(ig, 1) = (lambda * zc(ig, 1, nisurf) + tsurf(ig)) &
                / (lambda * (1. - zd(ig, 1, nisurf)) + 1.)
        END DO
 
-       ! other temperatures
+       ! Other temperatures:
        DO jk = 1, nsoilmx - 1
           DO ig = 1, knon
              tsoil(ig, jk + 1) = zc(ig, jk, nisurf) &
@@ -186,12 +204,12 @@ contains
        END DO
     END DO
 
-    ! computation of the surface diffusive flux from ground and
+    ! Computation of the surface diffusive flux from ground and
     ! calorific capacity of the ground:
 
     DO ig = 1, knon
-       soilflux(ig) = ztherm_i(ig) * dz1(1) * (zc(ig, 1, nisurf) + (zd(ig, 1, &
-            nisurf) - 1.) * tsoil(ig, 1))
+       soilflux(ig) = ztherm_i(ig) * dz1(1) * (zc(ig, 1, nisurf) &
+            + (zd(ig, 1, nisurf) - 1.) * tsoil(ig, 1))
        soilcap(ig) = ztherm_i(ig) * (dz2(1) &
             + dtphys * (1. - zd(ig, 1, nisurf)) * dz1(1))
        z1(ig, nisurf) = lambda * (1. - zd(ig, 1, nisurf)) + 1.
@@ -200,18 +218,23 @@ contains
             * z1(ig, nisurf) - lambda * zc(ig, 1, nisurf) - tsurf(ig)) / dtphys
     END DO
 
-  contains
-
-    pure real function fz(rk)
-
-      real, intent(in):: rk
-
-      !-----------------------------------------
-
-      fz = fz1 * (dalph_soil**rk - 1.) / (dalph_soil - 1.)
-
-    end function fz
-
   END SUBROUTINE soil
+
+  !****************************************************************
+
+  pure real function fz(rk, dalph_soil, fz1)
+
+    real, intent(in):: rk
+
+    real, intent(in):: dalph_soil
+    ! rapport entre les \'epaisseurs de 2 couches successives
+
+    real, intent(in):: fz1 ! depth
+
+    !-----------------------------------------
+
+    fz = fz1 * (dalph_soil**rk - 1.) / (dalph_soil - 1.)
+
+  end function fz
 
 end module soil_m

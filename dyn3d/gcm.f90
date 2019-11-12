@@ -1,12 +1,15 @@
 PROGRAM gcm
 
   ! Authors: P. Le Van, L. Fairhead, F. Hourdin
-  ! From "gcm.F", version 1.4, 2006/04/04 15:05:16
+  ! From "gcm.F", version 1.4, 2006/04/04
 
   ! General circulation model of LMD. Avec coordonn\'ee verticale
   ! hybride, avec nouveaux op\'erateurs de dissipation "*" ("gradiv2",
   ! "divgrad2", "nxgraro2"). Possibilit\'e de choisir le sch\'ema pour
   ! l'advection de "q", en modifiant "iadv" dans "traceur.def".
+
+  ! Libraries:
+  use netcdf95, only: nf95_close
 
   use comconst, only: dtvr, iniconst
   use comdissnew, only: read_comdissnew
@@ -28,7 +31,6 @@ PROGRAM gcm
   use init_dynzon_m, only: init_dynzon
   USE ioconf_calendar_m, only: ioconf_calendar
   use leapfrog_m, only: leapfrog
-  use netcdf95, only: nf95_close
   use suphec_m, only: suphec
   use unit_nml_m, only: unit_nml, set_unit_nml
   use createnewfield_m, only: NbField, Ncid
@@ -38,7 +40,7 @@ PROGRAM gcm
   ! Variables dynamiques :
   REAL ucov(iim + 1, jjm + 1, llm), vcov(iim + 1, jjm, llm)  ! vent covariant
   REAL teta(iim + 1, jjm + 1, llm) ! temp\'erature potentielle 
-  REAL q(iim + 1, jjm + 1, llm, nqmx) ! champs advect\'es
+  REAL q(iim + 1, jjm + 1, llm, nqmx) ! mass fraction of advected species
   REAL ps(iim + 1, jjm + 1) ! pression au sol (Pa)
   REAL masse(iim + 1, jjm + 1, llm) ! masse d'air
   REAL phis(iim + 1, jjm + 1) ! g\'eopotentiel au sol

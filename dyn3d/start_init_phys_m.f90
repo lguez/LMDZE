@@ -12,7 +12,7 @@ CONTAINS
     use netcdf, only: nf90_nowrite
     use netcdf95, only: nf95_open, nf95_close, nf95_get_var, nf95_inq_varid, &
          nf95_gw_var, find_coord
-    use nr_util, only: assert, pi
+    use nr_util, only: assert, deg_to_rad
 
     use conf_dat2d_m, only: conf_dat2d
     use dimensions, only: iim, jjm
@@ -45,12 +45,12 @@ CONTAINS
 
     call find_coord(ncid, varid=varid, std_name="longitude")
     call nf95_gw_var(ncid, varid, lon_ini)
-    lon_ini = lon_ini * pi / 180. ! convert to rad
+    lon_ini = lon_ini * deg_to_rad
     iml_phys = size(lon_ini)
 
     call find_coord(ncid, varid=varid, std_name="latitude")
     call nf95_gw_var(ncid, varid, lat_ini)
-    lat_ini = lat_ini * pi / 180. ! convert to rad
+    lat_ini = lat_ini * deg_to_rad
     jml_phys = size(lat_ini)
 
     ! Allocate the space we will need to get the data out of this file

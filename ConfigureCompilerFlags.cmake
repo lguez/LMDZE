@@ -4,7 +4,7 @@ if(CMAKE_Fortran_COMPILER_ID MATCHES GNU)
 
   # Error and warning options:
   string(APPEND CMAKE_Fortran_FLAGS
-    " -fmax-errors=1 -pedantic -Wall -Wcharacter-truncation -Wunused-parameter -Wno-conversion -Wimplicit-interface -Wimplicit-procedure -Wno-integer-division")
+    " -fmax-errors=1 -pedantic -Wall -Wcharacter-truncation -Wunused-parameter -Wno-conversion -Wno-integer-division")
 
   # Debugging options:
   set(CMAKE_Fortran_FLAGS_DEBUG
