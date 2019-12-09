@@ -18,10 +18,10 @@ contains
     ! Method: implicit time integration
 
     ! Consecutive ground temperatures are related by:
-    ! T(k + 1) = C(k) + D(k) * T(k) (1)
+    ! T(k + 1) = C(k) + D(k) * T(k) (equation 1)
     ! The coefficients C and D are computed at the t - dt time-step.
     ! Structure of the procedure:
-    ! 1) new temperatures are computed using (1)
+    ! 1) new temperatures are computed using equation 1
     ! 2) C and D coefficients are computed from the new temperature
     ! profile for the t + dt time-step
     ! 3) the coefficients A and B are computed where the diffusive

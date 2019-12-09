@@ -54,7 +54,8 @@ contains
     REAL, INTENT(IN):: cdmmax, cdhmax ! seuils cdrm, cdrh
 
     REAL, INTENT(inout):: ftsoil(:, :, :) ! (klon, nsoilmx, nbsrf)
-    ! soil temperature of surface fraction
+    ! temperature of surface fraction inside the ground, in K, layer 1
+    ! nearest to the surface
 
     REAL, INTENT(inout):: qsol(:) ! (klon)
     ! column-density of water in soil, in kg m-2

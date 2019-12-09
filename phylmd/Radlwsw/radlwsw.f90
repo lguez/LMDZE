@@ -5,10 +5,9 @@ module radlwsw_m
 contains
 
   SUBROUTINE radlwsw(dist, mu0, fract, paprs, play, tsol, albedo, t, q, wo, &
-       cldfra, cldemi, cldtau, heat, heat0, cool, cool0, radsol, albpla, &
-       topsw, toplw, solsw, sollw, sollwdown, topsw0, toplw0, solsw0, sollw0, &
-       lwdn0, lwdn, lwup0, lwup, swdn0, swdn, swup0, swup, ok_ade, topswad, &
-       solswad)
+       cldfra, cldemi, cldtau, heat, heat0, cool, cool0, radsol, topsw, toplw, &
+       solsw, sollw, sollwdown, topsw0, toplw0, solsw0, sollw0, lwdn0, lwdn, &
+       lwup0, lwup, swdn0, swdn, swup0, swup, ok_ade, topswad, solswad)
 
     ! From LMDZ4/libf/phylmd/radlwsw.F, version 1.4, 2005/06/06 13:16:33
     ! Author: Z. X. Li (LMD/CNRS)
@@ -29,7 +28,7 @@ contains
     use sw_m, only: sw
     USE yoethf_m, ONLY: rvtmp2
 
-    real, intent(in):: dist ! distance astronomique terre-soleil
+    real, intent(in):: dist ! distance Terre-Soleil, en ua
     real, intent(in):: mu0(klon) ! cosinus de l'angle zenithal
     real, intent(in):: fract(klon) ! duree d'ensoleillement normalisee
     real, intent(in):: paprs(klon, klev + 1) ! pression a inter-couche (Pa)
@@ -62,7 +61,6 @@ contains
     real, intent(out):: radsol(klon)
     ! bilan radiatif net au sol (W/m**2), positif vers le bas
 
-    real, intent(out):: albpla(klon) ! albedo planetaire (entre 0 et 1)
     real, intent(out):: topsw(klon) ! flux solaire net au sommet de l'atm.
 
     real, intent(out):: toplw(klon)
@@ -124,7 +122,7 @@ contains
     DOUBLE PRECISION zheat(kdlon, klev), zcool(kdlon, klev)
     DOUBLE PRECISION zheat0(kdlon, klev), zcool0(kdlon, klev)
     DOUBLE PRECISION ztopsw(kdlon), ztoplw(kdlon)
-    DOUBLE PRECISION zsolsw(kdlon), zsollw(kdlon), zalbpla(kdlon)
+    DOUBLE PRECISION zsolsw(kdlon), zsollw(kdlon)
     DOUBLE PRECISION zsollwdown(kdlon)
 
     DOUBLE PRECISION ztopsw0(kdlon), ztoplw0(kdlon)
@@ -216,9 +214,9 @@ contains
             PCLDLU, PVIEW, zcool, zcool0, ztoplw, zsollw, ztoplw0, zsollw0, &
             zsollwdown, ZFLUP, ZFLDN, ZFLUP0, ZFLDN0)
        CALL SW(PSCT, zrmu0, zfract, PPMB, PDP, PPSOL, PALBD, PALBP, PTAVE, &
-            PWV, PQS, POZON, PCLDSW, PTAU, POMEGA, PCG, zheat, zheat0, &
-            zalbpla, ztopsw, zsolsw, ztopsw0, zsolsw0, ZFSUP, ZFSDN, ZFSUP0, &
-            ZFSDN0, ztopswad, zsolswad, ok_ade)
+            PWV, PQS, POZON, PCLDSW, PTAU, POMEGA, PCG, zheat, zheat0, ztopsw, &
+            zsolsw, ztopsw0, zsolsw0, ZFSUP, ZFSDN, ZFSUP0, ZFSDN0, ztopswad, &
+            zsolswad, ok_ade)
 
        DO i = 1, kdlon
           radsol(iof + i) = zsolsw(i) + zsollw(i)
@@ -239,7 +237,6 @@ contains
           toplw0(iof + i) = ztoplw0(i)
           solsw0(iof + i) = zsolsw0(i)
           sollw0(iof + i) = zsollw0(i)
-          albpla(iof + i) = zalbpla(i)
 
           DO k = 1, klev + 1
              swdn0(iof + i, k) = ZFSDN0(i, k)

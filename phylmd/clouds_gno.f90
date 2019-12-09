@@ -10,28 +10,26 @@ contains
 
     use numer_rec_95, only: nr_erf
 
-    ! Inputs:
+    INTEGER, intent(in):: klon
+    INTEGER, intent(in):: ND ! number of vertical levels
 
-    ! ND : Number of vertical levels
-    ! R ND: Domain-averaged mixing ratio of total water 
-    ! RS ND: Mean saturation humidity mixing ratio within the gridbox
+    REAL, intent(in):: R(klon, ND)
+    ! domain-averaged mixing ratio of total water 
 
-    ! QSUB ND: Mixing ratio of condensed water within clouds associated
+    REAL, intent(in):: RS(klon, ND)
+    ! mean saturation humidity mixing ratio within the gridbox
+
+    REAL, intent(in):: QSUB(klon, ND)
+    ! mixing ratio of condensed water within clouds associated
     ! with SUBGRID-SCALE condensation processes (here, it is
     ! predicted by the convection scheme)
 
-    ! Outputs:
+    LOGICAL, intent(out):: PTCONV(klon, ND) ! Point convectif = TRUE
+    REAL, intent(out):: RATQSC(klon, ND) ! largeur normalisee de la distribution
+    REAL, intent(out):: CLDF(klon, ND) ! fraction nuageuse
 
-    ! PTCONV ND: Point convectif = TRUE
-    ! RATQSC ND: Largeur normalisee de la distribution
-    ! CLDF ND: Fraction nuageuse
-
-    INTEGER klon, ND
-    REAL R(klon, ND), RS(klon, ND), QSUB(klon, ND)
-    LOGICAL PTCONV(klon, ND)
-    REAL RATQSC(klon, ND)
-    REAL CLDF(klon, ND)
-
+    ! Local:
+    
     ! parameters controlling the iteration:
     ! nmax : maximum nb of iterations (hopefully never reached)
     ! epsilon : accuracy of the numerical resolution 
@@ -48,7 +46,7 @@ contains
     INTEGER i, K, n
     REAL mu(klon), qsat(klon), delta(klon), beta(klon) 
     real zu2(klon), zv2(klon)
-    REAL xx(klon), aux(klon), coeff(klon), block(klon)
+    REAL xx(klon), aux(klon), coeff(klon), my_block(klon)
     REAL dist(klon), fprime(klon), det(klon)
     REAL pi, u(klon), v(klon), erfcu(klon), erfcv(klon)
     REAL xx1(klon), xx2(klon)
@@ -58,7 +56,7 @@ contains
 
     !--------------------------------------------------------------
 
-    cldf(:, :)=0.0
+    cldf=0.0
 
     pi = ACOS(-1.)
     sqrtpi=sqrt(pi)
@@ -131,7 +129,7 @@ contains
        enddo
 
        ! Debut des nmax iterations pour trouver la solution.
-       DO n = 1, nmax 
+       loop_n: DO n = 1, nmax 
           loop_horizontal: do i = 1, klon
              test_lconv: if (.not.lconv(i)) then
                 u(i) = delta(i)/(xx(i)*sqrt2) + xx(i)/(2.*sqrt2)
@@ -147,7 +145,7 @@ contains
                          aux(i)=0.
                       endif
                       xx(i) = -SQRT(aux(i))
-                      block(i) = EXP(-v(i)*v(i)) / v(i) / sqrtpi
+                      my_block(i) = EXP(-v(i)*v(i)) / v(i) / sqrtpi
                       dist(i) = 0.0
                       fprime(i) = 1.0
                    ELSE
@@ -158,7 +156,7 @@ contains
                       ! Attention : ajout d'un seuil pour l'exponentielle
                       aux(i) = sqrtpi*erfcu(i)*EXP(min(v(i)*v(i), 80.))
                       coeff(i) = 1.0 - 1./2./(v(i)**2.) + 3./4./(v(i)**4.)
-                      block(i) = coeff(i) * EXP(-v(i)*v(i)) / v(i) / sqrtpi
+                      my_block(i) = coeff(i) * EXP(-v(i)*v(i)) / v(i) / sqrtpi
                       dist(i) = v(i) * aux(i) / coeff(i) - beta(i)
                       fprime(i) = 2.0 / xx(i) * (v(i)**2.) &
                            * ( coeff(i)*EXP(-delta(i)) - u(i) * aux(i) ) &
@@ -169,7 +167,7 @@ contains
 
                    erfcu(i) = 1.0-NR_ERF(u(i))
                    erfcv(i) = 1.0-NR_ERF(v(i))
-                   block(i) = erfcv(i)
+                   my_block(i) = erfcv(i)
                    dist(i) = erfcu(i) / erfcv(i) - beta(i)
                    zu2(i)=u(i)*u(i)
                    zv2(i)=v(i)*v(i)
@@ -191,13 +189,13 @@ contains
                    ! borne pour l'exponentielle
                    ratqsc(i, k)=min(2.*(v(i)-u(i))**2, 20.)
                    ratqsc(i, k)=sqrt(exp(ratqsc(i, k))-1.)
-                   CLDF(i, K) = 0.5 * block(i)
+                   CLDF(i, K) = 0.5 * my_block(i)
                 else
                    xx(i) = xx(i) - dist(i)/fprime(i)
                 endif
              endif test_lconv
           enddo loop_horizontal
-       ENDDO
+       ENDDO loop_n
     end DO loop_vertical
 
   END SUBROUTINE CLOUDS_GNO

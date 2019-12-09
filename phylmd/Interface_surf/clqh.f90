@@ -23,7 +23,9 @@ contains
     integer, intent(in):: julien ! jour de l'annee en cours
     integer, intent(in):: nisurf
     integer, intent(in):: knindex(:) ! (knon)
+
     REAL, intent(inout):: tsoil(:, :) ! (knon, nsoilmx)
+    ! temperature inside the ground, in K, layer 1 nearest to the surface
 
     REAL, intent(inout):: qsol(:) ! (knon)
     ! column-density of water in soil, in kg m-2

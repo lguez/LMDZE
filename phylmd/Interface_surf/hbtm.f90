@@ -279,7 +279,7 @@ contains
           ! (attention, on ajoute therm(i) qui est virtuelle ...)
           ! pourquoi pas sqrt(b1)*t_star ?
           qT_th(i) = qT_th(i) + b2sr*q_star
-          ! new on differre le calcul de Theta_e
+          ! new on diff\`ere le calcul de Theta_e
           rhino(i, 1) = 0.
        ENDIF
     ENDDO

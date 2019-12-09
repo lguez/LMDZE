@@ -36,6 +36,7 @@ contains
     ! index des points de la surface a traiter
 
     REAL, intent(inout):: tsoil(:, :) ! (knon, nsoilmx)
+    ! temperature inside the ground, in K, layer 1 nearest to the surface
 
     REAL, intent(INOUT):: qsol(:) ! (knon)
     ! column-density of water in soil, in kg m-2

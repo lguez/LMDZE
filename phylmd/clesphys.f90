@@ -4,7 +4,7 @@ module clesphys
 
   implicit none
 
-  real, protected:: solaire = 1365. ! AMIP II, constante solaire en W / m2
+  real, protected:: solaire = 1365. ! constante solaire en W / m2
   double precision, save, protected:: RCO2 ! mass mixing ratio of CO2
   double precision, save, protected:: RCH4 ! mass mixing ratio of CH4
   double precision, save, protected:: RN2O ! mass mixing ratio of N2O

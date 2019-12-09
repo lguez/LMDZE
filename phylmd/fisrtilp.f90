@@ -194,11 +194,11 @@ contains
           zq(i) = q(i, k)
        END DO
 
-       ! Calculer la varition de temp. de l'air du a la chaleur sensible
-       ! transporter par la pluie.
-       ! Il resterait a rajouter cet effet de la chaleur sensible sur les
-       ! flux de surface, du a la diff. de temp. entre le 1er niveau et la
-       ! surface.
+       ! Calculer la variation de temp\'erature de l'air due \`a la
+       ! chaleur sensible transport\'ee par la pluie. Il resterait \`a
+       ! ajouter cet effet de la chaleur sensible sur les flux de
+       ! surface, du \`a la diff\'erence de temp\'erature entre le 1er
+       ! niveau et la surface.
 
        DO i = 1, klon
           IF (k <= klev - 1) THEN

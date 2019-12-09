@@ -276,9 +276,10 @@ contains
     ENDIF
 
     ierr = NF90_INQ_VARID(ncid_startphy, "RNEBCON", varid)
+
     IF (ierr /= NF90_NOERR) THEN
-       PRINT *, "phyetat0: Le champ RNEBCON est absent"
-       PRINT *, "Depart legerement fausse. Mais je continue"
+       PRINT *, "phyetat0: le champ RNEBCON est absent."
+       PRINT *, "D\'epart l\'eg\`erement fauss\'e. Mais je continue."
        rnebcon = 0.
     ELSE
        call nf95_get_var(ncid_startphy, varid, rnebcon(:, 1))

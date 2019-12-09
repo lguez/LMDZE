@@ -141,11 +141,12 @@ contains
     REAL, save:: radsol(klon)
     ! Bilan radiatif net au sol (W/m2), positif vers le bas. Must be
     ! saved because radlwsw is not called at every time step.
-    
+
     REAL, save:: ftsol(klon, nbsrf) ! skin temperature of surface fraction, in K
 
     REAL, save:: ftsoil(klon, nsoilmx, nbsrf)
-    ! soil temperature of surface fraction
+    ! temperature of surface fraction inside the ground, in K, layer 1
+    ! nearest to the surface
 
     REAL fluxlat(klon, nbsrf) ! flux de chaleur latente, en W m-2
 
@@ -263,7 +264,6 @@ contains
     REAL, save:: sollw(klon) ! surface net downward longwave flux, in W m-2
     real, save:: sollwdown(klon) ! downwelling longwave flux at surface
     REAL, save:: topsw0(klon), toplw0(klon), solsw0(klon), sollw0(klon)
-    REAL, save:: albpla(klon)
 
     REAL conv_q(klon, llm) ! convergence de l'humidite (kg / kg / s)
     REAL conv_t(klon, llm) ! convergence of temperature (K / s)
@@ -272,7 +272,8 @@ contains
     REAL cldt(klon), cldq(klon) ! nuage total, eau liquide integree
 
     REAL zxfluxlat(klon)
-    REAL dist, mu0(klon), fract(klon)
+    REAL dist ! distance Terre-Soleil, en ua
+    real mu0(klon), fract(klon)
     real longi
     REAL z_avant(klon), z_apres(klon), z_factor(klon)
     REAL zb
@@ -311,7 +312,7 @@ contains
     ! eva: \'evaporation de l'eau liquide nuageuse
     ! vdf: vertical diffusion in boundary layer
     REAL d_t_con(klon, llm), d_q_con(klon, llm)
-    REAL, save:: d_u_con(klon, llm), d_v_con(klon, llm)
+    REAL d_u_con(klon, llm), d_v_con(klon, llm)
     REAL d_t_lsc(klon, llm), d_q_lsc(klon, llm), d_ql_lsc(klon, llm)
     REAL d_t_ajs(klon, llm), d_q_ajs(klon, llm)
     REAL d_u_ajs(klon, llm), d_v_ajs(klon, llm)
@@ -346,10 +347,13 @@ contains
 
     ! Param\`etres li\'es au nouveau sch\'ema de nuages :
     real:: fact_cldcon = 0.375
-    real:: facttemps = 1.e-4
+
+    real:: facttemps = 1.e-4 ! in s-1
+    ! 1 / facttemps est le temps de relaxation des ratqs.
+
     real facteur
 
-    integer:: iflag_cldcon = 1
+    integer:: iflag_cldcon = 1 ! allowed values: - 2, ..., 3
     logical ptconv(klon, llm)
 
     ! Variables pour effectuer les appels en s\'erie :
@@ -382,7 +386,7 @@ contains
 
     REAL, save:: u10m_srf(klon, nbsrf), v10m_srf(klon, nbsrf)
     ! composantes du vent \`a 10 m
-    
+
     REAL zt2m(klon), zq2m(klon) ! température, humidité 2 m moyenne sur 1 maille
     REAL u10m(klon), v10m(klon) ! vent \`a 10 m moyenn\' sur les sous-surfaces
 
@@ -416,11 +420,8 @@ contains
        t2m = 0.
        q2m = 0.
        ffonte = 0.
-       d_u_con = 0.
-       d_v_con = 0.
        rnebcon0 = 0.
        clwcon0 = 0.
-       rnebcon = 0.
        clwcon = 0.
        pblh =0. ! Hauteur de couche limite
        plcl =0. ! Niveau de condensation de la CLA
@@ -433,6 +434,8 @@ contains
        print *, "Enter namelist 'physiq_nml'."
        read(unit=*, nml=physiq_nml)
        write(unit_nml, nml=physiq_nml)
+       call assert(iflag_cldcon >= - 2 .and. iflag_cldcon <= 3, &
+            "physiq iflag_cldcon")
 
        call ctherm
        call conf_phys
@@ -621,6 +624,8 @@ contains
        pen_d = 0.
        pde_d = 0.
        pde_u = 0.
+       u_seri = u_seri + d_u_con
+       v_seri = v_seri + d_v_con
     else
        conv_q = d_q_dyn + d_q_vdf / dtphys
        conv_t = d_t_dyn + d_t_vdf / dtphys
@@ -635,14 +640,8 @@ contains
        itop_con = llm + 1 - kctop
     END if
 
-    DO k = 1, llm
-       DO i = 1, klon
-          t_seri(i, k) = t_seri(i, k) + d_t_con(i, k)
-          q_seri(i, k) = q_seri(i, k) + d_q_con(i, k)
-          u_seri(i, k) = u_seri(i, k) + d_u_con(i, k)
-          v_seri(i, k) = v_seri(i, k) + d_v_con(i, k)
-       ENDDO
-    ENDDO
+    t_seri = t_seri + d_t_con
+    q_seri = q_seri + d_q_con
 
     IF (.not. conv_emanuel) THEN
        z_apres = sum((q_seri + ql_seri) * zmasse, dim=2)
@@ -703,8 +702,6 @@ contains
     if (iflag_cldcon == 1 .or. iflag_cldcon == 2) then
        ! les ratqs sont une conbinaison de ratqss et ratqsc
        ! ratqs final
-       ! 1e4 (en gros 3 heures), en dur pour le moment, est le temps de
-       ! relaxation des ratqs
        ratqs = max(ratqs * exp(- dtphys * facttemps), ratqss)
        ratqs = max(ratqs, ratqsc)
     else
@@ -808,9 +805,9 @@ contains
        albsol = sum(falbe * pctsrf, dim = 2)
        CALL radlwsw(dist, mu0, fract, paprs, play, tsol, albsol, t_seri, &
             q_seri, wo, cldfra, cldemi, cldtau, heat, heat0, cool, cool0, &
-            radsol, albpla, topsw, toplw, solsw, sollw, sollwdown, topsw0, &
-            toplw0, solsw0, sollw0, lwdn0, lwdn, lwup0, lwup, swdn0, swdn, &
-            swup0, swup, ok_ade, topswad, solswad)
+            radsol, topsw, toplw, solsw, sollw, sollwdown, topsw0, toplw0, &
+            solsw0, sollw0, lwdn0, lwdn, lwup0, lwup, swdn0, swdn, swup0, &
+            swup, ok_ade, topswad, solswad)
     ENDIF
 
     ! Ajouter la tendance des rayonnements (tous les pas)

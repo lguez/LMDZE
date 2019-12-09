@@ -7,41 +7,29 @@ contains
   SUBROUTINE sw1s(knu, palbd, palbp, pcg, pcld, pclear, pdsig, pomega, poz, &
        prmu, psec, ptau, pud, pfd, pfu)
     
-    USE dimensions
-    USE dimphy
-    USE raddim
+    USE raddim, only: kdlon, kflev
     use swclr_m, only: swclr
     use swr_m, only: swr
 
-    ! ------------------------------------------------------------------
     ! PURPOSE.
-    ! --------
-
     ! THIS ROUTINE COMPUTES THE SHORTWAVE RADIATION FLUXES IN TWO
     ! SPECTRAL INTERVALS FOLLOWING FOUQUART AND BONNEL (1980).
 
     ! METHOD.
-    ! -------
-
     ! 1. COMPUTES UPWARD AND DOWNWARD FLUXES CORRESPONDING TO
     ! CONTINUUM SCATTERING
     ! 2. MULTIPLY BY OZONE TRANSMISSION FUNCTION
 
     ! REFERENCE.
-    ! ----------
-
     ! SEE RADIATION'S PART OF THE ECMWF RESEARCH DEPARTMENT
     ! DOCUMENTATION, AND FOUQUART AND BONNEL (1980)
 
     ! AUTHOR.
-    ! -------
     ! JEAN-JACQUES MORCRETTE  *ECMWF*
 
     ! MODIFICATIONS.
-    ! --------------
     ! ORIGINAL : 89-07-14
     ! 94-11-15   J.-J. MORCRETTE    DIRECT/DIFFUSE ALBEDO
-    ! ------------------------------------------------------------------
 
     ! * ARGUMENTS:
 
@@ -62,7 +50,7 @@ contains
     DOUBLE PRECISION pfd(kdlon, kflev+1)
     DOUBLE PRECISION pfu(kdlon, kflev+1)
 
-    ! * LOCAL VARIABLES:
+    ! LOCAL VARIABLES:
 
     INTEGER iind(4)
 
