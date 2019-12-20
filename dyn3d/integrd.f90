@@ -11,24 +11,27 @@ contains
     ! Author: P. Le Van 
     ! Objet: incrémentation des tendances dynamiques
 
-    USE comgeom, ONLY : aire, aire_2d, apoln, apols
+    ! Libraries:
+    use nr_util, only: assert    
+
+    USE comgeom, ONLY : aire_2d, apoln, apols
     USE dimensions, ONLY : iim, jjm, llm
     USE disvert_m, ONLY : ap, bp
     use massdair_m, only: massdair
-    use nr_util, only: assert
-    USE paramet_m, ONLY : iip1, iip2, ip1jm, llmp1
+    USE paramet_m, ONLY : ip1jm
     use qminimum_m, only: qminimum
 
-    REAL vcovm1(ip1jm, llm), ucovm1((iim + 1) * (jjm + 1), llm)
+    REAL, intent(inout):: vcovm1(ip1jm, llm), ucovm1((iim + 1) * (jjm + 1), llm)
     REAL, intent(inout):: tetam1(iim + 1, jjm + 1, llm)
-    REAL, intent(inout):: psm1((iim + 1) * (jjm + 1))
+    REAL, intent(inout):: psm1(:, :) ! (iim + 1, jjm + 1)
     real, intent(inout):: massem1(iim + 1, jjm + 1, llm)
     REAL, intent(in):: dv(ip1jm, llm), du((iim + 1) * (jjm + 1), llm)
-    REAL, intent(in):: dteta(iim + 1, jjm + 1, llm), dp((iim + 1) * (jjm + 1))
+    REAL, intent(in):: dteta(iim + 1, jjm + 1, llm)
+    REAL, intent(in):: dp(:, :) ! (iim + 1, jjm + 1)
     REAL, intent(inout):: vcov(ip1jm, llm), ucov((iim + 1) * (jjm + 1), llm)
     real, intent(inout):: teta(iim + 1, jjm + 1, llm)
-    REAL q(:, :, :, :) ! (iim + 1, jjm + 1, llm, nq)
-    REAL, intent(inout):: ps((iim + 1) * (jjm + 1))
+    REAL, intent(inout):: q(:, :, :, :) ! (iim + 1, jjm + 1, llm, nq)
+    REAL, intent(inout):: ps(:, :) ! (iim + 1, jjm + 1) pression au sol, en Pa
     REAL, intent(inout):: masse(iim + 1, jjm + 1, llm)
     real, intent(in):: dt ! time step, in s
     LOGICAL, INTENT (IN) :: leapf
@@ -37,11 +40,10 @@ contains
     REAL finvmaold(iim + 1, jjm + 1, llm)
     INTEGER nq
     REAL vscr(ip1jm), uscr((iim + 1) * (jjm + 1)), hscr(iim + 1, jjm + 1)
-    real pscr((iim + 1) * (jjm + 1))
-    REAL p((iim + 1) * (jjm + 1), llmp1)
-    REAL tpn, tps, tppn(iim), tpps(iim)
-    REAL deltap((iim + 1) * (jjm + 1), llm)
-    INTEGER l, ij, iq
+    real pscr(iim + 1, jjm + 1)
+    REAL p(iim + 1, jjm + 1, llm + 1)
+    REAL deltap(iim + 1, jjm + 1, llm)
+    INTEGER l, ij, iq, i, j
 
     !-----------------------------------------------------------------------
 
@@ -50,7 +52,7 @@ contains
     nq = size(q, 4)
 
     DO l = 1, llm
-       DO ij = 1, iip1
+       DO ij = 1, iim + 1
           ucov(ij, l) = 0.
           ucov(ij+ip1jm, l) = 0.
           uscr(ij) = 0.
@@ -63,34 +65,29 @@ contains
     pscr = ps
     ps = psm1 + dt * dp
 
-    DO ij = 1, (iim + 1) * (jjm + 1)
-       IF (ps(ij) < 0.) THEN
-          PRINT *, 'integrd: au point ij = ', ij, &
-               ', negative surface pressure ', ps(ij)
-          STOP 1
-       END IF
-    END DO
+    DO j = 1, jjm + 1
+       do i = 1, iim + 1
+          IF (ps(i, j) < 0.) THEN
+             PRINT *, 'integrd: au point i, j = ', i, j, &
+                  ', negative surface pressure ', ps(i, j)
+             STOP 1
+          END IF
+       END DO
+    end DO
 
-    DO ij = 1, iim
-       tppn(ij) = aire(ij) * ps(ij)
-       tpps(ij) = aire(ij+ip1jm) * ps(ij+ip1jm)
-    END DO
-    tpn = sum(tppn)/apoln
-    tps = sum(tpps)/apols
-    DO ij = 1, iip1
-       ps(ij) = tpn
-       ps(ij+ip1jm) = tps
-    END DO
+    ps(:, 1) = sum(aire_2d(:iim, 1) * ps(:iim, 1)) / apoln
+    ps(:, jjm + 1) = sum(aire_2d(:iim, jjm + 1) * ps(:iim, jjm + 1)) / apols
+    
 
     ! Calcul de la nouvelle masse d'air au dernier temps integre t+1
 
-    forall (l = 1: llm + 1) p(:, l) = ap(l) + bp(l) * ps
+    forall (l = 1: llm + 1) p(:, :, l) = ap(l) + bp(l) * ps
     CALL massdair(p, finvmaold)
 
     ! integration de ucov, vcov, h
 
     DO l = 1, llm
-       DO ij = iip2, ip1jm
+       DO ij = iim + 2, ip1jm
           uscr(ij) = ucov(ij, l)
           ucov(ij, l) = ucovm1(ij, l) + dt * du(ij, l)
        END DO
@@ -116,12 +113,7 @@ contains
        END IF
     END DO
 
-    DO l = 1, llm
-       DO ij = 1, (iim + 1) * (jjm + 1)
-          deltap(ij, l) = p(ij, l) - p(ij, l+1)
-       END DO
-    END DO
-
+    forall (l = 1:llm) deltap(:, :, l) = p(:, :, l) - p(:, :, l + 1)
     CALL qminimum(q, nq, deltap)
 
     ! Calcul de la valeur moyenne, unique aux poles pour q
@@ -132,8 +124,6 @@ contains
                * q(:iim, jjm + 1, l, iq)) / apols
        END DO
     END DO
-
-    ! Fin de l'integration de q
 
     IF (leapf) THEN
        psm1 = pscr
