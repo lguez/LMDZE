@@ -9,7 +9,7 @@ contains
 
     ! From dyn3d/integrd.F, version 1.1.1.1, 2004/05/19 12:53:05
     ! Author: P. Le Van 
-    ! Objet: incrémentation des tendances dynamiques
+    ! Objet : incrémentation des tendances dynamiques
 
     ! Libraries:
     use nr_util, only: assert    
@@ -107,7 +107,7 @@ contains
             * teta(:iim, jjm + 1, l)) / apols
 
        IF (leapf) THEN
-          ucovm1(:, l)  =uscr
+          ucovm1(:, l) = uscr
           vcovm1(:, l) = vscr
           tetam1(:, :, l) = hscr
        END IF

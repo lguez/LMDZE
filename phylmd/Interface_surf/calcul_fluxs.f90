@@ -13,7 +13,7 @@ contains
 
     ! L. Fairhead, April 2000
 
-    ! Note that, if cal = 0, beta = 1 and dif_grnd = 0, then tsurf_new
+    ! Note that if cal = 0, beta = 1 and dif_grnd = 0, then tsurf_new
     ! = tsurf and qsurf = qsat.
 
     ! Libraries:
@@ -64,7 +64,7 @@ contains
     real, dimension(size(ps)):: mh, oh, mq, nq, oq, dq_s_dt, coef ! (knon)
     real qsat(size(ps)) ! (knon) mass fraction
     real sl(size(ps)) ! (knon) chaleur latente d'évaporation ou de sublimation
-    logical delta
+    logical ice
     real zcor
     real, parameter:: t_grnd = 271.35
     real, parameter:: min_wind_speed = 1. ! in m s-1
@@ -81,12 +81,12 @@ contains
     ! Traitement de l'humidité du sol
 
     DO i = 1, knon
-       delta = rtt >= tsurf(i)
-       qsat(i) = MIN(0.5, r2es * FOEEW(tsurf(i), delta) / ps(i))
+       ice = tsurf(i) <= rtt
+       qsat(i) = MIN(0.5, r2es * FOEEW(tsurf(i), ice) / ps(i))
        zcor = 1. / (1. - retv * qsat(i))
        qsat(i) = qsat(i) * zcor
-       dq_s_dt(i) = RCPD * FOEDE(tsurf(i), delta, merge(R5IES * RLSTT, &
-            R5LES * RLVTT, delta) / RCPD / (1. + RVTMP2 * q1lay(i)), qsat(i), &
+       dq_s_dt(i) = RCPD * FOEDE(tsurf(i), ice, merge(R5IES * RLSTT, &
+            R5LES * RLVTT, ice) / RCPD / (1. + RVTMP2 * q1lay(i)), qsat(i), &
             zcor) / RLVTT
     ENDDO
 

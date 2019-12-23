@@ -52,9 +52,7 @@ contains
 
     namelist /conf_gcm_nml/ raz_date, nday, day_step, iperiod, iapp_tracvl, &
          iconser, periodav, iphysiq
-
     namelist /iniprint_nml/ prt_level
-
     namelist /logic_nml/ purmats, iflag_phys
 
     !------------------------------------
