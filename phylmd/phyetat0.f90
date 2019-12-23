@@ -339,7 +339,6 @@ contains
     rlon(klon) = 0.
 
     masque = pack(mask, dyn_phy)
-    itau_phy = 0
 
   end subroutine phyetat0_new
 

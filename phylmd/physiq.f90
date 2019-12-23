@@ -30,7 +30,7 @@ contains
     use comconst, only: dtphys
     USE comgeomphy, ONLY: airephy
     USE concvl_m, ONLY: concvl
-    USE conf_gcm_m, ONLY: lmt_pas
+    USE conf_gcm_m, ONLY: nday, lmt_pas
     USE conf_phys_m, ONLY: conf_phys
     use conflx_m, only: conflx
     USE ctherm_m, ONLY: iflag_thermals, ctherm
@@ -51,7 +51,7 @@ contains
     use newmicro_m, only: newmicro
     USE orbite_m, ONLY: orbite
     USE ozonecm_m, ONLY: ozonecm
-    USE phyetat0_m, ONLY: phyetat0
+    USE phyetat0_m, ONLY: phyetat0, itau_phy
     USE phyredem_m, ONLY: phyredem
     USE phyredem0_m, ONLY: phyredem0
     USE phytrac_m, ONLY: phytrac
@@ -470,7 +470,7 @@ contains
 
        ! Initialisation des sorties
        call ini_histins
-       CALL phyredem0
+       CALL phyredem0(itau_phy + nday * lmt_pas)
        call conf_interface
     ENDIF test_firstcal
 

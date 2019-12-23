@@ -6,7 +6,7 @@ module phyredem0_m
 
 contains
 
-  SUBROUTINE phyredem0
+  SUBROUTINE phyredem0(itau_phy_redem)
 
     ! From phylmd/phyredem.F, version 1.3, 2005/05/25 13:10:09
     ! Author: Z. X. Li (LMD/CNRS)
@@ -15,14 +15,15 @@ contains
     ! Objet : \'ecriture de l'\'etat de d\'emarrage ou red\'emarrage
     ! pour la physique
 
-    use conf_gcm_m, only: nday, lmt_pas
     USE dimphy, ONLY: klev, klon
     USE dimsoil, ONLY: nsoilmx
     USE indicesol, ONLY: nbsrf
     USE netcdf, ONLY: nf90_clobber, nf90_global, nf90_float
     USE netcdf95, ONLY: nf95_create, nf95_put_att, nf95_def_dim, &
          nf95_def_var, nf95_enddef, nf95_put_var
-    use phyetat0_m, only: rlat, rlon, itau_phy
+    use phyetat0_m, only: rlat, rlon
+
+    integer, intent(in):: itau_phy_redem
 
     ! Local:
 
@@ -36,8 +37,7 @@ contains
 
     call nf95_put_att(ncid_restartphy, nf90_global, 'title', &
          'start file for the physics code')
-    call nf95_put_att(ncid_restartphy, nf90_global, "itau_phy", &
-         itau_phy + nday * lmt_pas)
+    call nf95_put_att(ncid_restartphy, nf90_global, "itau_phy", itau_phy_redem)
 
     call nf95_def_dim(ncid_restartphy, 'points_physiques', klon, idim2)
     call nf95_def_dim(ncid_restartphy, 'klev', klev, idim3)

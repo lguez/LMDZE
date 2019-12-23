@@ -304,8 +304,7 @@ contains
     sig1 = 0.
     w01 = 0.
 
-    nday = 0 ! side effect
-    call phyredem0
+    call phyredem0(0)
 
     call nf95_inq_varid(ncid_restartphy, "trs", varid)
     call nf95_put_var(ncid_restartphy, varid, null_array)

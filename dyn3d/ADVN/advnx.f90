@@ -124,10 +124,6 @@ SUBROUTINE advnx(q, qg, qd, masse, u_m, mode)
   END DO
 
   IF (n0>1) THEN
-    IF (prt_level>9) PRINT *, &
-      'Nombre de points pour lesquels on advect plus que le', &
-      'contenu de la maille : ', n0
-
     DO l = 1, llm
       IF (nl(l)>0) THEN
         iju = 0
