@@ -17,16 +17,11 @@ foreach(my_dir Mobidic Thermcell Orography Radlwsw CV30_routines Conflx
   include(${CMAKE_CURRENT_LIST_DIR}/${my_dir}/CMakeLists.txt)
 endforeach(my_dir)
 
-add_executable(test_orbite $<TARGET_OBJECTS:LMDZE_objects>
-  ${CMAKE_CURRENT_LIST_DIR}/test_orbite.f90)
+add_executable(test_orbite ${CMAKE_CURRENT_LIST_DIR}/test_orbite.f90)
+target_link_libraries(test_orbite LMDZE_objects ${netcdff_LIBRARY}
+  ${NetCDF_LIBRARY})
 
-target_include_directories(test_orbite PRIVATE ${nr_util_INCLUDE_DIR})
-target_link_libraries(test_orbite ${library_list})
-
-add_executable(test_ozonecm $<TARGET_OBJECTS:LMDZE_objects>
-  ${CMAKE_CURRENT_LIST_DIR}/test_ozonecm.f90)
-
-target_include_directories(test_ozonecm PRIVATE ${nr_util_INCLUDE_DIR}
-  ${netcdff_INCLUDE_DIR} ${netcdf95_INCLUDE_DIR})
-
-target_link_libraries(test_ozonecm ${library_list})
+add_executable(test_ozonecm ${CMAKE_CURRENT_LIST_DIR}/test_ozonecm.f90)
+target_include_directories(test_ozonecm PRIVATE ${netcdff_INCLUDE_DIR})
+target_link_libraries(test_ozonecm ${netcdff_LIBRARY}
+  ${NetCDF_LIBRARY} LMDZE_objects)
