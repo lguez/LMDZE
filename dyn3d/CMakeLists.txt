@@ -7,11 +7,12 @@ foreach(my_dir Guide Dissipation Inter_barxy Vlsplt ADVN)
 endforeach(my_dir)
 
 add_executable(gcm ${CMAKE_CURRENT_LIST_DIR}/gcm.f90)
-target_link_libraries(gcm LMDZE_objects ${netcdff_LIBRARY} ${NetCDF_LIBRARY})
+target_include_directories(gcm PRIVATE ${XIOS_INCLUDE_DIR})
+target_link_libraries(gcm LMDZE_objects ${XIOS_LIBRARY}
+  stdc++ MPI::MPI_CXX)
 
 add_executable(test_fxhyp ${CMAKE_CURRENT_LIST_DIR}/test_fxhyp.f90)
-target_link_libraries(test_fxhyp LMDZE_objects ${netcdff_LIBRARY}
-  ${NetCDF_LIBRARY})
+target_link_libraries(test_fxhyp LMDZE_objects)
 
 add_executable(ce0l ${CMAKE_CURRENT_LIST_DIR}/ce0l.f90)
-target_link_libraries(ce0l LMDZE_objects ${netcdff_LIBRARY} ${NetCDF_LIBRARY})
+target_link_libraries(ce0l LMDZE_objects)

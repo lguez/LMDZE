@@ -4,5 +4,4 @@ target_sources(LMDZE_objects PRIVATE ${file_list_var})
 
 add_executable(test_inifilr ${CMAKE_CURRENT_LIST_DIR}/test_inifilr.f90)
 target_include_directories(test_inifilr PRIVATE ${netcdff_INCLUDE_DIR})
-target_link_libraries(test_inifilr LMDZE_objects ${netcdff_LIBRARY}
-  ${NetCDF_LIBRARY})
+target_link_libraries(test_inifilr LMDZE_objects)

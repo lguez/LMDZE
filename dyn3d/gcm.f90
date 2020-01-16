@@ -10,6 +10,7 @@ PROGRAM gcm
 
   ! Libraries:
   use netcdf95, only: nf95_close
+  use xios, only: xios_initialize, xios_finalize
 
   use comconst, only: dtvr, iniconst
   use comdissnew, only: read_comdissnew
@@ -62,6 +63,8 @@ PROGRAM gcm
   read (unit=*, nml=main_nml)
   write(unit_nml, nml=main_nml)
 
+  call xios_initialize("LMDZE")
+  
   ! Choix du calendrier :
   if (true_calendar) then
      call ioconf_calendar('gregorian')
@@ -99,6 +102,8 @@ PROGRAM gcm
   do i = 1, nbfield
      call nf95_close(Ncid(i))
   end do
+
+  call xios_finalize
 
   print *, 'Simulation finished'
   print *, 'Everything is cool'

@@ -1,13 +1,18 @@
 cmake_minimum_required(VERSION 3.14)
-project(LMDZE Fortran)
+project(LMDZE Fortran CXX)
+set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR})
 
 find_path(netcdff_INCLUDE_DIR netcdf.mod)
-find_library(netcdff_LIBRARY netcdff)
+
+find_path(XIOS_INCLUDE_DIR xios.mod)
+find_library(XIOS_LIBRARY xios)
 
 find_package(NR_util REQUIRED CONFIG)
 find_package(Jumble REQUIRED CONFIG)
 find_package(Numer_Rec_95 REQUIRED CONFIG)
 find_package(NetCDF95 REQUIRED CONFIG)
+find_package(NetCDF REQUIRED)
+find_package(MPI REQUIRED COMPONENTS CXX)
 
 add_library(LMDZE_objects OBJECT dimensions.F90)
 
@@ -27,6 +32,5 @@ foreach(my_dir dyn3d filtrez IOIPSL misc phylmd)
   include(${my_dir}/CMakeLists.txt)
 endforeach(my_dir)
 
-set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR})
 include(ConfigureCompilerFlags)
 include(TAGS)
