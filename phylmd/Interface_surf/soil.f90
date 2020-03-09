@@ -50,7 +50,7 @@ contains
     ! temperature inside the ground (K), layer 1 nearest to the surface
 
     REAL, intent(out):: soilcap(:) ! (knon)
-    ! specific heat per unit surface (W m-2 s K-1)
+    ! specific heat per unit surface (in J m-2 K-1)
 
     REAL, intent(out):: soilflux(:) ! (knon) 
     ! surface diffusive flux from ground (W m-2)

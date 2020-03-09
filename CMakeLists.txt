@@ -1,5 +1,5 @@
-cmake_minimum_required(VERSION 3.14)
-project(LMDZE Fortran CXX)
+cmake_minimum_required(VERSION 3.16)
+project(LMDZE LANGUAGES Fortran CXX)
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR})
 
 find_path(netcdff_INCLUDE_DIR netcdf.mod)

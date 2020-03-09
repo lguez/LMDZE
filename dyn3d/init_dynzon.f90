@@ -11,10 +11,11 @@ module init_dynzon_m
 
 contains
 
-  SUBROUTINE init_dynzon(dt_app)
+  SUBROUTINE init_dynzon
 
     ! From LMDZ4/libf/dyn3d/bilan_dyn.F, version 1.5 2005/03/16 10:12:17
 
+    use comconst, only: dtvr
     USE conf_gcm_m, ONLY: day_step, iperiod, periodav
     USE dimensions, ONLY: jjm, llm
     USE disvert_m, ONLY: presnivs
@@ -26,8 +27,6 @@ contains
     USE histvert_m, ONLY: histvert
     USE nr_util, ONLY: pi
     USE ymds2ju_m, ONLY: ymds2ju
-
-    real, intent(in):: dt_app
 
     ! Local:
 
@@ -56,7 +55,7 @@ contains
     ! Initialisation des fichiers
     ! ncum est la frequence de stokage en pas de temps
     ncum = day_step / iperiod * periodav
-    dt_cum = ncum * dt_app
+    dt_cum = day_step * periodav * dtvr
 
     ! Initialisation du fichier contenant les moyennes zonales
 

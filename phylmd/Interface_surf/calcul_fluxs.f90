@@ -29,7 +29,9 @@ contains
     real, intent(IN):: p1lay(:) ! (knon)
     ! pression première couche (milieu de couche)
 
-    real, intent(IN):: cal(:) ! (knon) capacité calorifique du sol
+    real, intent(IN):: cal(:) ! (knon) RCPD / soilcap, où soilcap est
+    ! la capacité calorifique surfacique apparente du sol. En m2/kg.
+    
     real, intent(IN):: beta(:) ! (knon) évaporation réelle
     real, intent(IN):: cdragh(:) ! (knon) coefficient d'échange
     real, intent(IN):: ps(:) ! (knon) pression au sol, en Pa
@@ -38,7 +40,6 @@ contains
     real, intent(IN):: radsol(:) ! (knon)
     ! net downward radiative (longwave + shortwave) flux at the surface
 
-    real, intent(IN):: dif_grnd ! coefficient de diffusion vers le sol profond
     real, intent(IN):: t1lay(:) ! (knon) temp\'erature de l'air 1\`ere couche
     real, intent(IN):: q1lay(:), u1lay(:), v1lay(:) ! (knon)
 
@@ -57,6 +58,8 @@ contains
     real, intent(OUT):: dflux_s(:), dflux_l(:) ! (knon)
     ! dérivées des flux de chaleurs sensible et latente par rapport à
     ! Ts (W m-2 K-1)
+
+    real, intent(IN):: dif_grnd ! coefficient de diffusion vers le sol profond
 
     ! Local:
     integer i

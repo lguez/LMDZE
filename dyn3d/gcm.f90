@@ -12,7 +12,7 @@ PROGRAM gcm
   use netcdf95, only: nf95_close
   use xios, only: xios_initialize, xios_finalize
 
-  use comconst, only: dtvr, iniconst
+  use comconst, only: iniconst
   use comdissnew, only: read_comdissnew
   use comgeom, only:  aire_2d, inigeom
   use comgeomphy, only: airephy
@@ -90,8 +90,8 @@ PROGRAM gcm
 
   ! Initialisation des entr\'ees-sorties :
   CALL dynredem0(day_ini + nday, phis)
-  CALL inithist(t_ops = dtvr, t_wrt = dtvr)
-  call init_dynzon(dt_app = dtvr * iperiod)
+  CALL inithist
+  call init_dynzon
 
   CALL conf_guide
   CALL leapfrog(ucov, vcov, teta, ps, masse, phis, q)

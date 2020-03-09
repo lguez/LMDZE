@@ -152,7 +152,7 @@ contains
     case("read_pressure")
        ! Read pressure values, in Pa, in descending order, from preff
        ! to 0. First line is skipped (title line).
-       call read_column("pressure.txt", p, first=2)
+       call read_column(p, "pressure.txt", first = 2)
        call assert(size(p) == llm + 1, "disvert: bad number of pressure values")
        ! Quick check:
        call assert(p(1) == preff, p(llm + 1) == 0., &

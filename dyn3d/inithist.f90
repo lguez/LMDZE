@@ -6,7 +6,7 @@ module inithist_m
 
 contains
 
-  subroutine inithist(t_ops, t_wrt)
+  subroutine inithist
 
     ! From inithist.F, version 1.1.1.1, 2004/05/19 12:53:05
     ! L. Fairhead, LMD, 03/99
@@ -27,9 +27,6 @@ contains
     USE nr_util, ONLY: pi
     USE paramet_m, ONLY: iip1, jjp1
     use ymds2ju_m, ONLY: ymds2ju
-
-    real, intent(in):: t_ops ! fréquence de l'opération pour IOIPSL
-    real, intent(in):: t_wrt ! fréquence d'écriture sur le fichier
 
     ! Local:
     double precision julian
@@ -62,26 +59,26 @@ contains
          presnivs/100., zvertiid, 'down')
 
     call histdef(histuid, 'u', 'vent u', 'm/s', iip1, jjp1, uhoriid, llm, 1, &
-         llm, zvertiid, 'inst(X)', t_ops, t_wrt)
+         llm, zvertiid, 'inst(X)', dtvr, dtvr)
     call histdef(histvid, 'v', 'vent v', 'm/s', iip1, jjm, vhoriid, llm, 1, &
-         llm, zvertiid, 'inst(X)', t_ops, t_wrt)
+         llm, zvertiid, 'inst(X)', dtvr, dtvr)
     call histdef(histid, 'temp', 'temperature', 'K', iip1, jjp1, &
-         thoriid, llm, 1, llm, zvertiid, 'inst(X)', t_ops, t_wrt)
+         thoriid, llm, 1, llm, zvertiid, 'inst(X)', dtvr, dtvr)
     call histdef(histid, 'theta', 'temperature potentielle', 'K', iip1, jjp1, &
-         thoriid, llm, 1, llm, zvertiid, 'inst(X)', t_ops, t_wrt)
+         thoriid, llm, 1, llm, zvertiid, 'inst(X)', dtvr, dtvr)
     call histdef(histid, 'phi', 'geopotential', 'm2 s-2', iip1, jjp1, thoriid, &
-         llm, 1, llm, zvertiid, 'inst(X)', t_ops, t_wrt)
+         llm, 1, llm, zvertiid, 'inst(X)', dtvr, dtvr)
 
     ! Traceurs
     DO iq = 1, nqmx
        call histdef(histid, ttext(iq), ttext(iq), '-', iip1, jjp1, thoriid, &
-            llm, 1, llm, zvertiid, 'inst(X)', t_ops, t_wrt)
+            llm, 1, llm, zvertiid, 'inst(X)', dtvr, dtvr)
     enddo
 
     call histdef(histid, 'masse', 'masse', 'kg', iip1, jjp1, thoriid, llm, 1, &
-         llm, zvertiid, 'inst(X)', t_ops, t_wrt)
+         llm, zvertiid, 'inst(X)', dtvr, dtvr)
     call histdef(histid, 'ps', 'pression naturelle au sol', 'Pa', iip1, jjp1, &
-         thoriid, 1, 1, 1, -99, 'inst(X)', t_ops, t_wrt)
+         thoriid, 1, 1, 1, -99, 'inst(X)', dtvr, dtvr)
 
     call histend(histid)
     call histend(histuid)
