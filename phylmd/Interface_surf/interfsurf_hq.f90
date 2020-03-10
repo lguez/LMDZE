@@ -114,7 +114,9 @@ contains
     real zfra(size(knindex)) ! (knon) fraction of surface covered by snow
     REAL, PARAMETER:: fmagic = 1. ! facteur magique pour r\'egler l'alb\'edo
     REAL, PARAMETER:: max_eau_sol = 150. ! in kg m-2
+
     REAL, PARAMETER:: tau_gl = 86400. * 5.
+    ! constante de rappel de la temp\'erature \`a la surface de la glace, en s
 
     !-------------------------------------------------------------
 
