@@ -19,22 +19,20 @@ module comgeom
   equivalence (unscv2, unscv2_2d)
 
   real aire((iim + 1) * (jjm + 1)), aire_2d(iim + 1, jjm + 1) ! in m2
-  real airesurg_2d(iim + 1, jjm + 1), airesurg((iim + 1) * (jjm + 1))
-  equivalence (aire, aire_2d), (airesurg, airesurg_2d)
+  equivalence (aire, aire_2d)
+
+  real airesurg_2d(iim + 1, jjm + 1)
 
   real aireu_2d(iim + 1, jjm + 1) ! in m2
   real aireu((iim + 1) * (jjm + 1)) ! in m2
   equivalence (aireu, aireu_2d)
 
   real airev((iim + 1) * jjm), airev_2d(iim + 1, jjm) ! in m2
-  real unsaire((iim + 1) * (jjm + 1)), unsaire_2d(iim + 1, jjm + 1) ! in m-2
-  equivalence (airev, airev_2d), (unsaire, unsaire_2d)
+  equivalence (airev, airev_2d)
 
+  real unsaire_2d(iim + 1, jjm + 1) ! in m-2
   real apoln, apols ! in m2
-
   real unsairez_2d(iim + 1, jjm)
-  real unsairez((iim + 1) * jjm)
-  equivalence (unsairez, unsairez_2d)
 
   real alpha1_2d(iim + 1, jjm + 1)
   real alpha1((iim + 1) * (jjm + 1))
@@ -65,14 +63,14 @@ module comgeom
   equivalence (fext, fext_2d), (constang, constang_2d)
 
   real cuvsurcv_2d(iim + 1, jjm), cvsurcuv_2d(iim + 1, jjm) ! no dimension
-  real cuvsurcv((iim + 1) * jjm), cvsurcuv((iim + 1) * jjm) ! no dimension
-  equivalence (cuvsurcv, cuvsurcv_2d), (cvsurcuv, cvsurcuv_2d)
+  
+  real cvsurcuv((iim + 1) * jjm) ! no dimension
+  equivalence (cvsurcuv, cvsurcuv_2d)
 
   real cvusurcu_2d(iim + 1, jjm + 1), cusurcvu_2d(iim + 1, jjm + 1)
   ! no dimension
-  real cvusurcu((iim + 1) * (jjm + 1)), cusurcvu((iim + 1) * (jjm + 1))
-  ! no dimension
-  equivalence (cvusurcu, cvusurcu_2d), (cusurcvu, cusurcvu_2d)
+  real cusurcvu((iim + 1) * (jjm + 1)) ! no dimension
+  equivalence (cusurcvu, cusurcvu_2d)
 
   real cuvscvgam1_2d(iim + 1, jjm)
   real cuvscvgam1((iim + 1) * jjm)
