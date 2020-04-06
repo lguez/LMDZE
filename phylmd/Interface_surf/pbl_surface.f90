@@ -142,7 +142,7 @@ contains
     REAL, intent(in):: solsw(:) ! (klon)
     ! surface net downward shortwave flux, in W m-2
 
-    REAL, intent(in):: tsol(:) ! (klon)
+    REAL, intent(out):: tsol(:) ! (klon)
 
     ! Local:
 
@@ -207,6 +207,7 @@ contains
 
     !------------------------------------------------------------
 
+    tsol = sum(ftsol * pctsrf, dim = 2)
     albsol = sum(falbe * pctsrf, dim = 2)
 
     ! R\'epartition sous maille des flux longwave et shortwave
@@ -510,6 +511,8 @@ contains
     CALL histwrite_phy("dtsvdft", d_ts(:, is_ter))
     CALL histwrite_phy("dtsvdfg", d_ts(:, is_lic))
     CALL histwrite_phy("dtsvdfi", d_ts(:, is_sic))
+
+    tsol = sum(ftsol * pctsrf, dim = 2)
 
   END SUBROUTINE pbl_surface
 

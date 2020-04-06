@@ -483,8 +483,6 @@ contains
     ql_seri = qx(:, :, iliq)
     tr_seri = qx(:, :, 3:nqmx)
 
-    tsol = sum(ftsol * pctsrf, dim = 2)
-
     ! Diagnostic de la tendance dynamique :
     IF (ancien_ok) THEN
        DO k = 1, llm
@@ -547,11 +545,11 @@ contains
          pblh, capCL, oliqCL, cteiCL, pblT, therm, plcl, fqcalving, ffonte, &
          run_off_lic_0, albsol, sollw, solsw, tsol)
 
-    ! Incr\'ementation des flux
-
+    ! Incr\'ementation des flux :
     sens = sum(flux_t * pctsrf, dim = 2)
     evap = - sum(flux_q * pctsrf, dim = 2)
     fder = dlw + dflux_t + dflux_q
+    dlw = - 4. * RSIGMA * tsol**3
 
     DO k = 1, llm
        DO i = 1, klon
@@ -563,7 +561,6 @@ contains
     ENDDO
 
     call assert(abs(sum(pctsrf, dim = 2) - 1.) <= EPSFRA, 'physiq: pctsrf')
-    tsol = sum(ftsol * pctsrf, dim = 2)
     zxfluxlat = sum(fluxlat * pctsrf, dim = 2)
     zt2m = sum(t2m * pctsrf, dim = 2)
     zq2m = sum(q2m * pctsrf, dim = 2)
@@ -598,8 +595,6 @@ contains
           end IF
        ENDDO
     ENDDO
-
-    dlw = - 4. * RSIGMA * tsol**3
 
     ! Appeler la convection
 
