@@ -579,7 +579,6 @@ contains
     DO nsrf = 1, nbsrf
        DO i = 1, klon
           IF (pctsrf(i, nsrf) < epsfra) then
-             ftsol(i, nsrf) = tsol(i)
              t2m(i, nsrf) = zt2m(i)
              q2m(i, nsrf) = zq2m(i)
              u10m_srf(i, nsrf) = u10m(i)

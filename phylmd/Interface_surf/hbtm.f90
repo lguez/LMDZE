@@ -11,13 +11,13 @@ contains
     ! JAS 47 BLM
 
     ! Algorithme th\'ese Anne Mathieu. Crit\'ere d'entra\^inement
-    ! Peter Duynkerke (JAS 50).  Written by: Anne MATHIEU and Alain
+    ! Peter Duynkerke (JAS 50). Written by: Anne MATHIEU and Alain
     ! LAHELLEC, 22nd November 1999.
 
     ! Modifications : d\'ecembre 99 passage th \`a niveau plus bas. Voir fixer
-    ! la prise du th \`a z/Lambda = -.2 (max Ray)
+    ! la prise du th \`a z / Lambda = -.2 (max Ray)
     ! Autre algorithme : entra\^inement ~ Theta + v =constante
-    !  mais comment ? The ?
+    ! mais comment ? The ?
     ! On peut fixer q \`a 0.7 qsat (cf. non adiabatique) d'où T2 et The2.
     ! Voir aussi KE pblh = niveau The_e ou l = env.
 
@@ -29,36 +29,28 @@ contains
     ! conserv\'ee).
 
     USE dimphy, ONLY: klev, klon
+    USE fcttre, ONLY: foeew
     USE suphec_m, ONLY: rcpd, rd, retv, rg, rkappa, rtt
     USE yoethf_m, ONLY: r2es, rvtmp2
-    USE fcttre, ONLY: foeew
 
     ! Arguments:
 
-    ! pression a inter-couche (Pa)
-    REAL, intent(in):: paprs(klon, klev+1)
-    ! pression au milieu de couche (Pa)
-    REAL, intent(in):: pplay(klon, klev)
+    REAL, intent(in):: paprs(klon, klev+1) ! pression a inter-couche (Pa)
+    REAL, intent(in):: pplay(klon, klev) ! pression au milieu de couche (Pa)
     REAL, intent(in):: t2m(klon) ! temperature a 2 m
-    ! q a 2 et 10m
-    REAL, intent(in):: q2m(klon)
+    REAL, intent(in):: q2m(klon) ! q a 2 et 10m
     REAL, intent(in):: ustar(:) ! (knon)
     REAL, intent(in):: flux_t(:), flux_q(:) ! (knon) flux à la surface
     REAL, intent(in):: u(:, :) ! (knon, klev) vitesse U (m/s)
     REAL, intent(in):: v(:, :) ! (knon, klev) vitesse V (m/s)
     REAL, intent(in):: t(:, :) ! (knon, klev) temperature (K)
     REAL, intent(in):: q(:, :) ! (knon, klev) vapeur d'eau (kg/kg)
-
     REAL, intent(out):: pblh(:) ! (knon)
-    ! Cape du thermique
-    REAL Cape(klon)
-    ! Eau liqu integr du thermique
-    REAL EauLiq(klon)
-    ! Critere d'instab d'entrainmt des nuages de
-    REAL ctei(klon)
+    REAL Cape(klon) ! Cape du thermique
+    REAL EauLiq(klon) ! Eau liqu integr du thermique
+    REAL ctei(klon) ! Critere d'instab d'entrainmt des nuages de
     REAL pblT(klon)
-    ! thermal virtual temperature excess
-    REAL therm(klon)
+    REAL therm(:) ! (knon) ! thermal virtual temperature excess
     REAL plcl(klon)
 
     ! Local:
