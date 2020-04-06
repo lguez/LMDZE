@@ -169,7 +169,7 @@ contains
     REAL ysnow_fall(klon) ! solid water mass flux (kg / m2 / s), positive down
     REAL yrugm(klon), radsol(klon), yrugoro(klon)
     REAL yfluxlat(klon)
-    REAL y_d_ts(klon)
+    REAL tsurf_new(klon)
     REAL y_d_t(klon, klev), y_d_q(klon, klev)
     REAL y_d_u(klon, klev), y_d_v(klon, klev)
     REAL y_flux_t(klon), y_flux_q(klon)
@@ -363,7 +363,7 @@ contains
                ydelp(:knon, :), radsol(:knon), yalb(:knon), snow(:knon), &
                yqsurf(:knon), yrain_fall(:knon), ysnow_fall(:knon), &
                yfluxlat(:knon), pctsrf_new_sic(ni(:knon)), yagesno(:knon), &
-               y_d_t(:knon, :), y_d_q(:knon, :), y_d_ts(:knon), &
+               y_d_t(:knon, :), y_d_q(:knon, :), tsurf_new(:knon), &
                yz0_new(:knon), y_flux_t(:knon), y_flux_q(:knon), &
                y_dflux_t(:knon), y_dflux_q(:knon), y_fqcalving(:knon), &
                y_ffonte(:knon), y_run_off_lic_0(:knon), y_run_off_lic(:knon))
@@ -399,9 +399,11 @@ contains
           fsnow(:, nsrf) = 0.
           fqsurf(:, nsrf) = 0.
           frugs(:, nsrf) = 0.
+          
           DO j = 1, knon
              i = ni(j)
-             d_ts(i, nsrf) = y_d_ts(j)
+             d_ts(i, nsrf) = tsurf_new(j) - yts(j)
+             ftsol(i, nsrf) = tsurf_new(j) ! update surface temperature
              falbe(i, nsrf) = yalb(j)
              fsnow(i, nsrf) = snow(j)
              fqsurf(i, nsrf) = yqsurf(j)
@@ -419,6 +421,7 @@ contains
              dflux_t(i) = dflux_t(i) + y_dflux_t(j) * ypctsrf(j)
              dflux_q(i) = dflux_q(i) + y_dflux_q(j) * ypctsrf(j)
           END DO
+          
           IF (nsrf == is_ter) THEN
              qsol(ni(:knon)) = yqsol(:knon)
           else IF (nsrf == is_lic) THEN
@@ -460,10 +463,9 @@ contains
           CALL stdlevvar(nsrf, u1(:knon), v1(:knon), tair1(:knon), &
                yq(:knon, 1) + y_d_q(:knon, 1), rd * tair1(:knon) &
                / (0.5 * (ypaprs(:knon, 1) + ypplay(:knon, 1))) &
-               * (ypaprs(:knon, 1) - ypplay(:knon, 1)), &
-               yts(:knon) + y_d_ts(:knon), yqsurf(:knon), rugo1, &
-               ypaprs(:knon, 1), ypplay(:knon, 1), yt2m, yq2m, yt10m, yq10m, &
-               wind10m(:knon), ustar(:knon))
+               * (ypaprs(:knon, 1) - ypplay(:knon, 1)), tsurf_new(:knon), &
+               yqsurf(:knon), rugo1, ypaprs(:knon, 1), ypplay(:knon, 1), yt2m, &
+               yq2m, yt10m, yq10m, wind10m(:knon), ustar(:knon))
 
           DO j = 1, knon
              i = ni(j)
@@ -504,7 +506,6 @@ contains
     pctsrf(:, is_sic) = pctsrf_new_sic
 
     CALL histwrite_phy("run_off_lic", run_off_lic)
-    ftsol = ftsol + d_ts ! update surface temperature
     CALL histwrite_phy("dtsvdfo", d_ts(:, is_oce))
     CALL histwrite_phy("dtsvdft", d_ts(:, is_ter))
     CALL histwrite_phy("dtsvdfg", d_ts(:, is_lic))

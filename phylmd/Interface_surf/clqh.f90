@@ -7,7 +7,7 @@ contains
   SUBROUTINE clqh(julien, nisurf, knindex, tsoil, qsol, mu0, rugos, rugoro, &
        u1lay, v1lay, coef, cdragh, t, q, ts, paprs, pplay, delp, radsol, &
        albedo, snow, qsurf, rain_fall, snow_fall, fluxlat, pctsrf_new_sic, &
-       agesno, d_t, d_q, d_ts, z0_new, flux_t, flux_q, dflux_s, dflux_l, &
+       agesno, d_t, d_q, tsurf_new, z0_new, flux_t, flux_q, dflux_s, dflux_l, &
        fqcalving, ffonte, run_off_lic_0, run_off_lic)
 
     ! Author: Z. X. Li (LMD/CNRS)
@@ -78,7 +78,7 @@ contains
     REAL, intent(inout):: agesno(:) ! (knon)
     REAL, intent(out):: d_t(:, :) ! (knon, klev) variation of air temperature t
     REAL, intent(out):: d_q(:, :) ! (knon, klev) incrementation de "q"
-    REAL, intent(out):: d_ts(:) ! (knon) variation of surface temperature
+    REAL, intent(out):: tsurf_new(:) ! (knon) new surface temperature, in K
     real, intent(out):: z0_new(:) ! (knon)
 
     REAL, intent(out):: flux_t(:) ! (knon)
@@ -109,7 +109,6 @@ contains
     REAL evap(size(knindex)) ! (knon) evaporation au sol
     REAL, dimension(size(knindex), klev):: cq, dq, ch, dh ! (knon, klev)
     REAL pkf(size(knindex), klev) ! (knon, klev)
-    real tsurf_new(size(knindex)) ! (knon)
 
     !----------------------------------------------------------------
 
@@ -124,7 +123,6 @@ contains
          dflux_s, tsurf_new, albedo, z0_new, pctsrf_new_sic, agesno, &
          fqcalving, ffonte, run_off_lic_0, run_off_lic)
     flux_q = - evap
-    d_ts = tsurf_new - ts
     call climb_hq_up(d_t, d_q, cq, dq, ch, dh, flux_t, flux_q, pkf, t, q)
 
   END SUBROUTINE clqh
