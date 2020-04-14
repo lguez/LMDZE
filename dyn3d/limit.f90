@@ -1,4 +1,4 @@
-module limit_mod
+module limit_m
 
   IMPLICIT none
 
@@ -408,4 +408,4 @@ contains
 
   END SUBROUTINE limit
 
-end module limit_mod
+end module limit_m

@@ -10,7 +10,7 @@ PROGRAM ce0l
   use etat0_m, only: etat0
   use grilles_gcm_netcdf_sub_m, only: grilles_gcm_netcdf_sub
   use indicesol, only: nbsrf
-  use limit_mod, only: limit
+  use limit_m, only: limit
   use unit_nml_m, only: unit_nml, set_unit_nml
 
   implicit none

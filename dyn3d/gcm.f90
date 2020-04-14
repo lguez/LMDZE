@@ -89,7 +89,7 @@ PROGRAM gcm
   ENDIF
 
   ! Initialisation des entr\'ees-sorties :
-  CALL dynredem0(day_ini + nday, phis)
+  CALL dynredem0(phis, iday_end = day_ini + nday)
   CALL inithist
   call init_dynzon
 

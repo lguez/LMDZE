@@ -72,7 +72,7 @@ rotat_nfil.f90
 scopy.f90
 sortvarc.f90
 ssum.f90
-startdyn.f90
+start_init_dyn.f90
 start_init_phys_m.f90
 start_inter_3d.f90
 test_disvert.f90

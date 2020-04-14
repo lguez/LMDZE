@@ -2,11 +2,11 @@ MODULE dynredem0_m
 
   IMPLICIT NONE
 
-  INTEGER ncid
+  INTEGER, protected:: ncid
 
 CONTAINS
 
-  SUBROUTINE dynredem0(iday_end, phis)
+  SUBROUTINE dynredem0(phis, iday_end)
 
     ! From dyn3d/dynredem.F, version 1.2, 2004/06/22 11:45:30
     ! \'Ecriture du fichier de red\'emarrage au format NetCDF (initialisation)
@@ -27,10 +27,10 @@ CONTAINS
     USE paramet_m, ONLY: iip1, jjp1, llmp1
     use ymds2ju_m, only: ymds2ju
 
-    INTEGER, INTENT(IN):: iday_end
-
     REAL, INTENT(IN):: phis(:, :) ! (iim + 1, jjm + 1)
     ! surface geopotential, in m2 s-2
+
+    INTEGER, INTENT(IN):: iday_end
 
     ! Local:
 
@@ -211,9 +211,6 @@ CONTAINS
     CALL nf95_put_var(ncid, varid_bp, bp)
     CALL nf95_put_var(ncid, varid_presnivs, presnivs)
     CALL nf95_put_var(ncid, varid_phis, phis)
-
-    PRINT *, 'iim, jjm, llm, iday_end', iim, jjm, llm, iday_end
-    PRINT *, 'rad, omeg, g, cpp, kappa', rad, omeg, g, cpp, kappa
 
   END SUBROUTINE dynredem0
 

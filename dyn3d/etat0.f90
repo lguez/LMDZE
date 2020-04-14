@@ -38,7 +38,7 @@ contains
     use q_sat_m, only: q_sat
     use regr_lat_time_coefoz_m, only: regr_lat_time_coefoz
     use regr_pr_o3_m, only: regr_pr_o3
-    use startdyn, only: start_init_dyn
+    use start_init_dyn_m, only: start_init_dyn
     USE start_init_orog_m, only: start_init_orog
     use start_init_phys_m, only: start_init_phys
     use start_inter_3d_m, only: start_inter_3d
@@ -277,7 +277,7 @@ contains
     call infotrac_init
     CALL geopot(teta, pk , pks, phis, phi)
     CALL caldyn0(ucov, vcov, teta, ps, pk, phis, phi)
-    CALL dynredem0(day_ref, phis)
+    CALL dynredem0(phis, day_ref)
     CALL dynredem1(vcov, ucov, teta, q, masse, ps, itau = 0)
 
     ! Initialisations :

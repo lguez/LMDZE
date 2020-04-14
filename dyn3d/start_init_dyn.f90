@@ -1,4 +1,4 @@
-MODULE startdyn
+MODULE start_init_dyn_m
 
   ! From startvar.F, version 1.4
   ! January 27th, 2006 15:14:22
@@ -97,4 +97,4 @@ CONTAINS
 
   END SUBROUTINE start_init_dyn
 
-END MODULE startdyn
+END MODULE start_init_dyn_m

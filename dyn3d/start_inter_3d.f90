@@ -15,7 +15,8 @@ contains
     use conf_dat3d_m, only: conf_dat3d
     use netcdf, only: nf90_nowrite
     use netcdf95, only: nf95_open, nf95_close, nf95_get_var, nf95_inq_varid
-    use startdyn, only: IML_DYN, JML_DYN, LLM_DYN, LAT_INI, LEVDYN_INI, LON_INI
+    use start_init_dyn_m, only: IML_DYN, JML_DYN, LLM_DYN, LAT_INI, &
+         LEVDYN_INI, LON_INI
 
     CHARACTER(len=*), intent(in):: varname
     REAL, intent(in):: lon_in2(:) ! (iml) longitude, in rad

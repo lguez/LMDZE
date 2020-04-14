@@ -29,7 +29,7 @@ module dynetat0_m
   REAL, protected, save:: rlatu1(jjm), rlatu2(jjm), yprimu1(jjm), yprimu2(jjm)
   REAL, save:: ang0, etot0, ptot0, ztot0, stot0
   INTEGER, PARAMETER, private:: nmax = 30000
-  INTEGER, save:: itau_dyn
+  INTEGER, protected, save:: itau_dyn
 
 contains
 
