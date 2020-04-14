@@ -41,8 +41,6 @@ contains
     !----------------------------------------------------------------
 
     ! Modele du thermique
-    print*, 'avant isplit ', nsplit_thermals
-
     fm_therm=0.
     entr_therm=0.
 
@@ -59,7 +57,7 @@ contains
 
     zdt=dtphys/real(nsplit_thermals)
     do isplit = 1, nsplit_thermals
-       CALL thermcell(klon, klev, zdt, pplay, paprs, pphi, u_seri, v_seri, &
+       CALL thermcell(klev, zdt, pplay, paprs, pphi, u_seri, v_seri, &
             t_seri, q_seri, d_u_the, d_v_the, d_t_the, d_q_the, zfm_therm, &
             zentr_therm)
 
