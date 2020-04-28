@@ -16,13 +16,15 @@ CONTAINS
   SUBROUTINE start_init_orog(phis, zmea_2d, zstd_2d, zsig_2d, zgam_2d, &
        zthe_2d, zpic_2d, zval_2d)
 
+    ! Libraries:
+    use netcdf, only: nf90_nowrite
+    use netcdf95, only: nf95_open, nf95_gw_var, nf95_inq_varid, nf95_close
+    use nr_util, only: pi, assert    
+
     use conf_dat2d_m, only: conf_dat2d
     use dynetat0_m, only: rlatu, rlonv
     use grid_noro_m, only: grid_noro
     use indicesol, only: epsfra
-    use netcdf, only: nf90_nowrite
-    use netcdf95, only: nf95_open, nf95_gw_var, nf95_inq_varid, nf95_close
-    use nr_util, only: pi, assert
 
     REAL, intent(out):: phis(:, :) ! (iim + 1, jjm + 1)
     ! surface geopotential, in m2 s-2
@@ -68,7 +70,7 @@ CONTAINS
          size(zsig_2d, 2), size(zgam_2d, 2), size(zthe_2d, 2), &
          size(zpic_2d, 2), size(zval_2d, 2)/) == jjm + 1, "start_init_orog jjm")
 
-    print *, 'Reading the high resolution orography...'
+    ! Read the high resolution orography:
 
     call nf95_open('Relief.nc', nf90_nowrite, ncid)
 
@@ -95,10 +97,10 @@ CONTAINS
     CALL grid_noro(lon_rad, lat_rad, relief, rlonv, rlatu, phis, zmea_2d, &
          zstd_2d, zsig_2d, zgam_2d, zthe_2d, zpic_2d, zval_2d, mask)
     phis(:, :) = phis(:, :) * 9.81
-
     mask(2:, 1) = mask(1, 1) ! north pole
     mask(2:, jjm + 1) = mask(1, jjm + 1) ! south pole
     mask(iim + 1, 2:jjm) = mask(1, 2:jjm) ! Greenwich
+    
     WHERE (mask < EPSFRA)
        mask = 0.
     elsewhere (1. - mask < EPSFRA)

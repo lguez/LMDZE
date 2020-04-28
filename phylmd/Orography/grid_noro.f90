@@ -4,7 +4,7 @@ module grid_noro_m
 
 contains
 
-  SUBROUTINE grid_noro(xdata, ydata, zdata, x, y, zphi, zmea, zstd, zsig, &
+  SUBROUTINE grid_noro(xdata, ydata, relief, x, y, phis, zmea, zstd, zsig, &
        zgam, zthe, zpic, zval, mask)
 
     ! From dyn3d/grid_noro.F, version 1.1.1.1 2004/05/19 12:53:06
@@ -21,31 +21,33 @@ contains
     ! iim + 1 longitudes, with periodicity: longitude(iim + 1) = longitude(1)
     ! At the poles the field value is repeated iim + 1 times.
 
-    ! The parameters a, b, c, d represent the limite of the target
-    ! gridpoint region. The means over this region are calculated from
+    ! The parameters a, b, c, d represent the limit of the target
+    ! grid-point region. The mean over this region is calculated from
     ! US Navy data, ponderated by a weight proportional to the surface
-    ! occupied by the data inside the model gridpoint area. In most
+    ! occupied by the data inside the model grid-point area. In most
     ! circumstances, this weight is the ratio between the surface of
-    ! the US Navy gridpoint area and the surface of the model gridpoint
-    ! area. See "grid_noto.txt".
+    ! the US Navy gridpoint area and the surface of the model
+    ! grid-point area. See documentation.
+
+    ! Libraries:
+    use nr_util, only: assert, pi
 
     use dimensions, only: iim, jjm
     use mva9_m, only: mva9
-    use nr_util, only: assert, pi
 
     ! Coordinates of input field:
     REAL, intent(in):: xdata(:) ! (iusn)
     REAL, intent(in):: ydata(:) ! (jusn)
 
-    REAL, intent(in):: zdata(:, :) ! (iusn, jusn) input field, in m
+    REAL, intent(in):: relief(:, :) ! (iusn, jusn) input field, in m
     REAL, intent(in):: x(:), y(:) ! coordinates of output field
 
     ! Correlations of US Navy orography gradients:
 
-    REAL, intent(out):: zphi(:, :) ! (iim + 1, jjm + 1)
+    REAL, intent(out):: phis(:, :) ! (iim + 1, jjm + 1)
     ! geoptential height of orography, not smoothed, in m
     
-    real, intent(out):: zmea(:, :) ! (iim + 1, jjm + 1) smoothed orography
+    real, intent(out):: zmea(:, :) ! (iim + 1, jjm + 1) smoothed mean orography
     real, intent(out):: zstd(:, :) ! (iim + 1, jjm + 1) Standard deviation
     REAL, intent(out):: zsig(:, :) ! (iim + 1, jjm + 1) Slope
     real, intent(out):: zgam(:, :) ! (iim + 1, jjm + 1) Anisotropy
@@ -81,22 +83,21 @@ contains
     integer ii, i, jj, j
     real, parameter:: rad = 6371229.
 
-    !-------------------------------
+    !--------------------------------------------------------------------
 
     print *, "Call sequence information: grid_noro"
 
-    call assert((/size(xdata), size(zdata, 1)/) == iusn, "grid_noro iusn")
-    call assert((/size(ydata), size(zdata, 2)/) == jusn, "grid_noro jusn")
+    call assert((/size(xdata), size(relief, 1)/) == iusn, "grid_noro iusn")
+    call assert((/size(ydata), size(relief, 2)/) == jusn, "grid_noro jusn")
 
-    call assert((/size(x), size(zphi, 1), size(zmea, 1), size(zstd, 1), &
+    call assert((/size(x), size(phis, 1), size(zmea, 1), size(zstd, 1), &
          size(zsig, 1), size(zgam, 1), size(zthe, 1), size(zpic, 1), &
          size(zval, 1), size(mask, 1)/) == iim + 1, "grid_noro iim")
 
-    call assert((/size(y), size(zphi, 2), size(zmea, 2), size(zstd, 2), &
+    call assert((/size(y), size(phis, 2), size(zmea, 2), size(zstd, 2), &
          size(zsig, 2), size(zgam, 2), size(zthe, 2), size(zpic, 2), &
          size(zval, 2), size(mask, 2)/) == jjm + 1, "grid_noro jjm")
 
-    print *, "Parameters of subgrid-scale orography" 
     zdeltay = 2. * pi / real(jusn) * rad
 
     ! Extension of the US Navy database for computations at boundaries:
@@ -104,13 +105,13 @@ contains
     DO j = 1, jusn
        yusn(j + 1) = ydata(j)
        DO i = 1, iusn
-          zusn(i + iext, j + 1) = zdata(i, j)
+          zusn(i + iext, j + 1) = relief(i, j)
           xusn(i + iext) = xdata(i)
        ENDDO
        DO i = 1, iext
-          zusn(i, j + 1) = zdata(iusn - iext + i, j)
+          zusn(i, j + 1) = relief(iusn - iext + i, j)
           xusn(i) = xdata(iusn - iext + i) - 2. * pi
-          zusn(iusn + iext + i, j + 1) = zdata(i, j)
+          zusn(iusn + iext + i, j + 1) = relief(i, j)
           xusn(iusn + iext + i) = xdata(i) + 2. * pi
        ENDDO
     ENDDO
@@ -252,7 +253,7 @@ contains
     ! sens.
     mask_tmp = merge(1., 0., mask >= 0.1)
 
-    zphi(:iim, :) = zmea(:iim, :) * mask_tmp(:iim, :)
+    phis(:iim, :) = zmea(:iim, :) * mask_tmp(:iim, :)
     ! (zmea is not yet smoothed)
 
     ! Filters to smooth out fields for input into subgrid-scale
@@ -294,17 +295,9 @@ contains
     zval(:iim, :) = zval(:iim, :) * mask_tmp(:iim, :)
     zstd(:iim, :) = zstd(:iim, :) * mask_tmp(:iim, :)
 
-    print *, 'MEAN ORO: ', MAXVAL(zmea(:iim, :))
-    print *, 'ST. DEV.: ', MAXVAL(zstd(:iim, :))
-    print *, 'PENTE: ', MAXVAL(zsig(:iim, :))
-    print *, 'ANISOTROP: ', MAXVAL(zgam(:iim, :))
-    print *, 'ANGLE: ', minval(zthe(:iim, :)), MAXVAL(zthe(:iim, :))
-    print *, 'pic: ', MAXVAL(zpic(:iim, :))
-    print *, 'val: ', MAXVAL(zval(:iim, :))
-
     ! gamma and theta at 1. and 0. at poles
     zmea(iim + 1, :) = zmea(1, :)
-    zphi(iim + 1, :) = zphi(1, :)
+    phis(iim + 1, :) = phis(1, :)
     zpic(iim + 1, :) = zpic(1, :)
     zval(iim + 1, :) = zval(1, :)
     zstd(iim + 1, :) = zstd(1, :)
@@ -320,8 +313,8 @@ contains
     zmea(:, 1) = zmeanor / zweinor
     zmea(:, jjm + 1) = zmeasud / zweisud
 
-    zphi(:, 1) = zmeanor / zweinor
-    zphi(:, jjm + 1) = zmeasud / zweisud
+    phis(:, 1) = zmeanor / zweinor
+    phis(:, jjm + 1) = zmeasud / zweisud
 
     zpic(:, 1) = sum(zpic(:iim, 1) * weight(:iim, 1)) / zweinor
     zpic(:, jjm + 1) = sum(zpic(:iim, jjm + 1) * weight(:iim, jjm + 1)) &

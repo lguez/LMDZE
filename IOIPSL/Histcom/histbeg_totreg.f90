@@ -61,7 +61,10 @@ CONTAINS
     INTEGER, INTENT(IN):: szy ! size of the slab of data in Y
 
     INTEGER, INTENT(IN):: pitau0 ! time step at which the history tape starts
-    double precision, INTENT(IN):: pdate0 ! the Julian date at which the itau was equal to 0
+
+    double precision, INTENT(IN):: pdate0
+    ! the Julian date at which the itau was equal to 0
+
     REAL, INTENT(IN):: pdeltat ! time step of the counter itau, in seconds
 
     INTEGER, INTENT(OUT):: horiid ! ID of the horizontal grid

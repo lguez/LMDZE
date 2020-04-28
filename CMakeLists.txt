@@ -26,7 +26,7 @@ target_compile_definitions(LMDZE_objects PRIVATE CPP_IIM=${CPP_IIM}
   CPP_JJM=${CPP_JJM} CPP_LLM=${CPP_LLM})
 
 target_include_directories(LMDZE_objects PRIVATE ${netcdff_INCLUDE_DIR})
-target_link_libraries(LMDZE_objects netcdf95 jumble numer_rec_95)
+target_link_libraries(LMDZE_objects PUBLIC netcdf95 jumble numer_rec_95)
 
 foreach(my_dir dyn3d filtrez IOIPSL misc phylmd)
   include(${my_dir}/CMakeLists.txt)

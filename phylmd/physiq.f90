@@ -817,9 +817,10 @@ contains
     IF (ok_orodr) THEN
        ! S\'election des points pour lesquels le sch\'ema est actif :
        DO i = 1, klon
-          ktest(i) = 0
           IF (zpic(i) - zmea(i) > 100. .AND. zstd(i) > 10.) THEN
              ktest(i) = 1
+          else
+             ktest(i) = 0
           ENDIF
        ENDDO
 
@@ -840,9 +841,10 @@ contains
     IF (ok_orolf) THEN
        ! S\'election des points pour lesquels le sch\'ema est actif :
        DO i = 1, klon
-          ktest(i) = 0
           IF (zpic(i) - zmea(i) > 100.) THEN
              ktest(i) = 1
+          else
+             ktest(i) = 0
           ENDIF
        ENDDO
 

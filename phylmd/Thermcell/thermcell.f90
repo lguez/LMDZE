@@ -4,8 +4,8 @@ module thermcell_m
 
 contains
 
-  SUBROUTINE thermcell(nlay, ptimestep, pplay, pplev, pphi, u, v, pt, &
-       po, pduadj, pdvadj, pdtadj, pdoadj, fm0, entr0)
+  SUBROUTINE thermcell(nlay, ptimestep, pplay, pplev, pphi, u, v, pt, po, &
+       pduadj, pdvadj, pdtadj, pdoadj, fm0, entr0)
 
     ! Calcul du transport vertical dans la couche limite en pr\'esence
     ! de "thermiques" explicitement repr\'esent\'es. R\'ecriture \`a
@@ -38,18 +38,13 @@ contains
 
     ! Local:
 
-    integer idetr
-    save idetr
-    data idetr/3/
-
+    integer:: idetr = 3
     INTEGER ig, k, l, lmaxa(klon), lmix(klon)
     ! CR: on remplace lmax(klon, klev+1)
     INTEGER lmax(klon), lmin(klon), lentr(klon)
     real linter(klon)
     real zmix(klon), fracazmix(klon)
-
     real zmax(klon), zw, zw2(klon, klev+1), ztva(klon, klev)
-
     real zlev(klon, klev+1)
     REAL zh(klon, klev), zdhadj(klon, klev)
     REAL ztv(klon, klev)
@@ -57,18 +52,14 @@ contains
     real zva(klon, klev)
     real zua(klon, klev)
     real zoa(klon, klev)
-
     real zha(klon, klev)
     real wa_moy(klon, klev+1)
     real fraca(klon, klev+1)
     real fracc(klon, klev+1)
     real zf, zf2
     real thetath2(klon, klev), wth2(klon, klev)
-    common/comtherm/thetath2, wth2
-
     real rho(klon, klev), rhobarz(klon, klev+1), masse(klon, klev)
     real zpspsk(klon, klev)
-
     real wmax(klon), wmaxa(klon)
     real fracd(klon, klev+1)
     real xxx(klon, klev+1)
@@ -88,8 +79,6 @@ contains
     real, parameter:: l_mix = 10.
     real, parameter:: tho = 0.
     integer, parameter:: w2di = 0
-
-    EXTERNAL SCOPY
 
     !-----------------------------------------------------------------------
 
