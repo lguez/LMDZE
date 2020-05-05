@@ -78,7 +78,13 @@ contains
     real, dimension(iim + 1, jjm + 1):: mask_tmp, num_tot, num_lan
     REAL a(iim + 1), b(iim + 1), c(jjm + 1), d(jjm + 1)
     real weighx, weighy, xincr, xk, xp, xm, xw, xq, xl
-    real zbordnor, zdeltax, zbordsud, zdeltay, zbordoue, zlenx, zleny, zmeasud
+    real zbordnor, zbordsud, zbordoue, zlenx, zleny, zmeasud
+
+    real zdeltax, zdeltay
+    ! utilisés pour calculer des dérivées zonales et méridiennes à
+    ! partir de paire de points de grille séparés de deux pas de
+    ! grille, et non pas adjacents
+    
     real zweinor, zweisud, zmeanor, zbordest
     integer ii, i, jj, j
     real, parameter:: rad = 6371229.

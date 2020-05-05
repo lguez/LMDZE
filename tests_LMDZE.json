@@ -1,0 +1,716 @@
+[
+    {
+	"input" : "&SERRE_NML /\n&dynetat0_nml /\n",
+	"command" : "$build_dir/test_fxhyp",
+	"title" : "Test_fxhyp_1"
+    },
+    {
+	"title" : "Test_fxhyp_2",
+	"input" : "&SERRE_NML CLON_DEG=  20./\n&dynetat0_nml /\n",
+	"command" : "$build_dir/test_fxhyp"
+    },
+    {
+	"input" : "&SERRE_NML GROSSISMX=  2./\n&dynetat0_nml /\n",
+	"command" : "$build_dir/test_fxhyp",
+	"title" : "Test_fxhyp_3",
+	"description": "GROSSISMX > 1"
+    },
+    {
+	"title" : "Test_fxhyp_4",
+	"stdin_filename" : "$test_input_dir/Namelists/test_fxhyp_nml_4.txt",
+	"command" : "$build_dir/test_fxhyp"
+    },
+    {
+	"title" : "Test_fxhyp_5",
+	"stdin_filename" : "$test_input_dir/Namelists/test_fxhyp_nml_5.txt",
+	"command" : "$build_dir/test_fxhyp"
+    },
+    {
+	"title" : "Test_fxhyp_6",
+	"input" : "&SERRE_NML GROSSISMX = 1.0000001/\n&dynetat0_nml /\n",
+	"command" : "$build_dir/test_fxhyp",
+	"description": "GROSSISMX = 1 + epsilon"
+    },
+    {
+	"title" : "Test_fxhyp_7",
+	"command" : "$build_dir/test_fxhyp",
+	"stdin_filename" : "$test_input_dir/Namelists/test_fxhyp_nml_7.txt"
+    },
+    {
+	"command" : "$build_dir/test_inifilr",
+	"input" : "&SERRE_NML /\n&dynetat0_nml /\n",
+	"title" : "Test_inifilr_1"
+    },
+    {
+	"title" : "Test_inifilr_2",
+	"input" : "&SERRE_NML CLON_DEG=  20./\n&dynetat0_nml /\n",
+	"command" : "$build_dir/test_inifilr"
+    },
+    {
+	"command" : "$build_dir/test_inifilr",
+	"input" : "&SERRE_NML GROSSISMX=  2./\n&dynetat0_nml /\n",
+	"title" : "Test_inifilr_3"
+    },
+    {
+	"title" : "Test_inifilr_4",
+	"stdin_filename" : "$test_input_dir/Namelists/test_fxhyp_nml_4.txt",
+	"command" : "$build_dir/test_inifilr"
+    },
+    {
+	"command" : "$build_dir/test_inifilr",
+	"stdin_filename" : "$test_input_dir/Namelists/test_fxhyp_nml_5.txt",
+	"title" : "Test_inifilr_5"
+    },
+    {
+	"title" : "Test_inifilr_6",
+	"input" : "&SERRE_NML GROSSISMX = 1.0000001/\n&dynetat0_nml /\n",
+	"command" : "$build_dir/test_inifilr"
+    },
+    {
+	"title" : "Test_inifilr_7",
+	"command" : "$build_dir/test_inifilr",
+	"stdin_filename" : "$test_input_dir/Namelists/test_fxhyp_nml_7.txt"
+    },
+    {
+	"input" : "&SERRE_NML GROSSISMy = 2./\n&dynetat0_nml /\n",
+	"command" : "$build_dir/test_inifilr",
+	"title" : "Test_inifilr_8",
+	"description": "for colat0 < 0.5"
+    },
+    {
+	"title" : "CE0L_control",
+	"required" : [
+            "$datasets_dir/Albedo.nc",
+            "$datasets_dir/amipbc_sic_1x1.nc",
+            "$datasets_dir/amipbc_sst_1x1.nc",
+            [
+		"$datasets_dir/Ozone/Cariolle/Cariolle_v2_8/coefoz_v2_8.nc",
+		"coefoz.nc"
+            ],
+            "$datasets_dir/ERA_interim/ECDYN.nc",
+            [
+		"$datasets_dir/ERA_interim/ECDYN.nc",
+		"ECPHY.nc"
+            ],
+            "$datasets_dir/landiceref.nc",
+            "$datasets_dir/Relief.nc",
+            "$datasets_dir/Rugos.nc",
+            "$test_input_dir/Namelists/traceur.def"
+	],
+	"command" : "$build_dir/ce0l",
+	"stdin_filename" : "$test_input_dir/Namelists/ce0l_nml_control.txt"
+    },
+    {
+	"command" : "$build_dir/ce0l",
+	"stdin_filename" : "$test_input_dir/Namelists/ce0l_nml_zoom.txt",
+	"title" : "CE0L_zoom",
+	"required" : [
+            "$datasets_dir/Albedo.nc",
+            "$datasets_dir/amipbc_sic_1x1.nc",
+            "$datasets_dir/amipbc_sst_1x1.nc",
+            [
+		"$datasets_dir/Ozone/Cariolle/Cariolle_v2_8/coefoz_v2_8.nc",
+		"coefoz.nc"
+            ],
+            "$datasets_dir/ERA_interim/ECDYN.nc",
+            [
+		"$datasets_dir/ERA_interim/ECDYN.nc",
+		"ECPHY.nc"
+            ],
+            "$datasets_dir/landiceref.nc",
+            "$datasets_dir/Relief.nc",
+            "$datasets_dir/Rugos.nc",
+            "$test_input_dir/Namelists/traceur.def"
+	]
+    },
+    {
+	"stdin_filename" : "$test_input_dir/Namelists/gcm_nml_control.txt",
+	"command" : "$build_dir/gcm",
+	"required" : [
+            "$tests_old_dir/CE0L_control/limit.nc",
+            "$tests_old_dir/CE0L_control/coefoz_LMDZ.nc",
+            [
+		"$tests_old_dir/CE0L_control/restart.nc",
+		"start.nc"
+            ],
+            [
+		"$tests_old_dir/CE0L_control/restartphy.nc",
+		"startphy.nc"
+            ],
+            "$test_input_dir/Namelists/traceur.def",
+            "$test_input_dir/iodef.xml"
+	],
+	"title" : "GCM_control"
+    },
+    {
+	"command" : "$build_dir/gcm",
+	"stdin_filename" : "$test_input_dir/Namelists/gcm_nml_Tiedke.txt",
+	"title" : "GCM_Tiedke",
+	"required" : [
+            "$tests_old_dir/CE0L_control/limit.nc",
+            "$tests_old_dir/CE0L_control/coefoz_LMDZ.nc",
+            [
+		"$tests_old_dir/CE0L_control/restart.nc",
+		"start.nc"
+            ],
+            [
+		"$tests_old_dir/CE0L_control/restartphy.nc",
+		"startphy.nc"
+            ],
+            "$test_input_dir/Namelists/traceur.def",
+            "$test_input_dir/iodef.xml"
+	]
+    },
+    {
+	"stdin_filename" : "$test_input_dir/Namelists/gcm_nml_nudging.txt",
+	"command" : "$build_dir/gcm",
+	"required" : [
+            "$tests_old_dir/CE0L_control/limit.nc",
+            "$tests_old_dir/CE0L_control/coefoz_LMDZ.nc",
+            [
+		"$tests_old_dir/CE0L_control/restart.nc",
+		"start.nc"
+            ],
+            [
+		"$tests_old_dir/CE0L_control/restartphy.nc",
+		"startphy.nc"
+            ],
+            "$test_input_dir/Namelists/traceur.def",
+            "$test_input_dir/iodef.xml",
+            [
+		"$test_input_dir/Nudging_regular_grid/u_day_1.nc",
+		"u.nc"
+            ],
+            [
+		"$test_input_dir/Nudging_regular_grid/v_day_1.nc",
+		"v.nc"
+            ]
+	],
+	"title" : "GCM_nudging"
+    },
+    {
+	"stdin_filename" : "$test_input_dir/Namelists/gcm_nml_ini_anal.txt",
+	"command" : "$build_dir/gcm",
+	"title" : "GCM_ini_anal",
+	"required" : [
+            "$tests_old_dir/CE0L_control/limit.nc",
+            "$tests_old_dir/CE0L_control/coefoz_LMDZ.nc",
+            [
+		"$tests_old_dir/CE0L_control/restart.nc",
+		"start.nc"
+            ],
+            [
+		"$tests_old_dir/CE0L_control/restartphy.nc",
+		"startphy.nc"
+            ],
+            "$test_input_dir/Namelists/traceur.def",
+            "$test_input_dir/iodef.xml",
+            [
+		"$test_input_dir/Nudging_regular_grid/u_day_1.nc",
+		"u.nc"
+            ],
+            [
+		"$test_input_dir/Nudging_regular_grid/v_day_1.nc",
+		"v.nc"
+            ]
+	]
+    },
+    {
+	"required" : [
+            "$tests_old_dir/CE0L_control/limit.nc",
+            "$tests_old_dir/CE0L_control/coefoz_LMDZ.nc",
+            [
+		"$tests_old_dir/CE0L_control/restart.nc",
+		"start.nc"
+            ],
+            [
+		"$tests_old_dir/CE0L_control/restartphy.nc",
+		"startphy.nc"
+            ],
+            "$test_input_dir/Namelists/traceur.def",
+            "$test_input_dir/iodef.xml",
+            [
+		"$test_input_dir/Nudging_regular_grid/u_day_1.nc",
+		"u.nc"
+            ],
+            [
+		"$test_input_dir/Nudging_regular_grid/v_day_1.nc",
+		"v.nc"
+            ],
+            [
+		"$test_input_dir/Nudging_regular_grid/T_day_1.nc",
+		"T.nc"
+            ],
+            [
+		"$test_input_dir/Nudging_regular_grid/hur_day_1.nc",
+		"hur.nc"
+            ]
+	],
+	"title" : "GCM_nudging_Tq",
+	"command" : "$build_dir/gcm",
+	"stdin_filename" : "$test_input_dir/Namelists/gcm_nml_nudging_Tq.txt"
+    },
+    {
+	"command" : "$build_dir/gcm",
+	"stdin_filename" : "$test_input_dir/Namelists/gcm_nml_control.txt",
+	"title" : "GCM_zoom_control",
+	"required" : [
+            "$tests_old_dir/CE0L_zoom/limit.nc",
+            "$tests_old_dir/CE0L_zoom/coefoz_LMDZ.nc",
+            [
+		"$tests_old_dir/CE0L_zoom/restart.nc",
+		"start.nc"
+            ],
+            [
+		"$tests_old_dir/CE0L_zoom/restartphy.nc",
+		"startphy.nc"
+            ],
+            "$test_input_dir/Namelists/traceur.def",
+            "$test_input_dir/iodef.xml"
+	]
+    },
+    {
+	"required" : [
+            "$tests_old_dir/CE0L_zoom/limit.nc",
+            "$tests_old_dir/CE0L_zoom/coefoz_LMDZ.nc",
+            [
+		"$tests_old_dir/CE0L_zoom/restart.nc",
+		"start.nc"
+            ],
+            [
+		"$tests_old_dir/CE0L_zoom/restartphy.nc",
+		"startphy.nc"
+            ],
+            "$test_input_dir/Namelists/traceur.def",
+            "$test_input_dir/iodef.xml"
+	],
+	"title" : "GCM_zoom_Tiedke",
+	"command" : "$build_dir/gcm",
+	"stdin_filename" : "$test_input_dir/Namelists/gcm_nml_Tiedke.txt"
+    },
+    {
+	"stdin_filename" : "$test_input_dir/Namelists/gcm_nml_control.txt",
+	"command" : "$build_dir/gcm",
+	"title" : "GCM_control_day_2",
+	"required" : [
+            "$tests_old_dir/CE0L_control/limit.nc",
+            "$tests_old_dir/CE0L_control/coefoz_LMDZ.nc",
+            [
+		"$PWD/GCM_control/restart.nc",
+		"start.nc"
+            ],
+            [
+		"$PWD/GCM_control/restartphy.nc",
+		"startphy.nc"
+            ],
+            "$test_input_dir/Namelists/traceur.def",
+            "$test_input_dir/iodef.xml"
+	]
+    },
+    {
+	"stdin_filename" : "$test_input_dir/Namelists/gcm_nml_Tiedke.txt",
+	"command" : "$build_dir/gcm",
+	"title" : "GCM_Tiedke_day_2",
+	"required" : [
+            "$tests_old_dir/CE0L_control/limit.nc",
+            "$tests_old_dir/CE0L_control/coefoz_LMDZ.nc",
+            [
+		"$PWD/GCM_Tiedke/restart.nc",
+		"start.nc"
+            ],
+            [
+		"$PWD/GCM_Tiedke/restartphy.nc",
+		"startphy.nc"
+            ],
+            "$test_input_dir/Namelists/traceur.def",
+            "$test_input_dir/iodef.xml"
+	]
+    },
+    {
+	"stdin_filename" : "$test_input_dir/Namelists/gcm_nml_nudging.txt",
+	"command" : "$build_dir/gcm",
+	"title" : "GCM_nudging_day_2",
+	"required" : [
+            "$tests_old_dir/CE0L_control/limit.nc",
+            "$tests_old_dir/CE0L_control/coefoz_LMDZ.nc",
+            [
+		"$PWD/GCM_nudging/restart.nc",
+		"start.nc"
+            ],
+            [
+		"$PWD/GCM_nudging/restartphy.nc",
+		"startphy.nc"
+            ],
+            "$test_input_dir/Namelists/traceur.def",
+            "$test_input_dir/iodef.xml",
+            [
+		"$test_input_dir/Nudging_regular_grid/u_day_2.nc",
+		"u.nc"
+            ],
+            [
+		"$test_input_dir/Nudging_regular_grid/v_day_2.nc",
+		"v.nc"
+            ]
+	]
+    },
+    {
+	"title" : "GCM_nudging_Tq_day_2",
+	"required" : [
+            "$tests_old_dir/CE0L_control/limit.nc",
+            "$tests_old_dir/CE0L_control/coefoz_LMDZ.nc",
+            [
+		"$PWD/GCM_nudging_Tq/restart.nc",
+		"start.nc"
+            ],
+            [
+		"$PWD/GCM_nudging_Tq/restartphy.nc",
+		"startphy.nc"
+            ],
+            "$test_input_dir/Namelists/traceur.def",
+            "$test_input_dir/iodef.xml",
+            [
+		"$test_input_dir/Nudging_regular_grid/u_day_2.nc",
+		"u.nc"
+            ],
+            [
+		"$test_input_dir/Nudging_regular_grid/v_day_2.nc",
+		"v.nc"
+            ],
+            [
+		"$test_input_dir/Nudging_regular_grid/T_day_2.nc",
+		"T.nc"
+            ],
+            [
+		"$test_input_dir/Nudging_regular_grid/hur_day_2.nc",
+		"hur.nc"
+            ]
+	],
+	"stdin_filename" : "$test_input_dir/Namelists/gcm_nml_nudging_Tq.txt",
+	"command" : "$build_dir/gcm"
+    },
+    {
+	"required" : [
+            "$tests_old_dir/CE0L_zoom/limit.nc",
+            "$tests_old_dir/CE0L_zoom/coefoz_LMDZ.nc",
+            [
+		"$PWD/GCM_zoom_control/restart.nc",
+		"start.nc"
+            ],
+            [
+		"$PWD/GCM_zoom_control/restartphy.nc",
+		"startphy.nc"
+            ],
+            "$test_input_dir/Namelists/traceur.def",
+            "$test_input_dir/iodef.xml"
+	],
+	"title" : "GCM_zoom_control_day_2",
+	"command" : "$build_dir/gcm",
+	"stdin_filename" : "$test_input_dir/Namelists/gcm_nml_control.txt"
+    },
+    {
+	"command" : "$build_dir/gcm",
+	"stdin_filename" : "$test_input_dir/Namelists/gcm_nml_Tiedke.txt",
+	"required" : [
+            "$tests_old_dir/CE0L_zoom/limit.nc",
+            "$tests_old_dir/CE0L_zoom/coefoz_LMDZ.nc",
+            [
+		"$PWD/GCM_zoom_Tiedke/restart.nc",
+		"start.nc"
+            ],
+            [
+		"$PWD/GCM_zoom_Tiedke/restartphy.nc",
+		"startphy.nc"
+            ],
+            "$test_input_dir/Namelists/traceur.def",
+            "$test_input_dir/iodef.xml"
+	],
+	"title" : "GCM_zoom_Tiedke_day_2"
+    },
+    {
+	"command" : "$build_dir/gcm",
+	"stdin_filename" : "$test_input_dir/Namelists/gcm_nml_nudging.txt",
+	"title" : "GCM_zoom_nudging",
+	"required" : [
+            "$tests_old_dir/CE0L_zoom/limit.nc",
+            "$tests_old_dir/CE0L_zoom/coefoz_LMDZ.nc",
+            [
+		"$tests_old_dir/CE0L_zoom/restart.nc",
+		"start.nc"
+            ],
+            [
+		"$tests_old_dir/CE0L_zoom/restartphy.nc",
+		"startphy.nc"
+            ],
+            "$test_input_dir/Namelists/traceur.def",
+            "$test_input_dir/iodef.xml",
+            [
+		"$test_input_dir/Nudging_zoom/u_day_1.nc",
+		"u.nc"
+            ],
+            [
+		"$test_input_dir/Nudging_zoom/v_day_1.nc",
+		"v.nc"
+            ]
+	]
+    },
+    {
+	"command" : "$build_dir/gcm",
+	"stdin_filename" : "$test_input_dir/Namelists/gcm_nml_ini_anal.txt",
+	"required" : [
+            "$tests_old_dir/CE0L_zoom/limit.nc",
+            "$tests_old_dir/CE0L_zoom/coefoz_LMDZ.nc",
+            [
+		"$tests_old_dir/CE0L_zoom/restart.nc",
+		"start.nc"
+            ],
+            [
+		"$tests_old_dir/CE0L_zoom/restartphy.nc",
+		"startphy.nc"
+            ],
+            "$test_input_dir/Namelists/traceur.def",
+            "$test_input_dir/iodef.xml",
+            [
+		"$test_input_dir/Nudging_zoom/u_day_1.nc",
+		"u.nc"
+            ],
+            [
+		"$test_input_dir/Nudging_zoom/v_day_1.nc",
+		"v.nc"
+            ]
+	],
+	"title" : "GCM_zoom_ini_anal"
+    },
+    {
+	"title" : "GCM_no_phys",
+	"required": [
+	    [
+		"$tests_old_dir/CE0L_control/restart.nc",
+		"start.nc"
+	    ],
+	    "$test_input_dir/Namelists/traceur.def",
+            "$test_input_dir/iodef.xml"
+	],
+	"command": "$build_dir/gcm",
+	"stdin_filename" : "$test_input_dir/Namelists/gcm_nml_no_phys.txt"
+    },
+    {
+	"stdin_filename" : "$test_input_dir/Namelists/gcm_nml_ade.txt",
+	"command" : "$build_dir/gcm",
+	"required" : [
+            "$tests_old_dir/CE0L_control/limit.nc",
+            "$tests_old_dir/CE0L_control/coefoz_LMDZ.nc",
+            [
+		"$tests_old_dir/CE0L_control/restart.nc",
+		"start.nc"
+            ],
+            [
+		"$tests_old_dir/CE0L_control/restartphy.nc",
+		"startphy.nc"
+            ],
+            "$test_input_dir/Namelists/traceur.def",
+            "$test_input_dir/iodef.xml"
+	],
+	"title" : "GCM_ade"
+    },
+    {
+	"stdin_filename" : "$test_input_dir/Namelists/gcm_nml_pbl_6.txt",
+	"command" : "$build_dir/gcm",
+	"required" : [
+            "$tests_old_dir/CE0L_control/limit.nc",
+            "$tests_old_dir/CE0L_control/coefoz_LMDZ.nc",
+            [
+		"$tests_old_dir/CE0L_control/restart.nc",
+		"start.nc"
+            ],
+            [
+		"$tests_old_dir/CE0L_control/restartphy.nc",
+		"startphy.nc"
+            ],
+            "$test_input_dir/Namelists/traceur.def",
+            "$test_input_dir/iodef.xml"
+	],
+	"title" : "GCM_pbl_6"
+    },
+    {
+	"stdin_filename" : "$test_input_dir/Namelists/gcm_nml_pbl_8.txt",
+	"command" : "$build_dir/gcm",
+	"required" : [
+            "$tests_old_dir/CE0L_control/limit.nc",
+            "$tests_old_dir/CE0L_control/coefoz_LMDZ.nc",
+            [
+		"$tests_old_dir/CE0L_control/restart.nc",
+		"start.nc"
+            ],
+            [
+		"$tests_old_dir/CE0L_control/restartphy.nc",
+		"startphy.nc"
+            ],
+            "$test_input_dir/Namelists/traceur.def",
+            "$test_input_dir/iodef.xml"
+	],
+	"title" : "GCM_pbl_8"
+    },
+    {
+	"stdin_filename" : "$test_input_dir/Namelists/gcm_nml_pbl_9.txt",
+	"command" : "$build_dir/gcm",
+	"required" : [
+            "$tests_old_dir/CE0L_control/limit.nc",
+            "$tests_old_dir/CE0L_control/coefoz_LMDZ.nc",
+            [
+		"$tests_old_dir/CE0L_control/restart.nc",
+		"start.nc"
+            ],
+            [
+		"$tests_old_dir/CE0L_control/restartphy.nc",
+		"startphy.nc"
+            ],
+            "$test_input_dir/Namelists/traceur.def",
+            "$test_input_dir/iodef.xml"
+	],
+	"title" : "GCM_pbl_9"
+    },
+    {
+	"stdin_filename" : "$test_input_dir/Namelists/gcm_nml_pbl_0.txt",
+	"command" : "$build_dir/gcm",
+	"required" : [
+            "$tests_old_dir/CE0L_control/limit.nc",
+            "$tests_old_dir/CE0L_control/coefoz_LMDZ.nc",
+            [
+		"$tests_old_dir/CE0L_control/restart.nc",
+		"start.nc"
+            ],
+            [
+		"$tests_old_dir/CE0L_control/restartphy.nc",
+		"startphy.nc"
+            ],
+            "$test_input_dir/Namelists/traceur.def",
+            "$test_input_dir/iodef.xml"
+	],
+	"title" : "GCM_pbl_0"
+    },
+    {
+	"stdin_filename" : "$test_input_dir/Namelists/gcm_no_kzmin.txt",
+	"command" : "$build_dir/gcm",
+	"required" : [
+            "$tests_old_dir/CE0L_control/limit.nc",
+            "$tests_old_dir/CE0L_control/coefoz_LMDZ.nc",
+            [
+		"$tests_old_dir/CE0L_control/restart.nc",
+		"start.nc"
+            ],
+            [
+		"$tests_old_dir/CE0L_control/restartphy.nc",
+		"startphy.nc"
+            ],
+            "$test_input_dir/Namelists/traceur.def",
+            "$test_input_dir/iodef.xml"
+	],
+	"title" : "No_kzmin",
+	"description": "ok_kzmin = f"
+    },
+    {
+	"command" : "$build_dir/test_inter_barxy",
+	"title": "Test_inter_barxy",
+	"stdin_filename": "$test_input_dir/Namelists/test_inter_barxy_nml.txt"
+    },
+    {
+	"command" : "$build_dir_1x12x11/test_ozonecm",
+	"title": "Test_ozonecm",
+	"input": "&serre_nml /\n&dynetat0_nml /\n&disvert_nml /\n",
+	"required" :
+	[["$test_input_dir/restartphy_test_ozonecm.nc", "startphy.nc"]]
+    },
+    {
+	"title" : "Disvert_CMIP5",
+	"required" : [
+            "$datasets_dir/Albedo.nc",
+            "$datasets_dir/amipbc_sic_1x1.nc",
+            "$datasets_dir/amipbc_sst_1x1.nc",
+            [
+		"$datasets_dir/Ozone/Cariolle/Cariolle_v2_8/coefoz_v2_8.nc",
+		"coefoz.nc"
+            ],
+            "$datasets_dir/ERA_interim/ECDYN.nc",
+            [
+		"$datasets_dir/ERA_interim/ECDYN.nc",
+		"ECPHY.nc"
+            ],
+            "$datasets_dir/landiceref.nc",
+            "$datasets_dir/Relief.nc",
+            "$datasets_dir/Rugos.nc",
+            "$test_input_dir/Namelists/traceur.def"
+	],
+	"command" : "$build_dir_16x12x39/ce0l",
+	"stdin_filename" : "$test_input_dir/Namelists/disvert_CMIP5.txt"
+    },
+    {
+	"title" : "Disvert_CMIP6",
+	"required" : [
+            "$datasets_dir/Albedo.nc",
+            "$datasets_dir/amipbc_sic_1x1.nc",
+            "$datasets_dir/amipbc_sst_1x1.nc",
+            [
+		"$datasets_dir/Ozone/Cariolle/Cariolle_v2_8/coefoz_v2_8.nc",
+		"coefoz.nc"
+            ],
+            "$datasets_dir/ERA_interim/ECDYN.nc",
+            [
+		"$datasets_dir/ERA_interim/ECDYN.nc",
+		"ECPHY.nc"
+            ],
+            "$datasets_dir/landiceref.nc",
+            "$datasets_dir/Relief.nc",
+            "$datasets_dir/Rugos.nc",
+            "$test_input_dir/Namelists/traceur.def"
+	],
+	"command" : "$build_dir_16x12x79/ce0l",
+	"stdin_filename" : "$test_input_dir/Namelists/disvert_CMIP6.txt"
+    },
+    {
+	"title" : "Disvert_CMIP3",
+	"required" : [
+            "$datasets_dir/Albedo.nc",
+            "$datasets_dir/amipbc_sic_1x1.nc",
+            "$datasets_dir/amipbc_sst_1x1.nc",
+            [
+		"$datasets_dir/Ozone/Cariolle/Cariolle_v2_8/coefoz_v2_8.nc",
+		"coefoz.nc"
+            ],
+            "$datasets_dir/ERA_interim/ECDYN.nc",
+            [
+		"$datasets_dir/ERA_interim/ECDYN.nc",
+		"ECPHY.nc"
+            ],
+            "$datasets_dir/landiceref.nc",
+            "$datasets_dir/Relief.nc",
+            "$datasets_dir/Rugos.nc",
+            "$test_input_dir/Namelists/traceur.def"
+	],
+	"command" : "$build_dir_16x12x19/ce0l",
+	"stdin_filename" : "$test_input_dir/Namelists/ce0l_nml_control.txt"
+    },
+    {
+	"title": "Test_orbite",
+	"command": "$build_dir/test_orbite",
+	"stdout": "test_orbite.csv"
+    },
+    {
+	"stdin_filename" : "$test_input_dir/Namelists/gcm_nml_thermals.txt",
+	"command" : "$build_dir/gcm",
+	"required" : [
+            "$tests_old_dir/CE0L_control/limit.nc",
+            "$tests_old_dir/CE0L_control/coefoz_LMDZ.nc",
+            [
+		"$tests_old_dir/CE0L_control/restart.nc",
+		"start.nc"
+            ],
+            [
+		"$tests_old_dir/CE0L_control/restartphy.nc",
+		"startphy.nc"
+            ],
+            "$test_input_dir/Namelists/traceur.def",
+            "$test_input_dir/iodef.xml"
+	],
+	"title" : "GCM_thermals"
+    }
+]

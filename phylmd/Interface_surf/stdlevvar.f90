@@ -73,8 +73,8 @@ contains
        speed(i)=SQRT(u1(i)**2+v1(i)**2)
     ENDDO
 
-    CALL cdrag(nsrf, speed(:knon), t1, q1, z1, psol, ts1, qsurf, &
-         rugos(:knon), cdram, cdrah) 
+    CALL cdrag(nsrf, speed(:knon), t1, q1, z1, psol, ts1, qsurf, rugos(:knon), &
+         cdram, cdrah) 
 
     ! Star variables 
 

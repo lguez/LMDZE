@@ -4,9 +4,9 @@ module calcul_fluxs_m
 
 contains
 
-  SUBROUTINE calcul_fluxs(tsurf, p1lay, cal, beta, cdragh, ps, qsurf, radsol, &
-       t1lay, q1lay, u1lay, v1lay, tAcoef, qAcoef, tBcoef, qBcoef, tsurf_new, &
-       evap, fluxlat, flux_t, dflux_s, dflux_l, dif_grnd)
+  SUBROUTINE calcul_fluxs(qsurf, tsurf_new, evap, fluxlat, flux_t, dflux_s, &
+       dflux_l, tsurf, p1lay, cal, beta, cdragh, ps, radsol, t1lay, q1lay, &
+       u1lay, v1lay, tAcoef, qAcoef, tBcoef, qBcoef, dif_grnd)
 
     ! Cette routine calcule les flux en h et q à l'interface et une
     ! température de surface.
@@ -24,18 +24,24 @@ contains
     USE suphec_m, ONLY: rcpd, rd, retv, rlstt, rlvtt, rtt
     USE yoethf_m, ONLY: r2es, r5ies, r5les, rvtmp2
 
+    real, intent(OUT):: qsurf(:) ! (knon) humidité de l'air au-dessus du sol
+    real, intent(OUT):: tsurf_new(:) ! (knon) température au sol
+    real, intent(OUT):: evap(:) ! (knon)
+
+    real, intent(OUT):: fluxlat(:), flux_t(:) ! (knon)
+    ! flux de chaleurs latente et sensible, en W m-2
+
+    real, intent(OUT):: dflux_s(:), dflux_l(:) ! (knon)
+    ! dérivées des flux de chaleurs sensible et latente par rapport à
+    ! Ts (W m-2 K-1)
+
     real, intent(IN):: tsurf(:) ! (knon) température de surface
 
     real, intent(IN):: p1lay(:) ! (knon)
     ! pression première couche (milieu de couche)
 
-    real, intent(IN):: cal(:) ! (knon) RCPD / soilcap, où soilcap est
-    ! la capacité calorifique surfacique apparente du sol. En m2/kg.
-    
-    real, intent(IN):: beta(:) ! (knon) évaporation réelle
     real, intent(IN):: cdragh(:) ! (knon) coefficient d'échange
     real, intent(IN):: ps(:) ! (knon) pression au sol, en Pa
-    real, intent(OUT):: qsurf(:) ! (knon) humidité de l'air au-dessus du sol
 
     real, intent(IN):: radsol(:) ! (knon)
     ! net downward radiative (longwave + shortwave) flux at the surface
@@ -49,16 +55,10 @@ contains
     real, intent(IN):: tBcoef(:), qBcoef(:) ! (knon)
     ! coefficients B de la résolution de la couche limite pour t et q
 
-    real, intent(OUT):: tsurf_new(:) ! (knon) température au sol
-    real, intent(OUT):: evap(:) ! (knon)
-
-    real, intent(OUT):: fluxlat(:), flux_t(:) ! (knon)
-    ! flux de chaleurs latente et sensible, en W m-2
-
-    real, intent(OUT):: dflux_s(:), dflux_l(:) ! (knon)
-    ! dérivées des flux de chaleurs sensible et latente par rapport à
-    ! Ts (W m-2 K-1)
-
+    real, intent(IN):: cal(:) ! (knon) RCPD / soilcap, où soilcap est
+    ! la capacité calorifique surfacique apparente du sol. En m2/kg.
+    
+    real, intent(IN):: beta(:) ! (knon) évaporation réelle
     real, intent(IN):: dif_grnd ! coefficient de diffusion vers le sol profond
 
     ! Local:
