@@ -5,8 +5,8 @@ module calcul_fluxs_m
 contains
 
   SUBROUTINE calcul_fluxs(qsurf, tsurf_new, evap, fluxlat, flux_t, dflux_s, &
-       dflux_l, tsurf, p1lay, cal, beta, cdragh, ps, radsol, t1lay, q1lay, &
-       u1lay, v1lay, tAcoef, qAcoef, tBcoef, qBcoef, dif_grnd)
+       dflux_l, tsurf, p1lay, cdragh, ps, radsol, t1lay, q1lay, u1lay, v1lay, &
+       tAcoef, qAcoef, tBcoef, qBcoef, cal, beta, dif_grnd)
 
     ! Cette routine calcule les flux en h et q à l'interface et une
     ! température de surface.

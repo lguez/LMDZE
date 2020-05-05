@@ -106,9 +106,7 @@ contains
     ! Local:
     REAL soilcap(size(knindex)) ! (knon)
     REAL soilflux(size(knindex)) ! (knon)
-    integer ii
-    real cal(size(knindex)) ! (knon)
-    real beta(size(knindex)) ! (knon) evap reelle
+    integer i, knon
     real tsurf(size(knindex)) ! (knon)
     real alb_neig(size(knindex)) ! (knon)
     real zfra(size(knindex)) ! (knon) fraction of surface covered by snow
@@ -120,43 +118,39 @@ contains
 
     !-------------------------------------------------------------
 
+    knon  = size(knindex)
+
     select case (nisurf)
     case (is_ter)
        ! Surface "terre", appel \`a l'interface avec les sols continentaux
 
-       ! Calcul age de la neige
-
-       ! Read albedo from the file containing boundary conditions then
-       ! add the albedo of snow:
-
-       call interfsur_lim(julien, knindex, albedo, z0_new)
-
-       beta = min(2. * qsol / max_eau_sol, 1.)
        CALL soil(is_ter, snow, ts, tsoil, soilcap, soilflux)
-       cal = RCPD / soilcap
-
        CALL calcul_fluxs(qsurf, tsurf_new, evap, fluxlat, flux_t, dflux_s, &
-            dflux_l, ts, p1lay, cal, beta, cdragh, ps, radsol + soilflux, &
-            t1lay, q1lay, u1lay, v1lay, tAcoef, qAcoef, tBcoef, qBcoef, &
+            dflux_l, ts, p1lay, cdragh, ps, radsol + soilflux, t1lay, q1lay, &
+            u1lay, v1lay, tAcoef, qAcoef, tBcoef, qBcoef, &
+            cal = RCPD / soilcap, beta = min(2. * qsol / max_eau_sol, 1.), &
             dif_grnd = 0.)
-       CALL fonte_neige(is_ter, rain_fall, snow_fall, snow, qsol, &
-            tsurf_new, evap, fqcalving, ffonte, run_off_lic_0, run_off_lic)
-
+       CALL fonte_neige(is_ter, rain_fall, snow_fall, snow, qsol, tsurf_new, &
+            evap, fqcalving, ffonte, run_off_lic_0, run_off_lic)
        call albsno(agesno, alb_neig, snow_fall)
        where (snow < 1e-4) agesno = 0.
        zfra = snow / (snow + 10.)
+
+       ! Read albedo from the file containing boundary conditions then
+       ! add the albedo of snow:
+       call interfsur_lim(julien, knindex, albedo, z0_new)
        albedo = alb_neig * zfra + albedo * (1. - zfra)
+
        z0_new = sqrt(z0_new**2 + rugoro**2)
     case (is_oce)
        ! Surface oc\'ean, appel \`a l'interface avec l'oc\'ean
 
        ffonte = 0.
        call limit_read_sst(julien, knindex, tsurf)
-       cal = 0.
-       beta = 1.
        call calcul_fluxs(qsurf, tsurf_new, evap, fluxlat, flux_t, dflux_s, &
-            dflux_l, tsurf, p1lay, cal, beta, cdragh, ps, radsol, t1lay, &
-            q1lay, u1lay, v1lay, tAcoef, qAcoef, tBcoef, qBcoef, dif_grnd = 0.)
+            dflux_l, tsurf, p1lay, cdragh, ps, radsol, t1lay, q1lay, u1lay, &
+            v1lay, tAcoef, qAcoef, tBcoef, qBcoef, cal = [(0., i = 1, knon)], &
+            beta = [(1., i = 1, knon)], dif_grnd = 0.)
        agesno = 0.
        albedo = alboc_cd(mu0) * fmagic
        z0_new = sqrt(rugos**2 + rugoro**2)
@@ -164,22 +158,21 @@ contains
     case (is_sic)
        ! Surface glace de mer
 
-       DO ii = 1, size(knindex)
-          IF (pctsrf_new_sic(ii) < EPSFRA) then
-             snow(ii) = 0.
-             tsurf(ii) = RTT - 1.8
-             tsoil(ii, :) = tsurf(ii)
+       DO i = 1, knon
+          IF (pctsrf_new_sic(i) < EPSFRA) then
+             snow(i) = 0.
+             tsurf(i) = RTT - 1.8
+             tsoil(i, :) = tsurf(i)
           else
-             tsurf(ii) = ts(ii)
+             tsurf(i) = ts(i)
           endif
        enddo
 
        CALL soil(is_sic, snow, tsurf, tsoil, soilcap, soilflux)
-       cal = RCPD / soilcap
-       beta = 1.
        CALL calcul_fluxs(qsurf, tsurf_new, evap, fluxlat, flux_t, dflux_s, &
-            dflux_l, tsurf, p1lay, cal, beta, cdragh, ps, radsol + soilflux, &
-            t1lay, q1lay, u1lay, v1lay, tAcoef, qAcoef, tBcoef, qBcoef, &
+            dflux_l, tsurf, p1lay, cdragh, ps, radsol + soilflux, t1lay, &
+            q1lay, u1lay, v1lay, tAcoef, qAcoef, tBcoef, qBcoef, &
+            cal = RCPD / soilcap, beta = [(1., i = 1, knon)], &
             dif_grnd = 1. / tau_gl)
        CALL fonte_neige(is_sic, rain_fall, snow_fall, snow, qsol, &
             tsurf_new, evap, fqcalving, ffonte, run_off_lic_0, run_off_lic)
@@ -196,12 +189,10 @@ contains
        ! Surface "glaciers continentaux" appel \`a l'interface avec le sol
 
        CALL soil(is_lic, snow, ts, tsoil, soilcap, soilflux)
-       cal = RCPD / soilcap
-       beta = 1.
        call calcul_fluxs(qsurf, tsurf_new, evap, fluxlat, flux_t, dflux_s, &
-            dflux_l, ts, p1lay, cal, beta, cdragh, ps, radsol + soilflux, &
-            t1lay, q1lay, u1lay, v1lay, tAcoef, qAcoef, tBcoef, qBcoef, &
-            dif_grnd = 0.)
+            dflux_l, ts, p1lay, cdragh, ps, radsol + soilflux, t1lay, q1lay, &
+            u1lay, v1lay, tAcoef, qAcoef, tBcoef, qBcoef, &
+            cal = RCPD / soilcap, beta = [(1., i = 1, knon)], dif_grnd = 0.)
        call fonte_neige(is_lic, rain_fall, snow_fall, snow, qsol, &
             tsurf_new, evap, fqcalving, ffonte, run_off_lic_0, run_off_lic)
 
