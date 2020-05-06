@@ -4,7 +4,8 @@ Simplified version of the LMDZ atmospheric general circulation model
 ## What is it?
 
 LMDZE is a fork of [LMDZ](http://lmdz.lmd.jussieu.fr). The fork dates
-from [revision 691 of LMDZ](http://lmdz.lmd.jussieu.fr) in
+from [revision 691 of
+LMDZ](http://trac.lmd.jussieu.fr/LMDZ/changeset/691) in
 April 2006. Note that that was the time just before LMDZ was
 parallelized. Since then, LMDZE has evolved mostly in form and very
 little in content. So, essentially, the content of LMDZE is the

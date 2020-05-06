@@ -23,7 +23,6 @@ contains
     ! D\'esert partout:
     alb_neig = 0.55 + 0.3 * EXP(- agesno / 5.)
 
-    ! Modulation en fonction de l'\^age de la neige :
     agesno = (agesno + (1. - agesno / 50.) * dtphys / 86400.) &
          * EXP(- snow_fall * dtphys / 0.3)
 

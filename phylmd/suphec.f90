@@ -78,7 +78,7 @@ module suphec_m
   real, parameter:: RESTT = 611.14
   REAL, save:: RALPD, RBETD, RGAMD
 
-  private pi
+  private pi, twoPI
 
 contains
 
