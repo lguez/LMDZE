@@ -7,7 +7,7 @@ contains
   SUBROUTINE lwvn(kuaer, pabcu, pdbsl, pga, pgb, padjd, padju, pcntrb, pdbdt)
     USE dimensions
     USE dimphy
-    USE raddim
+    use conf_phys_m, only: kdlon
     USE raddimlw
     ! -----------------------------------------------------------------------
     ! PURPOSE.
@@ -40,15 +40,15 @@ contains
 
     INTEGER kuaer
 
-    DOUBLE PRECISION pabcu(kdlon, nua, 3*kflev+1) ! ABSORBER AMOUNTS
-    DOUBLE PRECISION pdbsl(kdlon, ninter, kflev*2) ! SUB-LAYER PLANCK FUNCTION GRADIENT
-    DOUBLE PRECISION pga(kdlon, 8, 2, kflev) ! PADE APPROXIMANTS
-    DOUBLE PRECISION pgb(kdlon, 8, 2, kflev) ! PADE APPROXIMANTS
+    DOUBLE PRECISION pabcu(kdlon, nua, 3*llm+1) ! ABSORBER AMOUNTS
+    DOUBLE PRECISION pdbsl(kdlon, ninter, llm*2) ! SUB-LAYER PLANCK FUNCTION GRADIENT
+    DOUBLE PRECISION pga(kdlon, 8, 2, llm) ! PADE APPROXIMANTS
+    DOUBLE PRECISION pgb(kdlon, 8, 2, llm) ! PADE APPROXIMANTS
 
-    DOUBLE PRECISION padjd(kdlon, kflev+1) ! CONTRIBUTION OF ADJACENT LAYERS
-    DOUBLE PRECISION padju(kdlon, kflev+1) ! CONTRIBUTION OF ADJACENT LAYERS
-    DOUBLE PRECISION pcntrb(kdlon, kflev+1, kflev+1) ! CLEAR-SKY ENERGY EXCHANGE MATRIX
-    DOUBLE PRECISION pdbdt(kdlon, ninter, kflev) !  LAYER PLANCK FUNCTION GRADIENT
+    DOUBLE PRECISION padjd(kdlon, llm+1) ! CONTRIBUTION OF ADJACENT LAYERS
+    DOUBLE PRECISION padju(kdlon, llm+1) ! CONTRIBUTION OF ADJACENT LAYERS
+    DOUBLE PRECISION pcntrb(kdlon, llm+1, llm+1) ! CLEAR-SKY ENERGY EXCHANGE MATRIX
+    DOUBLE PRECISION pdbdt(kdlon, ninter, llm) !  LAYER PLANCK FUNCTION GRADIENT
 
     ! * LOCAL ARRAYS:
 
@@ -76,7 +76,7 @@ contains
     ! ------------------------------
 
 
-    DO jk = 1, kflev + 1
+    DO jk = 1, llm + 1
        DO jl = 1, kdlon
           padjd(jl, jk) = 0.
           padju(jl, jk) = 0.
@@ -110,7 +110,7 @@ contains
     ! ---------------------------------
 
 
-    DO jk = 1, kflev
+    DO jk = 1, llm
 
        ! *         2.1.1   DOWNWARD LAYERS
        ! ---------------
@@ -184,7 +184,7 @@ contains
        END DO
     END DO
 
-    DO jk = 1, kflev
+    DO jk = 1, llm
        jk2 = 2*jk
        jk1 = jk2 - 1
        DO jnu = 1, ninter

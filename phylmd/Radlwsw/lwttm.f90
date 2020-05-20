@@ -1,7 +1,7 @@
 SUBROUTINE lwttm(pga, pgb, puu1, puu2, ptt)
   USE dimensions
   USE dimphy
-  USE raddim
+  use conf_phys_m, only: kdlon
   USE raddimlw
   IMPLICIT NONE
 

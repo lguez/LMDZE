@@ -32,7 +32,7 @@ contains
 
     REAL d_t_the(klon, klev), d_q_the(klon, klev)
     REAL d_u_the(klon, klev), d_v_the(klon, klev)
-    real, save:: zfm_therm(klon, klev+1), zentr_therm(klon, klev)
+    real zfm_therm(klon, klev+1), zentr_therm(klon, klev)
     real zdt
     integer i, k, isplit
 

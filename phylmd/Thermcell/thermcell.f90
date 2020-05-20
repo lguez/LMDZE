@@ -34,7 +34,7 @@ contains
     real pdvadj(klon, nlay)
     real pdtadj(klon, nlay)
     real pdoadj(klon, nlay)
-    real fm0(klon, klev+1), entr0(klon, klev)
+    real, intent(out):: fm0(klon, klev+1), entr0(klon, klev)
 
     ! Local:
 
@@ -77,8 +77,6 @@ contains
 
     real, parameter:: r_aspect = 4.
     real, parameter:: l_mix = 10.
-    real, parameter:: tho = 0.
-    integer, parameter:: w2di = 0
 
     !-----------------------------------------------------------------------
 
@@ -511,13 +509,8 @@ contains
        enddo
     enddo
 
-    if (w2di.eq.1) then
-       fm0=fm0+ptimestep*(fm-fm0)/tho
-       entr0=entr0+ptimestep*(entr-entr0)/tho
-    else
-       fm0=fm
-       entr0=entr
-    endif
+    fm0=fm
+    entr0=entr
 
     call dqthermcell(klon, nlay, ptimestep, fm0, entr0, masse, zh, zdhadj, zha)
     call dqthermcell(klon, nlay, ptimestep, fm0, entr0, masse, zo, pdoadj, zoa)

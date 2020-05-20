@@ -1,16 +1,12 @@
 module inifgn_m
 
-  use dimensions, only: iim
-
   IMPLICIT NONE
 
-  private iim
-
-  real sddu(iim), sddv(iim) 
+  real, allocatable, protected:: sddu(:), sddv(:) ! (iim) 
   ! sdd[uv] = sqrt(2 pi / iim * (derivative of the longitudinal zoom
   ! function)(rlon[uv]))
 
-  real unsddu(iim), unsddv(iim)
+  real, allocatable, protected:: unsddu(:), unsddv(:) ! (iim)
 
 contains
 
@@ -46,6 +42,9 @@ contains
     !----------------------------------------------------------------
 
     print *, "Call sequence information: inifgn"
+
+    allocate(sddu(iim), sddv(iim))
+    allocate(unsddu(iim), unsddv(iim))
 
     sddv = sqrt(xprimv(:iim))
     sddu = sqrt(xprimu(:iim))

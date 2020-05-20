@@ -7,7 +7,7 @@ contains
   SUBROUTINE lwvd(ktraer, pabcu, pdbdt, pga, pgb, pcntrb, pdisd, pdisu)
     USE dimensions
     USE dimphy
-    USE raddim
+    use conf_phys_m, only: kdlon
     USE raddimlw
 
     ! -----------------------------------------------------------------------
@@ -39,14 +39,14 @@ contains
 
     INTEGER ktraer
 
-    DOUBLE PRECISION pabcu(kdlon, nua, 3*kflev+1) ! ABSORBER AMOUNTS
-    DOUBLE PRECISION pdbdt(kdlon, ninter, kflev) ! LAYER PLANCK FUNCTION GRADIENT
-    DOUBLE PRECISION pga(kdlon, 8, 2, kflev) ! PADE APPROXIMANTS
-    DOUBLE PRECISION pgb(kdlon, 8, 2, kflev) ! PADE APPROXIMANTS
+    DOUBLE PRECISION pabcu(kdlon, nua, 3*llm+1) ! ABSORBER AMOUNTS
+    DOUBLE PRECISION pdbdt(kdlon, ninter, llm) ! LAYER PLANCK FUNCTION GRADIENT
+    DOUBLE PRECISION pga(kdlon, 8, 2, llm) ! PADE APPROXIMANTS
+    DOUBLE PRECISION pgb(kdlon, 8, 2, llm) ! PADE APPROXIMANTS
 
-    DOUBLE PRECISION pcntrb(kdlon, kflev+1, kflev+1) ! ENERGY EXCHANGE MATRIX
-    DOUBLE PRECISION pdisd(kdlon, kflev+1) !  CONTRIBUTION BY DISTANT LAYERS
-    DOUBLE PRECISION pdisu(kdlon, kflev+1) !  CONTRIBUTION BY DISTANT LAYERS
+    DOUBLE PRECISION pcntrb(kdlon, llm+1, llm+1) ! ENERGY EXCHANGE MATRIX
+    DOUBLE PRECISION pdisd(kdlon, llm+1) !  CONTRIBUTION BY DISTANT LAYERS
+    DOUBLE PRECISION pdisu(kdlon, llm+1) !  CONTRIBUTION BY DISTANT LAYERS
 
     ! * LOCAL VARIABLES:
 
@@ -69,7 +69,7 @@ contains
     ! ------------------------------
 
 
-    DO jk = 1, kflev + 1
+    DO jk = 1, llm + 1
        DO jl = 1, kdlon
           pdisd(jl, jk) = 0.
           pdisu(jl, jk) = 0.
@@ -109,7 +109,7 @@ contains
     ! -----------------
 
 
-    DO jk = 1, kflev - 1
+    DO jk = 1, llm - 1
        ikp1 = jk + 1
        ikn = (jk-1)*ng1p1 + 1
        ikd1 = jk*ng1p1 + 1
@@ -124,7 +124,7 @@ contains
 
 
        itt = 1
-       DO jkj = ikp1, kflev
+       DO jkj = ikp1, llm
           IF (itt==1) THEN
              itt = 2
           ELSE
@@ -175,7 +175,7 @@ contains
     ! -----------------
 
 
-    DO jk = 3, kflev + 1
+    DO jk = 3, llm + 1
        ikn = (jk-1)*ng1p1 + 1
        ikm1 = jk - 1
        ikj = jk - 2

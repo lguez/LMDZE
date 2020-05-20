@@ -3,13 +3,10 @@ MODULE start_init_orog_m
   ! From startvar.F, version 1.4
   ! 2006/01/27
 
-  use dimensions, only: iim, jjm
-
   IMPLICIT NONE
 
-  REAL, SAVE:: mask(iim + 1, jjm + 1) ! interpolated fraction of land
-
-  private iim, jjm
+  REAL, SAVE, allocatable, protected:: mask(:, :) ! (iim + 1, jjm + 1)
+  ! interpolated fraction of land
 
 CONTAINS
 
@@ -22,6 +19,7 @@ CONTAINS
     use nr_util, only: pi, assert    
 
     use conf_dat2d_m, only: conf_dat2d
+    use dimensions, only: iim, jjm
     use dynetat0_m, only: rlatu, rlonv
     use grid_noro_m, only: grid_noro
     use indicesol, only: epsfra
@@ -36,7 +34,7 @@ CONTAINS
 
     REAL, intent(out):: zsig_2d(:, :) ! (iim + 1, jjm + 1)
     ! (pente de l'orographie sous-maille)
-    
+
     REAL, intent(out):: zgam_2d(:, :) ! (iim + 1, jjm + 1)
     ! (anisotropie de l'orographie sous maille)
 
@@ -70,6 +68,8 @@ CONTAINS
          size(zsig_2d, 2), size(zgam_2d, 2), size(zthe_2d, 2), &
          size(zpic_2d, 2), size(zval_2d, 2)/) == jjm + 1, "start_init_orog jjm")
 
+    allocate(mask(iim + 1, jjm + 1))
+
     ! Read the high resolution orography:
 
     call nf95_open('Relief.nc', nf90_nowrite, ncid)
@@ -100,7 +100,7 @@ CONTAINS
     mask(2:, 1) = mask(1, 1) ! north pole
     mask(2:, jjm + 1) = mask(1, jjm + 1) ! south pole
     mask(iim + 1, 2:jjm) = mask(1, 2:jjm) ! Greenwich
-    
+
     WHERE (mask < EPSFRA)
        mask = 0.
     elsewhere (1. - mask < EPSFRA)

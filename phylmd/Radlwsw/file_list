@@ -9,7 +9,6 @@ lwvb.f90
 lwvd.f90
 lwv.f90
 lwvn.f90
-raddim.f90
 raddimlw.f90
 radlwsw.f90
 radopt.f90

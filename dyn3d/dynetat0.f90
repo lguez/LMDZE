@@ -1,32 +1,28 @@
 module dynetat0_m
 
-  use dimensions, only: iim, jjm
-
   IMPLICIT NONE
-
-  private iim, jjm
 
   INTEGER, protected, save:: day_ini 
   ! day number at the beginning of the run, based at value 1 on
   ! January 1st of annee_ref
 
-  real, protected, save:: rlatu(jjm + 1)
+  real, protected, save, allocatable:: rlatu(:) ! (jjm + 1)
   ! latitudes of points of the "scalar" and "u" grid, in rad
 
-  real, protected, save:: rlatv(jjm) 
+  real, protected, save, allocatable:: rlatv(:) ! (jjm) 
   ! latitudes of points of the "v" grid, in rad, in decreasing order
 
-  real, protected, save:: rlonu(iim + 1)
+  real, protected, save, allocatable:: rlonu(:) ! (iim + 1)
   ! longitudes of points of the "u" grid, in rad
 
-  real, protected, save:: rlonv(iim + 1)
+  real, protected, save, allocatable:: rlonv(:) ! (iim + 1)
   ! longitudes of points of the "scalar" and "v" grid, in rad
 
-  real, protected, save:: xprimu(iim + 1), xprimv(iim + 1)
+  real, protected, save, allocatable:: xprimu(:), xprimv(:) ! (iim + 1)
   ! 2 pi / iim * (derivative of the longitudinal zoom function)(rlon[uv])
 
-  REAL, protected, save:: xprimm025(iim + 1), xprimp025(iim + 1)
-  REAL, protected, save:: rlatu1(jjm), rlatu2(jjm), yprimu1(jjm), yprimu2(jjm)
+  REAL, protected, save, allocatable:: xprimm025(:), xprimp025(:) ! (iim + 1)
+  REAL, protected, save, allocatable:: rlatu1(:), rlatu2(:), yprimu1(:), yprimu2(:) ! (jjm)
   REAL, save:: ang0, etot0, ptot0, ztot0, stot0
   INTEGER, PARAMETER, private:: nmax = 30000
   INTEGER, protected, save:: itau_dyn
@@ -75,6 +71,14 @@ contains
     call assert((/size(vcov, 3), size(ucov, 3), size(teta, 3), size(q, 3), &
          size(masse, 3)/) == llm, "dynetat0 llm")
     call assert(size(q, 4) == nqmx, "dynetat0 q nqmx")
+
+    allocate(rlatu(jjm + 1))
+    allocate(rlatv(jjm))
+    allocate(rlonu(iim + 1))
+    allocate(rlonv(iim + 1))
+    allocate(xprimu(iim + 1), xprimv(iim + 1))
+    allocate(xprimm025(iim + 1), xprimp025(iim + 1))
+    allocate(rlatu1(jjm), rlatu2(jjm), yprimu1(jjm), yprimu2(jjm))
 
     ! Fichier \'etat initial :
     call nf95_open("start.nc", NF90_NOWRITE, ncid)
@@ -219,6 +223,10 @@ contains
     !-------------------------------------------------------------------
 
     print *, "Call sequence information: fyhyp"
+
+    allocate(rlatu(jjm + 1))
+    allocate(rlatv(jjm))
+    allocate(rlatu1(jjm), rlatu2(jjm), yprimu1(jjm), yprimu2(jjm))
 
     pi = 2.*asin(1.)
     pis2 = pi/2.
@@ -525,6 +533,11 @@ contains
     !----------------------------------------------------------------------
 
     print *, "Call sequence information: fxhyp"
+
+    allocate(rlonu(iim + 1))
+    allocate(rlonv(iim + 1))
+    allocate(xprimu(iim + 1), xprimv(iim + 1))
+    allocate(xprimm025(iim + 1), xprimp025(iim + 1))
 
     if (grossismx == 1.) then
        h = twopi / iim

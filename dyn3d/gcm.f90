@@ -14,16 +14,16 @@ PROGRAM gcm
 
   use comconst, only: iniconst
   use comdissnew, only: read_comdissnew
-  use comgeom, only:  aire_2d, inigeom
-  use comgeomphy, only: airephy
+  use comgeom, only:  inigeom
   use conf_gcm_m, only: day_step, iperiod, iphysiq, nday, conf_gcm, iflag_phys
   use conf_guide_m, only: conf_guide
   use dimensions, only: iim, jjm, llm, nqmx
+  use dimphy, only: init_dimphy
   USE disvert_m, ONLY : disvert
   use dynetat0_m, only: dynetat0, day_ini
   use dynetat0_chosen_m, only: dynetat0_chosen
   use dynredem0_m, only: dynredem0
-  use grid_change, only: dyn_phy, init_dyn_phy
+  use grid_change, only: init_dyn_phy
   use histclo_m, only: histclo
   use infotrac_init_m, only: infotrac_init
   use inidissip_m, only: inidissip
@@ -32,6 +32,7 @@ PROGRAM gcm
   use init_dynzon_m, only: init_dynzon
   USE ioconf_calendar_m, only: ioconf_calendar
   use leapfrog_m, only: leapfrog
+  use paramet_m, only: paramet
   use suphec_m, only: suphec
   use unit_nml_m, only: unit_nml, set_unit_nml
   use createnewfield_m, only: NbField, Ncid
@@ -39,12 +40,19 @@ PROGRAM gcm
   IMPLICIT NONE
 
   ! Variables dynamiques :
-  REAL ucov(iim + 1, jjm + 1, llm), vcov(iim + 1, jjm, llm)  ! vent covariant
-  REAL teta(iim + 1, jjm + 1, llm) ! temp\'erature potentielle 
-  REAL q(iim + 1, jjm + 1, llm, nqmx) ! mass fraction of advected species
-  REAL ps(iim + 1, jjm + 1) ! pression au sol (Pa)
-  REAL masse(iim + 1, jjm + 1, llm) ! masse d'air
-  REAL phis(iim + 1, jjm + 1) ! g\'eopotentiel au sol
+
+  REAL, ALLOCATABLE:: ucov(:, :, :) ! (iim + 1, jjm + 1, llm) ! vent covariant
+  REAL, ALLOCATABLE:: vcov(:, :, :) ! (iim + 1, jjm, llm) ! vent covariant
+
+  REAL, ALLOCATABLE:: teta(:, :, :) ! (iim + 1, jjm + 1, llm)
+  ! temp\'erature potentielle 
+
+  REAL, ALLOCATABLE:: q(:, :, :, :) ! (iim + 1, jjm + 1, llm, nqmx)
+  ! mass fraction of advected species
+
+  REAL, ALLOCATABLE:: ps(:, :) ! (iim + 1, jjm + 1) ! pression au sol (Pa)
+  REAL, ALLOCATABLE:: masse(:, :, :) ! (iim + 1, jjm + 1, llm) ! masse d'air
+  REAL, ALLOCATABLE:: phis(:, :) ! (iim + 1, jjm + 1) ! g\'eopotentiel au sol
 
   LOGICAL:: true_calendar = .false. ! default value
   integer i
@@ -53,9 +61,18 @@ PROGRAM gcm
 
   !------------------------------------------------------------
 
+  ALLOCATE(ucov(iim + 1, jjm + 1, llm), vcov(iim + 1, jjm, llm))
+  ALLOCATE(teta(iim + 1, jjm + 1, llm))
+  ALLOCATE(q(iim + 1, jjm + 1, llm, nqmx))
+  ALLOCATE(ps(iim + 1, jjm + 1))
+  ALLOCATE(masse(iim + 1, jjm + 1, llm))
+  ALLOCATE(phis(iim + 1, jjm + 1))
+
   call set_unit_nml
   open(unit_nml, file="used_namelists.txt", status="replace", action="write")
 
+  call paramet
+  call init_dimphy
   CALL conf_gcm
   call read_comdissnew
 
@@ -83,10 +100,7 @@ PROGRAM gcm
   call init_dyn_phy
 
   ! Initialisation de la physique :
-  IF (iflag_phys) THEN
-     airephy = pack(aire_2d, dyn_phy)
-     CALL suphec
-  ENDIF
+  IF (iflag_phys) CALL suphec
 
   ! Initialisation des entr\'ees-sorties :
   CALL dynredem0(phis, iday_end = day_ini + nday)

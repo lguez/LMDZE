@@ -7,7 +7,8 @@ contains
   SUBROUTINE swr(knu, palbd, pcg, pcld, pomega, psec, ptau, pcgaz, ppizaz, &
        pray1, pray2, prefz, prj, prk, prmue, ptauaz, ptra1, ptra2)
 
-    USE raddim, only: kdlon, kflev
+    USE conf_phys_m, ONLY: kdlon
+    use dimensions, only: llm
     USE radepsi, only: zepsec
     USE radopt, only: novlp
     use swde_m, only: swde
@@ -41,27 +42,27 @@ contains
 
     INTEGER knu
     DOUBLE PRECISION palbd(kdlon, 2)
-    DOUBLE PRECISION pcg(kdlon, 2, kflev)
-    DOUBLE PRECISION pcld(kdlon, kflev)
-    DOUBLE PRECISION pomega(kdlon, 2, kflev)
+    DOUBLE PRECISION pcg(kdlon, 2, llm)
+    DOUBLE PRECISION pcld(kdlon, llm)
+    DOUBLE PRECISION pomega(kdlon, 2, llm)
     DOUBLE PRECISION psec(kdlon)
-    DOUBLE PRECISION ptau(kdlon, 2, kflev)
+    DOUBLE PRECISION ptau(kdlon, 2, llm)
 
-    DOUBLE PRECISION pray1(kdlon, kflev+1)
-    DOUBLE PRECISION pray2(kdlon, kflev+1)
-    DOUBLE PRECISION prefz(kdlon, 2, kflev+1)
-    DOUBLE PRECISION prj(kdlon, 6, kflev+1)
-    DOUBLE PRECISION prk(kdlon, 6, kflev+1)
-    DOUBLE PRECISION prmue(kdlon, kflev+1)
-    DOUBLE PRECISION pcgaz(kdlon, kflev)
-    DOUBLE PRECISION ppizaz(kdlon, kflev)
-    DOUBLE PRECISION ptauaz(kdlon, kflev)
-    DOUBLE PRECISION ptra1(kdlon, kflev+1)
-    DOUBLE PRECISION ptra2(kdlon, kflev+1)
+    DOUBLE PRECISION pray1(kdlon, llm+1)
+    DOUBLE PRECISION pray2(kdlon, llm+1)
+    DOUBLE PRECISION prefz(kdlon, 2, llm+1)
+    DOUBLE PRECISION prj(kdlon, 6, llm+1)
+    DOUBLE PRECISION prk(kdlon, 6, llm+1)
+    DOUBLE PRECISION prmue(kdlon, llm+1)
+    DOUBLE PRECISION pcgaz(kdlon, llm)
+    DOUBLE PRECISION ppizaz(kdlon, llm)
+    DOUBLE PRECISION ptauaz(kdlon, llm)
+    DOUBLE PRECISION ptra1(kdlon, llm+1)
+    DOUBLE PRECISION ptra2(kdlon, llm+1)
 
     ! * LOCAL VARIABLES:
 
-    DOUBLE PRECISION zc1i(kdlon, kflev+1)
+    DOUBLE PRECISION zc1i(kdlon, llm+1)
     DOUBLE PRECISION zclear(kdlon)
     DOUBLE PRECISION zcloud(kdlon)
     DOUBLE PRECISION zgg(kdlon)
@@ -74,7 +75,7 @@ contains
     DOUBLE PRECISION zr22(kdlon)
     DOUBLE PRECISION zss1(kdlon)
     DOUBLE PRECISION zto1(kdlon)
-    DOUBLE PRECISION ztr(kdlon, 2, kflev+1)
+    DOUBLE PRECISION ztr(kdlon, 2, llm+1)
     DOUBLE PRECISION ztr1(kdlon)
     DOUBLE PRECISION ztr2(kdlon)
     DOUBLE PRECISION zw(kdlon)
@@ -90,7 +91,7 @@ contains
     ! --------------
 
 
-    DO jk = 1, kflev + 1
+    DO jk = 1, llm + 1
        DO ja = 1, 6
           DO jl = 1, kdlon
              prj(jl, ja, jk) = 0.
@@ -107,13 +108,13 @@ contains
 
 
     DO jl = 1, kdlon
-       zc1i(jl, kflev+1) = 0.
+       zc1i(jl, llm+1) = 0.
        zclear(jl) = 1.
        zcloud(jl) = 0.
     END DO
 
     jk = 1
-    jkl = kflev + 1 - jk
+    jkl = llm + 1 - jk
     jklp1 = jkl + 1
     DO jl = 1, kdlon
        zfacoa = 1. - ppizaz(jl, jkl)*pcgaz(jl, jkl)*pcgaz(jl, jkl)
@@ -143,8 +144,8 @@ contains
        END IF
     END DO
 
-    DO jk = 2, kflev
-       jkl = kflev + 1 - jk
+    DO jk = 2, llm
+       jkl = llm + 1 - jk
        jklp1 = jkl + 1
        DO jl = 1, kdlon
           zfacoa = 1. - ppizaz(jl, jkl)*pcgaz(jl, jkl)*pcgaz(jl, jkl)
@@ -182,15 +183,15 @@ contains
 
 
     DO jl = 1, kdlon
-       pray1(jl, kflev+1) = 0.
-       pray2(jl, kflev+1) = 0.
+       pray1(jl, llm+1) = 0.
+       pray2(jl, llm+1) = 0.
        prefz(jl, 2, 1) = palbd(jl, knu)
        prefz(jl, 1, 1) = palbd(jl, knu)
-       ptra1(jl, kflev+1) = 1.
-       ptra2(jl, kflev+1) = 1.
+       ptra1(jl, llm+1) = 1.
+       ptra2(jl, llm+1) = 1.
     END DO
 
-    DO jk = 2, kflev + 1
+    DO jk = 2, llm + 1
        jkm1 = jk - 1
        DO jl = 1, kdlon
           zrneb(jl) = pcld(jl, jkm1)
@@ -291,12 +292,12 @@ contains
     IF (knu==1) THEN
        jaj = 2
        DO jl = 1, kdlon
-          prj(jl, jaj, kflev+1) = 1.
-          prk(jl, jaj, kflev+1) = prefz(jl, 1, kflev+1)
+          prj(jl, jaj, llm+1) = 1.
+          prk(jl, jaj, llm+1) = prefz(jl, 1, llm+1)
        END DO
 
-       DO jk = 1, kflev
-          jkl = kflev + 1 - jk
+       DO jk = 1, llm
+          jkl = llm + 1 - jk
           jklp1 = jkl + 1
           DO jl = 1, kdlon
              zre11 = prj(jl, jaj, jklp1)*ztr(jl, 1, jkl)
@@ -309,12 +310,12 @@ contains
 
        DO jaj = 1, 2
           DO jl = 1, kdlon
-             prj(jl, jaj, kflev+1) = 1.
-             prk(jl, jaj, kflev+1) = prefz(jl, jaj, kflev+1)
+             prj(jl, jaj, llm+1) = 1.
+             prk(jl, jaj, llm+1) = prefz(jl, jaj, llm+1)
           END DO
 
-          DO jk = 1, kflev
-             jkl = kflev + 1 - jk
+          DO jk = 1, llm
+             jkl = llm + 1 - jk
              jklp1 = jkl + 1
              DO jl = 1, kdlon
                 zre11 = prj(jl, jaj, jklp1)*ztr(jl, jaj, jkl)

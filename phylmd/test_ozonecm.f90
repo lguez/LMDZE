@@ -23,42 +23,48 @@ program test_ozonecm
 
   implicit none
 
-  real p(llm + 1) ! pressure at LMDZ layer interface, in Pa
-  real wo(klon, llm, 360) ! column density of ozone in a cell, in kDU
-  real tro3(klon, llm, 360) ! mole fraction of ozone
+  real, allocatable:: p(:) ! (llm + 1) ! pressure at LMDZ layer interface, in Pa
+
+  real, allocatable:: wo(:, :, :) ! (klon, llm, 360)
+  ! column density of ozone in a cell, in kDU
+
+  real, allocatable:: tro3(:, :, :) ! (klon, llm, 360) ! mole fraction of ozone
   integer julien, k
   real, parameter:: RG = 9.80665 ! acceleration of gravity, in m s-2
   real, parameter:: dobson_u = 2.1415e-05 ! Dobson unit, in kg m-2
 
-  REAL pctsrf(klon, nbsrf)
-  REAL ftsol(klon, nbsrf)
-  REAL ftsoil(klon, nsoilmx, nbsrf)
-  REAL qsurf(klon, nbsrf)
-  REAL qsol(klon) ! column-density of water in soil, in kg m-2
-  REAL snow(klon, nbsrf)
-  REAL albe(klon, nbsrf)
-  REAL rain_fall(klon)
-  REAL snow_fall(klon)
-  real solsw(klon)
-  REAL sollw(klon)
-  real fder(klon)
-  REAL radsol(klon)
-  REAL frugs(klon, nbsrf)
-  REAL agesno(klon, nbsrf)
-  REAL zmea(klon)
-  REAL zstd(klon)
-  REAL zsig(klon)
-  REAL zgam(klon)
-  REAL zthe(klon)
-  REAL zpic(klon)
-  REAL zval(klon)
-  REAL t_ancien(klon, llm), q_ancien(klon, llm)
-  LOGICAL ancien_ok
-  real rnebcon(klon, llm), ratqs(klon, llm)
-  REAL clwcon(klon, llm), run_off_lic_0(klon)
-  real sig1(klon, llm) ! section adiabatic updraft
+  REAL, ALLOCATABLE:: pctsrf(:, :) ! (klon, nbsrf)
+  REAL, ALLOCATABLE:: ftsol(:, :) ! (klon, nbsrf)
+  REAL, ALLOCATABLE:: ftsoil(:, :, :) ! (klon, nsoilmx, nbsrf)
+  REAL, ALLOCATABLE:: qsurf(:, :) ! (klon, nbsrf)
 
-  real w01(klon, llm) 
+  REAL, ALLOCATABLE:: qsol(:) ! (klon)
+  ! column-density of water in soil, in kg m-2
+
+  REAL, ALLOCATABLE:: snow(:, :) ! (klon, nbsrf)
+  REAL, ALLOCATABLE:: albe(:, :) ! (klon, nbsrf)
+  REAL, ALLOCATABLE:: rain_fall(:) ! (klon)
+  REAL, ALLOCATABLE:: snow_fall(:) ! (klon)
+  real, allocatable:: solsw(:) ! (klon)
+  REAL, ALLOCATABLE:: sollw(:) ! (klon)
+  real, allocatable:: fder(:) ! (klon)
+  REAL, ALLOCATABLE:: radsol(:) ! (klon)
+  REAL, ALLOCATABLE:: frugs(:, :) ! (klon, nbsrf)
+  REAL, ALLOCATABLE:: agesno(:, :) ! (klon, nbsrf)
+  REAL, ALLOCATABLE:: zmea(:) ! (klon)
+  REAL, ALLOCATABLE:: zstd(:) ! (klon)
+  REAL, ALLOCATABLE:: zsig(:) ! (klon)
+  REAL, ALLOCATABLE:: zgam(:) ! (klon)
+  REAL, ALLOCATABLE:: zthe(:) ! (klon)
+  REAL, ALLOCATABLE:: zpic(:) ! (klon)
+  REAL, ALLOCATABLE:: zval(:) ! (klon)
+  REAL, ALLOCATABLE:: t_ancien(:, :), q_ancien(:, :) ! (klon, llm)
+  LOGICAL ancien_ok
+  real, allocatable:: rnebcon(:, :), ratqs(:, :), clwcon(:, :) ! (klon, llm)
+  REAL, ALLOCATABLE:: run_off_lic_0(:) ! (klon)
+  real, allocatable:: sig1(:, :) ! (klon, llm) ! section adiabatic updraft
+
+  real, allocatable:: w01(:, :) ! (klon, llm) 
   ! vertical velocity within adiabatic updraft
 
   integer ncid_startphy
@@ -71,6 +77,37 @@ program test_ozonecm
 
   call assert(klon == jjm + 1, "test_ozonecm: iim should be 1")
 
+  allocate(p(llm + 1))
+  allocate(wo(klon, llm, 360))
+  allocate(tro3(klon, llm, 360))
+  ALLOCATE(pctsrf(klon, nbsrf))
+  ALLOCATE(ftsol(klon, nbsrf))
+  ALLOCATE(ftsoil(klon, nsoilmx, nbsrf))
+  ALLOCATE(qsurf(klon, nbsrf))
+  ALLOCATE(qsol(klon))
+  ALLOCATE(snow(klon, nbsrf))
+  ALLOCATE(albe(klon, nbsrf))
+  ALLOCATE(rain_fall(klon))
+  ALLOCATE(snow_fall(klon))
+  allocate(solsw(klon))
+  ALLOCATE(sollw(klon))
+  allocate(fder(klon))
+  ALLOCATE(radsol(klon))
+  ALLOCATE(frugs(klon, nbsrf))
+  ALLOCATE(agesno(klon, nbsrf))
+  ALLOCATE(zmea(klon))
+  ALLOCATE(zstd(klon))
+  ALLOCATE(zsig(klon))
+  ALLOCATE(zgam(klon))
+  ALLOCATE(zthe(klon))
+  ALLOCATE(zpic(klon))
+  ALLOCATE(zval(klon))
+  ALLOCATE(t_ancien(klon, llm), q_ancien(klon, llm))
+  allocate(rnebcon(klon, llm), ratqs(klon, llm))
+  ALLOCATE(clwcon(klon, llm), run_off_lic_0(klon))
+  allocate(sig1(klon, llm))
+  allocate(w01(klon, llm))
+  
   call set_unit_nml
   open(unit_nml, file="used_namelists.txt", status="replace", action="write")
 

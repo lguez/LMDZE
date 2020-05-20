@@ -28,7 +28,7 @@ contains
     ! Local:
 
     ! Champ lu dans le fichier de conditions aux limites :
-    real, save:: sst_lu(klon)
+    real, save, allocatable:: sst_lu(:) ! (klon)
 
     integer ncid, varid ! pour NetCDF
 
@@ -38,6 +38,7 @@ contains
 
     ! Tester d'abord si c'est le moment de lire le fichier
     if (mod(itap - 1, lmt_pas) == 0) then
+       if (itap == 1) allocate(sst_lu(klon))
        call NF95_OPEN ('limit.nc', NF90_NOWRITE, ncid)
 
        call NF95_INQ_VARID(ncid, 'SST', varid)

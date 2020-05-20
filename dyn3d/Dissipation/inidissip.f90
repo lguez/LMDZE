@@ -1,14 +1,13 @@
 module inidissip_m
 
-  use dimensions, only: llm
-
   IMPLICIT NONE
-
-  private llm
 
   REAL, protected:: dtdiss ! in s
   integer, protected:: idissip ! période de la dissipation (en pas de temps)
-  real, protected:: tetaudiv(llm), tetaurot(llm), tetah(llm) ! in s-1
+
+  real, protected, allocatable:: tetaudiv(:), tetaurot(:), tetah(:) ! (llm)
+  ! in s-1
+
   real, protected:: cdivu, crot, cdivh
 
 contains
@@ -24,7 +23,7 @@ contains
     use comdissnew, only: nitergdiv, nitergrot, niterh, tetagdiv, tetagrot, &
          tetatemp
     USE conf_gcm_m, ONLY: iperiod
-    USE dimensions, ONLY: iim, jjm
+    USE dimensions, ONLY: iim, jjm, llm
     USE disvert_m, ONLY: preff, presnivs
     use divgrad2_m, only: divgrad2
     use filtreg_scal_m, only: filtreg_scal
@@ -44,6 +43,9 @@ contains
     !-----------------------------------------------------------------------
 
     PRINT *, 'Call sequence information: inidissip'
+
+    allocate(tetaudiv(llm), tetaurot(llm), tetah(llm))
+
     call random_seed(size=seed_size)
     call random_seed(put=[(1, ii = 1, seed_size)])
 

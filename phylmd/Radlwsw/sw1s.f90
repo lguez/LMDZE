@@ -7,7 +7,8 @@ contains
   SUBROUTINE sw1s(knu, palbd, palbp, pcg, pcld, pclear, pdsig, pomega, poz, &
        prmu, psec, ptau, pud, pfd, pfu)
     
-    USE raddim, only: kdlon, kflev
+    use conf_phys_m, only: kdlon
+    use dimensions, only: llm
     use swclr_m, only: swclr
     use swr_m, only: swr
 
@@ -36,42 +37,42 @@ contains
     INTEGER knu
     DOUBLE PRECISION palbd(kdlon, 2)
     DOUBLE PRECISION palbp(kdlon, 2)
-    DOUBLE PRECISION pcg(kdlon, 2, kflev)
-    DOUBLE PRECISION pcld(kdlon, kflev)
+    DOUBLE PRECISION pcg(kdlon, 2, llm)
+    DOUBLE PRECISION pcld(kdlon, llm)
     DOUBLE PRECISION pclear(kdlon)
-    DOUBLE PRECISION pdsig(kdlon, kflev)
-    DOUBLE PRECISION pomega(kdlon, 2, kflev)
-    DOUBLE PRECISION poz(kdlon, kflev)
+    DOUBLE PRECISION pdsig(kdlon, llm)
+    DOUBLE PRECISION pomega(kdlon, 2, llm)
+    DOUBLE PRECISION poz(kdlon, llm)
     DOUBLE PRECISION prmu(kdlon)
     DOUBLE PRECISION psec(kdlon)
-    DOUBLE PRECISION ptau(kdlon, 2, kflev)
-    DOUBLE PRECISION pud(kdlon, 5, kflev+1)
+    DOUBLE PRECISION ptau(kdlon, 2, llm)
+    DOUBLE PRECISION pud(kdlon, 5, llm+1)
 
-    DOUBLE PRECISION pfd(kdlon, kflev+1)
-    DOUBLE PRECISION pfu(kdlon, kflev+1)
+    DOUBLE PRECISION pfd(kdlon, llm+1)
+    DOUBLE PRECISION pfu(kdlon, llm+1)
 
     ! LOCAL VARIABLES:
 
     INTEGER iind(4)
 
-    DOUBLE PRECISION zcgaz(kdlon, kflev)
+    DOUBLE PRECISION zcgaz(kdlon, llm)
     DOUBLE PRECISION zdiff(kdlon)
     DOUBLE PRECISION zdirf(kdlon)
-    DOUBLE PRECISION zpizaz(kdlon, kflev)
+    DOUBLE PRECISION zpizaz(kdlon, llm)
     DOUBLE PRECISION zrayl(kdlon)
-    DOUBLE PRECISION zray1(kdlon, kflev+1)
-    DOUBLE PRECISION zray2(kdlon, kflev+1)
-    DOUBLE PRECISION zrefz(kdlon, 2, kflev+1)
-    DOUBLE PRECISION zrj(kdlon, 6, kflev+1)
-    DOUBLE PRECISION zrj0(kdlon, 6, kflev+1)
-    DOUBLE PRECISION zrk(kdlon, 6, kflev+1)
-    DOUBLE PRECISION zrk0(kdlon, 6, kflev+1)
-    DOUBLE PRECISION zrmue(kdlon, kflev+1)
-    DOUBLE PRECISION zrmu0(kdlon, kflev+1)
+    DOUBLE PRECISION zray1(kdlon, llm+1)
+    DOUBLE PRECISION zray2(kdlon, llm+1)
+    DOUBLE PRECISION zrefz(kdlon, 2, llm+1)
+    DOUBLE PRECISION zrj(kdlon, 6, llm+1)
+    DOUBLE PRECISION zrj0(kdlon, 6, llm+1)
+    DOUBLE PRECISION zrk(kdlon, 6, llm+1)
+    DOUBLE PRECISION zrk0(kdlon, 6, llm+1)
+    DOUBLE PRECISION zrmue(kdlon, llm+1)
+    DOUBLE PRECISION zrmu0(kdlon, llm+1)
     DOUBLE PRECISION zr(kdlon, 4)
-    DOUBLE PRECISION ztauaz(kdlon, kflev)
-    DOUBLE PRECISION ztra1(kdlon, kflev+1)
-    DOUBLE PRECISION ztra2(kdlon, kflev+1)
+    DOUBLE PRECISION ztauaz(kdlon, llm)
+    DOUBLE PRECISION ztra1(kdlon, llm+1)
+    DOUBLE PRECISION ztra2(kdlon, llm+1)
     DOUBLE PRECISION zw(kdlon, 4)
 
     INTEGER jl, jk, k, jaj, ikm1, ikl
@@ -150,11 +151,11 @@ contains
        zw(jl, 2) = 0.
        zw(jl, 3) = 0.
        zw(jl, 4) = 0.
-       pfd(jl, kflev+1) = ((1.-pclear(jl))*zrj(jl,jaj,kflev+1)+pclear(jl)*zrj0( &
-            jl,jaj,kflev+1))*rsun(knu)
+       pfd(jl, llm+1) = ((1.-pclear(jl))*zrj(jl,jaj,llm+1)+pclear(jl)*zrj0( &
+            jl,jaj,llm+1))*rsun(knu)
     END DO
-    DO jk = 1, kflev
-       ikl = kflev + 1 - jk
+    DO jk = 1, llm
+       ikl = llm + 1 - jk
        DO jl = 1, kdlon
           zw(jl, 1) = zw(jl, 1) + pud(jl, 1, ikl)/zrmue(jl, ikl)
           zw(jl, 2) = zw(jl, 2) + poz(jl, ikl)/zrmue(jl, ikl)
@@ -182,7 +183,7 @@ contains
             )*palbp(jl,knu))*rsun(knu)
     END DO
 
-    DO jk = 2, kflev + 1
+    DO jk = 2, llm + 1
        ikm1 = jk - 1
        DO jl = 1, kdlon
           zw(jl, 1) = zw(jl, 1) + pud(jl, 1, ikm1)*1.66

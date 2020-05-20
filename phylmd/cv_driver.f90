@@ -190,9 +190,6 @@ contains
 
     !-------------------------------------------------------------------
 
-    ! SET CONSTANTS AND PARAMETERS
-    CALL cv30_param
-
     ! INITIALIZE OUTPUT ARRAYS AND PARAMETERS
 
     da1 = 0.

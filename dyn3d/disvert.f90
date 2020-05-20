@@ -1,19 +1,17 @@
 module disvert_m
 
-  use dimensions, only: llm
-
   implicit none
 
-  private llm, hybrid, funcd, y, ya, compute_ab
+  private hybrid, funcd, y, ya, compute_ab
 
-  real, save:: ap(llm+1) ! in Pa
-  real, save:: bp(llm+1)
+  real, save, allocatable, protected:: ap(:) ! (llm+1) in Pa
+  real, save, allocatable, protected:: bp(:) ! (llm+1)
 
-  REAL s(llm+1)
+  REAL, allocatable, protected:: s(:) ! (llm+1)
   ! "s(l)" is the atmospheric hybrid sigma-pressure coordinate at
   ! half-level, between layers "l" and "l-1"
 
-  real, save:: presnivs(llm)
+  real, save, allocatable, protected:: presnivs(:) ! (llm)
   ! approximate full level pressure for a reference surface pressure, in Pa
 
   real, parameter:: preff = 101325. ! in Pa
@@ -33,7 +31,8 @@ contains
     ! Libraries:
     use jumble, only: read_column, new_unit
     use nr_util, only: pi, assert
-    
+
+    use dimensions, only: llm
     use dynetat0_chosen_m, only: pa
     use unit_nml_m, only: unit_nml
 
@@ -73,6 +72,11 @@ contains
     !-----------------------------------------------------------------------
 
     print *, "Call sequence information: disvert"
+
+    allocate(ap(llm+1))
+    allocate(bp(llm+1))
+    allocate(s(llm+1))
+    allocate(presnivs(llm))
 
     write(unit=*, nml=disvert_nml)
     print *, "Enter namelist 'disvert_nml'."

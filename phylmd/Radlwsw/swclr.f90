@@ -21,7 +21,8 @@ contains
     ! MODIFICATIONS.
     ! ORIGINAL : 94-11-15
 
-    USE raddim, only: kdlon, kflev
+    USE conf_phys_m, ONLY: kdlon
+    use dimensions, only: llm
     USE radepsi, only: zepsec
     USE radopt, only: novlp
 
@@ -29,28 +30,28 @@ contains
 
     INTEGER knu
     DOUBLE PRECISION palbp(kdlon, 2)
-    DOUBLE PRECISION, intent(in):: pdsig(kdlon, kflev)
+    DOUBLE PRECISION, intent(in):: pdsig(kdlon, llm)
     DOUBLE PRECISION, intent(in):: prayl(kdlon)
     DOUBLE PRECISION psec(kdlon)
 
-    DOUBLE PRECISION, intent(out):: ppizaz(kdlon, kflev)
-    DOUBLE PRECISION pray1(kdlon, kflev + 1)
-    DOUBLE PRECISION pray2(kdlon, kflev + 1)
-    DOUBLE PRECISION prefz(kdlon, 2, kflev + 1)
-    DOUBLE PRECISION prj(kdlon, 6, kflev + 1)
-    DOUBLE PRECISION prk(kdlon, 6, kflev + 1)
-    DOUBLE PRECISION prmu0(kdlon, kflev + 1)
-    DOUBLE PRECISION, intent(out):: ptauaz(kdlon, kflev)
-    DOUBLE PRECISION ptra1(kdlon, kflev + 1)
-    DOUBLE PRECISION ptra2(kdlon, kflev + 1)
+    DOUBLE PRECISION, intent(out):: ppizaz(kdlon, llm)
+    DOUBLE PRECISION pray1(kdlon, llm + 1)
+    DOUBLE PRECISION pray2(kdlon, llm + 1)
+    DOUBLE PRECISION prefz(kdlon, 2, llm + 1)
+    DOUBLE PRECISION prj(kdlon, 6, llm + 1)
+    DOUBLE PRECISION prk(kdlon, 6, llm + 1)
+    DOUBLE PRECISION prmu0(kdlon, llm + 1)
+    DOUBLE PRECISION, intent(out):: ptauaz(kdlon, llm)
+    DOUBLE PRECISION ptra1(kdlon, llm + 1)
+    DOUBLE PRECISION ptra2(kdlon, llm + 1)
 
     ! LOCAL VARIABLES:
-    DOUBLE PRECISION zc0i(kdlon, kflev + 1)
+    DOUBLE PRECISION zc0i(kdlon, llm + 1)
     DOUBLE PRECISION zclear(kdlon)
     DOUBLE PRECISION zr21(kdlon)
     DOUBLE PRECISION zss0(kdlon)
     DOUBLE PRECISION zscat(kdlon)
-    DOUBLE PRECISION ztr(kdlon, 2, kflev + 1)
+    DOUBLE PRECISION ztr(kdlon, 2, llm + 1)
     INTEGER jl, jk, ja, jkl, jklp1, jaj, jkm1
     DOUBLE PRECISION zfacoa, zcorae
     DOUBLE PRECISION zmue, zgap, zww, zto, zden, zmu1, zden1
@@ -61,7 +62,7 @@ contains
     
     ! 1. OPTICAL PARAMETERS FOR AEROSOLS AND RAYLEIGH
 
-    DO jk = 1, kflev + 1
+    DO jk = 1, llm + 1
        DO ja = 1, 6
           DO jl = 1, kdlon
              prj(jl, ja, jk) = 0d0
@@ -70,7 +71,7 @@ contains
        END DO
     END DO
 
-    DO jk = 1, kflev
+    DO jk = 1, llm
        DO jl = 1, kdlon
           ptauaz(jl, jk) = prayl(jl) * pdsig(jl, jk)
           ppizaz(jl, jk) = 1d0 - repsct
@@ -80,13 +81,13 @@ contains
     ! 2. TOTAL EFFECTIVE CLOUDINESS ABOVE A GIVEN LEVEL
 
     DO jl = 1, kdlon
-       zc0i(jl, kflev + 1) = 0d0
+       zc0i(jl, llm + 1) = 0d0
        zclear(jl) = 1d0
        zscat(jl) = 0d0
     END DO
 
     jk = 1
-    jkl = kflev + 1 - jk
+    jkl = llm + 1 - jk
     jklp1 = jkl + 1
     DO jl = 1, kdlon
        zfacoa = 1d0
@@ -112,8 +113,8 @@ contains
        END IF
     END DO
 
-    DO jk = 2, kflev
-       jkl = kflev + 1 - jk
+    DO jk = 2, llm
+       jkl = llm + 1 - jk
        jklp1 = jkl + 1
        DO jl = 1, kdlon
           zfacoa = 1d0
@@ -143,15 +144,15 @@ contains
     ! 3. REFLECTIVITY/TRANSMISSIVITY FOR PURE SCATTERING
 
     DO jl = 1, kdlon
-       pray1(jl, kflev + 1) = 0d0
-       pray2(jl, kflev + 1) = 0d0
+       pray1(jl, llm + 1) = 0d0
+       pray2(jl, llm + 1) = 0d0
        prefz(jl, 2, 1) = palbp(jl, knu)
        prefz(jl, 1, 1) = palbp(jl, knu)
-       ptra1(jl, kflev + 1) = 1d0
-       ptra2(jl, kflev + 1) = 1d0
+       ptra1(jl, llm + 1) = 1d0
+       ptra2(jl, llm + 1) = 1d0
     END DO
 
-    DO jk = 2, kflev + 1
+    DO jk = 2, llm + 1
        jkm1 = jk - 1
        DO jl = 1, kdlon
 
@@ -203,12 +204,12 @@ contains
     IF (knu == 1) THEN
        jaj = 2
        DO jl = 1, kdlon
-          prj(jl, jaj, kflev + 1) = 1d0
-          prk(jl, jaj, kflev + 1) = prefz(jl, 1, kflev + 1)
+          prj(jl, jaj, llm + 1) = 1d0
+          prk(jl, jaj, llm + 1) = prefz(jl, 1, llm + 1)
        END DO
 
-       DO jk = 1, kflev
-          jkl = kflev + 1 - jk
+       DO jk = 1, llm
+          jkl = llm + 1 - jk
           jklp1 = jkl + 1
           DO jl = 1, kdlon
              zre11 = prj(jl, jaj, jklp1) * ztr(jl, 1, jkl)
@@ -219,12 +220,12 @@ contains
     ELSE
        DO jaj = 1, 2
           DO jl = 1, kdlon
-             prj(jl, jaj, kflev + 1) = 1d0
-             prk(jl, jaj, kflev + 1) = prefz(jl, jaj, kflev + 1)
+             prj(jl, jaj, llm + 1) = 1d0
+             prk(jl, jaj, llm + 1) = prefz(jl, jaj, llm + 1)
           END DO
 
-          DO jk = 1, kflev
-             jkl = kflev + 1 - jk
+          DO jk = 1, llm
+             jkl = llm + 1 - jk
              jklp1 = jkl + 1
              DO jl = 1, kdlon
                 zre11 = prj(jl, jaj, jklp1) * ztr(jl, jaj, jkl)

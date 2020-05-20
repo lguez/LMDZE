@@ -11,7 +11,7 @@ contains
     USE dimphy
     use lwv_m, only: lwv
     USE suphec_m
-    USE raddim
+    use conf_phys_m, only: kdlon
     USE raddimlw
 
     ! PURPOSE.
@@ -51,27 +51,27 @@ contains
 
     DOUBLE PRECISION pdt0(kdlon)
     DOUBLE PRECISION pemis(kdlon)
-    DOUBLE PRECISION ppmb(kdlon, kflev+1)
-    DOUBLE PRECISION ptl(kdlon, kflev+1)
-    DOUBLE PRECISION ptave(kdlon, kflev)
+    DOUBLE PRECISION ppmb(kdlon, llm+1)
+    DOUBLE PRECISION ptl(kdlon, llm+1)
+    DOUBLE PRECISION ptave(kdlon, llm)
 
-    DOUBLE PRECISION pfluc(kdlon, 2, kflev+1)
+    DOUBLE PRECISION pfluc(kdlon, 2, llm+1)
 
-    DOUBLE PRECISION pabcu(kdlon, nua, 3*kflev+1)
-    DOUBLE PRECISION pbint(kdlon, kflev+1)
+    DOUBLE PRECISION pabcu(kdlon, nua, 3*llm+1)
+    DOUBLE PRECISION pbint(kdlon, llm+1)
     DOUBLE PRECISION pbsui(kdlon)
-    DOUBLE PRECISION pcts(kdlon, kflev)
-    DOUBLE PRECISION pcntrb(kdlon, kflev+1, kflev+1)
+    DOUBLE PRECISION pcts(kdlon, llm)
+    DOUBLE PRECISION pcntrb(kdlon, llm+1, llm+1)
 
     ! -------------------------------------------------------------------------
 
     ! * LOCAL VARIABLES:
-    DOUBLE PRECISION zb(kdlon, ninter, kflev+1)
+    DOUBLE PRECISION zb(kdlon, ninter, llm+1)
     DOUBLE PRECISION zbsur(kdlon, ninter)
     DOUBLE PRECISION zbtop(kdlon, ninter)
-    DOUBLE PRECISION zdbsl(kdlon, ninter, kflev*2)
-    DOUBLE PRECISION zga(kdlon, 8, 2, kflev)
-    DOUBLE PRECISION zgb(kdlon, 8, 2, kflev)
+    DOUBLE PRECISION zdbsl(kdlon, ninter, llm*2)
+    DOUBLE PRECISION zga(kdlon, 8, 2, llm)
+    DOUBLE PRECISION zgb(kdlon, 8, 2, llm)
     DOUBLE PRECISION zgasur(kdlon, 8, 2)
     DOUBLE PRECISION zgbsur(kdlon, 8, 2)
     DOUBLE PRECISION zgatop(kdlon, 8, 2)

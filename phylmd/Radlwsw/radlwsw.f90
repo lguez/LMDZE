@@ -23,7 +23,7 @@ contains
     USE clesphys, ONLY: solaire
     USE dimphy, ONLY: klev, klon
     use lw_m, only: lw
-    USE raddim, ONLY: kdlon
+    use conf_phys_m, only: kdlon
     USE suphec_m, ONLY: rg
     use sw_m, only: sw
     USE yoethf_m, ONLY: rvtmp2

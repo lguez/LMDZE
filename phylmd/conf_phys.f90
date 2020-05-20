@@ -11,6 +11,7 @@ module conf_phys_m
   
   real:: epmax = 0.993 ! \'efficacit\'e de pr\'ecipitation
   integer:: iflag_clw = 0
+  integer, protected, save:: kdlon
 
 contains
 
@@ -24,6 +25,7 @@ contains
     use clesphys2, only: read_clesphys2
     USE comfisrtilp, ONLY: cld_lc_con, cld_lc_lsc, cld_tau_con, &
          cld_tau_lsc, coef_eva, ffallv_con, ffallv_lsc, iflag_pdf, reevap_ice
+    use dimphy, only: klon
     use nr_util, only: assert
     use unit_nml_m, only: unit_nml
     USE yomcst, ONLY: read_YOMCST
@@ -37,6 +39,7 @@ contains
     !-----------------------------------------------------------
 
     print *, "Call sequence information: conf_phys"
+    kdlon = klon
     call read_clesphys2
     call read_YOMCST
 

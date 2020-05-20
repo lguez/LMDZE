@@ -63,7 +63,7 @@ contains
     real dalph_soil ! rapport entre les \'epaisseurs de 2 couches successives
     REAL ztherm_i(size(tsurf)) ! (knon)
     REAL, save:: dz1(nsoilmx), dz2(nsoilmx)
-    REAL, save:: zc(klon, nsoilmx, nbsrf), zd(klon, nsoilmx, nbsrf)
+    REAL, allocatable, save:: zc(:, :, :), zd(:, :, :) ! (klon, nsoilmx, nbsrf)
     REAL, save:: lambda
     LOGICAL:: firstsurf(nbsrf) = .TRUE.
     REAL, parameter:: isol = 2000., isno = 2000., iice = 2000.
@@ -112,6 +112,9 @@ contains
        STOP 1
     END select
 
+    if (all(firstsurf)) allocate(zc(klon, nsoilmx, nbsrf), &
+         zd(klon, nsoilmx, nbsrf))
+    
     IF (firstsurf(nisurf)) THEN
        ! ground levels
        ! grnd=z / l where l is the skin depth of the diurnal cycle:

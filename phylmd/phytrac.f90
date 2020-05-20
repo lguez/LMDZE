@@ -53,7 +53,7 @@ contains
     use phyredem0_m, only: ncid_restartphy
     use press_coefoz_m, only: press_coefoz
     use radiornpb_m, only: radiornpb
-    use regr_pr_comb_coefoz_m, only: regr_pr_comb_coefoz
+    use regr_pr_comb_coefoz_m, only: regr_pr_comb_coefoz, init
     use SUPHEC_M, only: rg
     use time_phylmdz, only: itap
 
@@ -118,15 +118,17 @@ contains
     ! 
     ! Pour la source de radon et son reservoir de sol
 
-    REAL, save:: trs(klon, nqmx - 2) ! Concentration de traceur dans le sol
+    REAL, save, allocatable:: trs(:, :) ! (klon, nqmx - 2)
+    ! Concentration de traceur dans le sol
 
-    REAL, save:: masktr(klon, nqmx - 2) ! Masque reservoir de sol traceur
+    REAL, save, allocatable:: masktr(:, :) ! (klon, nqmx - 2)
+    ! Masque reservoir de sol traceur
     ! Masque de l'echange avec la surface
     ! (1 = reservoir) ou (possible => 1)
-    
-    REAL, save:: fshtr(klon, nqmx - 2)
+
+    REAL, save, allocatable:: fshtr(:, :) ! (klon, nqmx - 2)
     ! Flux surfacique dans le reservoir de sol
-    
+
     REAL, save:: hsoltr(nqmx - 2) ! Epaisseur equivalente du reservoir de sol
     REAL, save:: tautr(nqmx - 2) ! constante de d\'ecroissance radioactive
 
@@ -182,7 +184,10 @@ contains
     call assert(shape(tr_seri) == (/klon, llm, nqmx - 2/), "phytrac tr_seri")
 
     if (firstcal) then
-       ! Initialisation de certaines variables pour le radon et le plomb 
+       allocate(trs(klon, nqmx - 2), masktr(klon, nqmx - 2), &
+            fshtr(klon, nqmx - 2))
+
+       ! Initialisation de certaines variables pour le radon et le plomb
        ! Initialisation du traceur dans le sol (couche limite radonique)
        trs(:, 2:) = 0.
 
@@ -194,7 +199,7 @@ contains
        ! Initialisation de la fraction d'aerosols lessivee
 
        d_tr_lessi_impa = 0.
-       d_tr_lessi_nucl = 0. 
+       d_tr_lessi_nucl = 0.
 
        ! Initialisation de la nature des traceurs
 
@@ -203,6 +208,7 @@ contains
 
        if (nqmx >= 5) then
           call press_coefoz ! read input pressure levels for ozone coefficients
+          call init
        end if
 
        ! Initialisation du traceur dans le sol (couche limite radonique)
@@ -210,7 +216,7 @@ contains
        radio(2)= .true.
        clsol(:2)= .true.
        clsol(3:)= .false.
-       aerosol(2) = .TRUE. ! le Pb est un aerosol 
+       aerosol(2) = .TRUE. ! le Pb est un aerosol
        call initrrnpb(pctsrf, masktr, fshtr, hsoltr, tautr, vdeptr, scavtr)
     endif
 
@@ -252,7 +258,7 @@ contains
        nsplit=10
        DO it=1, nqmx - 2
           do isplit=1, nsplit
-             ! Thermiques 
+             ! Thermiques
              call dqthermcell(klon, llm, dtphys/nsplit &
                   , fm_therm, entr_therm, zmasse &
                   , tr_seri(1:klon, 1:llm, it), d_tr, ztra_th)
@@ -278,7 +284,7 @@ contains
 
     ! MAF modif pour tenir compte du cas traceur
     DO it=1, nqmx - 2
-       if (clsol(it)) then 
+       if (clsol(it)) then
           ! couche limite avec quantite dans le sol calculee
           CALL cltracrn(it, dtphys, yu1, yv1, coefh, cdragh, t_seri, ftsol, &
                pctsrf, tr_seri(:, :, it), trs(:, it), paprs, pplay, delp, &
@@ -310,7 +316,7 @@ contains
 
     ! Calcul de l'effet du puits radioactif
 
-    ! MAF il faudrait faire une modification pour passer dans radiornpb 
+    ! MAF il faudrait faire une modification pour passer dans radiornpb
     ! si radio=true
     d_tr_dec = radiornpb(tr_seri, dtphys, tautr)
     DO it = 1, nqmx - 2
@@ -332,11 +338,11 @@ contains
 
     ! Calcul de l'effet de la precipitation
 
-    d_tr_lessi_nucl = 0. 
-    d_tr_lessi_impa = 0. 
-    flestottr = 0. 
+    d_tr_lessi_nucl = 0.
+    d_tr_lessi_impa = 0.
+    flestottr = 0.
 
-    ! tendance des aerosols nuclees et impactes 
+    ! tendance des aerosols nuclees et impactes
 
     DO it = 1, nqmx - 2
        IF (aerosol(it)) THEN
@@ -351,7 +357,7 @@ contains
        ENDIF
     ENDDO
 
-    ! Mises a jour des traceurs + calcul des flux de lessivage 
+    ! Mises a jour des traceurs + calcul des flux de lessivage
     ! Mise a jour due a l'impaction et a la nucleation
 
     DO it = 1, nqmx - 2
@@ -365,7 +371,7 @@ contains
        ENDIF
     ENDDO
 
-    ! Flux lessivage total 
+    ! Flux lessivage total
     DO it = 1, nqmx - 2
        DO k = 1, llm
           DO i = 1, klon

@@ -1,17 +1,13 @@
 module phyetat0_m
 
-  use dimphy, only: klon
-
   IMPLICIT none
 
-  REAL, save, protected:: rlat(klon), rlon(klon)
+  REAL, save, protected, allocatable:: rlat(:), rlon(:) ! (klon)
   ! latitude and longitude of a point of the scalar grid identified
   ! by a simple index, in degrees
 
   integer, save, protected:: itau_phy
-  REAL, save, protected:: masque(KLON) ! fraction of land
-
-  private klon
+  REAL, save, protected, allocatable:: masque(:) ! (KLON) fraction of land
 
 contains
 
@@ -26,7 +22,7 @@ contains
     ! Objet : lecture de l'état initial pour la physique
 
     USE conf_gcm_m, ONLY: raz_date
-    use dimphy, only: klev
+    use dimphy, only: klev, klon
     USE indicesol, ONLY : epsfra, is_lic, is_oce, is_sic, is_ter, nbsrf
     use netcdf, only: nf90_global, nf90_inq_varid, NF90_NOERR, NF90_NOWRITE
     use netcdf95, only: nf95_get_att, nf95_get_var, nf95_inq_varid, &
@@ -75,6 +71,9 @@ contains
     !---------------------------------------------------------------
 
     print *, "Call sequence information: phyetat0"
+
+    allocate(rlat(klon), rlon(klon))
+    allocate(masque(KLON))
 
     ! Fichier contenant l'état initial :
     call NF95_OPEN("startphy.nc", NF90_NOWRITE, ncid_startphy)
@@ -324,12 +323,16 @@ contains
     use nr_util, only: rad_to_deg
 
     use dimensions, only: iim, jjm
+    use dimphy, only: klon
     use dynetat0_m, only: rlatu, rlonv
     use grid_change, only: dyn_phy
     USE start_init_orog_m, only: mask
     
     !-------------------------------------------------------------------------
     
+    allocate(rlat(klon), rlon(klon))
+    allocate(masque(KLON))
+
     rlat(1) = 90.
     rlat(2:klon-1) = pack(spread(rlatu(2:jjm), 1, iim), .true.) * rad_to_deg
     rlat(klon) = - 90.

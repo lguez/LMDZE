@@ -35,28 +35,25 @@
 !
       INTEGER i,ij,l
 !
-      REAL airej2,airejjm,airescb(iim),airesch(iim)
+      REAL, save:: airej2,airejjm
+      real airescb(iim),airesch(iim)
       REAL dyq(ip1jmp1,llm),dyqv(ip1jm)
       REAL adyqv(ip1jm),dyqmax(ip1jmp1)
       REAL qbyv(ip1jm,llm)
 
       REAL qpns,qpsn,dyn1,dys1,dyn2,dys2,newmasse,fn,fs
-      Logical first
-      SAVE first
+      Logical:: first = .true.
 
       REAL convpn,convps,convmpn,convmps
-      REAL sinlon(iip1),sinlondlon(iip1)
-      REAL coslon(iip1),coslondlon(iip1)
-      SAVE sinlon,coslon,sinlondlon,coslondlon
-      SAVE airej2,airejjm
+      REAL, save, allocatable:: sinlon(:),sinlondlon(:) ! (iip1)
+      REAL, save, allocatable:: coslon(:),coslondlon(:) ! (iip1)
 !
 !
       REAL      SSUM
 
-      DATA first/.true./
-
-      IF(first) THEN
+      IF (first) THEN
          PRINT*,'Shema  Amont nouveau  appele dans  Vanleer   '
+         allocate(sinlon(iip1), sinlondlon(iip1), coslon(iip1),coslondlon(iip1))
          first=.false.
          do i=2,iip1
             coslon(i)=cos(rlonv(i))

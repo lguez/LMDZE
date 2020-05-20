@@ -17,12 +17,14 @@ program test_inter_barxy
   real, allocatable:: lat_rad(:), lat_ini(:)
   integer i
   real, allocatable:: var_ana3d(:, :)
-  REAL var_tmp2d(iim, jjm + 1)
+  REAL, allocatable:: var_tmp2d(:, :) ! (iim, jjm + 1)
 
   namelist /main/iml_dyn, jml_dyn
 
   !------------------------
 
+  allocate(var_tmp2d(iim, jjm + 1))
+  
   print *, "Enter namelist 'main'."
   read (unit=*, nml=main)
   write(unit=*, nml=main)

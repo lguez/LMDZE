@@ -56,9 +56,6 @@ contains
     ! Local:
     
     INTEGER knon ! nombre de points a calculer
-    INTEGER isommet
-    ! limite max sommet pbl
-    PARAMETER (isommet=klev)
     REAL vk
     ! Von Karman => passer a .41 ! cf U.Olgstrom
     PARAMETER (vk=0.35)
@@ -199,7 +196,7 @@ contains
     ! until the Richardson number between the first level and the
     ! current level exceeds the "critical" value.  (bonne idee Nu de
     ! separer le Ric et l'exces de temp du thermique)
-    DO k = 2, isommet
+    DO k = 2, klev
        DO i = 1, knon
           IF (check(i)) THEN
              ! pourquoi / niveau 1 (au lieu du sol) et le terme en u*^2 ?
@@ -232,7 +229,7 @@ contains
     ! Set pbl height to maximum value where computation exceeds number of
     ! layers allowed
     DO i = 1, knon
-       if (check(i)) pblh(i) = z(i, isommet)
+       if (check(i)) pblh(i) = z(i, klev)
     ENDDO
 
     ! Improve estimate of pbl height for the unstable points.
@@ -278,7 +275,7 @@ contains
 
     ! Improve pblh estimate for unstable conditions using the
     ! convective temperature excess :
-    DO k = 2, isommet
+    DO k = 2, klev
        DO i = 1, knon
           IF (check(i)) THEN
              zdu2 = u(i, k)**2 + v(i, k)**2
@@ -310,7 +307,7 @@ contains
     ! Set pbl height to maximum value where computation exceeds number of
     ! layers allowed
     DO i = 1, knon
-       if (check(i)) pblh(i) = z(i, isommet)
+       if (check(i)) pblh(i) = z(i, klev)
     ENDDO
 
     ! PBL height must be greater than some minimum mechanical mixing depth
@@ -355,7 +352,7 @@ contains
 
     ! Main level loop to compute the diffusivities and
     ! counter-gradient terms:
-    loop_level: DO k = 2, isommet
+    loop_level: DO k = 2, klev
        ! Find levels within boundary layer:
        DO i = 1, knon
           zp(i) = z(i, k)

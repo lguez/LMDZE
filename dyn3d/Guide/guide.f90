@@ -36,21 +36,23 @@ CONTAINS
 
     ! Variables dynamiques pour les réanalyses
 
-    REAL, save:: ucovrea1(iim + 1, jjm + 1, llm), vcovrea1(iim + 1, jjm, llm)
+    REAL, save, allocatable:: ucovrea1(:, :, :) ! (iim + 1, jjm + 1, llm)
+    REAL, save, allocatable:: vcovrea1(:, :, :) ! (iim + 1, jjm, llm)
     ! vents covariants r\'eanalyses
 
-    REAL, save:: tetarea1(iim + 1, jjm + 1, llm)
+    REAL, save, allocatable:: tetarea1(:, :, :) ! (iim + 1, jjm + 1, llm)
     ! potential temperture from reanalysis
 
-    REAL, save:: qrea1(iim + 1, jjm + 1, llm)
+    REAL, save, allocatable:: qrea1(:, :, :) ! (iim + 1, jjm + 1, llm)
 
-    REAL, save:: ucovrea2(iim + 1, jjm + 1, llm), vcovrea2(iim + 1, jjm, llm)
+    REAL, save, allocatable:: ucovrea2(:, :, :) ! (iim + 1, jjm + 1, llm)
+    REAL, save, allocatable:: vcovrea2(:, :, :) ! (iim + 1, jjm, llm)
     ! vents covariants reanalyses
 
-    REAL, save:: tetarea2(iim + 1, jjm + 1, llm)
+    REAL, save, allocatable:: tetarea2(:, :, :) ! (iim + 1, jjm + 1, llm)
     ! potential temperture from reanalysis
 
-    REAL, save:: qrea2(iim + 1, jjm + 1, llm)
+    REAL, save, allocatable:: qrea2(:, :, :) ! (iim + 1, jjm + 1, llm)
 
     INTEGER l
     REAL tau
@@ -63,6 +65,13 @@ CONTAINS
     !-----------------------------------------------------------------------
 
     IF (itau == 0) THEN
+       allocate(ucovrea1(iim + 1, jjm + 1, llm), vcovrea1(iim + 1, jjm, llm))
+       allocate(tetarea1(iim + 1, jjm + 1, llm))
+       allocate(qrea1(iim + 1, jjm + 1, llm))
+       allocate(ucovrea2(iim + 1, jjm + 1, llm), vcovrea2(iim + 1, jjm, llm))
+       allocate(tetarea2(iim + 1, jjm + 1, llm))
+       allocate(qrea2(iim + 1, jjm + 1, llm))
+
        ! Lecture du premier état des réanalyses :
        CALL read_reanalyse(ps, ucovrea2, vcovrea2, tetarea2, qrea2)
        qrea2 = max(qrea2, 0.1)

@@ -54,7 +54,6 @@ contains
 
     REAL kstable ! diffusion minimale (situation stable)
     REAL, PARAMETER:: mixlen = 35. ! constante contrôlant longueur de mélange
-    INTEGER, PARAMETER:: isommet = klev ! sommet de la couche limite
     INTEGER i, k
     REAL zmgeom(size(ts))
     REAL ri(size(ts))
@@ -84,9 +83,9 @@ contains
 
     ! Calculer les coefficients turbulents dans l'atmosphere
 
-    itop = isommet
+    itop = klev
 
-    DO k = 2, isommet
+    DO k = 2, klev
        DO i = 1, knon
           zdu2 = MAX(cepdu2, (u(i, k) - u(i, k - 1))**2 &
                + (v(i, k) - v(i, k - 1))**2)

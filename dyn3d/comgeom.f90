@@ -1,102 +1,92 @@
 module comgeom
 
-  use dimensions, only: iim, jjm
-
   implicit none
 
-  private iim, jjm
+  real, pointer:: cu_2d(:, :) ! (iim + 1, jjm + 1) in m
+  real, pointer:: cv_2d(:, :) ! (iim + 1, jjm) in m
+  real, allocatable, target:: cu(:) ! ((iim + 1) * (jjm + 1)) in m
+  real, allocatable, target:: cv(:) ! ((iim + 1) * jjm) in m
 
-  real cu_2d(iim + 1, jjm + 1), cv_2d(iim + 1, jjm) ! in m
-  real cu((iim + 1) * (jjm + 1)), cv((iim + 1) * jjm) ! in m
-  equivalence (cu, cu_2d), (cv, cv_2d)
+  real, pointer:: unscu2_2d(:, :) ! (iim + 1, jjm + 1) in m-2
+  real, allocatable, target:: unscu2(:) ! ((iim + 1) * (jjm + 1)) in m-2
 
-  real unscu2_2d(iim + 1, jjm + 1) ! in m-2
-  real unscu2((iim + 1) * (jjm + 1)) ! in m-2
-  equivalence (unscu2, unscu2_2d)
+  real, pointer:: unscv2_2d(:, :) ! (iim + 1, jjm) in m-2
+  real, allocatable, target:: unscv2(:) ! ((iim + 1) * jjm) in m-2
 
-  real unscv2_2d(iim + 1, jjm) ! in m-2
-  real unscv2((iim + 1) * jjm) ! in m-2
-  equivalence (unscv2, unscv2_2d)
+  real, allocatable, target:: aire(:) ! ((iim + 1) * (jjm + 1)) in m2
+  real, pointer:: aire_2d(:, :) ! (iim + 1, jjm + 1) in m2
 
-  real aire((iim + 1) * (jjm + 1)), aire_2d(iim + 1, jjm + 1) ! in m2
-  equivalence (aire, aire_2d)
-
-  real airesurg_2d(iim + 1, jjm + 1)
-
-  real aireu_2d(iim + 1, jjm + 1) ! in m2
-  real aireu((iim + 1) * (jjm + 1)) ! in m2
-  equivalence (aireu, aireu_2d)
-
-  real airev((iim + 1) * jjm), airev_2d(iim + 1, jjm) ! in m2
-  equivalence (airev, airev_2d)
-
-  real unsaire_2d(iim + 1, jjm + 1) ! in m-2
-  real apoln, apols ! in m2
-  real unsairez_2d(iim + 1, jjm)
-
-  real alpha1_2d(iim + 1, jjm + 1)
-  real alpha1((iim + 1) * (jjm + 1))
-  equivalence (alpha1, alpha1_2d)
-
-  real alpha2_2d(iim + 1, jjm + 1)         
-  real alpha2((iim + 1) * (jjm + 1))
-  equivalence (alpha2, alpha2_2d)
-
-  real alpha3_2d(iim + 1, jjm + 1), alpha4_2d(iim + 1, jjm + 1)
-  real alpha3((iim + 1) * (jjm + 1)), alpha4((iim + 1) * (jjm + 1))
-  equivalence (alpha3, alpha3_2d), (alpha4, alpha4_2d)
-
-  real alpha1p2_2d(iim + 1, jjm + 1)        
-  real alpha1p2((iim + 1) * (jjm + 1))
-  equivalence (alpha1p2, alpha1p2_2d)
-
-  real alpha1p4_2d(iim + 1, jjm + 1), alpha2p3_2d(iim + 1, jjm + 1)
-  real alpha1p4((iim + 1) * (jjm + 1)), alpha2p3((iim + 1) * (jjm + 1))
-  equivalence (alpha1p4, alpha1p4_2d), (alpha2p3, alpha2p3_2d)
-
-  real alpha3p4((iim + 1) * (jjm + 1))
-  real alpha3p4_2d(iim + 1, jjm + 1)    
-  equivalence (alpha3p4, alpha3p4_2d)
-
-  real fext_2d(iim + 1, jjm), constang_2d(iim + 1, jjm + 1)
-  real fext((iim + 1) * jjm), constang((iim + 1) * (jjm + 1))
-  equivalence (fext, fext_2d), (constang, constang_2d)
-
-  real cuvsurcv_2d(iim + 1, jjm), cvsurcuv_2d(iim + 1, jjm) ! no dimension
+  real, allocatable:: airesurg_2d(:, :) ! (iim + 1, jjm + 1)
   
-  real cvsurcuv((iim + 1) * jjm) ! no dimension
-  equivalence (cvsurcuv, cvsurcuv_2d)
+  real, pointer:: aireu_2d(:, :) ! (iim + 1, jjm + 1) in m2
+  real, allocatable, target:: aireu(:) ! ((iim + 1) * (jjm + 1)) in m2
 
-  real cvusurcu_2d(iim + 1, jjm + 1), cusurcvu_2d(iim + 1, jjm + 1)
-  ! no dimension
-  real cusurcvu((iim + 1) * (jjm + 1)) ! no dimension
-  equivalence (cusurcvu, cusurcvu_2d)
+  real, allocatable, target:: airev(:) ! ((iim + 1) * jjm)
+  real, pointer:: airev_2d(:, :) ! (iim + 1, jjm) in m2
 
-  real cuvscvgam1_2d(iim + 1, jjm)
-  real cuvscvgam1((iim + 1) * jjm)
-  equivalence (cuvscvgam1, cuvscvgam1_2d)
+  real, allocatable:: unsaire_2d(:, :) ! (iim + 1, jjm + 1) in m-2
+  real apoln, apols ! in m2
+  real, allocatable:: unsairez_2d(:, :) ! (iim + 1, jjm)
+  
+  real, pointer:: alpha1_2d(:, :) ! (iim + 1, jjm + 1)
+  real, allocatable, target:: alpha1(:) ! ((iim + 1) * (jjm + 1))
 
-  real cuvscvgam2_2d(iim + 1, jjm), cvuscugam1_2d(iim + 1, jjm + 1)
-  real cuvscvgam2((iim + 1) * jjm), cvuscugam1((iim + 1) * (jjm + 1))
-  equivalence (cuvscvgam2, cuvscvgam2_2d), (cvuscugam1, cvuscugam1_2d)
+  real, pointer:: alpha2_2d(:, :) ! (iim + 1, jjm + 1) 
+  real, allocatable, target:: alpha2(:) ! ((iim + 1) * (jjm + 1))
 
-  real cvuscugam2_2d(iim + 1, jjm + 1), cvscuvgam_2d(iim + 1, jjm)
-  real cvuscugam2((iim + 1) * (jjm + 1)), cvscuvgam((iim + 1) * jjm)
-  equivalence (cvuscugam2, cvuscugam2_2d), (cvscuvgam, cvscuvgam_2d)
+  real, pointer:: alpha3_2d(:, :), alpha4_2d(:, :) ! (iim + 1, jjm + 1)
+  real, allocatable, target:: alpha3(:), alpha4(:) ! ((iim + 1) * (jjm + 1))
 
-  real cuscvugam((iim + 1) * (jjm + 1))
-  real cuscvugam_2d(iim + 1, jjm + 1) 
-  equivalence (cuscvugam, cuscvugam_2d)
+  real, pointer:: alpha1p2_2d(:, :) ! (iim + 1, jjm + 1) 
+  real, allocatable, target:: alpha1p2(:) ! ((iim + 1) * (jjm + 1))
 
-  real unsapolnga1, unsapolnga2, unsapolsga1, unsapolsga2                
+  real, pointer:: alpha1p4_2d(:, :), alpha2p3_2d(:, :) ! (iim + 1, jjm + 1)
+  real, allocatable, target:: alpha1p4(:), alpha2p3(:) ! ((iim + 1) * (jjm + 1))
 
-  real unsair_gam1_2d(iim + 1, jjm + 1), unsair_gam2_2d(iim + 1, jjm + 1)
-  real unsair_gam1((iim + 1) * (jjm + 1)), unsair_gam2((iim + 1) * (jjm + 1))
-  equivalence (unsair_gam1, unsair_gam1_2d), (unsair_gam2, unsair_gam2_2d)
+  real, allocatable, target:: alpha3p4(:) ! ((iim + 1) * (jjm + 1))
+  real, pointer:: alpha3p4_2d(:, :) ! (iim + 1, jjm + 1) 
 
-  real unsairz_gam_2d(iim + 1, jjm)
-  real unsairz_gam((iim + 1) * jjm)
-  equivalence (unsairz_gam, unsairz_gam_2d)
+  real, pointer:: fext_2d(:, :) ! (iim + 1, jjm)
+  real, pointer:: constang_2d(:, :) ! (iim + 1, jjm + 1)
+  real, allocatable, target:: fext(:) ! ((iim + 1) * jjm)
+  real, allocatable, target:: constang(:) ! ((iim + 1) * (jjm + 1))
+
+  real, allocatable:: cuvsurcv_2d(:, :) ! (iim + 1, jjm) no dimension
+  
+  real, pointer:: cvsurcuv_2d(:, :) ! (iim + 1, jjm) no dimension
+  real, allocatable, target:: cvsurcuv(:) ! ((iim + 1) * jjm) no dimension
+
+  real, allocatable:: cvusurcu_2d(:, :) ! (iim + 1, jjm + 1) no dimension
+  
+  real, pointer:: cusurcvu_2d(:, :) ! (iim + 1, jjm + 1) no dimension
+  real, allocatable, target:: cusurcvu(:) ! ((iim + 1) * (jjm + 1)) no dimension
+
+  real, pointer:: cuvscvgam1_2d(:, :) ! (iim + 1, jjm)
+  real, allocatable, target:: cuvscvgam1(:) ! ((iim + 1) * jjm)
+
+  real, pointer:: cuvscvgam2_2d(:, :) ! (iim + 1, jjm)
+  real, pointer:: cvuscugam1_2d(:, :) ! (iim + 1, jjm + 1)
+  real, allocatable, target:: cuvscvgam2(:) ! ((iim + 1) * jjm)
+  real, allocatable, target:: cvuscugam1(:) ! ((iim + 1) * (jjm + 1))
+
+  real, pointer:: cvuscugam2_2d(:, :) ! (iim + 1, jjm + 1)
+  real, pointer:: cvscuvgam_2d(:, :) ! (iim + 1, jjm)
+  real, allocatable, target:: cvuscugam2(:) ! ((iim + 1) * (jjm + 1))
+  real, allocatable, target:: cvscuvgam(:) ! ((iim + 1) * jjm)
+
+  real, allocatable, target:: cuscvugam(:) ! ((iim + 1) * (jjm + 1))
+  real, pointer:: cuscvugam_2d(:, :) ! (iim + 1, jjm + 1) 
+
+  real unsapolnga1, unsapolnga2, unsapolsga1, unsapolsga2 
+
+  real, pointer:: unsair_gam1_2d(:, :), unsair_gam2_2d(:, :)
+  ! (iim + 1, jjm + 1)
+
+  real, allocatable, target:: unsair_gam1(:), unsair_gam2(:)
+  ! ((iim + 1) * (jjm + 1))
+
+  real, pointer:: unsairz_gam_2d(:, :) ! (iim + 1, jjm)
+  real, allocatable, target:: unsairz_gam(:) ! ((iim + 1) * jjm)
 
   save
 
@@ -137,6 +127,7 @@ contains
 
     USE comconst, ONLY : g, omeg, rad
     USE comdissnew, ONLY : coefdis, nitergdiv, nitergrot, niterh
+    use dimensions, only: iim, jjm
     use dynetat0_m, only: xprimp025, xprimm025, rlatu1, rlatu2, rlatu, rlatv, &
          yprimu1, yprimu2
     USE paramet_m, ONLY : iip1, jjp1
@@ -154,6 +145,64 @@ contains
     !------------------------------------------------------------------
 
     PRINT *, 'Call sequence information: inigeom'
+
+    allocate(cu((iim + 1) * (jjm + 1)), cv((iim + 1) * jjm))
+    allocate(unscu2((iim + 1) * (jjm + 1)))
+    allocate(unscv2((iim + 1) * jjm))
+    allocate(aire((iim + 1) * (jjm + 1)))
+    allocate(aireu((iim + 1) * (jjm + 1)))
+    allocate(airev((iim + 1) * jjm))
+    allocate(alpha1((iim + 1) * (jjm + 1)))
+    allocate(alpha2((iim + 1) * (jjm + 1)))
+    allocate(alpha3((iim + 1) * (jjm + 1)), alpha4((iim + 1) * (jjm + 1)))
+    allocate(alpha1p2((iim + 1) * (jjm + 1)))
+    allocate(alpha1p4((iim + 1) * (jjm + 1)), alpha2p3((iim + 1) * (jjm + 1)))
+    allocate(alpha3p4((iim + 1) * (jjm + 1)))
+    allocate(fext((iim + 1) * jjm), constang((iim + 1) * (jjm + 1)))
+    allocate(cvsurcuv((iim + 1) * jjm))
+    allocate(cusurcvu((iim + 1) * (jjm + 1)))
+    allocate(cuvscvgam1((iim + 1) * jjm))
+    allocate(cuvscvgam2((iim + 1) * jjm), cvuscugam1((iim + 1) * (jjm + 1)))
+    allocate(cvuscugam2((iim + 1) * (jjm + 1)), cvscuvgam((iim + 1) * jjm))
+    allocate(cuscvugam((iim + 1) * (jjm + 1)))
+    allocate(unsair_gam1((iim + 1) * (jjm + 1)), &
+         unsair_gam2((iim + 1) * (jjm + 1)))
+    allocate(unsairz_gam((iim + 1) * jjm))
+
+    allocate(airesurg_2d(iim + 1, jjm + 1))
+    allocate(unsaire_2d(iim + 1, jjm + 1))
+    allocate(unsairez_2d(iim + 1, jjm))
+    allocate(cuvsurcv_2d(iim + 1, jjm))
+    allocate(cvusurcu_2d(iim + 1, jjm + 1))
+
+    cu_2d(1:iim + 1, 1:jjm + 1) => cu
+    cv_2d(1:iim + 1, 1:jjm) => cv
+    unscu2_2d(1:iim + 1, 1:jjm + 1) => unscu2
+    unscv2_2d(1:iim + 1, 1:jjm) => unscv2
+    aire_2d(1:iim + 1, 1:jjm + 1) => aire
+    aireu_2d(1:iim + 1, 1:jjm + 1) => aireu
+    airev_2d(1:iim + 1, 1:jjm) => airev
+    alpha1_2d(1:iim + 1, 1:jjm + 1) => alpha1
+    alpha2_2d(1:iim + 1, 1:jjm + 1) => alpha2
+    alpha3_2d(1:iim + 1, 1:jjm + 1) => alpha3
+    alpha4_2d(1:iim + 1, 1:jjm + 1) => alpha4
+    alpha1p2_2d(1:iim + 1, 1:jjm + 1) => alpha1p2
+    alpha1p4_2d(1:iim + 1, 1:jjm + 1) => alpha1p4
+    alpha2p3_2d(1:iim + 1, 1:jjm + 1) => alpha2p3
+    alpha3p4_2d(1:iim + 1, 1:jjm + 1) => alpha3p4
+    fext_2d(1:iim + 1, 1:jjm) => fext
+    constang_2d(1:iim + 1, 1:jjm + 1) => constang
+    cvsurcuv_2d(1:iim + 1, 1:jjm) => cvsurcuv
+    cusurcvu_2d(1:iim + 1, 1:jjm + 1) => cusurcvu
+    cuvscvgam1_2d(1:iim + 1, 1:jjm) => cuvscvgam1
+    cuvscvgam2_2d(1:iim + 1, 1:jjm) => cuvscvgam2
+    cvuscugam1_2d(1:iim + 1, 1:jjm + 1) => cvuscugam1
+    cvuscugam2_2d(1:iim + 1, 1:jjm + 1) => cvuscugam2
+    cvscuvgam_2d(1:iim + 1, 1:jjm) => cvscuvgam
+    cuscvugam_2d(1:iim + 1, 1:jjm + 1) => cuscvugam
+    unsair_gam1_2d(1:iim + 1, 1:jjm + 1) => unsair_gam1
+    unsair_gam2_2d(1:iim + 1, 1:jjm + 1) => unsair_gam2
+    unsairz_gam_2d(1:iim + 1, 1:jjm) => unsairz_gam
 
     IF (nitergdiv /= 2) THEN
        gamdi_gdiv = coefdis / (nitergdiv - 2)
@@ -363,7 +412,7 @@ contains
        cuscvugam_2d(iip1, j) = cuscvugam_2d(1, j)
     END DO
 
-    ! Calcul aux pôles 
+    ! Calcul aux pôles
 
     cu_2d(:, 1) = 0.
     unscu2_2d(:, 1) = 0.

@@ -20,6 +20,7 @@ contains
 
     use aaam_bud_m, only: aaam_bud
     USE abort_gcm_m, ONLY: abort_gcm
+    use comgeom, only:  aire_2d
     use ajsec_m, only: ajsec
     use calltherm_m, only: calltherm
     USE clesphys, ONLY: cdhmax, cdmmax, ecrit_ins, ok_instan
@@ -28,12 +29,12 @@ contains
     USE pbl_surface_m, ONLY: pbl_surface
     use clouds_gno_m, only: clouds_gno
     use comconst, only: dtphys
-    USE comgeomphy, ONLY: airephy
     USE concvl_m, ONLY: concvl
     USE conf_gcm_m, ONLY: nday, lmt_pas
     USE conf_phys_m, ONLY: conf_phys
     use conflx_m, only: conflx
     USE ctherm_m, ONLY: iflag_thermals, ctherm
+    use cv30_param_m, only: cv30_param
     use diagcld1_m, only: diagcld1
     USE dimensions, ONLY: llm, nqmx
     USE dimphy, ONLY: klon
@@ -42,6 +43,7 @@ contains
     use dynetat0_chosen_m, only: day_ref, annee_ref
     USE fcttre, ONLY: foeew
     use fisrtilp_m, only: fisrtilp
+    use grid_change, only: dyn_phy
     USE hgardfou_m, ONLY: hgardfou
     USE histsync_m, ONLY: histsync
     USE histwrite_phy_m, ONLY: histwrite_phy
@@ -105,12 +107,12 @@ contains
     ! pour phystoke avec thermiques
     REAL fm_therm(klon, llm + 1)
     REAL entr_therm(klon, llm)
-    real, save:: q2(klon, llm + 1, nbsrf)
+    real, save, allocatable:: q2(:, :, :) ! (klon, llm + 1, nbsrf)
 
     INTEGER, PARAMETER:: ivap = 1 ! indice de traceur pour vapeur d'eau
     INTEGER, PARAMETER:: iliq = 2 ! indice de traceur pour eau liquide
 
-    REAL, save:: t_ancien(klon, llm), q_ancien(klon, llm)
+    REAL, save, allocatable:: t_ancien(:, :), q_ancien(:, :) ! (klon, llm)
     LOGICAL, save:: ancien_ok
 
     REAL d_t_dyn(klon, llm) ! tendance dynamique pour "t" (K / s)
@@ -118,11 +120,11 @@ contains
 
     real da(klon, llm), phi(klon, llm, llm), mp(klon, llm)
 
-    REAL, save:: swdn0(klon, llm + 1), swdn(klon, llm + 1)
-    REAL, save:: swup0(klon, llm + 1), swup(klon, llm + 1)
+    REAL, save, allocatable:: swdn0(:, :), swdn(:, :) ! (klon, llm + 1)
+    REAL, save, allocatable:: swup0(:, :), swup(:, :) ! (klon, llm + 1)
 
-    REAL, save:: lwdn0(klon, llm + 1), lwdn(klon, llm + 1)
-    REAL, save:: lwup0(klon, llm + 1), lwup(klon, llm + 1)
+    REAL, save, allocatable:: lwdn0(:, :), lwdn(:, :) ! (klon, llm + 1)
+    REAL, save, allocatable:: lwup0(:, :), lwup(:, :) ! (klon, llm + 1)
 
     ! prw: precipitable water
     real prw(klon)
@@ -138,46 +140,46 @@ contains
     ! Radiative transfer computations are made every "radpas" call to
     ! "physiq".
 
-    REAL, save:: radsol(klon)
+    REAL, save, allocatable:: radsol(:) ! (klon)
     ! Bilan radiatif net au sol (W/m2), positif vers le bas. Must be
     ! saved because radlwsw is not called at every time step.
 
-    REAL, save:: ftsol(klon, nbsrf) ! skin temperature of surface fraction, in K
+    REAL, save, allocatable:: ftsol(:, :) ! (klon, nbsrf) ! skin temperature of surface fraction, in K
 
-    REAL, save:: ftsoil(klon, nsoilmx, nbsrf)
+    REAL, save, allocatable:: ftsoil(:, :, :) ! (klon, nsoilmx, nbsrf)
     ! temperature of surface fraction inside the ground, in K, layer 1
     ! nearest to the surface
 
     REAL fluxlat(klon, nbsrf) ! flux de chaleur latente, en W m-2
 
-    REAL, save:: fqsurf(klon, nbsrf)
+    REAL, save, allocatable:: fqsurf(:, :) ! (klon, nbsrf)
     ! humidite de l'air au contact de la surface
 
-    REAL, save:: qsol(klon) ! column-density of water in soil, in kg m-2
+    REAL, save, allocatable:: qsol(:) ! (klon) ! column-density of water in soil, in kg m-2
 
-    REAL, save:: fsnow(klon, nbsrf)
+    REAL, save, allocatable:: fsnow(:, :) ! (klon, nbsrf)
     ! column-density of mass of snow at the surface, in kg m-2
 
-    REAL, save:: falbe(klon, nbsrf) ! albedo visible par type de surface
+    REAL, save, allocatable:: falbe(:, :) ! (klon, nbsrf) ! albedo visible par type de surface
 
     ! Param\`etres de l'orographie \`a l'\'echelle sous-maille (OESM) :
-    REAL, save:: zmea(klon) ! orographie moyenne
-    REAL, save:: zstd(klon) ! deviation standard de l'OESM
-    REAL, save:: zsig(klon) ! pente de l'OESM
-    REAL, save:: zgam(klon) ! anisotropie de l'OESM
-    REAL, save:: zthe(klon) ! orientation de l'OESM
-    REAL, save:: zpic(klon) ! Maximum de l'OESM
-    REAL, save:: zval(klon) ! Minimum de l'OESM
-    REAL, save:: rugoro(klon) ! longueur de rugosite de l'OESM
+    REAL, save, allocatable:: zmea(:) ! (klon) ! orographie moyenne
+    REAL, save, allocatable:: zstd(:) ! (klon) ! deviation standard de l'OESM
+    REAL, save, allocatable:: zsig(:) ! (klon) ! pente de l'OESM
+    REAL, save, allocatable:: zgam(:) ! (klon) ! anisotropie de l'OESM
+    REAL, save, allocatable:: zthe(:) ! (klon) ! orientation de l'OESM
+    REAL, save, allocatable:: zpic(:) ! (klon) ! Maximum de l'OESM
+    REAL, save, allocatable:: zval(:) ! (klon) ! Minimum de l'OESM
+    REAL, save, allocatable:: rugoro(:) ! (klon) ! longueur de rugosite de l'OESM
     REAL zulow(klon), zvlow(klon)
     INTEGER ktest(klon)
 
-    REAL, save:: agesno(klon, nbsrf) ! age de la neige
-    REAL, save:: run_off_lic_0(klon)
+    REAL, save, allocatable:: agesno(:, :) ! (klon, nbsrf) ! age de la neige
+    REAL, save, allocatable:: run_off_lic_0(:) ! (klon)
 
     ! Variables li\'ees \`a la convection d'Emanuel :
-    REAL, save:: Ma(klon, llm) ! undilute upward mass flux
-    REAL, save:: sig1(klon, llm), w01(klon, llm)
+    REAL, save, allocatable:: Ma(:, :) ! (klon, llm) ! undilute upward mass flux
+    REAL, save, allocatable:: sig1(:, :), w01(:, :) ! (klon, llm)
 
     ! Variables pour la couche limite (Alain Lahellec) :
     REAL cdragh(klon) ! drag coefficient pour T and Q
@@ -185,7 +187,7 @@ contains
 
     REAL coefh(klon, 2:llm) ! coef d'echange pour phytrac
 
-    REAL, save:: ffonte(klon, nbsrf)
+    REAL, save, allocatable:: ffonte(:, :) ! (klon, nbsrf)
     ! flux thermique utilise pour fondre la neige
 
     REAL fqcalving(klon, nbsrf)
@@ -194,19 +196,19 @@ contains
 
     REAL zxffonte(klon)
 
-    REAL, save:: pfrac_impa(klon, llm)! Produits des coefs lessivage impaction
-    REAL, save:: pfrac_nucl(klon, llm)! Produits des coefs lessivage nucleation
+    REAL, save, allocatable:: pfrac_impa(:, :) ! (klon, llm)! Produits des coefs lessivage impaction
+    REAL, save, allocatable:: pfrac_nucl(:, :) ! (klon, llm)! Produits des coefs lessivage nucleation
 
-    REAL, save:: pfrac_1nucl(klon, llm)
+    REAL, save, allocatable:: pfrac_1nucl(:, :) ! (klon, llm)
     ! Produits des coefs lessi nucl (alpha = 1)
 
     REAL frac_impa(klon, llm) ! fraction d'a\'erosols lessiv\'es (impaction)
     REAL frac_nucl(klon, llm) ! idem (nucleation)
 
-    REAL, save:: rain_fall(klon)
+    REAL, save, allocatable:: rain_fall(:) ! (klon)
     ! liquid water mass flux (kg / m2 / s), positive down
 
-    REAL, save:: snow_fall(klon)
+    REAL, save, allocatable:: snow_fall(:) ! (klon)
     ! solid water mass flux (kg / m2 / s), positive down
 
     REAL rain_tiedtke(klon), snow_tiedtke(klon)
@@ -215,26 +217,26 @@ contains
     real dflux_q(klon) ! derivative of the evaporation flux at the surface
     REAL sens(klon) ! flux de chaleur sensible au sol
     real dflux_t(klon) ! derivee du flux de chaleur sensible au sol
-    REAL, save:: dlw(klon) ! derivative of infra-red flux
+    REAL, save, allocatable:: dlw(:) ! (klon) ! derivative of infra-red flux
     REAL fder(klon) ! d\'erive de flux (sensible et latente)
     REAL ve(klon) ! integr. verticale du transport meri. de l'energie
     REAL vq(klon) ! integr. verticale du transport meri. de l'eau
     REAL ue(klon) ! integr. verticale du transport zonal de l'energie
     REAL uq(klon) ! integr. verticale du transport zonal de l'eau
 
-    REAL, save:: frugs(klon, nbsrf) ! longueur de rugosite
+    REAL, save, allocatable:: frugs(:, :) ! (klon, nbsrf) ! longueur de rugosite
     REAL zxrugs(klon) ! longueur de rugosite
 
     ! Conditions aux limites
 
     INTEGER julien
-    REAL, save:: pctsrf(klon, nbsrf) ! percentage of surface
-    REAL, save:: albsol(klon) ! albedo du sol total, visible, moyen par maille
-    REAL, SAVE:: wo(klon, llm) ! column density of ozone in a cell, in kDU
+    REAL, save, allocatable:: pctsrf(:, :) ! (klon, nbsrf) ! percentage of surface
+    REAL, save, allocatable:: albsol(:) ! (klon) ! albedo du sol total, visible, moyen par maille
+    REAL, SAVE, ALLOCATABLE:: wo(:, :) ! (klon, llm) ! column density of ozone in a cell, in kDU
     real, parameter:: dobson_u = 2.1415e-05 ! Dobson unit, in kg m-2
 
-    real, save:: clwcon(klon, llm), rnebcon(klon, llm)
-    real, save:: clwcon0(klon, llm), rnebcon0(klon, llm)
+    real, save, allocatable:: clwcon(:, :), rnebcon(:, :) ! (klon, llm)
+    real, save, allocatable:: clwcon0(:, :), rnebcon0(:, :) ! (klon, llm)
 
     REAL rhcl(klon, llm) ! humidit\'e relative ciel clair
     REAL dialiq(klon, llm) ! eau liquide nuageuse
@@ -255,15 +257,15 @@ contains
 
     ! Le rayonnement n'est pas calcul\'e tous les pas, il faut donc que
     ! les variables soient r\'emanentes.
-    REAL, save:: heat(klon, llm) ! chauffage solaire
-    REAL, save:: heat0(klon, llm) ! chauffage solaire ciel clair
-    REAL, save:: cool(klon, llm) ! refroidissement infrarouge
-    REAL, save:: cool0(klon, llm) ! refroidissement infrarouge ciel clair
-    REAL, save:: topsw(klon), toplw(klon), solsw(klon)
+    REAL, save, allocatable:: heat(:, :) ! (klon, llm) ! chauffage solaire
+    REAL, save, allocatable:: heat0(:, :) ! (klon, llm) ! chauffage solaire ciel clair
+    REAL, save, allocatable:: cool(:, :) ! (klon, llm) ! refroidissement infrarouge
+    REAL, save, allocatable:: cool0(:, :) ! (klon, llm) ! refroidissement infrarouge ciel clair
+    REAL, save, allocatable:: topsw(:), toplw(:), solsw(:) ! (klon)
 
-    REAL, save:: sollw(klon) ! surface net downward longwave flux, in W m-2
-    real, save:: sollwdown(klon) ! downwelling longwave flux at surface
-    REAL, save:: topsw0(klon), toplw0(klon), solsw0(klon), sollw0(klon)
+    REAL, save, allocatable:: sollw(:) ! (klon) ! surface net downward longwave flux, in W m-2
+    real, save, allocatable:: sollwdown(:) ! (klon) ! downwelling longwave flux at surface
+    REAL, save, allocatable:: topsw0(:), toplw0(:), solsw0(:), sollw0(:) ! (klon)
 
     REAL conv_q(klon, llm) ! convergence de l'humidite (kg / kg / s)
     REAL conv_t(klon, llm) ! convergence of temperature (K / s)
@@ -284,13 +286,13 @@ contains
 
     ! cf. Anne Mathieu, variables pour la couche limite atmosphérique (hbtm)
 
-    REAL, SAVE:: pblh(klon, nbsrf) ! Hauteur de couche limite
-    REAL, SAVE:: plcl(klon, nbsrf) ! Niveau de condensation de la CLA
-    REAL, SAVE:: capCL(klon, nbsrf) ! CAPE de couche limite
-    REAL, SAVE:: oliqCL(klon, nbsrf) ! eau_liqu integree de couche limite
-    REAL, SAVE:: cteiCL(klon, nbsrf) ! cloud top instab. crit. couche limite
-    REAL, SAVE:: pblt(klon, nbsrf) ! T \`a la hauteur de couche limite
-    REAL, SAVE:: therm(klon, nbsrf)
+    REAL, SAVE, ALLOCATABLE:: pblh(:, :) ! (klon, nbsrf) ! Hauteur de couche limite
+    REAL, SAVE, ALLOCATABLE:: plcl(:, :) ! (klon, nbsrf) ! Niveau de condensation de la CLA
+    REAL, SAVE, ALLOCATABLE:: capCL(:, :) ! (klon, nbsrf) ! CAPE de couche limite
+    REAL, SAVE, ALLOCATABLE:: oliqCL(:, :) ! (klon, nbsrf) ! eau_liqu integree de couche limite
+    REAL, SAVE, ALLOCATABLE:: cteiCL(:, :) ! (klon, nbsrf) ! cloud top instab. crit. couche limite
+    REAL, SAVE, ALLOCATABLE:: pblt(:, :) ! (klon, nbsrf) ! T \`a la hauteur de couche limite
+    REAL, SAVE, ALLOCATABLE:: therm(:, :) ! (klon, nbsrf)
     ! Grandeurs de sorties
     REAL s_pblh(klon), s_lcl(klon), s_capCL(klon)
     REAL s_oliqCL(klon), s_cteiCL(klon), s_pblt(klon)
@@ -300,7 +302,7 @@ contains
 
     REAL upwd(klon, llm) ! saturated updraft mass flux
     REAL dnwd(klon, llm) ! saturated downdraft mass flux
-    REAL, save:: cape(klon)
+    REAL, save, allocatable:: cape(:) ! (klon)
 
     INTEGER iflagctrl(klon) ! flag fonctionnement de convect
 
@@ -325,7 +327,7 @@ contains
     REAL pmflxr(klon, llm + 1), pmflxs(klon, llm + 1)
     REAL prfl(klon, llm + 1), psfl(klon, llm + 1)
 
-    INTEGER, save:: ibas_con(klon), itop_con(klon)
+    INTEGER, save, allocatable:: ibas_con(:), itop_con(:) ! (klon)
     real ema_pct(klon) ! Emanuel pressure at cloud top, in Pa
 
     REAL rain_con(klon)
@@ -341,7 +343,7 @@ contains
     REAL d_u_lif(klon, llm), d_v_lif(klon, llm)
     REAL d_t_lif(klon, llm)
 
-    REAL, save:: ratqs(klon, llm)
+    REAL, save, allocatable:: ratqs(:, :) ! (klon, llm)
     real ratqss(klon, llm), ratqsc(klon, llm)
     real:: ratqsbas = 0.01, ratqshaut = 0.3
 
@@ -381,10 +383,10 @@ contains
     ! tendance due \`a la conversion d'\'energie cin\'etique en
     ! énergie thermique
 
-    REAL, save:: t2m(klon, nbsrf), q2m(klon, nbsrf) 
+    REAL, save, allocatable:: t2m(:, :), q2m(:, :) ! (klon, nbsrf) 
     ! temperature and humidity at 2 m
 
-    REAL, save:: u10m_srf(klon, nbsrf), v10m_srf(klon, nbsrf)
+    REAL, save, allocatable:: u10m_srf(:, :), v10m_srf(:, :) ! (klon, nbsrf)
     ! composantes du vent \`a 10 m
 
     REAL zt2m(klon), zq2m(klon) ! température, humidité 2 m moyenne sur 1 maille
@@ -392,7 +394,7 @@ contains
 
     ! Aerosol effects:
 
-    REAL, save:: topswad(klon), solswad(klon) ! aerosol direct effect
+    REAL, save, allocatable:: topswad(:), solswad(:) ! (klon) ! aerosol direct effect
     LOGICAL:: ok_ade = .false. ! apply aerosol direct effect
 
     REAL:: bl95_b0 = 2., bl95_b1 = 0.2
@@ -404,6 +406,7 @@ contains
     ! (column-density of mass of air in a cell, in kg m-2)
 
     integer, save:: ncid_startphy
+    real, save, allocatable:: airephy(:) ! (klon)
 
     namelist /physiq_nml/ fact_cldcon, facttemps, iflag_cldcon, ratqsbas, &
          ratqshaut, ok_ade, bl95_b0, bl95_b1
@@ -414,6 +417,55 @@ contains
          'eaux vapeur et liquide sont indispensables')
 
     test_firstcal: IF (firstcal) THEN
+       allocate(q2(klon, llm + 1, nbsrf))
+       allocate(t_ancien(klon, llm), q_ancien(klon, llm))
+       allocate(swdn0(klon, llm + 1), swdn(klon, llm + 1))
+       allocate(swup0(klon, llm + 1), swup(klon, llm + 1))
+       allocate(lwdn0(klon, llm + 1), lwdn(klon, llm + 1))
+       allocate(lwup0(klon, llm + 1), lwup(klon, llm + 1))
+       allocate(radsol(klon))
+       allocate(ftsol(klon, nbsrf))
+       allocate(ftsoil(klon, nsoilmx, nbsrf))
+       allocate(fqsurf(klon, nbsrf))
+       allocate(qsol(klon))
+       allocate(fsnow(klon, nbsrf))
+       allocate(falbe(klon, nbsrf))
+       allocate(zmea(klon))
+       allocate(zstd(klon))
+       allocate(zsig(klon))
+       allocate(zgam(klon))
+       allocate(zthe(klon))
+       allocate(zpic(klon))
+       allocate(zval(klon))
+       allocate(rugoro(klon))
+       allocate(agesno(klon, nbsrf))
+       allocate(run_off_lic_0(klon))
+       allocate(Ma(klon, llm))
+       allocate(sig1(klon, llm), w01(klon, llm))
+       allocate(ffonte(klon, nbsrf))
+       allocate(pfrac_impa(klon, llm))
+       allocate(pfrac_nucl(klon, llm))
+       allocate(pfrac_1nucl(klon, llm))
+       allocate(rain_fall(klon))
+       allocate(snow_fall(klon))
+       allocate(dlw(klon))
+       allocate(frugs(klon, nbsrf))
+       allocate(pctsrf(klon, nbsrf))
+       allocate(albsol(klon))
+       ALLOCATE(wo(klon, llm))
+       allocate(clwcon(klon, llm), rnebcon(klon, llm))
+       allocate(clwcon0(klon, llm), rnebcon0(klon, llm))
+       ALLOCATE(pblh(klon, nbsrf))
+       ALLOCATE(plcl(klon, nbsrf))
+       ALLOCATE(capCL(klon, nbsrf))
+       ALLOCATE(oliqCL(klon, nbsrf))
+       ALLOCATE(cteiCL(klon, nbsrf))
+       ALLOCATE(pblt(klon, nbsrf))
+       ALLOCATE(therm(klon, nbsrf))
+       allocate(cape(klon))
+       allocate(ibas_con(klon), itop_con(klon))
+       allocate(ratqs(klon, llm))
+
        ! initialiser
        u10m_srf = 0.
        v10m_srf = 0.
@@ -459,6 +511,7 @@ contains
        IF (conv_emanuel) THEN
           ibas_con = 1
           itop_con = 1
+          CALL cv30_param
        ENDIF
 
        IF (ok_orodr) THEN
@@ -472,6 +525,7 @@ contains
        call ini_histins
        CALL phyredem0(itau_phy + nday * lmt_pas)
        call conf_interface
+       airephy = pack(aire_2d, dyn_phy)
     ENDIF test_firstcal
 
     ! We will modify variables *_seri and we will not touch variables

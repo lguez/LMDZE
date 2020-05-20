@@ -9,34 +9,35 @@ contains
 
     USE clesphys, only: rco2
     USE suphec_m, only: rg
-    USE raddim, only: kdlon, kflev
+    use conf_phys_m, only: kdlon
+    use dimensions, only: llm
     USE radepsi, only: zepscq, zepsec
     USE radopt, only: novlp
 
     ! ARGUMENTS:
 
     DOUBLE PRECISION, intent(in):: psct
-    DOUBLE PRECISION, intent(in):: pcldsw(kdlon, kflev)
-    DOUBLE PRECISION, intent(in):: ppmb(kdlon, kflev + 1)
+    DOUBLE PRECISION, intent(in):: pcldsw(kdlon, llm)
+    DOUBLE PRECISION, intent(in):: ppmb(kdlon, llm + 1)
     DOUBLE PRECISION, intent(in):: ppsol(kdlon)
     DOUBLE PRECISION, intent(in):: prmu0(kdlon)
     DOUBLE PRECISION, intent(in):: pfrac(kdlon)
-    DOUBLE PRECISION, intent(in):: ptave(kdlon, kflev)
-    DOUBLE PRECISION, intent(in):: pwv(kdlon, kflev)
+    DOUBLE PRECISION, intent(in):: ptave(kdlon, llm)
+    DOUBLE PRECISION, intent(in):: pwv(kdlon, llm)
 
     DOUBLE PRECISION paki(kdlon, 2)
-    DOUBLE PRECISION pcld(kdlon, kflev)
+    DOUBLE PRECISION pcld(kdlon, llm)
     DOUBLE PRECISION pclear(kdlon)
-    DOUBLE PRECISION pdsig(kdlon, kflev)
+    DOUBLE PRECISION pdsig(kdlon, llm)
     DOUBLE PRECISION pfact(kdlon)
     DOUBLE PRECISION prmu(kdlon)
     DOUBLE PRECISION psec(kdlon)
-    DOUBLE PRECISION pud(kdlon, 5, kflev + 1)
+    DOUBLE PRECISION pud(kdlon, 5, llm + 1)
 
     ! Local:
 
     INTEGER iind(2)
-    DOUBLE PRECISION zc1j(kdlon, kflev + 1)
+    DOUBLE PRECISION zc1j(kdlon, llm + 1)
     DOUBLE PRECISION zclear(kdlon)
     DOUBLE PRECISION zcloud(kdlon)
     DOUBLE PRECISION zn175(kdlon)
@@ -75,15 +76,15 @@ contains
     ! 1.1 INITIALIZES QUANTITIES
 
     DO jl = 1, kdlon
-       pud(jl, 1, kflev + 1) = 0.
-       pud(jl, 2, kflev + 1) = 0.
-       pud(jl, 3, kflev + 1) = 0.
-       pud(jl, 4, kflev + 1) = 0.
-       pud(jl, 5, kflev + 1) = 0.
+       pud(jl, 1, llm + 1) = 0.
+       pud(jl, 2, llm + 1) = 0.
+       pud(jl, 3, llm + 1) = 0.
+       pud(jl, 4, llm + 1) = 0.
+       pud(jl, 5, llm + 1) = 0.
        pfact(jl) = prmu0(jl) * pfrac(jl) * psct
        prmu(jl) = sqrt(1224. * prmu0(jl) * prmu0(jl) + 1.) / 35.
        psec(jl) = 1. / prmu(jl)
-       zc1j(jl, kflev + 1) = 0.
+       zc1j(jl, llm + 1) = 0.
     END DO
 
     ! 1.3 AMOUNTS OF ABSORBERS
@@ -98,9 +99,9 @@ contains
        zcloud(jl) = 0.
     END DO
 
-    DO jk = 1, kflev
+    DO jk = 1, llm
        jkp1 = jk + 1
-       jkl = kflev + 1 - jk
+       jkl = llm + 1 - jk
        DO jl = 1, kdlon
           zrth = (rth2o / ptave(jl, jk))**rtdh2o
           zrtu = (rtumg / ptave(jl, jk))**rtdumg
@@ -143,7 +144,7 @@ contains
     DO jl = 1, kdlon
        pclear(jl) = 1. - zc1j(jl, 1)
     END DO
-    DO jk = 1, kflev
+    DO jk = 1, llm
        DO jl = 1, kdlon
           IF (pclear(jl)<1.) THEN
              pcld(jl, jk) = pcldsw(jl, jk) / (1. - pclear(jl))

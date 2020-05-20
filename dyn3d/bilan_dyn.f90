@@ -50,13 +50,13 @@ contains
     real Q(iip1, jjp1, llm, nQ)
 
     ! Champs cumul\'es
-    real, save:: ps_cum(iip1, jjp1)
-    real, save:: masse_cum(iip1, jjp1, llm)
-    real, save:: flux_u_cum(iip1, jjp1, llm)
-    real, save:: flux_v_cum(iip1, jjm, llm)
-    real, save:: Q_cum(iip1, jjp1, llm, nQ)
-    real, save:: flux_uQ_cum(iip1, jjp1, llm, nQ)
-    real, save:: flux_vQ_cum(iip1, jjm, llm, nQ)
+    real, save, allocatable:: ps_cum(:, :) ! (iip1, jjp1)
+    real, save, allocatable:: masse_cum(:, :, :) ! (iip1, jjp1, llm)
+    real, save, allocatable:: flux_u_cum(:, :, :) ! (iip1, jjp1, llm)
+    real, save, allocatable:: flux_v_cum(:, :, :) ! (iip1, jjm, llm)
+    real, save, allocatable:: Q_cum(:, :, :, :) ! (iip1, jjp1, llm, nQ)
+    real, save, allocatable:: flux_uQ_cum(:, :, :, :) ! (iip1, jjp1, llm, nQ)
+    real, save, allocatable:: flux_vQ_cum(:, :, :, :) ! (iip1, jjm, llm, nQ)
 
     ! champs de tansport en moyenne zonale
     integer itr
@@ -69,6 +69,16 @@ contains
     integer i, j, l, iQ
 
     !-----------------------------------------------------------------
+
+    if (itau == 0) then
+       allocate(ps_cum(iip1, jjp1))
+       allocate(masse_cum(iip1, jjp1, llm))
+       allocate(flux_u_cum(iip1, jjp1, llm))
+       allocate(flux_v_cum(iip1, jjm, llm))
+       allocate(Q_cum(iip1, jjp1, llm, nQ))
+       allocate(flux_uQ_cum(iip1, jjp1, llm, nQ))
+       allocate(flux_vQ_cum(iip1, jjm, llm, nQ))
+    end if
 
     ! Calcul des champs dynamiques
 

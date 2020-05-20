@@ -1,36 +1,31 @@
 module regr_pr_comb_coefoz_m
 
-  use dimensions, only: llm
-  use dimphy, only: klon
-
   implicit none
 
   ! The five module variables declared here are on the "physics" grid.
   ! The value of each variable for index "(i, k)" is at longitude
   ! "rlon(i)", latitude "rlat(i)" and middle of layer "k".
 
-  real, save:: c_Mob(klon, llm)
+  real, save, allocatable, protected:: c_Mob(:, :) ! (klon, llm)
   ! (sum of Mobidic terms in the net mass production rate of ozone
   ! by chemistry, per unit mass of air, in s-1)
 
-  real, save:: a2(klon, llm)
+  real, save, allocatable, protected:: a2(:, :) ! (klon, llm)
   ! (derivative of mass production rate of ozone per unit mass of
   ! air with respect to ozone mass fraction, in s-1)
 
-  real, save:: a4_mass(klon, llm)
+  real, save, allocatable, protected:: a4_mass(:, :) ! (klon, llm)
   ! (derivative of mass production rate of ozone per unit mass of
   ! air with respect to temperature, in s-1 K-1)
 
-  real, save:: a6_mass(klon, llm)
+  real, save, allocatable, protected:: a6_mass(:, :) ! (klon, llm)
   ! (derivative of mass production rate of ozone per unit mass of
   ! air with respect to mass column-density of ozone above, in m2 s-1 kg-1)
 
-  real, save:: r_het_interm(klon, llm)
+  real, save, allocatable, protected:: r_het_interm(:, :) ! (klon, llm)
   ! (net mass production rate by heterogeneous chemistry, per unit
   ! mass of ozone, corrected for chlorine content and latitude, but
   ! not for temperature and sun direction, in s-1)
-
-  private klon, llm
 
 contains
 
@@ -46,6 +41,8 @@ contains
     ! -- packs the coefficients to the "physics" horizontal grid ;
     ! -- combines the eight coefficients to define the five module variables.
 
+    use dimensions, only: llm
+    use dimphy, only: klon
     use netcdf, only: nf90_nowrite
     use netcdf95, only: nf95_open, nf95_close
     use phyetat0_m, only: rlat
@@ -127,5 +124,19 @@ contains
     call nf95_close(ncid)
 
   end subroutine regr_pr_comb_coefoz
+
+  !**********************************************************************
+
+  subroutine init
+
+    use dimensions, only: llm
+    use dimphy, only: klon
+
+    !----------------------------------------------------------------
+
+    allocate(c_Mob(klon, llm), a2(klon, llm), a4_mass(klon, llm), &
+         a6_mass(klon, llm), r_het_interm(klon, llm))
+
+  end subroutine init
 
 end module regr_pr_comb_coefoz_m

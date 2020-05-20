@@ -30,7 +30,7 @@ contains
     integer:: jour_lu_sur = - 1
 
     ! Champs lus dans le fichier de conditions aux limites :
-    real, save:: alb_lu(klon), rug_lu(klon)
+    real, save, allocatable:: alb_lu(:), rug_lu(:) ! (klon)
 
     integer ncid, varid
 
@@ -38,6 +38,7 @@ contains
 
     ! Tester d'abord si c'est le moment de lire le fichier
     if (mod(itap - 1, lmt_pas) == 0 .and. jour /= jour_lu_sur) then
+       if (itap == 1) allocate(alb_lu(klon), rug_lu(klon))
        call NF95_OPEN('limit.nc', NF90_NOWRITE, ncid)
 
        ! Lecture Albedo

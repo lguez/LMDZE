@@ -45,8 +45,8 @@
 
       REAL convpn,convps,convmpn,convmps
       real massepn,masseps,qpn,qps
-      REAL sinlon(iip1),sinlondlon(iip1)
-      REAL coslon(iip1),coslondlon(iip1)
+      REAL, allocatable:: sinlon(:),sinlondlon(:) ! (iip1)
+      REAL, allocatable:: coslon(:),coslondlon(:) ! (iip1)
       SAVE sinlon,coslon,sinlondlon,coslondlon
       SAVE airej2,airejjm
 !
@@ -56,6 +56,7 @@
       DATA first/.true./
 
       IF(first) THEN
+         allocate(sinlon(iip1),sinlondlon(iip1), coslon(iip1),coslondlon(iip1))
          PRINT*,'Shema  Amont nouveau  appele dans  Vanleer   '
          first=.false.
          do i=2,iip1

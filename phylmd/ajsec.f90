@@ -22,27 +22,27 @@ contains
     REAL, intent(out):: d_q(klon, klev)
 
     ! Local:
-    INTEGER, PARAMETER:: limbas=1, limhau=klev ! les couches à ajuster
+    INTEGER, PARAMETER:: limbas=1 ! les couches à ajuster
     LOGICAL, PARAMETER:: mixq = .FALSE.
-    REAL, dimension(klon, limbas: limhau):: zh, zq, zpk, zpkdp
+    REAL, dimension(klon, limbas: klev):: zh, zq, zpk, zpkdp
     REAL hm, sm, qm
     LOGICAL down
     INTEGER i, k, k1, k2
 
     !--------------------------------------------------------------------
 
-    zpk = pplay(:, limbas: limhau)**RKAPPA
-    zh = RCPD * t(:, limbas: limhau) / zpk
-    zq = q(:, limbas: limhau)
-    forall (k = limbas: limhau) &
+    zpk = pplay(:, limbas: klev)**RKAPPA
+    zh = RCPD * t(:, limbas: klev) / zpk
+    zq = q(:, limbas: klev)
+    forall (k = limbas: klev) &
          zpkdp(:, k) = zpk(:, k) * (paprs(:, k) - paprs(:, k+1))
 
     ! Correction des profils instables :
     DO i = 1, klon
-       IF (any((/(zh(i, k) < zh(i, k - 1), k = limbas + 1, limhau)/))) THEN
+       IF (any((/(zh(i, k) < zh(i, k - 1), k = limbas + 1, klev)/))) THEN
           ! Profil instable, à modifier
           k2 = limbas
-          do while (k2 <= limhau - 1)
+          do while (k2 <= klev - 1)
              k2 = k2 + 1
              IF (zh(i, k2) < zh(i, k2-1)) THEN
                 k1 = k2 - 1
@@ -62,7 +62,7 @@ contains
                       k1 = k1 - 1
                       k = k1
                    ELSE
-                      IF (k2 == limhau) exit
+                      IF (k2 == klev) exit
                       IF (zh(i, k2 + 1) >= hm) exit
                       k2 = k2 + 1
                       k = k2
@@ -81,13 +81,13 @@ contains
     end DO
 
     d_t(:, : limbas - 1) = 0.
-    d_t(:, limbas: limhau) = zh * zpk / RCPD - t(:, limbas: limhau)
-    d_t(:, limhau + 1:) = 0.
+    d_t(:, limbas: klev) = zh * zpk / RCPD - t(:, limbas: klev)
+    d_t(:, klev + 1:) = 0.
 
     if (mixq) then
        d_q(:, : limbas - 1) = 0.
-       d_q(:, limbas: limhau) = zq - q(:, limbas: limhau)
-       d_q(:, limhau + 1:) = 0.
+       d_q(:, limbas: klev) = zq - q(:, limbas: klev)
+       d_q(:, klev + 1:) = 0.
     else
        d_q = 0.
     end if

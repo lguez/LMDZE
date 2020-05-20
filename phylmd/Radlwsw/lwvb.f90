@@ -3,7 +3,7 @@ SUBROUTINE lwvb(kuaer, ktraer, klim, pabcu, padjd, padju, pb, pbint, pbsui, &
     pgatop, pgbtop, pcts, pfluc)
   USE dimensions
   USE dimphy
-  USE raddim
+  use conf_phys_m, only: kdlon
   USE radopt
   USE raddimlw
   IMPLICIT NONE
@@ -44,27 +44,27 @@ SUBROUTINE lwvb(kuaer, ktraer, klim, pabcu, padjd, padju, pb, pbint, pbsui, &
 
   INTEGER kuaer, ktraer, klim
 
-  DOUBLE PRECISION pabcu(kdlon, nua, 3*kflev+1) ! ABSORBER AMOUNTS
-  DOUBLE PRECISION padjd(kdlon, kflev+1) ! CONTRIBUTION BY ADJACENT LAYERS
-  DOUBLE PRECISION padju(kdlon, kflev+1) ! CONTRIBUTION BY ADJACENT LAYERS
-  DOUBLE PRECISION pb(kdlon, ninter, kflev+1) ! SPECTRAL HALF-LEVEL PLANCK FUNCTIONS
-  DOUBLE PRECISION pbint(kdlon, kflev+1) ! HALF-LEVEL PLANCK FUNCTIONS
+  DOUBLE PRECISION pabcu(kdlon, nua, 3*llm+1) ! ABSORBER AMOUNTS
+  DOUBLE PRECISION padjd(kdlon, llm+1) ! CONTRIBUTION BY ADJACENT LAYERS
+  DOUBLE PRECISION padju(kdlon, llm+1) ! CONTRIBUTION BY ADJACENT LAYERS
+  DOUBLE PRECISION pb(kdlon, ninter, llm+1) ! SPECTRAL HALF-LEVEL PLANCK FUNCTIONS
+  DOUBLE PRECISION pbint(kdlon, llm+1) ! HALF-LEVEL PLANCK FUNCTIONS
   DOUBLE PRECISION pbsur(kdlon, ninter) ! SPECTRAL SURFACE PLANCK FUNCTION
   DOUBLE PRECISION pbsui(kdlon) ! SURFACE PLANCK FUNCTION
   DOUBLE PRECISION pbtop(kdlon, ninter) ! SPECTRAL T.O.A. PLANCK FUNCTION
-  DOUBLE PRECISION pdisd(kdlon, kflev+1) ! CONTRIBUTION BY DISTANT LAYERS
-  DOUBLE PRECISION pdisu(kdlon, kflev+1) ! CONTRIBUTION BY DISTANT LAYERS
+  DOUBLE PRECISION pdisd(kdlon, llm+1) ! CONTRIBUTION BY DISTANT LAYERS
+  DOUBLE PRECISION pdisu(kdlon, llm+1) ! CONTRIBUTION BY DISTANT LAYERS
   DOUBLE PRECISION pemis(kdlon) ! SURFACE EMISSIVITY
-  DOUBLE PRECISION ppmb(kdlon, kflev+1) ! PRESSURE MB
-  DOUBLE PRECISION pga(kdlon, 8, 2, kflev) ! PADE APPROXIMANTS
-  DOUBLE PRECISION pgb(kdlon, 8, 2, kflev) ! PADE APPROXIMANTS
+  DOUBLE PRECISION ppmb(kdlon, llm+1) ! PRESSURE MB
+  DOUBLE PRECISION pga(kdlon, 8, 2, llm) ! PADE APPROXIMANTS
+  DOUBLE PRECISION pgb(kdlon, 8, 2, llm) ! PADE APPROXIMANTS
   DOUBLE PRECISION pgasur(kdlon, 8, 2) ! SURFACE PADE APPROXIMANTS
   DOUBLE PRECISION pgbsur(kdlon, 8, 2) ! SURFACE PADE APPROXIMANTS
   DOUBLE PRECISION pgatop(kdlon, 8, 2) ! T.O.A. PADE APPROXIMANTS
   DOUBLE PRECISION pgbtop(kdlon, 8, 2) ! T.O.A. PADE APPROXIMANTS
 
-  DOUBLE PRECISION pfluc(kdlon, 2, kflev+1) ! CLEAR-SKY RADIATIVE FLUXES
-  DOUBLE PRECISION pcts(kdlon, kflev) ! COOLING-TO-SPACE TERM
+  DOUBLE PRECISION pfluc(kdlon, 2, llm+1) ! CLEAR-SKY RADIATIVE FLUXES
+  DOUBLE PRECISION pcts(kdlon, llm) ! COOLING-TO-SPACE TERM
 
   ! * LOCAL VARIABLES:
 
@@ -115,7 +115,7 @@ SUBROUTINE lwvb(kuaer, ktraer, klim, pabcu, padjd, padju, pb, pbint, pbsui, &
   ! -----------------------------------
 
 
-  DO jk = 1, kflev
+  DO jk = 1, llm
     in = (jk-1)*ng1p1 + 1
 
     DO ja = 1, kuaer
@@ -140,7 +140,7 @@ SUBROUTINE lwvb(kuaer, ktraer, klim, pabcu, padjd, padju, pb, pbint, pbsui, &
 
   END DO
 
-  jk = kflev + 1
+  jk = llm + 1
   in = (jk-1)*ng1p1 + 1
 
   DO jl = 1, kdlon
@@ -159,10 +159,10 @@ SUBROUTINE lwvb(kuaer, ktraer, klim, pabcu, padjd, padju, pb, pbint, pbsui, &
   ! --------------
 
 
-  jlim = kflev
+  jlim = llm
 
   IF (.NOT. levoigt) THEN
-    DO jk = kflev, 1, -1
+    DO jk = llm, 1, -1
       IF (ppmb(1,jk)<10.0) THEN
         jlim = jk
       END IF
@@ -181,7 +181,7 @@ SUBROUTINE lwvb(kuaer, ktraer, klim, pabcu, padjd, padju, pb, pbint, pbsui, &
     ! -----------------------------
 
 
-    DO jstra = kflev, jlim, -1
+    DO jstra = llm, jlim, -1
       jstru = (jstra-1)*ng1p1 + 1
 
       DO ja = 1, kuaer
@@ -215,7 +215,7 @@ SUBROUTINE lwvb(kuaer, ktraer, klim, pabcu, padjd, padju, pb, pbint, pbsui, &
   END IF
   ! Mise a zero de securite pour PCTS en cas de LEVOIGT
   IF (levoigt) THEN
-    DO jstra = 1, kflev
+    DO jstra = 1, llm
       DO jl = 1, kdlon
         pcts(jl, jstra) = 0.
       END DO
@@ -243,7 +243,7 @@ SUBROUTINE lwvb(kuaer, ktraer, klim, pabcu, padjd, padju, pb, pbint, pbsui, &
     pfluc(jl, 1, jk) = zfu(jl)
   END DO
 
-  DO jk = 2, kflev + 1
+  DO jk = 2, llm + 1
     in = (jk-1)*ng1p1 + 1
 
 
@@ -281,7 +281,7 @@ SUBROUTINE lwvb(kuaer, ktraer, klim, pabcu, padjd, padju, pb, pbint, pbsui, &
     DO jl = 1, kdlon
       zfn10(jl) = pfluc(jl, 1, jlim) + pfluc(jl, 2, jlim)
     END DO
-    DO jk = jlim + 1, kflev + 1
+    DO jk = jlim + 1, llm + 1
       DO jl = 1, kdlon
         zfn10(jl) = zfn10(jl) + pcts(jl, jk-1)
         pfluc(jl, 1, jk) = zfn10(jl)

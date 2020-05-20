@@ -1,7 +1,5 @@
 module conf_guide_m
 
-  USE dimensions, ONLY: iim, jjm
-
   IMPLICIT NONE
 
   LOGICAL:: ini_anal = .false. ! Initial = analyse
@@ -15,11 +13,9 @@ module conf_guide_m
   ! alpha détermine la part des injections de données à chaque étape
   ! alpha=0 signifie pas d'injection
   ! alpha=1 signifie injection totale
-  REAL, save:: alpha_q(iim + 1, jjm + 1)
-  REAL, save:: alpha_t(iim + 1, jjm + 1)
-  REAL, save:: alpha_u(iim + 1, jjm + 1), alpha_v(iim + 1, jjm)
-
-  private iim, jjm
+  REAL, save, allocatable, protected:: alpha_q(:, :), alpha_t(:, :), &
+       alpha_u(:, :) ! (iim + 1, jjm + 1)
+  REAL, save, allocatable, protected:: alpha_v(:, :) ! (iim + 1, jjm)
 
 contains
 
@@ -29,6 +25,7 @@ contains
     !  Parametres de controle du run:
 
     use comconst, only: daysec, dtvr
+    USE dimensions, ONLY: iim, jjm
     use conf_gcm_m, only: day_step, iperiod
     use dynetat0_m, only: rlatu, rlatv
     use dynetat0_chosen_m, only: grossismx, grossismy
@@ -61,6 +58,10 @@ contains
     !-----------------------------------------------------------------------
 
     print *, "Call sequence information: conf_guide"
+
+    allocate(alpha_q(iim + 1, jjm + 1))
+    allocate(alpha_t(iim + 1, jjm + 1))
+    allocate(alpha_u(iim + 1, jjm + 1), alpha_v(iim + 1, jjm))
 
     ! Default values:
     tau_min_u = 0.03

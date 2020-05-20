@@ -30,8 +30,9 @@ contains
     ! Variables locales
 
     REAL massebx(ip1jmp1, llm), masseby(ip1jm, llm)
-    REAL, save:: pbaruc(ip1jmp1, llm), pbarvc(ip1jm, llm)
-    REAL, save:: massem(ip1jmp1, llm)
+    REAL, save, allocatable:: pbaruc(:, :) ! (ip1jmp1, llm)
+    REAL, save, allocatable:: pbarvc(:, :) ! (ip1jm, llm)
+    REAL, save, allocatable:: massem(:, :) ! (ip1jmp1, llm)
     real zdp(ip1jmp1)
     REAL pbarug(ip1jmp1, llm), pbarvg(ip1jm, llm), wg(ip1jmp1, llm)
 
@@ -43,8 +44,15 @@ contains
     INTEGER indice, n
     ! Pas de temps adaptatif pour que CFL < 1 
     REAL dtbon
+    logical:: first_call = .true.
 
     !-----------------------------------------------------------
+
+    if (first_call) then
+       allocate(pbaruc(ip1jmp1, llm), pbarvc(ip1jm, llm))
+       allocate(massem(ip1jmp1, llm))
+       first_call = .false.
+    end if
 
     IF (iadvtr==0) THEN
        CALL initial0(ijp1llm, pbaruc)
@@ -105,7 +113,7 @@ contains
           case (10)
              ! Schema de Van Leer I MUSCL
              CALL vlsplt(q(:, :, iq), 2., massem, wg, pbarug, pbarvg, dtvr)
-           case (12)
+          case (12)
              ! Schema de Frederic Hourdin
              ! Pas de temps adaptatif
              CALL adaptdt(dtbon, n, pbarug, massem)
@@ -126,7 +134,7 @@ contains
              DO indice = 1, n
                 CALL advn(q(1, 1, iq), massem, wg, pbarug, pbarvg, dtbon, 2)
              END DO
-         case (14)
+          case (14)
              ! Schema "pseudo amont" + test sur humidite specifique
              ! pour la vapeur d'eau. F. Codron
              CALL vlspltqs(q(1, 1, 1), 2., massem, wg, pbarug, pbarvg, dtvr, &

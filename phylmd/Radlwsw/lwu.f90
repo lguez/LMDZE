@@ -23,28 +23,29 @@ contains
 
     USE clesphys, ONLY: rcfc11, rcfc12, rch4, rco2, rn2o
     USE suphec_m, ONLY: rg
-    USE raddim, ONLY: kdlon, kflev
+    USE conf_phys_m, ONLY: kdlon
+    use dimensions, only: llm
     USE radepsi, ONLY: zepsco, zepscq
     USE radopt, ONLY: levoigt
     USE raddimlw, ONLY: ng1, ng1p1, ninter, nua
 
     ! ARGUMENTS:
 
-    DOUBLE PRECISION PAER(KDLON, KFLEV, 5)
-    DOUBLE PRECISION PDP(KDLON, KFLEV)
-    DOUBLE PRECISION PPMB(KDLON, KFLEV + 1)
-    DOUBLE PRECISION POZ(KDLON, KFLEV)
-    DOUBLE PRECISION PTAVE(KDLON, KFLEV)
+    DOUBLE PRECISION PAER(KDLON, LLM, 5)
+    DOUBLE PRECISION PDP(KDLON, LLM)
+    DOUBLE PRECISION PPMB(KDLON, LLM + 1)
+    DOUBLE PRECISION POZ(KDLON, LLM)
+    DOUBLE PRECISION PTAVE(KDLON, LLM)
     DOUBLE PRECISION PVIEW(KDLON)
-    DOUBLE PRECISION PWV(KDLON, KFLEV)
+    DOUBLE PRECISION PWV(KDLON, LLM)
 
-    DOUBLE PRECISION PABCU(KDLON, NUA, 3 * KFLEV + 1)
+    DOUBLE PRECISION PABCU(KDLON, NUA, 3 * LLM + 1)
     ! effective absorber amounts
 
     ! LOCAL VARIABLES:
 
-    DOUBLE PRECISION ZABLY(KDLON, NUA, 3 * KFLEV + 1)
-    DOUBLE PRECISION ZDUC(KDLON, 3 * KFLEV + 1)
+    DOUBLE PRECISION ZABLY(KDLON, NUA, 3 * LLM + 1)
+    DOUBLE PRECISION ZDUC(KDLON, 3 * LLM + 1)
     DOUBLE PRECISION ZPHIO(KDLON)
     DOUBLE PRECISION ZPSC2(KDLON)
     DOUBLE PRECISION ZPSC3(KDLON)
@@ -60,7 +61,7 @@ contains
     DOUBLE PRECISION ZPSM6(KDLON)
     DOUBLE PRECISION ZPHN6(KDLON)
     DOUBLE PRECISION ZPSN6(KDLON)
-    DOUBLE PRECISION ZSSIG(KDLON, 3 * KFLEV + 1)
+    DOUBLE PRECISION ZSSIG(KDLON, 3 * LLM + 1)
     DOUBLE PRECISION ZTAVI(KDLON)
     DOUBLE PRECISION ZUAER(KDLON, Ninter)
     DOUBLE PRECISION ZXOZ(KDLON)
@@ -132,7 +133,7 @@ contains
        ZSSIG(JL, 1) = PPMB(JL, 1) * 100.
     end DO
 
-    DO JK = 1, KFLEV
+    DO JK = 1, LLM
        JKJ = (JK - 1) * NG1P1 + 1
        JKJR = JKJ
        JKJP = JKJ + NG1P1
@@ -150,7 +151,7 @@ contains
 
     ! 4. PRESSURE THICKNESS AND MEAN PRESSURE OF SUB-LAYERS
 
-    DO JKI = 1, 3 * KFLEV
+    DO JKI = 1, 3 * LLM
        JKIP1 = JKI + 1
        DO JL = 1, KDLON
           ZABLY(JL, 5, JKI) = (ZSSIG(JL, JKI) + ZSSIG(JL, JKIP1)) * 0.5
@@ -158,8 +159,8 @@ contains
        end DO
     end DO
 
-    DO JK = 1, KFLEV
-       JKL = KFLEV + 1 - JK
+    DO JK = 1, LLM
+       JKL = LLM + 1 - JK
        DO JL = 1, KDLON
           ZXWV(JL) = MAX(PWV(JL, JK), ZEPSCQ)
           ZXOZ(JL) = MAX(POZ(JL, JK) / PDP(JL, JK), ZEPSCO)
@@ -191,20 +192,20 @@ contains
 
     DO JA = 1, NUA
        DO JL = 1, KDLON
-          PABCU(JL, JA, 3 * KFLEV + 1) = 0.
+          PABCU(JL, JA, 3 * LLM + 1) = 0.
        end DO
     end DO
 
-    DO JK = 1, KFLEV
+    DO JK = 1, LLM
        JJ = (JK - 1) * NG1P1 + 1
        JJPN = JJ + NG1
-       JKL = KFLEV + 1 - JK
+       JKL = LLM + 1 - JK
 
        ! 5.1 CUMULATIVE AEROSOL AMOUNTS FROM TOP OF ATMOSPHERE
 
-       JAE1 = 3 * KFLEV + 1 - JJ
-       JAE2 = 3 * KFLEV + 1 - (JJ + 1)
-       JAE3 = 3 * KFLEV + 1 - JJPN
+       JAE1 = 3 * LLM + 1 - JJ
+       JAE2 = 3 * LLM + 1 - (JJ + 1)
+       JAE3 = 3 * LLM + 1 - JJPN
        DO JAE = 1, 5
           DO JL = 1, KDLON
              ZUAER(JL, JAE) = (RAER(JAE, 1) * PAER(JL, JKL, 1) &
@@ -265,7 +266,7 @@ contains
        end DO
 
        DO JKK = JJ, JJPN
-          JC = 3 * KFLEV + 1 - JKK
+          JC = 3 * LLM + 1 - JKK
           JCP1 = JC + 1
           DO JL = 1, KDLON
              ZDIFF = PVIEW(JL)

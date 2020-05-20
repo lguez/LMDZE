@@ -1,18 +1,20 @@
 module grid_change
 
-  use dimensions, only: iim, jjm
-
   IMPLICIT NONE
 
-  logical, save:: dyn_phy(iim + 1, jjm + 1)
+  logical, save, allocatable:: dyn_phy(:, :) ! (iim + 1, jjm + 1)
   ! (mask for distinct points in the scalar grid and the "u" grid,
   ! first index is for longitude, second index is for latitude)
-
-  private iim, jjm
 
 contains
 
   subroutine init_dyn_phy
+
+    use dimensions, only: iim, jjm
+
+    !---------------------------------------------------------
+
+    allocate(dyn_phy(iim + 1, jjm + 1))
 
     ! Construct the mask:
     dyn_phy = .true.
@@ -30,6 +32,7 @@ contains
     ! From gr_fi_dyn.F, version 1.1.1.1, 2004/05/19 12:53:05
     ! Passage d'un champ de la grille physique \`a la grille dynamique.
 
+    use dimensions, only: iim, jjm
     use dimphy, only: klon
 
     REAL, intent(in):: pfi(:) ! (klon)

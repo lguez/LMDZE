@@ -151,8 +151,7 @@ contains
     REAL fsolsw(klon, nbsrf) ! flux solaire absorb\'e pour chaque sous-surface
 
     ! la nouvelle repartition des surfaces sortie de l'interface
-    REAL, save:: pctsrf_new_oce(klon)
-    REAL, save:: pctsrf_new_sic(klon)
+    REAL, save, allocatable:: pctsrf_new_oce(:), pctsrf_new_sic(:) ! (klon)
 
     REAL y_fqcalving(klon), y_ffonte(klon)
     real y_run_off_lic_0(klon), y_run_off_lic(klon)
@@ -259,6 +258,8 @@ contains
     pctsrf_pot(:, is_lic) = pctsrf(:, is_lic)
     pctsrf_pot(:, is_oce) = 1. - masque
     pctsrf_pot(:, is_sic) = 1. - masque
+
+    if (itap == 1) allocate(pctsrf_new_oce(klon), pctsrf_new_sic(klon))
 
     ! Tester si c'est le moment de lire le fichier:
     if (mod(itap - 1, lmt_pas) == 0) then

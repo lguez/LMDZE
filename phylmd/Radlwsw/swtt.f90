@@ -1,7 +1,7 @@
 SUBROUTINE swtt(knu, ka, pu, ptr)
   USE dimensions
   USE dimphy
-  USE raddim
+  use conf_phys_m, only: kdlon
   IMPLICIT NONE
 
   ! -----------------------------------------------------------------------
