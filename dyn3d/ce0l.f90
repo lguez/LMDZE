@@ -25,13 +25,12 @@ PROGRAM ce0l
 
   !-------------------------------------
 
-  ALLOCATE(phis(iim + 1, jjm + 1))
-  ALLOCATE(pctsrf(klon, nbsrf))
-  
   call set_unit_nml
   open(unit_nml, file="used_namelists.txt", status="replace", action="write")
   call paramet
   call init_dimphy
+  ALLOCATE(phis(iim + 1, jjm + 1))
+  ALLOCATE(pctsrf(klon, nbsrf))
   CALL conf_gcm
   call read_comdissnew
   call read_serre

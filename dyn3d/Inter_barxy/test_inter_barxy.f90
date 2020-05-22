@@ -9,6 +9,7 @@ program test_inter_barxy
   use dynetat0_chosen_m, only: read_serre
   use inter_barxy_m, only: inter_barxy
   USE nr_util, ONLY : pi
+  use paramet_m, only: paramet
 
   implicit none
 
@@ -24,6 +25,7 @@ program test_inter_barxy
   !------------------------
 
   allocate(var_tmp2d(iim, jjm + 1))
+  call paramet
   
   print *, "Enter namelist 'main'."
   read (unit=*, nml=main)

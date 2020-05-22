@@ -465,6 +465,18 @@ contains
        allocate(cape(klon))
        allocate(ibas_con(klon), itop_con(klon))
        allocate(ratqs(klon, llm))
+       allocate(t2m(klon, nbsrf), q2m(klon, nbsrf))
+       allocate(u10m_srf(klon, nbsrf), v10m_srf(klon, nbsrf))
+       allocate(topswad(klon), solswad(klon))
+       allocate(airephy(klon))
+       allocate(heat(klon, llm))
+       allocate(heat0(klon, llm))
+       allocate(cool(klon, llm))
+       allocate(cool0(klon, llm))
+       allocate(topsw(klon), toplw(klon), solsw(klon))
+       allocate(sollw(klon))
+       allocate(sollwdown(klon))
+       allocate(topsw0(klon), toplw0(klon), solsw0(klon), sollw0(klon))
 
        ! initialiser
        u10m_srf = 0.
