@@ -6,7 +6,7 @@ contains
 
   SUBROUTINE swde(pgg, pref, prmuz, pto1, pw, pre1, pre2, ptr1, ptr2)
     
-    USE raddim, only: kdlon
+    USE conf_phys_m, only: kdlon
 
     ! PURPOSE.
     ! --------
