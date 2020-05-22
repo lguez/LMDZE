@@ -12,4 +12,20 @@ module dimensions
 
   integer, parameter:: nqmx = 5 ! maximum number of tracers
 
+contains
+
+  subroutine set_dimensions
+
+    use unit_nml_m, only: unit_nml
+
+    namelist /dimensions_nml/iim, jjm, llm
+
+    !------------------------------------------------------------
+
+    print *, "Enter namelist 'dimensions_nml'."
+    read (unit=*, nml=dimensions_nml)
+    write(unit_nml, nml=dimensions_nml)
+
+  end subroutine set_dimensions
+  
 end module dimensions

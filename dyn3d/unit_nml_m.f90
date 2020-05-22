@@ -2,7 +2,7 @@ module unit_nml_m
 
   implicit none
 
-  integer, protected:: unit_nml
+  integer, protected:: unit_nml = - huge(0)
   ! logical unit number for file containing used namelists
 
 contains

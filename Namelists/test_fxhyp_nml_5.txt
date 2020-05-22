@@ -1,0 +1,16 @@
+! clon /= 0 and GROSSISMX > 1 and non-default dzoomx
+
+&dimensions_nml /
+
+&SERRE_NML
+ CLON_DEG=  20.0000000    ,
+ CLAT_DEG=  45.0000000    ,
+ GROSSISMX=  2.00000000    ,
+ GROSSISMY=  2.00000000    ,
+ DZOOMX= 0.250000000    ,
+ DZOOMY= 0.250000000    ,
+ TAUX=  3.00000000    ,
+ TAUY=  3.00000000    ,
+ /
+
+&dynetat0_nml /

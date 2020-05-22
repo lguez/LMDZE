@@ -11,8 +11,8 @@ program test_ozonecm
        nf95_enddef, nf95_put_var, nf95_close
   use netcdf, only: nf90_clobber, nf90_float, nf90_global
 
-  use dimensions, only: jjm, llm
-  USE dimphy, ONLY : klon
+  use dimensions, only: jjm, llm, set_dimensions
+  USE dimphy, ONLY : klon, init_dimphy
   USE dimsoil, ONLY : nsoilmx
   use disvert_m, only: disvert, ap, bp, preff, presnivs
   use dynetat0_chosen_m, only: read_serre
@@ -75,6 +75,11 @@ program test_ozonecm
 
   !---------------------
 
+  call set_unit_nml
+  open(unit_nml, file="used_namelists.txt", status="replace", action="write")
+
+  call set_dimensions
+  call init_dimphy
   call assert(klon == jjm + 1, "test_ozonecm: iim should be 1")
 
   allocate(p(llm + 1))
@@ -108,9 +113,6 @@ program test_ozonecm
   allocate(sig1(klon, llm))
   allocate(w01(klon, llm))
   
-  call set_unit_nml
-  open(unit_nml, file="used_namelists.txt", status="replace", action="write")
-
   call read_serre
   call disvert
   p = ap + bp * preff

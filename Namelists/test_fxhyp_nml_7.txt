@@ -1,0 +1,16 @@
+! Test case for revision 167
+
+&dimensions_nml /
+
+&SERRE_NML
+ CLON_DEG=  100.000000    ,
+ CLAT_DEG=  0.00000000E+00,
+ GROSSISMX=  2.90000010    ,
+ GROSSISMY=  1.00000000    ,
+ DZOOMX= 0.300000012    ,
+ DZOOMY= 0.200000003    ,
+ TAUX=  5.00000000    ,
+ TAUY=  3.00000000    ,
+ /
+
+&dynetat0_nml /

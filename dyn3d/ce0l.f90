@@ -4,7 +4,7 @@ PROGRAM ce0l
 
   use comdissnew, only: read_comdissnew
   use conf_gcm_m, only: conf_gcm
-  use dimensions, only: iim, jjm
+  use dimensions, only: iim, jjm, set_dimensions
   use dimphy, only: klon, init_dimphy
   use dynetat0_chosen_m, only: read_serre
   use etat0_m, only: etat0
@@ -27,6 +27,7 @@ PROGRAM ce0l
 
   call set_unit_nml
   open(unit_nml, file="used_namelists.txt", status="replace", action="write")
+  call set_dimensions
   call paramet
   call init_dimphy
   ALLOCATE(phis(iim + 1, jjm + 1))

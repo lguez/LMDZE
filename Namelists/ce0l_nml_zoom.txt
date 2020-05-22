@@ -1,0 +1,20 @@
+! With zoom
+
+&dimensions_nml /
+&logic_nml /
+
+&conf_gcm_nml /
+
+&comdissnew_nml
+tetagdiv=3600.,
+tetagrot=3600.,
+tetatemp=3600.
+/
+
+&serre_nml clon_deg = 20., clat_deg = 45., grossismx = 2., grossismy = 2.,
+dzoomx = 0.25, dzoomy = 0.25 /
+
+&dynetat0_nml /
+&etat0_nml /
+&disvert_nml /
+&limit_nml /

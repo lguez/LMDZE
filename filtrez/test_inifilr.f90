@@ -1,6 +1,6 @@
 program test_inifilr
 
-  use dimensions, only: iim, jjm
+  use dimensions, only: iim, jjm, set_dimensions
   use dynetat0_m, only: rlatu, rlatv, fyhyp, fxhyp
   use dynetat0_chosen_m, only: read_serre
   use inifilr_m, only: inifilr, jfiltnu, jfiltnv, jfiltsu, jfiltsv, &
@@ -22,6 +22,7 @@ program test_inifilr
 
   call set_unit_nml
   open(unit_nml, file="used_namelists.txt", status="replace", action="write")
+  call set_dimensions
   call read_serre
   CALL fyhyp
   CALL fxhyp

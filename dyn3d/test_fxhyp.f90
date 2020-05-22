@@ -1,5 +1,6 @@
 program test_fxhyp
 
+  use dimensions, only: set_dimensions
   use dynetat0_m, only: fxhyp, xprimm025, rlonv, xprimv, rlonu, xprimu, &
        xprimp025
   use dynetat0_chosen_m, only: read_serre
@@ -11,6 +12,7 @@ program test_fxhyp
 
   call set_unit_nml
   open(unit_nml, file="used_namelists.txt", status="replace", action="write")
+  call set_dimensions
   call read_serre
   call fxhyp
   close(unit_nml)

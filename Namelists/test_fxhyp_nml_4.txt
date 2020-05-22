@@ -1,0 +1,3 @@
+&dimensions_nml /
+&SERRE_NML CLON_DEG=  20., GROSSISMX=  2./
+&dynetat0_nml /

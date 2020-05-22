@@ -53,8 +53,6 @@ contains
 
     !------------------------------------
 
-    print *, "Call sequence information: conf_gcm"
-
     print *, "Enter namelist 'logic_nml'."
     read(unit=*, nml=logic_nml)
     write(unit_nml, nml=logic_nml)

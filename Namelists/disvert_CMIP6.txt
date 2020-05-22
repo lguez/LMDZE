@@ -1,0 +1,20 @@
+&dimensions_nml llm = 79 /
+&logic_nml /
+&conf_gcm_nml /
+
+&comdissnew_nml
+tetagdiv=3600.,
+tetagrot=3600.,
+tetatemp=3600.
+/
+
+&serre_nml /
+&dynetat0_nml /
+&etat0_nml /
+
+&disvert_nml
+vert_sampling = "strato_custom"
+/
+
+&limit_nml
+/

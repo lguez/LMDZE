@@ -4,12 +4,13 @@ program test_inter_barxy
   use comdissnew, only: read_comdissnew
   use comgeom, only: inigeom
   use conf_gcm_m, only: conf_gcm
-  use dimensions, only: iim, jjm
+  use dimensions, only: iim, jjm, set_dimensions
   USE dynetat0_m, only: rlonu, rlatv, fyhyp, fxhyp
   use dynetat0_chosen_m, only: read_serre
   use inter_barxy_m, only: inter_barxy
   USE nr_util, ONLY : pi
   use paramet_m, only: paramet
+  use unit_nml_m, only: set_unit_nml, unit_nml
 
   implicit none
 
@@ -24,12 +25,16 @@ program test_inter_barxy
 
   !------------------------
 
+  call set_unit_nml
+  open(unit_nml, file="used_namelists.txt", status="replace", action="write")
+
+  call set_dimensions
   allocate(var_tmp2d(iim, jjm + 1))
   call paramet
   
   print *, "Enter namelist 'main'."
   read (unit=*, nml=main)
-  write(unit=*, nml=main)
+  write(unit=unit_nml, nml=main)
 
   allocate(lon_rad(iml_dyn), lon_ini(iml_dyn))
   allocate(lat_rad(jml_dyn-1), lat_ini(jml_dyn))
@@ -62,5 +67,6 @@ program test_inter_barxy
 
   print *, "minval(var_tmp2d, dim=1) = ", minval(var_tmp2d, dim=1)
   print *, "maxval(var_tmp2d, dim=1) = ", maxval(var_tmp2d, dim=1)
+  close(unit_nml)
 
 end program test_inter_barxy

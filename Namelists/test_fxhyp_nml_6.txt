@@ -1,0 +1,3 @@
+&dimensions_nml /
+&SERRE_NML GROSSISMX = 1.0000001/
+&dynetat0_nml /

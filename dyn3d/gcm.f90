@@ -17,7 +17,7 @@ PROGRAM gcm
   use comgeom, only:  inigeom
   use conf_gcm_m, only: day_step, iperiod, iphysiq, nday, conf_gcm, iflag_phys
   use conf_guide_m, only: conf_guide
-  use dimensions, only: iim, jjm, llm, nqmx
+  use dimensions, only: iim, jjm, llm, nqmx, set_dimensions
   use dimphy, only: init_dimphy
   USE disvert_m, ONLY : disvert
   use dynetat0_m, only: dynetat0, day_ini
@@ -61,16 +61,16 @@ PROGRAM gcm
 
   !------------------------------------------------------------
 
+  call set_unit_nml
+  open(unit_nml, file="used_namelists.txt", status="replace", action="write")
+
+  call set_dimensions
   ALLOCATE(ucov(iim + 1, jjm + 1, llm), vcov(iim + 1, jjm, llm))
   ALLOCATE(teta(iim + 1, jjm + 1, llm))
   ALLOCATE(q(iim + 1, jjm + 1, llm, nqmx))
   ALLOCATE(ps(iim + 1, jjm + 1))
   ALLOCATE(masse(iim + 1, jjm + 1, llm))
   ALLOCATE(phis(iim + 1, jjm + 1))
-
-  call set_unit_nml
-  open(unit_nml, file="used_namelists.txt", status="replace", action="write")
-
   call paramet
   call init_dimphy
   CALL conf_gcm

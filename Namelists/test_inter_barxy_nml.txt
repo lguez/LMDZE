@@ -1,0 +1,7 @@
+&dimensions_nml /
+&main /
+&logic_nml /
+&conf_gcm_nml /
+&comdissnew_nml /
+&serre_nml /
+&dynetat0_nml /

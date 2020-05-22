@@ -1,0 +1,16 @@
+&dimensions_nml /
+&logic_nml iflag_phys = f /
+
+&conf_gcm_nml
+/
+
+&comdissnew_nml
+tetagdiv=3600.,
+tetagrot=3600.,
+tetatemp=3600.
+/
+
+&main_nml /
+&dynetat0_nml /
+&disvert_nml /
+&conf_guide_nml /

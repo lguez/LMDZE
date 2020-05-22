@@ -1,0 +1,51 @@
+! Nudging in temperature and humidity
+&dimensions_nml /
+&logic_nml /
+
+&conf_gcm_nml
+/
+
+&comdissnew_nml
+tetagdiv=3600.,
+tetagrot=3600.,
+tetatemp=3600.
+/
+
+&main_nml /
+&dynetat0_nml /
+
+&disvert_nml /
+
+&conf_guide_nml guide_u = t, guide_v = t, guide_t = t, guide_q = t /
+
+&physiq_nml
+iflag_cldcon = 3,
+fact_cldcon = 1.,
+ratqsbas = 0.005,
+ratqshaut = 0.33,
+/
+
+&ctherm_nml /
+&clesphys2_nml /
+&YOMCST_nml /
+
+&conf_phys_nml
+epmax = .99,
+iflag_clw = 1,
+reevap_ice = t,
+iflag_pdf = 1,
+/
+
+&clesphys_nml 
+OK_instan=t
+ksta_ter=0.0000001,
+cdmmax = 0.0025,
+cdhmax = 0.002,
+/
+
+&nuagecom
+rad_chau1=12,
+rad_chau2=11
+/
+
+&conf_interface_nml /

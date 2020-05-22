@@ -1,0 +1,4 @@
+&dimensions_nml iim = 1 /
+&serre_nml /
+&dynetat0_nml /
+&disvert_nml /
