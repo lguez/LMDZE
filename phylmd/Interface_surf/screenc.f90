@@ -4,8 +4,8 @@ module screenc_m
 
 contains
 
-  SUBROUTINE screenc(klon, knon, nsrf, speed, temp, q_zref, zref, ts, &
-       qsurf, rugos, psol, ustar, testar, qstar, pref, delu, delte, delq)
+  SUBROUTINE screenc(nsrf, speed, temp, q_zref, zref, ts, qsurf, rugos, psol, &
+       ustar, testar, qstar, pref, delu, delte, delq)
     
     ! From LMDZ4/libf/phylmd/screenc.F90, version 1.1.1.1, 2004/05/19 12:53:09
 
@@ -22,45 +22,48 @@ contains
     use cdrag_m, only: cdrag
     use SUPHEC_M, only: RG
 
-    INTEGER, intent(in):: klon
-    ! klon----input-I- dimension de la grille physique (=
-    ! nb_pts_latitude X nb_pts_longitude)
-    INTEGER, intent(in):: knon
-    ! knon----input-I- nombre de points pour un type de surface
-    INTEGER, intent(in):: nsrf
-    ! nsrf----input-I- indice pour le type de surface; voir indicesol.inc
+    INTEGER, intent(in):: nsrf ! indice pour le type de surface; voir indicesol
     REAL, intent(in):: speed(:) ! (knon) module du vent au 1er niveau du modele
 
     REAL, intent(in):: temp(:) ! (knon)
     ! temperature de l'air au 1er niveau du modele
 
-    REAL, intent(in):: q_zref(klon) ! humidite relative au 1er niveau du modele
+    REAL, intent(in):: q_zref(:) ! (knon)
+    ! humidite relative au 1er niveau du modele
+    
     REAL, intent(in):: zref ! altitude de reference
     REAL, intent(in):: ts(:) ! (knon) temperature de l'air a la surface
     REAL, intent(in):: qsurf(:) ! (knon) humidite relative a la surface
     REAL, intent(in):: rugos(:) ! (knon) rugosit\'e
     REAL, intent(in):: psol(:) ! (knon) pression au sol
     REAL, intent(in):: ustar(:) ! (knon) facteur d'\'echelle pour le vent
-    REAL, dimension(klon), intent(in):: testar
-    ! testar--input-R- facteur d'echelle pour la temperature potentielle
-    REAL, dimension(klon), intent(in):: qstar
-    ! qstar---input-R- facteur d'echelle pour l'humidite relative
+
+    REAL, intent(in):: testar(:) ! (knon)
+    ! facteur d'echelle pour la temperature potentielle
+    
+    REAL, intent(in):: qstar(:) ! (knon)
+    ! facteur d'echelle pour l'humidite relative
 
     REAL, intent(out):: pref(:) ! (knon) pression au niveau de reference
-    REAL, dimension(klon), intent(out):: delu
-    ! delu----input-R- anomalie du vent par rapport au 1er niveau
-    REAL, dimension(klon), intent(out):: delte
-    ! delte---input-R- anomalie de la temperature potentielle par
-    ! rapport a la surface
-    REAL, dimension(klon), intent(out):: delq
-    ! delq----input-R- anomalie de l'humidite relative par rapport a la surface
+
+    REAL, intent(out):: delu(:) ! (knon)
+    ! anomalie du vent par rapport au 1er niveau
+
+    REAL, intent(out):: delte(:) ! (knon)
+    ! anomalie de la temperature potentielle par rapport a la surface
+    
+    REAL, intent(out):: delq(:) ! (knon)
+    ! anomalie de l'humidite relative par rapport a la surface
 
     ! Local:
+    INTEGER knon ! nombre de points pour un type de surface
     INTEGER i
-    REAL, dimension(knon):: cdram, cdrah, gref
+    REAL, dimension(size(speed)):: cdram, cdrah, gref ! (knon)
 
     !------------------------------------------------------------------------- 
 
+    knon = size(speed)
+    
     DO i=1, knon
        gref(i) = zref*RG
     ENDDO

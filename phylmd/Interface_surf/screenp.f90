@@ -4,8 +4,8 @@ module screenp_m
 
 contains
 
-  SUBROUTINE screenp(knon, speed, tair, qair, ts, qsurf, rugos, lmon, ustar, &
-       testar, qstar, zref, delu, delte, delq)
+  SUBROUTINE screenp(speed, tair, qair, ts, qsurf, rugos, lmon, ustar, testar, &
+       qstar, zref, delu, delte, delq)
 
     ! From LMDZ4/libf/phylmd/screenp.F90, version 1.1.1.1, 2004/05/19 12:53:09
 
@@ -21,9 +21,10 @@ contains
 
     use dimphy, only: klon
 
-    INTEGER, intent(in):: knon ! nombre de points pour un type de surface
-    REAL, intent(in):: speed(klon) ! module du vent au 1er niveau du modele
-    REAL, intent(in):: tair(klon) ! temperature de l'air au 1er niveau du modele
+    REAL, intent(in):: speed(:) ! (knon) module du vent au 1er niveau du modele
+
+    REAL, intent(in):: tair(:) ! (knon)
+    ! temperature de l'air au 1er niveau du modele
 
     REAL, intent(in):: qair(:) ! (knon)
     ! humidite relative au 1er niveau du modele
@@ -31,10 +32,10 @@ contains
     REAL, intent(in):: ts(:) ! (knon) temperature de l'air a la surface
     REAL, intent(in):: qsurf(:) ! (knon) humidite relative a la surface
     REAL, intent(in):: rugos(:) ! (knon) rugosite
-    DOUBLE PRECISION, intent(in):: lmon(klon) ! longueur de Monin-Obukov
+    DOUBLE PRECISION, intent(in):: lmon(:) ! (knon) longueur de Monin-Obukov
     REAL, intent(in):: ustar(:) ! (knon) facteur d'\'echelle pour le vent
 
-    REAL, intent(in):: testar(klon)
+    REAL, intent(in):: testar(:) ! (knon)
     ! facteur d'echelle pour la temperature potentielle
 
     REAL, intent(in):: qstar(klon) ! facteur d'echelle pour l'humidite relative
@@ -54,7 +55,7 @@ contains
     
     !-------------------------------------------------------------------------
     
-    DO i = 1, knon
+    DO i = 1, size(speed)
        IF (lmon(i) >= 0.) THEN
           ! STABLE CASE
           IF (speed(i) > 1.5.AND.lmon(i) <= 1.0) THEN
