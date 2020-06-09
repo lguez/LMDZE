@@ -59,7 +59,7 @@ contains
     temp_loc = (ts1 + delte) * (psol / pat1)**(- RKAPPA)
 
     ! Iteration of the variables at the reference level zref:
-    ! corrector calculation ; see Hess & McAvaney, 1995
+    ! corrector calculation. See Hess and McAvaney, 1995.
     DO n = 1, niter
        CALL screenc(nsrf, temp_loc, q_zref_loc, zref, ts1, qsurf, rugos, psol, &
             ustar, testar, qstar, pref, u_zref_loc, delte, delq)

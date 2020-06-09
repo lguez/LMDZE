@@ -17,9 +17,6 @@ contains
 
     ! Author: I. Musat, July 1st, 2002
 
-    ! Library:
-    use nr_util, only: assert_eq
-
     use cdrag_m, only: cdrag
     USE suphec_m, ONLY: rg, rkappa
     use screencp_m, only: screencp
@@ -27,8 +24,10 @@ contains
     INTEGER, intent(in):: nsrf ! indice pour le type de surface
     REAL, intent(in):: u1(:) ! (knon) vent zonal au 1er niveau du modele
     REAL, intent(in):: v1(:) ! (knon) vent meridien au 1er niveau du modele
+
     REAL, intent(in):: t1(:) ! (knon) temperature de l'air au 1er
-    ! niveau du modele
+                             ! niveau du modele
+    
     REAL, intent(in):: q1(:) ! (knon) humidite relative au 1er niveau du modele
     REAL, intent(in):: z1(:) ! (knon) geopotentiel au 1er niveau du modele
     REAL, intent(in):: ts1(:) ! (knon) temperature de l'air a la surface
@@ -42,9 +41,8 @@ contains
     REAL, intent(out):: ustar(:) ! (knon) u*
 
     ! Local:
-    INTEGER knon ! nombre de points pour un type de surface
+
     REAL, PARAMETER:: RKAR = 0.4 ! constante de von Karman
-    INTEGER i
     REAL tpot(size(u1)) ! (knon) temperature potentielle
     REAL cdram(size(u1)), cdrah(size(u1))
 
@@ -55,24 +53,17 @@ contains
 
     !------------------------------------------------------------------------- 
 
-    knon = assert_eq([size(u1), size(v1), size(t1), size(wind10m), &
-         size(ustar)], "stdlevvar knon")
-
     speed = SQRT(u1**2 + v1**2)
     CALL cdrag(nsrf, speed, t1, q1, z1, psol, ts1, qsurf, rugos, cdram, cdrah)
 
-    ! Star variables 
-
-    DO i = 1, knon
-       tpot(i) = t1(i)* (psol(i)/pat1(i))**RKAPPA
-       ustar(i) = sqrt(cdram(i)) * speed(i)
-       zdte(i) = tpot(i) - ts1(i)
-       zdte(i) = sign(max(abs(zdte(i)), 1.e-10), zdte(i))
-       testar(i) = (cdrah(i) * zdte(i) * speed(i))/ustar(i)
-       qstar(i) = (cdrah(i) * (max(q1(i), 0.) - max(qsurf(i), 0.)) * speed(i)) &
-            / ustar(i)
-       lmon(i) = (ustar(i) * ustar(i) * tpot(i)) / (RKAR * RG * testar(i))
-    ENDDO
+    ! Star variables:
+    tpot = t1 * (psol / pat1)**RKAPPA
+    ustar = sqrt(cdram) * speed
+    zdte = tpot - ts1
+    zdte = sign(max(abs(zdte), 1.e-10), zdte)
+    testar = (cdrah * zdte * speed)/ustar
+    qstar = (cdrah * (max(q1, 0.) - max(qsurf, 0.)) * speed) / ustar
+    lmon = (ustar**2 * tpot) / (RKAR * RG * testar)
 
     call screencp(speed, tpot, q1, ts1, qsurf, rugos, lmon, ustar, testar, &
          qstar, psol, pat1, nsrf, zref = 2., temp = t2m, q_zref = q2m)

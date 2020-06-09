@@ -19,8 +19,6 @@ contains
 
     ! I. Musat, July 2002
 
-    use dimphy, only: klon
-
     REAL, intent(in):: speed(:) ! (knon) module du vent au 1er niveau du modele
 
     REAL, intent(in):: tair(:) ! (knon)
@@ -38,18 +36,22 @@ contains
     REAL, intent(in):: testar(:) ! (knon)
     ! facteur d'echelle pour la temperature potentielle
 
-    REAL, intent(in):: qstar(klon) ! facteur d'echelle pour l'humidite relative
-    REAL, intent(in):: zref ! altitude de reference
-    REAL, intent(out):: delu(klon) ! anomalie du vent par rapport au 1er niveau
+    REAL, intent(in):: qstar(:) ! (knon)
+    ! facteur d'echelle pour l'humidite relative
 
-    REAL, intent(out):: delte(klon)
+    REAL, intent(in):: zref ! altitude de reference
+
+    REAL, intent(out):: delu(:) ! (knon)
+    ! anomalie du vent par rapport au 1er niveau
+
+    REAL, intent(out):: delte(:) ! (knon)
     ! anomalie de la temperature potentielle par rapport a la surface
 
-    REAL, intent(out):: delq(klon)
+    REAL, intent(out):: delq(:) ! (knon)
     ! anomalie de l'humidite relative par rapport a la surface
 
     ! Local:
-    REAL, PARAMETER:: RKAR=0.40
+    REAL, PARAMETER:: RKAR = 0.4
     INTEGER i
     REAL xtmp, xtmp0
     
