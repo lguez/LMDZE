@@ -5,13 +5,13 @@ module stdlevvar_m
 contains
 
   SUBROUTINE stdlevvar(nsrf, u1, v1, t1, q1, z1, ts1, qsurf, rugos, psol, &
-       pat1, t_2m, q_2m, t_10m, q_10m, wind10m, ustar)
+       pat1, t2m, q2m, wind10m, ustar)
 
     ! From LMDZ4/libf/phylmd/stdlevvar.F90, version 1.3, 2005 May 25th
 
-    ! Objet : calcul de la température et de l'humidité relative à 2 m
-    ! et du module du vent à 10 m à partir des relations de
-    ! Dyer-Businger et des équations de Louis.
+    ! Objet : calcul de la temp\'erature et de l'humidit\'e relative
+    ! \`a 2 m et du module du vent \`a 10 m \`a partir des relations
+    ! de Dyer-Businger et des \'equations de Louis.
 
     ! Reference: Hess, Colman and McAvaney (1995) 
 
@@ -35,13 +35,11 @@ contains
     REAL, intent(in):: z1(:) ! (knon) geopotentiel au 1er niveau du modele
     REAL, intent(in):: ts1(:) ! (knon) temperature de l'air a la surface
     REAL, intent(in):: qsurf(:) ! (knon) humidit\'e relative \`a la surface
-    REAL, intent(in):: rugos(klon) ! rugosite
+    REAL, intent(in):: rugos(:) ! (knon) rugosit\'e
     REAL, intent(in):: psol(:) ! (knon) pression au sol
     REAL, intent(in):: pat1(:) ! (knon) pression au 1er niveau du modele
-    REAL, intent(out):: t_2m(klon) ! temperature de l'air a 2m
-    REAL, intent(out):: q_2m(klon) ! humidite relative a 2m
-    REAL, intent(out):: t_10m(klon) ! temperature de l'air a 10m
-    REAL, intent(out):: q_10m(klon) ! humidite specifique a 10m
+    REAL, intent(out):: t2m(:) ! (knon) temperature de l'air a 2m
+    REAL, intent(out):: q2m(:) ! (knon) humidite relative a 2m
     REAL, intent(out):: wind10m(:) ! (knon) norme du vent \`a 10m
     REAL, intent(out):: ustar(:) ! (knon) u*
 
@@ -60,8 +58,8 @@ contains
     ! lmon : longueur de Monin-Obukhov selon Hess, Colman and McAvaney 
     DOUBLE PRECISION, dimension(klon):: lmon
     REAL, dimension(klon):: delu, delte, delq
-    REAL, dimension(klon):: u_zref, te_zref, q_zref 
-    REAL temp(size(u1)) ! (knon)
+    REAL, dimension(klon):: q_zref 
+    REAL u_zref(size(u1)), temp(size(u1)) ! (knon)
     real pref(size(u1)) ! (knon)
 
     !------------------------------------------------------------------------- 
@@ -73,8 +71,8 @@ contains
        speed(i)=SQRT(u1(i)**2+v1(i)**2)
     ENDDO
 
-    CALL cdrag(nsrf, speed(:knon), t1, q1, z1, psol, ts1, qsurf, rugos(:knon), &
-         cdram, cdrah) 
+    CALL cdrag(nsrf, speed(:knon), t1, q1, z1, psol, ts1, qsurf, rugos, cdram, &
+         cdrah)
 
     ! Star variables 
 
@@ -92,15 +90,14 @@ contains
     ENDDO
 
     ! First aproximation of variables at zref  
-    zref = 2.0
+    zref = 2.
     CALL screenp(knon, speed, tpot, q1, ts1, qsurf, rugos, lmon, ustar, &
          testar, qstar, zref, delu, delte, delq)
 
     DO i = 1, knon
        u_zref(i) = delu(i)
        q_zref(i) = max(qsurf(i), 0.0) + delq(i)
-       te_zref(i) = ts1(i) + delte(i)
-       temp(i) = te_zref(i) * (psol(i)/pat1(i))**(-RKAPPA)
+       temp(i) = (ts1(i) + delte(i)) * (psol(i)/pat1(i))**(-RKAPPA)
     ENDDO
 
     ! Iteration of the variables at the reference level zref :
@@ -108,23 +105,20 @@ contains
 
     DO n = 1, niter
        CALL screenc(klon, knon, nsrf, u_zref, temp, q_zref, zref, ts1, qsurf, &
-            rugos, psol, ustar, testar, qstar, pref, delu, delte, delq) 
+            rugos, psol, ustar, testar, qstar, pref, delu, delte, delq)
 
        DO i = 1, knon
           u_zref(i) = delu(i)
           q_zref(i) = delq(i) + max(qsurf(i), 0.0)
-          te_zref(i) = delte(i) + ts1(i) 
-
-          ! return to normal temperature
-          temp(i) = te_zref(i) * (psol(i)/pref(i))**(-RKAPPA)
+          temp(i) = (delte(i) + ts1(i)) * (psol(i)/pref(i))**(-RKAPPA)
        ENDDO
     ENDDO
 
     ! verifier le critere de convergence : 0.25% pour te_zref et 5% pour qe_zref
 
     DO i = 1, knon
-       t_2m(i) = temp(i)
-       q_2m(i) = q_zref(i)
+       t2m(i) = temp(i)
+       q2m(i) = q_zref(i)
     ENDDO
 
     ! First aproximation of variables at zref  
@@ -134,31 +128,23 @@ contains
          testar, qstar, zref, delu, delte, delq)
 
     DO i = 1, knon
-       u_zref(i) = delu(i)
+       wind10m(i) = delu(i)
        q_zref(i) = max(qsurf(i), 0.0) + delq(i)
-       te_zref(i) = ts1(i) + delte(i)
-       temp(i) = te_zref(i) * (psol(i)/pat1(i))**(-RKAPPA)
+       temp(i) = (ts1(i) + delte(i)) * (psol(i)/pat1(i))**(-RKAPPA)
     ENDDO
 
     ! Iteration of the variables at the reference level zref:
     ! corrector ; see Hess & McAvaney, 1995
 
     DO n = 1, niter
-       CALL screenc(klon, knon, nsrf, u_zref, temp, q_zref, zref, ts1, qsurf, &
+       CALL screenc(klon, knon, nsrf, wind10m, temp, q_zref, zref, ts1, qsurf, &
             rugos, psol, ustar, testar, qstar, pref, delu, delte, delq)
 
        DO i = 1, knon
-          u_zref(i) = delu(i)
+          wind10m(i) = delu(i)
           q_zref(i) = delq(i) + max(qsurf(i), 0.0)
-          te_zref(i) = delte(i) + ts1(i)
-          temp(i) = te_zref(i) * (psol(i)/pref(i))**(-RKAPPA)
+          temp(i) = (delte(i) + ts1(i)) * (psol(i)/pref(i))**(-RKAPPA)
        ENDDO
-    ENDDO
-
-    DO i = 1, knon
-       wind10m(i) = u_zref(i)
-       t_10m(i) = temp(i)
-       q_10m(i) = q_zref(i)
     ENDDO
 
   END subroutine stdlevvar

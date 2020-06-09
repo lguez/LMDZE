@@ -190,8 +190,6 @@ contains
 
     REAL yt2m(klon), yq2m(klon), wind10m(klon)
     REAL ustar(klon)
-
-    REAL yt10m(klon), yq10m(klon)
     REAL ypblh(klon)
     REAL ylcl(klon)
     REAL ycapcl(klon)
@@ -200,8 +198,7 @@ contains
     REAL ypblt(klon)
     REAL ytherm(klon)
     REAL u1(klon), v1(klon)
-    REAL tair1(klon)
-    REAL rugo1(klon)
+    REAL t1(klon)
     REAL zgeop(klon, klev)
 
     !------------------------------------------------------------
@@ -454,20 +451,16 @@ contains
 
           u1(:knon) = yu(:knon, 1) + y_d_u(:knon, 1)
           v1(:knon) = yv(:knon, 1) + y_d_v(:knon, 1)
-          tair1(:knon) = yt(:knon, 1) + y_d_t(:knon, 1)
+          t1(:knon) = yt(:knon, 1) + y_d_t(:knon, 1)
 
-          IF (nsrf == is_oce) THEN
-             rugo1(:knon) = frugs(ni(:knon), is_oce)
-          else
-             rugo1(:knon) = yrugos(:knon)
-          END IF
-
-          CALL stdlevvar(nsrf, u1(:knon), v1(:knon), tair1(:knon), &
-               yq(:knon, 1) + y_d_q(:knon, 1), rd * tair1(:knon) &
-               / (0.5 * (ypaprs(:knon, 1) + ypplay(:knon, 1))) &
-               * (ypaprs(:knon, 1) - ypplay(:knon, 1)), tsurf_new(:knon), &
-               yqsurf(:knon), rugo1, ypaprs(:knon, 1), ypplay(:knon, 1), yt2m, &
-               yq2m, yt10m, yq10m, wind10m(:knon), ustar(:knon))
+          CALL stdlevvar(nsrf, u1(:knon), v1(:knon), t1(:knon), &
+               yq(:knon, 1) + y_d_q(:knon, 1), &
+               rd * t1(:knon) / (0.5 * (ypaprs(:knon, 1) + ypplay(:knon, 1))) &
+               * (ypaprs(:knon, 1) - ypplay(:knon, 1)), &
+               tsurf_new(:knon), yqsurf(:knon), &
+               merge(frugs(ni(:knon), is_oce), yrugos(:knon), nsrf == is_oce), &
+               ypaprs(:knon, 1), ypplay(:knon, 1), yt2m(:knon), yq2m(:knon), &
+               wind10m(:knon), ustar(:knon))
 
           DO j = 1, knon
              i = ni(j)

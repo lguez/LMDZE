@@ -30,7 +30,7 @@ contains
 
     REAL, intent(in):: ts(:) ! (knon) temperature de l'air a la surface
     REAL, intent(in):: qsurf(:) ! (knon) humidite relative a la surface
-    REAL, intent(in):: rugos(klon) ! rugosite
+    REAL, intent(in):: rugos(:) ! (knon) rugosite
     DOUBLE PRECISION, intent(in):: lmon(klon) ! longueur de Monin-Obukov
     REAL, intent(in):: ustar(:) ! (knon) facteur d'\'echelle pour le vent
 
