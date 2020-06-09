@@ -51,8 +51,7 @@ contains
     DOUBLE PRECISION lmon(size(u1)) ! (knon)
     ! longueur de Monin-Obukhov selon Hess, Colman and McAvaney 
 
-    REAL, dimension(size(u1)):: speed, testar, qstar, zdte, temp, u_zref, q_zref
-    ! (knon)
+    REAL, dimension(size(u1)):: speed, testar, qstar, zdte ! (knon)
 
     !------------------------------------------------------------------------- 
 
@@ -75,10 +74,10 @@ contains
        lmon(i) = (ustar(i) * ustar(i) * tpot(i)) / (RKAR * RG * testar(i))
     ENDDO
 
-    call screencp(u_zref, t2m, q2m, speed, tpot, q1, ts1, qsurf, &
-         rugos, lmon, ustar, testar, qstar, psol, pat1, nsrf, zref = 2.)
-    call screencp(wind10m, temp, q_zref, speed, tpot, q1, ts1, &
-         qsurf, rugos, lmon, ustar, testar, qstar, psol, pat1, nsrf, zref = 10.)
+    call screencp(speed, tpot, q1, ts1, qsurf, rugos, lmon, ustar, testar, &
+         qstar, psol, pat1, nsrf, zref = 2., temp = t2m, q_zref = q2m)
+    call screencp(speed, tpot, q1, ts1, qsurf, rugos, lmon, ustar, testar, &
+         qstar, psol, pat1, nsrf, zref = 10., u_zref = wind10m)
 
   END subroutine stdlevvar
 

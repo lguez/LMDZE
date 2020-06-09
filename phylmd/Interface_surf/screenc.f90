@@ -55,15 +55,14 @@ contains
     ! anomalie de l'humidite relative par rapport a la surface
 
     ! Local:
-    REAL, dimension(size(temp)):: cdram, cdrah, gref ! (knon)
+    REAL, dimension(size(temp)):: cdram, cdrah ! (knon)
+    integer i
 
     !------------------------------------------------------------------------- 
 
-    gref = zref * RG
-
     ! Richardson at reference level
-    CALL cdrag(nsrf, u_zref, temp, q_zref, gref, psol, ts, qsurf, rugos, &
-         cdram, cdrah, pref)
+    CALL cdrag(nsrf, u_zref, temp, q_zref, [(zref * RG, i = 1, size(temp))], &
+         psol, ts, qsurf, rugos, cdram, cdrah, pref)
 
     u_zref = ustar / sqrt(cdram)
     delte = testar * sqrt(cdram) / cdrah
