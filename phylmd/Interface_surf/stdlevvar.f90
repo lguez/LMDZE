@@ -51,8 +51,8 @@ contains
     DOUBLE PRECISION lmon(size(u1)) ! (knon)
     ! longueur de Monin-Obukhov selon Hess, Colman and McAvaney 
 
-    REAL, dimension(size(u1)):: speed, testar, qstar, zdte, zdq, temp, delu, &
-         delte, delq, q_zref ! (knon)
+    REAL, dimension(size(u1)):: speed, testar, qstar, zdte, temp, u_zref, q_zref
+    ! (knon)
 
     !------------------------------------------------------------------------- 
 
@@ -66,20 +66,18 @@ contains
 
     DO i = 1, knon
        tpot(i) = t1(i)* (psol(i)/pat1(i))**RKAPPA
-       ustar(i) = sqrt(cdram(i) * speed(i)**2)
+       ustar(i) = sqrt(cdram(i)) * speed(i)
        zdte(i) = tpot(i) - ts1(i)
-       zdq(i) = max(q1(i), 0.) - max(qsurf(i), 0.)
-
        zdte(i) = sign(max(abs(zdte(i)), 1.e-10), zdte(i))
-
        testar(i) = (cdrah(i) * zdte(i) * speed(i))/ustar(i)
-       qstar(i) = (cdrah(i) * zdq(i) * speed(i))/ustar(i)
+       qstar(i) = (cdrah(i) * (max(q1(i), 0.) - max(qsurf(i), 0.)) * speed(i)) &
+            / ustar(i)
        lmon(i) = (ustar(i) * ustar(i) * tpot(i)) / (RKAR * RG * testar(i))
     ENDDO
 
-    call screencp(delu, delte, delq, t2m, q2m, speed, tpot, q1, ts1, qsurf, &
+    call screencp(u_zref, t2m, q2m, speed, tpot, q1, ts1, qsurf, &
          rugos, lmon, ustar, testar, qstar, psol, pat1, nsrf, zref = 2.)
-    call screencp(wind10m, delte, delq, temp, q_zref, speed, tpot, q1, ts1, &
+    call screencp(wind10m, temp, q_zref, speed, tpot, q1, ts1, &
          qsurf, rugos, lmon, ustar, testar, qstar, psol, pat1, nsrf, zref = 10.)
 
   END subroutine stdlevvar
