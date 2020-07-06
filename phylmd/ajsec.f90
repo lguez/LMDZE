@@ -26,7 +26,6 @@ contains
 
     ! Local:
     INTEGER, PARAMETER:: limbas=1 ! les couches à ajuster
-    LOGICAL, PARAMETER:: mixq = .FALSE.
     REAL, dimension(klon, limbas: klev):: zh, zq, zpk, zpkdp
     REAL hm, sm, qm
     LOGICAL down
@@ -86,14 +85,7 @@ contains
     d_t(:, : limbas - 1) = 0.
     d_t(:, limbas: klev) = zh * zpk / RCPD - t(:, limbas: klev)
     d_t(:, klev + 1:) = 0.
-
-    if (mixq) then
-       d_q(:, : limbas - 1) = 0.
-       d_q(:, limbas: klev) = zq - q(:, limbas: klev)
-       d_q(:, klev + 1:) = 0.
-    else
-       d_q = 0.
-    end if
+    d_q = 0.
 
   END SUBROUTINE ajsec
 
