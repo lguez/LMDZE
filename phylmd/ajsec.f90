@@ -14,12 +14,15 @@ contains
     USE dimphy, ONLY : klev, klon
     USE suphec_m, ONLY : rcpd, rkappa
 
-    REAL, intent(in):: paprs(klon, klev+1)
-    real, intent(in):: pplay(klon, klev)
-    REAL, intent(in):: t(klon, klev) ! temperature
-    real, intent(in):: q(klon, klev)
-    REAL, intent(out):: d_t(klon, klev) ! incrémentation de la température
-    REAL, intent(out):: d_q(klon, klev)
+    REAL, intent(in):: paprs(:, :) ! (klon, klev+1)
+    real, intent(in):: pplay(:, :) ! (klon, klev)
+    REAL, intent(in):: t(:, :) ! (klon, klev) temperature
+    real, intent(in):: q(:, :) ! (klon, klev)
+
+    REAL, intent(out):: d_t(:, :) ! (klon, klev)
+    ! incrémentation de la température
+
+    REAL, intent(out):: d_q(:, :) ! (klon, klev)
 
     ! Local:
     INTEGER, PARAMETER:: limbas=1 ! les couches à ajuster
@@ -31,10 +34,10 @@ contains
 
     !--------------------------------------------------------------------
 
-    zpk = pplay(:, limbas: klev)**RKAPPA
-    zh = RCPD * t(:, limbas: klev) / zpk
-    zq = q(:, limbas: klev)
-    forall (k = limbas: klev) &
+    zpk = pplay(:, limbas:)**RKAPPA
+    zh = RCPD * t(:, limbas:) / zpk
+    zq = q(:, limbas:)
+    forall (k = limbas:klev) &
          zpkdp(:, k) = zpk(:, k) * (paprs(:, k) - paprs(:, k+1))
 
     ! Correction des profils instables :
