@@ -84,19 +84,20 @@
     },
     {
 	"title" : "CE0L_control",
-	"required" : [
+	"required" :
+	[
             "$datasets_dir/Albedo.nc",
-            "$datasets_dir/amipbc_sic_1x1.nc",
-            "$datasets_dir/amipbc_sst_1x1.nc",
             [
-		"$datasets_dir/Ozone/Cariolle/Cariolle_v2_8/coefoz_v2_8.nc",
-		"coefoz.nc"
-            ],
-            "$datasets_dir/ERA_interim/ECDYN.nc",
+		"$AMIP_dir/amipbc_sic_360x180_1979_2008_clim.nc",
+		"amipbc_sic_1x1.nc"
+	    ],
             [
-		"$datasets_dir/ERA_interim/ECDYN.nc",
-		"ECPHY.nc"
-            ],
+		"$AMIP_dir/amipbc_sst_360x180_1979_2008_clim.nc",
+		"amipbc_sst_1x1.nc"
+	    ],
+            ["$Cariolle_dir/coefoz_v2_8.nc", "coefoz.nc"],
+            "$ECMWF_dir/ECDYN.nc",
+            ["$ECMWF_dir/ECDYN.nc", "ECPHY.nc"],
             "$datasets_dir/landiceref.nc",
             "$datasets_dir/Relief.nc",
             "$datasets_dir/Rugos.nc",
@@ -109,19 +110,20 @@
 	"command" : "$build_dir/ce0l",
 	"stdin_filename" : "$namelists_dir/ce0l_nml_zoom.txt",
 	"title" : "CE0L_zoom",
-	"required" : [
+	"required" :
+	[
             "$datasets_dir/Albedo.nc",
-            "$datasets_dir/amipbc_sic_1x1.nc",
-            "$datasets_dir/amipbc_sst_1x1.nc",
             [
-		"$datasets_dir/Ozone/Cariolle/Cariolle_v2_8/coefoz_v2_8.nc",
-		"coefoz.nc"
-            ],
-            "$datasets_dir/ERA_interim/ECDYN.nc",
+		"$AMIP_dir/amipbc_sic_360x180_1979_2008_clim.nc",
+		"amipbc_sic_1x1.nc"
+	    ],
             [
-		"$datasets_dir/ERA_interim/ECDYN.nc",
-		"ECPHY.nc"
-            ],
+		"$AMIP_dir/amipbc_sst_360x180_1979_2008_clim.nc",
+		"amipbc_sst_1x1.nc"
+	    ],
+            ["$Cariolle_dir/coefoz_v2_8.nc", "coefoz.nc"],
+            "$ECMWF_dir/ECDYN.nc",
+            ["$ECMWF_dir/ECDYN.nc", "ECPHY.nc"],
             "$datasets_dir/landiceref.nc",
             "$datasets_dir/Relief.nc",
             "$datasets_dir/Rugos.nc",
@@ -134,10 +136,7 @@
 	"required" : [
             "$tests_old_dir/CE0L_control/limit.nc",
             "$tests_old_dir/CE0L_control/coefoz_LMDZ.nc",
-            [
-		"$tests_old_dir/CE0L_control/restart.nc",
-		"start.nc"
-            ],
+            ["$tests_old_dir/CE0L_control/restart.nc", "start.nc"],
             [
 		"$tests_old_dir/CE0L_control/restartphy.nc",
 		"startphy.nc"
@@ -629,15 +628,17 @@
 	"title" : "Disvert_CMIP5",
 	"required" : [
             "$datasets_dir/Albedo.nc",
-            "$datasets_dir/amipbc_sic_1x1.nc",
-            "$datasets_dir/amipbc_sst_1x1.nc",
+            ["$AMIP_dir/amipbc_sic_360x180_1979_2008_clim.nc",
+	     "amipbc_sic_1x1.nc"],
+            ["$AMIP_dir/amipbc_sst_360x180_1979_2008_clim.nc",
+	     "amipbc_sst_1x1.nc"],
             [
-		"$datasets_dir/Ozone/Cariolle/Cariolle_v2_8/coefoz_v2_8.nc",
+		"$Cariolle_dir/coefoz_v2_8.nc",
 		"coefoz.nc"
             ],
-            "$datasets_dir/ERA_interim/ECDYN.nc",
+            "$ECMWF_dir/ECDYN.nc",
             [
-		"$datasets_dir/ERA_interim/ECDYN.nc",
+		"$ECMWF_dir/ECDYN.nc",
 		"ECPHY.nc"
             ],
             "$datasets_dir/landiceref.nc",
@@ -652,15 +653,17 @@
 	"title" : "Disvert_CMIP6",
 	"required" : [
             "$datasets_dir/Albedo.nc",
-            "$datasets_dir/amipbc_sic_1x1.nc",
-            "$datasets_dir/amipbc_sst_1x1.nc",
+            ["$AMIP_dir/amipbc_sic_360x180_1979_2008_clim.nc",
+	     "amipbc_sic_1x1.nc"],
+            ["$AMIP_dir/amipbc_sst_360x180_1979_2008_clim.nc",
+	     "amipbc_sst_1x1.nc"],
             [
-		"$datasets_dir/Ozone/Cariolle/Cariolle_v2_8/coefoz_v2_8.nc",
+		"$Cariolle_dir/coefoz_v2_8.nc",
 		"coefoz.nc"
             ],
-            "$datasets_dir/ERA_interim/ECDYN.nc",
+            "$ECMWF_dir/ECDYN.nc",
             [
-		"$datasets_dir/ERA_interim/ECDYN.nc",
+		"$ECMWF_dir/ECDYN.nc",
 		"ECPHY.nc"
             ],
             "$datasets_dir/landiceref.nc",
@@ -675,15 +678,17 @@
 	"title" : "Disvert_CMIP3",
 	"required" : [
             "$datasets_dir/Albedo.nc",
-            "$datasets_dir/amipbc_sic_1x1.nc",
-            "$datasets_dir/amipbc_sst_1x1.nc",
+            ["$AMIP_dir/amipbc_sic_360x180_1979_2008_clim.nc",
+	     "amipbc_sic_1x1.nc"],
+            ["$AMIP_dir/amipbc_sst_360x180_1979_2008_clim.nc",
+	     "amipbc_sst_1x1.nc"],
             [
-		"$datasets_dir/Ozone/Cariolle/Cariolle_v2_8/coefoz_v2_8.nc",
+		"$Cariolle_dir/coefoz_v2_8.nc",
 		"coefoz.nc"
             ],
-            "$datasets_dir/ERA_interim/ECDYN.nc",
+            "$ECMWF_dir/ECDYN.nc",
             [
-		"$datasets_dir/ERA_interim/ECDYN.nc",
+		"$ECMWF_dir/ECDYN.nc",
 		"ECPHY.nc"
             ],
             "$datasets_dir/landiceref.nc",
