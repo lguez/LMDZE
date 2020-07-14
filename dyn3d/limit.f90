@@ -12,13 +12,7 @@ contains
     ! It uses files with climatological data.  Both grids must be
     ! regular.
 
-    use conf_dat2d_m, only: conf_dat2d
-    use dimensions, only: iim, jjm
-    use dimphy, only: klon
-    use dynetat0_m, only: rlonu, rlatv
-    use grid_change, only: dyn_phy
-    use indicesol, only: epsfra, is_ter, is_oce, is_lic, is_sic
-    use inter_barxy_m, only: inter_barxy
+    ! Libraries:
     use netcdf95, only: NF95_CLOSE, NF95_CREATE, NF95_DEF_DIM, nf95_def_var, &
          nf95_enddef, nf95_get_var, nf95_gw_var, nf95_inq_dimid, &
          nf95_inq_varid, nf95_inquire_dimension, NF95_OPEN, NF95_PUT_ATT, &
@@ -27,6 +21,14 @@ contains
          NF90_UNLIMITED
     use nr_util, only: assert
     use numer_rec_95, only: spline, splint
+    
+    use conf_dat2d_m, only: conf_dat2d
+    use dimensions, only: iim, jjm
+    use dimphy, only: klon
+    use dynetat0_m, only: rlonu, rlatv
+    use grid_change, only: dyn_phy
+    use indicesol, only: epsfra, is_ter, is_oce, is_lic, is_sic
+    use inter_barxy_m, only: inter_barxy
     use phyetat0_m, only: masque
     use start_init_orog_m, only: mask
     use unit_nml_m, only: unit_nml
