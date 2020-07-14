@@ -16,7 +16,7 @@ contains
     use netcdf95, only: NF95_CLOSE, NF95_CREATE, NF95_DEF_DIM, nf95_def_var, &
          nf95_enddef, nf95_get_var, nf95_gw_var, nf95_inq_dimid, &
          nf95_inq_varid, nf95_inquire_dimension, NF95_OPEN, NF95_PUT_ATT, &
-         NF95_PUT_VAR
+         NF95_PUT_VAR, find_coord
     use netcdf, only: NF90_CLOBBER, NF90_FLOAT, NF90_GLOBAL, NF90_NOWRITE, &
          NF90_UNLIMITED
     use nr_util, only: assert
@@ -189,11 +189,11 @@ contains
     PRINT *, 'Processing sea ice...'
     call NF95_OPEN('amipbc_sic_1x1.nc', NF90_NOWRITE, ncid)
 
-    call nf95_inq_varid(ncid, "longitude", varid)
+    call find_coord(ncid, std_name = "longitude", varid = varid)
     call nf95_gw_var(ncid, varid, dlon_ini)
     imdep = size(dlon_ini)
 
-    call nf95_inq_varid(ncid, "latitude", varid)
+    call find_coord(ncid, std_name = "latitude", varid = varid)
     call nf95_gw_var(ncid, varid, dlat_ini)
     jmdep = size(dlat_ini)
 
@@ -290,11 +290,11 @@ contains
     PRINT *, 'Traitement de la sst'
     call NF95_OPEN('amipbc_sst_1x1.nc', NF90_NOWRITE, ncid)
 
-    call nf95_inq_varid(ncid, "longitude", varid)
+    call find_coord(ncid, std_name = "longitude", varid = varid)
     call nf95_gw_var(ncid, varid, dlon_ini)
     imdep = size(dlon_ini)
 
-    call nf95_inq_varid(ncid, "latitude", varid)
+    call find_coord(ncid, std_name = "latitude", varid = varid)
     call nf95_gw_var(ncid, varid, dlat_ini)
     jmdep = size(dlat_ini)
 

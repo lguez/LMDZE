@@ -62,7 +62,7 @@ CONTAINS
     jml_dyn = size(lat_ini)
     print *, "jml_dyn = ", jml_dyn
 
-    call nf95_inq_varid(ncid, "level", varid)
+    call find_coord(ncid, varid=varid, std_name="plev")
     call nf95_gw_var(ncid, varid, levdyn_ini)
     llm_dyn = size(levdyn_ini)
     print *, "llm_dyn = ", llm_dyn
