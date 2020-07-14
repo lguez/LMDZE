@@ -1,0 +1,8 @@
+<?xml version = "1.0"?>
+<simulation>
+  <context id = "xios">
+    <variable_definition>
+      <variable id = "print_file" type = "bool">true</variable>
+    </variable_definition>
+  </context>
+</simulation>
