@@ -432,6 +432,9 @@ contains
           endif
        enddo
     enddo
+    
+    fraca(:, 1) = 0.
+
     !CR: calcul de fracazmix
     do ig=1, klon
        fracazmix(ig)=(fraca(ig, lmix(ig)+1)-fraca(ig, lmix(ig)))/ &
@@ -466,6 +469,9 @@ contains
           endif
        enddo
     enddo
+
+    fracc(:, 1) = 0.
+    fracc(:, nlay + 1) = 0.
 
     ! Calcul de fracd, wd
     ! somme wa - wd = 0
