@@ -29,7 +29,7 @@ contains
          nf95_inquire_variable, NF95_OPEN
 
     REAL, intent(out):: pctsrf(:, :) ! (klon, nbsrf)
-    REAL, intent(out):: ftsol(klon, nbsrf)
+    REAL, intent(out):: ftsol(:, :) ! (klon, nbsrf)
     REAL, intent(out):: ftsoil(:, :, :) ! (klon, nsoilmx, nbsrf)
     REAL, intent(out):: qsurf(klon, nbsrf)
 

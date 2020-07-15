@@ -618,15 +618,9 @@
             "$datasets_dir/Albedo.nc",
             "$PWD/sea_ice.nc",
             "$PWD/SST.nc",
-            [
-		"$Cariolle_dir/coefoz_v2_8.nc",
-		"coefoz.nc"
-            ],
+            ["$Cariolle_dir/coefoz_v2_8.nc", "coefoz.nc"],
             "$ECMWF_dir/ECDYN.nc",
-            [
-		"$ECMWF_dir/ECDYN.nc",
-		"ECPHY.nc"
-            ],
+            ["$ECMWF_dir/ECDYN.nc", "ECPHY.nc"],
             "$datasets_dir/landiceref.nc",
             "$datasets_dir/Relief.nc",
             "$datasets_dir/Rugos.nc",
@@ -641,15 +635,9 @@
             "$datasets_dir/Albedo.nc",
             "$PWD/sea_ice.nc",
             "$PWD/SST.nc",
-            [
-		"$Cariolle_dir/coefoz_v2_8.nc",
-		"coefoz.nc"
-            ],
+            ["$Cariolle_dir/coefoz_v2_8.nc", "coefoz.nc"],
             "$ECMWF_dir/ECDYN.nc",
-            [
-		"$ECMWF_dir/ECDYN.nc",
-		"ECPHY.nc"
-            ],
+            ["$ECMWF_dir/ECDYN.nc", "ECPHY.nc"],
             "$datasets_dir/landiceref.nc",
             "$datasets_dir/Relief.nc",
             "$datasets_dir/Rugos.nc",
@@ -664,15 +652,9 @@
             "$datasets_dir/Albedo.nc",
             "$PWD/sea_ice.nc",
             "$PWD/SST.nc",
-            [
-		"$Cariolle_dir/coefoz_v2_8.nc",
-		"coefoz.nc"
-            ],
+            ["$Cariolle_dir/coefoz_v2_8.nc", "coefoz.nc"],
             "$ECMWF_dir/ECDYN.nc",
-            [
-		"$ECMWF_dir/ECDYN.nc",
-		"ECPHY.nc"
-            ],
+            ["$ECMWF_dir/ECDYN.nc", "ECPHY.nc"],
             "$datasets_dir/landiceref.nc",
             "$datasets_dir/Relief.nc",
             "$datasets_dir/Rugos.nc",

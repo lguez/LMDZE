@@ -336,9 +336,6 @@ contains
     deallocate(champtime, yder)
     champan(iim + 1, :, :) = champan(1, :, :)
 
-    !IM14/03/2002 : SST amipbc greater then 271.38
-    PRINT *, 'limit: SST Amipbc >= 271.38 '
-
     DO k = 1, 360
        DO j = 1, jjm + 1
           DO i = 1, iim
