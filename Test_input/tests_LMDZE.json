@@ -87,14 +87,8 @@
 	"required" :
 	[
             "$datasets_dir/Albedo.nc",
-            [
-		"$AMIP_dir/amipbc_sic_360x180_1979_2008_clim.nc",
-		"amipbc_sic_1x1.nc"
-	    ],
-            [
-		"$AMIP_dir/amipbc_sst_360x180_1979_2008_clim.nc",
-		"amipbc_sst_1x1.nc"
-	    ],
+            "$PWD/sea_ice.nc",
+            "$PWD/SST.nc",
             ["$Cariolle_dir/coefoz_v2_8.nc", "coefoz.nc"],
             "$ECMWF_dir/ECDYN.nc",
             ["$ECMWF_dir/ECDYN.nc", "ECPHY.nc"],
@@ -113,14 +107,8 @@
 	"required" :
 	[
             "$datasets_dir/Albedo.nc",
-            [
-		"$AMIP_dir/amipbc_sic_360x180_1979_2008_clim.nc",
-		"amipbc_sic_1x1.nc"
-	    ],
-            [
-		"$AMIP_dir/amipbc_sst_360x180_1979_2008_clim.nc",
-		"amipbc_sst_1x1.nc"
-	    ],
+            "$PWD/sea_ice.nc",
+            "$PWD/SST.nc",
             ["$Cariolle_dir/coefoz_v2_8.nc", "coefoz.nc"],
             "$ECMWF_dir/ECDYN.nc",
             ["$ECMWF_dir/ECDYN.nc", "ECPHY.nc"],
@@ -628,10 +616,8 @@
 	"title" : "Disvert_CMIP5",
 	"required" : [
             "$datasets_dir/Albedo.nc",
-            ["$AMIP_dir/amipbc_sic_360x180_1979_2008_clim.nc",
-	     "amipbc_sic_1x1.nc"],
-            ["$AMIP_dir/amipbc_sst_360x180_1979_2008_clim.nc",
-	     "amipbc_sst_1x1.nc"],
+            "$PWD/sea_ice.nc",
+            "$PWD/SST.nc",
             [
 		"$Cariolle_dir/coefoz_v2_8.nc",
 		"coefoz.nc"
@@ -653,10 +639,8 @@
 	"title" : "Disvert_CMIP6",
 	"required" : [
             "$datasets_dir/Albedo.nc",
-            ["$AMIP_dir/amipbc_sic_360x180_1979_2008_clim.nc",
-	     "amipbc_sic_1x1.nc"],
-            ["$AMIP_dir/amipbc_sst_360x180_1979_2008_clim.nc",
-	     "amipbc_sst_1x1.nc"],
+            "$PWD/sea_ice.nc",
+            "$PWD/SST.nc",
             [
 		"$Cariolle_dir/coefoz_v2_8.nc",
 		"coefoz.nc"
@@ -678,10 +662,8 @@
 	"title" : "Disvert_CMIP3",
 	"required" : [
             "$datasets_dir/Albedo.nc",
-            ["$AMIP_dir/amipbc_sic_360x180_1979_2008_clim.nc",
-	     "amipbc_sic_1x1.nc"],
-            ["$AMIP_dir/amipbc_sst_360x180_1979_2008_clim.nc",
-	     "amipbc_sst_1x1.nc"],
+            "$PWD/sea_ice.nc",
+            "$PWD/SST.nc",
             [
 		"$Cariolle_dir/coefoz_v2_8.nc",
 		"coefoz.nc"

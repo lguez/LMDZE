@@ -187,7 +187,7 @@ contains
     ENDDO
 
     PRINT *, 'Processing sea ice...'
-    call NF95_OPEN('amipbc_sic_1x1.nc', NF90_NOWRITE, ncid)
+    call NF95_OPEN('sea_ice.nc', NF90_NOWRITE, ncid)
 
     call find_coord(ncid, std_name = "longitude", varid = varid)
     call nf95_gw_var(ncid, varid, dlon_ini)
@@ -288,7 +288,7 @@ contains
     end DO
     
     PRINT *, 'Traitement de la sst'
-    call NF95_OPEN('amipbc_sst_1x1.nc', NF90_NOWRITE, ncid)
+    call NF95_OPEN('SST.nc', NF90_NOWRITE, ncid)
 
     call find_coord(ncid, std_name = "longitude", varid = varid)
     call nf95_gw_var(ncid, varid, dlon_ini)
