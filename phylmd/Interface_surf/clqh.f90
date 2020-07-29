@@ -38,7 +38,7 @@ contains
     ! vitesse de la 1ere couche (m / s)
 
     REAL, intent(in):: coef(:, 2:) ! (knon, 2:klev)
-    ! Le coefficient d'echange (m**2 / s) multiplie par le cisaillement
+    ! Le coefficient d'echange (m^2 / s) multiplie par le cisaillement
     ! du vent (dV / dz)
 
     REAL, intent(in):: cdragh(:) ! (knon) sans unite

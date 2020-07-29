@@ -41,7 +41,7 @@ contains
     ! contre-gradient pour la chaleur sensible, en K m-1
 
     REAL gamah(size(paprs, 1), 2:klev) ! (knon, 2:klev)
-    REAL buf1(size(paprs, 1)), buf2(size(paprs, 1))
+    REAL buf1(size(paprs, 1)), buf2(size(paprs, 1)) ! (knon)
 
     !----------------------------------------------------------------
 

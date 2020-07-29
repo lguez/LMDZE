@@ -55,7 +55,7 @@ module suphec_m
   ! specific heat capacity at constant volume of dry air, in J K-1 kg-1
   
   real, parameter:: RMO3 = 47.9942
-  REAL, parameter:: RKAPPA = RD/RCPD
+  REAL, parameter:: RKAPPA = RD / RCPD
   real, parameter:: RETV = RV / RD - 1.
 
   ! A1.5, 6 Thermodynamic liquid, solid phases
@@ -107,7 +107,7 @@ contains
     print '('' Cpd = '', e13.7)', RCPD
     print '('' Cvd = '', e13.7)', RCVD
     print '('' Cvv = '', e13.7)', RCVV
-    print '('' Rd/Cpd = '', e13.7)', RKAPPA
+    print '('' Rd / Cpd = '', e13.7)', RKAPPA
     print *, 'Rv / Rd - 1 = ', RETV
 
     ! 7. DEFINE THERMODYNAMIC CONSTANTS, SOLID PHASE.
@@ -127,12 +127,12 @@ contains
 
     ! 9. SATURATED VAPOUR PRESSURE.
 
-    RGAMW = (RCW-RCPV)/RV
-    RBETW = RLVTT/RV+RGAMW*RTT
-    RALPW = LOG(RESTT)+RBETW/RTT+RGAMW*LOG(RTT)
-    RGAMS = (RCS-RCPV)/RV
-    RBETS = RLSTT/RV+RGAMS*RTT
-    RALPS = LOG(RESTT)+RBETS/RTT+RGAMS*LOG(RTT)
+    RGAMW = (RCW-RCPV) / RV
+    RBETW = RLVTT / RV+RGAMW*RTT
+    RALPW = LOG(RESTT)+RBETW / RTT+RGAMW*LOG(RTT)
+    RGAMS = (RCS-RCPV) / RV
+    RBETS = RLSTT / RV+RGAMS*RTT
+    RALPS = LOG(RESTT)+RBETS / RTT+RGAMS*LOG(RTT)
     RGAMD = RGAMS-RGAMW
     RBETD = RBETS-RBETW
     RALPD = RALPS-RALPW

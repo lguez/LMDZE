@@ -78,7 +78,7 @@ contains
 
     REAL pde_u(klon, llm) ! flux detraine dans le panache montant
     REAL pen_d(klon, llm) ! flux entraine dans le panache descendant
-    REAL coefh(:, 2:) ! (klon, 2:llm) coeff melange couche limite
+    REAL, intent(in):: coefh(:, 2:) ! (klon, 2:llm) coeff melange couche limite
     real cdragh(:) ! (klon)
     real fm_therm(klon, llm+1), entr_therm(klon, llm) ! thermiques
     REAL, intent(in):: yu1(:), yv1(:) ! (klon) vent au premier niveau

@@ -33,14 +33,12 @@ contains
     
     ! Quelques constantes et options:
 
-    REAL prandtl
-    PARAMETER (prandtl=0.4)
-    REAL kstable
-    PARAMETER (kstable=0.002)
-    REAL mixlen ! constante controlant longueur de melange
-    PARAMETER (mixlen=35.0)
-    REAL seuil ! au-dela l'inversion est consideree trop faible
-    PARAMETER (seuil=-0.02)
+    REAL, PARAMETER:: prandtl=0.4
+    REAL, PARAMETER:: kstable=0.002
+    REAL, PARAMETER:: mixlen=35.0 ! constante controlant longueur de melange
+
+    REAL, PARAMETER:: seuil=-0.02
+    ! au-dela l'inversion est consideree trop faible
 
     INTEGER knon ! nombre de points a traiter
     INTEGER i, k
