@@ -13,12 +13,11 @@ program test_ozonecm
 
   use dimensions, only: jjm, llm, set_dimensions
   USE dimphy, ONLY : klon, init_dimphy
-  USE dimsoil, ONLY : nsoilmx
   use disvert_m, only: disvert, ap, bp, preff, presnivs
   use dynetat0_chosen_m, only: read_serre
-  USE indicesol, ONLY : nbsrf
+  use dynetat0_m, only: fyhyp
   use ozonecm_m, only: ozonecm
-  use phyetat0_m, only: rlat, phyetat0
+  use phyetat0_m, only: rlat, set_lat
   use unit_nml_m, only: unit_nml, set_unit_nml
 
   implicit none
@@ -32,42 +31,6 @@ program test_ozonecm
   integer julien, k
   real, parameter:: RG = 9.80665 ! acceleration of gravity, in m s-2
   real, parameter:: dobson_u = 2.1415e-05 ! Dobson unit, in kg m-2
-
-  REAL, ALLOCATABLE:: pctsrf(:, :) ! (klon, nbsrf)
-  REAL, ALLOCATABLE:: ftsol(:, :) ! (klon, nbsrf)
-  REAL, ALLOCATABLE:: ftsoil(:, :, :) ! (klon, nsoilmx, nbsrf)
-  REAL, ALLOCATABLE:: qsurf(:, :) ! (klon, nbsrf)
-
-  REAL, ALLOCATABLE:: qsol(:) ! (klon)
-  ! column-density of water in soil, in kg m-2
-
-  REAL, ALLOCATABLE:: snow(:, :) ! (klon, nbsrf)
-  REAL, ALLOCATABLE:: albe(:, :) ! (klon, nbsrf)
-  REAL, ALLOCATABLE:: rain_fall(:) ! (klon)
-  REAL, ALLOCATABLE:: snow_fall(:) ! (klon)
-  real, allocatable:: solsw(:) ! (klon)
-  REAL, ALLOCATABLE:: sollw(:) ! (klon)
-  real, allocatable:: fder(:) ! (klon)
-  REAL, ALLOCATABLE:: radsol(:) ! (klon)
-  REAL, ALLOCATABLE:: frugs(:, :) ! (klon, nbsrf)
-  REAL, ALLOCATABLE:: agesno(:, :) ! (klon, nbsrf)
-  REAL, ALLOCATABLE:: zmea(:) ! (klon)
-  REAL, ALLOCATABLE:: zstd(:) ! (klon)
-  REAL, ALLOCATABLE:: zsig(:) ! (klon)
-  REAL, ALLOCATABLE:: zgam(:) ! (klon)
-  REAL, ALLOCATABLE:: zthe(:) ! (klon)
-  REAL, ALLOCATABLE:: zpic(:) ! (klon)
-  REAL, ALLOCATABLE:: zval(:) ! (klon)
-  REAL, ALLOCATABLE:: t_ancien(:, :), q_ancien(:, :) ! (klon, llm)
-  LOGICAL ancien_ok
-  real, allocatable:: rnebcon(:, :), ratqs(:, :), clwcon(:, :) ! (klon, llm)
-  REAL, ALLOCATABLE:: run_off_lic_0(:) ! (klon)
-  real, allocatable:: sig1(:, :) ! (klon, llm) ! section adiabatic updraft
-
-  real, allocatable:: w01(:, :) ! (klon, llm) 
-  ! vertical velocity within adiabatic updraft
-
-  integer ncid_startphy
 
   ! For NetCDF:
   integer ncid, dimid_time, dimid_plev, dimid_latitude
@@ -85,42 +48,13 @@ program test_ozonecm
   allocate(p(llm + 1))
   allocate(wo(klon, llm, 360))
   allocate(tro3(klon, llm, 360))
-  ALLOCATE(pctsrf(klon, nbsrf))
-  ALLOCATE(ftsol(klon, nbsrf))
-  ALLOCATE(ftsoil(klon, nsoilmx, nbsrf))
-  ALLOCATE(qsurf(klon, nbsrf))
-  ALLOCATE(qsol(klon))
-  ALLOCATE(snow(klon, nbsrf))
-  ALLOCATE(albe(klon, nbsrf))
-  ALLOCATE(rain_fall(klon))
-  ALLOCATE(snow_fall(klon))
-  allocate(solsw(klon))
-  ALLOCATE(sollw(klon))
-  allocate(fder(klon))
-  ALLOCATE(radsol(klon))
-  ALLOCATE(frugs(klon, nbsrf))
-  ALLOCATE(agesno(klon, nbsrf))
-  ALLOCATE(zmea(klon))
-  ALLOCATE(zstd(klon))
-  ALLOCATE(zsig(klon))
-  ALLOCATE(zgam(klon))
-  ALLOCATE(zthe(klon))
-  ALLOCATE(zpic(klon))
-  ALLOCATE(zval(klon))
-  ALLOCATE(t_ancien(klon, llm), q_ancien(klon, llm))
-  allocate(rnebcon(klon, llm), ratqs(klon, llm))
-  ALLOCATE(clwcon(klon, llm), run_off_lic_0(klon))
-  allocate(sig1(klon, llm))
-  allocate(w01(klon, llm))
   
   call read_serre
   call disvert
   p = ap + bp * preff
-  call phyetat0(pctsrf, ftsol, ftsoil, qsurf, qsol, snow, albe, rain_fall, &
-       snow_fall, solsw, sollw, fder, radsol, frugs, agesno, zmea, zstd, zsig, &
-       zgam, zthe, zpic, zval, t_ancien, q_ancien, ancien_ok, rnebcon, ratqs, &
-       clwcon, run_off_lic_0, sig1, w01, ncid_startphy)
-
+  call fyhyp
+  call set_lat
+  
   do julien = 1, 360
      wo(:, :, julien) = ozonecm(REAL(julien), spread(p, dim=1, ncopies=jjm+1))
   end do

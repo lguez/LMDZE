@@ -608,9 +608,7 @@
     {
 	"command" : "$build_dir/test_ozonecm",
 	"title": "Test_ozonecm",
-	"stdin_filename": "$test_input_dir/Namelists/test_ozonecm_nml.txt",
-	"required" :
-	[["$test_input_dir/restartphy_test_ozonecm.nc", "startphy.nc"]]
+	"stdin_filename": "$test_input_dir/Namelists/test_ozonecm_nml.txt"
     },
     {
 	"title" : "Disvert_CMIP5",
