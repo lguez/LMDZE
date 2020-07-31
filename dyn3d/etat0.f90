@@ -32,7 +32,7 @@ contains
     use netcdf95, only: nf95_close, nf95_get_var, nf95_gw_var, nf95_put_var, &
          nf95_inq_varid, nf95_open
     use nr_util, only: pi, assert
-    use phyetat0_m, only: masque, phyetat0_new
+    use phyetat0_m, only: masque, set_lat, set_lon, set_masque
     use phyredem0_m, only: phyredem0, ncid_restartphy
     use phyredem_m, only: phyredem
     use q_sat_m, only: q_sat
@@ -126,7 +126,9 @@ contains
     call start_init_orog(phis, zmea_2d, zstd_2d, zsig_2d, zgam_2d, zthe_2d, &
          zpic_2d, zval_2d) ! also compute "mask"
     call init_dyn_phy ! define the mask "dyn_phy" for distinct grid points
-    call phyetat0_new
+    call set_lat
+    call set_lon
+    call set_masque
 
     call start_init_phys(tsol_2d, qsol_2d)
     CALL start_init_dyn(tsol_2d, phis, ps)

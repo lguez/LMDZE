@@ -318,31 +318,55 @@ contains
 
   !*********************************************************************
 
-  subroutine phyetat0_new
+  subroutine set_lat
 
     use nr_util, only: rad_to_deg
 
     use dimensions, only: iim, jjm
     use dimphy, only: klon
-    use dynetat0_m, only: rlatu, rlonv
-    use grid_change, only: dyn_phy
-    USE start_init_orog_m, only: mask
+    use dynetat0_m, only: rlatu
     
     !-------------------------------------------------------------------------
     
-    allocate(rlat(klon), rlon(klon))
-    allocate(masque(KLON))
-
+    allocate(rlat(klon))
     rlat(1) = 90.
     rlat(2:klon-1) = pack(spread(rlatu(2:jjm), 1, iim), .true.) * rad_to_deg
     rlat(klon) = - 90.
 
+  end subroutine set_lat
+
+  !*********************************************************************
+
+  subroutine set_lon
+
+    use nr_util, only: rad_to_deg
+
+    use dimensions, only: iim, jjm
+    use dimphy, only: klon
+    use dynetat0_m, only: rlonv
+    
+    !-------------------------------------------------------------------------
+    
+    allocate(rlon(klon))
     rlon(1) = 0.
     rlon(2:klon-1) = pack(spread(rlonv(:iim), 2, jjm - 1), .true.) * rad_to_deg
     rlon(klon) = 0.
 
+  end subroutine set_lon
+
+  !*********************************************************************
+
+  subroutine set_masque
+
+    use dimphy, only: klon
+    use grid_change, only: dyn_phy
+    USE start_init_orog_m, only: mask
+
+    !-------------------------------------------------------------------------
+    
+    allocate(masque(KLON))
     masque = pack(mask, dyn_phy)
 
-  end subroutine phyetat0_new
+  end subroutine set_masque
 
 end module phyetat0_m
