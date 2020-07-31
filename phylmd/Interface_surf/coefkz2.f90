@@ -51,14 +51,6 @@ contains
 
     knon = size(paprs, 1)
     
-    ! Initialiser les sorties
-    DO k = 2, klev
-       DO i = 1, knon
-          coefm(i, k) = 0.0
-          coefh(i, k) = 0.0
-       ENDDO
-    ENDDO
-
     ! Chercher la zone d'inversion forte
 
     DO i = 1, knon
