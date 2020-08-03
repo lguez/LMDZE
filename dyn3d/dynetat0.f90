@@ -190,6 +190,8 @@ contains
 
     ! Il vaut mieux avoir : grossismy * dzoom < pi / 2
 
+    use nr_util, only: rad_to_deg
+
     use coefpoly_m, only: coefpoly, a0, a1, a2, a3
     USE dimensions, only: jjm
     use dynetat0_chosen_m, only: clat, grossismy, dzoomy, tauy
@@ -484,13 +486,10 @@ contains
        ENDIF
     ENDDO
 
-    print *, 'Latitudes'
-    print 3, minval(ylat(:jjm)) *180d0/pi, maxval(ylat(:jjm))*180d0/pi
-
-3   Format(1x, ' Au centre du zoom, la longueur de la maille est', &
-         ' d environ ', f0.2, ' degres ', /, &
-         ' alors que la maille en dehors de la zone du zoom est ', &
-         "d'environ ", f0.2, ' degres ')
+    print *, "Minimum latitude step:", minval(ylat(:jjm)) * rad_to_deg, &
+         "degrees"
+    print *, "Maximum latitude step:", maxval(ylat(:jjm)) * rad_to_deg, &
+         "degrees"
 
     rlatu(1) = pi / 2.
     rlatu(jjm + 1) = -rlatu(1)
