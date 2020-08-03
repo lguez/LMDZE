@@ -16,12 +16,12 @@ contains
 
     integer, intent(in):: nsrf ! indicateur de la nature du sol
 
-    REAL, intent(in):: paprs(:, :) ! (knon, klev+1)
+    REAL, intent(in):: paprs(:, :) ! (knon, klev + 1)
     ! pression a chaque intercouche (en Pa)
 
     REAL, intent(in):: pplay(:, :) ! (knon, klev)
     ! pression au milieu de chaque couche (en Pa)
-    
+
     REAL, intent(in):: t(:, :) ! (knon, klev) temperature (K)
 
     REAL, intent(out):: coefm(:, 2:) ! (knon, 2:klev) coefficient vitesse
@@ -30,14 +30,14 @@ contains
     ! coefficient chaleur et humidite)
 
     ! Local:
-    
+
     ! Quelques constantes et options:
 
-    REAL, PARAMETER:: prandtl=0.4
-    REAL, PARAMETER:: kstable=0.002
-    REAL, PARAMETER:: mixlen=35.0 ! constante controlant longueur de melange
+    REAL, PARAMETER:: prandtl = 0.4
+    REAL, PARAMETER:: kstable = 0.002
+    REAL, PARAMETER:: mixlen = 35.0 ! constante controlant longueur de melange
 
-    REAL, PARAMETER:: seuil=-0.02
+    REAL, PARAMETER:: seuil = - 0.02
     ! au-dela l'inversion est consideree trop faible
 
     INTEGER knon ! nombre de points a traiter
@@ -50,14 +50,15 @@ contains
     !----------------------------------------------------------
 
     knon = size(paprs, 1)
-    
+
     ! Chercher la zone d'inversion forte
 
     DO i = 1, knon
        invb(i) = klev
-       zdthmin(i)=0.0
+       zdthmin(i) = 0.0
     ENDDO
-    DO k = 2, klev/ 2 - 1
+    
+    DO k = 2, klev / 2 - 1
        DO i = 1, knon
           zdthdp = (t(i, k) - t(i, k + 1)) / (pplay(i, k) - pplay(i, k + 1)) &
                - RD * 0.5 * (t(i, k) + t(i, k + 1)) / RCPD / paprs(i, k + 1)
@@ -74,12 +75,12 @@ contains
        DO i = 1, knon
           ! si on est sur ocean et s'il n'y a pas d'inversion ou si
           ! l'inversion est trop faible:
-          IF ((nsrf.EQ.is_oce) .AND.  &  
-               ((invb(i).EQ.klev) .OR. (zdthmin(i) > seuil))) THEN
-             zl2(i)=(mixlen*MAX(0.0, (paprs(i, k)-paprs(i, klev+1)) &
-                  /(paprs(i, 2)-paprs(i, klev+1))))**2
-             coefm(i, k)= zl2(i)* kstable
-             coefh(i, k) = coefm(i, k) /prandtl ! h et m different
+          IF (nsrf == is_oce .AND. &
+               (invb(i) == klev .OR. zdthmin(i) > seuil)) THEN
+             zl2(i) = (mixlen * MAX(0.0, (paprs(i, k) - paprs(i, klev + 1)) &
+                  / (paprs(i, 2) - paprs(i, klev + 1))))**2
+             coefm(i, k) = zl2(i) * kstable
+             coefh(i, k) = coefm(i, k) / prandtl ! h et m different
           ENDIF
        ENDDO
     ENDDO
