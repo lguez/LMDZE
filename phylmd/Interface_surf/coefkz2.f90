@@ -69,7 +69,6 @@ contains
        ENDDO
     ENDDO
 
-    ! Introduire une diffusion:
     DO k = 2, klev
        DO i = 1, knon
           ! si on est sur ocean et s'il n'y a pas d'inversion ou si
@@ -85,6 +84,7 @@ contains
              coefh(i, k) = 0. 
           ENDIF
        ENDDO
+    ! Introduire une diffusion :
     ENDDO
 
   END SUBROUTINE coefkz2
