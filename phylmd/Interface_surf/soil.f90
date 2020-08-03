@@ -188,7 +188,8 @@ contains
        zdz2(jk) = dz2(jk) / dtphys
     END DO
 
-    call compute_c_d(nisurf, zdz2, dz1, zc, zd, tsoil)
+    call compute_c_d(zdz2, dz1, zc(:knon, :, nisurf), zd(:knon, :, nisurf), &
+         tsoil)
 
     ! Computation of the surface diffusive flux from ground and
     ! calorific capacity of the ground:
@@ -225,43 +226,36 @@ contains
 
   !****************************************************************
 
-  subroutine compute_c_d(nisurf, zdz2, dz1, zc, zd, tsoil)
+  subroutine compute_c_d(zdz2, dz1, zc, zd, tsoil)
 
     ! Computation of the coefficients Zc and Zd for the next step.
 
     USE dimsoil, only: nsoilmx
-    USE indicesol, only: nbsrf
     
-    INTEGER, intent(in):: nisurf ! surface type index
     REAL, intent(in):: zdz2(:) ! (nsoilmx)
     REAL, intent(in):: dz1(:) ! (nsoilmx)
-    REAL, intent(inout):: zc(:, :, :), zd(:, :, :) ! (klon, nsoilmx, nbsrf)
+    REAL, intent(inout):: zc(:, :), zd(:, :) ! (knon, nsoilmx)
 
     real, intent(in):: tsoil(:, :) ! (knon, nsoilmx)
     ! temperature inside the ground (K), layer 1 nearest to the surface
 
     ! Local:
     integer ig, knon, jk
-    real z1(size(tsoil, 1), nbsrf) ! (knon, nbsrf)
+    real z1
 
     !------------------------------------------------------------------
 
     knon  = size(tsoil, 1)
-    
-    DO ig = 1, knon
-       z1(ig, nisurf) = zdz2(nsoilmx) + dz1(nsoilmx - 1)
-       zc(ig, nsoilmx - 1, nisurf) = zdz2(nsoilmx) * tsoil(ig, nsoilmx) / &
-            z1(ig, nisurf)
-       zd(ig, nsoilmx - 1, nisurf) = dz1(nsoilmx - 1) / z1(ig, nisurf)
-    END DO
+    z1 = zdz2(nsoilmx) + dz1(nsoilmx - 1)
+    zc(:, nsoilmx - 1) = zdz2(nsoilmx) * tsoil(:, nsoilmx) / z1
+    zd(:, nsoilmx - 1) = dz1(nsoilmx - 1) / z1
 
     DO jk = nsoilmx - 1, 2, - 1
        DO ig = 1, knon
-          z1(ig, nisurf) = 1. / (zdz2(jk) + dz1(jk - 1) &
-               + dz1(jk) * (1. - zd(ig, jk, nisurf)))
-          zc(ig, jk - 1, nisurf) = (tsoil(ig, jk) * zdz2(jk) &
-               + dz1(jk) * zc(ig, jk, nisurf)) * z1(ig, nisurf)
-          zd(ig, jk - 1, nisurf) = dz1(jk - 1) * z1(ig, nisurf)
+          z1 = 1. / (zdz2(jk) + dz1(jk - 1) + dz1(jk) * (1. - zd(ig, jk)))
+          zc(ig, jk - 1) = (tsoil(ig, jk) * zdz2(jk) &
+               + dz1(jk) * zc(ig, jk)) * z1
+          zd(ig, jk - 1) = dz1(jk - 1) * z1
        END DO
     END DO
 
