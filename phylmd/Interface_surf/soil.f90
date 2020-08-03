@@ -8,7 +8,7 @@ contains
 
   SUBROUTINE soil(nisurf, snow, tsurf, tsoil, soilcap, soilflux)
 
-    ! From LMDZ4/libf/phylmd/soil.F, version 1.1.1.1, 2004/05/19
+    ! From LMDZ4/libf/phylmd/soil.F, version 1.1.1.1, 2004 May 19th
 
     ! Author: Frederic Hourdin, January 30th, 1992
 
