@@ -43,7 +43,6 @@ contains
     INTEGER knon ! nombre de points a traiter
     INTEGER i, k
     INTEGER invb(size(paprs, 1)) ! (knon)
-    REAL zl2(size(paprs, 1)) ! (knon)
     REAL zdthmin(size(paprs, 1)) ! (knon)
     real zdthdp
 
@@ -77,9 +76,9 @@ contains
           ! l'inversion est trop faible:
           IF (nsrf == is_oce .AND. &
                (invb(i) == klev .OR. zdthmin(i) > seuil)) THEN
-             zl2(i) = (mixlen * MAX(0.0, (paprs(i, k) - paprs(i, klev + 1)) &
-                  / (paprs(i, 2) - paprs(i, klev + 1))))**2
-             coefm(i, k) = zl2(i) * kstable
+             coefm(i, k) = (mixlen * MAX(0.0, (paprs(i, k) &
+                  - paprs(i, klev + 1)) / (paprs(i, 2) &
+                  - paprs(i, klev + 1))))**2 * kstable
              coefh(i, k) = coefm(i, k) / prandtl ! h et m different
           else
              coefm(i, k) = 0. 
