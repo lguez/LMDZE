@@ -227,7 +227,7 @@ contains
 
   subroutine compute_c_d(nisurf, zdz2, dz1, zc, zd, tsoil)
 
-    ! Computation of the Zc and Zd coefficient for the next step.
+    ! Computation of the coefficients Zc and Zd for the next step.
 
     USE dimsoil, only: nsoilmx
     USE indicesol, only: nbsrf
