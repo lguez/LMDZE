@@ -81,6 +81,9 @@ contains
                   / (paprs(i, 2) - paprs(i, klev + 1))))**2
              coefm(i, k) = zl2(i) * kstable
              coefh(i, k) = coefm(i, k) / prandtl ! h et m different
+          else
+             coefm(i, k) = 0. 
+             coefh(i, k) = 0. 
           ENDIF
        ENDDO
     ENDDO
