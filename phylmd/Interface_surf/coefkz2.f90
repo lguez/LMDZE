@@ -51,18 +51,18 @@ contains
 
     knon = size(paprs, 1)
 
-    ! Chercher la zone d'inversion forte
+    ! Chercher la zone d'inversion forte :
 
     DO i = 1, knon
        invb(i) = klev
        zdthmin(i) = 0.0
     ENDDO
-    
+
     DO k = 2, klev / 2 - 1
        DO i = 1, knon
-          zdthdp = (t(i, k) - t(i, k + 1)) / (pplay(i, k) - pplay(i, k + 1)) &
-               - RD * 0.5 * (t(i, k) + t(i, k + 1)) / RCPD / paprs(i, k + 1)
-          zdthdp = zdthdp * 100.
+          zdthdp = ((t(i, k) - t(i, k + 1)) / (pplay(i, k) - pplay(i, k + 1)) &
+               - RD * 0.5 * (t(i, k) + t(i, k + 1)) / RCPD / paprs(i, k + 1)) &
+               * 100.
           IF (pplay(i, k) > 0.8 * paprs(i, 1) .AND. zdthdp < zdthmin(i)) THEN
              zdthmin(i) = zdthdp
              invb(i) = k
