@@ -4,17 +4,14 @@ module coefkz2_m
 
 contains
 
-  SUBROUTINE coefkz2(nsrf, paprs, pplay, t, coefm, coefh)
+  SUBROUTINE coefkz2(paprs, pplay, t, coefm, coefh)
 
     ! J'introduit un peu de diffusion sauf dans les endroits o\`u une
     ! forte inversion est pr\'esente. On peut dire que la diffusion
     ! repr\'esente la convection peu profonde.
 
-    use indicesol, only: is_oce
     use dimphy, only: klev
     use SUPHEC_M, only: RCPD, rd
-
-    integer, intent(in):: nsrf ! indicateur de la nature du sol
 
     REAL, intent(in):: paprs(:, :) ! (knon, klev + 1)
     ! pression a chaque intercouche (en Pa)
@@ -69,22 +66,19 @@ contains
        ENDDO
     ENDDO
 
-    DO k = 2, klev
-       DO i = 1, knon
-          ! si on est sur ocean et s'il n'y a pas d'inversion ou si
-          ! l'inversion est trop faible:
-          IF (nsrf == is_oce .AND. &
-               (invb(i) == klev .OR. zdthmin(i) > seuil)) THEN
-             coefm(i, k) = (mixlen * MAX(0.0, (paprs(i, k) &
-                  - paprs(i, klev + 1)) / (paprs(i, 2) &
-                  - paprs(i, klev + 1))))**2 * kstable
-             coefh(i, k) = coefm(i, k) / prandtl ! h et m different
-          else
-             coefm(i, k) = 0. 
-             coefh(i, k) = 0. 
-          ENDIF
-       ENDDO
     ! Introduire une diffusion :
+    DO i = 1, knon
+       IF (invb(i) == klev .OR. zdthmin(i) > seuil) THEN
+          ! S'il n'y a pas d'inversion ou si l'inversion est trop
+          ! faible :
+          coefm(i, :) = (mixlen * MAX(0.0, (paprs(i, 2:klev) &
+               - paprs(i, klev + 1)) / (paprs(i, 2) - paprs(i, klev + 1))))**2 &
+               * kstable
+          coefh(i, :) = coefm(i, :) / prandtl ! h et m different
+       else
+          coefm(i, :) = 0. 
+          coefh(i, :) = 0. 
+       ENDIF
     ENDDO
 
   END SUBROUTINE coefkz2

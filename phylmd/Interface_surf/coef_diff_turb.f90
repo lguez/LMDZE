@@ -17,6 +17,7 @@ contains
     use coefkz2_m, only: coefkz2
     USE conf_phys_m, ONLY: iflag_pbl
     USE dimphy, ONLY: klev
+    use indicesol, only: is_oce
     USE suphec_m, ONLY: rd, rg, rkappa
     use ustarhb_m, only: ustarhb
     use yamada4_m, only: yamada4
@@ -71,8 +72,8 @@ contains
     else
        CALL coefkz(nsrf, paprs, pplay, ts, u, v, t, q, zgeop, coefm, coefh)
 
-       IF (iflag_pbl == 1) THEN
-          CALL coefkz2(nsrf, paprs, pplay, t, coefm0, coefh0)
+       IF (iflag_pbl == 1 .and. nsrf == is_oce) THEN
+          CALL coefkz2(paprs, pplay, t, coefm0, coefh0)
           coefm = max(coefm, coefm0)
           coefh = max(coefh, coefh0)
        END IF
