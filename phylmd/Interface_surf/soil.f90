@@ -37,7 +37,6 @@ contains
     use jumble, only: new_unit
 
     use comconst, only: dtphys
-    USE dimphy, only: klon
     USE dimsoil, only: nsoilmx
     USE indicesol, only: nbsrf, is_lic, is_oce, is_sic, is_ter
     USE suphec_m, only: rtt
@@ -58,12 +57,12 @@ contains
     ! Local:
     INTEGER knon, ig, jk, unit
     REAL zdz2(nsoilmx)
-    real z1(size(tsurf), nbsrf) ! (knon, nbsrf)
+    real z1(size(tsurf)) ! (knon)
     REAL min_period ! in s
     real dalph_soil ! rapport entre les \'epaisseurs de 2 couches successives
     REAL ztherm_i(size(tsurf)) ! (knon)
     REAL, save:: dz1(nsoilmx), dz2(nsoilmx)
-    REAL, allocatable, save:: zc(:, :, :), zd(:, :, :) ! (klon, nsoilmx, nbsrf)
+    REAL zc(size(tsurf), nsoilmx), zd(size(tsurf), nsoilmx) ! (knon, nsoilmx)
     REAL, save:: lambda
     LOGICAL:: firstsurf(nbsrf) = .TRUE.
     REAL, parameter:: isol = 2000., isno = 2000., iice = 2000.
@@ -72,8 +71,6 @@ contains
     !-----------------------------------------------------------------------
 
     knon = size(tsurf)
-    if (all(firstsurf)) allocate(zc(klon, nsoilmx, nbsrf), &
-         zd(klon, nsoilmx, nbsrf))
 
     IF (firstsurf(nisurf)) THEN
        ! ground levels
@@ -164,23 +161,21 @@ contains
        zdz2(jk) = dz2(jk) / dtphys
     END DO
 
-    call compute_c_d(zdz2, dz1, zc(:knon, :, nisurf), zd(:knon, :, nisurf), &
-         tsoil)
+    call compute_c_d(zdz2, dz1, zc, zd, tsoil)
 
     ! Computation of the soil temperatures using the Zc and Zd
     ! coefficient computed above:
 
     ! Surface temperature:
     DO ig = 1, knon
-       tsoil(ig, 1) = (lambda * zc(ig, 1, nisurf) + tsurf(ig)) &
-            / (lambda * (1. - zd(ig, 1, nisurf)) + 1.)
+       tsoil(ig, 1) = (lambda * zc(ig, 1) + tsurf(ig)) &
+            / (lambda * (1. - zd(ig, 1)) + 1.)
     END DO
 
     ! Other temperatures:
     DO jk = 1, nsoilmx - 1
        DO ig = 1, knon
-          tsoil(ig, jk + 1) = zc(ig, jk, nisurf) &
-               + zd(ig, jk, nisurf) * tsoil(ig, jk)
+          tsoil(ig, jk + 1) = zc(ig, jk) + zd(ig, jk) * tsoil(ig, jk)
        END DO
     END DO
 
@@ -190,21 +185,20 @@ contains
        END DO
     END IF
 
-    call compute_c_d(zdz2, dz1, zc(:knon, :, nisurf), zd(:knon, :, nisurf), &
-         tsoil)
+    call compute_c_d(zdz2, dz1, zc, zd, tsoil)
 
     ! Computation of the surface diffusive flux from ground and
     ! calorific capacity of the ground:
 
     DO ig = 1, knon
-       soilflux(ig) = ztherm_i(ig) * dz1(1) * (zc(ig, 1, nisurf) &
-            + (zd(ig, 1, nisurf) - 1.) * tsoil(ig, 1))
+       soilflux(ig) = ztherm_i(ig) * dz1(1) * (zc(ig, 1) &
+            + (zd(ig, 1) - 1.) * tsoil(ig, 1))
        soilcap(ig) = ztherm_i(ig) * (dz2(1) &
-            + dtphys * (1. - zd(ig, 1, nisurf)) * dz1(1))
-       z1(ig, nisurf) = lambda * (1. - zd(ig, 1, nisurf)) + 1.
-       soilcap(ig) = soilcap(ig) / z1(ig, nisurf)
+            + dtphys * (1. - zd(ig, 1)) * dz1(1))
+       z1(ig) = lambda * (1. - zd(ig, 1)) + 1.
+       soilcap(ig) = soilcap(ig) / z1(ig)
        soilflux(ig) = soilflux(ig) + soilcap(ig) * (tsoil(ig, 1) &
-            * z1(ig, nisurf) - lambda * zc(ig, 1, nisurf) - tsurf(ig)) / dtphys
+            * z1(ig) - lambda * zc(ig, 1) - tsurf(ig)) / dtphys
     END DO
 
   END SUBROUTINE soil
