@@ -59,11 +59,11 @@ contains
     INTEGER knon, ig, jk, unit
     REAL zdz2(nsoilmx), z1
     REAL min_period ! in s
-    real dalph_soil ! rapport entre les \'epaisseurs de 2 couches successives
+    real depth_ratio ! rapport entre les \'epaisseurs de 2 couches successives
     REAL ztherm_i(size(tsurf)) ! (knon)
     REAL, save:: dz1(nsoilmx - 1), dz2(nsoilmx)
     REAL zc(size(tsurf), nsoilmx), zd(size(tsurf), nsoilmx) ! (knon, nsoilmx)
-    REAL, save:: lambda
+    REAL, save:: mu
     LOGICAL:: first_call = .TRUE.
     REAL, parameter:: isol = 2000., isno = 2000., iice = 2000.
     REAL fz1 ! depth
@@ -77,7 +77,6 @@ contains
        ! z / l where l is the skin depth of the diurnal cycle
 
        min_period = 1800.
-       dalph_soil = 2.
        call new_unit(unit)
        OPEN(unit, FILE = 'soil.def', STATUS = 'old', action = "read", &
             position = 'rewind', ERR = 9999)
@@ -88,15 +87,16 @@ contains
             dalph_soil
        CLOSE(unit)
 9999   CONTINUE
+       depth_ratio = 2.
 
        ! La premi\`ere couche repr\'esente un dixi\`eme de cycle diurne :
        fz1 = sqrt(min_period / 3.14)
 
-       forall (jk = 1:nsoilmx) dz2(jk) = fz(real(jk), dalph_soil, fz1) &
-            - fz(jk - 1., dalph_soil, fz1)
+       forall (jk = 1:nsoilmx) dz2(jk) = fz(real(jk), depth_ratio, fz1) &
+            - fz(jk - 1., depth_ratio, fz1)
        forall (jk = 1:nsoilmx - 1) dz1(jk) = 1. &
-            / (fz(jk + 0.5, dalph_soil, fz1) - fz(jk - 0.5, dalph_soil, fz1))
-       lambda = fz(0.5, dalph_soil, fz1) * dz1(1)
+            / (fz(jk + 0.5, depth_ratio, fz1) - fz(jk - 0.5, depth_ratio, fz1))
+       mu = fz(0.5, depth_ratio, fz1) * dz1(1)
        first_call = .FALSE.
     END IF
 
@@ -149,10 +149,7 @@ contains
     ! coefficient computed above:
 
     ! Surface temperature:
-    DO ig = 1, knon
-       tsoil(ig, 1) = (lambda * zc(ig, 1) + tsurf(ig)) &
-            / (lambda * (1. - zd(ig, 1)) + 1.)
-    END DO
+    tsoil(:, 1) = (mu * zc(:, 1) + tsurf(:)) / (mu * (1. - zd(:, 1)) + 1.)
 
     ! Other temperatures:
     DO jk = 1, nsoilmx - 1
@@ -177,28 +174,28 @@ contains
             + (zd(ig, 1) - 1.) * tsoil(ig, 1))
        soilcap(ig) = ztherm_i(ig) * (dz2(1) &
             + dtphys * (1. - zd(ig, 1)) * dz1(1))
-       z1 = lambda * (1. - zd(ig, 1)) + 1.
+       z1 = mu * (1. - zd(ig, 1)) + 1.
        soilcap(ig) = soilcap(ig) / z1
-       soilflux(ig) = soilflux(ig) + soilcap(ig) * (tsoil(ig, 1) &
-            * z1 - lambda * zc(ig, 1) - tsurf(ig)) / dtphys
+       soilflux(ig) = soilflux(ig) + soilcap(ig) * (tsoil(ig, 1) * z1 - mu &
+            * zc(ig, 1) - tsurf(ig)) / dtphys
     END DO
 
   END SUBROUTINE soil
 
   !****************************************************************
 
-  pure real function fz(rk, dalph_soil, fz1)
+  pure real function fz(rk, depth_ratio, fz1)
 
     real, intent(in):: rk
 
-    real, intent(in):: dalph_soil
+    real, intent(in):: depth_ratio
     ! rapport entre les \'epaisseurs de 2 couches successives
 
     real, intent(in):: fz1 ! depth
 
     !-----------------------------------------
 
-    fz = fz1 * (dalph_soil**rk - 1.) / (dalph_soil - 1.)
+    fz = fz1 * (depth_ratio**rk - 1.) / (depth_ratio - 1.)
 
   end function fz
 
