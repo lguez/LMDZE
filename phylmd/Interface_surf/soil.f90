@@ -91,15 +91,10 @@ contains
        ! La premi\`ere couche repr\'esente un dixi\`eme de cycle diurne :
        fz1 = sqrt(min_period / 3.14)
 
-       DO jk = 1, nsoilmx
-          dz2(jk) = fz(real(jk), dalph_soil, fz1) - fz(jk - 1., dalph_soil, fz1)
-       END DO
-
-       DO jk = 1, nsoilmx - 1
-          dz1(jk) = 1. / (fz(jk + 0.5, dalph_soil, fz1) &
-               - fz(jk - 0.5, dalph_soil, fz1))
-       END DO
-
+       forall (jk = 1:nsoilmx) dz2(jk) = fz(real(jk), dalph_soil, fz1) &
+            - fz(jk - 1., dalph_soil, fz1)
+       forall (jk = 1:nsoilmx - 1) dz1(jk) = 1. &
+            / (fz(jk + 0.5, dalph_soil, fz1) - fz(jk - 0.5, dalph_soil, fz1))
        lambda = fz(.5, dalph_soil, fz1) * dz1(1)
        firstsurf(nisurf) = .FALSE.
     END IF
