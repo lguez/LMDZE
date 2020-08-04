@@ -56,8 +56,7 @@ contains
 
     ! Local:
     INTEGER knon, ig, jk, unit
-    REAL zdz2(nsoilmx)
-    real z1(size(tsurf)) ! (knon)
+    REAL zdz2(nsoilmx), z1
     REAL min_period ! in s
     real dalph_soil ! rapport entre les \'epaisseurs de 2 couches successives
     REAL ztherm_i(size(tsurf)) ! (knon)
@@ -195,10 +194,10 @@ contains
             + (zd(ig, 1) - 1.) * tsoil(ig, 1))
        soilcap(ig) = ztherm_i(ig) * (dz2(1) &
             + dtphys * (1. - zd(ig, 1)) * dz1(1))
-       z1(ig) = lambda * (1. - zd(ig, 1)) + 1.
-       soilcap(ig) = soilcap(ig) / z1(ig)
+       z1 = lambda * (1. - zd(ig, 1)) + 1.
+       soilcap(ig) = soilcap(ig) / z1
        soilflux(ig) = soilflux(ig) + soilcap(ig) * (tsoil(ig, 1) &
-            * z1(ig) - lambda * zc(ig, 1) - tsurf(ig)) / dtphys
+            * z1 - lambda * zc(ig, 1) - tsurf(ig)) / dtphys
     END DO
 
   END SUBROUTINE soil
