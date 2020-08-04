@@ -60,7 +60,7 @@ contains
     REAL min_period ! in s
     real dalph_soil ! rapport entre les \'epaisseurs de 2 couches successives
     REAL ztherm_i(size(tsurf)) ! (knon)
-    REAL, save:: dz1(nsoilmx), dz2(nsoilmx)
+    REAL, save:: dz1(nsoilmx - 1), dz2(nsoilmx)
     REAL zc(size(tsurf), nsoilmx), zd(size(tsurf), nsoilmx) ! (knon, nsoilmx)
     REAL, save:: lambda
     LOGICAL:: firstsurf(nbsrf) = .TRUE.
@@ -215,7 +215,7 @@ contains
     USE dimsoil, only: nsoilmx
     
     REAL, intent(in):: zdz2(:) ! (nsoilmx)
-    REAL, intent(in):: dz1(:) ! (nsoilmx)
+    REAL, intent(in):: dz1(:) ! (nsoilmx - 1)
     REAL, intent(inout):: zc(:, :), zd(:, :) ! (knon, nsoilmx)
 
     real, intent(in):: tsoil(:, :) ! (knon, nsoilmx)
