@@ -148,7 +148,7 @@ contains
     ! Computation of the soil temperatures using the Zc and Zd
     ! coefficient computed above:
 
-    ! Surface temperature:
+    ! Surface temperature (Hourdin 1992 k1078, equation A.27):
     tsoil(:, 1) = (mu * zc(:, 1) + tsurf(:)) / (mu * (1. - zd(:, 1)) + 1.)
 
     ! Other temperatures:
@@ -196,6 +196,7 @@ contains
     !-----------------------------------------
 
     fz = fz1 * (depth_ratio**rk - 1.) / (depth_ratio - 1.)
+    ! Hourdin 1992 k1078, equation A.5
 
   end function fz
 
