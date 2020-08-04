@@ -39,7 +39,7 @@ contains
 
     use comconst, only: dtphys
     USE dimsoil, only: nsoilmx
-    USE indicesol, only: nbsrf, is_lic, is_oce, is_sic, is_ter
+    USE indicesol, only: is_lic, is_oce, is_sic, is_ter
     USE suphec_m, only: rtt
 
     INTEGER, intent(in):: nisurf ! surface type index
@@ -64,7 +64,7 @@ contains
     REAL, save:: dz1(nsoilmx - 1), dz2(nsoilmx)
     REAL zc(size(tsurf), nsoilmx), zd(size(tsurf), nsoilmx) ! (knon, nsoilmx)
     REAL, save:: lambda
-    LOGICAL:: firstsurf(nbsrf) = .TRUE.
+    LOGICAL:: first_call = .TRUE.
     REAL, parameter:: isol = 2000., isno = 2000., iice = 2000.
     REAL fz1 ! depth
 
@@ -72,7 +72,7 @@ contains
 
     knon = size(tsurf)
 
-    IF (firstsurf(nisurf)) THEN
+    IF (first_call) THEN
        ! ground levels
        ! z / l where l is the skin depth of the diurnal cycle
 
@@ -96,8 +96,8 @@ contains
             - fz(jk - 1., dalph_soil, fz1)
        forall (jk = 1:nsoilmx - 1) dz1(jk) = 1. &
             / (fz(jk + 0.5, dalph_soil, fz1) - fz(jk - 0.5, dalph_soil, fz1))
-       firstsurf(nisurf) = .FALSE.
        lambda = fz(0.5, dalph_soil, fz1) * dz1(1)
+       first_call = .FALSE.
     END IF
 
     ! Calcul de l'inertie thermique. On initialise \`a iice m\^eme
