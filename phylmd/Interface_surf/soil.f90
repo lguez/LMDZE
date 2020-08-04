@@ -177,15 +177,15 @@ contains
        STOP 1
     END select
 
+    DO jk = 1, nsoilmx
+       zdz2(jk) = dz2(jk) / dtphys
+    END DO
+
     IF (nisurf==is_sic) THEN
        DO ig = 1, knon
           tsoil(ig, nsoilmx) = rtt - 1.8
        END DO
     END IF
-
-    DO jk = 1, nsoilmx
-       zdz2(jk) = dz2(jk) / dtphys
-    END DO
 
     call compute_c_d(zdz2, dz1, zc(:knon, :, nisurf), zd(:knon, :, nisurf), &
          tsoil)
