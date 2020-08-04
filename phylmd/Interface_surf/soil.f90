@@ -65,7 +65,7 @@ contains
     REAL, save:: lambda
     LOGICAL:: firstsurf(nbsrf) = .TRUE.
     REAL, parameter:: isol = 2000., isno = 2000., iice = 2000.
-    REAL fz1, rk1, rk2 ! depths
+    REAL fz1 ! depth
 
     !-----------------------------------------------------------------------
 
@@ -92,15 +92,12 @@ contains
        fz1 = sqrt(min_period / 3.14)
 
        DO jk = 1, nsoilmx
-          rk1 = jk
-          rk2 = jk - 1
-          dz2(jk) = fz(rk1, dalph_soil, fz1) - fz(rk2, dalph_soil, fz1)
+          dz2(jk) = fz(real(jk), dalph_soil, fz1) - fz(jk - 1., dalph_soil, fz1)
        END DO
 
        DO jk = 1, nsoilmx - 1
-          rk1 = jk + .5
-          rk2 = jk - .5
-          dz1(jk) = 1. / (fz(rk1, dalph_soil, fz1) - fz(rk2, dalph_soil, fz1))
+          dz1(jk) = 1. / (fz(jk + 0.5, dalph_soil, fz1) &
+               - fz(jk - 0.5, dalph_soil, fz1))
        END DO
 
        lambda = fz(.5, dalph_soil, fz1) * dz1(1)
