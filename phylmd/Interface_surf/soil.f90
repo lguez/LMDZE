@@ -21,10 +21,11 @@ contains
     ! T(k + 1) = C(k) + D(k) * T(k) (equation 1)
     ! The coefficients C and D are computed at the t - dt time-step.
     ! Structure of the procedure:
-    ! 1) new temperatures are computed using equation 1
-    ! 2) C and D coefficients are computed from the new temperature
+!   ! 1) C and D coefficients are computed from the old temperature
+    ! 2) new temperatures are computed using equation 1
+    ! 3) C and D coefficients are computed from the new temperature
     ! profile for the t + dt time-step
-    ! 3) the coefficients A and B are computed where the diffusive
+    ! 4) the coefficients A and B are computed where the diffusive
     ! fluxes at the t + dt time-step is given by
     ! Fdiff = A + B Ts(t + dt)
     ! or 
@@ -73,7 +74,7 @@ contains
 
     IF (firstsurf(nisurf)) THEN
        ! ground levels
-       ! grnd=z / l where l is the skin depth of the diurnal cycle:
+       ! z / l where l is the skin depth of the diurnal cycle
 
        min_period = 1800.
        dalph_soil = 2.
@@ -95,8 +96,8 @@ contains
             - fz(jk - 1., dalph_soil, fz1)
        forall (jk = 1:nsoilmx - 1) dz1(jk) = 1. &
             / (fz(jk + 0.5, dalph_soil, fz1) - fz(jk - 0.5, dalph_soil, fz1))
-       lambda = fz(.5, dalph_soil, fz1) * dz1(1)
        firstsurf(nisurf) = .FALSE.
+       lambda = fz(0.5, dalph_soil, fz1) * dz1(1)
     END IF
 
     ! Calcul de l'inertie thermique. On initialise \`a iice m\^eme
@@ -160,7 +161,7 @@ contains
        END DO
     END DO
 
-    IF (nisurf==is_sic) THEN
+    IF (nisurf == is_sic) THEN
        DO ig = 1, knon
           tsoil(ig, nsoilmx) = rtt - 1.8
        END DO
