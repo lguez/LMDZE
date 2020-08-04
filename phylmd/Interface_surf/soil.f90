@@ -74,7 +74,7 @@ contains
     knon = size(tsurf)
     if (all(firstsurf)) allocate(zc(klon, nsoilmx, nbsrf), &
          zd(klon, nsoilmx, nbsrf))
-    
+
     IF (firstsurf(nisurf)) THEN
        ! ground levels
        ! grnd=z / l where l is the skin depth of the diurnal cycle:
