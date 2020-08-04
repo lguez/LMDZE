@@ -72,46 +72,6 @@ contains
     !-----------------------------------------------------------------------
 
     knon = size(tsurf)
-
-    ! Calcul de l'inertie thermique. On initialise \`a iice m\^eme
-    ! au-dessus d'un point de mer pour le cas o\`u le point de mer
-    ! deviendrait point de glace au pas suivant. On corrige si on a un
-    ! point de terre avec ou sans glace.
-
-    select case (nisurf)
-    case (is_sic)
-       DO ig = 1, knon
-          IF (snow(ig) > 0.) then
-             ztherm_i(ig) = isno
-          else
-             ztherm_i(ig) = iice
-          end IF
-       END DO
-    case (is_lic)
-       DO ig = 1, knon
-          IF (snow(ig) > 0.) then
-             ztherm_i(ig) = isno
-          else
-             ztherm_i(ig) = iice
-          end IF
-       END DO
-    case (is_ter)
-       DO ig = 1, knon
-          IF (snow(ig) > 0.) then
-             ztherm_i(ig) = isno
-          else
-             ztherm_i(ig) = isol
-          end IF
-       END DO
-    case (is_oce)
-       DO ig = 1, knon
-          ztherm_i(ig) = iice
-       END DO
-    case default
-       PRINT *, 'soil: unexpected subscript value:', nisurf
-       STOP 1
-    END select
-
     if (all(firstsurf)) allocate(zc(klon, nsoilmx, nbsrf), &
          zd(klon, nsoilmx, nbsrf))
     
@@ -177,6 +137,45 @@ contains
           END DO
        END DO
     END IF
+
+    ! Calcul de l'inertie thermique. On initialise \`a iice m\^eme
+    ! au-dessus d'un point de mer pour le cas o\`u le point de mer
+    ! deviendrait point de glace au pas suivant. On corrige si on a un
+    ! point de terre avec ou sans glace.
+
+    select case (nisurf)
+    case (is_sic)
+       DO ig = 1, knon
+          IF (snow(ig) > 0.) then
+             ztherm_i(ig) = isno
+          else
+             ztherm_i(ig) = iice
+          end IF
+       END DO
+    case (is_lic)
+       DO ig = 1, knon
+          IF (snow(ig) > 0.) then
+             ztherm_i(ig) = isno
+          else
+             ztherm_i(ig) = iice
+          end IF
+       END DO
+    case (is_ter)
+       DO ig = 1, knon
+          IF (snow(ig) > 0.) then
+             ztherm_i(ig) = isno
+          else
+             ztherm_i(ig) = isol
+          end IF
+       END DO
+    case (is_oce)
+       DO ig = 1, knon
+          ztherm_i(ig) = iice
+       END DO
+    case default
+       PRINT *, 'soil: unexpected subscript value:', nisurf
+       STOP 1
+    END select
 
     IF (nisurf==is_sic) THEN
        DO ig = 1, knon
