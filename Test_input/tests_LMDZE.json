@@ -300,6 +300,22 @@
 	]
     },
     {
+	"stdin_filename" : "$test_input_dir/Namelists/control_2_days.txt",
+	"command" : "$build_dir/gcm",
+	"required" : [
+            "$tests_old_dir/CE0L_control/limit.nc",
+            "$tests_old_dir/CE0L_control/coefoz_LMDZ.nc",
+            ["$tests_old_dir/CE0L_control/restart.nc", "start.nc"],
+            [
+		"$tests_old_dir/CE0L_control/restartphy.nc",
+		"startphy.nc"
+            ],
+            "$test_input_dir/Namelists/traceur.def",
+            "$test_input_dir/iodef.xml"
+	],
+	"title" : "GCM_control_2_days"
+    },
+    {
 	"stdin_filename" : "$test_input_dir/Namelists/gcm_nml_Tiedke.txt",
 	"command" : "$build_dir/gcm",
 	"title" : "GCM_Tiedke_day_2",
