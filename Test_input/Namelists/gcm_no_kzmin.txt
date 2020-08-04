@@ -45,3 +45,4 @@ rad_chau2=11
 /
 
 &conf_interface_nml /
+&soil_nml /

@@ -34,14 +34,12 @@ contains
     ! F0 = A + B (Ts(t))
     ! Soilcap = B * dt
 
-    ! Libraries:
-    use jumble, only: new_unit
-
     use comconst, only: dtphys
     USE dimsoil, only: nsoilmx
     USE indicesol, only: is_lic, is_oce, is_sic, is_ter
     USE suphec_m, only: rtt
-
+    use unit_nml_m, only: unit_nml
+    
     INTEGER, intent(in):: nisurf ! surface type index
     REAL, intent(in):: snow(:) ! (knon)
     REAL, intent(in):: tsurf(:) ! (knon) surface temperature at time-step t (K)
@@ -56,7 +54,8 @@ contains
     ! surface diffusive flux from ground (W m-2)
 
     ! Local:
-    INTEGER knon, ig, jk, unit
+    
+    INTEGER knon, ig, jk
     REAL zdz2(nsoilmx), z1
     REAL min_period ! in s
     real depth_ratio ! rapport entre les \'epaisseurs de 2 couches successives
@@ -68,6 +67,8 @@ contains
     REAL, parameter:: isol = 2000., isno = 2000., iice = 2000.
     REAL fz1 ! depth
 
+    namelist /soil_nml/ min_period, depth_ratio
+
     !-----------------------------------------------------------------------
 
     knon = size(tsurf)
@@ -76,18 +77,13 @@ contains
        ! ground levels
        ! z / l where l is the skin depth of the diurnal cycle
 
+       ! Default values:
        min_period = 1800.
-       call new_unit(unit)
-       OPEN(unit, FILE = 'soil.def', STATUS = 'old', action = "read", &
-            position = 'rewind', ERR = 9999)
-       READ(unit, fmt = *) min_period
-       READ(unit, fmt = *) dalph_soil
-       PRINT *, 'Discretization for the soil model'
-       PRINT *, 'First level e-folding depth', min_period, ' dalph', &
-            dalph_soil
-       CLOSE(unit)
-9999   CONTINUE
        depth_ratio = 2.
+       
+       print *, "Enter namelist 'soil_nml'."
+       read (unit = *, nml = soil_nml)
+       write(unit_nml, nml = soil_nml)
 
        ! La premi\`ere couche repr\'esente un dixi\`eme de cycle diurne :
        fz1 = sqrt(min_period / 3.14)
