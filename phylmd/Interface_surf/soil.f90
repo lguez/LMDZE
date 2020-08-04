@@ -119,23 +119,6 @@ contains
        END DO
 
        firstsurf(nisurf) = .FALSE.
-    ELSE
-       ! Computation of the soil temperatures using the Zc and Zd
-       ! coefficient computed at the previous time-step:
-
-       ! Surface temperature:
-       DO ig = 1, knon
-          tsoil(ig, 1) = (lambda * zc(ig, 1, nisurf) + tsurf(ig)) &
-               / (lambda * (1. - zd(ig, 1, nisurf)) + 1.)
-       END DO
-
-       ! Other temperatures:
-       DO jk = 1, nsoilmx - 1
-          DO ig = 1, knon
-             tsoil(ig, jk + 1) = zc(ig, jk, nisurf) &
-                  + zd(ig, jk, nisurf) * tsoil(ig, jk)
-          END DO
-       END DO
     END IF
 
     ! Calcul de l'inertie thermique. On initialise \`a iice m\^eme
@@ -179,6 +162,26 @@ contains
 
     DO jk = 1, nsoilmx
        zdz2(jk) = dz2(jk) / dtphys
+    END DO
+
+    call compute_c_d(zdz2, dz1, zc(:knon, :, nisurf), zd(:knon, :, nisurf), &
+         tsoil)
+
+    ! Computation of the soil temperatures using the Zc and Zd
+    ! coefficient computed above:
+
+    ! Surface temperature:
+    DO ig = 1, knon
+       tsoil(ig, 1) = (lambda * zc(ig, 1, nisurf) + tsurf(ig)) &
+            / (lambda * (1. - zd(ig, 1, nisurf)) + 1.)
+    END DO
+
+    ! Other temperatures:
+    DO jk = 1, nsoilmx - 1
+       DO ig = 1, knon
+          tsoil(ig, jk + 1) = zc(ig, jk, nisurf) &
+               + zd(ig, jk, nisurf) * tsoil(ig, jk)
+       END DO
     END DO
 
     IF (nisurf==is_sic) THEN
