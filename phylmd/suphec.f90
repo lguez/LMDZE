@@ -64,13 +64,13 @@ module suphec_m
   real, save:: RCS
 
   ! A1.7 Thermodynamic transition of phase
-  REAL, save:: RLMLT
   real, parameter:: RTT = 273.16
 
   real, parameter:: RLVTT = 2.5008E+6 
   ! specific latent heat of vaporization of water at triple point, in J kg-1
 
   real, parameter:: RLSTT = 2.8345E+6
+  REAL, parameter:: RLMLT = RLSTT - RLVTT
   real, parameter:: RATM = 1e5
 
   ! A1.8 Curve of saturation
@@ -118,11 +118,10 @@ contains
 
     ! 8. DEFINE THERMODYNAMIC CONSTANTS, TRANSITION OF PHASE.
 
-    RLMLT = RLSTT-RLVTT
     print *, 'Thermodynamic, transition of phase:'
     print '('' Fusion point = '', E13.7)', RTT
     print '('' RLsTt = '', E13.7)', RLSTT
-    print '('' RLMlt = '', E13.7)', RLMLT
+    print *, 'RLMlt = ', RLMLT
     print '('' Normal pressure = '', E13.7)', RATM
 
     ! 9. SATURATED VAPOUR PRESSURE.

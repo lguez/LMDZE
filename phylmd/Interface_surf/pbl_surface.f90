@@ -116,7 +116,7 @@ contains
     ! composantes du vent \`a 10m sans spirale d'Ekman
 
     ! Ionela Musat. Cf. Anne Mathieu : planetary boundary layer, hbtm.
-    ! Comme les autres diagnostics on cumule dans physiq ce qui permet
+    ! Comme les autres diagnostics, on cumule dans physiq ce qui permet
     ! de sortir les grandeurs par sous-surface.
     REAL pblh(klon, nbsrf) ! height of planetary boundary layer
     REAL capcl(klon, nbsrf)

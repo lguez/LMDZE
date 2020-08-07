@@ -400,7 +400,6 @@ contains
     logical ptconv(klon, llm)
 
     ! Variables pour effectuer les appels en s\'erie :
-
     REAL t_seri(klon, llm)
     real q_seri(klon, llm) ! mass fraction of water vapor
     REAL ql_seri(klon, llm)

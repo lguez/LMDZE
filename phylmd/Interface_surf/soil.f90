@@ -90,9 +90,14 @@ contains
 
        forall (jk = 1:nsoilmx) dz2(jk) = fz(real(jk), depth_ratio, fz1) &
             - fz(jk - 1., depth_ratio, fz1)
+
+       ! Hourdin 1992 k1078, equation A.12:
        forall (jk = 1:nsoilmx - 1) dz1(jk) = 1. &
             / (fz(jk + 0.5, depth_ratio, fz1) - fz(jk - 0.5, depth_ratio, fz1))
+       
+       ! Hourdin 1992 k1078, equation A.28:
        mu = fz(0.5, depth_ratio, fz1) * dz1(1)
+       
        first_call = .FALSE.
     END IF
 
@@ -144,22 +149,16 @@ contains
     ! Computation of the soil temperatures using the Zc and Zd
     ! coefficient computed above:
 
-    ! Surface temperature (Hourdin 1992 k1078, equation A.27):
+    ! Surface temperature (Hourdin 1992 k1078, equation A.34):
     tsoil(:, 1) = (mu * zc(:, 1) + tsurf(:)) / (mu * (1. - zd(:, 1)) + 1.)
 
     ! Other temperatures:
     DO jk = 1, nsoilmx - 1
-       DO ig = 1, knon
-          tsoil(ig, jk + 1) = zc(ig, jk) + zd(ig, jk) * tsoil(ig, jk)
-       END DO
+       ! Hourdin 1992 k1078, equation A.15:
+       tsoil(:, jk + 1) = zc(:, jk) + zd(:, jk) * tsoil(:, jk)
     END DO
 
-    IF (nisurf == is_sic) THEN
-       DO ig = 1, knon
-          tsoil(ig, nsoilmx) = rtt - 1.8
-       END DO
-    END IF
-
+    IF (nisurf == is_sic) tsoil(:, nsoilmx) = rtt - 1.8
     call compute_c_d(zdz2, dz1, zc, zd, tsoil)
 
     ! Computation of the surface diffusive flux from ground and
@@ -170,8 +169,14 @@ contains
             + (zd(ig, 1) - 1.) * tsoil(ig, 1))
        soilcap(ig) = ztherm_i(ig) * (dz2(1) &
             + dtphys * (1. - zd(ig, 1)) * dz1(1))
+
+       ! Hourdin 1992 k1078, equation A.24:
        z1 = mu * (1. - zd(ig, 1)) + 1.
+
+       ! Hourdin 1992 k1078, equation A.30:
        soilcap(ig) = soilcap(ig) / z1
+
+       ! Hourdin 1992 k1078, equation A.31:
        soilflux(ig) = soilflux(ig) + soilcap(ig) * (tsoil(ig, 1) * z1 - mu &
             * zc(ig, 1) - tsurf(ig)) / dtphys
     END DO
