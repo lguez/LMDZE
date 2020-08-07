@@ -165,6 +165,7 @@ contains
     ! calorific capacity of the ground:
 
     DO ig = 1, knon
+       ! Hourdin 1992 k1078, equation A.25:
        soilflux(ig) = therm_i(ig) * dz1(1) * (zc(ig, 1) &
             + (zd(ig, 1) - 1.) * tsoil(ig, 1))
 
