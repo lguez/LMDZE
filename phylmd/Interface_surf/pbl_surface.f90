@@ -166,7 +166,7 @@ contains
     real yqsol(klon) ! column-density of water in soil, in kg m-2
     REAL yrain_fall(klon) ! liquid water mass flux (kg / m2 / s), positive down
     REAL ysnow_fall(klon) ! solid water mass flux (kg / m2 / s), positive down
-    REAL yrugm(klon), radsol(klon), yrugoro(klon)
+    REAL yrugm(klon), yrugoro(klon)
     REAL yfluxlat(klon)
     REAL tsurf_new(klon)
     REAL y_d_t(klon, klev), y_d_q(klon, klev)
@@ -291,7 +291,6 @@ contains
           yagesno(:knon) = agesno(ni(:knon), nsrf)
           yrugos(:knon) = frugs(ni(:knon), nsrf)
           yrugoro(:knon) = rugoro(ni(:knon))
-          radsol(:knon) = fsolsw(ni(:knon), nsrf) + fsollw(ni(:knon), nsrf)
           ypaprs(:knon, klev + 1) = paprs(ni(:knon), klev + 1)
           y_run_off_lic_0(:knon) = run_off_lic_0(ni(:knon))
 
@@ -359,13 +358,15 @@ contains
                mu0(ni(:knon)), yrugos(:knon), yrugoro(:knon), yu(:knon, 1), &
                yv(:knon, 1), ycoefh(:knon, :), ycdragh(:knon), yt(:knon, :), &
                yq(:knon, :), yts(:knon), ypaprs(:knon, :), ypplay(:knon, :), &
-               ydelp(:knon, :), radsol(:knon), yalb(:knon), snow(:knon), &
-               yqsurf(:knon), yrain_fall(:knon), ysnow_fall(:knon), &
-               yfluxlat(:knon), pctsrf_new_sic(ni(:knon)), yagesno(:knon), &
-               y_d_t(:knon, :), y_d_q(:knon, :), tsurf_new(:knon), &
-               yz0_new(:knon), y_flux_t(:knon), y_flux_q(:knon), &
-               y_dflux_t(:knon), y_dflux_q(:knon), y_fqcalving(:knon), &
-               y_ffonte(:knon), y_run_off_lic_0(:knon), y_run_off_lic(:knon))
+               ydelp(:knon, :), &
+               fsolsw(ni(:knon), nsrf) + fsollw(ni(:knon), nsrf), yalb(:knon), &
+               snow(:knon), yqsurf(:knon), yrain_fall(:knon), &
+               ysnow_fall(:knon), yfluxlat(:knon), pctsrf_new_sic(ni(:knon)), &
+               yagesno(:knon), y_d_t(:knon, :), y_d_q(:knon, :), &
+               tsurf_new(:knon), yz0_new(:knon), y_flux_t(:knon), &
+               y_flux_q(:knon), y_dflux_t(:knon), y_dflux_q(:knon), &
+               y_fqcalving(:knon), y_ffonte(:knon), y_run_off_lic_0(:knon), &
+               y_run_off_lic(:knon))
 
           ! calculer la longueur de rugosite sur ocean
 
