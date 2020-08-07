@@ -59,7 +59,7 @@ contains
     REAL zdz2(nsoilmx), z1
     REAL min_period ! in s
     real depth_ratio ! rapport entre les \'epaisseurs de 2 couches successives
-    REAL ztherm_i(size(tsurf)) ! (knon)
+    REAL therm_i(size(tsurf)) ! (knon) thermal inertia
     REAL, save:: dz1(nsoilmx - 1), dz2(nsoilmx)
     REAL zc(size(tsurf), nsoilmx), zd(size(tsurf), nsoilmx) ! (knon, nsoilmx)
     REAL, save:: mu
@@ -110,30 +110,30 @@ contains
     case (is_sic)
        DO ig = 1, knon
           IF (snow(ig) > 0.) then
-             ztherm_i(ig) = isno
+             therm_i(ig) = isno
           else
-             ztherm_i(ig) = iice
+             therm_i(ig) = iice
           end IF
        END DO
     case (is_lic)
        DO ig = 1, knon
           IF (snow(ig) > 0.) then
-             ztherm_i(ig) = isno
+             therm_i(ig) = isno
           else
-             ztherm_i(ig) = iice
+             therm_i(ig) = iice
           end IF
        END DO
     case (is_ter)
        DO ig = 1, knon
           IF (snow(ig) > 0.) then
-             ztherm_i(ig) = isno
+             therm_i(ig) = isno
           else
-             ztherm_i(ig) = isol
+             therm_i(ig) = isol
           end IF
        END DO
     case (is_oce)
        DO ig = 1, knon
-          ztherm_i(ig) = iice
+          therm_i(ig) = iice
        END DO
     case default
        PRINT *, 'soil: unexpected subscript value:', nisurf
@@ -165,12 +165,12 @@ contains
     ! calorific capacity of the ground:
 
     DO ig = 1, knon
-       soilflux(ig) = ztherm_i(ig) * dz1(1) * (zc(ig, 1) &
+       soilflux(ig) = therm_i(ig) * dz1(1) * (zc(ig, 1) &
             + (zd(ig, 1) - 1.) * tsoil(ig, 1))
-       soilcap(ig) = ztherm_i(ig) * (dz2(1) &
-            + dtphys * (1. - zd(ig, 1)) * dz1(1))
 
        ! Hourdin 1992 k1078, equation A.24:
+       soilcap(ig) = therm_i(ig) * (dz2(1) + dtphys * (1. - zd(ig, 1)) * dz1(1))
+
        z1 = mu * (1. - zd(ig, 1)) + 1.
 
        ! Hourdin 1992 k1078, equation A.30:
