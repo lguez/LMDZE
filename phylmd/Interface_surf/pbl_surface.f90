@@ -476,8 +476,8 @@ contains
 
           CALL hbtm(ypaprs, ypplay, yt2m, yq2m, ustar(:knon), y_flux_t(:knon), &
                y_flux_q(:knon), yu(:knon, :), yv(:knon, :), yt(:knon, :), &
-               yq(:knon, :), ypblh(:knon), ycapcl, yoliqcl, ycteicl, ypblt, &
-               ytherm(:knon), ylcl)
+               yq(:knon, :), ypblh(:knon), ycapcl(:knon), yoliqcl(:knon), &
+               ycteicl(:knon), ypblt(:knon), ytherm(:knon), ylcl(:knon))
 
           DO j = 1, knon
              i = ni(j)

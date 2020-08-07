@@ -46,12 +46,12 @@ contains
     REAL, intent(in):: t(:, :) ! (knon, klev) temperature (K)
     REAL, intent(in):: q(:, :) ! (knon, klev) vapeur d'eau (kg/kg)
     REAL, intent(out):: pblh(:) ! (knon)
-    REAL Cape(klon) ! Cape du thermique
-    REAL EauLiq(klon) ! Eau liqu integr du thermique
-    REAL ctei(klon) ! Critere d'instab d'entrainmt des nuages de
-    REAL pblT(klon)
+    REAL Cape(:) ! (knon) Cape du thermique
+    REAL EauLiq(:) ! (knon) Eau liqu integr du thermique
+    REAL ctei(:) ! (knon) Critere d'instab d'entrainmt des nuages de
+    REAL pblT(:) ! (knon)
     REAL therm(:) ! (knon) ! thermal virtual temperature excess
-    REAL plcl(klon)
+    REAL plcl(:) ! (knon)
 
     ! Local:
     
