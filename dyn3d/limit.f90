@@ -88,7 +88,7 @@ contains
     call NF95_DEF_DIM(ncid_limit, "points_physiques", klon, ndim)
     call NF95_DEF_DIM(ncid_limit, "time", NF90_UNLIMITED, ntim)
 
-    call NF95_DEF_VAR(ncid_limit, "TEMPS", NF90_FLOAT, ntim, varid_time)
+    call NF95_DEF_VAR(ncid_limit, "time", NF90_FLOAT, ntim, varid_time)
     call NF95_PUT_ATT(ncid_limit, varid_time, "title", "Jour dans l annee")
 
     call NF95_DEF_VAR(ncid_limit, "FOCE", NF90_FLOAT, dimids=[ndim, ntim], &
