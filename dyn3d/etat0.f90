@@ -62,7 +62,7 @@ contains
     ! and pressure level "pls(i, j, l)".)
 
     real qsat(iim + 1, jjm + 1, llm) ! mass fraction of saturating water vapor
-    REAL qsolsrf(klon, nbsrf), fsnow(klon, nbsrf) 
+    REAL fqsurf(klon, nbsrf), fsnow(klon, nbsrf) 
     REAL falbe(klon, nbsrf)
     REAL ftsoil(klon, nsoilmx, nbsrf) 
     REAL null_array(klon)
@@ -288,7 +288,7 @@ contains
     falbe(:, is_lic) = 0.6
     falbe(:, is_oce) = 0.5
     falbe(:, is_sic) = 0.6
-    qsolsrf = 150.
+    fqsurf = 150.
     ftsoil = spread(spread(pack(tsol_2d, dyn_phy), 2, nsoilmx), 3, nbsrf)
     solsw = 165.
     sollw = -53.
@@ -311,7 +311,7 @@ contains
     call nf95_inq_varid(ncid_restartphy, "trs", varid)
     call nf95_put_var(ncid_restartphy, varid, null_array)
 
-    call phyredem(pctsrf, ftsoil(:, 1, :), ftsoil, qsolsrf, &
+    call phyredem(pctsrf, ftsoil(:, 1, :), ftsoil, fqsurf, &
          pack(qsol_2d, dyn_phy), fsnow, falbe, null_array, null_array, solsw, &
          sollw, null_array, null_array, frugs, agesno, zmea, zstd, zsig, zgam, &
          zthe, zpic, zval, t_ancien, q_ancien, rnebcon, ratqs, clwcon, &
