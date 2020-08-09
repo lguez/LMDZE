@@ -29,7 +29,7 @@ contains
     use grid_change, only: dyn_phy
     use indicesol, only: epsfra, is_ter, is_oce, is_lic, is_sic
     use inter_barxy_m, only: inter_barxy
-    use phyetat0_m, only: masque
+    use phyetat0_m, only: masque, rlon, rlat
     use start_init_orog_m, only: mask
     use unit_nml_m, only: unit_nml
 
@@ -62,7 +62,7 @@ contains
     REAL, allocatable:: yder(:)
 
     INTEGER ndim, ntim
-    INTEGER varid_time
+    INTEGER varid_time, varid_longitude, varid_latitude
     INTEGER id_SST, id_BILS, id_RUG, id_ALB
     INTEGER id_FOCE, id_FSIC, id_FTER, id_FLIC
 
@@ -90,6 +90,15 @@ contains
 
     call NF95_DEF_VAR(ncid_limit, "time", NF90_FLOAT, ntim, varid_time)
     call NF95_PUT_ATT(ncid_limit, varid_time, "title", "Jour dans l annee")
+
+    call nf95_def_var(ncid_limit, "longitude", NF90_FLOAT, ndim, &
+         varid_longitude)
+    call nf95_put_att(ncid_limit, varid_longitude, "standard_name", "longitude")
+    call nf95_put_att(ncid_limit, varid_longitude, "units", "degrees_east")
+
+    call nf95_def_var(ncid_limit, "latitude", NF90_FLOAT, ndim, varid_latitude)
+    call nf95_put_att(ncid_limit, varid_latitude, "standard_name", "latitude")
+    call nf95_put_att(ncid_limit, varid_latitude, "units", "degrees_north")
 
     call NF95_DEF_VAR(ncid_limit, "FOCE", NF90_FLOAT, dimids=[ndim, ntim], &
          varid=id_foce)
@@ -128,6 +137,8 @@ contains
     call NF95_ENDDEF(ncid_limit)
 
     call NF95_PUT_VAR(ncid_limit, varid_time, [(k, k = 1, 360)])
+    call nf95_put_var(ncid_limit, varid_longitude, rlon)
+    call nf95_put_var(ncid_limit, varid_latitude, rlat)
     
     PRINT *, 'Processing rugosity...'
 
