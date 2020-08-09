@@ -215,8 +215,6 @@ contains
        fsolsw(:, nsrf) = solsw * (1. - falbe(:, nsrf)) / (1. - albsol)
     END forall
 
-    ytherm = 0.
-
     DO k = 1, klev ! epaisseur de couche
        DO i = 1, klon
           delp(i, k) = paprs(i, k) - paprs(i, k + 1)

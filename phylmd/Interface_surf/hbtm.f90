@@ -136,6 +136,7 @@ contains
     ! initialisations
     q_star = 0
     t_star = 0
+    therm = 0.
 
     b212=sqrt(b1*b2)
     b2sr=sqrt(b2)
