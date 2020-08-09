@@ -65,7 +65,7 @@ contains
     REAL, INTENT(inout):: fsnow(:, :) ! (klon, nbsrf)
     ! column-density of mass of snow at the surface, in kg m-2
 
-    REAL, INTENT(inout):: fqsurf(klon, nbsrf)
+    REAL, INTENT(inout):: fqsurf(:, :) ! (klon, nbsrf)
     REAL, intent(inout):: falbe(klon, nbsrf)
 
     REAL, intent(out):: fluxlat(:, :) ! (klon, nbsrf)
