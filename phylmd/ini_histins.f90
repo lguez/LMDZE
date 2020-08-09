@@ -215,6 +215,8 @@ contains
        CALL histdef(nid_ins, "qsurf", "Surface Air humidity", "", &
             iim, jjm + 1, nhori, 1, 1, 1, -99, &
             "inst(X)", zsto, zout)
+       CALL histdef(nid_ins, "ffonte", "Thermal flux for snow melting", &
+            "W m-2", iim, jjm + 1, nhori, 1, 1, 1, -99, "inst(X)", zsto, zout)
 
        if (conv_emanuel) then
           CALL histdef(nid_ins, "ptop", "cloud top pressure", &

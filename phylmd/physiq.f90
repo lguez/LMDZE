@@ -1025,6 +1025,7 @@ contains
     call histwrite_phy("flat", zxfluxlat)
     call histwrite_phy("rld", lwdn)
     call histwrite_phy("rldcs", lwdn0)
+    call histwrite_phy("ffonte", zxffonte)
 
     DO nsrf = 1, nbsrf
        CALL histwrite_phy("fract_"//clnsurf(nsrf), pctsrf(:, nsrf))
