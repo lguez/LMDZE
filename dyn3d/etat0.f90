@@ -288,7 +288,7 @@ contains
     falbe(:, is_lic) = 0.6
     falbe(:, is_oce) = 0.5
     falbe(:, is_sic) = 0.6
-    fqsurf = 150.
+    fqsurf = 0.
     ftsoil = spread(spread(pack(tsol_2d, dyn_phy), 2, nsoilmx), 3, nbsrf)
     solsw = 165.
     sollw = -53.
