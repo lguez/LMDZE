@@ -312,28 +312,6 @@ contains
     INTEGER i, k, iq, nsrf
     REAL zphi(klon, llm)
 
-    ! cf. Anne Mathieu, variables pour la couche limite atmosphérique (hbtm)
-
-    REAL, SAVE, ALLOCATABLE:: pblh(:, :) ! (klon, nbsrf)
-    ! Hauteur de couche limite
-
-    REAL, SAVE, ALLOCATABLE:: plcl(:, :) ! (klon, nbsrf)
-    ! Niveau de condensation de la CLA
-
-    REAL, SAVE, ALLOCATABLE:: capCL(:, :) ! (klon, nbsrf)
-    ! CAPE de couche limite
-
-    REAL, SAVE, ALLOCATABLE:: oliqCL(:, :) ! (klon, nbsrf)
-    ! eau_liqu integree de couche limite
-
-    REAL, SAVE, ALLOCATABLE:: cteiCL(:, :) ! (klon, nbsrf)
-    ! cloud top instab. crit. couche limite
-
-    REAL, SAVE, ALLOCATABLE:: pblt(:, :) ! (klon, nbsrf)
-    ! T \`a la hauteur de couche limite
-
-    REAL, SAVE, ALLOCATABLE:: therm(:, :) ! (klon, nbsrf)
-
     ! Grandeurs de sorties
     REAL s_pblh(klon), s_lcl(klon), s_capCL(klon)
     REAL s_oliqCL(klon), s_cteiCL(klon), s_pblt(klon)
@@ -497,13 +475,6 @@ contains
        ALLOCATE(wo(klon, llm))
        allocate(clwcon(klon, llm), rnebcon(klon, llm))
        allocate(clwcon0(klon, llm), rnebcon0(klon, llm))
-       ALLOCATE(pblh(klon, nbsrf))
-       ALLOCATE(plcl(klon, nbsrf))
-       ALLOCATE(capCL(klon, nbsrf))
-       ALLOCATE(oliqCL(klon, nbsrf))
-       ALLOCATE(cteiCL(klon, nbsrf))
-       ALLOCATE(pblt(klon, nbsrf))
-       ALLOCATE(therm(klon, nbsrf))
        allocate(cape(klon))
        allocate(ibas_con(klon), itop_con(klon))
        allocate(ratqs(klon, llm))
@@ -529,13 +500,6 @@ contains
        rnebcon0 = 0.
        clwcon0 = 0.
        clwcon = 0.
-       pblh =0. ! Hauteur de couche limite
-       plcl =0. ! Niveau de condensation de la CLA
-       capCL =0. ! CAPE de couche limite
-       oliqCL =0. ! eau_liqu integree de couche limite
-       cteiCL =0. ! cloud top instab. crit. couche limite
-       pblt =0.
-       therm =0.
 
        print *, "Enter namelist 'physiq_nml'."
        read(unit=*, nml=physiq_nml)
@@ -650,8 +614,8 @@ contains
          falbe, fluxlat, rain_fall, snow_fall, frugs, agesno, rugoro, d_t_vdf, &
          d_q_vdf, d_u_vdf, d_v_vdf, flux_t, flux_q, flux_u, flux_v, cdragh, &
          cdragm, q2, dflux_t, dflux_q, coefh, t2m, q2m, u10m_srf, v10m_srf, &
-         pblh, capCL, oliqCL, cteiCL, pblT, therm, plcl, fqcalving, ffonte, &
-         run_off_lic_0, albsol, sollw, solsw, tsol)
+         s_pblh, s_capCL, s_oliqCL, s_cteiCL, s_pblT, s_therm, s_lcl, &
+         fqcalving, ffonte, run_off_lic_0, albsol, sollw, solsw, tsol)
 
     ! Incr\'ementation des flux :
     sens = sum(flux_t * pctsrf, dim = 2)
@@ -675,13 +639,6 @@ contains
     u10m = sum(u10m_srf * pctsrf, dim = 2)
     v10m = sum(v10m_srf * pctsrf, dim = 2)
     zxffonte = sum(ffonte * pctsrf, dim = 2)
-    s_pblh = sum(pblh * pctsrf, dim = 2)
-    s_lcl = sum(plcl * pctsrf, dim = 2)
-    s_capCL = sum(capCL * pctsrf, dim = 2)
-    s_oliqCL = sum(oliqCL * pctsrf, dim = 2)
-    s_cteiCL = sum(cteiCL * pctsrf, dim = 2)
-    s_pblT = sum(pblT * pctsrf, dim = 2)
-    s_therm = sum(therm * pctsrf, dim = 2)
 
     ! Si une sous-fraction n'existe pas, elle prend la valeur moyenne :
     DO nsrf = 1, nbsrf

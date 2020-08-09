@@ -8,9 +8,9 @@ contains
        ftsol, cdmmax, cdhmax, ftsoil, qsol, paprs, play, fsnow, fqsurf, falbe, &
        fluxlat, rain_fall, snow_fall, frugs, agesno, rugoro, d_t, d_q, d_u, &
        d_v, flux_t, flux_q, flux_u, flux_v, cdragh, cdragm, q2, dflux_t, &
-       dflux_q, coefh, t2m, q2m, u10m_srf, v10m_srf, pblh, capcl, oliqcl, &
-       cteicl, pblt, therm, plcl, fqcalving, ffonte, run_off_lic_0, albsol, &
-       sollw, solsw, tsol)
+       dflux_q, coefh, t2m, q2m, u10m_srf, v10m_srf, s_pblh, s_capcl, &
+       s_oliqcl, s_cteicl, s_pblt, s_therm, s_lcl, fqcalving, ffonte, &
+       run_off_lic_0, albsol, sollw, solsw, tsol)
 
     ! From phylmd/clmain.F, version 1.6, 2005/11/16 14:47:19
     ! Author: Z. X. Li (LMD/CNRS)
@@ -116,15 +116,13 @@ contains
     ! composantes du vent \`a 10m sans spirale d'Ekman
 
     ! Ionela Musat. Cf. Anne Mathieu : planetary boundary layer, hbtm.
-    ! Comme les autres diagnostics, on cumule dans physiq ce qui permet
-    ! de sortir les grandeurs par sous-surface.
-    REAL pblh(klon, nbsrf) ! height of planetary boundary layer
-    REAL capcl(klon, nbsrf)
-    REAL oliqcl(klon, nbsrf)
-    REAL cteicl(klon, nbsrf)
-    REAL, INTENT(inout):: pblt(:, :) ! (klon, nbsrf) temp\'erature au nveau HCL
-    REAL therm(klon, nbsrf)
-    REAL plcl(klon, nbsrf)
+    REAL, INTENT(out):: s_pblh(klon) ! height of planetary boundary layer
+    REAL, INTENT(out):: s_capcl(klon)
+    REAL, INTENT(out):: s_oliqcl(klon)
+    REAL, INTENT(out):: s_cteicl(klon)
+    REAL, INTENT(out):: s_pblt(:) ! (klon) temp\'erature au nveau HCL
+    REAL, INTENT(out):: s_therm(klon)
+    REAL, INTENT(out):: s_lcl(klon)
 
     REAL, intent(out):: fqcalving(klon, nbsrf)
     ! flux d'eau "perdue" par la surface et necessaire pour limiter la
@@ -201,6 +199,15 @@ contains
     REAL t1(klon)
     REAL zgeop(klon, klev)
 
+    ! Ionela Musat. Cf. Anne Mathieu : planetary boundary layer, hbtm.
+    REAL pblh(klon, nbsrf) ! height of planetary boundary layer
+    REAL capcl(klon, nbsrf) ! CAPE de couche limite
+    REAL oliqcl(klon, nbsrf) ! eau_liqu integree de couche limite
+    REAL cteicl(klon, nbsrf) ! cloud top instab. crit. couche limite
+    REAL pblt(klon, nbsrf) ! temp\'erature au nveau HCL
+    REAL therm(klon, nbsrf)
+    REAL plcl(klon, nbsrf) ! Niveau de condensation de la CLA
+
     !------------------------------------------------------------
 
     tsol = sum(ftsol * pctsrf, dim = 2)
@@ -244,6 +251,13 @@ contains
     coefh = 0.
     fqcalving = 0.
     run_off_lic = 0.
+    pblh = huge(0.)
+    plcl = huge(0.)
+    capCL = huge(0.)
+    oliqCL = huge(0.)
+    cteiCL = huge(0.)
+    pblt = huge(0.)
+    therm = huge(0.)
 
     ! Initialisation des "pourcentages potentiels". On consid\`ere ici qu'on
     ! peut avoir potentiellement de la glace sur tout le domaine oc\'eanique
@@ -506,6 +520,13 @@ contains
     CALL histwrite_phy("dtsvdfi", d_ts(:, is_sic))
 
     tsol = sum(ftsol * pctsrf, dim = 2)
+    s_pblh = sum(pblh * pctsrf, dim = 2)
+    s_lcl = sum(plcl * pctsrf, dim = 2)
+    s_capCL = sum(capCL * pctsrf, dim = 2)
+    s_oliqCL = sum(oliqCL * pctsrf, dim = 2)
+    s_cteiCL = sum(cteiCL * pctsrf, dim = 2)
+    s_pblT = sum(pblT * pctsrf, dim = 2)
+    s_therm = sum(therm * pctsrf, dim = 2)
 
   END SUBROUTINE pbl_surface
 
