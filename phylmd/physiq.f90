@@ -692,13 +692,6 @@ contains
              u10m_srf(i, nsrf) = u10m(i)
              v10m_srf(i, nsrf) = v10m(i)
              ffonte(i, nsrf) = zxffonte(i)
-             pblh(i, nsrf) = s_pblh(i)
-             plcl(i, nsrf) = s_lcl(i)
-             capCL(i, nsrf) = s_capCL(i)
-             oliqCL(i, nsrf) = s_oliqCL(i)
-             cteiCL(i, nsrf) = s_cteiCL(i)
-             pblT(i, nsrf) = s_pblT(i)
-             therm(i, nsrf) = s_therm(i)
           end IF
        ENDDO
     ENDDO
