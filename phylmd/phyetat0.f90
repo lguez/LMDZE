@@ -11,7 +11,7 @@ module phyetat0_m
 
 contains
 
-  SUBROUTINE phyetat0(pctsrf, ftsol, ftsoil, qsurf, qsol, fsnow, albe, &
+  SUBROUTINE phyetat0(pctsrf, ftsol, ftsoil, fqsurf, qsol, fsnow, albe, &
        rain_fall, snow_fall, solsw, sollw, fder, radsol, frugs, agesno, zmea, &
        zstd, zsig, zgam, zthe, zpic, zval, t_ancien, q_ancien, ancien_ok, &
        rnebcon, ratqs, clwcon, run_off_lic_0, sig1, w01, ncid_startphy)
@@ -31,7 +31,7 @@ contains
     REAL, intent(out):: pctsrf(:, :) ! (klon, nbsrf)
     REAL, intent(out):: ftsol(:, :) ! (klon, nbsrf)
     REAL, intent(out):: ftsoil(:, :, :) ! (klon, nsoilmx, nbsrf)
-    REAL, intent(out):: qsurf(klon, nbsrf)
+    REAL, intent(out):: fqsurf(klon, nbsrf)
 
     REAL, intent(out):: qsol(:)
     ! (klon) column-density of water in soil, in kg m-2
@@ -144,7 +144,7 @@ contains
     ! Lecture de l'humidite de l'air juste au dessus du sol:
 
     call NF95_INQ_VARID(ncid_startphy, "QS", varid)
-    call nf95_get_var(ncid_startphy, varid, qsurf)
+    call nf95_get_var(ncid_startphy, varid, fqsurf)
 
     ierr = NF90_INQ_VARID(ncid_startphy, "QSOL", varid)
     IF (ierr == NF90_NOERR) THEN
