@@ -312,11 +312,6 @@ contains
     INTEGER i, k, iq, nsrf
     REAL zphi(klon, llm)
 
-    ! Grandeurs de sorties
-    REAL s_pblh(klon), s_lcl(klon), s_capCL(klon)
-    REAL s_oliqCL(klon), s_cteiCL(klon), s_pblt(klon)
-    REAL s_therm(klon)
-
     ! Variables pour la convection de K. Emanuel :
 
     REAL upwd(klon, llm) ! saturated updraft mass flux
@@ -614,7 +609,6 @@ contains
          falbe, fluxlat, rain_fall, snow_fall, frugs, agesno, rugoro, d_t_vdf, &
          d_q_vdf, d_u_vdf, d_v_vdf, flux_t, flux_q, flux_u, flux_v, cdragh, &
          cdragm, q2, dflux_t, dflux_q, coefh, t2m, q2m, u10m_srf, v10m_srf, &
-         s_pblh, s_capCL, s_oliqCL, s_cteiCL, s_pblT, s_therm, s_lcl, &
          fqcalving, ffonte, run_off_lic_0, albsol, sollw, solsw, tsol)
 
     ! Incr\'ementation des flux :
@@ -1014,13 +1008,6 @@ contains
     CALL histwrite_phy("albs", albsol)
     CALL histwrite_phy("tro3", wo * dobson_u * 1e3 / zmasse / rmo3 * md)
     CALL histwrite_phy("rugs", zxrugs)
-    CALL histwrite_phy("s_pblh", s_pblh)
-    CALL histwrite_phy("s_pblt", s_pblt)
-    CALL histwrite_phy("s_lcl", s_lcl)
-    CALL histwrite_phy("s_capCL", s_capCL)
-    CALL histwrite_phy("s_oliqCL", s_oliqCL)
-    CALL histwrite_phy("s_cteiCL", s_cteiCL)
-    CALL histwrite_phy("s_therm", s_therm)
     CALL histwrite_phy("temp", t_seri)
     CALL histwrite_phy("vitu", u_seri)
     CALL histwrite_phy("vitv", v_seri)

@@ -8,8 +8,7 @@ contains
        ftsol, cdmmax, cdhmax, ftsoil, qsol, paprs, play, fsnow, fqsurf, falbe, &
        fluxlat, rain_fall, snow_fall, frugs, agesno, rugoro, d_t, d_q, d_u, &
        d_v, flux_t, flux_q, flux_u, flux_v, cdragh, cdragm, q2, dflux_t, &
-       dflux_q, coefh, t2m, q2m, u10m_srf, v10m_srf, s_pblh, s_capcl, &
-       s_oliqcl, s_cteicl, s_pblt, s_therm, s_lcl, fqcalving, ffonte, &
+       dflux_q, coefh, t2m, q2m, u10m_srf, v10m_srf, fqcalving, ffonte, &
        run_off_lic_0, albsol, sollw, solsw, tsol)
 
     ! From phylmd/clmain.F, version 1.6, 2005/11/16 14:47:19
@@ -114,15 +113,6 @@ contains
 
     REAL, INTENT(inout):: u10m_srf(:, :), v10m_srf(:, :) ! (klon, nbsrf)
     ! composantes du vent \`a 10m sans spirale d'Ekman
-
-    ! Ionela Musat. Cf. Anne Mathieu : planetary boundary layer, hbtm.
-    REAL, INTENT(out):: s_pblh(klon) ! height of planetary boundary layer
-    REAL, INTENT(out):: s_capcl(klon)
-    REAL, INTENT(out):: s_oliqcl(klon)
-    REAL, INTENT(out):: s_cteicl(klon)
-    REAL, INTENT(out):: s_pblt(:) ! (klon) temp\'erature au nveau HCL
-    REAL, INTENT(out):: s_therm(klon)
-    REAL, INTENT(out):: s_lcl(klon)
 
     REAL, intent(out):: fqcalving(klon, nbsrf)
     ! flux d'eau "perdue" par la surface et necessaire pour limiter la
@@ -520,13 +510,13 @@ contains
     CALL histwrite_phy("dtsvdft", d_ts(:, is_ter))
     CALL histwrite_phy("dtsvdfg", d_ts(:, is_lic))
     CALL histwrite_phy("dtsvdfi", d_ts(:, is_sic))
-    s_pblh = sum(pblh * pctsrf, dim = 2)
-    s_lcl = sum(plcl * pctsrf, dim = 2)
-    s_capCL = sum(capCL * pctsrf, dim = 2)
-    s_oliqCL = sum(oliqCL * pctsrf, dim = 2)
-    s_cteiCL = sum(cteiCL * pctsrf, dim = 2)
-    s_pblT = sum(pblT * pctsrf, dim = 2)
-    s_therm = sum(therm * pctsrf, dim = 2)
+    CALL histwrite_phy("s_pblh", sum(pblh * pctsrf, dim = 2))
+    CALL histwrite_phy("s_pblt", sum(pblT * pctsrf, dim = 2))
+    CALL histwrite_phy("s_lcl", sum(plcl * pctsrf, dim = 2))
+    CALL histwrite_phy("s_capCL", sum(capCL * pctsrf, dim = 2))
+    CALL histwrite_phy("s_oliqCL", sum(oliqCL * pctsrf, dim = 2))
+    CALL histwrite_phy("s_cteiCL", sum(cteiCL * pctsrf, dim = 2))
+    CALL histwrite_phy("s_therm", sum(therm * pctsrf, dim = 2))
 
   END SUBROUTINE pbl_surface
 
