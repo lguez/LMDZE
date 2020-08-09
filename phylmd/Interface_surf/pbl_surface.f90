@@ -196,7 +196,7 @@ contains
     REAL cteicl(klon, nbsrf) ! cloud top instab. crit. couche limite
     REAL pblt(klon, nbsrf) ! temp\'erature au nveau HCL
     REAL therm(klon, nbsrf)
-    REAL plcl(klon, nbsrf) ! Niveau de condensation de la CLA
+    REAL lcl(klon, nbsrf) ! Niveau de condensation de la CLA
 
     !------------------------------------------------------------
 
@@ -242,7 +242,7 @@ contains
     fqcalving = 0.
     run_off_lic = 0.
     pblh = huge(0.)
-    plcl = huge(0.)
+    lcl = huge(0.)
     capCL = huge(0.)
     oliqCL = huge(0.)
     cteiCL = huge(0.)
@@ -484,7 +484,7 @@ contains
           DO j = 1, knon
              i = ni(j)
              pblh(i, nsrf) = ypblh(j)
-             plcl(i, nsrf) = ylcl(j)
+             lcl(i, nsrf) = ylcl(j)
              capcl(i, nsrf) = ycapcl(j)
              oliqcl(i, nsrf) = yoliqcl(j)
              cteicl(i, nsrf) = ycteicl(j)
@@ -512,7 +512,7 @@ contains
     CALL histwrite_phy("dtsvdfi", d_ts(:, is_sic))
     CALL histwrite_phy("s_pblh", sum(pblh * pctsrf, dim = 2))
     CALL histwrite_phy("s_pblt", sum(pblT * pctsrf, dim = 2))
-    CALL histwrite_phy("s_lcl", sum(plcl * pctsrf, dim = 2))
+    CALL histwrite_phy("s_lcl", sum(lcl * pctsrf, dim = 2))
     CALL histwrite_phy("s_capCL", sum(capCL * pctsrf, dim = 2))
     CALL histwrite_phy("s_oliqCL", sum(oliqCL * pctsrf, dim = 2))
     CALL histwrite_phy("s_cteiCL", sum(cteiCL * pctsrf, dim = 2))

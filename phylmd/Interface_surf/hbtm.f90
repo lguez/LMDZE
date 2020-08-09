@@ -5,7 +5,7 @@ module HBTM_m
 contains
 
   SUBROUTINE HBTM(paprs, pplay, t2m, q2m, ustar, flux_t, flux_q, u, v, t, q, &
-       pblh, cape, EauLiq, ctei, pblT, therm, plcl)
+       pblh, cape, EauLiq, ctei, pblT, therm, lcl)
 
     ! D'apr\'es Holstag et Boville et Troen et Mahrt
     ! JAS 47 BLM
@@ -54,7 +54,7 @@ contains
 
     REAL, INTENT(OUT):: pblT(:) ! (knon)
     REAL, INTENT(OUT):: therm(:) ! (knon) ! thermal virtual temperature excess
-    REAL, INTENT(OUT):: plcl(:) ! (knon)
+    REAL, INTENT(OUT):: lcl(:) ! (knon)
 
     ! Local:
     
@@ -191,7 +191,7 @@ contains
        check(i) = .TRUE.
        ! on initialise pblh a l'altitude du 1er niv
        pblh(i) = z(i, 1)
-       plcl(i) = 6000.
+       lcl(i) = 6000.
        ! Lambda = -u*^3 / (alpha.g.kvon.<w'Theta'v>
        obklen(i) = -t(i, 1)*ustar(i)**3/(RG*vk*heatv(i))
     ENDDO
@@ -377,9 +377,9 @@ contains
                 if (qqsat < qT_th(i)) then
                    ! on calcule lcl
                    if (k == 2) then
-                      plcl(i) = z(i, k)
+                      lcl(i) = z(i, k)
                    else
-                      plcl(i) = z(i, k-1) + (z(i, k-1)-z(i, k)) &
+                      lcl(i) = z(i, k-1) + (z(i, k-1)-z(i, k)) &
                            * (qT_th(i)-qsatbef(i)) / (qsatbef(i)-qqsat)
                    endif
                    Zsat(i) = .true.
