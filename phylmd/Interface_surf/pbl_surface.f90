@@ -513,13 +513,13 @@ contains
     pctsrf(:, is_oce) = pctsrf_new_oce
     pctsrf(:, is_sic) = pctsrf_new_sic
 
+    tsol = sum(ftsol * pctsrf, dim = 2)
+
     CALL histwrite_phy("run_off_lic", run_off_lic)
     CALL histwrite_phy("dtsvdfo", d_ts(:, is_oce))
     CALL histwrite_phy("dtsvdft", d_ts(:, is_ter))
     CALL histwrite_phy("dtsvdfg", d_ts(:, is_lic))
     CALL histwrite_phy("dtsvdfi", d_ts(:, is_sic))
-
-    tsol = sum(ftsol * pctsrf, dim = 2)
     s_pblh = sum(pblh * pctsrf, dim = 2)
     s_lcl = sum(plcl * pctsrf, dim = 2)
     s_capCL = sum(capCL * pctsrf, dim = 2)
