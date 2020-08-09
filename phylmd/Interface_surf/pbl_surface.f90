@@ -397,7 +397,7 @@ contains
           fsnow(:, nsrf) = 0.
           fqsurf(:, nsrf) = 0.
           frugs(:, nsrf) = 0.
-          
+
           DO j = 1, knon
              i = ni(j)
              d_ts(i, nsrf) = tsurf_new(j) - yts(j)
@@ -419,7 +419,7 @@ contains
              dflux_t(i) = dflux_t(i) + y_dflux_t(j) * ypctsrf(j)
              dflux_q(i) = dflux_q(i) + y_dflux_q(j) * ypctsrf(j)
           END DO
-          
+
           IF (nsrf == is_ter) THEN
              qsol(ni(:knon)) = yqsol(:knon)
           else IF (nsrf == is_lic) THEN
