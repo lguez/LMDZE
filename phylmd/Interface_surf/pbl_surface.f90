@@ -324,11 +324,6 @@ contains
                yts(:knon), yqsurf(:knon), yrugos(:knon), ycdragm(:knon), &
                ycdragh(:knon)) 
 
-          IF (iflag_pbl == 1) THEN
-             ycdragm(:knon) = max(ycdragm(:knon), 0.)
-             ycdragh(:knon) = max(ycdragh(:knon), 0.)
-          end IF
-
           IF (nsrf == is_oce) THEN
              ! On met un seuil pour ycdragm et ycdragh :
              ycdragm(:knon) = min(ycdragm(:knon), cdmmax)
