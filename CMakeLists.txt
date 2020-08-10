@@ -19,7 +19,7 @@ add_library(LMDZE_objects OBJECT dimensions.F90)
 target_include_directories(LMDZE_objects PRIVATE ${netcdf-fortran_INCLUDEDIR})
 target_link_libraries(LMDZE_objects PUBLIC netcdf95 jumble numer_rec_95 nr_util)
 
-foreach(my_dir dyn3d filtrez IOIPSL misc phylmd)
+foreach(my_dir dyn3d filtrez IOIPSL misc phylmd dynphy_lonlat)
   include(${my_dir}/CMakeLists.txt)
 endforeach(my_dir)
 
