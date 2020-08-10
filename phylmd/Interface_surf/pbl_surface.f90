@@ -168,7 +168,7 @@ contains
     REAL yt(klon, klev), yq(klon, klev)
     REAL ypaprs(klon, klev + 1), ypplay(klon, klev), ydelp(klon, klev)
     REAL yq2(klon, klev + 1)
-    REAL delp(klon, klev)
+    REAL delp(klon, klev) ! \'epaisseur de couche
     INTEGER i, k, nsrf
     INTEGER ni(klon), knon, j
 
@@ -212,11 +212,7 @@ contains
        fsolsw(:, nsrf) = solsw * (1. - falbe(:, nsrf)) / (1. - albsol)
     END forall
 
-    DO k = 1, klev ! epaisseur de couche
-       DO i = 1, klon
-          delp(i, k) = paprs(i, k) - paprs(i, k + 1)
-       END DO
-    END DO
+    forall (k = 1:klev) delp(:, k) = paprs(:, k) - paprs(:, k + 1)
 
     ! Initialization:
     rugmer = 0.
@@ -260,10 +256,9 @@ contains
 
     if (itap == 1) allocate(pctsrf_new_oce(klon), pctsrf_new_sic(klon))
 
-    ! Tester si c'est le moment de lire le fichier:
-    if (mod(itap - 1, lmt_pas) == 0) then
-       CALL interfoce_lim(julien, pctsrf_new_oce, pctsrf_new_sic)
-    endif
+    ! Tester si c'est le moment de lire le fichier :
+    if (mod(itap - 1, lmt_pas) == 0) &
+         CALL interfoce_lim(julien, pctsrf_new_oce, pctsrf_new_sic)
 
     ! Boucler sur toutes les sous-fractions du sol:
 
@@ -293,7 +288,7 @@ contains
           yagesno(:knon) = agesno(ni(:knon), nsrf)
           yrugos(:knon) = frugs(ni(:knon), nsrf)
           yrugoro(:knon) = rugoro(ni(:knon))
-          ypaprs(:knon, klev + 1) = paprs(ni(:knon), klev + 1)
+          ypaprs(:knon, :) = paprs(ni(:knon), :)
           y_run_off_lic_0(:knon) = run_off_lic_0(ni(:knon))
 
           ! For continent, copy soil water content
@@ -304,7 +299,6 @@ contains
           DO k = 1, klev
              DO j = 1, knon
                 i = ni(j)
-                ypaprs(j, k) = paprs(i, k)
                 ypplay(j, k) = play(i, k)
                 ydelp(j, k) = delp(i, k)
                 yu(j, k) = u_seri(i, k)
