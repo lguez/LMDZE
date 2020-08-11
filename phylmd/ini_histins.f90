@@ -115,7 +115,7 @@ contains
        CALL histdef(nid_ins, "sens", "Sensible heat flux", "W/m2", &
             iim, jjm + 1, nhori, 1, 1, 1, -99,  &
             "inst(X)", zsto, zout)
-       CALL histdef(nid_ins, "fder", "Heat flux derivation", "W/m2", &
+       CALL histdef(nid_ins, "fder", "Heat flux derivative", "W/m2", &
             iim, jjm + 1, nhori, 1, 1, 1, -99,  &
             "inst(X)", zsto, zout)
        CALL histdef(nid_ins, "dtsvdfo", "Boundary-layer dTs(o)", "K/s", &

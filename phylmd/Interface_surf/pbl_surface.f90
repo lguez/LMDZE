@@ -495,8 +495,6 @@ contains
     pctsrf(:, is_oce) = pctsrf_new_oce
     pctsrf(:, is_sic) = pctsrf_new_sic
 
-    tsol = sum(ftsol * pctsrf, dim = 2)
-
     CALL histwrite_phy("run_off_lic", run_off_lic)
     CALL histwrite_phy("dtsvdfo", d_ts(:, is_oce))
     CALL histwrite_phy("dtsvdft", d_ts(:, is_ter))
@@ -510,6 +508,7 @@ contains
     CALL histwrite_phy("s_cteiCL", sum(cteiCL * pctsrf, dim = 2))
     CALL histwrite_phy("s_therm", sum(therm * pctsrf, dim = 2))
 
+    tsol = sum(ftsol * pctsrf, dim = 2)
   END SUBROUTINE pbl_surface
 
 end module pbl_surface_m
