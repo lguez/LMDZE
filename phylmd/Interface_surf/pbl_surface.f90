@@ -97,12 +97,15 @@ contains
     REAL, intent(out):: flux_u(:, :), flux_v(:, :) ! (klon, nbsrf)
     ! tension du vent (flux turbulent de vent) à la surface, en Pa
 
-    REAL, INTENT(out):: cdragh(klon), cdragm(klon)
+    REAL, INTENT(out):: cdragh(:), cdragm(:) ! (klon)
     real q2(klon, klev + 1, nbsrf)
 
     ! Ocean slab:
-    REAL, INTENT(out):: dflux_t(klon) ! derive du flux sensible
-    REAL, INTENT(out):: dflux_q(klon) ! derive du flux latent
+
+    REAL, INTENT(out):: dflux_t(:) ! (klon)
+    ! d\'eriv\'ee du flux de chaleur sensible au sol
+    
+    REAL, INTENT(out):: dflux_q(:) ! (klon) derive du flux latent
 
     REAL, intent(out):: coefh(:, 2:) ! (klon, 2:klev)
     ! Pour pouvoir extraire les coefficients d'\'echange, le champ

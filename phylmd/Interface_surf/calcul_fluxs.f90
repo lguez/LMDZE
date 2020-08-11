@@ -40,7 +40,7 @@ contains
     real, intent(IN):: p1lay(:) ! (knon)
     ! pression première couche (milieu de couche)
 
-    real, intent(IN):: cdragh(:) ! (knon) coefficient d'échange
+    real, intent(IN):: cdragh(:) ! (knon) coefficient d'\'echange
     real, intent(IN):: ps(:) ! (knon) pression au sol, en Pa
 
     real, intent(IN):: radsol(:) ! (knon)

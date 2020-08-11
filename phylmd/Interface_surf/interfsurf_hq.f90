@@ -47,7 +47,7 @@ contains
     real, intent(IN):: q1lay(:) ! (knon)
     ! humidit\'e sp\'ecifique de la premi\`ere couche
 
-    real, intent(IN):: cdragh(:) ! (knon) coefficient d'echange
+    real, intent(IN):: cdragh(:) ! (knon) coefficient d'\'echange
 
     real, intent(IN):: tAcoef(:), qAcoef(:) ! (knon)
     ! coefficients A de la r\'esolution de la couche limite pour t et q
@@ -104,6 +104,7 @@ contains
     REAL, intent(OUT):: run_off_lic(:) ! (knon) ruissellement total
 
     ! Local:
+
     REAL soilcap(size(knindex)) ! (knon)
     REAL soilflux(size(knindex)) ! (knon)
     integer i, knon

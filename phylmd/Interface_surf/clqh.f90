@@ -104,7 +104,6 @@ contains
     REAL, intent(OUT):: run_off_lic(:) ! (knon) ruissellement total
 
     ! Local:
-
     INTEGER k
     REAL evap(size(knindex)) ! (knon) evaporation au sol
     REAL, dimension(size(knindex), klev):: cq, dq, ch, dh ! (knon, klev)

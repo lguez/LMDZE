@@ -188,9 +188,9 @@ contains
     REAL, save, allocatable:: Ma(:, :) ! (klon, llm) ! undilute upward mass flux
     REAL, save, allocatable:: sig1(:, :), w01(:, :) ! (klon, llm)
 
-    ! Variables pour la couche limite (Alain Lahellec) :
-    REAL cdragh(klon) ! drag coefficient pour T and Q
-    REAL cdragm(klon) ! drag coefficient pour vent
+    ! Variables pour la couche limite :
+    REAL cdragh(klon) ! drag coefficient for T and Q
+    REAL cdragm(klon) ! drag coefficient for wind
 
     REAL coefh(klon, 2:llm) ! coef d'echange pour phytrac
 
@@ -226,8 +226,8 @@ contains
     REAL evap(klon) ! flux d'\'evaporation au sol
     real dflux_q(klon) ! derivative of the evaporation flux at the surface
     REAL sens(klon) ! flux de chaleur sensible au sol
-    real dflux_t(klon) ! derivee du flux de chaleur sensible au sol
-    REAL, save, allocatable:: dlw(:) ! (klon) ! derivative of infra-red flux
+    real dflux_t(klon) ! d\'eriv\'ee du flux de chaleur sensible au sol
+    REAL, save, allocatable:: dlw(:) ! (klon) derivative of infra-red flux
     REAL fder(klon) ! d\'erive de flux (sensible et latente)
     REAL ve(klon) ! integr. verticale du transport meri. de l'energie
     REAL vq(klon) ! integr. verticale du transport meri. de l'eau

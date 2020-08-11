@@ -36,7 +36,7 @@ contains
     REAL, intent(in):: coef(:, 2:) ! (klon, 2:klev)
     ! coefficient d'echange (m^2 / s)
 
-    real cdragh(:) ! klon
+    real, intent(in):: cdragh(:) ! klon
     REAL, intent(in):: t(klon, klev) ! temperature (K)
     real, intent(in):: ftsol(klon, nbsrf), pctsrf(klon, nbsrf) 
     ! ftsol----input-R- temperature du sol (en Kelvin)
