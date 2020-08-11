@@ -59,7 +59,7 @@ contains
     USE phytrac_m, ONLY: phytrac
     use radlwsw_m, only: radlwsw
     use yoegwd, only: sugwd
-    USE suphec_m, ONLY: rcpd, retv, rg, rlvtt, romega, rsigma, rtt, rmo3, md
+    USE suphec_m, ONLY: rcpd, retv, rg, rlvtt, romega, rtt, rmo3, md
     use time_phylmdz, only: itap, increment_itap
     use transp_m, only: transp
     use transp_lay_m, only: transp_lay
@@ -224,11 +224,8 @@ contains
     REAL rain_tiedtke(klon), snow_tiedtke(klon)
 
     REAL evap(klon) ! flux d'\'evaporation au sol
-    real dflux_q(klon) ! derivative of the evaporation flux at the surface
     REAL sens(klon) ! flux de chaleur sensible au sol
-    real dflux_t(klon) ! d\'eriv\'ee du flux de chaleur sensible au sol
     REAL, save, allocatable:: dlw(:) ! (klon) derivative of infra-red flux
-    REAL fder(klon) ! d\'erive de flux (sensible et latente)
     REAL ve(klon) ! integr. verticale du transport meri. de l'energie
     REAL vq(klon) ! integr. verticale du transport meri. de l'eau
     REAL ue(klon) ! integr. verticale du transport zonal de l'energie
@@ -608,14 +605,12 @@ contains
          ftsol, cdmmax, cdhmax, ftsoil, qsol, paprs, play, fsnow, fqsurf, &
          falbe, fluxlat, rain_fall, snow_fall, frugs, agesno, rugoro, d_t_vdf, &
          d_q_vdf, d_u_vdf, d_v_vdf, flux_t, flux_q, flux_u, flux_v, cdragh, &
-         cdragm, q2, dflux_t, dflux_q, coefh, t2m, q2m, u10m_srf, v10m_srf, &
-         fqcalving, ffonte, run_off_lic_0, albsol, sollw, solsw, tsol)
+         cdragm, q2, coefh, t2m, q2m, u10m_srf, v10m_srf, fqcalving, ffonte, &
+         run_off_lic_0, albsol, sollw, solsw, tsol, dlw)
 
     ! Incr\'ementation des flux :
     sens = sum(flux_t * pctsrf, dim = 2)
     evap = - sum(flux_q * pctsrf, dim = 2)
-    fder = dlw + dflux_t + dflux_q
-    dlw = - 4. * RSIGMA * tsol**3
 
     DO k = 1, llm
        DO i = 1, klon
@@ -1003,7 +998,6 @@ contains
     CALL histwrite_phy("solldown", sollwdown)
     CALL histwrite_phy("bils", radsol + sens + zxfluxlat)
     CALL histwrite_phy("sens", sens)
-    CALL histwrite_phy("fder", fder)
     CALL histwrite_phy("zxfqcalving", sum(fqcalving * pctsrf, dim = 2))
     CALL histwrite_phy("albs", albsol)
     CALL histwrite_phy("tro3", wo * dobson_u * 1e3 / zmasse / rmo3 * md)

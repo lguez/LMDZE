@@ -7,9 +7,9 @@ contains
   SUBROUTINE pbl_surface(pctsrf, t_seri, q_seri, u_seri, v_seri, julien, mu0, &
        ftsol, cdmmax, cdhmax, ftsoil, qsol, paprs, play, fsnow, fqsurf, falbe, &
        fluxlat, rain_fall, snow_fall, frugs, agesno, rugoro, d_t, d_q, d_u, &
-       d_v, flux_t, flux_q, flux_u, flux_v, cdragh, cdragm, q2, dflux_t, &
-       dflux_q, coefh, t2m, q2m, u10m_srf, v10m_srf, fqcalving, ffonte, &
-       run_off_lic_0, albsol, sollw, solsw, tsol)
+       d_v, flux_t, flux_q, flux_u, flux_v, cdragh, cdragm, q2, coefh, t2m, &
+       q2m, u10m_srf, v10m_srf, fqcalving, ffonte, run_off_lic_0, albsol, &
+       sollw, solsw, tsol, dlw)
 
     ! From phylmd/clmain.F, version 1.6, 2005/11/16 14:47:19
     ! Author: Z. X. Li (LMD/CNRS)
@@ -102,11 +102,6 @@ contains
 
     ! Ocean slab:
 
-    REAL, INTENT(out):: dflux_t(:) ! (klon)
-    ! d\'eriv\'ee du flux de chaleur sensible au sol
-    
-    REAL, INTENT(out):: dflux_q(:) ! (klon) derive du flux latent
-
     REAL, intent(out):: coefh(:, 2:) ! (klon, 2:klev)
     ! Pour pouvoir extraire les coefficients d'\'echange, le champ
     ! "coefh" a \'et\'e cr\'e\'e. Nous avons moyenn\'e les valeurs de
@@ -134,9 +129,12 @@ contains
     ! surface net downward shortwave flux, in W m-2
 
     REAL, intent(out):: tsol(:) ! (klon)
+    REAL, intent(inout):: dlw(:) ! (klon) derivative of infra-red flux
 
     ! Local:
 
+    REAL dflux_t(klon) ! d\'eriv\'ee du flux de chaleur sensible au sol
+    REAL dflux_q(klon) ! derive du flux latent at the surface
     REAL d_ts(klon, nbsrf) ! variation of ftsol
     REAL fsollw(klon, nbsrf) ! bilan flux IR pour chaque sous-surface
     REAL fsolsw(klon, nbsrf) ! flux solaire absorb\'e pour chaque sous-surface
@@ -495,6 +493,7 @@ contains
     pctsrf(:, is_oce) = pctsrf_new_oce
     pctsrf(:, is_sic) = pctsrf_new_sic
 
+    CALL histwrite_phy("fder", dlw + dflux_t + dflux_q)
     CALL histwrite_phy("run_off_lic", run_off_lic)
     CALL histwrite_phy("dtsvdfo", d_ts(:, is_oce))
     CALL histwrite_phy("dtsvdft", d_ts(:, is_ter))
@@ -509,6 +508,8 @@ contains
     CALL histwrite_phy("s_therm", sum(therm * pctsrf, dim = 2))
 
     tsol = sum(ftsol * pctsrf, dim = 2)
+    dlw = - 4. * RSIGMA * tsol**3
+
   END SUBROUTINE pbl_surface
 
 end module pbl_surface_m
