@@ -11,7 +11,6 @@ contains
     use caldyn0_m, only: caldyn0
     use comconst, only: cpp, kappa, iniconst
     use comgeom, only: aire_2d, apoln, apols, cu_2d, cv_2d, inigeom
-    use conf_gcm_m, only: nday
     use dimensions, only: iim, jjm, llm, nqmx
     use dimphy, only: klon
     use dimsoil, only: nsoilmx

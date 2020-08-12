@@ -205,7 +205,7 @@ contains
        ! Rugosite
        z0_new = rugoro
     case default
-       print *, 'Index surface = ', nisurf
+       print *, 'Index of surface = ', nisurf
        call abort_gcm("interfsurf_hq", 'Index surface non valable')
     end select
 

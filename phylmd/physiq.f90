@@ -23,7 +23,7 @@ contains
     use comgeom, only:  aire_2d
     use ajsec_m, only: ajsec
     use calltherm_m, only: calltherm
-    USE clesphys, ONLY: cdhmax, cdmmax, ecrit_ins, ok_instan
+    USE clesphys, ONLY: cdhmax, cdmmax, ok_instan
     USE clesphys2, ONLY: conv_emanuel, nbapp_rad, ok_orodr, ok_orolf
     USE conf_interface_m, ONLY: conf_interface
     USE pbl_surface_m, ONLY: pbl_surface
@@ -40,7 +40,6 @@ contains
     USE dimphy, ONLY: klon
     USE dimsoil, ONLY: nsoilmx
     use drag_noro_m, only: drag_noro
-    use dynetat0_chosen_m, only: day_ref, annee_ref
     USE fcttre, ONLY: foeew
     use fisrtilp_m, only: fisrtilp
     use grid_change, only: dyn_phy
