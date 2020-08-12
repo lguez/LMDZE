@@ -21,8 +21,10 @@ contains
     USE suphec_m, ONLY: rkappa
 
     integer, intent(in):: julien ! jour de l'annee en cours
-    integer, intent(in):: nisurf
+    integer, intent(in):: nisurf ! index de la surface a traiter
+
     integer, intent(in):: knindex(:) ! (knon)
+    ! index des points de la surface a traiter
 
     REAL, intent(inout):: tsoil(:, :) ! (knon, nsoilmx)
     ! temperature inside the ground, in K, layer 1 nearest to the surface
@@ -32,7 +34,7 @@ contains
 
     real, intent(in):: mu0(:) ! (knon) cosinus de l'angle solaire zenithal
     real, intent(in):: rugos(:) ! (knon) rugosite
-    REAL, intent(in):: rugoro(:) ! (knon)
+    REAL, intent(in):: rugoro(:) ! (knon) rugosite orographique
 
     REAL, intent(in):: u1lay(:), v1lay(:) ! (knon)
     ! vitesse de la 1ere couche (m / s)
@@ -41,11 +43,11 @@ contains
     ! Le coefficient d'echange (m^2 / s) multiplie par le cisaillement
     ! du vent (dV / dz)
 
-    REAL, intent(in):: cdragh(:) ! (knon) sans unite
+    REAL, intent(in):: cdragh(:) ! (knon) coefficient d'\'echange, sans unite
 
     REAL, intent(in):: t(:, :) ! (knon, klev) air temperature, in K
     REAL, intent(in):: q(:, :) ! (knon, klev) humidit\'e sp\'ecifique
-    REAL, intent(in):: ts(:) ! (knon) temperature du sol (K)
+    REAL, intent(in):: ts(:) ! (knon) temperature de surface (K)
 
     REAL, intent(in):: paprs(:, :) ! (knon, klev + 1)
     ! pression \`a l'inter-couche (Pa)
@@ -68,18 +70,21 @@ contains
     ! humidite de l'air au dessus de la surface
 
     real, intent(in):: rain_fall(:) ! (knon)
-    ! liquid water mass flux (kg / m2 / s), positive down
+    ! precipitation, liquid water mass flux (kg / m2 / s), positive down
 
     real, intent(in):: snow_fall(:) ! (knon)
-    ! solid water mass flux (kg / m2 / s), positive down
+    ! precipitation, solid water mass flux (kg / m2 / s), positive down
 
     real, intent(out):: fluxlat(:) ! (knon) flux de chaleur latente, en W m-2
+
     real, intent(in):: pctsrf_new_sic(:) ! (knon)
+    ! nouvelle repartition des surfaces
+
     REAL, intent(inout):: agesno(:) ! (knon)
     REAL, intent(out):: d_t(:, :) ! (knon, klev) variation of air temperature t
     REAL, intent(out):: d_q(:, :) ! (knon, klev) incrementation de "q"
     REAL, intent(out):: tsurf_new(:) ! (knon) new surface temperature, in K
-    real, intent(out):: z0_new(:) ! (knon)
+    real, intent(out):: z0_new(:) ! (knon) surface roughness
 
     REAL, intent(out):: flux_t(:) ! (knon)
     ! (diagnostic) flux de chaleur sensible (Cp T) à la surface,
@@ -92,7 +97,7 @@ contains
     REAL, intent(out):: dflux_l(:) ! (knon) derivee du flux latent dF / dTs
 
     REAL, intent(out):: fqcalving(:) ! (knon)
-    ! Flux d'eau "perdue" par la surface et n\'ecessaire pour que limiter la
+    ! Flux d'eau "perdue" par la surface et n\'ecessaire pour limiter la
     ! hauteur de neige, en kg / m2 / s
 
     REAL, intent(out):: ffonte(:) ! (knon)
@@ -104,9 +109,13 @@ contains
     REAL, intent(OUT):: run_off_lic(:) ! (knon) ruissellement total
 
     ! Local:
+
     INTEGER k
     REAL evap(size(knindex)) ! (knon) evaporation au sol
+
     REAL, dimension(size(knindex), klev):: cq, dq, ch, dh ! (knon, klev)
+    ! coefficients de la r\'esolution de la couche limite pour t et q
+
     REAL pkf(size(knindex), klev) ! (knon, klev)
 
     !----------------------------------------------------------------
