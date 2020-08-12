@@ -18,7 +18,7 @@ contains
     ! (diagnostic) flux de chaleur sensible (Cp T) à la surface,
     ! positif vers le bas, W / m2
 
-    REAL, intent(out):: flux_q(:) ! (knon)
+    REAL, intent(in):: flux_q(:) ! (knon)
     ! flux de la vapeur d'eau à la surface, en kg / (m**2 s)
 
     REAL, intent(in):: pkf(:, :) ! (knon, klev)
