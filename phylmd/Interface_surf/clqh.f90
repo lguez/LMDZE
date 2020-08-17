@@ -233,7 +233,7 @@ contains
        z0_new = rugoro
     case default
        print *, 'Index of surface = ', nisurf
-       call abort_gcm("interfsurf_hq", 'Index surface non valable')
+       call abort_gcm("clqh", 'Index surface non valable')
     end select
 
     flux_q = - evap
