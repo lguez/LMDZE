@@ -57,8 +57,7 @@ contains
     INTEGER i, k
     REAL zmgeom(size(ts))
     REAL ri(size(ts))
-    REAL l2(size(ts))
-    REAL zdphi, zdu2, ztvd, ztvu, cdn
+    REAL zdphi, zdu2, ztvd, ztvu
     REAL zt, zq, zcvm5, zcor, zqs, zfr, zdqs
     logical zdelta
     REAL gamt(2:klev) ! contre-gradient pour la chaleur sensible: Kelvin / metre
@@ -117,17 +116,14 @@ contains
                * (1. + RETV * q(i, k - 1))
           ri(i) = zmgeom(i) * (ztvd - ztvu) / (zdu2 * 0.5 * (ztvd + ztvu))
           ri(i) = ri(i) &
-          cdn = SQRT(zdu2) / zmgeom(i) * RG
-
-          l2(i) = (mixlen * MAX(0.0, (paprs(i, k) - paprs(i, itop(i) + 1)) &
-               /(paprs(i, 2) - paprs(i, itop(i) + 1))))**2
-          coefm(i, k) = sqrt(max(cdn**2 * (ric - ri(i)) / ric, kstable))
-          coefm(i, k) = l2(i) * coefm(i, k)
                + zmgeom(i) * zmgeom(i) / RG * gamt(k) &
                * (paprs(i, k) / 101325.)**RKAPPA &
                / (zdu2 * 0.5 * (ztvd + ztvu))
 
           ! Finalement, les coefficients d'\'echange sont obtenus:
+          coefm(i, k) = (mixlen * MAX(0., (paprs(i, k) - paprs(i, itop(i) &
+               + 1)) / (paprs(i, 2) - paprs(i, itop(i) + 1))))**2 &
+               * sqrt(max((SQRT(zdu2) / zmgeom(i) * RG)**2 * (ric - ri(i)) / ric, kstable))
           coefh(i, k) = coefm(i, k) / prandtl ! h et m different
        ENDDO
     ENDDO
