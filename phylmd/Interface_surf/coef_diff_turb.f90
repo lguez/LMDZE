@@ -26,9 +26,10 @@ contains
     INTEGER, INTENT(IN):: ni(:) ! (knon)
     REAL, INTENT(IN):: paprs(:, :) ! (knon, klev + 1)
     REAL, INTENT(IN):: pplay(:, :) ! (knon, klev)
-    REAL, INTENT(IN), dimension(:, :):: u, v, q, t ! (knon, klev)
+    REAL, INTENT(IN):: u(:, :), v(:, :) ! (knon, klev) wind, in m s-1
+    REAL, INTENT(IN):: q(:, :), t(:, :) ! (knon, klev)
     REAL, INTENT(IN):: ts(:), cdragm(:) ! (knon)
-    REAL, INTENT(IN):: zgeop(:, :) ! (knon, klev)
+    REAL, INTENT(IN):: zgeop(:, :) ! (knon, klev) geopotential, in m2 s-2
     REAL, intent(out):: coefm(:, 2:) ! (knon, 2:klev) coefficient, vitesse
 
     real, intent(out):: coefh(:, 2:) ! (knon, 2:klev) 

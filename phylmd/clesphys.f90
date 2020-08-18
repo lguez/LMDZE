@@ -12,7 +12,7 @@ module clesphys
   double precision, save, protected:: RCFC12 ! mass mixing ratio of CFC12
   REAL, protected:: cdmmax = 1.3E-3, cdhmax = 1.1E-3 ! seuils cdrm, cdrh
   
-  REAL, protected:: ksta = 1e-10, ksta_ter = 1e-10
+  REAL, protected:: ksta = 1e-10, ksta_ter = 1e-10 ! in s-2
   ! param\`etres de stabilit\'e sur terre et en dehors
 
   LOGICAL, protected:: ok_kzmin  = .true.

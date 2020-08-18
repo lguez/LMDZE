@@ -29,14 +29,16 @@ contains
     ! pression au milieu de chaque couche (en Pa)
 
     REAL, intent(in):: ts(:) ! (knon) temperature du sol (en Kelvin)
-    REAL, intent(in):: u(:, :), v(:, :) ! (knon, klev) wind
+    REAL, intent(in):: u(:, :), v(:, :) ! (knon, klev) wind, in m s-1
     REAL, intent(in):: t(:, :) ! (knon, klev) temperature (K)
     real, intent(in):: q(:, :) ! (knon, klev) vapeur d'eau (kg / kg)
-    REAL, intent(in):: zgeop(:, :) ! (knon, klev)
-    REAL, intent(out):: coefm(:, 2:) ! (knon, 2:klev) coefficient, vitesse
+    REAL, intent(in):: zgeop(:, :) ! (knon, klev) geopotential, in m2 s-2
+
+    REAL, intent(out):: coefm(:, 2:) ! (knon, 2:klev)
+    ! coefficient de diffusion, vitesse, en m2 s-1
 
     real, intent(out):: coefh(:, 2:) ! (knon, 2:klev)
-    ! coefficient, chaleur et humidité
+    ! coefficient de diffusion, chaleur et humidité, en m2 s-1
 
     ! Local:
 
@@ -47,20 +49,20 @@ contains
 
     ! Quelques constantes et options:
 
-    REAL, PARAMETER:: cepdu2 =0.1**2
+    REAL, PARAMETER:: cepdu2 = 0.1**2 ! in m2 s-2
     REAL, PARAMETER:: ratqs = 0.05 ! largeur de distribution de vapeur d'eau
     REAL, PARAMETER:: ric = 0.4 ! nombre de Richardson critique
     REAL, PARAMETER:: prandtl = 0.4
 
-    REAL kstable ! diffusion minimale (situation stable)
+    REAL kstable ! diffusion minimale (situation stable), en s-2
     REAL, PARAMETER:: mixlen = 35. ! constante contrôlant longueur de mélange
     INTEGER i, k
-    REAL zmgeom(size(ts))
+    REAL zmgeom(size(ts)) ! in m2 s-2
     REAL ri(size(ts))
     REAL zdphi, zdu2, ztvd, ztvu
     REAL zt, zq, zcvm5, zcor, zqs, zfr, zdqs
     logical zdelta
-    REAL gamt(2:klev) ! contre-gradient pour la chaleur sensible: Kelvin / metre
+    REAL gamt(2:klev) ! contre-gradient pour la chaleur sensible, en K / m
 
     !--------------------------------------------------------------------
 

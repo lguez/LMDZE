@@ -188,7 +188,7 @@ contains
     REAL ytherm(klon)
     REAL u1(klon), v1(klon)
     REAL t1(klon)
-    REAL zgeop(klon, klev)
+    REAL zgeop(klon, klev) ! geopotential, in m2 s-2
 
     ! Ionela Musat. Cf. Anne Mathieu : planetary boundary layer, hbtm.
     REAL pblh(klon, nbsrf) ! height of planetary boundary layer
