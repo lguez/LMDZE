@@ -31,7 +31,7 @@ contains
     REAL, intent(in):: ts(:) ! (knon) temperature du sol (en Kelvin)
     REAL, intent(in):: u(:, :), v(:, :) ! (knon, klev) wind
     REAL, intent(in):: t(:, :) ! (knon, klev) temperature (K)
-    real, intent(in):: q(:, :) ! (knon, klev) vapeur d'eau (kg/kg)
+    real, intent(in):: q(:, :) ! (knon, klev) vapeur d'eau (kg / kg)
     REAL, intent(in):: zgeop(:, :) ! (knon, klev)
     REAL, intent(out):: coefm(:, 2:) ! (knon, 2:klev) coefficient, vitesse
 
@@ -61,7 +61,7 @@ contains
     REAL zdphi, zdu2, ztvd, ztvu, cdn
     REAL zt, zq, zcvm5, zcor, zqs, zfr, zdqs
     logical zdelta
-    REAL gamt(2:klev) ! contre-gradient pour la chaleur sensible: Kelvin/metre
+    REAL gamt(2:klev) ! contre-gradient pour la chaleur sensible: Kelvin / metre
 
     !--------------------------------------------------------------------
 
@@ -75,7 +75,7 @@ contains
        gamt(2) = - 2.5E-3
     else
        DO k = 2, klev
-          gamt(k) = 0.0
+          gamt(k) = 0.
        ENDDO
     ENDIF
 
@@ -90,47 +90,44 @@ contains
           zdu2 = MAX(cepdu2, (u(i, k) - u(i, k - 1))**2 &
                + (v(i, k) - v(i, k - 1))**2)
           zmgeom(i) = zgeop(i, k) - zgeop(i, k - 1)
-          zdphi = zmgeom(i) / 2.0
+          zdphi = zmgeom(i) / 2.
           zt = (t(i, k) + t(i, k - 1)) * 0.5
           zq = (q(i, k) + q(i, k - 1)) * 0.5
 
-          ! calculer Qs et dQs/dT:
+          ! calculer Qs et dQs / dT:
           zdelta = RTT >=zt
           zcvm5 = merge(R5IES * RLSTT, R5LES * RLVTT, zdelta) / RCPD &
                / (1. + RVTMP2 * zq)
           zqs = R2ES * FOEEW(zt, zdelta) / pplay(i, k)
           zqs = MIN(0.5, zqs)
-          zcor = 1./(1. - RETV * zqs)
+          zcor = 1. / (1. - RETV * zqs)
           zqs = zqs * zcor
           zdqs = FOEDE(zt, zdelta, zcvm5, zqs, zcor)
 
           ! calculer la fraction nuageuse (processus humide):
-          zfr = (zq + ratqs * zq - zqs) / (2.0 * ratqs * zq)
-          zfr = MAX(0.0, MIN(1.0, zfr))
+          zfr = (zq + ratqs * zq - zqs) / (2. * ratqs * zq)
+          zfr = MAX(0., MIN(1., zfr))
 
           ! calculer le nombre de Richardson:
-          ztvd = (t(i, k) &
-               + zdphi/RCPD/(1. + RVTMP2 * zq) &
-               * ((1. - zfr) + zfr * (1. + RLVTT * zqs/RD/zt)/(1. + zdqs)) &
-               ) * (1. + RETV * q(i, k))
-          ztvu = (t(i, k - 1) &
-               - zdphi/RCPD/(1. + RVTMP2 * zq) &
-               * ((1. - zfr) + zfr * (1. + RLVTT * zqs/RD/zt)/(1. + zdqs)) &
-               ) * (1. + RETV * q(i, k - 1))
-          ri(i) = zmgeom(i) * (ztvd - ztvu)/(zdu2 * 0.5 * (ztvd + ztvu))
+          ztvd = (t(i, k) + zdphi / RCPD / (1. + RVTMP2 * zq) * ((1. - zfr) &
+               + zfr * (1. + RLVTT * zqs / RD / zt) / (1. + zdqs))) * (1. &
+               + RETV * q(i, k))
+          ztvu = (t(i, k - 1) - zdphi / RCPD / (1. + RVTMP2 * zq) * ((1. &
+               - zfr) + zfr * (1. + RLVTT * zqs / RD / zt) / (1. + zdqs))) &
+               * (1. + RETV * q(i, k - 1))
+          ri(i) = zmgeom(i) * (ztvd - ztvu) / (zdu2 * 0.5 * (ztvd + ztvu))
           ri(i) = ri(i) &
-               + zmgeom(i) * zmgeom(i)/RG * gamt(k) &
-               * (paprs(i, k)/101325.0)**RKAPPA &
-               /(zdu2 * 0.5 * (ztvd + ztvu))
-
-          ! finalement, les coefficients d'echange sont obtenus:
-
           cdn = SQRT(zdu2) / zmgeom(i) * RG
 
           l2(i) = (mixlen * MAX(0.0, (paprs(i, k) - paprs(i, itop(i) + 1)) &
                /(paprs(i, 2) - paprs(i, itop(i) + 1))))**2
           coefm(i, k) = sqrt(max(cdn**2 * (ric - ri(i)) / ric, kstable))
           coefm(i, k) = l2(i) * coefm(i, k)
+               + zmgeom(i) * zmgeom(i) / RG * gamt(k) &
+               * (paprs(i, k) / 101325.)**RKAPPA &
+               / (zdu2 * 0.5 * (ztvd + ztvu))
+
+          ! Finalement, les coefficients d'\'echange sont obtenus:
           coefh(i, k) = coefm(i, k) / prandtl ! h et m different
        ENDDO
     ENDDO

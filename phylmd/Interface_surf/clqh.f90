@@ -125,7 +125,6 @@ contains
     ! coefficients de la r\'esolution de la couche limite pour t et q
 
     REAL pkf(size(knindex), klev) ! (knon, klev)
-
     REAL soilcap(size(knindex)) ! (knon)
     REAL soilflux(size(knindex)) ! (knon)
     integer i, knon
