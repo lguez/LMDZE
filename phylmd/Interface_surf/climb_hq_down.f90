@@ -57,9 +57,9 @@ contains
     if (iflag_pbl == 1) then
        gamt(:, 2) = - 2.5e-3
        gamt(:, 3:)= - 1e-3
-       forall (k = 2:klev) gamah(:, k) = gamt(:, k) * (RD * (t(:, k - 1) &
+       forall (k = 2:klev) gamah(:, k) = gamt(:, k) * RD * (t(:, k - 1) &
             + t(:, k)) / 2. / RG / paprs(:, k) * (pplay(:, k - 1) &
-            - pplay(:, k))) * RCPD * (paprs(:, 1) / paprs(:, k))**RKAPPA
+            - pplay(:, k)) * RCPD * (paprs(:, 1) / paprs(:, k))**RKAPPA
     else
        gamah = 0.
     endif
