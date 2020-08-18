@@ -123,9 +123,11 @@ contains
                / (zdu2 * 0.5 * (ztvd + ztvu))
 
           ! Finalement, les coefficients d'\'echange sont obtenus:
-          coefm(i, k) = (mixlen * MAX(0., (paprs(i, k) - paprs(i, itop(i) &
-               + 1)) / (paprs(i, 2) - paprs(i, itop(i) + 1))))**2 &
-               * sqrt(max((SQRT(zdu2) / zmgeom(i) * RG)**2 * (ric - ri(i)) / ric, kstable))
+          coefm(i, k) = (mixlen * MAX(0., (paprs(i, k) &
+               - paprs(i, itop(i) + 1)) / (paprs(i, 2) &
+               - paprs(i, itop(i) + 1))))**2 &
+               * sqrt(max(zdu2 / (zmgeom(i) / RG)**2 * (ric - ri(i)) / ric, &
+               kstable))
           coefh(i, k) = coefm(i, k) / prandtl ! h et m different
        ENDDO
     ENDDO
