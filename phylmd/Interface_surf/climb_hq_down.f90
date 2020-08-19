@@ -4,7 +4,7 @@ module climb_hq_down_m
 
 contains
 
-  subroutine climb_hq_down(pkf, cq, dq, ch, dh, paprs, pplay, t, coef, delp, q)
+  subroutine climb_hq_down(pkf, cq, dq, ch, dh, paprs, pplay, t, coefh, delp, q)
 
     use comconst, only: dtphys
     USE conf_phys_m, ONLY: iflag_pbl
@@ -22,7 +22,7 @@ contains
 
     REAL, intent(in):: t(:, :) ! (knon, klev) temperature (K)
 
-    REAL, intent(in):: coef(:, 2:) ! (knon, 2:klev)
+    REAL, intent(in):: coefh(:, 2:) ! (knon, 2:klev)
     ! diffusion coefficient at layer interface, for heat and humidity, in m2 s-1
 
     REAL, intent(in):: delp(:, :) ! (knon, klev)
@@ -47,7 +47,7 @@ contains
     h = RCPD * t * pkf
 
     ! Convertir les coefficients en variables convenables au calcul:
-    forall (k = 2:klev) zx_coef(:, k) = coef(:, k) &
+    forall (k = 2:klev) zx_coef(:, k) = coefh(:, k) &
          / (pplay(:, k - 1) - pplay(:, k)) &
          * (paprs(:, k) * 2 / (t(:, k) + t(:, k - 1)) / RD)**2 * dtphys * RG**2
 

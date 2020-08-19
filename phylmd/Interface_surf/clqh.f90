@@ -5,7 +5,7 @@ module clqh_m
 contains
 
   SUBROUTINE clqh(julien, nisurf, knindex, tsoil, qsol, mu0, rugos, rugoro, &
-       u1lay, v1lay, coef, cdragh, t, q, ts, paprs, pplay, delp, radsol, &
+       u1lay, v1lay, coefh, cdragh, t, q, ts, paprs, pplay, delp, radsol, &
        albedo, snow, qsurf, rain_fall, snow_fall, fluxlat, pctsrf_new_sic, &
        agesno, d_t, d_q, tsurf_new, z0_new, flux_t, flux_q, dflux_s, dflux_l, &
        fqcalving, ffonte, run_off_lic_0, run_off_lic)
@@ -47,7 +47,7 @@ contains
     REAL, intent(in):: u1lay(:), v1lay(:) ! (knon)
     ! vitesse de la 1ere couche (m / s)
 
-    REAL, intent(in):: coef(:, 2:) ! (knon, 2:klev)
+    REAL, intent(in):: coefh(:, 2:) ! (knon, 2:klev)
     ! diffusion coefficient at layer interface, for heat and humidity, in m2 s-1
 
     REAL, intent(in):: cdragh(:) ! (knon) coefficient d'\'echange, sans unite
@@ -141,7 +141,7 @@ contains
     forall (k = 1:klev) pkf(:, k) = (paprs(:, 1) / pplay(:, k))**RKAPPA
     ! (La pression de r\'ef\'erence est celle au sol.)
 
-    call climb_hq_down(pkf, cq, dq, ch, dh, paprs, pplay, t, coef, delp, q)
+    call climb_hq_down(pkf, cq, dq, ch, dh, paprs, pplay, t, coefh, delp, q)
     knon  = size(knindex)
 
     select case (nisurf)
