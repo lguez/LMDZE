@@ -32,13 +32,15 @@ contains
     REAL, intent(in):: u(:, :), v(:, :) ! (knon, klev) wind, in m s-1
     REAL, intent(in):: t(:, :) ! (knon, klev) temperature (K)
     real, intent(in):: q(:, :) ! (knon, klev) vapeur d'eau (kg / kg)
-    REAL, intent(in):: zgeop(:, :) ! (knon, klev) geopotential, in m2 s-2
+
+    REAL, intent(in):: zgeop(:, :) ! (knon, klev)
+    ! geopotential at mid-layer, in m2 s-2
 
     REAL, intent(out):: coefm(:, 2:) ! (knon, 2:klev)
-    ! coefficient de diffusion, vitesse, en m2 s-1
+    ! diffusion coefficient at layer interface, for wind, in m2 s-1
 
     real, intent(out):: coefh(:, 2:) ! (knon, 2:klev)
-    ! coefficient de diffusion, chaleur et humidité, en m2 s-1
+    ! diffusion coefficient at layer interface, for heat and humidity, in m2 s-1
 
     ! Local:
 

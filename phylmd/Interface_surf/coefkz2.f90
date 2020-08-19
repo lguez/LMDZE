@@ -31,7 +31,7 @@ contains
     ! Quelques constantes et options:
 
     REAL, PARAMETER:: prandtl = 0.4
-    REAL, PARAMETER:: kstable = 0.002
+    REAL, PARAMETER:: kstable = 0.002 ! in s-1
     REAL, PARAMETER:: mixlen = 35.0 ! constante controlant longueur de melange
 
     REAL, PARAMETER:: seuil = - 0.02

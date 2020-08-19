@@ -23,8 +23,7 @@ contains
     REAL, intent(in):: t(:, :) ! (knon, klev) temperature (K)
 
     REAL, intent(in):: coef(:, 2:) ! (knon, 2:klev)
-    ! Le coefficient d'echange (m**2 / s) multiplie par le cisaillement
-    ! du vent (dV / dz)
+    ! diffusion coefficient at layer interface, for heat and humidity, in m2 s-1
 
     REAL, intent(in):: delp(:, :) ! (knon, klev)
     ! epaisseur de couche en pression (Pa)

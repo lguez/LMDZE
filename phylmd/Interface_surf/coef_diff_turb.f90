@@ -29,11 +29,15 @@ contains
     REAL, INTENT(IN):: u(:, :), v(:, :) ! (knon, klev) wind, in m s-1
     REAL, INTENT(IN):: q(:, :), t(:, :) ! (knon, klev)
     REAL, INTENT(IN):: ts(:), cdragm(:) ! (knon)
-    REAL, INTENT(IN):: zgeop(:, :) ! (knon, klev) geopotential, in m2 s-2
-    REAL, intent(out):: coefm(:, 2:) ! (knon, 2:klev) coefficient, vitesse
+
+    REAL, INTENT(IN):: zgeop(:, :) ! (knon, klev)
+    ! geopotential at mid-layer, in m2 s-2
+
+    REAL, intent(out):: coefm(:, 2:) ! (knon, 2:klev)
+    ! coefficient de diffusion, chaleur et humidité, en m2 s-1
 
     real, intent(out):: coefh(:, 2:) ! (knon, 2:klev) 
-    ! coefficient, chaleur et humidité
+    ! diffusion coefficient at layer interface, for heat and humidity, in m2 s-1
 
     real, intent(inout):: q2(:, :) ! (knon, klev + 1)
 
