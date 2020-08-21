@@ -15,7 +15,7 @@ contains
     REAL, intent(out), dimension(:, :):: cq, dq, ch, dh ! (knon, klev)
 
     REAL, intent(in):: paprs(:, :) ! (knon, klev + 1)
-    ! pression a inter-couche (Pa)
+    ! pression \`a inter-couche (Pa)
 
     REAL, intent(in):: pplay(:, :) ! (knon, klev)
     ! pression au milieu de couche (Pa)
