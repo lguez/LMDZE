@@ -15,7 +15,7 @@ find_package(NetCDF95 REQUIRED CONFIG)
 find_package(NetCDF REQUIRED)
 find_package(MPI REQUIRED COMPONENTS CXX)
 
-add_library(LMDZE_objects OBJECT dimensions.F90)
+add_library(LMDZE_objects OBJECT dimensions.f90)
 target_include_directories(LMDZE_objects PRIVATE ${netcdf-fortran_INCLUDEDIR})
 target_link_libraries(LMDZE_objects PUBLIC netcdf95 jumble numer_rec_95 nr_util)
 
