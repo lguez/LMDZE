@@ -72,8 +72,8 @@ contains
     cq(:, klev) = q(:, klev) * delp(:, klev) / buf1
     dq(:, klev) = zx_coef(:, klev) / buf1
 
-    buf2 = delp(:, klev) / pkf(:, klev) + zx_coef(:, klev)
-    ch(:, klev) = (h(:, klev) / pkf(:, klev) * delp(:, klev) &
+    buf2 = delp(:, klev) + zx_coef(:, klev)
+    ch(:, klev) = (h(:, klev) * delp(:, klev) &
          - zx_coef(:, klev) * gamah(:, klev)) / buf2
     dh(:, klev) = zx_coef(:, klev) / buf2
 
@@ -84,9 +84,9 @@ contains
             + zx_coef(:, k + 1) * cq(:, k + 1)) / buf1
        dq(:, k) = zx_coef(:, k) / buf1
 
-       buf2 = delp(:, k) / pkf(:, k) + zx_coef(:, k) &
+       buf2 = delp(:, k) + zx_coef(:, k) &
             + zx_coef(:, k + 1) * (1. - dh(:, k + 1))
-       ch(:, k) = (h(:, k) / pkf(:, k) * delp(:, k) &
+       ch(:, k) = (h(:, k) * delp(:, k) &
             + zx_coef(:, k + 1) * ch(:, k + 1) &
             + zx_coef(:, k + 1) * gamah(:, k + 1) &
             - zx_coef(:, k) * gamah(:, k)) / buf2
@@ -97,8 +97,8 @@ contains
     cq(:, 1) = (q(:, 1) * delp(:, 1) + zx_coef(:, 2) * cq(:, 2)) / buf1
     dq(:, 1) = - 1. * RG / buf1
 
-    buf2 = delp(:, 1) / pkf(:, 1) + zx_coef(:, 2) * (1. - dh(:, 2))
-    ch(:, 1) = (h(:, 1) / pkf(:, 1) * delp(:, 1) &
+    buf2 = delp(:, 1) + zx_coef(:, 2) * (1. - dh(:, 2))
+    ch(:, 1) = (h(:, 1) * delp(:, 1) &
          + zx_coef(:, 2) * (gamah(:, 2) + ch(:, 2))) / buf2
     dh(:, 1) = - 1. * RG / buf2
 
