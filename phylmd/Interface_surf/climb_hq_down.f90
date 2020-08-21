@@ -42,23 +42,28 @@ contains
     REAL gamah(size(paprs, 1), 2:klev) ! (knon, 2:klev)
     REAL buf1(size(paprs, 1)), buf2(size(paprs, 1)) ! (knon)
 
+    real rho(size(paprs, 1), 2:klev) ! (knon, 2:klev)
+    ! mass density of air at layer interface
+
     !----------------------------------------------------------------
 
     h = RCPD * t * pkf
 
+    forall (k = 2:klev) &
+         rho(:, k) = paprs(:, k) * 2 / (t(:, k) + t(:, k - 1)) / RD
+
     ! Convertir les coefficients en variables convenables au calcul:
     forall (k = 2:klev) zx_coef(:, k) = coefh(:, k) &
-         / (pplay(:, k - 1) - pplay(:, k)) &
-         * (paprs(:, k) * 2 / (t(:, k) + t(:, k - 1)) / RD)**2 * dtphys * RG**2
+         / (pplay(:, k - 1) - pplay(:, k)) * rho(:, k)**2 * dtphys * RG**2
 
     ! Preparer les flux lies aux contre-gardients
 
     if (iflag_pbl == 1) then
        gamt(:, 2) = - 2.5e-3
        gamt(:, 3:)= - 1e-3
-       forall (k = 2:klev) gamah(:, k) = gamt(:, k) * RD * (t(:, k - 1) &
-            + t(:, k)) / 2. / RG / paprs(:, k) * (pplay(:, k - 1) &
-            - pplay(:, k)) * RCPD * (paprs(:, 1) / paprs(:, k))**RKAPPA
+       forall (k = 2:klev) gamah(:, k) = gamt(:, k) / rho(:, k) / RG &
+            * (pplay(:, k - 1) - pplay(:, k)) * RCPD * (paprs(:, 1) &
+            / paprs(:, k))**RKAPPA
     else
        gamah = 0.
     endif
