@@ -39,7 +39,7 @@ contains
     USE indicesol, only: is_lic, is_oce, is_sic, is_ter
     USE suphec_m, only: rtt
     use unit_nml_m, only: unit_nml
-    
+
     INTEGER, intent(in):: nisurf ! surface type index
     REAL, intent(in):: snow(:) ! (knon)
     REAL, intent(in):: tsurf(:) ! (knon) surface temperature at time-step t (K)
@@ -54,7 +54,7 @@ contains
     ! surface diffusive flux from ground (W m-2)
 
     ! Local:
-    
+
     INTEGER knon, ig, jk
     REAL zdz2(nsoilmx), z1
     REAL min_period ! in s
@@ -80,7 +80,7 @@ contains
        ! Default values:
        min_period = 1800.
        depth_ratio = 2.
-       
+
        print *, "Enter namelist 'soil_nml'."
        read (unit = *, nml = soil_nml)
        write(unit_nml, nml = soil_nml)
@@ -94,10 +94,10 @@ contains
        ! Hourdin 1992 k1078, equation A.12:
        forall (jk = 1:nsoilmx - 1) dz1(jk) = 1. &
             / (fz(jk + 0.5, depth_ratio, fz1) - fz(jk - 0.5, depth_ratio, fz1))
-       
+
        ! Hourdin 1992 k1078, equation A.28:
        mu = fz(0.5, depth_ratio, fz1) * dz1(1)
-       
+
        first_call = .FALSE.
     END IF
 
@@ -108,33 +108,25 @@ contains
 
     select case (nisurf)
     case (is_sic)
-       DO ig = 1, knon
-          IF (snow(ig) > 0.) then
-             therm_i(ig) = isno
-          else
-             therm_i(ig) = iice
-          end IF
-       END DO
+       where (snow > 0.)
+          therm_i = isno
+       elsewhere
+          therm_i = iice
+       end where
     case (is_lic)
-       DO ig = 1, knon
-          IF (snow(ig) > 0.) then
-             therm_i(ig) = isno
-          else
-             therm_i(ig) = iice
-          end IF
-       END DO
+       where (snow > 0.)
+          therm_i = isno
+       elsewhere
+          therm_i = iice
+       end where
     case (is_ter)
-       DO ig = 1, knon
-          IF (snow(ig) > 0.) then
-             therm_i(ig) = isno
-          else
-             therm_i(ig) = isol
-          end IF
-       END DO
+       where (snow > 0.)
+          therm_i = isno
+       elsewhere
+          therm_i = isol
+       end where
     case (is_oce)
-       DO ig = 1, knon
-          therm_i(ig) = iice
-       END DO
+       therm_i = iice
     case default
        PRINT *, 'soil: unexpected subscript value:', nisurf
        STOP 1

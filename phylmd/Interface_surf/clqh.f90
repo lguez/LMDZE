@@ -89,7 +89,7 @@ contains
 
     REAL, intent(inout):: agesno(:) ! (knon)
     REAL, intent(out):: d_t(:, :) ! (knon, klev) variation of air temperature t
-    REAL, intent(out):: d_q(:, :) ! (knon, klev) incrementation de "q"
+    REAL, intent(out):: d_q(:, :) ! (knon, klev) variation of q
     REAL, intent(out):: tsurf_new(:) ! (knon) new surface temperature, in K
     real, intent(out):: z0_new(:) ! (knon) surface roughness
 
