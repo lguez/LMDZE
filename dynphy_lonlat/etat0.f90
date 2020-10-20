@@ -164,11 +164,12 @@ contains
     call start_inter_3d('R', rlonu, rlatv, pls, q(:, :, :, 1))
     q(:, :, :, 1) = 0.01 * q(:, :, :, 1) * q_sat(t3d, pls)
     WHERE (q(:, :, :, 1) < 0.) q(:, :, :, 1) = 1E-10
-    DO l = 1, llm
+    
+    forall (l = 1:llm)
        q(:, 1, l, 1) = SUM(aire_2d(:, 1) * q(:, 1, l, 1)) / apoln
        q(:, jjm + 1, l, 1) &
             = SUM(aire_2d(:, jjm + 1) * q(:, jjm + 1, l, 1)) / apols
-    ENDDO
+    END forall
 
     q(:, :, :, 2:4) = 0. ! liquid water, radon and lead
 
