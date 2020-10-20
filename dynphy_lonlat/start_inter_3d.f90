@@ -4,7 +4,7 @@ module start_inter_3d_m
 
 contains
 
-  subroutine start_inter_3d(varname, lon_in2, lat_in2, pls_in, var3d)
+  subroutine start_inter_3d(varname, lon_in2, lat_in2, pls, var3d)
 
     ! This procedure gets a 3D variable from a file and interpolates it.
 
@@ -21,7 +21,7 @@ contains
     CHARACTER(len=*), intent(in):: varname
     REAL, intent(in):: lon_in2(:) ! (iml) longitude, in rad
     REAL, intent(in):: lat_in2(:) ! latitude, in rad
-    REAL, intent(in):: pls_in(:, :, :) ! (iml, jml, lml)
+    REAL, intent(in):: pls(:, :, :) ! (iml, jml, lml)
     REAL, intent(out):: var3d(:, :, :) ! (iml, jml, lml)
 
     ! LOCAL:
@@ -29,8 +29,8 @@ contains
     INTEGER ii, ij, il
     REAL lon_rad(iml_dyn), lat_rad(jml_dyn)
     REAL lev_dyn(llm_dyn)
-    REAL var_tmp2d(size(lon_in2)-1, size(pls_in, 2))
-    real var_tmp3d(size(lon_in2), size(pls_in, 2), llm_dyn)
+    REAL var_tmp2d(size(lon_in2)-1, size(pls, 2))
+    real var_tmp3d(size(lon_in2), size(pls, 2), llm_dyn)
     REAL ax(llm_dyn), ay(llm_dyn), yder(llm_dyn)
     real var_ana3d(iml_dyn, jml_dyn, llm_dyn)
 
@@ -38,10 +38,10 @@ contains
 
     print *, "Call sequence information: start_inter_3d"
 
-    iml = assert_eq(size(pls_in, 1), size(lon_in2), size(var3d, 1), &
+    iml = assert_eq(size(pls, 1), size(lon_in2), size(var3d, 1), &
          "start_inter_3d iml")
-    jml = assert_eq(size(pls_in, 2), size(var3d, 2), "start_inter_3d jml")
-    lml = assert_eq(size(pls_in, 3), size(var3d, 3), "start_inter_3d lml")
+    jml = assert_eq(size(pls, 2), size(var3d, 2), "start_inter_3d jml")
+    lml = assert_eq(size(pls, 3), size(var3d, 3), "start_inter_3d lml")
 
     print *, "iml = ", iml, ", jml = ", jml
     print *, "varname = ", varname
@@ -66,7 +66,7 @@ contains
           ay = var_tmp3d(ii, ij, llm_dyn:1:-1)
           yder = SPLINE(ax, ay)
           do il=1, lml
-             var3d(ii, ij, il) = SPLINT(ax, ay, yder, pls_in(ii, ij, il))
+             var3d(ii, ij, il) = SPLINT(ax, ay, yder, pls(ii, ij, il))
           END do
        ENDDO
     ENDDO
