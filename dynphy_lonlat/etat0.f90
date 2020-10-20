@@ -60,7 +60,6 @@ contains
     ! "rlonv(i)", latitude "rlatu(j)" and pressure level "pls(i, j,
     ! l)".
 
-    real qsat(iim + 1, jjm + 1, llm) ! mass fraction of saturating water vapor
     REAL fqsurf(klon, nbsrf), fsnow(klon, nbsrf) 
     REAL falbe(klon, nbsrf)
     REAL ftsoil(klon, nsoilmx, nbsrf) 
@@ -161,15 +160,9 @@ contains
             / apols
     ENDDO
 
-    ! Calcul de l'humidit\'e \`a saturation :
-    qsat = q_sat(t3d, pls)
-    PRINT *, "minval(qsat) = ", minval(qsat)
-    print *, "maxval(qsat) = ", maxval(qsat)
-    IF (MINVAL(qsat) == MAXVAL(qsat)) stop '"qsat" should not be constant'
-
     ! Water vapor:
     call start_inter_3d('R', rlonu, rlatv, pls, q(:, :, :, 1))
-    q(:, :, :, 1) = 0.01 * q(:, :, :, 1) * qsat
+    q(:, :, :, 1) = 0.01 * q(:, :, :, 1) * q_sat(t3d, pls)
     WHERE (q(:, :, :, 1) < 0.) q(:, :, :, 1) = 1E-10
     DO l = 1, llm
        q(:, 1, l, 1) = SUM(aire_2d(:, 1) * q(:, 1, l, 1)) / apoln
