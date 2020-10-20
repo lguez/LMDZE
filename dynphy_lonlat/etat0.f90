@@ -56,9 +56,9 @@ contains
     REAL vcov(iim + 1, jjm, llm)
 
     REAL q(iim + 1, jjm + 1, llm, nqmx)
-    ! (mass fractions of trace species
-    ! "q(i, j, l)" is at longitude "rlonv(i)", latitude "rlatu(j)"
-    ! and pressure level "pls(i, j, l)".)
+    ! Mass fractions of trace species. "q(i, j, l)" is at longitude
+    ! "rlonv(i)", latitude "rlatu(j)" and pressure level "pls(i, j,
+    ! l)".
 
     real qsat(iim + 1, jjm + 1, llm) ! mass fraction of saturating water vapor
     REAL fqsurf(klon, nbsrf), fsnow(klon, nbsrf) 
