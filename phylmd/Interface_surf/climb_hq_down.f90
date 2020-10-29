@@ -52,11 +52,11 @@ contains
     forall (k = 2:klev) &
          rho(:, k) = paprs(:, k) * 2 / (t(:, k) + t(:, k - 1)) / RD
 
-    ! Convertir les coefficients en variables convenables au calcul:
+    ! Convertir les coefficients en variables convenables au calcul :
     forall (k = 2:klev) zx_coef(:, k) = coefh(:, k) &
          / (pplay(:, k - 1) - pplay(:, k)) * rho(:, k)**2 * dtphys * RG**2
 
-    ! Preparer les flux lies aux contre-gardients
+    ! Pr\'eparer les flux li\'es aux contre-gradients :
 
     if (iflag_pbl == 1) then
        gamt(:, 2) = - 2.5e-3

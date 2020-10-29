@@ -3,6 +3,7 @@ module conf_phys_m
   implicit none
 
   integer, protected:: iflag_pbl = 1 ! for the planetary boundary layer
+  ! Allowed values: 0, 1, 6, 8, 9
   ! 6 : Mellor and Yamada 2.0
   ! 8 : Mellor and Yamada 2.5
 
