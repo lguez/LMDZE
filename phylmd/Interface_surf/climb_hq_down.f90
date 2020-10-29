@@ -59,10 +59,10 @@ contains
     ! Pr\'eparer les flux li\'es aux contre-gradients :
 
     if (iflag_pbl == 1) then
-       gamt(:, 2) = - 2.5e-3
-       gamt(:, 3:)= - 1e-3
+       gamt(:, 2) = 2.5e-3
+       gamt(:, 3:)= 1e-3
        forall (k = 2:klev) gamah(:, k) = gamt(:, k) / rho(:, k) / RG &
-            * (pplay(:, k - 1) - pplay(:, k)) * RCPD * (paprs(:, 1) &
+            * (pplay(:, k) - pplay(:, k - 1)) * RCPD * (paprs(:, 1) &
             / paprs(:, k))**RKAPPA
     else
        gamah = 0.
