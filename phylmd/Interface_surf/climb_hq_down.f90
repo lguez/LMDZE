@@ -34,20 +34,13 @@ contains
     ! Local:
     
     INTEGER k
-    REAL h(size(paprs, 1), klev) ! (knon, klev) enthalpie potentielle
     REAL zx_coef(size(paprs, 1), 2:klev) ! (knon, 2:klev)
-
-    REAL gamt(size(paprs, 1), 2:klev) ! (knon, 2:klev)
-    ! contre-gradient pour la chaleur sensible, en J kg-1 m-1
-
     REAL gamma(size(paprs, 1), 2:klev) ! (knon, 2:klev)
 
     real rho(size(paprs, 1), 2:klev) ! (knon, 2:klev)
     ! mass density of air at layer interface
 
     !----------------------------------------------------------------
-
-    h = RCPD * t * pkf
 
     forall (k = 2:klev) &
          rho(:, k) = paprs(:, k) * 2 / (t(:, k) + t(:, k - 1)) / RD
@@ -58,16 +51,16 @@ contains
 
     ! Counter-gradient for potential enthalpy:
     if (iflag_pbl == 1) then
-       gamt(:, 2) = 2.5e-3 * RCPD * (paprs(:, 1) / paprs(:, 2))**RKAPPA
-       forall (k = 3:klev) gamt(:, k)= 1e-3 * RCPD * (paprs(:, 1) &
-            / paprs(:, k))**RKAPPA
-       forall (k = 2:klev) gamma(:, k) = gamt(:, k) / rho(:, k) / RG &
-            * (pplay(:, k - 1) - pplay(:, k))
+       gamma(:, 2) = 2.5e-3
+       gamma(:, 3:klev)= 1e-3
+       forall (k = 2:klev) gamma(:, k) = gamma(:, k) * RCPD * (paprs(:, 1) &
+            / paprs(:, k))**RKAPPA / rho(:, k) / RG * (pplay(:, k - 1) &
+            - pplay(:, k))
     else
        gamma = 0.
     endif
 
-    call calc_coef(ch, dh, h, gamma, delp, zx_coef)
+    call calc_coef(ch, dh, RCPD * t * pkf, gamma, delp, zx_coef)
 
     ! Counter-gradient for humidity:
     if (iflag_pbl == 1) gamma = 0.
