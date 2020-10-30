@@ -37,7 +37,7 @@ contains
     REAL zx_coef(size(paprs, 1), 2:klev) ! (knon, 2:klev)
 
     REAL gamt(size(paprs, 1), 2:klev) ! (knon, 2:klev)
-    ! contre-gradient pour la chaleur sensible, en K m-1
+    ! contre-gradient pour la chaleur sensible, en J kg-1 m-1
 
     REAL gamah(size(paprs, 1), 2:klev) ! (knon, 2:klev)
     REAL buf1(size(paprs, 1)), buf2(size(paprs, 1)) ! (knon)
@@ -59,11 +59,11 @@ contains
     ! Pr\'eparer les flux li\'es aux contre-gradients :
 
     if (iflag_pbl == 1) then
-       gamt(:, 2) = 2.5e-3
-       gamt(:, 3:)= 1e-3
-       forall (k = 2:klev) gamah(:, k) = gamt(:, k) / rho(:, k) / RG &
-            * (pplay(:, k) - pplay(:, k - 1)) * RCPD * (paprs(:, 1) &
+       gamt(:, 2) = 2.5e-3 * RCPD * (paprs(:, 1) / paprs(:, 2))**RKAPPA
+       forall (k = 3:klev) gamt(:, k)= 1e-3 * RCPD * (paprs(:, 1) &
             / paprs(:, k))**RKAPPA
+       forall (k = 2:klev) gamah(:, k) = gamt(:, k) / rho(:, k) / RG &
+            * (pplay(:, k) - pplay(:, k - 1))
     else
        gamah = 0.
     endif
