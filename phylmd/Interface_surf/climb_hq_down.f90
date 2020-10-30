@@ -63,7 +63,7 @@ contains
        forall (k = 3:klev) gamt(:, k)= 1e-3 * RCPD * (paprs(:, 1) &
             / paprs(:, k))**RKAPPA
        forall (k = 2:klev) gamah(:, k) = gamt(:, k) / rho(:, k) / RG &
-            * (pplay(:, k) - pplay(:, k - 1))
+            * (pplay(:, k - 1) - pplay(:, k))
     else
        gamah = 0.
     endif
@@ -74,7 +74,7 @@ contains
 
     buf2 = delp(:, klev) + zx_coef(:, klev)
     ch(:, klev) = (h(:, klev) * delp(:, klev) &
-         - zx_coef(:, klev) * gamah(:, klev)) / buf2
+         + zx_coef(:, klev) * gamah(:, klev)) / buf2
     dh(:, klev) = zx_coef(:, klev) / buf2
 
     DO k = klev - 1, 2, - 1
@@ -88,8 +88,8 @@ contains
             + zx_coef(:, k + 1) * (1. - dh(:, k + 1))
        ch(:, k) = (h(:, k) * delp(:, k) &
             + zx_coef(:, k + 1) * ch(:, k + 1) &
-            + zx_coef(:, k + 1) * gamah(:, k + 1) &
-            - zx_coef(:, k) * gamah(:, k)) / buf2
+            - zx_coef(:, k + 1) * gamah(:, k + 1) &
+            + zx_coef(:, k) * gamah(:, k)) / buf2
        dh(:, k) = zx_coef(:, k) / buf2
     ENDDO
 
@@ -99,7 +99,7 @@ contains
 
     buf2 = delp(:, 1) + zx_coef(:, 2) * (1. - dh(:, 2))
     ch(:, 1) = (h(:, 1) * delp(:, 1) &
-         + zx_coef(:, 2) * (gamah(:, 2) + ch(:, 2))) / buf2
+         + zx_coef(:, 2) * (- gamah(:, 2) + ch(:, 2))) / buf2
     dh(:, 1) = - 1. * RG / buf2
 
   end subroutine climb_hq_down
