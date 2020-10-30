@@ -4,7 +4,8 @@ module climb_hq_down_m
 
 contains
 
-  subroutine climb_hq_down(pkf, cq, dq, ch, dh, paprs, pplay, t, coefh, delp, q)
+  subroutine climb_hq_down(pkf, cq, dq, ch, dh, aq, bq, ah, bh, paprs, pplay, &
+       t, coefh, delp, q)
 
     use calc_coef_m, only: calc_coef
     use comconst, only: dtphys
@@ -13,7 +14,8 @@ contains
     USE suphec_m, ONLY: rcpd, rd, rg, rkappa
 
     REAL, intent(in):: pkf(:, :) ! (knon, klev)
-    REAL, intent(out), dimension(:, :):: cq, dq, ch, dh ! (knon, klev)
+    REAL, intent(out), dimension(:, 2:):: cq, dq, ch, dh ! (knon, 2:klev)
+    REAL, intent(out):: aq(:), bq(:), ah(:), bh(:) ! (knon)
 
     REAL, intent(in):: paprs(:, :) ! (knon, klev + 1)
     ! pression \`a inter-couche (Pa)
@@ -60,12 +62,12 @@ contains
        gamma = 0.
     endif
 
-    call calc_coef(ch, dh, RCPD * t * pkf, gamma, delp, zx_coef)
+    call calc_coef(ch, dh, ah, bh, RCPD * t * pkf, gamma, delp, zx_coef)
 
     ! Counter-gradient for humidity:
     if (iflag_pbl == 1) gamma = 0.
 
-    call calc_coef(cq, dq, q, gamma, delp, zx_coef)
+    call calc_coef(cq, dq, aq, bq, q, gamma, delp, zx_coef)
     
   end subroutine climb_hq_down
   

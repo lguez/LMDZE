@@ -120,9 +120,10 @@ contains
     INTEGER k
     REAL evap(size(knindex)) ! (knon) evaporation au sol
 
-    REAL, dimension(size(knindex), klev):: cq, dq, ch, dh ! (knon, klev)
+    REAL, dimension(size(knindex), 2:klev):: cq, dq, ch, dh ! (knon, 2:klev)
     ! coefficients de la r\'esolution de la couche limite pour t et q
 
+    REAL, dimension(size(knindex)):: aq, bq, ah, bh ! (knon)
     REAL pkf(size(knindex), klev) ! (knon, klev)
     REAL soilcap(size(knindex)) ! (knon)
     REAL soilflux(size(knindex)) ! (knon)
@@ -141,7 +142,8 @@ contains
     forall (k = 1:klev) pkf(:, k) = (paprs(:, 1) / pplay(:, k))**RKAPPA
     ! (La pression de r\'ef\'erence est celle au sol.)
 
-    call climb_hq_down(pkf, cq, dq, ch, dh, paprs, pplay, t, coefh, delp, q)
+    call climb_hq_down(pkf, cq, dq, ch, dh, aq, bq, ah, bh, paprs, pplay, t, &
+         coefh, delp, q)
     knon  = size(knindex)
 
     select case (nisurf)
@@ -151,9 +153,9 @@ contains
        CALL soil(is_ter, snow, ts, tsoil, soilcap, soilflux)
        CALL calcul_fluxs(qsurf, tsurf_new, evap, fluxlat, flux_t, dflux_s, &
             dflux_l, ts, pplay(:, 1), cdragh, paprs(:, 1), radsol + soilflux, &
-            t(:, 1), q(:, 1), u1lay, v1lay, ch(:, 1), cq(:, 1), dh(:, 1), &
-            dq(:, 1), cal = RCPD / soilcap, &
-            beta = min(2. * qsol / max_eau_sol, 1.), dif_grnd = 0.)
+            t(:, 1), q(:, 1), u1lay, v1lay, ah, aq, bh, bq, &
+            cal = RCPD / soilcap, beta = min(2. * qsol / max_eau_sol, 1.), &
+            dif_grnd = 0.)
        CALL fonte_neige(is_ter, rain_fall, snow_fall, snow, qsol, tsurf_new, &
             evap, fqcalving, ffonte, run_off_lic_0, run_off_lic)
        call albsno(agesno, alb_neig, snow_fall)
@@ -173,9 +175,8 @@ contains
        call limit_read_sst(julien, knindex, tsurf)
        call calcul_fluxs(qsurf, tsurf_new, evap, fluxlat, flux_t, dflux_s, &
             dflux_l, tsurf, pplay(:, 1), cdragh, paprs(:, 1), radsol, t(:, 1), &
-            q(:, 1), u1lay, v1lay, ch(:, 1), cq(:, 1), dh(:, 1), dq(:, 1), &
-            cal = [(0., i = 1, knon)], beta = [(1., i = 1, knon)], &
-            dif_grnd = 0.)
+            q(:, 1), u1lay, v1lay, ah, aq, bh, bq, cal = [(0., i = 1, knon)], &
+            beta = [(1., i = 1, knon)], dif_grnd = 0.)
        agesno = 0.
        albedo = alboc_cd(mu0) * fmagic
        z0_new = sqrt(rugos**2 + rugoro**2)
@@ -196,9 +197,9 @@ contains
        CALL soil(is_sic, snow, tsurf, tsoil, soilcap, soilflux)
        CALL calcul_fluxs(qsurf, tsurf_new, evap, fluxlat, flux_t, dflux_s, &
             dflux_l, tsurf, pplay(:, 1), cdragh, paprs(:, 1), &
-            radsol + soilflux, t(:, 1), q(:, 1), u1lay, v1lay, ch(:, 1), &
-            cq(:, 1), dh(:, 1), dq(:, 1), cal = RCPD / soilcap, &
-            beta = [(1., i = 1, knon)], dif_grnd = 1. / tau_gl)
+            radsol + soilflux, t(:, 1), q(:, 1), u1lay, v1lay, ah, aq, bh, bq, &
+            cal = RCPD / soilcap, beta = [(1., i = 1, knon)], &
+            dif_grnd = 1. / tau_gl)
        CALL fonte_neige(is_sic, rain_fall, snow_fall, snow, qsol, &
             tsurf_new, evap, fqcalving, ffonte, run_off_lic_0, run_off_lic)
 
@@ -216,9 +217,8 @@ contains
        CALL soil(is_lic, snow, ts, tsoil, soilcap, soilflux)
        call calcul_fluxs(qsurf, tsurf_new, evap, fluxlat, flux_t, dflux_s, &
             dflux_l, ts, pplay(:, 1), cdragh, paprs(:, 1), radsol + soilflux, &
-            t(:, 1), q(:, 1), u1lay, v1lay, ch(:, 1), cq(:, 1), dh(:, 1), &
-            dq(:, 1), cal = RCPD / soilcap, beta = [(1., i = 1, knon)], &
-            dif_grnd = 0.)
+            t(:, 1), q(:, 1), u1lay, v1lay, ah, aq, bh, bq, &
+            cal = RCPD / soilcap, beta = [(1., i = 1, knon)], dif_grnd = 0.)
        call fonte_neige(is_lic, rain_fall, snow_fall, snow, qsol, &
             tsurf_new, evap, fqcalving, ffonte, run_off_lic_0, run_off_lic)
 
@@ -235,7 +235,8 @@ contains
     end select
 
     flux_q = - evap
-    call climb_hq_up(d_t, d_q, cq, dq, ch, dh, flux_t, flux_q, pkf, t, q)
+    call climb_hq_up(d_t, d_q, cq, dq, ch, dh, ah, aq, bh, bq, flux_t, flux_q, &
+         pkf, t, q)
 
   END SUBROUTINE clqh
 

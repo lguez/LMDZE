@@ -4,7 +4,8 @@ module climb_hq_up_m
 
 contains
 
-  subroutine climb_hq_up(d_t, d_q, cq, dq, ch, dh, flux_t, flux_q, pkf, t, q)
+  subroutine climb_hq_up(d_t, d_q, cq, dq, ch, dh, ah, aq, bh, bq, flux_t, &
+       flux_q, pkf, t, q)
 
     use comconst, only: dtphys
     USE dimphy, ONLY: klev
@@ -12,7 +13,8 @@ contains
 
     REAL, intent(out):: d_t(:, :) ! (knon, klev) variation of air temperature t
     REAL, intent(out):: d_q(:, :) ! (knon, klev) incrementation de "q"
-    REAL, intent(in), dimension(:, :):: cq, dq, ch, dh ! (knon, klev)
+    REAL, intent(in), dimension(:, 2:):: cq, dq, ch, dh ! (knon, 2:klev)
+    REAL, intent(in):: ah(:), aq(:), bh(:), bq(:) ! (knon)
 
     REAL, intent(in):: flux_t(:) ! (knon)
     ! (diagnostic) flux de chaleur sensible (Cp T) à la surface,
@@ -32,8 +34,8 @@ contains
 
     !----------------------------------------------------------------------
 
-    h(:, 1) = ch(:, 1) + dh(:, 1) * flux_t * dtphys
-    local_q(:, 1) = cq(:, 1) + dq(:, 1) * flux_q * dtphys
+    h(:, 1) = ah + bh * flux_t * dtphys
+    local_q(:, 1) = aq + bq * flux_q * dtphys
 
     DO k = 2, klev
        h(:, k) = ch(:, k) + dh(:, k) * h(:, k - 1)

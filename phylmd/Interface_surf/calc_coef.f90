@@ -4,12 +4,13 @@ module calc_coef_m
 
 contains
 
-  subroutine calc_coef(c, d, x, gamma, delp, zx_coef)
+  subroutine calc_coef(c, d, a, b, x, gamma, delp, zx_coef)
 
     USE dimphy, ONLY: klev
     USE suphec_m, ONLY: rg
 
-    REAL, intent(out):: c(:, :), d(:, :) ! (knon, klev)
+    REAL, intent(out):: c(:, 2:), d(:, 2:) ! (knon, 2:klev)
+    REAL, intent(out):: a(:), b(:) ! (knon)
     REAL, intent(in):: x(:, :) ! (knon, klev)
     REAL, intent(in):: gamma(:, 2:) ! (knon, 2:klev)
 
@@ -39,9 +40,8 @@ contains
     ENDDO
 
     buf = delp(:, 1) + zx_coef(:, 2) * (1. - d(:, 2))
-    c(:, 1) = (x(:, 1) * delp(:, 1) + zx_coef(:, 2) * (c(:, 2) &
-         - gamma(:, 2))) / buf
-    d(:, 1) = - RG / buf
+    a = (x(:, 1) * delp(:, 1) + zx_coef(:, 2) * (c(:, 2) - gamma(:, 2))) / buf
+    b = - RG / buf
 
   end subroutine calc_coef
 
