@@ -56,8 +56,7 @@ contains
     forall (k = 2:klev) zx_coef(:, k) = coefh(:, k) &
          / (pplay(:, k - 1) - pplay(:, k)) * rho(:, k)**2 * dtphys * RG**2
 
-    ! Pr\'eparer les flux li\'es aux contre-gradients :
-
+    ! Counter-gradient for potential enthalpy:
     if (iflag_pbl == 1) then
        gamt(:, 2) = 2.5e-3 * RCPD * (paprs(:, 1) / paprs(:, 2))**RKAPPA
        forall (k = 3:klev) gamt(:, k)= 1e-3 * RCPD * (paprs(:, 1) &
@@ -69,7 +68,10 @@ contains
     endif
 
     call calc_coef(ch, dh, h, gamma, delp, zx_coef)
+
+    ! Counter-gradient for humidity:
     if (iflag_pbl == 1) gamma = 0.
+
     call calc_coef(cq, dq, q, gamma, delp, zx_coef)
     
   end subroutine climb_hq_down

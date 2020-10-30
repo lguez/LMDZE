@@ -41,7 +41,7 @@ contains
     buf = delp(:, 1) + zx_coef(:, 2) * (1. - d(:, 2))
     c(:, 1) = (x(:, 1) * delp(:, 1) + zx_coef(:, 2) * (c(:, 2) &
          - gamma(:, 2))) / buf
-    d(:, 1) = - 1. * RG / buf
+    d(:, 1) = - RG / buf
 
   end subroutine calc_coef
 
