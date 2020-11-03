@@ -204,7 +204,7 @@ contains
     
     REAL, intent(in):: zdz2(:) ! (nsoilmx)
     REAL, intent(in):: dz1(:) ! (nsoilmx - 1)
-    REAL, intent(inout):: zc(:, :), zd(:, :) ! (knon, nsoilmx - 1)
+    REAL, intent(out):: zc(:, :), zd(:, :) ! (knon, nsoilmx - 1)
 
     real, intent(in):: tsoil(:, :) ! (knon, nsoilmx)
     ! temperature inside the ground (K), layer 1 nearest to the surface
