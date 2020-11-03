@@ -6,7 +6,7 @@ contains
 
   SUBROUTINE calcul_fluxs(qsurf, tsurf_new, evap, fluxlat, flux_t, dflux_s, &
        dflux_l, tsurf, p1lay, cdragh, ps, radsol, t1lay, q1lay, u1lay, v1lay, &
-       tAcoef, qAcoef, tBcoef, qBcoef, cal, beta, dif_grnd)
+       ah, aq, bh, bq, cal, beta, dif_grnd)
 
     ! Cette routine calcule les flux en h et q à l'interface et une
     ! température de surface.
@@ -49,10 +49,10 @@ contains
     real, intent(IN):: t1lay(:) ! (knon) temp\'erature de l'air 1\`ere couche
     real, intent(IN):: q1lay(:), u1lay(:), v1lay(:) ! (knon)
 
-    real, intent(IN):: tAcoef(:), qAcoef(:) ! (knon)
+    real, intent(IN):: ah(:), aq(:) ! (knon)
     ! coefficients A de la résolution de la couche limite pour T et q
 
-    real, intent(IN):: tBcoef(:), qBcoef(:) ! (knon)
+    real, intent(IN):: bh(:), bq(:) ! (knon)
     ! coefficients B de la résolution de la couche limite pour t et q
 
     real, intent(IN):: cal(:) ! (knon) RCPD / soilcap, où soilcap est
@@ -76,8 +76,8 @@ contains
 
     knon = assert_eq([size(tsurf), size(p1lay), size(cal), size(beta), &
          size(cdragh), size(ps), size(qsurf), size(radsol), size(t1lay), &
-         size(q1lay), size(u1lay), size(v1lay), size(tAcoef), size(qAcoef), &
-         size(tBcoef), size(qBcoef), size(tsurf_new), size(evap), &
+         size(q1lay), size(u1lay), size(v1lay), size(ah), size(aq), &
+         size(bh), size(bq), size(tsurf_new), size(evap), &
          size(fluxlat), size(flux_t), size(dflux_s), size(dflux_l)], &
          "calcul_fluxs knon")
 
@@ -98,13 +98,13 @@ contains
     sl = merge(RLSTT, RLVTT, tsurf < RTT)
 
     ! Q
-    oq = 1. - beta * coef * qBcoef * dtphys
-    mq = beta * coef * (qAcoef - qsat + dq_s_dt * tsurf) / oq
+    oq = 1. - beta * coef * bq * dtphys
+    mq = beta * coef * (aq - qsat + dq_s_dt * tsurf) / oq
     nq = - beta * coef * dq_s_dt / oq
 
     ! H
-    oh = 1. - coef * tBcoef * dtphys
-    mh = coef * tAcoef / oh
+    oh = 1. - coef * bh * dtphys
+    mh = coef * ah / oh
     dflux_s = - coef * RCPD / oh
 
     tsurf_new = (tsurf + cal / RCPD * dtphys * (radsol + mh + sl * mq) &
@@ -114,8 +114,8 @@ contains
     fluxlat = - evap * sl
     flux_t = mh + dflux_s * tsurf_new
     dflux_l = sl * nq
-    qsurf = (qAcoef - qBcoef * evap * dtphys) * (1. - beta) + beta * (qsat &
-         + dq_s_dt * (tsurf_new - tsurf))
+    qsurf = (aq - bq * evap * dtphys) * (1. - beta) + beta * (qsat + dq_s_dt &
+         * (tsurf_new - tsurf))
 
   END SUBROUTINE calcul_fluxs
 
