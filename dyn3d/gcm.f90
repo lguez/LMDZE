@@ -86,7 +86,7 @@ PROGRAM gcm
   if (true_calendar) then
      call ioconf_calendar('gregorian')
   else
-     call ioconf_calendar('360d')
+     call ioconf_calendar('360_day')
   endif
 
   call infotrac_init

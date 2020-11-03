@@ -102,7 +102,7 @@ contains
           un_an = 366.0
           mon_len(:)=(/31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31/)
        CASE DEFAULT
-          ipos = INDEX(str, 'd')
+          ipos = INDEX(str, '_day')
           IF (ipos == 4) THEN
              READ(str(1:3), '(I3)') leng
              IF ((MOD(leng, 12) == 0).AND.(leng > 1)) THEN
