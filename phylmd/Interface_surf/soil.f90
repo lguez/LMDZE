@@ -61,7 +61,7 @@ contains
     real depth_ratio ! rapport entre les \'epaisseurs de 2 couches successives
     REAL therm_i(size(tsurf)) ! (knon) thermal inertia
     REAL, save:: dz1(nsoilmx - 1), dz2(nsoilmx)
-    REAL zc(size(tsurf), nsoilmx), zd(size(tsurf), nsoilmx) ! (knon, nsoilmx)
+    REAL, dimension(size(tsurf), nsoilmx - 1):: zc, zd ! (knon, nsoilmx - 1)
     REAL, save:: mu
     LOGICAL:: first_call = .TRUE.
     REAL, parameter:: isol = 2000., isno = 2000., iice = 2000.
@@ -204,7 +204,7 @@ contains
     
     REAL, intent(in):: zdz2(:) ! (nsoilmx)
     REAL, intent(in):: dz1(:) ! (nsoilmx - 1)
-    REAL, intent(inout):: zc(:, :), zd(:, :) ! (knon, nsoilmx)
+    REAL, intent(inout):: zc(:, :), zd(:, :) ! (knon, nsoilmx - 1)
 
     real, intent(in):: tsoil(:, :) ! (knon, nsoilmx)
     ! temperature inside the ground (K), layer 1 nearest to the surface
