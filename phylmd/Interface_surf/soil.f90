@@ -74,8 +74,7 @@ contains
     knon = size(tsurf)
 
     IF (first_call) THEN
-       ! ground levels
-       ! z / l where l is the skin depth of the diurnal cycle
+       ! Compute ground levels:
 
        ! Default values:
        min_period = 1800.
@@ -84,8 +83,6 @@ contains
        print *, "Enter namelist 'soil_nml'."
        read (unit = *, nml = soil_nml)
        write(unit_nml, nml = soil_nml)
-
-       ! La premi\`ere couche repr\'esente un dixi\`eme de cycle diurne :
        fz1 = sqrt(min_period / 3.14)
 
        forall (jk = 1:nsoilmx) dz2(jk) = fz(real(jk), depth_ratio, fz1) &
@@ -132,17 +129,14 @@ contains
        STOP 1
     END select
 
-    DO jk = 1, nsoilmx
-       zdz2(jk) = dz2(jk) / dtphys
-    END DO
-
+    zdz2 = dz2 / dtphys
     call compute_c_d(zdz2, dz1, zc, zd, tsoil)
 
     ! Computation of the soil temperatures using the Zc and Zd
     ! coefficient computed above:
 
     ! Surface temperature (Hourdin 1992 k1078, equation A.34):
-    tsoil(:, 1) = (mu * zc(:, 1) + tsurf(:)) / (mu * (1. - zd(:, 1)) + 1.)
+    tsoil(:, 1) = (mu * zc(:, 1) + tsurf) / (mu * (1. - zd(:, 1)) + 1.)
 
     ! Other temperatures:
     DO jk = 1, nsoilmx - 1
