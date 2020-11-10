@@ -66,7 +66,7 @@ contains
     REAL, dimension(size(tsurf), nsoilmx - 1):: zc, zd ! (knon, nsoilmx - 1)
     REAL, save:: mu
     LOGICAL:: first_call = .TRUE.
-    REAL, parameter:: isol = 2000., isno = 2000., iice = 2000.
+    REAL, parameter:: inertie_sol = 2000., inertie_sno = 2000., inertie_sic = 2000.
     REAL fz1 ! depth
 
     namelist /soil_nml/ min_period, depth_ratio
@@ -100,7 +100,7 @@ contains
        first_call = .FALSE.
     END IF
 
-    ! Calcul de l'inertie thermique. On initialise \`a iice m\^eme
+    ! Calcul de l'inertie thermique. On initialise \`a inertie_sic m\^eme
     ! au-dessus d'un point de mer pour le cas o\`u le point de mer
     ! deviendrait point de glace au pas suivant. On corrige si on a un
     ! point de terre avec ou sans glace.
@@ -108,24 +108,24 @@ contains
     select case (nisurf)
     case (is_sic)
        where (snow > 0.)
-          therm_i = isno
+          therm_i = inertie_sno
        elsewhere
-          therm_i = iice
+          therm_i = inertie_sic
        end where
     case (is_lic)
        where (snow > 0.)
-          therm_i = isno
+          therm_i = inertie_sno
        elsewhere
-          therm_i = iice
+          therm_i = inertie_sic
        end where
     case (is_ter)
        where (snow > 0.)
-          therm_i = isno
+          therm_i = inertie_sno
        elsewhere
-          therm_i = isol
+          therm_i = inertie_sol
        end where
     case (is_oce)
-       therm_i = iice
+       therm_i = inertie_sic
     case default
        PRINT *, 'soil: unexpected subscript value:', nisurf
        STOP 1
