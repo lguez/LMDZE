@@ -66,10 +66,11 @@ contains
     REAL, dimension(size(tsurf), nsoilmx - 1):: zc, zd ! (knon, nsoilmx - 1)
     REAL, save:: mu
     LOGICAL:: first_call = .TRUE.
-    REAL, parameter:: inertie_sol = 2000., inertie_sno = 2000., inertie_sic = 2000.
+    REAL:: inertie_sol = 2000., inertie_sno = 2000., inertie_sic = 2000.
     REAL fz1 ! depth
 
-    namelist /soil_nml/ min_period, depth_ratio
+    namelist /soil_nml/ min_period, depth_ratio, inertie_sol, inertie_sno, &
+         inertie_sic
 
     !-----------------------------------------------------------------------
 
