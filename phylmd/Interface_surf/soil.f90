@@ -34,6 +34,8 @@ contains
     ! F0 = A + B (Ts(t))
     ! Soilcap = B * dt
 
+    use nr_util, only: pi
+
     use comconst, only: dtphys
     USE dimsoil, only: nsoilmx
     USE indicesol, only: is_lic, is_oce, is_sic, is_ter
@@ -83,7 +85,7 @@ contains
        print *, "Enter namelist 'soil_nml'."
        read (unit = *, nml = soil_nml)
        write(unit_nml, nml = soil_nml)
-       fz1 = sqrt(min_period / 3.14)
+       fz1 = sqrt(min_period / pi)
 
        forall (jk = 1:nsoilmx) dz2(jk) = fz(real(jk), depth_ratio, fz1) &
             - fz(jk - 1., depth_ratio, fz1)
