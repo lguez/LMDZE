@@ -21,7 +21,7 @@ contains
     ! T(k + 1) = C(k) + D(k) * T(k) (equation 1)
     ! The coefficients C and D are computed at the t - dt time-step.
     ! Structure of the procedure:
-!   ! 1) C and D coefficients are computed from the old temperature
+    ! 1) C and D coefficients are computed from the old temperature
     ! 2) new temperatures are computed using equation 1
     ! 3) C and D coefficients are computed from the new temperature
     ! profile for the t + dt time-step
