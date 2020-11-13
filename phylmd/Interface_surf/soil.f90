@@ -58,11 +58,11 @@ contains
     ! Local:
 
     INTEGER knon, ig, jk
-    REAL zdz2(nsoilmx), z1
+    REAL z1
     REAL min_period ! in s
     real depth_ratio ! rapport entre les \'epaisseurs de 2 couches successives
     REAL therm_i(size(tsurf)) ! (knon) thermal inertia
-    REAL, save:: dz1(nsoilmx - 1), dz2(nsoilmx)
+    REAL, save:: dz1(nsoilmx - 1), dz2(nsoilmx), zdz2(nsoilmx)
     REAL, dimension(size(tsurf), nsoilmx - 1):: zc, zd ! (knon, nsoilmx - 1)
     REAL, save:: mu
     LOGICAL:: first_call = .TRUE.
@@ -98,6 +98,7 @@ contains
        ! Hourdin 1992 k1078, equation A.28:
        mu = fz(0.5, depth_ratio, fz1) * dz1(1)
 
+       zdz2 = dz2 / dtphys
        first_call = .FALSE.
     END IF
 
@@ -132,7 +133,6 @@ contains
        STOP 1
     END select
 
-    zdz2 = dz2 / dtphys
     call compute_c_d(zdz2, dz1, zc, zd, tsoil)
 
     ! Computation of the soil temperatures using the Zc and Zd
