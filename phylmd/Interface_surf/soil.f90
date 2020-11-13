@@ -58,17 +58,17 @@ contains
     ! Local:
 
     INTEGER knon, ig, jk
-    REAL z1
-    REAL min_period ! in s
+    REAL min_period ! no dimension
+    REAL fz1 ! e-folding depth for a wave of period min_period times 1 s
     real depth_ratio ! rapport entre les \'epaisseurs de 2 couches successives
     REAL therm_i(size(tsurf)) ! (knon) thermal inertia
+    REAL z1
     REAL, save:: dz1(nsoilmx - 1), dz2(nsoilmx), zdz2(nsoilmx)
     REAL zc(size(tsurf), nsoilmx - 1) ! (knon, nsoilmx - 1)
     REAL zd(nsoilmx - 1)
     REAL, save:: mu
     LOGICAL:: first_call = .TRUE.
     REAL:: inertie_sol = 2000., inertie_sno = 2000., inertie_sic = 2000.
-    REAL fz1 ! depth
 
     namelist /soil_nml/ min_period, depth_ratio, inertie_sol, inertie_sno, &
          inertie_sic
