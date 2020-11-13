@@ -2,7 +2,7 @@ module soil_m
 
   IMPLICIT NONE
 
-  private fz, compute_zc
+  private fz, compute_beta
 
 contains
 
@@ -65,8 +65,8 @@ contains
     REAL therm_i(size(tsurf)) ! (knon) thermal inertia
     REAL tempor
     REAL, save:: d(nsoilmx - 1), dz2(nsoilmx), c(nsoilmx)
-    REAL zc(size(tsurf), nsoilmx - 1) ! (knon, nsoilmx - 1)
-    REAL, save:: zd(nsoilmx - 1)
+    REAL beta(size(tsurf), nsoilmx - 1) ! (knon, nsoilmx - 1)
+    REAL, save:: alpha(nsoilmx - 1)
     REAL, save:: mu
     LOGICAL:: first_call = .TRUE.
     REAL:: inertie_sol = 2000., inertie_sno = 2000., inertie_sic = 2000.
@@ -102,11 +102,11 @@ contains
 
        c = dz2 / dtphys
        delta(nsoilmx - 1) = c(nsoilmx) + d(nsoilmx - 1)
-       zd(nsoilmx - 1) = d(nsoilmx - 1) / delta(nsoilmx - 1)
+       alpha(nsoilmx - 1) = d(nsoilmx - 1) / delta(nsoilmx - 1)
 
        DO jk = nsoilmx - 1, 2, - 1
-          delta(jk - 1) = c(jk) + d(jk - 1) + d(jk) * (1. - zd(jk))
-          zd(jk - 1) = d(jk - 1) / delta(jk - 1)
+          delta(jk - 1) = c(jk) + d(jk - 1) + d(jk) * (1. - alpha(jk))
+          alpha(jk - 1) = d(jk - 1) / delta(jk - 1)
        END DO
 
        first_call = .FALSE.
@@ -143,39 +143,39 @@ contains
        STOP 1
     END select
 
-    zc = compute_zc(c, d, delta, tsoil)
+    beta = compute_beta(c, d, delta, tsoil)
 
     ! Hourdin 1992 k1078, equation A.34:
-    tsoil(:, 1) = (mu * zc(:, 1) + tsurf) / (mu * (1. - zd(1)) + 1.)
+    tsoil(:, 1) = (mu * beta(:, 1) + tsurf) / (mu * (1. - alpha(1)) + 1.)
 
     ! Other temperatures:
     DO jk = 1, nsoilmx - 1
        ! Hourdin 1992 k1078, equation A.15:
-       tsoil(:, jk + 1) = zc(:, jk) + zd(jk) * tsoil(:, jk)
+       tsoil(:, jk + 1) = beta(:, jk) + alpha(jk) * tsoil(:, jk)
     END DO
 
     IF (nisurf == is_sic) tsoil(:, nsoilmx) = rtt - 1.8
-    zc = compute_zc(c, d, delta, tsoil)
+    beta = compute_beta(c, d, delta, tsoil)
 
     ! Computation of the surface diffusive flux from ground and
     ! calorific capacity of the ground:
 
     DO ig = 1, knon
        ! Hourdin 1992 k1078, equation A.25:
-       soilflux(ig) = therm_i(ig) * d(1) * (zc(ig, 1) &
-            + (zd(1) - 1.) * tsoil(ig, 1))
+       soilflux(ig) = therm_i(ig) * d(1) * (beta(ig, 1) &
+            + (alpha(1) - 1.) * tsoil(ig, 1))
 
        ! Hourdin 1992 k1078, equation A.24:
-       soilcap(ig) = therm_i(ig) * (dz2(1) + dtphys * (1. - zd(1)) * d(1))
+       soilcap(ig) = therm_i(ig) * (dz2(1) + dtphys * (1. - alpha(1)) * d(1))
 
-       tempor = mu * (1. - zd(1)) + 1.
+       tempor = mu * (1. - alpha(1)) + 1.
 
        ! Hourdin 1992 k1078, equation A.30:
        soilcap(ig) = soilcap(ig) / tempor
 
        ! Hourdin 1992 k1078, equation A.31:
        soilflux(ig) = soilflux(ig) + soilcap(ig) * (tsoil(ig, 1) * tempor - mu &
-            * zc(ig, 1) - tsurf(ig)) / dtphys
+            * beta(ig, 1) - tsurf(ig)) / dtphys
     END DO
 
   END SUBROUTINE soil
@@ -200,9 +200,9 @@ contains
 
   !****************************************************************
 
-  pure function compute_zc(c, d, delta, tsoil) result (zc)
+  pure function compute_beta(c, d, delta, tsoil) result (beta)
 
-    ! Computation of the coefficient Zc for the next step.
+    ! Computation of the coefficient Beta for the next step.
 
     USE dimsoil, only: nsoilmx
     
@@ -213,20 +213,20 @@ contains
     real, intent(in):: tsoil(:, :) ! (knon, nsoilmx)
     ! temperature inside the ground (K), layer 1 nearest to the surface
 
-    REAL zc(size(tsoil, 1), size(d)) ! (knon, nsoilmx - 1)
+    REAL beta(size(tsoil, 1), size(d)) ! (knon, nsoilmx - 1)
 
     ! Local:
     integer jk
 
     !------------------------------------------------------------------
 
-    zc(:, nsoilmx - 1) = c(nsoilmx) * tsoil(:, nsoilmx) / delta(nsoilmx - 1)
+    beta(:, nsoilmx - 1) = c(nsoilmx) * tsoil(:, nsoilmx) / delta(nsoilmx - 1)
 
     DO jk = nsoilmx - 1, 2, - 1
-       zc(:, jk - 1) = (tsoil(:, jk) * c(jk) + d(jk) * zc(:, jk)) &
+       beta(:, jk - 1) = (tsoil(:, jk) * c(jk) + d(jk) * beta(:, jk)) &
             / delta(jk - 1)
     END DO
 
-  end function compute_zc
+  end function compute_beta
 
 end module soil_m
