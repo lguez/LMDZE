@@ -2,7 +2,7 @@ module soil_m
 
   IMPLICIT NONE
 
-  private fz, compute_c_d
+  private fz, compute_c
 
 contains
 
@@ -61,11 +61,12 @@ contains
     REAL min_period ! no dimension
     REAL fz1 ! e-folding depth for a wave of period min_period times 1 s
     real depth_ratio ! rapport entre les \'epaisseurs de 2 couches successives
+    real, save:: z1(nsoilmx - 1)
     REAL therm_i(size(tsurf)) ! (knon) thermal inertia
     REAL tempor
     REAL, save:: dz1(nsoilmx - 1), dz2(nsoilmx), zdz2(nsoilmx)
     REAL zc(size(tsurf), nsoilmx - 1) ! (knon, nsoilmx - 1)
-    REAL zd(nsoilmx - 1)
+    REAL, save:: zd(nsoilmx - 1)
     REAL, save:: mu
     LOGICAL:: first_call = .TRUE.
     REAL:: inertie_sol = 2000., inertie_sno = 2000., inertie_sic = 2000.
@@ -100,6 +101,14 @@ contains
        mu = fz(0.5, depth_ratio, fz1) * dz1(1)
 
        zdz2 = dz2 / dtphys
+       z1(nsoilmx - 1) = zdz2(nsoilmx) + dz1(nsoilmx - 1)
+       zd(nsoilmx - 1) = dz1(nsoilmx - 1) / z1(nsoilmx - 1)
+
+       DO jk = nsoilmx - 1, 2, - 1
+          z1(jk - 1) = 1. / (zdz2(jk) + dz1(jk - 1) + dz1(jk) * (1. - zd(jk)))
+          zd(jk - 1) = dz1(jk - 1) * z1(jk - 1)
+       END DO
+
        first_call = .FALSE.
     END IF
 
@@ -134,7 +143,7 @@ contains
        STOP 1
     END select
 
-    call compute_c_d(zdz2, dz1, zc, zd, tsoil)
+    zc = compute_c(zdz2, dz1, z1, tsoil)
 
     ! Hourdin 1992 k1078, equation A.34:
     tsoil(:, 1) = (mu * zc(:, 1) + tsurf) / (mu * (1. - zd(1)) + 1.)
@@ -146,7 +155,7 @@ contains
     END DO
 
     IF (nisurf == is_sic) tsoil(:, nsoilmx) = rtt - 1.8
-    call compute_c_d(zdz2, dz1, zc, zd, tsoil)
+    zc = compute_c(zdz2, dz1, z1, tsoil)
 
     ! Computation of the surface diffusive flux from ground and
     ! calorific capacity of the ground:
@@ -191,33 +200,25 @@ contains
 
   !****************************************************************
 
-  subroutine compute_c_d(zdz2, dz1, zc, zd, tsoil)
+  pure function compute_c(zdz2, dz1, z1, tsoil) result (zc)
 
-    ! Computation of the coefficients Zc and Zd for the next step.
+    ! Computation of the coefficient Zc for the next step.
 
     USE dimsoil, only: nsoilmx
     
     REAL, intent(in):: zdz2(:) ! (nsoilmx)
     REAL, intent(in):: dz1(:) ! (nsoilmx - 1)
-    REAL, intent(out):: zc(:, :) ! (knon, nsoilmx - 1)
-    REAL, intent(out):: zd(:) ! (nsoilmx - 1)
+    real, intent(in):: z1(:) ! (nsoilmx - 1)
 
     real, intent(in):: tsoil(:, :) ! (knon, nsoilmx)
     ! temperature inside the ground (K), layer 1 nearest to the surface
 
+    REAL zc(size(tsoil, 1), size(dz1)) ! (knon, nsoilmx - 1)
+
     ! Local:
     integer jk
-    real z1(nsoilmx - 1)
 
     !------------------------------------------------------------------
-
-    z1(nsoilmx - 1) = zdz2(nsoilmx) + dz1(nsoilmx - 1)
-    zd(nsoilmx - 1) = dz1(nsoilmx - 1) / z1(nsoilmx - 1)
-
-    DO jk = nsoilmx - 1, 2, - 1
-       z1(jk - 1) = 1. / (zdz2(jk) + dz1(jk - 1) + dz1(jk) * (1. - zd(jk)))
-       zd(jk - 1) = dz1(jk - 1) * z1(jk - 1)
-    END DO
 
     zc(:, nsoilmx - 1) = zdz2(nsoilmx) * tsoil(:, nsoilmx) / z1(nsoilmx - 1)
 
@@ -226,6 +227,6 @@ contains
             * z1(jk - 1)
     END DO
 
-  end subroutine compute_c_d
+  end function compute_c
 
 end module soil_m
