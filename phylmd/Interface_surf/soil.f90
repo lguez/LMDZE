@@ -63,7 +63,8 @@ contains
     real depth_ratio ! rapport entre les \'epaisseurs de 2 couches successives
     REAL therm_i(size(tsurf)) ! (knon) thermal inertia
     REAL, save:: dz1(nsoilmx - 1), dz2(nsoilmx), zdz2(nsoilmx)
-    REAL, dimension(size(tsurf), nsoilmx - 1):: zc, zd ! (knon, nsoilmx - 1)
+    REAL zc(size(tsurf), nsoilmx - 1) ! (knon, nsoilmx - 1)
+    REAL zd(nsoilmx - 1)
     REAL, save:: mu
     LOGICAL:: first_call = .TRUE.
     REAL:: inertie_sol = 2000., inertie_sno = 2000., inertie_sic = 2000.
@@ -139,12 +140,12 @@ contains
     ! coefficient computed above:
 
     ! Surface temperature (Hourdin 1992 k1078, equation A.34):
-    tsoil(:, 1) = (mu * zc(:, 1) + tsurf) / (mu * (1. - zd(:, 1)) + 1.)
+    tsoil(:, 1) = (mu * zc(:, 1) + tsurf) / (mu * (1. - zd(1)) + 1.)
 
     ! Other temperatures:
     DO jk = 1, nsoilmx - 1
        ! Hourdin 1992 k1078, equation A.15:
-       tsoil(:, jk + 1) = zc(:, jk) + zd(:, jk) * tsoil(:, jk)
+       tsoil(:, jk + 1) = zc(:, jk) + zd(jk) * tsoil(:, jk)
     END DO
 
     IF (nisurf == is_sic) tsoil(:, nsoilmx) = rtt - 1.8
@@ -156,12 +157,12 @@ contains
     DO ig = 1, knon
        ! Hourdin 1992 k1078, equation A.25:
        soilflux(ig) = therm_i(ig) * dz1(1) * (zc(ig, 1) &
-            + (zd(ig, 1) - 1.) * tsoil(ig, 1))
+            + (zd(1) - 1.) * tsoil(ig, 1))
 
        ! Hourdin 1992 k1078, equation A.24:
-       soilcap(ig) = therm_i(ig) * (dz2(1) + dtphys * (1. - zd(ig, 1)) * dz1(1))
+       soilcap(ig) = therm_i(ig) * (dz2(1) + dtphys * (1. - zd(1)) * dz1(1))
 
-       z1 = mu * (1. - zd(ig, 1)) + 1.
+       z1 = mu * (1. - zd(1)) + 1.
 
        ! Hourdin 1992 k1078, equation A.30:
        soilcap(ig) = soilcap(ig) / z1
@@ -201,29 +202,26 @@ contains
     
     REAL, intent(in):: zdz2(:) ! (nsoilmx)
     REAL, intent(in):: dz1(:) ! (nsoilmx - 1)
-    REAL, intent(out):: zc(:, :), zd(:, :) ! (knon, nsoilmx - 1)
+    REAL, intent(out):: zc(:, :) ! (knon, nsoilmx - 1)
+    REAL, intent(out):: zd(:) ! (nsoilmx - 1)
 
     real, intent(in):: tsoil(:, :) ! (knon, nsoilmx)
     ! temperature inside the ground (K), layer 1 nearest to the surface
 
     ! Local:
-    integer ig, knon, jk
+    integer jk
     real z1
 
     !------------------------------------------------------------------
 
-    knon  = size(tsoil, 1)
     z1 = zdz2(nsoilmx) + dz1(nsoilmx - 1)
     zc(:, nsoilmx - 1) = zdz2(nsoilmx) * tsoil(:, nsoilmx) / z1
-    zd(:, nsoilmx - 1) = dz1(nsoilmx - 1) / z1
+    zd(nsoilmx - 1) = dz1(nsoilmx - 1) / z1
 
     DO jk = nsoilmx - 1, 2, - 1
-       DO ig = 1, knon
-          z1 = 1. / (zdz2(jk) + dz1(jk - 1) + dz1(jk) * (1. - zd(ig, jk)))
-          zc(ig, jk - 1) = (tsoil(ig, jk) * zdz2(jk) &
-               + dz1(jk) * zc(ig, jk)) * z1
-          zd(ig, jk - 1) = dz1(jk - 1) * z1
-       END DO
+       z1 = 1. / (zdz2(jk) + dz1(jk - 1) + dz1(jk) * (1. - zd(jk)))
+       zc(:, jk - 1) = (tsoil(:, jk) * zdz2(jk) + dz1(jk) * zc(:, jk)) * z1
+       zd(jk - 1) = dz1(jk - 1) * z1
     END DO
 
   end subroutine compute_c_d
