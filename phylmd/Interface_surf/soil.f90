@@ -210,18 +210,23 @@ contains
 
     ! Local:
     integer jk
-    real z1
+    real z1(nsoilmx - 1)
 
     !------------------------------------------------------------------
 
-    z1 = zdz2(nsoilmx) + dz1(nsoilmx - 1)
-    zc(:, nsoilmx - 1) = zdz2(nsoilmx) * tsoil(:, nsoilmx) / z1
-    zd(nsoilmx - 1) = dz1(nsoilmx - 1) / z1
+    z1(nsoilmx - 1) = zdz2(nsoilmx) + dz1(nsoilmx - 1)
+    zd(nsoilmx - 1) = dz1(nsoilmx - 1) / z1(nsoilmx - 1)
 
     DO jk = nsoilmx - 1, 2, - 1
-       z1 = 1. / (zdz2(jk) + dz1(jk - 1) + dz1(jk) * (1. - zd(jk)))
-       zc(:, jk - 1) = (tsoil(:, jk) * zdz2(jk) + dz1(jk) * zc(:, jk)) * z1
-       zd(jk - 1) = dz1(jk - 1) * z1
+       z1(jk - 1) = 1. / (zdz2(jk) + dz1(jk - 1) + dz1(jk) * (1. - zd(jk)))
+       zd(jk - 1) = dz1(jk - 1) * z1(jk - 1)
+    END DO
+
+    zc(:, nsoilmx - 1) = zdz2(nsoilmx) * tsoil(:, nsoilmx) / z1(nsoilmx - 1)
+
+    DO jk = nsoilmx - 1, 2, - 1
+       zc(:, jk - 1) = (tsoil(:, jk) * zdz2(jk) + dz1(jk) * zc(:, jk)) &
+            * z1(jk - 1)
     END DO
 
   end subroutine compute_c_d
