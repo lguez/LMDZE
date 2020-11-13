@@ -105,8 +105,8 @@ contains
        zd(nsoilmx - 1) = d(nsoilmx - 1) / delta(nsoilmx - 1)
 
        DO jk = nsoilmx - 1, 2, - 1
-          delta(jk - 1) = 1. / (c(jk) + d(jk - 1) + d(jk) * (1. - zd(jk)))
-          zd(jk - 1) = d(jk - 1) * delta(jk - 1)
+          delta(jk - 1) = c(jk) + d(jk - 1) + d(jk) * (1. - zd(jk))
+          zd(jk - 1) = d(jk - 1) / delta(jk - 1)
        END DO
 
        first_call = .FALSE.
@@ -224,7 +224,7 @@ contains
 
     DO jk = nsoilmx - 1, 2, - 1
        zc(:, jk - 1) = (tsoil(:, jk) * c(jk) + d(jk) * zc(:, jk)) &
-            * delta(jk - 1)
+            / delta(jk - 1)
     END DO
 
   end function compute_zc
