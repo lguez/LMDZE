@@ -62,7 +62,7 @@ contains
     REAL fz1 ! e-folding depth for a wave of period min_period times 1 s
     real depth_ratio ! rapport entre les \'epaisseurs de 2 couches successives
     REAL therm_i(size(tsurf)) ! (knon) thermal inertia
-    REAL z1
+    REAL tempor
     REAL, save:: dz1(nsoilmx - 1), dz2(nsoilmx), zdz2(nsoilmx)
     REAL zc(size(tsurf), nsoilmx - 1) ! (knon, nsoilmx - 1)
     REAL zd(nsoilmx - 1)
@@ -162,13 +162,13 @@ contains
        ! Hourdin 1992 k1078, equation A.24:
        soilcap(ig) = therm_i(ig) * (dz2(1) + dtphys * (1. - zd(1)) * dz1(1))
 
-       z1 = mu * (1. - zd(1)) + 1.
+       tempor = mu * (1. - zd(1)) + 1.
 
        ! Hourdin 1992 k1078, equation A.30:
-       soilcap(ig) = soilcap(ig) / z1
+       soilcap(ig) = soilcap(ig) / tempor
 
        ! Hourdin 1992 k1078, equation A.31:
-       soilflux(ig) = soilflux(ig) + soilcap(ig) * (tsoil(ig, 1) * z1 - mu &
+       soilflux(ig) = soilflux(ig) + soilcap(ig) * (tsoil(ig, 1) * tempor - mu &
             * zc(ig, 1) - tsurf(ig)) / dtphys
     END DO
 
