@@ -66,14 +66,16 @@ contains
 
     real depth_ratio ! rapport entre les \'epaisseurs de 2 couches successives
     real, save:: delta(nsoilmx - 1)
-    REAL therm_i(size(tsurf)) ! (knon) thermal inertia
+    REAL therm_i(size(tsurf)) ! (knon) thermal inertia, in W m-2 K-1
     REAL tempor
     REAL, save:: d(nsoilmx - 1), dz2(nsoilmx), c(nsoilmx)
     REAL beta(size(tsurf), nsoilmx - 1) ! (knon, nsoilmx - 1)
     REAL, save:: alpha(nsoilmx - 1)
     REAL, save:: mu
     LOGICAL:: first_call = .TRUE.
+
     REAL:: inertie_sol = 2000., inertie_sno = 2000., inertie_sic = 2000.
+    ! in W m-2 K-1
 
     namelist /soil_nml/ min_period, depth_ratio, inertie_sol, inertie_sno, &
          inertie_sic
@@ -103,11 +105,17 @@ contains
        mu = fz(0.5, depth_ratio, fz1) * d(1)
 
        c = dz2 / dtphys
+       ! Hourdin 1992 k1078, equation A.18:
        delta(nsoilmx - 1) = c(nsoilmx) + d(nsoilmx - 1)
+
+       ! Hourdin 1992 k1078, equation A.16:
        alpha(nsoilmx - 1) = d(nsoilmx - 1) / delta(nsoilmx - 1)
 
        DO jk = nsoilmx - 1, 2, - 1
+          ! Hourdin 1992 k1078, equation A.21:
           delta(jk - 1) = c(jk) + d(jk - 1) + d(jk) * (1. - alpha(jk))
+          
+          ! Hourdin 1992 k1078, equation A.19:
           alpha(jk - 1) = d(jk - 1) / delta(jk - 1)
        END DO
 
@@ -181,7 +189,9 @@ contains
     real, intent(in):: depth_ratio
     ! rapport entre les \'epaisseurs de 2 couches successives
 
-    real, intent(in):: fz1 ! depth
+    real, intent(in):: fz1
+    ! e-folding depth for a wave of period "min_period times 1 s",
+    ! divided by e-folding depth for a wave of period one day
 
     !-----------------------------------------
 
@@ -212,9 +222,11 @@ contains
 
     !------------------------------------------------------------------
 
+    ! Hourdin 1992 k1078, equation A.17:
     beta(:, nsoilmx - 1) = c(nsoilmx) * tsoil(:, nsoilmx) / delta(nsoilmx - 1)
 
     DO jk = nsoilmx - 1, 2, - 1
+       ! Hourdin 1992 k1078, equation A.20:
        beta(:, jk - 1) = (tsoil(:, jk) * c(jk) + d(jk) * beta(:, jk)) &
             / delta(jk - 1)
     END DO
