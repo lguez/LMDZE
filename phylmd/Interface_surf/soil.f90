@@ -18,12 +18,12 @@ contains
     ! Method: implicit time integration
 
     ! Consecutive ground temperatures are related by:
-    ! T(k + 1) = C(k) + D(k) * T(k) (equation 1)
-    ! The coefficients C and D are computed at the t - dt time-step.
+    ! T(k + 1) = BETA(k) + ALPHA(k) * T(k) (equation 1)
+    ! The coefficients BETA and ALPHA are computed at the t - dt time-step.
     ! Structure of the procedure:
-    ! 1) C and D coefficients are computed from the old temperature
+    ! 1) BETA and ALPHA coefficients are computed from the old temperature
     ! 2) new temperatures are computed using equation 1
-    ! 3) C and D coefficients are computed from the new temperature
+    ! 3) BETA and ALPHA coefficients are computed from the new temperature
     ! profile for the t + dt time-step
     ! 4) the coefficients A and B are computed where the diffusive
     ! fluxes at the t + dt time-step is given by
@@ -59,7 +59,11 @@ contains
 
     INTEGER knon, ig, jk
     REAL min_period ! no dimension
-    REAL fz1 ! e-folding depth for a wave of period min_period times 1 s
+
+    REAL fz1
+    ! e-folding depth for a wave of period "min_period times 1 s",
+    ! divided by e-folding depth for a wave of period one day
+
     real depth_ratio ! rapport entre les \'epaisseurs de 2 couches successives
     real, save:: delta(nsoilmx - 1)
     REAL therm_i(size(tsurf)) ! (knon) thermal inertia
@@ -148,7 +152,6 @@ contains
     ! Hourdin 1992 k1078, equation A.34:
     tsoil(:, 1) = (mu * beta(:, 1) + tsurf) / (mu * (1. - alpha(1)) + 1.)
 
-    ! Other temperatures:
     DO jk = 1, nsoilmx - 1
        ! Hourdin 1992 k1078, equation A.15:
        tsoil(:, jk + 1) = beta(:, jk) + alpha(jk) * tsoil(:, jk)

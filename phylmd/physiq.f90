@@ -500,9 +500,6 @@ contains
 
        call ctherm
        call conf_phys
-
-       ! Initialiser les compteurs:
-
        frugs = 0.
        CALL phyetat0(pctsrf, ftsol, ftsoil, fqsurf, qsol, fsnow, falbe, &
             rain_fall, snow_fall, solsw, sollw, dlw, radsol, frugs, agesno, &
