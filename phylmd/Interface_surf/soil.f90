@@ -68,7 +68,7 @@ contains
     real, save:: delta(nsoilmx - 1)
     REAL therm_i(size(tsurf)) ! (knon) thermal inertia, in W m-2 K-1
     REAL tempor
-    REAL, save:: d(nsoilmx - 1), dz2(nsoilmx), c(nsoilmx)
+    REAL, save:: d(nsoilmx - 1), c(nsoilmx)
     REAL beta(size(tsurf), nsoilmx - 1) ! (knon, nsoilmx - 1)
     REAL, save:: alpha(nsoilmx - 1)
     REAL, save:: mu
@@ -94,8 +94,9 @@ contains
        write(unit_nml, nml = soil_nml)
        fz1 = sqrt(min_period / pi)
 
-       forall (jk = 1:nsoilmx) dz2(jk) = fz(real(jk), depth_ratio, fz1) &
-            - fz(jk - 1., depth_ratio, fz1)
+       ! Hourdin 1992 k1078, equation A.11:
+       forall (jk = 1:nsoilmx) c(jk) = (fz(real(jk), depth_ratio, fz1) &
+            - fz(jk - 1., depth_ratio, fz1)) / dtphys
 
        ! Hourdin 1992 k1078, equation A.12:
        forall (jk = 1:nsoilmx - 1) d(jk) = 1. &
@@ -104,7 +105,6 @@ contains
        ! Hourdin 1992 k1078, equation A.28:
        mu = fz(0.5, depth_ratio, fz1) * d(1)
 
-       c = dz2 / dtphys
        ! Hourdin 1992 k1078, equation A.18:
        delta(nsoilmx - 1) = c(nsoilmx) + d(nsoilmx - 1)
 
@@ -172,7 +172,7 @@ contains
     tempor = mu * (1. - alpha(1)) + 1.
 
     ! Hourdin 1992 k1078, equation A.30:
-    soilcap = therm_i * (dz2(1) + dtphys * (1. - alpha(1)) * d(1)) / tempor
+    soilcap = therm_i * dtphys * (c(1) + (1. - alpha(1)) * d(1)) / tempor
 
     ! Hourdin 1992 k1078, equation A.31:
     soilflux = therm_i * d(1) * (beta(:, 1) + (alpha(1) - 1.) * tsoil(:, 1)) &
