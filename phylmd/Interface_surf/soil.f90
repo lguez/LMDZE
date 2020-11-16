@@ -2,7 +2,7 @@ module soil_m
 
   IMPLICIT NONE
 
-  private fz, compute_beta
+  private compute_beta
 
 contains
 
@@ -95,15 +95,23 @@ contains
        fz1 = sqrt(min_period / pi)
 
        ! Hourdin 1992 k1078, equation A.11:
-       forall (jk = 1:nsoilmx) c(jk) = (fz(real(jk), depth_ratio, fz1) &
-            - fz(jk - 1., depth_ratio, fz1)) / dtphys
+       
+       c(1) = fz1 / dtphys
+
+       do jk = 2, nsoilmx
+          c(jk) = c(jk - 1) * depth_ratio
+       end do
 
        ! Hourdin 1992 k1078, equation A.12:
-       forall (jk = 1:nsoilmx - 1) d(jk) = 1. &
-            / (fz(jk + 0.5, depth_ratio, fz1) - fz(jk - 0.5, depth_ratio, fz1))
+
+       d(1) = 1. / (sqrt(depth_ratio) * fz1)
+
+       do jk = 2, nsoilmx - 1
+          d(jk) = d(jk - 1) / depth_ratio
+       end do
 
        ! Hourdin 1992 k1078, equation A.28:
-       mu = fz(0.5, depth_ratio, fz1) * d(1)
+       mu = 1. / (depth_ratio + sqrt(depth_ratio))
 
        ! Hourdin 1992 k1078, equation A.18:
        delta(nsoilmx - 1) = c(nsoilmx) + d(nsoilmx - 1)
@@ -179,26 +187,6 @@ contains
          + soilcap * (tsoil(:, 1) * tempor - mu * beta(:, 1) - tsurf) / dtphys
 
   END SUBROUTINE soil
-
-  !****************************************************************
-
-  pure real function fz(rk, depth_ratio, fz1)
-
-    real, intent(in):: rk
-
-    real, intent(in):: depth_ratio
-    ! rapport entre les \'epaisseurs de 2 couches successives
-
-    real, intent(in):: fz1
-    ! e-folding depth for a wave of period "min_period times 1 s",
-    ! divided by e-folding depth for a wave of period one day
-
-    !-----------------------------------------
-
-    fz = fz1 * (depth_ratio**rk - 1.) / (depth_ratio - 1.)
-    ! Hourdin 1992 k1078, equation A.5
-
-  end function fz
 
   !****************************************************************
 
