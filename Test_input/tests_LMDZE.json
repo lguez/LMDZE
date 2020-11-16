@@ -700,5 +700,10 @@
             "$test_input_dir/iodef.xml"
 	],
 	"title" : "GCM_thermals"
+    },
+    {
+	"input" : "&logic_nml /\n&conf_gcm_nml /\n&soil_nml /\n",
+	"command" : "$build_dir/test_soil",
+	"title" : "Test_soil"
     }
 ]

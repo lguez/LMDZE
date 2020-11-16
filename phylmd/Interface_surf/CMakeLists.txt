@@ -8,3 +8,6 @@ set(file_list_var alboc_cd.f90 albsno.f90 calcul_fluxs.f90 cdrag.f90
 
 list(TRANSFORM file_list_var PREPEND ${CMAKE_CURRENT_LIST_DIR}/)
 target_sources(LMDZE_objects PRIVATE ${file_list_var})
+
+add_executable(test_soil ${CMAKE_CURRENT_LIST_DIR}/test_soil.f90)
+target_link_libraries(test_soil PRIVATE LMDZE_objects)
