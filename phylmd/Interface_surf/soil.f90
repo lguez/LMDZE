@@ -163,9 +163,9 @@ contains
     ! Computation of the surface diffusive flux from ground and
     ! calorific capacity of the ground:
 
-    DO ig = 1, knon
-       tempor = mu * (1. - alpha(1)) + 1.
+    tempor = mu * (1. - alpha(1)) + 1.
 
+    DO ig = 1, knon
        ! Hourdin 1992 k1078, equation A.30:
        soilcap(ig) = therm_i(ig) * (dz2(1) + dtphys * (1. - alpha(1)) * d(1)) &
             / tempor
