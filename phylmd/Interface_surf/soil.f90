@@ -164,20 +164,15 @@ contains
     ! calorific capacity of the ground:
 
     DO ig = 1, knon
-       ! Hourdin 1992 k1078, equation A.25:
-       soilflux(ig) = therm_i(ig) * d(1) * (beta(ig, 1) &
-            + (alpha(1) - 1.) * tsoil(ig, 1))
-
-       ! Hourdin 1992 k1078, equation A.24:
-       soilcap(ig) = therm_i(ig) * (dz2(1) + dtphys * (1. - alpha(1)) * d(1))
-
        tempor = mu * (1. - alpha(1)) + 1.
 
        ! Hourdin 1992 k1078, equation A.30:
-       soilcap(ig) = soilcap(ig) / tempor
+       soilcap(ig) = therm_i(ig) * (dz2(1) + dtphys * (1. - alpha(1)) * d(1)) &
+            / tempor
 
        ! Hourdin 1992 k1078, equation A.31:
-       soilflux(ig) = soilflux(ig) + soilcap(ig) * (tsoil(ig, 1) * tempor - mu &
+       soilflux(ig) = therm_i(ig) * d(1) * (beta(ig, 1) + (alpha(1) - 1.) &
+            * tsoil(ig, 1)) + soilcap(ig) * (tsoil(ig, 1) * tempor - mu &
             * beta(ig, 1) - tsurf(ig)) / dtphys
     END DO
 
