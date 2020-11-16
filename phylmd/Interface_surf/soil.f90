@@ -57,7 +57,7 @@ contains
 
     ! Local:
 
-    INTEGER knon, ig, jk
+    INTEGER jk
     REAL min_period ! no dimension
 
     REAL fz1
@@ -79,8 +79,6 @@ contains
          inertie_sic
 
     !-----------------------------------------------------------------------
-
-    knon = size(tsurf)
 
     IF (first_call) THEN
        ! Compute ground levels:
@@ -165,16 +163,12 @@ contains
 
     tempor = mu * (1. - alpha(1)) + 1.
 
-    DO ig = 1, knon
-       ! Hourdin 1992 k1078, equation A.30:
-       soilcap(ig) = therm_i(ig) * (dz2(1) + dtphys * (1. - alpha(1)) * d(1)) &
-            / tempor
+    ! Hourdin 1992 k1078, equation A.30:
+    soilcap = therm_i * (dz2(1) + dtphys * (1. - alpha(1)) * d(1)) / tempor
 
-       ! Hourdin 1992 k1078, equation A.31:
-       soilflux(ig) = therm_i(ig) * d(1) * (beta(ig, 1) + (alpha(1) - 1.) &
-            * tsoil(ig, 1)) + soilcap(ig) * (tsoil(ig, 1) * tempor - mu &
-            * beta(ig, 1) - tsurf(ig)) / dtphys
-    END DO
+    ! Hourdin 1992 k1078, equation A.31:
+    soilflux = therm_i * d(1) * (beta(:, 1) + (alpha(1) - 1.) * tsoil(:, 1)) &
+         + soilcap * (tsoil(:, 1) * tempor - mu * beta(:, 1) - tsurf) / dtphys
 
   END SUBROUTINE soil
 
