@@ -18,21 +18,31 @@ contains
     ! Method: implicit time integration
 
     ! Consecutive ground temperatures are related by:
+
     ! T(k + 1) = BETA(k) + ALPHA(k) * T(k) (equation 1)
-    ! The coefficients BETA and ALPHA are computed at the t - dt time-step.
+
+    ! The coefficient BETA is computed using soil temperatures from
+    ! the previous time-step.
+
     ! Structure of the procedure:
-    ! 1) BETA and ALPHA coefficients are computed from the old temperature
-    ! 2) new temperatures are computed using equation 1
-    ! 3) BETA and ALPHA coefficients are computed from the new temperature
-    ! profile for the t + dt time-step
-    ! 4) the coefficients A and B are computed where the diffusive
-    ! fluxes at the t + dt time-step is given by
-    ! Fdiff = A + B Ts(t + dt)
-    ! or 
-    ! Fdiff = F0 + Soilcap (Ts(t + dt) - Ts(t)) / dt
-    ! with 
-    ! F0 = A + B (Ts(t))
-    ! Soilcap = B * dt
+    
+    ! 1) BETA is computed from input soil temperature which is
+    ! supposed to be the soil temperature profile two time steps
+    ! before. This is $\beta^{t - \delta t}$.
+
+    ! 2) New soil temperature is computed using equation 1. This is
+    ! supposed to be the soil temperature profile for one time step
+    ! before, since it is associated to the surface temperature for
+    ! one time step before.
+    
+    ! 3) BETA is computed again from the new soil temperature
+    ! profile. This is $\beta^t$.
+    
+    ! 4) The coefficients soilflux and Soilcap are computed in the
+    ! following relation between surface thermal conduction flux at
+    ! time-step t, Fc0, and surface temperature at t:
+    
+    ! Fc0 + soilflux  = Soilcap (Ts(t) - Ts(t - delta t)) / (delta t)
 
     use nr_util, only: pi
 
@@ -44,7 +54,9 @@ contains
 
     INTEGER, intent(in):: nisurf ! surface type index
     REAL, intent(in):: snow(:) ! (knon)
-    REAL, intent(in):: tsurf(:) ! (knon) surface temperature at time-step t (K)
+
+    REAL, intent(in):: tsurf(:) ! (knon)
+    ! surface temperature at previous time-step (K)
 
     real, intent(inout):: tsoil(:, :) ! (knon, nsoilmx)
     ! temperature inside the ground (K), layer 1 nearest to the surface
