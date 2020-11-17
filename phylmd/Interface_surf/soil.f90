@@ -67,7 +67,7 @@ contains
     real depth_ratio ! rapport entre les \'epaisseurs de 2 couches successives
     real, save:: delta(nsoilmx - 1)
     REAL therm_i(size(tsurf)) ! (knon) thermal inertia, in W m-2 K-1
-    REAL tempor
+    REAL, save:: tempor
     REAL, save:: d(nsoilmx - 1), c(nsoilmx)
     REAL beta(size(tsurf), nsoilmx - 1) ! (knon, nsoilmx - 1)
     REAL, save:: alpha(nsoilmx - 1)
@@ -127,6 +127,7 @@ contains
           alpha(jk - 1) = d(jk - 1) / delta(jk - 1)
        END DO
 
+       tempor = mu * (1. - alpha(1)) + 1.
        first_call = .FALSE.
     END IF
 
@@ -176,8 +177,6 @@ contains
 
     ! Computation of the surface diffusive flux from ground and
     ! calorific capacity of the ground:
-
-    tempor = mu * (1. - alpha(1)) + 1.
 
     ! Hourdin 1992 k1078, equation A.30:
     soilcap = therm_i * dtphys * (c(1) + (1. - alpha(1)) * d(1)) / tempor
