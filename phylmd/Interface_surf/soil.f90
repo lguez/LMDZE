@@ -73,8 +73,7 @@ contains
     REAL min_period ! no dimension
 
     REAL fz1
-    ! e-folding depth for a wave of period "min_period times 1 s",
-    ! divided by e-folding depth for a wave of period one day
+    ! normalized e-folding depth for a wave of period "min_period times 1 s"
 
     real depth_ratio ! rapport entre les \'epaisseurs de 2 couches successives
     real, save:: delta(nsoilmx - 1)

@@ -33,7 +33,7 @@ contains
 
     real, intent(OUT):: dflux_s(:), dflux_l(:) ! (knon)
     ! dérivées des flux de chaleurs sensible et latente par rapport à
-    ! Ts (W m-2 K-1)
+    ! T_surf (W m-2 K-1)
 
     real, intent(IN):: tsurf(:) ! (knon) température de surface
 
