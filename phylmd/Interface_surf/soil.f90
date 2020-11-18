@@ -104,6 +104,7 @@ contains
        read (unit = *, nml = soil_nml)
        write(unit_nml, nml = soil_nml)
        fz1 = sqrt(min_period / pi)
+       print *, "fz1 = ", fz1
 
        ! Hourdin 1992 k1078, equation A.11:
        
@@ -123,6 +124,7 @@ contains
 
        ! Hourdin 1992 k1078, equation A.28:
        mu = 1. / (depth_ratio + sqrt(depth_ratio))
+       print *, "mu = ", mu
 
        ! Hourdin 1992 k1078, equation A.18:
        delta(nsoilmx - 1) = c(nsoilmx) + d(nsoilmx - 1)
@@ -139,6 +141,7 @@ contains
        END DO
 
        tempor = mu * (1. - alpha(1)) + 1.
+       print *, "tempor = ", tempor
        first_call = .FALSE.
     END IF
 
