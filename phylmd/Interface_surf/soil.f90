@@ -46,7 +46,8 @@ contains
 
     use nr_util, only: pi
 
-    use comconst, only: dtphys
+    use comconst, only: dtphys, daysec
+    use conf_gcm_m, only: lmt_pas
     USE dimsoil, only: nsoilmx
     USE indicesol, only: is_lic, is_oce, is_sic, is_ter
     USE suphec_m, only: rtt
@@ -70,10 +71,11 @@ contains
     ! Local:
 
     INTEGER jk
-    REAL min_period ! no dimension
+    REAL min_period ! in s
 
     REAL fz1
-    ! normalized e-folding depth for a wave of period "min_period times 1 s"
+    ! e-folding depth for a wave of period min_period divided by
+    ! e-folding depth for a wave of period one day
 
     real depth_ratio ! rapport entre les \'epaisseurs de 2 couches successives
     real, save:: delta(nsoilmx - 1)
@@ -85,11 +87,15 @@ contains
     REAL, save:: mu
     LOGICAL:: first_call = .TRUE.
 
-    REAL:: inertie_sol = 2000., inertie_sno = 2000., inertie_sic = 2000.
+    REAL lambda_c_sol, lambda_c_sno, lambda_c_sic
+    ! thermal conductivity multiplied by volumetric heat capacity of
+    ! soil, in J2 m-4 K-2 s-1
+
+    real, save:: inertie_sol, inertie_sno, inertie_sic
     ! in W m-2 K-1
 
-    namelist /soil_nml/ min_period, depth_ratio, inertie_sol, inertie_sno, &
-         inertie_sic
+    namelist /soil_nml/ min_period, depth_ratio, lambda_c_sol, lambda_c_sno, &
+         lambda_c_sic
 
     !-----------------------------------------------------------------------
 
@@ -99,16 +105,22 @@ contains
        ! Default values:
        min_period = 1800.
        depth_ratio = 2.
+       lambda_c_sol = 4e6
+       lambda_c_sno = 4e6
+       lambda_c_sic = 4e6
 
        print *, "Enter namelist 'soil_nml'."
        read (unit = *, nml = soil_nml)
        write(unit_nml, nml = soil_nml)
-       fz1 = sqrt(min_period / pi)
+       fz1 = sqrt(min_period / daysec)
        print *, "fz1 = ", fz1
+       inertie_sol = sqrt(lambda_c_sol * pi / daysec)
+       inertie_sno = sqrt(lambda_c_sno * pi / daysec)
+       inertie_sic = sqrt(lambda_c_sic * pi / daysec)
 
        ! Hourdin 1992 k1078, equation A.11:
        
-       c(1) = fz1 / dtphys
+       c(1) = lmt_pas / pi * fz1
 
        do jk = 2, nsoilmx
           c(jk) = c(jk - 1) * depth_ratio
