@@ -6,7 +6,7 @@ contains
 
   SUBROUTINE calcul_fluxs(qsurf, tsurf_new, flux_q, fluxlat, flux_t, dflux_s, &
        dflux_l, tsurf, p1lay, cdragh, ps, radsol, t1lay, q1lay, u1lay, v1lay, &
-       ah, aq, bh, bq, cal, beta, dif_grnd)
+       ah, aq, bh, bq, soilflux, cal, beta, dif_grnd)
 
     ! Cette routine calcule les flux en h et q à l'interface et une
     ! température de surface.
@@ -63,6 +63,8 @@ contains
     real, intent(IN):: bh(:), bq(:) ! (knon)
     ! coefficients B de la résolution de la couche limite pour t et q
 
+    REAL, intent(IN):: soilflux(:) ! (knon)
+    
     real, intent(IN):: cal(:) ! (knon) RCPD / soilcap, où soilcap est
     ! la capacité calorifique surfacique apparente du sol. En m2/kg.
     
@@ -115,9 +117,9 @@ contains
     mh = coef * ah / oh
     dflux_s = - coef * RCPD / oh
 
-    tsurf_new = (tsurf + cal / RCPD * dtphys * (radsol + mh + sl * mq) &
-         + dif_grnd * t_grnd * dtphys) / (1. - dtphys * cal / RCPD * (dflux_s &
-         + sl * nq) + dtphys * dif_grnd)
+    tsurf_new = (tsurf + cal / RCPD * dtphys * (radsol + soilflux + mh + sl &
+         * mq) + dif_grnd * t_grnd * dtphys) / (1. - dtphys * cal / RCPD &
+         * (dflux_s + sl * nq) + dtphys * dif_grnd)
     flux_q = mq + nq * tsurf_new
     fluxlat = flux_q * sl
     flux_t = mh + dflux_s * tsurf_new

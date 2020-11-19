@@ -156,8 +156,8 @@ contains
 
        CALL soil(is_ter, snow, ts, tsoil, soilcap, soilflux)
        CALL calcul_fluxs(qsurf, tsurf_new, flux_q, fluxlat, flux_t, dflux_s, &
-            dflux_l, ts, pplay(:, 1), cdragh, paprs(:, 1), radsol + soilflux, &
-            t(:, 1), q(:, 1), u1lay, v1lay, ah, aq, bh, bq, &
+            dflux_l, ts, pplay(:, 1), cdragh, paprs(:, 1), radsol, t(:, 1), &
+            q(:, 1), u1lay, v1lay, ah, aq, bh, bq, soilflux, &
             cal = RCPD / soilcap, beta = min(2. * qsol / max_eau_sol, 1.), &
             dif_grnd = 0.)
        CALL fonte_neige(is_ter, rain_fall, snow_fall, snow, qsol, tsurf_new, &
@@ -179,7 +179,8 @@ contains
        call limit_read_sst(julien, knindex, tsurf)
        call calcul_fluxs(qsurf, tsurf_new, flux_q, fluxlat, flux_t, dflux_s, &
             dflux_l, tsurf, pplay(:, 1), cdragh, paprs(:, 1), radsol, t(:, 1), &
-            q(:, 1), u1lay, v1lay, ah, aq, bh, bq, cal = [(0., i = 1, knon)], &
+            q(:, 1), u1lay, v1lay, ah, aq, bh, bq, &
+            soilflux = [(0., i = 1, knon)], cal = [(0., i = 1, knon)], &
             beta = [(1., i = 1, knon)], dif_grnd = 0.)
        agesno = 0.
        albedo = alboc_cd(mu0) * fmagic
@@ -200,8 +201,8 @@ contains
 
        CALL soil(is_sic, snow, tsurf, tsoil, soilcap, soilflux)
        CALL calcul_fluxs(qsurf, tsurf_new, flux_q, fluxlat, flux_t, dflux_s, &
-            dflux_l, tsurf, pplay(:, 1), cdragh, paprs(:, 1), &
-            radsol + soilflux, t(:, 1), q(:, 1), u1lay, v1lay, ah, aq, bh, bq, &
+            dflux_l, tsurf, pplay(:, 1), cdragh, paprs(:, 1), radsol, t(:, 1), &
+            q(:, 1), u1lay, v1lay, ah, aq, bh, bq, soilflux, &
             cal = RCPD / soilcap, beta = [(1., i = 1, knon)], &
             dif_grnd = 1. / tau_gl)
        CALL fonte_neige(is_sic, rain_fall, snow_fall, snow, qsol, &
@@ -220,8 +221,8 @@ contains
 
        CALL soil(is_lic, snow, ts, tsoil, soilcap, soilflux)
        call calcul_fluxs(qsurf, tsurf_new, flux_q, fluxlat, flux_t, dflux_s, &
-            dflux_l, ts, pplay(:, 1), cdragh, paprs(:, 1), radsol + soilflux, &
-            t(:, 1), q(:, 1), u1lay, v1lay, ah, aq, bh, bq, &
+            dflux_l, ts, pplay(:, 1), cdragh, paprs(:, 1), radsol, t(:, 1), &
+            q(:, 1), u1lay, v1lay, ah, aq, bh, bq, soilflux, &
             cal = RCPD / soilcap, beta = [(1., i = 1, knon)], dif_grnd = 0.)
        call fonte_neige(is_lic, rain_fall, snow_fall, snow, qsol, &
             tsurf_new, - flux_q, fqcalving, ffonte, run_off_lic_0, run_off_lic)
