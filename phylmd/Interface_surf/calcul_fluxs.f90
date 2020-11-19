@@ -4,7 +4,7 @@ module calcul_fluxs_m
 
 contains
 
-  SUBROUTINE calcul_fluxs(qsurf, tsurf_new, evap, fluxlat, flux_t, dflux_s, &
+  SUBROUTINE calcul_fluxs(qsurf, tsurf_new, flux_q, fluxlat, flux_t, dflux_s, &
        dflux_l, tsurf, p1lay, cdragh, ps, radsol, t1lay, q1lay, u1lay, v1lay, &
        ah, aq, bh, bq, cal, beta, dif_grnd)
 
@@ -26,7 +26,9 @@ contains
 
     real, intent(OUT):: qsurf(:) ! (knon) humidité de l'air au-dessus du sol
     real, intent(OUT):: tsurf_new(:) ! (knon) température au sol
-    real, intent(OUT):: evap(:) ! (knon)
+
+    real, intent(OUT):: flux_q(:) ! (knon)
+    ! downward water vapor flux at the surface, in kg m-2 s-1
 
     real, intent(OUT):: fluxlat(:), flux_t(:) ! (knon)
     ! downward flux of latent and sensible heat, in W m-2
@@ -77,7 +79,7 @@ contains
     knon = assert_eq([size(tsurf), size(p1lay), size(cal), size(beta), &
          size(cdragh), size(ps), size(qsurf), size(radsol), size(t1lay), &
          size(q1lay), size(u1lay), size(v1lay), size(ah), size(aq), &
-         size(bh), size(bq), size(tsurf_new), size(evap), &
+         size(bh), size(bq), size(tsurf_new), size(flux_q), &
          size(fluxlat), size(flux_t), size(dflux_s), size(dflux_l)], &
          "calcul_fluxs knon")
 
@@ -110,11 +112,11 @@ contains
     tsurf_new = (tsurf + cal / RCPD * dtphys * (radsol + mh + sl * mq) &
          + dif_grnd * t_grnd * dtphys) / (1. - dtphys * cal / RCPD * (dflux_s &
          + sl * nq) + dtphys * dif_grnd)
-    evap = - mq - nq * tsurf_new
-    fluxlat = - evap * sl
+    flux_q = mq + nq * tsurf_new
+    fluxlat = flux_q * sl
     flux_t = mh + dflux_s * tsurf_new
     dflux_l = sl * nq
-    qsurf = (aq - bq * evap * dtphys) * (1. - beta) + beta * (qsat + dq_s_dt &
+    qsurf = (aq + bq * flux_q * dtphys) * (1. - beta) + beta * (qsat + dq_s_dt &
          * (tsurf_new - tsurf))
 
   END SUBROUTINE calcul_fluxs
