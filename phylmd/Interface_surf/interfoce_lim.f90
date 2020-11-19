@@ -27,13 +27,13 @@ contains
 
     call NF95_OPEN ('limit.nc', NF90_NOWRITE, ncid)
 
-    ! Fraction "ocean"
+    ! Ocean fraction:
     call NF95_INQ_VARID(ncid, 'FOCE', varid)
-    call NF95_GET_VAR(ncid, varid, pctsrf_new_oce, start = (/1, jour/))
+    call NF95_GET_VAR(ncid, varid, pctsrf_new_oce, start = [1, jour])
 
-    ! Fraction "glace de mer"
+    ! Fraction "glace de mer" :
     call NF95_INQ_VARID(ncid, 'FSIC', varid)
-    call NF95_GET_VAR(ncid, varid, pctsrf_new_sic, start = (/1, jour/))
+    call NF95_GET_VAR(ncid, varid, pctsrf_new_sic, start = [1, jour])
 
     call NF95_CLOSE(ncid)
 

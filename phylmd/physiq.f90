@@ -236,8 +236,7 @@ contains
     ! Conditions aux limites
 
     INTEGER julien
-    REAL, save, allocatable:: pctsrf(:, :) ! (klon, nbsrf)
-    ! percentage of surface
+    REAL, save, allocatable:: pctsrf(:, :) ! (klon, nbsrf) percentage of surface
     
     REAL, save, allocatable:: albsol(:) ! (klon)
     ! albedo du sol total, visible, moyen par maille

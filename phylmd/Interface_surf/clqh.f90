@@ -50,7 +50,8 @@ contains
     REAL, intent(in):: coefh(:, 2:) ! (knon, 2:klev)
     ! diffusion coefficient at layer interface, for heat and humidity, in m2 s-1
 
-    REAL, intent(in):: cdragh(:) ! (knon) coefficient d'\'echange, sans unite
+    REAL, intent(in):: cdragh(:) ! (knon)
+    ! coefficient d'\'echange, sans dimension
 
     REAL, intent(in):: t(:, :) ! (knon, klev) air temperature, in K
     REAL, intent(in):: q(:, :) ! (knon, klev) humidit\'e sp\'ecifique
@@ -68,7 +69,8 @@ contains
     ! epaisseur de couche en pression (Pa)
 
     REAL, intent(in):: radsol(:) ! (knon)
-    ! surface net downward radiative flux, in W / m2
+    ! net downward radiative (longwave + shortwave) flux at the
+    ! surface, in W / m2
 
     REAL, intent(inout):: albedo(:) ! (knon) albedo de la surface
 
@@ -84,7 +86,8 @@ contains
     real, intent(in):: snow_fall(:) ! (knon)
     ! precipitation, solid water mass flux (kg / m2 / s), positive down
 
-    real, intent(out):: fluxlat(:) ! (knon) flux de chaleur latente, en W m-2
+    real, intent(out):: fluxlat(:) ! (knon)
+    ! downward flux of latent heat at the surface, in W m-2
 
     real, intent(in):: pctsrf_new_sic(:) ! (knon)
     ! nouvelle repartition des surfaces
@@ -96,14 +99,14 @@ contains
     real, intent(out):: z0_new(:) ! (knon) surface roughness
 
     REAL, intent(out):: flux_t(:) ! (knon)
-    ! (diagnostic) flux de chaleur sensible (Cp T) à la surface,
-    ! positif vers le bas, W / m2
+    ! downward flux of sensible heat at the surface (c_p T), in W m-2
 
     REAL, intent(out):: flux_q(:) ! (knon)
     ! downward water vapor flux at the surface, in kg m-2 s-1
 
-    REAL, intent(out):: dflux_s(:) ! (knon) derivee du flux sensible dF / dTs
-    REAL, intent(out):: dflux_l(:) ! (knon) derivee du flux latent dF / dTs
+    real, intent(OUT):: dflux_s(:), dflux_l(:) ! (knon)
+    ! dérivées des flux de chaleurs sensible et latente par rapport à
+    ! T_surf (W m-2 K-1)
 
     REAL, intent(out):: fqcalving(:) ! (knon)
     ! Flux d'eau "perdue" par la surface et n\'ecessaire pour limiter la

@@ -24,29 +24,35 @@ contains
     USE suphec_m, ONLY: rcpd, rd, retv, rlstt, rlvtt, rtt
     USE yoethf_m, ONLY: r2es, r5ies, r5les, rvtmp2
 
-    real, intent(OUT):: qsurf(:) ! (knon) humidité de l'air au-dessus du sol
-    real, intent(OUT):: tsurf_new(:) ! (knon) température au sol
+    real, intent(OUT):: qsurf(:) ! (knon)
+    ! humidité de l'air au-dessus de la surface
+    
+    real, intent(OUT):: tsurf_new(:) ! (knon) new surface temperature, in K
 
     real, intent(OUT):: flux_q(:) ! (knon)
     ! downward water vapor flux at the surface, in kg m-2 s-1
 
     real, intent(OUT):: fluxlat(:), flux_t(:) ! (knon)
-    ! downward flux of latent and sensible heat, in W m-2
+    ! downward flux of latent and sensible heat (c_p T) at the surface, in W m-2
 
     real, intent(OUT):: dflux_s(:), dflux_l(:) ! (knon)
     ! dérivées des flux de chaleurs sensible et latente par rapport à
     ! T_surf (W m-2 K-1)
 
-    real, intent(IN):: tsurf(:) ! (knon) température de surface
+    real, intent(IN):: tsurf(:) ! (knon)
+    ! surface temperature at previous time step (K)
 
     real, intent(IN):: p1lay(:) ! (knon)
     ! pression première couche (milieu de couche)
 
-    real, intent(IN):: cdragh(:) ! (knon) coefficient d'\'echange
+    real, intent(IN):: cdragh(:) ! (knon)
+    ! coefficient d'\'echange, sans dimension
+    
     real, intent(IN):: ps(:) ! (knon) pression au sol, en Pa
 
     real, intent(IN):: radsol(:) ! (knon)
-    ! net downward radiative (longwave + shortwave) flux at the surface
+    ! net downward radiative (longwave + shortwave) flux at the
+    ! surface, in W / m2
 
     real, intent(IN):: t1lay(:) ! (knon) temp\'erature de l'air 1\`ere couche
     real, intent(IN):: q1lay(:), u1lay(:), v1lay(:) ! (knon)
@@ -71,7 +77,7 @@ contains
     real sl(size(ps)) ! (knon) chaleur latente d'évaporation ou de sublimation
     logical ice
     real zcor
-    real, parameter:: t_grnd = 271.35
+    real, parameter:: t_grnd = 271.35 ! in K
     real, parameter:: min_wind_speed = 1. ! in m s-1
 
     !---------------------------------------------------------------------
