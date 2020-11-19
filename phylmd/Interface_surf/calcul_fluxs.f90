@@ -29,7 +29,7 @@ contains
     real, intent(OUT):: evap(:) ! (knon)
 
     real, intent(OUT):: fluxlat(:), flux_t(:) ! (knon)
-    ! flux de chaleurs latente et sensible, en W m-2
+    ! downward flux of latent and sensible heat, in W m-2
 
     real, intent(OUT):: dflux_s(:), dflux_l(:) ! (knon)
     ! dérivées des flux de chaleurs sensible et latente par rapport à

@@ -54,7 +54,9 @@ contains
 
     REAL, intent(in):: t(:, :) ! (knon, klev) air temperature, in K
     REAL, intent(in):: q(:, :) ! (knon, klev) humidit\'e sp\'ecifique
-    REAL, intent(in):: ts(:) ! (knon) temperature de surface (K)
+
+    REAL, intent(in):: ts(:) ! (knon)
+    ! surface temperature at previous time step (K)
 
     REAL, intent(in):: paprs(:, :) ! (knon, klev + 1)
     ! pression \`a l'inter-couche (Pa)
@@ -98,7 +100,7 @@ contains
     ! positif vers le bas, W / m2
 
     REAL, intent(out):: flux_q(:) ! (knon)
-    ! flux de la vapeur d'eau à la surface, en kg / (m**2 s)
+    ! downward water vapor flux at the surface, in kg m-2 s-1
 
     REAL, intent(out):: dflux_s(:) ! (knon) derivee du flux sensible dF / dTs
     REAL, intent(out):: dflux_l(:) ! (knon) derivee du flux latent dF / dTs
