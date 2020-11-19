@@ -163,13 +163,7 @@ contains
     ! point de terre avec ou sans glace.
 
     select case (nisurf)
-    case (is_sic)
-       where (snow > 0.)
-          therm_i = inertie_sno
-       elsewhere
-          therm_i = inertie_sic
-       end where
-    case (is_lic)
+    case (is_sic, is_lic)
        where (snow > 0.)
           therm_i = inertie_sno
        elsewhere
