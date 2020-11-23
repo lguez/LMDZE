@@ -12,8 +12,9 @@ contains
 
     ! Author: Frederic Hourdin, January 30th, 1992
 
-    ! Object: computation of the soil temperature evolution, the heat
-    ! capacity per unit surface and the surface conduction flux
+    ! Object: computation of the soil temperature evolution, and the
+    ! relation between surface thermal conduction flux and surface
+    ! temperature
 
     ! Method: implicit time integration
 
@@ -28,7 +29,7 @@ contains
     
     ! 1) BETA is computed from input soil temperature which is
     ! supposed to be the soil temperature profile two time steps
-    ! before. This is $\beta^{t - \delta t}$.
+    ! before. beta is $\beta^{t - \delta t}$.
 
     ! 2) New soil temperature is computed using equation 1. This is
     ! supposed to be the soil temperature profile for one time step
@@ -63,10 +64,12 @@ contains
     ! temperature inside the ground (K), layer 1 nearest to the surface
 
     REAL, intent(out):: soilcap(:) ! (knon)
-    ! specific heat per unit surface (in J m-2 K-1)
+    ! coefficient in the relation between surface thermal conduction
+    ! flux and surface temperature, in J m-2 K-1
 
-    REAL, intent(out):: soilflux(:) ! (knon) 
-    ! surface diffusive flux from ground (W m-2)
+    REAL, intent(out):: soilflux(:) ! (knon)
+    ! coefficient in the relation between surface thermal conduction
+    ! flux and surface temperature, in W m-2
 
     ! Local:
 

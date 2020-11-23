@@ -8,7 +8,7 @@ contains
        d_ven, flux_v)
 
     ! Author: Z. X. Li (LMD/CNRS)
-    ! Date: 1993/08/18
+    ! Date: 1993 August 18th
     ! Objet : diffusion verticale de la vitesse
 
     ! Library:
