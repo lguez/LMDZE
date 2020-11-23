@@ -64,10 +64,7 @@ contains
     ! coefficients B de la résolution de la couche limite pour t et q
 
     REAL, intent(IN):: soilflux(:) ! (knon)
-    
-    real, intent(IN):: cal(:) ! (knon) RCPD / soilcap, où soilcap est
-    ! la capacité calorifique surfacique apparente du sol. En m2/kg.
-    
+    real, intent(IN):: cal(:) ! (knon) 1 / soilcap, in J-1 K m2
     real, intent(IN):: beta(:) ! (knon) évaporation réelle
     real, intent(IN):: dif_grnd ! coefficient de diffusion vers le sol profond
 
@@ -117,9 +114,9 @@ contains
     mh = coef * ah / oh
     dflux_s = - coef * RCPD / oh
 
-    tsurf_new = (tsurf + cal / RCPD * dtphys * (radsol + soilflux + mh + sl &
-         * mq) + dif_grnd * t_grnd * dtphys) / (1. - dtphys * cal / RCPD &
-         * (dflux_s + sl * nq) + dtphys * dif_grnd)
+    tsurf_new = (tsurf + cal * dtphys * (radsol + soilflux + mh + sl * mq) &
+         + dif_grnd * t_grnd * dtphys) / (1. - dtphys * cal * (dflux_s + sl &
+         * nq) + dtphys * dif_grnd)
     flux_q = mq + nq * tsurf_new
     fluxlat = flux_q * sl
     flux_t = mh + dflux_s * tsurf_new

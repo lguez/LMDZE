@@ -26,7 +26,7 @@ contains
     USE interfsur_lim_m, ONLY: interfsur_lim
     use limit_read_sst_m, only: limit_read_sst
     use soil_m, only: soil
-    USE suphec_m, ONLY: rcpd, rtt, rkappa
+    USE suphec_m, ONLY: rtt, rkappa
 
     integer, intent(in):: julien ! jour de l'annee en cours
     integer, intent(in):: nisurf ! index de la surface a traiter
@@ -158,7 +158,7 @@ contains
        CALL calcul_fluxs(qsurf, tsurf_new, flux_q, fluxlat, flux_t, dflux_s, &
             dflux_l, ts, pplay(:, 1), cdragh, paprs(:, 1), radsol, t(:, 1), &
             q(:, 1), u1lay, v1lay, ah, aq, bh, bq, soilflux, &
-            cal = RCPD / soilcap, beta = min(2. * qsol / max_eau_sol, 1.), &
+            cal = 1. / soilcap, beta = min(2. * qsol / max_eau_sol, 1.), &
             dif_grnd = 0.)
        CALL fonte_neige(is_ter, rain_fall, snow_fall, snow, qsol, tsurf_new, &
             - flux_q, fqcalving, ffonte, run_off_lic_0, run_off_lic)
@@ -203,7 +203,7 @@ contains
        CALL calcul_fluxs(qsurf, tsurf_new, flux_q, fluxlat, flux_t, dflux_s, &
             dflux_l, tsurf, pplay(:, 1), cdragh, paprs(:, 1), radsol, t(:, 1), &
             q(:, 1), u1lay, v1lay, ah, aq, bh, bq, soilflux, &
-            cal = RCPD / soilcap, beta = [(1., i = 1, knon)], &
+            cal = 1. / soilcap, beta = [(1., i = 1, knon)], &
             dif_grnd = 1. / tau_gl)
        CALL fonte_neige(is_sic, rain_fall, snow_fall, snow, qsol, &
             tsurf_new, - flux_q, fqcalving, ffonte, run_off_lic_0, run_off_lic)
@@ -223,7 +223,7 @@ contains
        call calcul_fluxs(qsurf, tsurf_new, flux_q, fluxlat, flux_t, dflux_s, &
             dflux_l, ts, pplay(:, 1), cdragh, paprs(:, 1), radsol, t(:, 1), &
             q(:, 1), u1lay, v1lay, ah, aq, bh, bq, soilflux, &
-            cal = RCPD / soilcap, beta = [(1., i = 1, knon)], dif_grnd = 0.)
+            cal = 1. / soilcap, beta = [(1., i = 1, knon)], dif_grnd = 0.)
        call fonte_neige(is_lic, rain_fall, snow_fall, snow, qsol, &
             tsurf_new, - flux_q, fqcalving, ffonte, run_off_lic_0, run_off_lic)
 
