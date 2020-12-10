@@ -25,7 +25,7 @@ endforeach(my_dir)
 
 add_executable(gcm ${CMAKE_CURRENT_LIST_DIR}/gcm.f90)
 target_include_directories(gcm PRIVATE ${XIOS_INCLUDE_DIR})
-target_link_libraries(gcm LMDZE_objects ${XIOS_LIBRARY}
+target_link_libraries(gcm PRIVATE LMDZE_objects ${XIOS_LIBRARY}
   stdc++ MPI::MPI_CXX)
 
 add_executable(test_fxhyp ${CMAKE_CURRENT_LIST_DIR}/test_fxhyp.f90)
