@@ -11,7 +11,7 @@ set(file_list_var aaam_bud.f90 ajsec.f90 chem.f90 clesphys2.f90
 list(TRANSFORM file_list_var PREPEND ${CMAKE_CURRENT_LIST_DIR}/)
 target_sources(LMDZE_objects PRIVATE ${file_list_var})
 
-foreach(my_dir Mobidic Thermcell Orography Radlwsw CV30_routines Conflx
+foreach(my_dir IN ITEMS Mobidic Thermcell Orography Radlwsw CV30_routines Conflx
     Interface_surf)
   include(${CMAKE_CURRENT_LIST_DIR}/${my_dir}/CMakeLists.txt)
 endforeach(my_dir)

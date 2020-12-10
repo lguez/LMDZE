@@ -19,8 +19,8 @@ set(file_list_var abort_gcm.f90 adaptdt.f90 addfi.f90 advect.f90
 list(TRANSFORM file_list_var PREPEND ${CMAKE_CURRENT_LIST_DIR}/)
 target_sources(LMDZE_objects PRIVATE ${file_list_var})
 
-foreach(my_dir Guide Dissipation Inter_barxy Vlsplt ADVN)
   include(${CMAKE_CURRENT_LIST_DIR}/${my_dir}/CMakeLists.txt)
+foreach(my_dir IN ITEMS Guide Dissipation Inter_barxy Vlsplt ADVN)
 endforeach(my_dir)
 
 add_executable(gcm ${CMAKE_CURRENT_LIST_DIR}/gcm.f90)
