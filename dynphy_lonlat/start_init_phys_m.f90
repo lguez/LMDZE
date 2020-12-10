@@ -24,6 +24,7 @@ CONTAINS
     ! both soil temperature and surface temperature, in K
     
     REAL, intent(out):: qsol_2d(:, :) ! (iim + 1, jjm + 1)
+    ! column-density of water in soil, in kg m-2
 
     ! Local:
     INTEGER iml_phys, jml_phys, ncid, varid

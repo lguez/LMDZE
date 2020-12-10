@@ -74,7 +74,8 @@ contains
     real tsol_2d(iim + 1, jjm + 1)
     ! both soil temperature and surface temperature, in K
 
-    real, dimension(iim + 1, jjm + 1):: qsol_2d, ps
+    real qsol_2d(iim + 1, jjm + 1) ! column-density of water in soil, in kg m-2
+    real ps(iim + 1, jjm + 1)
     REAL zmea(klon), zstd(klon)
     REAL zsig(klon), zgam(klon)
     REAL zthe(klon)
