@@ -16,10 +16,11 @@ find_package(NetCDF REQUIRED)
 find_package(MPI REQUIRED COMPONENTS CXX)
 
 add_library(LMDZE_objects OBJECT dimensions.f90)
+target_include_directories(LMDZE_objects INTERFACE ${PROJECT_BINARY_DIR})
 target_link_libraries(LMDZE_objects PUBLIC netcdf95 jumble numer_rec_95 nr_util)
 
-  include(${my_dir}/CMakeLists.txt)
 foreach(my_dir IN ITEMS dyn3d filtrez IOIPSL misc phylmd dynphy_lonlat)
+  add_subdirectory(${my_dir})
 endforeach(my_dir)
 
 include(ConfigureCompilerFlags)

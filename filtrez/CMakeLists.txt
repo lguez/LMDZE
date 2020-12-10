@@ -1,6 +1,6 @@
-file(STRINGS ${CMAKE_CURRENT_LIST_DIR}/file_list file_list_var)
-list(TRANSFORM file_list_var PREPEND ${CMAKE_CURRENT_LIST_DIR}/)
-target_sources(LMDZE_objects PRIVATE ${file_list_var})
+target_sources(LMDZE_objects PRIVATE filtreg_hemisph.f90
+  filtreg_scal.f90 filtreg_v.f90 inifgn.f90 inifilr.f90
+  inifilr_hemisph.f90)
 
-add_executable(test_inifilr ${CMAKE_CURRENT_LIST_DIR}/test_inifilr.f90)
+add_executable(test_inifilr test_inifilr.f90)
 target_link_libraries(test_inifilr LMDZE_objects)

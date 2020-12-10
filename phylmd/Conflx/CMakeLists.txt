@@ -1,4 +1,3 @@
-file(STRINGS ${CMAKE_CURRENT_LIST_DIR}/file_list file_list_var)
-list(TRANSFORM file_list_var PREPEND ${CMAKE_CURRENT_LIST_DIR}/)
-target_sources(LMDZE_objects PRIVATE ${file_list_var})
-
+target_sources(LMDZE_objects PRIVATE conflx.f90 flxadjtq.f90
+  flxasc.f90 flxbase.f90 flxddraf.f90 flxdlfs.f90 flxdtdq.f90
+  flxflux.f90 flxini.f90 flxmain.f90 YOECUMF.f90)
