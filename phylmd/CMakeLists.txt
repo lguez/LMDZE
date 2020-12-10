@@ -20,5 +20,4 @@ add_executable(test_orbite ${CMAKE_CURRENT_LIST_DIR}/test_orbite.f90)
 target_link_libraries(test_orbite PRIVATE LMDZE_objects)
 
 add_executable(test_ozonecm ${CMAKE_CURRENT_LIST_DIR}/test_ozonecm.f90)
-target_include_directories(test_ozonecm PRIVATE ${netcdff_INCLUDE_DIR})
 target_link_libraries(test_ozonecm PRIVATE LMDZE_objects)
