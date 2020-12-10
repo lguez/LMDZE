@@ -5,8 +5,8 @@ set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR})
 include(FindPkgConfig)
 pkg_check_modules(netcdf-fortran IMPORTED_TARGET netcdf-fortran)
 
-find_path(XIOS_INCLUDE_DIR xios.mod)
-find_library(XIOS_LIBRARY xios)
+find_path(XIOS_INCLUDE_DIR xios.mod REQUIRED)
+find_library(XIOS_LIBRARY xios REQUIRED)
 
 find_package(NR_util REQUIRED CONFIG)
 find_package(Jumble REQUIRED CONFIG)
