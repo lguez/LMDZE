@@ -11,15 +11,16 @@ contains
 
     USE comconst, ONLY : dtvr
     USE conf_gcm_m, ONLY : iapp_tracvl
-    USE dimensions, ONLY : jjm, llm, nqmx
+    USE dimensions, ONLY : iim, jjm, llm, nqmx
     use groupe_m, only: groupe
     USE infotrac_init_m, ONLY : iadv
     use massbar_m, only: massbar
-    USE paramet_m, ONLY : iip1, iip2, ijmllm, ijp1llm, ip1jm, ip1jmp1, llmp1
+    USE paramet_m, ONLY : iip1, iip2, ijmllm, ijp1llm, ip1jm, ip1jmp1
     use vlsplt_m, only: vlsplt
     use vlspltqs_m, only: vlspltqs
 
-    REAL, intent(in):: pbaru(ip1jmp1, llm), pbarv(ip1jm, llm)
+    REAL, intent(in):: pbaru(:, :, :) ! (iim + 1, jjm + 1, llm)
+    REAL, intent(in):: pbarv(:, :, :) ! (iim + 1, jjm, llm)
     REAL, intent(in):: p3d(:, :, :) ! (iim + 1, jjm + 1, llm + 1)
     real, intent(in):: masse(ip1jmp1, llm)
     REAL, intent(inout):: q(ip1jmp1, llm, nqmx)
@@ -30,8 +31,8 @@ contains
     ! Variables locales
 
     REAL massebx(ip1jmp1, llm), masseby(ip1jm, llm)
-    REAL, save, allocatable:: pbaruc(:, :) ! (ip1jmp1, llm)
-    REAL, save, allocatable:: pbarvc(:, :) ! (ip1jm, llm)
+    REAL, save, allocatable:: pbaruc(:, :, :) ! (iim + 1, jjm + 1, llm)
+    REAL, save, allocatable:: pbarvc(:, :, :) ! (iim + 1, jjm, llm)
     REAL, save, allocatable:: massem(:, :) ! (ip1jmp1, llm)
     real zdp(ip1jmp1)
     REAL pbarug(ip1jmp1, llm), pbarvg(ip1jm, llm), wg(ip1jmp1, llm)
@@ -49,7 +50,7 @@ contains
     !-----------------------------------------------------------
 
     if (first_call) then
-       allocate(pbaruc(ip1jmp1, llm), pbarvc(ip1jm, llm))
+       allocate(pbaruc(iim + 1, jjm + 1, llm), pbarvc(iim + 1, jjm, llm))
        allocate(massem(ip1jmp1, llm))
        first_call = .false.
     end if
@@ -60,14 +61,8 @@ contains
     END IF
 
     ! accumulation des flux de masse horizontaux
-    DO l = 1, llm
-       DO ij = 1, ip1jmp1
-          pbaruc(ij, l) = pbaruc(ij, l) + pbaru(ij, l)
-       END DO
-       DO ij = 1, ip1jm
-          pbarvc(ij, l) = pbarvc(ij, l) + pbarv(ij, l)
-       END DO
-    END DO
+    pbaruc = pbaruc + pbaru
+    pbarvc = pbarvc + pbarv
 
     ! selection de la masse instantannee des mailles avant le transport.
     IF (iadvtr==0) massem = masse

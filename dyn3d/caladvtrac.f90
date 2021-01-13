@@ -16,15 +16,14 @@ contains
     use advtrac_m, only: advtrac
     use conf_gcm_m, only: iapp_tracvl
     use dimensions, only: iim, jjm, llm
-    use paramet_m, only: ip1jmp1
     use qminimum_m, only: qminimum
 
     real, intent(inout):: q(:, :, :, :) ! (iim + 1, jjm + 1, llm, nqmx)
-    REAL, intent(in):: pbaru(ip1jmp1, llm), pbarv((iim + 1) * jjm, llm)
-    real, intent(in):: masse(iim + 1, jjm + 1, llm)
-    REAL, intent(in):: teta(ip1jmp1, llm)
-    real, intent(in):: pk(ip1jmp1, llm)
+    REAL, intent(in):: pbaru(:, :, :) ! (iim + 1, jjm + 1, llm)
+    REAL, intent(in):: pbarv(:, :, :) ! (iim + 1, jjm, llm)
     REAL, intent(in):: p3d(:, :, :) ! (iim + 1, jjm + 1, llm + 1)
+    real, intent(in), dimension(:, :, :):: masse, teta, pk
+    ! (iim + 1, jjm + 1, llm)
 
     ! Local:
     INTEGER l, iapptrac
