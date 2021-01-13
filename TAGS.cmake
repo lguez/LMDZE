@@ -20,9 +20,10 @@ function(tags_add_dir _dir)
     get_property(_t_files  TARGET ${_tgt} PROPERTY SOURCES)
     list(FILTER _t_files EXCLUDE REGEX TARGET_OBJECTS)
     
-    list(APPEND _all_source_files ${_t_files})
     string(REGEX REPLACE "${CMAKE_SOURCE_DIR}/" "" _t_files
       "${_t_files}")
+
+    list(APPEND _all_source_files ${_t_files})
   endforeach()
 
   set(_all_source_files ${_all_source_files} PARENT_SCOPE)
