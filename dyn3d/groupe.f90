@@ -8,9 +8,9 @@ contains
 
     ! From dyn3d/groupe.F, v 1.1.1.1 2004/05/19 12:53:06
 
-    ! sous-programme servant a fitlrer les champs de flux de masse aux    
-    ! poles en "regroupant" les mailles 2 par 2 puis 4 par 4 etc. au fur  
-    ! et a mesure qu'on se rapproche du pole.                             
+    ! Sous-programme servant \`a filtrer les champs de flux de masse
+    ! aux p\^oles en "regroupant" les mailles 2 par 2 puis 4 par 4
+    ! etc. au fur et \`a mesure qu'on se rapproche du p\^ole.
 
     ! en entree: pbaru et pbarv                                     
     ! en sortie:  pbarum, pbarvm et wm.                                    
