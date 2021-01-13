@@ -43,6 +43,7 @@ function(tags_add_dir _dir)
 endfunction()
 
 if(CTAGS)
+  ##variable_watch(_all_source_files)
   set(SOURCES_LIST "${CMAKE_BINARY_DIR}/sources_list")
   set(_all_source_files "")
   file(REMOVE "${SOURCES_LIST}")
