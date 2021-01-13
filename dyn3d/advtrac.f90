@@ -4,7 +4,7 @@ module advtrac_m
 
 contains
 
-  SUBROUTINE advtrac(pbaru, pbarv, p, masse, q, iapptrac, teta, pk)
+  SUBROUTINE advtrac(pbaru, pbarv, p3d, masse, q, iapptrac, teta, pk)
 
     ! From dyn3d/advtrac.F, version 1.4 2005/04/13 08:58:34
     ! Author: F. Hourdin
@@ -20,7 +20,7 @@ contains
     use vlspltqs_m, only: vlspltqs
 
     REAL, intent(in):: pbaru(ip1jmp1, llm), pbarv(ip1jm, llm)
-    REAL, intent(in):: p(ip1jmp1, llmp1)
+    REAL, intent(in):: p3d(:, :, :) ! (iim + 1, jjm + 1, llm + 1)
     real, intent(in):: masse(ip1jmp1, llm)
     REAL, intent(inout):: q(ip1jmp1, llm, nqmx)
     INTEGER, intent(out):: iapptrac
@@ -138,7 +138,7 @@ contains
              ! Schema "pseudo amont" + test sur humidite specifique
              ! pour la vapeur d'eau. F. Codron
              CALL vlspltqs(q(1, 1, 1), 2., massem, wg, pbarug, pbarvg, dtvr, &
-                  p, pk, teta)
+                  p3d, pk, teta)
           END select
        END DO
 
