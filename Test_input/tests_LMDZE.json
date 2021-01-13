@@ -1,45 +1,45 @@
 [
     {
 	"input" : "&dimensions_nml /\n&SERRE_NML /\n&dynetat0_nml /\n",
-	"command" : "$build_dir/test_fxhyp",
+	"command" : "$build_dir/dyn3d/test_fxhyp",
 	"title" : "Test_fxhyp_1"
     },
     {
 	"title" : "Test_fxhyp_2",
 	"input" :
 	"&dimensions_nml /\n&SERRE_NML CLON_DEG=  20./\n&dynetat0_nml /\n",
-	"command" : "$build_dir/test_fxhyp"
+	"command" : "$build_dir/dyn3d/test_fxhyp"
     },
     {
 	"input" :
 	"&dimensions_nml /\n&SERRE_NML GROSSISMX=  2./\n&dynetat0_nml /\n",
-	"command" : "$build_dir/test_fxhyp",
+	"command" : "$build_dir/dyn3d/test_fxhyp",
 	"title" : "Test_fxhyp_3",
 	"description": "GROSSISMX > 1"
     },
     {
 	"title" : "Test_fxhyp_4",
 	"stdin_filename" : "$test_input_dir/Namelists/test_fxhyp_nml_4.txt",
-	"command" : "$build_dir/test_fxhyp"
+	"command" : "$build_dir/dyn3d/test_fxhyp"
     },
     {
 	"title" : "Test_fxhyp_5",
 	"stdin_filename" : "$test_input_dir/Namelists/test_fxhyp_nml_5.txt",
-	"command" : "$build_dir/test_fxhyp"
+	"command" : "$build_dir/dyn3d/test_fxhyp"
     },
     {
 	"title" : "Test_fxhyp_6",
 	"stdin_filename" : "$test_input_dir/Namelists/test_fxhyp_nml_6.txt",
-	"command" : "$build_dir/test_fxhyp",
+	"command" : "$build_dir/dyn3d/test_fxhyp",
 	"description": "GROSSISMX = 1 + epsilon"
     },
     {
 	"title" : "Test_fxhyp_7",
-	"command" : "$build_dir/test_fxhyp",
+	"command" : "$build_dir/dyn3d/test_fxhyp",
 	"stdin_filename" : "$test_input_dir/Namelists/test_fxhyp_nml_7.txt"
     },
     {
-	"command" : "$build_dir/test_inifilr",
+	"command" : "$build_dir/filtrez/test_inifilr",
 	"input" : "&dimensions_nml /\n&SERRE_NML /\n&dynetat0_nml /\n",
 	"title" : "Test_inifilr_1"
     },
@@ -47,10 +47,10 @@
 	"title" : "Test_inifilr_2",
 	"input" :
 	"&dimensions_nml /\n&SERRE_NML CLON_DEG=  20./\n&dynetat0_nml /\n",
-	"command" : "$build_dir/test_inifilr"
+	"command" : "$build_dir/filtrez/test_inifilr"
     },
     {
-	"command" : "$build_dir/test_inifilr",
+	"command" : "$build_dir/filtrez/test_inifilr",
 	"input" :
 	"&dimensions_nml /\n&SERRE_NML GROSSISMX=  2./\n&dynetat0_nml /\n",
 	"title" : "Test_inifilr_3"
@@ -58,27 +58,27 @@
     {
 	"title" : "Test_inifilr_4",
 	"stdin_filename" : "$test_input_dir/Namelists/test_fxhyp_nml_4.txt",
-	"command" : "$build_dir/test_inifilr"
+	"command" : "$build_dir/filtrez/test_inifilr"
     },
     {
-	"command" : "$build_dir/test_inifilr",
+	"command" : "$build_dir/filtrez/test_inifilr",
 	"stdin_filename" : "$test_input_dir/Namelists/test_fxhyp_nml_5.txt",
 	"title" : "Test_inifilr_5"
     },
     {
 	"title" : "Test_inifilr_6",
 	"stdin_filename" : "$test_input_dir/Namelists/test_fxhyp_nml_6.txt",
-	"command" : "$build_dir/test_inifilr"
+	"command" : "$build_dir/filtrez/test_inifilr"
     },
     {
 	"title" : "Test_inifilr_7",
-	"command" : "$build_dir/test_inifilr",
+	"command" : "$build_dir/filtrez/test_inifilr",
 	"stdin_filename" : "$test_input_dir/Namelists/test_fxhyp_nml_7.txt"
     },
     {
 	"input" :
 	"&dimensions_nml /\n&SERRE_NML GROSSISMy = 2./\n&dynetat0_nml /\n",
-	"command" : "$build_dir/test_inifilr",
+	"command" : "$build_dir/filtrez/test_inifilr",
 	"title" : "Test_inifilr_8",
 	"description": "for colat0 < 0.5"
     },
@@ -97,11 +97,11 @@
             "$datasets_dir/Rugos.nc",
             "$test_input_dir/Namelists/traceur.def"
 	],
-	"command" : "$build_dir/ce0l",
+	"command" : "$build_dir/dynphy_lonlat/ce0l",
 	"stdin_filename" : "$test_input_dir/Namelists/ce0l_nml_control.txt"
     },
     {
-	"command" : "$build_dir/ce0l",
+	"command" : "$build_dir/dynphy_lonlat/ce0l",
 	"stdin_filename" : "$test_input_dir/Namelists/ce0l_nml_zoom.txt",
 	"title" : "CE0L_zoom",
 	"required" :
@@ -120,7 +120,7 @@
     },
     {
 	"stdin_filename" : "$test_input_dir/Namelists/gcm_nml_control.txt",
-	"command" : "$build_dir/gcm",
+	"command" : "$build_dir/dyn3d/gcm",
 	"required" : [
             "$tests_old_dir/CE0L_control/limit.nc",
             "$tests_old_dir/CE0L_control/coefoz_LMDZ.nc",
@@ -135,7 +135,7 @@
 	"title" : "GCM_control"
     },
     {
-	"command" : "$build_dir/gcm",
+	"command" : "$build_dir/dyn3d/gcm",
 	"stdin_filename" : "$test_input_dir/Namelists/gcm_nml_Tiedke.txt",
 	"title" : "GCM_Tiedke",
 	"required" : [
@@ -155,7 +155,7 @@
     },
     {
 	"stdin_filename" : "$test_input_dir/Namelists/gcm_nml_nudging.txt",
-	"command" : "$build_dir/gcm",
+	"command" : "$build_dir/dyn3d/gcm",
 	"required" : [
             "$tests_old_dir/CE0L_control/limit.nc",
             "$tests_old_dir/CE0L_control/coefoz_LMDZ.nc",
@@ -182,7 +182,7 @@
     },
     {
 	"stdin_filename" : "$test_input_dir/Namelists/gcm_nml_ini_anal.txt",
-	"command" : "$build_dir/gcm",
+	"command" : "$build_dir/dyn3d/gcm",
 	"title" : "GCM_ini_anal",
 	"required" : [
             "$tests_old_dir/CE0L_control/limit.nc",
@@ -239,11 +239,11 @@
             ]
 	],
 	"title" : "GCM_nudging_Tq",
-	"command" : "$build_dir/gcm",
+	"command" : "$build_dir/dyn3d/gcm",
 	"stdin_filename" : "$test_input_dir/Namelists/gcm_nml_nudging_Tq.txt"
     },
     {
-	"command" : "$build_dir/gcm",
+	"command" : "$build_dir/dyn3d/gcm",
 	"stdin_filename" : "$test_input_dir/Namelists/gcm_nml_control.txt",
 	"title" : "GCM_zoom_control",
 	"required" : [
@@ -277,12 +277,12 @@
             "$test_input_dir/iodef.xml"
 	],
 	"title" : "GCM_zoom_Tiedke",
-	"command" : "$build_dir/gcm",
+	"command" : "$build_dir/dyn3d/gcm",
 	"stdin_filename" : "$test_input_dir/Namelists/gcm_nml_Tiedke.txt"
     },
     {
 	"stdin_filename" : "$test_input_dir/Namelists/gcm_nml_control.txt",
-	"command" : "$build_dir/gcm",
+	"command" : "$build_dir/dyn3d/gcm",
 	"title" : "GCM_control_day_2",
 	"required" : [
             "$tests_old_dir/CE0L_control/limit.nc",
@@ -301,7 +301,7 @@
     },
     {
 	"stdin_filename" : "$test_input_dir/Namelists/control_2_days.txt",
-	"command" : "$build_dir/gcm",
+	"command" : "$build_dir/dyn3d/gcm",
 	"required" : [
             "$tests_old_dir/CE0L_control/limit.nc",
             "$tests_old_dir/CE0L_control/coefoz_LMDZ.nc",
@@ -317,7 +317,7 @@
     },
     {
 	"stdin_filename" : "$test_input_dir/Namelists/gcm_nml_Tiedke.txt",
-	"command" : "$build_dir/gcm",
+	"command" : "$build_dir/dyn3d/gcm",
 	"title" : "GCM_Tiedke_day_2",
 	"required" : [
             "$tests_old_dir/CE0L_control/limit.nc",
@@ -336,7 +336,7 @@
     },
     {
 	"stdin_filename" : "$test_input_dir/Namelists/gcm_nml_nudging.txt",
-	"command" : "$build_dir/gcm",
+	"command" : "$build_dir/dyn3d/gcm",
 	"title" : "GCM_nudging_day_2",
 	"required" : [
             "$tests_old_dir/CE0L_control/limit.nc",
@@ -394,7 +394,7 @@
             ]
 	],
 	"stdin_filename" : "$test_input_dir/Namelists/gcm_nml_nudging_Tq.txt",
-	"command" : "$build_dir/gcm"
+	"command" : "$build_dir/dyn3d/gcm"
     },
     {
 	"required" : [
@@ -412,11 +412,11 @@
             "$test_input_dir/iodef.xml"
 	],
 	"title" : "GCM_zoom_control_day_2",
-	"command" : "$build_dir/gcm",
+	"command" : "$build_dir/dyn3d/gcm",
 	"stdin_filename" : "$test_input_dir/Namelists/gcm_nml_control.txt"
     },
     {
-	"command" : "$build_dir/gcm",
+	"command" : "$build_dir/dyn3d/gcm",
 	"stdin_filename" : "$test_input_dir/Namelists/gcm_nml_Tiedke.txt",
 	"required" : [
             "$tests_old_dir/CE0L_zoom/limit.nc",
@@ -435,7 +435,7 @@
 	"title" : "GCM_zoom_Tiedke_day_2"
     },
     {
-	"command" : "$build_dir/gcm",
+	"command" : "$build_dir/dyn3d/gcm",
 	"stdin_filename" : "$test_input_dir/Namelists/gcm_nml_nudging.txt",
 	"title" : "GCM_zoom_nudging",
 	"required" : [
@@ -462,7 +462,7 @@
 	]
     },
     {
-	"command" : "$build_dir/gcm",
+	"command" : "$build_dir/dyn3d/gcm",
 	"stdin_filename" : "$test_input_dir/Namelists/gcm_nml_ini_anal.txt",
 	"required" : [
             "$tests_old_dir/CE0L_zoom/limit.nc",
@@ -498,12 +498,12 @@
 	    "$test_input_dir/Namelists/traceur.def",
             "$test_input_dir/iodef.xml"
 	],
-	"command": "$build_dir/gcm",
+	"command": "$build_dir/dyn3d/gcm",
 	"stdin_filename" : "$test_input_dir/Namelists/gcm_nml_no_phys.txt"
     },
     {
 	"stdin_filename" : "$test_input_dir/Namelists/gcm_nml_ade.txt",
-	"command" : "$build_dir/gcm",
+	"command" : "$build_dir/dyn3d/gcm",
 	"required" : [
             "$tests_old_dir/CE0L_control/limit.nc",
             "$tests_old_dir/CE0L_control/coefoz_LMDZ.nc",
@@ -522,7 +522,7 @@
     },
     {
 	"stdin_filename" : "$test_input_dir/Namelists/gcm_nml_pbl_6.txt",
-	"command" : "$build_dir/gcm",
+	"command" : "$build_dir/dyn3d/gcm",
 	"required" : [
             "$tests_old_dir/CE0L_control/limit.nc",
             "$tests_old_dir/CE0L_control/coefoz_LMDZ.nc",
@@ -541,7 +541,7 @@
     },
     {
 	"stdin_filename" : "$test_input_dir/Namelists/gcm_nml_pbl_8.txt",
-	"command" : "$build_dir/gcm",
+	"command" : "$build_dir/dyn3d/gcm",
 	"required" : [
             "$tests_old_dir/CE0L_control/limit.nc",
             "$tests_old_dir/CE0L_control/coefoz_LMDZ.nc",
@@ -560,7 +560,7 @@
     },
     {
 	"stdin_filename" : "$test_input_dir/Namelists/gcm_nml_pbl_9.txt",
-	"command" : "$build_dir/gcm",
+	"command" : "$build_dir/dyn3d/gcm",
 	"required" : [
             "$tests_old_dir/CE0L_control/limit.nc",
             "$tests_old_dir/CE0L_control/coefoz_LMDZ.nc",
@@ -579,7 +579,7 @@
     },
     {
 	"stdin_filename" : "$test_input_dir/Namelists/gcm_nml_pbl_0.txt",
-	"command" : "$build_dir/gcm",
+	"command" : "$build_dir/dyn3d/gcm",
 	"required" : [
             "$tests_old_dir/CE0L_control/limit.nc",
             "$tests_old_dir/CE0L_control/coefoz_LMDZ.nc",
@@ -598,7 +598,7 @@
     },
     {
 	"stdin_filename" : "$test_input_dir/Namelists/gcm_no_kzmin.txt",
-	"command" : "$build_dir/gcm",
+	"command" : "$build_dir/dyn3d/gcm",
 	"required" : [
             "$tests_old_dir/CE0L_control/limit.nc",
             "$tests_old_dir/CE0L_control/coefoz_LMDZ.nc",
@@ -617,12 +617,12 @@
 	"description": "ok_kzmin = f"
     },
     {
-	"command" : "$build_dir/test_inter_barxy",
+	"command" : "$build_dir/dyn3d/Inter_barxy/test_inter_barxy",
 	"title": "Test_inter_barxy",
 	"stdin_filename": "$test_input_dir/Namelists/test_inter_barxy_nml.txt"
     },
     {
-	"command" : "$build_dir/test_ozonecm",
+	"command" : "$build_dir/phylmd/test_ozonecm",
 	"title": "Test_ozonecm",
 	"stdin_filename": "$test_input_dir/Namelists/test_ozonecm_nml.txt"
     },
@@ -640,7 +640,7 @@
             "$datasets_dir/Rugos.nc",
             "$test_input_dir/Namelists/traceur.def"
 	],
-	"command" : "$build_dir/ce0l",
+	"command" : "$build_dir/dynphy_lonlat/ce0l",
 	"stdin_filename" : "$test_input_dir/Namelists/disvert_CMIP5.txt"
     },
     {
@@ -657,7 +657,7 @@
             "$datasets_dir/Rugos.nc",
             "$test_input_dir/Namelists/traceur.def"
 	],
-	"command" : "$build_dir/ce0l",
+	"command" : "$build_dir/dynphy_lonlat/ce0l",
 	"stdin_filename" : "$test_input_dir/Namelists/disvert_CMIP6.txt"
     },
     {
@@ -674,17 +674,17 @@
             "$datasets_dir/Rugos.nc",
             "$test_input_dir/Namelists/traceur.def"
 	],
-	"command" : "$build_dir/ce0l",
+	"command" : "$build_dir/dynphy_lonlat/ce0l",
 	"stdin_filename" : "$test_input_dir/Namelists/disvert_CMIP3.txt"
     },
     {
 	"title": "Test_orbite",
-	"command": "$build_dir/test_orbite",
+	"command": "$build_dir/phylmd/test_orbite",
 	"stdout": "test_orbite.csv"
     },
     {
 	"stdin_filename" : "$test_input_dir/Namelists/gcm_nml_thermals.txt",
-	"command" : "$build_dir/gcm",
+	"command" : "$build_dir/dyn3d/gcm",
 	"required" : [
             "$tests_old_dir/CE0L_control/limit.nc",
             "$tests_old_dir/CE0L_control/coefoz_LMDZ.nc",
@@ -703,7 +703,7 @@
     },
     {
 	"input" : "&logic_nml /\n&conf_gcm_nml /\n&soil_nml /\n",
-	"command" : "$build_dir/test_soil",
+	"command" : "$build_dir/phylmd/test_soil",
 	"title" : "Test_soil"
     }
 ]
