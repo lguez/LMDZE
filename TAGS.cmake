@@ -49,8 +49,8 @@ if(CTAGS)
   tags_add_dir(${CMAKE_SOURCE_DIR})
   list(SORT _all_source_files)
   list(REMOVE_DUPLICATES _all_source_files)
-  file(APPEND ${SOURCES_LIST} "\n${_asf}")
   string(REGEX REPLACE ";" "\n" _asf "${_all_source_files}")
+  file(APPEND ${SOURCES_LIST} "${_asf}\n")
   add_custom_target(TAGS DEPENDS ${CMAKE_SOURCE_DIR}/TAGS)
 
   add_custom_command(OUTPUT ${CMAKE_SOURCE_DIR}/TAGS
