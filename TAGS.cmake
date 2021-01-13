@@ -13,6 +13,10 @@ function(tags_add_dir _dir)
     tags_add_dir(${_sd})
   endforeach()
 
+  if(NOT _dir STREQUAL CMAKE_SOURCE_DIR)
+    string(REPLACE "${CMAKE_SOURCE_DIR}/" "" rel_dir "${_dir}")
+  endif()
+
   get_property(_targets_list DIRECTORY "${_dir}" PROPERTY
     BUILDSYSTEM_TARGETS)
 
@@ -20,10 +24,19 @@ function(tags_add_dir _dir)
     get_property(_t_files  TARGET ${_tgt} PROPERTY SOURCES)
     list(FILTER _t_files EXCLUDE REGEX TARGET_OBJECTS)
     
-    string(REGEX REPLACE "${CMAKE_SOURCE_DIR}/" "" _t_files
-      "${_t_files}")
-
-    list(APPEND _all_source_files ${_t_files})
+    foreach(my_file IN LISTS _t_files)
+      if(my_file MATCHES "${CMAKE_SOURCE_DIR}/(.*)")
+	list(APPEND _all_source_files ${CMAKE_MATCH_1})
+      else()
+	get_filename_component(my_dir ${my_file} DIRECTORY)
+	
+	if(my_dir OR _dir STREQUAL CMAKE_SOURCE_DIR)
+	  list(APPEND _all_source_files ${my_file})
+	else()
+	  list(APPEND _all_source_files "${rel_dir}/${my_file}")
+	endif()
+      endif()
+    endforeach()
   endforeach()
 
   set(_all_source_files ${_all_source_files} PARENT_SCOPE)
@@ -36,12 +49,8 @@ if(CTAGS)
   tags_add_dir(${CMAKE_SOURCE_DIR})
   list(SORT _all_source_files)
   list(REMOVE_DUPLICATES _all_source_files)
-
-  string(REGEX REPLACE "${CMAKE_SOURCE_DIR}/" "" _asf
-    "${_all_source_files}")
-
-  string(REGEX REPLACE ";" "\n" _asf "${_asf}")
   file(APPEND ${SOURCES_LIST} "\n${_asf}")
+  string(REGEX REPLACE ";" "\n" _asf "${_all_source_files}")
   add_custom_target(TAGS DEPENDS ${CMAKE_SOURCE_DIR}/TAGS)
 
   add_custom_command(OUTPUT ${CMAKE_SOURCE_DIR}/TAGS
