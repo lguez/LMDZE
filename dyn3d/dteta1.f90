@@ -12,6 +12,7 @@ contains
     ! Calcul du terme de convergence horizontale du flux d'enthalpie
     ! potentielle.
 
+    use convflu_m, only: convflu
     USE dimensions, ONLY: iim, jjm, llm
     USE paramet_m, ONLY: iip1, iip2, ip1jm, ip1jmp1
     USE filtreg_scal_m, ONLY: filtreg_scal

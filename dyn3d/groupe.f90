@@ -18,6 +18,7 @@ contains
     ! remarque, le wm est recalcule a partir des pbaru pbarv et on n'a    
     ! donc pas besoin de w en entree.
 
+    use convflu_m, only: convflu
     USE dimensions
     USE paramet_m
     USE comconst

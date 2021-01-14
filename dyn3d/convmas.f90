@@ -8,6 +8,7 @@ contains
 
     ! From LMDZ4/libf/dyn3d/convmas.F, version 1.1.1.1, 2004/05/19 12:53:07
 
+    use convflu_m, only: convflu
     USE dimensions, ONLY: iim, jjm, llm
     USE paramet_m, ONLY: ip1jm, ip1jmp1, llmm1
     USE filtreg_scal_m, ONLY: filtreg_scal
