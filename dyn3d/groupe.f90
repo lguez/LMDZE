@@ -19,25 +19,22 @@ contains
     ! donc pas besoin de w en entree.
 
     use convflu_m, only: convflu
-    USE dimensions
-    USE paramet_m
-    USE comconst
-    USE disvert_m
-    USE comgeom
+    USE dimensions, only: iim, jjm, llm
+    USE paramet_m, only: iip1, jjp1, ijmllm, ijp1llm
     use vitvert_m, only: vitvert
-
-    INTEGER, PARAMETER:: ngroup = 3
 
     REAL pbaru(iip1, jjp1, llm), pbarv(iip1, jjm, llm)
     REAL, intent(out):: pbarum(iip1, jjp1, llm)
     real pbarvm(iip1, jjm, llm)
     REAL wm(iip1, jjp1, llm)
 
+    ! Local:
     REAL zconvm(iip1, jjp1, llm), zconvmm(iip1, jjp1, llm)
     REAL uu
     INTEGER i, j, l
     LOGICAL:: firstcall = .TRUE.
-
+    INTEGER, PARAMETER:: ngroup = 3
+    
     !------------------------------------------------------
 
     IF (firstcall) THEN

@@ -13,13 +13,13 @@ contains
     ! Calcule convergence horizontale * aire locale du flux ayant pour
     ! composantes xflu et yflu, variables extensives.
 
-    ! nbniv est le nombre de niveaux vert. de xflu et de yflu.
-
-    use dimensions
-    use paramet_m
-    use comgeom
+    use dimensions, only: iim
+    use paramet_m, only: ip1jmp1, ip1jm, iip1, iip2
+    use comgeom, only: apoln, apols, aire
 
     integer, intent(in):: nbniv
+    ! nombre de niveaux verticauw de xflu et de yflu
+
     REAL, intent(in):: xflu(ip1jmp1, nbniv), yflu(ip1jm, nbniv)
     real, intent(out):: convfl(ip1jmp1, nbniv)
 
@@ -35,17 +35,15 @@ contains
                yflu(ij +1, l) - yflu(ij -iim, l)
        end DO
 
-       ! correction pour convfl(1, j, l)
-       ! convfl(1, j, l)= convfl(iip1, j, l)
-
        DO ij = iip2, ip1jm, iip1
           convfl(ij, l) = convfl(ij + iim, l)
        end DO
 
-       ! calcul aux pôles
+       ! Calcul aux p\^oles :
 
        convpn = SSUM(iim, yflu(1, l), 1)
        convps = - SSUM(iim, yflu(ip1jm-iim, l), 1)
+       
        DO ij = 1, iip1
           convfl(ij, l) = convpn * aire(ij) / apoln
           convfl(ij+ ip1jm, l) = convps * aire(ij+ ip1jm) / apols
