@@ -50,8 +50,8 @@ contains
     zconvmm = zconvm
     pbarvm = pbarv
 
-    CALL groupeun(jjp1, llm, zconvmm)
-    CALL groupeun(jjm, llm, pbarvm)
+    CALL groupeun(zconvmm)
+    CALL groupeun(pbarvm)
 
     ! Champs 3D                                                           
 

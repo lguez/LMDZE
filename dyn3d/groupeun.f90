@@ -4,7 +4,7 @@ module groupeun_m
 
 contains
 
-  SUBROUTINE groupeun(jjmax, llmax, q)
+  SUBROUTINE groupeun(q)
 
     ! From LMDZ4/libf/dyn3d/groupeun.F, version 1.1.1.1 2004/05/19
     ! 12:53:07
@@ -13,8 +13,7 @@ contains
     USE paramet_m, only: iip1, jjp1
     USE comgeom, only: aire_2d
 
-    INTEGER jjmax, llmax
-    REAL q(iip1, jjmax, llmax)
+    REAL, intent(inout):: q(:, :, :) ! (iim + 1, :, llm)
 
     ! Local:
     INTEGER, PARAMETER:: ngroup=3
@@ -25,7 +24,7 @@ contains
     !-------------------------------------------------------------------
 
     ! Champs 3D
-    jd = jjp1 - jjmax
+    jd = jjp1 - size(q, 2)
     DO l = 1, llm
        j1 = 1 + jd
        j2 = 2
