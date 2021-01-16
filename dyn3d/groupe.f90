@@ -44,7 +44,6 @@ contains
     END IF
 
     ! Champs 1D                                                           
-
     CALL convflu(pbaru, pbarv, llm, zconvm)
     pbarvm = pbarv
     CALL groupeun(zconvm)
@@ -55,17 +54,21 @@ contains
     DO l = 1, llm
        DO j = 2, jjm
           uu = pbaru(iim, j, l)
+          
           DO i = 1, iim
              uu = uu + pbarvm(i, j, l) - pbarvm(i, j-1, l) - zconvm(i, j, l)
              pbarum(i, j, l) = uu
           END DO
+          
           pbarum(iip1, j, l) = pbarum(1, j, l)
        END DO
     END DO
+    
     pbarum(:, 1, :) = 0
     pbarum(:, jjm + 1, :) = 0
 
-    ! integration de la convergence de masse de haut  en bas
+    ! Int\'egration de la convergence de masse de haut en bas :
+    
     DO l = 1, llm
        DO j = 1, jjp1
           DO i = 1, iip1
@@ -73,6 +76,7 @@ contains
           END DO
        END DO
     END DO
+    
     DO l = llm - 1, 1, -1
        DO j = 1, jjp1
           DO i = 1, iip1

@@ -64,13 +64,10 @@ contains
     if (iphysiq <= 0 .or. iperiod <= 0 .or. day_step <= 0) &
          call abort_gcm("conf_gcm", &
          "iphysiq <= 0 or iperiod <= 0 or day_step <= 0")
-
     IF (MOD(day_step, iperiod) /= 0) call abort_gcm("conf_gcm", &
          'Il faut choisir un nombre de pas par jour multiple de "iperiod".')
-
     IF (MOD(day_step, iphysiq)/= 0) call abort_gcm("conf_gcm", &
          'Il faut choisir un nombre de pas par jour multiple de "iphysiq".')
-
     call assert(mod(iphysiq, iperiod) == 0, &
          "conf_gcm -- iphysiq must be multiple of iperiod")
 
