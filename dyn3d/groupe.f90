@@ -27,7 +27,7 @@ contains
     REAL, intent(out):: wm(iip1, jjp1, llm)
 
     ! Local:
-    REAL zconvm(iip1, jjp1, llm), zconvmm(iip1, jjp1, llm)
+    REAL zconvm(iip1, jjp1, llm)
     REAL uu
     INTEGER i, j, l
     LOGICAL:: firstcall = .TRUE.
@@ -46,11 +46,8 @@ contains
     ! Champs 1D                                                           
 
     CALL convflu(pbaru, pbarv, llm, zconvm)
-
-    zconvmm = zconvm
     pbarvm = pbarv
-
-    CALL groupeun(zconvmm)
+    CALL groupeun(zconvm)
     CALL groupeun(pbarvm)
 
     ! Champs 3D                                                           
@@ -59,7 +56,7 @@ contains
        DO j = 2, jjm
           uu = pbaru(iim, j, l)
           DO i = 1, iim
-             uu = uu + pbarvm(i, j, l) - pbarvm(i, j-1, l) - zconvmm(i, j, l)
+             uu = uu + pbarvm(i, j, l) - pbarvm(i, j-1, l) - zconvm(i, j, l)
              pbarum(i, j, l) = uu
           END DO
           pbarum(iip1, j, l) = pbarum(1, j, l)
@@ -72,19 +69,19 @@ contains
     DO l = 1, llm
        DO j = 1, jjp1
           DO i = 1, iip1
-             zconvmm(i, j, l) = zconvmm(i, j, l)
+             zconvm(i, j, l) = zconvm(i, j, l)
           END DO
        END DO
     END DO
     DO l = llm - 1, 1, -1
        DO j = 1, jjp1
           DO i = 1, iip1
-             zconvmm(i, j, l) = zconvmm(i, j, l) + zconvmm(i, j, l+1)
+             zconvm(i, j, l) = zconvm(i, j, l) + zconvm(i, j, l+1)
           END DO
        END DO
     END DO
 
-    wm = vitvert(zconvmm)
+    wm = vitvert(zconvm)
 
   END SUBROUTINE groupe
 
