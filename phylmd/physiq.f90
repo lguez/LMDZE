@@ -20,16 +20,15 @@ contains
 
     use aaam_bud_m, only: aaam_bud
     USE abort_gcm_m, ONLY: abort_gcm
-    use comgeom, only:  aire_2d
     use ajsec_m, only: ajsec
     use calltherm_m, only: calltherm
     USE clesphys, ONLY: cdhmax, cdmmax, ok_instan
     USE clesphys2, ONLY: conv_emanuel, nbapp_rad, ok_orodr, ok_orolf
-    USE conf_interface_m, ONLY: conf_interface
-    USE pbl_surface_m, ONLY: pbl_surface
     use clouds_gno_m, only: clouds_gno
+    use comgeom, only:  aire_2d
     USE concvl_m, ONLY: concvl
     USE conf_gcm_m, ONLY: nday, lmt_pas, dtphys
+    USE conf_interface_m, ONLY: conf_interface
     USE conf_phys_m, ONLY: conf_phys
     use conflx_m, only: conflx
     USE ctherm_m, ONLY: iflag_thermals, ctherm
@@ -51,18 +50,19 @@ contains
     use newmicro_m, only: newmicro
     USE orbite_m, ONLY: orbite
     USE ozonecm_m, ONLY: ozonecm
+    USE pbl_surface_m, ONLY: pbl_surface
     USE phyetat0_m, ONLY: phyetat0, itau_phy
     USE phyredem_m, ONLY: phyredem
     USE phyredem0_m, ONLY: phyredem0
     USE phytrac_m, ONLY: phytrac
     use radlwsw_m, only: radlwsw
-    use yoegwd, only: sugwd
     USE suphec_m, ONLY: rcpd, retv, rg, rlvtt, romega, rtt, rmo3, md
     use time_phylmdz, only: itap, increment_itap
     use transp_m, only: transp
     use transp_lay_m, only: transp_lay
     use unit_nml_m, only: unit_nml
     USE ymds2ju_m, ONLY: ymds2ju
+    use yoegwd, only: sugwd
     USE yoethf_m, ONLY: r2es, rvtmp2
     use zenang_m, only: zenang
 

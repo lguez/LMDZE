@@ -44,7 +44,6 @@ contains
   SUBROUTINE conf_gcm
 
     ! Auteurs : L. Fairhead, P. Le Van
-    ! Version du 29/04/97
 
     use abort_gcm_m, only: abort_gcm
     use comconst, only: daysec

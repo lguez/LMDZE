@@ -15,7 +15,6 @@ contains
     ! Remarque : wm est recalcul\'e \`a partir de pbaru et pbarv, et
     ! on n'a donc pas besoin de w en entr\'ee.
 
-    use conf_gcm_m, only: ngroup
     use convflu_m, only: convflu
     use groupeun_m, only: groupeun
     USE dimensions, only: iim, jjm, llm
@@ -62,7 +61,7 @@ contains
     DO l = llm - 1, 1, -1
        DO j = 1, jjp1
           DO i = 1, iip1
-             zconvm(i, j, l) = zconvm(i, j, l) + zconvm(i, j, l+1)
+             zconvm(i, j, l) = zconvm(i, j, l) + zconvm(i, j, l + 1)
           END DO
        END DO
     END DO
