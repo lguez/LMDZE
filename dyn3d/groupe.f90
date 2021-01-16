@@ -59,15 +59,6 @@ contains
     pbarum(:, jjm + 1, :) = 0
 
     ! Int\'egration de la convergence de masse de haut en bas :
-    
-    DO l = 1, llm
-       DO j = 1, jjp1
-          DO i = 1, iip1
-             zconvm(i, j, l) = zconvm(i, j, l)
-          END DO
-       END DO
-    END DO
-    
     DO l = llm - 1, 1, -1
        DO j = 1, jjp1
           DO i = 1, iip1
