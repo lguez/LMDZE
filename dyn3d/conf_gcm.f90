@@ -45,7 +45,7 @@ contains
     ! Version du 29/04/97
 
     use abort_gcm_m, only: abort_gcm
-    use dimensions, only: iim
+    use dimensions, only: iim, jjm
     use nr_util, only: assert
     use unit_nml_m, only: unit_nml
 
@@ -76,7 +76,8 @@ contains
     lmt_pas = day_step / iphysiq
     print *, 'Number of time steps of "physics" per day: ', lmt_pas
 
-    call assert(mod(iim, 2**ngroup) == 0, "iim must be multiple of 2**ngroup")
+    call assert(mod(iim, 2**ngroup) == 0 .and. 2**ngroup <= jjm + 1, &
+         "conf_gcm: ngroup")
 
   END SUBROUTINE conf_gcm
 
