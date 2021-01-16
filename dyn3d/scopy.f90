@@ -4,7 +4,10 @@ subroutine scopy(n, sx, incx, sy, incy)
 
   ! This subroutine should not exist in a Fortran 95 program. If the
   ! actual arguments 2 and 4 are of rank 1 then replace each call to
-  ! this subroutine by the simple statement in this subroutine.
+  ! this subroutine by the simple statement in this subroutine. If the
+  ! actual arguments 2 and 4 have the same shape and incx == 1 and
+  ! incy == 1 then replace each call to this subroutine by the simple
+  ! statement sy = sx.
 
   IMPLICIT NONE
 

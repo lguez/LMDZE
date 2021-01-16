@@ -23,6 +23,7 @@ contains
     REAL, intent(in):: xflu(ip1jmp1, nbniv), yflu(ip1jm, nbniv)
     real, intent(out):: convfl(ip1jmp1, nbniv)
 
+    ! Local:
     real convpn, convps
     INTEGER l, ij
     REAL SSUM

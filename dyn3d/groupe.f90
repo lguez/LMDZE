@@ -12,21 +12,17 @@ contains
     ! aux p\^oles en "regroupant" les mailles 2 par 2 puis 4 par 4
     ! etc. au fur et \`a mesure qu'on se rapproche du p\^ole.
 
-    ! en entree: pbaru et pbarv                                     
-    ! en sortie:  pbarum, pbarvm et wm.                                    
-
-    ! remarque, le wm est recalcule a partir des pbaru pbarv et on n'a    
-    ! donc pas besoin de w en entree.
+    ! Remarque : wm est recalcul\'e \`a partir de pbaru et pbarv, et
+    ! on n'a donc pas besoin de w en entr\'ee.
 
     use convflu_m, only: convflu
     USE dimensions, only: iim, jjm, llm
-    USE paramet_m, only: iip1, jjp1, ijmllm, ijp1llm
+    USE paramet_m, only: iip1, jjp1
     use vitvert_m, only: vitvert
 
-    REAL pbaru(iip1, jjp1, llm), pbarv(iip1, jjm, llm)
-    REAL, intent(out):: pbarum(iip1, jjp1, llm)
-    real pbarvm(iip1, jjm, llm)
-    REAL wm(iip1, jjp1, llm)
+    REAL, intent(in):: pbaru(iip1, jjp1, llm), pbarv(iip1, jjm, llm)
+    REAL, intent(out):: pbarum(iip1, jjp1, llm), pbarvm(iip1, jjm, llm)
+    REAL, intent(out):: wm(iip1, jjp1, llm)
 
     ! Local:
     REAL zconvm(iip1, jjp1, llm), zconvmm(iip1, jjp1, llm)
