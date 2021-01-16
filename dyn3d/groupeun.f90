@@ -6,28 +6,25 @@ contains
 
   SUBROUTINE groupeun(jjmax, llmax, q)
 
-    ! $Header: /home/cvsroot/LMDZ4/libf/dyn3d/groupeun.F,v 1.1.1.1 2004/05/19
-    ! 12:53:07 lmdzadmin Exp $
+    ! From LMDZ4/libf/dyn3d/groupeun.F, version 1.1.1.1 2004/05/19
+    ! 12:53:07
 
-    USE dimensions
-    USE paramet_m
-    USE comconst
-    USE comgeom
-    IMPLICIT NONE
-
+    USE dimensions, only: iim, llm
+    USE paramet_m, only: iip1, jjp1
+    USE comgeom, only: aire_2d
 
     INTEGER jjmax, llmax
     REAL q(iip1, jjmax, llmax)
 
-    INTEGER ngroup
-    PARAMETER (ngroup=3)
-
+    ! Local:
+    INTEGER, PARAMETER:: ngroup=3
     REAL airen, qn
     REAL aires, qs
-
     INTEGER i, j, l, ig, j1, j2, i0, jd
 
-    ! hamps 3D
+    !-------------------------------------------------------------------
+
+    ! Champs 3D
     jd = jjp1 - jjmax
     DO l = 1, llm
        j1 = 1 + jd
@@ -58,7 +55,6 @@ contains
        END DO
     END DO
 
-    RETURN
   END SUBROUTINE groupeun
 
 end module groupeun_m

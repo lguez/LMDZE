@@ -28,7 +28,7 @@ contains
     real, intent(in):: teta(ip1jmp1, llm)
     REAL, intent(in):: pk(ip1jmp1, llm)
 
-    ! Variables locales
+    ! Local:
 
     REAL massebx(ip1jmp1, llm), masseby(ip1jm, llm)
     REAL, save, allocatable:: pbaruc(:, :, :) ! (iim + 1, jjm + 1, llm)
