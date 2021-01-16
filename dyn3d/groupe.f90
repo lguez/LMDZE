@@ -45,8 +45,8 @@ contains
 
     CALL convflu(pbaru, pbarv, llm, zconvm)
 
-    CALL scopy(ijp1llm, zconvm, 1, zconvmm, 1)
-    CALL scopy(ijmllm, pbarv, 1, pbarvm, 1)
+    zconvmm = zconvm
+    pbarvm = pbarv
 
     CALL groupeun(jjp1, llm, zconvmm)
     CALL groupeun(jjm, llm, pbarvm)
