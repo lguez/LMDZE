@@ -35,7 +35,8 @@ module conf_gcm_m
 
   logical, protected:: iflag_phys = .true. ! call parameterizations of physics
   INTEGER, SAVE, protected:: lmt_pas ! number of time steps of "physics" per day
-
+  INTEGER, protected:: ngroup = 3
+  
 contains
 
   SUBROUTINE conf_gcm
@@ -44,11 +45,12 @@ contains
     ! Version du 29/04/97
 
     use abort_gcm_m, only: abort_gcm
+    use dimensions, only: iim
     use nr_util, only: assert
     use unit_nml_m, only: unit_nml
 
     namelist /conf_gcm_nml/ raz_date, nday, day_step, iperiod, iapp_tracvl, &
-         iconser, periodav, iphysiq
+         iconser, periodav, iphysiq, ngroup
     namelist /logic_nml/ purmats, iflag_phys
 
     !------------------------------------
@@ -73,6 +75,8 @@ contains
 
     lmt_pas = day_step / iphysiq
     print *, 'Number of time steps of "physics" per day: ', lmt_pas
+
+    call assert(mod(iim, 2**ngroup) == 0, "iim must be multiple of 2**ngroup")
 
   END SUBROUTINE conf_gcm
 

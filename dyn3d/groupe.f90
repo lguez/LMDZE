@@ -15,6 +15,7 @@ contains
     ! Remarque : wm est recalcul\'e \`a partir de pbaru et pbarv, et
     ! on n'a donc pas besoin de w en entr\'ee.
 
+    use conf_gcm_m, only: ngroup
     use convflu_m, only: convflu
     use groupeun_m, only: groupeun
     USE dimensions, only: iim, jjm, llm
@@ -30,18 +31,8 @@ contains
     REAL zconvm(iip1, jjp1, llm)
     REAL uu
     INTEGER i, j, l
-    LOGICAL:: firstcall = .TRUE.
-    INTEGER, PARAMETER:: ngroup = 3
     
     !------------------------------------------------------
-
-    IF (firstcall) THEN
-       IF (mod(iim, 2**ngroup) /= 0) then
-          print *, 'groupe: bad iim'
-          STOP 1
-       end IF
-       firstcall = .FALSE.
-    END IF
 
     ! Champs 1D                                                           
     CALL convflu(pbaru, pbarv, llm, zconvm)

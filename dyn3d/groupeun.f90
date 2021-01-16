@@ -12,11 +12,11 @@ contains
     USE dimensions, only: iim
     USE paramet_m, only: iip1, jjp1
     USE comgeom, only: aire_2d
+    use conf_gcm_m, only: ngroup
 
     REAL, intent(inout):: q(:, :, :) ! (iim + 1, jjm or jjm + 1, llm)
 
     ! Local:
-    INTEGER, PARAMETER:: ngroup=3
     REAL airen, qn
     REAL aires, qs
     INTEGER i, j, l, ig, j1, j2, i0, jd
