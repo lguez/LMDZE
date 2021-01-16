@@ -16,6 +16,7 @@ contains
     ! on n'a donc pas besoin de w en entr\'ee.
 
     use convflu_m, only: convflu
+    use groupeun_m, only: groupeun
     USE dimensions, only: iim, jjm, llm
     USE paramet_m, only: iip1, jjp1
     use vitvert_m, only: vitvert
