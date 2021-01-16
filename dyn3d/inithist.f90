@@ -14,7 +14,7 @@ contains
     ! Routine d'initialisation des écritures des fichiers histoires au
     ! format IOIPSL.
 
-    use comconst, only: dtvr
+    use conf_gcm_m, only: dtvr
     USE dimensions, ONLY: jjm, llm, nqmx
     USE disvert_m, ONLY: presnivs
     use dynetat0_m, only: itau_dyn, rlatu, rlatv, rlonu, rlonv

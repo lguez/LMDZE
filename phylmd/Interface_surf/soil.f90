@@ -47,8 +47,8 @@ contains
 
     use nr_util, only: pi
 
-    use comconst, only: dtphys, daysec
-    use conf_gcm_m, only: lmt_pas
+    use comconst, only: daysec
+    use conf_gcm_m, only: lmt_pas, dtphys
     USE dimsoil, only: nsoilmx
     USE indicesol, only: is_lic, is_oce, is_sic, is_ter
     USE suphec_m, only: rtt

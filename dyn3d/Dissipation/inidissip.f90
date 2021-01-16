@@ -19,10 +19,9 @@ contains
     ! Initialisation de la dissipation horizontale. Calcul des valeurs
     ! propres des opérateurs par méthode itérative.
 
-    USE comconst, ONLY: dtvr
     use comdissnew, only: nitergdiv, nitergrot, niterh, tetagdiv, tetagrot, &
          tetatemp
-    USE conf_gcm_m, ONLY: iperiod
+    USE conf_gcm_m, ONLY: iperiod, dtvr
     USE dimensions, ONLY: iim, jjm, llm
     USE disvert_m, ONLY: preff, presnivs
     use divgrad2_m, only: divgrad2

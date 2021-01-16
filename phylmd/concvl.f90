@@ -13,7 +13,7 @@ contains
     ! Date: 1993 August 18
     ! Objet : schéma de convection d'Emanuel (1991), interface
 
-    use comconst, only: dtphys
+    use conf_gcm_m, only: dtphys
     use cv_driver_m, only: cv_driver
     USE dimphy, ONLY: klev, klon
     USE fcttre, ONLY: foeew

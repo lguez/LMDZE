@@ -10,8 +10,8 @@ contains
 
     ! Addition of the physical tendencies
 
-    USE comconst, ONLY: dtphys
     USE comgeom, ONLY: aire, apoln, apols
+    USE conf_gcm_m, ONLY: dtphys
     USE dimensions, ONLY: iim, jjm, llm, nqmx
 
     ! First and second components of the covariant velocity:

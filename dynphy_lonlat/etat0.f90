@@ -9,7 +9,7 @@ contains
     ! From "etat0_netcdf.F", version 1.3, 2005/05/25 13:10:09
 
     use caldyn0_m, only: caldyn0
-    use comconst, only: cpp, kappa, iniconst
+    use comconst, only: cpp, kappa
     use comgeom, only: aire_2d, apoln, apols, cu_2d, cv_2d, inigeom
     use dimensions, only: iim, jjm, llm, nqmx
     use dimphy, only: klon
@@ -111,8 +111,6 @@ contains
     !---------------------------------
 
     print *, "Call sequence information: etat0"
-
-    CALL iniconst
 
     ! Construct a grid:
 

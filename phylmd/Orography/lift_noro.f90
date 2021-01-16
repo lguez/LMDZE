@@ -10,7 +10,7 @@ contains
     ! Author: F.Lott (LMD/CNRS) date: 1995/02/01
     ! Objet: Frottement de la montagne, interface
 
-    use comconst, only: dtphys
+    use conf_gcm_m, only: dtphys
     USE dimphy, only: klon, klev
     use orolift_m, only: orolift
     use phyetat0_m, only: rlat

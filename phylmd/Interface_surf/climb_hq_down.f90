@@ -8,7 +8,7 @@ contains
        t, coefh, delp, q)
 
     use calc_coef_m, only: calc_coef
-    use comconst, only: dtphys
+    use conf_gcm_m, ONLY: dtphys
     USE conf_phys_m, ONLY: iflag_pbl
     USE dimphy, ONLY: klev
     USE suphec_m, ONLY: rcpd, rd, rg, rkappa

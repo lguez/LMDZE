@@ -14,7 +14,7 @@ contains
 
     ! Several modules corresponding to different physical processes
 
-    use comconst, only: dtphys
+    use conf_gcm_m, only: dtphys
     use cv30_closure_m, only: cv30_closure
     use cv30_compress_m, only: cv30_compress
     use cv30_feed_m, only: cv30_feed

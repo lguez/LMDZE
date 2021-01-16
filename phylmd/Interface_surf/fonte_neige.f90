@@ -15,7 +15,7 @@ contains
     ! Library:
     use nr_util, only: assert_eq
 
-    use comconst, only: dtphys
+    use conf_gcm_m, only: dtphys
     USE indicesol, ONLY: epsfra, is_lic, is_sic, is_ter
     USE conf_interface_m, ONLY: tau_calv
     USE suphec_m, ONLY: rday, rlmlt, rtt

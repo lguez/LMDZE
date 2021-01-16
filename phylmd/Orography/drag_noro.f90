@@ -12,7 +12,7 @@ contains
     ! Author: F. Lott (LMD/CNRS). Date: 1995/02/01.
     ! Objet : frottement de la montagne, interface.
 
-    use comconst, only: dtphys
+    use conf_gcm_m, only: dtphys
     USE dimphy, ONLY: klev, klon
     use orodrag_m, only: orodrag
     USE suphec_m, ONLY: rd, rg

@@ -11,7 +11,7 @@ contains
 
     ! Thermiques.
 
-    use comconst, only: dtphys
+    use conf_gcm_m, only: dtphys
     USE ctherm_m, ONLY: nsplit_thermals
     USE dimphy, ONLY: klev, klon
     use thermcell_m, only: thermcell

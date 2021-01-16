@@ -7,7 +7,7 @@ contains
   subroutine climb_hq_up(d_t, d_q, cq, dq, ch, dh, ah, aq, bh, bq, flux_t, &
        flux_q, pkf, t, q)
 
-    use comconst, only: dtphys
+    use conf_gcm_m, only: dtphys
     USE dimphy, ONLY: klev
     USE suphec_m, ONLY: rcpd
 

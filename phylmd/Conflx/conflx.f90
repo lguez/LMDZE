@@ -20,7 +20,7 @@ contains
     ! par Olivier Boucher et Alexandre Armengaud pour le mélange et le
     ! lessivage des traceurs passifs.
 
-    use comconst, only: dtphys
+    use conf_gcm_m, only: dtphys
     USE dimphy, ONLY: klev, klon
     USE fcttre, ONLY: foeew
     use flxmain_m, only: flxmain

@@ -2,7 +2,6 @@ program test_soil
 
   use jumble, only: new_unit
 
-  use comconst, only: iniconst
   use conf_gcm_m, only: conf_gcm
   USE dimsoil, only: nsoilmx
   USE indicesol, only: is_ter
@@ -27,7 +26,6 @@ program test_soil
   call set_unit_nml
   open(unit_nml, file="used_namelists.txt", status="replace", action="write")
   CALL conf_gcm
-  CALL iniconst
   tsoil = 270.
   call soil(is_ter, [0.], [288.], tsoil, soilcap, soilflux)
   call new_unit(unit)

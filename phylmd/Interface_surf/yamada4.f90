@@ -15,7 +15,7 @@ contains
     ! Library:
     use nr_util, only: assert, assert_eq
 
-    use comconst, only: dtphys
+    use conf_gcm_m, ONLY: dtphys
     USE conf_phys_m, ONLY: iflag_pbl
     USE dimphy, ONLY: klev
     USE suphec_m, ONLY: rg

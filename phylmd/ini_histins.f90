@@ -12,7 +12,7 @@ contains
 
     use clesphys, only: ecrit_ins, ok_instan
     use clesphys2, only: conv_emanuel
-    use comconst, only: dtphys
+    use conf_gcm_m, only: dtphys
     use dimensions, only: iim, jjm, llm, nqmx
     use disvert_m, only: presnivs
     use dynetat0_m, only: rlatu, rlonv

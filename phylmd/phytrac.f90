@@ -32,8 +32,7 @@ contains
     use clesphys2, only: conv_emanuel
     use cltrac_m, only: cltrac
     use cltracrn_m, only: cltracrn
-    use comconst, only: dtphys
-    USE conf_gcm_m, ONLY: lmt_pas
+    USE conf_gcm_m, ONLY: lmt_pas, dtphys
     use ctherm_m, only: iflag_thermals
     use cvltr_m, only: cvltr
     use dimensions, only: llm, nqmx

@@ -36,8 +36,7 @@ contains
     use netcdf95, only: nf95_open, nf95_inq_varid, NF95_CLOSE, NF95_Gw_VAR
     use nr_util, only: assert
 
-    use comconst, only: dtvr
-    use conf_gcm_m, only: raz_date
+    use conf_gcm_m, only: dtvr, raz_date
     use dimensions, only: iim, jjm, llm
     use unit_nml_m, only: unit_nml
 

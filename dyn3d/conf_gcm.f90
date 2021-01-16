@@ -36,7 +36,9 @@ module conf_gcm_m
   logical, protected:: iflag_phys = .true. ! call parameterizations of physics
   INTEGER, SAVE, protected:: lmt_pas ! number of time steps of "physics" per day
   INTEGER, protected:: ngroup = 3
-  
+  REAL, protected:: dtvr ! time step for dynamics, in s
+  REAL, protected:: dtphys ! time step for physics, in s
+
 contains
 
   SUBROUTINE conf_gcm
@@ -45,6 +47,7 @@ contains
     ! Version du 29/04/97
 
     use abort_gcm_m, only: abort_gcm
+    use comconst, only: daysec
     use dimensions, only: iim, jjm
     use nr_util, only: assert
     use unit_nml_m, only: unit_nml
@@ -78,6 +81,11 @@ contains
 
     call assert(mod(iim, 2**ngroup) == 0 .and. 2**ngroup <= jjm + 1, &
          "conf_gcm: ngroup")
+
+    dtvr = daysec / real(day_step)
+    dtphys  = iphysiq * dtvr
+    print *, 'dtvr = ', dtvr
+    print *, 'dtphys = ', dtphys
 
   END SUBROUTINE conf_gcm
 

@@ -1,6 +1,5 @@
 program test_inter_barxy
 
-  use comconst, only: iniconst
   use comdissnew, only: read_comdissnew
   use comgeom, only: inigeom
   use conf_gcm_m, only: conf_gcm
@@ -42,7 +41,6 @@ program test_inter_barxy
 
   CALL conf_gcm
   call read_comdissnew
-  CALL iniconst
   call read_serre
   CALL fyhyp
   CALL fxhyp

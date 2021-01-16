@@ -9,8 +9,7 @@ contains
     ! From dyn3d/advtrac.F, version 1.4 2005/04/13 08:58:34
     ! Author: F. Hourdin
 
-    USE comconst, ONLY : dtvr
-    USE conf_gcm_m, ONLY : iapp_tracvl
+    USE conf_gcm_m, ONLY : iapp_tracvl, dtvr
     USE dimensions, ONLY : iim, jjm, llm, nqmx
     use groupe_m, only: groupe
     USE infotrac_init_m, ONLY : iadv

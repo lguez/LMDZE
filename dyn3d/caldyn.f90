@@ -13,9 +13,9 @@ contains
 
     use advect_m, only: advect
     use bernoui_m, only: bernoui
-    USE comconst, ONLY: daysec, dtvr
+    USE comconst, ONLY: daysec
     USE comgeom, ONLY: airesurg_2d, constang_2d
-    USE conf_gcm_m, ONLY: day_step
+    USE conf_gcm_m, ONLY: day_step, dtvr
     use convmas_m, only: convmas
     use covcont_m, only: covcont
     USE dimensions, ONLY: iim, jjm, llm

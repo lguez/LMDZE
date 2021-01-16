@@ -37,7 +37,7 @@ contains
     ! From LMDZ4/libf/phylmd/cv3_routines.F, version 1.5, 2005/07/11 15:20:02
     ! SET CONSTANTS AND PARAMETERS
 
-    use comconst, only: dtphys
+    use conf_gcm_m, only: dtphys
     USE dimphy, ONLY: klev
 
     ! Local:

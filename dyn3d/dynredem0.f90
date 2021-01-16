@@ -11,7 +11,8 @@ CONTAINS
     ! From dyn3d/dynredem.F, version 1.2, 2004/06/22 11:45:30
     ! \'Ecriture du fichier de red\'emarrage au format NetCDF (initialisation)
 
-    USE comconst, ONLY: cpp, daysec, dtvr, g, kappa, omeg, rad
+    USE comconst, ONLY: cpp, daysec, g, kappa, omeg, rad
+    USE conf_gcm_m, ONLY: dtvr
     USE dimensions, ONLY: iim, jjm, llm, nqmx
     USE disvert_m, ONLY: ap, bp, preff, presnivs
     use dynetat0_m, only: rlatu, rlatv, rlonu, rlonv, rlatu1, rlatu2, yprimu1, &

@@ -15,7 +15,7 @@ contains
 
     ! From LMDZ4/libf/dyn3d/bilan_dyn.F, version 1.5 2005/03/16 10:12:17
 
-    use comconst, only: dtvr
+    use conf_gcm_m, only: dtvr
     USE conf_gcm_m, ONLY: day_step, iperiod, periodav
     USE dimensions, ONLY: jjm, llm
     USE disvert_m, ONLY: presnivs

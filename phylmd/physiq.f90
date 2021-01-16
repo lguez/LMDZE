@@ -28,9 +28,8 @@ contains
     USE conf_interface_m, ONLY: conf_interface
     USE pbl_surface_m, ONLY: pbl_surface
     use clouds_gno_m, only: clouds_gno
-    use comconst, only: dtphys
     USE concvl_m, ONLY: concvl
-    USE conf_gcm_m, ONLY: nday, lmt_pas
+    USE conf_gcm_m, ONLY: nday, lmt_pas, dtphys
     USE conf_phys_m, ONLY: conf_phys
     use conflx_m, only: conflx
     USE ctherm_m, ONLY: iflag_thermals, ctherm

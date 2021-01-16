@@ -19,7 +19,7 @@ contains
     ! Libraries:
     use nr_util, only: assert_eq
 
-    use comconst, only: dtphys
+    use conf_gcm_m, only: dtphys
     USE fcttre, ONLY: foede, foeew
     USE suphec_m, ONLY: rcpd, rd, retv, rlstt, rlvtt, rtt
     USE yoethf_m, ONLY: r2es, r5ies, r5les, rvtmp2

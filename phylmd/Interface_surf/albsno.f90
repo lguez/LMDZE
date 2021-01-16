@@ -10,7 +10,7 @@ contains
 
     ! Calcul \^age de la neige.
 
-    use comconst, only: dtphys
+    use conf_gcm_m, only: dtphys
 
     REAL, intent(inout):: agesno(:) ! (knon) age of snow, in days
     real, intent(out):: alb_neig(:) ! (knon)

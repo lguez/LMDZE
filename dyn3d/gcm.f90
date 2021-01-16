@@ -12,7 +12,6 @@ PROGRAM gcm
   use netcdf95, only: nf95_close
   use xios, only: xios_initialize, xios_finalize
 
-  use comconst, only: iniconst
   use comdissnew, only: read_comdissnew
   use comgeom, only:  inigeom
   use conf_gcm_m, only: day_step, iperiod, iphysiq, nday, conf_gcm, iflag_phys
@@ -90,7 +89,6 @@ PROGRAM gcm
   endif
 
   call infotrac_init
-  CALL iniconst
   CALL dynetat0_chosen
   CALL dynetat0(vcov, ucov, teta, q, masse, ps, phis)
   CALL disvert
