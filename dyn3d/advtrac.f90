@@ -54,7 +54,7 @@ contains
        first_call = .false.
     end if
 
-    IF (iadvtr==0) THEN
+    IF (iadvtr == 0) THEN
        CALL initial0(ijp1llm, pbaruc)
        CALL initial0(ijmllm, pbarvc)
     END IF
@@ -64,7 +64,7 @@ contains
     pbarvc = pbarvc + pbarv
 
     ! selection de la masse instantannee des mailles avant le transport.
-    IF (iadvtr==0) massem = masse
+    IF (iadvtr == 0) massem = masse
 
     iadvtr = iadvtr + 1
     iapptrac = iadvtr
