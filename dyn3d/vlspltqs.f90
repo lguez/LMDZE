@@ -29,6 +29,7 @@ contains
     USE paramet_m, ONLY : iip1, iip2, ijp1llm, ip1jm, ip1jmp1, llmp1
     USE comconst, ONLY : cpp
     use SUPHEC_M, only: rtt
+    use vlyqs_m, only: vlyqs
 
     ! Arguments:
 
