@@ -28,4 +28,4 @@ target_link_libraries(gcm PRIVATE LMDZE_objects NetCDF95::netcdf95
   ${XIOS_LIBRARY} stdc++ MPI::MPI_CXX)
 
 add_executable(test_fxhyp test_fxhyp.f90)
-target_link_libraries(test_fxhyp LMDZE_objects)
+target_link_libraries(test_fxhyp PRIVATE LMDZE_objects)

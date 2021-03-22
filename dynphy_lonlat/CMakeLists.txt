@@ -3,4 +3,4 @@ target_sources(LMDZE_objects PRIVATE calfis.f90 etat0.f90
   start_init_phys_m.f90 start_inter_3d.f90 test_disvert.f90)
 
 add_executable(ce0l ce0l.f90)
-target_link_libraries(ce0l LMDZE_objects)
+target_link_libraries(ce0l PRIVATE LMDZE_objects)
