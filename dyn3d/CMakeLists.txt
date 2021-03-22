@@ -22,10 +22,9 @@ foreach(my_dir IN ITEMS Guide Dissipation Inter_barxy Vlsplt ADVN)
 endforeach(my_dir)
 
 add_executable(gcm gcm.f90)
-target_include_directories(gcm PRIVATE ${XIOS_INCLUDE_DIR})
 
 target_link_libraries(gcm PRIVATE LMDZE_objects NetCDF95::netcdf95
-  ${XIOS_LIBRARY} stdc++ MPI::MPI_CXX)
+  XIOS)
 
 add_executable(test_fxhyp test_fxhyp.f90)
 target_link_libraries(test_fxhyp PRIVATE LMDZE_objects)
