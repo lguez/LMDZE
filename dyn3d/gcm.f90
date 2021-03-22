@@ -12,7 +12,8 @@ PROGRAM gcm
   use netcdf95, only: nf95_close
   use mpi_f08, only: mpi_init, mpi_finalize, mpi_comm_size, mpi_comm_world, &
        mpi_abort
-  use xios, only: xios_initialize, xios_finalize
+  use xios, only: xios_initialize, xios_finalize, xios_context_initialize, &
+       xios_context_finalize, xios_close_context_definition
 
   use comdissnew, only: read_comdissnew
   use comgeom, only:  inigeom
@@ -56,7 +57,7 @@ PROGRAM gcm
   REAL, ALLOCATABLE:: phis(:, :) ! (iim + 1, jjm + 1) ! g\'eopotentiel au sol
 
   LOGICAL:: true_calendar = .false. ! default value
-  integer i, n_proc
+  integer i, n_proc, return_comm
 
   namelist /main_nml/true_calendar
 
@@ -65,8 +66,9 @@ PROGRAM gcm
   call mpi_init
   call mpi_comm_size(mpi_comm_world, n_proc)
   if (n_proc /= 1) call mpi_abort(mpi_comm_world, errorcode = 1)
-  call xios_initialize("LMDZE")
-  
+  call xios_initialize("LMDZE", return_comm = return_comm)
+  CALL xios_context_initialize("LMDZE_context", return_comm)
+
   call set_unit_nml
   open(unit_nml, file="used_namelists.txt", status="replace", action="write")
 
@@ -86,6 +88,8 @@ PROGRAM gcm
   read (unit=*, nml=main_nml)
   write(unit_nml, nml=main_nml)
 
+  call xios_close_context_definition
+  
   ! Choix du calendrier :
   if (true_calendar) then
      call ioconf_calendar('gregorian')
@@ -122,6 +126,7 @@ PROGRAM gcm
 
   print *, 'Simulation finished'
   print *, 'Everything is cool'
+  CALL xios_context_finalize
   call xios_finalize
   call mpi_finalize
 

@@ -46,11 +46,14 @@ contains
     ! Auteurs : L. Fairhead, P. Le Van
 
     use nr_util, only: assert
+    use xios, only: xios_duration, xios_set_timestep
 
     use abort_gcm_m, only: abort_gcm
     use comconst, only: daysec
     use dimensions, only: iim, jjm
     use unit_nml_m, only: unit_nml
+
+    TYPE(xios_duration) dtime
 
     namelist /conf_gcm_nml/ raz_date, nday, day_step, iperiod, iapp_tracvl, &
          iconser, periodav, iphysiq, ngroup
@@ -86,6 +89,8 @@ contains
     dtphys  = iphysiq * dtvr
     print *, 'dtvr = ', dtvr
     print *, 'dtphys = ', dtphys
+    dtime%second = 3600
+    call xios_set_timestep(dtime)
 
   END SUBROUTINE conf_gcm
 
