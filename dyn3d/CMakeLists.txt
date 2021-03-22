@@ -23,8 +23,8 @@ endforeach(my_dir)
 
 add_executable(gcm gcm.f90)
 
-target_link_libraries(gcm PRIVATE LMDZE_objects NetCDF95::netcdf95
-  XIOS)
+target_link_libraries(gcm PRIVATE LMDZE_objects MPI::MPI_Fortran
+  NetCDF95::netcdf95 XIOS)
 
 add_executable(test_fxhyp test_fxhyp.f90)
 target_link_libraries(test_fxhyp PRIVATE LMDZE_objects)

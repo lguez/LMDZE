@@ -10,6 +10,8 @@ PROGRAM gcm
 
   ! Libraries:
   use netcdf95, only: nf95_close
+  use mpi_f08, only: mpi_init, mpi_finalize, mpi_comm_size, mpi_comm_world, &
+       mpi_abort
   use xios, only: xios_initialize, xios_finalize
 
   use comdissnew, only: read_comdissnew
@@ -54,12 +56,15 @@ PROGRAM gcm
   REAL, ALLOCATABLE:: phis(:, :) ! (iim + 1, jjm + 1) ! g\'eopotentiel au sol
 
   LOGICAL:: true_calendar = .false. ! default value
-  integer i
+  integer i, n_proc
 
   namelist /main_nml/true_calendar
 
   !------------------------------------------------------------
 
+  call mpi_init
+  call mpi_comm_size(mpi_comm_world, n_proc)
+  if (n_proc /= 1) call mpi_abort(mpi_comm_world, errorcode = 1)
   call xios_initialize("LMDZE")
   
   call set_unit_nml
@@ -118,5 +123,6 @@ PROGRAM gcm
   print *, 'Simulation finished'
   print *, 'Everything is cool'
   call xios_finalize
+  call mpi_finalize
 
 END PROGRAM gcm
