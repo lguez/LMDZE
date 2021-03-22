@@ -60,6 +60,8 @@ PROGRAM gcm
 
   !------------------------------------------------------------
 
+  call xios_initialize("LMDZE")
+  
   call set_unit_nml
   open(unit_nml, file="used_namelists.txt", status="replace", action="write")
 
@@ -79,8 +81,6 @@ PROGRAM gcm
   read (unit=*, nml=main_nml)
   write(unit_nml, nml=main_nml)
 
-  call xios_initialize("LMDZE")
-  
   ! Choix du calendrier :
   if (true_calendar) then
      call ioconf_calendar('gregorian')
@@ -115,9 +115,8 @@ PROGRAM gcm
      call nf95_close(Ncid(i))
   end do
 
-  call xios_finalize
-
   print *, 'Simulation finished'
   print *, 'Everything is cool'
+  call xios_finalize
 
 END PROGRAM gcm

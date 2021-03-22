@@ -2,9 +2,6 @@ cmake_minimum_required(VERSION 3.16)
 project(LMDZE LANGUAGES Fortran CXX)
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR})
 
-find_path(XIOS_INCLUDE_DIR xios.mod REQUIRED)
-find_library(XIOS_LIBRARY xios REQUIRED)
-
 find_package(NR_util REQUIRED CONFIG)
 find_package(Jumble REQUIRED CONFIG)
 find_package(Numer_Rec_95 REQUIRED CONFIG)
@@ -12,6 +9,9 @@ find_package(NetCDF95 REQUIRED CONFIG)
 find_package(NetCDF REQUIRED)
 find_package(MPI REQUIRED COMPONENTS CXX)
 find_package(NetCDF_Fortran REQUIRED)
+
+find_path(XIOS_INCLUDE_DIR xios.mod REQUIRED)
+find_library(XIOS_LIBRARY xios REQUIRED)
 
 add_library(LMDZE_objects OBJECT dimensions.f90)
 target_include_directories(LMDZE_objects INTERFACE ${PROJECT_BINARY_DIR})
