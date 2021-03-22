@@ -16,7 +16,7 @@ find_library(XIOS_LIBRARY xios REQUIRED)
 add_library(LMDZE_objects OBJECT dimensions.f90)
 target_include_directories(LMDZE_objects INTERFACE ${PROJECT_BINARY_DIR})
 
-target_link_libraries(LMDZE_objects PUBLIC NetCDF95::netcdf95
+target_link_libraries(LMDZE_objects PRIVATE NetCDF95::netcdf95
   NetCDF_Fortran::NetCDF_Fortran jumble numer_rec_95 nr_util)
 
 foreach(my_dir IN ITEMS dyn3d filtrez IOIPSL misc phylmd dynphy_lonlat)
