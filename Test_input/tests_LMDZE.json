@@ -704,6 +704,7 @@
     {
 	"input" : "&logic_nml /\n&conf_gcm_nml /\n&soil_nml /\n",
 	"command" : "$build_dir/phylmd/Interface_surf/test_soil",
-	"title" : "Test_soil"
+	"title" : "Test_soil", 
+        "required": ["$test_input_dir/iodef.xml"]
     }
 ]
