@@ -2,7 +2,6 @@ program test_inter_barxy
 
   use comdissnew, only: read_comdissnew
   use comgeom, only: inigeom
-  use conf_gcm_m, only: conf_gcm
   use dimensions, only: iim, jjm, set_dimensions
   USE dynetat0_m, only: rlonu, rlatv, fyhyp, fxhyp
   use dynetat0_chosen_m, only: read_serre
@@ -39,7 +38,6 @@ program test_inter_barxy
   allocate(lat_rad(jml_dyn-1), lat_ini(jml_dyn))
   allocate(var_ana3d(iml_dyn, jml_dyn))
 
-  CALL conf_gcm
   call read_comdissnew
   call read_serre
   CALL fyhyp

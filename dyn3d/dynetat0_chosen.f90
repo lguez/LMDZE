@@ -36,7 +36,7 @@ contains
     use netcdf95, only: nf95_open, nf95_inq_varid, NF95_CLOSE, NF95_Gw_VAR
     use nr_util, only: assert
 
-    use conf_gcm_m, only: dtvr, raz_date
+    use conf_gcm_m, only: raz_date
     use dimensions, only: iim, jjm, llm
     use unit_nml_m, only: unit_nml
 
@@ -59,14 +59,6 @@ contains
     call assert(int(tab_cntrl(1)) == iim, "dynetat0_chosen tab_cntrl iim") 
     call assert(int(tab_cntrl(2)) == jjm, "dynetat0_chosen tab_cntrl jjm") 
     call assert(int(tab_cntrl(3)) == llm, "dynetat0_chosen tab_cntrl llm") 
-
-    IF (dtvr /= tab_cntrl(12)) THEN
-       print *, 'Warning: the time steps from day_step and "start.nc" ' // &
-            'are different.'
-       print *, 'dtvr from day_step: ', dtvr
-       print *, 'dtvr from "start.nc": ', tab_cntrl(12)
-       print *, 'Using the value from day_step.'
-    ENDIF
 
     pa = tab_cntrl(18)
     clon = tab_cntrl(20)

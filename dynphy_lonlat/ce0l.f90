@@ -3,7 +3,6 @@ PROGRAM ce0l
   ! This program sets the initial and boundary values.
 
   use comdissnew, only: read_comdissnew
-  use conf_gcm_m, only: conf_gcm
   use dimensions, only: iim, jjm, set_dimensions
   use dimphy, only: klon, init_dimphy
   use dynetat0_chosen_m, only: read_serre
@@ -32,7 +31,6 @@ PROGRAM ce0l
   call init_dimphy
   ALLOCATE(phis(iim + 1, jjm + 1))
   ALLOCATE(pctsrf(klon, nbsrf))
-  CALL conf_gcm
   call read_comdissnew
   call read_serre
   CALL etat0(phis, pctsrf)

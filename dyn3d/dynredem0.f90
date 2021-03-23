@@ -12,7 +12,6 @@ CONTAINS
     ! \'Ecriture du fichier de red\'emarrage au format NetCDF (initialisation)
 
     USE comconst, ONLY: cpp, daysec, g, kappa, omeg, rad
-    USE conf_gcm_m, ONLY: dtvr
     USE dimensions, ONLY: iim, jjm, llm, nqmx
     USE disvert_m, ONLY: ap, bp, preff, presnivs
     use dynetat0_m, only: rlatu, rlatv, rlonu, rlonv, rlatu1, rlatu2, yprimu1, &
@@ -72,7 +71,7 @@ CONTAINS
     tab_cntrl(9) = cpp
     tab_cntrl(10) = kappa
     tab_cntrl(11) = daysec
-    tab_cntrl(12) = dtvr
+    tab_cntrl(12) = 0.
     tab_cntrl(13) = etot0
     tab_cntrl(14) = ptot0
     tab_cntrl(15) = ztot0
