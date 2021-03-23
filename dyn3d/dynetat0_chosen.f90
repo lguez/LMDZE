@@ -69,7 +69,6 @@ contains
     ENDIF
 
     pa = tab_cntrl(18)
-
     clon = tab_cntrl(20)
     clat = tab_cntrl(21)
     grossismx = tab_cntrl(22)

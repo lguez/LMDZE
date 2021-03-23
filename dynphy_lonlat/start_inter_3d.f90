@@ -8,13 +8,14 @@ contains
 
     ! This procedure gets a 3D variable from a file and interpolates it.
 
+    use netcdf, only: nf90_nowrite
+    use netcdf95, only: nf95_open, nf95_close, nf95_get_var, nf95_inq_varid
     use nr_util, only: assert_eq
     use numer_rec_95, only: spline, splint
+
     use inter_barxy_m, only: inter_barxy
     use gr_int_dyn_m, only: gr_int_dyn
     use conf_dat3d_m, only: conf_dat3d
-    use netcdf, only: nf90_nowrite
-    use netcdf95, only: nf95_open, nf95_close, nf95_get_var, nf95_inq_varid
     use start_init_dyn_m, only: IML_DYN, JML_DYN, LLM_DYN, LAT_INI, &
          LEVDYN_INI, LON_INI
 
