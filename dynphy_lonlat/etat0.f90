@@ -8,6 +8,11 @@ contains
 
     ! From "etat0_netcdf.F", version 1.3, 2005/05/25 13:10:09
 
+    use netcdf, only: nf90_nowrite
+    use netcdf95, only: nf95_close, nf95_get_var, nf95_gw_var, nf95_put_var, &
+         nf95_inq_varid, nf95_open
+    use nr_util, only: pi, assert
+
     use dimensions, only: iim, jjm, llm
     use dimphy, only: klon
     use dimsoil, only: nsoilmx
@@ -16,10 +21,6 @@ contains
     use grille_m_m, only: grille_m
     use grid_change, only: init_dyn_phy, dyn_phy
     use indicesol, only: is_oce, is_sic, is_ter, is_lic, epsfra, nbsrf
-    use netcdf, only: nf90_nowrite
-    use netcdf95, only: nf95_close, nf95_get_var, nf95_gw_var, nf95_put_var, &
-         nf95_inq_varid, nf95_open
-    use nr_util, only: pi, assert
     use phyetat0_m, only: masque, set_lat, set_lon, set_masque
     use phyredem0_m, only: phyredem0, ncid_restartphy
     use phyredem_m, only: phyredem

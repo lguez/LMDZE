@@ -14,16 +14,17 @@ CONTAINS
 
   SUBROUTINE start_init_dyn(tsol_2d, phis, ps)
 
+    use netcdf, only: nf90_nowrite
+    use netcdf95, only: nf95_open, nf95_close, nf95_get_var, nf95_inq_varid, &
+         nf95_gw_var, find_coord
+    use nr_util, only: assert, pi
+
     use comgeom, only: aire_2d, apoln, apols
     use conf_dat2d_m, only: conf_dat2d
     use dimensions, only: iim, jjm
     use dynetat0_m, only: rlonu, rlatv
     use gr_int_dyn_m, only: gr_int_dyn
     use inter_barxy_m, only: inter_barxy
-    use netcdf, only: nf90_nowrite
-    use netcdf95, only: nf95_open, nf95_close, nf95_get_var, nf95_inq_varid, &
-         nf95_gw_var, find_coord
-    use nr_util, only: assert, pi
 
     REAL, intent(in):: tsol_2d(:, :) ! (iim + 1, jjm + 1)
 
