@@ -10,6 +10,7 @@ PROGRAM ce0l
   use dynetat0_chosen_m, only: read_serre
   use dynetat0_m, only: fyhyp, fxhyp
   use etat0_m, only: etat0
+  use etat0dyn_m, only: etat0dyn
   use grilles_gcm_netcdf_sub_m, only: grilles_gcm_netcdf_sub
   use indicesol, only: nbsrf
   use infotrac_init_m, only: infotrac_init
@@ -20,6 +21,9 @@ PROGRAM ce0l
   use unit_nml_m, only: unit_nml, set_unit_nml
 
   implicit none
+
+  real, ALLOCATABLE:: tsol_2d(:, :) ! (iim + 1, jjm + 1)
+  ! both soil temperature and surface temperature, in K
 
   REAL, ALLOCATABLE:: phis(:, :) ! (iim + 1, jjm + 1)
   ! surface geopotential, in m2 s-2
@@ -35,7 +39,7 @@ PROGRAM ce0l
   call set_dimensions
   call paramet
   call init_dimphy
-  ALLOCATE(phis(iim + 1, jjm + 1))
+  ALLOCATE(tsol_2d(iim + 1, jjm + 1), phis(iim + 1, jjm + 1))
   ALLOCATE(pctsrf(klon, nbsrf))
   call read_comdissnew
   call read_serre
@@ -49,7 +53,8 @@ PROGRAM ce0l
   CALL inifilr
 
   call infotrac_init
-  CALL etat0(phis, pctsrf)
+  CALL etat0(tsol_2d, phis, pctsrf)
+  CALL etat0dyn(tsol_2d, phis)
   CALL limit(pctsrf)
   CALL grilles_gcm_netcdf_sub(phis)
   close(unit_nml)
