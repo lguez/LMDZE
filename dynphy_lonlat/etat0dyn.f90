@@ -64,6 +64,7 @@ contains
 
     !---------------------------------
 
+    print *, "Call sequence information: etat0dyn"
     CALL start_init_dyn(tsol_2d, phis, ps)
 
     ! Compute pressure on intermediate levels:
