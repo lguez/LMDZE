@@ -1,10 +1,10 @@
-module etat0_m
+module etat0phys_m
 
   IMPLICIT NONE
 
 contains
 
-  SUBROUTINE etat0(tsol_2d, phis, pctsrf)
+  SUBROUTINE etat0phys(tsol_2d, phis, pctsrf)
 
     ! From "etat0_netcdf.F", version 1.3, 2005/05/25 13:10:09
 
@@ -71,7 +71,7 @@ contains
 
     !---------------------------------
 
-    print *, "Call sequence information: etat0"
+    print *, "Call sequence information: etat0phys"
     call start_init_orog(phis, zmea_2d, zstd_2d, zsig_2d, zgam_2d, zthe_2d, &
          zpic_2d, zval_2d) ! also compute "mask"
     call init_dyn_phy ! define the mask "dyn_phy" for distinct grid points
@@ -191,6 +191,6 @@ contains
          zthe, zpic, zval, t_ancien, q_ancien, rnebcon, ratqs, clwcon, &
          null_array, sig1, w01)
 
-  END SUBROUTINE etat0
+  END SUBROUTINE etat0phys
 
-end module etat0_m
+end module etat0phys_m

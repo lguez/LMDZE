@@ -9,7 +9,7 @@ PROGRAM ce0l
   use disvert_m, only: disvert
   use dynetat0_chosen_m, only: read_serre
   use dynetat0_m, only: fyhyp, fxhyp
-  use etat0_m, only: etat0
+  use etat0phys_m, only: etat0phys
   use etat0dyn_m, only: etat0dyn
   use grilles_gcm_netcdf_sub_m, only: grilles_gcm_netcdf_sub
   use indicesol, only: nbsrf
@@ -53,7 +53,7 @@ PROGRAM ce0l
   CALL inifilr
 
   call infotrac_init
-  CALL etat0(tsol_2d, phis, pctsrf)
+  CALL etat0phys(tsol_2d, phis, pctsrf)
   CALL etat0dyn(tsol_2d, phis)
   CALL limit(pctsrf)
   CALL grilles_gcm_netcdf_sub(phis)
