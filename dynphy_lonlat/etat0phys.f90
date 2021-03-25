@@ -40,7 +40,6 @@ contains
     REAL ftsoil(klon, nsoilmx, nbsrf) 
     REAL null_array(klon)
     REAL solsw(klon), sollw(klon)
-    !IM "slab" ocean
     REAL frugs(klon, nbsrf), agesno(klon, nbsrf)
     REAL rugmer(klon)
     real, dimension(iim + 1, jjm + 1):: zmea_2d, zstd_2d, zsig_2d, zgam_2d
@@ -67,7 +66,6 @@ contains
     call set_lon
     call set_masque
     call start_init_phys(tsol_2d, qsol_2d)
-
     null_array = 0.
     rugmer = 0.001
     zmea = pack(zmea_2d, dyn_phy)
