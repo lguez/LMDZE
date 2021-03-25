@@ -10,12 +10,12 @@ contains
 
     use caldyn0_m, only: caldyn0
     use comconst, only: cpp, kappa
-    use comgeom, only: aire_2d, apoln, apols, cu_2d, cv_2d, inigeom
+    use comgeom, only: aire_2d, apoln, apols, cu_2d, cv_2d
     use dimensions, only: iim, jjm, llm, nqmx
     use dimphy, only: klon
     use dimsoil, only: nsoilmx
-    use disvert_m, only: ap, bp, preff, disvert
-    use dynetat0_m, only: rlatu, rlatv, rlonu, rlonv, fyhyp, fxhyp
+    use disvert_m, only: ap, bp, preff
+    use dynetat0_m, only: rlatu, rlatv, rlonu, rlonv
     use dynetat0_chosen_m, only: day_ref
     use dynredem0_m, only: dynredem0
     use dynredem1_m, only: dynredem1
@@ -25,7 +25,6 @@ contains
     use grid_change, only: init_dyn_phy, dyn_phy
     use indicesol, only: is_oce, is_sic, is_ter, is_lic, epsfra, nbsrf
     use infotrac_init_m, only: infotrac_init
-    use inifilr_m, only: inifilr
     use massdair_m, only: massdair
     use netcdf, only: nf90_nowrite
     use netcdf95, only: nf95_close, nf95_get_var, nf95_gw_var, nf95_put_var, &
@@ -41,7 +40,6 @@ contains
     USE start_init_orog_m, only: start_init_orog
     use start_init_phys_m, only: start_init_phys
     use start_inter_3d_m, only: start_inter_3d
-    use test_disvert_m, only: test_disvert
 
     REAL, intent(out):: phis(:, :) ! (iim + 1, jjm + 1)
     ! surface geopotential, in m2 s-2
@@ -111,15 +109,6 @@ contains
     !---------------------------------
 
     print *, "Call sequence information: etat0"
-
-    ! Construct a grid:
-
-    CALL disvert
-    call test_disvert
-    CALL fyhyp
-    CALL fxhyp
-    CALL inigeom
-    CALL inifilr
     call start_init_orog(phis, zmea_2d, zstd_2d, zsig_2d, zgam_2d, zthe_2d, &
          zpic_2d, zval_2d) ! also compute "mask"
     call init_dyn_phy ! define the mask "dyn_phy" for distinct grid points
