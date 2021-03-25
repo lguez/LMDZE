@@ -115,7 +115,6 @@ contains
     call set_lat
     call set_lon
     call set_masque
-
     call start_init_phys(tsol_2d, qsol_2d)
     CALL start_init_dyn(tsol_2d, phis, ps)
 
@@ -286,12 +285,9 @@ contains
     ratqs = 0.
     sig1 = 0.
     w01 = 0.
-
     call phyredem0(0)
-
     call nf95_inq_varid(ncid_restartphy, "trs", varid)
     call nf95_put_var(ncid_restartphy, varid, null_array)
-
     call phyredem(pctsrf, ftsoil(:, 1, :), ftsoil, fqsurf, &
          pack(qsol_2d, dyn_phy), fsnow, falbe, null_array, null_array, solsw, &
          sollw, null_array, null_array, frugs, agesno, zmea, zstd, zsig, zgam, &

@@ -2,7 +2,7 @@ module phyredem0_m
 
   IMPLICIT NONE
 
-  INTEGER ncid_restartphy
+  INTEGER, protected:: ncid_restartphy
 
 contains
 
@@ -15,12 +15,13 @@ contains
     ! Objet : \'ecriture de l'\'etat de d\'emarrage ou red\'emarrage
     ! pour la physique
 
-    USE dimphy, ONLY: klev, klon
-    USE dimsoil, ONLY: nsoilmx
-    USE indicesol, ONLY: nbsrf
     USE netcdf, ONLY: nf90_clobber, nf90_global, nf90_float
     USE netcdf95, ONLY: nf95_create, nf95_put_att, nf95_def_dim, &
          nf95_def_var, nf95_enddef, nf95_put_var
+
+    USE dimphy, ONLY: klev, klon
+    USE dimsoil, ONLY: nsoilmx
+    USE indicesol, ONLY: nbsrf
     use phyetat0_m, only: rlat, rlon
 
     integer, intent(in):: itau_phy_redem

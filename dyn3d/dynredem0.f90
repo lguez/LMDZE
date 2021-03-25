@@ -11,6 +11,10 @@ CONTAINS
     ! From dyn3d/dynredem.F, version 1.2, 2004/06/22 11:45:30
     ! \'Ecriture du fichier de red\'emarrage au format NetCDF (initialisation)
 
+    USE netcdf, ONLY: nf90_clobber, nf90_float, nf90_global, nf90_unlimited
+    USE netcdf95, ONLY: nf95_create, nf95_def_dim, nf95_def_var, nf95_enddef, &
+         nf95_put_att, nf95_put_var
+
     USE comconst, ONLY: cpp, daysec, g, kappa, omeg, rad
     USE dimensions, ONLY: iim, jjm, llm, nqmx
     USE disvert_m, ONLY: ap, bp, preff, presnivs
@@ -21,9 +25,6 @@ CONTAINS
          dzoomy, grossismx, grossismy, taux, tauy
     USE infotrac_init_m, ONLY: tname, ttext
     USE ju2ymds_m, ONLY: ju2ymds
-    USE netcdf, ONLY: nf90_clobber, nf90_float, nf90_global, nf90_unlimited
-    USE netcdf95, ONLY: nf95_create, nf95_def_dim, nf95_def_var, nf95_enddef, &
-         nf95_put_att, nf95_put_var
     USE paramet_m, ONLY: iip1, jjp1, llmp1
     use ymds2ju_m, only: ymds2ju
 

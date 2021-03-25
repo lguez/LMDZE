@@ -3,12 +3,12 @@ MODULE start_init_dyn_m
   ! From startvar.F, version 1.4
   ! January 27th, 2006 15:14:22
 
-  INTEGER iml_dyn, jml_dyn, llm_dyn
+  INTEGER, protected:: iml_dyn, jml_dyn, llm_dyn
 
-  REAL, allocatable:: lon_ini(:), lat_ini(:)
+  REAL, protected, allocatable:: lon_ini(:), lat_ini(:)
   ! longitude and latitude from the input file, converted to rad
 
-  real, allocatable:: levdyn_ini(:)
+  real, protected, allocatable:: levdyn_ini(:)
 
 CONTAINS
 
