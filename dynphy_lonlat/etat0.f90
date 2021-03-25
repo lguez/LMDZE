@@ -115,57 +115,6 @@ contains
     call set_lon
     call set_masque
     call start_init_phys(tsol_2d, qsol_2d)
-    CALL start_init_dyn(tsol_2d, phis, ps)
-
-    ! Compute pressure on intermediate levels:
-    forall(l = 1: llm + 1) p3d(:, :, l) = ap(l) + bp(l) * ps
-    CALL exner_hyb(ps, p3d, pks, pk)
-    call assert(MINVAL(pk) /= MAXVAL(pk), '"pk" should not be constant')
-
-    pls = preff * (pk / cpp)**(1. / kappa)
-    PRINT *, "minval(pls) = ", minval(pls)
-    print *, "maxval(pls) = ", maxval(pls)
-
-    call start_inter_3d('U', rlonv, rlatv, pls, ucov)
-    forall (l = 1: llm) ucov(:iim, :, l) = ucov(:iim, :, l) * cu_2d(:iim, :)
-    ucov(iim+1, :, :) = ucov(1, :, :)
-
-    call start_inter_3d('V', rlonu, rlatu(:jjm), pls(:, :jjm, :), vcov)
-    forall (l = 1: llm) vcov(:iim, :, l) = vcov(:iim, :, l) * cv_2d(:iim, :)
-    vcov(iim + 1, :, :) = vcov(1, :, :)
-
-    call start_inter_3d('TEMP', rlonu, rlatv, pls, t3d)
-    PRINT *, 'minval(t3d) = ', minval(t3d)
-    print *, "maxval(t3d) = ", maxval(t3d)
-
-    teta(:iim, :, :) = t3d(:iim, :, :) * cpp / pk(:iim, :, :)
-    teta(iim + 1, :, :) = teta(1, :, :)
-    DO l = 1, llm
-       teta(:, 1, l) = SUM(aire_2d(:, 1) * teta(:, 1, l)) / apoln
-       teta(:, jjm + 1, l) = SUM(aire_2d(:, jjm + 1) * teta(:, jjm + 1, l)) &
-            / apols
-    ENDDO
-
-    ! Water vapor:
-    call start_inter_3d('R', rlonu, rlatv, pls, q(:, :, :, 1))
-    q(:, :, :, 1) = 0.01 * q(:, :, :, 1) * q_sat(t3d, pls)
-    WHERE (q(:, :, :, 1) < 0.) q(:, :, :, 1) = 1E-10
-    
-    forall (l = 1:llm)
-       q(:, 1, l, 1) = SUM(aire_2d(:, 1) * q(:, 1, l, 1)) / apoln
-       q(:, jjm + 1, l, 1) &
-            = SUM(aire_2d(:, jjm + 1) * q(:, jjm + 1, l, 1)) / apols
-    END forall
-
-    q(:, :, :, 2:4) = 0. ! liquid water, radon and lead
-
-    if (nqmx >= 5) then
-       ! Ozone:
-       call regr_lat_time_coefoz
-       call regr_pr_o3(p3d, q(:, :, :, 5))
-       ! Convert from mole fraction to mass fraction:
-       q(:, :, :, 5) = q(:, :, :, 5) * 48. / 29.
-    end if
 
     null_array = 0.
     rugmer = 0.001
@@ -246,20 +195,6 @@ contains
        PRINT *, 'Bad surface percentages for ', ji, 'points'
     end IF
 
-    ! Calcul interm\'ediaire :
-    CALL massdair(p3d, masse)
-
-    forall (l = 1:llm)
-       masse(:, 1, l) = SUM(aire_2d(:iim, 1) * masse(:iim, 1, l)) / apoln
-       masse(:, jjm + 1, l) = &
-            SUM(aire_2d(:iim, jjm + 1) * masse(:iim, jjm + 1, l)) / apols
-    END forall
-
-    CALL geopot(teta, pk , pks, phis, phi)
-    CALL caldyn0(ucov, vcov, teta, ps, pk, phis, phi)
-    CALL dynredem0(phis, day_ref)
-    CALL dynredem1(vcov, ucov, teta, q, masse, ps, itau = 0)
-
     ! Initialisations :
     fsnow = 0.
     falbe(:, is_ter) = 0.08
@@ -291,6 +226,72 @@ contains
          sollw, null_array, null_array, frugs, agesno, zmea, zstd, zsig, zgam, &
          zthe, zpic, zval, t_ancien, q_ancien, rnebcon, ratqs, clwcon, &
          null_array, sig1, w01)
+
+    CALL start_init_dyn(tsol_2d, phis, ps)
+
+    ! Compute pressure on intermediate levels:
+    forall(l = 1: llm + 1) p3d(:, :, l) = ap(l) + bp(l) * ps
+    CALL exner_hyb(ps, p3d, pks, pk)
+    call assert(MINVAL(pk) /= MAXVAL(pk), '"pk" should not be constant')
+
+    pls = preff * (pk / cpp)**(1. / kappa)
+    PRINT *, "minval(pls) = ", minval(pls)
+    print *, "maxval(pls) = ", maxval(pls)
+
+    call start_inter_3d('U', rlonv, rlatv, pls, ucov)
+    forall (l = 1: llm) ucov(:iim, :, l) = ucov(:iim, :, l) * cu_2d(:iim, :)
+    ucov(iim+1, :, :) = ucov(1, :, :)
+
+    call start_inter_3d('V', rlonu, rlatu(:jjm), pls(:, :jjm, :), vcov)
+    forall (l = 1: llm) vcov(:iim, :, l) = vcov(:iim, :, l) * cv_2d(:iim, :)
+    vcov(iim + 1, :, :) = vcov(1, :, :)
+
+    call start_inter_3d('TEMP', rlonu, rlatv, pls, t3d)
+    PRINT *, 'minval(t3d) = ', minval(t3d)
+    print *, "maxval(t3d) = ", maxval(t3d)
+
+    teta(:iim, :, :) = t3d(:iim, :, :) * cpp / pk(:iim, :, :)
+    teta(iim + 1, :, :) = teta(1, :, :)
+    DO l = 1, llm
+       teta(:, 1, l) = SUM(aire_2d(:, 1) * teta(:, 1, l)) / apoln
+       teta(:, jjm + 1, l) = SUM(aire_2d(:, jjm + 1) * teta(:, jjm + 1, l)) &
+            / apols
+    ENDDO
+
+    ! Water vapor:
+    call start_inter_3d('R', rlonu, rlatv, pls, q(:, :, :, 1))
+    q(:, :, :, 1) = 0.01 * q(:, :, :, 1) * q_sat(t3d, pls)
+    WHERE (q(:, :, :, 1) < 0.) q(:, :, :, 1) = 1E-10
+    
+    forall (l = 1:llm)
+       q(:, 1, l, 1) = SUM(aire_2d(:, 1) * q(:, 1, l, 1)) / apoln
+       q(:, jjm + 1, l, 1) &
+            = SUM(aire_2d(:, jjm + 1) * q(:, jjm + 1, l, 1)) / apols
+    END forall
+
+    q(:, :, :, 2:4) = 0. ! liquid water, radon and lead
+
+    if (nqmx >= 5) then
+       ! Ozone:
+       call regr_lat_time_coefoz
+       call regr_pr_o3(p3d, q(:, :, :, 5))
+       ! Convert from mole fraction to mass fraction:
+       q(:, :, :, 5) = q(:, :, :, 5) * 48. / 29.
+    end if
+
+    ! Calcul interm\'ediaire :
+    CALL massdair(p3d, masse)
+
+    forall (l = 1:llm)
+       masse(:, 1, l) = SUM(aire_2d(:iim, 1) * masse(:iim, 1, l)) / apoln
+       masse(:, jjm + 1, l) = &
+            SUM(aire_2d(:iim, jjm + 1) * masse(:iim, jjm + 1, l)) / apols
+    END forall
+
+    CALL geopot(teta, pk , pks, phis, phi)
+    CALL caldyn0(ucov, vcov, teta, ps, pk, phis, phi)
+    CALL dynredem0(phis, day_ref)
+    CALL dynredem1(vcov, ucov, teta, q, masse, ps, itau = 0)
 
   END SUBROUTINE etat0
 
