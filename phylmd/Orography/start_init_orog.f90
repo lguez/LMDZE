@@ -10,43 +10,38 @@ MODULE start_init_orog_m
 
 CONTAINS
 
-  SUBROUTINE start_init_orog(phis, zmea_2d, zstd_2d, zsig_2d, zgam_2d, &
-       zthe_2d, zpic_2d, zval_2d)
+  SUBROUTINE start_init_orog(phis, zmea, zstd, zsig, zgam, &
+       zthe, zpic, zval)
 
     ! Libraries:
     use netcdf, only: nf90_nowrite
     use netcdf95, only: nf95_open, nf95_gw_var, nf95_inq_varid, nf95_close
-    use nr_util, only: pi, assert    
+    use nr_util, only: pi
 
     use conf_dat2d_m, only: conf_dat2d
     use dimensions, only: iim, jjm
     use dynetat0_m, only: rlatu, rlonv
+    use grid_change, only: dyn_phy
     use grid_noro_m, only: grid_noro
     use indicesol, only: epsfra
 
     REAL, intent(out):: phis(:, :) ! (iim + 1, jjm + 1)
     ! surface geopotential, in m2 s-2
 
-    REAL, intent(out):: zmea_2d(:, :) ! (iim + 1, jjm + 1) orographie moyenne
+    REAL, intent(out):: zmea(:) ! (klon) orographie moyenne
 
-    REAL, intent(out):: zstd_2d(:, :) ! (iim + 1, jjm + 1)
+    REAL, intent(out):: zstd(:) ! (klon)
     ! (deviation standard de l'orographie sous-maille)
 
-    REAL, intent(out):: zsig_2d(:, :) ! (iim + 1, jjm + 1)
-    ! (pente de l'orographie sous-maille)
+    REAL, intent(out):: zsig(:) ! (klon) pente de l'orographie sous-maille
+    REAL, intent(out):: zgam(:) ! (klon) anisotropie de l'orographie sous maille
 
-    REAL, intent(out):: zgam_2d(:, :) ! (iim + 1, jjm + 1)
-    ! (anisotropie de l'orographie sous maille)
-
-    REAL, intent(out):: zthe_2d(:, :) ! (iim + 1, jjm + 1)
+    REAL, intent(out):: zthe(:) ! (klon)
     ! (orientation de l'axe oriente dans la direction de plus grande
     ! pente de l'orographie sous maille)
 
-    REAL, intent(out):: zpic_2d(:, :) ! (iim + 1, jjm + 1)
-    ! hauteur pics de la SSO
-
-    REAL, intent(out):: zval_2d(:, :) ! (iim + 1, jjm + 1)
-    ! hauteur vallees de la SSO
+    REAL, intent(out):: zpic(:) ! (klon) hauteur pics de la SSO
+    REAL, intent(out):: zval(:) ! (klon) hauteur vallees de la SSO
 
     ! Local:
 
@@ -56,18 +51,12 @@ CONTAINS
     REAL, ALLOCATABLE:: relief(:, :) ! in m
     REAL, ALLOCATABLE:: lon_rad(:), lat_rad(:)
     REAL, ALLOCATABLE:: lon_ini(:), lat_ini(:)
+    real, dimension(iim + 1, jjm + 1):: zmea_2d, zstd_2d, zsig_2d, zgam_2d
+    real, dimension(iim + 1, jjm + 1):: zthe_2d, zpic_2d, zval_2d
 
     !-----------------------------------
 
     print *, "Call sequence information: start_init_orog"
-
-    call assert((/size(phis, 1), size(zmea_2d, 1), size(zstd_2d, 1), &
-         size(zsig_2d, 1), size(zgam_2d, 1), size(zthe_2d, 1), &
-         size(zpic_2d, 1), size(zval_2d, 1)/) == iim + 1, "start_init_orog iim")
-    call assert((/size(phis, 2), size(zmea_2d, 2), size(zstd_2d, 2), &
-         size(zsig_2d, 2), size(zgam_2d, 2), size(zthe_2d, 2), &
-         size(zpic_2d, 2), size(zval_2d, 2)/) == jjm + 1, "start_init_orog jjm")
-
     allocate(mask(iim + 1, jjm + 1))
 
     ! Read the high resolution orography:
@@ -106,6 +95,14 @@ CONTAINS
     elsewhere (1. - mask < EPSFRA)
        mask = 1.
     endwhere
+
+    zmea = pack(zmea_2d, dyn_phy)
+    zstd = pack(zstd_2d, dyn_phy)
+    zsig = pack(zsig_2d, dyn_phy)
+    zgam = pack(zgam_2d, dyn_phy)
+    zthe = pack(zthe_2d, dyn_phy)
+    zpic = pack(zpic_2d, dyn_phy)
+    zval = pack(zval_2d, dyn_phy)
 
   END SUBROUTINE start_init_orog
 

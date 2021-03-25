@@ -42,8 +42,6 @@ contains
     REAL solsw(klon), sollw(klon)
     REAL frugs(klon, nbsrf), agesno(klon, nbsrf)
     REAL rugmer(klon)
-    real, dimension(iim + 1, jjm + 1):: zmea_2d, zstd_2d, zsig_2d, zgam_2d
-    real, dimension(iim + 1, jjm + 1):: zthe_2d, zpic_2d, zval_2d
 
     real qsol_2d(iim + 1, jjm + 1) ! column-density of water in soil, in kg m-2
     REAL zmea(klon), zstd(klon)
@@ -59,22 +57,17 @@ contains
     !---------------------------------
 
     print *, "Call sequence information: etat0phys"
-    call start_init_orog(phis, zmea_2d, zstd_2d, zsig_2d, zgam_2d, zthe_2d, &
-         zpic_2d, zval_2d) ! also compute "mask"
     call init_dyn_phy ! define the mask "dyn_phy" for distinct grid points
+
+    call start_init_orog(phis, zmea, zstd, zsig, zgam, zthe, zpic, zval)
+    ! (also compute "mask")
+
     call set_lat
     call set_lon
     call set_masque
     call start_init_phys(tsol_2d, qsol_2d)
     null_array = 0.
     rugmer = 0.001
-    zmea = pack(zmea_2d, dyn_phy)
-    zstd = pack(zstd_2d, dyn_phy)
-    zsig = pack(zsig_2d, dyn_phy)
-    zgam = pack(zgam_2d, dyn_phy)
-    zthe = pack(zthe_2d, dyn_phy)
-    zpic = pack(zpic_2d, dyn_phy)
-    zval = pack(zval_2d, dyn_phy)
     call start_init_subsurf(pctsrf)
 
     ! Initialisations :
