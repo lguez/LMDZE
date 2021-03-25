@@ -42,12 +42,18 @@ contains
     REAL solsw(klon), sollw(klon)
     REAL frugs(klon, nbsrf), agesno(klon, nbsrf)
     REAL rugmer(klon)
+    REAL zmea(klon) ! orographie moyenne
+    REAL zstd(klon) ! deviation standard de l'orographie sous-maille
+    REAL zsig(klon) ! pente de l'orographie sous-maille
+    REAL zgam(klon) ! anisotropie de l'orographie sous maille
 
-    real qsol_2d(iim + 1, jjm + 1) ! column-density of water in soil, in kg m-2
-    REAL zmea(klon), zstd(klon)
-    REAL zsig(klon), zgam(klon)
     REAL zthe(klon)
-    REAL zpic(klon), zval(klon)
+    ! (orientation de l'axe oriente dans la direction de plus grande
+    ! pente de l'orographie sous maille)
+
+    REAL zpic(klon) ! hauteur pics de la SSO
+    REAL zval(klon) ! hauteur vallees de la SSO
+    real qsol_2d(iim + 1, jjm + 1) ! column-density of water in soil, in kg m-2
     REAL t_ancien(klon, llm), q_ancien(klon, llm)
     real clwcon(klon, llm), rnebcon(klon, llm), ratqs(klon, llm)
     INTEGER varid
@@ -66,7 +72,6 @@ contains
     call set_lon
     call set_masque
     call start_init_phys(tsol_2d, qsol_2d)
-    null_array = 0.
     rugmer = 0.001
     call start_init_subsurf(pctsrf)
 
@@ -95,6 +100,7 @@ contains
     w01 = 0.
     call phyredem0(0)
     call nf95_inq_varid(ncid_restartphy, "trs", varid)
+    null_array = 0.
     call nf95_put_var(ncid_restartphy, varid, null_array)
     call phyredem(pctsrf, ftsoil(:, 1, :), ftsoil, fqsurf, &
          pack(qsol_2d, dyn_phy), fsnow, falbe, null_array, null_array, solsw, &
