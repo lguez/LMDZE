@@ -24,7 +24,6 @@ contains
     use grille_m_m, only: grille_m
     use grid_change, only: init_dyn_phy, dyn_phy
     use indicesol, only: is_oce, is_sic, is_ter, is_lic, epsfra, nbsrf
-    use infotrac_init_m, only: infotrac_init
     use massdair_m, only: massdair
     use netcdf, only: nf90_nowrite
     use netcdf95, only: nf95_close, nf95_get_var, nf95_gw_var, nf95_put_var, &
@@ -256,7 +255,6 @@ contains
             SUM(aire_2d(:iim, jjm + 1) * masse(:iim, jjm + 1, l)) / apols
     END forall
 
-    call infotrac_init
     CALL geopot(teta, pk , pks, phis, phi)
     CALL caldyn0(ucov, vcov, teta, ps, pk, phis, phi)
     CALL dynredem0(phis, day_ref)

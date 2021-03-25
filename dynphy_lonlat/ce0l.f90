@@ -12,6 +12,7 @@ PROGRAM ce0l
   use etat0_m, only: etat0
   use grilles_gcm_netcdf_sub_m, only: grilles_gcm_netcdf_sub
   use indicesol, only: nbsrf
+  use infotrac_init_m, only: infotrac_init
   use inifilr_m, only: inifilr
   use limit_m, only: limit
   use paramet_m, only: paramet
@@ -47,6 +48,7 @@ PROGRAM ce0l
   CALL inigeom
   CALL inifilr
 
+  call infotrac_init
   CALL etat0(phis, pctsrf)
   CALL limit(pctsrf)
   CALL grilles_gcm_netcdf_sub(phis)
