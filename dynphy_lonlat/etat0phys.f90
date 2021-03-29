@@ -41,7 +41,6 @@ contains
     REAL null_array(klon)
     REAL solsw(klon), sollw(klon)
     REAL frugs(klon, nbsrf), agesno(klon, nbsrf)
-    REAL rugmer(klon)
     REAL zmea(klon) ! orographie moyenne
     REAL zstd(klon) ! deviation standard de l'orographie sous-maille
     REAL zsig(klon) ! pente de l'orographie sous-maille
@@ -69,7 +68,6 @@ contains
     call set_lon
     call set_masque
     call start_init_phys(tsol_2d, qsol_2d)
-    rugmer = 0.001
     call start_init_subsurf(pctsrf)
 
     ! Initialisations :
@@ -86,9 +84,9 @@ contains
     q_ancien = 0.
     agesno = 0.
 
-    frugs(:, is_oce) = rugmer
     frugs(:, is_ter) = MAX(1e-5, zstd * zsig / 2)
     frugs(:, is_lic) = MAX(1e-5, zstd * zsig / 2)
+    frugs(:, is_oce) = 0.001
     frugs(:, is_sic) = 0.001
     clwcon = 0.
     rnebcon = 0.
