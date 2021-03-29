@@ -96,16 +96,16 @@ contains
     print *, "Call sequence information: grid_noro"
     allocate(mask(iim + 1, jjm + 1))
 
-    call assert((/size(xdata), size(relief, 1)/) == iusn, "grid_noro iusn")
-    call assert((/size(ydata), size(relief, 2)/) == jusn, "grid_noro jusn")
+    call assert([size(xdata), size(relief, 1)] == iusn, "grid_noro iusn")
+    call assert([size(ydata), size(relief, 2)] == jusn, "grid_noro jusn")
 
-    call assert((/size(x), size(phis, 1), size(zmea, 1), size(zstd, 1), &
+    call assert([size(x), size(phis, 1), size(zmea, 1), size(zstd, 1), &
          size(zsig, 1), size(zgam, 1), size(zthe, 1), size(zpic, 1), &
-         size(zval, 1)/) == iim + 1, "grid_noro iim")
+         size(zval, 1)] == iim + 1, "grid_noro iim")
 
-    call assert((/size(y), size(phis, 2), size(zmea, 2), size(zstd, 2), &
+    call assert([size(y), size(phis, 2), size(zmea, 2), size(zstd, 2), &
          size(zsig, 2), size(zgam, 2), size(zthe, 2), size(zpic, 2), &
-         size(zval, 2)/) == jjm + 1, "grid_noro jjm")
+         size(zval, 2)] == jjm + 1, "grid_noro jjm")
 
     zdeltay = 2. * pi / real(jusn) * rad
 

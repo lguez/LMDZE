@@ -10,6 +10,8 @@ contains
 
   subroutine init_dyn_phy
 
+    ! Define the mask "dyn_phy" for distinct grid points.
+
     use dimensions, only: iim, jjm
 
     !---------------------------------------------------------

@@ -6,7 +6,7 @@ contains
 
   SUBROUTINE etat0phys(tsol_2d, phis, pctsrf)
 
-    ! From "etat0_netcdf.F", version 1.3, 2005/05/25 13:10:09
+    ! From "etat0_netcdf.F", revision 644
 
     use netcdf95, only: nf95_put_var, nf95_inq_varid
 
@@ -63,11 +63,8 @@ contains
     !---------------------------------
 
     print *, "Call sequence information: etat0phys"
-    call init_dyn_phy ! define the mask "dyn_phy" for distinct grid points
-
+    call init_dyn_phy
     call start_init_orog(phis, zmea, zstd, zsig, zgam, zthe, zpic, zval)
-    ! (also compute "mask")
-
     call set_lat
     call set_lon
     call set_masque
@@ -99,8 +96,8 @@ contains
     sig1 = 0.
     w01 = 0.
     call phyredem0(0)
-    call nf95_inq_varid(ncid_restartphy, "trs", varid)
     null_array = 0.
+    call nf95_inq_varid(ncid_restartphy, "trs", varid)
     call nf95_put_var(ncid_restartphy, varid, null_array)
     call phyredem(pctsrf, ftsoil(:, 1, :), ftsoil, fqsurf, &
          pack(qsol_2d, dyn_phy), fsnow, falbe, null_array, null_array, solsw, &

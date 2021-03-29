@@ -7,8 +7,7 @@ MODULE start_init_orog_m
 
 CONTAINS
 
-  SUBROUTINE start_init_orog(phis, zmea, zstd, zsig, zgam, &
-       zthe, zpic, zval)
+  SUBROUTINE start_init_orog(phis, zmea, zstd, zsig, zgam, zthe, zpic, zval)
 
     ! Libraries:
     use netcdf, only: nf90_nowrite
@@ -73,9 +72,7 @@ CONTAINS
 
     call nf95_close(ncid)
 
-    ALLOCATE(lon_rad(iml_rel))
-    ALLOCATE(lat_rad(jml_rel))
-
+    ALLOCATE(lon_rad(iml_rel), lat_rad(jml_rel))
     CALL conf_dat2d(lon_ini, lat_ini, lon_rad, lat_rad, relief, &
          interbar = .FALSE.)
     CALL grid_noro(lon_rad, lat_rad, relief, rlonv, rlatu, phis, zmea_2d, &
