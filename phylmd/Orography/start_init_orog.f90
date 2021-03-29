@@ -5,9 +5,6 @@ MODULE start_init_orog_m
 
   IMPLICIT NONE
 
-  REAL, SAVE, allocatable, protected:: mask(:, :) ! (iim + 1, jjm + 1)
-  ! interpolated fraction of land
-
 CONTAINS
 
   SUBROUTINE start_init_orog(phis, zmea, zstd, zsig, zgam, &
@@ -23,7 +20,6 @@ CONTAINS
     use dynetat0_m, only: rlatu, rlonv
     use grid_change, only: dyn_phy
     use grid_noro_m, only: grid_noro
-    use indicesol, only: epsfra
 
     REAL, intent(out):: phis(:, :) ! (iim + 1, jjm + 1)
     ! surface geopotential, in m2 s-2
@@ -57,7 +53,6 @@ CONTAINS
     !-----------------------------------
 
     print *, "Call sequence information: start_init_orog"
-    allocate(mask(iim + 1, jjm + 1))
 
     ! Read the high resolution orography:
 
@@ -84,18 +79,8 @@ CONTAINS
     CALL conf_dat2d(lon_ini, lat_ini, lon_rad, lat_rad, relief, &
          interbar = .FALSE.)
     CALL grid_noro(lon_rad, lat_rad, relief, rlonv, rlatu, phis, zmea_2d, &
-         zstd_2d, zsig_2d, zgam_2d, zthe_2d, zpic_2d, zval_2d, mask)
+         zstd_2d, zsig_2d, zgam_2d, zthe_2d, zpic_2d, zval_2d)
     phis(:, :) = phis(:, :) * 9.81
-    mask(2:, 1) = mask(1, 1) ! north pole
-    mask(2:, jjm + 1) = mask(1, jjm + 1) ! south pole
-    mask(iim + 1, 2:jjm) = mask(1, 2:jjm) ! Greenwich
-
-    WHERE (mask < EPSFRA)
-       mask = 0.
-    elsewhere (1. - mask < EPSFRA)
-       mask = 1.
-    endwhere
-
     zmea = pack(zmea_2d, dyn_phy)
     zstd = pack(zstd_2d, dyn_phy)
     zsig = pack(zsig_2d, dyn_phy)

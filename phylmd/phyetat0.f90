@@ -360,7 +360,7 @@ contains
 
     use dimphy, only: klon
     use grid_change, only: dyn_phy
-    USE start_init_orog_m, only: mask
+    USE grid_noro_m, only: mask
 
     !-------------------------------------------------------------------------
     

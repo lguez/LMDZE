@@ -17,7 +17,7 @@ contains
     USE netcdf95, ONLY: nf95_close, nf95_create, nf95_def_dim, nf95_def_var, &
          nf95_enddef, nf95_put_att, nf95_put_var
     USE nr_util, ONLY: pi
-    USE start_init_orog_m, ONLY: mask
+    USE grid_noro_m, ONLY: mask
 
     REAL, INTENT(IN):: phis(:, :) ! (iim + 1, jjm + 1) 
     ! surface geopotential, in m2 s-2

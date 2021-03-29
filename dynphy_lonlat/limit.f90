@@ -27,10 +27,10 @@ contains
     use dimphy, only: klon
     use dynetat0_m, only: rlonu, rlatv
     use grid_change, only: dyn_phy
+    use grid_noro_m, only: mask
     use indicesol, only: epsfra, is_ter, is_oce, is_lic, is_sic
     use inter_barxy_m, only: inter_barxy
     use phyetat0_m, only: masque, rlon, rlat
-    use start_init_orog_m, only: mask
     use unit_nml_m, only: unit_nml
 
     REAL, intent(inout):: pctsrf(:, :) ! (klon, nbsrf)
