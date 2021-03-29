@@ -84,8 +84,8 @@ contains
     q_ancien = 0.
     agesno = 0.
 
-    frugs(:, is_ter) = MAX(1e-5, zstd * zsig / 2)
-    frugs(:, is_lic) = MAX(1e-5, zstd * zsig / 2)
+    frugs(:, is_ter) = 0.01
+    frugs(:, is_lic) = 0.001
     frugs(:, is_oce) = 0.001
     frugs(:, is_sic) = 0.001
     clwcon = 0.
