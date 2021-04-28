@@ -26,14 +26,9 @@ contains
     ! Local:
     REAL d_t_the(klon, klev), d_q_the(klon, klev)
     REAL d_u_the(klon, klev), d_v_the(klon, klev)
-    real zfm_therm(klon, klev + 1), zentr_therm(klon, klev)
-    real zdt
     integer i, k
 
     !----------------------------------------------------------------
-
-    fm_therm = 0.
-    entr_therm = 0.
 
     ! tests sur les valeurs negatives de l'eau
     do k = 1, klev
@@ -46,13 +41,8 @@ contains
        enddo
     enddo
 
-    zdt = dtphys
-    CALL thermcell(klev, zdt, pplay, paprs, pphi, u_seri, v_seri, &
-         t_seri, q_seri, d_u_the, d_v_the, d_t_the, d_q_the, zfm_therm, &
-         zentr_therm)
-
-    fm_therm = fm_therm + zfm_therm
-    entr_therm = entr_therm + zentr_therm
+    CALL thermcell(klev, dtphys, pplay, paprs, pphi, u_seri, v_seri, t_seri, &
+         q_seri, d_u_the, d_v_the, d_t_the, d_q_the, fm_therm, entr_therm)
     fm_therm(:, klev + 1) = 0.
 
     ! incrementation des variables meteo
