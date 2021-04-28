@@ -255,12 +255,12 @@ contains
 
     if (iflag_thermals) then
        nsplit=10
+       
        DO it=1, nqmx - 2
           do isplit=1, nsplit
              ! Thermiques
-             call dqthermcell(klon, llm, dtphys/nsplit &
-                  , fm_therm, entr_therm, zmasse &
-                  , tr_seri(1:klon, 1:llm, it), d_tr, ztra_th)
+             call dqthermcell(klon, llm, dtphys/nsplit, fm_therm, entr_therm, &
+                  zmasse , tr_seri(1:klon, 1:llm, it), d_tr, ztra_th)
 
              do k=1, llm
                 do i=1, klon

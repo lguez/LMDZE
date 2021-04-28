@@ -87,7 +87,6 @@ contains
     s(llm+1) = 0.
 
     select case (vert_sampling)
-
     case ("tropo")
        ! with llm = 19 and dsigmin = 1 for CMIP 3
 
@@ -100,7 +99,6 @@ contains
        ENDDO
 
        call compute_ab
-
     case ("strato")
        ! with llm = 39 and dsigmin = 0.3 for CMIP5
 
@@ -114,7 +112,6 @@ contains
        ENDDO
 
        call compute_ab
-
     case ("strato_custom")
        ! with llm = 79 for CMIP 6
 
@@ -135,7 +132,6 @@ contains
        s(2: llm) = hybrid(p)
 
        call compute_ab
-
     case("read_hybrid")
        ! Read "ap" and "bp". First line is skipped (title line). "ap"
        ! should be in Pa. First couple of values should correspond to
@@ -152,7 +148,6 @@ contains
        call assert(ap(1) == 0., ap(llm + 1) == 0., bp(1) == 1., &
             bp(llm + 1) == 0., "disvert: bad ap or bp values")
        s(2: llm) = ap(2: llm) / pa + bp(2: llm)
-
     case("read_pressure")
        ! Read pressure values, in Pa, in descending order, from preff
        ! to 0. First line is skipped (title line).
@@ -164,11 +159,9 @@ contains
        ya = pa / preff
        s(2: llm) = hybrid(p(2: llm))
        call compute_ab
-
     case default
        print *, 'Wrong value for "vert_sampling"'
        stop 1
-
     END select
 
     forall (l = 1: llm) presnivs(l) = 0.5 &

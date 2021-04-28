@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.16)
 project(LMDZE LANGUAGES Fortran CXX)
-set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/cmake)
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 
 find_package(NR_util REQUIRED CONFIG)
 find_package(Jumble REQUIRED CONFIG)

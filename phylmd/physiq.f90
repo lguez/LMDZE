@@ -203,7 +203,7 @@ contains
 
     REAL, save, allocatable:: pfrac_impa(:, :) ! (klon, llm)
     ! Produits des coefs lessivage impaction
-    
+
     REAL, save, allocatable:: pfrac_nucl(:, :) ! (klon, llm)
     ! Produits des coefs lessivage nucleation
 
@@ -236,13 +236,13 @@ contains
 
     INTEGER julien
     REAL, save, allocatable:: pctsrf(:, :) ! (klon, nbsrf) percentage of surface
-    
+
     REAL, save, allocatable:: albsol(:) ! (klon)
     ! albedo du sol total, visible, moyen par maille
-    
+
     REAL, SAVE, ALLOCATABLE:: wo(:, :) ! (klon, llm)
     ! column density of ozone in a cell, in kDU
-    
+
     real, parameter:: dobson_u = 2.1415e-05 ! Dobson unit, in kg m-2
 
     real, save, allocatable:: clwcon(:, :), rnebcon(:, :) ! (klon, llm)
