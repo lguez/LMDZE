@@ -1,10 +1,10 @@
-module dqthermcell_m
+module thermcell_dq_m
 
   implicit none
 
 contains
 
-  subroutine dqthermcell(ngrid, nlay, ptimestep, fm, entr, masse, q, dq, qa)
+  subroutine thermcell_dq(ngrid, nlay, ptimestep, fm, entr, masse, q, dq, qa)
 
     use dimensions
     use dimphy
@@ -70,6 +70,6 @@ contains
        enddo
     enddo
 
-  end subroutine dqthermcell
+  end subroutine thermcell_dq
 
-end module dqthermcell_m
+end module thermcell_dq_m

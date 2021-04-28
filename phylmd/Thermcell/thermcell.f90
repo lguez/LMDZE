@@ -18,7 +18,7 @@ contains
     ! entra\^inement ; un d\'etra\^inement.
 
     USE dimphy, ONLY : klev, klon
-    use dqthermcell_m, only: dqthermcell
+    use thermcell_dq_m, only: thermcell_dq
     USE suphec_m, ONLY : rd, rg, rkappa
 
     INTEGER nlay
@@ -518,10 +518,10 @@ contains
     fm0=fm
     entr0=entr
 
-    call dqthermcell(klon, nlay, ptimestep, fm0, entr0, masse, zh, zdhadj, zha)
-    call dqthermcell(klon, nlay, ptimestep, fm0, entr0, masse, zo, pdoadj, zoa)
-    call dqthermcell(klon, nlay, ptimestep, fm0, entr0, masse, zu, pduadj, zua)
-    call dqthermcell(klon, nlay, ptimestep, fm0, entr0, masse, zv, pdvadj, zva)
+    call thermcell_dq(klon, nlay, ptimestep, fm0, entr0, masse, zh, zdhadj, zha)
+    call thermcell_dq(klon, nlay, ptimestep, fm0, entr0, masse, zo, pdoadj, zoa)
+    call thermcell_dq(klon, nlay, ptimestep, fm0, entr0, masse, zu, pduadj, zua)
+    call thermcell_dq(klon, nlay, ptimestep, fm0, entr0, masse, zv, pdvadj, zva)
 
     do l=1, nlay
        do ig=1, klon
