@@ -325,7 +325,6 @@ contains
     REAL d_u_con(klon, llm), d_v_con(klon, llm)
     REAL d_t_lsc(klon, llm), d_q_lsc(klon, llm), d_ql_lsc(klon, llm)
     REAL d_t_ajs(klon, llm), d_q_ajs(klon, llm)
-    REAL d_u_ajs(klon, llm), d_v_ajs(klon, llm)
     REAL rneb(klon, llm)
 
     REAL mfu(klon, llm), mfd(klon, llm)
@@ -692,16 +691,12 @@ contains
 
     ! Convection s\`eche (thermiques ou ajustement)
 
-    d_t_ajs = 0.
-    d_u_ajs = 0.
-    d_v_ajs = 0.
-    d_q_ajs = 0.
     fm_therm = 0.
     entr_therm = 0.
 
     if (iflag_thermals) then
        call calltherm(play, paprs, pphi, u_seri, v_seri, t_seri, q_seri, &
-            d_u_ajs, d_v_ajs, d_t_ajs, d_q_ajs, fm_therm, entr_therm)
+            fm_therm, entr_therm)
     else
        CALL ajsec(paprs, play, t_seri, q_seri, d_t_ajs, d_q_ajs)
        t_seri = t_seri + d_t_ajs

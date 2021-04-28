@@ -5,7 +5,7 @@ module calltherm_m
 contains
 
   subroutine calltherm(pplay, paprs, pphi, u_seri, v_seri, t_seri, q_seri, &
-       d_u_ajs, d_v_ajs, d_t_ajs, d_q_ajs, fm_therm, entr_therm)
+       fm_therm, entr_therm)
 
     ! From LMDZ4/libf/phylmd/calltherm.F, version 1.2 2004/12/10 11:27:46
 
@@ -38,6 +38,10 @@ contains
 
     !----------------------------------------------------------------
 
+    d_u_ajs = 0.
+    d_v_ajs = 0.
+    d_t_ajs = 0.
+    d_q_ajs = 0.
     fm_therm = 0.
     entr_therm = 0.
 
