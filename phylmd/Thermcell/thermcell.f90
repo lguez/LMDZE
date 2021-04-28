@@ -22,7 +22,7 @@ contains
     USE suphec_m, ONLY : rd, rg, rkappa
 
     INTEGER nlay
-    real ptimestep
+    real, intent(in):: ptimestep
     REAL, intent(in):: pplay(klon, nlay)
     real, intent(in):: pplev(klon, nlay+1)
     real, intent(in):: pphi(klon, nlay)
