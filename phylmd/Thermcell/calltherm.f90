@@ -51,20 +51,15 @@ contains
          t_seri, q_seri, d_u_the, d_v_the, d_t_the, d_q_the, zfm_therm, &
          zentr_therm)
 
-    ! transformation de la derivee en tendance
-    d_t_the = d_t_the * dtphys
-    d_u_the = d_u_the * dtphys
-    d_v_the = d_v_the * dtphys
-    d_q_the = d_q_the * dtphys
     fm_therm = fm_therm + zfm_therm
     entr_therm = entr_therm + zentr_therm
     fm_therm(:, klev + 1) = 0.
 
     ! incrementation des variables meteo
-    t_seri = t_seri + d_t_the
-    u_seri = u_seri + d_u_the
-    v_seri = v_seri + d_v_the
-    q_seri = q_seri + d_q_the
+    t_seri = t_seri + d_t_the * dtphys
+    u_seri = u_seri + d_u_the * dtphys
+    v_seri = v_seri + d_v_the * dtphys
+    q_seri = q_seri + d_q_the * dtphys
 
     ! tests sur les valeurs negatives de l'eau
     DO k = 1, klev
