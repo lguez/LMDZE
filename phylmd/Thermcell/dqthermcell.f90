@@ -15,7 +15,7 @@ contains
 
     integer ngrid, nlay
 
-    real ptimestep
+    real, intent(in):: ptimestep
     real, intent(in):: masse(ngrid, nlay)
     real fm(ngrid, nlay+1)
     real entr(ngrid, nlay)
