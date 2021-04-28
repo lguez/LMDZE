@@ -50,7 +50,7 @@ contains
        do i = 1, klon
           if (q_seri(i, k) < 0.) then
              print *, 'Warning: eau < 0 avant calltherm, i =', i, ', k =', k, &
-                  ', dq =', d_q_the(i, k), ', q =', q_seri(i, k)
+                  ', q =', q_seri(i, k)
              q_seri(i, k) = 1e-15
           endif
        enddo
