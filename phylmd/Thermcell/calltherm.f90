@@ -22,13 +22,13 @@ contains
     REAL, intent(inout):: u_seri(klon, klev), v_seri(klon, klev)
     REAL, intent(inout):: t_seri(klon, klev)
     real, intent(inout):: q_seri(klon, klev)
+    real, intent(out):: fm_therm(klon, klev + 1), entr_therm(klon, klev)
+
+    ! Local:
 
     ! Update thermiques
     REAL d_u_ajs(klon, klev), d_v_ajs(klon, klev)
     REAL d_t_ajs(klon, klev), d_q_ajs(klon, klev)
-    real fm_therm(klon, klev+1), entr_therm(klon, klev)
-
-    ! Local:
 
     REAL d_t_the(klon, klev), d_q_the(klon, klev)
     REAL d_u_the(klon, klev), d_v_the(klon, klev)
