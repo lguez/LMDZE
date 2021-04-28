@@ -9,18 +9,7 @@ find_package(NetCDF95 REQUIRED CONFIG)
 find_package(NetCDF REQUIRED)
 find_package(NetCDF_Fortran REQUIRED)
 find_package(MPI REQUIRED COMPONENTS Fortran CXX)
-
-find_path(XIOS_INCLUDE_DIR xios.mod REQUIRED)
-find_library(XIOS_LIBRARY xios REQUIRED)
-add_library(XIOS::XIOS STATIC IMPORTED)
-
-set_target_properties(XIOS::XIOS PROPERTIES IMPORTED_LOCATION
-  ${XIOS_LIBRARY} IMPORTED_LINK_INTERFACE_LANGUAGES "CXX")
-
-target_include_directories(XIOS::XIOS INTERFACE ${XIOS_INCLUDE_DIR})
-
-target_link_libraries(XIOS::XIOS INTERFACE MPI::MPI_CXX
-  NetCDF_Fortran::NetCDF_Fortran)
+find_package(XIOS REQUIRED)
 
 add_library(LMDZE_objects OBJECT dimensions.f90)
 target_include_directories(LMDZE_objects INTERFACE ${PROJECT_BINARY_DIR})
