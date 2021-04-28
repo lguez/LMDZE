@@ -690,10 +690,6 @@ contains
     ENDIF
 
     ! Convection s\`eche (thermiques ou ajustement)
-
-    fm_therm = 0.
-    entr_therm = 0.
-
     if (iflag_thermals) then
        call calltherm(play, paprs, pphi, u_seri, v_seri, t_seri, q_seri, &
             fm_therm, entr_therm)
