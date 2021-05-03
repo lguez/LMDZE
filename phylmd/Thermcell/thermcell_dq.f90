@@ -6,25 +6,26 @@ contains
 
   subroutine thermcell_dq(ngrid, nlay, ptimestep, fm, entr, masse, q, dq, qa)
 
-    use dimensions
-    use dimphy
+    use dimphy, only: klon, klev
 
     ! Calcul du transport verticale dans la couche limite en presence
     ! de "thermiques" explicitement representes
     ! calcul du dq/dt une fois qu'on connait les ascendances
 
-    integer ngrid, nlay
-
+    integer, intent(in):: ngrid, nlay
     real, intent(in):: ptimestep
-    real, intent(in):: masse(ngrid, nlay)
     real fm(ngrid, nlay+1)
     real entr(ngrid, nlay)
+    real, intent(in):: masse(ngrid, nlay)
     real q(ngrid, nlay)
     real dq(ngrid, nlay)
+    real qa(klon, klev)
 
-    real qa(klon, klev), detr(klon, klev), wqd(klon, klev+1)
-
+    ! Local:
+    real detr(klon, klev), wqd(klon, klev+1)
     integer ig, k
+
+    !--------------------------------------------------------------------
 
     ! calcul du detrainement
 

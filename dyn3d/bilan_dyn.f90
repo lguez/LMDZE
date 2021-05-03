@@ -24,14 +24,14 @@ contains
     use massbar_m, only: massbar
     USE paramet_m, ONLY: iip1, jjp1
 
-    real, intent(in):: ps(iip1, jjp1)
-    real, intent(in):: masse(iip1, jjp1, llm), pk(iip1, jjp1, llm)
-    real, intent(in):: flux_u(iip1, jjp1, llm)
-    real, intent(in):: flux_v(iip1, jjm, llm)
-    real, intent(in):: teta(iip1, jjp1, llm)
-    real, intent(in):: phi(iip1, jjp1, llm)
+    real, intent(in):: ps(:, :) ! (iip1, jjp1)
+    real, intent(in):: masse(:, :, :), pk(:, :, :) ! (iip1, jjp1, llm)
+    real, intent(in):: flux_u(:, :, :) ! (iip1, jjp1, llm)
+    real, intent(in):: flux_v(:, :, :) ! (iip1, jjm, llm)
+    real, intent(in):: teta(:, :, :) ! (iip1, jjp1, llm)
+    real, intent(in):: phi(:, :, :) ! (iip1, jjp1, llm)
     real, intent(in):: ucov(:, :, :) ! (iip1, jjp1, llm)
-    real, intent(in):: vcov(iip1, jjm, llm)
+    real, intent(in):: vcov(:, :, :) ! (iip1, jjm, llm)
     real, intent(in):: trac(:, :, :) ! (iim + 1, jjm + 1, llm)
 
     ! Local:

@@ -21,7 +21,7 @@ contains
     use thermcell_dq_m, only: thermcell_dq
     USE suphec_m, ONLY : rd, rg, rkappa
 
-    INTEGER nlay
+    INTEGER, intent(in):: nlay
     real, intent(in):: ptimestep
     REAL, intent(in):: pplay(klon, nlay)
     real, intent(in):: pplev(klon, nlay+1)
