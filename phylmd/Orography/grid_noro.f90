@@ -64,18 +64,16 @@ contains
 
     ! Local:
 
-    ! In this version it is assumed that the input data come from
-    ! the US Navy dataset:
-    integer, parameter:: iusn = 2160, jusn = 1080
-    integer, parameter:: iext = 216
-    REAL xusn(iusn + 2 * iext), yusn(jusn + 2)
-    REAL zusn(iusn + 2 * iext, jusn + 2) ! in m
+    integer iusn, jusn, iext
+    REAL xusn((size(xdata) * 6) / 5), yusn(size(ydata) + 2)
+    REAL zusn((size(xdata) * 6) / 5, size(ydata) + 2) ! in m
 
     ! Intermediate fields (correlations of orography gradient)
     REAL, dimension(iim + 1, jjm + 1):: ztz, zxtzx, zytzy, zxtzy, weight
 
     ! Correlations of US Navy orography gradients:
-    REAL, dimension(iusn + 2 * iext, jusn + 2):: zxtzxusn, zytzyusn, zxtzyusn
+    REAL, dimension((size(xdata) * 6) / 5, size(ydata) + 2):: zxtzxusn, &
+         zytzyusn, zxtzyusn
 
     real, dimension(iim + 1, jjm + 1):: mask_tmp, num_tot, num_lan
     REAL a(iim + 1), b(iim + 1), c(jjm + 1), d(jjm + 1)
@@ -95,9 +93,11 @@ contains
 
     print *, "Call sequence information: grid_noro"
     allocate(mask(iim + 1, jjm + 1))
-
-    call assert([size(xdata), size(relief, 1)] == iusn, "grid_noro iusn")
-    call assert([size(ydata), size(relief, 2)] == jusn, "grid_noro jusn")
+    iusn = size(xdata)
+    jusn = size(ydata)
+    iext = iusn / 10
+    call assert(iusn == size(relief, 1), "grid_noro iusn")
+    call assert(jusn == size(relief, 2), "grid_noro jusn")
 
     call assert([size(x), size(phis, 1), size(zmea, 1), size(zstd, 1), &
          size(zsig, 1), size(zgam, 1), size(zthe, 1), size(zpic, 1), &
