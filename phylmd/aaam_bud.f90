@@ -15,7 +15,7 @@ contains
     USE dimensions, ONLY : iim, jjm
     use nr_util, only: assert_eq, assert, pi
     use phyetat0_m, only: rlat, rlon
-    USE suphec_m, ONLY: ra
+    USE comconst, ONLY: ra
 
     real, intent(in):: rg ! gravity constant
     real, intent(in):: ome ! Earth rotation rate

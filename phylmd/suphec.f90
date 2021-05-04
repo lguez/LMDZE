@@ -22,7 +22,6 @@ module suphec_m
 
   ! A1.2 Geoide
   real, parameter:: RG = 9.80665 ! acceleration of gravity, in m s-2
-  real, parameter:: RA = 6371229.
 
   ! A1.3 Radiation
   REAL, parameter:: rsigma = 2. * pi**5 * (kbol / rhpla)**3 * kbol / rclum**2 &
