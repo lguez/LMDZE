@@ -35,6 +35,7 @@ contains
     ! Libraries:
     use nr_util, only: assert, pi
 
+    use comconst, only: ra
     use dimensions, only: iim, jjm
     use indicesol, only: epsfra
     use mva9_m, only: mva9
@@ -87,7 +88,6 @@ contains
     
     real zweinor, zweisud, zmeanor, zbordest
     integer ii, i, jj, j
-    real, parameter:: rad = 6371229.
 
     !--------------------------------------------------------------------
 
@@ -107,7 +107,7 @@ contains
          size(zsig, 2), size(zgam, 2), size(zthe, 2), size(zpic, 2), &
          size(zval, 2)] == jjm + 1, "grid_noro jjm")
 
-    zdeltay = 2. * pi / real(jusn) * rad
+    zdeltay = 2. * pi / real(jusn) * ra
 
     ! Extension of the US Navy database for computations at boundaries:
 
@@ -182,7 +182,7 @@ contains
 
     ! Summation over gridpoint area
 
-    zleny = pi / real(jusn) * rad
+    zleny = pi / real(jusn) * ra
     xincr = pi / 2. / real(jusn)
     DO ii = 1, iim + 1
        DO jj = 1, jjm + 1
@@ -191,13 +191,13 @@ contains
           DO j = 2, jusn + 1 
              zlenx = zleny * cos(yusn(j))
              zdeltax = zdeltay * cos(yusn(j))
-             zbordnor = (c(jj) - yusn(j) + xincr) * rad
-             zbordsud = (yusn(j) - d(jj) + xincr) * rad
+             zbordnor = (c(jj) - yusn(j) + xincr) * ra
+             zbordsud = (yusn(j) - d(jj) + xincr) * ra
              weighy = MAX(0., min(zbordnor, zbordsud, zleny))
              IF (weighy /= 0) THEN
                 DO i = 2, iusn + 2 * iext - 1
-                   zbordest = (xusn(i) - a(ii) + xincr) * rad * cos(yusn(j))
-                   zbordoue = (b(ii) + xincr - xusn(i)) * rad * cos(yusn(j))
+                   zbordest = (xusn(i) - a(ii) + xincr) * ra * cos(yusn(j))
+                   zbordoue = (b(ii) + xincr - xusn(i)) * ra * cos(yusn(j))
                    weighx = MAX(0., min(zbordest, zbordoue, zlenx))
                    IF (weighx /= 0) THEN
                       num_tot(ii, jj) = num_tot(ii, jj) + 1.
