@@ -7,8 +7,7 @@ contains
   SUBROUTINE albsno(agesno, alb_neig, snow_fall)
 
     ! From phylmd/interface_surf.F90, version 1.8 2005/05/25 13:10:09
-
-    ! Calcul \^age de la neige.
+    ! Update the age of snow.
 
     use conf_gcm_m, only: dtphys
 
@@ -20,7 +19,7 @@ contains
 
     !------------------------------------------------------------------------
 
-    ! D\'esert partout:
+    ! D\'esert partout :
     alb_neig = 0.55 + 0.3 * EXP(- agesno / 5.)
 
     agesno = (agesno + (1. - agesno / 50.) * dtphys / 86400.) &

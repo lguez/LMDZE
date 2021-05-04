@@ -96,7 +96,6 @@ contains
 
     print *, 'Geoid:'
     print '('' Gravity = '', E13.7, '' m s-2'')', RG
-    print '('' Earth radius = '', E13.7, '' m'')', RA
 
     print *, 'Radiation constants:'
     print '('' Stefan-Bol. = '', E13.7, '' W m-2 K-4'')', RSIGMA

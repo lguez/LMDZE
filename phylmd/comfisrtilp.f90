@@ -4,15 +4,27 @@ module comfisrtilp
 
   implicit none
 
+  ! seuils de la precipitation des nuages strateformes
   REAL, protected:: cld_lc_lsc  = 2.6e-4
   real, protected:: cld_lc_con = 2.6e-4
+
+  ! constante de temps pour eleminer eau lsc et convective
   real, protected:: cld_tau_lsc = 3600.
   real, protected:: cld_tau_con = 3600.
+
+  ! facteurs correctifs sur la vitesse de chute des cristaux de glace
   real, protected:: ffallv_lsc = 1.
   real, protected:: ffallv_con = 1.
+
   real, protected:: coef_eva = 2.e-5
+  ! coefficient sur la reevaporation de la pluie, regle a 3.e-5 sur
+  ! des cas de cumulus en 1D
+  
   logical, protected:: reevap_ice = .false.
+
   integer, protected:: iflag_pdf = 0
+  ! calcul eau condensee et fraction nuageuse a partir des PDF
+  ! 0: version avec ratqs sinon nouvelles PDFs
 
 contains
 

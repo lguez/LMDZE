@@ -8,20 +8,19 @@ contains
     
     ! From "etat0_netcdf.F", version 1.3, 2005/05/25 13:10:09
 
-    ! On initialise les sous-surfaces.
-    ! Lecture du fichier glace de terre pour fixer la fraction de terre 
-    ! et de glace de terre :
+    ! On initialise les sous-surfaces. Lecture du fichier glace de
+    ! terre pour fixer la fraction de terre et de glace de terre.
 
     use netcdf, only: nf90_nowrite
     use netcdf95, only: nf95_close, nf95_get_var, nf95_gw_var, nf95_inq_varid, &
          nf95_open
-    use nr_util, only: pi
+    use nr_util, only: pi, deg_to_rad
 
     use dimensions, only: iim, jjm, llm
-    use dynetat0_m, only: rlatu, rlonv
     use dynetat0_chosen_m, only: day_ref
-    use grille_m_m, only: grille_m
+    use dynetat0_m, only: rlatu, rlonv
     use grid_change, only: dyn_phy
+    use grille_m_m, only: grille_m
     use indicesol, only: is_oce, is_ter, is_lic, epsfra
     use phyetat0_m, only: masque
 
@@ -63,10 +62,10 @@ contains
 
     ! Si les coordonn\'ees sont en degr\'es, on les transforme :
     IF (MAXVAL(dlon_lic) > pi) THEN
-       dlon_lic = dlon_lic * pi / 180.
+       dlon_lic = dlon_lic * deg_to_rad
     ENDIF
     IF (maxval(dlat_lic) > pi) THEN 
-       dlat_lic = dlat_lic * pi/ 180.
+       dlat_lic = dlat_lic * deg_to_rad
     ENDIF
 
     flic_tmp(:iim, :) = grille_m(dlon_lic, dlat_lic, landice, rlonv(:iim), &
@@ -77,7 +76,7 @@ contains
     pctsrf = 0.
     pctsrf(:, is_lic) = pack(flic_tmp, dyn_phy)
 
-    ! Ad\'equation avec le maque terre/mer :
+    ! Ad\'equation avec le maque terre-mer :
     WHERE (pctsrf(:, is_lic) < EPSFRA) pctsrf(:, is_lic) = 0.
     WHERE (masque < EPSFRA) pctsrf(:, is_lic) = 0.
     where (masque <= EPSFRA) pctsrf(:, is_ter) = masque

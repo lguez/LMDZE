@@ -41,11 +41,9 @@ contains
     call read_clesphys2
     call read_YOMCST
 
-
     print *, "Enter namelist 'conf_phys_nml'."
     read(unit=*, nml=conf_phys_nml)
     write(unit_nml, nml=conf_phys_nml)
-
     call assert(any(iflag_pbl == [0, 1, 6, 8, 9]), &
          "conf_phys: bad value for iflag_pbl")
 
