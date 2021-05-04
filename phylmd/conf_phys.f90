@@ -24,16 +24,13 @@ contains
 
     USE clesphys, ONLY: read_clesphys
     use clesphys2, only: read_clesphys2
-    USE comfisrtilp, ONLY: cld_lc_con, cld_lc_lsc, cld_tau_con, &
-         cld_tau_lsc, coef_eva, ffallv_con, ffallv_lsc, iflag_pdf, reevap_ice
+    use comfisrtilp, only: read_comfisrtilp
     use dimphy, only: klon
     use nr_util, only: assert
     use unit_nml_m, only: unit_nml
     USE yomcst, ONLY: read_YOMCST
 
-    namelist /conf_phys_nml/ epmax, iflag_clw, cld_lc_lsc, cld_lc_con, &
-         cld_tau_lsc, cld_tau_con, ffallv_lsc, ffallv_con, coef_eva, &
-         reevap_ice, iflag_pdf, iflag_pbl
+    namelist /conf_phys_nml/ epmax, iflag_clw, iflag_pbl
 
     namelist /nuagecom/ rad_chau1, rad_chau2
 
@@ -44,15 +41,6 @@ contains
     call read_clesphys2
     call read_YOMCST
 
-    cld_lc_lsc = 2.6e-4
-    cld_lc_con = 2.6e-4
-    cld_tau_lsc = 3600.
-    cld_tau_con = 3600.
-    ffallv_lsc = 1.
-    ffallv_con = 1.
-    coef_eva = 2.e-5
-    reevap_ice = .false.
-    iflag_pdf = 0
 
     print *, "Enter namelist 'conf_phys_nml'."
     read(unit=*, nml=conf_phys_nml)
@@ -60,6 +48,8 @@ contains
 
     call assert(any(iflag_pbl == [0, 1, 6, 8, 9]), &
          "conf_phys: bad value for iflag_pbl")
+
+    call read_comfisrtilp
     call read_clesphys
 
     print *, "Enter namelist 'nuagecom'."
