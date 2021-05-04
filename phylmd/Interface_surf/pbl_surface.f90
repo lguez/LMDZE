@@ -170,7 +170,7 @@ contains
     REAL ypaprs(klon, klev + 1), ypplay(klon, klev), ydelp(klon, klev)
     REAL yq2(klon, klev + 1)
     REAL delp(klon, klev) ! \'epaisseur de couche
-    INTEGER i, k, nsrf
+    INTEGER i, k, nisrf
     INTEGER ni(klon), knon, j
 
     REAL pctsrf_pot(klon, nbsrf)
@@ -207,10 +207,10 @@ contains
     ! R\'epartition sous maille des flux longwave et shortwave
     ! R\'epartition du longwave par sous-surface lin\'earis\'ee
 
-    forall (nsrf = 1:nbsrf)
-       fsollw(:, nsrf) = sollw + 4. * RSIGMA * tsol**3 &
-            * (tsol - ftsol(:, nsrf))
-       fsolsw(:, nsrf) = solsw * (1. - falbe(:, nsrf)) / (1. - albsol)
+    forall (nisrf = 1:nbsrf)
+       fsollw(:, nisrf) = sollw + 4. * RSIGMA * tsol**3 &
+            * (tsol - ftsol(:, nisrf))
+       fsolsw(:, nisrf) = solsw * (1. - falbe(:, nisrf)) / (1. - albsol)
     END forall
 
     forall (k = 1:klev) delp(:, k) = paprs(:, k) - paprs(:, k + 1)
@@ -263,7 +263,7 @@ contains
 
     ! Boucler sur toutes les sous-fractions du sol:
 
-    loop_surface: DO nsrf = 1, nbsrf
+    loop_surface: DO nisrf = 1, nbsrf
        ! Define ni and knon:
 
        ni = 0
@@ -272,30 +272,30 @@ contains
        DO i = 1, klon
           ! Pour d\'eterminer le domaine \`a traiter, on utilise les surfaces
           ! "potentielles"
-          IF (pctsrf_pot(i, nsrf) > epsfra) THEN
+          IF (pctsrf_pot(i, nisrf) > epsfra) THEN
              knon = knon + 1
              ni(knon) = i
           END IF
        END DO
 
        if_knon: IF (knon /= 0) then
-          ypctsrf(:knon) = pctsrf(ni(:knon), nsrf)
-          yts(:knon) = ftsol(ni(:knon), nsrf)
-          snow(:knon) = fsnow(ni(:knon), nsrf)
-          yqsurf(:knon) = fqsurf(ni(:knon), nsrf)
-          yalb(:knon) = falbe(ni(:knon), nsrf)
+          ypctsrf(:knon) = pctsrf(ni(:knon), nisrf)
+          yts(:knon) = ftsol(ni(:knon), nisrf)
+          snow(:knon) = fsnow(ni(:knon), nisrf)
+          yqsurf(:knon) = fqsurf(ni(:knon), nisrf)
+          yalb(:knon) = falbe(ni(:knon), nisrf)
           yrain_fall(:knon) = rain_fall(ni(:knon))
           ysnow_fall(:knon) = snow_fall(ni(:knon))
-          yagesno(:knon) = agesno(ni(:knon), nsrf)
-          yrugos(:knon) = frugs(ni(:knon), nsrf)
+          yagesno(:knon) = agesno(ni(:knon), nisrf)
+          yrugos(:knon) = frugs(ni(:knon), nisrf)
           yrugoro(:knon) = rugoro(ni(:knon))
           ypaprs(:knon, :) = paprs(ni(:knon), :)
           y_run_off_lic_0(:knon) = run_off_lic_0(ni(:knon))
 
           ! For continent, copy soil water content
-          IF (nsrf == is_ter) yqsol(:knon) = qsol(ni(:knon))
+          IF (nisrf == is_ter) yqsol(:knon) = qsol(ni(:knon))
 
-          ytsoil(:knon, :) = ftsoil(ni(:knon), :, nsrf)
+          ytsoil(:knon, :) = ftsoil(ni(:knon), :, nisrf)
 
           DO k = 1, klev
              DO j = 1, knon
@@ -320,19 +320,19 @@ contains
                   * (ypplay(:knon, k - 1) - ypplay(:knon, k))
           ENDDO
 
-          CALL cdrag(nsrf, sqrt(yu(:knon, 1)**2 + yv(:knon, 1)**2), &
+          CALL cdrag(nisrf, sqrt(yu(:knon, 1)**2 + yv(:knon, 1)**2), &
                yt(:knon, 1), yq(:knon, 1), zgeop(:knon, 1), ypaprs(:knon, 1), &
                yts(:knon), yqsurf(:knon), yrugos(:knon), ycdragm(:knon), &
                ycdragh(:knon)) 
 
-          IF (nsrf == is_oce) THEN
+          IF (nisrf == is_oce) THEN
              ! On met un seuil pour ycdragm et ycdragh :
              ycdragm(:knon) = min(ycdragm(:knon), cdmmax)
              ycdragh(:knon) = min(ycdragh(:knon), cdhmax)
           END IF
 
-          IF (iflag_pbl >= 6) yq2(:knon, :) = q2(ni(:knon), :, nsrf)
-          call coef_diff_turb(nsrf, ni(:knon), ypaprs(:knon, :), &
+          IF (iflag_pbl >= 6) yq2(:knon, :) = q2(ni(:knon), :, nisrf)
+          call coef_diff_turb(nisrf, ni(:knon), ypaprs(:knon, :), &
                ypplay(:knon, :), yu(:knon, :), yv(:knon, :), yq(:knon, :), &
                yt(:knon, :), yts(:knon), ycdragm(:knon), zgeop(:knon, :), &
                ycoefm(:knon, :), ycoefh(:knon, :), yq2(:knon, :))
@@ -346,12 +346,12 @@ contains
                ypplay(:knon, :), ydelp(:knon, :), y_d_v(:knon, :), &
                y_flux_v(:knon))
 
-          CALL clqh(julien, nsrf, ni(:knon), ytsoil(:knon, :), yqsol(:knon), &
+          CALL clqh(julien, nisrf, ni(:knon), ytsoil(:knon, :), yqsol(:knon), &
                mu0(ni(:knon)), yrugos(:knon), yrugoro(:knon), yu(:knon, 1), &
                yv(:knon, 1), ycoefh(:knon, :), ycdragh(:knon), yt(:knon, :), &
                yq(:knon, :), yts(:knon), ypaprs(:knon, :), ypplay(:knon, :), &
                ydelp(:knon, :), &
-               fsolsw(ni(:knon), nsrf) + fsollw(ni(:knon), nsrf), yalb(:knon), &
+               fsolsw(ni(:knon), nisrf) + fsollw(ni(:knon), nisrf), yalb(:knon), &
                snow(:knon), yqsurf(:knon), yrain_fall(:knon), &
                ysnow_fall(:knon), yfluxlat(:knon), pctsrf_new_sic(ni(:knon)), &
                yagesno(:knon), y_d_t(:knon, :), y_d_q(:knon, :), &
@@ -364,7 +364,7 @@ contains
 
           yrugm = 0.
 
-          IF (nsrf == is_oce) THEN
+          IF (nisrf == is_oce) THEN
              DO j = 1, knon
                 yrugm(j) = 0.018 * ycdragm(j) * (yu(j, 1)**2 + yv(j, 1)**2) &
                      / rg + 0.11 * 14E-6 &
@@ -382,41 +382,41 @@ contains
              END DO
           END DO
 
-          flux_t(ni(:knon), nsrf) = y_flux_t(:knon)
-          flux_q(ni(:knon), nsrf) = y_flux_q(:knon)
-          flux_u(ni(:knon), nsrf) = y_flux_u(:knon)
-          flux_v(ni(:knon), nsrf) = y_flux_v(:knon)
+          flux_t(ni(:knon), nisrf) = y_flux_t(:knon)
+          flux_q(ni(:knon), nisrf) = y_flux_q(:knon)
+          flux_u(ni(:knon), nisrf) = y_flux_u(:knon)
+          flux_v(ni(:knon), nisrf) = y_flux_v(:knon)
 
-          falbe(:, nsrf) = 0.
-          fsnow(:, nsrf) = 0.
-          fqsurf(:, nsrf) = 0.
-          frugs(:, nsrf) = 0.
+          falbe(:, nisrf) = 0.
+          fsnow(:, nisrf) = 0.
+          fqsurf(:, nisrf) = 0.
+          frugs(:, nisrf) = 0.
 
           DO j = 1, knon
              i = ni(j)
-             d_ts(i, nsrf) = tsurf_new(j) - yts(j)
-             ftsol(i, nsrf) = tsurf_new(j) ! update surface temperature
-             falbe(i, nsrf) = yalb(j)
-             fsnow(i, nsrf) = snow(j)
-             fqsurf(i, nsrf) = yqsurf(j)
-             frugs(i, nsrf) = yz0_new(j)
-             fluxlat(i, nsrf) = yfluxlat(j)
-             IF (nsrf == is_oce) THEN
+             d_ts(i, nisrf) = tsurf_new(j) - yts(j)
+             ftsol(i, nisrf) = tsurf_new(j) ! update surface temperature
+             falbe(i, nisrf) = yalb(j)
+             fsnow(i, nisrf) = snow(j)
+             fqsurf(i, nisrf) = yqsurf(j)
+             frugs(i, nisrf) = yz0_new(j)
+             fluxlat(i, nisrf) = yfluxlat(j)
+             IF (nisrf == is_oce) THEN
                 rugmer(i) = yrugm(j)
-                frugs(i, nsrf) = yrugm(j)
+                frugs(i, nisrf) = yrugm(j)
              END IF
-             agesno(i, nsrf) = yagesno(j)
-             fqcalving(i, nsrf) = y_fqcalving(j)
-             ffonte(i, nsrf) = y_ffonte(j)
+             agesno(i, nisrf) = yagesno(j)
+             fqcalving(i, nisrf) = y_fqcalving(j)
+             ffonte(i, nisrf) = y_ffonte(j)
              cdragh(i) = cdragh(i) + ycdragh(j) * ypctsrf(j)
              cdragm(i) = cdragm(i) + ycdragm(j) * ypctsrf(j)
              dflux_t(i) = dflux_t(i) + y_dflux_t(j) * ypctsrf(j)
              dflux_q(i) = dflux_q(i) + y_dflux_q(j) * ypctsrf(j)
           END DO
 
-          IF (nsrf == is_ter) THEN
+          IF (nisrf == is_ter) THEN
              qsol(ni(:knon)) = yqsol(:knon)
-          else IF (nsrf == is_lic) THEN
+          else IF (nisrf == is_lic) THEN
              DO j = 1, knon
                 i = ni(j)
                 run_off_lic_0(i) = y_run_off_lic_0(j)
@@ -424,8 +424,8 @@ contains
              END DO
           END IF
 
-          ftsoil(:, :, nsrf) = 0.
-          ftsoil(ni(:knon), :, nsrf) = ytsoil(:knon, :)
+          ftsoil(:, :, nisrf) = 0.
+          ftsoil(ni(:knon), :, nisrf) = ytsoil(:knon, :)
 
           DO j = 1, knon
              i = ni(j)
@@ -446,23 +446,23 @@ contains
           v1(:knon) = yv(:knon, 1) + y_d_v(:knon, 1)
           t1(:knon) = yt(:knon, 1) + y_d_t(:knon, 1)
 
-          CALL stdlevvar(nsrf, u1(:knon), v1(:knon), t1(:knon), &
+          CALL stdlevvar(nisrf, u1(:knon), v1(:knon), t1(:knon), &
                yq(:knon, 1) + y_d_q(:knon, 1), &
                rd * t1(:knon) / (0.5 * (ypaprs(:knon, 1) + ypplay(:knon, 1))) &
                * (ypaprs(:knon, 1) - ypplay(:knon, 1)), &
                tsurf_new(:knon), yqsurf(:knon), &
-               merge(frugs(ni(:knon), is_oce), yrugos(:knon), nsrf == is_oce), &
+               merge(frugs(ni(:knon), is_oce), yrugos(:knon), nisrf == is_oce), &
                ypaprs(:knon, 1), ypplay(:knon, 1), yt2m(:knon), yq2m(:knon), &
                wind10m(:knon), ustar(:knon))
 
           DO j = 1, knon
              i = ni(j)
-             t2m(i, nsrf) = yt2m(j)
-             q2m(i, nsrf) = yq2m(j)
+             t2m(i, nisrf) = yt2m(j)
+             q2m(i, nisrf) = yq2m(j)
 
-             u10m_srf(i, nsrf) = (wind10m(j) * u1(j)) &
+             u10m_srf(i, nisrf) = (wind10m(j) * u1(j)) &
                   / sqrt(u1(j)**2 + v1(j)**2)
-             v10m_srf(i, nsrf) = (wind10m(j) * v1(j)) &
+             v10m_srf(i, nisrf) = (wind10m(j) * v1(j)) &
                   / sqrt(u1(j)**2 + v1(j)**2)
           END DO
 
@@ -473,18 +473,18 @@ contains
 
           DO j = 1, knon
              i = ni(j)
-             pblh(i, nsrf) = ypblh(j)
-             lcl(i, nsrf) = ylcl(j)
-             capcl(i, nsrf) = ycapcl(j)
-             oliqcl(i, nsrf) = yoliqcl(j)
-             cteicl(i, nsrf) = ycteicl(j)
-             pblt(i, nsrf) = ypblt(j)
-             therm(i, nsrf) = ytherm(j)
+             pblh(i, nisrf) = ypblh(j)
+             lcl(i, nisrf) = ylcl(j)
+             capcl(i, nisrf) = ycapcl(j)
+             oliqcl(i, nisrf) = yoliqcl(j)
+             cteicl(i, nisrf) = ycteicl(j)
+             pblt(i, nisrf) = ypblt(j)
+             therm(i, nisrf) = ytherm(j)
           END DO
 
-          IF (iflag_pbl >= 6) q2(ni(:knon), :, nsrf) = yq2(:knon, :)
+          IF (iflag_pbl >= 6) q2(ni(:knon), :, nisrf) = yq2(:knon, :)
        else
-          fsnow(:, nsrf) = 0.
+          fsnow(:, nisrf) = 0.
        end IF if_knon
     END DO loop_surface
 

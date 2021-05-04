@@ -4,7 +4,7 @@ module clqh_m
 
 contains
 
-  SUBROUTINE clqh(julien, nisurf, knindex, tsoil, qsol, mu0, rugos, rugoro, &
+  SUBROUTINE clqh(julien, nisrf, knindex, tsoil, qsol, mu0, rugos, rugoro, &
        u1lay, v1lay, coefh, cdragh, t, q, ts, paprs, pplay, delp, radsol, &
        albedo, snow, qsurf, rain_fall, snow_fall, fluxlat, pctsrf_new_sic, &
        agesno, d_t, d_q, tsurf_new, z0_new, flux_t, flux_q, dflux_s, dflux_l, &
@@ -29,7 +29,7 @@ contains
     USE suphec_m, ONLY: rtt, rkappa
 
     integer, intent(in):: julien ! jour de l'annee en cours
-    integer, intent(in):: nisurf ! index de la surface a traiter
+    integer, intent(in):: nisrf ! index de la surface a traiter
 
     integer, intent(in):: knindex(:) ! (knon)
     ! index des points de la surface a traiter
@@ -150,7 +150,7 @@ contains
          coefh, delp, q)
     knon  = size(knindex)
 
-    select case (nisurf)
+    select case (nisrf)
     case (is_ter)
        ! Surface "terre", appel \`a l'interface avec les sols continentaux
 
@@ -235,7 +235,7 @@ contains
        ! Rugosite
        z0_new = rugoro
     case default
-       print *, 'Index of surface = ', nisurf
+       print *, 'Index of surface = ', nisrf
        call abort_gcm("clqh", 'Index surface non valable')
     end select
 
