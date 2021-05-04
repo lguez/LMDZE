@@ -11,7 +11,7 @@ contains
     ! Author: P. Le Van
     ! Objet : sortie des variables de contr\^ole
 
-    USE comconst, ONLY: daysec, g, omeg, rad
+    USE comconst, ONLY: daysec, g, omeg, ra
     USE comgeom, ONLY: aire_2d, cu_2d
     USE dimensions, ONLY: iim, jjm, llm
     use dynetat0_m, ONLY: rlatu
@@ -47,8 +47,8 @@ contains
 
     ! Calcul du moment  angulaire :
     
-    radsg = rad / g
-    radomeg = rad * omeg
+    radsg = ra / g
+    radomeg = ra * omeg
     cosphi = cos(rlatu(2:jjm))
 
     DO l = 1, llm

@@ -15,7 +15,7 @@ CONTAINS
     USE netcdf95, ONLY: nf95_create, nf95_def_dim, nf95_def_var, nf95_enddef, &
          nf95_put_att, nf95_put_var
 
-    USE comconst, ONLY: cpp, daysec, g, kappa, omeg, rad
+    USE comconst, ONLY: cpp, daysec, g, kappa, omeg, ra
     USE dimensions, ONLY: iim, jjm, llm, nqmx
     USE disvert_m, ONLY: ap, bp, preff, presnivs
     use dynetat0_m, only: rlatu, rlatv, rlonu, rlonv, rlatu1, rlatu2, yprimu1, &
@@ -66,7 +66,7 @@ CONTAINS
     tab_cntrl(3) = llm
     tab_cntrl(4) = day_ref
     tab_cntrl(5) = annee_ref
-    tab_cntrl(6) = rad
+    tab_cntrl(6) = ra
     tab_cntrl(7) = omeg
     tab_cntrl(8) = g
     tab_cntrl(9) = cpp

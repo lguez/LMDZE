@@ -5,8 +5,7 @@ module comconst
   implicit none
 
   real, parameter:: daysec = 86400. ! number of seconds per day
-
-  real, parameter:: rad = 6371229. ! radius of the Earth (in m)
+  real, parameter:: ra = 6371229. ! radius of the Earth (in m)
 
   real, parameter:: cpp = 1004.70885
   ! specific heat capacity at constant pressure of dry air, in J K-1 kg-1

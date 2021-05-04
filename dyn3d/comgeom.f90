@@ -115,8 +115,8 @@ contains
     ! x est la longitude du point en radians.
     ! y est la latitude du point en radians.
     ! 
-    ! On a : cu_2d(i, j) = rad * cos(y) * dx / dX
-    ! cv(j) = rad * dy / dY
+    ! On a : cu_2d(i, j) = ra * cos(y) * dx / dX
+    ! cv(j) = ra * dy / dY
     ! aire_2d(i, j) = cu_2d(i, j) * cv(j)
     ! 
     ! y, dx / dX, dy / dY calculés aux points concernés. cv, bien que
@@ -125,7 +125,7 @@ contains
 
     ! cv_2d est aux points v. cu_2d est aux points u. Cf. "inigeom.txt".
 
-    USE comconst, ONLY : g, omeg, rad
+    USE comconst, ONLY : g, omeg, ra
     USE comdissnew, ONLY : coefdis, nitergdiv, nitergrot, niterh
     use dimensions, only: iim, jjm
     use dynetat0_m, only: xprimp025, xprimm025, rlatu1, rlatu2, rlatu, rlatv, &
@@ -226,7 +226,7 @@ contains
     print *, "gamdi_grot = ", gamdi_grot
     print *, "gamdi_h = ", gamdi_h
 
-    un4rad2 = 0.25 * rad * rad
+    un4rad2 = 0.25 * ra * ra
 
     ! Cf. "inigeom.txt". Calcul des quatre aires élémentaires
     ! aireij1_2d, aireij2_2d, aireij3_2d, aireij4_2d qui entourent
@@ -235,7 +235,7 @@ contains
     ! calculées aux mêmes endroits que les aireij.
 
     coslatm = cos(rlatu1(1))
-    radclatm = 0.5 * rad * coslatm
+    radclatm = 0.5 * ra * coslatm
 
     aireij1_2d(:iim, 1) = 0.
     aireij2_2d(:iim, 1) = un4rad2 * coslatm * xprimp025(:iim) * yprimu1(1)
@@ -248,15 +248,15 @@ contains
     cuij4(:iim, 1) = 0.
 
     cvij1(:iim, 1) = 0.
-    cvij2(:iim, 1) = 0.5 * rad * yprimu1(1)
+    cvij2(:iim, 1) = 0.5 * ra * yprimu1(1)
     cvij3(:iim, 1) = cvij2(:iim, 1)
     cvij4(:iim, 1) = 0.
 
     do j = 2, jjm
        coslatm = cos(rlatu1(j))
        coslatp = cos(rlatu2(j-1))
-       radclatp = 0.5 * rad * coslatp
-       radclatm = 0.5 * rad * coslatm
+       radclatp = 0.5 * ra * coslatp
+       radclatm = 0.5 * ra * coslatm
        ai14 = un4rad2 * coslatp * yprimu2(j-1)
        ai23 = un4rad2 * coslatm * yprimu1(j)
 
@@ -268,14 +268,14 @@ contains
        cuij2(:iim, j) = radclatm * xprimp025(:iim)
        cuij3(:iim, j) = radclatm * xprimm025(:iim)
        cuij4(:iim, j) = radclatp * xprimm025(:iim)
-       cvij1(:iim, j) = 0.5 * rad * yprimu2(j-1)
-       cvij2(:iim, j) = 0.5 * rad * yprimu1(j)
+       cvij1(:iim, j) = 0.5 * ra * yprimu2(j-1)
+       cvij2(:iim, j) = 0.5 * ra * yprimu1(j)
        cvij3(:iim, j) = cvij2(:iim, j)
        cvij4(:iim, j) = cvij1(:iim, j)
     end do
 
     coslatp = cos(rlatu2(jjm))
-    radclatp = 0.5 * rad * coslatp
+    radclatp = 0.5 * ra * coslatp
 
     aireij1_2d(:iim, jjp1) = un4rad2 * coslatp * xprimp025(:iim) * yprimu2(jjm)
     aireij2_2d(:iim, jjp1) = 0.
@@ -287,7 +287,7 @@ contains
     cuij3(:iim, jjp1) = 0.
     cuij4(:iim, jjp1) = radclatp * xprimm025(:iim)
 
-    cvij1(:iim, jjp1) = 0.5 * rad * yprimu2(jjm)
+    cvij1(:iim, jjp1) = 0.5 * ra * yprimu2(jjm)
     cvij2(:iim, jjp1) = 0.
     cvij3(:iim, jjp1) = 0.
     cvij4(:iim, jjp1) = cvij1(:iim, jjp1)
@@ -437,7 +437,7 @@ contains
     END DO
     DO j = 1, jjm - 1
        DO i = 1, iim
-          constang_2d(i, j + 1) = rad * omeg * cu_2d(i, j + 1) &
+          constang_2d(i, j + 1) = ra * omeg * cu_2d(i, j + 1) &
                * cos(rlatu(j + 1))
        END DO
     END DO
