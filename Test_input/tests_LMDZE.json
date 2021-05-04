@@ -93,7 +93,10 @@
             "$ECMWF_dir/ECDYN.nc",
             ["$ECMWF_dir/ECDYN.nc", "ECPHY.nc"],
             "$datasets_dir/landiceref.nc",
-            "$datasets_dir/Relief.nc",
+            [
+		"$datasets_dir/Relief_GMTED2010_15n015_00625deg_plus_GA.nc",
+		"Relief.nc"
+	    ],
             "$datasets_dir/Rugos.nc",
             "$test_input_dir/Namelists/traceur.def"
 	],
@@ -113,7 +116,10 @@
             "$ECMWF_dir/ECDYN.nc",
             ["$ECMWF_dir/ECDYN.nc", "ECPHY.nc"],
             "$datasets_dir/landiceref.nc",
-            "$datasets_dir/Relief.nc",
+            [
+		"$datasets_dir/Relief_GMTED2010_15n015_00625deg_plus_GA.nc",
+		"Relief.nc"
+	    ],
             "$datasets_dir/Rugos.nc",
             "$test_input_dir/Namelists/traceur.def"
 	]
@@ -636,7 +642,10 @@
             "$ECMWF_dir/ECDYN.nc",
             ["$ECMWF_dir/ECDYN.nc", "ECPHY.nc"],
             "$datasets_dir/landiceref.nc",
-            "$datasets_dir/Relief.nc",
+            [
+		"$datasets_dir/Relief_GMTED2010_15n015_00625deg_plus_GA.nc",
+		"Relief.nc"
+	    ],
             "$datasets_dir/Rugos.nc",
             "$test_input_dir/Namelists/traceur.def"
 	],
@@ -653,7 +662,10 @@
             "$ECMWF_dir/ECDYN.nc",
             ["$ECMWF_dir/ECDYN.nc", "ECPHY.nc"],
             "$datasets_dir/landiceref.nc",
-            "$datasets_dir/Relief.nc",
+            [
+		"$datasets_dir/Relief_GMTED2010_15n015_00625deg_plus_GA.nc",
+		"Relief.nc"
+	    ],
             "$datasets_dir/Rugos.nc",
             "$test_input_dir/Namelists/traceur.def"
 	],
@@ -670,7 +682,10 @@
             "$ECMWF_dir/ECDYN.nc",
             ["$ECMWF_dir/ECDYN.nc", "ECPHY.nc"],
             "$datasets_dir/landiceref.nc",
-            "$datasets_dir/Relief.nc",
+            [
+		"$datasets_dir/Relief_GMTED2010_15n015_00625deg_plus_GA.nc",
+		"Relief.nc"
+	    ],
             "$datasets_dir/Rugos.nc",
             "$test_input_dir/Namelists/traceur.def"
 	],
