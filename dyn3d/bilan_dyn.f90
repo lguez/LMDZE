@@ -4,7 +4,7 @@ module bilan_dyn_m
 
 contains
 
-  SUBROUTINE bilan_dyn(ps, masse, pk, flux_u, flux_v, teta, phi, ucov, vcov, &
+  SUBROUTINE bilan_dyn(ps, masse, pk, pbaru, pbarv, teta, phi, ucov, vcov, &
        trac)
 
     ! From LMDZ4/libf/dyn3d/bilan_dyn.F, version 1.5 2005/03/16 10:12:17
@@ -26,8 +26,8 @@ contains
 
     real, intent(in):: ps(:, :) ! (iip1, jjp1)
     real, intent(in):: masse(:, :, :), pk(:, :, :) ! (iip1, jjp1, llm)
-    real, intent(in):: flux_u(:, :, :) ! (iip1, jjp1, llm)
-    real, intent(in):: flux_v(:, :, :) ! (iip1, jjm, llm)
+    real, intent(in):: pbaru(:, :, :) ! (iip1, jjp1, llm)
+    real, intent(in):: pbarv(:, :, :) ! (iip1, jjm, llm)
     real, intent(in):: teta(:, :, :) ! (iip1, jjp1, llm)
     real, intent(in):: phi(:, :, :) ! (iip1, jjp1, llm)
     real, intent(in):: ucov(:, :, :) ! (iip1, jjp1, llm)
@@ -119,21 +119,21 @@ contains
     ! Accumulation des flux de masse horizontaux
     ps_cum = ps_cum + ps
     masse_cum = masse_cum + masse
-    flux_u_cum = flux_u_cum + flux_u
-    flux_v_cum = flux_v_cum + flux_v
+    flux_u_cum = flux_u_cum + pbaru
+    flux_v_cum = flux_v_cum + pbarv
     forall (iQ = 1: nQ) Q_cum(:, :, :, iQ) = Q_cum(:, :, :, iQ) &
          + Q(:, :, :, iQ) * masse
 
     ! Flux longitudinal
     forall (iQ = 1: nQ, i = 1: iim) flux_uQ_cum(i, :, :, iQ) &
          = flux_uQ_cum(i, :, :, iQ) &
-         + flux_u(i, :, :) * 0.5 * (Q(i, :, :, iQ) + Q(i + 1, :, :, iQ))
+         + pbaru(i, :, :) * 0.5 * (Q(i, :, :, iQ) + Q(i + 1, :, :, iQ))
     flux_uQ_cum(iip1, :, :, :) = flux_uQ_cum(1, :, :, :)
 
     ! Flux m\'eridien
     forall (iQ = 1: nQ, j = 1: jjm) flux_vQ_cum(:, j, :, iQ) &
          = flux_vQ_cum(:, j, :, iQ) &
-         + flux_v(:, j, :) * 0.5 * (Q(:, j, :, iQ) + Q(:, j + 1, :, iQ))
+         + pbarv(:, j, :) * 0.5 * (Q(:, j, :, iQ) + Q(:, j + 1, :, iQ))
 
     writing_step: if (icum == ncum) then
        ! Normalisation
