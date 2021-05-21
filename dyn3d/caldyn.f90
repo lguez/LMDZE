@@ -4,8 +4,8 @@ module caldyn_m
 
 contains
 
-  SUBROUTINE caldyn(itau, ucov, vcov, teta, ps, masse, pk, pkf, phis, phi, &
-       du, dv, dteta, dp, w, pbaru, pbarv, conser)
+  SUBROUTINE caldyn(itau, ucov, vcov, teta, ps, masse, pk, pkf, phis, phi, du, &
+       dv, dteta, dp, w, pbaru, pbarv, conser)
 
     ! From dyn3d/caldyn.F, version 1.1.1.1, 2004/05/19 12:53:06
     ! Author: P. Le Van
@@ -82,11 +82,10 @@ contains
     CALL enercin(vcov, ucov, vcont, ucont, ecin)
     bern = bernoui(phi, ecin)
     CALL dudv2(teta, pkf, bern, du(:, 2:jjm, :), dv)
-
     forall (l = 1: llm) ang_3d(:, :, l) = ucov(:, :, l) + constang_2d
     CALL advect(ang_3d, vcov, teta, w, massebx, masseby, du, dv, dteta)
 
-    ! Warning problème de périodicité de dv sur les PC Linux. Problème
+    ! Problème de périodicité de dv sur les PC Linux. Problème
     ! d'arrondi probablement. Observé sur le code compilé avec pgf90
     ! 3.0-1.
     DO l = 1, llm
@@ -97,15 +96,13 @@ contains
        end do
     END DO
 
-    ! Sorties éventuelles des variables de contrôle :
+    ! Sortie éventuelle des variables de contrôle :
     IF (conser) then
        CALL sortvarc(ucov, teta, ps, masse, pk, phis, vorpot, phi, bern, dp, &
             ang, etot, ptot, ztot, stot, rmsdpdt, rmsv)
-
        time = real(itau) / day_step
        heure = mod(itau * dtvr / daysec, 1.) * 24.
-       IF (abs(heure-24.) <= 1e-4) heure = 0.
-
+       IF (abs(heure - 24.) <= 1e-4) heure = 0.
        PRINT 3500, itau, int(day_ini + time), heure, time
        PRINT 4000, ptot / ptot0, rmsdpdt, etot / etot0, ztot / ztot0, &
             stot / stot0, sqrt(rmsv / ptot), ang / ang0
