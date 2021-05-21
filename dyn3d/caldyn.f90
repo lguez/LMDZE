@@ -41,11 +41,11 @@ contains
     REAL, INTENT (IN):: ps(ip1jmp1)
     real, intent(out):: masse(ip1jmp1, llm)
     REAL, INTENT(IN):: pk(iip1, jjp1, llm)
-    REAL, INTENT(IN):: pkf(ip1jmp1, llm)
+    REAL, INTENT(IN):: pkf(:, :, :) ! (iim + 1, jjm + 1, llm)
     REAL, INTENT(IN):: phis(ip1jmp1)
     REAL, INTENT(IN):: phi(iim + 1, jjm + 1, llm)
     REAL du(:, :, :) ! (iim + 1, jjm + 1, llm)
-    real dv((iim + 1) * jjm, llm)
+    real dv(iim + 1, jjm, llm)
     REAL, INTENT(out):: dteta(:, :, :) ! (iim + 1, jjm + 1, llm)
     real, INTENT(out):: dp(:, :) ! (iim + 1, jjm + 1)
     REAL, INTENT(out):: w(:, :, :) ! (iim + 1, jjm + 1, llm)
@@ -61,7 +61,7 @@ contains
     real ecin(iim + 1, jjm + 1, llm), convm(iim + 1, jjm + 1, llm)
     REAL bern(iim + 1, jjm + 1, llm)
     REAL massebxy(iim + 1, jjm, llm)
-    INTEGER ij, l
+    INTEGER j, l
     real heure, time
     real ang, etot, ptot, ztot, stot, rmsdpdt, rmsv
 
@@ -90,11 +90,11 @@ contains
     ! d'arrondi probablement. Observé sur le code compilé avec pgf90
     ! 3.0-1.
     DO l = 1, llm
-       DO ij = 1, (iim + 1) * jjm, iip1
-          IF (dv(ij, l)/=dv(ij+iim, l)) THEN
-             dv(ij+iim, l) = dv(ij, l)
+       do j = 1, jjm
+          IF (dv(1, j, l) /= dv(iim + 1, j, l)) THEN
+             dv(iim + 1, j, l) = dv(1, j, l)
           END IF
-       END DO
+       end do
     END DO
 
     ! Sorties éventuelles des variables de contrôle :
