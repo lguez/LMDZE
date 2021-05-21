@@ -15,7 +15,7 @@ contains
     ! Bernoulli". Ces termes sont ajoutés à d(ucov)/dt et à
     ! d(vcov)/dt.
 
-    USE dimensions, ONLY: iim, jjm, llm
+    USE dimensions, ONLY: iim, jjm
 
     REAL, INTENT(IN):: teta(:, :, :) ! (iim + 1, jjm + 1, llm)
     REAL, INTENT(IN):: pkf(:, :, :) ! (iim + 1, jjm + 1, llm)
@@ -24,31 +24,19 @@ contains
     real, intent(inout):: dv(:, :, :) ! (iim + 1, jjm, llm)
 
     ! Local:
-    INTEGER l, i, j
+    INTEGER i, j
 
     !-----------------------------------------------------------------
 
-    DO l = 1, llm
-       do j = 2, jjm
-          do i = 1, iim
-             du(i, j, l) = du(i, j, l) + 0.5 * (teta(i, j, l) &
-                  + teta(i + 1, j, l)) * (pkf(i, j, l) - pkf(i + 1, j, l)) &
-                  + bern(i, j, l) - bern(i + 1, j, l)
-          end do
-       end do
+    forall (i = 1:iim) du(i, 2:jjm, :) = du(i, 2:jjm, :) + 0.5 &
+         * (teta(i, 2:jjm, :) + teta(i + 1, 2:jjm, :)) * (pkf(i, 2:jjm, :) &
+         - pkf(i + 1, 2:jjm, :)) + bern(i, 2:jjm, :) - bern(i + 1, 2:jjm, :)
 
-       do j = 2, jjm
-          du(iim + 1, j, l) = du(1, j, l)
-       end do
+    du(iim + 1, 2:jjm, :) = du(1, 2:jjm, :)
 
-       do j = 1, jjm
-          do i = 1, iim + 1
-             dv(i, j, l) = dv(i, j, l) + 0.5 * (teta(i, j, l) &
-                  + teta(i, j + 1, l)) * (pkf(i, j + 1, l) - pkf(i, j, l)) &
-                  + bern(i, j + 1, l) - bern(i, j, l)
-          end do
-       END DO
-    END DO
+    forall (j = 1:jjm) dv(:, j, :) = dv(:, j, :) + 0.5 * (teta(:, j, :) &
+         + teta(:, j + 1, :)) * (pkf(:, j + 1, :) - pkf(:, j, :)) &
+         + bern(:, j + 1, :) - bern(:, j, :)
 
   END SUBROUTINE dudv2
 
