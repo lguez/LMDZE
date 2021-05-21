@@ -15,35 +15,37 @@ contains
     ! Bernoulli". Ces termes sont ajoutés à d(ucov)/dt et à
     ! d(vcov)/dt.
 
-    USE dimensions, ONLY: iim, llm
-    USE paramet_m, ONLY: iip1, iip2, ip1jm, ip1jmp1
+    USE dimensions, ONLY: iim, jjm, llm
 
-    REAL, INTENT(IN):: teta(ip1jmp1, llm)
-    REAL, INTENT(IN):: pkf(ip1jmp1, llm)
-    real, INTENT(IN):: bern(ip1jmp1, llm)
-    real, intent(inout):: du(ip1jmp1, llm), dv(ip1jm, llm)
+    REAL, INTENT(IN):: teta(iim + 1, jjm + 1, llm)
+    REAL, INTENT(IN):: pkf(iim + 1, jjm + 1, llm)
+    real, INTENT(IN):: bern(iim + 1, jjm + 1, llm)
+    real, intent(inout):: du(iim + 1, jjm + 1, llm), dv(iim + 1, jjm, llm)
 
     ! Local:
-    INTEGER l, ij
+    INTEGER l, i, j
 
     !-----------------------------------------------------------------
 
     DO l = 1, llm
-       DO ij = iip2, ip1jm - 1
-          du(ij, l) = du(ij, l) + 0.5 * (teta(ij, l) + teta(ij + 1, l)) &
-               * (pkf(ij, l) - pkf(ij + 1, l)) + bern(ij, l) - bern(ij + 1, l)
-       END DO
+       do j = 2, jjm
+          do i = 1, iim
+             du(i, j, l) = du(i, j, l) + 0.5 * (teta(i, j, l) &
+                  + teta(i + 1, j, l)) * (pkf(i, j, l) - pkf(i + 1, j, l)) &
+                  + bern(i, j, l) - bern(i + 1, j, l)
+          end do
+       end do
 
-       ! correction pour du(iip1, j, l), j=2, jjm
-       ! du(iip1, j, l) = du(1, j, l)
-       DO ij = iip1 + iip1, ip1jm, iip1
-          du(ij, l) = du(ij - iim, l)
-       END DO
+       do j = 2, jjm
+          du(iim + 1, j, l) = du(1, j, l)
+       end do
 
-       DO ij = 1, ip1jm
-          dv(ij, l) = dv(ij, l) + 0.5 * (teta(ij, l) + teta(ij + iip1, l)) &
-               * (pkf(ij + iip1, l) - pkf(ij, l)) + bern(ij + iip1, l) &
-               - bern(ij, l)
+       do j = 1, jjm
+          do i = 1, iim + 1
+             dv(i, j, l) = dv(i, j, l) + 0.5 * (teta(i, j, l) &
+                  + teta(i, j + 1, l)) * (pkf(i, j + 1, l) - pkf(i, j, l)) &
+                  + bern(i, j + 1, l) - bern(i, j, l)
+          end do
        END DO
     END DO
 
