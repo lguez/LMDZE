@@ -67,7 +67,7 @@ contains
     REAL massem1(iim + 1, jjm + 1, llm)
 
     ! Tendances dynamiques
-    REAL dv((iim + 1) * jjm, llm), du(iim + 1, jjm + 1, llm)
+    REAL dv(iim + 1, jjm, llm), du(iim + 1, jjm + 1, llm)
     REAL dteta(iim + 1, jjm + 1, llm)
     real dp(iim + 1, jjm + 1)
 
