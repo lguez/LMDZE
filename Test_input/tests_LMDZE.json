@@ -92,7 +92,7 @@
             ["$Cariolle_dir/coefoz_v2_8.nc", "coefoz.nc"],
             "$ECMWF_dir/ECDYN.nc",
             ["$ECMWF_dir/ECDYN.nc", "ECPHY.nc"],
-            "$datasets_dir/landiceref.nc",
+            ["$datasets_dir/landiceref_GA_HR.nc", "landiceref.nc"],
             [
 		"$datasets_dir/Relief_GMTED2010_15n015_00625deg_plus_GA.nc",
 		"Relief.nc"
@@ -115,7 +115,7 @@
             ["$Cariolle_dir/coefoz_v2_8.nc", "coefoz.nc"],
             "$ECMWF_dir/ECDYN.nc",
             ["$ECMWF_dir/ECDYN.nc", "ECPHY.nc"],
-            "$datasets_dir/landiceref.nc",
+            ["$datasets_dir/landiceref_GA_HR.nc", "landiceref.nc"],
             [
 		"$datasets_dir/Relief_GMTED2010_15n015_00625deg_plus_GA.nc",
 		"Relief.nc"
@@ -641,7 +641,7 @@
             ["$Cariolle_dir/coefoz_v2_8.nc", "coefoz.nc"],
             "$ECMWF_dir/ECDYN.nc",
             ["$ECMWF_dir/ECDYN.nc", "ECPHY.nc"],
-            "$datasets_dir/landiceref.nc",
+            ["$datasets_dir/landiceref_GA_HR.nc", "landiceref.nc"],
             [
 		"$datasets_dir/Relief_GMTED2010_15n015_00625deg_plus_GA.nc",
 		"Relief.nc"
@@ -661,7 +661,7 @@
             ["$Cariolle_dir/coefoz_v2_8.nc", "coefoz.nc"],
             "$ECMWF_dir/ECDYN.nc",
             ["$ECMWF_dir/ECDYN.nc", "ECPHY.nc"],
-            "$datasets_dir/landiceref.nc",
+            ["$datasets_dir/landiceref_GA_HR.nc", "landiceref.nc"],
             [
 		"$datasets_dir/Relief_GMTED2010_15n015_00625deg_plus_GA.nc",
 		"Relief.nc"
@@ -681,7 +681,7 @@
             ["$Cariolle_dir/coefoz_v2_8.nc", "coefoz.nc"],
             "$ECMWF_dir/ECDYN.nc",
             ["$ECMWF_dir/ECDYN.nc", "ECPHY.nc"],
-            "$datasets_dir/landiceref.nc",
+            ["$datasets_dir/landiceref_GA_HR.nc", "landiceref.nc"],
             [
 		"$datasets_dir/Relief_GMTED2010_15n015_00625deg_plus_GA.nc",
 		"Relief.nc"
