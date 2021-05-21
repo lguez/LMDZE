@@ -61,7 +61,7 @@ contains
     real ecin(iim + 1, jjm + 1, llm), convm(iim + 1, jjm + 1, llm)
     REAL bern(iim + 1, jjm + 1, llm)
     REAL massebxy(iim + 1, jjm, llm)
-    INTEGER j, l
+    INTEGER l
     real heure, time
     real ang, etot, ptot, ztot, stot, rmsdpdt, rmsv
 
@@ -88,13 +88,7 @@ contains
     ! Problème de périodicité de dv sur les PC Linux. Problème
     ! d'arrondi probablement. Observé sur le code compilé avec pgf90
     ! 3.0-1.
-    DO l = 1, llm
-       do j = 1, jjm
-          IF (dv(1, j, l) /= dv(iim + 1, j, l)) THEN
-             dv(iim + 1, j, l) = dv(1, j, l)
-          END IF
-       end do
-    END DO
+    where (dv(1, :, :) /= dv(iim + 1, :, :)) dv(iim + 1, :, :) = dv(1, :, :)
 
     ! Sortie éventuelle des variables de contrôle :
     IF (conser) then
