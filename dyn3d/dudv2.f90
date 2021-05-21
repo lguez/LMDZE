@@ -10,9 +10,10 @@ contains
 
     ! Author: P. Le Van
 
-    ! Objet : calcul du terme de pression (gradient de p / densité) et
-    ! du terme "- gradient de la fonction de Bernouilli". Ces termes
-    ! sont ajoutés à d(ucov)/dt et à d(vcov)/dt.
+    ! Objet : calcul du terme de pression (gradient de pression /
+    ! densité) et du terme "- gradient de la fonction de
+    ! Bernoulli". Ces termes sont ajoutés à d(ucov)/dt et à
+    ! d(vcov)/dt.
 
     USE dimensions, ONLY: iim, llm
     USE paramet_m, ONLY: iip1, iip2, ip1jm, ip1jmp1

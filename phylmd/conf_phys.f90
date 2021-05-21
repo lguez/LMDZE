@@ -22,16 +22,17 @@ contains
 
     ! Configuration de la "physique" de LMDZ.
 
+    ! Libraries:
+    use nr_util, only: assert
+
     USE clesphys, ONLY: read_clesphys
     use clesphys2, only: read_clesphys2
     use comfisrtilp, only: read_comfisrtilp
     use dimphy, only: klon
-    use nr_util, only: assert
     use unit_nml_m, only: unit_nml
     USE yomcst, ONLY: read_YOMCST
 
     namelist /conf_phys_nml/ epmax, iflag_clw, iflag_pbl
-
     namelist /nuagecom/ rad_chau1, rad_chau2
 
     !-----------------------------------------------------------

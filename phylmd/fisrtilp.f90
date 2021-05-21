@@ -14,6 +14,7 @@ contains
     ! Objet : condensation et pr\'ecipitation stratiforme, sch\'ema de
     ! nuage, sch\'ema de condensation \`a grande \'echelle (pluie).
 
+    ! Libraries:
     USE numer_rec_95, ONLY: nr_erf
 
     USE comfisrtilp, ONLY: cld_lc_con, cld_lc_lsc, cld_tau_con, &

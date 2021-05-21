@@ -143,12 +143,12 @@ contains
 
        if (.not. leapf) then
           ! Matsuno backward
-          ! Calcul des tendances dynamiques:
+          ! Calcul des tendances dynamiques :
           CALL geopot(teta, pk, pks, phis, phi)
           CALL caldyn(itau + 1, ucov, vcov, teta, ps, masse, pk, pkf, phis, &
                phi, du, dv, dteta, dp, w, pbaru, pbarv, conser = .false.)
 
-          ! integrations dynamique et traceurs:
+          ! Int\'egrations dynamique et traceurs :
           CALL integrd(vcovm1, ucovm1, tetam1, psm1, massem1, dv, du, dteta, &
                dp, vcov, ucov, teta, q(:, :, :, :2), ps, masse, dtvr, &
                leapf=.false.)
