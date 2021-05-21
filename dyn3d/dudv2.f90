@@ -17,10 +17,11 @@ contains
 
     USE dimensions, ONLY: iim, jjm, llm
 
-    REAL, INTENT(IN):: teta(iim + 1, jjm + 1, llm)
-    REAL, INTENT(IN):: pkf(iim + 1, jjm + 1, llm)
-    real, INTENT(IN):: bern(iim + 1, jjm + 1, llm)
-    real, intent(inout):: du(iim + 1, jjm + 1, llm), dv(iim + 1, jjm, llm)
+    REAL, INTENT(IN):: teta(:, :, :) ! (iim + 1, jjm + 1, llm)
+    REAL, INTENT(IN):: pkf(:, :, :) ! (iim + 1, jjm + 1, llm)
+    real, INTENT(IN):: bern(:, :, :) ! (iim + 1, jjm + 1, llm)
+    real, intent(inout):: du(:, :, :) ! (iim + 1, jjm + 1, llm)
+    real, intent(inout):: dv(:, :, :) ! (iim + 1, jjm, llm)
 
     ! Local:
     INTEGER l, i, j
