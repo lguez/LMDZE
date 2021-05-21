@@ -81,7 +81,7 @@ contains
     CALL dudv1(vorpot, pbaru, pbarv, du(:, 2: jjm, :), dv)
     CALL enercin(vcov, ucov, vcont, ucont, ecin)
     bern = bernoui(phi, ecin)
-    CALL dudv2(teta, pkf, bern, du, dv)
+    CALL dudv2(teta, pkf, bern, du(:, 2:jjm, :), dv)
 
     forall (l = 1: llm) ang_3d(:, :, l) = ucov(:, :, l) + constang_2d
     CALL advect(ang_3d, vcov, teta, w, massebx, masseby, du, dv, dteta)

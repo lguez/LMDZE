@@ -20,7 +20,7 @@ contains
     REAL, INTENT(IN):: teta(:, :, :) ! (iim + 1, jjm + 1, llm)
     REAL, INTENT(IN):: pkf(:, :, :) ! (iim + 1, jjm + 1, llm)
     real, INTENT(IN):: bern(:, :, :) ! (iim + 1, jjm + 1, llm)
-    real, intent(inout):: du(:, :, :) ! (iim + 1, jjm + 1, llm)
+    real, intent(inout):: du(:, 2:, :) ! (iim + 1, 2:jjm, llm)
     real, intent(inout):: dv(:, :, :) ! (iim + 1, jjm, llm)
 
     ! Local:
@@ -28,11 +28,11 @@ contains
 
     !-----------------------------------------------------------------
 
-    forall (i = 1:iim) du(i, 2:jjm, :) = du(i, 2:jjm, :) + 0.5 &
+    forall (i = 1:iim) du(i, :, :) = du(i, :, :) + 0.5 &
          * (teta(i, 2:jjm, :) + teta(i + 1, 2:jjm, :)) * (pkf(i, 2:jjm, :) &
          - pkf(i + 1, 2:jjm, :)) + bern(i, 2:jjm, :) - bern(i + 1, 2:jjm, :)
 
-    du(iim + 1, 2:jjm, :) = du(1, 2:jjm, :)
+    du(iim + 1, :, :) = du(1, :, :)
 
     forall (j = 1:jjm) dv(:, j, :) = dv(:, j, :) + 0.5 * (teta(:, j, :) &
          + teta(:, j + 1, :)) * (pkf(:, j + 1, :) - pkf(:, j, :)) &
