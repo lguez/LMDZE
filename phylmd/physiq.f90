@@ -909,7 +909,6 @@ contains
          ftsol, pctsrf, frac_impa, frac_nucl, da, phi, mp, upwd, dnwd, &
          tr_seri, zmasse, ncid_startphy)
 
-    ! Calculer le transport de l'eau et de l'\'energie (diagnostique)
     CALL transp(paprs, t_seri, q_seri, u_seri, v_seri, zphi, ve, vq, ue, uq)
 
     ! diag. bilKP
