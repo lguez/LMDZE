@@ -93,9 +93,6 @@ contains
     print *, 'Astronomical constants '
     print '('' omega = '', E13.7, '' s-1'')', ROMEGA
 
-    print *, 'Geoid:'
-    print '('' Gravity = '', E13.7, '' m s-2'')', RG
-
     print *, 'Radiation constants:'
     print '('' Stefan-Bol. = '', E13.7, '' W m-2 K-4'')', RSIGMA
 

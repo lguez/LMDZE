@@ -16,6 +16,8 @@ contains
     USE histwrite_phy_m, ONLY: histwrite_phy
 
     REAL, INTENT(IN):: paprs(:, :) ! (klon, klev + 1)
+    ! pression pour chaque inter-couche, en Pa
+
     REAL, INTENT(IN):: t_seri(:, :) ! (klon, klev)
     REAL, INTENT(IN):: q_seri(:, :), u_seri(:, :), v_seri(:, :) ! (klon, klev)
     REAL, INTENT(IN):: zphi(:, :)
