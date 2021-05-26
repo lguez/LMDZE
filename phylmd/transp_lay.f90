@@ -27,20 +27,19 @@ contains
     ! Local:
     INTEGER i, l
     real esh
+    real sigma(klon, klev) ! mass per unit surface in a 3D grid cell, in kg m-2
 
     !------------------------------------------------------------------
 
+    forall (l = 1:klev) sigma(:, l) = (paprs(:, l) - paprs(:, l + 1)) / rg
+    
     DO l = 1, klev
        DO i = 1, klon
           esh = rcpd * t_seri(i, l) + rlvtt * q_seri(i, l) + zphi(i, l)
-          ue_lay(i, l) = u_seri(i, l) * esh * (paprs(i, l) - paprs(i, l + 1)) &
-               / rg
-          uq_lay(i, l) = u_seri(i, l) * q_seri(i, l) * (paprs(i, l) &
-               - paprs(i, l + 1)) / rg
-          ve_lay(i, l) = v_seri(i, l) * esh * (paprs(i, l) - paprs(i, l + 1)) &
-               / rg
-          vq_lay(i, l) = v_seri(i, l) * q_seri(i, l) * (paprs(i, l) &
-               - paprs(i, l + 1)) / rg
+          ue_lay(i, l) = u_seri(i, l) * esh * sigma(i, l)
+          uq_lay(i, l) = u_seri(i, l) * q_seri(i, l) * sigma(i, l)
+          ve_lay(i, l) = v_seri(i, l) * esh * sigma(i, l)
+          vq_lay(i, l) = v_seri(i, l) * q_seri(i, l) * sigma(i, l)
        END DO
     END DO
 
