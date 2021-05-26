@@ -8,9 +8,9 @@ contains
 
     ! From LMDZ4/libf/phylmd/transp.F,v 1.1.1.1 2004/05/19 12:53:09
 
-    ! Auteur(s): Z.X.Li (LMD/CNRS)
-    ! Date: le 25 avril 1994
-    ! Objet: Calculer le transport total de l'energie et de la vapeur d'eau
+    ! Author: Z. X. Li (LMD/CNRS)
+    ! Date: 25 avril 1994
+    ! Objet: calculer le transport total de l'\'energie et de la vapeur d'eau
 
     USE dimensions
     USE dimphy

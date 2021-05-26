@@ -224,10 +224,10 @@ contains
     REAL evap(klon) ! flux d'\'evaporation au sol
     REAL sens(klon) ! flux de chaleur sensible au sol
     REAL, save, allocatable:: dlw(:) ! (klon) derivative of infra-red flux
-    REAL ve(klon) ! integr. verticale du transport meri. de l'energie
-    REAL vq(klon) ! integr. verticale du transport meri. de l'eau
-    REAL ue(klon) ! integr. verticale du transport zonal de l'energie
-    REAL uq(klon) ! integr. verticale du transport zonal de l'eau
+    REAL ve(klon) ! int\'egrale verticale du transport méridien de l'\'energie
+    REAL vq(klon) ! int\'egrale verticale du transport méridien de l'eau
+    REAL ue(klon) ! int\'egrale verticale du transport zonal de l'\'energie
+    REAL uq(klon) ! int\'egrale verticale du transport zonal de l'eau
 
     REAL, save, allocatable:: frugs(:, :) ! (klon, nbsrf) ! longueur de rugosite
     REAL zxrugs(klon) ! longueur de rugosite
@@ -378,11 +378,16 @@ contains
     REAL zustrli(klon), zvstrli(klon)
     REAL aam, torsfc
 
-    REAL ve_lay(klon, llm) ! transport meri. de l'energie a chaque niveau vert.
-    REAL vq_lay(klon, llm) ! transport meri. de l'eau a chaque niveau vert.
-    REAL ue_lay(klon, llm) ! transport zonal de l'energie a chaque niveau vert.
-    REAL uq_lay(klon, llm) ! transport zonal de l'eau a chaque niveau vert.
+    REAL ve_lay(klon, llm)
+    ! transport m\'eridien de l'\'energie \`a chaque niveau vertical
+    
+    REAL vq_lay(klon, llm)
+    ! transport m\'eridien de l'eau \`a chaque niveau vertical
 
+    REAL ue_lay(klon, llm)
+    ! transport zonal de l'\'energie \`a chaque niveau vertical
+
+    REAL uq_lay(klon, llm) ! transport zonal de l'eau \`a chaque niveau vertical
     REAL tsol(klon)
 
     REAL d_t_ec(klon, llm)
@@ -904,7 +909,7 @@ contains
          ftsol, pctsrf, frac_impa, frac_nucl, da, phi, mp, upwd, dnwd, &
          tr_seri, zmasse, ncid_startphy)
 
-    ! Calculer le transport de l'eau et de l'energie (diagnostique)
+    ! Calculer le transport de l'eau et de l'\'energie (diagnostique)
     CALL transp(paprs, t_seri, q_seri, u_seri, v_seri, zphi, ve, vq, ue, uq)
 
     ! diag. bilKP
