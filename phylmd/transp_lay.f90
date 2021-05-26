@@ -13,6 +13,7 @@ contains
 
     USE dimphy, only: klon, klev
     USE suphec_m, only: rcpd, rg, rlvtt
+    USE histwrite_phy_m, ONLY: histwrite_phy
 
     REAL, INTENT(IN):: paprs(klon, klev+1)
     REAL, INTENT(IN):: t(klon, klev)
@@ -50,6 +51,11 @@ contains
        END DO
     END DO
 
+    CALL histwrite_phy("ue_lay", utran_e)
+    CALL histwrite_phy("ve_lay", vtran_e)
+    CALL histwrite_phy("uq_lay", utran_q)
+    CALL histwrite_phy("vq_lay", vtran_q)
+    
   END SUBROUTINE transp_lay
 
 end module transp_lay_m

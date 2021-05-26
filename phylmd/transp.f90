@@ -15,6 +15,7 @@ contains
     USE dimensions
     USE dimphy
     USE suphec_m
+    USE histwrite_phy_m, ONLY: histwrite_phy
 
     REAL, INTENT (IN) :: paprs(klon, klev+1)
     REAL, INTENT (IN) :: t(klon, klev)
@@ -42,6 +43,11 @@ contains
        END DO
     END DO
 
+    CALL histwrite_phy("ue", utran_e)
+    CALL histwrite_phy("ve", vtran_e)
+    CALL histwrite_phy("uq", utran_q)
+    CALL histwrite_phy("vq", vtran_q)
+    
   END SUBROUTINE transp
 
 end module transp_m
