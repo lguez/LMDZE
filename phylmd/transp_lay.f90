@@ -25,29 +25,23 @@ contains
     REAL, INTENT(out):: ue_lay(:, :), uq_lay(:, :) ! (klon, klev)
 
     ! Local:
-    INTEGER i, l
-    real esh
+    INTEGER l
+    real esh(klon, klev) ! moist static energy, in J kg-1
     real sigma(klon, klev) ! mass per unit surface in a 3D grid cell, in kg m-2
 
     !------------------------------------------------------------------
 
     forall (l = 1:klev) sigma(:, l) = (paprs(:, l) - paprs(:, l + 1)) / rg
-    
-    DO l = 1, klev
-       DO i = 1, klon
-          esh = rcpd * t_seri(i, l) + rlvtt * q_seri(i, l) + zphi(i, l)
-          ue_lay(i, l) = u_seri(i, l) * esh * sigma(i, l)
-          uq_lay(i, l) = u_seri(i, l) * q_seri(i, l) * sigma(i, l)
-          ve_lay(i, l) = v_seri(i, l) * esh * sigma(i, l)
-          vq_lay(i, l) = v_seri(i, l) * q_seri(i, l) * sigma(i, l)
-       END DO
-    END DO
-
+    esh = rcpd * t_seri + rlvtt * q_seri + zphi
+    ue_lay = u_seri * esh * sigma
+    uq_lay = u_seri * q_seri * sigma
+    ve_lay = v_seri * esh * sigma
+    vq_lay = v_seri * q_seri * sigma
     CALL histwrite_phy("ue_lay", ue_lay)
     CALL histwrite_phy("ve_lay", ve_lay)
     CALL histwrite_phy("uq_lay", uq_lay)
     CALL histwrite_phy("vq_lay", vq_lay)
-    
+
   END SUBROUTINE transp_lay
 
 end module transp_lay_m
