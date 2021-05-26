@@ -28,22 +28,17 @@ contains
 
     !------------------------------------------------------------------
 
-    ue_lay = 0.
-    uq_lay = 0.
-    ve_lay = 0.
-    vq_lay = 0.
-
     DO l = 1, klev
        DO i = 1, klon
           esh = rcpd * t_seri(i, l) + rlvtt * q_seri(i, l) + zphi(i, l)
-          ue_lay(i, l) = ue_lay(i, l) + u_seri(i, l) * esh &
-               * (paprs(i, l) - paprs(i, l + 1)) / rg
-          uq_lay(i, l) = uq_lay(i, l) + u_seri(i, l) * q_seri(i, l) &
-               * (paprs(i, l) - paprs(i, l + 1)) / rg
-          ve_lay(i, l) = ve_lay(i, l) + v_seri(i, l) * esh &
-               * (paprs(i, l) - paprs(i, l + 1)) / rg
-          vq_lay(i, l) = vq_lay(i, l) + v_seri(i, l) * q_seri(i, l) &
-               * (paprs(i, l) - paprs(i, l + 1)) / rg
+          ue_lay(i, l) = u_seri(i, l) * esh * (paprs(i, l) - paprs(i, l + 1)) &
+               / rg
+          uq_lay(i, l) = u_seri(i, l) * q_seri(i, l) * (paprs(i, l) &
+               - paprs(i, l + 1)) / rg
+          ve_lay(i, l) = v_seri(i, l) * esh * (paprs(i, l) - paprs(i, l + 1)) &
+               / rg
+          vq_lay(i, l) = v_seri(i, l) * q_seri(i, l) * (paprs(i, l) &
+               - paprs(i, l + 1)) / rg
        END DO
     END DO
 
