@@ -4,7 +4,7 @@ module transp_m
 
 contains
 
-  SUBROUTINE transp(paprs, t, q, u, v, geom, vtran_e, vtran_q, utran_e, utran_q)
+  SUBROUTINE transp(paprs, t_seri, q_seri, u_seri, v_seri, zphi, ve, vq, ue, uq)
 
     ! From LMDZ4/libf/phylmd/transp.F,v 1.1.1.1 2004/05/19 12:53:09
 
@@ -18,35 +18,35 @@ contains
     USE histwrite_phy_m, ONLY: histwrite_phy
 
     REAL, INTENT (IN) :: paprs(klon, klev+1)
-    REAL, INTENT (IN) :: t(klon, klev)
-    REAL, INTENT (IN) :: q(klon, klev), u(klon, klev), v(klon, klev)
-    REAL utran_e(klon), utran_q(klon), vtran_e(klon), vtran_q(klon)
+    REAL, INTENT (IN) :: t_seri(klon, klev)
+    REAL, INTENT (IN) :: q_seri(klon, klev), u_seri(klon, klev), v_seri(klon, klev)
+    REAL ue(klon), uq(klon), ve(klon), vq(klon)
 
     INTEGER i, l
     ! ------------------------------------------------------------------
-    REAL geom(klon, klev), e
+    REAL zphi(klon, klev), e
     ! ------------------------------------------------------------------
     DO i = 1, klon
-       utran_e(i) = 0.0
-       utran_q(i) = 0.0
-       vtran_e(i) = 0.0
-       vtran_q(i) = 0.0
+       ue(i) = 0.0
+       uq(i) = 0.0
+       ve(i) = 0.0
+       vq(i) = 0.0
     END DO
 
     DO l = 1, klev
        DO i = 1, klon
-          e = rcpd*t(i, l) + rlvtt*q(i, l) + geom(i, l)
-          utran_e(i) = utran_e(i) + u(i, l)*e*(paprs(i,l)-paprs(i,l+1))/rg
-          utran_q(i) = utran_q(i) + u(i, l)*q(i, l)*(paprs(i,l)-paprs(i,l+1))/rg
-          vtran_e(i) = vtran_e(i) + v(i, l)*e*(paprs(i,l)-paprs(i,l+1))/rg
-          vtran_q(i) = vtran_q(i) + v(i, l)*q(i, l)*(paprs(i,l)-paprs(i,l+1))/rg
+          e = rcpd*t_seri(i, l) + rlvtt*q_seri(i, l) + zphi(i, l)
+          ue(i) = ue(i) + u_seri(i, l)*e*(paprs(i,l)-paprs(i,l+1))/rg
+          uq(i) = uq(i) + u_seri(i, l)*q_seri(i, l)*(paprs(i,l)-paprs(i,l+1))/rg
+          ve(i) = ve(i) + v_seri(i, l)*e*(paprs(i,l)-paprs(i,l+1))/rg
+          vq(i) = vq(i) + v_seri(i, l)*q_seri(i, l)*(paprs(i,l)-paprs(i,l+1))/rg
        END DO
     END DO
 
-    CALL histwrite_phy("ue", utran_e)
-    CALL histwrite_phy("ve", vtran_e)
-    CALL histwrite_phy("uq", utran_q)
-    CALL histwrite_phy("vq", vtran_q)
+    CALL histwrite_phy("ue", ue)
+    CALL histwrite_phy("ve", ve)
+    CALL histwrite_phy("uq", uq)
+    CALL histwrite_phy("vq", vq)
     
   END SUBROUTINE transp
 
