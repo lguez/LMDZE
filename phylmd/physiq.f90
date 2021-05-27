@@ -59,7 +59,6 @@ contains
     USE suphec_m, ONLY: rcpd, retv, rg, rlvtt, romega, rtt, rmo3, md
     use time_phylmdz, only: itap, increment_itap
     use transp_m, only: transp
-    use transp_lay_m, only: transp_lay
     use unit_nml_m, only: unit_nml
     USE ymds2ju_m, ONLY: ymds2ju
     use yoegwd, only: sugwd
@@ -377,17 +376,6 @@ contains
     REAL zustrdr(klon), zvstrdr(klon)
     REAL zustrli(klon), zvstrli(klon)
     REAL aam, torsfc
-
-    REAL ve_lay(klon, llm)
-    ! transport m\'eridien de l'\'energie \`a chaque niveau vertical
-    
-    REAL vq_lay(klon, llm)
-    ! transport m\'eridien de l'eau \`a chaque niveau vertical
-
-    REAL ue_lay(klon, llm)
-    ! transport zonal de l'\'energie \`a chaque niveau vertical
-
-    REAL uq_lay(klon, llm) ! transport zonal de l'eau \`a chaque niveau vertical
     REAL tsol(klon)
 
     REAL d_t_ec(klon, llm)
@@ -912,9 +900,6 @@ contains
     CALL transp(paprs, t_seri, q_seri, u_seri, v_seri, zphi, ve, vq, ue, uq)
 
     ! diag. bilKP
-
-    CALL transp_lay(paprs, t_seri, q_seri, u_seri, v_seri, zphi, ve_lay, &
-         vq_lay, ue_lay, uq_lay)
 
     ! Accumuler les variables a stocker dans les fichiers histoire:
 

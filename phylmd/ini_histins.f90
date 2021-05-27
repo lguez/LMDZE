@@ -287,18 +287,6 @@ contains
             jjm + 1, nhori, llm, 1, llm, nvert, "inst(X)", zsto, zout)
        CALL histdef(nid_ins, "rldcs", "LW CS downward radiation", "W m-2", &
             iim, jjm + 1, nhori, llm, 1, llm, nvert, "inst(X)", zsto, zout)
-       CALL histdef(nid_ins, "ue_lay", "zonal moist static energy transport", &
-            "W m-1", iim, jjm + 1, nhori, llm, 1, llm, nvert, "inst(X)", zsto, &
-            zout)
-       CALL histdef(nid_ins, "ve_lay", &
-            "meridional moist static energy transport", "W m-1", iim, jjm + 1, &
-            nhori, llm, 1, llm, nvert, "inst(X)", zsto, zout)
-       CALL histdef(nid_ins, "uq_lay", "zonal humidity transport", &
-            "W m-1", iim, jjm + 1, nhori, llm, 1, llm, nvert, "inst(X)", zsto, &
-            zout)
-       CALL histdef(nid_ins, "vq_lay", "meridional humidity transport", &
-            "W m-1", iim, jjm + 1, nhori, llm, 1, llm, nvert, "inst(X)", zsto, &
-            zout)
 
        DO it = 1, nqmx - 2
           ! champ 2D
