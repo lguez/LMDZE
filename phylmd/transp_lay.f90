@@ -25,18 +25,26 @@ contains
     REAL, INTENT(out):: ue_lay(:, :), uq_lay(:, :) ! (klon, klev)
 
     ! Local:
+
     INTEGER l
-    real esh(klon, klev) ! moist static energy, in J kg-1
+
+    real esh(klon, klev)
+    ! moist static energy per unit surface in a 3D grid cell, in J m-2
+
     real sigma(klon, klev) ! mass per unit surface in a 3D grid cell, in kg m-2
+
+    real sigma_w(klon, klev)
+    ! mass of water vapor per unit surface in a 3D grid cell, in kg m-2
 
     !------------------------------------------------------------------
 
     forall (l = 1:klev) sigma(:, l) = (paprs(:, l) - paprs(:, l + 1)) / rg
-    esh = rcpd * t_seri + rlvtt * q_seri + zphi
-    ue_lay = u_seri * esh * sigma
-    uq_lay = u_seri * q_seri * sigma
-    ve_lay = v_seri * esh * sigma
-    vq_lay = v_seri * q_seri * sigma
+    esh = (rcpd * t_seri + rlvtt * q_seri + zphi) * sigma
+    sigma_w = q_seri * sigma
+    ue_lay = u_seri * esh
+    uq_lay = u_seri * sigma_w
+    ve_lay = v_seri * esh
+    vq_lay = v_seri * sigma_w
     CALL histwrite_phy("ue_lay", ue_lay)
     CALL histwrite_phy("ve_lay", ve_lay)
     CALL histwrite_phy("uq_lay", uq_lay)
