@@ -9,7 +9,7 @@ contains
     ! From LMDZ4/libf/phylmd/transp.F, version 1.1.1.1 2004/05/19 12:53:09
 
     ! Author: Z. X. Li (LMD/CNRS)
-    ! Date: 25 avril 1994
+    ! Date: April, 25th 1994
 
     ! Objet: calculer le transport total de l'\'energie et de la
     ! vapeur d'eau (diagnostique)
@@ -17,8 +17,10 @@ contains
     USE dimphy, only: klon, klev
     USE suphec_m, only: rcpd, rg, rlvtt
     USE histwrite_phy_m, ONLY: histwrite_phy
-    
+
     REAL, INTENT(IN):: paprs(:, :) ! (klon, klev + 1)
+    ! pression pour chaque inter-couche, en Pa
+
     REAL, INTENT(IN):: t_seri(:, :) ! (klon, klev)
     REAL, INTENT(IN):: q_seri(:, :), u_seri(:, :), v_seri(:, :) ! (klon, klev)
     REAL, INTENT(IN):: zphi(:, :) ! (klon, klev)
