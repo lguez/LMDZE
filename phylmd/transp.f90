@@ -27,29 +27,26 @@ contains
     REAL, INTENT(out):: ve(:), vq(:), ue(:), uq(:) ! (klon)
 
     ! Local:
-    INTEGER i, l
-    real e
+
+    INTEGER l
+
+    real esh(klon, klev)
+    ! moist static energy per unit surface in a 3D grid cell, in J m-2
+
+    real sigma(klon, klev) ! mass per unit surface in a 3D grid cell, in kg m-2
+
+    real sigma_w(klon, klev)
+    ! mass of water vapor per unit surface in a 3D grid cell, in kg m-2
 
     !------------------------------------------------------------------
 
-    ue = 0.
-    uq = 0.
-    ve = 0.
-    vq = 0.
-
-    DO l = 1, klev
-       DO i = 1, klon
-          e = rcpd * t_seri(i, l) + rlvtt * q_seri(i, l) + zphi(i, l)
-          ue(i) = ue(i) + u_seri(i, l) * e * (paprs(i, l) - paprs(i, l + 1)) &
-               / rg
-          uq(i) = uq(i) + u_seri(i, l) * q_seri(i, l) * (paprs(i, l) &
-               - paprs(i, l + 1)) / rg
-          ve(i) = ve(i) + v_seri(i, l) * e * (paprs(i, l) - paprs(i, l + 1)) &
-               / rg
-          vq(i) = vq(i) + v_seri(i, l) * q_seri(i, l) * (paprs(i, l) &
-               - paprs(i, l + 1)) / rg
-       END DO
-    END DO
+    forall (l = 1:klev) sigma(:, l) = (paprs(:, l) - paprs(:, l + 1)) / rg
+    esh = (rcpd * t_seri + rlvtt * q_seri + zphi) * sigma
+    sigma_w = q_seri * sigma
+    ue = sum(u_seri * esh, dim = 2)
+    uq = sum(u_seri * sigma_w, dim = 2)
+    ve = sum(v_seri * esh, dim = 2)
+    vq = sum(v_seri * sigma_w, dim = 2)
 
     CALL histwrite_phy("ue", ue)
     CALL histwrite_phy("ve", ve)
