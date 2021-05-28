@@ -222,11 +222,6 @@ contains
     REAL evap(klon) ! flux d'\'evaporation au sol
     REAL sens(klon) ! flux de chaleur sensible au sol
     REAL, save, allocatable:: dlw(:) ! (klon) derivative of infra-red flux
-    REAL ve(klon) ! int\'egrale verticale du transport méridien de l'\'energie
-    REAL vq(klon) ! int\'egrale verticale du transport méridien de l'eau
-    REAL ue(klon) ! int\'egrale verticale du transport zonal de l'\'energie
-    REAL uq(klon) ! int\'egrale verticale du transport zonal de l'eau
-
     REAL, save, allocatable:: frugs(:, :) ! (klon, nbsrf) ! longueur de rugosite
     REAL zxrugs(klon) ! longueur de rugosite
 
@@ -895,7 +890,7 @@ contains
          ftsol, pctsrf, frac_impa, frac_nucl, da, phi, mp, upwd, dnwd, &
          tr_seri, zmasse, ncid_startphy)
 
-    CALL transp(paprs, t_seri, q_seri, u_seri, v_seri, zphi, ve, vq, ue, uq)
+    CALL transp(paprs, t_seri, q_seri, u_seri, v_seri, zphi)
 
     ! conversion Ec en énergie thermique
     DO k = 1, llm

@@ -4,7 +4,7 @@ module transp_m
 
 contains
 
-  SUBROUTINE transp(paprs, t_seri, q_seri, u_seri, v_seri, zphi, ve, vq, ue, uq)
+  SUBROUTINE transp(paprs, t_seri, q_seri, u_seri, v_seri, zphi)
 
     ! From LMDZ4/libf/phylmd/transp.F, version 1.1.1.1 2004/05/19 12:53:09
 
@@ -24,7 +24,6 @@ contains
     REAL, INTENT(IN):: t_seri(:, :) ! (klon, klev)
     REAL, INTENT(IN):: q_seri(:, :), u_seri(:, :), v_seri(:, :) ! (klon, klev)
     REAL, INTENT(IN):: zphi(:, :) ! (klon, klev)
-    REAL, INTENT(out):: ve(:), vq(:), ue(:), uq(:) ! (klon)
 
     ! Local:
 
@@ -43,15 +42,12 @@ contains
     forall (l = 1:klev) sigma(:, l) = (paprs(:, l) - paprs(:, l + 1)) / rg
     esh = (rcpd * t_seri + rlvtt * q_seri + zphi) * sigma
     sigma_w = q_seri * sigma
-    ue = sum(u_seri * esh, dim = 2)
-    uq = sum(u_seri * sigma_w, dim = 2)
-    ve = sum(v_seri * esh, dim = 2)
-    vq = sum(v_seri * sigma_w, dim = 2)
 
-    CALL histwrite_phy("ue", ue)
-    CALL histwrite_phy("ve", ve)
-    CALL histwrite_phy("uq", uq)
-    CALL histwrite_phy("vq", vq)
+    ! Intégrales verticales:
+    CALL histwrite_phy("ue", sum(u_seri * esh, dim = 2))
+    CALL histwrite_phy("ve", sum(v_seri * esh, dim = 2))
+    CALL histwrite_phy("uq", sum(u_seri * sigma_w, dim = 2))
+    CALL histwrite_phy("vq", sum(v_seri * sigma_w, dim = 2))
     
   END SUBROUTINE transp
 
