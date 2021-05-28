@@ -15,7 +15,7 @@ contains
     ! vapeur d'eau (diagnostique)
 
     USE dimphy, only: klon, klev
-    USE suphec_m, only: rcpd, rg, rlvtt
+    USE suphec_m, only: rcpd, rg
     USE histwrite_phy_m, ONLY: histwrite_phy
 
     REAL, INTENT(IN):: paprs(:, :) ! (klon, klev + 1)
@@ -29,8 +29,8 @@ contains
 
     INTEGER l
 
-    real esh(klon, klev)
-    ! moist static energy per unit surface in a 3D grid cell, in J m-2
+    real dse(klon, klev)
+    ! dry static energy per unit surface in a 3D grid cell, in J m-2
 
     real sigma(klon, klev) ! mass per unit surface in a 3D grid cell, in kg m-2
 
@@ -40,12 +40,12 @@ contains
     !------------------------------------------------------------------
 
     forall (l = 1:klev) sigma(:, l) = (paprs(:, l) - paprs(:, l + 1)) / rg
-    esh = (rcpd * t_seri + rlvtt * q_seri + zphi) * sigma
+    dse = (rcpd * t_seri + zphi) * sigma
     sigma_w = q_seri * sigma
 
     ! Intégrales verticales:
-    CALL histwrite_phy("ue", sum(u_seri * esh, dim = 2))
-    CALL histwrite_phy("ve", sum(v_seri * esh, dim = 2))
+    CALL histwrite_phy("ue", sum(u_seri * dse, dim = 2))
+    CALL histwrite_phy("ve", sum(v_seri * dse, dim = 2))
     CALL histwrite_phy("uq", sum(u_seri * sigma_w, dim = 2))
     CALL histwrite_phy("vq", sum(v_seri * sigma_w, dim = 2))
     

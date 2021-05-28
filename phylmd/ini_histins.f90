@@ -217,9 +217,9 @@ contains
             "inst(X)", zsto, zout)
        CALL histdef(nid_ins, "ffonte", "Thermal flux for snow melting", &
             "W m-2", iim, jjm + 1, nhori, 1, 1, 1, -99, "inst(X)", zsto, zout)
-       CALL histdef(nid_ins, "ue", "zonal moist static energy transport", &
+       CALL histdef(nid_ins, "ue", "zonal dry static energy transport", &
             "W m-1", iim, jjm + 1, nhori, 1, 1, 1, -99, "inst(X)", zsto, zout)
-       CALL histdef(nid_ins, "ve", "meridional moist static energy transport", &
+       CALL histdef(nid_ins, "ve", "meridional dry static energy transport", &
             "W m-1", iim, jjm + 1, nhori, 1, 1, 1, -99, "inst(X)", zsto, zout)
        CALL histdef(nid_ins, "uq", "zonal humidity transport", "kg s-1 m-1", &
             iim, jjm + 1, nhori, 1, 1, 1, -99, "inst(X)", zsto, zout)
