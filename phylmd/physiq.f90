@@ -219,7 +219,6 @@ contains
     ! solid water mass flux (kg / m2 / s), positive down
 
     REAL rain_tiedtke(klon), snow_tiedtke(klon)
-
     REAL evap(klon) ! flux d'\'evaporation au sol
     REAL sens(klon) ! flux de chaleur sensible au sol
     REAL, save, allocatable:: dlw(:) ! (klon) derivative of infra-red flux
@@ -372,7 +371,6 @@ contains
     REAL tr_seri(klon, llm, nqmx - 2)
 
     REAL zx_rh(klon, llm)
-
     REAL zustrdr(klon), zvstrdr(klon)
     REAL zustrli(klon), zvstrli(klon)
     REAL aam, torsfc
@@ -898,10 +896,6 @@ contains
          tr_seri, zmasse, ncid_startphy)
 
     CALL transp(paprs, t_seri, q_seri, u_seri, v_seri, zphi, ve, vq, ue, uq)
-
-    ! diag. bilKP
-
-    ! Accumuler les variables a stocker dans les fichiers histoire:
 
     ! conversion Ec en énergie thermique
     DO k = 1, llm
