@@ -16,7 +16,7 @@ contains
     ! From LMDZ4/libf/dyn3d/bilan_dyn.F, version 1.5 2005/03/16 10:12:17
 
     ! Libraries:
-    USE nr_util, ONLY: pi
+    USE nr_util, ONLY: rad_to_deg
 
     use conf_gcm_m, only: dtvr, day_step, iperiod, periodav
     USE dimensions, ONLY: jjm, llm
@@ -59,7 +59,7 @@ contains
     dt_cum = day_step * periodav * dtvr
     CALL ymds2ju(annee_ref, 1, day_ref, 0.0, julian)
     rlong = 0.
-    rlatg = rlatv * 180. / pi
+    rlatg = rlatv * rad_to_deg
     call histbeg_totreg('dynzon', rlong(:1), rlatg, 1, 1, 1, jjm, itau_dyn, &
          julian, dt_cum, horiid, fileid)
     call histvert(fileid, 'presnivs', 'Niveaux sigma', 'mb', presnivs, vertiid)
