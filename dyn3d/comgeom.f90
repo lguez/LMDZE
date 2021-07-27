@@ -7,11 +7,8 @@ module comgeom
   real, allocatable, target:: cu(:) ! ((iim + 1) * (jjm + 1)) in m
   real, allocatable, target:: cv(:) ! ((iim + 1) * jjm) in m
 
-  real, pointer:: unscu2_2d(:, :) ! (iim + 1, jjm + 1) in m-2
-  real, allocatable, target:: unscu2(:) ! ((iim + 1) * (jjm + 1)) in m-2
-
-  real, pointer:: unscv2_2d(:, :) ! (iim + 1, jjm) in m-2
-  real, allocatable, target:: unscv2(:) ! ((iim + 1) * jjm) in m-2
+  real, allocatable:: unscu2_2d(:, :) ! (iim + 1, jjm + 1) in m-2
+  real, allocatable:: unscv2_2d(:, :) ! (iim + 1, jjm) in m-2
 
   real, allocatable, target:: aire(:) ! ((iim + 1) * (jjm + 1)) in m2
   real, pointer:: aire_2d(:, :) ! (iim + 1, jjm + 1) in m2
@@ -147,8 +144,8 @@ contains
     PRINT *, 'Call sequence information: inigeom'
 
     allocate(cu((iim + 1) * (jjm + 1)), cv((iim + 1) * jjm))
-    allocate(unscu2((iim + 1) * (jjm + 1)))
-    allocate(unscv2((iim + 1) * jjm))
+    allocate(unscu2_2d(iim + 1, jjm + 1))
+    allocate(unscv2_2d(iim + 1, jjm))
     allocate(aire((iim + 1) * (jjm + 1)))
     allocate(aireu((iim + 1) * (jjm + 1)))
     allocate(airev((iim + 1) * jjm))
@@ -177,8 +174,6 @@ contains
 
     cu_2d(1:iim + 1, 1:jjm + 1) => cu
     cv_2d(1:iim + 1, 1:jjm) => cv
-    unscu2_2d(1:iim + 1, 1:jjm + 1) => unscu2
-    unscv2_2d(1:iim + 1, 1:jjm) => unscv2
     aire_2d(1:iim + 1, 1:jjm + 1) => aire
     aireu_2d(1:iim + 1, 1:jjm + 1) => aireu
     airev_2d(1:iim + 1, 1:jjm) => airev
