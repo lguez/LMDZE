@@ -12,7 +12,7 @@ module suphec_m
 
   ! A1.1 Astronomical constants
 
-  real, parameter:: RDAY = 86400.
+  real, parameter:: RDAY = 86400. ! in s
 
   REAL, parameter, private:: n_sid = 365.25636
   ! Number of days in sideral year. Capderou 2003 k0784, § 4.2.1.

@@ -403,6 +403,7 @@ contains
           cvuscugam2_2d(i, j) = cvusurcu_2d(i, j)**(-gamdi_h)
           cuscvugam_2d(i, j) = cusurcvu_2d(i, j)**(-gamdi_grot)
        END DO
+
        cu_2d(iip1, j) = cu_2d(1, j)
        unscu2_2d(iip1, j) = unscu2_2d(1, j)
        cvusurcu_2d(iip1, j) = cvusurcu_2d(1, j)
