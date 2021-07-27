@@ -14,11 +14,11 @@ module suphec_m
 
   real, parameter:: RDAY = 86400.
 
-  REAL, parameter:: RSIYEA = 365.25 * RDAY * 2. * PI / 6.283076
-  ! sideral year, in s
+  REAL, parameter, private:: n_sid = 365.25636
+  ! Number of days in sideral year. Capderou 2003 k0784, § 4.2.1.
 
-  REAL, parameter:: RSIDAY = RDAY / (1. + RDAY / RSIYEA) ! sideral day, in s
-  REAL, parameter:: ROMEGA = twoPI / RSIDAY
+  REAL, parameter:: ROMEGA = twoPI / RDAY * (n_sid + 1) / n_sid
+  ! Capderou 2003 k0784, equation 4.20
 
   ! A1.2 Geoide
   real, parameter:: RG = 9.80665 ! acceleration of gravity, in m s-2
