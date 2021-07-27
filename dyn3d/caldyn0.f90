@@ -39,7 +39,7 @@ contains
     real masse(ip1jmp1, llm)
     REAL w(iim + 1, jjm + 1, llm)
     REAL pbaru(ip1jmp1, llm), pbarv((iim + 1) * jjm, llm)
-    REAL vcont((iim + 1) * jjm, llm), ucont(ip1jmp1, llm)
+    REAL vcont(iim + 1, jjm, llm), ucont(iim + 1, jjm + 1, llm)
     REAL p(ip1jmp1, llmp1)
     REAL massebx(ip1jmp1, llm), masseby((iim + 1) * jjm, llm)
     REAL vorpot(iim + 1, jjm, llm)
@@ -52,7 +52,7 @@ contains
 
     PRINT *, 'Call sequence information: caldyn0'
 
-    CALL covcont(llm, ucov, vcov, ucont, vcont)
+    CALL covcont(ucov, vcov, ucont, vcont)
     forall (l = 1: llm + 1) p(:, l) = ap(l) + bp(l) * ps
     CALL massdair(p, masse)
     CALL massbar(masse, massebx, masseby)

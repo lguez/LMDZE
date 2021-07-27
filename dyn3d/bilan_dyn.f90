@@ -83,7 +83,7 @@ contains
 
     ! \'Energie cin\'etique
     ucont = 0
-    CALL covcont(llm, ucov, vcov, ucont, vcont)
+    CALL covcont(ucov, vcov, ucont, vcont)
     CALL enercin(vcov, ucov, vcont, ucont, ecin)
 
     ! moment cin\'etique

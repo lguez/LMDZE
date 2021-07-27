@@ -4,7 +4,7 @@ module covcont_m
 
 contains
 
-  SUBROUTINE covcont(klevel, ucov, vcov, ucont, vcont)
+  SUBROUTINE covcont(ucov, vcov, ucont, vcont)
 
     ! From LMDZ4/libf/dyn3d/covcont.F, version 1.1.1.1 2004/05/19 12:53:07
 
@@ -13,27 +13,23 @@ contains
     ! Objet: calcul des composantes contravariantes \`a partir des
     ! composantes covariantes
 
-    USE paramet_m, only: ip1jmp1, ip1jm, iip2
-    USE comgeom, only: unscu2, unscv2
+    use dimensions, only: jjm, llm
+    USE comgeom, only: unscu2_2d, unscv2_2d
 
-    INTEGER klevel
-    REAL, INTENT (IN) :: ucov(ip1jmp1, klevel), vcov(ip1jm, klevel)
-    REAL ucont(ip1jmp1, klevel), vcont(ip1jm, klevel)
+    REAL, INTENT(IN):: ucov(:, :, :) ! (iim + 1, jjm + 1, llm) vent covariant
+    REAL, INTENT(IN):: vcov(:, :, :) ! (iim + 1, jjm, llm) vent covariant
+    REAL, INTENT(out):: ucont(:, :, :) ! (iim + 1, jjm + 1, llm)
+    real, INTENT(out):: vcont(:, :, :) ! (iim + 1, jjm, llm)
 
     ! Local:
-    INTEGER l, ij
+    INTEGER l
 
     !-------------------------------------------------------------------
 
-    DO l = 1, klevel
-       DO ij = iip2, ip1jm
-          ucont(ij, l) = ucov(ij, l) * unscu2(ij)
-       END DO
-
-       DO ij = 1, ip1jm
-          vcont(ij, l) = vcov(ij, l) * unscv2(ij)
-       END DO
-    END DO
+    forall (l = 1:llm)
+       ucont(:, 2:jjm, l) = ucov(:, 2:jjm, l) * unscu2_2d(:, 2:jjm)
+       vcont(:, :, l) = vcov(:, :, l) * unscv2_2d
+    END forall
 
   END SUBROUTINE covcont
 

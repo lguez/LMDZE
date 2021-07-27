@@ -87,7 +87,7 @@ contains
     ! Variables test conservation \'energie
     REAL ecin(iim + 1, jjm + 1, llm), ecin0(iim + 1, jjm + 1, llm)
 
-    REAL vcont((iim + 1) * jjm, llm), ucont((iim + 1) * (jjm + 1), llm)
+    REAL vcont(iim + 1, jjm, llm), ucont(iim + 1, jjm + 1, llm)
     logical leapf
     real dt ! time step, in s
 
@@ -172,7 +172,7 @@ contains
           ! Dissipation horizontale et verticale des petites \'echelles
 
           ! calcul de l'\'energie cin\'etique avant dissipation
-          call covcont(llm, ucov, vcov, ucont, vcont)
+          call covcont(ucov, vcov, ucont, vcont)
           call enercin(vcov, ucov, vcont, ucont, ecin0)
 
           ! dissipation
@@ -182,7 +182,7 @@ contains
 
           ! On ajoute la tendance due \`a la transformation \'energie
           ! cin\'etique en \'energie thermique par la dissipation
-          call covcont(llm, ucov, vcov, ucont, vcont)
+          call covcont(ucov, vcov, ucont, vcont)
           call enercin(vcov, ucov, vcont, ucont, ecin)
           dtetadis = dtetadis + (ecin0 - ecin) / pk
           teta = teta + dtetadis

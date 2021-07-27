@@ -54,7 +54,7 @@ contains
     LOGICAL, INTENT(IN):: conser
 
     ! Local:
-    REAL vcont((iim + 1) * jjm, llm), ucont(ip1jmp1, llm)
+    REAL vcont(iim + 1, jjm, llm), ucont(iim + 1, jjm + 1, llm)
     REAL ang_3d(iim + 1, jjm + 1, llm), p(ip1jmp1, llmp1)
     REAL massebx(ip1jmp1, llm), masseby((iim + 1) * jjm, llm)
     REAL vorpot(iim + 1, jjm, llm)
@@ -67,7 +67,7 @@ contains
 
     !-----------------------------------------------------------------------
 
-    CALL covcont(llm, ucov, vcov, ucont, vcont)
+    CALL covcont(ucov, vcov, ucont, vcont)
     forall (l = 1: llm + 1) p(:, l) = ap(l) + bp(l) * ps
     CALL massdair(p, masse)
     CALL massbar(masse, massebx, masseby)
