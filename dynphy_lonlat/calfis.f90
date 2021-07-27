@@ -31,7 +31,7 @@ contains
     ! grandeur horizontalement).
 
     use comconst, only: kappa, cpp, g
-    use comgeom, only: apoln, cu_2d, cv_2d, unsaire_2d, apols
+    use comgeom, only: apoln, cu_2d, cv_2d, unsaire, apols
     use dimensions, only: iim, jjm, llm, nqmx
     use dimphy, only: klon
     use disvert_m, only: preff
@@ -127,7 +127,7 @@ contains
     forall (l = 1: llm)
        omega(1, l) = w(1, 1, l) * g / apoln
        omega(2: klon - 1, l) &
-            = pack(w(:iim, 2: jjm, l) * g * unsaire_2d(:iim, 2: jjm), .true.)
+            = pack(w(:iim, 2: jjm, l) * g * unsaire(:iim, 2: jjm), .true.)
        omega(klon, l) = w(1, jjm + 1, l) * g / apols
     END forall
 

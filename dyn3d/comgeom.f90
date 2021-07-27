@@ -7,13 +7,13 @@ module comgeom
   real, allocatable, target:: cu(:) ! ((iim + 1) * (jjm + 1)) in m
   real, allocatable, target:: cv(:) ! ((iim + 1) * jjm) in m
 
-  real, allocatable:: unscu2_2d(:, :) ! (iim + 1, jjm + 1) in m-2
-  real, allocatable:: unscv2_2d(:, :) ! (iim + 1, jjm) in m-2
+  real, allocatable:: unscu2(:, :) ! (iim + 1, jjm + 1) in m-2
+  real, allocatable:: unscv2(:, :) ! (iim + 1, jjm) in m-2
 
   real, allocatable, target:: aire(:) ! ((iim + 1) * (jjm + 1)) in m2
   real, pointer:: aire_2d(:, :) ! (iim + 1, jjm + 1) in m2
 
-  real, allocatable:: airesurg_2d(:, :) ! (iim + 1, jjm + 1)
+  real, allocatable:: airesurg(:, :) ! (iim + 1, jjm + 1)
   
   real, pointer:: aireu_2d(:, :) ! (iim + 1, jjm + 1) in m2
   real, allocatable, target:: aireu(:) ! ((iim + 1) * (jjm + 1)) in m2
@@ -21,9 +21,9 @@ module comgeom
   real, allocatable, target:: airev(:) ! ((iim + 1) * jjm)
   real, pointer:: airev_2d(:, :) ! (iim + 1, jjm) in m2
 
-  real, allocatable:: unsaire_2d(:, :) ! (iim + 1, jjm + 1) in m-2
+  real, allocatable:: unsaire(:, :) ! (iim + 1, jjm + 1) in m-2
   real apoln, apols ! in m2
-  real, allocatable:: unsairez_2d(:, :) ! (iim + 1, jjm)
+  real, allocatable:: unsairez(:, :) ! (iim + 1, jjm)
   
   real, pointer:: alpha1_2d(:, :) ! (iim + 1, jjm + 1)
   real, allocatable, target:: alpha1(:) ! ((iim + 1) * (jjm + 1))
@@ -48,12 +48,12 @@ module comgeom
   real, allocatable, target:: fext(:) ! ((iim + 1) * jjm)
   real, allocatable, target:: constang(:) ! ((iim + 1) * (jjm + 1))
 
-  real, allocatable:: cuvsurcv_2d(:, :) ! (iim + 1, jjm) no dimension
+  real, allocatable:: cuvsurcv(:, :) ! (iim + 1, jjm) no dimension
   
   real, pointer:: cvsurcuv_2d(:, :) ! (iim + 1, jjm) no dimension
   real, allocatable, target:: cvsurcuv(:) ! ((iim + 1) * jjm) no dimension
 
-  real, allocatable:: cvusurcu_2d(:, :) ! (iim + 1, jjm + 1) no dimension
+  real, allocatable:: cvusurcu(:, :) ! (iim + 1, jjm + 1) no dimension
   
   real, pointer:: cusurcvu_2d(:, :) ! (iim + 1, jjm + 1) no dimension
   real, allocatable, target:: cusurcvu(:) ! ((iim + 1) * (jjm + 1)) no dimension
@@ -144,8 +144,8 @@ contains
     PRINT *, 'Call sequence information: inigeom'
 
     allocate(cu((iim + 1) * (jjm + 1)), cv((iim + 1) * jjm))
-    allocate(unscu2_2d(iim + 1, jjm + 1))
-    allocate(unscv2_2d(iim + 1, jjm))
+    allocate(unscu2(iim + 1, jjm + 1))
+    allocate(unscv2(iim + 1, jjm))
     allocate(aire((iim + 1) * (jjm + 1)))
     allocate(aireu((iim + 1) * (jjm + 1)))
     allocate(airev((iim + 1) * jjm))
@@ -166,11 +166,11 @@ contains
          unsair_gam2((iim + 1) * (jjm + 1)))
     allocate(unsairz_gam((iim + 1) * jjm))
 
-    allocate(airesurg_2d(iim + 1, jjm + 1))
-    allocate(unsaire_2d(iim + 1, jjm + 1))
-    allocate(unsairez_2d(iim + 1, jjm))
-    allocate(cuvsurcv_2d(iim + 1, jjm))
-    allocate(cvusurcu_2d(iim + 1, jjm + 1))
+    allocate(airesurg(iim + 1, jjm + 1))
+    allocate(unsaire(iim + 1, jjm + 1))
+    allocate(unsairez(iim + 1, jjm))
+    allocate(cuvsurcv(iim + 1, jjm))
+    allocate(cvusurcu(iim + 1, jjm + 1))
 
     cu_2d(1:iim + 1, 1:jjm + 1) => cu
     cv_2d(1:iim + 1, 1:jjm) => cv
@@ -333,16 +333,16 @@ contains
        DO i = 1, iim
           aireu_2d(i, j) = aireij1_2d(i, j) + aireij2_2d(i, j) + &
                aireij4_2d(i + 1, j) + aireij3_2d(i + 1, j)
-          unsaire_2d(i, j) = 1. / aire_2d(i, j)
-          unsair_gam1_2d(i, j) = unsaire_2d(i, j)**(-gamdi_gdiv)
-          unsair_gam2_2d(i, j) = unsaire_2d(i, j)**(-gamdi_h)
-          airesurg_2d(i, j) = aire_2d(i, j) / g
+          unsaire(i, j) = 1. / aire_2d(i, j)
+          unsair_gam1_2d(i, j) = unsaire(i, j)**(-gamdi_gdiv)
+          unsair_gam2_2d(i, j) = unsaire(i, j)**(-gamdi_h)
+          airesurg(i, j) = aire_2d(i, j) / g
        END DO
        aireu_2d(iip1, j) = aireu_2d(1, j)
-       unsaire_2d(iip1, j) = unsaire_2d(1, j)
+       unsaire(iip1, j) = unsaire(1, j)
        unsair_gam1_2d(iip1, j) = unsair_gam1_2d(1, j)
        unsair_gam2_2d(iip1, j) = unsair_gam2_2d(1, j)
-       airesurg_2d(iip1, j) = airesurg_2d(1, j)
+       airesurg(iip1, j) = airesurg(1, j)
     END DO
 
     DO j = 1, jjm
@@ -353,12 +353,12 @@ contains
        DO i = 1, iim
           airez = aireij2_2d(i, j) + aireij1_2d(i, j + 1) &
                + aireij3_2d(i + 1, j) + aireij4_2d(i + 1, j + 1)
-          unsairez_2d(i, j) = 1. / airez
-          unsairz_gam_2d(i, j) = unsairez_2d(i, j)**(-gamdi_grot)
+          unsairez(i, j) = 1. / airez
+          unsairz_gam_2d(i, j) = unsairez(i, j)**(-gamdi_grot)
           fext_2d(i, j) = airez * sin(rlatv(j)) * 2. * omeg
        END DO
        airev_2d(iip1, j) = airev_2d(1, j)
-       unsairez_2d(iip1, j) = unsairez_2d(1, j)
+       unsairez(iip1, j) = unsairez(1, j)
        fext_2d(iip1, j) = fext_2d(1, j)
        unsairz_gam_2d(iip1, j) = unsairz_gam_2d(1, j)
     END DO
@@ -369,18 +369,18 @@ contains
        DO i = 1, iim
           cv_2d(i, j) = 0.5 * &
                (cvij2(i, j) + cvij3(i, j) + cvij1(i, j + 1) + cvij4(i, j + 1))
-          unscv2_2d(i, j) = 1. / cv_2d(i, j)**2
+          unscv2(i, j) = 1. / cv_2d(i, j)**2
        END DO
        DO i = 1, iim
-          cuvsurcv_2d(i, j) = airev_2d(i, j) * unscv2_2d(i, j)
-          cvsurcuv_2d(i, j) = 1. / cuvsurcv_2d(i, j)
-          cuvscvgam1_2d(i, j) = cuvsurcv_2d(i, j)**(-gamdi_gdiv)
-          cuvscvgam2_2d(i, j) = cuvsurcv_2d(i, j)**(-gamdi_h)
+          cuvsurcv(i, j) = airev_2d(i, j) * unscv2(i, j)
+          cvsurcuv_2d(i, j) = 1. / cuvsurcv(i, j)
+          cuvscvgam1_2d(i, j) = cuvsurcv(i, j)**(-gamdi_gdiv)
+          cuvscvgam2_2d(i, j) = cuvsurcv(i, j)**(-gamdi_h)
           cvscuvgam_2d(i, j) = cvsurcuv_2d(i, j)**(-gamdi_grot)
        END DO
        cv_2d(iip1, j) = cv_2d(1, j)
-       unscv2_2d(iip1, j) = unscv2_2d(1, j)
-       cuvsurcv_2d(iip1, j) = cuvsurcv_2d(1, j)
+       unscv2(iip1, j) = unscv2(1, j)
+       cuvsurcv(iip1, j) = cuvsurcv(1, j)
        cvsurcuv_2d(iip1, j) = cvsurcuv_2d(1, j)
        cuvscvgam1_2d(iip1, j) = cuvscvgam1_2d(1, j)
        cuvscvgam2_2d(iip1, j) = cuvscvgam2_2d(1, j)
@@ -391,17 +391,17 @@ contains
        DO i = 1, iim
           cu_2d(i, j) = 0.5 * (cuij1(i, j) + cuij4(i + 1, j) + cuij2(i, j) &
                + cuij3(i + 1, j))
-          unscu2_2d(i, j) = 1. / cu_2d(i, j)**2
-          cvusurcu_2d(i, j) = aireu_2d(i, j) * unscu2_2d(i, j)
-          cusurcvu_2d(i, j) = 1. / cvusurcu_2d(i, j)
-          cvuscugam1_2d(i, j) = cvusurcu_2d(i, j)**(-gamdi_gdiv)
-          cvuscugam2_2d(i, j) = cvusurcu_2d(i, j)**(-gamdi_h)
+          unscu2(i, j) = 1. / cu_2d(i, j)**2
+          cvusurcu(i, j) = aireu_2d(i, j) * unscu2(i, j)
+          cusurcvu_2d(i, j) = 1. / cvusurcu(i, j)
+          cvuscugam1_2d(i, j) = cvusurcu(i, j)**(-gamdi_gdiv)
+          cvuscugam2_2d(i, j) = cvusurcu(i, j)**(-gamdi_h)
           cuscvugam_2d(i, j) = cusurcvu_2d(i, j)**(-gamdi_grot)
        END DO
 
        cu_2d(iip1, j) = cu_2d(1, j)
-       unscu2_2d(iip1, j) = unscu2_2d(1, j)
-       cvusurcu_2d(iip1, j) = cvusurcu_2d(1, j)
+       unscu2(iip1, j) = unscu2(1, j)
+       cvusurcu(iip1, j) = cvusurcu(1, j)
        cusurcvu_2d(iip1, j) = cusurcvu_2d(1, j)
        cvuscugam1_2d(iip1, j) = cvuscugam1_2d(1, j)
        cvuscugam2_2d(iip1, j) = cvuscugam2_2d(1, j)
@@ -411,10 +411,10 @@ contains
     ! Calcul aux pôles
 
     cu_2d(:, 1) = 0.
-    unscu2_2d(:, 1) = 0.
+    unscu2(:, 1) = 0.
 
     cu_2d(:, jjp1) = 0.
-    unscu2_2d(:, jjp1) = 0.
+    unscu2(:, jjp1) = 0.
 
     ! Calcul des aires aux pôles :
 

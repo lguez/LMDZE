@@ -11,7 +11,7 @@ contains
     ! Calcule la masse d'air dans chaque maille.
     ! Authors: P. Le Van, F. Hourdin
 
-    USE comgeom, ONLY: airesurg_2d
+    USE comgeom, ONLY: airesurg
     USE dimensions, ONLY: iim, jjm, llm
 
     REAL, intent(in):: p(iim + 1, jjm + 1, llm + 1)
@@ -24,7 +24,7 @@ contains
 
     !----------------------------------------------------------
 
-    forall (l = 1: llm) masse(:iim, :, l) = airesurg_2d(:iim, :) &
+    forall (l = 1: llm) masse(:iim, :, l) = airesurg(:iim, :) &
          * (p(:iim, :, l) - p(:iim, :, l + 1))
     masse(iim + 1, :, :) = masse(1, :, :)
 

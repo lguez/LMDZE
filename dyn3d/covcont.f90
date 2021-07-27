@@ -14,7 +14,7 @@ contains
     ! composantes covariantes
 
     use dimensions, only: jjm, llm
-    USE comgeom, only: unscu2_2d, unscv2_2d
+    USE comgeom, only: unscu2, unscv2
 
     REAL, INTENT(IN):: ucov(:, :, :) ! (iim + 1, jjm + 1, llm) vent covariant
     REAL, INTENT(IN):: vcov(:, :, :) ! (iim + 1, jjm, llm) vent covariant
@@ -27,8 +27,8 @@ contains
     !-------------------------------------------------------------------
 
     forall (l = 1:llm)
-       ucont(:, 2:jjm, l) = ucov(:, 2:jjm, l) * unscu2_2d(:, 2:jjm)
-       vcont(:, :, l) = vcov(:, :, l) * unscv2_2d
+       ucont(:, 2:jjm, l) = ucov(:, 2:jjm, l) * unscu2(:, 2:jjm)
+       vcont(:, :, l) = vcov(:, :, l) * unscv2
     END forall
 
   END SUBROUTINE covcont

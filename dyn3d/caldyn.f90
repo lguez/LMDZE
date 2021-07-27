@@ -14,7 +14,7 @@ contains
     use advect_m, only: advect
     use bernoui_m, only: bernoui
     USE comconst, ONLY: daysec
-    USE comgeom, ONLY: airesurg_2d, constang_2d
+    USE comgeom, ONLY: airesurg, constang_2d
     USE conf_gcm_m, ONLY: day_step, dtvr
     use convmas_m, only: convmas
     use covcont_m, only: covcont
@@ -75,7 +75,7 @@ contains
     CALL flumass(massebx, masseby, vcont, ucont, pbaru, pbarv)
     CALL dteta1(teta, pbaru, pbarv, dteta)
     CALL convmas(pbaru, pbarv, convm)
-    dp = convm(:, :, 1) / airesurg_2d
+    dp = convm(:, :, 1) / airesurg
     w = vitvert(convm)
     CALL tourpot(vcov, ucov, massebxy, vorpot)
     CALL dudv1(vorpot, pbaru, pbarv, du(:, 2: jjm, :), dv)

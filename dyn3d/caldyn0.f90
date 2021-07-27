@@ -11,7 +11,7 @@ contains
     ! Objet : calcul des tendances dynamiques
 
     use bernoui_m, only: bernoui
-    USE comgeom, ONLY: airesurg_2d
+    USE comgeom, ONLY: airesurg
     use convmas_m, only: convmas
     use covcont_m, only: covcont
     USE dimensions, ONLY: iim, jjm, llm
@@ -59,7 +59,7 @@ contains
     CALL massbarxy(masse, massebxy)
     CALL flumass(massebx, masseby, vcont, ucont, pbaru, pbarv)
     CALL convmas(pbaru, pbarv, convm)
-    dp = convm(:, :, 1) / airesurg_2d
+    dp = convm(:, :, 1) / airesurg
     w = vitvert(convm)
     CALL tourpot(vcov, ucov, massebxy, vorpot)
     CALL enercin(vcov, ucov, vcont, ucont, ecin)

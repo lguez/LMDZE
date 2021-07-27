@@ -42,7 +42,7 @@ contains
     CALL filtreg_v(rot, intensive = .false.)
 
     DO l = 1, klevel
-       rot(:, :, l) = rot(:, :, l)*unsairez_2d
+       rot(:, :, l) = rot(:, :, l)*unsairez
     END DO
 
   END SUBROUTINE rotatf
