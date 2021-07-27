@@ -4,8 +4,7 @@ module bilan_dyn_m
 
 contains
 
-  SUBROUTINE bilan_dyn(ps, masse, pk, pbaru, pbarv, teta, phi, ucov, vcov, &
-       trac)
+  SUBROUTINE bilan_dyn(ps, masse, pk, pbaru, pbarv, teta, phi, ucov, vcov, trac)
 
     ! From LMDZ4/libf/dyn3d/bilan_dyn.F, version 1.5 2005/03/16 10:12:17
 

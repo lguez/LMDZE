@@ -4,10 +4,10 @@ module init_dynzon_m
 
   integer, parameter:: ntr = 5
   integer, parameter:: nQ = 7
-  integer ncum, fileid
-  character(len=10) znom(ntr, nQ)
-  character(len=4), parameter:: nom(nQ) = (/'T   ', 'gz  ', 'K   ', 'ang ', &
-       'u   ', 'ovap', 'un  '/)
+  integer, protected:: ncum, fileid
+  character(len=10), protected:: znom(ntr, nQ)
+  character(len = *), parameter:: nom(nQ) = [character(len = 4):: 'T', 'gz', &
+       'K', 'ang', 'u', 'ovap', 'un']
 
 contains
 
@@ -15,31 +15,32 @@ contains
 
     ! From LMDZ4/libf/dyn3d/bilan_dyn.F, version 1.5 2005/03/16 10:12:17
 
-    use conf_gcm_m, only: dtvr
-    USE conf_gcm_m, ONLY: day_step, iperiod, periodav
+    ! Libraries:
+    USE nr_util, ONLY: pi
+
+    use conf_gcm_m, only: dtvr, day_step, iperiod, periodav
     USE dimensions, ONLY: jjm, llm
     USE disvert_m, ONLY: presnivs
-    use dynetat0_m, only: rlatv, itau_dyn
     use dynetat0_chosen_m, only: day_ref, annee_ref
+    use dynetat0_m, only: rlatv, itau_dyn
     USE histbeg_totreg_m, ONLY: histbeg_totreg
     USE histdef_m, ONLY: histdef
     USE histend_m, ONLY: histend
     USE histvert_m, ONLY: histvert
-    USE nr_util, ONLY: pi
     USE ymds2ju_m, ONLY: ymds2ju
 
     ! Local:
 
     real dt_cum
-    character(len=5), parameter:: unites(nQ) = (/'K    ', 'm2/s2', 'm2/s2', &
-         'ang  ', 'm/s  ', 'kg/kg', 'un   '/)
+    character(len = *), parameter:: unites(nQ) = [character(len = 5):: 'K', &
+         'm2/s2', 'm2/s2', 'ang', 'm/s', 'kg/kg', 'un']
 
     ! Champs de tansport en moyenne zonale
     integer itr
     character(len=26) noml(ntr, nQ)
     character(len=12) zunites(ntr, nQ)
-    character(len=3), parameter:: ctrs(ntr) = (/'   ', 'TOT', 'MMC', 'TRS', &
-         'STN'/)
+    character(len=*), parameter:: ctrs(ntr) = ['   ', 'TOT', 'MMC', 'TRS', &
+         'STN']
     integer iQ
 
     ! Initialisation du fichier contenant les moyennes zonales.
@@ -53,22 +54,14 @@ contains
     print *, "Call sequence information: init_dynzon"
 
     ! Initialisation des fichiers
-    ! ncum est la frequence de stokage en pas de temps
+    ! ncum est la fr\'equence de stockage en pas de temps
     ncum = day_step / iperiod * periodav
     dt_cum = day_step * periodav * dtvr
-
-    ! Initialisation du fichier contenant les moyennes zonales
-
     CALL ymds2ju(annee_ref, 1, day_ref, 0.0, julian)
-
     rlong = 0.
     rlatg = rlatv * 180. / pi
-
     call histbeg_totreg('dynzon', rlong(:1), rlatg, 1, 1, 1, jjm, itau_dyn, &
          julian, dt_cum, horiid, fileid)
-
-    ! Appel \`a histvert pour la grille verticale
-
     call histvert(fileid, 'presnivs', 'Niveaux sigma', 'mb', presnivs, vertiid)
 
     ! Appels \`a histdef pour la d\'efinition des variables \`a sauvegarder
