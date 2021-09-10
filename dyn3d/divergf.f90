@@ -21,8 +21,7 @@ contains
     REAL, intent(in):: x(iim + 1, jjm + 1, klevel), y(iim + 1, jjm, klevel)
     real, intent(out):: div(iim + 1, jjm + 1, klevel) ! in (unit of x, y) m-2
 
-    ! Variables locales :
-
+    ! Local:
     INTEGER l, i, j
 
     !------------------------------------------------------------
@@ -30,9 +29,7 @@ contains
     DO l = 1, klevel
        forall (i = 2:iim + 1, j = 2:jjm) div(i, j, l) = cvusurcu(i, j) &
             * x(i, j, l) - cvusurcu(i - 1, j) * x(i - 1, j , l) &
-            + cuvsurcv(i, j - 1) * y(i, j - 1, l) - cuvsurcv(i, j) &
-            * y(i, j, l)
-
+            + cuvsurcv(i, j - 1) * y(i, j - 1, l) - cuvsurcv(i, j) * y(i, j, l)
        div(1, 2:jjm, l) = div(iim + 1, 2:jjm, l)
 
        ! Calcul aux pôles 

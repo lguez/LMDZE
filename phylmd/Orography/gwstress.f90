@@ -56,14 +56,15 @@ contains
     !              ---------
 
     INTEGER nlon, nlev
-    INTEGER ktest(nlon), kkenvh(nlon)
+    integer, intent(in):: ktest(nlon)
+    integer, intent(in):: kkenvh(nlon)
 
     REAL prho(nlon,nlev+1), pstab(nlon,nlev+1), ptau(nlon,nlev+1), &
          pvph(nlon,nlev+1), pgeom1(nlon,nlev)
-    REAL, INTENT (IN) :: pstd(nlon)
+    REAL, INTENT(IN):: pstd(nlon)
 
-    REAL, INTENT (IN) :: psig(nlon)
-    REAL pmea(nlon), ppic(nlon)
+    REAL, INTENT(IN):: psig(nlon)
+    REAL, INTENT(IN):: pmea(nlon), ppic(nlon)
     REAL pdmod(nlon)
 
     !-----------------------------------------------------------------------

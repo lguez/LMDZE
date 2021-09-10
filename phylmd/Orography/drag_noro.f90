@@ -17,17 +17,18 @@ contains
     use orodrag_m, only: orodrag
     USE suphec_m, ONLY: rd, rg
 
-    REAL, INTENT (IN):: paprs(klon, klev+1) ! pression pour chaque
+    REAL, INTENT(IN):: paprs(klon, klev+1) ! pression pour chaque
                                              ! inter-couche (en Pa)
-    REAL, INTENT (IN):: pplay(klon, klev) ! pression pour le mileu de
+    REAL, INTENT(IN):: pplay(klon, klev) ! pression pour le mileu de
                                            ! chaque couche (en Pa)
-    REAL pmea(klon)
-    REAL, INTENT (IN):: pstd(klon), psig(klon)
+    REAL, INTENT(IN):: pmea(klon)
+    REAL, INTENT(IN):: pstd(klon), psig(klon)
     REAL pgam(klon), pthe(klon)
     REAL ppic(klon), pval(klon)
-    integer ktest(klon)
-    REAL, INTENT (IN):: t(klon, klev) ! temperature (K)
-    real, INTENT (IN):: u(klon, klev), v(klon, klev) ! vitesse horizontale (m/s)
+    integer, INTENT(IN):: ktest(klon)
+
+    REAL, INTENT(IN):: t(klon, klev) ! temperature (K)
+    real, INTENT(IN):: u(klon, klev), v(klon, klev) ! vitesse horizontale (m/s)
     REAL, intent(out):: pulow(klon), pvlow(klon), pustr(klon), pvstr(klon)
     REAL, intent(out):: d_t(klon, klev) ! increment de la temperature
 

@@ -25,13 +25,14 @@ contains
     INTEGER, intent(in):: ktest(nlon)
     integer kkcrit(nlon), kkcrith(nlon), kcrit(nlon), kkenvh(nlon)
     INTEGER kknu(klon), kknu2(klon)
-    REAL paphm1(nlon, klev + 1), papm1(nlon, klev), pum1(nlon, klev), &
-         pvm1(nlon, klev), ptm1(nlon, klev), pgeom1(nlon, klev), &
-         prho(nlon, klev + 1), pri(nlon, klev + 1), pstab(nlon, klev + 1), &
+    REAL, intent(in):: paphm1(nlon, klev + 1), papm1(nlon, klev), &
+         pum1(nlon, klev), pvm1(nlon, klev), ptm1(nlon, klev), &
+         pgeom1(nlon, klev)
+    real prho(nlon, klev + 1), pri(nlon, klev + 1), pstab(nlon, klev + 1), &
          ptau(nlon, klev + 1), pvph(nlon, klev + 1), ppsi(nlon, klev + 1), &
          pzdep(nlon, klev)
     REAL pulow(nlon), pvlow(nlon), ptheta(nlon), pgamma(nlon)
-    REAL pmea(nlon), ppic(nlon), pval(nlon)
+    REAL, intent(in):: pmea(nlon), ppic(nlon), pval(nlon)
     real pnu(nlon), pd1(nlon), pd2(nlon), pdmod(nlon)
 
     ! Local:

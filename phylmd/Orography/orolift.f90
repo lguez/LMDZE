@@ -44,7 +44,7 @@ contains
     REAL, INTENT (IN) :: pvaror(nlon)
     REAL ppic(nlon), pgeom1(nlon,nlev), paphm1(nlon,nlev+1)
 
-    INTEGER ktest(nlon)
+    INTEGER, intent(in):: ktest(nlon)
     REAL, INTENT (IN) :: ptsphy
     !-----------------------------------------------------------------------
 

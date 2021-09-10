@@ -8,11 +8,10 @@ contains
        pum1, pvm1, pmea, pstd, psig, pgamma, ptheta, ppic, pval, pulow, &
        pvlow, pvom, pvol, pte)
 
-    USE dimensions
-    USE dimphy
+    USE dimphy, only: klon, klev
     use gwstress_m, only: gwstress
-    USE suphec_m
-    USE yoegwd
+    USE suphec_m, only: rg
+    USE yoegwd, only: gkwake
     use gwprofil_m, only: gwprofil
     use orosetup_m, only: orosetup
 
@@ -59,13 +58,14 @@ contains
     REAL zzd1, ratio, zbet, zust, zvst, zdis
     REAL pte(nlon, nlev), pvol(nlon, nlev), pvom(nlon, nlev), pulow(klon), &
          pvlow(klon)
-    REAL pum1(nlon, nlev), pvm1(nlon, nlev), ptm1(nlon, nlev), pmea(nlon)
-    REAL, INTENT (IN) :: pstd(nlon)
-    REAL, INTENT (IN) :: psig(nlon)
+    REAL, INTENT(IN):: pum1(nlon, nlev), pvm1(nlon, nlev), ptm1(nlon, nlev), &
+         pmea(nlon)
+    REAL, INTENT(IN):: pstd(nlon)
+    REAL, INTENT(IN):: psig(nlon)
     REAL pgamma(nlon), ptheta(nlon), ppic(nlon), pval(nlon), &
          pgeom1(nlon, nlev), papm1(nlon, nlev), paphm1(nlon, nlev+1)
 
-    INTEGER ktest(nlon)
+    INTEGER, intent(in):: ktest(nlon)
 
     !* 0.2 local arrays
 
@@ -164,13 +164,8 @@ contains
                 zdudt(ji) = -pum1(ji, jk)/ztmst
                 zdvdt(ji) = -pvm1(ji, jk)/ztmst
 
-                ! projection dans la direction de l'axe principal de l'orographie
-                !mod zdudt(ji)=-(pum1(ji, jk)*cos(ptheta(ji)*rpi/180.)
-                !mod * +pvm1(ji, jk)*sin(ptheta(ji)*rpi/180.))
-                !mod * *cos(ptheta(ji)*rpi/180.)/ztmst
-                !mod zdvdt(ji)=-(pum1(ji, jk)*cos(ptheta(ji)*rpi/180.)
-                !mod * +pvm1(ji, jk)*sin(ptheta(ji)*rpi/180.))
-                !mod * *sin(ptheta(ji)*rpi/180.)/ztmst
+                ! projection dans la direction de l'axe principal de
+                ! l'orographie
                 zdudt(ji) = zdudt(ji)*(zbet/(1.+zbet))
                 zdvdt(ji) = zdvdt(ji)*(zbet/(1.+zbet))
              END IF

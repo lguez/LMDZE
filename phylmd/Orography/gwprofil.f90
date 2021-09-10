@@ -25,7 +25,8 @@ contains
     USE yoegwd, ONLY : gkdrag, grahilo, grcrit, gssec, gtsec, nstra
 
     INTEGER, intent(in):: nlon, nlev
-    INTEGER, intent(in):: ktest(nlon), kkcrith(nlon), kcrit(nlon)
+    INTEGER, intent(in):: ktest(nlon)
+    INTEGER, intent(in):: kkcrith(nlon), kcrit(nlon)
     REAL, intent(in):: paphm1(nlon, nlev+1), prho(nlon, nlev+1)
     REAL, intent(in):: pstab(nlon, nlev+1)
     real, intent(in):: pvph(nlon, nlev+1), pri(nlon, nlev+1)

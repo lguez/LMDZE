@@ -846,14 +846,10 @@ contains
             ktest, t_seri, u_seri, v_seri, zulow, zvlow, zustrdr, zvstrdr, &
             d_t_oro, d_u_oro, d_v_oro)
 
-       ! ajout des tendances
-       DO k = 1, llm
-          DO i = 1, klon
-             t_seri(i, k) = t_seri(i, k) + d_t_oro(i, k)
-             u_seri(i, k) = u_seri(i, k) + d_u_oro(i, k)
-             v_seri(i, k) = v_seri(i, k) + d_v_oro(i, k)
-          ENDDO
-       ENDDO
+       ! Ajout des tendances :
+       t_seri = t_seri + d_t_oro
+       u_seri = u_seri + d_u_oro
+       v_seri = v_seri + d_v_oro
     ENDIF
 
     IF (ok_orolf) THEN
@@ -870,13 +866,9 @@ contains
             v_seri, zulow, zvlow, zustrli, zvstrli, d_t_lif, d_u_lif, d_v_lif)
 
        ! Ajout des tendances :
-       DO k = 1, llm
-          DO i = 1, klon
-             t_seri(i, k) = t_seri(i, k) + d_t_lif(i, k)
-             u_seri(i, k) = u_seri(i, k) + d_u_lif(i, k)
-             v_seri(i, k) = v_seri(i, k) + d_v_lif(i, k)
-          ENDDO
-       ENDDO
+       t_seri = t_seri + d_t_lif
+       u_seri = u_seri + d_u_lif
+       v_seri = v_seri + d_v_lif
     ENDIF
 
     CALL aaam_bud(rg, romega, pphis, zustrdr, zustrli, &
