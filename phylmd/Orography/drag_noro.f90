@@ -25,6 +25,7 @@ contains
     REAL, INTENT(IN):: pstd(klon), psig(klon)
     REAL pgam(klon), pthe(klon)
     REAL ppic(klon), pval(klon)
+
     REAL, INTENT(IN):: t(klon, klev) ! temperature (K)
     real, INTENT(IN):: u(klon, klev), v(klon, klev) ! vitesse horizontale (m/s)
     REAL, intent(out):: pulow(klon), pvlow(klon), pustr(klon), pvstr(klon)

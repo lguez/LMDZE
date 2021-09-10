@@ -23,6 +23,7 @@ contains
     REAL pmea(klon)
     REAL, INTENT (IN):: pstd(klon)
     REAL ppic(klon)
+
     REAL, INTENT (IN):: t(klon, klev)
     ! t-------input-R-temperature (K)
     real, INTENT (IN):: u(klon, klev), v(klon, klev)
