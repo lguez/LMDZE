@@ -5,7 +5,7 @@ module drag_noro_m
 contains
 
   SUBROUTINE drag_noro(paprs, pplay, pmea, pstd, psig, pgam, pthe, ppic, pval, &
-       ktest, t, u, v, pulow, pvlow, pustr, pvstr, d_t, d_u, d_v)
+       t, u, v, pulow, pvlow, pustr, pvstr, d_t, d_u, d_v, ktest)
 
     ! From LMDZ4/libf/phylmd/orografi.F, version 1.4 2005/12/01 11:27:29
 
@@ -25,8 +25,6 @@ contains
     REAL, INTENT(IN):: pstd(klon), psig(klon)
     REAL pgam(klon), pthe(klon)
     REAL ppic(klon), pval(klon)
-    integer, INTENT(IN):: ktest(klon)
-
     REAL, INTENT(IN):: t(klon, klev) ! temperature (K)
     real, INTENT(IN):: u(klon, klev), v(klon, klev) ! vitesse horizontale (m/s)
     REAL, intent(out):: pulow(klon), pvlow(klon), pustr(klon), pvstr(klon)
@@ -34,6 +32,8 @@ contains
 
     REAL, intent(out):: d_u(klon, klev), d_v(klon, klev) ! increment
     ! de la vitesse
+
+    integer, INTENT(IN):: ktest(klon)
 
     ! Local:
     INTEGER i, k

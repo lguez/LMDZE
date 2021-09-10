@@ -843,8 +843,8 @@ contains
        ENDDO
 
        CALL drag_noro(paprs, play, zmea, zstd, zsig, zgam, zthe, zpic, zval, &
-            ktest, t_seri, u_seri, v_seri, zulow, zvlow, zustrdr, zvstrdr, &
-            d_t_oro, d_u_oro, d_v_oro)
+            t_seri, u_seri, v_seri, zulow, zvlow, zustrdr, zvstrdr, d_t_oro, &
+            d_u_oro, d_v_oro, ktest)
 
        ! Ajout des tendances :
        t_seri = t_seri + d_t_oro
@@ -862,8 +862,8 @@ contains
           ENDIF
        ENDDO
 
-       CALL lift_noro(paprs, play, zmea, zstd, zpic, ktest, t_seri, u_seri, &
-            v_seri, zulow, zvlow, zustrli, zvstrli, d_t_lif, d_u_lif, d_v_lif)
+       CALL lift_noro(paprs, play, zmea, zstd, zpic, t_seri, u_seri, v_seri, &
+            zulow, zvlow, zustrli, zvstrli, d_t_lif, d_u_lif, d_v_lif, ktest)
 
        ! Ajout des tendances :
        t_seri = t_seri + d_t_lif

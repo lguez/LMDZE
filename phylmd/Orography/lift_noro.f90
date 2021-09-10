@@ -4,8 +4,8 @@ module lift_noro_m
 
 contains
 
-  SUBROUTINE lift_noro(paprs, pplay, pmea, pstd, ppic, ktest, t, u, v, pulow, &
-       pvlow, pustr, pvstr, d_t, d_u, d_v)
+  SUBROUTINE lift_noro(paprs, pplay, pmea, pstd, ppic, t, u, v, pulow, pvlow, &
+       pustr, pvstr, d_t, d_u, d_v, ktest)
 
     ! Author: F.Lott (LMD/CNRS) date: 1995/02/01
     ! Objet: Frottement de la montagne, interface
@@ -23,7 +23,6 @@ contains
     REAL pmea(klon)
     REAL, INTENT (IN):: pstd(klon)
     REAL ppic(klon)
-    integer, INTENT(IN):: ktest(klon)
     REAL, INTENT (IN):: t(klon, klev)
     ! t-------input-R-temperature (K)
     real, INTENT (IN):: u(klon, klev), v(klon, klev)
@@ -34,6 +33,8 @@ contains
     ! d_t-----output-R-increment de la temperature
     ! d_u-----output-R-increment de la vitesse u
     ! d_v-----output-R-increment de la vitesse v
+
+    integer, INTENT(IN):: ktest(klon)
 
     ! Local:
     INTEGER i, k
