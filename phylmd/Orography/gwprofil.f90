@@ -25,7 +25,7 @@ contains
     USE yoegwd, ONLY : gkdrag, grahilo, grcrit, gssec, gtsec, nstra
 
     INTEGER, intent(in):: nlon, nlev
-    INTEGER, intent(in):: ktest(nlon)
+    logical, intent(in):: ktest(nlon)
     INTEGER, intent(in):: kkcrith(nlon), kcrit(nlon)
     REAL, intent(in):: paphm1(nlon, nlev+1), prho(nlon, nlev+1)
     REAL, intent(in):: pstab(nlon, nlev+1)
@@ -49,7 +49,7 @@ contains
     ! COMPUTATIONAL CONSTANTS.
 
     DO jl = 1, klon
-       IF (ktest(jl)==1) THEN
+       IF (ktest(jl)) THEN
           zoro(jl) = psig(jl)*pdmod(jl)/4./max(pvar(jl), 1.0)
           ztau(jl, klev+1) = ptau(jl, klev+1)
        END IF
@@ -59,7 +59,7 @@ contains
        ! 4.1 CONSTANT WAVE STRESS UNTIL TOP OF THE
        ! BLOCKING LAYER.
        DO jl = 1, klon
-          IF (ktest(jl)==1) THEN
+          IF (ktest(jl)) THEN
              IF (jk>kkcrith(jl)) THEN
                 ptau(jl, jk) = ztau(jl, klev+1)
              ELSE
@@ -70,7 +70,7 @@ contains
 
        ! 4.2 WAVE DISPLACEMENT AT NEXT LEVEL.
        DO jl = 1, klon
-          IF (ktest(jl)==1) THEN
+          IF (ktest(jl)) THEN
              IF (jk<kkcrith(jl)) THEN
                 znorm(jl) = gkdrag * prho(jl, jk) * sqrt(pstab(jl, jk)) &
                      * pvph(jl, jk)* zoro(jl)
@@ -83,7 +83,7 @@ contains
        ! AND STRESS: BREAKING EVALUATION AND CRITICAL
        ! LEVEL
        DO jl = 1, klon
-          IF (ktest(jl)==1) THEN
+          IF (ktest(jl)) THEN
              IF (jk<kkcrith(jl)) THEN
                 IF ((ptau(jl, jk+1)<gtsec) .OR. (jk<=kcrit(jl))) THEN
                    ptau(jl, jk) = 0.0
@@ -110,7 +110,7 @@ contains
     ! REORGANISATION OF THE STRESS PROFILE AT LOW LEVEL
 
     DO jl = 1, klon
-       IF (ktest(jl)==1) THEN
+       IF (ktest(jl)) THEN
           ztau(jl, kkcrith(jl)) = ptau(jl, kkcrith(jl))
           ztau(jl, nstra) = ptau(jl, nstra)
        END IF
@@ -118,7 +118,7 @@ contains
 
     DO jk = 1, klev
        DO jl = 1, klon
-          IF (ktest(jl)==1) THEN
+          IF (ktest(jl)) THEN
              IF (jk>kkcrith(jl)) THEN
                 zdelp = paphm1(jl, jk) - paphm1(jl, klev+1)
                 zdelpt = paphm1(jl, kkcrith(jl)) - paphm1(jl, klev+1)
@@ -130,7 +130,7 @@ contains
 
        ! REORGANISATION IN THE STRATOSPHERE
        DO jl = 1, klon
-          IF (ktest(jl)==1) THEN
+          IF (ktest(jl)) THEN
              IF (jk < nstra) THEN
                 zdelp = paphm1(jl, nstra)
                 zdelpt = paphm1(jl, jk)
@@ -141,7 +141,7 @@ contains
 
        ! REORGANISATION IN THE TROPOSPHERE
        DO jl = 1, klon
-          IF (ktest(jl)==1) THEN
+          IF (ktest(jl)) THEN
              IF (jk<kkcrith(jl) .AND. jk > nstra) THEN
                 zdelp = paphm1(jl, jk) - paphm1(jl, kkcrith(jl))
                 zdelpt = paphm1(jl, nstra) - paphm1(jl, kkcrith(jl))

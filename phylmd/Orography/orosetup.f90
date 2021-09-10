@@ -22,7 +22,7 @@ contains
 
     ! Arguments:
     INTEGER nlon
-    INTEGER, intent(in):: ktest(nlon)
+    logical, intent(in):: ktest(nlon)
     integer kkcrit(nlon), kkcrith(nlon), kcrit(nlon), kkenvh(nlon)
     INTEGER kknu(klon), kknu2(klon)
     REAL, intent(in):: paphm1(nlon, klev + 1), papm1(nlon, klev), &
@@ -151,7 +151,7 @@ contains
 
     DO jk = klev, 2, - 1
        DO jl = 1, klon
-          IF (ktest(jl) == 1) THEN
+          IF (ktest(jl)) THEN
              zdp(jl, jk) = papm1(jl, jk) - papm1(jl, jk - 1)
              prho(jl, jk) = 2. * paphm1(jl, jk) * zcons1 &
                   / (ptm1(jl, jk) + ptm1(jl, jk - 1))
@@ -207,7 +207,7 @@ contains
 
     DO jk = 1, klev
        DO jl = 1, klon
-          IF (ktest(jl) == 1) THEN
+          IF (ktest(jl)) THEN
              zvt1 = pulow(jl) * pum1(jl, jk) + pvlow(jl) * pvm1(jl, jk)
              zvt2 = - pvlow(jl) * pum1(jl, jk) + pulow(jl) * pvm1(jl, jk)
              zvpf(jl, jk) = (zvt1 * pd1(jl) + zvt2 * pd2(jl)) / (znorm(jl) &
@@ -221,7 +221,7 @@ contains
     end DO
     DO jk = 2, klev
        DO jl = 1, klon
-          IF (ktest(jl) == 1) THEN
+          IF (ktest(jl)) THEN
              zdp(jl, jk) = papm1(jl, jk) - papm1(jl, jk - 1)
              pvph(jl, jk) = ((paphm1(jl, jk) - papm1(jl, jk - 1)) &
                   * zvpf(jl, jk) + (papm1(jl, jk) - paphm1(jl, jk)) &
@@ -238,7 +238,7 @@ contains
 
     DO jk = ilevh, klev
        DO jl = 1, klon
-          IF (ktest(jl) == 1) THEN
+          IF (ktest(jl)) THEN
              IF (jk>=(kknub(jl) + 1) .AND. jk<=kknul(jl)) THEN
                 zst = zcons2 / ptm1(jl, jk) * (1. - rcpd * prho(jl, jk) &
                      * (ptm1(jl, jk) - ptm1(jl, jk - 1)) / zdp(jl, jk))
@@ -263,7 +263,7 @@ contains
 
     DO jk = 2, klev
        DO jl = 1, klon
-          IF (ktest(jl) == 1) THEN
+          IF (ktest(jl)) THEN
              zdwind = max(abs(zvpf(jl, jk) - zvpf(jl, jk - 1)), gvsec)
              pri(jl, jk) = pstab(jl, jk) * (zdp(jl, jk) / (rg * prho(jl, jk) &
                   * zdwind))**2
@@ -282,7 +282,7 @@ contains
     DO jk = 2, klev - 1
        DO jl = 1, klon
 
-          IF (ktest(jl) == 1) THEN
+          IF (ktest(jl)) THEN
 
              IF (jk>=kknub(jl)) THEN
 
@@ -318,7 +318,7 @@ contains
     DO jk = klev - 1, 2, - 1
        DO jl = 1, klon
 
-          IF (ktest(jl) == 1) THEN
+          IF (ktest(jl)) THEN
 
              znum(jl) = znup(jl)
              zwind = (pulow(jl) * pum1(jl, jk) + pvlow(jl) * pvm1(jl, jk)) / &

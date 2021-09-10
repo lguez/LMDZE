@@ -56,7 +56,7 @@ contains
     !              ---------
 
     INTEGER nlon, nlev
-    integer, intent(in):: ktest(nlon)
+    logical, intent(in):: ktest(nlon)
     integer, intent(in):: kkenvh(nlon)
 
     REAL prho(nlon,nlev+1), pstab(nlon,nlev+1), ptau(nlon,nlev+1), &
@@ -86,7 +86,7 @@ contains
     !*         3.1     gravity wave stress.
 
     DO jl = 1, klon
-       IF (ktest(jl)==1) THEN
+       IF (ktest(jl)) THEN
 
           !  effective mountain height above the blocked flow
 

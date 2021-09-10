@@ -65,7 +65,7 @@ contains
     REAL pgamma(nlon), ptheta(nlon), ppic(nlon), pval(nlon), &
          pgeom1(nlon, nlev), papm1(nlon, nlev), paphm1(nlon, nlev+1)
 
-    INTEGER, intent(in):: ktest(nlon)
+    logical, intent(in):: ktest(nlon)
 
     !* 0.2 local arrays
 
@@ -130,7 +130,7 @@ contains
 
        ! Modif vectorisation 02/04/2004
        DO ji = 1, klon
-          IF (ktest(ji)==1) THEN
+          IF (ktest(ji)) THEN
 
              zdelp = paphm1(ji, jk+1) - paphm1(ji, jk)
              ztemp = -rg*(ztau(ji, jk+1)-ztau(ji, jk))/(zvph(ji, ilevp1)*zdelp)

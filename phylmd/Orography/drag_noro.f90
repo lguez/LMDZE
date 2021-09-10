@@ -33,7 +33,8 @@ contains
     REAL, intent(out):: d_u(klon, klev), d_v(klon, klev) ! increment
     ! de la vitesse
 
-    integer, INTENT(IN):: ktest(klon)
+    logical, intent(in):: ktest(klon)
+    ! points pour lesquels le sch\'ema est actif
 
     ! Local:
     INTEGER i, k

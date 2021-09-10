@@ -34,7 +34,8 @@ contains
     ! d_u-----output-R-increment de la vitesse u
     ! d_v-----output-R-increment de la vitesse v
 
-    integer, INTENT(IN):: ktest(klon)
+    logical, INTENT(IN):: ktest(klon)
+    ! points pour lesquels le sch\'ema est actif
 
     ! Local:
     INTEGER i, k

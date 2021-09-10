@@ -44,7 +44,7 @@ contains
     REAL, INTENT (IN) :: pvaror(nlon)
     REAL ppic(nlon), pgeom1(nlon,nlev), paphm1(nlon,nlev+1)
 
-    INTEGER, intent(in):: ktest(nlon)
+    logical, intent(in):: ktest(nlon)
     REAL, INTENT (IN) :: ptsphy
     !-----------------------------------------------------------------------
 
@@ -95,7 +95,7 @@ contains
 
     DO jk = klev, 1, -1
        DO jl = 1, klon
-          IF (ktest(jl)==1) THEN
+          IF (ktest(jl)) THEN
              zhcrit(jl,jk) = amax1(ppic(jl)-pmea(jl),100.)
              zhgeo = pgeom1(jl,jk)/rg
              ll1(jl,jk) = (zhgeo>zhcrit(jl,jk))
@@ -107,7 +107,7 @@ contains
     end DO
 
     DO jl = 1, klon
-       IF (ktest(jl)==1) THEN
+       IF (ktest(jl)) THEN
           iknub(jl) = max(iknub(jl),klev/2)
           iknul(jl) = max(iknul(jl),2*klev/3)
           IF (iknub(jl)>nktopg) iknub(jl) = nktopg
@@ -126,7 +126,7 @@ contains
     !      -------------------
     DO jk = klev, 1, -1
        DO jl = 1, klon
-          IF (ktest(jl)==1) THEN
+          IF (ktest(jl)) THEN
              IF (jk>=iknub(jl) .AND. jk<=iknul(jl)) THEN
                 pulow(jl) = pulow(jl) + pum1(jl,jk)*(paphm1(jl,jk+1)-paphm1(jl, &
                      jk))
@@ -139,7 +139,7 @@ contains
        end DO
     end DO
     DO jl = 1, klon
-       IF (ktest(jl)==1) THEN
+       IF (ktest(jl)) THEN
           pulow(jl) = pulow(jl)/(paphm1(jl,iknul(jl)+1)-paphm1(jl,iknub(jl)))
           pvlow(jl) = pvlow(jl)/(paphm1(jl,iknul(jl)+1)-paphm1(jl,iknub(jl)))
           zrho(jl,klev+1) = zrho(jl,klev+1)/(paphm1(jl,iknul(jl)+1)-paphm1(jl, &
@@ -150,7 +150,7 @@ contains
     !*         3.      COMPUTE MOUNTAIN LIFT
 
     DO jl = 1, klon
-       IF (ktest(jl)==1) THEN
+       IF (ktest(jl)) THEN
           ztau(jl,klev+1) = -gklift*zrho(jl,klev+1)*2.*romega*2*pvaror(jl)*sin &
                (zpi/180.*plat(jl))*pvlow(jl)
           ztav(jl,klev+1) = gklift*zrho(jl,klev+1)*2.*romega*2*pvaror(jl)* &
@@ -168,7 +168,7 @@ contains
 
     DO jk = 1, klev
        DO jl = 1, klon
-          IF (ktest(jl)==1) THEN
+          IF (ktest(jl)) THEN
              ztau(jl,jk) = ztau(jl,klev+1)*paphm1(jl,jk)/paphm1(jl,klev+1)
              ztav(jl,jk) = ztav(jl,klev+1)*paphm1(jl,jk)/paphm1(jl,klev+1)
           ELSE
@@ -189,7 +189,7 @@ contains
 
        DO jk = 1, klev
           DO jl = 1, klon
-             IF (ktest(jl)==1) THEN
+             IF (ktest(jl)) THEN
                 zdelp = paphm1(jl,jk+1) - paphm1(jl,jk)
                 zdudt(jl) = -rg*(ztau(jl,jk+1)-ztau(jl,jk))/zdelp
                 zdvdt(jl) = -rg*(ztav(jl,jk+1)-ztav(jl,jk))/zdelp
@@ -201,7 +201,7 @@ contains
 
        DO jk = 1, klev
           DO jl = 1, klon
-             IF (ktest(jl)==1) THEN
+             IF (ktest(jl)) THEN
 
                 zslow = sqrt(pulow(jl)**2+pvlow(jl)**2)
                 zsqua = amax1(sqrt(pum1(jl,jk)**2+pvm1(jl,jk)**2),gvsec)
@@ -229,7 +229,7 @@ contains
     ELSE
 
        DO jl = 1, klon
-          IF (ktest(jl)==1) THEN
+          IF (ktest(jl)) THEN
              DO jk = klev, iknub(jl), -1
                 zbet = gklift*2.*romega*sin(zpi/180.*plat(jl))*ztmst* &
                      (pgeom1(jl,iknub(jl)-1)-pgeom1(jl,jk))/ &

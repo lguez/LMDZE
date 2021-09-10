@@ -176,8 +176,6 @@ contains
     ! longueur de rugosite de l'OESM
 
     REAL zulow(klon), zvlow(klon)
-    INTEGER ktest(klon)
-
     REAL, save, allocatable:: agesno(:, :) ! (klon, nbsrf) ! age de la neige
     REAL, save, allocatable:: run_off_lic_0(:) ! (klon)
 
@@ -833,18 +831,9 @@ contains
     ! Param\'etrisation de l'orographie \`a l'\'echelle sous-maille :
 
     IF (ok_orodr) THEN
-       ! S\'election des points pour lesquels le sch\'ema est actif :
-       DO i = 1, klon
-          IF (zpic(i) - zmea(i) > 100. .AND. zstd(i) > 10.) THEN
-             ktest(i) = 1
-          else
-             ktest(i) = 0
-          ENDIF
-       ENDDO
-
        CALL drag_noro(paprs, play, zmea, zstd, zsig, zgam, zthe, zpic, zval, &
             t_seri, u_seri, v_seri, zulow, zvlow, zustrdr, zvstrdr, d_t_oro, &
-            d_u_oro, d_v_oro, ktest)
+            d_u_oro, d_v_oro, ktest = zpic - zmea > 100. .AND. zstd > 10.)
 
        ! Ajout des tendances :
        t_seri = t_seri + d_t_oro
@@ -853,17 +842,9 @@ contains
     ENDIF
 
     IF (ok_orolf) THEN
-       ! S\'election des points pour lesquels le sch\'ema est actif :
-       DO i = 1, klon
-          IF (zpic(i) - zmea(i) > 100.) THEN
-             ktest(i) = 1
-          else
-             ktest(i) = 0
-          ENDIF
-       ENDDO
-
        CALL lift_noro(paprs, play, zmea, zstd, zpic, t_seri, u_seri, v_seri, &
-            zulow, zvlow, zustrli, zvstrli, d_t_lif, d_u_lif, d_v_lif, ktest)
+            zulow, zvlow, zustrli, zvstrli, d_t_lif, d_u_lif, d_v_lif, &
+            ktest = zpic - zmea > 100.)
 
        ! Ajout des tendances :
        t_seri = t_seri + d_t_lif
