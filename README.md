@@ -39,3 +39,18 @@ GCM that is still close in structure to LMDZ, much simpler to read,
 and can thus be used to understand what is going on in LMDZ, or, more
 generally, what is in a GCM. Also, LMDZE is a test of ideas on the best
 architecture for a large code in modern Fortran.
+
+## Installation
+
+Dependencies: [CMake](https://cmake.org/download) (version ≥ 3.17),
+[XIOS](http://forge.ipsl.jussieu.fr/ioserver/wiki),
+[NetCDF-Fortran](https://www.unidata.ucar.edu/downloads/netcdf/index.jsp)
+(XIOS itself depends on MPI and NetCDF-Fortran depends on NetCDF).
+
+        cd the-directory-containing-LMDZE
+        mkdir build
+        cd build
+		cmake .. -DFETCH=TRUE \
+		   -DXIOS_INCLUDE_DIR=/directory/containing/XIOS/inc \
+		   -DXIOS_LIBRARY=/directory/containing/XIOS/lib/libxios.a
+		make
