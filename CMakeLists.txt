@@ -15,7 +15,7 @@ add_library(LMDZE_objects OBJECT dimensions.f90)
 target_include_directories(LMDZE_objects INTERFACE ${PROJECT_BINARY_DIR})
 
 target_link_libraries(LMDZE_objects PRIVATE NetCDF95::netcdf95 XIOS::xios
-  NetCDF_Fortran::netcdff jumble numer_rec_95 nr_util)
+  NetCDF_Fortran::netcdff Jumble::jumble numer_rec_95 NR_util::nr_util)
 
 foreach(my_dir IN ITEMS dyn3d filtrez IOIPSL misc phylmd dynphy_lonlat)
   add_subdirectory(${my_dir})

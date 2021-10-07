@@ -18,5 +18,5 @@ target_link_libraries(test_orbite PRIVATE LMDZE_objects)
 
 add_executable(test_ozonecm test_ozonecm.f90)
 
-target_link_libraries(test_ozonecm PRIVATE LMDZE_objects nr_util
+target_link_libraries(test_ozonecm PRIVATE LMDZE_objects NR_util::nr_util
   NetCDF_Fortran::netcdff NetCDF95::netcdf95)

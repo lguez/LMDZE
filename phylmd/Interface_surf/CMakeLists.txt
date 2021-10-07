@@ -8,5 +8,5 @@ target_sources(LMDZE_objects PRIVATE alboc_cd.f90 albsno.f90
 
 add_executable(test_soil test_soil.f90)
 
-target_link_libraries(test_soil PRIVATE LMDZE_objects jumble
+target_link_libraries(test_soil PRIVATE LMDZE_objects Jumble::jumble
   MPI::MPI_Fortran XIOS::xios)
