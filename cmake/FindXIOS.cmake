@@ -14,5 +14,5 @@ if (XIOS_FOUND)
   target_include_directories(XIOS::xios INTERFACE ${XIOS_INCLUDE_DIR})
 
   target_link_libraries(XIOS::xios INTERFACE MPI::MPI_CXX
-    NetCDF_Fortran::NetCDF_Fortran)
+    NetCDF_Fortran::netcdff)
 endif()
