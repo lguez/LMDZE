@@ -6,13 +6,13 @@ find_package_handle_standard_args(XIOS REQUIRED_VARS XIOS_INCLUDE_DIR
   XIOS_LIBRARY)
 
 if (XIOS_FOUND)
-  add_library(XIOS::XIOS STATIC IMPORTED)
+  add_library(XIOS::xios STATIC IMPORTED)
 
-  set_target_properties(XIOS::XIOS PROPERTIES IMPORTED_LOCATION
+  set_target_properties(XIOS::xios PROPERTIES IMPORTED_LOCATION
     ${XIOS_LIBRARY} IMPORTED_LINK_INTERFACE_LANGUAGES "CXX")
   
-  target_include_directories(XIOS::XIOS INTERFACE ${XIOS_INCLUDE_DIR})
+  target_include_directories(XIOS::xios INTERFACE ${XIOS_INCLUDE_DIR})
 
-  target_link_libraries(XIOS::XIOS INTERFACE MPI::MPI_CXX
+  target_link_libraries(XIOS::xios INTERFACE MPI::MPI_CXX
     NetCDF_Fortran::NetCDF_Fortran)
 endif()
