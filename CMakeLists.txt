@@ -21,5 +21,4 @@ foreach(my_dir IN ITEMS dyn3d filtrez IOIPSL misc phylmd dynphy_lonlat)
   add_subdirectory(${my_dir})
 endforeach(my_dir)
 
-include(ConfigureCompilerFlags)
 include(TAGS)
