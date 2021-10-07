@@ -15,4 +15,5 @@ if (XIOS_FOUND)
 
   target_link_libraries(XIOS::xios INTERFACE MPI::MPI_CXX
     NetCDF_Fortran::netcdff)
+
 endif()

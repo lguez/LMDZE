@@ -491,7 +491,8 @@ contains
        enddo
        do ig=1, klon
           if(fracd(ig, l).lt.0.1) then
-             stop 'fracd trop petit'
+             print *, 'fracd trop petit'
+             stop 1
           endif
        enddo
     enddo
