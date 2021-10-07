@@ -47,10 +47,10 @@ Dependencies: [CMake](https://cmake.org/download) (version ≥ 3.17),
 [NetCDF-Fortran](https://www.unidata.ucar.edu/downloads/netcdf/index.jsp)
 (XIOS itself depends on MPI and NetCDF-Fortran depends on NetCDF).
 
-        cd the-directory-containing-LMDZE
-        mkdir build
-        cd build
-		cmake .. -DFETCH=TRUE \
-		   -DXIOS_INCLUDE_DIR=/directory/containing/XIOS/inc \
-		   -DXIOS_LIBRARY=/directory/containing/XIOS/lib/libxios.a
-		make
+    cd the-directory-containing-LMDZE
+    mkdir build
+    cd build
+    cmake .. -DFETCH=TRUE \
+       -DXIOS_INCLUDE_DIR=/directory/containing/XIOS/inc \
+       -DXIOS_LIBRARY=/directory/containing/XIOS/lib/libxios.a
+    make
