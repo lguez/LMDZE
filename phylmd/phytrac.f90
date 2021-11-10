@@ -2,9 +2,6 @@ module phytrac_m
 
   IMPLICIT none
 
-  private
-  public phytrac
-
 contains
 
   SUBROUTINE phytrac(julien, gmtime, firstcal, lafin, t_seri, paprs, pplay, &
