@@ -351,8 +351,8 @@ contains
                yv(:knon, 1), ycoefh(:knon, :), ycdragh(:knon), yt(:knon, :), &
                yq(:knon, :), yts(:knon), ypaprs(:knon, :), ypplay(:knon, :), &
                ydelp(:knon, :), &
-               fsolsw(ni(:knon), nisrf) + fsollw(ni(:knon), nisrf), yalb(:knon), &
-               snow(:knon), yqsurf(:knon), yrain_fall(:knon), &
+               fsolsw(ni(:knon), nisrf) + fsollw(ni(:knon), nisrf), &
+               yalb(:knon), snow(:knon), yqsurf(:knon), yrain_fall(:knon), &
                ysnow_fall(:knon), yfluxlat(:knon), pctsrf_new_sic(ni(:knon)), &
                yagesno(:knon), y_d_t(:knon, :), y_d_q(:knon, :), &
                tsurf_new(:knon), yz0_new(:knon), y_flux_t(:knon), &

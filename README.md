@@ -50,7 +50,7 @@ Dependencies: [CMake](https://cmake.org/download) (version ≥ 3.17),
     cd the-directory-containing-LMDZE
     mkdir build
     cd build
-    cmake .. -DFETCH=TRUE \
+    cmake .. -DFETCH=True \
        -DXIOS_INCLUDE_DIR=/directory/containing/XIOS/inc \
        -DXIOS_LIBRARY=/directory/containing/XIOS/lib/libxios.a
     make
