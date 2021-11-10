@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.16)
 list(APPEND CMAKE_MESSAGE_CONTEXT LMDZE)
 project(LMDZE LANGUAGES Fortran CXX)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
-option(FETCH "Download" OFF)
+option(FETCH "Download")
 
 if(FETCH)
   include(FetchContent)
