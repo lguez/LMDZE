@@ -17,7 +17,7 @@ if(FETCH)
     https://github.com/lguez/NetCDF95.git)
 
   FetchContent_Declare(Numer_Rec_95 GIT_REPOSITORY
-    https://gitlab.in2p3.fr/ipsl/lmd/dpao/numer_rec_95.git)
+    https://gitlab.in2p3.fr/guez/Numer_Rec_95.git)
 
   FetchContent_MakeAvailable(NR_util Jumble NetCDF95 Numer_Rec_95)
 else()
