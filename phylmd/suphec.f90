@@ -81,7 +81,6 @@ contains
   SUBROUTINE suphec
 
     ! From phylmd/suphec.F, version 1.2 2005/06/06 13:16:33
-    ! Initialise certaines constantes et certains paramètres physiques.
 
     !------------------------------------------
 
@@ -101,14 +100,10 @@ contains
     print '('' Cvv = '', e13.7)', RCVV
     print '('' Rd / Cpd = '', e13.7)', RKAPPA
     print *, 'Rv / Rd - 1 = ', RETV
-
-    ! 8. DEFINE THERMODYNAMIC CONSTANTS, TRANSITION OF PHASE.
+    print *, 'RCPV = ', RCPV
 
     print *, 'Thermodynamic, transition of phase:'
-    print '('' Fusion point = '', E13.7)', RTT
-    print '('' RLsTt = '', E13.7)', RLSTT
     print *, 'RLMlt = ', RLMLT
-    print '('' Normal pressure = '', E13.7)', RATM
 
   END SUBROUTINE suphec
 
