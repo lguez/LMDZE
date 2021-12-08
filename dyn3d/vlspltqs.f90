@@ -27,8 +27,7 @@ contains
     USE dimensions, ONLY : iim, llm
     use FCTTRE, only: foeew
     USE paramet_m, ONLY : iip1, iip2, ijp1llm, ip1jm, ip1jmp1, llmp1
-    USE comconst, ONLY : cpp
-    use SUPHEC_M, only: rtt
+    use SUPHEC_M, only: rtt, rcpd
     use vlyqs_m, only: vlyqs
 
     ! Arguments:
@@ -70,7 +69,7 @@ contains
     ! pour eviter une exponentielle.
     DO l = 1, llm
        DO ij = 1, ip1jmp1
-          tempe(ij) = teta(ij, l) * pk(ij, l) /cpp
+          tempe(ij) = teta(ij, l) * pk(ij, l) /rcpd
        ENDDO
        DO ij = 1, ip1jmp1
           zdelta = rtt > tempe(ij)

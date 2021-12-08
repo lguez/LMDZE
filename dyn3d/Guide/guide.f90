@@ -11,7 +11,6 @@ CONTAINS
 
     ! Author: F. Hourdin
 
-    USE comconst, ONLY: cpp, kappa
     USE conf_gcm_m, ONLY: day_step
     use conf_guide_m, only: guide_u, guide_v, guide_t, guide_q, ini_anal, &
          alpha_u, alpha_v, alpha_t, alpha_q
@@ -20,6 +19,7 @@ CONTAINS
     USE exner_hyb_m, ONLY: exner_hyb
     USE q_sat_m, ONLY: q_sat
     use read_reanalyse_m, only: read_reanalyse
+    use suphec_m, only: rcpd, rkappa
     use writefield_m, only: writefield
 
     INTEGER, INTENT(IN):: itau
@@ -85,7 +85,7 @@ CONTAINS
              ! Calcul de l'humidité saturante :
              forall (l = 1: llm + 1) p(:, :, l) = ap(l) + bp(l) * ps
              CALL exner_hyb(ps, p, pks, pk)
-             q = q_sat(pk * teta / cpp, preff * (pk / cpp)**(1. / kappa)) &
+             q = q_sat(pk * teta / rcpd, preff * (pk / rcpd)**(1. / rkappa)) &
                   * qrea2 * 0.01
           end IF
        end if
@@ -141,7 +141,7 @@ CONTAINS
        ! Calcul de l'humidité saturante :
        forall (l = 1: llm + 1) p(:, :, l) = ap(l) + bp(l) * ps
        CALL exner_hyb(ps, p, pks, pk)
-       qsat = q_sat(pk * teta / cpp, preff * (pk / cpp)**(1. / kappa))
+       qsat = q_sat(pk * teta / rcpd, preff * (pk / rcpd)**(1. / rkappa))
 
        ! humidité relative en % -> humidité spécifique
        forall (l = 1: llm) q(:, :, l) = (1. - alpha_q) * q(:, :, l) &

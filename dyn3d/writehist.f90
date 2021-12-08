@@ -10,7 +10,6 @@ contains
     ! Écriture du fichier histoire au format IOIPSL
     ! L. Fairhead, LMD, 03/99
 
-    USE comconst, ONLY: cpp
     use covnat_m, only: covnat
     use dimensions, only: llm
     use histsync_m, only: histsync
@@ -19,6 +18,7 @@ contains
     use inithist_m, only: histid, histvid, histuid
     use nr_util, only: assert
     use paramet_m, only: ip1jm, ip1jmp1
+    use suphec_m, only: rcpd
 
     ! Vent covariant :
     REAL, intent(in):: vcov(:, :, :) ! (iim + 1, jjm, llm)
@@ -54,7 +54,7 @@ contains
     call histwrite(histuid, 'u', itau_w, unat)
     call histwrite(histvid, 'v', itau_w, vnat)
     call histwrite(histid, 'theta', itau_w, teta)
-    call histwrite(histid, 'temp', itau_w, teta * pk / cpp)
+    call histwrite(histid, 'temp', itau_w, teta * pk / rcpd)
     call histwrite(histid, 'phi', itau_w, phi)
 
     DO iq = 1, size(q, 4)

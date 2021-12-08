@@ -30,7 +30,6 @@ contains
     ! rayonnement) et l'aire de la maille (quand on veut int\'egrer une
     ! grandeur horizontalement).
 
-    use comconst, only: kappa, cpp, g
     use comgeom, only: apoln, cu_2d, cv_2d, unsaire, apols
     use dimensions, only: iim, jjm, llm, nqmx
     use dimphy, only: klon
@@ -39,6 +38,7 @@ contains
     use grid_change, only: dyn_phy, gr_fi_dyn
     use nr_util, only: pi
     use physiq_m, only: physiq
+    use suphec_m, only: rcpd, rkappa, rg
 
     REAL, intent(in):: ucov(:, :, :) ! (iim + 1, jjm + 1, llm) 
     ! covariant zonal velocity
@@ -109,8 +109,8 @@ contains
 
     ! 43. Température et pression milieu couche
     DO l = 1, llm
-       pksurcp = pk(:, :, l) / cpp
-       play(:, l) = pack(preff * pksurcp**(1./ kappa), dyn_phy)
+       pksurcp = pk(:, :, l) / rcpd
+       play(:, l) = pack(preff * pksurcp**(1./ rkappa), dyn_phy)
        t(:, l) = pack(teta(:, :, l) * pksurcp, dyn_phy)
     ENDDO
 
@@ -125,10 +125,10 @@ contains
 
     ! Calcul de la vitesse verticale :
     forall (l = 1: llm)
-       omega(1, l) = w(1, 1, l) * g / apoln
+       omega(1, l) = w(1, 1, l) * rg / apoln
        omega(2: klon - 1, l) &
-            = pack(w(:iim, 2: jjm, l) * g * unsaire(:iim, 2: jjm), .true.)
-       omega(klon, l) = w(1, jjm + 1, l) * g / apols
+            = pack(w(:iim, 2: jjm, l) * rg * unsaire(:iim, 2: jjm), .true.)
+       omega(klon, l) = w(1, jjm + 1, l) * rg / apols
     END forall
 
     ! 45. champ u:
@@ -190,7 +190,7 @@ contains
 
     ! 62. enthalpie potentielle
     do l = 1, llm
-       dtetafi(:, :, l) = cpp * gr_fi_dyn(d_t(:, l)) / pk(:, :, l)
+       dtetafi(:, :, l) = rcpd * gr_fi_dyn(d_t(:, l)) / pk(:, :, l)
     end do
 
     ! 63. traceurs

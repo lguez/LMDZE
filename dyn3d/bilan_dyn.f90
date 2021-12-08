@@ -13,7 +13,6 @@ contains
     ! sont pond\'er\'ees par la masse. Les flux de masse sont, eux,
     ! simplement moyenn\'es.
 
-    USE comconst, ONLY: cpp
     USE comgeom, ONLY: constang_2d, cu_2d, cv_2d
     use covcont_m, only: covcont
     USE dimensions, ONLY: iim, jjm, llm
@@ -22,6 +21,7 @@ contains
     use init_dynzon_m, only: ncum, fileid, znom, ntr, nq, nom
     use massbar_m, only: massbar
     USE paramet_m, ONLY: iip1, jjp1
+    use suphec_m, only: rcpd
 
     real, intent(in):: ps(:, :) ! (iip1, jjp1)
     real, intent(in):: masse(:, :, :), pk(:, :, :) ! (iip1, jjp1, llm)
@@ -92,7 +92,7 @@ contains
        unat(:, :, l) = ucont(:, :, l) * cu_2d
     end forall
 
-    Q(:, :, :, 1) = teta * pk / cpp
+    Q(:, :, :, 1) = teta * pk / rcpd
     Q(:, :, :, 2) = phi
     Q(:, :, :, 3) = ecin
     Q(:, :, :, 4) = ang

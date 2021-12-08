@@ -11,13 +11,14 @@ contains
     ! Author: P. Le Van
     ! Objet : sortie des variables de contr\^ole
 
-    USE comconst, ONLY: daysec, g, omeg, ra
+    USE comconst, ONLY: daysec, ra
     USE comgeom, ONLY: aire_2d, cu_2d
     USE dimensions, ONLY: iim, jjm, llm
     use dynetat0_m, ONLY: rlatu
     use filtreg_scal_m, only: filtreg_scal
     use massbarxy_m, only: massbarxy
     USE paramet_m, ONLY: jjp1
+    use suphec_m, ONLY: rg, romega
 
     REAL, INTENT(IN):: ucov(iim + 1, jjm + 1, llm)
     REAL, INTENT(IN):: teta(iim + 1, jjm + 1, llm)
@@ -47,8 +48,8 @@ contains
 
     ! Calcul du moment  angulaire :
     
-    radsg = ra / g
-    radomeg = ra * omeg
+    radsg = ra / rg
+    radomeg = ra * romega
     cosphi = cos(rlatu(2:jjm))
 
     DO l = 1, llm

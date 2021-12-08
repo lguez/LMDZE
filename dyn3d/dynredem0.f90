@@ -15,7 +15,7 @@ CONTAINS
     USE netcdf95, ONLY: nf95_create, nf95_def_dim, nf95_def_var, nf95_enddef, &
          nf95_put_att, nf95_put_var
 
-    USE comconst, ONLY: cpp, daysec, g, kappa, omeg, ra
+    USE comconst, ONLY: daysec, ra
     USE dimensions, ONLY: iim, jjm, llm, nqmx
     USE disvert_m, ONLY: ap, bp, preff, presnivs
     use dynetat0_m, only: rlatu, rlatv, rlonu, rlonv, rlatu1, rlatu2, yprimu1, &
@@ -26,6 +26,7 @@ CONTAINS
     USE infotrac_init_m, ONLY: tname, ttext
     USE ju2ymds_m, ONLY: ju2ymds
     USE paramet_m, ONLY: iip1, jjp1, llmp1
+    use suphec_m, only: rg, rcpd, rkappa, romega
     use ymds2ju_m, only: ymds2ju
 
     REAL, INTENT(IN):: phis(:, :) ! (iim + 1, jjm + 1)
@@ -67,10 +68,10 @@ CONTAINS
     tab_cntrl(4) = day_ref
     tab_cntrl(5) = annee_ref
     tab_cntrl(6) = ra
-    tab_cntrl(7) = omeg
-    tab_cntrl(8) = g
-    tab_cntrl(9) = cpp
-    tab_cntrl(10) = kappa
+    tab_cntrl(7) = romega
+    tab_cntrl(8) = rg
+    tab_cntrl(9) = rcpd
+    tab_cntrl(10) = rkappa
     tab_cntrl(11) = daysec
     tab_cntrl(12) = 0.
     tab_cntrl(13) = etot0

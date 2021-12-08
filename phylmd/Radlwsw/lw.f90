@@ -8,12 +8,13 @@ contains
        PCLDLU, PVIEW, PCOLR, PCOLR0, PTOPLW, PSOLLW, PTOPLW0, PSOLLW0, &
        psollwdown, plwup, plwdn, plwup0, plwdn0)
 
+    use comconst, only: daysec
     use lwbv_m, only: lwbv
     use LWU_m, only: LWU
     USE conf_phys_m, ONLY: kdlon
     use dimensions, only: llm
     USE raddimlw, ONLY: nua
-    USE suphec_m, ONLY: md, rcpd, rday, rg, rmo3
+    USE suphec_m, ONLY: md, rcpd, rg, rmo3
 
     ! Method.
 
@@ -127,10 +128,10 @@ contains
        DO i = 1, KDLON
           PCOLR(i, k) = ZFLUX(i, 1, kpl1)+ZFLUX(i, 2, kpl1) &
                - ZFLUX(i, 1, k)- ZFLUX(i, 2, k)
-          PCOLR(i, k) = PCOLR(i, k) * RDAY*RG/RCPD / PDP(i, k)
+          PCOLR(i, k) = PCOLR(i, k) * DAYSEC*RG/RCPD / PDP(i, k)
           PCOLR0(i, k) = ZFLUC(i, 1, kpl1)+ZFLUC(i, 2, kpl1) &
                - ZFLUC(i, 1, k)- ZFLUC(i, 2, k)
-          PCOLR0(i, k) = PCOLR0(i, k) * RDAY*RG/RCPD / PDP(i, k)
+          PCOLR0(i, k) = PCOLR0(i, k) * DAYSEC*RG/RCPD / PDP(i, k)
        ENDDO
     ENDDO
     DO i = 1, KDLON

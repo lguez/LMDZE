@@ -9,10 +9,10 @@ contains
     ! Passage aux variables du mod\`ele (vents covariants,
     ! temp\'erature potentielle et humidit\'e sp\'ecifique).
 
-    use comconst, only: cpp
     use comgeom, only: cu_2d, cv_2d
     use dimensions, only: iim, jjm, llm
     use paramet_m, only: iip1, jjp1
+    use suphec_m, only: rcpd
 
     real, intent(in):: pk(iip1, jjp1, llm)
     real, intent(inout):: u(iip1, jjp1, llm), v(iip1, jjm, llm)
@@ -30,7 +30,7 @@ contains
        do j = 1, jjp1
           do i = 1, iim
              u(i, j, l) = u(i, j, l) * cu_2d(i, j)
-             t(i, j, l) = t(i, j, l) * cpp / pk(i, j, l)
+             t(i, j, l) = t(i, j, l) * rcpd / pk(i, j, l)
           enddo
           u(iip1, j, l) = u(1, j, l)
           t(iip1, j, l) = t(1, j, l)

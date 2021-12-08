@@ -29,8 +29,8 @@ contains
     ! l = 2 \`a l = llm.
 
     use dimensions, only: llm
-    use comconst, only: kappa, cpp
     use disvert_m, only: preff
+    use suphec_m, only: rcpd, rkappa
 
     REAL, intent(in):: ps(:, :) ! (longitude, latitude)
     REAL, intent(in):: p(:, :, :) ! (longitude, latitude, llm + 1)
@@ -45,8 +45,8 @@ contains
 
     !-------------------------------------
 
-    pks = cpp * (ps / preff)**kappa
-    unpl2k = 1. + 2 * kappa
+    pks = rcpd * (ps / preff)**rkappa
+    unpl2k = 1. + 2 * rkappa
 
     beta(:, :, llm) = 1. / unpl2k
     DO l = llm - 1, 2, -1
@@ -55,7 +55,7 @@ contains
     ENDDO
 
     pk(:, :, 1) = ps * pks &
-         / (ps * (1. + kappa) + 0.5 * (beta(:, :, 2) - unpl2k) * p(:, :, 2))
+         / (ps * (1. + rkappa) + 0.5 * (beta(:, :, 2) - unpl2k) * p(:, :, 2))
     DO l = 2, llm
        pk(:, :, l) = beta(:, :, l) * pk(:, :, l - 1)
     ENDDO

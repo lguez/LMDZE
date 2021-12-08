@@ -30,9 +30,10 @@ contains
     ! 95-01-01 J.-J. Morcrette direct/diffuse albedo
     ! 03-11-27 J. Quaas Introduce aerosol forcings (based on Boucher)
 
+    use comconst, only: daysec
     use conf_phys_m, only: kdlon
     use dimensions, only: llm
-    USE suphec_m, ONLY: rcpd, rday, rg
+    USE suphec_m, ONLY: rcpd, rg
     use sw1s_m, only: sw1s
     use sw2s_m, only: sw2s
     use swu_m, only: swu
@@ -195,10 +196,10 @@ contains
        DO i = 1, KDLON
           PHEAT(i, k) = -(ZFSUP(i, kpl1)-ZFSUP(i, k)) &
                -(ZFSDN(i, k)-ZFSDN(i, kpl1))
-          PHEAT(i, k) = PHEAT(i, k) * RDAY*RG/RCPD / PDP(i, k)
+          PHEAT(i, k) = PHEAT(i, k) * DAYSEC*RG/RCPD / PDP(i, k)
           PHEAT0(i, k) = -(ZFSUP0(i, kpl1)-ZFSUP0(i, k)) &
                -(ZFSDN0(i, k)-ZFSDN0(i, kpl1))
-          PHEAT0(i, k) = PHEAT0(i, k) * RDAY*RG/RCPD / PDP(i, k)
+          PHEAT0(i, k) = PHEAT0(i, k) * DAYSEC*RG/RCPD / PDP(i, k)
        ENDDO
     ENDDO
     DO i = 1, KDLON

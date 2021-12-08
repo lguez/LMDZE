@@ -15,10 +15,11 @@ contains
     ! Library:
     use nr_util, only: assert_eq
 
+    use comconst, only: daysec
     use conf_gcm_m, only: dtphys
     USE indicesol, ONLY: epsfra, is_lic, is_sic, is_ter
     USE conf_interface_m, ONLY: tau_calv
-    USE suphec_m, ONLY: rday, rlmlt, rtt
+    USE suphec_m, ONLY: rlmlt, rtt
 
     integer, intent(IN):: nisurf ! surface \`a traiter
 
@@ -72,7 +73,7 @@ contains
          size(qsol), size(tsurf_new), size(evap), size(fqcalving), &
          size(ffonte), size(run_off_lic_0)/), "fonte_neige knon")
 
-    coeff_rel = dtphys / (tau_calv * rday)
+    coeff_rel = dtphys / (tau_calv * daysec)
     WHERE (snow_fall > 0.) snow = snow + snow_fall * dtphys
 
     WHERE (evap > 0.)

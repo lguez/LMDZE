@@ -1,5 +1,6 @@
 module suphec_m
 
+  use comconst, only: daysec
   use nr_util, only: pi, twoPI
 
   implicit none
@@ -12,12 +13,10 @@ module suphec_m
 
   ! A1.1 Astronomical constants
 
-  real, parameter:: RDAY = 86400. ! in s
-
   REAL, parameter, private:: n_sid = 365.25636
   ! Number of days in sideral year. Capderou 2003 k0784, § 4.2.1.
 
-  REAL, parameter:: ROMEGA = twoPI / RDAY * (n_sid + 1) / n_sid
+  REAL, parameter:: ROMEGA = twoPI / daysec * (n_sid + 1) / n_sid
   ! Capderou 2003 k0784, equation 4.20
 
   ! A1.2 Geoide

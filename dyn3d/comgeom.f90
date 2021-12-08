@@ -122,12 +122,13 @@ contains
 
     ! cv_2d est aux points v. cu_2d est aux points u. Cf. "inigeom.txt".
 
-    USE comconst, ONLY : g, omeg, ra
+    USE comconst, ONLY : ra
     USE comdissnew, ONLY : coefdis, nitergdiv, nitergrot, niterh
     use dimensions, only: iim, jjm
     use dynetat0_m, only: xprimp025, xprimm025, rlatu1, rlatu2, rlatu, rlatv, &
          yprimu1, yprimu2
     USE paramet_m, ONLY : iip1, jjp1
+    use suphec_m, ONLY: rg, romega
 
     ! Local:
     INTEGER i, j
@@ -336,7 +337,7 @@ contains
           unsaire(i, j) = 1. / aire_2d(i, j)
           unsair_gam1_2d(i, j) = unsaire(i, j)**(-gamdi_gdiv)
           unsair_gam2_2d(i, j) = unsaire(i, j)**(-gamdi_h)
-          airesurg(i, j) = aire_2d(i, j) / g
+          airesurg(i, j) = aire_2d(i, j) / rg
        END DO
        aireu_2d(iip1, j) = aireu_2d(1, j)
        unsaire(iip1, j) = unsaire(1, j)
@@ -355,7 +356,7 @@ contains
                + aireij3_2d(i + 1, j) + aireij4_2d(i + 1, j + 1)
           unsairez(i, j) = 1. / airez
           unsairz_gam_2d(i, j) = unsairez(i, j)**(-gamdi_grot)
-          fext_2d(i, j) = airez * sin(rlatv(j)) * 2. * omeg
+          fext_2d(i, j) = airez * sin(rlatv(j)) * 2. * romega
        END DO
        airev_2d(iip1, j) = airev_2d(1, j)
        unsairez(iip1, j) = unsairez(1, j)
@@ -433,7 +434,7 @@ contains
     END DO
     DO j = 1, jjm - 1
        DO i = 1, iim
-          constang_2d(i, j + 1) = ra * omeg * cu_2d(i, j + 1) &
+          constang_2d(i, j + 1) = ra * romega * cu_2d(i, j + 1) &
                * cos(rlatu(j + 1))
        END DO
     END DO

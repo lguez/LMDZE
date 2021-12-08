@@ -15,10 +15,10 @@ contains
     ! surface pressure, which sample possible values on Earth.
 
     use abort_gcm_m, only: abort_gcm
-    use comconst, only: kappa, cpp
     use disvert_m, only: ap, bp, preff, presnivs, s
     use dimensions, only: llm
     use exner_hyb_m, only: exner_hyb
+    use suphec_m, only: rcpd, rkappa
     use jumble, only: new_unit
 
     integer i, unit, l
@@ -38,7 +38,7 @@ contains
     ps(:, 1) = [(5e4 + delta_ps * i, i = 0, ngrid - 2), preff]
     forall (l = 1: llm + 1) p(:, 1, l) = ap(l) + bp(l) * ps(:, 1)
     call exner_hyb(ps, p, pks, pk)
-    p_lay = preff * (pk(:, 1, :) / cpp)**(1. / kappa)
+    p_lay = preff * (pk(:, 1, :) / rcpd)**(1. / rkappa)
 
     ! Write distribution for the reference surface pressure (which is
     ! surface pressure at index ngrid):

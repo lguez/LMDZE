@@ -10,7 +10,6 @@ contains
     ! Inversion nord-sud de la grille et interpolation verticale sur
     ! les niveaux du modèle.
 
-    USE comconst, ONLY: cpp, kappa
     USE comgeom, ONLY: aireu_2d, airev_2d, aire_2d
     USE dimensions, ONLY: jjm, llm
     USE disvert_m, ONLY: ap, bp, preff
@@ -18,6 +17,7 @@ contains
     use massbar_m, only: massbar
     USE paramet_m, ONLY: iip1, jjp1, llmp1
     use pres2lev_m, only: pres2lev
+    use suphec_m, only: rcpd, rkappa
 
     logical, intent(in):: invert_y
     real, intent(in):: psi(:, :) ! (iip1, jjp1)
@@ -57,11 +57,11 @@ contains
     CALL exner_hyb(psi, p, pks, pk)
 
     ! Calcul de pls, pression au milieu des couches, en Pascals
-    unskap=1./kappa
+    unskap=1./rkappa
     DO l = 1, llm
        DO j=1, jjp1
           DO i =1, iip1
-             pls(i, j, l) = preff * ( pk(i, j, l)/cpp) ** unskap
+             pls(i, j, l) = preff * ( pk(i, j, l)/rcpd) ** unskap
           ENDDO
        ENDDO
     ENDDO

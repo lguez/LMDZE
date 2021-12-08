@@ -13,7 +13,6 @@ contains
     use nr_util, only: assert
 
     use caldyn0_m, only: caldyn0
-    use comconst, only: cpp, kappa
     use comgeom, only: aire_2d, apoln, apols, cu_2d, cv_2d
     use dimensions, only: iim, jjm, llm, nqmx
     use disvert_m, only: ap, bp, preff
@@ -29,6 +28,7 @@ contains
     use regr_pr_o3_m, only: regr_pr_o3
     use start_init_dyn_m, only: start_init_dyn
     use start_inter_3d_m, only: start_inter_3d
+    use suphec_m, only: rcpd, rkappa
 
     real, intent(in):: tsol_2d(:, :) ! (iim + 1, jjm + 1)
     ! both soil temperature and surface temperature, in K
@@ -72,7 +72,7 @@ contains
     CALL exner_hyb(ps, p3d, pks, pk)
     call assert(MINVAL(pk) /= MAXVAL(pk), '"pk" should not be constant')
 
-    pls = preff * (pk / cpp)**(1. / kappa)
+    pls = preff * (pk / rcpd)**(1. / rkappa)
     PRINT *, "minval(pls) = ", minval(pls)
     print *, "maxval(pls) = ", maxval(pls)
 
@@ -88,7 +88,7 @@ contains
     PRINT *, 'minval(t3d) = ', minval(t3d)
     print *, "maxval(t3d) = ", maxval(t3d)
 
-    teta(:iim, :, :) = t3d(:iim, :, :) * cpp / pk(:iim, :, :)
+    teta(:iim, :, :) = t3d(:iim, :, :) * rcpd / pk(:iim, :, :)
     teta(iim + 1, :, :) = teta(1, :, :)
     DO l = 1, llm
        teta(:, 1, l) = SUM(aire_2d(:, 1) * teta(:, 1, l)) / apoln

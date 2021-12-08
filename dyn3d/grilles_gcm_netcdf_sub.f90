@@ -14,11 +14,11 @@ contains
          nf95_enddef, nf95_put_att, nf95_put_var
     USE nr_util, ONLY: pi
 
-    USE comconst, ONLY: g
     USE comgeom, ONLY: aire_2d
     USE dimensions, ONLY: iim, jjm
     use dynetat0_m, only: rlatu, rlatv, rlonu, rlonv
     USE grid_noro_m, ONLY: mask
+    use suphec_m, ONLY: rg
 
     REAL, INTENT(IN):: phis(:, :) ! (iim + 1, jjm + 1) 
     ! surface geopotential, in m2 s-2
@@ -88,7 +88,7 @@ contains
     forall (i = 1:iim + 1, j = 1:jjm + 1) grille_s(i, j) = MOD(i, 2) + MOD(j, 2)
     call NF95_PUT_VAR(ncid, varid, grille_s)
 
-    call NF95_PUT_VAR(ncid, varid_orog, phis / g)
+    call NF95_PUT_VAR(ncid, varid_orog, phis / rg)
     call NF95_PUT_VAR(ncid, varid_area, aire_2d)
     call NF95_PUT_VAR(ncid, varid_mask, nINT(mask))
 
