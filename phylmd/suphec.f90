@@ -60,7 +60,6 @@ module suphec_m
   ! A1.5, 6 Thermodynamic liquid, solid phases
 
   REAL, parameter:: RCW = RCPV ! LIQUID PHASE Cw
-  real, save:: RCS
 
   ! A1.7 Thermodynamic transition of phase
   real, parameter:: RTT = 273.16
@@ -73,9 +72,7 @@ module suphec_m
   real, parameter:: RATM = 1e5
 
   ! A1.8 Curve of saturation
-  REAL, save:: RALPW, RBETW, RGAMW, RALPS, RBETS, RGAMS
   real, parameter:: RESTT = 611.14
-  REAL, save:: RALPD, RBETD, RGAMD
 
   private pi, twoPI
 
@@ -105,12 +102,6 @@ contains
     print '('' Rd / Cpd = '', e13.7)', RKAPPA
     print *, 'Rv / Rd - 1 = ', RETV
 
-    ! 7. DEFINE THERMODYNAMIC CONSTANTS, SOLID PHASE.
-
-    RCS = RCPV
-    print *, 'thermodynamic, solid'
-    print '('' Cs = '', E13.7)', RCS
-
     ! 8. DEFINE THERMODYNAMIC CONSTANTS, TRANSITION OF PHASE.
 
     print *, 'Thermodynamic, transition of phase:'
@@ -118,18 +109,6 @@ contains
     print '('' RLsTt = '', E13.7)', RLSTT
     print *, 'RLMlt = ', RLMLT
     print '('' Normal pressure = '', E13.7)', RATM
-
-    ! 9. SATURATED VAPOUR PRESSURE.
-
-    RGAMW = (RCW - RCPV) / RV
-    RBETW = RLVTT / RV + RGAMW * RTT
-    RALPW = LOG(RESTT) + RBETW / RTT + RGAMW * LOG(RTT)
-    RGAMS = (RCS - RCPV) / RV
-    RBETS = RLSTT / RV + RGAMS * RTT
-    RALPS = LOG(RESTT) + RBETS / RTT + RGAMS * LOG(RTT)
-    RGAMD = RGAMS - RGAMW
-    RBETD = RBETS - RBETW
-    RALPD = RALPS - RALPW
 
   END SUBROUTINE suphec
 
