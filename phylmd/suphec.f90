@@ -5,10 +5,10 @@ module suphec_m
   implicit none
 
   ! A1.0 Fundamental constants
-  real, parameter:: RCLUM = 299792458. ! speed of light, m s-1
-  real, parameter:: RHPLA = 6.6260755E-34 ! Planck constant, J s
-  real, parameter:: KBOL = 1.380658E-23 ! Boltzmann constant, in J K-1
-  real, parameter:: NAVO = 6.0221367E23 ! Avogadro number, in mol-1
+  real, parameter, private:: RCLUM = 299792458. ! speed of light, m s-1
+  real, parameter, private:: RHPLA = 6.6260755E-34 ! Planck constant, J s
+  real, parameter, private:: KBOL = 1.380658E-23 ! Boltzmann constant, in J K-1
+  real, parameter, private:: NAVO = 6.0221367E23 ! Avogadro number, in mol-1
 
   ! A1.1 Astronomical constants
 
