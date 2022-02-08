@@ -11,8 +11,9 @@ contains
     ! P. Le Van
     ! Calcul de nxgrad(rot) du vecteur (xcov, ycov).
 
-    USE filtreg_v_m, ONLY: filtreg_v
     use jumble, only: assert, assert_eq
+
+    USE filtreg_v_m, ONLY: filtreg_v
     use nxgrad_m, only: nxgrad
     use rotatf_m, only: rotatf
 

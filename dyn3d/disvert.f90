@@ -29,8 +29,7 @@ contains
     ! this procedure is called.
 
     ! Libraries:
-    use jumble, only: read_column, new_unit
-    use jumble, only: pi, assert
+    use jumble, only: read_column, new_unit, pi, assert
 
     use dimensions, only: llm
     use dynetat0_chosen_m, only: pa

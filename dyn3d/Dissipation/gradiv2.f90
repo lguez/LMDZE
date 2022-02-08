@@ -10,6 +10,8 @@ contains
     ! P. Le Van
     ! Calcul du gradient de la divergence du vecteur v.
 
+    use jumble, only: assert_eq, assert
+
     USE comgeom, ONLY: cuvscvgam1, cvuscugam1, unsair_gam1, unsapolnga1, &
          unsapolsga1
     USE dimensions, ONLY: iim, jjm
@@ -18,7 +20,6 @@ contains
     use grad_m, only: grad
     use laplacien_gam_m, only: laplacien_gam
     use laplacien_m, only: laplacien
-    use jumble, only: assert_eq, assert
 
     ! Composantes covariantes de v :
     REAL, intent(in):: xcov(:, :, :) ! (iim + 1, jjm + 1, klevel)

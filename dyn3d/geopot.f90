@@ -11,8 +11,9 @@ contains
     ! Objet : calcul du géopotentiel aux milieux des couches
     ! L'intégration se fait de bas en haut.
 
-    USE dimensions, ONLY: iim, jjm, llm
     use jumble, only: assert
+
+    USE dimensions, ONLY: iim, jjm, llm
 
     REAL, INTENT(IN):: teta(:, :, :) ! (iim + 1, jjm + 1, llm)
     REAL, INTENT(IN):: pk(:, :, :) ! (iim + 1, jjm + 1, llm)

@@ -40,8 +40,7 @@ contains
     ! grid case.
 
     ! Libraries:
-    use jumble, only: new_unit
-    use jumble, only: pi, ifirstloc, assert
+    use jumble, only: new_unit, pi, ifirstloc, assert
 
     USE dimensions, ONLY: iim, jjm
     USE dynetat0_m, ONLY: rlatu, rlatv, xprimu

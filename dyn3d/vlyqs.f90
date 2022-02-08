@@ -17,12 +17,13 @@ contains
     !
     !   --------------------------------------------------------------------
     !
+    USE jumble, ONLY : pi
+
     use comconst
     use dimensions
     use disvert_m
     use conf_gcm_m
     use comgeom, only: aire, apoln, apols
-    USE jumble, ONLY : pi
     USE dynetat0_m, only: rlonv, rlonu
     use paramet_m
 

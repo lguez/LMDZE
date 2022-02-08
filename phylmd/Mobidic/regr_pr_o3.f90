@@ -22,14 +22,15 @@ contains
     ! We assume that, in the input file, the pressure levels are in
     ! hPa and strictly increasing.
 
-    use dimensions, only: iim, jjm, llm
-    use dynetat0_chosen_m, only: day_ref
-    use grid_change, only: dyn_phy
+    use jumble, only: assert
     use netcdf, only:  nf90_nowrite
     use netcdf95, only: nf95_open, nf95_close, nf95_inq_varid, nf95_get_var, &
          nf95_gw_var
-    use jumble, only: assert
     use numer_rec_95, only: regr1_step_av
+
+    use dimensions, only: iim, jjm, llm
+    use dynetat0_chosen_m, only: day_ref
+    use grid_change, only: dyn_phy
 
     REAL, intent(in):: p3d(:, :, :) ! (iim + 1, jjm + 1, llm+1) 
     ! pressure at layer interfaces, in Pa

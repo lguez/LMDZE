@@ -25,6 +25,10 @@ contains
     ! - uniformisation des param\'etrisations dans phytrac
     ! - stockage des moyennes des champs n\'ecessaires en mode traceur off-line 
 
+    use jumble, only: assert
+    use netcdf, only: NF90_FILL_float
+    use netcdf95, only: nf95_inq_varid, nf95_get_var, nf95_put_var
+
     use abort_gcm_m, only: abort_gcm
     use clesphys2, only: conv_emanuel
     use cltrac_m, only: cltrac
@@ -40,10 +44,7 @@ contains
     use infotrac_init_m, only: tname
     use initrrnpb_m, only: initrrnpb
     use minmaxqfi_m, only: minmaxqfi
-    use netcdf, only: NF90_FILL_float
-    use netcdf95, only: nf95_inq_varid, nf95_get_var, nf95_put_var
     use nflxtr_m, only: nflxtr
-    use jumble, only: assert
     use o3_chem_m, only: o3_chem
     use phyetat0_m, only: rlat
     use phyredem0_m, only: ncid_restartphy

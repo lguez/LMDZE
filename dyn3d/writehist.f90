@@ -10,13 +10,14 @@ contains
     ! Écriture du fichier histoire au format IOIPSL
     ! L. Fairhead, LMD, 03/99
 
+    use jumble, only: assert
+
     use covnat_m, only: covnat
     use dimensions, only: llm
     use histsync_m, only: histsync
     use histwrite_m, only: histwrite
     use infotrac_init_m, only: ttext
     use inithist_m, only: histid, histvid, histuid
-    use jumble, only: assert
     use paramet_m, only: ip1jm, ip1jmp1
     use suphec_m, only: rcpd
 

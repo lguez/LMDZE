@@ -15,8 +15,8 @@ contains
     ! This is the main procedure for the "physics" part of the program.
 
     ! Libraries:
-    use netcdf95, only: NF95_CLOSE
     use jumble, only: assert
+    use netcdf95, only: NF95_CLOSE
 
     use aaam_bud_m, only: aaam_bud
     USE abort_gcm_m, ONLY: abort_gcm

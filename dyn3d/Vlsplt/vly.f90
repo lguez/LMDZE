@@ -8,13 +8,14 @@
 !     q,masse_adv_v,w sont des arguments d'entree  pour le s-pg ....
 !     dq              sont des arguments de sortie pour le s-pg ....
 
+      USE jumble, ONLY : pi
+
       use comconst
       use comgeom, only: aire
       use conf_gcm_m
       use dimensions
       use disvert_m
       USE dynetat0_m, only: rlonv, rlonu
-      USE jumble, ONLY : pi
       use paramet_m
 
       IMPLICIT NONE

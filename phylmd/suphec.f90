@@ -1,7 +1,8 @@
 module suphec_m
 
-  use comconst, only: daysec
   use jumble, only: pi, twoPI
+
+  use comconst, only: daysec
 
   implicit none
 

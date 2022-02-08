@@ -10,11 +10,12 @@ contains
 
     ! Author: P. Le Van
 
+    use jumble, only: assert_eq, assert
+
     use comgeom, only: aire_2d, apoln, apols
     use dimensions, only: iim, jjm
     use inter_barx_m, only: inter_barx
     use inter_bary_m, only: inter_bary
-    use jumble, only: assert_eq, assert
     use ord_coord_m, only: ord_coord
     use ord_coordm_m, only: ord_coordm
 

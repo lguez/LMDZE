@@ -235,12 +235,13 @@ contains
     ! This subroutine creates the NetCDF output file, defines
     ! dimensions and variables, and writes one of the coordinate variables.
 
-    use dimensions, only: jjm
-    use dynetat0_m, only: rlatu
+    use jumble, only: assert_eq, pi
     use netcdf, only: nf90_clobber, nf90_float, nf90_copy_att, nf90_global
     use netcdf95, only: nf95_create, nf95_def_dim, nf95_def_var, &
          nf95_put_att, nf95_enddef, nf95_copy_att, nf95_put_var
-    use jumble, only: assert_eq, pi
+
+    use dimensions, only: jjm
+    use dynetat0_m, only: rlatu
 
     integer, intent(in):: ncid_in, varid_in(:), n_plev
     character(len=*), intent(in):: name_out(:) ! of NetCDF variables

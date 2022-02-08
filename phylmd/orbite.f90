@@ -15,6 +15,7 @@ CONTAINS
     ! la distance Terre-Soleil.
 
     use jumble, only: deg_to_rad, rad_to_deg
+
     USE yomcst, ONLY: r_ecc, r_peri
 
     REAL, INTENT (IN):: xjour ! jour de l'ann\'ee \`a compter du premier janvier

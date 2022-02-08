@@ -11,12 +11,13 @@ contains
     ! Objet : filtre matriciel longitudinal, avec les matrices pr\'ecalcul\'ees
     ! pour l'op\'erateur filtre. 
 
+    use jumble, only: assert
+
     USE dimensions, ONLY: iim, jjm
     use filtreg_hemisph_m, only: filtreg_hemisph
     USE inifgn_m, ONLY: sddv, unsddv
     use inifilr_m, only: jfiltnu, jfiltsu, matriceun, matriceus, matrinvn, &
          matrinvs
-    use jumble, only: assert
 
     REAL, intent(inout):: champ(:, :, :) ! (iim + 1, jjm + 1, :)
     ! en entr\'ee : champ \`a filtrer, en sortie : champ filtr\'e

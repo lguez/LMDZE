@@ -1,12 +1,13 @@
 program test_inter_barxy
 
+  USE jumble, ONLY: pi
+
   use comdissnew, only: read_comdissnew
   use comgeom, only: inigeom
   use dimensions, only: iim, jjm, set_dimensions
   USE dynetat0_m, only: rlonu, rlatv, fyhyp, fxhyp
   use dynetat0_chosen_m, only: read_serre
   use inter_barxy_m, only: inter_barxy
-  USE jumble, ONLY : pi
   use paramet_m, only: paramet
   use unit_nml_m, only: set_unit_nml, unit_nml
 

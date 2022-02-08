@@ -8,9 +8,10 @@ contains
 
     ! From phylmd/minmaxqfi.F, version 1.1.1.1 2004/05/19 12:53:09
 
+    use jumble, only: assert
+
     use dimensions, only: llm
     use dimphy, only: klon
-    use jumble, only: assert
 
     real, intent(in):: zq(:, :), qmin, qmax
     CHARACTER(len=*), intent(in):: comment

@@ -12,8 +12,9 @@ contains
     ! Only valid for regular rectangular grids. Should be called after
     ! "lift_noro".
 
-    USE dimensions, ONLY : iim, jjm
     use jumble, only: assert_eq, assert, pi
+
+    USE dimensions, ONLY : iim, jjm
     use phyetat0_m, only: rlat, rlon
     USE comconst, ONLY: ra
 

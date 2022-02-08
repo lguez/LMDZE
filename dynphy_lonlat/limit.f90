@@ -13,13 +13,13 @@ contains
     ! regular.
 
     ! Libraries:
+    use jumble, only: assert
+    use netcdf, only: NF90_CLOBBER, NF90_FLOAT, NF90_GLOBAL, NF90_NOWRITE, &
+         NF90_UNLIMITED
     use netcdf95, only: NF95_CLOSE, NF95_CREATE, NF95_DEF_DIM, nf95_def_var, &
          nf95_enddef, nf95_get_var, nf95_gw_var, nf95_inq_dimid, &
          nf95_inq_varid, nf95_inquire_dimension, NF95_OPEN, NF95_PUT_ATT, &
          NF95_PUT_VAR, find_coord
-    use netcdf, only: NF90_CLOBBER, NF90_FLOAT, NF90_GLOBAL, NF90_NOWRITE, &
-         NF90_UNLIMITED
-    use jumble, only: assert
     use numer_rec_95, only: spline, splint
     
     use conf_dat2d_m, only: conf_dat2d

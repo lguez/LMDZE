@@ -30,13 +30,14 @@ contains
     ! rayonnement) et l'aire de la maille (quand on veut int\'egrer une
     ! grandeur horizontalement).
 
+    use jumble, only: pi
+
     use comgeom, only: apoln, cu_2d, cv_2d, unsaire, apols
     use dimensions, only: iim, jjm, llm, nqmx
     use dimphy, only: klon
     use disvert_m, only: preff
     use dynetat0_m, only: rlonu, rlonv
     use grid_change, only: dyn_phy, gr_fi_dyn
-    use jumble, only: pi
     use physiq_m, only: physiq
     use suphec_m, only: rcpd, rkappa, rg
 

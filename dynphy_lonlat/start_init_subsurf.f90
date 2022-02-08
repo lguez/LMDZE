@@ -11,10 +11,10 @@ contains
     ! On initialise les sous-surfaces. Lecture du fichier glace de
     ! terre pour fixer la fraction de terre et de glace de terre.
 
+    use jumble, only: pi, deg_to_rad
     use netcdf, only: nf90_nowrite
     use netcdf95, only: nf95_close, nf95_get_var, nf95_gw_var, nf95_inq_varid, &
          nf95_open
-    use jumble, only: pi, deg_to_rad
 
     use dimensions, only: iim, jjm, llm
     use dynetat0_chosen_m, only: day_ref

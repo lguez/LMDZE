@@ -91,8 +91,9 @@ contains
 
   subroutine read_serre
 
-    use unit_nml_m, only: unit_nml
     use jumble, only: assert, pi
+
+    use unit_nml_m, only: unit_nml
 
     REAL:: clon_deg = 0. ! longitude of the center of the zoom, in degrees
     real:: clat_deg = 0. ! latitude of the center of the zoom, in degrees

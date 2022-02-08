@@ -108,8 +108,9 @@ contains
     ! Their shape is "(/klon, llm/)".
     ! Index "(i, :)" is for longitude "rlon(i)", latitude "rlat(i)".
 
-    use regr_pr_comb_coefoz_m, only: a6_mass
     use jumble, only: assert
+
+    use regr_pr_comb_coefoz_m, only: a6_mass
     use dimensions, only: llm
     use dimphy, only: klon
 

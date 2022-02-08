@@ -1,14 +1,15 @@
 program test_inifilr
 
+  use jumble, only: pi
+  use netcdf, only: NF90_CLOBBER, NF90_FLOAT
+  use netcdf95, only: nf95_create, NF95_DEF_DIM, NF95_DEF_VAR, NF95_ENDDEF, &
+       NF95_PUT_VAR, NF95_CLOSE, nf95_put_att
+
   use dimensions, only: iim, jjm, set_dimensions
   use dynetat0_m, only: rlatu, rlatv, fyhyp, fxhyp
   use dynetat0_chosen_m, only: read_serre
   use inifilr_m, only: inifilr, jfiltnu, jfiltnv, jfiltsu, jfiltsv, &
        matriceun, matrinvn, matricevn, matriceus, matrinvs, matricevs
-  use netcdf, only: NF90_CLOBBER, NF90_FLOAT
-  use netcdf95, only: nf95_create, NF95_DEF_DIM, NF95_DEF_VAR, NF95_ENDDEF, &
-       NF95_PUT_VAR, NF95_CLOSE, nf95_put_att
-  use jumble, only: pi
   use unit_nml_m, only: unit_nml, set_unit_nml
 
   IMPLICIT NONE

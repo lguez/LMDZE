@@ -8,9 +8,9 @@ contains
 
     ! From "etat0_netcdf.F", version 1.3, 2005/05/25 13:10:09
 
+    use jumble, only: assert
     use netcdf95, only: nf95_close, nf95_get_var, nf95_gw_var, nf95_put_var, &
          nf95_inq_varid, nf95_open
-    use jumble, only: assert
 
     use caldyn0_m, only: caldyn0
     use comgeom, only: aire_2d, apoln, apols, cu_2d, cv_2d

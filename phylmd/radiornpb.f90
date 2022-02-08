@@ -17,9 +17,10 @@ contains
     ! suppos\'e beaucoup plus petit que la constante de temps de
     ! d\'ecroissance.
 
+    use jumble, only: assert
+
     use dimensions, only: llm, nqmx
     use dimphy, only: klon
-    use jumble, only: assert
 
     REAL, intent(in):: tr_seri(:, :, :) ! (klon, llm, nqmx - 2)
     REAL, intent(in):: pdtphys

@@ -10,6 +10,8 @@ contains
 
     ! From phylmd/ini_histins.h, version 1.2, 2005/05/25 13:10:09
 
+    use jumble, only: pi
+
     use clesphys, only: ecrit_ins, ok_instan
     use clesphys2, only: conv_emanuel
     use conf_gcm_m, only: dtphys
@@ -23,7 +25,6 @@ contains
     USE histvert_m, ONLY : histvert
     use indicesol, only: nbsrf, clnsurf
     use infotrac_init_m, only: tname, ttext
-    use jumble, only: pi
     use phyetat0_m, only: itau_phy
     USE ymds2ju_m, only: ymds2ju
 

@@ -33,8 +33,7 @@ contains
     ! Initialisation des traceurs
     ! Choix du sch\'ema pour l'advection dans le fichier "traceur.def"
 
-    use jumble, only: assert
-    use jumble, only: new_unit
+    use jumble, only: assert, new_unit
 
     ! Local:
     character(len = 3) descrq(0:14)

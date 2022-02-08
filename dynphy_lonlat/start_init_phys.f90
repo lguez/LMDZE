@@ -9,10 +9,10 @@ CONTAINS
   SUBROUTINE start_init_phys(tsol_2d, qsol_2d)
 
     ! Libraries:
+    use jumble, only: assert, deg_to_rad
     use netcdf, only: nf90_nowrite
     use netcdf95, only: nf95_open, nf95_close, nf95_get_var, nf95_inq_varid, &
          nf95_gw_var, find_coord
-    use jumble, only: assert, deg_to_rad
 
     use conf_dat2d_m, only: conf_dat2d
     use dimensions, only: iim, jjm

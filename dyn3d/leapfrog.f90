@@ -11,6 +11,8 @@ contains
 
     ! Int\'egration temporelle du mod\`ele : Matsuno-leapfrog scheme.
 
+    use jumble, only: assert
+
     use addfi_m, only: addfi
     use bilan_dyn_m, only: bilan_dyn
     use caladvtrac_m, only: caladvtrac
@@ -33,7 +35,6 @@ contains
     USE guide_m, ONLY: guide
     use inidissip_m, only: idissip
     use integrd_m, only: integrd
-    use jumble, only: assert
     use writehist_m, only: writehist
 
     REAL, intent(inout):: ucov(:, :, :) ! (iim + 1, jjm + 1, llm) vent covariant

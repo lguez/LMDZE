@@ -14,10 +14,10 @@ CONTAINS
 
   SUBROUTINE start_init_dyn(tsol_2d, phis, ps)
 
+    use jumble, only: assert, pi
     use netcdf, only: nf90_nowrite
     use netcdf95, only: nf95_open, nf95_close, nf95_get_var, nf95_inq_varid, &
          nf95_gw_var, find_coord
-    use jumble, only: assert, pi
 
     use comgeom, only: aire_2d, apoln, apols
     use conf_dat2d_m, only: conf_dat2d

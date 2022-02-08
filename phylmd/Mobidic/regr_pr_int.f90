@@ -24,12 +24,13 @@ contains
     ! LMDZ mid-layers does. Therefore, the values on the LMDZ grid do
     ! depend on longitude. Regridding is by linear interpolation.
 
+    use jumble, only: assert
+    use netcdf95, only: nf95_inq_varid, nf95_get_var
+    use numer_rec_95, only: regr1_lint
+
     use dimensions, only: iim, jjm, llm
     use dimphy, only: klon
     use grid_change, only: gr_dyn_phy
-    use netcdf95, only: nf95_inq_varid, nf95_get_var
-    use jumble, only: assert
-    use numer_rec_95, only: regr1_lint
     use press_coefoz_m, only: plev
 
     integer, intent(in):: ncid ! NetCDF ID of the file

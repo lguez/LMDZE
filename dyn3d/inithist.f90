@@ -14,6 +14,8 @@ contains
     ! Routine d'initialisation des écritures des fichiers histoires au
     ! format IOIPSL.
 
+    USE jumble, ONLY: pi
+
     use conf_gcm_m, only: dtvr
     USE dimensions, ONLY: jjm, llm, nqmx
     USE disvert_m, ONLY: presnivs
@@ -24,7 +26,6 @@ contains
     USE histend_m, ONLY: histend
     USE histvert_m, ONLY: histvert
     USE infotrac_init_m, ONLY: ttext
-    USE jumble, ONLY: pi
     USE paramet_m, ONLY: iip1, jjp1
     use ymds2ju_m, ONLY: ymds2ju
 

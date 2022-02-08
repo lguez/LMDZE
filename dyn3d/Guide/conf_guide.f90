@@ -24,13 +24,14 @@ contains
     ! From LMDZ4/libf/dyn3d/conf_guide.F, version 1.1.1.1 2004/05/19 12:53:07
     !  Parametres de controle du run:
 
+    use jumble, only: assert, pi
+
     use comconst, only: daysec
     USE dimensions, ONLY: iim, jjm
     use conf_gcm_m, only: day_step, iperiod, dtvr
     use dynetat0_m, only: rlatu, rlatv
     use dynetat0_chosen_m, only: grossismx, grossismy
     use init_tau2alpha_m, only: init_tau2alpha
-    use jumble, only: assert, pi
     use tau2alpha_m, only: tau2alpha
     use unit_nml_m, only: unit_nml
     use writefield_m, only: writefield
