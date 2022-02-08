@@ -41,7 +41,7 @@ contains
 
     ! Libraries:
     use jumble, only: new_unit
-    use nr_util, only: pi, ifirstloc, assert
+    use jumble, only: pi, ifirstloc, assert
 
     USE dimensions, ONLY: iim, jjm
     USE dynetat0_m, ONLY: rlatu, rlatv, xprimu

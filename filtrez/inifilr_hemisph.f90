@@ -10,7 +10,7 @@ contains
     ! See notes.
 
     USE dimensions, ONLY : iim
-    use nr_util, only: pi, ifirstloc
+    use jumble, only: pi, ifirstloc
 
     real, intent(in):: rlat(:) ! (n_lat)
     ! latitudes, in rad, in [0, pi / 2[, in strictly ascending order

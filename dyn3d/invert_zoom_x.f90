@@ -10,7 +10,7 @@ contains
   subroutine invert_zoom_x(beta, xf, xtild, G, xlon, xprim, xuv)
 
     ! Libraries:
-    use nr_util, only: pi_d, twopi_d
+    use jumble, only: pi_d, twopi_d
     use numer_rec_95, only: hunt, rtsafe    
     
     use coefpoly_m, only: coefpoly, a1, a2, a3

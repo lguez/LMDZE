@@ -16,7 +16,7 @@ contains
     use filtreg_hemisph_m, only: filtreg_hemisph
     USE inifgn_m, ONLY: sddu, unsddu
     use inifilr_m, only: jfiltnv, jfiltsv, matricevn, matricevs
-    use nr_util, only: assert
+    use jumble, only: assert
 
     REAL, intent(inout):: champ(:, :, :) ! (iim + 1, jjm, :)
     ! en entr\'ee : champ \`a filtrer, en sortie : champ filtr\'e

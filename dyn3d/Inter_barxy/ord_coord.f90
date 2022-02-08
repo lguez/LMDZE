@@ -18,7 +18,7 @@ contains
     ! reverses their order.
     ! Finally, the procedure adds 90° as the last value of the array.
 
-    use nr_util, only: assert_eq, pi
+    use jumble, only: assert_eq, pi
 
 
     REAL, intent(in):: xi(:)

@@ -12,7 +12,7 @@ contains
     USE netcdf, ONLY: nf90_clobber, nf90_float, nf90_int
     USE netcdf95, ONLY: nf95_close, nf95_create, nf95_def_dim, nf95_def_var, &
          nf95_enddef, nf95_put_att, nf95_put_var
-    USE nr_util, ONLY: pi
+    USE jumble, ONLY: pi
 
     USE comgeom, ONLY: aire_2d
     USE dimensions, ONLY: iim, jjm

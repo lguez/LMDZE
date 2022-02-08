@@ -13,7 +13,7 @@ contains
     use abort_gcm_m, only: abort_gcm
     USE indicesol, ONLY: nbsrf, clnsurf
     USE dimphy, ONLY: klev, klon
-    use nr_util, only: ifirstloc
+    use jumble, only: ifirstloc
     use phyetat0_m, only: rlon, rlat
 
     REAL, intent(in):: t_seri(:, :) ! (klon, klev)

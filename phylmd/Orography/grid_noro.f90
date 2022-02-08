@@ -33,7 +33,7 @@ contains
     ! grid-point area. See documentation.
 
     ! Libraries:
-    use nr_util, only: assert, pi
+    use jumble, only: assert, pi
 
     use comconst, only: ra
     use dimensions, only: iim, jjm

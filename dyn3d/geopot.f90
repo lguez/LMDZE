@@ -12,7 +12,7 @@ contains
     ! L'intégration se fait de bas en haut.
 
     USE dimensions, ONLY: iim, jjm, llm
-    use nr_util, only: assert
+    use jumble, only: assert
 
     REAL, INTENT(IN):: teta(:, :, :) ! (iim + 1, jjm + 1, llm)
     REAL, INTENT(IN):: pk(:, :, :) ! (iim + 1, jjm + 1, llm)

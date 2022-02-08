@@ -320,7 +320,7 @@ contains
 
   subroutine set_lat
 
-    use nr_util, only: rad_to_deg
+    use jumble, only: rad_to_deg
 
     use dimensions, only: iim, jjm
     use dimphy, only: klon
@@ -339,7 +339,7 @@ contains
 
   subroutine set_lon
 
-    use nr_util, only: rad_to_deg
+    use jumble, only: rad_to_deg
 
     use dimensions, only: iim, jjm
     use dimphy, only: klon

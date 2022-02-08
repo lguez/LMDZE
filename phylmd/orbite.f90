@@ -14,7 +14,7 @@ CONTAINS
     ! Pour un jour donn\'e, calcule la longitude vraie de la Terre et
     ! la distance Terre-Soleil.
 
-    use nr_util, only: deg_to_rad, rad_to_deg
+    use jumble, only: deg_to_rad, rad_to_deg
     USE yomcst, ONLY: r_ecc, r_peri
 
     REAL, INTENT (IN):: xjour ! jour de l'ann\'ee \`a compter du premier janvier

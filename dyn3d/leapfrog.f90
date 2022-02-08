@@ -33,7 +33,7 @@ contains
     USE guide_m, ONLY: guide
     use inidissip_m, only: idissip
     use integrd_m, only: integrd
-    use nr_util, only: assert
+    use jumble, only: assert
     use writehist_m, only: writehist
 
     REAL, intent(inout):: ucov(:, :, :) ! (iim + 1, jjm + 1, llm) vent covariant

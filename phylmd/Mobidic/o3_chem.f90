@@ -15,7 +15,7 @@ contains
     ! Their shape is "(/klon, llm/)".
     ! Index "(i, :)" is for longitude "rlon(i)", latitude "rlat(i)".
 
-    use nr_util, only: assert, pi
+    use jumble, only: assert, pi
     use dimphy, only: klon
     use dimensions, only: llm
     use regr_pr_comb_coefoz_m, only: c_Mob, a4_mass, a2, r_het_interm
@@ -109,7 +109,7 @@ contains
     ! Index "(i, :)" is for longitude "rlon(i)", latitude "rlat(i)".
 
     use regr_pr_comb_coefoz_m, only: a6_mass
-    use nr_util, only: assert
+    use jumble, only: assert
     use dimensions, only: llm
     use dimphy, only: klon
 

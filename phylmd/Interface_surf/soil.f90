@@ -45,7 +45,7 @@ contains
     
     ! Fc0 + soilflux  = Soilcap (Ts(t) - Ts(t - delta t)) / (delta t)
 
-    use nr_util, only: pi
+    use jumble, only: pi
 
     use comconst, only: daysec
     use conf_gcm_m, only: lmt_pas, dtphys

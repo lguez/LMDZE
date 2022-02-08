@@ -14,7 +14,7 @@ contains
     use dimensions, only: iim, jjm
     use inter_barx_m, only: inter_barx
     use inter_bary_m, only: inter_bary
-    use nr_util, only: assert_eq, assert
+    use jumble, only: assert_eq, assert
     use ord_coord_m, only: ord_coord
     use ord_coordm_m, only: ord_coordm
 

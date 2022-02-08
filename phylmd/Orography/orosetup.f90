@@ -14,7 +14,7 @@ contains
     ! november 1993.
 
     ! Libraries:
-    use nr_util, only: pi
+    use jumble, only: pi
 
     USE dimphy, only: klon, klev
     USE suphec_m, only: rcpd, rd, rg

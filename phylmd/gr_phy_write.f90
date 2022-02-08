@@ -52,7 +52,7 @@ contains
     ! duplicate the first longitude in the last longitude. Input array
     ! has rank 2. Horizontal index is in the first dimension.
 
-    use nr_util, only: assert
+    use jumble, only: assert
 
     REAL, intent(in):: fi(:, :) ! (klon, :)
     real gr_phy_write_3d(iim, jjm + 1, size(fi, 2))

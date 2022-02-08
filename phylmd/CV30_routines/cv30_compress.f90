@@ -13,7 +13,7 @@ contains
     ! Compress the fields (vectorization over convective gridpoints).
 
     ! Libraries:
-    use nr_util, only: assert
+    use jumble, only: assert
 
     use cv30_param_m, only: nl
     USE dimphy, ONLY: klev, klon

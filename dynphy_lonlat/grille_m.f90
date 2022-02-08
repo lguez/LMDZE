@@ -16,7 +16,7 @@ contains
 
     ! Aucune pond\'eration n'est consid\'er\'ee. Cf. grille_m.txt.
 
-    use nr_util, only: assert_eq
+    use jumble, only: assert_eq
 
     use  dist_sphe_m, only: dist_sphe
 

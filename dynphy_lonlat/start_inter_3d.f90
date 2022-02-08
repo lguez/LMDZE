@@ -10,7 +10,7 @@ contains
 
     use netcdf, only: nf90_nowrite
     use netcdf95, only: nf95_open, nf95_close, nf95_get_var, nf95_inq_varid
-    use nr_util, only: assert_eq
+    use jumble, only: assert_eq
     use numer_rec_95, only: spline, splint
 
     use inter_barxy_m, only: inter_barxy

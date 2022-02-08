@@ -36,7 +36,7 @@ contains
     use disvert_m, only: preff
     use dynetat0_m, only: rlonu, rlonv
     use grid_change, only: dyn_phy, gr_fi_dyn
-    use nr_util, only: pi
+    use jumble, only: pi
     use physiq_m, only: physiq
     use suphec_m, only: rcpd, rkappa, rg
 

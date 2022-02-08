@@ -23,7 +23,7 @@ contains
     USE dimphy, ONLY: klon
     USE yomcst, ONLY: r_incl
     USE phyetat0_m, ONLY: rlat, rlon
-    use nr_util, only: assert, pi, twopi
+    use jumble, only: assert, pi, twopi
 
     REAL, INTENT(IN):: longi
     ! longitude vraie de la terre dans son plan solaire à partir de

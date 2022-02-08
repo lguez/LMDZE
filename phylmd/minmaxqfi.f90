@@ -10,7 +10,7 @@ contains
 
     use dimensions, only: llm
     use dimphy, only: klon
-    use nr_util, only: assert
+    use jumble, only: assert
 
     real, intent(in):: zq(:, :), qmin, qmax
     CHARACTER(len=*), intent(in):: comment

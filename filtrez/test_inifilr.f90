@@ -8,7 +8,7 @@ program test_inifilr
   use netcdf, only: NF90_CLOBBER, NF90_FLOAT
   use netcdf95, only: nf95_create, NF95_DEF_DIM, NF95_DEF_VAR, NF95_ENDDEF, &
        NF95_PUT_VAR, NF95_CLOSE, nf95_put_att
-  use nr_util, only: pi
+  use jumble, only: pi
   use unit_nml_m, only: unit_nml, set_unit_nml
 
   IMPLICIT NONE

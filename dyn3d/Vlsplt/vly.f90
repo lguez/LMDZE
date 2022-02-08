@@ -14,7 +14,7 @@
       use dimensions
       use disvert_m
       USE dynetat0_m, only: rlonv, rlonu
-      USE nr_util, ONLY : pi
+      USE jumble, ONLY : pi
       use paramet_m
 
       IMPLICIT NONE

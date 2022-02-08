@@ -23,7 +23,7 @@ contains
     ! AUTHOR: MARTIN MILLER *ECMWF*
     ! ORIGINAL : 90-01-01
 
-    use nr_util, only: assert_eq, ifirstloc
+    use jumble, only: assert_eq, ifirstloc
 
     REAL, INTENT(IN):: paprs(:, :) ! (klon, llm + 1)
     REAL, INTENT(IN):: pplay(:, :) ! (klon, llm)

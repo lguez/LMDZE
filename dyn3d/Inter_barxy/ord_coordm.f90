@@ -15,7 +15,7 @@ contains
     ! This procedure converts to degrees, if necessary, and inverts the
     ! order.
 
-    use nr_util, only: pi
+    use jumble, only: pi
 
 
     REAL, intent(in):: xi(:) ! angle, in rad or degrees

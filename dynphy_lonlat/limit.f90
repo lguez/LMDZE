@@ -19,7 +19,7 @@ contains
          NF95_PUT_VAR, find_coord
     use netcdf, only: NF90_CLOBBER, NF90_FLOAT, NF90_GLOBAL, NF90_NOWRITE, &
          NF90_UNLIMITED
-    use nr_util, only: assert
+    use jumble, only: assert
     use numer_rec_95, only: spline, splint
     
     use conf_dat2d_m, only: conf_dat2d

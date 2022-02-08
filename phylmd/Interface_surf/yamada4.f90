@@ -13,7 +13,7 @@ contains
     ! From LMDZ4/libf/phylmd/yamada4.F, version 1.1 2004/06/22 11:45:36
 
     ! Library:
-    use nr_util, only: assert, assert_eq
+    use jumble, only: assert, assert_eq
 
     use conf_gcm_m, ONLY: dtphys
     USE conf_phys_m, ONLY: iflag_pbl

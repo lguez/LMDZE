@@ -11,7 +11,7 @@ contains
     ! xprimm.
 
     ! Libraries:
-    use nr_util, only: twopi
+    use jumble, only: twopi
 
     use dynetat0_chosen_m, only: clon
     USE dimensions, ONLY: iim

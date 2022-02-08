@@ -12,7 +12,7 @@ contains
     ! Objet : calcul de la dissipation horizontale. Avec op\'erateurs
     ! star : gradiv2, divgrad2, nxgraro2.
 
-    use nr_util, only: assert
+    use jumble, only: assert
 
     USE comdissnew, ONLY: nitergdiv, nitergrot, niterh
     USE dimensions, ONLY: iim, jjm, llm

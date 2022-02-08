@@ -12,7 +12,7 @@ contains
     ! Calcul de nxgrad(rot) du vecteur (xcov, ycov).
 
     USE filtreg_v_m, ONLY: filtreg_v
-    use nr_util, only: assert, assert_eq
+    use jumble, only: assert, assert_eq
     use nxgrad_m, only: nxgrad
     use rotatf_m, only: rotatf
 

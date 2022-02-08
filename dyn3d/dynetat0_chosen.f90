@@ -34,7 +34,7 @@ contains
     ! Libraries:
     use netcdf, only: NF90_NOWRITE
     use netcdf95, only: nf95_open, nf95_inq_varid, NF95_CLOSE, NF95_Gw_VAR
-    use nr_util, only: assert
+    use jumble, only: assert
 
     use conf_gcm_m, only: raz_date
     use dimensions, only: iim, jjm, llm
@@ -92,7 +92,7 @@ contains
   subroutine read_serre
 
     use unit_nml_m, only: unit_nml
-    use nr_util, only: assert, pi
+    use jumble, only: assert, pi
 
     REAL:: clon_deg = 0. ! longitude of the center of the zoom, in degrees
     real:: clat_deg = 0. ! latitude of the center of the zoom, in degrees

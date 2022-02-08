@@ -13,7 +13,7 @@ contains
     ! "lift_noro".
 
     USE dimensions, ONLY : iim, jjm
-    use nr_util, only: assert_eq, assert, pi
+    use jumble, only: assert_eq, assert, pi
     use phyetat0_m, only: rlat, rlon
     USE comconst, ONLY: ra
 

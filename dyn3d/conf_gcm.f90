@@ -45,7 +45,7 @@ contains
 
     ! Auteurs : L. Fairhead, P. Le Van
 
-    use nr_util, only: assert
+    use jumble, only: assert
     use xios, only: xios_duration, xios_set_timestep
 
     use abort_gcm_m, only: abort_gcm

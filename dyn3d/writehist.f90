@@ -16,7 +16,7 @@ contains
     use histwrite_m, only: histwrite
     use infotrac_init_m, only: ttext
     use inithist_m, only: histid, histvid, histuid
-    use nr_util, only: assert
+    use jumble, only: assert
     use paramet_m, only: ip1jm, ip1jmp1
     use suphec_m, only: rcpd
 

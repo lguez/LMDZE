@@ -12,7 +12,7 @@ contains
     ! Objet : incrémentation des tendances dynamiques
 
     ! Libraries:
-    use nr_util, only: assert    
+    use jumble, only: assert
 
     USE comgeom, ONLY : aire_2d, apoln, apols
     USE dimensions, ONLY : iim, jjm, llm

@@ -28,7 +28,7 @@ contains
     use dimphy, only: klon
     use grid_change, only: gr_dyn_phy
     use netcdf95, only: nf95_inq_varid, nf95_get_var
-    use nr_util, only: assert
+    use jumble, only: assert
     use numer_rec_95, only: regr1_lint
     use press_coefoz_m, only: plev
 

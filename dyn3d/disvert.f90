@@ -30,7 +30,7 @@ contains
 
     ! Libraries:
     use jumble, only: read_column, new_unit
-    use nr_util, only: pi, assert
+    use jumble, only: pi, assert
 
     use dimensions, only: llm
     use dynetat0_chosen_m, only: pa

@@ -23,7 +23,7 @@ contains
   subroutine read_clesphys2
 
     use unit_nml_m, only: unit_nml
-    use nr_util, only: assert
+    use jumble, only: assert
     use conf_gcm_m, only: day_step, iphysiq
 
     namelist /clesphys2_nml/ok_orodr, ok_orolf, ok_limitvrai, nbapp_rad, &

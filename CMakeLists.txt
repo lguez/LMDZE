@@ -7,9 +7,6 @@ option(FETCH "Download")
 if(FETCH)
   include(FetchContent)
   
-  FetchContent_Declare(NR_util GIT_REPOSITORY
-    https://github.com/lguez/NR_util.git)
-
   FetchContent_Declare(Jumble GIT_REPOSITORY
     https://github.com/lguez/Jumble.git)
 
@@ -19,9 +16,8 @@ if(FETCH)
   FetchContent_Declare(Numer_Rec_95 GIT_REPOSITORY
     https://gitlab.in2p3.fr/guez/Numer_Rec_95.git)
 
-  FetchContent_MakeAvailable(NR_util Jumble NetCDF95 Numer_Rec_95)
+  FetchContent_MakeAvailable(Jumble NetCDF95 Numer_Rec_95)
 else()
-  find_package(NR_util REQUIRED CONFIG)
   find_package(Jumble REQUIRED CONFIG)
   find_package(Numer_Rec_95 REQUIRED CONFIG)
   find_package(NetCDF95 REQUIRED CONFIG)
@@ -36,7 +32,7 @@ target_include_directories(LMDZE_objects INTERFACE ${PROJECT_BINARY_DIR})
 
 target_link_libraries(LMDZE_objects PRIVATE NetCDF95::netcdf95
   XIOS::xios NetCDF_Fortran::netcdff Jumble::jumble
-  Numer_Rec_95::numer_rec_95 NR_util::nr_util)
+  Numer_Rec_95::numer_rec_95)
 
 foreach(my_dir IN ITEMS dyn3d filtrez IOIPSL misc phylmd dynphy_lonlat)
   add_subdirectory(${my_dir})

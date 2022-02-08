@@ -14,7 +14,7 @@ contains
     ! que la longitude varie de - pi \`a pi, la latitude de pi/2 \`a
     ! - pi/2 et pour que la coordonn\'ee pression soit d\'ecroissante.
 
-    use nr_util, only: assert_eq, pi
+    use jumble, only: assert_eq, pi
 
     REAL, intent(in):: xd(:), yd(:) ! longitudes et latitudes initiales, en rad
     REAL, intent(in):: zd(:) ! pressure levels, in Pa or hPa

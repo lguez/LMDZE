@@ -12,7 +12,7 @@ contains
     ! Objet : diffusion verticale de la vitesse
 
     ! Library:
-    use nr_util, only: assert
+    use jumble, only: assert
 
     use conf_gcm_m, only: dtphys
     USE dimphy, ONLY: klev

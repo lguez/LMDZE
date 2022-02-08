@@ -6,7 +6,7 @@ program test_ozonecm
   ! latitude-pressure grid, and writes the values to a NetCDF file.
   ! The pressure grid is "presnivs" from "disvert".
 
-  use nr_util, only: assert
+  use jumble, only: assert
   use netcdf95, only: nf95_create, nf95_def_dim, nf95_def_var, nf95_put_att, &
        nf95_enddef, nf95_put_var, nf95_close
   use netcdf, only: nf90_clobber, nf90_float, nf90_global

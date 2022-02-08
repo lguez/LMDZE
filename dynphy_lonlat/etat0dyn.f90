@@ -10,7 +10,7 @@ contains
 
     use netcdf95, only: nf95_close, nf95_get_var, nf95_gw_var, nf95_put_var, &
          nf95_inq_varid, nf95_open
-    use nr_util, only: assert
+    use jumble, only: assert
 
     use caldyn0_m, only: caldyn0
     use comgeom, only: aire_2d, apoln, apols, cu_2d, cv_2d

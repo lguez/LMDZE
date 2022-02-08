@@ -23,7 +23,7 @@ contains
     ! Configuration de la "physique" de LMDZ.
 
     ! Libraries:
-    use nr_util, only: assert
+    use jumble, only: assert
 
     USE clesphys, ONLY: read_clesphys
     use clesphys2, only: read_clesphys2

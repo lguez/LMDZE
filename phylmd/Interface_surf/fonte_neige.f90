@@ -13,7 +13,7 @@ contains
     ! Laurent Fairhead, March, 2001
 
     ! Library:
-    use nr_util, only: assert_eq
+    use jumble, only: assert_eq
 
     use comconst, only: daysec
     use conf_gcm_m, only: dtphys

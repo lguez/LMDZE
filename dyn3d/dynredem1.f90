@@ -10,7 +10,7 @@ contains
     ! Ecriture du fichier de red\'emarrage au format NetCDF
 
     use netcdf95, only: nf95_close, nf95_inq_varid, nf95_put_var
-    use nr_util, only: assert
+    use jumble, only: assert
 
     USE dimensions, ONLY: iim, jjm, llm, nqmx
     use dynredem0_m, only: ncid

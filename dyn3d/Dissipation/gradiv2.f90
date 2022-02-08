@@ -18,7 +18,7 @@ contains
     use grad_m, only: grad
     use laplacien_gam_m, only: laplacien_gam
     use laplacien_m, only: laplacien
-    use nr_util, only: assert_eq, assert
+    use jumble, only: assert_eq, assert
 
     ! Composantes covariantes de v :
     REAL, intent(in):: xcov(:, :, :) ! (iim + 1, jjm + 1, klevel)

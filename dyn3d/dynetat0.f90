@@ -39,7 +39,7 @@ contains
     use netcdf, only: NF90_NOWRITE, NF90_NOERR
     use netcdf95, only: NF95_GET_VAR, nf95_open, nf95_inq_varid, NF95_CLOSE, &
          NF95_Gw_VAR
-    use nr_util, only: assert
+    use jumble, only: assert
 
     use conf_gcm_m, only: raz_date
     use dimensions, only: iim, jjm, llm, nqmx
@@ -190,7 +190,7 @@ contains
 
     ! Il vaut mieux avoir : grossismy * dzoom < pi / 2
 
-    use nr_util, only: rad_to_deg
+    use jumble, only: rad_to_deg
 
     use coefpoly_m, only: coefpoly, a0, a1, a2, a3
     USE dimensions, only: jjm
@@ -514,7 +514,7 @@ contains
     ! 1) avec clon = 0 est à - 180 degrés.
 
     ! Libraries:
-    use nr_util, only: pi, pi_d, twopi, twopi_d, arth, assert, rad_to_deg
+    use jumble, only: pi, pi_d, twopi, twopi_d, arth, assert, rad_to_deg
 
     USE dimensions, ONLY: iim
     use dynetat0_chosen_m, only: clon, grossismx, dzoomx, taux

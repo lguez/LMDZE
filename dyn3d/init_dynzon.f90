@@ -16,7 +16,7 @@ contains
     ! From LMDZ4/libf/dyn3d/bilan_dyn.F, version 1.5 2005/03/16 10:12:17
 
     ! Libraries:
-    USE nr_util, ONLY: rad_to_deg
+    USE jumble, ONLY: rad_to_deg
 
     use conf_gcm_m, only: dtvr, day_step, iperiod, periodav
     USE dimensions, ONLY: jjm, llm

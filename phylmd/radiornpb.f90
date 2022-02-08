@@ -19,7 +19,7 @@ contains
 
     use dimensions, only: llm, nqmx
     use dimphy, only: klon
-    use nr_util, only: assert
+    use jumble, only: assert
 
     REAL, intent(in):: tr_seri(:, :, :) ! (klon, llm, nqmx - 2)
     REAL, intent(in):: pdtphys

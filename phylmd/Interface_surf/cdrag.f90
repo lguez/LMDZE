@@ -26,7 +26,7 @@ contains
     ! evaporation from the tropical oceans. J. Climate, 5:418-434.
 
     ! Library:
-    use nr_util, only: assert_eq
+    use jumble, only: assert_eq
 
     use clesphys, only: f_cdrag_oce, f_cdrag_ter
     use indicesol, only: is_oce

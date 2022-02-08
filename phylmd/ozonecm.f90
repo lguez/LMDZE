@@ -20,7 +20,7 @@ contains
 
     ! Keating 1985 k1032
 
-    use nr_util, only: assert, twopi, deg_to_rad
+    use jumble, only: assert, twopi, deg_to_rad
 
     use dimensions, only: llm
     use phyetat0_m, only: rlat

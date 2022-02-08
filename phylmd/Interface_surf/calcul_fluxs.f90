@@ -17,7 +17,7 @@ contains
     ! = tsurf and qsurf = qsat.
 
     ! Libraries:
-    use nr_util, only: assert_eq
+    use jumble, only: assert_eq
 
     use conf_gcm_m, only: dtphys
     USE fcttre, ONLY: foede, foeew

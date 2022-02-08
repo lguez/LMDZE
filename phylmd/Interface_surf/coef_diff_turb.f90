@@ -9,7 +9,7 @@ contains
 
     ! Computes coefficients for turbulent diffusion in the atmosphere.
 
-    use nr_util, only: assert
+    use jumble, only: assert
 
     USE clesphys, ONLY: ok_kzmin
     use coefkz_m, only: coefkz

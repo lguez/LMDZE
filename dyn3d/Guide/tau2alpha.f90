@@ -8,7 +8,7 @@ contains
        taumin, taumax, alpha)
 
     use init_tau2alpha_m, only: dxdy_min, dxdy_max, gamma
-    USE nr_util, ONLY: assert_eq
+    USE jumble, ONLY: assert_eq
 
     ! Dans le cas où on n'a les analyses que sur une bande de latitudes :
     REAL, intent(in):: lat_min_guide ! minimum latitude for nudging, in rad

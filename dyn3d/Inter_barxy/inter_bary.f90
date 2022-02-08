@@ -16,7 +16,7 @@ contains
     ! Version unidimensionnelle, en latitude.
     ! L'indice 1 correspond à l'interface maille 1 -- maille 2.
 
-    use nr_util, only: assert
+    use jumble, only: assert
 
 
     REAL, intent(in):: yjdat(:)

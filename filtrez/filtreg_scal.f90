@@ -16,7 +16,7 @@ contains
     USE inifgn_m, ONLY: sddv, unsddv
     use inifilr_m, only: jfiltnu, jfiltsu, matriceun, matriceus, matrinvn, &
          matrinvs
-    use nr_util, only: assert
+    use jumble, only: assert
 
     REAL, intent(inout):: champ(:, :, :) ! (iim + 1, jjm + 1, :)
     ! en entr\'ee : champ \`a filtrer, en sortie : champ filtr\'e

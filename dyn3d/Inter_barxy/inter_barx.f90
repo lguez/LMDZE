@@ -13,7 +13,7 @@ contains
     ! Interpolation barycentrique bas\'ee sur les aires. Version
     ! unidimensionnelle, en longitude.
 
-    use nr_util, only: assert_eq, pi
+    use jumble, only: assert_eq, pi
 
     REAL, intent(in):: dlonid(:) ! (idatmax)
     ! abscisses des interfaces des mailles donn\'ees
