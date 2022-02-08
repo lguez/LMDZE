@@ -262,7 +262,7 @@ contains
     ! sens.
     mask_tmp = merge(1., 0., mask >= 0.1)
 
-    phis(:iim, :) = zmea(:iim, :) * mask_tmp(:iim, :)
+    phis(:iim, 2:jjm) = zmea(:iim, 2:jjm) * mask_tmp(:iim, 2:jjm)
     ! (zmea is not yet smoothed)
 
     ! Filters to smooth out fields for input into subgrid-scale
@@ -306,7 +306,7 @@ contains
 
     ! gamma and theta at 1. and 0. at poles
     zmea(iim + 1, :) = zmea(1, :)
-    phis(iim + 1, :) = phis(1, :)
+    phis(iim + 1, 2:jjm) = phis(1, 2:jjm)
     zpic(iim + 1, :) = zpic(1, :)
     zval(iim + 1, :) = zval(1, :)
     zstd(iim + 1, :) = zstd(1, :)
