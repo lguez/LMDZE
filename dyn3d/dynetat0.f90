@@ -131,9 +131,6 @@ contains
     CALL nf95_inq_varid(ncid_start, 'yprimu1', varid)
     CALL nf95_get_var(ncid_start, varid, yprimu1)
 
-    CALL nf95_inq_varid (ncid_start, "phis", varid)
-    CALL nf95_get_var(ncid_start, varid, phis)
-
     call NF95_INQ_VARID(ncid_start, 'yprimu2', varid)
     call NF95_GET_VAR(ncid_start, varid, yprimu2)
 

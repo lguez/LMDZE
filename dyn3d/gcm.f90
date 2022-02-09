@@ -27,6 +27,7 @@ PROGRAM gcm
   use dynetat0_chosen_m, only: dynetat0_chosen
   use dynredem0_m, only: dynredem0
   use grid_change, only: init_dyn_phy
+  use grid_noro_m, only: read_phis
   use histclo_m, only: histclo
   use infotrac_init_m, only: infotrac_init
   use inidissip_m, only: inidissip
@@ -100,6 +101,7 @@ PROGRAM gcm
   call nf95_open("start.nc", NF90_NOWRITE, ncid_start) ! fichier \'etat initial
   CALL dynetat0_chosen(ncid_start)
   CALL dynetat0(vcov, ucov, teta, q, masse, ps, ncid_start)
+  call read_phis(ncid_start)
   call NF95_CLOSE(ncid_start)
   CALL disvert
   CALL inigeom ! initialisation de la g\'eometrie

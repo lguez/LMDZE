@@ -359,4 +359,24 @@ contains
 
   END SUBROUTINE grid_noro
 
+  !*********************************************************************
+
+  subroutine read_phis(ncid_start)
+
+    use dimensions, only: iim, jjm
+    use netcdf95, only: NF95_GET_VAR, nf95_inq_varid
+
+    integer, intent(in):: ncid_start
+
+    ! Local:
+    integer varid
+
+    !------------------------------------------------------------------
+
+    ALLOCATE(phis(iim + 1, jjm + 1))
+    call NF95_INQ_VARID (ncid_start, "phis", varid)
+    call NF95_GET_VAR(ncid_start, varid, phis)
+
+  end subroutine read_phis
+
 end module grid_noro_m
