@@ -845,7 +845,7 @@ contains
          ftsol, pctsrf, frac_impa, frac_nucl, da, phi, mp, upwd, dnwd, &
          tr_seri, zmasse)
 
-    CALL transp(paprs, t_seri, q_seri, u_seri, v_seri, zphi)
+    CALL transp(zmasse, t_seri, q_seri, u_seri, v_seri, zphi)
 
     ! conversion Ec en énergie thermique
     DO k = 1, llm
