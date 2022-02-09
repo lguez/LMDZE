@@ -124,8 +124,7 @@ contains
     pphis = pack(phis, dyn_phy)
 
     ! G\'eopotentiel calcul\'e par rapport \`a la surface locale :
-    forall (l = 1 :llm) pphi(:, l) = pack(phi(:, :, l), dyn_phy)
-    forall (l = 1: llm) pphi(:, l) = pphi(:, l) - pphis
+    forall (l = 1 :llm) pphi(:, l) = pack(phi(:, :, l), dyn_phy) - pphis
 
     ! Calcul de la vitesse verticale :
     forall (l = 1: llm)
