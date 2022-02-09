@@ -9,10 +9,10 @@ PROGRAM gcm
   ! l'advection de "q", en modifiant "iadv" dans "traceur.def".
 
   ! Libraries:
-  use netcdf95, only: nf95_close, nf95_open
   use mpi_f08, only: mpi_init, mpi_finalize, mpi_comm_size, mpi_comm_world, &
        mpi_abort
   use netcdf, only: NF90_NOWRITE
+  use netcdf95, only: nf95_close, nf95_open
   use xios, only: xios_initialize, xios_finalize, xios_context_initialize, &
        xios_context_finalize, xios_close_context_definition
 
@@ -43,8 +43,6 @@ PROGRAM gcm
 
   IMPLICIT NONE
 
-  ! Variables dynamiques :
-
   REAL, ALLOCATABLE:: ucov(:, :, :) ! (iim + 1, jjm + 1, llm) ! vent covariant
   REAL, ALLOCATABLE:: vcov(:, :, :) ! (iim + 1, jjm, llm) ! vent covariant
 
@@ -56,7 +54,6 @@ PROGRAM gcm
 
   REAL, ALLOCATABLE:: ps(:, :) ! (iim + 1, jjm + 1) ! pression au sol (Pa)
   REAL, ALLOCATABLE:: masse(:, :, :) ! (iim + 1, jjm + 1, llm) ! masse d'air
-
   LOGICAL:: true_calendar = .false. ! default value
   integer i, n_proc, return_comm, ncid_start
 
@@ -89,7 +86,7 @@ PROGRAM gcm
   write(unit_nml, nml=main_nml)
 
   call xios_close_context_definition
-  
+
   ! Choix du calendrier :
   if (true_calendar) then
      call ioconf_calendar('gregorian')
