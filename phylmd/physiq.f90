@@ -4,7 +4,7 @@ module physiq_m
 
 contains
 
-  SUBROUTINE physiq(lafin, dayvrai, time, paprs, play, pphi, pphis, u, v, t, &
+  SUBROUTINE physiq(lafin, dayvrai, time, paprs, play, zphi, pphis, u, v, t, &
        qx, omega, d_u, d_v, d_t, d_qx)
 
     ! From phylmd/physiq.F, version 1.22 2006/02/20 09:38:28
@@ -78,8 +78,8 @@ contains
     REAL, intent(in):: play(:, :) ! (klon, llm)
     ! pression pour le mileu de chaque couche (en Pa)
 
-    REAL, intent(in):: pphi(:, :) ! (klon, llm)
-    ! geopotential at mid-layer minus surface geopotential, in m2 s-2
+    REAL, intent(in):: zphi(:, :) ! (klon, llm)
+    ! geopotential at mid-layer, in m2 s-2
 
     REAL, intent(in):: pphis(:) ! (klon) surface geopotential, in m2 s-2
     REAL, intent(in):: u(:, :) ! (klon, llm) zonal wind, in m / s
@@ -295,7 +295,9 @@ contains
     REAL zx_qs, zcor
     real zqsat(klon, llm)
     INTEGER i, k, iq, nsrf
-    REAL zphi(klon, llm)
+
+    REAL pphi(klon, llm)
+    ! geopotential at mid-layer minus surface geopotential, in m2 s-2
 
     ! Variables pour la convection de K. Emanuel :
 
@@ -542,13 +544,6 @@ contains
        ancien_ok = .TRUE.
     ENDIF
 
-    ! Ajouter le geopotentiel du sol:
-    DO k = 1, llm
-       DO i = 1, klon
-          zphi(i, k) = pphi(i, k) + pphis(i)
-       ENDDO
-    ENDDO
-
     ! Check temperatures:
     CALL hgardfou(t_seri, ftsol)
 
@@ -675,6 +670,13 @@ contains
 
     ! Convection s\`eche (thermiques ou ajustement)
     if (iflag_thermals) then
+       ! Ajouter le geopotentiel du sol:
+       DO k = 1, llm
+          DO i = 1, klon
+             pphi(i, k) = zphi(i, k) - pphis(i)
+          ENDDO
+       ENDDO
+
        call calltherm(play, paprs, pphi, u_seri, v_seri, t_seri, q_seri, &
             fm_therm, entr_therm)
     else

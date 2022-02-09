@@ -89,10 +89,7 @@ contains
     INTEGER i, j, l, ig0, iq
     REAL paprs(klon, llm + 1) ! aux interfaces des couches 
     REAL play(klon, llm) ! aux milieux des couches 
-
-    REAL pphi(klon, llm)
-    ! geopotential at mid-layer minus surface geopotential, in m2 s-2
-
+    REAL zphi(klon, llm) ! geopotential at mid-layer, in m2 s-2
     real pphis(klon) ! surface geopotential, in m2 s-2
     REAL u(klon, llm), v(klon, llm)
     real zvfi(iim + 1, jjm + 1, llm)
@@ -125,9 +122,7 @@ contains
          qx(:, l, iq) = pack(q(:, :, l, iq), dyn_phy)
 
     pphis = pack(phis, dyn_phy)
-
-    ! G\'eopotentiel calcul\'e par rapport \`a la surface locale :
-    forall (l = 1 :llm) pphi(:, l) = pack(phi(:, :, l), dyn_phy) - pphis
+    forall (l = 1 :llm) zphi(:, l) = pack(phi(:, :, l), dyn_phy)
 
     ! Calcul de la vitesse verticale :
     forall (l = 1: llm)
@@ -189,7 +184,7 @@ contains
 
     forall(l = 1: llm) v(:, l) = pack(zvfi(:, :, l), dyn_phy)
 
-    CALL physiq(lafin, dayvrai, time, paprs, play, pphi, pphis, u, v, t, qx, &
+    CALL physiq(lafin, dayvrai, time, paprs, play, zphi, pphis, u, v, t, qx, &
          omega, d_u, d_v, d_t, d_qx)
 
     ! transformation des tendances physiques en tendances dynamiques:
