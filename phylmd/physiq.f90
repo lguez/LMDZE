@@ -107,17 +107,12 @@ contains
 
     INTEGER, PARAMETER:: ivap = 1 ! indice de traceur pour vapeur d'eau
     INTEGER, PARAMETER:: iliq = 2 ! indice de traceur pour eau liquide
-
     LOGICAL, save:: ancien_ok
-
     REAL d_t_dyn(klon, llm) ! tendance dynamique pour "t" (K / s)
     REAL d_q_dyn(klon, llm) ! tendance dynamique pour "q" (kg / kg / s)
-
     real da(klon, llm), phi(klon, llm, llm), mp(klon, llm)
-
     REAL, save, allocatable:: swdn0(:, :), swdn(:, :) ! (klon, llm + 1)
     REAL, save, allocatable:: swup0(:, :), swup(:, :) ! (klon, llm + 1)
-
     REAL, save, allocatable:: lwdn0(:, :), lwdn(:, :) ! (klon, llm + 1)
     REAL, save, allocatable:: lwup0(:, :), lwup(:, :) ! (klon, llm + 1)
 
@@ -399,7 +394,7 @@ contains
     ! concentration.
 
     real zmasse(klon, llm)
-    ! (column-density of mass of air in a cell, in kg m-2)
+    ! column-density of mass of air in a cell, in kg m-2
 
     real, save, allocatable:: airephy(:) ! (klon)
     namelist /physiq_nml/ fact_cldcon, facttemps, iflag_cldcon, ratqsbas, &
@@ -518,19 +513,11 @@ contains
 
     ! Diagnostic de la tendance dynamique :
     IF (ancien_ok) THEN
-       DO k = 1, llm
-          DO i = 1, klon
-             d_t_dyn(i, k) = (t(i, k) - t_seri(i, k)) / dtphys
-             d_q_dyn(i, k) = (qx(i, k, ivap) - q_seri(i, k)) / dtphys
-          ENDDO
-       ENDDO
+       d_t_dyn = (t - t_seri) / dtphys
+       d_q_dyn = (qx(:, :, ivap) - q_seri) / dtphys
     ELSE
-       DO k = 1, llm
-          DO i = 1, klon
-             d_t_dyn(i, k) = 0.
-             d_q_dyn(i, k) = 0.
-          ENDDO
-       ENDDO
+       d_t_dyn = 0.
+       d_q_dyn = 0.
        ancien_ok = .TRUE.
     ENDIF
 
