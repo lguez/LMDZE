@@ -108,7 +108,6 @@ contains
     INTEGER, PARAMETER:: ivap = 1 ! indice de traceur pour vapeur d'eau
     INTEGER, PARAMETER:: iliq = 2 ! indice de traceur pour eau liquide
 
-    REAL, save, allocatable:: t_ancien(:, :), q_ancien(:, :) ! (klon, llm)
     LOGICAL, save:: ancien_ok
 
     REAL d_t_dyn(klon, llm) ! tendance dynamique pour "t" (K / s)
@@ -358,8 +357,12 @@ contains
     logical ptconv(klon, llm)
 
     ! Variables pour effectuer les appels en s\'erie :
-    REAL t_seri(klon, llm)
-    real q_seri(klon, llm) ! mass fraction of water vapor
+
+    REAL, save, allocatable:: t_seri(:, :) ! (klon, llm)
+
+    real, save, allocatable:: q_seri(:, :)
+    ! (klon, llm) ! mass fraction of water vapor
+
     REAL ql_seri(klon, llm)
     REAL u_seri(klon, llm), v_seri(klon, llm) ! wind, in m s-1
     REAL tr_seri(klon, llm, nqmx - 2)
@@ -409,7 +412,7 @@ contains
 
     test_firstcal: IF (firstcal) THEN
        allocate(q2(klon, llm + 1, nbsrf))
-       allocate(t_ancien(klon, llm), q_ancien(klon, llm))
+       allocate(t_seri(klon, llm), q_seri(klon, llm))
        allocate(swdn0(klon, llm + 1), swdn(klon, llm + 1))
        allocate(swup0(klon, llm + 1), swup(klon, llm + 1))
        allocate(lwdn0(klon, llm + 1), lwdn(klon, llm + 1))
@@ -483,7 +486,7 @@ contains
        frugs = 0.
        CALL phyetat0(pctsrf, ftsol, ftsoil, fqsurf, qsol, fsnow, falbe, &
             rain_fall, snow_fall, solsw, sollw, dlw, radsol, frugs, agesno, &
-            zmea, zstd, zsig, zgam, zthe, zpic, zval, t_ancien, q_ancien, &
+            zmea, zstd, zsig, zgam, zthe, zpic, zval, t_seri, q_seri, &
             ancien_ok, rnebcon, ratqs, clwcon, run_off_lic_0, sig1, w01)
 
        ! ATTENTION : il faudra a terme relire q2 dans l'etat initial
@@ -513,21 +516,12 @@ contains
        airephy = pack(aire_2d, dyn_phy)
     ENDIF test_firstcal
 
-    ! We will modify variables *_seri and we will not touch variables
-    ! u, v, t, qx:
-    t_seri = t
-    u_seri = u
-    v_seri = v
-    q_seri = qx(:, :, ivap)
-    ql_seri = qx(:, :, iliq)
-    tr_seri = qx(:, :, 3:nqmx)
-
     ! Diagnostic de la tendance dynamique :
     IF (ancien_ok) THEN
        DO k = 1, llm
           DO i = 1, klon
-             d_t_dyn(i, k) = (t_seri(i, k) - t_ancien(i, k)) / dtphys
-             d_q_dyn(i, k) = (q_seri(i, k) - q_ancien(i, k)) / dtphys
+             d_t_dyn(i, k) = (t(i, k) - t_seri(i, k)) / dtphys
+             d_q_dyn(i, k) = (qx(i, k, ivap) - q_seri(i, k)) / dtphys
           ENDDO
        ENDDO
     ELSE
@@ -539,6 +533,15 @@ contains
        ENDDO
        ancien_ok = .TRUE.
     ENDIF
+
+    ! We will modify variables *_seri and we will not touch variables
+    ! u, v, t, qx:
+    t_seri = t
+    u_seri = u
+    v_seri = v
+    q_seri = qx(:, :, ivap)
+    ql_seri = qx(:, :, iliq)
+    tr_seri = qx(:, :, 3:nqmx)
 
     ! Check temperatures:
     CALL hgardfou(t_seri, ftsol)
@@ -897,14 +900,6 @@ contains
        ENDDO
     ENDDO
 
-    ! Sauvegarder les valeurs de t et q a la fin de la physique:
-    DO k = 1, llm
-       DO i = 1, klon
-          t_ancien(i, k) = t_seri(i, k)
-          q_ancien(i, k) = q_seri(i, k)
-       ENDDO
-    ENDDO
-
     CALL histwrite_phy("phis", pphis)
     CALL histwrite_phy("aire", airephy)
     CALL histwrite_phy("psol", paprs(:, 1))
@@ -972,8 +967,8 @@ contains
     IF (lafin) then
        CALL phyredem(pctsrf, ftsol, ftsoil, fqsurf, qsol, fsnow, falbe, &
             rain_fall, snow_fall, solsw, sollw, dlw, radsol, frugs, agesno, &
-            zmea, zstd, zsig, zgam, zthe, zpic, zval, t_ancien, q_ancien, &
-            rnebcon, ratqs, clwcon, run_off_lic_0, sig1, w01)
+            zmea, zstd, zsig, zgam, zthe, zpic, zval, t_seri, q_seri, rnebcon, &
+            ratqs, clwcon, run_off_lic_0, sig1, w01)
     end IF
 
     firstcal = .FALSE.
