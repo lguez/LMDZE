@@ -42,7 +42,7 @@ contains
 
     ! Local: 
     REAL, allocatable:: tab_cntrl(:) ! tableau des param\`etres du run
-    INTEGER ncid, varid
+    INTEGER ncid_start, varid
 
     namelist /dynetat0_nml/ day_ref, annee_ref
 
@@ -51,10 +51,10 @@ contains
     print *, "Call sequence information: dynetat0_chosen"
 
     ! Fichier \'etat initial :
-    call nf95_open("start.nc", NF90_NOWRITE, ncid)
+    call nf95_open("start.nc", NF90_NOWRITE, ncid_start)
 
-    call nf95_inq_varid(ncid, "controle", varid)
-    call NF95_Gw_VAR(ncid, varid, tab_cntrl)
+    call nf95_inq_varid(ncid_start, "controle", varid)
+    call NF95_Gw_VAR(ncid_start, varid, tab_cntrl)
 
     call assert(int(tab_cntrl(1)) == iim, "dynetat0_chosen tab_cntrl iim") 
     call assert(int(tab_cntrl(2)) == jjm, "dynetat0_chosen tab_cntrl jjm") 
@@ -83,7 +83,7 @@ contains
        annee_ref = tab_cntrl(5)
     end if
 
-    call NF95_CLOSE(ncid)
+    call NF95_CLOSE(ncid_start)
 
   END SUBROUTINE dynetat0_chosen
 

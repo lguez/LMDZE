@@ -56,7 +56,7 @@ contains
     ! Local variables: 
     INTEGER iq
     REAL, allocatable:: tab_cntrl(:) ! tableau des param\`etres du run
-    INTEGER ierr, ncid, varid
+    INTEGER ierr, ncid_start, varid
 
     !-----------------------------------------------------------------------
 
@@ -79,10 +79,10 @@ contains
     allocate(rlatu1(jjm), rlatu2(jjm), yprimu1(jjm), yprimu2(jjm))
 
     ! Fichier \'etat initial :
-    call nf95_open("start.nc", NF90_NOWRITE, ncid)
+    call nf95_open("start.nc", NF90_NOWRITE, ncid_start)
 
-    call nf95_inq_varid(ncid, "controle", varid)
-    call NF95_Gw_VAR(ncid, varid, tab_cntrl)
+    call nf95_inq_varid(ncid_start, "controle", varid)
+    call NF95_Gw_VAR(ncid_start, varid, tab_cntrl)
 
     etot0 = tab_cntrl(13)
     ptot0 = tab_cntrl(14)
@@ -101,58 +101,58 @@ contains
 
     print *, "day_ini = ", day_ini
 
-    call NF95_INQ_VARID (ncid, "rlonu", varid)
-    call NF95_GET_VAR(ncid, varid, rlonu)
+    call NF95_INQ_VARID (ncid_start, "rlonu", varid)
+    call NF95_GET_VAR(ncid_start, varid, rlonu)
 
-    call NF95_INQ_VARID (ncid, "rlatu", varid)
-    call NF95_GET_VAR(ncid, varid, rlatu)
+    call NF95_INQ_VARID (ncid_start, "rlatu", varid)
+    call NF95_GET_VAR(ncid_start, varid, rlatu)
 
-    call NF95_INQ_VARID (ncid, "rlonv", varid)
-    call NF95_GET_VAR(ncid, varid, rlonv)
+    call NF95_INQ_VARID (ncid_start, "rlonv", varid)
+    call NF95_GET_VAR(ncid_start, varid, rlonv)
 
-    call NF95_INQ_VARID (ncid, "rlatv", varid)
-    call NF95_GET_VAR(ncid, varid, rlatv)
+    call NF95_INQ_VARID (ncid_start, "rlatv", varid)
+    call NF95_GET_VAR(ncid_start, varid, rlatv)
 
-    CALL nf95_inq_varid(ncid, 'xprimu', varid)
-    CALL nf95_get_var(ncid, varid, xprimu)
+    CALL nf95_inq_varid(ncid_start, 'xprimu', varid)
+    CALL nf95_get_var(ncid_start, varid, xprimu)
 
-    CALL nf95_inq_varid(ncid, 'xprimv', varid)
-    CALL nf95_get_var(ncid, varid, xprimv)
+    CALL nf95_inq_varid(ncid_start, 'xprimv', varid)
+    CALL nf95_get_var(ncid_start, varid, xprimv)
 
-    CALL nf95_inq_varid(ncid, 'xprimm025', varid)
-    CALL nf95_get_var(ncid, varid, xprimm025)
+    CALL nf95_inq_varid(ncid_start, 'xprimm025', varid)
+    CALL nf95_get_var(ncid_start, varid, xprimm025)
 
-    CALL nf95_inq_varid(ncid, 'xprimp025', varid)
-    CALL nf95_get_var(ncid, varid, xprimp025)
+    CALL nf95_inq_varid(ncid_start, 'xprimp025', varid)
+    CALL nf95_get_var(ncid_start, varid, xprimp025)
 
-    call NF95_INQ_VARID (ncid, "rlatu1", varid)
-    call NF95_GET_VAR(ncid, varid, rlatu1)
+    call NF95_INQ_VARID (ncid_start, "rlatu1", varid)
+    call NF95_GET_VAR(ncid_start, varid, rlatu1)
 
-    call NF95_INQ_VARID (ncid, "rlatu2", varid)
-    call NF95_GET_VAR(ncid, varid, rlatu2)
+    call NF95_INQ_VARID (ncid_start, "rlatu2", varid)
+    call NF95_GET_VAR(ncid_start, varid, rlatu2)
 
-    CALL nf95_inq_varid(ncid, 'yprimu1', varid)
-    CALL nf95_get_var(ncid, varid, yprimu1)
+    CALL nf95_inq_varid(ncid_start, 'yprimu1', varid)
+    CALL nf95_get_var(ncid_start, varid, yprimu1)
 
-    CALL nf95_inq_varid(ncid, 'yprimu2', varid)
-    CALL nf95_get_var(ncid, varid, yprimu2)
+    CALL nf95_inq_varid (ncid_start, "phis", varid)
+    CALL nf95_get_var(ncid_start, varid, phis)
 
-    call NF95_INQ_VARID (ncid, "phis", varid)
-    call NF95_GET_VAR(ncid, varid, phis)
+    call NF95_INQ_VARID(ncid_start, 'yprimu2', varid)
+    call NF95_GET_VAR(ncid_start, varid, yprimu2)
 
-    call NF95_INQ_VARID (ncid, "ucov", varid)
-    call NF95_GET_VAR(ncid, varid, ucov)
+    call NF95_INQ_VARID (ncid_start, "ucov", varid)
+    call NF95_GET_VAR(ncid_start, varid, ucov)
 
-    call NF95_INQ_VARID (ncid, "vcov", varid)
-    call NF95_GET_VAR(ncid, varid, vcov)
+    call NF95_INQ_VARID (ncid_start, "vcov", varid)
+    call NF95_GET_VAR(ncid_start, varid, vcov)
 
-    call NF95_INQ_VARID (ncid, "teta", varid)
-    call NF95_GET_VAR(ncid, varid, teta)
+    call NF95_INQ_VARID (ncid_start, "teta", varid)
+    call NF95_GET_VAR(ncid_start, varid, teta)
 
     DO iq = 1, nqmx
-       call NF95_INQ_VARID(ncid, tname(iq), varid, ierr)
+       call NF95_INQ_VARID(ncid_start, tname(iq), varid, ierr)
        IF (ierr == NF90_NOERR) THEN
-          call NF95_GET_VAR(ncid, varid, q(:, :, :, iq))
+          call NF95_GET_VAR(ncid_start, varid, q(:, :, :, iq))
        ELSE
           PRINT *, 'dynetat0: "' // tname(iq) // '" not found, ' // &
                "setting it to zero..."
@@ -160,16 +160,16 @@ contains
        ENDIF
     ENDDO
 
-    call NF95_INQ_VARID (ncid, "masse", varid)
-    call NF95_GET_VAR(ncid, varid, masse)
+    call NF95_INQ_VARID (ncid_start, "masse", varid)
+    call NF95_GET_VAR(ncid_start, varid, masse)
 
-    call NF95_INQ_VARID (ncid, "ps", varid)
-    call NF95_GET_VAR(ncid, varid, ps)
+    call NF95_INQ_VARID (ncid_start, "ps", varid)
+    call NF95_GET_VAR(ncid_start, varid, ps)
     ! Check that there is a single value at each pole:
     call assert(ps(1, 1) == ps(2:, 1), "dynetat0 ps north pole")
     call assert(ps(1, jjm + 1) == ps(2:, jjm + 1), "dynetat0 ps south pole")
 
-    call NF95_CLOSE(ncid)
+    call NF95_CLOSE(ncid_start)
 
   END SUBROUTINE dynetat0
 
