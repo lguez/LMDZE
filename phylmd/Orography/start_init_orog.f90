@@ -77,7 +77,6 @@ CONTAINS
          interbar = .FALSE.)
     CALL grid_noro(lon_rad, lat_rad, relief, rlonv, rlatu, phis, zmea_2d, &
          zstd_2d, zsig_2d, zgam_2d, zthe_2d, zpic_2d, zval_2d)
-    phis(:, :) = phis(:, :) * 9.81
     zmea = pack(zmea_2d, dyn_phy)
     zstd = pack(zstd_2d, dyn_phy)
     zsig = pack(zsig_2d, dyn_phy)

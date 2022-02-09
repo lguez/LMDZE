@@ -50,7 +50,7 @@ contains
     ! Correlations of US Navy orography gradients:
 
     REAL, intent(out):: phis(:, :) ! (iim + 1, jjm + 1)
-    ! geoptential height of orography, not smoothed, in m
+    ! surface geopotential, not smoothed, in m2 s-2
     
     real, intent(out):: zmea(:, :) ! (iim + 1, jjm + 1) smoothed mean orography
     real, intent(out):: zstd(:, :) ! (iim + 1, jjm + 1) Standard deviation
@@ -262,7 +262,7 @@ contains
     ! sens.
     mask_tmp = merge(1., 0., mask >= 0.1)
 
-    phis(:iim, 2:jjm) = zmea(:iim, 2:jjm) * mask_tmp(:iim, 2:jjm)
+    phis(:iim, 2:jjm) = zmea(:iim, 2:jjm) * mask_tmp(:iim, 2:jjm) * 9.81
     ! (zmea is not yet smoothed)
 
     ! Filters to smooth out fields for input into subgrid-scale
@@ -322,8 +322,8 @@ contains
     zmea(:, 1) = zmeanor / zweinor
     zmea(:, jjm + 1) = zmeasud / zweisud
 
-    phis(:, 1) = zmeanor / zweinor
-    phis(:, jjm + 1) = zmeasud / zweisud
+    phis(:, 1) = zmeanor / zweinor * 9.81
+    phis(:, jjm + 1) = zmeasud / zweisud * 9.81
 
     zpic(:, 1) = sum(zpic(:iim, 1) * weight(:iim, 1)) / zweinor
     zpic(:, jjm + 1) = sum(zpic(:iim, jjm + 1) * weight(:iim, jjm + 1)) &
