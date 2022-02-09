@@ -19,7 +19,9 @@ contains
     REAL, INTENT(IN):: teta(:, :, :) ! (iim + 1, jjm + 1, llm)
     REAL, INTENT(IN):: pk(:, :, :) ! (iim + 1, jjm + 1, llm)
     REAL, INTENT(IN):: pks(:, :) ! (iim + 1, jjm + 1)
+
     REAL, INTENT(out)::  phi(:, :, :) ! (iim + 1, jjm + 1, llm)
+    ! geopotential at mid-layer, in m2 s-2
 
     ! Local:
     INTEGER l

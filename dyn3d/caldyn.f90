@@ -43,7 +43,10 @@ contains
     real, intent(out):: masse(ip1jmp1, llm)
     REAL, INTENT(IN):: pk(iip1, jjp1, llm)
     REAL, INTENT(IN):: pkf(:, :, :) ! (iim + 1, jjm + 1, llm)
+
     REAL, INTENT(IN):: phi(iim + 1, jjm + 1, llm)
+    ! geopotential at mid-layer, in m2 s-2
+
     REAL, INTENT(out):: du(:, :, :) ! (iim + 1, jjm + 1, llm)
     real, INTENT(out):: dv(:, :, :) ! (iim + 1, jjm, llm)
     REAL, INTENT(out):: dteta(:, :, :) ! (iim + 1, jjm + 1, llm)

@@ -36,7 +36,6 @@ CONTAINS
     REAL, intent(out):: zval(:) ! (klon) hauteur vallees de la SSO
 
     ! Local:
-
     INTEGER iml_rel
     INTEGER jml_rel
     INTEGER ncid, varid

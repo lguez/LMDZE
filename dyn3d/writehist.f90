@@ -29,7 +29,10 @@ contains
     ! temperature potentielle
 
     real, intent(in):: pk(:, :, :) ! (iim + 1, jjm + 1, llm)
-    real, intent(in):: phi(:, :, :) ! (iim + 1, jjm + 1, llm) ! geopotential
+
+    real, intent(in):: phi(:, :, :) ! (iim + 1, jjm + 1, llm)
+    ! geopotential at mid-layer, in m2 s-2
+
     REAL, intent(in):: q(:, :, :, :) ! (iim + 1, jjm + 1, llm, nqmx) traceurs
     real, intent(in):: masse(:, :, :) ! (iim + 1, jjm + 1, llm)
     REAL, intent(in):: ps(:, :) ! (iim + 1, jjm + 1) pression au sol

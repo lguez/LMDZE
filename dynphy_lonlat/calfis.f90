@@ -63,6 +63,7 @@ contains
     ! Exner = cp * (p / preff)**kappa 
 
     REAL, intent(in):: phi(:, :, :) ! (iim + 1, jjm + 1, llm)
+    ! geopotential at mid-layer, in m2 s-2
 
     REAL, intent(in):: w(:, :, :) ! (iim + 1, jjm + 1, llm)
     ! vertical mass flux, in kg / s
@@ -88,7 +89,8 @@ contains
     INTEGER i, j, l, ig0, iq
     REAL paprs(klon, llm + 1) ! aux interfaces des couches 
     REAL play(klon, llm) ! aux milieux des couches 
-    REAL pphi(klon, llm), pphis(klon)
+    REAL pphi(klon, llm)
+    real pphis(klon) ! surface geopotential, in m2 s-2
     REAL u(klon, llm), v(klon, llm)
     real zvfi(iim + 1, jjm + 1, llm)
     REAL t(klon, llm) ! temperature, in K
@@ -119,9 +121,10 @@ contains
     forall (iq = 1: nqmx, l = 1: llm) &
          qx(:, l, iq) = pack(q(:, :, l, iq), dyn_phy)
 
-    ! Geopotentiel calcule par rapport a la surface locale :
-    forall (l = 1 :llm) pphi(:, l) = pack(phi(:, :, l), dyn_phy)
     pphis = pack(phis, dyn_phy)
+
+    ! G\'eopotentiel calcul\'e par rapport \`a la surface locale :
+    forall (l = 1 :llm) pphi(:, l) = pack(phi(:, :, l), dyn_phy)
     forall (l = 1: llm) pphi(:, l) = pphi(:, l) - pphis
 
     ! Calcul de la vitesse verticale :

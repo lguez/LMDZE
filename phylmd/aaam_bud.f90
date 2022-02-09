@@ -20,18 +20,18 @@ contains
 
     real, intent(in):: rg ! gravity constant
     real, intent(in):: ome ! Earth rotation rate
-    real, intent(in):: pphis(:) ! (nlon) Geopotential at the ground
-    REAL, intent(in):: dragu(:) ! (nlon) orodrag stress (zonal)
-    REAL, intent(in):: liftu(:) ! (nlon) orolift stress (zonal)
-    REAL, intent(in):: phyu(:) ! (nlon) Stress total de la physique (zonal)
-    REAL, intent(in):: dragv(:) ! (nlon) orodrag stress (Meridional)
-    REAL, intent(in):: liftv(:) ! (nlon) orolift stress (Meridional)
-    REAL, intent(in):: phyv(:) ! (nlon) Stress total de la physique (Meridional)
+    real, intent(in):: pphis(:) ! (klon) surface geopotential, in m2 s-2
+    REAL, intent(in):: dragu(:) ! (klon) orodrag stress (zonal)
+    REAL, intent(in):: liftu(:) ! (klon) orolift stress (zonal)
+    REAL, intent(in):: phyu(:) ! (klon) Stress total de la physique (zonal)
+    REAL, intent(in):: dragv(:) ! (klon) orodrag stress (Meridional)
+    REAL, intent(in):: liftv(:) ! (klon) orolift stress (Meridional)
+    REAL, intent(in):: phyv(:) ! (klon) Stress total de la physique (Meridional)
 
     REAL, intent(in):: p(:, :) 
-    ! (nlon, nlev + 1) pressure (Pa) at model half levels
+    ! (klon, nlev + 1) pressure (Pa) at model half levels
 
-    real, intent(in):: u(:, :), v(:, :) ! (nlon, nlev) horizontal wind (m/s)
+    real, intent(in):: u(:, :), v(:, :) ! (klon, nlev) horizontal wind (m/s)
     REAL, intent(out):: aam ! axial component of wind AAM
     REAL, intent(out):: torsfc ! axial component of total surface torque
 
@@ -58,7 +58,7 @@ contains
 
     call assert(size(pphis) == (/size(dragu), size(liftu), size(phyu), &
          size(dragv), size(liftv), size(phyv), size(p, 1), size(u, 1), &
-         size(v, 1)/), "aaam_bud nlon")
+         size(v, 1)/), "aaam_bud klon")
     nlev = assert_eq(size(p, 2) - 1, size(u, 2), size(v, 2), "aaam_bud nlev")
 
     if (iim + 1 > 801 .or. jjm + 1 > 401) then

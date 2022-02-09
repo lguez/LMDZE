@@ -28,7 +28,10 @@ contains
     real, intent(in):: pbaru(:, :, :) ! (iip1, jjp1, llm)
     real, intent(in):: pbarv(:, :, :) ! (iip1, jjm, llm)
     real, intent(in):: teta(:, :, :) ! (iip1, jjp1, llm)
+
     real, intent(in):: phi(:, :, :) ! (iip1, jjp1, llm)
+    ! geopotential at mid-layer, in m2 s-2
+
     real, intent(in):: ucov(:, :, :) ! (iip1, jjp1, llm)
     real, intent(in):: vcov(:, :, :) ! (iip1, jjm, llm)
     real, intent(in):: trac(:, :, :) ! (iim + 1, jjm + 1, llm)

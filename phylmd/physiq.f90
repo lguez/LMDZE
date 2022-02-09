@@ -81,7 +81,7 @@ contains
     REAL, intent(in):: pphi(:, :) ! (klon, llm)
     ! géopotentiel de chaque couche (référence sol)
 
-    REAL, intent(in):: pphis(:) ! (klon) géopotentiel du sol
+    REAL, intent(in):: pphis(:) ! (klon) surface geopotential, in m2 s-2
     REAL, intent(in):: u(:, :) ! (klon, llm) zonal wind, in m / s
     REAL, intent(in):: v(:, :) ! (klon, llm) meridional wind, in m / s
     REAL, intent(in):: t(:, :) ! (klon, llm) temperature (K)
