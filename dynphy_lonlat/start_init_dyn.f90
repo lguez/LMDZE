@@ -12,7 +12,7 @@ MODULE start_init_dyn_m
 
 CONTAINS
 
-  SUBROUTINE start_init_dyn(tsol_2d, phis, ps)
+  SUBROUTINE start_init_dyn(tsol_2d, ps)
 
     use jumble, only: assert, pi
     use netcdf, only: nf90_nowrite
@@ -24,13 +24,10 @@ CONTAINS
     use dimensions, only: iim, jjm
     use dynetat0_m, only: rlonu, rlatv
     use gr_int_dyn_m, only: gr_int_dyn
+    use grid_noro_m, only: phis
     use inter_barxy_m, only: inter_barxy
 
     REAL, intent(in):: tsol_2d(:, :) ! (iim + 1, jjm + 1)
-
-    REAL, intent(in):: phis(:, :) ! (iim + 1, jjm + 1)
-    ! surface geopotential, in m2 s-2
-
     REAL, intent(out):: ps(:, :) ! (iim + 1, jjm + 1) surface pressure, in Pa
 
     ! Local:
@@ -44,9 +41,9 @@ CONTAINS
     !--------------------------
 
     print *, "Call sequence information: start_init_dyn"
-    call assert((/size(tsol_2d, 1), size(phis, 1), size(ps, 1)/) == iim + 1, &
+    call assert((/size(tsol_2d, 1), size(ps, 1)/) == iim + 1, &
          "start_init_dyn size 1")
-    call assert((/size(tsol_2d, 2), size(phis, 2), size(ps, 2)/) == jjm + 1, &
+    call assert((/size(tsol_2d, 2), size(ps, 2)/) == jjm + 1, &
          "start_init_dyn size 2")
 
     call nf95_open('ECDYN.nc', nf90_nowrite, ncid)

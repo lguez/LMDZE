@@ -25,9 +25,6 @@ PROGRAM ce0l
   real, ALLOCATABLE:: tsol_2d(:, :) ! (iim + 1, jjm + 1)
   ! both soil temperature and surface temperature, in K
 
-  REAL, ALLOCATABLE:: phis(:, :) ! (iim + 1, jjm + 1)
-  ! surface geopotential, in m2 s-2
-
   REAL, ALLOCATABLE:: pctsrf(:, :) ! (klon, nbsrf)
   ! ("pctsrf(i, :)" is the composition of the surface at horizontal
   ! position "i")
@@ -39,7 +36,7 @@ PROGRAM ce0l
   call set_dimensions
   call paramet
   call init_dimphy
-  ALLOCATE(tsol_2d(iim + 1, jjm + 1), phis(iim + 1, jjm + 1))
+  ALLOCATE(tsol_2d(iim + 1, jjm + 1))
   ALLOCATE(pctsrf(klon, nbsrf))
   call read_comdissnew
   call read_serre
@@ -53,10 +50,10 @@ PROGRAM ce0l
   CALL inifilr
 
   call infotrac_init
-  CALL etat0phys(tsol_2d, phis, pctsrf)
-  CALL etat0dyn(tsol_2d, phis)
+  CALL etat0phys(tsol_2d, pctsrf)
+  CALL etat0dyn(tsol_2d)
   CALL limit(pctsrf)
-  CALL grilles_gcm_netcdf_sub(phis)
+  CALL grilles_gcm_netcdf_sub
   close(unit_nml)
   print *, "ce0l: done"
 

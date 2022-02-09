@@ -6,7 +6,7 @@ MODULE dynredem0_m
 
 CONTAINS
 
-  SUBROUTINE dynredem0(phis, iday_end)
+  SUBROUTINE dynredem0(iday_end)
 
     ! From dyn3d/dynredem.F, version 1.2, 2004/06/22 11:45:30
     ! \'Ecriture du fichier de red\'emarrage au format NetCDF (initialisation)
@@ -23,14 +23,12 @@ CONTAINS
          stot0, ztot0
     use dynetat0_chosen_m, only: pa, day_ref, annee_ref, clat, clon, dzoomx, &
          dzoomy, grossismx, grossismy, taux, tauy
+    use grid_noro_m, only: phis
     USE infotrac_init_m, ONLY: tname, ttext
     USE ju2ymds_m, ONLY: ju2ymds
     USE paramet_m, ONLY: iip1, jjp1, llmp1
     use suphec_m, only: rg, rcpd, rkappa, romega
     use ymds2ju_m, only: ymds2ju
-
-    REAL, INTENT(IN):: phis(:, :) ! (iim + 1, jjm + 1)
-    ! surface geopotential, in m2 s-2
 
     INTEGER, INTENT(IN):: iday_end
 

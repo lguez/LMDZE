@@ -7,7 +7,7 @@ MODULE start_init_orog_m
 
 CONTAINS
 
-  SUBROUTINE start_init_orog(phis, zmea, zstd, zsig, zgam, zthe, zpic, zval)
+  SUBROUTINE start_init_orog(zmea, zstd, zsig, zgam, zthe, zpic, zval)
 
     ! Libraries:
     use jumble, only: pi
@@ -19,9 +19,6 @@ CONTAINS
     use dynetat0_m, only: rlatu, rlonv
     use grid_change, only: dyn_phy
     use grid_noro_m, only: grid_noro
-
-    REAL, intent(out):: phis(:, :) ! (iim + 1, jjm + 1)
-    ! surface geopotential, in m2 s-2
 
     REAL, intent(out):: zmea(:) ! (klon) orographie moyenne
 
@@ -75,8 +72,8 @@ CONTAINS
     ALLOCATE(lon_rad(iml_rel), lat_rad(jml_rel))
     CALL conf_dat2d(lon_ini, lat_ini, lon_rad, lat_rad, relief, &
          interbar = .FALSE.)
-    CALL grid_noro(lon_rad, lat_rad, relief, rlonv, rlatu, phis, zmea_2d, &
-         zstd_2d, zsig_2d, zgam_2d, zthe_2d, zpic_2d, zval_2d)
+    CALL grid_noro(lon_rad, lat_rad, relief, rlonv, rlatu, zmea_2d, zstd_2d, &
+         zsig_2d, zgam_2d, zthe_2d, zpic_2d, zval_2d)
     zmea = pack(zmea_2d, dyn_phy)
     zstd = pack(zstd_2d, dyn_phy)
     zsig = pack(zsig_2d, dyn_phy)

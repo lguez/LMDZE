@@ -4,8 +4,8 @@ module calfis_m
 
 contains
 
-  SUBROUTINE calfis(ucov, vcov, teta, q, p3d, pk, phis, phi, w, dufi, dvfi, &
-       dtetafi, dqfi, dayvrai, time, lafin)
+  SUBROUTINE calfis(ucov, vcov, teta, q, p3d, pk, phi, w, dufi, dvfi, dtetafi, &
+       dqfi, dayvrai, time, lafin)
 
     ! From dyn3d/calfis.F, version 1.3, 2005/05/25 13:10:09
     ! Authors: P. Le Van, F. Hourdin
@@ -38,6 +38,7 @@ contains
     use disvert_m, only: preff
     use dynetat0_m, only: rlonu, rlonv
     use grid_change, only: dyn_phy, gr_fi_dyn
+    use grid_noro_m, only: phis
     use physiq_m, only: physiq
     use suphec_m, only: rcpd, rkappa, rg
 
@@ -61,7 +62,6 @@ contains
     REAL, intent(in):: pk(:, :, :) ! (iim + 1, jjm + 1, llm)
     ! Exner = cp * (p / preff)**kappa 
 
-    REAL, intent(in):: phis(:, :) ! (iim + 1, jjm + 1)
     REAL, intent(in):: phi(:, :, :) ! (iim + 1, jjm + 1, llm)
 
     REAL, intent(in):: w(:, :, :) ! (iim + 1, jjm + 1, llm)

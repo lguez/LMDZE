@@ -4,7 +4,7 @@ module grilles_gcm_netcdf_sub_m
 
 contains
 
-  SUBROUTINE grilles_gcm_netcdf_sub(phis)
+  SUBROUTINE grilles_gcm_netcdf_sub
 
     ! This subroutine creates the file "grilles_gcm.nc" containg
     ! longitudes and latitudes in degrees for grids u and v.
@@ -17,11 +17,8 @@ contains
     USE comgeom, ONLY: aire_2d
     USE dimensions, ONLY: iim, jjm
     use dynetat0_m, only: rlatu, rlatv, rlonu, rlonv
-    USE grid_noro_m, ONLY: mask
+    USE grid_noro_m, ONLY: mask, phis
     use suphec_m, ONLY: rg
-
-    REAL, INTENT(IN):: phis(:, :) ! (iim + 1, jjm + 1) 
-    ! surface geopotential, in m2 s-2
 
     ! Local:
 

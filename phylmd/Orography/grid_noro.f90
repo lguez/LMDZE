@@ -5,10 +5,13 @@ module grid_noro_m
   REAL, SAVE, allocatable, protected:: mask(:, :) ! (iim + 1, jjm + 1)
   ! interpolated fraction of land
 
+  REAL, SAVE, allocatable, protected:: phis(:, :) ! (iim + 1, jjm + 1)
+  ! surface geopotential, not smoothed, in m2 s-2
+
 contains
 
-  SUBROUTINE grid_noro(xdata, ydata, relief, x, y, phis, zmea, zstd, zsig, &
-       zgam, zthe, zpic, zval)
+  SUBROUTINE grid_noro(xdata, ydata, relief, x, y, zmea, zstd, zsig, zgam, &
+       zthe, zpic, zval)
 
     ! From dyn3d/grid_noro.F, version 1.1.1.1 2004/05/19 12:53:06
 
@@ -49,9 +52,6 @@ contains
 
     ! Correlations of US Navy orography gradients:
 
-    REAL, intent(out):: phis(:, :) ! (iim + 1, jjm + 1)
-    ! surface geopotential, not smoothed, in m2 s-2
-    
     real, intent(out):: zmea(:, :) ! (iim + 1, jjm + 1) smoothed mean orography
     real, intent(out):: zstd(:, :) ! (iim + 1, jjm + 1) Standard deviation
     REAL, intent(out):: zsig(:, :) ! (iim + 1, jjm + 1) Slope
@@ -92,19 +92,19 @@ contains
     !--------------------------------------------------------------------
 
     print *, "Call sequence information: grid_noro"
-    allocate(mask(iim + 1, jjm + 1))
+    allocate(mask(iim + 1, jjm + 1), phis(iim + 1, jjm + 1))
     iusn = size(xdata)
     jusn = size(ydata)
     iext = iusn / 10
     call assert(iusn == size(relief, 1), "grid_noro iusn")
     call assert(jusn == size(relief, 2), "grid_noro jusn")
 
-    call assert([size(x), size(phis, 1), size(zmea, 1), size(zstd, 1), &
-         size(zsig, 1), size(zgam, 1), size(zthe, 1), size(zpic, 1), &
+    call assert([size(x), size(zmea, 1), size(zstd, 1), size(zsig, 1), &
+         size(zgam, 1), size(zthe, 1), size(zpic, 1), &
          size(zval, 1)] == iim + 1, "grid_noro iim")
 
-    call assert([size(y), size(phis, 2), size(zmea, 2), size(zstd, 2), &
-         size(zsig, 2), size(zgam, 2), size(zthe, 2), size(zpic, 2), &
+    call assert([size(y), size(zmea, 2), size(zstd, 2), size(zsig, 2), &
+         size(zgam, 2), size(zthe, 2), size(zpic, 2), &
          size(zval, 2)] == jjm + 1, "grid_noro jjm")
 
     zdeltay = 2. * pi / real(jusn) * ra

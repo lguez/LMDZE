@@ -4,7 +4,7 @@ module leapfrog_m
 
 contains
 
-  SUBROUTINE leapfrog(ucov, vcov, teta, ps, masse, phis, q)
+  SUBROUTINE leapfrog(ucov, vcov, teta, ps, masse, q)
 
     ! From dyn3d/leapfrog.F, version 1.6, 2005/04/13 08:58:34 revision 616
     ! Authors: P. Le Van, L. Fairhead, F. Hourdin
@@ -45,7 +45,6 @@ contains
 
     REAL, intent(inout):: ps(:, :) ! (iim + 1, jjm + 1) pression au sol, en Pa
     REAL, intent(inout):: masse(:, :, :) ! (iim + 1, jjm + 1, llm) masse d'air
-    REAL, intent(in):: phis(:, :) ! (iim + 1, jjm + 1) surface geopotential
 
     REAL, intent(inout):: q(:, :, :, :) ! (iim + 1, jjm + 1, llm, nqmx)
     ! mass fractions of advected fields
@@ -127,9 +126,9 @@ contains
        end if
 
        ! Calcul des tendances dynamiques:
-       CALL geopot(teta, pk, pks, phis, phi)
-       CALL caldyn(itau, ucov, vcov, teta, ps, masse, pk, pkf, phis, phi, du, &
-            dv, dteta, dp, w, pbaru, pbarv, conser = MOD(itau, iconser) == 0)
+       CALL geopot(teta, pk, pks, phi)
+       CALL caldyn(itau, ucov, vcov, teta, ps, masse, pk, pkf, phi, du, dv, &
+            dteta, dp, w, pbaru, pbarv, conser = MOD(itau, iconser) == 0)
 
        CALL caladvtrac(q, pbaru, pbarv, p3d, masse, teta, pk)
 
@@ -145,9 +144,9 @@ contains
        if (.not. leapf) then
           ! Matsuno backward
           ! Calcul des tendances dynamiques :
-          CALL geopot(teta, pk, pks, phis, phi)
-          CALL caldyn(itau + 1, ucov, vcov, teta, ps, masse, pk, pkf, phis, &
-               phi, du, dv, dteta, dp, w, pbaru, pbarv, conser = .false.)
+          CALL geopot(teta, pk, pks, phi)
+          CALL caldyn(itau + 1, ucov, vcov, teta, ps, masse, pk, pkf, phi, du, &
+               dv, dteta, dp, w, pbaru, pbarv, conser = .false.)
 
           ! Int\'egrations dynamique et traceurs :
           CALL integrd(vcovm1, ucovm1, tetam1, psm1, massem1, dv, du, dteta, &
@@ -161,7 +160,7 @@ contains
        end if
 
        IF (MOD(itau + 1, iphysiq) == 0 .AND. iflag_phys) THEN
-          CALL calfis(ucov, vcov, teta, q, p3d, pk, phis, phi, w, dufi, dvfi, &
+          CALL calfis(ucov, vcov, teta, q, p3d, pk, phi, w, dufi, dvfi, &
                dtetafi, dqfi, dayvrai = itau / day_step + day_ini, &
                time = REAL(mod(itau, day_step)) / day_step, &
                lafin = itau + 1 == itaufin)
@@ -201,7 +200,7 @@ contains
                q(:, :, :, 1))
        ENDIF
 
-       CALL geopot(teta, pk, pks, phis, phi)
+       CALL geopot(teta, pk, pks, phi)
        CALL writehist(vcov, ucov, teta, pk, phi, q, masse, ps, &
             itau_w = itau_dyn + itau + 1)
     end do time_integration
@@ -209,9 +208,9 @@ contains
     CALL dynredem1(vcov, ucov, teta, q, masse, ps, itau = itau_dyn + itaufin)
 
     ! Calcul des tendances dynamiques:
-    CALL geopot(teta, pk, pks, phis, phi)
-    CALL caldyn(itaufin, ucov, vcov, teta, ps, masse, pk, pkf, phis, phi, du, &
-         dv, dteta, dp, w, pbaru, pbarv, conser = MOD(itaufin, iconser) == 0)
+    CALL geopot(teta, pk, pks, phi)
+    CALL caldyn(itaufin, ucov, vcov, teta, ps, masse, pk, pkf, phi, du, dv, &
+         dteta, dp, w, pbaru, pbarv, conser = MOD(itaufin, iconser) == 0)
 
   END SUBROUTINE leapfrog
 

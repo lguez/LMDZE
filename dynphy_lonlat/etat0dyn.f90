@@ -4,7 +4,7 @@ module etat0dyn_m
 
 contains
 
-  SUBROUTINE etat0dyn(tsol_2d, phis)
+  SUBROUTINE etat0dyn(tsol_2d)
 
     ! From "etat0_netcdf.F", version 1.3, 2005/05/25 13:10:09
 
@@ -32,9 +32,6 @@ contains
 
     real, intent(in):: tsol_2d(:, :) ! (iim + 1, jjm + 1)
     ! both soil temperature and surface temperature, in K
-
-    REAL, intent(in):: phis(:, :) ! (iim + 1, jjm + 1)
-    ! surface geopotential, in m2 s-2
 
     ! Local:
 
@@ -65,7 +62,7 @@ contains
     !---------------------------------
 
     print *, "Call sequence information: etat0dyn"
-    CALL start_init_dyn(tsol_2d, phis, ps)
+    CALL start_init_dyn(tsol_2d, ps)
 
     ! Compute pressure on intermediate levels:
     forall(l = 1: llm + 1) p3d(:, :, l) = ap(l) + bp(l) * ps
@@ -126,9 +123,9 @@ contains
             SUM(aire_2d(:iim, jjm + 1) * masse(:iim, jjm + 1, l)) / apols
     END forall
 
-    CALL geopot(teta, pk , pks, phis, phi)
-    CALL caldyn0(ucov, vcov, teta, ps, pk, phis, phi)
-    CALL dynredem0(phis, day_ref)
+    CALL geopot(teta, pk , pks, phi)
+    CALL caldyn0(ucov, vcov, teta, ps, pk, phi)
+    CALL dynredem0(day_ref)
     CALL dynredem1(vcov, ucov, teta, q, masse, ps, itau = 0)
 
   END SUBROUTINE etat0dyn

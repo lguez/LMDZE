@@ -4,7 +4,7 @@ module etat0phys_m
 
 contains
 
-  SUBROUTINE etat0phys(tsol_2d, phis, pctsrf)
+  SUBROUTINE etat0phys(tsol_2d, pctsrf)
 
     ! From "etat0_netcdf.F", revision 644
 
@@ -25,9 +25,6 @@ contains
 
     real, intent(out):: tsol_2d(:, :) ! (iim + 1, jjm + 1)
     ! both soil temperature and surface temperature, in K
-
-    REAL, intent(out):: phis(:, :) ! (iim + 1, jjm + 1)
-    ! surface geopotential, in m2 s-2
 
     REAL, intent(out):: pctsrf(:, :) ! (klon, nbsrf)
     ! "pctsrf(i, :)" is the composition of the surface at horizontal
@@ -63,7 +60,7 @@ contains
 
     print *, "Call sequence information: etat0phys"
     call init_dyn_phy
-    call start_init_orog(phis, zmea, zstd, zsig, zgam, zthe, zpic, zval)
+    call start_init_orog(zmea, zstd, zsig, zgam, zthe, zpic, zval)
     call set_lat
     call set_lon
     call set_masque

@@ -54,7 +54,6 @@ PROGRAM gcm
 
   REAL, ALLOCATABLE:: ps(:, :) ! (iim + 1, jjm + 1) ! pression au sol (Pa)
   REAL, ALLOCATABLE:: masse(:, :, :) ! (iim + 1, jjm + 1, llm) ! masse d'air
-  REAL, ALLOCATABLE:: phis(:, :) ! (iim + 1, jjm + 1) ! g\'eopotentiel au sol
 
   LOGICAL:: true_calendar = .false. ! default value
   integer i, n_proc, return_comm
@@ -78,7 +77,6 @@ PROGRAM gcm
   ALLOCATE(q(iim + 1, jjm + 1, llm, nqmx))
   ALLOCATE(ps(iim + 1, jjm + 1))
   ALLOCATE(masse(iim + 1, jjm + 1, llm))
-  ALLOCATE(phis(iim + 1, jjm + 1))
   call paramet
   call init_dimphy
   CALL conf_gcm
@@ -99,7 +97,7 @@ PROGRAM gcm
 
   call infotrac_init
   CALL dynetat0_chosen
-  CALL dynetat0(vcov, ucov, teta, q, masse, ps, phis)
+  CALL dynetat0(vcov, ucov, teta, q, masse, ps)
   CALL disvert
   CALL inigeom ! initialisation de la g\'eometrie
   CALL inifilr ! initialisation du filtre
@@ -110,12 +108,12 @@ PROGRAM gcm
   IF (iflag_phys) CALL suphec
 
   ! Initialisation des entr\'ees-sorties :
-  CALL dynredem0(phis, iday_end = day_ini + nday)
+  CALL dynredem0(iday_end = day_ini + nday)
   CALL inithist
   call init_dynzon
 
   CALL conf_guide
-  CALL leapfrog(ucov, vcov, teta, ps, masse, phis, q)
+  CALL leapfrog(ucov, vcov, teta, ps, masse, q)
 
   close(unit_nml)
   call histclo

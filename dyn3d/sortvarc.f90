@@ -4,8 +4,8 @@ module sortvarc_m
 
 contains
 
-  SUBROUTINE sortvarc(ucov, teta, ps, masse, pk, phis, vorpot, phi, bern, dp, &
-       ang, etot, ptot, ztot, stot, rmsdpdt, rmsv)
+  SUBROUTINE sortvarc(ucov, teta, ps, masse, pk, vorpot, phi, bern, dp, ang, &
+       etot, ptot, ztot, stot, rmsdpdt, rmsv)
 
     ! From dyn3d/sortvarc.F, version 1.1.1.1, 2004/05/19 12:53:07
     ! Author: P. Le Van
@@ -16,6 +16,7 @@ contains
     USE dimensions, ONLY: iim, jjm, llm
     use dynetat0_m, ONLY: rlatu
     use filtreg_scal_m, only: filtreg_scal
+    use grid_noro_m, only: phis
     use massbarxy_m, only: massbarxy
     USE paramet_m, ONLY: jjp1
     use suphec_m, ONLY: rg, romega
@@ -25,7 +26,6 @@ contains
     REAL, INTENT(IN):: ps(iim + 1, jjm + 1)
     REAL, INTENT(IN):: masse(iim + 1, jjm + 1, llm)
     REAL, INTENT(IN):: pk(iim + 1, jjm + 1, llm)
-    REAL, INTENT(IN):: phis(iim + 1, jjm + 1)
     REAL, INTENT(IN):: vorpot(:, :, :) ! (iim + 1, jjm, llm)
     REAL, intent(in):: phi(iim + 1, jjm + 1, llm)
     real, intent(in):: bern(iim + 1, jjm + 1, llm)

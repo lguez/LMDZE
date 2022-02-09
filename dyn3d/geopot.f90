@@ -4,7 +4,7 @@ module geopot_m
 
 contains
 
-  SUBROUTINE geopot(teta, pk, pks, phis, phi)
+  SUBROUTINE geopot(teta, pk, pks, phi)
 
     ! From libf/dyn3d/geopot.F, version 1.1.1.1 2004/05/19
     ! Author: P. Le Van
@@ -14,11 +14,11 @@ contains
     use jumble, only: assert
 
     USE dimensions, ONLY: iim, jjm, llm
+    use grid_noro_m, only: phis
 
     REAL, INTENT(IN):: teta(:, :, :) ! (iim + 1, jjm + 1, llm)
     REAL, INTENT(IN):: pk(:, :, :) ! (iim + 1, jjm + 1, llm)
     REAL, INTENT(IN):: pks(:, :) ! (iim + 1, jjm + 1)
-    REAL, INTENT(IN):: phis(:, :) ! (iim + 1, jjm + 1)
     REAL, INTENT(out)::  phi(:, :, :) ! (iim + 1, jjm + 1, llm)
 
     ! Local:
@@ -26,9 +26,9 @@ contains
 
     ! -----------------------------------------------------------------------
 
-    call assert((/size(teta, 1), size(pk, 1), size(pks, 1), size(phis, 1), &
+    call assert((/size(teta, 1), size(pk, 1), size(pks, 1), &
          size(phi, 1)/) == iim + 1, "geopot iim")
-    call assert((/size(teta, 2), size(pk, 2), size(pks, 2), size(phis, 2), &
+    call assert((/size(teta, 2), size(pk, 2), size(pks, 2), &
          size(phi, 2)/) == jjm + 1, "geopot jjm")
     call assert((/size(teta, 3), size(pk, 3), size(phi, 3)/) == llm, &
          "geopot llm")

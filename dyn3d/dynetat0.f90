@@ -29,7 +29,7 @@ module dynetat0_m
 
 contains
 
-  SUBROUTINE dynetat0(vcov, ucov, teta, q, masse, ps, phis)
+  SUBROUTINE dynetat0(vcov, ucov, teta, q, masse, ps)
 
     ! From dynetat0.F, version 1.2, 2004/06/22 11:45:30
     ! Authors: P. Le Van, L. Fairhead
@@ -52,7 +52,6 @@ contains
     REAL, intent(out):: q(:, :, :, :) ! (iim + 1, jjm + 1, llm, nqmx)
     REAL, intent(out):: masse(:, :, :) ! (iim + 1, jjm + 1, llm)
     REAL, intent(out):: ps(:, :) ! (iim + 1, jjm + 1) in Pa
-    REAL, intent(out):: phis(:, :) ! (iim + 1, jjm + 1)
 
     ! Local variables: 
     INTEGER iq
@@ -64,10 +63,9 @@ contains
     print *, "Call sequence information: dynetat0"
 
     call assert((/size(ucov, 1), size(vcov, 1), size(masse, 1), size(ps, 1), &
-         size(phis, 1), size(q, 1), size(teta, 1)/) == iim + 1, "dynetat0 iim")
+         size(q, 1), size(teta, 1)/) == iim + 1, "dynetat0 iim")
     call assert((/size(ucov, 2), size(vcov, 2) + 1, size(masse, 2), &
-         size(ps, 2), size(phis, 2), size(q, 2), size(teta, 2)/) == jjm + 1, &
-         "dynetat0 jjm")
+         size(ps, 2), size(q, 2), size(teta, 2)/) == jjm + 1, "dynetat0 jjm")
     call assert((/size(vcov, 3), size(ucov, 3), size(teta, 3), size(q, 3), &
          size(masse, 3)/) == llm, "dynetat0 llm")
     call assert(size(q, 4) == nqmx, "dynetat0 q nqmx")

@@ -4,7 +4,8 @@ module caldyn0_m
 
 contains
 
-  SUBROUTINE caldyn0(ucov, vcov, teta, ps, pk, phis, phi)
+
+  SUBROUTINE caldyn0(ucov, vcov, teta, ps, pk, phi)
 
     ! From dyn3d/caldyn0.F, version 1.1.1.1, 2004/05/19 12:53:07
     ! Authors:  P. Le Van, F. Forget
@@ -32,7 +33,6 @@ contains
     REAL, INTENT(IN):: teta(ip1jmp1, llm)
     REAL, INTENT (IN):: ps(ip1jmp1)
     REAL, INTENT (IN):: pk(iip1, jjp1, llm)
-    REAL, INTENT (IN):: phis(ip1jmp1)
     REAL, INTENT (IN):: phi(iim + 1, jjm + 1, llm)
 
     ! Local:
@@ -63,8 +63,8 @@ contains
     w = vitvert(convm)
     CALL tourpot(vcov, ucov, massebxy, vorpot)
     CALL enercin(vcov, ucov, vcont, ucont, ecin)
-    CALL sortvarc(ucov, teta, ps, masse, pk, phis, vorpot, phi, &
-         bernoui(phi, ecin), dp, ang, etot, ptot, ztot, stot, rmsdpdt, rmsv)
+    CALL sortvarc(ucov, teta, ps, masse, pk, vorpot, phi, bernoui(phi, ecin), &
+         dp, ang, etot, ptot, ztot, stot, rmsdpdt, rmsv)
     PRINT *, 'ptot = ', ptot
     PRINT *, 'etot = ', etot
     PRINT *, 'ztot = ', ztot

@@ -4,8 +4,9 @@ module caldyn_m
 
 contains
 
-  SUBROUTINE caldyn(itau, ucov, vcov, teta, ps, masse, pk, pkf, phis, phi, du, &
-       dv, dteta, dp, w, pbaru, pbarv, conser)
+
+  SUBROUTINE caldyn(itau, ucov, vcov, teta, ps, masse, pk, pkf, phi, du, dv, &
+       dteta, dp, w, pbaru, pbarv, conser)
 
     ! From dyn3d/caldyn.F, version 1.1.1.1, 2004/05/19 12:53:06
     ! Author: P. Le Van
@@ -42,7 +43,6 @@ contains
     real, intent(out):: masse(ip1jmp1, llm)
     REAL, INTENT(IN):: pk(iip1, jjp1, llm)
     REAL, INTENT(IN):: pkf(:, :, :) ! (iim + 1, jjm + 1, llm)
-    REAL, INTENT(IN):: phis(ip1jmp1)
     REAL, INTENT(IN):: phi(iim + 1, jjm + 1, llm)
     REAL, INTENT(out):: du(:, :, :) ! (iim + 1, jjm + 1, llm)
     real, INTENT(out):: dv(:, :, :) ! (iim + 1, jjm, llm)
@@ -92,8 +92,8 @@ contains
 
     ! Sortie éventuelle des variables de contrôle :
     IF (conser) then
-       CALL sortvarc(ucov, teta, ps, masse, pk, phis, vorpot, phi, bern, dp, &
-            ang, etot, ptot, ztot, stot, rmsdpdt, rmsv)
+       CALL sortvarc(ucov, teta, ps, masse, pk, vorpot, phi, bern, dp, ang, &
+            etot, ptot, ztot, stot, rmsdpdt, rmsv)
        time = real(itau) / day_step
        heure = mod(itau * dtvr / daysec, 1.) * 24.
        IF (abs(heure - 24.) <= 1e-4) heure = 0.
