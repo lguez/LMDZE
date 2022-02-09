@@ -37,7 +37,7 @@ contains
 
     ! Libraries:
     use netcdf, only: NF90_NOERR
-    use netcdf95, only: NF95_GET_VAR, nf95_inq_varid, NF95_Gw_VAR
+    use netcdf95, only: NF95_GET_VAR, nf95_inq_varid
     use jumble, only: assert
 
     use conf_gcm_m, only: raz_date
@@ -55,7 +55,7 @@ contains
 
     ! Local:
     INTEGER iq
-    REAL, allocatable:: tab_cntrl(:) ! tableau des param\`etres du run
+    REAL tab_cntrl(2) ! partie du tableau des param\`etres du run
     INTEGER ierr, varid
 
     !-----------------------------------------------------------------------
@@ -79,15 +79,15 @@ contains
     allocate(rlatu1(jjm), rlatu2(jjm), yprimu1(jjm), yprimu2(jjm))
 
     call nf95_inq_varid(ncid_start, "controle", varid)
-    call NF95_Gw_VAR(ncid_start, varid, tab_cntrl)
+    call NF95_Get_VAR(ncid_start, varid, tab_cntrl, start = [30])
 
     if (raz_date) then
        print *, 'Resetting the date.'
        day_ini = day_ref
        itau_dyn = 0
     else
-       itau_dyn = tab_cntrl(31)
-       day_ini = tab_cntrl(30)
+       itau_dyn = tab_cntrl(2)
+       day_ini = tab_cntrl(1)
     end if
 
     print *, "day_ini = ", day_ini
