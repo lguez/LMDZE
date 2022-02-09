@@ -4,7 +4,7 @@ module aaam_bud_m
 
 contains
 
-  subroutine aaam_bud(rg, ome, phis, dragu, liftu, phyu, dragv, liftv, phyv, &
+  subroutine aaam_bud(rg, ome, pphis, dragu, liftu, phyu, dragv, liftv, phyv, &
        p, u, v, aam, torsfc)
 
     ! Author: F. Lott (LMD/CNRS). Date: 2003/10/20. Object: Compute
@@ -20,7 +20,7 @@ contains
 
     real, intent(in):: rg ! gravity constant
     real, intent(in):: ome ! Earth rotation rate
-    real, intent(in):: phis(:) ! (nlon) Geopotential at the ground
+    real, intent(in):: pphis(:) ! (nlon) Geopotential at the ground
     REAL, intent(in):: dragu(:) ! (nlon) orodrag stress (zonal)
     REAL, intent(in):: liftu(:) ! (nlon) orolift stress (zonal)
     REAL, intent(in):: phyu(:) ! (nlon) Stress total de la physique (zonal)
@@ -56,7 +56,7 @@ contains
 
     !-------------------------------------------------------------------
 
-    call assert(size(phis) == (/size(dragu), size(liftu), size(phyu), &
+    call assert(size(pphis) == (/size(dragu), size(liftu), size(phyu), &
          size(dragv), size(liftv), size(phyv), size(p, 1), size(u, 1), &
          size(v, 1)/), "aaam_bud nlon")
     nlev = assert_eq(size(p, 2) - 1, size(u, 2), size(v, 2), "aaam_bud nlev")
@@ -89,7 +89,7 @@ contains
     zlat(1) = rlat(1) * pi / 180.
 
     do i = 1, iim + 1
-       zs(i, 1) = phis(1) / rg
+       zs(i, 1) = pphis(1) / rg
        ps(i, 1) = p(1, 1)
        ub(i, 1) = ub(1, 1) 
        vb(i, 1) = vb(1, 1) 
@@ -103,7 +103,7 @@ contains
     do j = 2, jjm
        ! Values at Greenwich (Periodicity)
 
-       zs(iim + 1, j) = phis(l + 1) / rg
+       zs(iim + 1, j) = pphis(l + 1) / rg
        ps(iim + 1, j) = p(l + 1, 1)
        ssou(iim + 1, j) = dragu(l + 1) + liftu(l + 1)
        ssov(iim + 1, j) = dragv(l + 1) + liftv(l + 1)
@@ -123,7 +123,7 @@ contains
 
        do i = 1, iim
           l = l + 1
-          zs(i, j) = phis(l) / rg
+          zs(i, j) = pphis(l) / rg
           ps(i, j) = p(l, 1)
           ssou(i, j) = dragu(l) + liftu(l)
           ssov(i, j) = dragv(l) + liftv(l)
@@ -152,7 +152,7 @@ contains
     zlat(jjm + 1) = rlat(l) * pi / 180.
 
     do i = 1, iim + 1
-       zs(i, jjm + 1) = phis(l) / rg
+       zs(i, jjm + 1) = pphis(l) / rg
        ps(i, jjm + 1) = p(l, 1)
        ssou(i, jjm + 1) = dragu(l) + liftu(l)
        ssov(i, jjm + 1) = dragv(l) + liftv(l)
