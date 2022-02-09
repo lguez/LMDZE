@@ -82,7 +82,7 @@ contains
     ! Calcul de la nouvelle masse d'air au dernier temps integre t+1
 
     forall (l = 1: llm + 1) p(:, :, l) = ap(l) + bp(l) * ps
-    CALL massdair(p, finvmaold)
+    finvmaold = massdair(p)
 
     ! integration de ucov, vcov, h
 

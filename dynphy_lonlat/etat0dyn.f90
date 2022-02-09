@@ -115,7 +115,7 @@ contains
     end if
 
     ! Calcul interm\'ediaire :
-    CALL massdair(p3d, masse)
+    masse = massdair(p3d)
 
     forall (l = 1:llm)
        masse(:, 1, l) = SUM(aire_2d(:iim, 1) * masse(:iim, 1, l)) / apoln

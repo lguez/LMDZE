@@ -55,7 +55,7 @@ contains
 
     CALL covcont(ucov, vcov, ucont, vcont)
     forall (l = 1: llm + 1) p(:, l) = ap(l) + bp(l) * ps
-    CALL massdair(p, masse)
+    masse = massdair(p)
     CALL massbar(masse, massebx, masseby)
     CALL massbarxy(masse, massebxy)
     CALL flumass(massebx, masseby, vcont, ucont, pbaru, pbarv)
