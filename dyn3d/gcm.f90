@@ -9,9 +9,10 @@ PROGRAM gcm
   ! l'advection de "q", en modifiant "iadv" dans "traceur.def".
 
   ! Libraries:
-  use netcdf95, only: nf95_close
+  use netcdf95, only: nf95_close, nf95_open
   use mpi_f08, only: mpi_init, mpi_finalize, mpi_comm_size, mpi_comm_world, &
        mpi_abort
+  use netcdf, only: NF90_NOWRITE
   use xios, only: xios_initialize, xios_finalize, xios_context_initialize, &
        xios_context_finalize, xios_close_context_definition
 
@@ -56,7 +57,7 @@ PROGRAM gcm
   REAL, ALLOCATABLE:: masse(:, :, :) ! (iim + 1, jjm + 1, llm) ! masse d'air
 
   LOGICAL:: true_calendar = .false. ! default value
-  integer i, n_proc, return_comm
+  integer i, n_proc, return_comm, ncid_start
 
   namelist /main_nml/true_calendar
 
@@ -96,8 +97,10 @@ PROGRAM gcm
   endif
 
   call infotrac_init
-  CALL dynetat0_chosen
-  CALL dynetat0(vcov, ucov, teta, q, masse, ps)
+  call nf95_open("start.nc", NF90_NOWRITE, ncid_start) ! fichier \'etat initial
+  CALL dynetat0_chosen(ncid_start)
+  CALL dynetat0(vcov, ucov, teta, q, masse, ps, ncid_start)
+  call NF95_CLOSE(ncid_start)
   CALL disvert
   CALL inigeom ! initialisation de la g\'eometrie
   CALL inifilr ! initialisation du filtre

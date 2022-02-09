@@ -26,32 +26,30 @@ module dynetat0_chosen_m
 
 contains
 
-  SUBROUTINE dynetat0_chosen
+  SUBROUTINE dynetat0_chosen(ncid_start)
 
     ! This procedure reads the initial state of the atmosphere. Values
     ! that were chosen in ce0l.
 
     ! Libraries:
-    use netcdf, only: NF90_NOWRITE
-    use netcdf95, only: nf95_open, nf95_inq_varid, NF95_CLOSE, NF95_Gw_VAR
+    use netcdf95, only: nf95_inq_varid, NF95_Gw_VAR
     use jumble, only: assert
 
     use conf_gcm_m, only: raz_date
     use dimensions, only: iim, jjm, llm
     use unit_nml_m, only: unit_nml
 
+    integer, intent(in):: ncid_start
+
     ! Local: 
     REAL, allocatable:: tab_cntrl(:) ! tableau des param\`etres du run
-    INTEGER ncid_start, varid
+    INTEGER varid
 
     namelist /dynetat0_nml/ day_ref, annee_ref
 
     !-----------------------------------------------------------------------
 
     print *, "Call sequence information: dynetat0_chosen"
-
-    ! Fichier \'etat initial :
-    call nf95_open("start.nc", NF90_NOWRITE, ncid_start)
 
     call nf95_inq_varid(ncid_start, "controle", varid)
     call NF95_Gw_VAR(ncid_start, varid, tab_cntrl)
@@ -82,8 +80,6 @@ contains
        day_ref = tab_cntrl(4)
        annee_ref = tab_cntrl(5)
     end if
-
-    call NF95_CLOSE(ncid_start)
 
   END SUBROUTINE dynetat0_chosen
 

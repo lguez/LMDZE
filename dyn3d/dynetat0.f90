@@ -29,16 +29,15 @@ module dynetat0_m
 
 contains
 
-  SUBROUTINE dynetat0(vcov, ucov, teta, q, masse, ps)
+  SUBROUTINE dynetat0(vcov, ucov, teta, q, masse, ps, ncid_start)
 
     ! From dynetat0.F, version 1.2, 2004/06/22 11:45:30
     ! Authors: P. Le Van, L. Fairhead
     ! This procedure reads the initial state of the atmosphere.
 
     ! Libraries:
-    use netcdf, only: NF90_NOWRITE, NF90_NOERR
-    use netcdf95, only: NF95_GET_VAR, nf95_open, nf95_inq_varid, NF95_CLOSE, &
-         NF95_Gw_VAR
+    use netcdf, only: NF90_NOERR
+    use netcdf95, only: NF95_GET_VAR, nf95_inq_varid, NF95_Gw_VAR
     use jumble, only: assert
 
     use conf_gcm_m, only: raz_date
@@ -52,11 +51,12 @@ contains
     REAL, intent(out):: q(:, :, :, :) ! (iim + 1, jjm + 1, llm, nqmx)
     REAL, intent(out):: masse(:, :, :) ! (iim + 1, jjm + 1, llm)
     REAL, intent(out):: ps(:, :) ! (iim + 1, jjm + 1) in Pa
+    integer, intent(in):: ncid_start
 
     ! Local variables: 
     INTEGER iq
     REAL, allocatable:: tab_cntrl(:) ! tableau des param\`etres du run
-    INTEGER ierr, ncid_start, varid
+    INTEGER ierr, varid
 
     !-----------------------------------------------------------------------
 
@@ -77,9 +77,6 @@ contains
     allocate(xprimu(iim + 1), xprimv(iim + 1))
     allocate(xprimm025(iim + 1), xprimp025(iim + 1))
     allocate(rlatu1(jjm), rlatu2(jjm), yprimu1(jjm), yprimu2(jjm))
-
-    ! Fichier \'etat initial :
-    call nf95_open("start.nc", NF90_NOWRITE, ncid_start)
 
     call nf95_inq_varid(ncid_start, "controle", varid)
     call NF95_Gw_VAR(ncid_start, varid, tab_cntrl)
@@ -168,8 +165,6 @@ contains
     ! Check that there is a single value at each pole:
     call assert(ps(1, 1) == ps(2:, 1), "dynetat0 ps north pole")
     call assert(ps(1, jjm + 1) == ps(2:, jjm + 1), "dynetat0 ps south pole")
-
-    call NF95_CLOSE(ncid_start)
 
   END SUBROUTINE dynetat0
 
