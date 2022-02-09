@@ -16,7 +16,6 @@ contains
 
     ! Libraries:
     use jumble, only: assert
-    use netcdf95, only: NF95_CLOSE
 
     use aaam_bud_m, only: aaam_bud
     USE abort_gcm_m, ONLY: abort_gcm
@@ -973,7 +972,6 @@ contains
     if (ok_instan) call histsync(nid_ins)
 
     IF (lafin) then
-       call NF95_CLOSE(ncid_startphy)
        CALL phyredem(pctsrf, ftsol, ftsoil, fqsurf, qsol, fsnow, falbe, &
             rain_fall, snow_fall, solsw, sollw, dlw, radsol, frugs, agesno, &
             zmea, zstd, zsig, zgam, zthe, zpic, zval, t_ancien, q_ancien, &

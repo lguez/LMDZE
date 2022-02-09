@@ -27,7 +27,7 @@ contains
 
     use jumble, only: assert
     use netcdf, only: NF90_FILL_float
-    use netcdf95, only: nf95_inq_varid, nf95_get_var, nf95_put_var
+    use netcdf95, only: nf95_inq_varid, nf95_get_var, nf95_put_var, nf95_close
 
     use abort_gcm_m, only: abort_gcm
     use clesphys2, only: conv_emanuel
@@ -190,6 +190,7 @@ contains
 
        call nf95_inq_varid(ncid_startphy, "trs", varid)
        call nf95_get_var(ncid_startphy, varid, trs(:, 1))
+       call nf95_close(ncid_startphy)
        if (any(trs(:, 1) == NF90_FILL_float)) call abort_gcm("phytrac", &
             "some missing values in trs(:, 1)")
 
