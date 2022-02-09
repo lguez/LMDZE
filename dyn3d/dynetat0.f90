@@ -22,7 +22,8 @@ module dynetat0_m
   ! 2 pi / iim * (derivative of the longitudinal zoom function)(rlon[uv])
 
   REAL, protected, save, allocatable:: xprimm025(:), xprimp025(:) ! (iim + 1)
-  REAL, protected, save, allocatable:: rlatu1(:), rlatu2(:), yprimu1(:), yprimu2(:) ! (jjm)
+  REAL, protected, save, allocatable:: rlatu1(:), rlatu2(:), yprimu1(:), &
+       yprimu2(:) ! (jjm)
   INTEGER, PARAMETER, private:: nmax = 30000
   INTEGER, protected, save:: itau_dyn
 
@@ -52,7 +53,7 @@ contains
     REAL, intent(out):: ps(:, :) ! (iim + 1, jjm + 1) in Pa
     integer, intent(in):: ncid_start
 
-    ! Local variables: 
+    ! Local:
     INTEGER iq
     REAL, allocatable:: tab_cntrl(:) ! tableau des param\`etres du run
     INTEGER ierr, varid
