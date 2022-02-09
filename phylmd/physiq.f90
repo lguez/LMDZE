@@ -79,7 +79,7 @@ contains
     ! pression pour le mileu de chaque couche (en Pa)
 
     REAL, intent(in):: pphi(:, :) ! (klon, llm)
-    ! géopotentiel de chaque couche (référence sol)
+    ! geopotential at mid-layer minus surface geopotential, in m2 s-2
 
     REAL, intent(in):: pphis(:) ! (klon) surface geopotential, in m2 s-2
     REAL, intent(in):: u(:, :) ! (klon, llm) zonal wind, in m / s

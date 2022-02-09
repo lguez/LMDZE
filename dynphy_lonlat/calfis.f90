@@ -89,7 +89,10 @@ contains
     INTEGER i, j, l, ig0, iq
     REAL paprs(klon, llm + 1) ! aux interfaces des couches 
     REAL play(klon, llm) ! aux milieux des couches 
+
     REAL pphi(klon, llm)
+    ! geopotential at mid-layer minus surface geopotential, in m2 s-2
+
     real pphis(klon) ! surface geopotential, in m2 s-2
     REAL u(klon, llm), v(klon, llm)
     real zvfi(iim + 1, jjm + 1, llm)
