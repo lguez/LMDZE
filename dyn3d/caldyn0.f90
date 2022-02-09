@@ -2,6 +2,8 @@ module caldyn0_m
 
   IMPLICIT NONE
 
+  REAL, save, protected:: ang0, etot0, ptot0, ztot0, stot0
+
 contains
 
 
@@ -17,7 +19,6 @@ contains
     use covcont_m, only: covcont
     USE dimensions, ONLY: iim, jjm, llm
     USE disvert_m, ONLY: ap, bp
-    use dynetat0_m, only: ang0, etot0, ptot0, stot0, ztot0
     use enercin_m, only: enercin
     use flumass_m, only: flumass
     use massbar_m, only: massbar
@@ -77,5 +78,30 @@ contains
     ang0  = ang
 
   END SUBROUTINE caldyn0
+
+  !********************************************************************
+
+  subroutine read_caldyn0(ncid_start)
+
+    use netcdf95, only: NF95_GET_VAR, nf95_inq_varid
+
+    integer, intent(in):: ncid_start
+
+    ! Local:
+    REAL tab_cntrl(5) ! partie du tableau des param\`etres du run
+    integer varid
+
+    !------------------------------------------------------------------
+
+    call nf95_inq_varid(ncid_start, "controle", varid)
+    call NF95_Get_VAR(ncid_start, varid, tab_cntrl, start = [13])
+
+    etot0 = tab_cntrl(1)
+    ptot0 = tab_cntrl(2)
+    ztot0 = tab_cntrl(3)
+    stot0 = tab_cntrl(4)
+    ang0 = tab_cntrl(5)
+
+  end subroutine read_caldyn0
 
 end module caldyn0_m

@@ -15,12 +15,12 @@ CONTAINS
     USE netcdf95, ONLY: nf95_create, nf95_def_dim, nf95_def_var, nf95_enddef, &
          nf95_put_att, nf95_put_var
 
+    use caldyn0_m, only: ang0, etot0, ptot0, stot0, ztot0
     USE comconst, ONLY: daysec, ra
     USE dimensions, ONLY: iim, jjm, llm, nqmx
     USE disvert_m, ONLY: ap, bp, preff, presnivs
     use dynetat0_m, only: rlatu, rlatv, rlonu, rlonv, rlatu1, rlatu2, yprimu1, &
-         yprimu2, xprimp025, xprimm025, xprimu, xprimv, ang0, etot0, ptot0, &
-         stot0, ztot0
+         yprimu2, xprimp025, xprimm025, xprimu, xprimv
     use dynetat0_chosen_m, only: pa, day_ref, annee_ref, clat, clon, dzoomx, &
          dzoomy, grossismx, grossismy, taux, tauy
     use grid_noro_m, only: phis

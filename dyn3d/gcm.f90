@@ -16,6 +16,7 @@ PROGRAM gcm
   use xios, only: xios_initialize, xios_finalize, xios_context_initialize, &
        xios_context_finalize, xios_close_context_definition
 
+  use caldyn0_m, only: read_caldyn0
   use comdissnew, only: read_comdissnew
   use comgeom, only:  inigeom
   use conf_gcm_m, only: day_step, iperiod, iphysiq, nday, conf_gcm, iflag_phys
@@ -99,6 +100,7 @@ PROGRAM gcm
   CALL dynetat0_chosen(ncid_start)
   CALL dynetat0(vcov, ucov, teta, q, masse, ps, ncid_start)
   call read_phis(ncid_start)
+  call read_caldyn0(ncid_start)
   call NF95_CLOSE(ncid_start)
   CALL disvert
   CALL inigeom ! initialisation de la g\'eometrie

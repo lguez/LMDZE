@@ -14,6 +14,7 @@ contains
 
     use advect_m, only: advect
     use bernoui_m, only: bernoui
+    use caldyn0_m, only: ang0, etot0, ptot0, stot0, ztot0
     USE comconst, ONLY: daysec
     USE comgeom, ONLY: airesurg, constang_2d
     USE conf_gcm_m, ONLY: day_step, dtvr
@@ -24,7 +25,7 @@ contains
     use dteta1_m, only: dteta1
     use dudv1_m, only: dudv1
     use dudv2_m, only: dudv2
-    USE dynetat0_m, ONLY: day_ini, ang0, etot0, ptot0, stot0, ztot0
+    USE dynetat0_m, ONLY: day_ini
     use enercin_m, only: enercin
     use flumass_m, only: flumass
     use massbar_m, only: massbar

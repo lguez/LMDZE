@@ -23,7 +23,6 @@ module dynetat0_m
 
   REAL, protected, save, allocatable:: xprimm025(:), xprimp025(:) ! (iim + 1)
   REAL, protected, save, allocatable:: rlatu1(:), rlatu2(:), yprimu1(:), yprimu2(:) ! (jjm)
-  REAL, save:: ang0, etot0, ptot0, ztot0, stot0
   INTEGER, PARAMETER, private:: nmax = 30000
   INTEGER, protected, save:: itau_dyn
 
@@ -80,12 +79,6 @@ contains
 
     call nf95_inq_varid(ncid_start, "controle", varid)
     call NF95_Gw_VAR(ncid_start, varid, tab_cntrl)
-
-    etot0 = tab_cntrl(13)
-    ptot0 = tab_cntrl(14)
-    ztot0 = tab_cntrl(15)
-    stot0 = tab_cntrl(16)
-    ang0 = tab_cntrl(17)
 
     if (raz_date) then
        print *, 'Resetting the date.'
