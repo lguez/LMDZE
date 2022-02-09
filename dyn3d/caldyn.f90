@@ -41,7 +41,7 @@ contains
     REAL, INTENT(IN):: vcov(:, :, :) ! (iim + 1, jjm, llm) vent covariant
     REAL, INTENT(IN):: teta(:, :, :) ! (iim + 1, jjm + 1, llm)
     REAL, INTENT (IN):: ps(ip1jmp1)
-    real, intent(out):: masse(ip1jmp1, llm)
+    real, intent(out):: masse(:, :, :) ! (iim + 1, jjm, llm)
     REAL, INTENT(IN):: pk(iip1, jjp1, llm)
     REAL, INTENT(IN):: pkf(:, :, :) ! (iim + 1, jjm + 1, llm)
 

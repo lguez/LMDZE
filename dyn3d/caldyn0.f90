@@ -37,7 +37,7 @@ contains
     REAL, INTENT (IN):: phi(iim + 1, jjm + 1, llm)
 
     ! Local:
-    real masse(ip1jmp1, llm)
+    real masse(iim + 1, jjm + 1, llm)
     REAL w(iim + 1, jjm + 1, llm)
     REAL pbaru(ip1jmp1, llm), pbarv((iim + 1) * jjm, llm)
     REAL vcont(iim + 1, jjm, llm), ucont(iim + 1, jjm + 1, llm)
