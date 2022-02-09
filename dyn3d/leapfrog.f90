@@ -210,7 +210,7 @@ contains
     ! Calcul des tendances dynamiques:
     CALL geopot(teta, pk, pks, phi)
     CALL caldyn(itaufin, ucov, vcov, teta, ps, masse, pk, pkf, phi, du, dv, &
-         dteta, dp, w, pbaru, pbarv, conser = MOD(itaufin, iconser) == 0)
+         dteta, dp, w, pbaru, pbarv, conser = .true.)
 
   END SUBROUTINE leapfrog
 
