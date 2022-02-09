@@ -7,7 +7,7 @@ contains
   SUBROUTINE phytrac(julien, gmtime, firstcal, lafin, t_seri, paprs, pplay, &
        pmfu, pmfd, pde_u, pen_d, coefh, cdragh, fm_therm, entr_therm, yu1, &
        yv1, ftsol, pctsrf, frac_impa, frac_nucl, da, phi, mp, upwd, dnwd, &
-       tr_seri, zmasse, ncid_startphy)
+       tr_seri, zmasse)
 
     ! From phylmd/phytrac.F, version 1.15, 2006/02/21 08:08:30 (SVN
     ! revision 679) and phylmd/write_histrac.h, version 1.9,
@@ -46,7 +46,7 @@ contains
     use minmaxqfi_m, only: minmaxqfi
     use nflxtr_m, only: nflxtr
     use o3_chem_m, only: o3_chem
-    use phyetat0_m, only: rlat
+    use phyetat0_m, only: rlat, ncid_startphy
     use phyredem0_m, only: ncid_restartphy
     use press_coefoz_m, only: press_coefoz
     use radiornpb_m, only: radiornpb
@@ -98,8 +98,6 @@ contains
 
     real, intent(in):: zmasse(:, :) ! (klon, llm)
     ! (column-density of mass of air in a cell, in kg m-2)
-
-    integer, intent(in):: ncid_startphy
 
     ! Local:
 

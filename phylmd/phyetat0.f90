@@ -8,13 +8,14 @@ module phyetat0_m
 
   integer, save, protected:: itau_phy
   REAL, save, protected, allocatable:: masque(:) ! (KLON) fraction of land
+  integer, save, protected:: ncid_startphy
 
 contains
 
   SUBROUTINE phyetat0(pctsrf, ftsol, ftsoil, fqsurf, qsol, fsnow, albe, &
        rain_fall, snow_fall, solsw, sollw, fder, radsol, frugs, agesno, zmea, &
        zstd, zsig, zgam, zthe, zpic, zval, t_ancien, q_ancien, ancien_ok, &
-       rnebcon, ratqs, clwcon, run_off_lic_0, sig1, w01, ncid_startphy)
+       rnebcon, ratqs, clwcon, run_off_lic_0, sig1, w01)
 
     ! From phylmd/phyetat0.F, version 1.4 2005/06/03 10:03:07
     ! Author: Z.X. Li (LMD/CNRS)
@@ -61,8 +62,6 @@ contains
 
     real, intent(out):: w01(klon, klev) 
     ! vertical velocity within adiabatic updraft
-
-    integer, intent(out):: ncid_startphy
 
     ! Local:
     INTEGER varid, ndims

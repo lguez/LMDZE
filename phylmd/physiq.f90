@@ -398,7 +398,6 @@ contains
     real zmasse(klon, llm)
     ! (column-density of mass of air in a cell, in kg m-2)
 
-    integer, save:: ncid_startphy
     real, save, allocatable:: airephy(:) ! (klon)
     namelist /physiq_nml/ fact_cldcon, facttemps, iflag_cldcon, ratqsbas, &
          ratqshaut, ok_ade, bl95_b0, bl95_b1
@@ -485,8 +484,7 @@ contains
        CALL phyetat0(pctsrf, ftsol, ftsoil, fqsurf, qsol, fsnow, falbe, &
             rain_fall, snow_fall, solsw, sollw, dlw, radsol, frugs, agesno, &
             zmea, zstd, zsig, zgam, zthe, zpic, zval, t_ancien, q_ancien, &
-            ancien_ok, rnebcon, ratqs, clwcon, run_off_lic_0, sig1, w01, &
-            ncid_startphy)
+            ancien_ok, rnebcon, ratqs, clwcon, run_off_lic_0, sig1, w01)
 
        ! ATTENTION : il faudra a terme relire q2 dans l'etat initial
        q2 = 1e-8
@@ -855,7 +853,7 @@ contains
     call phytrac(julien, time, firstcal, lafin, t, paprs, play, mfu, mfd, &
          pde_u, pen_d, coefh, cdragh, fm_therm, entr_therm, u(:, 1), v(:, 1), &
          ftsol, pctsrf, frac_impa, frac_nucl, da, phi, mp, upwd, dnwd, &
-         tr_seri, zmasse, ncid_startphy)
+         tr_seri, zmasse)
 
     CALL transp(paprs, t_seri, q_seri, u_seri, v_seri, zphi)
 
