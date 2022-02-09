@@ -401,7 +401,6 @@ contains
 
     integer, save:: ncid_startphy
     real, save, allocatable:: airephy(:) ! (klon)
-
     namelist /physiq_nml/ fact_cldcon, facttemps, iflag_cldcon, ratqsbas, &
          ratqshaut, ok_ade, bl95_b0, bl95_b1
 
@@ -670,13 +669,7 @@ contains
 
     ! Convection s\`eche (thermiques ou ajustement)
     if (iflag_thermals) then
-       ! Ajouter le geopotentiel du sol:
-       DO k = 1, llm
-          DO i = 1, klon
-             pphi(i, k) = zphi(i, k) - pphis(i)
-          ENDDO
-       ENDDO
-
+       forall (k = 1:llm) pphi(:, k) = zphi(:, k) - pphis
        call calltherm(play, paprs, pphi, u_seri, v_seri, t_seri, q_seri, &
             fm_therm, entr_therm)
     else

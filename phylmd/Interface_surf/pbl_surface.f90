@@ -98,7 +98,7 @@ contains
     ! tension du vent (flux turbulent de vent) à la surface, en Pa
 
     REAL, INTENT(out):: cdragh(:), cdragm(:) ! (klon)
-    real q2(klon, klev + 1, nbsrf)
+    real, intent(inout):: q2(klon, klev + 1, nbsrf)
 
     ! Ocean slab:
 

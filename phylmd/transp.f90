@@ -23,7 +23,9 @@ contains
 
     REAL, INTENT(IN):: t_seri(:, :) ! (klon, klev)
     REAL, INTENT(IN):: q_seri(:, :), u_seri(:, :), v_seri(:, :) ! (klon, klev)
+
     REAL, INTENT(IN):: zphi(:, :) ! (klon, klev)
+    ! geopotential at mid-layer, in m2 s-2
 
     ! Local:
 
