@@ -7,9 +7,9 @@ contains
   SUBROUTINE pbl_surface(pctsrf, t_seri, q_seri, u_seri, v_seri, julien, mu0, &
        ftsol, cdmmax, cdhmax, ftsoil, qsol, paprs, play, fsnow, fqsurf, falbe, &
        fluxlat, rain_fall, snow_fall, frugs, agesno, rugoro, d_t, d_q, d_u, &
-       d_v, flux_t, flux_q, flux_u, flux_v, cdragh, cdragm, q2, coefh, t2m, &
-       q2m, u10m_srf, v10m_srf, fqcalving, ffonte, run_off_lic_0, albsol, &
-       sollw, solsw, tsol, dlw)
+       d_v, flux_t, flux_q, flux_u, flux_v, cdragh, cdragm, coefh, t2m, q2m, &
+       u10m_srf, v10m_srf, fqcalving, ffonte, run_off_lic_0, albsol, sollw, &
+       solsw, tsol, dlw)
 
     ! From phylmd/clmain.F, version 1.6, 2005/11/16 14:47:19
     ! Author: Z. X. Li (LMD/CNRS)
@@ -98,7 +98,6 @@ contains
     ! tension du vent (flux turbulent de vent) à la surface, en Pa
 
     REAL, INTENT(out):: cdragh(:), cdragm(:) ! (klon)
-    real, intent(inout):: q2(klon, klev + 1, nbsrf)
 
     ! Ocean slab:
 
@@ -199,6 +198,8 @@ contains
     REAL therm(klon, nbsrf)
     REAL lcl(klon, nbsrf) ! Niveau de condensation de la CLA
 
+    real, save, allocatable:: q2(:, :, :) ! (klon, llm + 1, nbsrf)
+
     !------------------------------------------------------------
 
     tsol = sum(ftsol * pctsrf, dim = 2)
@@ -255,7 +256,12 @@ contains
     pctsrf_pot(:, is_oce) = 1. - masque
     pctsrf_pot(:, is_sic) = 1. - masque
 
-    if (itap == 1) allocate(pctsrf_new_oce(klon), pctsrf_new_sic(klon))
+    if (itap == 1) then
+       allocate(pctsrf_new_oce(klon), pctsrf_new_sic(klon))
+       allocate(q2(klon, klev + 1, nbsrf))
+       ! ATTENTION : il faudra a terme relire q2 dans l'etat initial
+       q2 = 1e-8
+    end if
 
     ! Tester si c'est le moment de lire le fichier :
     if (mod(itap - 1, lmt_pas) == 0) &

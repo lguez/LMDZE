@@ -103,7 +103,6 @@ contains
     ! pour phystoke avec thermiques
     REAL fm_therm(klon, llm + 1)
     REAL entr_therm(klon, llm)
-    real, save, allocatable:: q2(:, :, :) ! (klon, llm + 1, nbsrf)
 
     INTEGER, PARAMETER:: ivap = 1 ! indice de traceur pour vapeur d'eau
     INTEGER, PARAMETER:: iliq = 2 ! indice de traceur pour eau liquide
@@ -406,7 +405,6 @@ contains
          'eaux vapeur et liquide sont indispensables')
 
     test_firstcal: IF (firstcal) THEN
-       allocate(q2(klon, llm + 1, nbsrf))
        allocate(t_seri(klon, llm), q_seri(klon, llm))
        allocate(swdn0(klon, llm + 1), swdn(klon, llm + 1))
        allocate(swup0(klon, llm + 1), swup(klon, llm + 1))
@@ -484,9 +482,6 @@ contains
             zmea, zstd, zsig, zgam, zthe, zpic, zval, t_seri, q_seri, &
             ancien_ok, rnebcon, ratqs, clwcon, run_off_lic_0, sig1, w01)
 
-       ! ATTENTION : il faudra a terme relire q2 dans l'etat initial
-       q2 = 1e-8
-
        radpas = lmt_pas / nbapp_rad
        print *, "radpas = ", radpas
 
@@ -563,7 +558,7 @@ contains
          ftsol, cdmmax, cdhmax, ftsoil, qsol, paprs, play, fsnow, fqsurf, &
          falbe, fluxlat, rain_fall, snow_fall, frugs, agesno, rugoro, d_t_vdf, &
          d_q_vdf, d_u_vdf, d_v_vdf, flux_t, flux_q, flux_u, flux_v, cdragh, &
-         cdragm, q2, coefh, t2m, q2m, u10m_srf, v10m_srf, fqcalving, ffonte, &
+         cdragm, coefh, t2m, q2m, u10m_srf, v10m_srf, fqcalving, ffonte, &
          run_off_lic_0, albsol, sollw, solsw, tsol, dlw)
 
     ! Incr\'ementation des flux :
