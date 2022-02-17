@@ -6,16 +6,12 @@ option(FETCH "Download")
 
 if(FETCH)
   include(FetchContent)
-  
   FetchContent_Declare(Jumble GIT_REPOSITORY
     https://github.com/lguez/Jumble.git)
-
   FetchContent_Declare(NetCDF95 GIT_REPOSITORY
     https://github.com/lguez/NetCDF95.git)
-
   FetchContent_Declare(Numer_Rec_95 GIT_REPOSITORY
     https://gitlab.in2p3.fr/guez/Numer_Rec_95.git)
-
   FetchContent_MakeAvailable(Jumble NetCDF95 Numer_Rec_95)
 else()
   find_package(Jumble REQUIRED CONFIG)
@@ -26,10 +22,8 @@ endif()
 
 find_package(MPI REQUIRED COMPONENTS Fortran CXX)
 find_package(XIOS REQUIRED)
-
 add_library(LMDZE_objects OBJECT dimensions.f90)
 target_include_directories(LMDZE_objects INTERFACE ${PROJECT_BINARY_DIR})
-
 target_link_libraries(LMDZE_objects PRIVATE NetCDF95::netcdf95
   XIOS::xios NetCDF_Fortran::netcdff Jumble::jumble
   Numer_Rec_95::numer_rec_95)

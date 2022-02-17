@@ -42,15 +42,16 @@ architecture for a large code in modern Fortran.
 
 ## Installation
 
-Dependencies: [CMake](https://cmake.org/download) (version ≥ 3.17),
+Dependencies: [CMake](https://cmake.org/download) (version ≥ 3.16),
 [XIOS](http://forge.ipsl.jussieu.fr/ioserver/wiki),
 [NetCDF-Fortran](https://www.unidata.ucar.edu/downloads/netcdf/index.jsp)
 (XIOS itself depends on MPI and NetCDF-Fortran depends on NetCDF).
 
-    cd the-directory-containing-LMDZE
+	git clone --recurse-submodules https://github.com/lguez/LMDZE.git
+	cd LMDZE
     mkdir build
     cd build
-    cmake .. -DFETCH=True \
+    cmake .. -DFETCH=ON \
        -DXIOS_INCLUDE_DIR=/directory/containing/XIOS/inc \
        -DXIOS_LIBRARY=/directory/containing/XIOS/lib/libxios.a
     make
