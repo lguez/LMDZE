@@ -450,10 +450,10 @@ contains
                yq(:knon, 1) + y_d_q(:knon, 1), &
                rd * t1(:knon) / (0.5 * (ypaprs(:knon, 1) + ypplay(:knon, 1))) &
                * (ypaprs(:knon, 1) - ypplay(:knon, 1)), &
-               tsurf_new(:knon), yqsurf(:knon), &
-               merge(frugs(ni(:knon), is_oce), yrugos(:knon), nisrf == is_oce), &
-               ypaprs(:knon, 1), ypplay(:knon, 1), yt2m(:knon), yq2m(:knon), &
-               wind10m(:knon), ustar(:knon))
+               tsurf_new(:knon), yqsurf(:knon), merge(frugs(ni(:knon), &
+               is_oce), yrugos(:knon), nisrf == is_oce), ypaprs(:knon, 1), &
+               ypplay(:knon, 1), yt2m(:knon), yq2m(:knon), wind10m(:knon), &
+               ustar(:knon))
 
           DO j = 1, knon
              i = ni(j)
