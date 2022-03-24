@@ -19,10 +19,9 @@ contains
 
     ! F.LOTT LMD 22/11/95
 
-    USE dimensions
-    USE dimphy
-    USE suphec_m
-    USE yoegwd
+    USE dimphy, only: klon, klev
+    USE suphec_m, only: rd, rg, romega
+    USE yoegwd, only: gklift, gvsec, nktopg
 
     !* 0.1 ARGUMENTS
 
