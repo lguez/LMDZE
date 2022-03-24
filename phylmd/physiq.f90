@@ -361,8 +361,8 @@ contains
     REAL tr_seri(klon, llm, nqmx - 2)
 
     REAL zx_rh(klon, llm)
-    REAL zustrdr(klon), zvstrdr(klon)
-    REAL zustrli(klon), zvstrli(klon)
+    REAL ustrdr(klon), vstrdr(klon)
+    REAL ustrli(klon), vstrli(klon)
     REAL aam, torsfc
     REAL tsol(klon)
 
@@ -808,7 +808,7 @@ contains
 
     IF (ok_orodr) THEN
        CALL drag_noro(paprs, play, zmea, zstd, zsig, zgam, zthe, zpic, zval, &
-            t_seri, u_seri, v_seri, zustrdr, zvstrdr, d_t_oro, d_u_oro, d_v_oro)
+            t_seri, u_seri, v_seri, ustrdr, vstrdr, d_t_oro, d_u_oro, d_v_oro)
 
        ! Ajout des tendances :
        t_seri = t_seri + d_t_oro
@@ -818,7 +818,7 @@ contains
 
     IF (ok_orolf) THEN
        CALL lift_noro(paprs, play, zmea, zstd, zpic, t_seri, u_seri, v_seri, &
-            zustrli, zvstrli, d_t_lif, d_u_lif, d_v_lif)
+            ustrli, vstrli, d_t_lif, d_u_lif, d_v_lif)
 
        ! Ajout des tendances :
        t_seri = t_seri + d_t_lif
@@ -826,10 +826,9 @@ contains
        v_seri = v_seri + d_v_lif
     ENDIF
 
-    CALL aaam_bud(rg, romega, pphis, zustrdr, zustrli, &
-         sum((u_seri - u) / dtphys * zmasse, dim = 2), zvstrdr, &
-         zvstrli, sum((v_seri - v) / dtphys * zmasse, dim = 2), paprs, u, v, &
-         aam, torsfc)
+    CALL aaam_bud(rg, romega, pphis, ustrdr, ustrli, &
+         sum((u_seri - u) / dtphys * zmasse, dim = 2), vstrdr, vstrli, &
+         sum((v_seri - v) / dtphys * zmasse, dim = 2), paprs, u, v, aam, torsfc)
 
     ! Calcul des tendances traceurs
     call phytrac(julien, time, firstcal, lafin, t, paprs, play, mfu, mfd, &
