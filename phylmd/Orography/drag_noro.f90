@@ -25,7 +25,7 @@ contains
 
     REAL, INTENT(IN):: zmea(klon)
     REAL, INTENT(IN):: zstd(klon), zsig(klon)
-    REAL, INTENT(INout):: zgam(klon)
+    REAL, INTENT(IN):: zgam(klon)
     real, INTENT(IN):: zthe(klon), zpic(klon), zval(klon)
 
     REAL, INTENT(IN):: t_seri(klon, klev) ! temperature (K)

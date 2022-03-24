@@ -31,7 +31,7 @@ contains
     REAL, INTENT(IN):: ptm1(klon, klev), pum1(klon, klev), pvm1(klon, klev)
     REAL, INTENT(IN):: zmea(klon), zstd(klon)
     REAL, INTENT(IN):: zsig(klon)
-    REAL, intent(inout):: zgam(klon)
+    REAL, intent(in):: zgam(klon)
     real, INTENT(IN):: zthe(klon), zpic(klon), zval(klon)
     REAL pvom(klon, klev), pvol(klon, klev), pte(klon, klev)
 

@@ -42,6 +42,7 @@ contains
     use dimensions, only: iim, jjm
     use indicesol, only: epsfra
     use mva9_m, only: mva9
+    USE yoegwd, only: gtsec
 
     ! Coordinates of input field:
     REAL, intent(in):: xdata(:) ! (iusn)
@@ -343,6 +344,7 @@ contains
 
     zgam(:, 1) = 1.
     zgam(:, jjm + 1) = 1.
+    zgam = max(zgam, gtsec)
 
     zthe(:, 1) = 0.
     zthe(:, jjm + 1) = 0.

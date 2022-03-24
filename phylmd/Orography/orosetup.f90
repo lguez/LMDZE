@@ -18,7 +18,7 @@ contains
 
     USE dimphy, only: klon, klev
     USE suphec_m, only: rcpd, rd, rg
-    USE yoegwd, only: gfrcrit, grcrit, gsigcr, gssec, gtsec, gvsec, nktopg
+    USE yoegwd, only: gfrcrit, grcrit, gsigcr, gssec, gvsec, nktopg
 
     ! Arguments:
     INTEGER nlon
@@ -33,7 +33,7 @@ contains
          pzdep(nlon, klev)
     REAL, intent(out):: pulow(nlon), pvlow(nlon)
     REAL, intent(in):: zthe(nlon)
-    real, intent(inout):: zgam(nlon)
+    real, intent(in):: zgam(nlon)
     REAL, intent(in):: zmea(nlon), zpic(nlon), zval(nlon)
     real pnu(nlon), pd1(nlon), pd2(nlon), pdmod(nlon)
 
@@ -72,7 +72,6 @@ contains
        kknu2(jl) = klev
        kknub(jl) = klev
        kknul(jl) = klev
-       zgam(jl) = max(zgam(jl), gtsec)
        ll1(jl, klev + 1) = .FALSE.
     end DO
 
