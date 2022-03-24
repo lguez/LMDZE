@@ -93,9 +93,8 @@ contains
 
     ! Appeler la routine principale
 
-    CALL orodrag(klon, klev, ktest, dtphys, papmh, papmf, zgeom, pt, pu, pv, &
-         pmea, pstd, psig, pgam, pthe, ppic, pval, pulow, pvlow, pdudt, &
-         pdvdt, pdtdt)
+    CALL orodrag(ktest, dtphys, papmh, papmf, zgeom, pt, pu, pv, pmea, pstd, &
+         psig, pgam, pthe, ppic, pval, pulow, pvlow, pdudt, pdvdt, pdtdt)
 
     DO k = 1, klev
        DO i = 1, klon

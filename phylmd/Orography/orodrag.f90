@@ -4,9 +4,9 @@ module orodrag_m
 
 contains
 
-  SUBROUTINE orodrag(nlon, nlev, ktest, ptsphy, paphm1, papm1, pgeom1, ptm1, &
-       pum1, pvm1, pmea, pstd, psig, pgamma, ptheta, ppic, pval, pulow, &
-       pvlow, pvom, pvol, pte)
+  SUBROUTINE orodrag(ktest, ptsphy, paphm1, papm1, pgeom1, ptm1, pum1, pvm1, &
+       pmea, pstd, psig, pgamma, ptheta, ppic, pval, pulow, pvlow, pvom, pvol, &
+       pte)
 
     USE dimphy, only: klon, klev
     use gwstress_m, only: gwstress
@@ -51,21 +51,20 @@ contains
 
     !* 0.1 arguments
 
-    INTEGER nlon, nlev
     INTEGER jl, ilevp1, jk, ji
     REAL zdelp, ztemp, zforc, ztend
     REAL rover, zb, zc, zconb, zabsv
     REAL zzd1, ratio, zbet, zust, zvst, zdis
-    REAL pte(nlon, nlev), pvol(nlon, nlev), pvom(nlon, nlev), pulow(klon), &
+    REAL pte(klon, klev), pvol(klon, klev), pvom(klon, klev), pulow(klon), &
          pvlow(klon)
-    REAL, INTENT(IN):: pum1(nlon, nlev), pvm1(nlon, nlev), ptm1(nlon, nlev), &
-         pmea(nlon)
-    REAL, INTENT(IN):: pstd(nlon)
-    REAL, INTENT(IN):: psig(nlon)
-    REAL pgamma(nlon), ptheta(nlon), ppic(nlon), pval(nlon), &
-         pgeom1(nlon, nlev), papm1(nlon, nlev), paphm1(nlon, nlev+1)
+    REAL, INTENT(IN):: pum1(klon, klev), pvm1(klon, klev), ptm1(klon, klev), &
+         pmea(klon)
+    REAL, INTENT(IN):: pstd(klon)
+    REAL, INTENT(IN):: psig(klon)
+    REAL pgamma(klon), ptheta(klon), ppic(klon), pval(klon), &
+         pgeom1(klon, klev), papm1(klon, klev), paphm1(klon, klev+1)
 
-    logical, intent(in):: ktest(nlon)
+    logical, intent(in):: ktest(klon)
 
     !* 0.2 local arrays
 
@@ -96,7 +95,7 @@ contains
     !* low level wind, determine sector in which to take
     !* the variance and set indicator for critical levels.
 
-    CALL orosetup(nlon, ktest, ikcrit, ikcrith, icrit, ikenvh, iknu, iknu2, &
+    CALL orosetup(klon, ktest, ikcrit, ikcrith, icrit, ikenvh, iknu, iknu2, &
          paphm1, papm1, pum1, pvm1, ptm1, pgeom1, zrho, zri, zstab, ztau, &
          zvph, zpsi, zzdep, pulow, pvlow, ptheta, pgamma, pmea, ppic, pval, &
          znu, zd1, zd2, zdmod)
@@ -105,12 +104,12 @@ contains
     !* supercritical forms.computes anisotropy coefficient
     !* as measure of orographic twodimensionality.
 
-    CALL gwstress(nlon, nlev, ktest, ikenvh, zrho, zstab, zvph, pstd, &
+    CALL gwstress(klon, klev, ktest, ikenvh, zrho, zstab, zvph, pstd, &
          psig, pmea, ppic, ztau, pgeom1, zdmod)
 
     !* 4. compute stress profile.
 
-    CALL gwprofil(nlon, nlev, ktest, ikcrith, icrit, paphm1, zrho, zstab, &
+    CALL gwprofil(klon, klev, ktest, ikcrith, icrit, paphm1, zrho, zstab, &
          zvph, zri, ztau, zdmod, psig, pstd)
 
     !* 5. compute tendencies.
