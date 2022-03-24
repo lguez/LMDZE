@@ -4,7 +4,7 @@ module drag_noro_m
 
 contains
 
-  SUBROUTINE drag_noro(paprs, pplay, pmea, pstd, psig, pgam, pthe, ppic, pval, &
+  SUBROUTINE drag_noro(paprs, play, zmea, zstd, zsig, zgam, zthe, zpic, zval, &
        t, u, v, pulow, pvlow, pustr, pvstr, d_t, d_u, d_v, ktest)
 
     ! From LMDZ4/libf/phylmd/orografi.F, version 1.4 2005/12/01 11:27:29
@@ -19,12 +19,12 @@ contains
 
     REAL, INTENT(IN):: paprs(klon, klev+1) ! pression pour chaque
                                              ! inter-couche (en Pa)
-    REAL, INTENT(IN):: pplay(klon, klev) ! pression pour le mileu de
+    REAL, INTENT(IN):: play(klon, klev) ! pression pour le mileu de
                                            ! chaque couche (en Pa)
-    REAL, INTENT(IN):: pmea(klon)
-    REAL, INTENT(IN):: pstd(klon), psig(klon)
-    REAL pgam(klon), pthe(klon)
-    REAL ppic(klon), pval(klon)
+    REAL, INTENT(IN):: zmea(klon)
+    REAL, INTENT(IN):: zstd(klon), zsig(klon)
+    REAL zgam(klon), zthe(klon)
+    REAL zpic(klon), zval(klon)
 
     REAL, INTENT(IN):: t(klon, klev) ! temperature (K)
     real, INTENT(IN):: u(klon, klev), v(klon, klev) ! vitesse horizontale (m/s)
@@ -73,7 +73,7 @@ contains
           pt(i, k) = t(i, klev-k+1)
           pu(i, k) = u(i, klev-k+1)
           pv(i, k) = v(i, klev-k+1)
-          papmf(i, k) = pplay(i, klev-k+1)
+          papmf(i, k) = play(i, klev-k+1)
        END DO
     END DO
     DO k = 1, klev + 1
@@ -93,8 +93,8 @@ contains
 
     ! Appeler la routine principale
 
-    CALL orodrag(ktest, dtphys, papmh, papmf, zgeom, pt, pu, pv, pmea, pstd, &
-         psig, pgam, pthe, ppic, pval, pulow, pvlow, pdudt, pdvdt, pdtdt)
+    CALL orodrag(ktest, dtphys, papmh, papmf, zgeom, pt, pu, pv, zmea, zstd, &
+         zsig, zgam, zthe, zpic, zval, pulow, pvlow, pdudt, pdvdt, pdtdt)
 
     DO k = 1, klev
        DO i = 1, klon
