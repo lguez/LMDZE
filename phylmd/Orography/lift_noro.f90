@@ -53,9 +53,6 @@ contains
     END DO
     DO k = 1, klev
        DO i = 1, klon
-          d_t_lif(i, k) = 0.0
-          d_u_lif(i, k) = 0.0
-          d_v_lif(i, k) = 0.0
           pdudt(i, k) = 0.0
           pdvdt(i, k) = 0.0
           pdtdt(i, k) = 0.0
