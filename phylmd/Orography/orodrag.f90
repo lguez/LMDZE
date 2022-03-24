@@ -54,8 +54,8 @@ contains
     REAL zdelp, ztemp, zforc, ztend
     REAL rover, zb, zc, zconb, zabsv
     REAL zzd1, ratio, zbet, zust, zvst, zdis
-    REAL pte(klon, klev), pvol(klon, klev), pvom(klon, klev), pulow(klon), &
-         pvlow(klon)
+    REAL pte(klon, klev), pvol(klon, klev), pvom(klon, klev)
+    real, intent(out):: pulow(klon), pvlow(klon)
     REAL, INTENT(IN):: pum1(klon, klev), pvm1(klon, klev), ptm1(klon, klev), &
          zmea(klon)
     REAL, INTENT(IN):: zstd(klon)

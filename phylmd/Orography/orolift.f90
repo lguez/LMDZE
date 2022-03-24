@@ -28,8 +28,8 @@ contains
     !* 0.1 ARGUMENTS
 
     INTEGER nlon, nlev
-    REAL pte(nlon, nlev), pvol(nlon, nlev), pvom(nlon, nlev), pulow(nlon), &
-         pvlow(nlon)
+    REAL pte(nlon, nlev), pvol(nlon, nlev), pvom(nlon, nlev)
+    real, intent(out)::pulow(nlon), pvlow(nlon)
     REAL pum1(nlon, nlev), pvm1(nlon, nlev), ptm1(nlon, nlev)
     REAL, INTENT (IN) :: plat(nlon)
     REAL, INTENT (IN):: zmea(nlon)

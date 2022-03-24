@@ -31,7 +31,7 @@ contains
     real prho(nlon, klev + 1), pri(nlon, klev + 1), pstab(nlon, klev + 1), &
          ptau(nlon, klev + 1), pvph(nlon, klev + 1), ppsi(nlon, klev + 1), &
          pzdep(nlon, klev)
-    REAL pulow(nlon), pvlow(nlon)
+    REAL, intent(out):: pulow(nlon), pvlow(nlon)
     REAL, intent(in):: zthe(nlon)
     real, intent(inout):: zgam(nlon)
     REAL, intent(in):: zmea(nlon), zpic(nlon), zval(nlon)

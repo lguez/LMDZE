@@ -29,8 +29,8 @@ contains
     real, INTENT (IN):: u_seri(klon, klev), v_seri(klon, klev)
     ! u_seri-------input-R-vitesse horizontale (m / s)
     ! v_seri-------input-R-vitesse horizontale (m / s)
-    REAL pulow(klon), pvlow(klon), pustr(klon), pvstr(klon)
-    REAL d_t(klon, klev), d_u(klon, klev), d_v(klon, klev)
+    REAL, intent(out):: pulow(klon), pvlow(klon), pustr(klon), pvstr(klon)
+    REAL, intent(out):: d_t(klon, klev), d_u(klon, klev), d_v(klon, klev)
     ! d_t-----output-R-increment de la temperature
     ! d_u-----output-R-increment de la vitesse u_seri
     ! d_v-----output-R-increment de la vitesse v_seri
