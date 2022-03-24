@@ -4,9 +4,10 @@ module orodrag_m
 
 contains
 
-  SUBROUTINE orodrag(ptsphy, paphm1, papm1, pgeom1, ptm1, pum1, pvm1, zmea, &
-       zstd, zsig, zgam, zthe, zpic, zval, pvom, pvol, pte)
+  SUBROUTINE orodrag(paphm1, papm1, pgeom1, ptm1, pum1, pvm1, zmea, zstd, &
+       zsig, zgam, zthe, zpic, zval, pvom, pvol, pte)
 
+    use conf_gcm_m, only: dtphys
     USE dimphy, only: klon, klev
     use gwstress_m, only: gwstress
     USE suphec_m, only: rg
@@ -75,7 +76,6 @@ contains
     REAL zdudt(klon), zdvdt(klon), zvidis(klon), &
          znu(klon), zd1(klon), zd2(klon), zdmod(klon)
     REAL ztmst
-    REAL, INTENT (IN) :: ptsphy
 
     !------------------------------------------------------------------
 
@@ -85,7 +85,7 @@ contains
 
     !* 1.1 computational constants
 
-    ztmst = ptsphy
+    ztmst = dtphys
 
     !* 1.3 check whether row contains point for printing
 

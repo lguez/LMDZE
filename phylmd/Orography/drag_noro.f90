@@ -80,8 +80,8 @@ contains
     END DO
 
     ! Appeler la routine principale
-    CALL orodrag(dtphys, papmh, papmf, zgeom, pt, pu, pv, zmea, zstd, zsig, &
-         zgam, zthe, zpic, zval, pdudt, pdvdt, pdtdt)
+    CALL orodrag(papmh, papmf, zgeom, pt, pu, pv, zmea, zstd, zsig, zgam, &
+         zthe, zpic, zval, pdudt, pdvdt, pdtdt)
 
     ustrdr = 0.
     vstrdr = 0.
