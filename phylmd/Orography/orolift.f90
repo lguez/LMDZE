@@ -4,9 +4,8 @@ module orolift_m
 
 contains
 
-  SUBROUTINE orolift(nlon, nlev, ptsphy, paphm1, pgeom1, ptm1, pum1, pvm1, &
-       plat, zmea, zstd, zpic &
-       , pvom, pvol, pte)
+  SUBROUTINE orolift(ptsphy, paphm1, pgeom1, ptm1, pum1, pvm1, plat, zmea, &
+       zstd, zpic, pvom, pvol, pte)
 
     !**** *OROLIFT: SIMULATE THE GEOSTROPHIC LIFT.
 
@@ -27,21 +26,20 @@ contains
 
     !* 0.1 ARGUMENTS
 
-    INTEGER nlon, nlev
-    REAL pte(nlon, nlev), pvol(nlon, nlev), pvom(nlon, nlev)
-    REAL pum1(nlon, nlev), pvm1(nlon, nlev), ptm1(nlon, nlev)
-    REAL, INTENT (IN) :: plat(nlon)
-    REAL, INTENT (IN):: zmea(nlon)
-    REAL, INTENT (IN) :: zstd(nlon)
-    REAL, INTENT (IN):: zpic(nlon)
-    real pgeom1(nlon, nlev), paphm1(nlon, nlev+1)
+    REAL pte(klon, klev), pvol(klon, klev), pvom(klon, klev)
+    REAL pum1(klon, klev), pvm1(klon, klev), ptm1(klon, klev)
+    REAL, INTENT (IN) :: plat(klon)
+    REAL, INTENT (IN):: zmea(klon)
+    REAL, INTENT (IN) :: zstd(klon)
+    REAL, INTENT (IN):: zpic(klon)
+    real pgeom1(klon, klev), paphm1(klon, klev+1)
 
     REAL, INTENT (IN) :: ptsphy
 
     !* 0.2 LOCAL ARRAYS
 
-    real pulow(nlon), pvlow(nlon)
-    logical ktest(nlon) ! points pour lesquels le sch\'ema est actif
+    real pulow(klon), pvlow(klon)
+    logical ktest(klon) ! points pour lesquels le sch\'ema est actif
     LOGICAL lifthigh
     INTEGER jl, jk
     REAL zcons1, ztmst, zpi, zhgeo
@@ -60,7 +58,6 @@ contains
     ktest = zpic - zmea > 100.
     lifthigh = .FALSE.
 
-    IF (nlon/=klon .OR. nlev/=klev) STOP
     zcons1 = 1./rd
     ztmst = ptsphy
     zpi = acos(-1.)

@@ -79,8 +79,8 @@ contains
     END DO
 
     ! appeler la routine principale
-    CALL orolift(klon, klev, dtphys, papmh, zgeom, pt, pu, pv, rlat, zmea, &
-         zstd, zpic, pdudt, pdvdt, pdtdt)
+    CALL orolift(dtphys, papmh, zgeom, pt, pu, pv, rlat, zmea, zstd, zpic, &
+         pdudt, pdvdt, pdtdt)
 
     ustrli = 0.
     vstrli = 0.
