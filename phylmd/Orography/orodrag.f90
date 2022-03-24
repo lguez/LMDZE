@@ -9,11 +9,11 @@ contains
 
     use conf_gcm_m, only: dtphys
     USE dimphy, only: klon, klev
+    use gwprofil_m, only: gwprofil
     use gwstress_m, only: gwstress
+    use orosetup_m, only: orosetup
     USE suphec_m, only: rg
     USE yoegwd, only: gkwake
-    use gwprofil_m, only: gwprofil
-    use orosetup_m, only: orosetup
 
     !**** *gwdrag* - does the gravity wave parametrization.
 
