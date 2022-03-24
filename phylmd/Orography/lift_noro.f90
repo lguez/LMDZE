@@ -4,8 +4,8 @@ module lift_noro_m
 
 contains
 
-  SUBROUTINE lift_noro(paprs, pplay, zmea, zstd, zpic, t, u, v, pulow, pvlow, &
-       pustr, pvstr, d_t, d_u, d_v)
+  SUBROUTINE lift_noro(paprs, pplay, zmea, zstd, zpic, t_seri, u_seri, v_seri, &
+       pulow, pvlow, pustr, pvstr, d_t, d_u, d_v)
 
     ! Author: F.Lott (LMD/CNRS) date: 1995/02/01
     ! Objet: Frottement de la montagne, interface
@@ -24,16 +24,16 @@ contains
     REAL, INTENT (IN):: zstd(klon)
     REAL, INTENT (IN):: zpic(klon)
 
-    REAL, INTENT (IN):: t(klon, klev)
-    ! t-------input-R-temperature (K)
-    real, INTENT (IN):: u(klon, klev), v(klon, klev)
-    ! u-------input-R-vitesse horizontale (m / s)
-    ! v-------input-R-vitesse horizontale (m / s)
+    REAL, INTENT (IN):: t_seri(klon, klev)
+    ! t_seri-------input-R-temperature (K)
+    real, INTENT (IN):: u_seri(klon, klev), v_seri(klon, klev)
+    ! u_seri-------input-R-vitesse horizontale (m / s)
+    ! v_seri-------input-R-vitesse horizontale (m / s)
     REAL pulow(klon), pvlow(klon), pustr(klon), pvstr(klon)
     REAL d_t(klon, klev), d_u(klon, klev), d_v(klon, klev)
     ! d_t-----output-R-increment de la temperature
-    ! d_u-----output-R-increment de la vitesse u
-    ! d_v-----output-R-increment de la vitesse v
+    ! d_u-----output-R-increment de la vitesse u_seri
+    ! d_v-----output-R-increment de la vitesse v_seri
 
     ! Local:
     INTEGER i, k
@@ -68,9 +68,9 @@ contains
 
     DO k = 1, klev
        DO i = 1, klon
-          pt(i, k) = t(i, klev-k + 1)
-          pu(i, k) = u(i, klev-k + 1)
-          pv(i, k) = v(i, klev-k + 1)
+          pt(i, k) = t_seri(i, klev-k + 1)
+          pu(i, k) = u_seri(i, klev-k + 1)
+          pv(i, k) = v_seri(i, klev-k + 1)
           papmf(i, k) = pplay(i, klev-k + 1)
        END DO
     END DO

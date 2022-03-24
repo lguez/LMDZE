@@ -5,7 +5,7 @@ module drag_noro_m
 contains
 
   SUBROUTINE drag_noro(paprs, play, zmea, zstd, zsig, zgam, zthe, zpic, zval, &
-       t, u, v, pulow, pvlow, pustr, pvstr, d_t, d_u, d_v)
+       t_seri, u_seri, v_seri, pulow, pvlow, pustr, pvstr, d_t, d_u, d_v)
 
     ! From LMDZ4/libf/phylmd/orografi.F, version 1.4 2005/12/01 11:27:29
 
@@ -26,8 +26,11 @@ contains
     REAL, INTENT(INout):: zgam(klon)
     real, INTENT(IN):: zthe(klon), zpic(klon), zval(klon)
 
-    REAL, INTENT(IN):: t(klon, klev) ! temperature (K)
-    real, INTENT(IN):: u(klon, klev), v(klon, klev) ! vitesse horizontale (m/s)
+    REAL, INTENT(IN):: t_seri(klon, klev) ! temperature (K)
+
+    real, INTENT(IN):: u_seri(klon, klev), v_seri(klon, klev)
+    ! vitesse horizontale (m/s)
+
     REAL, intent(out):: pulow(klon), pvlow(klon), pustr(klon), pvstr(klon)
     REAL, intent(out):: d_t(klon, klev) ! increment de la temperature
 
@@ -67,9 +70,9 @@ contains
 
     DO k = 1, klev
        DO i = 1, klon
-          pt(i, k) = t(i, klev-k+1)
-          pu(i, k) = u(i, klev-k+1)
-          pv(i, k) = v(i, klev-k+1)
+          pt(i, k) = t_seri(i, klev-k+1)
+          pu(i, k) = u_seri(i, klev-k+1)
+          pv(i, k) = v_seri(i, klev-k+1)
           papmf(i, k) = play(i, klev-k+1)
        END DO
     END DO
