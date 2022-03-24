@@ -43,8 +43,8 @@ contains
     INTEGER i, k
     REAL zgeom(klon, klev)
     REAL pdtdt(klon, klev), pdudt(klon, klev), pdvdt(klon, klev)
-    REAL pt(klon, klev), pu(klon, klev), pv(klon, klev)
-    REAL papmf(klon, klev), papmh(klon, klev+1)
+    REAL tm1(klon, klev), um1(klon, klev), vm1(klon, klev)
+    REAL papm1(klon, klev), paphm1(klon, klev+1)
 
     !--------------------------------------------------------------------
 
@@ -58,29 +58,29 @@ contains
 
     DO k = 1, klev
        DO i = 1, klon
-          pt(i, k) = t_seri(i, klev-k+1)
-          pu(i, k) = u_seri(i, klev-k+1)
-          pv(i, k) = v_seri(i, klev-k+1)
-          papmf(i, k) = play(i, klev-k+1)
+          tm1(i, k) = t_seri(i, klev-k+1)
+          um1(i, k) = u_seri(i, klev-k+1)
+          vm1(i, k) = v_seri(i, klev-k+1)
+          papm1(i, k) = play(i, klev-k+1)
        END DO
     END DO
     DO k = 1, klev + 1
        DO i = 1, klon
-          papmh(i, k) = paprs(i, klev-k+2)
+          paphm1(i, k) = paprs(i, klev-k+2)
        END DO
     END DO
     DO i = 1, klon
-       zgeom(i, klev) = rd*pt(i, klev)*log(papmh(i, klev+1)/papmf(i, klev))
+       zgeom(i, klev) = rd*tm1(i, klev)*log(paphm1(i, klev+1)/papm1(i, klev))
     END DO
     DO k = klev - 1, 1, -1
        DO i = 1, klon
-          zgeom(i, k) = zgeom(i, k + 1) + rd * (pt(i, k) + pt(i, k + 1)) / 2. &
-               * log(papmf(i, k + 1) / papmf(i, k))
+          zgeom(i, k) = zgeom(i, k + 1) + rd * (tm1(i, k) + tm1(i, k + 1)) / 2. &
+               * log(papm1(i, k + 1) / papm1(i, k))
        END DO
     END DO
 
     ! Appeler la routine principale
-    CALL orodrag(papmh, papmf, zgeom, pt, pu, pv, zmea, zstd, zsig, zgam, &
+    CALL orodrag(paphm1, papm1, zgeom, tm1, um1, vm1, zmea, zstd, zsig, zgam, &
          zthe, zpic, zval, pdudt, pdvdt, pdtdt)
 
     ustrdr = 0.
@@ -92,9 +92,9 @@ contains
           d_v_oro(i, klev+1-k) = dtphys*pdvdt(i, k)
           d_t_oro(i, klev+1-k) = dtphys*pdtdt(i, k)
           ustrdr(i) = ustrdr(i) &
-               + pdudt(i, k)*(papmh(i, k+1)-papmh(i, k))/rg
+               + pdudt(i, k)*(paphm1(i, k+1)-paphm1(i, k))/rg
           vstrdr(i) = vstrdr(i) &
-               + pdvdt(i, k)*(papmh(i, k+1)-papmh(i, k))/rg
+               + pdvdt(i, k)*(paphm1(i, k+1)-paphm1(i, k))/rg
        END DO
     END DO
 
