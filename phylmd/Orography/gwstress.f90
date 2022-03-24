@@ -5,7 +5,7 @@ module gwstress_m
 contains
 
   SUBROUTINE gwstress(nlon, nlev, ktest, kkenvh, prho, pstab, pvph, &
-       pstd, psig, pmea, ppic, ptau, pgeom1, pdmod)
+       zstd, zsig, zmea, zpic, ptau, pgeom1, pdmod)
 
     !**** *gwstress*
 
@@ -49,10 +49,10 @@ contains
 
     REAL prho(nlon, nlev+1), pstab(nlon, nlev+1), ptau(nlon, nlev+1), &
          pvph(nlon, nlev+1), pgeom1(nlon, nlev)
-    REAL, INTENT(IN):: pstd(nlon)
+    REAL, INTENT(IN):: zstd(nlon)
 
-    REAL, INTENT(IN):: psig(nlon)
-    REAL, INTENT(IN):: pmea(nlon), ppic(nlon)
+    REAL, INTENT(IN):: zsig(nlon)
+    REAL, INTENT(IN):: zmea(nlon), zpic(nlon)
     REAL pdmod(nlon)
 
     !-----------------------------------------------------------------------
@@ -79,11 +79,11 @@ contains
              zblock = (pgeom1(jl, kkenvh(jl))+pgeom1(jl, kkenvh(jl)+1))/2./rg
           END IF
 
-          zvar = ppic(jl) - pmea(jl)
+          zvar = zpic(jl) - zmea(jl)
           zeff = amax1(0., zvar-zblock)
 
-          ptau(jl, klev+1) = prho(jl, klev+1)*gkdrag*psig(jl)*zeff**2/4./ &
-               pstd(jl)*pvph(jl, klev+1)*pdmod(jl)*sqrt(pstab(jl, klev+1))
+          ptau(jl, klev+1) = prho(jl, klev+1)*gkdrag*zsig(jl)*zeff**2/4./ &
+               zstd(jl)*pvph(jl, klev+1)*pdmod(jl)*sqrt(pstab(jl, klev+1))
 
           ! too small value of stress or low level flow include critical level
           ! or low level flow: gravity wave stress nul.
