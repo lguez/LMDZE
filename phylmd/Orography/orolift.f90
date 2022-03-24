@@ -5,7 +5,7 @@ module orolift_m
 contains
 
   SUBROUTINE orolift(nlon, nlev, ktest, ptsphy, paphm1, pgeom1, ptm1, pum1, pvm1, &
-       plat, pmea, pvaror, ppic &
+       plat, zmea, zstd, zpic &
        , pulow, pvlow, pvom, pvol, pte)
 
     !**** *OROLIFT: SIMULATE THE GEOSTROPHIC LIFT.
@@ -32,9 +32,9 @@ contains
          pvlow(nlon)
     REAL pum1(nlon, nlev), pvm1(nlon, nlev), ptm1(nlon, nlev)
     REAL, INTENT (IN) :: plat(nlon)
-    REAL pmea(nlon)
-    REAL, INTENT (IN) :: pvaror(nlon)
-    REAL ppic(nlon), pgeom1(nlon, nlev), paphm1(nlon, nlev+1)
+    REAL zmea(nlon)
+    REAL, INTENT (IN) :: zstd(nlon)
+    REAL zpic(nlon), pgeom1(nlon, nlev), paphm1(nlon, nlev+1)
 
     logical, intent(in):: ktest(nlon)
     REAL, INTENT (IN) :: ptsphy
@@ -84,7 +84,7 @@ contains
     DO jk = klev, 1, -1
        DO jl = 1, klon
           IF (ktest(jl)) THEN
-             zhcrit(jl, jk) = amax1(ppic(jl)-pmea(jl), 100.)
+             zhcrit(jl, jk) = amax1(zpic(jl)-zmea(jl), 100.)
              zhgeo = pgeom1(jl, jk)/rg
              ll1(jl, jk) = (zhgeo>zhcrit(jl, jk))
              IF (ll1(jl, jk) .NEQV. ll1(jl, jk+1)) THEN
@@ -139,9 +139,9 @@ contains
 
     DO jl = 1, klon
        IF (ktest(jl)) THEN
-          ztau(jl, klev+1) = -gklift*zrho(jl, klev+1)*2.*romega*2*pvaror(jl)*sin &
+          ztau(jl, klev+1) = -gklift*zrho(jl, klev+1)*2.*romega*2*zstd(jl)*sin &
                (zpi/180.*plat(jl))*pvlow(jl)
-          ztav(jl, klev+1) = gklift*zrho(jl, klev+1)*2.*romega*2*pvaror(jl)* &
+          ztav(jl, klev+1) = gklift*zrho(jl, klev+1)*2.*romega*2*zstd(jl)* &
                sin(zpi/180.*plat(jl))*pulow(jl)
        ELSE
           ztau(jl, klev+1) = 0.0
