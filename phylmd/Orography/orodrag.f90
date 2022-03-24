@@ -4,7 +4,7 @@ module orodrag_m
 
 contains
 
-  SUBROUTINE orodrag(paphm1, papm1, pgeom1, ptm1, pum1, pvm1, zmea, zstd, &
+  SUBROUTINE orodrag(paphm1, papm1, zgeom, ptm1, pum1, pvm1, zmea, zstd, &
        zsig, zgam, zthe, zpic, zval, pvom, pvol, pte)
 
     use conf_gcm_m, only: dtphys
@@ -62,7 +62,7 @@ contains
     REAL, INTENT(IN):: zsig(klon)
     REAL, intent(inout):: zgam(klon)
     real, INTENT(IN):: zthe(klon), zpic(klon), zval(klon)
-    real pgeom1(klon, klev), papm1(klon, klev), paphm1(klon, klev+1)
+    real zgeom(klon, klev), papm1(klon, klev), paphm1(klon, klev+1)
 
     !* 0.2 local arrays
     real pulow(klon), pvlow(klon)
@@ -96,7 +96,7 @@ contains
     !* the variance and set indicator for critical levels.
 
     CALL orosetup(klon, ktest, ikcrit, ikcrith, icrit, ikenvh, iknu, iknu2, &
-         paphm1, papm1, pum1, pvm1, ptm1, pgeom1, zrho, zri, zstab, ztau, &
+         paphm1, papm1, pum1, pvm1, ptm1, zgeom, zrho, zri, zstab, ztau, &
          zvph, zpsi, zzdep, pulow, pvlow, zthe, zgam, zmea, zpic, zval, &
          znu, zd1, zd2, zdmod)
 
@@ -105,7 +105,7 @@ contains
     !* as measure of orographic twodimensionality.
 
     CALL gwstress(klon, klev, ktest, ikenvh, zrho, zstab, zvph, zstd, &
-         zsig, zmea, zpic, ztau, pgeom1, zdmod)
+         zsig, zmea, zpic, ztau, zgeom, zdmod)
 
     !* 4. compute stress profile.
 
