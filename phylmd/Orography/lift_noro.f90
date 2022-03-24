@@ -5,7 +5,7 @@ module lift_noro_m
 contains
 
   SUBROUTINE lift_noro(paprs, pplay, zmea, zstd, zpic, t_seri, u_seri, v_seri, &
-       pulow, pvlow, pustr, pvstr, d_t, d_u, d_v)
+       pustr, pvstr, d_t, d_u, d_v)
 
     ! Author: F.Lott (LMD/CNRS) date: 1995/02/01
     ! Objet: Frottement de la montagne, interface
@@ -29,7 +29,7 @@ contains
     real, INTENT (IN):: u_seri(klon, klev), v_seri(klon, klev)
     ! u_seri-------input-R-vitesse horizontale (m / s)
     ! v_seri-------input-R-vitesse horizontale (m / s)
-    REAL, intent(out):: pulow(klon), pvlow(klon), pustr(klon), pvstr(klon)
+    REAL, intent(out):: pustr(klon), pvstr(klon)
     REAL, intent(out):: d_t(klon, klev), d_u(klon, klev), d_v(klon, klev)
     ! d_t-----output-R-increment de la temperature
     ! d_u-----output-R-increment de la vitesse u_seri
@@ -47,8 +47,6 @@ contains
     ! initialiser les variables de sortie (pour securite)
 
     DO i = 1, klon
-       pulow(i) = 0.0
-       pvlow(i) = 0.0
        pustr(i) = 0.0
        pvstr(i) = 0.0
     END DO
@@ -92,7 +90,7 @@ contains
 
     ! appeler la routine principale
     CALL orolift(klon, klev, dtphys, papmh, zgeom, pt, pu, pv, rlat, zmea, &
-         zstd, zpic, pulow, pvlow, pdudt, pdvdt, pdtdt)
+         zstd, zpic, pdudt, pdvdt, pdtdt)
 
     DO k = 1, klev
        DO i = 1, klon

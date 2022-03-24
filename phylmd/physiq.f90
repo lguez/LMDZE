@@ -167,7 +167,6 @@ contains
     REAL, save, allocatable:: rugoro(:) ! (klon)
     ! longueur de rugosite de l'OESM
 
-    REAL zulow(klon), zvlow(klon)
     REAL, save, allocatable:: agesno(:, :) ! (klon, nbsrf) ! age de la neige
     REAL, save, allocatable:: run_off_lic_0(:) ! (klon)
 
@@ -809,8 +808,7 @@ contains
 
     IF (ok_orodr) THEN
        CALL drag_noro(paprs, play, zmea, zstd, zsig, zgam, zthe, zpic, zval, &
-            t_seri, u_seri, v_seri, zulow, zvlow, zustrdr, zvstrdr, d_t_oro, &
-            d_u_oro, d_v_oro)
+            t_seri, u_seri, v_seri, zustrdr, zvstrdr, d_t_oro, d_u_oro, d_v_oro)
 
        ! Ajout des tendances :
        t_seri = t_seri + d_t_oro
@@ -820,7 +818,7 @@ contains
 
     IF (ok_orolf) THEN
        CALL lift_noro(paprs, play, zmea, zstd, zpic, t_seri, u_seri, v_seri, &
-            zulow, zvlow, zustrli, zvstrli, d_t_lif, d_u_lif, d_v_lif)
+            zustrli, zvstrli, d_t_lif, d_u_lif, d_v_lif)
 
        ! Ajout des tendances :
        t_seri = t_seri + d_t_lif

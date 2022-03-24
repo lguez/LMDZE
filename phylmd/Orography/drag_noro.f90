@@ -5,7 +5,7 @@ module drag_noro_m
 contains
 
   SUBROUTINE drag_noro(paprs, play, zmea, zstd, zsig, zgam, zthe, zpic, zval, &
-       t_seri, u_seri, v_seri, pulow, pvlow, pustr, pvstr, d_t, d_u, d_v)
+       t_seri, u_seri, v_seri, pustr, pvstr, d_t, d_u, d_v)
 
     ! From LMDZ4/libf/phylmd/orografi.F, version 1.4 2005/12/01 11:27:29
 
@@ -31,7 +31,7 @@ contains
     real, INTENT(IN):: u_seri(klon, klev), v_seri(klon, klev)
     ! vitesse horizontale (m/s)
 
-    REAL, intent(out):: pulow(klon), pvlow(klon), pustr(klon), pvstr(klon)
+    REAL, intent(out):: pustr(klon), pvstr(klon)
     REAL, intent(out):: d_t(klon, klev) ! increment de la temperature
 
     REAL, intent(out):: d_u(klon, klev), d_v(klon, klev) ! increment
@@ -49,8 +49,6 @@ contains
     ! Initialiser les variables de sortie (pour securite)
 
     DO i = 1, klon
-       pulow(i) = 0.0
-       pvlow(i) = 0.0
        pustr(i) = 0.0
        pvstr(i) = 0.0
     END DO
@@ -94,7 +92,7 @@ contains
     ! Appeler la routine principale
 
     CALL orodrag(dtphys, papmh, papmf, zgeom, pt, pu, pv, zmea, zstd, zsig, &
-         zgam, zthe, zpic, zval, pulow, pvlow, pdudt, pdvdt, pdtdt)
+         zgam, zthe, zpic, zval, pdudt, pdvdt, pdtdt)
 
     DO k = 1, klev
        DO i = 1, klon

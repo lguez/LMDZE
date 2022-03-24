@@ -6,7 +6,7 @@ contains
 
   SUBROUTINE orolift(nlon, nlev, ptsphy, paphm1, pgeom1, ptm1, pum1, pvm1, &
        plat, zmea, zstd, zpic &
-       , pulow, pvlow, pvom, pvol, pte)
+       , pvom, pvol, pte)
 
     !**** *OROLIFT: SIMULATE THE GEOSTROPHIC LIFT.
 
@@ -29,7 +29,6 @@ contains
 
     INTEGER nlon, nlev
     REAL pte(nlon, nlev), pvol(nlon, nlev), pvom(nlon, nlev)
-    real, intent(out)::pulow(nlon), pvlow(nlon)
     REAL pum1(nlon, nlev), pvm1(nlon, nlev), ptm1(nlon, nlev)
     REAL, INTENT (IN) :: plat(nlon)
     REAL, INTENT (IN):: zmea(nlon)
@@ -41,6 +40,7 @@ contains
 
     !* 0.2 LOCAL ARRAYS
 
+    real pulow(nlon), pvlow(nlon)
     logical ktest(nlon) ! points pour lesquels le sch\'ema est actif
     LOGICAL lifthigh
     INTEGER jl, jk
