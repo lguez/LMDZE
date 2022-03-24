@@ -20,9 +20,9 @@ contains
     ! paprs---input-R-pression pour chaque inter-couche (en Pa)
     REAL, INTENT (IN) :: pplay(klon, klev)
     ! pplay---input-R-pression pour le mileu de chaque couche (en Pa)
-    REAL zmea(klon)
+    REAL, INTENT (IN):: zmea(klon)
     REAL, INTENT (IN):: zstd(klon)
-    REAL zpic(klon)
+    REAL, INTENT (IN):: zpic(klon)
 
     REAL, INTENT (IN):: t(klon, klev)
     ! t-------input-R-temperature (K)

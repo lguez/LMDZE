@@ -32,9 +32,10 @@ contains
          pvlow(nlon)
     REAL pum1(nlon, nlev), pvm1(nlon, nlev), ptm1(nlon, nlev)
     REAL, INTENT (IN) :: plat(nlon)
-    REAL zmea(nlon)
+    REAL, INTENT (IN):: zmea(nlon)
     REAL, INTENT (IN) :: zstd(nlon)
-    REAL zpic(nlon), pgeom1(nlon, nlev), paphm1(nlon, nlev+1)
+    REAL, INTENT (IN):: zpic(nlon)
+    real pgeom1(nlon, nlev), paphm1(nlon, nlev+1)
 
     logical, intent(in):: ktest(nlon)
     REAL, INTENT (IN) :: ptsphy
