@@ -4,7 +4,7 @@ module lift_noro_m
 
 contains
 
-  SUBROUTINE lift_noro(paprs, pplay, pmea, pstd, ppic, t, u, v, pulow, pvlow, &
+  SUBROUTINE lift_noro(paprs, pplay, zmea, zstd, zpic, t, u, v, pulow, pvlow, &
        pustr, pvstr, d_t, d_u, d_v, ktest)
 
     ! Author: F.Lott (LMD/CNRS) date: 1995/02/01
@@ -20,9 +20,9 @@ contains
     ! paprs---input-R-pression pour chaque inter-couche (en Pa)
     REAL, INTENT (IN) :: pplay(klon, klev)
     ! pplay---input-R-pression pour le mileu de chaque couche (en Pa)
-    REAL pmea(klon)
-    REAL, INTENT (IN):: pstd(klon)
-    REAL ppic(klon)
+    REAL zmea(klon)
+    REAL, INTENT (IN):: zstd(klon)
+    REAL zpic(klon)
 
     REAL, INTENT (IN):: t(klon, klev)
     ! t-------input-R-temperature (K)
@@ -96,7 +96,7 @@ contains
     ! appeler la routine principale
 
     CALL orolift(klon, klev, ktest, dtphys, papmh, zgeom, pt, pu, pv, rlat, &
-         pmea, pstd, ppic, pulow, pvlow, pdudt, pdvdt, pdtdt)
+         zmea, zstd, zpic, pulow, pvlow, pdudt, pdvdt, pdtdt)
 
     DO k = 1, klev
        DO i = 1, klon
