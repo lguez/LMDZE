@@ -5,8 +5,7 @@ module orodrag_m
 contains
 
   SUBROUTINE orodrag(ktest, ptsphy, paphm1, papm1, pgeom1, ptm1, pum1, pvm1, &
-       pmea, pstd, psig, pgamma, ptheta, ppic, pval, pulow, pvlow, pvom, pvol, &
-       pte)
+    zmea, zstd, zsig, zgam, zthe, zpic, zval, pulow, pvlow, pvom, pvol, pte)
 
     USE dimphy, only: klon, klev
     use gwstress_m, only: gwstress
@@ -58,10 +57,10 @@ contains
     REAL pte(klon, klev), pvol(klon, klev), pvom(klon, klev), pulow(klon), &
          pvlow(klon)
     REAL, INTENT(IN):: pum1(klon, klev), pvm1(klon, klev), ptm1(klon, klev), &
-         pmea(klon)
-    REAL, INTENT(IN):: pstd(klon)
-    REAL, INTENT(IN):: psig(klon)
-    REAL pgamma(klon), ptheta(klon), ppic(klon), pval(klon), &
+         zmea(klon)
+    REAL, INTENT(IN):: zstd(klon)
+    REAL, INTENT(IN):: zsig(klon)
+    REAL zgam(klon), zthe(klon), zpic(klon), zval(klon), &
          pgeom1(klon, klev), papm1(klon, klev), paphm1(klon, klev+1)
 
     logical, intent(in):: ktest(klon)
@@ -97,20 +96,20 @@ contains
 
     CALL orosetup(klon, ktest, ikcrit, ikcrith, icrit, ikenvh, iknu, iknu2, &
          paphm1, papm1, pum1, pvm1, ptm1, pgeom1, zrho, zri, zstab, ztau, &
-         zvph, zpsi, zzdep, pulow, pvlow, ptheta, pgamma, pmea, ppic, pval, &
+         zvph, zpsi, zzdep, pulow, pvlow, zthe, zgam, zmea, zpic, zval, &
          znu, zd1, zd2, zdmod)
 
     !* 3. compute low level stresses using subcritical and
     !* supercritical forms.computes anisotropy coefficient
     !* as measure of orographic twodimensionality.
 
-    CALL gwstress(klon, klev, ktest, ikenvh, zrho, zstab, zvph, pstd, &
-         psig, pmea, ppic, ztau, pgeom1, zdmod)
+    CALL gwstress(klon, klev, ktest, ikenvh, zrho, zstab, zvph, zstd, &
+         zsig, zmea, zpic, ztau, pgeom1, zdmod)
 
     !* 4. compute stress profile.
 
     CALL gwprofil(klon, klev, ktest, ikcrith, icrit, paphm1, zrho, zstab, &
-         zvph, zri, ztau, zdmod, psig, pstd)
+         zvph, zri, ztau, zdmod, zsig, zstd)
 
     !* 5. compute tendencies.
 
@@ -149,13 +148,13 @@ contains
              ! fin du controle des overshoots
 
              IF (jk>=ikenvh(ji)) THEN
-                zb = 1.0 - 0.18*pgamma(ji) - 0.04*pgamma(ji)**2
-                zc = 0.48*pgamma(ji) + 0.3*pgamma(ji)**2
-                zconb = 2.*ztmst*gkwake*psig(ji)/(4.*pstd(ji))
+                zb = 1.0 - 0.18*zgam(ji) - 0.04*zgam(ji)**2
+                zc = 0.48*zgam(ji) + 0.3*zgam(ji)**2
+                zconb = 2.*ztmst*gkwake*zsig(ji)/(4.*zstd(ji))
                 zabsv = sqrt(pum1(ji, jk)**2+pvm1(ji, jk)**2)/2.
                 zzd1 = zb*cos(zpsi(ji, jk))**2 + zc*sin(zpsi(ji, jk))**2
-                ratio = (cos(zpsi(ji, jk))**2+pgamma(ji)*sin(zpsi(ji, &
-                     jk))**2)/(pgamma(ji)*cos(zpsi(ji, jk))**2+sin(zpsi(ji, jk))**2)
+                ratio = (cos(zpsi(ji, jk))**2+zgam(ji)*sin(zpsi(ji, &
+                     jk))**2)/(zgam(ji)*cos(zpsi(ji, jk))**2+sin(zpsi(ji, jk))**2)
                 zbet = max(0., 2.-1./ratio)*zconb*zzdep(ji, jk)*zzd1*zabsv
 
                 ! simplement oppose au vent

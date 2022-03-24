@@ -6,7 +6,7 @@ contains
 
   SUBROUTINE orosetup(nlon, ktest, kkcrit, kkcrith, kcrit, kkenvh, kknu, &
        kknu2, paphm1, papm1, pum1, pvm1, ptm1, pgeom1, prho, pri, pstab, ptau, &
-       pvph, ppsi, pzdep, pulow, pvlow, ptheta, pgamma, pmea, ppic, pval, pnu, &
+       pvph, ppsi, pzdep, pulow, pvlow, zthe, zgam, zmea, zpic, zval, pnu, &
        pd1, pd2, pdmod)
 
     ! See ECMWF research department documentation of the I.F.S.
@@ -31,8 +31,8 @@ contains
     real prho(nlon, klev + 1), pri(nlon, klev + 1), pstab(nlon, klev + 1), &
          ptau(nlon, klev + 1), pvph(nlon, klev + 1), ppsi(nlon, klev + 1), &
          pzdep(nlon, klev)
-    REAL pulow(nlon), pvlow(nlon), ptheta(nlon), pgamma(nlon)
-    REAL, intent(in):: pmea(nlon), ppic(nlon), pval(nlon)
+    REAL pulow(nlon), pvlow(nlon), zthe(nlon), zgam(nlon)
+    REAL, intent(in):: zmea(nlon), zpic(nlon), zval(nlon)
     real pnu(nlon), pd1(nlon), pd2(nlon), pdmod(nlon)
 
     ! Local:
@@ -70,7 +70,7 @@ contains
        kknu2(jl) = klev
        kknub(jl) = klev
        kknul(jl) = klev
-       pgamma(jl) = max(pgamma(jl), gtsec)
+       zgam(jl) = max(zgam(jl), gtsec)
        ll1(jl, klev + 1) = .FALSE.
     end DO
 
@@ -90,7 +90,7 @@ contains
           IF (lo) THEN
              kkcrit(jl) = jk
           END IF
-          zhcrit(jl, jk) = ppic(jl)
+          zhcrit(jl, jk) = zpic(jl)
           zhgeo = pgeom1(jl, jk) / rg
           ll1(jl, jk) = (zhgeo>zhcrit(jl, jk))
           IF (ll1(jl, jk) .NEQV. ll1(jl, jk + 1)) THEN
@@ -101,7 +101,7 @@ contains
     end DO
     DO jk = klev, ilevh, - 1
        DO jl = 1, klon
-          zhcrit(jl, jk) = ppic(jl) - pval(jl)
+          zhcrit(jl, jk) = zpic(jl) - zval(jl)
           zhgeo = pgeom1(jl, jk) / rg
           ll1(jl, jk) = (zhgeo>zhcrit(jl, jk))
           IF (ll1(jl, jk) .NEQV. ll1(jl, jk + 1)) THEN
@@ -112,7 +112,7 @@ contains
     end DO
     DO jk = klev, ilevh, - 1
        DO jl = 1, klon
-          zhcrit(jl, jk) = amax1(ppic(jl) - pmea(jl), pmea(jl) - pval(jl))
+          zhcrit(jl, jk) = amax1(zpic(jl) - zmea(jl), zmea(jl) - zval(jl))
           zhgeo = pgeom1(jl, jk) / rg
           ll1(jl, jk) = (zhgeo>zhcrit(jl, jk))
           IF (ll1(jl, jk) .NEQV. ll1(jl, jk + 1)) THEN
@@ -194,9 +194,9 @@ contains
           zu = pulow(jl)
        END IF
        zphi = atan(pvlow(jl) / zu)
-       ppsi(jl, klev + 1) = ptheta(jl) * pi / 180. - zphi
-       zb(jl) = 1. - 0.18 * pgamma(jl) - 0.04 * pgamma(jl)**2
-       zc(jl) = 0.48 * pgamma(jl) + 0.3 * pgamma(jl)**2
+       ppsi(jl, klev + 1) = zthe(jl) * pi / 180. - zphi
+       zb(jl) = 1. - 0.18 * zgam(jl) - 0.04 * zgam(jl)**2
+       zc(jl) = 0.48 * zgam(jl) + 0.3 * zgam(jl)**2
        pd1(jl) = zb(jl) - (zb(jl) - zc(jl)) * (sin(ppsi(jl, klev + 1))**2)
        pd2(jl) = (zb(jl) - zc(jl)) * sin(ppsi(jl, klev + 1)) &
             * cos(ppsi(jl, klev + 1))
@@ -356,7 +356,7 @@ contains
                 zu = pum1(jl, jk)
              END IF
              zphi = atan(pvm1(jl, jk) / zu)
-             ppsi(jl, jk) = ptheta(jl) * pi / 180. - zphi
+             ppsi(jl, jk) = zthe(jl) * pi / 180. - zphi
           END IF
        end DO
     end DO
