@@ -5,7 +5,7 @@ module drag_noro_m
 contains
 
   SUBROUTINE drag_noro(paprs, play, zmea, zstd, zsig, zgam, zthe, zpic, zval, &
-       t_seri, u_seri, v_seri, pustr, pvstr, d_t, d_u, d_v)
+       t_seri, u_seri, v_seri, ustrdr, vstrdr, d_t_oro, d_u_oro, d_v_oro)
 
     ! From LMDZ4/libf/phylmd/orografi.F, version 1.4 2005/12/01 11:27:29
 
@@ -31,10 +31,10 @@ contains
     real, INTENT(IN):: u_seri(klon, klev), v_seri(klon, klev)
     ! vitesse horizontale (m/s)
 
-    REAL, intent(out):: pustr(klon), pvstr(klon)
-    REAL, intent(out):: d_t(klon, klev) ! increment de la temperature
+    REAL, intent(out):: ustrdr(klon), vstrdr(klon)
+    REAL, intent(out):: d_t_oro(klon, klev) ! increment de la temperature
 
-    REAL, intent(out):: d_u(klon, klev), d_v(klon, klev) ! increment
+    REAL, intent(out):: d_u_oro(klon, klev), d_v_oro(klon, klev) ! increment
     ! de la vitesse
 
     ! Local:
@@ -49,14 +49,14 @@ contains
     ! Initialiser les variables de sortie (pour securite)
 
     DO i = 1, klon
-       pustr(i) = 0.0
-       pvstr(i) = 0.0
+       ustrdr(i) = 0.0
+       vstrdr(i) = 0.0
     END DO
     DO k = 1, klev
        DO i = 1, klon
-          d_t(i, k) = 0.0
-          d_u(i, k) = 0.0
-          d_v(i, k) = 0.0
+          d_t_oro(i, k) = 0.0
+          d_u_oro(i, k) = 0.0
+          d_v_oro(i, k) = 0.0
           pdudt(i, k) = 0.0
           pdvdt(i, k) = 0.0
           pdtdt(i, k) = 0.0
@@ -96,12 +96,12 @@ contains
 
     DO k = 1, klev
        DO i = 1, klon
-          d_u(i, klev+1-k) = dtphys*pdudt(i, k)
-          d_v(i, klev+1-k) = dtphys*pdvdt(i, k)
-          d_t(i, klev+1-k) = dtphys*pdtdt(i, k)
-          pustr(i) = pustr(i) &
+          d_u_oro(i, klev+1-k) = dtphys*pdudt(i, k)
+          d_v_oro(i, klev+1-k) = dtphys*pdvdt(i, k)
+          d_t_oro(i, klev+1-k) = dtphys*pdtdt(i, k)
+          ustrdr(i) = ustrdr(i) &
                + pdudt(i, k)*(papmh(i, k+1)-papmh(i, k))/rg
-          pvstr(i) = pvstr(i) &
+          vstrdr(i) = vstrdr(i) &
                + pdvdt(i, k)*(papmh(i, k+1)-papmh(i, k))/rg
        END DO
     END DO
