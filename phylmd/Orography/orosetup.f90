@@ -9,7 +9,7 @@ contains
        pvph, ppsi, pzdep, pulow, pvlow, zthe, zgam, zmea, zpic, zval, pnu, &
        pd1, pd2, pdmod)
 
-    ! See ECMWF research department documentation of the I.F.S.
+    ! See ECMWF research department documentation of the IFS.
     ! Modifications F. Lott for the new gravity wave drag scheme,
     ! november 1993.
 
@@ -75,7 +75,7 @@ contains
        ll1(jl, klev + 1) = .FALSE.
     end DO
 
-    ! Ajouter une initialisation (L. Li, le 23fev99):
+    ! Ajouter une initialisation (L. Li, le 23 fév 1999):
 
     DO jk = klev, ilevh, - 1
        DO jl = 1, klon
@@ -282,11 +282,8 @@ contains
 
     DO jk = 2, klev - 1
        DO jl = 1, klon
-
           IF (ktest(jl)) THEN
-
              IF (jk>=kknub(jl)) THEN
-
                 znum(jl) = pnu(jl)
                 zwind = (pulow(jl) * pum1(jl, jk) + pvlow(jl) * pvm1(jl, jk)) &
                      / max(sqrt(pulow(jl)**2 + pvlow(jl)**2), gvsec)
@@ -300,11 +297,8 @@ contains
                      / zrhom) / 2.) / zwind
                 IF ((znum(jl)<=gfrcrit) .AND. (pnu(jl)>gfrcrit) .AND. (kkenvh(&
                      jl) == klev)) kkenvh(jl) = jk
-
              END IF
-
           END IF
-
        end DO
     end do
 
@@ -318,9 +312,7 @@ contains
 
     DO jk = klev - 1, 2, - 1
        DO jl = 1, klon
-
           IF (ktest(jl)) THEN
-
              znum(jl) = znup(jl)
              zwind = (pulow(jl) * pum1(jl, jk) + pvlow(jl) * pvm1(jl, jk)) / &
                   max(sqrt(pulow(jl)**2 + pvlow(jl)**2), gvsec)
@@ -334,9 +326,7 @@ contains
                   / zrhom) / 2.) / zwind
              IF ((znum(jl)<=pi / 2.) .AND. (znup(jl)>pi / 2.) .AND. (kkcrith(&
                   jl) == klev)) kkcrith(jl) = jk
-
           END IF
-
        end DO
     end DO
 

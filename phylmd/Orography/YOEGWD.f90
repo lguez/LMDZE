@@ -5,7 +5,7 @@ module yoegwd
 
   implicit none
 
-  integer NKTOPG, NSTRA
+  integer, protected:: NKTOPG, NSTRA
   real, parameter:: GFRCRIT = 1., GKWAKE = 0.5, GRCRIT = 0.01, GVCRIT = 0.
   real, parameter:: GKDRAG = 0.2, GKLIFT = 0.5, GRAHILO = 1., GSIGCR = 0.8
 

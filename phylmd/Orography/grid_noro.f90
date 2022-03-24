@@ -54,15 +54,15 @@ contains
     ! Correlations of US Navy orography gradients:
 
     real, intent(out):: zmea(:, :) ! (iim + 1, jjm + 1) smoothed mean orography
-    real, intent(out):: zstd(:, :) ! (iim + 1, jjm + 1) Standard deviation
-    REAL, intent(out):: zsig(:, :) ! (iim + 1, jjm + 1) Slope
-    real, intent(out):: zgam(:, :) ! (iim + 1, jjm + 1) Anisotropy
+    real, intent(out):: zstd(:, :) ! (iim + 1, jjm + 1) standard deviation
+    REAL, intent(out):: zsig(:, :) ! (iim + 1, jjm + 1) slope
+    real, intent(out):: zgam(:, :) ! (iim + 1, jjm + 1) anisotropy
 
     real, intent(out):: zthe(:, :) ! (iim + 1, jjm + 1)
-    ! Orientation of the small axis
+    ! orientation of the small axis (direction of maximum variance)
 
-    REAL, intent(out):: zpic(:, :) ! (iim + 1, jjm + 1) Maximum altitude
-    real, intent(out):: zval(:, :) ! (iim + 1, jjm + 1) Minimum altitude
+    REAL, intent(out):: zpic(:, :) ! (iim + 1, jjm + 1) maximum altitude
+    real, intent(out):: zval(:, :) ! (iim + 1, jjm + 1) minimum altitude
 
     ! Local:
 
