@@ -4,8 +4,8 @@ module orolift_m
 
 contains
 
-  SUBROUTINE orolift(ptsphy, paphm1, pgeom1, ptm1, pum1, pvm1, plat, zmea, &
-       zstd, zpic, pvom, pvol, pte)
+  SUBROUTINE orolift(paphm1, pgeom1, ptm1, pum1, pvm1, plat, zmea, zstd, zpic, &
+       pvom, pvol, pte)
 
     !**** *OROLIFT: SIMULATE THE GEOSTROPHIC LIFT.
 
@@ -19,6 +19,7 @@ contains
 
     ! F.LOTT LMD 22/11/95
 
+    use conf_gcm_m, only: dtphys
     USE dimphy, only: klon, klev
     USE suphec_m, only: rd, rg, romega
     USE yoegwd, only: gklift, gvsec, nktopg
@@ -32,8 +33,6 @@ contains
     REAL, INTENT (IN) :: zstd(klon)
     REAL, INTENT (IN):: zpic(klon)
     real pgeom1(klon, klev), paphm1(klon, klev+1)
-
-    REAL, INTENT (IN) :: ptsphy
 
     !* 0.2 LOCAL ARRAYS
 
@@ -58,7 +57,7 @@ contains
     lifthigh = .FALSE.
 
     zcons1 = 1./rd
-    ztmst = ptsphy
+    ztmst = dtphys
     zpi = acos(-1.)
 
     DO jl = 1, klon
