@@ -4,7 +4,7 @@ module orolift_m
 
 contains
 
-  SUBROUTINE orolift(nlon, nlev, ktest, ptsphy, paphm1, pgeom1, ptm1, pum1, pvm1, &
+  SUBROUTINE orolift(nlon, nlev, ptsphy, paphm1, pgeom1, ptm1, pum1, pvm1, &
        plat, zmea, zstd, zpic &
        , pulow, pvlow, pvom, pvol, pte)
 
@@ -37,11 +37,11 @@ contains
     REAL, INTENT (IN):: zpic(nlon)
     real pgeom1(nlon, nlev), paphm1(nlon, nlev+1)
 
-    logical, intent(in):: ktest(nlon)
     REAL, INTENT (IN) :: ptsphy
 
     !* 0.2 LOCAL ARRAYS
 
+    logical ktest(nlon) ! points pour lesquels le sch\'ema est actif
     LOGICAL lifthigh
     INTEGER jl, jk
     REAL zcons1, ztmst, zpi, zhgeo
@@ -57,6 +57,7 @@ contains
 
     !* 1.1 INITIALIZATIONS
 
+    ktest = zpic - zmea > 100.
     lifthigh = .FALSE.
 
     IF (nlon/=klon .OR. nlev/=klev) STOP

@@ -5,7 +5,7 @@ module lift_noro_m
 contains
 
   SUBROUTINE lift_noro(paprs, pplay, zmea, zstd, zpic, t, u, v, pulow, pvlow, &
-       pustr, pvstr, d_t, d_u, d_v, ktest)
+       pustr, pvstr, d_t, d_u, d_v)
 
     ! Author: F.Lott (LMD/CNRS) date: 1995/02/01
     ! Objet: Frottement de la montagne, interface
@@ -34,9 +34,6 @@ contains
     ! d_t-----output-R-increment de la temperature
     ! d_u-----output-R-increment de la vitesse u
     ! d_v-----output-R-increment de la vitesse v
-
-    logical, INTENT(IN):: ktest(klon)
-    ! points pour lesquels le sch\'ema est actif
 
     ! Local:
     INTEGER i, k
@@ -94,9 +91,8 @@ contains
     END DO
 
     ! appeler la routine principale
-
-    CALL orolift(klon, klev, ktest, dtphys, papmh, zgeom, pt, pu, pv, rlat, &
-         zmea, zstd, zpic, pulow, pvlow, pdudt, pdvdt, pdtdt)
+    CALL orolift(klon, klev, dtphys, papmh, zgeom, pt, pu, pv, rlat, zmea, &
+         zstd, zpic, pulow, pvlow, pdudt, pdvdt, pdtdt)
 
     DO k = 1, klev
        DO i = 1, klon

@@ -5,7 +5,7 @@ module drag_noro_m
 contains
 
   SUBROUTINE drag_noro(paprs, play, zmea, zstd, zsig, zgam, zthe, zpic, zval, &
-       t, u, v, pulow, pvlow, pustr, pvstr, d_t, d_u, d_v, ktest)
+       t, u, v, pulow, pvlow, pustr, pvstr, d_t, d_u, d_v)
 
     ! From LMDZ4/libf/phylmd/orografi.F, version 1.4 2005/12/01 11:27:29
 
@@ -33,9 +33,6 @@ contains
 
     REAL, intent(out):: d_u(klon, klev), d_v(klon, klev) ! increment
     ! de la vitesse
-
-    logical, intent(in):: ktest(klon)
-    ! points pour lesquels le sch\'ema est actif
 
     ! Local:
     INTEGER i, k
@@ -93,8 +90,8 @@ contains
 
     ! Appeler la routine principale
 
-    CALL orodrag(ktest, dtphys, papmh, papmf, zgeom, pt, pu, pv, zmea, zstd, &
-         zsig, zgam, zthe, zpic, zval, pulow, pvlow, pdudt, pdvdt, pdtdt)
+    CALL orodrag(dtphys, papmh, papmf, zgeom, pt, pu, pv, zmea, zstd, zsig, &
+         zgam, zthe, zpic, zval, pulow, pvlow, pdudt, pdvdt, pdtdt)
 
     DO k = 1, klev
        DO i = 1, klon

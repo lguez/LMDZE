@@ -4,8 +4,8 @@ module orodrag_m
 
 contains
 
-  SUBROUTINE orodrag(ktest, ptsphy, paphm1, papm1, pgeom1, ptm1, pum1, pvm1, &
-    zmea, zstd, zsig, zgam, zthe, zpic, zval, pulow, pvlow, pvom, pvol, pte)
+  SUBROUTINE orodrag(ptsphy, paphm1, papm1, pgeom1, ptm1, pum1, pvm1, zmea, &
+       zstd, zsig, zgam, zthe, zpic, zval, pulow, pvlow, pvom, pvol, pte)
 
     USE dimphy, only: klon, klev
     use gwstress_m, only: gwstress
@@ -64,10 +64,9 @@ contains
     real, INTENT(IN):: zthe(klon), zpic(klon), zval(klon)
     real pgeom1(klon, klev), papm1(klon, klev), paphm1(klon, klev+1)
 
-    logical, intent(in):: ktest(klon)
-
     !* 0.2 local arrays
 
+    logical ktest(klon) ! points pour lesquels le sch\'ema est actif
     INTEGER icrit(klon), ikcrith(klon), ikenvh(klon), &
          iknu(klon), iknu2(klon), ikcrit(klon)
 
@@ -82,6 +81,8 @@ contains
     !------------------------------------------------------------------
 
     !* 1. initialization
+
+    ktest = zpic - zmea > 100. .AND. zstd > 10.
 
     !* 1.1 computational constants
 

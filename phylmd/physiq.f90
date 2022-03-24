@@ -810,7 +810,7 @@ contains
     IF (ok_orodr) THEN
        CALL drag_noro(paprs, play, zmea, zstd, zsig, zgam, zthe, zpic, zval, &
             t_seri, u_seri, v_seri, zulow, zvlow, zustrdr, zvstrdr, d_t_oro, &
-            d_u_oro, d_v_oro, ktest = zpic - zmea > 100. .AND. zstd > 10.)
+            d_u_oro, d_v_oro)
 
        ! Ajout des tendances :
        t_seri = t_seri + d_t_oro
@@ -820,8 +820,7 @@ contains
 
     IF (ok_orolf) THEN
        CALL lift_noro(paprs, play, zmea, zstd, zpic, t_seri, u_seri, v_seri, &
-            zulow, zvlow, zustrli, zvstrli, d_t_lif, d_u_lif, d_v_lif, &
-            ktest = zpic - zmea > 100.)
+            zulow, zvlow, zustrli, zvstrli, d_t_lif, d_u_lif, d_v_lif)
 
        ! Ajout des tendances :
        t_seri = t_seri + d_t_lif
