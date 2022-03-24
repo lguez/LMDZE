@@ -60,8 +60,9 @@ contains
          zmea(klon)
     REAL, INTENT(IN):: zstd(klon)
     REAL, INTENT(IN):: zsig(klon)
-    REAL zgam(klon), zthe(klon), zpic(klon), zval(klon), &
-         pgeom1(klon, klev), papm1(klon, klev), paphm1(klon, klev+1)
+    REAL, intent(inout):: zgam(klon)
+    real, INTENT(IN):: zthe(klon), zpic(klon), zval(klon)
+    real pgeom1(klon, klev), papm1(klon, klev), paphm1(klon, klev+1)
 
     logical, intent(in):: ktest(klon)
 

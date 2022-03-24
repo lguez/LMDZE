@@ -23,8 +23,8 @@ contains
                                            ! chaque couche (en Pa)
     REAL, INTENT(IN):: zmea(klon)
     REAL, INTENT(IN):: zstd(klon), zsig(klon)
-    REAL zgam(klon), zthe(klon)
-    REAL zpic(klon), zval(klon)
+    REAL, INTENT(INout):: zgam(klon)
+    real, INTENT(IN):: zthe(klon), zpic(klon), zval(klon)
 
     REAL, INTENT(IN):: t(klon, klev) ! temperature (K)
     real, INTENT(IN):: u(klon, klev), v(klon, klev) ! vitesse horizontale (m/s)
