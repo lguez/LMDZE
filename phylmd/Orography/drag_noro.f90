@@ -17,10 +17,12 @@ contains
     use orodrag_m, only: orodrag
     USE suphec_m, ONLY: rd, rg
 
-    REAL, INTENT(IN):: paprs(klon, klev+1) ! pression pour chaque
-                                             ! inter-couche (en Pa)
-    REAL, INTENT(IN):: play(klon, klev) ! pression pour le mileu de
-                                           ! chaque couche (en Pa)
+    REAL, INTENT(IN):: paprs(klon, klev+1)
+    ! pression pour chaque inter-couche (en Pa)
+
+    REAL, INTENT(IN):: play(klon, klev)
+    ! pression pour le mileu de chaque couche (en Pa)
+
     REAL, INTENT(IN):: zmea(klon)
     REAL, INTENT(IN):: zstd(klon), zsig(klon)
     REAL, INTENT(INout):: zgam(klon)
@@ -34,8 +36,8 @@ contains
     REAL, intent(out):: ustrdr(klon), vstrdr(klon)
     REAL, intent(out):: d_t_oro(klon, klev) ! increment de la temperature
 
-    REAL, intent(out):: d_u_oro(klon, klev), d_v_oro(klon, klev) ! increment
-    ! de la vitesse
+    REAL, intent(out):: d_u_oro(klon, klev), d_v_oro(klon, klev)
+    ! incr\'ement de la vitesse
 
     ! Local:
     INTEGER i, k
@@ -47,18 +49,9 @@ contains
     !--------------------------------------------------------------------
 
     ! Initialiser les variables de sortie (pour securite)
-
-    DO i = 1, klon
-       ustrdr(i) = 0.0
-       vstrdr(i) = 0.0
-    END DO
-    DO k = 1, klev
-       DO i = 1, klon
-          pdudt(i, k) = 0.0
-          pdvdt(i, k) = 0.0
-          pdtdt(i, k) = 0.0
-       END DO
-    END DO
+    pdudt = 0.
+    pdvdt = 0.
+    pdtdt = 0.
 
     ! Preparer les variables d'entree (attention: l'ordre des niveaux
     ! verticaux augmente du haut vers le bas)
@@ -87,9 +80,11 @@ contains
     END DO
 
     ! Appeler la routine principale
-
     CALL orodrag(dtphys, papmh, papmf, zgeom, pt, pu, pv, zmea, zstd, zsig, &
          zgam, zthe, zpic, zval, pdudt, pdvdt, pdtdt)
+
+    ustrdr = 0.
+    vstrdr = 0.
 
     DO k = 1, klev
        DO i = 1, klon

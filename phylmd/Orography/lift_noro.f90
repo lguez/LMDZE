@@ -15,26 +15,27 @@ contains
     use orolift_m, only: orolift
     use phyetat0_m, only: rlat
     USE suphec_m, only: rd, rg
-    
+
     REAL, INTENT (IN) :: paprs(klon, klev + 1)
-    ! paprs---input-R-pression pour chaque inter-couche (en Pa)
+    ! pression pour chaque inter-couche (en Pa)
+
     REAL, INTENT (IN) :: play(klon, klev)
-    ! play---input-R-pression pour le mileu de chaque couche (en Pa)
+    ! pression pour le mileu de chaque couche (en Pa)
+
     REAL, INTENT (IN):: zmea(klon)
     REAL, INTENT (IN):: zstd(klon)
     REAL, INTENT (IN):: zpic(klon)
 
-    REAL, INTENT (IN):: t_seri(klon, klev)
-    ! t_seri-------input-R-temperature (K)
+    REAL, INTENT (IN):: t_seri(klon, klev) ! temperature (K)
+
     real, INTENT (IN):: u_seri(klon, klev), v_seri(klon, klev)
-    ! u_seri-------input-R-vitesse horizontale (m / s)
-    ! v_seri-------input-R-vitesse horizontale (m / s)
+    ! vitesse horizontale (m / s)
+
     REAL, intent(out):: ustrli(klon), vstrli(klon)
-    REAL, intent(out):: d_t_lif(klon, klev)
-    ! d_t_lif-----output-R-increment de la temperature
+    REAL, intent(out):: d_t_lif(klon, klev) ! incr\'ement de la temperature
+
     REAL, intent(out):: d_u_lif(klon, klev), d_v_lif(klon, klev)
-    ! d_u_lif-----output-R-increment de la vitesse u_seri
-    ! d_v_lif-----output-R-increment de la vitesse v_seri
+    ! incr\'ement de la vitesse u_seri, v_seri
 
     ! Local:
     INTEGER i, k
@@ -46,18 +47,9 @@ contains
     !----------------------------------------------------------------------
 
     ! initialiser les variables de sortie (pour securite)
-
-    DO i = 1, klon
-       ustrli(i) = 0.0
-       vstrli(i) = 0.0
-    END DO
-    DO k = 1, klev
-       DO i = 1, klon
-          pdudt(i, k) = 0.0
-          pdvdt(i, k) = 0.0
-          pdtdt(i, k) = 0.0
-       END DO
-    END DO
+    pdudt = 0.
+    pdvdt = 0.
+    pdtdt = 0.
 
     ! preparer les variables d'entree (attention: l'ordre des niveaux
     ! verticaux augmente du haut vers le bas)
@@ -89,6 +81,9 @@ contains
     ! appeler la routine principale
     CALL orolift(klon, klev, dtphys, papmh, zgeom, pt, pu, pv, rlat, zmea, &
          zstd, zpic, pdudt, pdvdt, pdtdt)
+
+    ustrli = 0.
+    vstrli = 0.
 
     DO k = 1, klev
        DO i = 1, klon
