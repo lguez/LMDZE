@@ -7,6 +7,18 @@ contains
   SUBROUTINE orodrag(paphm1, papm1, zgeom, ptm1, pum1, pvm1, zmea, zstd, &
        zsig, zgam, zthe, zpic, zval, pvom, pvol, pte)
 
+    ! Gravity wave parametrization. This procedure computes the
+    ! physical tendencies of the prognostic variables u, v and t due
+    ! to vertical transport by subgridscale gravity waves excited by
+    ! orography.
+
+    ! The routine takes its input from the long-term storage: u, v, t
+    ! and p at t-1.
+
+    ! Authors:
+    ! M. Miller and B. Ritter ECMWF 15/06/86
+    ! F. Lott + M. Miller ECMWF 22/11/94
+
     use conf_gcm_m, only: dtphys
     USE dimphy, only: klon, klev
     use gwprofil_m, only: gwprofil
@@ -15,61 +27,23 @@ contains
     USE suphec_m, only: rg
     USE yoegwd, only: gkwake
 
-    !**** *gwdrag* - does the gravity wave parametrization.
+    real paphm1(klon, klev+1), papm1(klon, klev), zgeom(klon, klev)
+    REAL, INTENT(IN):: ptm1(klon, klev), pum1(klon, klev), pvm1(klon, klev)
+    REAL, INTENT(IN):: zmea(klon), zstd(klon)
+    REAL, INTENT(IN):: zsig(klon)
+    REAL, intent(inout):: zgam(klon)
+    real, INTENT(IN):: zthe(klon), zpic(klon), zval(klon)
+    REAL pvom(klon, klev), pvol(klon, klev), pte(klon, klev)
 
-    ! purpose.
-
-    ! this routine computes the physical tendencies of the
-    ! prognostic variables u, v and t due to vertical transports by
-    ! subgridscale orographically excited gravity waves
-
-    !** interface.
-
-    ! called from *callpar*.
-
-    ! the routine takes its input from the long-term storage:
-    ! u, v, t and p at t-1.
-
-    ! explicit arguments :
-
-    ! ==== inputs ===
-    ! ==== outputs ===
-
-    ! implicit arguments : none
-
-    ! implicit logical (l)
-
-    ! method.
-
-    ! reference.
-
-    ! author.
-
-    ! m.miller + b.ritter e.c.m.w.f. 15/06/86.
-
-    ! f.lott + m. miller e.c.m.w.f. 22/11/94
-
-    !* 0.1 arguments
-
+    ! Local:
     INTEGER jl, ilevp1, jk, ji
     REAL zdelp, ztemp, zforc, ztend
     REAL rover, zb, zc, zconb, zabsv
     REAL zzd1, ratio, zbet, zust, zvst, zdis
-    REAL pte(klon, klev), pvol(klon, klev), pvom(klon, klev)
-    REAL, INTENT(IN):: pum1(klon, klev), pvm1(klon, klev), ptm1(klon, klev), &
-         zmea(klon)
-    REAL, INTENT(IN):: zstd(klon)
-    REAL, INTENT(IN):: zsig(klon)
-    REAL, intent(inout):: zgam(klon)
-    real, INTENT(IN):: zthe(klon), zpic(klon), zval(klon)
-    real zgeom(klon, klev), papm1(klon, klev), paphm1(klon, klev+1)
-
-    !* 0.2 local arrays
     real pulow(klon), pvlow(klon)
     logical ktest(klon) ! points pour lesquels le sch\'ema est actif
-    INTEGER icrit(klon), ikcrith(klon), ikenvh(klon), &
-         iknu(klon), iknu2(klon), ikcrit(klon)
-
+    INTEGER icrit(klon), ikcrith(klon), ikenvh(klon), iknu(klon), iknu2(klon)
+    integer ikcrit(klon)
     REAL ztau(klon, klev+1), zstab(klon, klev+1), &
          zvph(klon, klev+1), zrho(klon, klev+1), zri(klon, klev+1), &
          zpsi(klon, klev+1), zzdep(klon, klev)
@@ -126,7 +100,6 @@ contains
     ilevp1 = klev + 1
 
     DO jk = 1, klev
-
        ! Modif vectorisation 02/04/2004
        DO ji = 1, klon
           IF (ktest(ji)) THEN
@@ -137,7 +110,6 @@ contains
              zdvdt(ji) = (pvlow(ji)*zd1(ji)+pulow(ji)*zd2(ji))*ztemp/zdmod(ji)
 
              ! controle des overshoots:
-
              zforc = sqrt(zdudt(ji)**2+zdvdt(ji)**2) + 1.E-12
              ztend = sqrt(pum1(ji, jk)**2+pvm1(ji, jk)**2)/ztmst + 1.E-12
              rover = 0.25
@@ -145,8 +117,6 @@ contains
                 zdudt(ji) = rover*ztend/zforc*zdudt(ji)
                 zdvdt(ji) = rover*ztend/zforc*zdvdt(ji)
              END IF
-
-             ! fin du controle des overshoots
 
              IF (jk>=ikenvh(ji)) THEN
                 zb = 1.0 - 0.18*zgam(ji) - 0.04*zgam(ji)**2
@@ -159,7 +129,6 @@ contains
                 zbet = max(0., 2.-1./ratio)*zconb*zzdep(ji, jk)*zzd1*zabsv
 
                 ! simplement oppose au vent
-
                 zdudt(ji) = -pum1(ji, jk)/ztmst
                 zdvdt(ji) = -pvm1(ji, jk)/ztmst
 
@@ -176,9 +145,7 @@ contains
              zvidis(ji) = zvidis(ji) + zdis*zdelp
 
              ! ENCORE UN TRUC POUR EVITER LES EXPLOSIONS
-
              pte(ji, jk) = 0.0
-
           END IF
        end DO
 

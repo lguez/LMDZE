@@ -17,7 +17,7 @@ contains
     use orodrag_m, only: orodrag
     USE suphec_m, ONLY: rd, rg
 
-    REAL, INTENT(IN):: paprs(klon, klev+1)
+    REAL, INTENT(IN):: paprs(klon, klev + 1)
     ! pression pour chaque inter-couche (en Pa)
 
     REAL, INTENT(IN):: play(klon, klev)
@@ -31,7 +31,7 @@ contains
     REAL, INTENT(IN):: t_seri(klon, klev) ! temperature (K)
 
     real, INTENT(IN):: u_seri(klon, klev), v_seri(klon, klev)
-    ! vitesse horizontale (m/s)
+    ! vitesse horizontale (m / s)
 
     REAL, intent(out):: ustrdr(klon), vstrdr(klon)
     REAL, intent(out):: d_t_oro(klon, klev) ! increment de la temperature
@@ -41,10 +41,10 @@ contains
 
     ! Local:
     INTEGER i, k
-    REAL zgeom(klon, klev)
+    REAL zgeom(klon, klev) ! variation of geopotential
     REAL pdtdt(klon, klev), pdudt(klon, klev), pdvdt(klon, klev)
     REAL tm1(klon, klev), um1(klon, klev), vm1(klon, klev)
-    REAL papm1(klon, klev), paphm1(klon, klev+1)
+    REAL papm1(klon, klev), paphm1(klon, klev + 1)
 
     !--------------------------------------------------------------------
 
@@ -53,29 +53,33 @@ contains
     pdvdt = 0.
     pdtdt = 0.
 
-    ! Preparer les variables d'entree (attention: l'ordre des niveaux
+    ! Preparer les variables d'entree (attention: l'indice des niveaux
     ! verticaux augmente du haut vers le bas)
 
     DO k = 1, klev
        DO i = 1, klon
-          tm1(i, k) = t_seri(i, klev-k+1)
-          um1(i, k) = u_seri(i, klev-k+1)
-          vm1(i, k) = v_seri(i, klev-k+1)
-          papm1(i, k) = play(i, klev-k+1)
+          tm1(i, k) = t_seri(i, klev - k + 1)
+          um1(i, k) = u_seri(i, klev - k + 1)
+          vm1(i, k) = v_seri(i, klev - k + 1)
+          papm1(i, k) = play(i, klev - k + 1)
        END DO
     END DO
+
     DO k = 1, klev + 1
        DO i = 1, klon
-          paphm1(i, k) = paprs(i, klev-k+2)
+          paphm1(i, k) = paprs(i, klev - k + 2)
        END DO
     END DO
+
     DO i = 1, klon
-       zgeom(i, klev) = rd*tm1(i, klev)*log(paphm1(i, klev+1)/papm1(i, klev))
+       zgeom(i, klev) = rd * tm1(i, klev) &
+            * log(paphm1(i, klev + 1) / papm1(i, klev))
     END DO
-    DO k = klev - 1, 1, -1
+
+    DO k = klev - 1, 1, - 1
        DO i = 1, klon
-          zgeom(i, k) = zgeom(i, k + 1) + rd * (tm1(i, k) + tm1(i, k + 1)) / 2. &
-               * log(papm1(i, k + 1) / papm1(i, k))
+          zgeom(i, k) = zgeom(i, k + 1) + rd * (tm1(i, k) + tm1(i, k + 1)) &
+               / 2. * log(papm1(i, k + 1) / papm1(i, k))
        END DO
     END DO
 
@@ -88,13 +92,13 @@ contains
 
     DO k = 1, klev
        DO i = 1, klon
-          d_u_oro(i, klev+1-k) = dtphys*pdudt(i, k)
-          d_v_oro(i, klev+1-k) = dtphys*pdvdt(i, k)
-          d_t_oro(i, klev+1-k) = dtphys*pdtdt(i, k)
+          d_u_oro(i, klev + 1 - k) = dtphys * pdudt(i, k)
+          d_v_oro(i, klev + 1 - k) = dtphys * pdvdt(i, k)
+          d_t_oro(i, klev + 1 - k) = dtphys * pdtdt(i, k)
           ustrdr(i) = ustrdr(i) &
-               + pdudt(i, k)*(paphm1(i, k+1)-paphm1(i, k))/rg
+               + pdudt(i, k) * (paphm1(i, k + 1) - paphm1(i, k)) / rg
           vstrdr(i) = vstrdr(i) &
-               + pdvdt(i, k)*(paphm1(i, k+1)-paphm1(i, k))/rg
+               + pdvdt(i, k) * (paphm1(i, k + 1) - paphm1(i, k)) / rg
        END DO
     END DO
 
