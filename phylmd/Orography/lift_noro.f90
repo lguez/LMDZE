@@ -4,8 +4,8 @@ module lift_noro_m
 
 contains
 
-  SUBROUTINE lift_noro(paprs, pplay, zmea, zstd, zpic, t_seri, u_seri, v_seri, &
-       pustr, pvstr, d_t, d_u, d_v)
+  SUBROUTINE lift_noro(paprs, play, zmea, zstd, zpic, t_seri, u_seri, v_seri, &
+       ustrli, vstrli, d_t_lif, d_u_lif, d_v_lif)
 
     ! Author: F.Lott (LMD/CNRS) date: 1995/02/01
     ! Objet: Frottement de la montagne, interface
@@ -18,8 +18,8 @@ contains
     
     REAL, INTENT (IN) :: paprs(klon, klev + 1)
     ! paprs---input-R-pression pour chaque inter-couche (en Pa)
-    REAL, INTENT (IN) :: pplay(klon, klev)
-    ! pplay---input-R-pression pour le mileu de chaque couche (en Pa)
+    REAL, INTENT (IN) :: play(klon, klev)
+    ! play---input-R-pression pour le mileu de chaque couche (en Pa)
     REAL, INTENT (IN):: zmea(klon)
     REAL, INTENT (IN):: zstd(klon)
     REAL, INTENT (IN):: zpic(klon)
@@ -29,11 +29,12 @@ contains
     real, INTENT (IN):: u_seri(klon, klev), v_seri(klon, klev)
     ! u_seri-------input-R-vitesse horizontale (m / s)
     ! v_seri-------input-R-vitesse horizontale (m / s)
-    REAL, intent(out):: pustr(klon), pvstr(klon)
-    REAL, intent(out):: d_t(klon, klev), d_u(klon, klev), d_v(klon, klev)
-    ! d_t-----output-R-increment de la temperature
-    ! d_u-----output-R-increment de la vitesse u_seri
-    ! d_v-----output-R-increment de la vitesse v_seri
+    REAL, intent(out):: ustrli(klon), vstrli(klon)
+    REAL, intent(out):: d_t_lif(klon, klev)
+    ! d_t_lif-----output-R-increment de la temperature
+    REAL, intent(out):: d_u_lif(klon, klev), d_v_lif(klon, klev)
+    ! d_u_lif-----output-R-increment de la vitesse u_seri
+    ! d_v_lif-----output-R-increment de la vitesse v_seri
 
     ! Local:
     INTEGER i, k
@@ -47,14 +48,14 @@ contains
     ! initialiser les variables de sortie (pour securite)
 
     DO i = 1, klon
-       pustr(i) = 0.0
-       pvstr(i) = 0.0
+       ustrli(i) = 0.0
+       vstrli(i) = 0.0
     END DO
     DO k = 1, klev
        DO i = 1, klon
-          d_t(i, k) = 0.0
-          d_u(i, k) = 0.0
-          d_v(i, k) = 0.0
+          d_t_lif(i, k) = 0.0
+          d_u_lif(i, k) = 0.0
+          d_v_lif(i, k) = 0.0
           pdudt(i, k) = 0.0
           pdvdt(i, k) = 0.0
           pdtdt(i, k) = 0.0
@@ -69,7 +70,7 @@ contains
           pt(i, k) = t_seri(i, klev-k + 1)
           pu(i, k) = u_seri(i, klev-k + 1)
           pv(i, k) = v_seri(i, klev-k + 1)
-          papmf(i, k) = pplay(i, klev-k + 1)
+          papmf(i, k) = play(i, klev-k + 1)
        END DO
     END DO
     DO k = 1, klev + 1
@@ -94,12 +95,12 @@ contains
 
     DO k = 1, klev
        DO i = 1, klon
-          d_u(i, klev + 1-k) = dtphys * pdudt(i, k)
-          d_v(i, klev + 1-k) = dtphys * pdvdt(i, k)
-          d_t(i, klev + 1-k) = dtphys * pdtdt(i, k)
-          pustr(i) = pustr(i) &
+          d_u_lif(i, klev + 1-k) = dtphys * pdudt(i, k)
+          d_v_lif(i, klev + 1-k) = dtphys * pdvdt(i, k)
+          d_t_lif(i, klev + 1-k) = dtphys * pdtdt(i, k)
+          ustrli(i) = ustrli(i) &
                + pdudt(i, k) * (papmh(i, k + 1)-papmh(i, k)) / rg
-          pvstr(i) = pvstr(i) &
+          vstrli(i) = vstrli(i) &
                + pdvdt(i, k) * (papmh(i, k + 1)-papmh(i, k)) / rg
        END DO
     END DO
