@@ -381,11 +381,6 @@ contains
 
     ! Aerosol effects:
 
-    REAL, save, allocatable:: topswad(:), solswad(:) ! (klon)
-    ! aerosol direct effect
-
-    LOGICAL:: ok_ade = .false. ! apply aerosol direct effect
-
     REAL:: bl95_b0 = 2., bl95_b1 = 0.2
     ! Parameters in equation (D) of Boucher and Lohmann (1995, Tellus
     ! B). They link cloud droplet number concentration to aerosol mass
@@ -396,7 +391,7 @@ contains
 
     real, save, allocatable:: airephy(:) ! (klon)
     namelist /physiq_nml/ fact_cldcon, facttemps, iflag_cldcon, ratqsbas, &
-         ratqshaut, ok_ade, bl95_b0, bl95_b1
+         ratqshaut, bl95_b0, bl95_b1
 
     !----------------------------------------------------------------
 
@@ -446,7 +441,6 @@ contains
        allocate(ratqs(klon, llm))
        allocate(t2m(klon, nbsrf), q2m(klon, nbsrf))
        allocate(u10m_srf(klon, nbsrf), v10m_srf(klon, nbsrf))
-       allocate(topswad(klon), solswad(klon))
        allocate(airephy(klon))
        allocate(heat(klon, llm))
        allocate(heat0(klon, llm))
@@ -792,8 +786,7 @@ contains
        CALL radlwsw(dist, mu0, fract, paprs, play, tsol, albsol, t_seri, &
             q_seri, wo, cldfra, cldemi, cldtau, heat, heat0, cool, cool0, &
             radsol, topsw, toplw, solsw, sollw, sollwdown, topsw0, toplw0, &
-            solsw0, sollw0, lwdn0, lwdn, lwup0, lwup, swdn0, swdn, swup0, &
-            swup, ok_ade, topswad, solswad)
+            solsw0, sollw0, lwdn0, lwdn, lwup0, lwup, swdn0, swdn, swup0, swup)
     ENDIF
 
     ! Ajouter la tendance des rayonnements (tous les pas)

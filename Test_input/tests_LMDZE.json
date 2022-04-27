@@ -508,25 +508,6 @@
 	"stdin_filename" : "$test_input_dir/Namelists/gcm_nml_no_phys.txt"
     },
     {
-	"stdin_filename" : "$test_input_dir/Namelists/gcm_nml_ade.txt",
-	"command" : "$build_dir/dyn3d/gcm",
-	"symlink" : [
-            "$tests_old_dir/CE0L_control/limit.nc",
-            "$tests_old_dir/CE0L_control/coefoz_LMDZ.nc",
-            [
-		"$tests_old_dir/CE0L_control/restart.nc",
-		"start.nc"
-            ],
-            [
-		"$tests_old_dir/CE0L_control/restartphy.nc",
-		"startphy.nc"
-            ],
-            "$test_input_dir/Namelists/traceur.def",
-            "$test_input_dir/iodef.xml"
-	],
-	"title" : "GCM_ade"
-    },
-    {
 	"stdin_filename" : "$test_input_dir/Namelists/gcm_nml_pbl_6.txt",
 	"command" : "$build_dir/dyn3d/gcm",
 	"symlink" : [

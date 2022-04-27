@@ -7,8 +7,7 @@ contains
   SUBROUTINE radlwsw(dist, mu0, fract, paprs, play, tsol, albedo, t_seri, &
        q_seri, wo, cldfra, cldemi, cldtau, heat, heat0, cool, cool0, radsol, &
        topsw, toplw, solsw, sollw, sollwdown, topsw0, toplw0, solsw0, sollw0, &
-       lwdn0, lwdn, lwup0, lwup, swdn0, swdn, swup0, swup, ok_ade, topswad, &
-       solswad)
+       lwdn0, lwdn, lwup0, lwup, swdn0, swdn, swup0, swup)
 
     ! From LMDZ4/libf/phylmd/radlwsw.F, version 1.4, 2005/06/06 13:16:33
     ! Author: Z. X. Li (LMD/CNRS)
@@ -16,10 +15,6 @@ contains
 
     ! Objet : interface entre le modèle et les rayonnements solaire et
     ! infrarouge
-
-    ! ATTENTION: swad has to be interpreted in the following manner:
-    ! not ok_ade zero
-    ! ok_ade aerosol direct forcing is F_{AD} = topsw - topswad
 
     USE clesphys, ONLY: solaire
     USE dimphy, ONLY: klev, klon
@@ -87,12 +82,6 @@ contains
     REAL, intent(out):: lwup0(:, :), lwup(:, :) ! (klon, klev + 1)
     REAL, intent(out):: swdn0(:, :), swdn(:, :) ! (klon, klev + 1)
     REAL, intent(out):: swup0(:, :), swup(:, :) ! (klon, klev + 1)
-
-    logical, intent(in):: ok_ade ! apply the Aerosol Direct Effect
-
-    real, intent(out):: topswad(:), solswad(:) ! (klon)
-    ! aerosol direct forcing at TOA and surface
-    ! rayonnement solaire net absorb\'e
 
     ! Local:
 
@@ -217,7 +206,7 @@ contains
     CALL SW(PSCT, zrmu0, zfract, PPMB, PDP, PPSOL, PALBD, PALBP, PTAVE, &
          PWV, PQS, POZON, PCLDSW, PTAU, POMEGA, PCG, zheat, zheat0, ztopsw, &
          zsolsw, ztopsw0, zsolsw0, ZFSUP, ZFSDN, ZFSUP0, ZFSDN0, ztopswad, &
-         zsolswad, ok_ade)
+         zsolswad)
 
     DO i = 1, klon
        radsol(i) = zsolsw(i) + zsollw(i)
@@ -246,18 +235,6 @@ contains
           swup(i, k) = ZFSUP(i, k)
        ENDDO
     ENDDO
-    ! transform the aerosol forcings, if they have to be calculated
-    IF (ok_ade) THEN
-       DO i = 1, klon
-          topswad(i) = ztopswad(i)
-          solswad(i) = zsolswad(i)
-       ENDDO
-    ELSE
-       DO i = 1, klon
-          topswad(i) = 0.
-          solswad(i) = 0.
-       ENDDO
-    ENDIF
 
     DO k = 1, klev
        DO i = 1, klon

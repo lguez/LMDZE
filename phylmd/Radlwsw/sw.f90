@@ -7,7 +7,7 @@ contains
   SUBROUTINE SW(PSCT, PRMU0, PFRAC, PPMB, PDP, PPSOL, PALBD, PALBP, PTAVE, &
        PWV, PQS, POZON, PCLDSW, PTAU, POMEGA, PCG, PHEAT, PHEAT0, PTOPSW, &
        PSOLSW, PTOPSW0, PSOLSW0, ZFSUP, ZFSDN, ZFSUP0, ZFSDN0, PTOPSWAD, &
-       PSOLSWAD, ok_ade)
+       PSOLSWAD)
 
     ! Purpose.
     ! This routine computes the shortwave radiation fluxes in two
@@ -72,8 +72,6 @@ contains
 
     DOUBLE PRECISION, intent(out):: PSOLSWAD(KLON)
     ! (diagnosed aerosol forcing)SHORTWAVE FLUX AT SURFACE(+AEROSOL DIR)
-
-    logical, intent(in):: ok_ade ! use aerosol forcings or not?
 
     ! Local:
 
@@ -165,26 +163,6 @@ contains
              ZFSDN(JL, JK) = (ZFDOWN(JL, JK) + ZFD(JL, JK)) * ZFACT(JL)
           ENDDO
        ENDDO
-
-       IF (ok_ade) THEN
-          ! cloudy-sky + aerosol dir OB
-          CALL SWU(PSCT, PCLDSW, PPMB, PPSOL, PRMU0, PFRAC, PTAVE, PWV, ZAKI, &
-               ZCLD, ZCLEAR, ZDSIG, ZFACT, ZRMU, ZSEC, ZUD)
-          INU = 1
-          CALL SW1S(INU, PALBD, PALBP, PCG, ZCLD, ZCLEAR, ZDSIG, POMEGA, ZOZ, &
-               ZRMU, ZSEC, PTAU, ZUD, ZFD, ZFU)
-          INU = 2
-          CALL SW2S(INU, ZAKI, PALBD, PALBP, PCG, ZCLD, ZCLEAR, ZDSIG, POMEGA, &
-               ZOZ, ZRMU, ZSEC, PTAU, ZUD, PWV, PQS, ZFDOWN, ZFUP)
-          DO JK = 1, LLM+1
-             DO JL = 1, KLON
-                ZFSUPAD(JL, JK) = ZFSUP(JL, JK)
-                ZFSDNAD(JL, JK) = ZFSDN(JL, JK)
-                ZFSUP(JL, JK) = (ZFUP(JL, JK) + ZFU(JL, JK)) * ZFACT(JL)
-                ZFSDN(JL, JK) = (ZFDOWN(JL, JK) + ZFD(JL, JK)) * ZFACT(JL)
-             ENDDO
-          ENDDO
-       ENDIF
 
        itapsw = 0
     ENDIF
