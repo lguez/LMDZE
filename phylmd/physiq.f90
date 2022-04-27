@@ -379,19 +379,12 @@ contains
     REAL zt2m(klon), zq2m(klon) ! température, humidité 2 m moyenne sur 1 maille
     REAL u10m(klon), v10m(klon) ! vent \`a 10 m moyenn\' sur les sous-surfaces
 
-    ! Aerosol effects:
-
-    REAL:: bl95_b0 = 2., bl95_b1 = 0.2
-    ! Parameters in equation (D) of Boucher and Lohmann (1995, Tellus
-    ! B). They link cloud droplet number concentration to aerosol mass
-    ! concentration.
-
     real zmasse(klon, llm)
     ! column-density of mass of air in a cell, in kg m-2
 
     real, save, allocatable:: airephy(:) ! (klon)
     namelist /physiq_nml/ fact_cldcon, facttemps, iflag_cldcon, ratqsbas, &
-         ratqshaut, bl95_b0, bl95_b1
+         ratqshaut
 
     !----------------------------------------------------------------
 
