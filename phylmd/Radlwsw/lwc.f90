@@ -2,7 +2,6 @@ SUBROUTINE lwc(klim, pcldld, pcldlu, pemis, pfluc, pbint, pbsuin, pcts, &
     pcntrb, pflux)
   USE dimensions
   USE dimphy
-  use conf_phys_m, only: kdlon
   USE radepsi
   USE radopt
   IMPLICIT NONE
@@ -15,16 +14,16 @@ SUBROUTINE lwc(klim, pcldld, pcldlu, pemis, pfluc, pbint, pbsuin, pcts, &
   ! EXPLICIT ARGUMENTS :
   ! --------------------
   ! ==== INPUTS ===
-  ! PBINT  : (KDLON,0:LLM)     ; HALF LEVEL PLANCK FUNCTION
-  ! PBSUIN : (KDLON)             ; SURFACE PLANCK FUNCTION
-  ! PCLDLD : (KDLON,LLM)       ; DOWNWARD EFFECTIVE CLOUD FRACTION
-  ! PCLDLU : (KDLON,LLM)       ; UPWARD EFFECTIVE CLOUD FRACTION
-  ! PCNTRB : (KDLON,LLM+1,LLM+1); CLEAR-SKY ENERGY EXCHANGE
-  ! PCTS   : (KDLON,LLM)       ; CLEAR-SKY LAYER COOLING-TO-SPACE
-  ! PEMIS  : (KDLON)             ; SURFACE EMISSIVITY
+  ! PBINT  : (KLON,0:LLM)     ; HALF LEVEL PLANCK FUNCTION
+  ! PBSUIN : (KLON)             ; SURFACE PLANCK FUNCTION
+  ! PCLDLD : (KLON,LLM)       ; DOWNWARD EFFECTIVE CLOUD FRACTION
+  ! PCLDLU : (KLON,LLM)       ; UPWARD EFFECTIVE CLOUD FRACTION
+  ! PCNTRB : (KLON,LLM+1,LLM+1); CLEAR-SKY ENERGY EXCHANGE
+  ! PCTS   : (KLON,LLM)       ; CLEAR-SKY LAYER COOLING-TO-SPACE
+  ! PEMIS  : (KLON)             ; SURFACE EMISSIVITY
   ! PFLUC
   ! ==== OUTPUTS ===
-  ! PFLUX(KDLON,2,LLM)         ; RADIATIVE FLUXES :
+  ! PFLUX(KLON,2,LLM)         ; RADIATIVE FLUXES :
   ! 1  ==>  UPWARD   FLUX TOTAL
   ! 2  ==>  DOWNWARD FLUX TOTAL
 
@@ -53,25 +52,25 @@ SUBROUTINE lwc(klim, pcldld, pcldlu, pemis, pfluc, pbint, pbsuin, pcts, &
   ! -----------------------------------------------------------------------
   ! * ARGUMENTS:
   INTEGER klim
-  DOUBLE PRECISION pfluc(kdlon, 2, llm+1) ! CLEAR-SKY RADIATIVE FLUXES
-  DOUBLE PRECISION pbint(kdlon, llm+1) ! HALF LEVEL PLANCK FUNCTION
-  DOUBLE PRECISION pbsuin(kdlon) ! SURFACE PLANCK FUNCTION
-  DOUBLE PRECISION pcntrb(kdlon, llm+1, llm+1) !CLEAR-SKY ENERGY EXCHANGE
-  DOUBLE PRECISION pcts(kdlon, llm) ! CLEAR-SKY LAYER COOLING-TO-SPACE
+  DOUBLE PRECISION pfluc(klon, 2, llm+1) ! CLEAR-SKY RADIATIVE FLUXES
+  DOUBLE PRECISION pbint(klon, llm+1) ! HALF LEVEL PLANCK FUNCTION
+  DOUBLE PRECISION pbsuin(klon) ! SURFACE PLANCK FUNCTION
+  DOUBLE PRECISION pcntrb(klon, llm+1, llm+1) !CLEAR-SKY ENERGY EXCHANGE
+  DOUBLE PRECISION pcts(klon, llm) ! CLEAR-SKY LAYER COOLING-TO-SPACE
 
-  DOUBLE PRECISION pcldld(kdlon, llm)
-  DOUBLE PRECISION pcldlu(kdlon, llm)
-  DOUBLE PRECISION pemis(kdlon)
+  DOUBLE PRECISION pcldld(klon, llm)
+  DOUBLE PRECISION pcldlu(klon, llm)
+  DOUBLE PRECISION pemis(klon)
 
-  DOUBLE PRECISION pflux(kdlon, 2, llm+1)
+  DOUBLE PRECISION pflux(klon, 2, llm+1)
   ! -----------------------------------------------------------------------
   ! * LOCAL VARIABLES:
-  INTEGER imx(kdlon), imxp(kdlon)
+  INTEGER imx(klon), imxp(klon)
 
-  DOUBLE PRECISION zclear(kdlon), zcloud(kdlon)
-  DOUBLE PRECISION zdnf(kdlon, llm+1, llm+1), zfd(kdlon), zfn10(kdlon), &
-    zfu(kdlon), zupf(kdlon, llm+1, llm+1)
-  DOUBLE PRECISION zclm(kdlon, llm+1, llm+1)
+  DOUBLE PRECISION zclear(klon), zcloud(klon)
+  DOUBLE PRECISION zdnf(klon, llm+1, llm+1), zfd(klon), zfn10(klon), &
+    zfu(klon), zupf(klon, llm+1, llm+1)
+  DOUBLE PRECISION zclm(klon, llm+1, llm+1)
 
   INTEGER jk, jl, imaxc, imx1, imx2, jkj, jkp1, jkm1
   INTEGER jk1, jk2, jkc, jkcp1, jcloud
@@ -84,7 +83,7 @@ SUBROUTINE lwc(klim, pcldld, pcldlu, pemis, pfluc, pbint, pbsuin, pcts, &
 
   imaxc = 0
 
-  DO jl = 1, kdlon
+  DO jl = 1, klon
     imx(jl) = 0
     imxp(jl) = 0
     zcloud(jl) = 0.
@@ -95,7 +94,7 @@ SUBROUTINE lwc(klim, pcldld, pcldlu, pemis, pfluc, pbint, pbsuin, pcts, &
 
 
   DO jk = 1, llm
-    DO jl = 1, kdlon
+    DO jl = 1, klon
       imx1 = imx(jl)
       imx2 = jk
       IF (pcldlu(jl,jk)>zepsc) THEN
@@ -112,7 +111,7 @@ SUBROUTINE lwc(klim, pcldld, pcldlu, pemis, pfluc, pbint, pbsuin, pcts, &
   ! GM*******
 
   DO jk = 1, llm + 1
-    DO jl = 1, kdlon
+    DO jl = 1, klon
       pflux(jl, 1, jk) = pfluc(jl, 1, jk)
       pflux(jl, 2, jk) = pfluc(jl, 2, jk)
     END DO
@@ -130,7 +129,7 @@ SUBROUTINE lwc(klim, pcldld, pcldlu, pemis, pfluc, pbint, pbsuin, pcts, &
 
     DO jk1 = 1, llm + 1
       DO jk2 = 1, llm + 1
-        DO jl = 1, kdlon
+        DO jl = 1, klon
           zupf(jl, jk2, jk1) = pfluc(jl, 1, jk1)
           zdnf(jl, jk2, jk1) = pfluc(jl, 2, jk1)
         END DO
@@ -151,18 +150,18 @@ SUBROUTINE lwc(klim, pcldld, pcldlu, pemis, pfluc, pbint, pbsuin, pcts, &
 
       DO jk = jkcp1, llm + 1
         jkm1 = jk - 1
-        DO jl = 1, kdlon
+        DO jl = 1, klon
           zfu(jl) = 0.
         END DO
         IF (jk>jkcp1) THEN
           DO jkj = jkcp1, jkm1
-            DO jl = 1, kdlon
+            DO jl = 1, klon
               zfu(jl) = zfu(jl) + pcntrb(jl, jk, jkj)
             END DO
           END DO
         END IF
 
-        DO jl = 1, kdlon
+        DO jl = 1, klon
           zupf(jl, jkcp1, jk) = pbint(jl, jk) - zfu(jl)
         END DO
       END DO
@@ -173,18 +172,18 @@ SUBROUTINE lwc(klim, pcldld, pcldlu, pemis, pfluc, pbint, pbsuin, pcts, &
 
       DO jk = 1, jcloud
         jkp1 = jk + 1
-        DO jl = 1, kdlon
+        DO jl = 1, klon
           zfd(jl) = 0.
         END DO
 
         IF (jk<jcloud) THEN
           DO jkj = jkp1, jcloud
-            DO jl = 1, kdlon
+            DO jl = 1, klon
               zfd(jl) = zfd(jl) + pcntrb(jl, jk, jkj)
             END DO
           END DO
         END IF
-        DO jl = 1, kdlon
+        DO jl = 1, klon
           zdnf(jl, jkcp1, jk) = -pbint(jl, jk) - zfd(jl)
         END DO
       END DO
@@ -201,7 +200,7 @@ SUBROUTINE lwc(klim, pcldld, pcldlu, pemis, pfluc, pbint, pbsuin, pcts, &
 
     DO jk1 = 1, llm + 1
       DO jk2 = 1, llm + 1
-        DO jl = 1, kdlon
+        DO jl = 1, klon
           zclm(jl, jk1, jk2) = 0.
         END DO
       END DO
@@ -214,12 +213,12 @@ SUBROUTINE lwc(klim, pcldld, pcldlu, pemis, pfluc, pbint, pbsuin, pcts, &
 
 
     DO jk1 = 2, llm + 1
-      DO jl = 1, kdlon
+      DO jl = 1, klon
         zclear(jl) = 1.
         zcloud(jl) = 0.
       END DO
       DO jk = jk1 - 1, 1, -1
-        DO jl = 1, kdlon
+        DO jl = 1, klon
           IF (novlp==1) THEN
             ! * maximum-random
             zclear(jl) = zclear(jl)*(1.0-max(pcldlu(jl, &
@@ -246,12 +245,12 @@ SUBROUTINE lwc(klim, pcldld, pcldlu, pemis, pfluc, pbint, pbsuin, pcts, &
 
 
     DO jk1 = 1, llm
-      DO jl = 1, kdlon
+      DO jl = 1, klon
         zclear(jl) = 1.
         zcloud(jl) = 0.
       END DO
       DO jk = jk1, llm
-        DO jl = 1, kdlon
+        DO jl = 1, klon
           IF (novlp==1) THEN
             ! * maximum-random
             zclear(jl) = zclear(jl)*(1.0-max(pcldld(jl, &
@@ -282,7 +281,7 @@ SUBROUTINE lwc(klim, pcldld, pcldlu, pemis, pfluc, pbint, pbsuin, pcts, &
     ! ---------------
 
 
-    DO jl = 1, kdlon
+    DO jl = 1, klon
       pflux(jl, 2, llm+1) = 0.
     END DO
 
@@ -290,26 +289,26 @@ SUBROUTINE lwc(klim, pcldld, pcldlu, pemis, pfluc, pbint, pbsuin, pcts, &
 
       ! *                 CONTRIBUTION FROM CLEAR-SKY FRACTION
 
-      DO jl = 1, kdlon
+      DO jl = 1, klon
         zfd(jl) = (1.-zclm(jl,jk1,llm))*zdnf(jl, 1, jk1)
       END DO
 
       ! *                 CONTRIBUTION FROM ADJACENT CLOUD
 
-      DO jl = 1, kdlon
+      DO jl = 1, klon
         zfd(jl) = zfd(jl) + zclm(jl, jk1, jk1)*zdnf(jl, jk1+1, jk1)
       END DO
 
       ! *                 CONTRIBUTION FROM OTHER CLOUDY FRACTIONS
 
       DO jk = llm - 1, jk1, -1
-        DO jl = 1, kdlon
+        DO jl = 1, klon
           zcfrac = zclm(jl, jk1, jk+1) - zclm(jl, jk1, jk)
           zfd(jl) = zfd(jl) + zcfrac*zdnf(jl, jk+2, jk1)
         END DO
       END DO
 
-      DO jl = 1, kdlon
+      DO jl = 1, klon
         pflux(jl, 2, jk1) = zfd(jl)
       END DO
 
@@ -322,7 +321,7 @@ SUBROUTINE lwc(klim, pcldld, pcldlu, pemis, pfluc, pbint, pbsuin, pcts, &
     ! --------------------------
 
 
-    DO jl = 1, kdlon
+    DO jl = 1, klon
       pflux(jl, 1, 1) = pemis(jl)*pbsuin(jl) - (1.-pemis(jl))*pflux(jl, 2, 1)
     END DO
 
@@ -336,26 +335,26 @@ SUBROUTINE lwc(klim, pcldld, pcldlu, pemis, pfluc, pbint, pbsuin, pcts, &
 
       ! *                 CONTRIBUTION FROM CLEAR-SKY FRACTION
 
-      DO jl = 1, kdlon
+      DO jl = 1, klon
         zfu(jl) = (1.-zclm(jl,jk1,1))*zupf(jl, 1, jk1)
       END DO
 
       ! *                 CONTRIBUTION FROM ADJACENT CLOUD
 
-      DO jl = 1, kdlon
+      DO jl = 1, klon
         zfu(jl) = zfu(jl) + zclm(jl, jk1, jk1-1)*zupf(jl, jk1, jk1)
       END DO
 
       ! *                 CONTRIBUTION FROM OTHER CLOUDY FRACTIONS
 
       DO jk = 2, jk1 - 1
-        DO jl = 1, kdlon
+        DO jl = 1, klon
           zcfrac = zclm(jl, jk1, jk-1) - zclm(jl, jk1, jk)
           zfu(jl) = zfu(jl) + zcfrac*zupf(jl, jk, jk1)
         END DO
       END DO
 
-      DO jl = 1, kdlon
+      DO jl = 1, klon
         pflux(jl, 1, jk1) = zfu(jl)
       END DO
 
@@ -369,11 +368,11 @@ SUBROUTINE lwc(klim, pcldld, pcldlu, pemis, pfluc, pbint, pbsuin, pcts, &
 
 
   IF (.NOT. levoigt) THEN
-    DO jl = 1, kdlon
+    DO jl = 1, klon
       zfn10(jl) = pflux(jl, 1, klim) + pflux(jl, 2, klim)
     END DO
     DO jk = klim + 1, llm + 1
-      DO jl = 1, kdlon
+      DO jl = 1, klon
         zfn10(jl) = zfn10(jl) + pcts(jl, jk-1)
         pflux(jl, 1, jk) = zfn10(jl)
         pflux(jl, 2, jk) = 0.0

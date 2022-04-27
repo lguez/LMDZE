@@ -7,8 +7,8 @@ contains
   SUBROUTINE swr(knu, palbd, pcg, pcld, pomega, psec, ptau, pcgaz, ppizaz, &
        pray1, pray2, prefz, prj, prk, prmue, ptauaz, ptra1, ptra2)
 
-    USE conf_phys_m, ONLY: kdlon
     use dimensions, only: llm
+    use dimphy, only: klon
     USE radepsi, only: zepsec
     USE radopt, only: novlp
     use swde_m, only: swde
@@ -41,44 +41,44 @@ contains
     ! * ARGUMENTS:
 
     INTEGER knu
-    DOUBLE PRECISION palbd(kdlon, 2)
-    DOUBLE PRECISION pcg(kdlon, 2, llm)
-    DOUBLE PRECISION pcld(kdlon, llm)
-    DOUBLE PRECISION pomega(kdlon, 2, llm)
-    DOUBLE PRECISION psec(kdlon)
-    DOUBLE PRECISION ptau(kdlon, 2, llm)
+    DOUBLE PRECISION palbd(klon, 2)
+    DOUBLE PRECISION pcg(klon, 2, llm)
+    DOUBLE PRECISION pcld(klon, llm)
+    DOUBLE PRECISION pomega(klon, 2, llm)
+    DOUBLE PRECISION psec(klon)
+    DOUBLE PRECISION ptau(klon, 2, llm)
 
-    DOUBLE PRECISION pray1(kdlon, llm+1)
-    DOUBLE PRECISION pray2(kdlon, llm+1)
-    DOUBLE PRECISION prefz(kdlon, 2, llm+1)
-    DOUBLE PRECISION prj(kdlon, 6, llm+1)
-    DOUBLE PRECISION prk(kdlon, 6, llm+1)
-    DOUBLE PRECISION prmue(kdlon, llm+1)
-    DOUBLE PRECISION pcgaz(kdlon, llm)
-    DOUBLE PRECISION ppizaz(kdlon, llm)
-    DOUBLE PRECISION ptauaz(kdlon, llm)
-    DOUBLE PRECISION ptra1(kdlon, llm+1)
-    DOUBLE PRECISION ptra2(kdlon, llm+1)
+    DOUBLE PRECISION pray1(klon, llm+1)
+    DOUBLE PRECISION pray2(klon, llm+1)
+    DOUBLE PRECISION prefz(klon, 2, llm+1)
+    DOUBLE PRECISION prj(klon, 6, llm+1)
+    DOUBLE PRECISION prk(klon, 6, llm+1)
+    DOUBLE PRECISION prmue(klon, llm+1)
+    DOUBLE PRECISION pcgaz(klon, llm)
+    DOUBLE PRECISION ppizaz(klon, llm)
+    DOUBLE PRECISION ptauaz(klon, llm)
+    DOUBLE PRECISION ptra1(klon, llm+1)
+    DOUBLE PRECISION ptra2(klon, llm+1)
 
     ! * LOCAL VARIABLES:
 
-    DOUBLE PRECISION zc1i(kdlon, llm+1)
-    DOUBLE PRECISION zclear(kdlon)
-    DOUBLE PRECISION zcloud(kdlon)
-    DOUBLE PRECISION zgg(kdlon)
-    DOUBLE PRECISION zref(kdlon)
-    DOUBLE PRECISION zre1(kdlon)
-    DOUBLE PRECISION zre2(kdlon)
-    DOUBLE PRECISION zrmuz(kdlon)
-    DOUBLE PRECISION zrneb(kdlon)
-    DOUBLE PRECISION zr21(kdlon)
-    DOUBLE PRECISION zr22(kdlon)
-    DOUBLE PRECISION zss1(kdlon)
-    DOUBLE PRECISION zto1(kdlon)
-    DOUBLE PRECISION ztr(kdlon, 2, llm+1)
-    DOUBLE PRECISION ztr1(kdlon)
-    DOUBLE PRECISION ztr2(kdlon)
-    DOUBLE PRECISION zw(kdlon)
+    DOUBLE PRECISION zc1i(klon, llm+1)
+    DOUBLE PRECISION zclear(klon)
+    DOUBLE PRECISION zcloud(klon)
+    DOUBLE PRECISION zgg(klon)
+    DOUBLE PRECISION zref(klon)
+    DOUBLE PRECISION zre1(klon)
+    DOUBLE PRECISION zre2(klon)
+    DOUBLE PRECISION zrmuz(klon)
+    DOUBLE PRECISION zrneb(klon)
+    DOUBLE PRECISION zr21(klon)
+    DOUBLE PRECISION zr22(klon)
+    DOUBLE PRECISION zss1(klon)
+    DOUBLE PRECISION zto1(klon)
+    DOUBLE PRECISION ztr(klon, 2, llm+1)
+    DOUBLE PRECISION ztr1(klon)
+    DOUBLE PRECISION ztr2(klon)
+    DOUBLE PRECISION zw(klon)
 
     INTEGER jk, jl, ja, jkl, jklp1, jkm1, jaj
     DOUBLE PRECISION zfacoa, zfacoc, zcorae, zcorcd
@@ -93,7 +93,7 @@ contains
 
     DO jk = 1, llm + 1
        DO ja = 1, 6
-          DO jl = 1, kdlon
+          DO jl = 1, klon
              prj(jl, ja, jk) = 0.
              prk(jl, ja, jk) = 0.
           END DO
@@ -107,7 +107,7 @@ contains
     ! ----------------------------------------------
 
 
-    DO jl = 1, kdlon
+    DO jl = 1, klon
        zc1i(jl, llm+1) = 0.
        zclear(jl) = 1.
        zcloud(jl) = 0.
@@ -116,7 +116,7 @@ contains
     jk = 1
     jkl = llm + 1 - jk
     jklp1 = jkl + 1
-    DO jl = 1, kdlon
+    DO jl = 1, klon
        zfacoa = 1. - ppizaz(jl, jkl)*pcgaz(jl, jkl)*pcgaz(jl, jkl)
        zfacoc = 1. - pomega(jl, knu, jkl)*pcg(jl, knu, jkl)*pcg(jl, knu, jkl)
        zcorae = zfacoa*ptauaz(jl, jkl)*psec(jl)
@@ -147,7 +147,7 @@ contains
     DO jk = 2, llm
        jkl = llm + 1 - jk
        jklp1 = jkl + 1
-       DO jl = 1, kdlon
+       DO jl = 1, klon
           zfacoa = 1. - ppizaz(jl, jkl)*pcgaz(jl, jkl)*pcgaz(jl, jkl)
           zfacoc = 1. - pomega(jl, knu, jkl)*pcg(jl, knu, jkl)*pcg(jl, knu, jkl)
           zcorae = zfacoa*ptauaz(jl, jkl)*psec(jl)
@@ -182,7 +182,7 @@ contains
     ! -----------------------------------------------
 
 
-    DO jl = 1, kdlon
+    DO jl = 1, klon
        pray1(jl, llm+1) = 0.
        pray2(jl, llm+1) = 0.
        prefz(jl, 2, 1) = palbd(jl, knu)
@@ -193,7 +193,7 @@ contains
 
     DO jk = 2, llm + 1
        jkm1 = jk - 1
-       DO jl = 1, kdlon
+       DO jl = 1, klon
           zrneb(jl) = pcld(jl, jkm1)
           zre1(jl) = 0.
           ztr1(jl) = 0.
@@ -261,7 +261,7 @@ contains
 
        CALL swde(zgg, zref, zrmuz, zto1, zw, zre1, zre2, ztr1, ztr2)
 
-       DO jl = 1, kdlon
+       DO jl = 1, klon
 
           prefz(jl, 1, jk) = (1.-zrneb(jl))*(pray1(jl,jkm1)+prefz(jl,1,jkm1)* &
                ptra1(jl,jkm1)*ptra2(jl,jkm1)/(1.-pray2(jl,jkm1)*prefz(jl,1, &
@@ -277,7 +277,7 @@ contains
 
        END DO
     END DO
-    DO jl = 1, kdlon
+    DO jl = 1, klon
        zmue = (1.-zc1i(jl,1))*psec(jl) + zc1i(jl, 1)*1.66
        prmue(jl, 1) = 1./zmue
     END DO
@@ -291,7 +291,7 @@ contains
 
     IF (knu==1) THEN
        jaj = 2
-       DO jl = 1, kdlon
+       DO jl = 1, klon
           prj(jl, jaj, llm+1) = 1.
           prk(jl, jaj, llm+1) = prefz(jl, 1, llm+1)
        END DO
@@ -299,7 +299,7 @@ contains
        DO jk = 1, llm
           jkl = llm + 1 - jk
           jklp1 = jkl + 1
-          DO jl = 1, kdlon
+          DO jl = 1, klon
              zre11 = prj(jl, jaj, jklp1)*ztr(jl, 1, jkl)
              prj(jl, jaj, jkl) = zre11
              prk(jl, jaj, jkl) = zre11*prefz(jl, 1, jkl)
@@ -309,7 +309,7 @@ contains
     ELSE
 
        DO jaj = 1, 2
-          DO jl = 1, kdlon
+          DO jl = 1, klon
              prj(jl, jaj, llm+1) = 1.
              prk(jl, jaj, llm+1) = prefz(jl, jaj, llm+1)
           END DO
@@ -317,7 +317,7 @@ contains
           DO jk = 1, llm
              jkl = llm + 1 - jk
              jklp1 = jkl + 1
-             DO jl = 1, kdlon
+             DO jl = 1, klon
                 zre11 = prj(jl, jaj, jklp1)*ztr(jl, jaj, jkl)
                 prj(jl, jaj, jkl) = zre11
                 prk(jl, jaj, jkl) = zre11*prefz(jl, jaj, jkl)

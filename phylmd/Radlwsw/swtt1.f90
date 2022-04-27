@@ -1,7 +1,6 @@
 SUBROUTINE swtt1(knu, kabs, kind, pu, ptr)
   USE dimensions
   USE dimphy
-  use conf_phys_m, only: kdlon
   IMPLICIT NONE
 
   ! -----------------------------------------------------------------------
@@ -36,15 +35,15 @@ SUBROUTINE swtt1(knu, kabs, kind, pu, ptr)
   INTEGER knu ! INDEX OF THE SPECTRAL INTERVAL
   INTEGER kabs ! NUMBER OF ABSORBERS
   INTEGER kind(kabs) ! INDICES OF THE ABSORBERS
-  DOUBLE PRECISION pu(kdlon, kabs) ! ABSORBER AMOUNT
+  DOUBLE PRECISION pu(klon, kabs) ! ABSORBER AMOUNT
 
-  DOUBLE PRECISION ptr(kdlon, kabs) ! TRANSMISSION FUNCTION
+  DOUBLE PRECISION ptr(klon, kabs) ! TRANSMISSION FUNCTION
 
   ! * LOCAL VARIABLES:
 
-  DOUBLE PRECISION zr1(kdlon)
-  DOUBLE PRECISION zr2(kdlon)
-  DOUBLE PRECISION zu(kdlon)
+  DOUBLE PRECISION zr1(klon)
+  DOUBLE PRECISION zr2(klon)
+  DOUBLE PRECISION zu(klon)
   INTEGER jl, ja, i, j, ia
 
   ! * Prescribed Data:
@@ -86,7 +85,7 @@ SUBROUTINE swtt1(knu, kabs, kind, pu, ptr)
 
   DO ja = 1, kabs
     ia = kind(ja)
-    DO jl = 1, kdlon
+    DO jl = 1, klon
       zu(jl) = pu(jl, ja)
       zr1(jl) = apad(knu, ia, 1) + zu(jl)*(apad(knu,ia,2)+zu(jl)*(apad(knu, &
         ia,3)+zu(jl)*(apad(knu,ia,4)+zu(jl)*(apad(knu,ia,5)+zu(jl)*(apad(knu, &

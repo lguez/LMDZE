@@ -23,7 +23,6 @@ contains
     USE clesphys, ONLY: solaire
     USE dimphy, ONLY: klev, klon
     use lw_m, only: lw
-    use conf_phys_m, only: kdlon
     USE suphec_m, ONLY: rg
     use sw_m, only: sw
     USE yoethf_m, ONLY: rvtmp2
@@ -88,60 +87,54 @@ contains
 
     ! Local:
 
-    DOUBLE PRECISION ZFSUP(KDLON, KLEV + 1)
-    DOUBLE PRECISION ZFSDN(KDLON, KLEV + 1)
-    DOUBLE PRECISION ZFSUP0(KDLON, KLEV + 1)
-    DOUBLE PRECISION ZFSDN0(KDLON, KLEV + 1)
+    DOUBLE PRECISION ZFSUP(KLON, KLEV + 1)
+    DOUBLE PRECISION ZFSDN(KLON, KLEV + 1)
+    DOUBLE PRECISION ZFSUP0(KLON, KLEV + 1)
+    DOUBLE PRECISION ZFSDN0(KLON, KLEV + 1)
 
-    DOUBLE PRECISION ZFLUP(KDLON, KLEV + 1)
-    DOUBLE PRECISION ZFLDN(KDLON, KLEV + 1)
-    DOUBLE PRECISION ZFLUP0(KDLON, KLEV + 1)
-    DOUBLE PRECISION ZFLDN0(KDLON, KLEV + 1)
+    DOUBLE PRECISION ZFLUP(KLON, KLEV + 1)
+    DOUBLE PRECISION ZFLDN(KLON, KLEV + 1)
+    DOUBLE PRECISION ZFLUP0(KLON, KLEV + 1)
+    DOUBLE PRECISION ZFLDN0(KLON, KLEV + 1)
 
     DOUBLE PRECISION zx_alpha1, zx_alpha2
-    INTEGER k, kk, i, iof, nb_gr
+    INTEGER k, kk, i
     DOUBLE PRECISION PSCT
 
-    DOUBLE PRECISION PALBD(kdlon, 2), PALBP(kdlon, 2)
-    DOUBLE PRECISION PEMIS(kdlon), PDT0(kdlon), PVIEW(kdlon)
-    DOUBLE PRECISION PPSOL(kdlon), PDP(kdlon, klev)
-    DOUBLE PRECISION PTL(kdlon, klev + 1), PPMB(kdlon, klev + 1)
-    DOUBLE PRECISION PTAVE(kdlon, klev)
-    DOUBLE PRECISION PWV(kdlon, klev), PQS(kdlon, klev)
-    DOUBLE PRECISION POZON(kdlon, klev) ! mass fraction of ozone
-    DOUBLE PRECISION PAER(kdlon, klev, 5) ! AEROSOLS' OPTICAL THICKNESS
-    DOUBLE PRECISION PCLDLD(kdlon, klev)
-    DOUBLE PRECISION PCLDLU(kdlon, klev)
-    DOUBLE PRECISION PCLDSW(kdlon, klev)
-    DOUBLE PRECISION PTAU(kdlon, 2, klev)
-    DOUBLE PRECISION POMEGA(kdlon, 2, klev)
-    DOUBLE PRECISION PCG(kdlon, 2, klev)
+    DOUBLE PRECISION PALBD(klon, 2), PALBP(klon, 2)
+    DOUBLE PRECISION PEMIS(klon), PDT0(klon), PVIEW(klon)
+    DOUBLE PRECISION PPSOL(klon), PDP(klon, klev)
+    DOUBLE PRECISION PTL(klon, klev + 1), PPMB(klon, klev + 1)
+    DOUBLE PRECISION PTAVE(klon, klev)
+    DOUBLE PRECISION PWV(klon, klev), PQS(klon, klev)
+    DOUBLE PRECISION POZON(klon, klev) ! mass fraction of ozone
+    DOUBLE PRECISION PAER(klon, klev, 5) ! AEROSOLS' OPTICAL THICKNESS
+    DOUBLE PRECISION PCLDLD(klon, klev)
+    DOUBLE PRECISION PCLDLU(klon, klev)
+    DOUBLE PRECISION PCLDSW(klon, klev)
+    DOUBLE PRECISION PTAU(klon, 2, klev)
+    DOUBLE PRECISION POMEGA(klon, 2, klev)
+    DOUBLE PRECISION PCG(klon, 2, klev)
 
-    DOUBLE PRECISION zfract(kdlon), zrmu0(kdlon)
+    DOUBLE PRECISION zfract(klon), zrmu0(klon)
 
-    DOUBLE PRECISION zheat(kdlon, klev), zcool(kdlon, klev)
-    DOUBLE PRECISION zheat0(kdlon, klev), zcool0(kdlon, klev)
-    DOUBLE PRECISION ztopsw(kdlon), ztoplw(kdlon)
-    DOUBLE PRECISION zsolsw(kdlon), zsollw(kdlon)
-    DOUBLE PRECISION zsollwdown(kdlon)
+    DOUBLE PRECISION zheat(klon, klev), zcool(klon, klev)
+    DOUBLE PRECISION zheat0(klon, klev), zcool0(klon, klev)
+    DOUBLE PRECISION ztopsw(klon), ztoplw(klon)
+    DOUBLE PRECISION zsolsw(klon), zsollw(klon)
+    DOUBLE PRECISION zsollwdown(klon)
 
-    DOUBLE PRECISION ztopsw0(kdlon), ztoplw0(kdlon)
-    DOUBLE PRECISION zsolsw0(kdlon), zsollw0(kdlon)
+    DOUBLE PRECISION ztopsw0(klon), ztoplw0(klon)
+    DOUBLE PRECISION zsolsw0(klon), zsollw0(klon)
     DOUBLE PRECISION zznormcp
 
     ! The following quantities are needed for the aerosol radiative forcings:
-    DOUBLE PRECISION ztopswad(kdlon), zsolswad(kdlon)
+    DOUBLE PRECISION ztopswad(klon), zsolswad(klon)
     ! Aerosol direct forcing at TOA and surface
 
     real, parameter:: dobson_u = 2.1415e-05 ! Dobson unit, in kg m-2
 
     !----------------------------------------------------------------------
-
-    nb_gr = klon / kdlon
-    IF (nb_gr * kdlon /= klon) THEN
-       PRINT *, "kdlon mauvais :", klon, kdlon, nb_gr
-       stop 1
-    ENDIF
 
     heat = 0.
     cool = 0.
@@ -149,127 +142,125 @@ contains
     cool0 = 0.
     PSCT = solaire / dist**2
 
-    loop_iof: DO iof = 0, klon - kdlon, kdlon
-       DO i = 1, kdlon
-          zfract(i) = fract(iof + i)
-          zrmu0(i) = mu0(iof + i)
-          PALBD(i, 1) = albedo(iof + i)
-          PALBD(i, 2) = albedo(iof + i)
-          PALBP(i, 1) = albedo(iof + i)
-          PALBP(i, 2) = albedo(iof + i)
-          ! cf. JLD pour etre en accord avec ORCHIDEE il faut mettre
-          ! PEMIS(i) = 0.96
-          PEMIS(i) = 1.
-          PVIEW(i) = 1.66
-          PPSOL(i) = paprs(iof + i, 1)
-          zx_alpha1 = (paprs(iof + i, 1)-play(iof + i, 2)) &
-               / (play(iof + i, 1)-play(iof + i, 2))
-          zx_alpha2 = 1. - zx_alpha1
-          PTL(i, 1) = t(iof + i, 1) * zx_alpha1 + t(iof + i, 2) * zx_alpha2
-          PTL(i, klev + 1) = t(iof + i, klev)
-          PDT0(i) = tsol(iof + i) - PTL(i, 1)
+    DO i = 1, klon
+       zfract(i) = fract(i)
+       zrmu0(i) = mu0(i)
+       PALBD(i, 1) = albedo(i)
+       PALBD(i, 2) = albedo(i)
+       PALBP(i, 1) = albedo(i)
+       PALBP(i, 2) = albedo(i)
+       ! cf. JLD pour etre en accord avec ORCHIDEE il faut mettre
+       ! PEMIS(i) = 0.96
+       PEMIS(i) = 1.
+       PVIEW(i) = 1.66
+       PPSOL(i) = paprs(i, 1)
+       zx_alpha1 = (paprs(i, 1)-play(i, 2)) &
+            / (play(i, 1)-play(i, 2))
+       zx_alpha2 = 1. - zx_alpha1
+       PTL(i, 1) = t(i, 1) * zx_alpha1 + t(i, 2) * zx_alpha2
+       PTL(i, klev + 1) = t(i, klev)
+       PDT0(i) = tsol(i) - PTL(i, 1)
+    ENDDO
+    DO k = 2, klev
+       DO i = 1, klon
+          PTL(i, k) = (t(i, k) + t(i, k-1))*0.5
        ENDDO
-       DO k = 2, klev
-          DO i = 1, kdlon
-             PTL(i, k) = (t(iof + i, k) + t(iof + i, k-1))*0.5
-          ENDDO
+    ENDDO
+    DO k = 1, klev
+       DO i = 1, klon
+          PDP(i, k) = paprs(i, k)-paprs(i, k + 1)
+          PTAVE(i, k) = t(i, k)
+          PWV(i, k) = MAX(q(i, k), 1e-12)
+          PQS(i, k) = PWV(i, k)
+          POZON(i, k) = wo(i, k) * RG * dobson_u * 1e3 &
+               / (paprs(i, k) - paprs(i, k + 1))
+          PCLDLD(i, k) = cldfra(i, k)*cldemi(i, k)
+          PCLDLU(i, k) = cldfra(i, k)*cldemi(i, k)
+          PCLDSW(i, k) = cldfra(i, k)
+          PTAU(i, 1, k) = MAX(cldtau(i, k), 1e-05)
+          ! (1e-12 serait instable)
+          PTAU(i, 2, k) = MAX(cldtau(i, k), 1e-05)
+          ! (pour 32-bit machines)
+          POMEGA(i, 1, k) = 0.9999 - 5e-04 * EXP(-0.5 * PTAU(i, 1, k))
+          POMEGA(i, 2, k) = 0.9988 - 2.5e-03 * EXP(-0.05 * PTAU(i, 2, k))
+          PCG(i, 1, k) = 0.865
+          PCG(i, 2, k) = 0.910
        ENDDO
+    ENDDO
+
+    DO k = 1, klev + 1
+       DO i = 1, klon
+          PPMB(i, k) = paprs(i, k)/100.
+       ENDDO
+    ENDDO
+
+    DO kk = 1, 5
        DO k = 1, klev
-          DO i = 1, kdlon
-             PDP(i, k) = paprs(iof + i, k)-paprs(iof + i, k + 1)
-             PTAVE(i, k) = t(iof + i, k)
-             PWV(i, k) = MAX(q(iof + i, k), 1e-12)
-             PQS(i, k) = PWV(i, k)
-             POZON(i, k) = wo(iof + i, k) * RG * dobson_u * 1e3 &
-                  / (paprs(iof + i, k) - paprs(iof + i, k + 1))
-             PCLDLD(i, k) = cldfra(iof + i, k)*cldemi(iof + i, k)
-             PCLDLU(i, k) = cldfra(iof + i, k)*cldemi(iof + i, k)
-             PCLDSW(i, k) = cldfra(iof + i, k)
-             PTAU(i, 1, k) = MAX(cldtau(iof + i, k), 1e-05)
-             ! (1e-12 serait instable)
-             PTAU(i, 2, k) = MAX(cldtau(iof + i, k), 1e-05)
-             ! (pour 32-bit machines)
-             POMEGA(i, 1, k) = 0.9999 - 5e-04 * EXP(-0.5 * PTAU(i, 1, k))
-             POMEGA(i, 2, k) = 0.9988 - 2.5e-03 * EXP(-0.05 * PTAU(i, 2, k))
-             PCG(i, 1, k) = 0.865
-             PCG(i, 2, k) = 0.910
+          DO i = 1, klon
+             PAER(i, k, kk) = 1E-15
           ENDDO
        ENDDO
+    ENDDO
+
+    CALL LW(PPMB, PDP, PDT0, PEMIS, PTL, PTAVE, PWV, POZON, PAER, PCLDLD, &
+         PCLDLU, PVIEW, zcool, zcool0, ztoplw, zsollw, ztoplw0, zsollw0, &
+         zsollwdown, ZFLUP, ZFLDN, ZFLUP0, ZFLDN0)
+    CALL SW(PSCT, zrmu0, zfract, PPMB, PDP, PPSOL, PALBD, PALBP, PTAVE, &
+         PWV, PQS, POZON, PCLDSW, PTAU, POMEGA, PCG, zheat, zheat0, ztopsw, &
+         zsolsw, ztopsw0, zsolsw0, ZFSUP, ZFSDN, ZFSUP0, ZFSDN0, ztopswad, &
+         zsolswad, ok_ade)
+
+    DO i = 1, klon
+       radsol(i) = zsolsw(i) + zsollw(i)
+       topsw(i) = ztopsw(i)
+       toplw(i) = ztoplw(i)
+       solsw(i) = zsolsw(i)
+       sollw(i) = zsollw(i)
+       sollwdown(i) = zsollwdown(i)
 
        DO k = 1, klev + 1
-          DO i = 1, kdlon
-             PPMB(i, k) = paprs(iof + i, k)/100.
-          ENDDO
+          lwdn0(i, k) = ZFLDN0(i, k)
+          lwdn(i, k) = ZFLDN(i, k)
+          lwup0(i, k) = ZFLUP0(i, k)
+          lwup(i, k) = ZFLUP(i, k)
        ENDDO
 
-       DO kk = 1, 5
-          DO k = 1, klev
-             DO i = 1, kdlon
-                PAER(i, k, kk) = 1E-15
-             ENDDO
-          ENDDO
+       topsw0(i) = ztopsw0(i)
+       toplw0(i) = ztoplw0(i)
+       solsw0(i) = zsolsw0(i)
+       sollw0(i) = zsollw0(i)
+
+       DO k = 1, klev + 1
+          swdn0(i, k) = ZFSDN0(i, k)
+          swdn(i, k) = ZFSDN(i, k)
+          swup0(i, k) = ZFSUP0(i, k)
+          swup(i, k) = ZFSUP(i, k)
        ENDDO
-
-       CALL LW(PPMB, PDP, PDT0, PEMIS, PTL, PTAVE, PWV, POZON, PAER, PCLDLD, &
-            PCLDLU, PVIEW, zcool, zcool0, ztoplw, zsollw, ztoplw0, zsollw0, &
-            zsollwdown, ZFLUP, ZFLDN, ZFLUP0, ZFLDN0)
-       CALL SW(PSCT, zrmu0, zfract, PPMB, PDP, PPSOL, PALBD, PALBP, PTAVE, &
-            PWV, PQS, POZON, PCLDSW, PTAU, POMEGA, PCG, zheat, zheat0, ztopsw, &
-            zsolsw, ztopsw0, zsolsw0, ZFSUP, ZFSDN, ZFSUP0, ZFSDN0, ztopswad, &
-            zsolswad, ok_ade)
-
-       DO i = 1, kdlon
-          radsol(iof + i) = zsolsw(i) + zsollw(i)
-          topsw(iof + i) = ztopsw(i)
-          toplw(iof + i) = ztoplw(i)
-          solsw(iof + i) = zsolsw(i)
-          sollw(iof + i) = zsollw(i)
-          sollwdown(iof + i) = zsollwdown(i)
-
-          DO k = 1, klev + 1
-             lwdn0(iof + i, k) = ZFLDN0(i, k)
-             lwdn(iof + i, k) = ZFLDN(i, k)
-             lwup0(iof + i, k) = ZFLUP0(i, k)
-             lwup(iof + i, k) = ZFLUP(i, k)
-          ENDDO
-
-          topsw0(iof + i) = ztopsw0(i)
-          toplw0(iof + i) = ztoplw0(i)
-          solsw0(iof + i) = zsolsw0(i)
-          sollw0(iof + i) = zsollw0(i)
-
-          DO k = 1, klev + 1
-             swdn0(iof + i, k) = ZFSDN0(i, k)
-             swdn(iof + i, k) = ZFSDN(i, k)
-             swup0(iof + i, k) = ZFSUP0(i, k)
-             swup(iof + i, k) = ZFSUP(i, k)
-          ENDDO
+    ENDDO
+    ! transform the aerosol forcings, if they have to be calculated
+    IF (ok_ade) THEN
+       DO i = 1, klon
+          topswad(i) = ztopswad(i)
+          solswad(i) = zsolswad(i)
        ENDDO
-       ! transform the aerosol forcings, if they have to be calculated
-       IF (ok_ade) THEN
-          DO i = 1, kdlon
-             topswad(iof + i) = ztopswad(i)
-             solswad(iof + i) = zsolswad(i)
-          ENDDO
-       ELSE
-          DO i = 1, kdlon
-             topswad(iof + i) = 0.
-             solswad(iof + i) = 0.
-          ENDDO
-       ENDIF
-
-       DO k = 1, klev
-          DO i = 1, kdlon
-             ! scale factor to take into account the difference
-             ! between dry air and water vapour specific heat capacity
-             zznormcp = 1. + RVTMP2 * PWV(i, k)
-             heat(iof + i, k) = zheat(i, k) / zznormcp
-             cool(iof + i, k) = zcool(i, k)/zznormcp
-             heat0(iof + i, k) = zheat0(i, k)/zznormcp
-             cool0(iof + i, k) = zcool0(i, k)/zznormcp
-          ENDDO
+    ELSE
+       DO i = 1, klon
+          topswad(i) = 0.
+          solswad(i) = 0.
        ENDDO
-    end DO loop_iof
+    ENDIF
+
+    DO k = 1, klev
+       DO i = 1, klon
+          ! scale factor to take into account the difference
+          ! between dry air and water vapour specific heat capacity
+          zznormcp = 1. + RVTMP2 * PWV(i, k)
+          heat(i, k) = zheat(i, k) / zznormcp
+          cool(i, k) = zcool(i, k)/zznormcp
+          heat0(i, k) = zheat0(i, k)/zznormcp
+          cool0(i, k) = zcool0(i, k)/zznormcp
+       ENDDO
+    ENDDO
 
   END SUBROUTINE radlwsw
 

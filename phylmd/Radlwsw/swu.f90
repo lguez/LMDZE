@@ -8,8 +8,8 @@ contains
        pcld, pclear, pdsig, pfact, prmu, psec, pud)
 
     USE clesphys, only: rco2
+    use dimphy, only: klon
     USE suphec_m, only: rg
-    use conf_phys_m, only: kdlon
     use dimensions, only: llm
     USE radepsi, only: zepscq, zepsec
     USE radopt, only: novlp
@@ -17,37 +17,37 @@ contains
     ! ARGUMENTS:
 
     DOUBLE PRECISION, intent(in):: psct
-    DOUBLE PRECISION, intent(in):: pcldsw(kdlon, llm)
-    DOUBLE PRECISION, intent(in):: ppmb(kdlon, llm + 1)
-    DOUBLE PRECISION, intent(in):: ppsol(kdlon)
-    DOUBLE PRECISION, intent(in):: prmu0(kdlon)
-    DOUBLE PRECISION, intent(in):: pfrac(kdlon)
-    DOUBLE PRECISION, intent(in):: ptave(kdlon, llm)
-    DOUBLE PRECISION, intent(in):: pwv(kdlon, llm)
+    DOUBLE PRECISION, intent(in):: pcldsw(klon, llm)
+    DOUBLE PRECISION, intent(in):: ppmb(klon, llm + 1)
+    DOUBLE PRECISION, intent(in):: ppsol(klon)
+    DOUBLE PRECISION, intent(in):: prmu0(klon)
+    DOUBLE PRECISION, intent(in):: pfrac(klon)
+    DOUBLE PRECISION, intent(in):: ptave(klon, llm)
+    DOUBLE PRECISION, intent(in):: pwv(klon, llm)
 
-    DOUBLE PRECISION paki(kdlon, 2)
-    DOUBLE PRECISION pcld(kdlon, llm)
-    DOUBLE PRECISION pclear(kdlon)
-    DOUBLE PRECISION pdsig(kdlon, llm)
-    DOUBLE PRECISION pfact(kdlon)
-    DOUBLE PRECISION prmu(kdlon)
-    DOUBLE PRECISION psec(kdlon)
-    DOUBLE PRECISION pud(kdlon, 5, llm + 1)
+    DOUBLE PRECISION paki(klon, 2)
+    DOUBLE PRECISION pcld(klon, llm)
+    DOUBLE PRECISION pclear(klon)
+    DOUBLE PRECISION pdsig(klon, llm)
+    DOUBLE PRECISION pfact(klon)
+    DOUBLE PRECISION prmu(klon)
+    DOUBLE PRECISION psec(klon)
+    DOUBLE PRECISION pud(klon, 5, llm + 1)
 
     ! Local:
 
     INTEGER iind(2)
-    DOUBLE PRECISION zc1j(kdlon, llm + 1)
-    DOUBLE PRECISION zclear(kdlon)
-    DOUBLE PRECISION zcloud(kdlon)
-    DOUBLE PRECISION zn175(kdlon)
-    DOUBLE PRECISION zn190(kdlon)
-    DOUBLE PRECISION zo175(kdlon)
-    DOUBLE PRECISION zo190(kdlon)
-    DOUBLE PRECISION zsign(kdlon)
-    DOUBLE PRECISION zr(kdlon, 2)
-    DOUBLE PRECISION zsigo(kdlon)
-    DOUBLE PRECISION zud(kdlon, 2)
+    DOUBLE PRECISION zc1j(klon, llm + 1)
+    DOUBLE PRECISION zclear(klon)
+    DOUBLE PRECISION zcloud(klon)
+    DOUBLE PRECISION zn175(klon)
+    DOUBLE PRECISION zn190(klon)
+    DOUBLE PRECISION zo175(klon)
+    DOUBLE PRECISION zo190(klon)
+    DOUBLE PRECISION zsign(klon)
+    DOUBLE PRECISION zr(klon, 2)
+    DOUBLE PRECISION zsigo(klon)
+    DOUBLE PRECISION zud(klon, 2)
     DOUBLE PRECISION zrth, zrtu, zwh2o, zdsco2, zdsh2o, zfppw
     INTEGER jl, jk, jkp1, jkl, ja
 
@@ -75,7 +75,7 @@ contains
 
     ! 1.1 INITIALIZES QUANTITIES
 
-    DO jl = 1, kdlon
+    DO jl = 1, klon
        pud(jl, 1, llm + 1) = 0.
        pud(jl, 2, llm + 1) = 0.
        pud(jl, 3, llm + 1) = 0.
@@ -89,7 +89,7 @@ contains
 
     ! 1.3 AMOUNTS OF ABSORBERS
 
-    DO jl = 1, kdlon
+    DO jl = 1, klon
        zud(jl, 1) = 0.
        zud(jl, 2) = 0.
        zo175(jl) = ppsol(jl)**(zpdumg + 1.)
@@ -102,7 +102,7 @@ contains
     DO jk = 1, llm
        jkp1 = jk + 1
        jkl = llm + 1 - jk
-       DO jl = 1, kdlon
+       DO jl = 1, klon
           zrth = (rth2o / ptave(jl, jk))**rtdh2o
           zrtu = (rtumg / ptave(jl, jk))**rtdumg
           zwh2o = max(pwv(jl, jk), zepscq)
@@ -141,11 +141,11 @@ contains
           END IF
        END DO
     END DO
-    DO jl = 1, kdlon
+    DO jl = 1, klon
        pclear(jl) = 1. - zc1j(jl, 1)
     END DO
     DO jk = 1, llm
-       DO jl = 1, kdlon
+       DO jl = 1, klon
           IF (pclear(jl)<1.) THEN
              pcld(jl, jk) = pcldsw(jl, jk) / (1. - pclear(jl))
           ELSE
@@ -157,7 +157,7 @@ contains
     ! 1.4 COMPUTES CLEAR-SKY GREY ABSORPTION COEFFICIENTS
 
     DO ja = 1, 2
-       DO jl = 1, kdlon
+       DO jl = 1, klon
           zud(jl, ja) = zud(jl, ja) * psec(jl)
        END DO
     END DO
@@ -165,7 +165,7 @@ contains
     CALL swtt1(2, 2, iind, zud, zr)
 
     DO ja = 1, 2
-       DO jl = 1, kdlon
+       DO jl = 1, klon
           paki(jl, ja) = - log(zr(jl, ja)) / zud(jl, ja)
        END DO
     END DO

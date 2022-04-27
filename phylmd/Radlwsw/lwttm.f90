@@ -1,7 +1,6 @@
 SUBROUTINE lwttm(pga, pgb, puu1, puu2, ptt)
   USE dimensions
   USE dimphy
-  use conf_phys_m, only: kdlon
   USE raddimlw
   IMPLICIT NONE
 
@@ -44,11 +43,11 @@ SUBROUTINE lwttm(pga, pgb, puu1, puu2, ptt)
 
   ! * ARGUMENTS:
 
-  DOUBLE PRECISION pga(kdlon, 8, 2) ! PADE APPROXIMANTS
-  DOUBLE PRECISION pgb(kdlon, 8, 2) ! PADE APPROXIMANTS
-  DOUBLE PRECISION puu1(kdlon, nua) ! ABSORBER AMOUNTS FROM TOP TO LEVEL 1
-  DOUBLE PRECISION puu2(kdlon, nua) ! ABSORBER AMOUNTS FROM TOP TO LEVEL 2
-  DOUBLE PRECISION ptt(kdlon, ntra) ! TRANSMISSION FUNCTIONS
+  DOUBLE PRECISION pga(klon, 8, 2) ! PADE APPROXIMANTS
+  DOUBLE PRECISION pgb(klon, 8, 2) ! PADE APPROXIMANTS
+  DOUBLE PRECISION puu1(klon, nua) ! ABSORBER AMOUNTS FROM TOP TO LEVEL 1
+  DOUBLE PRECISION puu2(klon, nua) ! ABSORBER AMOUNTS FROM TOP TO LEVEL 2
+  DOUBLE PRECISION ptt(klon, ntra) ! TRANSMISSION FUNCTIONS
 
   ! * LOCAL VARIABLES:
 
@@ -70,7 +69,7 @@ SUBROUTINE lwttm(pga, pgb, puu1, puu2, ptt)
 
 
   DO ja = 1, 8
-    DO jl = 1, kdlon
+    DO jl = 1, klon
       zz = sqrt(puu1(jl,ja)-puu2(jl,ja))
       zxd = pgb(jl, ja, 1) + zz*(pgb(jl,ja,2)+zz)
       zxn = pga(jl, ja, 1) + zz*(pga(jl,ja,2))
@@ -84,7 +83,7 @@ SUBROUTINE lwttm(pga, pgb, puu1, puu2, ptt)
   ! ---------------------------------------------------
 
 
-  DO jl = 1, kdlon
+  DO jl = 1, klon
     ptt(jl, 9) = ptt(jl, 8)
 
     ! -  CONTINUUM ABSORPTION: E- AND P-TYPE

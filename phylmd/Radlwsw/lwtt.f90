@@ -1,7 +1,6 @@
 SUBROUTINE lwtt(pga, pgb, puu, ptt)
   USE dimensions
   USE dimphy
-  use conf_phys_m, only: kdlon
   USE raddimlw
   IMPLICIT NONE
 
@@ -44,10 +43,10 @@ SUBROUTINE lwtt(pga, pgb, puu, ptt)
 
   ! * ARGUMENTS:
 
-  DOUBLE PRECISION puu(kdlon, nua)
-  DOUBLE PRECISION ptt(kdlon, ntra)
-  DOUBLE PRECISION pga(kdlon, 8, 2)
-  DOUBLE PRECISION pgb(kdlon, 8, 2)
+  DOUBLE PRECISION puu(klon, nua)
+  DOUBLE PRECISION ptt(klon, ntra)
+  DOUBLE PRECISION pga(klon, 8, 2)
+  DOUBLE PRECISION pgb(klon, 8, 2)
 
   ! * LOCAL VARIABLES:
 
@@ -68,7 +67,7 @@ SUBROUTINE lwtt(pga, pgb, puu, ptt)
 
 
   DO ja = 1, 8
-    DO jl = 1, kdlon
+    DO jl = 1, klon
       zz = sqrt(puu(jl,ja))
       ! ZXD(JL,1)=PGB( JL, 1,1) + ZZ(JL, 1)*(PGB( JL, 1,2) + ZZ(JL, 1))
       ! ZXN(JL,1)=PGA( JL, 1,1) + ZZ(JL, 1)*(PGA( JL, 1,2) )
@@ -85,7 +84,7 @@ SUBROUTINE lwtt(pga, pgb, puu, ptt)
   ! ---------------------------------------------------
 
 
-  DO jl = 1, kdlon
+  DO jl = 1, klon
     ptt(jl, 9) = ptt(jl, 8)
 
     ! -  CONTINUUM ABSORPTION: E- AND P-TYPE

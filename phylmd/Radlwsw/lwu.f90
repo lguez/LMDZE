@@ -22,8 +22,8 @@ contains
     ! Voigt lines (loop 404 modified) - JJM & PhD - 01/96
 
     USE clesphys, ONLY: rcfc11, rcfc12, rch4, rco2, rn2o
+    use dimphy, only: klon
     USE suphec_m, ONLY: rg
-    USE conf_phys_m, ONLY: kdlon
     use dimensions, only: llm
     USE radepsi, ONLY: zepsco, zepscq
     USE radopt, ONLY: levoigt
@@ -31,41 +31,41 @@ contains
 
     ! ARGUMENTS:
 
-    DOUBLE PRECISION PAER(KDLON, LLM, 5)
-    DOUBLE PRECISION PDP(KDLON, LLM)
-    DOUBLE PRECISION PPMB(KDLON, LLM + 1)
-    DOUBLE PRECISION POZ(KDLON, LLM)
-    DOUBLE PRECISION PTAVE(KDLON, LLM)
-    DOUBLE PRECISION PVIEW(KDLON)
-    DOUBLE PRECISION PWV(KDLON, LLM)
+    DOUBLE PRECISION PAER(KLON, LLM, 5)
+    DOUBLE PRECISION PDP(KLON, LLM)
+    DOUBLE PRECISION PPMB(KLON, LLM + 1)
+    DOUBLE PRECISION POZ(KLON, LLM)
+    DOUBLE PRECISION PTAVE(KLON, LLM)
+    DOUBLE PRECISION PVIEW(KLON)
+    DOUBLE PRECISION PWV(KLON, LLM)
 
-    DOUBLE PRECISION PABCU(KDLON, NUA, 3 * LLM + 1)
+    DOUBLE PRECISION PABCU(KLON, NUA, 3 * LLM + 1)
     ! effective absorber amounts
 
     ! LOCAL VARIABLES:
 
-    DOUBLE PRECISION ZABLY(KDLON, NUA, 3 * LLM + 1)
-    DOUBLE PRECISION ZDUC(KDLON, 3 * LLM + 1)
-    DOUBLE PRECISION ZPHIO(KDLON)
-    DOUBLE PRECISION ZPSC2(KDLON)
-    DOUBLE PRECISION ZPSC3(KDLON)
-    DOUBLE PRECISION ZPSH1(KDLON)
-    DOUBLE PRECISION ZPSH2(KDLON)
-    DOUBLE PRECISION ZPSH3(KDLON)
-    DOUBLE PRECISION ZPSH4(KDLON)
-    DOUBLE PRECISION ZPSH5(KDLON)
-    DOUBLE PRECISION ZPSH6(KDLON)
-    DOUBLE PRECISION ZPSIO(KDLON)
-    DOUBLE PRECISION ZTCON(KDLON)
-    DOUBLE PRECISION ZPHM6(KDLON)
-    DOUBLE PRECISION ZPSM6(KDLON)
-    DOUBLE PRECISION ZPHN6(KDLON)
-    DOUBLE PRECISION ZPSN6(KDLON)
-    DOUBLE PRECISION ZSSIG(KDLON, 3 * LLM + 1)
-    DOUBLE PRECISION ZTAVI(KDLON)
-    DOUBLE PRECISION ZUAER(KDLON, Ninter)
-    DOUBLE PRECISION ZXOZ(KDLON)
-    DOUBLE PRECISION ZXWV(KDLON)
+    DOUBLE PRECISION ZABLY(KLON, NUA, 3 * LLM + 1)
+    DOUBLE PRECISION ZDUC(KLON, 3 * LLM + 1)
+    DOUBLE PRECISION ZPHIO(KLON)
+    DOUBLE PRECISION ZPSC2(KLON)
+    DOUBLE PRECISION ZPSC3(KLON)
+    DOUBLE PRECISION ZPSH1(KLON)
+    DOUBLE PRECISION ZPSH2(KLON)
+    DOUBLE PRECISION ZPSH3(KLON)
+    DOUBLE PRECISION ZPSH4(KLON)
+    DOUBLE PRECISION ZPSH5(KLON)
+    DOUBLE PRECISION ZPSH6(KLON)
+    DOUBLE PRECISION ZPSIO(KLON)
+    DOUBLE PRECISION ZTCON(KLON)
+    DOUBLE PRECISION ZPHM6(KLON)
+    DOUBLE PRECISION ZPSM6(KLON)
+    DOUBLE PRECISION ZPHN6(KLON)
+    DOUBLE PRECISION ZPSN6(KLON)
+    DOUBLE PRECISION ZSSIG(KLON, 3 * LLM + 1)
+    DOUBLE PRECISION ZTAVI(KLON)
+    DOUBLE PRECISION ZUAER(KLON, Ninter)
+    DOUBLE PRECISION ZXOZ(KLON)
+    DOUBLE PRECISION ZXWV(KLON)
 
     INTEGER jl, jk, jkj, jkjr, jkjp, ig1
     INTEGER jki, jkip1, ja, jj
@@ -129,7 +129,7 @@ contains
 
     ! 2. PRESSURE OVER GAUSS SUB-LEVELS
 
-    DO JL = 1, KDLON
+    DO JL = 1, KLON
        ZSSIG(JL, 1) = PPMB(JL, 1) * 100.
     end DO
 
@@ -137,12 +137,12 @@ contains
        JKJ = (JK - 1) * NG1P1 + 1
        JKJR = JKJ
        JKJP = JKJ + NG1P1
-       DO JL = 1, KDLON
+       DO JL = 1, KLON
           ZSSIG(JL, JKJP) = PPMB(JL, JK + 1) * 100.
        end DO
        DO IG1 = 1, NG1
           JKJ = JKJ + 1
-          DO JL = 1, KDLON
+          DO JL = 1, KLON
              ZSSIG(JL, JKJ) = (ZSSIG(JL, JKJR) + ZSSIG(JL, JKJP)) * 0.5 &
                   + RT1(IG1) * (ZSSIG(JL, JKJP) - ZSSIG(JL, JKJR)) * 0.5
           end DO
@@ -153,7 +153,7 @@ contains
 
     DO JKI = 1, 3 * LLM
        JKIP1 = JKI + 1
-       DO JL = 1, KDLON
+       DO JL = 1, KLON
           ZABLY(JL, 5, JKI) = (ZSSIG(JL, JKI) + ZSSIG(JL, JKIP1)) * 0.5
           ZABLY(JL, 3, JKI) = (ZSSIG(JL, JKI) - ZSSIG(JL, JKIP1)) / (10. * RG)
        end DO
@@ -161,14 +161,14 @@ contains
 
     DO JK = 1, LLM
        JKL = LLM + 1 - JK
-       DO JL = 1, KDLON
+       DO JL = 1, KLON
           ZXWV(JL) = MAX(PWV(JL, JK), ZEPSCQ)
           ZXOZ(JL) = MAX(POZ(JL, JK) / PDP(JL, JK), ZEPSCO)
        end DO
        JKJ = (JK - 1) * NG1P1 + 1
        JKJPN = JKJ + NG1
        DO JKK = JKJ, JKJPN
-          DO JL = 1, KDLON
+          DO JL = 1, KLON
              ZDPM = ZABLY(JL, 3, JKK)
              ZUPM = ZABLY(JL, 5, JKK) * ZDPM / 101325.
              ZUPMCO2 = (ZABLY(JL, 5, JKK) + PVGCO2) * ZDPM / 101325.
@@ -191,7 +191,7 @@ contains
     ! 5. CUMULATIVE ABSORBER AMOUNTS FROM TOP OF ATMOSPHERE
 
     DO JA = 1, NUA
-       DO JL = 1, KDLON
+       DO JL = 1, KLON
           PABCU(JL, JA, 3 * LLM + 1) = 0.
        end DO
     end DO
@@ -207,7 +207,7 @@ contains
        JAE2 = 3 * LLM + 1 - (JJ + 1)
        JAE3 = 3 * LLM + 1 - JJPN
        DO JAE = 1, 5
-          DO JL = 1, KDLON
+          DO JL = 1, KLON
              ZUAER(JL, JAE) = (RAER(JAE, 1) * PAER(JL, JKL, 1) &
                   + RAER(JAE, 2) * PAER(JL, JKL, 2) &
                   + RAER(JAE, 3) * PAER(JL, JKL, 3) &
@@ -219,7 +219,7 @@ contains
 
        ! 5.2 INTRODUCES TEMPERATURE EFFECTS ON ABSORBER AMOUNTS
 
-       DO JL = 1, KDLON
+       DO JL = 1, KLON
           ZTAVI(JL) = PTAVE(JL, JKL)
           ZTCON(JL) = EXP(6.08 * (296. / ZTAVI(JL) - 1.))
           ZTX = ZTAVI(JL) - TREF
@@ -250,7 +250,7 @@ contains
           ZPSN6(JL) = EXP(3.70E-3 * ZTX - 2.30E-6 * ZTX2)
        end DO
 
-       DO JL = 1, KDLON
+       DO JL = 1, KLON
           ZTAVI(JL) = PTAVE(JL, JKL)
           ZTX = ZTAVI(JL) - TREF
           ZTX2 = ZTX * ZTX
@@ -268,7 +268,7 @@ contains
        DO JKK = JJ, JJPN
           JC = 3 * LLM + 1 - JKK
           JCP1 = JC + 1
-          DO JL = 1, KDLON
+          DO JL = 1, KLON
              ZDIFF = PVIEW(JL)
              PABCU(JL, 10, JC) = PABCU(JL, 10, JCP1) &
                   + ZABLY(JL, 10, JC) * ZDIFF

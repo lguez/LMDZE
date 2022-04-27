@@ -7,7 +7,6 @@ contains
   SUBROUTINE lwvd(ktraer, pabcu, pdbdt, pga, pgb, pcntrb, pdisd, pdisu)
     USE dimensions
     USE dimphy
-    use conf_phys_m, only: kdlon
     USE raddimlw
 
     ! -----------------------------------------------------------------------
@@ -39,22 +38,22 @@ contains
 
     INTEGER ktraer
 
-    DOUBLE PRECISION pabcu(kdlon, nua, 3*llm+1) ! ABSORBER AMOUNTS
-    DOUBLE PRECISION pdbdt(kdlon, ninter, llm) ! LAYER PLANCK FUNCTION GRADIENT
-    DOUBLE PRECISION pga(kdlon, 8, 2, llm) ! PADE APPROXIMANTS
-    DOUBLE PRECISION pgb(kdlon, 8, 2, llm) ! PADE APPROXIMANTS
+    DOUBLE PRECISION pabcu(klon, nua, 3*llm+1) ! ABSORBER AMOUNTS
+    DOUBLE PRECISION pdbdt(klon, ninter, llm) ! LAYER PLANCK FUNCTION GRADIENT
+    DOUBLE PRECISION pga(klon, 8, 2, llm) ! PADE APPROXIMANTS
+    DOUBLE PRECISION pgb(klon, 8, 2, llm) ! PADE APPROXIMANTS
 
-    DOUBLE PRECISION pcntrb(kdlon, llm+1, llm+1) ! ENERGY EXCHANGE MATRIX
-    DOUBLE PRECISION pdisd(kdlon, llm+1) !  CONTRIBUTION BY DISTANT LAYERS
-    DOUBLE PRECISION pdisu(kdlon, llm+1) !  CONTRIBUTION BY DISTANT LAYERS
+    DOUBLE PRECISION pcntrb(klon, llm+1, llm+1) ! ENERGY EXCHANGE MATRIX
+    DOUBLE PRECISION pdisd(klon, llm+1) !  CONTRIBUTION BY DISTANT LAYERS
+    DOUBLE PRECISION pdisu(klon, llm+1) !  CONTRIBUTION BY DISTANT LAYERS
 
     ! * LOCAL VARIABLES:
 
-    DOUBLE PRECISION zglayd(kdlon)
-    DOUBLE PRECISION zglayu(kdlon)
-    DOUBLE PRECISION ztt(kdlon, ntra)
-    DOUBLE PRECISION ztt1(kdlon, ntra)
-    DOUBLE PRECISION ztt2(kdlon, ntra)
+    DOUBLE PRECISION zglayd(klon)
+    DOUBLE PRECISION zglayu(klon)
+    DOUBLE PRECISION ztt(klon, ntra)
+    DOUBLE PRECISION ztt1(klon, ntra)
+    DOUBLE PRECISION ztt2(klon, ntra)
 
     INTEGER jl, jk, ja, ikp1, ikn, ikd1, jkj, ikd2
     INTEGER ikjp1, ikm1, ikj, jlk, iku1, ijkl, iku2
@@ -70,7 +69,7 @@ contains
 
 
     DO jk = 1, llm + 1
-       DO jl = 1, kdlon
+       DO jl = 1, klon
           pdisd(jl, jk) = 0.
           pdisu(jl, jk) = 0.
        END DO
@@ -82,7 +81,7 @@ contains
 
 
     DO ja = 1, ntra
-       DO jl = 1, kdlon
+       DO jl = 1, klon
           ztt(jl, ja) = 1.0
           ztt1(jl, ja) = 1.0
           ztt2(jl, ja) = 1.0
@@ -142,12 +141,12 @@ contains
           END IF
 
           DO ja = 1, ktraer
-             DO jl = 1, kdlon
+             DO jl = 1, klon
                 ztt(jl, ja) = (ztt1(jl,ja)+ztt2(jl,ja))*0.5
              END DO
           END DO
 
-          DO jl = 1, kdlon
+          DO jl = 1, klon
              zww = pdbdt(jl, 1, jkj)*ztt(jl, 1)*ztt(jl, 10) + &
                   pdbdt(jl, 2, jkj)*ztt(jl, 2)*ztt(jl, 7)*ztt(jl, 11) + &
                   pdbdt(jl, 3, jkj)*ztt(jl, 4)*ztt(jl, 8)*ztt(jl, 12) + &
@@ -211,12 +210,12 @@ contains
           END IF
 
           DO ja = 1, ktraer
-             DO jl = 1, kdlon
+             DO jl = 1, klon
                 ztt(jl, ja) = (ztt1(jl,ja)+ztt2(jl,ja))*0.5
              END DO
           END DO
 
-          DO jl = 1, kdlon
+          DO jl = 1, klon
              zww = pdbdt(jl, 1, ijkl)*ztt(jl, 1)*ztt(jl, 10) + &
                   pdbdt(jl, 2, ijkl)*ztt(jl, 2)*ztt(jl, 7)*ztt(jl, 11) + &
                   pdbdt(jl, 3, ijkl)*ztt(jl, 4)*ztt(jl, 8)*ztt(jl, 12) + &

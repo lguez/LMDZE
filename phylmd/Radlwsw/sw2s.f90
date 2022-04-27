@@ -9,7 +9,6 @@ contains
     
     USE dimensions
     USE dimphy
-    use conf_phys_m, only: kdlon
     USE radepsi
     use swclr_m, only: swclr
     use swde_m, only: swde
@@ -52,70 +51,70 @@ contains
     ! * ARGUMENTS:
 
     INTEGER knu
-    DOUBLE PRECISION paki(kdlon, 2)
-    DOUBLE PRECISION palbd(kdlon, 2)
-    DOUBLE PRECISION palbp(kdlon, 2)
-    DOUBLE PRECISION pcg(kdlon, 2, llm)
-    DOUBLE PRECISION pcld(kdlon, llm)
-    DOUBLE PRECISION pclear(kdlon)
-    DOUBLE PRECISION pdsig(kdlon, llm)
-    DOUBLE PRECISION pomega(kdlon, 2, llm)
-    DOUBLE PRECISION poz(kdlon, llm)
-    DOUBLE PRECISION pqs(kdlon, llm)
-    DOUBLE PRECISION prmu(kdlon)
-    DOUBLE PRECISION psec(kdlon)
-    DOUBLE PRECISION ptau(kdlon, 2, llm)
-    DOUBLE PRECISION pud(kdlon, 5, llm+1)
-    DOUBLE PRECISION pwv(kdlon, llm)
+    DOUBLE PRECISION paki(klon, 2)
+    DOUBLE PRECISION palbd(klon, 2)
+    DOUBLE PRECISION palbp(klon, 2)
+    DOUBLE PRECISION pcg(klon, 2, llm)
+    DOUBLE PRECISION pcld(klon, llm)
+    DOUBLE PRECISION pclear(klon)
+    DOUBLE PRECISION pdsig(klon, llm)
+    DOUBLE PRECISION pomega(klon, 2, llm)
+    DOUBLE PRECISION poz(klon, llm)
+    DOUBLE PRECISION pqs(klon, llm)
+    DOUBLE PRECISION prmu(klon)
+    DOUBLE PRECISION psec(klon)
+    DOUBLE PRECISION ptau(klon, 2, llm)
+    DOUBLE PRECISION pud(klon, 5, llm+1)
+    DOUBLE PRECISION pwv(klon, llm)
 
-    DOUBLE PRECISION pfdown(kdlon, llm+1)
-    DOUBLE PRECISION pfup(kdlon, llm+1)
+    DOUBLE PRECISION pfdown(klon, llm+1)
+    DOUBLE PRECISION pfup(klon, llm+1)
 
     ! * LOCAL VARIABLES:
 
     INTEGER iind2(2), iind3(3)
-    DOUBLE PRECISION zcgaz(kdlon, llm)
-    DOUBLE PRECISION zfd(kdlon, llm+1)
-    DOUBLE PRECISION zfu(kdlon, llm+1)
-    DOUBLE PRECISION zg(kdlon)
-    DOUBLE PRECISION zgg(kdlon)
-    DOUBLE PRECISION zpizaz(kdlon, llm)
-    DOUBLE PRECISION zrayl(kdlon)
-    DOUBLE PRECISION zray1(kdlon, llm+1)
-    DOUBLE PRECISION zray2(kdlon, llm+1)
-    DOUBLE PRECISION zref(kdlon)
-    DOUBLE PRECISION zrefz(kdlon, 2, llm+1)
-    DOUBLE PRECISION zre1(kdlon)
-    DOUBLE PRECISION zre2(kdlon)
-    DOUBLE PRECISION zrj(kdlon, 6, llm+1)
-    DOUBLE PRECISION zrj0(kdlon, 6, llm+1)
-    DOUBLE PRECISION zrk(kdlon, 6, llm+1)
-    DOUBLE PRECISION zrk0(kdlon, 6, llm+1)
-    DOUBLE PRECISION zrl(kdlon, 8)
-    DOUBLE PRECISION zrmue(kdlon, llm+1)
-    DOUBLE PRECISION zrmu0(kdlon, llm+1)
-    DOUBLE PRECISION zrmuz(kdlon)
-    DOUBLE PRECISION zrneb(kdlon)
-    DOUBLE PRECISION zr1(kdlon)
-    DOUBLE PRECISION zr2(kdlon, 2)
-    DOUBLE PRECISION zr3(kdlon, 3)
-    DOUBLE PRECISION zr4(kdlon)
-    DOUBLE PRECISION zr21(kdlon)
-    DOUBLE PRECISION zr22(kdlon)
-    DOUBLE PRECISION zs(kdlon)
-    DOUBLE PRECISION ztauaz(kdlon, llm)
-    DOUBLE PRECISION zto1(kdlon)
-    DOUBLE PRECISION ztr(kdlon, 2, llm+1)
-    DOUBLE PRECISION ztra1(kdlon, llm+1)
-    DOUBLE PRECISION ztra2(kdlon, llm+1)
-    DOUBLE PRECISION ztr1(kdlon)
-    DOUBLE PRECISION ztr2(kdlon)
-    DOUBLE PRECISION zw(kdlon)
-    DOUBLE PRECISION zw1(kdlon)
-    DOUBLE PRECISION zw2(kdlon, 2)
-    DOUBLE PRECISION zw3(kdlon, 3)
-    DOUBLE PRECISION zw4(kdlon)
-    DOUBLE PRECISION zw5(kdlon)
+    DOUBLE PRECISION zcgaz(klon, llm)
+    DOUBLE PRECISION zfd(klon, llm+1)
+    DOUBLE PRECISION zfu(klon, llm+1)
+    DOUBLE PRECISION zg(klon)
+    DOUBLE PRECISION zgg(klon)
+    DOUBLE PRECISION zpizaz(klon, llm)
+    DOUBLE PRECISION zrayl(klon)
+    DOUBLE PRECISION zray1(klon, llm+1)
+    DOUBLE PRECISION zray2(klon, llm+1)
+    DOUBLE PRECISION zref(klon)
+    DOUBLE PRECISION zrefz(klon, 2, llm+1)
+    DOUBLE PRECISION zre1(klon)
+    DOUBLE PRECISION zre2(klon)
+    DOUBLE PRECISION zrj(klon, 6, llm+1)
+    DOUBLE PRECISION zrj0(klon, 6, llm+1)
+    DOUBLE PRECISION zrk(klon, 6, llm+1)
+    DOUBLE PRECISION zrk0(klon, 6, llm+1)
+    DOUBLE PRECISION zrl(klon, 8)
+    DOUBLE PRECISION zrmue(klon, llm+1)
+    DOUBLE PRECISION zrmu0(klon, llm+1)
+    DOUBLE PRECISION zrmuz(klon)
+    DOUBLE PRECISION zrneb(klon)
+    DOUBLE PRECISION zr1(klon)
+    DOUBLE PRECISION zr2(klon, 2)
+    DOUBLE PRECISION zr3(klon, 3)
+    DOUBLE PRECISION zr4(klon)
+    DOUBLE PRECISION zr21(klon)
+    DOUBLE PRECISION zr22(klon)
+    DOUBLE PRECISION zs(klon)
+    DOUBLE PRECISION ztauaz(klon, llm)
+    DOUBLE PRECISION zto1(klon)
+    DOUBLE PRECISION ztr(klon, 2, llm+1)
+    DOUBLE PRECISION ztra1(klon, llm+1)
+    DOUBLE PRECISION ztra2(klon, llm+1)
+    DOUBLE PRECISION ztr1(klon)
+    DOUBLE PRECISION ztr2(klon)
+    DOUBLE PRECISION zw(klon)
+    DOUBLE PRECISION zw1(klon)
+    DOUBLE PRECISION zw2(klon, 2)
+    DOUBLE PRECISION zw3(klon, 3)
+    DOUBLE PRECISION zw4(klon)
+    DOUBLE PRECISION zw5(klon)
 
     INTEGER jl, jk, k, jaj, ikm1, ikl, jn, jabs, jkm1
     INTEGER jref, jkl, jklp1, jajp, jkki, jkkp4, jn2j, iabs
@@ -145,7 +144,7 @@ contains
     ! -----------------------------------------
 
 
-    DO jl = 1, kdlon
+    DO jl = 1, klon
        zrmum1 = 1. - prmu(jl)
        zrayl(jl) = rray(knu, 1) + zrmum1*(rray(knu,2)+zrmum1*(rray(knu, &
             3)+zrmum1*(rray(knu,4)+zrmum1*(rray(knu,5)+zrmum1*rray(knu,6)))))
@@ -190,7 +189,7 @@ contains
        ! ------------------
 
 
-       DO jl = 1, kdlon
+       DO jl = 1, klon
           zrefz(jl, 2, 1) = palbd(jl, knu)
           zrefz(jl, 1, 1) = palbd(jl, knu)
        END DO
@@ -203,7 +202,7 @@ contains
        DO jk = 2, llm + 1
           jkm1 = jk - 1
           ikl = llm + 1 - jkm1
-          DO jl = 1, kdlon
+          DO jl = 1, klon
              zrneb(jl) = pcld(jl, jkm1)
              IF (jabs==1 .AND. zrneb(jl)>2.*zeelog) THEN
                 zwh2o = max(pwv(jl,jkm1), zeelog)
@@ -236,7 +235,7 @@ contains
 
           CALL swde(zgg, zref, zrmuz, zto1, zw, zre1, zre2, ztr1, ztr2)
 
-          DO jl = 1, kdlon
+          DO jl = 1, klon
 
              zrefz(jl, 2, jk) = (1.-zrneb(jl))*(zray1(jl,jkm1)+zrefz(jl,2,jkm1)* &
                   ztra1(jl,jkm1)*ztra2(jl,jkm1))*zg(jl)*zs(jl) + zrneb(jl)*zre1(jl)
@@ -262,7 +261,7 @@ contains
 
           jn = jn + 1
 
-          DO jl = 1, kdlon
+          DO jl = 1, klon
              zrj(jl, jn, llm+1) = 1.
              zrk(jl, jn, llm+1) = zrefz(jl, jref, llm+1)
           END DO
@@ -270,7 +269,7 @@ contains
           DO jk = 1, llm
              jkl = llm + 1 - jk
              jklp1 = jkl + 1
-             DO jl = 1, kdlon
+             DO jl = 1, klon
                 zre11 = zrj(jl, jn, jklp1)*ztr(jl, jref, jkl)
                 zrj(jl, jn, jkl) = zre11
                 zrk(jl, jn, jkl) = zre11*zrefz(jl, jref, jkl)
@@ -294,7 +293,7 @@ contains
     DO jk = 1, llm + 1
        DO jaj = 1, 5, 2
           jajp = jaj + 1
-          DO jl = 1, kdlon
+          DO jl = 1, klon
              zrj(jl, jaj, jk) = zrj(jl, jaj, jk) - zrj(jl, jajp, jk)
              zrk(jl, jaj, jk) = zrk(jl, jaj, jk) - zrk(jl, jajp, jk)
              zrj(jl, jaj, jk) = max(zrj(jl,jaj,jk), zeelog)
@@ -305,7 +304,7 @@ contains
 
     DO jk = 1, llm + 1
        DO jaj = 2, 6, 2
-          DO jl = 1, kdlon
+          DO jl = 1, klon
              zrj(jl, jaj, jk) = max(zrj(jl,jaj,jk), zeelog)
              zrk(jl, jaj, jk) = max(zrk(jl,jaj,jk), zeelog)
           END DO
@@ -329,7 +328,7 @@ contains
              ! --------------------------
 
 
-             DO jl = 1, kdlon
+             DO jl = 1, klon
                 zw2(jl, 1) = log(zrj(jl,jn,jk)/zrj(jl,jn2j,jk))/paki(jl, jaj)
                 zw2(jl, 2) = log(zrk(jl,jn,jk)/zrk(jl,jn2j,jk))/paki(jl, jaj)
              END DO
@@ -340,7 +339,7 @@ contains
 
              CALL swtt1(knu, 2, iind2, zw2, zr2)
 
-             DO jl = 1, kdlon
+             DO jl = 1, klon
                 zrl(jl, jkki) = zr2(jl, 1)
                 zrl(jl, jkkp4) = zr2(jl, 2)
              END DO
@@ -353,7 +352,7 @@ contains
        ! ------------------------------------------------------
 
 
-       DO jl = 1, kdlon
+       DO jl = 1, klon
           pfdown(jl, jk) = zrj(jl, 1, jk)*zrl(jl, 1)*zrl(jl, 3) + &
                zrj(jl, 2, jk)*zrl(jl, 2)*zrl(jl, 4)
           pfup(jl, jk) = zrk(jl, 1, jk)*zrl(jl, 5)*zrl(jl, 7) + &
@@ -378,7 +377,7 @@ contains
     iind3(2) = 2
     iind3(3) = 3
 
-    DO jl = 1, kdlon
+    DO jl = 1, klon
        zw3(jl, 1) = 0.
        zw3(jl, 2) = 0.
        zw3(jl, 3) = 0.
@@ -389,7 +388,7 @@ contains
     END DO
     DO jk = 1, llm
        ikl = llm + 1 - jk
-       DO jl = 1, kdlon
+       DO jl = 1, klon
           zw3(jl, 1) = zw3(jl, 1) + pud(jl, 1, ikl)/zrmu0(jl, ikl)
           zw3(jl, 2) = zw3(jl, 2) + pud(jl, 2, ikl)/zrmu0(jl, ikl)
           zw3(jl, 3) = zw3(jl, 3) + poz(jl, ikl)/zrmu0(jl, ikl)
@@ -399,7 +398,7 @@ contains
 
        CALL swtt1(knu, 3, iind3, zw3, zr3)
 
-       DO jl = 1, kdlon
+       DO jl = 1, klon
           ! ZR4(JL) = EXP(-RSWCE*ZW4(JL)-RSWCP*ZW5(JL))
           zfd(jl, ikl) = zr3(jl, 1)*zr3(jl, 2)*zr3(jl, 3)*zr4(jl)* &
                zrj0(jl, jaj, ikl)
@@ -411,13 +410,13 @@ contains
     ! -------------
 
 
-    DO jl = 1, kdlon
+    DO jl = 1, klon
        zfu(jl, 1) = zfd(jl, 1)*palbp(jl, knu)
     END DO
 
     DO jk = 2, llm + 1
        ikm1 = jk - 1
-       DO jl = 1, kdlon
+       DO jl = 1, klon
           zw3(jl, 1) = zw3(jl, 1) + pud(jl, 1, ikm1)*1.66
           zw3(jl, 2) = zw3(jl, 2) + pud(jl, 2, ikm1)*1.66
           zw3(jl, 3) = zw3(jl, 3) + poz(jl, ikm1)*1.66
@@ -427,7 +426,7 @@ contains
 
        CALL swtt1(knu, 3, iind3, zw3, zr3)
 
-       DO jl = 1, kdlon
+       DO jl = 1, klon
           ! ZR4(JL) = EXP(-RSWCE*ZW4(JL)-RSWCP*ZW5(JL))
           zfu(jl, jk) = zr3(jl, 1)*zr3(jl, 2)*zr3(jl, 3)*zr4(jl)* &
                zrk0(jl, jaj, jk)
@@ -445,7 +444,7 @@ contains
     ! *         6.1    DOWNWARD FLUXES
     ! ---------------
 
-    DO jl = 1, kdlon
+    DO jl = 1, klon
        zw1(jl) = 0.
        zw4(jl) = 0.
        zw5(jl) = 0.
@@ -456,7 +455,7 @@ contains
 
     DO jk = 1, llm
        ikl = llm + 1 - jk
-       DO jl = 1, kdlon
+       DO jl = 1, klon
           zw1(jl) = zw1(jl) + poz(jl, ikl)/zrmue(jl, ikl)
           zw4(jl) = zw4(jl) + pud(jl, 4, ikl)/zrmue(jl, ikl)
           zw5(jl) = zw5(jl) + pud(jl, 5, ikl)/zrmue(jl, ikl)
@@ -465,7 +464,7 @@ contains
 
        CALL swtt(knu, iabs, zw1, zr1)
 
-       DO jl = 1, kdlon
+       DO jl = 1, klon
           pfdown(jl, ikl) = ((1.-pclear(jl))*zr1(jl)*zr4(jl)*pfdown(jl,ikl)+ &
                pclear(jl)*zfd(jl,ikl))*rsun(knu)
        END DO
@@ -475,14 +474,14 @@ contains
     ! *         6.2    UPWARD FLUXES
     ! -------------
 
-    DO jl = 1, kdlon
+    DO jl = 1, klon
        pfup(jl, 1) = ((1.-pclear(jl))*zr1(jl)*zr4(jl)*pfup(jl,1)+pclear(jl)*zfu( &
             jl,1))*rsun(knu)
     END DO
 
     DO jk = 2, llm + 1
        ikm1 = jk - 1
-       DO jl = 1, kdlon
+       DO jl = 1, klon
           zw1(jl) = zw1(jl) + poz(jl, ikm1)*1.66
           zw4(jl) = zw4(jl) + pud(jl, 4, ikm1)*1.66
           zw5(jl) = zw5(jl) + pud(jl, 5, ikm1)*1.66
@@ -491,7 +490,7 @@ contains
 
        CALL swtt(knu, iabs, zw1, zr1)
 
-       DO jl = 1, kdlon
+       DO jl = 1, klon
           pfup(jl, jk) = ((1.-pclear(jl))*zr1(jl)*zr4(jl)*pfup(jl,jk)+pclear(jl)* &
                zfu(jl,jk))*rsun(knu)
        END DO

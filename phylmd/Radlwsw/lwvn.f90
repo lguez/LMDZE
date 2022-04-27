@@ -7,7 +7,6 @@ contains
   SUBROUTINE lwvn(kuaer, pabcu, pdbsl, pga, pgb, padjd, padju, pcntrb, pdbdt)
     USE dimensions
     USE dimphy
-    use conf_phys_m, only: kdlon
     USE raddimlw
     ! -----------------------------------------------------------------------
     ! PURPOSE.
@@ -40,22 +39,22 @@ contains
 
     INTEGER kuaer
 
-    DOUBLE PRECISION pabcu(kdlon, nua, 3*llm+1) ! ABSORBER AMOUNTS
-    DOUBLE PRECISION pdbsl(kdlon, ninter, llm*2) ! SUB-LAYER PLANCK FUNCTION GRADIENT
-    DOUBLE PRECISION pga(kdlon, 8, 2, llm) ! PADE APPROXIMANTS
-    DOUBLE PRECISION pgb(kdlon, 8, 2, llm) ! PADE APPROXIMANTS
+    DOUBLE PRECISION pabcu(klon, nua, 3*llm+1) ! ABSORBER AMOUNTS
+    DOUBLE PRECISION pdbsl(klon, ninter, llm*2) ! SUB-LAYER PLANCK FUNCTION GRADIENT
+    DOUBLE PRECISION pga(klon, 8, 2, llm) ! PADE APPROXIMANTS
+    DOUBLE PRECISION pgb(klon, 8, 2, llm) ! PADE APPROXIMANTS
 
-    DOUBLE PRECISION padjd(kdlon, llm+1) ! CONTRIBUTION OF ADJACENT LAYERS
-    DOUBLE PRECISION padju(kdlon, llm+1) ! CONTRIBUTION OF ADJACENT LAYERS
-    DOUBLE PRECISION pcntrb(kdlon, llm+1, llm+1) ! CLEAR-SKY ENERGY EXCHANGE MATRIX
-    DOUBLE PRECISION pdbdt(kdlon, ninter, llm) !  LAYER PLANCK FUNCTION GRADIENT
+    DOUBLE PRECISION padjd(klon, llm+1) ! CONTRIBUTION OF ADJACENT LAYERS
+    DOUBLE PRECISION padju(klon, llm+1) ! CONTRIBUTION OF ADJACENT LAYERS
+    DOUBLE PRECISION pcntrb(klon, llm+1, llm+1) ! CLEAR-SKY ENERGY EXCHANGE MATRIX
+    DOUBLE PRECISION pdbdt(klon, ninter, llm) !  LAYER PLANCK FUNCTION GRADIENT
 
     ! * LOCAL ARRAYS:
 
-    DOUBLE PRECISION zglayd(kdlon)
-    DOUBLE PRECISION zglayu(kdlon)
-    DOUBLE PRECISION ztt(kdlon, ntra)
-    DOUBLE PRECISION zuu(kdlon, nua)
+    DOUBLE PRECISION zglayd(klon)
+    DOUBLE PRECISION zglayu(klon)
+    DOUBLE PRECISION ztt(klon, ntra)
+    DOUBLE PRECISION zuu(klon, nua)
 
     INTEGER jk, jl, ja, im12, ind, inu, ixu, jg
     INTEGER ixd, ibs, idd, imu, jk1, jk2, jnu
@@ -77,7 +76,7 @@ contains
 
 
     DO jk = 1, llm + 1
-       DO jl = 1, kdlon
+       DO jl = 1, klon
           padjd(jl, jk) = 0.
           padju(jl, jk) = 0.
        END DO
@@ -88,13 +87,13 @@ contains
 
 
     DO ja = 1, ntra
-       DO jl = 1, kdlon
+       DO jl = 1, klon
           ztt(jl, ja) = 1.0
        END DO
     END DO
 
     DO ja = 1, nua
-       DO jl = 1, kdlon
+       DO jl = 1, klon
           zuu(jl, ja) = 0.
        END DO
     END DO
@@ -122,7 +121,7 @@ contains
        inu = jk*ng1p1 + 1
        ixu = ind
 
-       DO jl = 1, kdlon
+       DO jl = 1, klon
           zglayd(jl) = 0.
           zglayu(jl) = 0.
        END DO
@@ -131,7 +130,7 @@ contains
           ibs = im12 + jg
           idd = ixd + jg
           DO ja = 1, kuaer
-             DO jl = 1, kdlon
+             DO jl = 1, klon
                 zuu(jl, ja) = pabcu(jl, ja, ind) - pabcu(jl, ja, idd)
              END DO
           END DO
@@ -139,7 +138,7 @@ contains
 
           CALL lwtt(pga(1,1,1,jk), pgb(1,1,1,jk), zuu, ztt)
 
-          DO jl = 1, kdlon
+          DO jl = 1, klon
              zwtr = pdbsl(jl, 1, ibs)*ztt(jl, 1)*ztt(jl, 10) + &
                   pdbsl(jl, 2, ibs)*ztt(jl, 2)*ztt(jl, 7)*ztt(jl, 11) + &
                   pdbsl(jl, 3, ibs)*ztt(jl, 4)*ztt(jl, 8)*ztt(jl, 12) + &
@@ -155,7 +154,7 @@ contains
 
           imu = ixu + jg
           DO ja = 1, kuaer
-             DO jl = 1, kdlon
+             DO jl = 1, klon
                 zuu(jl, ja) = pabcu(jl, ja, imu) - pabcu(jl, ja, inu)
              END DO
           END DO
@@ -163,7 +162,7 @@ contains
 
           CALL lwtt(pga(1,1,1,jk), pgb(1,1,1,jk), zuu, ztt)
 
-          DO jl = 1, kdlon
+          DO jl = 1, klon
              zwtr = pdbsl(jl, 1, ibs)*ztt(jl, 1)*ztt(jl, 10) + &
                   pdbsl(jl, 2, ibs)*ztt(jl, 2)*ztt(jl, 7)*ztt(jl, 11) + &
                   pdbsl(jl, 3, ibs)*ztt(jl, 4)*ztt(jl, 8)*ztt(jl, 12) + &
@@ -175,7 +174,7 @@ contains
 
        END DO
 
-       DO jl = 1, kdlon
+       DO jl = 1, klon
           padjd(jl, jk) = zglayd(jl)
           pcntrb(jl, jk, jk+1) = zglayd(jl)
           padju(jl, jk+1) = zglayu(jl)
@@ -188,7 +187,7 @@ contains
        jk2 = 2*jk
        jk1 = jk2 - 1
        DO jnu = 1, ninter
-          DO jl = 1, kdlon
+          DO jl = 1, klon
              pdbdt(jl, jnu, jk) = pdbsl(jl, jnu, jk1) + pdbsl(jl, jnu, jk2)
           END DO
        END DO

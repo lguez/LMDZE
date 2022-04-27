@@ -1,7 +1,6 @@
 SUBROUTINE swtt(knu, ka, pu, ptr)
   USE dimensions
   USE dimphy
-  use conf_phys_m, only: kdlon
   IMPLICIT NONE
 
   ! -----------------------------------------------------------------------
@@ -36,13 +35,13 @@ SUBROUTINE swtt(knu, ka, pu, ptr)
 
   INTEGER knu ! INDEX OF THE SPECTRAL INTERVAL
   INTEGER ka ! INDEX OF THE ABSORBER
-  DOUBLE PRECISION pu(kdlon) ! ABSORBER AMOUNT
+  DOUBLE PRECISION pu(klon) ! ABSORBER AMOUNT
 
-  DOUBLE PRECISION ptr(kdlon) ! TRANSMISSION FUNCTION
+  DOUBLE PRECISION ptr(klon) ! TRANSMISSION FUNCTION
 
   ! * LOCAL VARIABLES:
 
-  DOUBLE PRECISION zr1(kdlon), zr2(kdlon)
+  DOUBLE PRECISION zr1(klon), zr2(klon)
   INTEGER jl, i, j
 
   ! * Prescribed Data:
@@ -83,7 +82,7 @@ SUBROUTINE swtt(knu, ka, pu, ptr)
   ! *         1.      HORNER'S ALGORITHM TO COMPUTE TRANSMISSION FUNCTION
 
 
-  DO jl = 1, kdlon
+  DO jl = 1, klon
     zr1(jl) = apad(knu, ka, 1) + pu(jl)*(apad(knu,ka,2)+pu(jl)*(apad(knu,ka, &
       3)+pu(jl)*(apad(knu,ka,4)+pu(jl)*(apad(knu,ka,5)+pu(jl)*(apad(knu,ka,6) &
       +pu(jl)*(apad(knu,ka,7)))))))

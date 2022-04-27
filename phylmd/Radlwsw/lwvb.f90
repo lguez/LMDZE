@@ -3,7 +3,6 @@ SUBROUTINE lwvb(kuaer, ktraer, klim, pabcu, padjd, padju, pb, pbint, pbsui, &
     pgatop, pgbtop, pcts, pfluc)
   USE dimensions
   USE dimphy
-  use conf_phys_m, only: kdlon
   USE radopt
   USE raddimlw
   IMPLICIT NONE
@@ -44,39 +43,39 @@ SUBROUTINE lwvb(kuaer, ktraer, klim, pabcu, padjd, padju, pb, pbint, pbsui, &
 
   INTEGER kuaer, ktraer, klim
 
-  DOUBLE PRECISION pabcu(kdlon, nua, 3*llm+1) ! ABSORBER AMOUNTS
-  DOUBLE PRECISION padjd(kdlon, llm+1) ! CONTRIBUTION BY ADJACENT LAYERS
-  DOUBLE PRECISION padju(kdlon, llm+1) ! CONTRIBUTION BY ADJACENT LAYERS
-  DOUBLE PRECISION pb(kdlon, ninter, llm+1) ! SPECTRAL HALF-LEVEL PLANCK FUNCTIONS
-  DOUBLE PRECISION pbint(kdlon, llm+1) ! HALF-LEVEL PLANCK FUNCTIONS
-  DOUBLE PRECISION pbsur(kdlon, ninter) ! SPECTRAL SURFACE PLANCK FUNCTION
-  DOUBLE PRECISION pbsui(kdlon) ! SURFACE PLANCK FUNCTION
-  DOUBLE PRECISION pbtop(kdlon, ninter) ! SPECTRAL T.O.A. PLANCK FUNCTION
-  DOUBLE PRECISION pdisd(kdlon, llm+1) ! CONTRIBUTION BY DISTANT LAYERS
-  DOUBLE PRECISION pdisu(kdlon, llm+1) ! CONTRIBUTION BY DISTANT LAYERS
-  DOUBLE PRECISION pemis(kdlon) ! SURFACE EMISSIVITY
-  DOUBLE PRECISION ppmb(kdlon, llm+1) ! PRESSURE MB
-  DOUBLE PRECISION pga(kdlon, 8, 2, llm) ! PADE APPROXIMANTS
-  DOUBLE PRECISION pgb(kdlon, 8, 2, llm) ! PADE APPROXIMANTS
-  DOUBLE PRECISION pgasur(kdlon, 8, 2) ! SURFACE PADE APPROXIMANTS
-  DOUBLE PRECISION pgbsur(kdlon, 8, 2) ! SURFACE PADE APPROXIMANTS
-  DOUBLE PRECISION pgatop(kdlon, 8, 2) ! T.O.A. PADE APPROXIMANTS
-  DOUBLE PRECISION pgbtop(kdlon, 8, 2) ! T.O.A. PADE APPROXIMANTS
+  DOUBLE PRECISION pabcu(klon, nua, 3*llm+1) ! ABSORBER AMOUNTS
+  DOUBLE PRECISION padjd(klon, llm+1) ! CONTRIBUTION BY ADJACENT LAYERS
+  DOUBLE PRECISION padju(klon, llm+1) ! CONTRIBUTION BY ADJACENT LAYERS
+  DOUBLE PRECISION pb(klon, ninter, llm+1) ! SPECTRAL HALF-LEVEL PLANCK FUNCTIONS
+  DOUBLE PRECISION pbint(klon, llm+1) ! HALF-LEVEL PLANCK FUNCTIONS
+  DOUBLE PRECISION pbsur(klon, ninter) ! SPECTRAL SURFACE PLANCK FUNCTION
+  DOUBLE PRECISION pbsui(klon) ! SURFACE PLANCK FUNCTION
+  DOUBLE PRECISION pbtop(klon, ninter) ! SPECTRAL T.O.A. PLANCK FUNCTION
+  DOUBLE PRECISION pdisd(klon, llm+1) ! CONTRIBUTION BY DISTANT LAYERS
+  DOUBLE PRECISION pdisu(klon, llm+1) ! CONTRIBUTION BY DISTANT LAYERS
+  DOUBLE PRECISION pemis(klon) ! SURFACE EMISSIVITY
+  DOUBLE PRECISION ppmb(klon, llm+1) ! PRESSURE MB
+  DOUBLE PRECISION pga(klon, 8, 2, llm) ! PADE APPROXIMANTS
+  DOUBLE PRECISION pgb(klon, 8, 2, llm) ! PADE APPROXIMANTS
+  DOUBLE PRECISION pgasur(klon, 8, 2) ! SURFACE PADE APPROXIMANTS
+  DOUBLE PRECISION pgbsur(klon, 8, 2) ! SURFACE PADE APPROXIMANTS
+  DOUBLE PRECISION pgatop(klon, 8, 2) ! T.O.A. PADE APPROXIMANTS
+  DOUBLE PRECISION pgbtop(klon, 8, 2) ! T.O.A. PADE APPROXIMANTS
 
-  DOUBLE PRECISION pfluc(kdlon, 2, llm+1) ! CLEAR-SKY RADIATIVE FLUXES
-  DOUBLE PRECISION pcts(kdlon, llm) ! COOLING-TO-SPACE TERM
+  DOUBLE PRECISION pfluc(klon, 2, llm+1) ! CLEAR-SKY RADIATIVE FLUXES
+  DOUBLE PRECISION pcts(klon, llm) ! COOLING-TO-SPACE TERM
 
   ! * LOCAL VARIABLES:
 
-  DOUBLE PRECISION zbgnd(kdlon)
-  DOUBLE PRECISION zfd(kdlon)
-  DOUBLE PRECISION zfn10(kdlon)
-  DOUBLE PRECISION zfu(kdlon)
-  DOUBLE PRECISION ztt(kdlon, ntra)
-  DOUBLE PRECISION ztt1(kdlon, ntra)
-  DOUBLE PRECISION zuu(kdlon, nua)
-  DOUBLE PRECISION zcnsol(kdlon)
-  DOUBLE PRECISION zcntop(kdlon)
+  DOUBLE PRECISION zbgnd(klon)
+  DOUBLE PRECISION zfd(klon)
+  DOUBLE PRECISION zfn10(klon)
+  DOUBLE PRECISION zfu(klon)
+  DOUBLE PRECISION ztt(klon, ntra)
+  DOUBLE PRECISION ztt1(klon, ntra)
+  DOUBLE PRECISION zuu(klon, nua)
+  DOUBLE PRECISION zcnsol(klon)
+  DOUBLE PRECISION zcntop(klon)
 
   INTEGER jk, jl, ja
   INTEGER jstra, jstru
@@ -94,14 +93,14 @@ SUBROUTINE lwvb(kuaer, ktraer, klim, pabcu, padjd, padju, pb, pbint, pbsui, &
 
 
   DO ja = 1, ntra
-    DO jl = 1, kdlon
+    DO jl = 1, klon
       ztt(jl, ja) = 1.0
       ztt1(jl, ja) = 1.0
     END DO
   END DO
 
   DO ja = 1, nua
-    DO jl = 1, kdlon
+    DO jl = 1, klon
       zuu(jl, ja) = 1.0
     END DO
   END DO
@@ -119,7 +118,7 @@ SUBROUTINE lwvb(kuaer, ktraer, klim, pabcu, padjd, padju, pb, pbint, pbsui, &
     in = (jk-1)*ng1p1 + 1
 
     DO ja = 1, kuaer
-      DO jl = 1, kdlon
+      DO jl = 1, klon
         zuu(jl, ja) = pabcu(jl, ja, in)
       END DO
     END DO
@@ -127,7 +126,7 @@ SUBROUTINE lwvb(kuaer, ktraer, klim, pabcu, padjd, padju, pb, pbint, pbsui, &
 
     CALL lwtt(pgatop(1,1,1), pgbtop(1,1,1), zuu, ztt)
 
-    DO jl = 1, kdlon
+    DO jl = 1, klon
       zcntop(jl) = pbtop(jl, 1)*ztt(jl, 1)*ztt(jl, 10) + &
         pbtop(jl, 2)*ztt(jl, 2)*ztt(jl, 7)*ztt(jl, 11) + &
         pbtop(jl, 3)*ztt(jl, 4)*ztt(jl, 8)*ztt(jl, 12) + &
@@ -143,7 +142,7 @@ SUBROUTINE lwvb(kuaer, ktraer, klim, pabcu, padjd, padju, pb, pbint, pbsui, &
   jk = llm + 1
   in = (jk-1)*ng1p1 + 1
 
-  DO jl = 1, kdlon
+  DO jl = 1, klon
     zcntop(jl) = pbtop(jl, 1) + pbtop(jl, 2) + pbtop(jl, 3) + pbtop(jl, 4) + &
       pbtop(jl, 5) + pbtop(jl, 6)
     zfd(jl) = zcntop(jl) - pbint(jl, jk) - pdisd(jl, jk) - padjd(jl, jk)
@@ -172,7 +171,7 @@ SUBROUTINE lwvb(kuaer, ktraer, klim, pabcu, padjd, padju, pb, pbint, pbsui, &
 
   IF (.NOT. levoigt) THEN
     DO ja = 1, ktraer
-      DO jl = 1, kdlon
+      DO jl = 1, klon
         ztt1(jl, ja) = 1.0
       END DO
     END DO
@@ -185,7 +184,7 @@ SUBROUTINE lwvb(kuaer, ktraer, klim, pabcu, padjd, padju, pb, pbint, pbsui, &
       jstru = (jstra-1)*ng1p1 + 1
 
       DO ja = 1, kuaer
-        DO jl = 1, kdlon
+        DO jl = 1, klon
           zuu(jl, ja) = pabcu(jl, ja, jstru)
         END DO
       END DO
@@ -193,7 +192,7 @@ SUBROUTINE lwvb(kuaer, ktraer, klim, pabcu, padjd, padju, pb, pbint, pbsui, &
 
       CALL lwtt(pga(1,1,1,jstra), pgb(1,1,1,jstra), zuu, ztt)
 
-      DO jl = 1, kdlon
+      DO jl = 1, klon
         zctstr = (pb(jl,1,jstra)+pb(jl,1,jstra+1))* &
           (ztt1(jl,1)*ztt1(jl,10)-ztt(jl,1)*ztt(jl,10)) + &
           (pb(jl,2,jstra)+pb(jl,2,jstra+1))*(ztt1(jl,2)*ztt1(jl,7)*ztt1(jl,11 &
@@ -207,7 +206,7 @@ SUBROUTINE lwvb(kuaer, ktraer, klim, pabcu, padjd, padju, pb, pbint, pbsui, &
         pcts(jl, jstra) = zctstr*0.5
       END DO
       DO ja = 1, ktraer
-        DO jl = 1, kdlon
+        DO jl = 1, klon
           ztt1(jl, ja) = ztt(jl, ja)
         END DO
       END DO
@@ -216,7 +215,7 @@ SUBROUTINE lwvb(kuaer, ktraer, klim, pabcu, padjd, padju, pb, pbint, pbsui, &
   ! Mise a zero de securite pour PCTS en cas de LEVOIGT
   IF (levoigt) THEN
     DO jstra = 1, llm
-      DO jl = 1, kdlon
+      DO jl = 1, klon
         pcts(jl, jstra) = 0.
       END DO
     END DO
@@ -227,7 +226,7 @@ SUBROUTINE lwvb(kuaer, ktraer, klim, pabcu, padjd, padju, pb, pbint, pbsui, &
   ! -------------------------
 
 
-  DO jl = 1, kdlon
+  DO jl = 1, klon
     zbgnd(jl) = pbsui(jl)*pemis(jl) - (1.-pemis(jl))*pfluc(jl, 2, 1) - &
       pbint(jl, 1)
   END DO
@@ -235,7 +234,7 @@ SUBROUTINE lwvb(kuaer, ktraer, klim, pabcu, padjd, padju, pb, pbint, pbsui, &
   jk = 1
   in = (jk-1)*ng1p1 + 1
 
-  DO jl = 1, kdlon
+  DO jl = 1, klon
     zcnsol(jl) = pbsur(jl, 1) + pbsur(jl, 2) + pbsur(jl, 3) + pbsur(jl, 4) + &
       pbsur(jl, 5) + pbsur(jl, 6)
     zcnsol(jl) = zcnsol(jl)*zbgnd(jl)/pbsui(jl)
@@ -248,7 +247,7 @@ SUBROUTINE lwvb(kuaer, ktraer, klim, pabcu, padjd, padju, pb, pbint, pbsui, &
 
 
     DO ja = 1, kuaer
-      DO jl = 1, kdlon
+      DO jl = 1, klon
         zuu(jl, ja) = pabcu(jl, ja, 1) - pabcu(jl, ja, in)
       END DO
     END DO
@@ -256,7 +255,7 @@ SUBROUTINE lwvb(kuaer, ktraer, klim, pabcu, padjd, padju, pb, pbint, pbsui, &
 
     CALL lwtt(pgasur(1,1,1), pgbsur(1,1,1), zuu, ztt)
 
-    DO jl = 1, kdlon
+    DO jl = 1, klon
       zcnsol(jl) = pbsur(jl, 1)*ztt(jl, 1)*ztt(jl, 10) + &
         pbsur(jl, 2)*ztt(jl, 2)*ztt(jl, 7)*ztt(jl, 11) + &
         pbsur(jl, 3)*ztt(jl, 4)*ztt(jl, 8)*ztt(jl, 12) + &
@@ -278,11 +277,11 @@ SUBROUTINE lwvb(kuaer, ktraer, klim, pabcu, padjd, padju, pb, pbint, pbsui, &
 
 
   IF (.NOT. levoigt) THEN
-    DO jl = 1, kdlon
+    DO jl = 1, klon
       zfn10(jl) = pfluc(jl, 1, jlim) + pfluc(jl, 2, jlim)
     END DO
     DO jk = jlim + 1, llm + 1
-      DO jl = 1, kdlon
+      DO jl = 1, klon
         zfn10(jl) = zfn10(jl) + pcts(jl, jk-1)
         pfluc(jl, 1, jk) = zfn10(jl)
         pfluc(jl, 2, jk) = 0.

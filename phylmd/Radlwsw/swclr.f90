@@ -21,37 +21,37 @@ contains
     ! MODIFICATIONS.
     ! ORIGINAL : 94-11-15
 
-    USE conf_phys_m, ONLY: kdlon
     use dimensions, only: llm
+    use dimphy, only: klon
     USE radepsi, only: zepsec
     USE radopt, only: novlp
 
     ! ARGUMENTS:
 
     INTEGER knu
-    DOUBLE PRECISION palbp(kdlon, 2)
-    DOUBLE PRECISION, intent(in):: pdsig(kdlon, llm)
-    DOUBLE PRECISION, intent(in):: prayl(kdlon)
-    DOUBLE PRECISION psec(kdlon)
+    DOUBLE PRECISION palbp(klon, 2)
+    DOUBLE PRECISION, intent(in):: pdsig(klon, llm)
+    DOUBLE PRECISION, intent(in):: prayl(klon)
+    DOUBLE PRECISION psec(klon)
 
-    DOUBLE PRECISION, intent(out):: ppizaz(kdlon, llm)
-    DOUBLE PRECISION pray1(kdlon, llm + 1)
-    DOUBLE PRECISION pray2(kdlon, llm + 1)
-    DOUBLE PRECISION prefz(kdlon, 2, llm + 1)
-    DOUBLE PRECISION prj(kdlon, 6, llm + 1)
-    DOUBLE PRECISION prk(kdlon, 6, llm + 1)
-    DOUBLE PRECISION prmu0(kdlon, llm + 1)
-    DOUBLE PRECISION, intent(out):: ptauaz(kdlon, llm)
-    DOUBLE PRECISION ptra1(kdlon, llm + 1)
-    DOUBLE PRECISION ptra2(kdlon, llm + 1)
+    DOUBLE PRECISION, intent(out):: ppizaz(klon, llm)
+    DOUBLE PRECISION pray1(klon, llm + 1)
+    DOUBLE PRECISION pray2(klon, llm + 1)
+    DOUBLE PRECISION prefz(klon, 2, llm + 1)
+    DOUBLE PRECISION prj(klon, 6, llm + 1)
+    DOUBLE PRECISION prk(klon, 6, llm + 1)
+    DOUBLE PRECISION prmu0(klon, llm + 1)
+    DOUBLE PRECISION, intent(out):: ptauaz(klon, llm)
+    DOUBLE PRECISION ptra1(klon, llm + 1)
+    DOUBLE PRECISION ptra2(klon, llm + 1)
 
     ! LOCAL VARIABLES:
-    DOUBLE PRECISION zc0i(kdlon, llm + 1)
-    DOUBLE PRECISION zclear(kdlon)
-    DOUBLE PRECISION zr21(kdlon)
-    DOUBLE PRECISION zss0(kdlon)
-    DOUBLE PRECISION zscat(kdlon)
-    DOUBLE PRECISION ztr(kdlon, 2, llm + 1)
+    DOUBLE PRECISION zc0i(klon, llm + 1)
+    DOUBLE PRECISION zclear(klon)
+    DOUBLE PRECISION zr21(klon)
+    DOUBLE PRECISION zss0(klon)
+    DOUBLE PRECISION zscat(klon)
+    DOUBLE PRECISION ztr(klon, 2, llm + 1)
     INTEGER jl, jk, ja, jkl, jklp1, jaj, jkm1
     DOUBLE PRECISION zfacoa, zcorae
     DOUBLE PRECISION zmue, zgap, zww, zto, zden, zmu1, zden1
@@ -64,7 +64,7 @@ contains
 
     DO jk = 1, llm + 1
        DO ja = 1, 6
-          DO jl = 1, kdlon
+          DO jl = 1, klon
              prj(jl, ja, jk) = 0d0
              prk(jl, ja, jk) = 0d0
           END DO
@@ -72,7 +72,7 @@ contains
     END DO
 
     DO jk = 1, llm
-       DO jl = 1, kdlon
+       DO jl = 1, klon
           ptauaz(jl, jk) = prayl(jl) * pdsig(jl, jk)
           ppizaz(jl, jk) = 1d0 - repsct
        END DO
@@ -80,7 +80,7 @@ contains
 
     ! 2. TOTAL EFFECTIVE CLOUDINESS ABOVE A GIVEN LEVEL
 
-    DO jl = 1, kdlon
+    DO jl = 1, klon
        zc0i(jl, llm + 1) = 0d0
        zclear(jl) = 1d0
        zscat(jl) = 0d0
@@ -89,7 +89,7 @@ contains
     jk = 1
     jkl = llm + 1 - jk
     jklp1 = jkl + 1
-    DO jl = 1, kdlon
+    DO jl = 1, klon
        zfacoa = 1d0
        zcorae = zfacoa * ptauaz(jl, jkl) * psec(jl)
        zr21(jl) = exp(- zcorae)
@@ -116,7 +116,7 @@ contains
     DO jk = 2, llm
        jkl = llm + 1 - jk
        jklp1 = jkl + 1
-       DO jl = 1, kdlon
+       DO jl = 1, klon
           zfacoa = 1d0
           zcorae = zfacoa * ptauaz(jl, jkl) * psec(jl)
           zr21(jl) = exp(- zcorae)
@@ -143,7 +143,7 @@ contains
 
     ! 3. REFLECTIVITY/TRANSMISSIVITY FOR PURE SCATTERING
 
-    DO jl = 1, kdlon
+    DO jl = 1, klon
        pray1(jl, llm + 1) = 0d0
        pray2(jl, llm + 1) = 0d0
        prefz(jl, 2, 1) = palbp(jl, knu)
@@ -154,7 +154,7 @@ contains
 
     DO jk = 2, llm + 1
        jkm1 = jk - 1
-       DO jl = 1, kdlon
+       DO jl = 1, klon
 
           ! 3.1 EQUIVALENT ZENITH ANGLE
 
@@ -194,7 +194,7 @@ contains
 
        END DO
     END DO
-    DO jl = 1, kdlon
+    DO jl = 1, klon
        zmue = (1d0 - zc0i(jl, 1)) * psec(jl) + zc0i(jl, 1) * 1.66d0
        prmu0(jl, 1) = 1d0 / zmue
     END DO
@@ -203,7 +203,7 @@ contains
 
     IF (knu == 1) THEN
        jaj = 2
-       DO jl = 1, kdlon
+       DO jl = 1, klon
           prj(jl, jaj, llm + 1) = 1d0
           prk(jl, jaj, llm + 1) = prefz(jl, 1, llm + 1)
        END DO
@@ -211,7 +211,7 @@ contains
        DO jk = 1, llm
           jkl = llm + 1 - jk
           jklp1 = jkl + 1
-          DO jl = 1, kdlon
+          DO jl = 1, klon
              zre11 = prj(jl, jaj, jklp1) * ztr(jl, 1, jkl)
              prj(jl, jaj, jkl) = zre11
              prk(jl, jaj, jkl) = zre11 * prefz(jl, 1, jkl)
@@ -219,7 +219,7 @@ contains
        END DO
     ELSE
        DO jaj = 1, 2
-          DO jl = 1, kdlon
+          DO jl = 1, klon
              prj(jl, jaj, llm + 1) = 1d0
              prk(jl, jaj, llm + 1) = prefz(jl, jaj, llm + 1)
           END DO
@@ -227,7 +227,7 @@ contains
           DO jk = 1, llm
              jkl = llm + 1 - jk
              jklp1 = jkl + 1
-             DO jl = 1, kdlon
+             DO jl = 1, klon
                 zre11 = prj(jl, jaj, jklp1) * ztr(jl, jaj, jkl)
                 prj(jl, jaj, jkl) = zre11
                 prk(jl, jaj, jkl) = zre11 * prefz(jl, jaj, jkl)
