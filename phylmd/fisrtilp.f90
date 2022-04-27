@@ -25,44 +25,51 @@ contains
     USE suphec_m, ONLY: rcpd, rd, retv, rg, rlstt, rlvtt, rtt
     USE yoethf_m, ONLY: r2es, r5ies, r5les, rvtmp2
 
-    REAL, INTENT (IN):: paprs(klon, klev+1) ! pression a inter-couche 
-    REAL, INTENT (IN):: pplay(klon, klev) ! pression au milieu de couche
-    REAL, INTENT (IN):: t(klon, klev) ! temperature (K)
-    REAL, INTENT (IN):: q(klon, klev) ! humidite specifique (kg/kg)
-    LOGICAL, INTENT (IN):: ptconv(klon, klev)
+    REAL, INTENT(IN):: paprs(:, :) ! (klon, klev+1) pression a inter-couche
+    REAL, INTENT(IN):: pplay(:, :) ! (klon, klev) pression au milieu de couche
+    REAL, INTENT(IN):: t(:, :) ! (klon, klev) temperature (K)
+    REAL, INTENT(IN):: q(:, :) ! (klon, klev) humidite specifique (kg/kg)
+    LOGICAL, INTENT(IN):: ptconv(:, :) ! (klon, klev)
 
-    REAL, INTENT (IN):: ratqs(klon, klev)
+    REAL, INTENT(IN):: ratqs(:, :) ! (klon, klev)
     ! determine la largeur de distribution de vapeur
 
-    REAL, INTENT (out):: d_t(klon, klev) ! incrementation de la temperature (K)
-    REAL, INTENT (out):: d_q(klon, klev) ! incrementation de la vapeur d'eau
-    REAL, INTENT (out):: d_ql(klon, klev) ! incrementation de l'eau liquide
-    REAL, INTENT (out):: rneb(klon, klev) ! fraction nuageuse
+    REAL, INTENT(out):: d_t(:, :) ! (klon, klev)
+    ! incrementation de la temperature (K)
 
-    REAL, INTENT (out):: cldliq(klon, klev)
+    REAL, INTENT(out):: d_q(:, :) ! (klon, klev)
+    ! incrementation de la vapeur d'eau
+
+    REAL, INTENT(out):: d_ql(:, :) ! (klon, klev)
+    ! incrementation de l'eau liquide
+
+    REAL, INTENT(out):: rneb(:, :) ! (klon, klev) fraction nuageuse
+
+    REAL, INTENT(out):: cldliq(:, :) ! (klon, klev)
     ! eau liquide utilisee dans rayonnement
 
-    REAL, INTENT (out):: rain(klon) ! pluies (mm/s)
-    REAL, INTENT (out):: snow(klon) ! neige (mm/s)
+    REAL, INTENT(out):: rain(:) ! (klon) pluies (mm/s)
+    REAL, INTENT(out):: snow(:) ! (klon) neige (mm/s)
 
     ! Coeffients de fraction lessivee :
-    REAL, INTENT (inout):: pfrac_impa(klon, klev)
-    REAL, INTENT (inout):: pfrac_nucl(klon, klev)
-    REAL, INTENT (inout):: pfrac_1nucl(klon, klev)
+    REAL, INTENT(inout):: pfrac_impa(:, :) ! (klon, klev)
+    REAL, INTENT(inout):: pfrac_nucl(:, :) ! (klon, klev)
+    REAL, INTENT(inout):: pfrac_1nucl(:, :) ! (klon, klev)
 
-    ! Fraction d'aerosols lessivee par impaction
-    REAL, INTENT (out):: frac_impa(klon, klev)
+    ! Fraction d'a\'erosols lessiv\'ee par impaction
+    REAL, INTENT(out):: frac_impa(:, :) ! (klon, klev)
 
-    ! Fraction d'aerosols lessivee par nucleation
-    REAL, INTENT (out):: frac_nucl(klon, klev)
+    ! Fraction d'a\'erosols lessiv\'ee par nucl\'eation
+    REAL, INTENT(out):: frac_nucl(:, :) ! (klon, klev)
 
-    REAL, INTENT (out):: prfl(klon, klev+1)
+    REAL, INTENT(out):: prfl(:, :) ! (klon, klev+1)
     ! flux d'eau precipitante aux interfaces (kg/m2/s)
 
-    REAL, INTENT (out):: psfl(klon, klev+1)
+    REAL, INTENT(out):: psfl(:, :) ! (klon, klev+1)
     ! flux d'eau precipitante aux interfaces (kg/m2/s)
 
-    REAL, INTENT (out):: rhcl(klon, klev) ! humidite relative en ciel clair 
+    REAL, INTENT(out):: rhcl(:, :) ! (klon, klev)
+    ! humidite relative en ciel clair
 
     ! Local:
 
@@ -75,12 +82,12 @@ contains
 
     INTEGER ninter ! sous-intervals pour la precipitation
     PARAMETER (ninter=5)
-    LOGICAL evap_prec ! evaporation de la pluie 
+    LOGICAL evap_prec ! evaporation de la pluie
     PARAMETER (evap_prec=.TRUE.)
     REAL zpdf_sig(klon), zpdf_k(klon), zpdf_delta(klon)
     REAL zpdf_a(klon), zpdf_b(klon), zpdf_e1(klon), zpdf_e2(klon)
 
-    LOGICAL cpartiel ! condensation partielle 
+    LOGICAL cpartiel ! condensation partielle
     PARAMETER (cpartiel=.TRUE.)
     REAL t_coup
     PARAMETER (t_coup=234.0)
@@ -91,7 +98,7 @@ contains
     REAL zrfl(klon), zrfln(klon), zqev, zqevt
     REAL zoliq(klon), zcond(klon), zq(klon), zqn(klon), zdelq
     REAL ztglace, zt(klon)
-    INTEGER nexpo ! exponentiel pour glace/eau 
+    INTEGER nexpo ! exponentiel pour glace/eau
     REAL zdz(klon), zrho(klon), ztot(klon), zrhol(klon)
     REAL zchau(klon), zfroi(klon), zfice(klon), zneb(klon)
 
@@ -422,7 +429,7 @@ contains
        END DO
 
        ! Lessivage par impaction dans les couches en-dessous
-       ! boucle sur i 
+       ! boucle sur i
        DO kk = k - 1, 1, -1
           DO i = 1, klon
              IF (rneb(i, k)>0. .AND. zprec_cond(i)>0.) THEN
