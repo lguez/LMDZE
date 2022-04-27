@@ -175,7 +175,6 @@ contains
           d_ql(i, k) = 0.0
           rneb(i, k) = 0.0
           cldliq(i, k) = 0.0
-          frac_nucl(i, k) = 1.
           frac_impa(i, k) = 1.
        END DO
     END DO
@@ -425,6 +424,8 @@ contains
              ! nucleation avec un facteur -1 au lieu de -0.5
              zfrac_lessi = 1. - exp(-zprec_cond(i)/zneb(i))
              pfrac_1nucl(i, k) = pfrac_1nucl(i, k)*(1.-zneb(i)*zfrac_lessi)
+          else
+             frac_nucl(i, k) = 1.
           END IF
        END DO
 
