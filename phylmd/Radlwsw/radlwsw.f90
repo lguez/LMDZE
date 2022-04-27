@@ -29,60 +29,68 @@ contains
     USE yoethf_m, ONLY: rvtmp2
 
     real, intent(in):: dist ! distance Terre-Soleil, en ua
-    real, intent(in):: mu0(klon) ! cosinus de l'angle zenithal
-    real, intent(in):: fract(klon) ! duree d'ensoleillement normalisee
-    real, intent(in):: paprs(klon, klev + 1) ! pression a inter-couche (Pa)
-    real, intent(in):: play(klon, klev) ! pression au milieu de couche (Pa)
-    real, intent(in):: tsol(klon) ! temperature du sol (en K)
-    real, intent(in):: albedo(klon) ! albedo du sol (entre 0 et 1)
+    real, intent(in):: mu0(:) ! (klon) cosinus de l'angle zenithal
+    real, intent(in):: fract(:) ! (klon)  duree d'ensoleillement normalisee
 
-    real, intent(in):: wo(klon, klev)
-    real, intent(in):: t_seri(klon, klev) ! temperature (K)
-    real, intent(in):: q_seri(klon, klev) ! vapeur d'eau (en kg/kg)
+    real, intent(in):: paprs(:, :) ! (klon, klev + 1)
+    ! pression a inter-couche (Pa)
+
+    real, intent(in):: play(:, :) ! (klon, klev)
+    ! pression au milieu de couche (Pa)
+
+    real, intent(in):: tsol(:) ! (klon)  temperature du sol (en K)
+    real, intent(in):: albedo(:) ! (klon)  albedo du sol (entre 0 et 1)
+    real, intent(in):: t_seri(:, :) ! (klon, klev) temperature (K)
+    real, intent(in):: q_seri(:, :) ! (klon, klev) vapeur d'eau (en kg/kg)
+
+    real, intent(in):: wo(:, :) ! (klon, klev)
     ! column-density of ozone in a layer, in kilo-Dobsons
 
-    real, intent(in):: cldfra(klon, klev) ! fraction nuageuse (entre 0 et 1)
+    real, intent(in):: cldfra(:, :) ! (klon, klev)
+    ! fraction nuageuse (entre 0 et 1)
 
-    real, intent(in):: cldemi(klon, klev)
+    real, intent(in):: cldemi(:, :) ! (klon, klev)
     ! emissivite des nuages dans l'IR (entre 0 et 1)
 
-    real, intent(in):: cldtau(klon, klev)
+    real, intent(in):: cldtau(:, :) ! (klon, klev)
     ! \'epaisseur optique des nuages dans le visible (present-day value)
 
-    real, intent(out):: heat(klon, klev)
+    real, intent(out):: heat(:, :) ! (klon, klev)
     ! échauffement atmosphérique (visible) (K/jour)
 
-    real, intent(out):: heat0(klon, klev) ! chauffage solaire ciel clair
-    real, intent(out):: cool(klon, klev) ! refroidissement dans l'IR (K/jour)
+    real, intent(out):: heat0(:, :) ! (klon, klev) chauffage solaire ciel clair
 
-    real, intent(out):: cool0(klon, klev)
+    real, intent(out):: cool(:, :) ! (klon, klev)
+    ! refroidissement dans l'IR (K/jour)
+
+    real, intent(out):: cool0(:, :) ! (klon, klev)
     ! refroidissement infrarouge ciel clair
 
-    real, intent(out):: radsol(klon)
+    real, intent(out):: radsol(:) ! (klon)
     ! bilan radiatif net au sol (W/m**2), positif vers le bas
 
-    real, intent(out):: topsw(klon) ! flux solaire net au sommet de l'atm.
+    real, intent(out):: topsw(:) ! (klon)  flux solaire net au sommet de l'atm.
 
-    real, intent(out):: toplw(klon)
+    real, intent(out):: toplw(:) ! (klon)
     ! rayonnement infrarouge montant au sommet de l'atmosphère
 
-    real, intent(out):: solsw(klon) ! flux solaire net à la surface
+    real, intent(out):: solsw(:) ! (klon) flux solaire net à la surface
 
-    real, intent(out):: sollw(klon)
+    real, intent(out):: sollw(:) ! (klon)
     ! rayonnement infrarouge net à la surface
 
-    real, intent(out):: sollwdown(klon)
-    real, intent(out):: topsw0(klon)
-    real, intent(out):: toplw0(klon)
-    real, intent(out):: solsw0(klon), sollw0(klon)
+    real, intent(out):: sollwdown(:) ! (klon)
+    real, intent(out):: topsw0(:) ! (klon)
+    real, intent(out):: toplw0(:) ! (klon)
+    real, intent(out):: solsw0(:), sollw0(:) ! (klon)
     REAL, intent(out):: lwdn0(:, :), lwdn(:, :) ! (klon, klev + 1)
-    REAL, intent(out):: lwup0(klon, klev + 1), lwup(klon, klev + 1)
-    REAL, intent(out):: swdn0(klon, klev + 1), swdn(klon, klev + 1)
-    REAL, intent(out):: swup0(klon, klev + 1), swup(klon, klev + 1)
+    REAL, intent(out):: lwup0(:, :), lwup(:, :) ! (klon, klev + 1)
+    REAL, intent(out):: swdn0(:, :), swdn(:, :) ! (klon, klev + 1)
+    REAL, intent(out):: swup0(:, :), swup(:, :) ! (klon, klev + 1)
 
     logical, intent(in):: ok_ade ! apply the Aerosol Direct Effect
 
-    real, intent(out):: topswad(klon), solswad(klon)
+    real, intent(out):: topswad(:), solswad(:) ! (klon)
     ! aerosol direct forcing at TOA and surface
     ! rayonnement solaire net absorb\'e
 
