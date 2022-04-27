@@ -4,10 +4,11 @@ module radlwsw_m
 
 contains
 
-  SUBROUTINE radlwsw(dist, mu0, fract, paprs, play, tsol, albedo, t, q, wo, &
-       cldfra, cldemi, cldtau, heat, heat0, cool, cool0, radsol, topsw, toplw, &
-       solsw, sollw, sollwdown, topsw0, toplw0, solsw0, sollw0, lwdn0, lwdn, &
-       lwup0, lwup, swdn0, swdn, swup0, swup, ok_ade, topswad, solswad)
+  SUBROUTINE radlwsw(dist, mu0, fract, paprs, play, tsol, albedo, t_seri, &
+       q_seri, wo, cldfra, cldemi, cldtau, heat, heat0, cool, cool0, radsol, &
+       topsw, toplw, solsw, sollw, sollwdown, topsw0, toplw0, solsw0, sollw0, &
+       lwdn0, lwdn, lwup0, lwup, swdn0, swdn, swup0, swup, ok_ade, topswad, &
+       solswad)
 
     ! From LMDZ4/libf/phylmd/radlwsw.F, version 1.4, 2005/06/06 13:16:33
     ! Author: Z. X. Li (LMD/CNRS)
@@ -34,10 +35,10 @@ contains
     real, intent(in):: play(klon, klev) ! pression au milieu de couche (Pa)
     real, intent(in):: tsol(klon) ! temperature du sol (en K)
     real, intent(in):: albedo(klon) ! albedo du sol (entre 0 et 1)
-    real, intent(in):: t(klon, klev) ! temperature (K)
-    real, intent(in):: q(klon, klev) ! vapeur d'eau (en kg/kg)
 
     real, intent(in):: wo(klon, klev)
+    real, intent(in):: t_seri(klon, klev) ! temperature (K)
+    real, intent(in):: q_seri(klon, klev) ! vapeur d'eau (en kg/kg)
     ! column-density of ozone in a layer, in kilo-Dobsons
 
     real, intent(in):: cldfra(klon, klev) ! fraction nuageuse (entre 0 et 1)
@@ -157,20 +158,20 @@ contains
        zx_alpha1 = (paprs(i, 1)-play(i, 2)) &
             / (play(i, 1)-play(i, 2))
        zx_alpha2 = 1. - zx_alpha1
-       PTL(i, 1) = t(i, 1) * zx_alpha1 + t(i, 2) * zx_alpha2
-       PTL(i, klev + 1) = t(i, klev)
+       PTL(i, 1) = t_seri(i, 1) * zx_alpha1 + t_seri(i, 2) * zx_alpha2
+       PTL(i, klev + 1) = t_seri(i, klev)
        PDT0(i) = tsol(i) - PTL(i, 1)
     ENDDO
     DO k = 2, klev
        DO i = 1, klon
-          PTL(i, k) = (t(i, k) + t(i, k-1))*0.5
+          PTL(i, k) = (t_seri(i, k) + t_seri(i, k-1))*0.5
        ENDDO
     ENDDO
     DO k = 1, klev
        DO i = 1, klon
           PDP(i, k) = paprs(i, k)-paprs(i, k + 1)
-          PTAVE(i, k) = t(i, k)
-          PWV(i, k) = MAX(q(i, k), 1e-12)
+          PTAVE(i, k) = t_seri(i, k)
+          PWV(i, k) = MAX(q_seri(i, k), 1e-12)
           PQS(i, k) = PWV(i, k)
           POZON(i, k) = wo(i, k) * RG * dobson_u * 1e3 &
                / (paprs(i, k) - paprs(i, k + 1))
