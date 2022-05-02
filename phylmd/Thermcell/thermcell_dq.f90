@@ -14,8 +14,8 @@ contains
 
     integer, intent(in):: ngrid, nlay
     real, intent(in):: ptimestep
-    real fm(ngrid, nlay+1)
-    real entr(ngrid, nlay)
+    real, intent(in):: fm(ngrid, nlay+1)
+    real, intent(in):: entr(ngrid, nlay)
     real, intent(in):: masse(ngrid, nlay)
     real q(ngrid, nlay)
     real dq(ngrid, nlay)
@@ -54,7 +54,6 @@ contains
 
     do k=2, nlay
        do ig=1, ngrid
-          ! wqd(ig, k)=fm(ig, k)*0.5*(q(ig, k-1)+q(ig, k))
           wqd(ig, k)=fm(ig, k)*q(ig, k)
        enddo
     enddo

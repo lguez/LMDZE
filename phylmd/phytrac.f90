@@ -22,8 +22,11 @@ contains
 
     ! Modifications pour les traceurs :
     ! - uniformisation des param\'etrisations dans phytrac
-    ! - stockage des moyennes des champs n\'ecessaires en mode traceur off-line 
+    ! - stockage des moyennes des champs n\'ecessaires en mode traceur off-line
 
+    ! Large scale scavenging: C. Genthon, Tellus (1992), 44B, 371--389
+
+    ! Libraries:
     use jumble, only: assert
     use netcdf, only: NF90_FILL_float
     use netcdf95, only: nf95_inq_varid, nf95_get_var, nf95_put_var, nf95_close
@@ -39,7 +42,6 @@ contains
     use dimphy, only: klon
     use thermcell_dq_m, only: thermcell_dq
     use histwrite_phy_m, only: histwrite_phy
-    use indicesol, only: nbsrf
     use infotrac_init_m, only: tname
     use initrrnpb_m, only: initrrnpb
     use minmaxqfi_m, only: minmaxqfi
@@ -57,40 +59,58 @@ contains
     real, intent(in):: time ! heure de la journ\'ee en fraction de jour
     logical, intent(in):: firstcal ! first call to "calfis"
     logical, intent(in):: lafin ! fin de la physique
-    real, intent(in):: t(klon, llm) ! temperature, in K
+    real, intent(in):: t(:, :) ! (klon, llm) temperature, in K
 
-    real, intent(in):: paprs(klon, llm+1)
+    real, intent(in):: paprs(:, :) ! (klon, llm+1)
     ! (pression pour chaque inter-couche, en Pa)
 
-    real, intent(in):: play(klon, llm)
+    real, intent(in):: play(:, :) ! (klon, llm)
     ! (pression pour le mileu de chaque couche, en Pa)
 
-    ! convection:
+    ! Convection:
 
-    REAL, intent(in):: mfu(klon, llm) ! flux de masse dans le panache montant
+    REAL, intent(in):: mfu(:, :) ! (klon, llm)
+    ! flux de masse dans le panache montant
 
-    REAL, intent(in):: mfd(klon, llm)
+    REAL, intent(in):: mfd(:, :) ! (klon, llm)
     ! flux de masse dans le panache descendant
 
-    REAL pde_u(klon, llm) ! flux detraine dans le panache montant
-    REAL pen_d(klon, llm) ! flux entraine dans le panache descendant
+    REAL, intent(in):: pde_u(:, :) ! (klon, llm)
+    ! flux detraine dans le panache montant
+
+    REAL, intent(in):: pen_d(:, :) ! (klon, llm)
+    ! flux entraine dans le panache descendant
+
     REAL, intent(in):: coefh(:, 2:) ! (klon, 2:llm) coeff melange couche limite
     real, intent(in):: cdragh(:) ! (klon)
-    real fm_therm(klon, llm+1), entr_therm(klon, llm) ! thermiques
+
+    ! Thermiques :
+    real, intent(in):: fm_therm(:, :) ! (klon, llm+1)
+    real, intent(in):: entr_therm(:, :) ! (klon, llm)
+
     REAL, intent(in):: yu1(:), yv1(:) ! (klon) vent au premier niveau
 
     ! Arguments n\'ecessaires pour les sources et puits de traceur :
-    real, intent(in):: ftsol(:, :) ! (klon, nbsrf) surface temperature (K)
-    real, intent(in):: pctsrf(klon, nbsrf) ! Pourcentage de sol f(nature du sol)
 
-    ! Lessivage pour le on-line
-    REAL, intent(in):: frac_impa(klon, llm) ! fraction d'aerosols impactes
-    REAL, intent(in):: frac_nucl(klon, llm) ! fraction d'aerosols nuclees
+    real, intent(in):: ftsol(:, :) ! (klon, nbsrf) surface temperature (K)
+
+    real, intent(in):: pctsrf(:, :) ! (klon, nbsrf)
+    ! Pourcentage de sol f(nature du sol)
+
+    ! Lessivage pour le on-line :
+
+    REAL, intent(in):: frac_impa(:, :) ! (klon, llm)
+    ! fraction d'a\'erosols impact\'es
+
+    REAL, intent(in):: frac_nucl(:, :) ! (klon, llm)
+    ! fraction d'a\'erosols nucl\'e\'es
 
     ! Kerry Emanuel
-    real, intent(in):: da(klon, llm), phi(klon, llm, llm), mp(klon, llm)
-    REAL, intent(in):: upwd(klon, llm) ! saturated updraft mass flux
-    REAL, intent(in):: dnwd(klon, llm) ! saturated downdraft mass flux
+    real, intent(in):: da(:, :) ! (klon, llm)
+    real, intent(in):: phi(:, :, :) ! (klon, llm, llm)
+    real, intent(in):: mp(:, :) ! (klon, llm)
+    REAL, intent(in):: upwd(:, :) ! (klon, llm) saturated updraft mass flux
+    REAL, intent(in):: dnwd(:, :) ! (klon, llm) saturated downdraft mass flux
 
     real, intent(inout):: tr_seri(:, :, :) ! (klon, llm, nqmx - 2)
     ! (mass fractions of tracers, excluding water, at mid-layers)
@@ -102,14 +122,11 @@ contains
 
     integer nsplit
 
-    ! TRACEURS
+    ! TRACEURS. Sources et puits des traceurs. Pour l'instant seuls
+    ! les cas du rn et du pb ont ete envisages.
 
-    ! Sources et puits des traceurs:
+    REAL source(klon) ! a voir lorsque le flux est prescrit
 
-    ! Pour l'instant seuls les cas du rn et du pb ont ete envisages.
-
-    REAL source(klon) ! a voir lorsque le flux est prescrit 
-    ! 
     ! Pour la source de radon et son reservoir de sol
 
     REAL, save, allocatable:: trs(:, :) ! (klon, nqmx - 2)
@@ -132,9 +149,8 @@ contains
     REAL, save:: scavtr(nqmx - 2) ! Coefficient de lessivage
     CHARACTER itn
 
-    logical, save:: aerosol(nqmx - 2) ! Nature du traceur
-    ! ! aerosol(it) = true => aerosol 
-    ! ! aerosol(it) = false => gaz 
+    logical, save:: aerosol(nqmx - 2) ! nature du traceur
+    ! true => aerosol, false => gaz
 
     logical, save:: clsol(nqmx - 2) ! couche limite sol flux
     ! calcul\'ee, sinon prescrit
@@ -144,27 +160,25 @@ contains
     INTEGER i, k, it
     REAL delp(klon, llm)
 
-    ! Variables liees a l'ecriture de la bande histoire physique
-
     ! Variables locales pour effectuer les appels en serie
 
-    REAL d_tr(klon, llm), d_trs(klon) ! tendances de traceurs 
+    REAL d_tr(klon, llm), d_trs(klon) ! tendances de traceurs
     REAL d_tr_cl(klon, llm, nqmx - 2) ! tendance de traceurs couche limite
 
-    REAL d_tr_cv(klon, llm, nqmx - 2) 
+    REAL d_tr_cv(klon, llm, nqmx - 2)
     ! tendance de traceurs conv pour chq traceur
 
     REAL d_tr_th(klon, llm, nqmx - 2) ! la tendance des thermiques
-    REAL d_tr_dec(klon, llm, 2) ! la tendance de la decroissance 
-    ! ! radioactive du rn - > pb 
+    REAL d_tr_dec(klon, llm, 2) ! la tendance de la decroissance
+    ! ! radioactive du rn - > pb
 
     REAL d_tr_lessi_impa(klon, llm, nqmx - 2)
     ! tendance du lessivage par impaction
 
     REAL d_tr_lessi_nucl(klon, llm, nqmx - 2)
-    ! tendance du lessivage par nucleation
+    ! tendance du lessivage par nucl\'eation
 
-    REAL flestottr(klon, llm, nqmx - 2) ! flux de lessivage dans chaque couche 
+    REAL flestottr(klon, llm, nqmx - 2) ! flux de lessivage dans chaque couche
 
     real ztra_th(klon, llm)
     integer isplit, varid
@@ -191,15 +205,15 @@ contains
        if (any(trs(:, 1) == NF90_FILL_float)) call abort_gcm("phytrac", &
             "some missing values in trs(:, 1)")
 
-       ! Initialisation de la fraction d'aerosols lessivee
-
+       ! Initialisation de la fraction d'a\'erosols lessiv\'ee
        d_tr_lessi_impa = 0.
        d_tr_lessi_nucl = 0.
 
        ! Initialisation de la nature des traceurs
-
-       aerosol = .FALSE. ! Tous les traceurs sont des gaz par defaut
-       radio = .FALSE. ! par d\'efaut pas de passage par "radiornpb"
+       aerosol(1) = .FALSE.
+       aerosol(3:) = .false.
+       radio(3:) = .FALSE. ! pas de passage par "radiornpb"
+       clsol(3:) = .false.
 
        if (nqmx >= 5) then
           call press_coefoz ! read input pressure levels for ozone coefficients
@@ -207,17 +221,15 @@ contains
        end if
 
        ! Initialisation du traceur dans le sol (couche limite radonique)
-       radio(1)= .true.
-       radio(2)= .true.
-       clsol(:2)= .true.
-       clsol(3:)= .false.
+       radio(:2) = .true.
+       clsol(:2) = .true.
        aerosol(2) = .TRUE. ! le Pb est un aerosol
        call initrrnpb(pctsrf, masktr, fshtr, hsoltr, tautr, vdeptr, scavtr)
     endif
 
     if (convection) then
        ! Calcul de l'effet de la convection
-       DO it=1, nqmx - 2
+       DO it = 1, nqmx - 2
           if (conv_emanuel) then
              call cvltr(dtphys, da, phi, mp, paprs, tr_seri(:, :, it), upwd, &
                   dnwd, d_tr_cv(:, :, it))
@@ -226,12 +238,8 @@ contains
                   tr_seri(:, :, it), d_tr_cv(:, :, it))
           endif
 
-          DO k = 1, llm
-             DO i = 1, klon
-                tr_seri(i, k, it) = tr_seri(i, k, it) + d_tr_cv(i, k, it)
-             ENDDO
-          ENDDO
-          WRITE(unit=itn, fmt='(i1)') it
+          tr_seri(:, :, it) = tr_seri(:, :, it) + d_tr_cv(:, :, it)
+          WRITE(unit = itn, fmt = '(i1)') it
           CALL minmaxqfi(tr_seri(:, :, it), 0., 1e33, &
                'convection, tracer index = ' // itn)
        ENDDO
@@ -239,30 +247,30 @@ contains
 
     ! Calcul de l'effet des thermiques
 
-    do it=1, nqmx - 2
-       do k=1, llm
-          do i=1, klon
-             d_tr_th(i, k, it)=0.
-             tr_seri(i, k, it)=max(tr_seri(i, k, it), 0.)
-             tr_seri(i, k, it)=min(tr_seri(i, k, it), 1e10)
+    do it = 1, nqmx - 2
+       do k = 1, llm
+          do i = 1, klon
+             d_tr_th(i, k, it) = 0.
+             tr_seri(i, k, it) = max(tr_seri(i, k, it), 0.)
+             tr_seri(i, k, it) = min(tr_seri(i, k, it), 1e10)
           enddo
        enddo
     enddo
 
     if (iflag_thermals) then
-       nsplit=10
-       
-       DO it=1, nqmx - 2
-          do isplit=1, nsplit
+       nsplit = 10
+
+       DO it = 1, nqmx - 2
+          do isplit = 1, nsplit
              ! Thermiques
              call thermcell_dq(klon, llm, dtphys/nsplit, fm_therm, entr_therm, &
                   zmasse , tr_seri(1:klon, 1:llm, it), d_tr, ztra_th)
 
-             do k=1, llm
-                do i=1, klon
-                   d_tr(i, k)=dtphys*d_tr(i, k)/nsplit
-                   d_tr_th(i, k, it)=d_tr_th(i, k, it)+d_tr(i, k)
-                   tr_seri(i, k, it)=max(tr_seri(i, k, it)+d_tr(i, k), 0.)
+             do k = 1, llm
+                do i = 1, klon
+                   d_tr(i, k) = dtphys * d_tr(i, k)/nsplit
+                   d_tr_th(i, k, it) = d_tr_th(i, k, it)+d_tr(i, k)
+                   tr_seri(i, k, it) = max(tr_seri(i, k, it)+d_tr(i, k), 0.)
                 enddo
              enddo
           enddo
@@ -277,14 +285,14 @@ contains
        ENDDO
     ENDDO
 
-    ! MAF modif pour tenir compte du cas traceur
-    DO it=1, nqmx - 2
+    DO it = 1, nqmx - 2
        if (clsol(it)) then
-          ! couche limite avec quantite dans le sol calculee
+          ! Couche limite avec quantit\'e dans le sol calcul\'ee
           CALL cltracrn(it, dtphys, yu1, yv1, coefh, cdragh, t, ftsol, &
                pctsrf, tr_seri(:, :, it), trs(:, it), paprs, play, delp, &
                masktr(1, it), fshtr(1, it), hsoltr(it), tautr(it), &
                vdeptr(it), rlat, d_tr_cl(1, 1, it), d_trs)
+
           DO k = 1, llm
              DO i = 1, klon
                 tr_seri(i, k, it) = tr_seri(i, k, it) + d_tr_cl(i, k, it)
@@ -294,8 +302,8 @@ contains
           trs(:, it) = trs(:, it) + d_trs
        else
           ! couche limite avec flux prescrit
-          !MAF provisoire source / traceur a creer
-          DO i=1, klon
+          ! provisoire source / traceur a creer
+          DO i = 1, klon
              source(i) = 0. ! pas de source, pour l'instant
           ENDDO
 
@@ -311,14 +319,14 @@ contains
 
     ! Calcul de l'effet du puits radioactif
 
-    ! MAF il faudrait faire une modification pour passer dans radiornpb
-    ! si radio=true
+    ! il faudrait faire une modification pour passer dans radiornpb si
+    ! radio = true
     d_tr_dec = radiornpb(tr_seri, dtphys, tautr)
     DO it = 1, nqmx - 2
        if (radio(it)) then
           tr_seri(:, :, it) = tr_seri(:, :, it) + d_tr_dec(:, :, it)
-          WRITE(unit=itn, fmt='(i1)') it
-          CALL minmaxqfi(tr_seri(:, :, it), 0., 1e33, 'puits rn it='//itn)
+          WRITE(unit = itn, fmt = '(i1)') it
+          CALL minmaxqfi(tr_seri(:, :, it), 0., 1e33, 'puits rn it = '//itn)
        endif
     ENDDO
 
@@ -338,15 +346,14 @@ contains
     flestottr = 0.
 
     ! tendance des aerosols nuclees et impactes
-
     DO it = 1, nqmx - 2
        IF (aerosol(it)) THEN
           DO k = 1, llm
              DO i = 1, klon
-                d_tr_lessi_nucl(i, k, it) = d_tr_lessi_nucl(i, k, it) + &
-                     (1 - frac_nucl(i, k))*tr_seri(i, k, it)
-                d_tr_lessi_impa(i, k, it) = d_tr_lessi_impa(i, k, it) + &
-                     (1 - frac_impa(i, k))*tr_seri(i, k, it)
+                d_tr_lessi_nucl(i, k, it) = d_tr_lessi_nucl(i, k, it) &
+                     + (1 - frac_nucl(i, k)) * tr_seri(i, k, it)
+                d_tr_lessi_impa(i, k, it) = d_tr_lessi_impa(i, k, it) &
+                     + (1 - frac_impa(i, k)) * tr_seri(i, k, it)
              ENDDO
           ENDDO
        ENDIF
@@ -379,7 +386,7 @@ contains
 
     ! Ecriture des sorties
     CALL histwrite_phy("zmasse", zmasse)
-    DO it=1, nqmx - 2
+    DO it = 1, nqmx - 2
        CALL histwrite_phy(tname(it+2), tr_seri(:, :, it))
        CALL histwrite_phy("fl"//tname(it+2), flestottr(:, :, it))
        CALL histwrite_phy("d_tr_th_"//tname(it+2), d_tr_th(:, :, it))
