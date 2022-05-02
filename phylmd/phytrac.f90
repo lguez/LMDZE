@@ -4,10 +4,9 @@ module phytrac_m
 
 contains
 
-  SUBROUTINE phytrac(julien, gmtime, firstcal, lafin, t_seri, paprs, pplay, &
-       pmfu, pmfd, pde_u, pen_d, coefh, cdragh, fm_therm, entr_therm, yu1, &
-       yv1, ftsol, pctsrf, frac_impa, frac_nucl, da, phi, mp, upwd, dnwd, &
-       tr_seri, zmasse)
+  SUBROUTINE phytrac(julien, time, firstcal, lafin, t, paprs, play, mfu, mfd, &
+       pde_u, pen_d, coefh, cdragh, fm_therm, entr_therm, yu1, yv1, ftsol, &
+       pctsrf, frac_impa, frac_nucl, da, phi, mp, upwd, dnwd, tr_seri, zmasse)
 
     ! From phylmd/phytrac.F, version 1.15, 2006/02/21 08:08:30 (SVN
     ! revision 679) and phylmd/write_histrac.h, version 1.9,
@@ -55,22 +54,22 @@ contains
     use time_phylmdz, only: itap
 
     integer, intent(in):: julien !jour julien, 1 <= julien <= 360
-    real, intent(in):: gmtime ! heure de la journ\'ee en fraction de jour
+    real, intent(in):: time ! heure de la journ\'ee en fraction de jour
     logical, intent(in):: firstcal ! first call to "calfis"
     logical, intent(in):: lafin ! fin de la physique
-    real, intent(in):: t_seri(klon, llm) ! temperature, in K
+    real, intent(in):: t(klon, llm) ! temperature, in K
 
     real, intent(in):: paprs(klon, llm+1)
     ! (pression pour chaque inter-couche, en Pa)
 
-    real, intent(in):: pplay(klon, llm)
+    real, intent(in):: play(klon, llm)
     ! (pression pour le mileu de chaque couche, en Pa)
 
     ! convection:
 
-    REAL, intent(in):: pmfu(klon, llm) ! flux de masse dans le panache montant
+    REAL, intent(in):: mfu(klon, llm) ! flux de masse dans le panache montant
 
-    REAL, intent(in):: pmfd(klon, llm)
+    REAL, intent(in):: mfd(klon, llm)
     ! flux de masse dans le panache descendant
 
     REAL pde_u(klon, llm) ! flux detraine dans le panache montant
@@ -223,7 +222,7 @@ contains
              call cvltr(dtphys, da, phi, mp, paprs, tr_seri(:, :, it), upwd, &
                   dnwd, d_tr_cv(:, :, it))
           else
-             CALL nflxtr(dtphys, pmfu, pmfd, pde_u, pen_d, paprs, &
+             CALL nflxtr(dtphys, mfu, mfd, pde_u, pen_d, paprs, &
                   tr_seri(:, :, it), d_tr_cv(:, :, it))
           endif
 
@@ -282,8 +281,8 @@ contains
     DO it=1, nqmx - 2
        if (clsol(it)) then
           ! couche limite avec quantite dans le sol calculee
-          CALL cltracrn(it, dtphys, yu1, yv1, coefh, cdragh, t_seri, ftsol, &
-               pctsrf, tr_seri(:, :, it), trs(:, it), paprs, pplay, delp, &
+          CALL cltracrn(it, dtphys, yu1, yv1, coefh, cdragh, t, ftsol, &
+               pctsrf, tr_seri(:, :, it), trs(:, it), paprs, play, delp, &
                masktr(1, it), fshtr(1, it), hsoltr(it), tautr(it), &
                vdeptr(it), rlat, d_tr_cl(1, 1, it), d_trs)
           DO k = 1, llm
@@ -300,8 +299,8 @@ contains
              source(i) = 0. ! pas de source, pour l'instant
           ENDDO
 
-          CALL cltrac(dtphys, coefh, t_seri, tr_seri(:, :, it), source, &
-               paprs, pplay, delp, d_tr_cl(1, 1, it))
+          CALL cltrac(dtphys, coefh, t, tr_seri(:, :, it), source, &
+               paprs, play, delp, d_tr_cl(1, 1, it))
           DO k = 1, llm
              DO i = 1, klon
                 tr_seri(i, k, it) = tr_seri(i, k, it) + d_tr_cl(i, k, it)
@@ -327,9 +326,9 @@ contains
        ! Ozone as a tracer:
        if (mod(itap - 1, lmt_pas) == 0) then
           ! Once per day, update the coefficients for ozone chemistry:
-          call regr_pr_comb_coefoz(julien, paprs, pplay)
+          call regr_pr_comb_coefoz(julien, paprs, play)
        end if
-       call o3_chem(julien, gmtime, t_seri, zmasse, dtphys, tr_seri(:, :, 3))
+       call o3_chem(julien, time, t, zmasse, dtphys, tr_seri(:, :, 3))
     end if
 
     ! Calcul de l'effet de la precipitation
