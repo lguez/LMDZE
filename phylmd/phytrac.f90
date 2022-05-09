@@ -37,7 +37,7 @@ contains
     use cltracrn_m, only: cltracrn
     USE conf_gcm_m, ONLY: lmt_pas, dtphys
     use ctherm_m, only: iflag_thermals
-    use cvltr_m, only: cvltr
+    use cvltr_noscav_m, only: cvltr_noscav
     use dimensions, only: llm, nqmx
     use dimphy, only: klon
     use thermcell_dq_m, only: thermcell_dq
@@ -227,8 +227,8 @@ contains
     ! Calcul de l'effet de la convection
     DO it = 1, nqmx - 2
        if (conv_emanuel) then
-          call cvltr(dtphys, da, phi, mp, paprs, tr_seri(:, :, it), upwd, &
-               dnwd, d_tr_cv(:, :, it))
+          call cvltr_noscav(dtphys, da, phi, mp, paprs, tr_seri(:, :, it), &
+               upwd, dnwd, d_tr_cv(:, :, it))
        else
           CALL nflxtr(dtphys, mfu, mfd, pde_u, pen_d, paprs, &
                tr_seri(:, :, it), d_tr_cv(:, :, it))

@@ -1,10 +1,10 @@
-module cvltr_m
+module cvltr_noscav_m
 
   IMPLICIT NONE
 
 contains
 
-  SUBROUTINE cvltr(pdtime, da, phi, mp, paprs, x, upd, dnd, dx)
+  SUBROUTINE cvltr_noscav(pdtime, da, phi, mp, paprs, x, upd, dnd, dx)
 
     ! From LMDZ4/libf/phylmd/cvltr.F, version 1.1 2005/04/15 12:36:17
 
@@ -127,6 +127,6 @@ contains
        enddo
     enddo
 
-  end SUBROUTINE cvltr
+  end SUBROUTINE cvltr_noscav
 
-end module cvltr_m
+end module cvltr_noscav_m
