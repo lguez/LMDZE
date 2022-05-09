@@ -97,14 +97,18 @@ contains
     REAL, intent(out):: flux_u(:, :), flux_v(:, :) ! (klon, nbsrf)
     ! tension du vent (flux turbulent de vent) à la surface, en Pa
 
-    REAL, INTENT(out):: cdragh(:), cdragm(:) ! (klon)
+    REAL, INTENT(out):: cdragh(:) ! (klon)
+    ! drag coefficient for latent and sensible heat fluxes
+
+    REAL, INTENT(out):: cdragm(:) ! (klon)
 
     ! Ocean slab:
 
-    REAL, intent(out):: coefh(:, 2:) ! (klon, 2:klev)
-    ! Pour pouvoir extraire les coefficients d'\'echange, le champ
-    ! "coefh" a \'et\'e cr\'e\'e. Nous avons moyenn\'e les valeurs de
-    ! ce champ sur les quatre sous-surfaces du mod\`ele.
+    REAL, intent(out):: coefh(:, 2:) ! (klon, 2:klev) Diffusion
+    ! coefficient at layer interface, for heat and humidity, in m2
+    ! s-1. Pour pouvoir extraire les coefficients d'\'echange, le
+    ! champ "coefh" a \'et\'e cr\'e\'e. Nous avons moyenn\'e les
+    ! valeurs de ce champ sur les quatre sous-surfaces du mod\`ele.
 
     REAL, INTENT(inout):: t2m(klon, nbsrf), q2m(klon, nbsrf)
 

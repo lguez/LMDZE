@@ -24,6 +24,7 @@ contains
     USE clesphys, ONLY: cdhmax, cdmmax, ok_instan
     USE clesphys2, ONLY: conv_emanuel, nbapp_rad, ok_orodr, ok_orolf
     use clouds_gno_m, only: clouds_gno
+    use comconst, only: daysec
     use comgeom, only:  aire_2d
     USE concvl_m, ONLY: concvl
     USE conf_gcm_m, ONLY: nday, lmt_pas, dtphys
@@ -178,7 +179,8 @@ contains
     REAL cdragh(klon) ! drag coefficient for T and Q
     REAL cdragm(klon) ! drag coefficient for wind
 
-    REAL coefh(klon, 2:llm) ! coef d'echange pour phytrac
+    REAL coefh(klon, 2:llm)
+    ! diffusion coefficient at layer interface, for heat and humidity, in m2 s-1
 
     REAL, save, allocatable:: ffonte(:, :) ! (klon, nbsrf)
     ! flux thermique utilise pour fondre la neige
@@ -782,13 +784,8 @@ contains
             solsw0, sollw0, lwdn0, lwdn, lwup0, lwup, swdn0, swdn, swup0, swup)
     ENDIF
 
-    ! Ajouter la tendance des rayonnements (tous les pas)
-    DO k = 1, llm
-       DO i = 1, klon
-          t_seri(i, k) = t_seri(i, k) + (heat(i, k) - cool(i, k)) * dtphys &
-               / 86400.
-       ENDDO
-    ENDDO
+    ! Ajouter la tendance des rayonnements (tous les pas) :
+    t_seri = t_seri + (heat - cool) * dtphys / daysec
 
     ! Param\'etrisation de l'orographie \`a l'\'echelle sous-maille :
 
@@ -898,8 +895,8 @@ contains
     CALL histwrite_phy("dqvdf", d_q_vdf)
     CALL histwrite_phy("rhum", zx_rh)
     CALL histwrite_phy("d_t_ec", d_t_ec)
-    CALL histwrite_phy("dtsw0", heat0 / 86400.)
-    CALL histwrite_phy("dtlw0", - cool0 / 86400.)
+    CALL histwrite_phy("dtsw0", heat0 / daysec)
+    CALL histwrite_phy("dtlw0", - cool0 / daysec)
     call histwrite_phy("pmflxr", pmflxr(:, :llm))
     CALL histwrite_phy("msnow", sum(fsnow * pctsrf, dim = 2))
     call histwrite_phy("qsurf", sum(fqsurf * pctsrf, dim = 2))

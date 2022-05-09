@@ -67,7 +67,7 @@ contains
     real, intent(in):: play(:, :) ! (klon, llm)
     ! (pression pour le mileu de chaque couche, en Pa)
 
-    ! Convection:
+    ! Used only with Tiedke convection scheme:
 
     REAL, intent(in):: mfu(:, :) ! (klon, llm)
     ! flux de masse dans le panache montant
@@ -81,7 +81,9 @@ contains
     REAL, intent(in):: pen_d(:, :) ! (klon, llm)
     ! flux entraine dans le panache descendant
 
-    REAL, intent(in):: coefh(:, 2:) ! (klon, 2:llm) coeff melange couche limite
+    REAL, intent(in):: coefh(:, 2:) ! (klon, 2:llm)
+    ! diffusion coefficient at layer interface, for heat and humidity, in m2 s-1
+
     real, intent(in):: cdragh(:) ! (klon)
 
     ! Thermiques :

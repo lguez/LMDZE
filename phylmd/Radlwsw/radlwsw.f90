@@ -62,9 +62,10 @@ contains
     ! refroidissement infrarouge ciel clair
 
     real, intent(out):: radsol(:) ! (klon)
-    ! bilan radiatif net au sol (W/m**2), positif vers le bas
+    ! bilan radiatif net au sol (W m-2), positif vers le bas
 
-    real, intent(out):: topsw(:) ! (klon)  flux solaire net au sommet de l'atm.
+    real, intent(out):: topsw(:) ! (klon)
+    ! flux solaire net au sommet de l'atmosph`ere
 
     real, intent(out):: toplw(:) ! (klon)
     ! rayonnement infrarouge montant au sommet de l'atmosphère
