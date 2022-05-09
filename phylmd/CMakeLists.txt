@@ -1,6 +1,6 @@
 target_sources(LMDZE_objects PRIVATE aaam_bud.f90 ajsec.f90 chem.f90
   clesphys2.f90 clesphys.f90 clouds_gno.f90 cltrac.f90 cltracrn.f90
-  comfisrtilp.f90 concvl.f90 conf_phys.f90 cv_driver.f90 cvltr.f90
+  comfisrtilp.f90 concvl.f90 conf_phys.f90 cv_driver.f90 cvltr_noscav.f90
   diagcld1.f90 dimphy.f90 FCTTRE.f90 fisrtilp.f90 gr_phy_write.f90
   hgardfou.f90 histwrite_phy.f90 indicesol.f90 ini_histins.f90
   initrrnpb.f90 minmaxqfi.f90 newmicro.f90 nflxtr.f90 orbite.f90
