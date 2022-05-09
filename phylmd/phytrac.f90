@@ -183,9 +183,6 @@ contains
     real ztra_th(klon, llm)
     integer isplit, varid
 
-    ! Controls:
-    logical:: convection = .true.
-
     !--------------------------------------
 
     call assert(shape(zmasse) == (/klon, llm/), "phytrac zmasse")
@@ -227,23 +224,21 @@ contains
        call initrrnpb(pctsrf, masktr, fshtr, hsoltr, tautr, vdeptr, scavtr)
     endif
 
-    if (convection) then
-       ! Calcul de l'effet de la convection
-       DO it = 1, nqmx - 2
-          if (conv_emanuel) then
-             call cvltr(dtphys, da, phi, mp, paprs, tr_seri(:, :, it), upwd, &
-                  dnwd, d_tr_cv(:, :, it))
-          else
-             CALL nflxtr(dtphys, mfu, mfd, pde_u, pen_d, paprs, &
-                  tr_seri(:, :, it), d_tr_cv(:, :, it))
-          endif
+    ! Calcul de l'effet de la convection
+    DO it = 1, nqmx - 2
+       if (conv_emanuel) then
+          call cvltr(dtphys, da, phi, mp, paprs, tr_seri(:, :, it), upwd, &
+               dnwd, d_tr_cv(:, :, it))
+       else
+          CALL nflxtr(dtphys, mfu, mfd, pde_u, pen_d, paprs, &
+               tr_seri(:, :, it), d_tr_cv(:, :, it))
+       endif
 
-          tr_seri(:, :, it) = tr_seri(:, :, it) + d_tr_cv(:, :, it)
-          WRITE(unit = itn, fmt = '(i1)') it
-          CALL minmaxqfi(tr_seri(:, :, it), 0., 1e33, &
-               'convection, tracer index = ' // itn)
-       ENDDO
-    endif
+       tr_seri(:, :, it) = tr_seri(:, :, it) + d_tr_cv(:, :, it)
+       WRITE(unit = itn, fmt = '(i1)') it
+       CALL minmaxqfi(tr_seri(:, :, it), 0., 1e33, &
+            'convection, tracer index = ' // itn)
+    ENDDO
 
     ! Calcul de l'effet des thermiques
 
