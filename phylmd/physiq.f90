@@ -785,7 +785,7 @@ contains
     ENDIF
 
     ! Ajouter la tendance des rayonnements (tous les pas) :
-    t_seri = t_seri + (heat - cool) * dtphys / daysec
+    t_seri = t_seri + (heat - cool) / lmt_pas
 
     ! Param\'etrisation de l'orographie \`a l'\'echelle sous-maille :
 
