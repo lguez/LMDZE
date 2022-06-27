@@ -44,7 +44,7 @@ contains
     ! 10: schema Van-leer (retenu pour l'eau vapeur et liquide)
     ! 12: schema Frederic Hourdin I
     ! 13: schema Frederic Hourdin II
-    ! 14: schema Van-leer + humidite specifique 
+    ! 14: schema Van-leer + humidite specifique
 
     !-----------------------------------------------------------------------
 
@@ -61,6 +61,7 @@ contains
     call new_unit(unit)
     open(unit, file = 'traceur.def', status = 'old', action = "read", &
          position = "rewind", iostat = iostat)
+
     if (iostat == 0) then
        print *, 'Ouverture de "traceur.def" ok'
        read(unit, fmt = *) nq_local
@@ -69,12 +70,13 @@ contains
 
        do iq = 1, nqmx
           read(unit, fmt = *) iadv(iq), tname(iq)
+
           if (.not. any(iadv(iq) == allowed_adv)) then
              print *, "bad number for advection scheme"
              stop 1
           end if
        end do
-       close(unit) 
+       close(unit)
     else
        print *, 'Could not open "traceur.def".'
        print *, 'Using default values.'
@@ -94,6 +96,8 @@ contains
     do iq = 1, nqmx
        ttext(iq) = trim(tname(iq)) // descrq(iadv(iq))
     end do
+    ! (Note that we cannnot use an array assignment because trim is
+    ! not elemental.)
 
   END subroutine infotrac_init
 

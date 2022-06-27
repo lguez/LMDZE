@@ -26,6 +26,7 @@ contains
     use dimensions, only: iim, jjm
     use dimphy, only: klon
     use dynetat0_m, only: rlonu, rlatv
+    use extrapol_m, only: extrapol
     use grid_change, only: dyn_phy
     use grid_noro_m, only: mask
     use indicesol, only: epsfra, is_ter, is_oce, is_lic, is_sic
