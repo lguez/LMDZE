@@ -4,7 +4,7 @@ module fisrtilp_m
 
 contains
 
-  SUBROUTINE fisrtilp(paprs, pplay, t, q, ptconv, ratqs, d_t, d_q, d_ql, rneb, &
+  SUBROUTINE fisrtilp(paprs, play, t, q, ptconv, ratqs, d_t, d_q, d_ql, rneb, &
        cldliq, rain, snow, pfrac_impa, pfrac_nucl, pfrac_1nucl, frac_impa, &
        frac_nucl, prfl, psfl, rhcl)
 
@@ -26,7 +26,7 @@ contains
     USE yoethf_m, ONLY: r2es, r5ies, r5les, rvtmp2
 
     REAL, INTENT(IN):: paprs(:, :) ! (klon, klev+1) pression a inter-couche
-    REAL, INTENT(IN):: pplay(:, :) ! (klon, klev) pression au milieu de couche
+    REAL, INTENT(IN):: play(:, :) ! (klon, klev) pression au milieu de couche
     REAL, INTENT(IN):: t(:, :) ! (klon, klev) temperature (K)
     REAL, INTENT(IN):: q(:, :) ! (klon, klev) humidite specifique (kg/kg)
     LOGICAL, INTENT(IN):: ptconv(:, :) ! (klon, klev)
@@ -222,13 +222,13 @@ contains
           ! Calculer l'evaporation de la precipitation
           DO i = 1, klon
              IF (zrfl(i)>0.) THEN
-                zqs(i) = r2es*foeew(zt(i), rtt >= zt(i))/pplay(i, k)
+                zqs(i) = r2es*foeew(zt(i), rtt >= zt(i))/play(i, k)
                 zqs(i) = min(0.5, zqs(i))
                 zcor = 1./(1.-retv*zqs(i))
                 zqs(i) = zqs(i)*zcor
                 zqev = max(0.0, (zqs(i)-zq(i))*zneb(i))
                 zqevt = coef_eva*(1.0-zq(i)/zqs(i))*sqrt(zrfl(i))* &
-                     (paprs(i, k)-paprs(i, k+1))/pplay(i, k)*zt(i)*rd/rg
+                     (paprs(i, k)-paprs(i, k+1))/play(i, k)*zt(i)*rd/rg
                 zqevt = max(0.0, min(zqevt, zrfl(i)))*rg*dtphys/ &
                      (paprs(i, k)-paprs(i, k+1))
                 zqev = min(zqev, zqevt)
@@ -255,7 +255,7 @@ contains
           zdelta = rtt >= zt(i)
           zcvm5 = merge(r5ies*rlstt, r5les*rlvtt, zdelta)
           zcvm5 = zcvm5/rcpd/(1.0+rvtmp2*zq(i))
-          zqs(i) = r2es*foeew(zt(i), zdelta)/pplay(i, k)
+          zqs(i) = r2es*foeew(zt(i), zdelta)/play(i, k)
           zqs(i) = min(0.5, zqs(i))
           zcor = 1./(1.-retv*zqs(i))
           zqs(i) = zqs(i)*zcor
@@ -345,7 +345,7 @@ contains
        DO i = 1, klon
           IF (rneb(i, k)>0.0) THEN
              zoliq(i) = zcond(i)
-             zrho(i) = pplay(i, k)/zt(i)/rd
+             zrho(i) = play(i, k)/zt(i)/rd
              zdz(i) = (paprs(i, k)-paprs(i, k+1))/(zrho(i)*rg)
              zfice(i) = 1.0 - (zt(i)-ztglace)/(273.13-ztglace)
              zfice(i) = min(max(zfice(i), 0.0), 1.0)
