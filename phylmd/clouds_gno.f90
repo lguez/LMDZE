@@ -4,29 +4,32 @@ module CLOUDS_GNO_m
 
 contains
 
-  SUBROUTINE CLOUDS_GNO(klon, ND, R, RS, QSUB, PTCONV, RATQSC, CLDF)
+  SUBROUTINE CLOUDS_GNO(R, RS, QSUB, PTCONV, RATQSC, CLDF)
 
     ! From LMDZ4/libf/phylmd/clouds_gno.F, version 1.2, 2004/11/09 16:55:40
 
+    ! Libraries:
     use numer_rec_95, only: nr_erf
 
-    INTEGER, intent(in):: klon
-    INTEGER, intent(in):: ND ! number of vertical levels
+    use dimphy, only: klon, klev
 
-    REAL, intent(in):: R(klon, ND)
+    REAL, intent(in):: R(:, :) ! (klon, llm)
     ! domain-averaged mixing ratio of total water 
 
-    REAL, intent(in):: RS(klon, ND)
+    REAL, intent(in):: RS(:, :) ! (klon, llm)
     ! mean saturation humidity mixing ratio within the gridbox
 
-    REAL, intent(in):: QSUB(klon, ND)
+    REAL, intent(in):: QSUB(:, :) ! (klon, llm)
     ! mixing ratio of condensed water within clouds associated
     ! with SUBGRID-SCALE condensation processes (here, it is
     ! predicted by the convection scheme)
 
-    LOGICAL, intent(out):: PTCONV(klon, ND) ! Point convectif = TRUE
-    REAL, intent(out):: RATQSC(klon, ND) ! largeur normalisee de la distribution
-    REAL, intent(out):: CLDF(klon, ND) ! fraction nuageuse
+    LOGICAL, intent(out):: PTCONV(:, :) ! (klon, llm) Point convectif = TRUE
+
+    REAL, intent(out):: RATQSC(:, :) ! (klon, llm)
+    ! largeur normalisee de la distribution
+
+    REAL, intent(out):: CLDF(:, :) ! (klon, llm) fraction nuageuse
 
     ! Local:
     
@@ -65,7 +68,7 @@ contains
     ptconv=.false.
     ratqsc=0.
 
-    loop_vertical: DO K = 1, ND
+    loop_vertical: DO K = 1, klev
        do i=1, klon
           mu(i) = R(i, K)
           mu(i) = MAX(mu(i), min_mu)

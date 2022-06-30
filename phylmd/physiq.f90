@@ -597,8 +597,7 @@ contains
 
        ! Properties of convective clouds
        clwcon0 = fact_cldcon * clwcon0
-       call clouds_gno(klon, llm, q_seri, zqsat, clwcon0, ptconv, ratqsc, &
-            rnebcon0)
+       call clouds_gno(q_seri, zqsat, clwcon0, ptconv, ratqsc, rnebcon0)
 
        forall (i = 1:klon) ema_pct(i) = paprs(i, itop_con(i) + 1)
        mfd = 0.
