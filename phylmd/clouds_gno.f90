@@ -47,7 +47,7 @@ contains
     PARAMETER ( min_mu = 1.e-12, min_Q=1.e-12 )
 
     INTEGER i, K, n
-    REAL mu(klon), qsat(klon), delta(klon), beta(klon) 
+    REAL mu(klon), delta(klon), beta(klon)
     real zu2(klon), zv2(klon)
     REAL xx(klon), aux(klon), coeff(klon), my_block(klon)
     REAL dist(klon), fprime(klon), det(klon)
@@ -72,9 +72,7 @@ contains
        do i=1, klon
           mu(i) = Q_SERI(i, K)
           mu(i) = MAX(mu(i), min_mu)
-          qsat(i) = RS(i, K) 
-          qsat(i) = MAX(qsat(i), min_mu)
-          delta(i) = log(mu(i)/qsat(i))
+          delta(i) = log(mu(i)/MAX(RS(i, K), min_mu))
        enddo
 
        ! There is no subgrid-scale condensation; the scheme becomes
