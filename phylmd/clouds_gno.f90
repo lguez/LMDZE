@@ -14,7 +14,7 @@ contains
     use dimphy, only: klon, klev
 
     REAL, intent(in):: q_seri(:, :) ! (klon, llm)
-    ! domain-averaged mixing ratio of total water 
+    ! domain-averaged mixing ratio of total water
 
     REAL, intent(in):: RS(:, :) ! (klon, llm)
     ! mean saturation humidity mixing ratio within the gridbox
@@ -32,16 +32,16 @@ contains
     REAL, intent(out):: CLDF(:, :) ! (klon, llm) fraction nuageuse
 
     ! Local:
-    
+
     ! parameters controlling the iteration:
     ! nmax : maximum nb of iterations (hopefully never reached)
-    ! epsilon : accuracy of the numerical resolution 
+    ! epsilon : accuracy of the numerical resolution
     ! vmax : v-value above which we use an asymptotic expression for ERF(v)
 
     INTEGER nmax
-    PARAMETER ( nmax = 10) 
+    PARAMETER ( nmax = 10)
     REAL epsilon, vmax0, vmax(klon)
-    PARAMETER ( epsilon = 0.02, vmax0 = 2.0 ) 
+    PARAMETER ( epsilon = 0.02, vmax0 = 2.0 )
 
     REAL min_mu, min_Q
     PARAMETER ( min_mu = 1.e-12, min_Q=1.e-12 )
@@ -81,19 +81,19 @@ contains
        ! equivalent to an "all-or-nothing" large-scale condensation
        ! scheme.
 
-       ! Some condensation is produced at the subgrid-scale 
-       ! 
-       ! PDF = generalized log-normal distribution (GNO) 
-       ! (k<0 because a lower bound is considered for the PDF) 
-       ! 
+       ! Some condensation is produced at the subgrid-scale
+       !
+       ! PDF = generalized log-normal distribution (GNO)
+       ! (k<0 because a lower bound is considered for the PDF)
+       !
        ! -> Determine x (the parameter k of the GNO PDF) such that the
        ! contribution of subgrid-scale processes to the in-cloud water
        ! content is equal to QSUB(K) (equations (13), (14), (15) +
        ! Appendix B of the paper)
-       ! 
+       !
        ! Here, an iterative method is used for this purpose (other
        ! numerical methods might be more efficient)
-       ! 
+       !
        ! NB: the "error function" is called ERF (ERF in double
        ! precision)
 
@@ -105,8 +105,8 @@ contains
              ptconv(i, k)=.false.
              ratqsc(i, k)=0.
              lconv(i) = .true.
-          ELSE 
-             lconv(i) = .FALSE. 
+          ELSE
+             lconv(i) = .FALSE.
              vmax(i) = vmax0
 
              beta(i) = QSUB(i, K)/mu(i) + EXP( -MIN(0.0, delta(i)) )
@@ -119,7 +119,7 @@ contains
 
              if (det(i).LE.0.) then
                 xx(i) = -0.0001
-             else 
+             else
                 zx1=-sqrt2*vmax(i)
                 zx2=SQRT(1.0+delta(i)/(vmax(i)**2.))
                 xx1(i)=zx1*(1.0-zx2)
@@ -127,18 +127,18 @@ contains
                 xx(i) = 1.01 * xx1(i)
                 if ( xx1(i) .GE. 0.0 ) xx(i) = 0.5*xx2(i)
              endif
-             if (delta(i).LT.0.) xx(i) = -0.5*SQRT(log(2.)) 
+             if (delta(i).LT.0.) xx(i) = -0.5*SQRT(log(2.))
           ENDIF
        enddo
 
        ! Debut des nmax iterations pour trouver la solution.
-       loop_n: DO n = 1, nmax 
+       loop_n: DO n = 1, nmax
           loop_horizontal: do i = 1, klon
              test_lconv: if (.not.lconv(i)) then
                 u(i) = delta(i)/(xx(i)*sqrt2) + xx(i)/(2.*sqrt2)
                 v(i) = delta(i)/(xx(i)*sqrt2) - xx(i)/(2.*sqrt2)
 
-                IF ( v(i) .GT. vmax(i) ) THEN 
+                IF ( v(i) .GT. vmax(i) ) THEN
                    IF ( ABS(u(i)) .GT. vmax(i) .AND. delta(i) .LT. 0. ) THEN
                       ! use asymptotic expression of erf for u and v large:
                       ! ( -> analytic solution for xx )
@@ -186,8 +186,8 @@ contains
                 ENDIF
 
                 ! test numerical convergence:
-                if ( ABS(dist(i)/beta(i)) .LT. epsilon ) then 
-                   ptconv(i, K) = .TRUE. 
+                if ( ABS(dist(i)/beta(i)) .LT. epsilon ) then
+                   ptconv(i, K) = .TRUE.
                    lconv(i)=.true.
                    ! borne pour l'exponentielle
                    ratqsc(i, k)=min(2.*(v(i)-u(i))**2, 20.)
