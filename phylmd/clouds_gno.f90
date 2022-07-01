@@ -4,7 +4,7 @@ module CLOUDS_GNO_m
 
 contains
 
-  SUBROUTINE CLOUDS_GNO(R, RS, QSUB, PTCONV, RATQSC, CLDF)
+  SUBROUTINE CLOUDS_GNO(Q_SERI, RS, QSUB, PTCONV, RATQSC, CLDF)
 
     ! From LMDZ4/libf/phylmd/clouds_gno.F, version 1.2, 2004/11/09 16:55:40
 
@@ -13,7 +13,7 @@ contains
 
     use dimphy, only: klon, klev
 
-    REAL, intent(in):: R(:, :) ! (klon, llm)
+    REAL, intent(in):: q_seri(:, :) ! (klon, llm)
     ! domain-averaged mixing ratio of total water 
 
     REAL, intent(in):: RS(:, :) ! (klon, llm)
@@ -70,7 +70,7 @@ contains
 
     loop_vertical: DO K = 1, klev
        do i=1, klon
-          mu(i) = R(i, K)
+          mu(i) = Q_SERI(i, K)
           mu(i) = MAX(mu(i), min_mu)
           qsat(i) = RS(i, K) 
           qsat(i) = MAX(qsat(i), min_mu)
