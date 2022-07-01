@@ -4,7 +4,7 @@ module CLOUDS_GNO_m
 
 contains
 
-  SUBROUTINE CLOUDS_GNO(Q_SERI, QSAT, QSUB, PTCONV, RATQSC, CLDF)
+  SUBROUTINE CLOUDS_GNO(Q_SERI, QSAT, CLWCON0, PTCONV, RATQSC, RNEBCON0)
 
     ! From LMDZ4/libf/phylmd/clouds_gno.F, version 1.2, 2004/11/09 16:55:40
 
@@ -19,7 +19,7 @@ contains
     REAL, intent(in):: QSAT(:, :) ! (klon, llm)
     ! mean saturation humidity mixing ratio within the gridbox
 
-    REAL, intent(in):: QSUB(:, :) ! (klon, llm)
+    REAL, intent(in):: CLWCON0(:, :) ! (klon, llm)
     ! mixing ratio of condensed water within clouds associated
     ! with SUBGRID-SCALE condensation processes (here, it is
     ! predicted by the convection scheme)
@@ -29,7 +29,7 @@ contains
     REAL, intent(out):: RATQSC(:, :) ! (klon, llm)
     ! largeur normalisee de la distribution
 
-    REAL, intent(out):: CLDF(:, :) ! (klon, llm) fraction nuageuse
+    REAL, intent(out):: RNEBCON0(:, :) ! (klon, llm) fraction nuageuse
 
     ! Local:
 
@@ -54,12 +54,12 @@ contains
     REAL pi, u(klon), v(klon), erfcu(klon), erfcv(klon)
     REAL xx1(klon), xx2(klon)
     real sqrtpi, sqrt2, zx1, zx2, exdel
-    ! lconv = true si le calcul a converge (entre autres si qsub < min_q)
+    ! lconv = true si le calcul a converge (entre autres si clwcon0 < min_q)
     LOGICAL lconv(klon)
 
     !--------------------------------------------------------------
 
-    cldf=0.0
+    rnebcon0=0.0
 
     pi = ACOS(-1.)
     sqrtpi=sqrt(pi)
@@ -86,7 +86,7 @@ contains
        !
        ! -> Determine x (the parameter k of the GNO PDF) such that the
        ! contribution of subgrid-scale processes to the in-cloud water
-       ! content is equal to QSUB(K) (equations (13), (14), (15) +
+       ! content is equal to CLWCON0(K) (equations (13), (14), (15) +
        ! Appendix B of the paper)
        !
        ! Here, an iterative method is used for this purpose (other
@@ -99,7 +99,7 @@ contains
        ! suffisamment d'eau nuageuse.
 
        do i=1, klon
-          IF ( QSUB(i, K) .lt. min_Q ) THEN
+          IF ( CLWCON0(i, K) .lt. min_Q ) THEN
              ptconv(i, k)=.false.
              ratqsc(i, k)=0.
              lconv(i) = .true.
@@ -107,7 +107,7 @@ contains
              lconv(i) = .FALSE.
              vmax(i) = vmax0
 
-             beta(i) = QSUB(i, K)/mu(i) + EXP( -MIN(0.0, delta(i)) )
+             beta(i) = CLWCON0(i, K)/mu(i) + EXP( -MIN(0.0, delta(i)) )
 
              ! roots of equation v > vmax:
 
@@ -190,7 +190,7 @@ contains
                    ! borne pour l'exponentielle
                    ratqsc(i, k)=min(2.*(v(i)-u(i))**2, 20.)
                    ratqsc(i, k)=sqrt(exp(ratqsc(i, k))-1.)
-                   CLDF(i, K) = 0.5 * my_block(i)
+                   RNEBCON0(i, K) = 0.5 * my_block(i)
                 else
                    xx(i) = xx(i) - dist(i)/fprime(i)
                 endif
