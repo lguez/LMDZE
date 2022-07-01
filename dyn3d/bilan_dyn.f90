@@ -6,7 +6,7 @@ contains
 
   SUBROUTINE bilan_dyn(ps, masse, pk, pbaru, pbarv, teta, phi, ucov, vcov, trac)
 
-    ! From LMDZ4/libf/dyn3d/bilan_dyn.F, version 1.5 2005/03/16 10:12:17
+    ! From LMDZ4/libf/dyn3d/bilan_dyn.F, version 1.5, 2005/03/16 10:12:17
 
     ! Sous-programme consacr\'e \`a des diagnostics dynamiques de
     ! base.  De fa\c{}con g\'en\'erale, les moyennes des scalaires Q
@@ -42,16 +42,16 @@ contains
     integer:: itau = 0
     real qy, factv(jjm, llm)
 
-    ! Variables dynamiques interm\'ediaires
+    ! Variables dynamiques interm\'ediaires :
     REAL vcont(iip1, jjm, llm), ucont(iip1, jjp1, llm)
     REAL ang(iip1, jjp1, llm), unat(iip1, jjp1, llm)
     REAL massebx(iip1, jjp1, llm), masseby(iip1, jjm, llm)
     REAL ecin(iip1, jjp1, llm)
 
-    ! Champ contenant les scalaires advect\'es
+    ! Champ contenant les scalaires advect\'es :
     real Q(iip1, jjp1, llm, nQ)
 
-    ! Champs cumul\'es
+    ! Champs cumul\'es :
     real, save, allocatable:: ps_cum(:, :) ! (iip1, jjp1)
     real, save, allocatable:: masse_cum(:, :, :) ! (iip1, jjp1, llm)
     real, save, allocatable:: flux_u_cum(:, :, :) ! (iip1, jjp1, llm)
@@ -60,7 +60,7 @@ contains
     real, save, allocatable:: flux_uQ_cum(:, :, :, :) ! (iip1, jjp1, llm, nQ)
     real, save, allocatable:: flux_vQ_cum(:, :, :, :) ! (iip1, jjm, llm, nQ)
 
-    ! champs de tansport en moyenne zonale
+    ! Champs de tansport en moyenne zonale :
     integer itr
     integer, parameter:: iave = 1, itot = 2, immc = 3, itrs = 4, istn = 5
 
@@ -85,7 +85,7 @@ contains
     ! Calcul des champs dynamiques
 
     ! \'Energie cin\'etique
-    ucont = 0
+    ucont = 0.
     CALL covcont(ucov, vcov, ucont, vcont)
     CALL enercin(vcov, ucov, vcont, ucont, ecin)
 

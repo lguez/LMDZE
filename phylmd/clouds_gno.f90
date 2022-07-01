@@ -45,7 +45,7 @@ contains
     real vmax(klon)
     ! v-value above which we use an asymptotic expression for ERF(v)
 
-    REAL, parameter:: min_mu = 1.e-12, min_Q =1.e-12
+    REAL, parameter:: min_mu = 1.e-12, min_Q = 1.e-12
     INTEGER i, K, n
     REAL mu(klon), delta(klon), beta(klon)
     real zu2(klon), zv2(klon)
@@ -58,15 +58,13 @@ contains
 
     !--------------------------------------------------------------
 
-    rnebcon0=0.0
-
-    sqrtpi=sqrt(pi)
-
-    ptconv=.false.
-    ratqsc=0.
+    rnebcon0 = 0.
+    sqrtpi = sqrt(pi)
+    ptconv = .false.
+    ratqsc = 0.
 
     loop_vertical: DO K = 1, klev
-       do i=1, klon
+       do i = 1, klon
           mu(i) = MAX(Q_SERI(i, K), min_mu)
           delta(i) = log(mu(i)/MAX(QSAT(i, K), min_mu))
        enddo
@@ -94,32 +92,32 @@ contains
        ! On commence par eliminer les cas pour lesquels on n'a pas
        ! suffisamment d'eau nuageuse.
 
-       do i=1, klon
+       do i = 1, klon
           IF ( CLWCON0(i, K) .lt. min_Q ) THEN
-             ptconv(i, k)=.false.
-             ratqsc(i, k)=0.
+             ptconv(i, k) = .false.
+             ratqsc(i, k) = 0.
              lconv(i) = .true.
           ELSE
              lconv(i) = .FALSE.
              vmax(i) = vmax0
 
-             beta(i) = CLWCON0(i, K)/mu(i) + EXP( -MIN(0.0, delta(i)) )
+             beta(i) = CLWCON0(i, K)/mu(i) + EXP( -MIN(0., delta(i)) )
 
              ! roots of equation v > vmax:
 
              det(i) = delta(i) + vmax(i)**2.
-             if (det(i).LE.0.0) vmax(i) = vmax0 + 1.0
+             if (det(i).LE.0.) vmax(i) = vmax0 + 1.
              det(i) = delta(i) + vmax(i)**2.
 
              if (det(i).LE.0.) then
                 xx(i) = -0.0001
              else
-                zx1=-sqrt2*vmax(i)
-                zx2=SQRT(1.0+delta(i)/(vmax(i)**2.))
-                xx1(i)=zx1*(1.0-zx2)
-                xx2(i)=zx1*(1.0+zx2)
+                zx1 = -sqrt2*vmax(i)
+                zx2 = SQRT(1.+delta(i)/(vmax(i)**2.))
+                xx1(i) = zx1*(1.-zx2)
+                xx2(i) = zx1*(1.+zx2)
                 xx(i) = 1.01 * xx1(i)
-                if ( xx1(i) .GE. 0.0 ) xx(i) = 0.5*xx2(i)
+                if ( xx1(i) .GE. 0. ) xx(i) = 0.5*xx2(i)
              endif
              if (delta(i).LT.0.) xx(i) = -0.5*SQRT(log(2.))
           ENDIF
@@ -136,41 +134,41 @@ contains
                    IF ( ABS(u(i)) .GT. vmax(i) .AND. delta(i) .LT. 0. ) THEN
                       ! use asymptotic expression of erf for u and v large:
                       ! ( -> analytic solution for xx )
-                      exdel=beta(i)*EXP(delta(i))
-                      aux(i) = 2.0*delta(i)*(1.-exdel) /(1.+exdel)
+                      exdel = beta(i)*EXP(delta(i))
+                      aux(i) = 2.*delta(i)*(1.-exdel) /(1.+exdel)
                       if (aux(i).lt.0.) then
-                         aux(i)=0.
+                         aux(i) = 0.
                       endif
                       xx(i) = -SQRT(aux(i))
                       my_block(i) = EXP(-v(i)*v(i)) / v(i) / sqrtpi
-                      dist(i) = 0.0
-                      fprime(i) = 1.0
+                      dist(i) = 0.
+                      fprime(i) = 1.
                    ELSE
-                      ! erfv -> 1.0, use an asymptotic expression of
+                      ! erfv -> 1., use an asymptotic expression of
                       ! erfv for v large:
 
-                      erfcu(i) = 1.0-NR_ERF(u(i))
+                      erfcu(i) = 1.-NR_ERF(u(i))
                       ! Attention : ajout d'un seuil pour l'exponentielle
                       aux(i) = sqrtpi*erfcu(i)*EXP(min(v(i)*v(i), 80.))
-                      coeff(i) = 1.0 - 1./2./(v(i)**2.) + 3./4./(v(i)**4.)
+                      coeff(i) = 1. - 1./2./(v(i)**2.) + 3./4./(v(i)**4.)
                       my_block(i) = coeff(i) * EXP(-v(i)*v(i)) / v(i) / sqrtpi
                       dist(i) = v(i) * aux(i) / coeff(i) - beta(i)
-                      fprime(i) = 2.0 / xx(i) * (v(i)**2.) &
+                      fprime(i) = 2. / xx(i) * (v(i)**2.) &
                            * ( coeff(i)*EXP(-delta(i)) - u(i) * aux(i) ) &
                            / coeff(i) / coeff(i)
                    ENDIF
                 ELSE
                    ! general case:
 
-                   erfcu(i) = 1.0-NR_ERF(u(i))
-                   erfcv(i) = 1.0-NR_ERF(v(i))
+                   erfcu(i) = 1.-NR_ERF(u(i))
+                   erfcv(i) = 1.-NR_ERF(v(i))
                    my_block(i) = erfcv(i)
                    dist(i) = erfcu(i) / erfcv(i) - beta(i)
-                   zu2(i)=u(i)*u(i)
-                   zv2(i)=v(i)*v(i)
+                   zu2(i) = u(i)*u(i)
+                   zv2(i) = v(i)*v(i)
                    if(zu2(i).gt.20..or. zv2(i).gt.20.) then
-                      zu2(i)=20.
-                      zv2(i)=20.
+                      zu2(i) = 20.
+                      zv2(i) = 20.
                       fprime(i) = 0.
                    else
                       fprime(i) = 2. /sqrtpi /xx(i) /erfcv(i)**2. &
@@ -182,10 +180,10 @@ contains
                 ! test numerical convergence:
                 if ( ABS(dist(i)/beta(i)) .LT. my_eps ) then
                    ptconv(i, K) = .TRUE.
-                   lconv(i)=.true.
+                   lconv(i) = .true.
                    ! borne pour l'exponentielle
-                   ratqsc(i, k)=min(2.*(v(i)-u(i))**2, 20.)
-                   ratqsc(i, k)=sqrt(exp(ratqsc(i, k))-1.)
+                   ratqsc(i, k) = min(2.*(v(i)-u(i))**2, 20.)
+                   ratqsc(i, k) = sqrt(exp(ratqsc(i, k))-1.)
                    RNEBCON0(i, K) = 0.5 * my_block(i)
                 else
                    xx(i) = xx(i) - dist(i)/fprime(i)

@@ -45,7 +45,7 @@ contains
     REAL, INTENT(IN):: q_seri(:, :) ! (klon, klev) mass fraction of water vapor
     REAL, INTENT(IN):: u_seri(:, :), v_seri(:, :) ! (klon, klev) wind, in m s -1
     INTEGER, INTENT(IN):: julien ! jour de l'annee en cours
-    REAL, intent(in):: mu0(klon) ! cosinus de l'angle solaire zenithal     
+    REAL, intent(in):: mu0(:) ! (klon) cosinus de l'angle solaire zenithal
 
     REAL, INTENT(INout):: ftsol(:, :) ! (klon, nbsrf)
     ! skin temperature of surface fraction, in K
@@ -59,39 +59,44 @@ contains
     REAL, INTENT(inout):: qsol(:) ! (klon)
     ! column-density of water in soil, in kg m-2
 
-    REAL, INTENT(IN):: paprs(klon, klev + 1) ! pression a intercouche (Pa)
-    REAL, INTENT(IN):: play(klon, klev) ! pression au milieu de couche (Pa)
+    REAL, INTENT(IN):: paprs(:, :) ! (klon, klev + 1)
+    ! pression a intercouche (Pa)
+
+    REAL, INTENT(IN):: play(:, :) ! (klon, klev)
+    ! pression au milieu de couche (Pa)
 
     REAL, INTENT(inout):: fsnow(:, :) ! (klon, nbsrf)
     ! column-density of mass of snow at the surface, in kg m-2
 
     REAL, INTENT(inout):: fqsurf(:, :) ! (klon, nbsrf)
-    REAL, intent(inout):: falbe(klon, nbsrf)
+    REAL, intent(inout):: falbe(:, :) ! (klon, nbsrf)
 
     REAL, intent(out):: fluxlat(:, :) ! (klon, nbsrf)
     ! flux de chaleur latente, en W m-2
 
-    REAL, intent(in):: rain_fall(klon)
+    REAL, intent(in):: rain_fall(:) ! (klon)
     ! liquid water mass flux (kg / m2 / s), positive down
 
-    REAL, intent(in):: snow_fall(klon)
+    REAL, intent(in):: snow_fall(:) ! (klon)
     ! solid water mass flux (kg / m2 / s), positive down
 
-    REAL, intent(inout):: frugs(klon, nbsrf) ! longueur de rugosit\'e (en m)
+    REAL, intent(inout):: frugs(:, :) ! (klon, nbsrf)
+    ! longueur de rugosit\'e (en m)
+
     real, intent(inout):: agesno(:, :) ! (klon, nbsrf)
-    REAL, INTENT(IN):: rugoro(klon)
+    REAL, INTENT(IN):: rugoro(:) ! (klon)
 
     REAL, intent(out):: d_t(:, :), d_q(:, :) ! (klon, klev)
     ! changement pour t_seri et q_seri
 
-    REAL, intent(out):: d_u(klon, klev), d_v(klon, klev)
+    REAL, intent(out):: d_u(:, :), d_v(:, :) ! (klon, klev)
     ! changement pour "u_seri" et "v_seri"
 
-    REAL, intent(out):: flux_t(klon, nbsrf)
+    REAL, intent(out):: flux_t(:, :) ! (klon, nbsrf)
     ! flux de chaleur sensible (c_p T) (W / m2) (orientation positive
     ! vers le bas) à la surface
 
-    REAL, intent(out):: flux_q(klon, nbsrf)
+    REAL, intent(out):: flux_q(:, :) ! (klon, nbsrf)
     ! flux de vapeur d'eau (kg / m2 / s) à la surface
 
     REAL, intent(out):: flux_u(:, :), flux_v(:, :) ! (klon, nbsrf)
@@ -110,16 +115,18 @@ contains
     ! champ "coefh" a \'et\'e cr\'e\'e. Nous avons moyenn\'e les
     ! valeurs de ce champ sur les quatre sous-surfaces du mod\`ele.
 
-    REAL, INTENT(inout):: t2m(klon, nbsrf), q2m(klon, nbsrf)
+    REAL, INTENT(inout):: t2m(:, :), q2m(:, :) ! (klon, nbsrf)
 
     REAL, INTENT(inout):: u10m_srf(:, :), v10m_srf(:, :) ! (klon, nbsrf)
     ! composantes du vent \`a 10m sans spirale d'Ekman
 
-    REAL, intent(out):: fqcalving(klon, nbsrf)
-    ! flux d'eau "perdue" par la surface et necessaire pour limiter la
-    ! hauteur de neige, en kg / m2 / s
+    REAL, intent(out):: fqcalving(:, :) ! (klon, nbsrf)
+    ! flux d'eau "perdue" par la surface et n\'ecessaire pour limiter
+    ! la hauteur de neige, en kg / m2 / s
 
-    real ffonte(klon, nbsrf) ! flux thermique utilise pour fondre la neige
+    real, INTENT(inout):: ffonte(:, :) ! (klon, nbsrf)
+    ! flux thermique utilis\'e pour fondre la neige
+
     REAL, intent(inout):: run_off_lic_0(:) ! (klon)
 
     REAL, intent(out):: albsol(:) ! (klon)
@@ -333,7 +340,7 @@ contains
           CALL cdrag(nisrf, sqrt(yu(:knon, 1)**2 + yv(:knon, 1)**2), &
                yt(:knon, 1), yq(:knon, 1), zgeop(:knon, 1), ypaprs(:knon, 1), &
                yts(:knon), yqsurf(:knon), yrugos(:knon), ycdragm(:knon), &
-               ycdragh(:knon)) 
+               ycdragh(:knon))
 
           IF (nisrf == is_oce) THEN
              ! On met un seuil pour ycdragm et ycdragh :
