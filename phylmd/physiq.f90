@@ -286,7 +286,7 @@ contains
     REAL z_avant(klon), z_apres(klon), z_factor(klon)
     REAL zb
     REAL zx_qs, zcor
-    real zqsat(klon, llm)
+    real qsat(klon, llm)
     INTEGER i, k, iq, nsrf
 
     REAL pphi(klon, llm)
@@ -592,12 +592,12 @@ contains
        snow_con = 0.
        mfu = upwd + dnwd
 
-       zqsat = MIN(0.5, r2es * FOEEW(t_seri, rtt >= t_seri) / play)
-       zqsat = zqsat / (1. - retv * zqsat)
+       qsat = MIN(0.5, r2es * FOEEW(t_seri, rtt >= t_seri) / play)
+       qsat = qsat / (1. - retv * qsat)
 
        ! Properties of convective clouds
        clwcon0 = fact_cldcon * clwcon0
-       call clouds_gno(q_seri, zqsat, clwcon0, ptconv, ratqsc, rnebcon0)
+       call clouds_gno(q_seri, qsat, clwcon0, ptconv, ratqsc, rnebcon0)
 
        forall (i = 1:klon) ema_pct(i) = paprs(i, itop_con(i) + 1)
        mfd = 0.
@@ -765,7 +765,7 @@ contains
           zcor = 1. / (1. - retv * zx_qs)
           zx_qs = zx_qs * zcor
           zx_rh(i, k) = q_seri(i, k) / zx_qs
-          zqsat(i, k) = zx_qs
+          qsat(i, k) = zx_qs
        ENDDO
     ENDDO
 
