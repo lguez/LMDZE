@@ -24,7 +24,7 @@ contains
     ! with SUBGRID-SCALE condensation processes (here, it is
     ! predicted by the convection scheme)
 
-    LOGICAL, intent(out):: PTCONV(:, :) ! (klon, llm) Point convectif
+    LOGICAL, intent(out):: PTCONV(:, :) ! (klon, llm) point convectif
 
     REAL, intent(out):: RATQSC(:, :) ! (klon, llm)
     ! largeur normalisee de la distribution
@@ -68,8 +68,7 @@ contains
 
     loop_vertical: DO K = 1, klev
        do i=1, klon
-          mu(i) = Q_SERI(i, K)
-          mu(i) = MAX(mu(i), min_mu)
+          mu(i) = MAX(Q_SERI(i, K), min_mu)
           delta(i) = log(mu(i)/MAX(QSAT(i, K), min_mu))
        enddo
 
@@ -127,7 +126,7 @@ contains
           ENDIF
        enddo
 
-       ! Debut des nmax iterations pour trouver la solution.
+       ! It\'erations pour trouver la solution :
        loop_n: DO n = 1, nmax
           loop_horizontal: do i = 1, klon
              test_lconv: if (.not.lconv(i)) then
