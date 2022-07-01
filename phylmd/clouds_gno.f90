@@ -4,7 +4,7 @@ module CLOUDS_GNO_m
 
 contains
 
-  SUBROUTINE CLOUDS_GNO(Q_SERI, RS, QSUB, PTCONV, RATQSC, CLDF)
+  SUBROUTINE CLOUDS_GNO(Q_SERI, QSAT, QSUB, PTCONV, RATQSC, CLDF)
 
     ! From LMDZ4/libf/phylmd/clouds_gno.F, version 1.2, 2004/11/09 16:55:40
 
@@ -16,7 +16,7 @@ contains
     REAL, intent(in):: q_seri(:, :) ! (klon, llm)
     ! domain-averaged mixing ratio of total water
 
-    REAL, intent(in):: RS(:, :) ! (klon, llm)
+    REAL, intent(in):: QSAT(:, :) ! (klon, llm)
     ! mean saturation humidity mixing ratio within the gridbox
 
     REAL, intent(in):: QSUB(:, :) ! (klon, llm)
@@ -72,7 +72,7 @@ contains
        do i=1, klon
           mu(i) = Q_SERI(i, K)
           mu(i) = MAX(mu(i), min_mu)
-          delta(i) = log(mu(i)/MAX(RS(i, K), min_mu))
+          delta(i) = log(mu(i)/MAX(QSAT(i, K), min_mu))
        enddo
 
        ! There is no subgrid-scale condensation; the scheme becomes
