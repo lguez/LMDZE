@@ -38,7 +38,7 @@ contains
     INTEGER, PARAMETER:: nmax = 10
     ! maximum nb of iterations (hopefully never reached)
 
-    REAL, parameter:: epsilon = 0.02 ! accuracy of the numerical resolution
+    REAL, parameter:: my_eps = 0.02 ! accuracy of the numerical resolution
     REAL, parameter:: vmax0 = 2.
 
     real vmax(klon)
@@ -182,7 +182,7 @@ contains
                 ENDIF
 
                 ! test numerical convergence:
-                if ( ABS(dist(i)/beta(i)) .LT. epsilon ) then
+                if ( ABS(dist(i)/beta(i)) .LT. my_eps ) then
                    ptconv(i, K) = .TRUE.
                    lconv(i)=.true.
                    ! borne pour l'exponentielle
