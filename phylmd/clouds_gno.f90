@@ -10,6 +10,7 @@ contains
 
     ! Libraries:
     use numer_rec_95, only: nr_erf
+    use jumble, only: pi, SQRT2
 
     use dimphy, only: klon, klev
 
@@ -50,18 +51,16 @@ contains
     real zu2(klon), zv2(klon)
     REAL xx(klon), aux(klon), coeff(klon), my_block(klon)
     REAL dist(klon), fprime(klon), det(klon)
-    REAL pi, u(klon), v(klon), erfcu(klon), erfcv(klon)
+    REAL u(klon), v(klon), erfcu(klon), erfcv(klon)
     REAL xx1(klon), xx2(klon)
-    real sqrtpi, sqrt2, zx1, zx2, exdel
+    real sqrtpi, zx1, zx2, exdel
     LOGICAL lconv(klon) ! le calcul a converge (entre autres si clwcon0 < min_q)
 
     !--------------------------------------------------------------
 
     rnebcon0=0.0
 
-    pi = ACOS(-1.)
     sqrtpi=sqrt(pi)
-    sqrt2=sqrt(2.)
 
     ptconv=.false.
     ratqsc=0.
