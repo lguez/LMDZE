@@ -24,7 +24,7 @@ contains
     ! with SUBGRID-SCALE condensation processes (here, it is
     ! predicted by the convection scheme)
 
-    LOGICAL, intent(out):: PTCONV(:, :) ! (klon, llm) Point convectif = TRUE
+    LOGICAL, intent(out):: PTCONV(:, :) ! (klon, llm) Point convectif
 
     REAL, intent(out):: RATQSC(:, :) ! (klon, llm)
     ! largeur normalisee de la distribution
@@ -33,19 +33,18 @@ contains
 
     ! Local:
 
-    ! parameters controlling the iteration:
-    ! nmax : maximum nb of iterations (hopefully never reached)
-    ! epsilon : accuracy of the numerical resolution
-    ! vmax : v-value above which we use an asymptotic expression for ERF(v)
+    ! Parameters controlling the iteration:
 
-    INTEGER nmax
-    PARAMETER ( nmax = 10)
-    REAL epsilon, vmax0, vmax(klon)
-    PARAMETER ( epsilon = 0.02, vmax0 = 2.0 )
+    INTEGER, PARAMETER:: nmax = 10
+    ! maximum nb of iterations (hopefully never reached)
 
-    REAL min_mu, min_Q
-    PARAMETER ( min_mu = 1.e-12, min_Q=1.e-12 )
+    REAL, parameter:: epsilon = 0.02 ! accuracy of the numerical resolution
+    REAL, parameter:: vmax0 = 2.
 
+    real vmax(klon)
+    ! v-value above which we use an asymptotic expression for ERF(v)
+
+    REAL, parameter:: min_mu = 1.e-12, min_Q =1.e-12
     INTEGER i, K, n
     REAL mu(klon), delta(klon), beta(klon)
     real zu2(klon), zv2(klon)
@@ -54,8 +53,7 @@ contains
     REAL pi, u(klon), v(klon), erfcu(klon), erfcv(klon)
     REAL xx1(klon), xx2(klon)
     real sqrtpi, sqrt2, zx1, zx2, exdel
-    ! lconv = true si le calcul a converge (entre autres si clwcon0 < min_q)
-    LOGICAL lconv(klon)
+    LOGICAL lconv(klon) ! le calcul a converge (entre autres si clwcon0 < min_q)
 
     !--------------------------------------------------------------
 
