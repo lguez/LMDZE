@@ -31,6 +31,9 @@ contains
        vcont(:, :, l) = vcov(:, :, l) * unscv2
     END forall
 
+    ucont(:, 1, :) = 0.
+    ucont(:, jjm + 1, :) = 0.
+
   END SUBROUTINE covcont
 
 end module covcont_m
