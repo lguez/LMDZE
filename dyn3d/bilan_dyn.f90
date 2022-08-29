@@ -85,7 +85,6 @@ contains
     ! Calcul des champs dynamiques
 
     ! \'Energie cin\'etique
-    ucont = 0.
     CALL covcont(ucov, vcov, ucont, vcont)
     CALL enercin(vcov, ucov, vcont, ucont, ecin)
 
