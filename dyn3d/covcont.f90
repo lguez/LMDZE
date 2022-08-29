@@ -6,11 +6,11 @@ contains
 
   SUBROUTINE covcont(ucov, vcov, ucont, vcont)
 
-    ! From LMDZ4/libf/dyn3d/covcont.F, version 1.1.1.1 2004/05/19 12:53:07
+    ! From LMDZ4/libf/dyn3d/covcont.F, version 1.1.1.1, 2004/05/19 12:53:07
 
-    ! Auteur:  P. Le Van
+    ! Author:  P. Le Van
 
-    ! Objet: calcul des composantes contravariantes \`a partir des
+    ! Objet : calcul des composantes contravariantes \`a partir des
     ! composantes covariantes
 
     use dimensions, only: jjm, llm
