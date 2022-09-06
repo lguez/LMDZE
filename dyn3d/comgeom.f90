@@ -250,10 +250,10 @@ contains
 
     do j = 2, jjm
        coslatm = cos(rlatu1(j))
-       coslatp = cos(rlatu2(j-1))
+       coslatp = cos(rlatu2(j - 1))
        radclatp = 0.5 * ra * coslatp
        radclatm = 0.5 * ra * coslatm
-       ai14 = un4rad2 * coslatp * yprimu2(j-1)
+       ai14 = un4rad2 * coslatp * yprimu2(j - 1)
        ai23 = un4rad2 * coslatm * yprimu1(j)
 
        aireij1_2d(:iim, j) = ai14 * xprimp025(:iim)
@@ -264,7 +264,7 @@ contains
        cuij2(:iim, j) = radclatm * xprimp025(:iim)
        cuij3(:iim, j) = radclatm * xprimm025(:iim)
        cuij4(:iim, j) = radclatp * xprimm025(:iim)
-       cvij1(:iim, j) = 0.5 * ra * yprimu2(j-1)
+       cvij1(:iim, j) = 0.5 * ra * yprimu2(j - 1)
        cvij2(:iim, j) = 0.5 * ra * yprimu1(j)
        cvij3(:iim, j) = cvij2(:iim, j)
        cvij4(:iim, j) = cvij1(:iim, j)
@@ -355,7 +355,7 @@ contains
           airez = aireij2_2d(i, j) + aireij1_2d(i, j + 1) &
                + aireij3_2d(i + 1, j) + aireij4_2d(i + 1, j + 1)
           unsairez(i, j) = 1. / airez
-          unsairz_gam_2d(i, j) = unsairez(i, j)**(-gamdi_grot)
+          unsairz_gam_2d(i, j) = unsairez(i, j)**(- gamdi_grot)
           fext_2d(i, j) = airez * sin(rlatv(j)) * 2. * romega
        END DO
        airev_2d(iip1, j) = airev_2d(1, j)
@@ -375,9 +375,9 @@ contains
        DO i = 1, iim
           cuvsurcv(i, j) = airev_2d(i, j) * unscv2(i, j)
           cvsurcuv_2d(i, j) = 1. / cuvsurcv(i, j)
-          cuvscvgam1_2d(i, j) = cuvsurcv(i, j)**(-gamdi_gdiv)
-          cuvscvgam2_2d(i, j) = cuvsurcv(i, j)**(-gamdi_h)
-          cvscuvgam_2d(i, j) = cvsurcuv_2d(i, j)**(-gamdi_grot)
+          cuvscvgam1_2d(i, j) = cuvsurcv(i, j)**(- gamdi_gdiv)
+          cuvscvgam2_2d(i, j) = cuvsurcv(i, j)**(- gamdi_h)
+          cvscuvgam_2d(i, j) = cvsurcuv_2d(i, j)**(- gamdi_grot)
        END DO
        cv_2d(iip1, j) = cv_2d(1, j)
        unscv2(iip1, j) = unscv2(1, j)
@@ -395,9 +395,9 @@ contains
           unscu2(i, j) = 1. / cu_2d(i, j)**2
           cvusurcu(i, j) = aireu_2d(i, j) * unscu2(i, j)
           cusurcvu_2d(i, j) = 1. / cvusurcu(i, j)
-          cvuscugam1_2d(i, j) = cvusurcu(i, j)**(-gamdi_gdiv)
-          cvuscugam2_2d(i, j) = cvusurcu(i, j)**(-gamdi_h)
-          cuscvugam_2d(i, j) = cusurcvu_2d(i, j)**(-gamdi_grot)
+          cvuscugam1_2d(i, j) = cvusurcu(i, j)**(- gamdi_gdiv)
+          cvuscugam2_2d(i, j) = cvusurcu(i, j)**(- gamdi_h)
+          cuscvugam_2d(i, j) = cusurcvu_2d(i, j)**(- gamdi_grot)
        END DO
 
        cu_2d(iip1, j) = cu_2d(1, j)
@@ -421,10 +421,10 @@ contains
 
     apoln = sum(aire_2d(:iim, 1))
     apols = sum(aire_2d(:iim, jjp1))
-    unsapolnga1 = 1. / (apoln**(-gamdi_gdiv))
-    unsapolsga1 = 1. / (apols**(-gamdi_gdiv))
-    unsapolnga2 = 1. / (apoln**(-gamdi_h))
-    unsapolsga2 = 1. / (apols**(-gamdi_h))
+    unsapolnga1 = 1. / (apoln**(- gamdi_gdiv))
+    unsapolsga1 = 1. / (apols**(- gamdi_gdiv))
+    unsapolnga2 = 1. / (apoln**(- gamdi_h))
+    unsapolsga2 = 1. / (apols**(- gamdi_h))
 
     ! Changement F. Hourdin calcul conservatif pour fext_2d
     ! constang_2d contient le produit a * cos (latitude) * omega
