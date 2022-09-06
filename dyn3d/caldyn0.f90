@@ -32,7 +32,7 @@ contains
     REAL, INTENT(IN):: ucov(:, :, :) ! (iim + 1, jjm + 1, llm) vent covariant
     REAL, INTENT(IN):: vcov(:, :, :) ! (iim + 1, jjm, llm) ! vent covariant
     REAL, INTENT(IN):: teta(ip1jmp1, llm)
-    REAL, INTENT (IN):: ps(ip1jmp1)
+    REAL, INTENT (IN):: ps(:, :) ! (iim + 1, jjm + 1)
     REAL, INTENT (IN):: pk(iip1, jjp1, llm)
     REAL, INTENT (IN):: phi(iim + 1, jjm + 1, llm)
 
@@ -41,7 +41,7 @@ contains
     REAL w(iim + 1, jjm + 1, llm)
     REAL pbaru(ip1jmp1, llm), pbarv((iim + 1) * jjm, llm)
     REAL vcont(iim + 1, jjm, llm), ucont(iim + 1, jjm + 1, llm)
-    REAL p(ip1jmp1, llmp1)
+    REAL p(iim + 1, jjm + 1, llmp1)
     REAL massebx(ip1jmp1, llm), masseby((iim + 1) * jjm, llm)
     REAL vorpot(iim + 1, jjm, llm)
     real ecin(iim + 1, jjm + 1, llm), convm(iim + 1, jjm + 1, llm)
@@ -54,7 +54,7 @@ contains
     PRINT *, 'Call sequence information: caldyn0'
 
     CALL covcont(ucov, vcov, ucont, vcont)
-    forall (l = 1: llm + 1) p(:, l) = ap(l) + bp(l) * ps
+    forall (l = 1: llm + 1) p(:, :, l) = ap(l) + bp(l) * ps
     masse = massdair(p)
     CALL massbar(masse, massebx, masseby)
     CALL massbarxy(masse, massebxy)

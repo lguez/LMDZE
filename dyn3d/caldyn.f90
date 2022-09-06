@@ -40,7 +40,7 @@ contains
     REAL, INTENT(IN):: ucov(:, :, :) ! (iim + 1, jjm + 1, llm) vent covariant
     REAL, INTENT(IN):: vcov(:, :, :) ! (iim + 1, jjm, llm) vent covariant
     REAL, INTENT(IN):: teta(:, :, :) ! (iim + 1, jjm + 1, llm)
-    REAL, INTENT (IN):: ps(ip1jmp1)
+    REAL, INTENT (IN):: ps(:, :) ! (iim + 1, jjm + 1)
     real, intent(out):: masse(:, :, :) ! (iim + 1, jjm, llm)
     REAL, INTENT(IN):: pk(iip1, jjp1, llm)
     REAL, INTENT(IN):: pkf(:, :, :) ! (iim + 1, jjm + 1, llm)
@@ -59,7 +59,8 @@ contains
 
     ! Local:
     REAL vcont(iim + 1, jjm, llm), ucont(iim + 1, jjm + 1, llm)
-    REAL ang_3d(iim + 1, jjm + 1, llm), p(ip1jmp1, llmp1)
+    REAL ang_3d(iim + 1, jjm + 1, llm)
+    real p(iim + 1, jjm + 1, llmp1)
     REAL massebx(ip1jmp1, llm), masseby((iim + 1) * jjm, llm)
     REAL vorpot(iim + 1, jjm, llm)
     real ecin(iim + 1, jjm + 1, llm), convm(iim + 1, jjm + 1, llm)
@@ -72,7 +73,7 @@ contains
     !-----------------------------------------------------------------------
 
     CALL covcont(ucov, vcov, ucont, vcont)
-    forall (l = 1: llm + 1) p(:, l) = ap(l) + bp(l) * ps
+    forall (l = 1: llm + 1) p(:, :, l) = ap(l) + bp(l) * ps
     masse = massdair(p)
     CALL massbar(masse, massebx, masseby)
     CALL massbarxy(masse, massebxy)

@@ -14,7 +14,7 @@ contains
     USE comgeom, ONLY: airesurg
     USE dimensions, ONLY: iim, jjm, llm
 
-    REAL, intent(in):: p(iim + 1, jjm + 1, llm + 1)
+    REAL, intent(in):: p(:, :, :) ! (iim + 1, jjm + 1, llm + 1)
     ! aux interfaces des llm couches
 
     real massdair(iim + 1, jjm + 1, llm)
