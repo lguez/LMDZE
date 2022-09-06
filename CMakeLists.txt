@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.16)
 list(APPEND CMAKE_MESSAGE_CONTEXT LMDZE)
 project(LMDZE LANGUAGES Fortran CXX)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
-option(FETCH "Download")
+option(FETCH "Download Jumble, NetCDF95 and Numer_Rec_95")
 
 if(FETCH)
   include(FetchContent)

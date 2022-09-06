@@ -9,7 +9,7 @@ contains
     ! From LMDZ4/libf/dyn3d/bilan_dyn.F, version 1.5, 2005/03/16 10:12:17
 
     ! Sous-programme consacr\'e \`a des diagnostics dynamiques de
-    ! base.  De fa\c{}con g\'en\'erale, les moyennes des scalaires Q
+    ! base. De fa\c{}con g\'en\'erale, les moyennes des scalaires Q
     ! sont pond\'er\'ees par la masse. Les flux de masse sont, eux,
     ! simplement moyenn\'es.
 
