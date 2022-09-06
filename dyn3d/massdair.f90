@@ -15,7 +15,7 @@ contains
     USE dimensions, ONLY: iim, jjm, llm
 
     REAL, intent(in):: p(:, :, :) ! (iim + 1, jjm + 1, llm + 1)
-    ! aux interfaces des llm couches
+    ! pressure at layer interface, in Pa
 
     real massdair(iim + 1, jjm + 1, llm)
 

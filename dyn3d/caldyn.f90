@@ -60,7 +60,7 @@ contains
     ! Local:
     REAL vcont(iim + 1, jjm, llm), ucont(iim + 1, jjm + 1, llm)
     REAL ang_3d(iim + 1, jjm + 1, llm)
-    real p(iim + 1, jjm + 1, llmp1)
+    real p(iim + 1, jjm + 1, llmp1) ! pressure at layer interface, in Pa
     REAL massebx(ip1jmp1, llm), masseby((iim + 1) * jjm, llm)
     REAL vorpot(iim + 1, jjm, llm)
     real ecin(iim + 1, jjm + 1, llm), convm(iim + 1, jjm + 1, llm)
