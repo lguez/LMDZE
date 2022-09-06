@@ -305,46 +305,45 @@ contains
     aireij3_2d(iip1, :) = aireij3_2d(1, :)
     aireij4_2d(iip1, :) = aireij4_2d(1, :)
 
-    DO j = 1, jjp1
-       DO i = 1, iim
-          aire_2d(i, j) = aireij1_2d(i, j) + aireij2_2d(i, j) &
-               + aireij3_2d(i, j) + aireij4_2d(i, j)
-          alpha1_2d(i, j) = aireij1_2d(i, j) / aire_2d(i, j)
-          alpha2_2d(i, j) = aireij2_2d(i, j) / aire_2d(i, j)
-          alpha3_2d(i, j) = aireij3_2d(i, j) / aire_2d(i, j)
-          alpha4_2d(i, j) = aireij4_2d(i, j) / aire_2d(i, j)
-          alpha1p2_2d(i, j) = alpha1_2d(i, j) + alpha2_2d(i, j)
-          alpha1p4_2d(i, j) = alpha1_2d(i, j) + alpha4_2d(i, j)
-          alpha2p3_2d(i, j) = alpha2_2d(i, j) + alpha3_2d(i, j)
-          alpha3p4_2d(i, j) = alpha3_2d(i, j) + alpha4_2d(i, j)
-       END DO
+    aire_2d(:iim, :) = aireij1_2d(:iim, :) + aireij2_2d(:iim, :) &
+         + aireij3_2d(:iim, :) + aireij4_2d(:iim, :)
+    aire_2d(iip1, :) = aire_2d(1, :)
 
-       aire_2d(iip1, j) = aire_2d(1, j)
-       alpha1_2d(iip1, j) = alpha1_2d(1, j)
-       alpha2_2d(iip1, j) = alpha2_2d(1, j)
-       alpha3_2d(iip1, j) = alpha3_2d(1, j)
-       alpha4_2d(iip1, j) = alpha4_2d(1, j)
-       alpha1p2_2d(iip1, j) = alpha1p2_2d(1, j)
-       alpha1p4_2d(iip1, j) = alpha1p4_2d(1, j)
-       alpha2p3_2d(iip1, j) = alpha2p3_2d(1, j)
-       alpha3p4_2d(iip1, j) = alpha3p4_2d(1, j)
-    END DO
+    alpha1_2d(:iim, :) = aireij1_2d(:iim, :) / aire_2d(:iim, :)
+    alpha2_2d(:iim, :) = aireij2_2d(:iim, :) / aire_2d(:iim, :)
+    alpha3_2d(:iim, :) = aireij3_2d(:iim, :) / aire_2d(:iim, :)
+    alpha4_2d(:iim, :) = aireij4_2d(:iim, :) / aire_2d(:iim, :)
+    alpha1p2_2d(:iim, :) = alpha1_2d(:iim, :) + alpha2_2d(:iim, :)
+    alpha1p4_2d(:iim, :) = alpha1_2d(:iim, :) + alpha4_2d(:iim, :)
+    alpha2p3_2d(:iim, :) = alpha2_2d(:iim, :) + alpha3_2d(:iim, :)
+    alpha3p4_2d(:iim, :) = alpha3_2d(:iim, :) + alpha4_2d(:iim, :)
+
+    alpha1_2d(iip1, :) = alpha1_2d(1, :)
+    alpha2_2d(iip1, :) = alpha2_2d(1, :)
+    alpha3_2d(iip1, :) = alpha3_2d(1, :)
+    alpha4_2d(iip1, :) = alpha4_2d(1, :)
+    alpha1p2_2d(iip1, :) = alpha1p2_2d(1, :)
+    alpha1p4_2d(iip1, :) = alpha1p4_2d(1, :)
+    alpha2p3_2d(iip1, :) = alpha2p3_2d(1, :)
+    alpha3p4_2d(iip1, :) = alpha3p4_2d(1, :)
 
     DO j = 1, jjp1
        DO i = 1, iim
           aireu_2d(i, j) = aireij1_2d(i, j) + aireij2_2d(i, j) + &
                aireij4_2d(i + 1, j) + aireij3_2d(i + 1, j)
-          unsaire(i, j) = 1. / aire_2d(i, j)
-          unsair_gam1_2d(i, j) = unsaire(i, j)**(-gamdi_gdiv)
-          unsair_gam2_2d(i, j) = unsaire(i, j)**(-gamdi_h)
-          airesurg(i, j) = aire_2d(i, j) / rg
        END DO
-       aireu_2d(iip1, j) = aireu_2d(1, j)
-       unsaire(iip1, j) = unsaire(1, j)
-       unsair_gam1_2d(iip1, j) = unsair_gam1_2d(1, j)
-       unsair_gam2_2d(iip1, j) = unsair_gam2_2d(1, j)
-       airesurg(iip1, j) = airesurg(1, j)
     END DO
+
+    aireu_2d(iip1, :) = aireu_2d(1, :)
+
+    unsaire(:iim, :) = 1. / aire_2d(:iim, :)
+    unsaire(iip1, :) = unsaire(1, :)
+    unsair_gam1_2d(:iim, :) = unsaire(:iim, :)**(- gamdi_gdiv)
+    unsair_gam1_2d(iip1, :) = unsair_gam1_2d(1, :)
+    unsair_gam2_2d(:iim, :) = unsaire(:iim, :)**(- gamdi_h)
+    unsair_gam2_2d(iip1, :) = unsair_gam2_2d(1, :)
+    airesurg(:iim, :) = aire_2d(:iim, :) / rg
+    airesurg(iip1, :) = airesurg(1, :)
 
     DO j = 1, jjm
        DO i = 1, iim
