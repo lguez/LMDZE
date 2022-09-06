@@ -47,12 +47,15 @@ contains
     REAL tsso(3) ! parameterised moutain drag torque (3 components)
     REAL tbls(3) ! parameterised boundary layer torque (3 components)
 
-    REAL ZS(801, 401) ! topographic height
-    REAL PS(801, 401) ! surface pressure 
-    REAL UB(801, 401), VB(801, 401) ! barotropic wind, zonal and meridional
-    REAL SSOU(801, 401), SSOV(801, 401)
-    REAL BLSU(801, 401), BLSV(801, 401)
-    REAL ZLON(801), ZLAT(401) ! longitude and latitude in radians
+    REAL ZS(iim + 1, jjm + 1) ! topographic height
+    REAL PS(iim + 1, jjm + 1) ! surface pressure 
+
+    REAL UB(iim + 1, jjm + 1), VB(iim + 1, jjm + 1)
+    ! barotropic wind, zonal and meridional
+
+    REAL SSOU(iim + 1, jjm + 1), SSOV(iim + 1, jjm + 1)
+    REAL BLSU(iim + 1, jjm + 1), BLSV(iim + 1, jjm + 1)
+    REAL ZLON(iim + 1), ZLAT(jjm + 1) ! longitude and latitude in radians
 
     !-------------------------------------------------------------------
 
@@ -60,12 +63,6 @@ contains
          size(dragv), size(liftv), size(phyv), size(p, 1), size(u, 1), &
          size(v, 1)/), "aaam_bud klon")
     nlev = assert_eq(size(p, 2) - 1, size(u, 2), size(v, 2), "aaam_bud nlev")
-
-    if (iim + 1 > 801 .or. jjm + 1 > 401) then
-       print *, ' Problème de dimension dans aaam_bud'
-       stop 1
-    endif
-
     dlat = pi / jjm
     dlon = 2 * pi / real(iim) 
 
