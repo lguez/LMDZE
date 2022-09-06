@@ -41,8 +41,8 @@ contains
     use jumble, only: pi
     use numer_rec_95, only: regr3_lint, regr1_conserv, slopes
     use netcdf95, only: nf95_open, nf95_gw_var, nf95_close, &
-         nf95_inq_varid, handle_err, nf95_put_var
-    use netcdf, only: nf90_nowrite, nf90_get_var
+         nf95_inq_varid, nf95_put_var, nf95_get_var
+    use netcdf, only: nf90_nowrite
 
     ! Variables local to the procedure:
 
@@ -96,7 +96,7 @@ contains
     ! (name of NetCDF primary variable in the output file)
 
     integer varid_in(n_o3_param), varid_out(n_o3_param), varid_plev, varid_time
-    integer ncerr, varid
+    integer varid
     ! (for NetCDF)
 
     real, parameter:: tmidmonth(0:13) = (/(-15. + 30. * j, j = 0, 13)/)
@@ -193,9 +193,7 @@ contains
     do i_v = 1, n_o3_param
        ! Process ozone parameter "name_in(i_v)"
 
-       ncerr = nf90_get_var(ncid_in, varid_in(i_v), o3_par_in)
-       call handle_err("nf90_get_var", ncerr, ncid_in)
-
+       call nf95_get_var(ncid_in, varid_in(i_v), o3_par_in)
        if (decr_lat) o3_par_in = o3_par_in(n_lat:1:-1, :, :)
 
        ! Regrid in latitude:
