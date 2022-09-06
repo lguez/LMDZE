@@ -54,7 +54,10 @@ PROGRAM gcm
   ! mass fraction of advected species
 
   REAL, ALLOCATABLE:: ps(:, :) ! (iim + 1, jjm + 1) ! pression au sol (Pa)
-  REAL, ALLOCATABLE:: masse(:, :, :) ! (iim + 1, jjm + 1, llm) ! masse d'air
+
+  REAL, ALLOCATABLE:: masse(:, :, :) ! (iim + 1, jjm + 1, llm)
+  ! mass in a grid cell, in kg
+
   LOGICAL:: true_calendar = .false. ! default value
   integer i, n_proc, return_comm, ncid_start
 

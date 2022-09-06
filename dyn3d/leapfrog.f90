@@ -44,7 +44,9 @@ contains
     ! potential temperature
 
     REAL, intent(inout):: ps(:, :) ! (iim + 1, jjm + 1) pression au sol, en Pa
-    REAL, intent(inout):: masse(:, :, :) ! (iim + 1, jjm + 1, llm) masse d'air
+
+    REAL, intent(inout):: masse(:, :, :) ! (iim + 1, jjm + 1, llm)
+    ! mass in a grid cell, in kg
 
     REAL, intent(inout):: q(:, :, :, :) ! (iim + 1, jjm + 1, llm, nqmx)
     ! mass fractions of advected fields

@@ -13,7 +13,7 @@ module comgeom
   real, allocatable, target:: aire(:) ! ((iim + 1) * (jjm + 1)) in m2
   real, pointer:: aire_2d(:, :) ! (iim + 1, jjm + 1) in m2
 
-  real, allocatable:: airesurg(:, :) ! (iim + 1, jjm + 1)
+  real, allocatable:: airesurg(:, :) ! (iim + 1, jjm + 1) ! aire / g, in m s2
   
   real, pointer:: aireu_2d(:, :) ! (iim + 1, jjm + 1) in m2
   real, allocatable, target:: aireu(:) ! ((iim + 1) * (jjm + 1)) in m2
@@ -287,8 +287,6 @@ contains
     cvij2(:iim, jjp1) = 0.
     cvij3(:iim, jjp1) = 0.
     cvij4(:iim, jjp1) = cvij1(:iim, jjp1)
-
-    ! Périodicité :
 
     cvij1(iip1, :) = cvij1(1, :)
     cvij2(iip1, :) = cvij2(1, :)

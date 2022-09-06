@@ -24,7 +24,12 @@ contains
     use suphec_m, only: rcpd
 
     real, intent(in):: ps(:, :) ! (iip1, jjp1)
-    real, intent(in):: masse(:, :, :), pk(:, :, :) ! (iip1, jjp1, llm)
+
+    real, intent(in):: masse(:, :, :) ! (iip1, jjp1, llm)
+    ! mass in a grid cell, in kg
+
+    real, intent(in):: pk(:, :, :) ! (iip1, jjp1, llm)
+
     real, intent(in):: pbaru(:, :, :) ! (iip1, jjp1, llm)
     real, intent(in):: pbarv(:, :, :) ! (iip1, jjm, llm)
     real, intent(in):: teta(:, :, :) ! (iip1, jjp1, llm)
