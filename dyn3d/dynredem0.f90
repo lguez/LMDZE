@@ -21,7 +21,7 @@ CONTAINS
     USE disvert_m, ONLY: ap, bp, preff, presnivs
     use dynetat0_m, only: rlatu, rlatv, rlonu, rlonv, rlatu1, rlatu2, yprimu1, &
          yprimu2, xprimp025, xprimm025, xprimu, xprimv
-    use dynetat0_chosen_m, only: pa, day_ref, annee_ref, clat, clon, dzoomx, &
+    use dynetat0_chosen_m, only: day_ref, annee_ref, clat, clon, dzoomx, &
          dzoomy, grossismx, grossismy, taux, tauy
     use grid_noro_m, only: phis
     USE infotrac_init_m, ONLY: tname, ttext
@@ -77,7 +77,7 @@ CONTAINS
     tab_cntrl(15) = ztot0
     tab_cntrl(16) = stot0
     tab_cntrl(17) = ang0
-    tab_cntrl(18) = pa
+    tab_cntrl(18) = 0.
     tab_cntrl(19) = preff
 
     ! Param\`etres pour le zoom :

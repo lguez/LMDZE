@@ -16,6 +16,7 @@ module disvert_m
 
   real, parameter:: preff = 101325. ! in Pa
   real y, ya ! for the hybrid function
+  real, parameter:: pa = 5e4 ! in Pa
 
 contains
 
@@ -25,14 +26,12 @@ contains
     ! Author: P. Le Van
 
     ! This procedure sets the vertical grid. It defines the host
-    ! variables "ap", "bp", "presnivs". "pa" should be defined before
-    ! this procedure is called.
+    ! variables "ap", "bp", "presnivs".
 
     ! Libraries:
     use jumble, only: read_column, new_unit, pi, assert
 
     use dimensions, only: llm
-    use dynetat0_chosen_m, only: pa
     use unit_nml_m, only: unit_nml
 
     ! Local:
@@ -171,8 +170,6 @@ contains
   !**********************************************************
 
   subroutine compute_ab
-
-    use dynetat0_chosen_m, only: pa
 
     ! Calcul de "ap" et "bp".
 

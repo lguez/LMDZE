@@ -22,8 +22,6 @@ module dynetat0_chosen_m
   real, protected, save:: taux, tauy
   ! raideur de la transition de l'int\'erieur \`a l'ext\'erieur du zoom
   
-  real, protected, save:: pa ! in Pa
-
 contains
 
   SUBROUTINE dynetat0_chosen(ncid_start)
@@ -58,7 +56,6 @@ contains
     call assert(int(tab_cntrl(2)) == jjm, "dynetat0_chosen tab_cntrl jjm") 
     call assert(int(tab_cntrl(3)) == llm, "dynetat0_chosen tab_cntrl llm") 
 
-    pa = tab_cntrl(18)
     clon = tab_cntrl(20)
     clat = tab_cntrl(21)
     grossismx = tab_cntrl(22)
@@ -125,8 +122,6 @@ contains
     print *, "Enter namelist 'dynetat0_nml'."
     read(unit = *, nml = dynetat0_nml)
     write(unit_nml, nml = dynetat0_nml)
-
-    pa = 5e4
 
   end subroutine read_serre
 
