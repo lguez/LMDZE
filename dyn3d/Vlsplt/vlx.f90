@@ -19,7 +19,6 @@ contains
     REAL, intent(in):: u_m(ip1jmp1, llm)
 
     ! Local:
-
     INTEGER ij, l, j, i, iju, ijq, indu(ip1jmp1), niju
     INTEGER n0, iadvplus(ip1jmp1, llm), nl(llm)
     REAL new_m, zu_m, zdum(ip1jmp1, llm)
