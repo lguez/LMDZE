@@ -16,7 +16,7 @@ module disvert_m
 
   real, parameter:: preff = 101325. ! in Pa
   real, private:: y, ya ! for the hybrid function
-  real, parameter, private:: pa = 5e4 ! in Pa
+  real, parameter, private:: pah = 5e4 ! in Pa
 
 contains
 
@@ -126,7 +126,7 @@ contains
 
        allocate(p(2: llm))
        p = preff * EXP(- zz(2:) / vert_scale)
-       ya = pa / preff
+       ya = pah / preff
        s(2: llm) = hybrid(p)
 
        call compute_ab
@@ -145,7 +145,7 @@ contains
        ! Quick check:
        call assert(ap(1) == 0., ap(llm + 1) == 0., bp(1) == 1., &
             bp(llm + 1) == 0., "disvert: bad ap or bp values")
-       s(2: llm) = ap(2: llm) / pa + bp(2: llm)
+       s(2: llm) = ap(2: llm) / pah + bp(2: llm)
     case("read_pressure")
        ! Read pressure values, in Pa, in descending order, from preff
        ! to 0. First line is skipped (title line).
@@ -154,7 +154,7 @@ contains
        ! Quick check:
        call assert(p(1) == preff, p(llm + 1) == 0., &
             "disvert: bad pressure values")
-       ya = pa / preff
+       ya = pah / preff
        s(2: llm) = hybrid(p(2: llm))
        call compute_ab
     case default
@@ -179,7 +179,7 @@ contains
        bp = 0.
     end where
 
-    ap = pa * (s - bp)
+    ap = pah * (s - bp)
 
   end subroutine compute_ab
 
