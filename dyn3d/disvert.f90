@@ -16,7 +16,7 @@ module disvert_m
 
   real, parameter:: preff = 101325. ! in Pa
   real, private:: y, ya ! for the hybrid function
-  real, parameter:: pa = 5e4 ! in Pa
+  real, parameter, private:: pa = 5e4 ! in Pa
 
 contains
 
