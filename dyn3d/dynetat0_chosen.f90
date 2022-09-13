@@ -32,8 +32,8 @@ contains
     ! that were chosen in ce0l.
 
     ! Libraries:
-    use netcdf95, only: nf95_inq_varid, NF95_Gw_VAR
     use jumble, only: assert
+    use netcdf95, only: nf95_inq_varid, NF95_Gw_VAR
 
     use conf_gcm_m, only: raz_date
     use dimensions, only: iim, jjm, llm

@@ -11,14 +11,16 @@ program test_fxhyp
   !--------------------------------------------------------
 
   call set_unit_nml
-  open(unit_nml, file="used_namelists.txt", status="replace", action="write")
+  open(unit_nml, file = "used_namelists.txt", status = "replace", &
+       action = "write")
   call set_dimensions
   call read_serre
   call fxhyp
   close(unit_nml)
 
   ! We can use the same unit number although we are not writing a namelist:
-  open(unit_nml, file="test_fxhyp_out.txt", status="replace", action="write")
+  open(unit_nml, file = "test_fxhyp_out.txt", status = "replace", &
+       action = "write")
   write(unit_nml, fmt = *) "xprimm025 = ", xprimm025
   write(unit_nml, fmt = *) "rlonv = ", rlonv
   write(unit_nml, fmt = *) "xprimv = ", xprimv

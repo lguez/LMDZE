@@ -487,7 +487,8 @@ contains
     ! From LMDZ4/libf/dyn3d/fxhyp.F, version 1.2, 2005/06/03 09:11:32
     ! Author: P. Le Van, from formulas by R. Sadourny
 
-    ! Compute xprimm025, rlonv, xprimv, rlonu, xprimu, xprimp025.
+    ! This procedures defines xprimm025, rlonv, xprimv, rlonu, xprimu
+    ! and xprimp025.
     
     ! Calcule les longitudes et dérivées dans la grille du GCM pour
     ! une fonction $x_f(\tilde x)$ à dérivée tangente hyperbolique.
