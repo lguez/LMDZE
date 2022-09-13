@@ -2,7 +2,7 @@ module disvert_m
 
   implicit none
 
-  private hybrid, funcd, y, ya, compute_ab
+  private hybrid, funcd, compute_ab
 
   real, save, allocatable, protected:: ap(:) ! (llm+1) in Pa
   real, save, allocatable, protected:: bp(:) ! (llm+1)
@@ -15,7 +15,7 @@ module disvert_m
   ! approximate full level pressure for a reference surface pressure, in Pa
 
   real, parameter:: preff = 101325. ! in Pa
-  real y, ya ! for the hybrid function
+  real, private:: y, ya ! for the hybrid function
   real, parameter:: pa = 5e4 ! in Pa
 
 contains
