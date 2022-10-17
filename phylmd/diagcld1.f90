@@ -18,14 +18,14 @@ contains
     ! Arguments d'entree:
     REAL, intent(in):: paprs(klon, klev+1) ! pression (Pa) a inter-couche
     REAL, intent(in):: pplay(klon, klev) ! pression (Pa) au milieu de couche
-    REAL rain(klon) ! pluie convective (kg/m2/s)
-    REAL snow(klon) ! neige convective (kg/m2/s)
-    INTEGER kbot(klon) ! bas de la convection
-    INTEGER ktop(klon) ! sommet de la convection
+    REAL, intent(in):: rain(klon) ! pluie convective (kg/m2/s)
+    REAL, intent(in):: snow(klon) ! neige convective (kg/m2/s)
+    INTEGER, intent(in):: kbot(klon) ! bas de la convection
+    INTEGER, intent(in):: ktop(klon) ! sommet de la convection
 
     ! Arguments de sortie:
-    REAL diafra(klon, klev) ! fraction nuageuse diagnostiquee
-    REAL dialiq(klon, klev) ! eau liquide nuageuse
+    REAL, intent(out):: diafra(klon, klev) ! fraction nuageuse diagnostiquee
+    REAL, intent(out):: dialiq(klon, klev) ! eau liquide nuageuse
 
     ! Constantes ajustables:
     REAL CANVA, CANVB, CANVH
