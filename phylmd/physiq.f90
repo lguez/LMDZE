@@ -722,6 +722,7 @@ contains
        ! Nuages diagnostiques pour Tiedtke
        CALL diagcld1(paprs, play, rain_tiedtke, snow_tiedtke, ibas_con, &
             itop_con, diafra, dialiq)
+
        DO k = 1, llm
           DO i = 1, klon
              IF (diafra(i, k) > cldfra(i, k)) THEN
