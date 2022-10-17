@@ -142,7 +142,7 @@ contains
 
     ! Lecture de l'humidite de l'air juste au dessus du sol:
 
-    call NF95_INQ_VARID(ncid_startphy, "QS", varid)
+    call NF95_INQ_VARID(ncid_startphy, "fqsurf", varid)
     call nf95_get_var(ncid_startphy, varid, fqsurf)
 
     ierr = NF90_INQ_VARID(ncid_startphy, "QSOL", varid)

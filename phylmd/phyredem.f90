@@ -75,7 +75,7 @@ contains
     call nf95_inq_varid(ncid_restartphy, "Tsoil", varid)
     call nf95_put_var(ncid_restartphy, varid, ftsoil)
 
-    call nf95_inq_varid(ncid_restartphy, "QS", varid)
+    call nf95_inq_varid(ncid_restartphy, "fqsurf", varid)
     call nf95_put_var(ncid_restartphy, varid, fqsurf)
 
     call nf95_inq_varid(ncid_restartphy, "QSOL", varid)

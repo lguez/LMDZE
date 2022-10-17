@@ -68,7 +68,7 @@ contains
          [idim2, dimid_nsoilmx, dimid_nbsrf], varid)
     call nf95_put_att(ncid_restartphy, varid, 'long_name', 'soil temperature')
 
-    call nf95_def_var(ncid_restartphy, 'QS', nf90_float, &
+    call nf95_def_var(ncid_restartphy, 'fqsurf', nf90_float, &
          [idim2, dimid_nbsrf], varid)
     call nf95_put_att(ncid_restartphy, varid, 'long_name', &
          'Humidite de surface')
