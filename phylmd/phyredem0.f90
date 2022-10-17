@@ -51,65 +51,65 @@ contains
          varid_rlat)
 
     call nf95_def_var(ncid_restartphy, 'masque', nf90_float, idim2, varid)
-    call nf95_put_att(ncid_restartphy, varid, 'title', 'masque terre mer')
+    call nf95_put_att(ncid_restartphy, varid, 'long_name', 'masque terre mer')
 
     ! Fractions de chaque sous-surface
 
     call nf95_def_var(ncid_restartphy, 'pctsrf', nf90_float, &
          [idim2, dimid_nbsrf], varid)
-    call nf95_put_att(ncid_restartphy, varid, 'title', 'surface fraction')
+    call nf95_put_att(ncid_restartphy, varid, 'long_name', 'surface fraction')
 
     call nf95_def_var(ncid_restartphy, 'TS', nf90_float, &
          [idim2, dimid_nbsrf], varid)
-    call nf95_put_att(ncid_restartphy, varid, 'title', 'surface temperature')
+    call nf95_put_att(ncid_restartphy, varid, 'long_name', 'surface temperature')
 
     call nf95_def_var(ncid_restartphy, 'Tsoil', nf90_float, &
          [idim2, dimid_nsoilmx, dimid_nbsrf], varid)
-    call nf95_put_att(ncid_restartphy, varid, 'title', 'soil temperature')
+    call nf95_put_att(ncid_restartphy, varid, 'long_name', 'soil temperature')
 
     call nf95_def_var(ncid_restartphy, 'QS', nf90_float, &
          [idim2, dimid_nbsrf], varid)
-    call nf95_put_att(ncid_restartphy, varid, 'title', 'Humidite de surface')
+    call nf95_put_att(ncid_restartphy, varid, 'long_name', 'Humidite de surface')
 
     call nf95_def_var(ncid_restartphy, 'QSOL', nf90_float, idim2, varid)
-    call nf95_put_att(ncid_restartphy, varid, 'title', 'Eau dans le sol (mm)')
+    call nf95_put_att(ncid_restartphy, varid, 'long_name', 'Eau dans le sol (mm)')
 
     call nf95_def_var(ncid_restartphy, 'ALBE', nf90_float, &
          [idim2, dimid_nbsrf], varid)
-    call nf95_put_att(ncid_restartphy, varid, 'title', 'albedo de surface')
+    call nf95_put_att(ncid_restartphy, varid, 'long_name', 'albedo de surface')
 
     call nf95_def_var(ncid_restartphy, 'SNOW', nf90_float, &
          [idim2, dimid_nbsrf], varid)
-    call nf95_put_att(ncid_restartphy, varid, 'title', 'Neige de surface')
+    call nf95_put_att(ncid_restartphy, varid, 'long_name', 'Neige de surface')
 
     call nf95_def_var(ncid_restartphy, 'RADS', nf90_float, idim2, varid)
-    call nf95_put_att(ncid_restartphy, varid, 'title', &
+    call nf95_put_att(ncid_restartphy, varid, 'long_name', &
          'Rayonnement net a la surface')
 
     call nf95_def_var(ncid_restartphy, 'solsw', nf90_float, idim2, varid)
-    call nf95_put_att(ncid_restartphy, varid, 'title', &
+    call nf95_put_att(ncid_restartphy, varid, 'long_name', &
          'Rayonnement solaire a la surface')
 
     call nf95_def_var(ncid_restartphy, 'sollw', nf90_float, idim2, varid)
-    call nf95_put_att(ncid_restartphy, varid, 'title', &
+    call nf95_put_att(ncid_restartphy, varid, 'long_name', &
          'Rayonnement IR a la surface')
 
     call nf95_def_var(ncid_restartphy, 'fder', nf90_float, idim2, varid)
-    call nf95_put_att(ncid_restartphy, varid, 'title', 'Derive de flux')
+    call nf95_put_att(ncid_restartphy, varid, 'long_name', 'Derive de flux')
 
     call nf95_def_var(ncid_restartphy, 'rain_f', nf90_float, idim2, varid)
-    call nf95_put_att(ncid_restartphy, varid, 'title', 'precipitation liquide')
+    call nf95_put_att(ncid_restartphy, varid, 'long_name', 'precipitation liquide')
 
     call nf95_def_var(ncid_restartphy, 'snow_f', nf90_float, idim2, varid)
-    call nf95_put_att(ncid_restartphy, varid, 'title', 'precipitation solide')
+    call nf95_put_att(ncid_restartphy, varid, 'long_name', 'precipitation solide')
 
     call nf95_def_var(ncid_restartphy, 'RUG', nf90_float, &
          [idim2, dimid_nbsrf], varid)
-    call nf95_put_att(ncid_restartphy, varid, 'title', 'rugosite de surface')
+    call nf95_put_att(ncid_restartphy, varid, 'long_name', 'rugosite de surface')
 
     call nf95_def_var(ncid_restartphy, 'AGESNO', nf90_float, &
          [idim2, dimid_nbsrf], varid)
-    call nf95_put_att(ncid_restartphy, varid, 'title', &
+    call nf95_put_att(ncid_restartphy, varid, 'long_name', &
          'Age de la neige surface')
 
     call nf95_def_var(ncid_restartphy, 'ZMEA', nf90_float, idim2, varid)
@@ -125,20 +125,20 @@ contains
          [idim2, idim3], varid)
 
     call nf95_def_var(ncid_restartphy, 'RUGMER', nf90_float, idim2, varid)
-    call nf95_put_att(ncid_restartphy, varid, 'title', &
+    call nf95_put_att(ncid_restartphy, varid, 'long_name', &
          'Longueur de rugosite sur mer')
 
     call nf95_def_var(ncid_restartphy, 'CLWCON', nf90_float, idim2, varid)
-    call nf95_put_att(ncid_restartphy, varid, 'title', 'Eau liquide convective')
+    call nf95_put_att(ncid_restartphy, varid, 'long_name', 'Eau liquide convective')
 
     call nf95_def_var(ncid_restartphy, 'RNEBCON', nf90_float, idim2, varid)
-    call nf95_put_att(ncid_restartphy, varid, 'title', 'Nebulosite convective')
+    call nf95_put_att(ncid_restartphy, varid, 'long_name', 'Nebulosite convective')
 
     call nf95_def_var(ncid_restartphy, 'RATQS', nf90_float, idim2, varid)
-    call nf95_put_att(ncid_restartphy, varid, 'title', 'Ratqs')
+    call nf95_put_att(ncid_restartphy, varid, 'long_name', 'Ratqs')
 
     call nf95_def_var(ncid_restartphy, 'RUNOFFLIC0', nf90_float, idim2, varid)
-    call nf95_put_att(ncid_restartphy, varid, 'title', 'Runofflic0')
+    call nf95_put_att(ncid_restartphy, varid, 'long_name', 'Runofflic0')
 
     call nf95_def_var(ncid_restartphy, 'sig1', nf90_float, [idim2, idim3], &
          varid)
