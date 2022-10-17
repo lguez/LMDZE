@@ -6,9 +6,7 @@ contains
 
   SUBROUTINE diagcld1(paprs, pplay, rain, snow, kbot, ktop, &
        diafra, dialiq)
-    use dimensions
-    use dimphy
-    use SUPHEC_M
+    use dimphy, only: klon, klev
 
     ! Laurent Li (LMD/CNRS), le 12 octobre 1998
     ! (adaptation du code ECMWF)
