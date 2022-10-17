@@ -84,7 +84,7 @@ contains
     call nf95_inq_varid(ncid_restartphy, "ALBE", varid)
     call nf95_put_var(ncid_restartphy, varid, falbe)
 
-    call nf95_inq_varid(ncid_restartphy, "SNOW", varid)
+    call nf95_inq_varid(ncid_restartphy, "fsnow", varid)
     call nf95_put_var(ncid_restartphy, varid, fsnow)
 
     call nf95_inq_varid(ncid_restartphy, "RADS", varid)

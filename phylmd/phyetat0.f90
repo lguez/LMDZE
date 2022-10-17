@@ -156,7 +156,7 @@ contains
 
     ! Lecture de neige au sol:
 
-    call NF95_INQ_VARID(ncid_startphy, "SNOW", varid)
+    call NF95_INQ_VARID(ncid_startphy, "fsnow", varid)
     call nf95_get_var(ncid_startphy, varid, fsnow)
 
     ! Lecture de albedo au sol:
