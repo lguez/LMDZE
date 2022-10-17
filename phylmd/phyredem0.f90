@@ -40,7 +40,7 @@ contains
          'start file for the physics code')
     call nf95_put_att(ncid_restartphy, nf90_global, "itau_phy", itau_phy_redem)
 
-    call nf95_def_dim(ncid_restartphy, 'points_physiques', klon, idim2)
+    call nf95_def_dim(ncid_restartphy, 'klon', klon, idim2)
     call nf95_def_dim(ncid_restartphy, 'klev', klev, idim3)
     call nf95_def_dim(ncid_restartphy, 'nbsrf', nbsrf, dimid_nbsrf)
     call nf95_def_dim(ncid_restartphy, 'nsoilmx', nsoilmx, dimid_nsoilmx)
