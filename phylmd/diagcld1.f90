@@ -4,24 +4,24 @@ module diagcld1_m
 
 contains
 
-  SUBROUTINE diagcld1(paprs, pplay, rain, snow, kbot, ktop, &
-       diafra, dialiq)
-    use dimphy, only: klon, klev
+  SUBROUTINE diagcld1(paprs, pplay, rain, snow, kbot, ktop, diafra, dialiq)
 
     ! Laurent Li (LMD/CNRS), le 12 octobre 1998
     ! (adaptation du code ECMWF)
 
-    ! Dans certains cas, le schema pronostique des nuages n'est
-    ! pas suffisament performant. On a donc besoin de diagnostiquer
-    ! ces nuages. Je dois avouer que c'est une frustration.
+    ! Dans certains cas, le sch\'ema pronostique des nuages n'est pas
+    ! suffisamment performant. On a donc besoin de diagnostiquer ces
+    ! nuages. Je dois avouer que c'est une frustration.
+
+    use dimphy, only: klon, klev
 
     ! Arguments d'entree:
     REAL, intent(in):: paprs(klon, klev+1) ! pression (Pa) a inter-couche
     REAL, intent(in):: pplay(klon, klev) ! pression (Pa) au milieu de couche
     REAL rain(klon) ! pluie convective (kg/m2/s)
     REAL snow(klon) ! neige convective (kg/m2/s)
-    INTEGER ktop(klon) ! sommet de la convection
     INTEGER kbot(klon) ! bas de la convection
+    INTEGER ktop(klon) ! sommet de la convection
 
     ! Arguments de sortie:
     REAL diafra(klon, klev) ! fraction nuageuse diagnostiquee
