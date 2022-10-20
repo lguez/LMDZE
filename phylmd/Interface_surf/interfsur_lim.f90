@@ -11,10 +11,12 @@ contains
 
     ! Laurent FAIRHEAD, February 2000
 
-    use conf_gcm_m, only: lmt_pas
-    USE dimphy, ONLY: klon
+    ! Libraries:
     use netcdf, only: NF90_NOWRITE
     use netcdf95, only: NF95_close, NF95_GET_VAR, NF95_INQ_VARID, NF95_OPEN
+
+    use conf_gcm_m, only: lmt_pas
+    USE dimphy, ONLY: klon
     use time_phylmdz, only: itap
 
     integer, intent(IN):: jour ! jour a lire dans l'annee

@@ -72,7 +72,7 @@ contains
     ! net downward radiative (longwave + shortwave) flux at the
     ! surface, in W / m2
 
-    REAL, intent(inout):: albedo(:) ! (knon) albedo de la surface
+    REAL, intent(inout):: albedo(:) ! (knon) alb\'edo de la surface
 
     REAL, intent(inout):: snow(:) ! (knon)
     ! column-density of mass of snow at the surface, in kg m-2
