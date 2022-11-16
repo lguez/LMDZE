@@ -13,7 +13,7 @@ contains
     use nat2gcm_m, only: nat2gcm
     USE netcdf, ONLY: nf90_nowrite
     USE netcdf95, ONLY: nf95_get_var, nf95_inq_varid, nf95_inquire_dimension, &
-         nf95_open, find_coord
+         nf95_open, nf95_find_coord
     USE paramet_m, ONLY: iip1, jjp1
     use reanalyse2nat_m, only: reanalyse2nat
 
@@ -79,7 +79,8 @@ contains
           ncid = ncidq
        end if
 
-       call find_coord(ncid, dimid = dimid, varid = varid, std_name = "plev")
+       call nf95_find_coord(ncid, dimid = dimid, varid = varid, &
+            std_name = "plev")
        call nf95_inquire_dimension(ncid, dimid, nclen = nlevnc)
        PRINT *, 'nlevnc = ', nlevnc
        allocate(unc(iip1, jjp1, nlevnc), vnc(iip1, jjm, nlevnc))
@@ -88,7 +89,7 @@ contains
        pl = 100. * pl ! passage en pascal
 
        ! Read latitude values just to know their order:
-       call find_coord(ncid, varid = varid, std_name = "latitude")
+       call nf95_find_coord(ncid, varid = varid, std_name = "latitude")
        call nf95_get_var(ncid, varid, latitude)
        invert_y = latitude(1) < latitude(2)
 

@@ -17,7 +17,7 @@ CONTAINS
     use jumble, only: assert, pi
     use netcdf, only: nf90_nowrite
     use netcdf95, only: nf95_open, nf95_close, nf95_get_var, nf95_inq_varid, &
-         nf95_gw_var, find_coord
+         nf95_gw_var, nf95_find_coord
 
     use comgeom, only: aire_2d, apoln, apols
     use conf_dat2d_m, only: conf_dat2d
@@ -48,19 +48,19 @@ CONTAINS
 
     call nf95_open('ECDYN.nc', nf90_nowrite, ncid)
 
-    call find_coord(ncid, varid=varid, std_name="longitude")
+    call nf95_find_coord(ncid, varid=varid, std_name="longitude")
     call nf95_gw_var(ncid, varid, lon_ini)
     lon_ini = lon_ini * pi / 180. ! convert to rad
     iml_dyn = size(lon_ini)
     print *, "iml_dyn = ", iml_dyn
 
-    call find_coord(ncid, varid=varid, std_name="latitude")
+    call nf95_find_coord(ncid, varid=varid, std_name="latitude")
     call nf95_gw_var(ncid, varid, lat_ini)
     lat_ini = lat_ini * pi / 180. ! convert to rad
     jml_dyn = size(lat_ini)
     print *, "jml_dyn = ", jml_dyn
 
-    call find_coord(ncid, varid=varid, std_name="plev")
+    call nf95_find_coord(ncid, varid=varid, std_name="plev")
     call nf95_gw_var(ncid, varid, levdyn_ini)
     llm_dyn = size(levdyn_ini)
     print *, "llm_dyn = ", llm_dyn

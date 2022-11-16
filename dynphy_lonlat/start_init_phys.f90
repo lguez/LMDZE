@@ -12,7 +12,7 @@ CONTAINS
     use jumble, only: assert, deg_to_rad
     use netcdf, only: nf90_nowrite
     use netcdf95, only: nf95_open, nf95_close, nf95_get_var, nf95_inq_varid, &
-         nf95_gw_var, find_coord
+         nf95_gw_var, nf95_find_coord
 
     use conf_dat2d_m, only: conf_dat2d
     use dimensions, only: iim, jjm
@@ -44,12 +44,12 @@ CONTAINS
 
     call nf95_open('ECPHY.nc', nf90_nowrite, ncid)
 
-    call find_coord(ncid, varid=varid, std_name="longitude")
+    call nf95_find_coord(ncid, varid=varid, std_name="longitude")
     call nf95_gw_var(ncid, varid, lon_ini)
     lon_ini = lon_ini * deg_to_rad
     iml_phys = size(lon_ini)
 
-    call find_coord(ncid, varid=varid, std_name="latitude")
+    call nf95_find_coord(ncid, varid=varid, std_name="latitude")
     call nf95_gw_var(ncid, varid, lat_ini)
     lat_ini = lat_ini * deg_to_rad
     jml_phys = size(lat_ini)
