@@ -300,7 +300,6 @@ contains
           yts(:knon) = ftsol(ni(:knon), nisrf)
           snow(:knon) = fsnow(ni(:knon), nisrf)
           yqsurf(:knon) = fqsurf(ni(:knon), nisrf)
-          yalb(:knon) = falbe(ni(:knon), nisrf)
           yrain_fall(:knon) = rain_fall(ni(:knon))
           ysnow_fall(:knon) = snow_fall(ni(:knon))
           yagesno(:knon) = agesno(ni(:knon), nisrf)
