@@ -4,7 +4,7 @@ module convmas_m
 
 contains
 
-  SUBROUTINE convmas(pbaru, pbarv, convm)
+  function convmas(pbaru, pbarv)
 
     ! From LMDZ4/libf/dyn3d/convmas.F, version 1.1.1.1, 2004/05/19 12:53:07
 
@@ -18,10 +18,10 @@ contains
 
     ! Le calcul se fait de haut en bas, la convergence de masse au
     ! niveau p(llm + 1) est égale à 0 et n'est pas stockée dans le
-    ! tableau convm.
+    ! tableau convmas.
 
     REAL, INTENT(IN):: pbaru(ip1jmp1, llm), pbarv(ip1jm, llm)
-    REAL, INTENT(OUT):: convm(iim + 1, jjm + 1, llm)
+    REAL convmas(iim + 1, jjm + 1, llm)
 
     ! Local:
     INTEGER l
@@ -29,16 +29,16 @@ contains
     !-----------------------------------------------------------------------
 
     ! Calcul de - (d(pbaru)/dx + d(pbarv)/dy) :
-    CALL convflu(pbaru, pbarv, llm, convm)
+    CALL convflu(pbaru, pbarv, llm, convmas)
 
     ! Filtrage :
-    CALL filtreg_scal(convm, direct = .true., intensive = .false.)
+    CALL filtreg_scal(convmas, direct = .true., intensive = .false.)
 
     ! Intégration de la convergence de masse de haut en bas :
     DO l = llmm1, 1, -1
-       convm(:, :, l) = convm(:, :, l) + convm(:, :, l + 1)
+       convmas(:, :, l) = convmas(:, :, l) + convmas(:, :, l + 1)
     END DO
 
-  END SUBROUTINE convmas
+  END function convmas
 
 end module convmas_m

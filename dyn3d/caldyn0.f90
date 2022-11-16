@@ -59,7 +59,7 @@ contains
     CALL massbar(masse, massebx, masseby)
     CALL massbarxy(masse, massebxy)
     CALL flumass(massebx, masseby, vcont, ucont, pbaru, pbarv)
-    CALL convmas(pbaru, pbarv, convm)
+    convm = convmas(pbaru, pbarv)
     dp = convm(:, :, 1) / airesurg
     w = vitvert(convm)
     CALL tourpot(vcov, ucov, massebxy, vorpot)
