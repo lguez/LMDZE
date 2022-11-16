@@ -10,14 +10,14 @@ contains
     ! Authors: P. Le Van, F. Hourdin.
 
     ! Calcule les moyennes en x et y de la masse d'air dans chaque
-    ! maille. Cf. "inigeom.txt" et "massbar.txt".
+    ! maille. Cf. documentation sur inigeom et massbar.
 
     USE comgeom, ONLY: alpha1p2, alpha1p4, alpha2p3, alpha3p4
     USE dimensions, ONLY: iim, llm
     USE paramet_m, ONLY: iip1, ip1jm, ip1jmp1
 
-    REAL, intent(in):: masse(ip1jmp1, llm)
-    real, intent(out):: massebx(ip1jmp1, llm), masseby(ip1jm, llm)
+    REAL, intent(in):: masse(ip1jmp1, llm) ! mass in a grid cell, in kg
+    real, intent(out):: massebx(ip1jmp1, llm), masseby(ip1jm, llm) ! in kg
 
     ! Local:
     integer l, ij

@@ -15,7 +15,7 @@ contains
     USE dimensions, ONLY: iim, llm
     USE paramet_m, ONLY: iip1, iip2, ip1jm, ip1jmi1, ip1jmp1
 
-    REAL, intent(in):: massebx(ip1jmp1, llm), masseby(ip1jm, llm)
+    REAL, intent(in):: massebx(ip1jmp1, llm), masseby(ip1jm, llm) ! in kg
     real, intent(in):: vcont(ip1jm, llm), ucont(ip1jmp1, llm)
     real, intent(out):: pbaru(ip1jmp1, llm), pbarv(ip1jm, llm)
 
