@@ -26,7 +26,6 @@ contains
     ! Local:
     real convpn, convps
     INTEGER l, ij
-    REAL SSUM
 
     !------------------------------------------------------------------
 
@@ -42,8 +41,8 @@ contains
 
        ! Calcul aux p\^oles :
 
-       convpn = SSUM(iim, yflu(1, l), 1)
-       convps = - SSUM(iim, yflu(ip1jm-iim, l), 1)
+       convpn = SUM(yflu(:iim, l))
+       convps = - SUM(yflu(ip1jm-iim:ip1jm - 1, l))
        
        DO ij = 1, iip1
           convfl(ij, l) = convpn * aire(ij) / apoln
