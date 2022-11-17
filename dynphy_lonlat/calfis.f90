@@ -87,11 +87,8 @@ contains
 
     ! Local:
     INTEGER i, j, l, ig0, iq
-    REAL paprs(klon, llm + 1) ! pression aux interfaces des couches
     REAL play(klon, llm) ! aux milieux des couches 
-    REAL zphi(klon, llm) ! geopotential at mid-layer, in m2 s-2
-    real pphis(klon) ! surface geopotential, in m2 s-2
-    REAL u(klon, llm), v(klon, llm) ! zonal and meridional wind, in m / s
+    REAL u(klon, llm) ! zonal wind, in m / s
 
     real zvfi(iim + 1, jjm + 1, llm)
     ! meridional wind, in m / s, interpolated to scalar grid
@@ -108,8 +105,6 @@ contains
 
     ! Transformation des variables dynamiques en variables physiques :
 
-    paprs = gr_dyn_phy(p3d)
-
     ! 43. Température et pression milieu couche
     DO l = 1, llm
        pksurcp = pk(:, :, l) / rcpd
@@ -119,9 +114,6 @@ contains
 
     ! 43.bis Traceurs :
     forall (iq = 1: nqmx) qx(:, :, iq) = gr_dyn_phy(q(:, :, :, iq))
-
-    pphis = pack(phis, dyn_phy)
-    zphi = gr_dyn_phy(phi)
 
     ! Calcul de la vitesse verticale :
     forall (l = 1: llm)
@@ -181,10 +173,9 @@ contains
        zvfi(:, jjm + 1, l) = SUM(SIN(rlonv(:iim)) * z1) / pi
     ENDDO
 
-    v = gr_dyn_phy(zvfi)
-
-    CALL physiq(lafin, dayvrai, time, paprs, play, zphi, pphis, u, v, t, qx, &
-         omega, d_u, d_v, d_t, d_qx)
+    CALL physiq(lafin, dayvrai, time, gr_dyn_phy(p3d), play, gr_dyn_phy(phi), &
+         pack(phis, dyn_phy), u, gr_dyn_phy(zvfi), t, qx, omega, d_u, d_v, &
+         d_t, d_qx)
 
     ! transformation des tendances physiques en tendances dynamiques:
 
