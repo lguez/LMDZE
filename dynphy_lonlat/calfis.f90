@@ -37,7 +37,7 @@ contains
     use dimphy, only: klon
     use disvert_m, only: preff
     use dynetat0_m, only: rlonu, rlonv
-    use grid_change, only: dyn_phy, gr_fi_dyn
+    use grid_change, only: dyn_phy, gr_fi_dyn, gr_dyn_phy
     use grid_noro_m, only: phis
     use physiq_m, only: physiq
     use suphec_m, only: rcpd, rkappa, rg
@@ -108,7 +108,7 @@ contains
 
     ! Transformation des variables dynamiques en variables physiques :
 
-    forall (l = 1: llm + 1) paprs(:, l) = pack(p3d(:, :, l), dyn_phy)
+    paprs = gr_dyn_phy(p3d)
 
     ! 43. Température et pression milieu couche
     DO l = 1, llm
@@ -118,11 +118,10 @@ contains
     ENDDO
 
     ! 43.bis Traceurs :
-    forall (iq = 1: nqmx, l = 1: llm) &
-         qx(:, l, iq) = pack(q(:, :, l, iq), dyn_phy)
+    forall (iq = 1: nqmx) qx(:, :, iq) = gr_dyn_phy(q(:, :, :, iq))
 
     pphis = pack(phis, dyn_phy)
-    forall (l = 1 :llm) zphi(:, l) = pack(phi(:, :, l), dyn_phy)
+    zphi = gr_dyn_phy(phi)
 
     ! Calcul de la vitesse verticale :
     forall (l = 1: llm)
@@ -182,7 +181,7 @@ contains
        zvfi(:, jjm + 1, l) = SUM(SIN(rlonv(:iim)) * z1) / pi
     ENDDO
 
-    forall(l = 1: llm) v(:, l) = pack(zvfi(:, :, l), dyn_phy)
+    v = gr_dyn_phy(zvfi)
 
     CALL physiq(lafin, dayvrai, time, paprs, play, zphi, pphis, u, v, t, qx, &
          omega, d_u, d_v, d_t, d_qx)
