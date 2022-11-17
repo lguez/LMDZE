@@ -86,6 +86,7 @@ contains
     LOGICAL, intent(in):: lafin
 
     ! Local:
+
     INTEGER i, j, l, ig0, iq
     REAL play(klon, llm) ! aux milieux des couches 
     REAL u(klon, llm) ! zonal wind, in m / s
