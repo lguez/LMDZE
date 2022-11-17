@@ -95,7 +95,11 @@ contains
 
     REAL t(klon, llm) ! temperature, in K
     real qx(klon, llm, nqmx) ! mass fractions of advected fields
-    REAL omega(klon, llm)
+
+    REAL omega(klon, llm) ! in Pa s-1
+    ! $(\partial_p s) \frac{\uD s}{\uD t}$, where $s$ is hybrid
+    ! sigma-pressure vertical coordinate. In Pa / s.
+
     REAL d_u(klon, llm), d_v(klon, llm) ! tendances physiques du vent (m s-2)
     REAL d_t(klon, llm), d_qx(klon, llm, nqmx)
     REAL z1(iim)
@@ -123,7 +127,7 @@ contains
        omega(klon, l) = w(1, jjm + 1, l) * rg / apols
     END forall
 
-    ! 45. champ u:
+    ! 45. Champ u :
 
     forall (l = 1:llm) zufi(1, 2:jjm, l) = 0.5 * (ucov(iim, 2:jjm, l) &
          / cu_2d(iim, 2:jjm) + ucov(1, 2:jjm, l) / cu_2d(1, 2:jjm))
@@ -132,7 +136,7 @@ contains
          / cu_2d(i, 2:jjm))
     zufi(iim + 1, 2:jjm, :) = zufi(1, 2:jjm, :)
 
-    ! 46.champ v:
+    ! 46. Champ v :
 
     forall (j = 2: jjm, l = 1: llm) zvfi(:iim, j, l) = 0.5 &
          * (vcov(:iim, j - 1, l) / cv_2d(:iim, j - 1) &

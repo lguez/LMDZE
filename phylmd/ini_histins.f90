@@ -100,7 +100,7 @@ contains
        CALL histdef(nid_ins, "topl", "OLR", "W/m2", &
             iim, jjm + 1, nhori, 1, 1, 1, -99, &
             "inst(X)", zsto, zout)
-       CALL histdef(nid_ins, "evap", "Evaporation", "kg/(s*m2)", &
+       CALL histdef(nid_ins, "evap", "evaporation", "kg/(s*m2)", &
             iim, jjm + 1, nhori, 1, 1, 1, -99,  &
             "inst(X)", zsto, zout)
        CALL histdef(nid_ins, "sols", "Solar rad. at surf.", "W/m2", &

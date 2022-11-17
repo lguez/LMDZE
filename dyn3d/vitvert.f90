@@ -17,8 +17,8 @@ contains
     
     USE disvert_m, ONLY: bp
 
-    real, intent(in):: convm(:, :, :) ! (iim + 1, jjm + 1, llm)
-    REAL vitvert(size(convm, 1), size(convm, 2), size(convm, 3))
+    real, intent(in):: convm(:, :, :) ! (iim + 1, jjm + 1, llm) in kg s-1
+    REAL vitvert(size(convm, 1), size(convm, 2), size(convm, 3)) ! in kg s-1
 
     ! Local:
     INTEGER l

@@ -60,7 +60,10 @@ contains
     real, INTENT(out):: dv(:, :, :) ! (iim + 1, jjm, llm)
     REAL, INTENT(out):: dteta(:, :, :) ! (iim + 1, jjm + 1, llm)
     real, INTENT(out):: dp(:, :) ! (iim + 1, jjm + 1)
+
     REAL, INTENT(out):: w(:, :, :) ! (iim + 1, jjm + 1, llm)
+    ! vertical mass flux, in kg s-1
+
     REAL, intent(out):: pbaru(:, :, :) ! (iim + 1, jjm + 1, llm) in kg s-1
     REAL, intent(out):: pbarv(:, :, :) ! (iim + 1, jjm, llm) in kg s-1
     LOGICAL, INTENT(IN):: conser
@@ -71,7 +74,8 @@ contains
     real p(iim + 1, jjm + 1, llmp1) ! pressure at layer interface, in Pa
     REAL massebx(ip1jmp1, llm), masseby((iim + 1) * jjm, llm) ! in kg
     REAL vorpot(iim + 1, jjm, llm)
-    real ecin(iim + 1, jjm + 1, llm), convm(iim + 1, jjm + 1, llm)
+    real ecin(iim + 1, jjm + 1, llm)
+    real convm(iim + 1, jjm + 1, llm) ! in kg s-1
     REAL bern(iim + 1, jjm + 1, llm)
     REAL massebxy(iim + 1, jjm, llm)
     INTEGER l

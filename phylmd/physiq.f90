@@ -89,7 +89,10 @@ contains
     REAL, intent(in):: qx(:, :, :) ! (klon, llm, nqmx)
     ! (humidit\'e sp\'ecifique et fractions massiques des autres traceurs)
 
-    REAL, intent(in):: omega(:, :) ! (klon, llm) vitesse verticale en Pa / s
+    REAL, intent(in):: omega(:, :) ! (klon, llm)
+    ! $(\partial_p s) \frac{\uD s}{\uD t}$, where $s$ is hybrid
+    ! sigma-pressure vertical coordinate. In Pa / s.
+
     REAL, intent(out):: d_u(:, :) ! (klon, llm) tendance physique de "u" (m s-2)
     REAL, intent(out):: d_v(:, :) ! (klon, llm) tendance physique de "v" (m s-2)
     REAL, intent(out):: d_t(:, :) ! (klon, llm) tendance physique de "t" (K / s)
@@ -210,7 +213,7 @@ contains
     ! solid water mass flux (kg / m2 / s), positive down
 
     REAL rain_tiedtke(klon), snow_tiedtke(klon)
-    REAL evap(klon) ! flux d'\'evaporation au sol
+    REAL evap(klon) ! water vapour flux at the surface, positive upwards
     REAL sens(klon) ! flux de chaleur sensible au sol
     REAL, save, allocatable:: dlw(:) ! (klon) derivative of infra-red flux
     REAL, save, allocatable:: frugs(:, :) ! (klon, nbsrf) ! longueur de rugosite
@@ -240,7 +243,8 @@ contains
     REAL cldtau(klon, llm) ! \'epaisseur optique
     REAL cldemi(klon, llm) ! \'emissivit\'e infrarouge
 
-    REAL flux_q(klon, nbsrf) ! flux turbulent d'humidite à la surface
+    REAL flux_q(klon, nbsrf)
+    ! flux turbulent d'humidite à la surface, en kg m-2 s-1
 
     REAL flux_t(klon, nbsrf)
     ! flux de chaleur sensible (c_p T) (W / m2) (orientation positive

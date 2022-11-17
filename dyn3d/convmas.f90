@@ -21,7 +21,7 @@ contains
     ! tableau convmas.
 
     REAL, INTENT(IN):: pbaru(ip1jmp1, llm), pbarv(ip1jm, llm) ! in kg s-1
-    REAL convmas(iim + 1, jjm + 1, llm)
+    REAL convmas(iim + 1, jjm + 1, llm) ! in kg s-1
 
     ! Local:
     INTEGER l

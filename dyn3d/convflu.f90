@@ -17,9 +17,7 @@ contains
     use paramet_m, only: ip1jmp1, ip1jm, iip1, iip2
     use comgeom, only: apoln, apols, aire
 
-    integer, intent(in):: nbniv
-    ! nombre de niveaux verticauw de xflu et de yflu
-
+    integer, intent(in):: nbniv ! nombre de niveaux verticaux de xflu et de yflu
     REAL, intent(in):: xflu(ip1jmp1, nbniv), yflu(ip1jm, nbniv)
     real, intent(out):: convfl(ip1jmp1, nbniv)
 
@@ -32,7 +30,7 @@ contains
     DO l = 1, nbniv
        DO ij = iip2, ip1jm - 1
           convfl(ij + 1, l) = xflu(ij, l) - xflu(ij + 1, l) + &
-               yflu(ij +1, l) - yflu(ij -iim, l)
+               yflu(ij + 1, l) - yflu(ij - iim, l)
        end DO
 
        DO ij = iip2, ip1jm, iip1
@@ -42,11 +40,11 @@ contains
        ! Calcul aux p\^oles :
 
        convpn = SUM(yflu(:iim, l))
-       convps = - SUM(yflu(ip1jm-iim:ip1jm - 1, l))
+       convps = - SUM(yflu(ip1jm - iim:ip1jm - 1, l))
        
        DO ij = 1, iip1
           convfl(ij, l) = convpn * aire(ij) / apoln
-          convfl(ij+ ip1jm, l) = convps * aire(ij+ ip1jm) / apols
+          convfl(ij + ip1jm, l) = convps * aire(ij + ip1jm) / apols
        end DO
     end DO
 
