@@ -16,10 +16,14 @@ contains
     use dimensions, only: jjm, llm
     USE comgeom, only: unscu2, unscv2
 
-    REAL, INTENT(IN):: ucov(:, :, :) ! (iim + 1, jjm + 1, llm) vent covariant
-    REAL, INTENT(IN):: vcov(:, :, :) ! (iim + 1, jjm, llm) vent covariant
-    REAL, INTENT(out):: ucont(:, :, :) ! (iim + 1, jjm + 1, llm)
-    real, INTENT(out):: vcont(:, :, :) ! (iim + 1, jjm, llm)
+    REAL, INTENT(IN):: ucov(:, :, :) ! (iim + 1, jjm + 1, llm)
+    ! covariant zonal velocity, in m2 s-1
+
+    REAL, INTENT(IN):: vcov(:, :, :) ! (iim + 1, jjm, llm)
+    ! covariant meridional velocity, in m2 s-1
+
+    REAL, INTENT(out):: ucont(:, :, :) ! (iim + 1, jjm + 1, llm) in s-1
+    real, INTENT(out):: vcont(:, :, :) ! (iim + 1, jjm, llm) in s-1
 
     ! Local:
     INTEGER l

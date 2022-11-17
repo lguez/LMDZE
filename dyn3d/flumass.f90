@@ -16,8 +16,8 @@ contains
     USE paramet_m, ONLY: iip1, iip2, ip1jm, ip1jmi1, ip1jmp1
 
     REAL, intent(in):: massebx(ip1jmp1, llm), masseby(ip1jm, llm) ! in kg
-    real, intent(in):: vcont(ip1jm, llm), ucont(ip1jmp1, llm)
-    real, intent(out):: pbaru(ip1jmp1, llm), pbarv(ip1jm, llm)
+    real, intent(in):: vcont(ip1jm, llm), ucont(ip1jmp1, llm) ! in s-1
+    real, intent(out):: pbaru(ip1jmp1, llm), pbarv(ip1jm, llm) ! in kg s-1
 
     ! Local:
     REAL apbarun(iip1), apbarus(iip1)

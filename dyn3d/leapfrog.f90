@@ -37,8 +37,11 @@ contains
     use integrd_m, only: integrd
     use writehist_m, only: writehist
 
-    REAL, intent(inout):: ucov(:, :, :) ! (iim + 1, jjm + 1, llm) vent covariant
-    REAL, intent(inout):: vcov(:, :, :) ! (iim + 1, jjm, llm) ! vent covariant
+    REAL, intent(inout):: ucov(:, :, :) ! (iim + 1, jjm + 1, llm)
+    ! covariant zonal velocity, in m2 s-1
+
+    REAL, intent(inout):: vcov(:, :, :) ! (iim + 1, jjm, llm)
+    ! covariant meridional velocity, in m2 s-1
 
     REAL, intent(inout):: teta(:, :, :) ! (iim + 1, jjm + 1, llm)
     ! potential temperature

@@ -20,7 +20,7 @@ contains
     ! niveau p(llm + 1) est égale à 0 et n'est pas stockée dans le
     ! tableau convmas.
 
-    REAL, INTENT(IN):: pbaru(ip1jmp1, llm), pbarv(ip1jm, llm)
+    REAL, INTENT(IN):: pbaru(ip1jmp1, llm), pbarv(ip1jm, llm) ! in kg s-1
     REAL convmas(iim + 1, jjm + 1, llm)
 
     ! Local:

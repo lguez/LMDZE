@@ -37,8 +37,13 @@ contains
     use vitvert_m, only: vitvert
 
     INTEGER, INTENT(IN):: itau
-    REAL, INTENT(IN):: ucov(:, :, :) ! (iim + 1, jjm + 1, llm) vent covariant
-    REAL, INTENT(IN):: vcov(:, :, :) ! (iim + 1, jjm, llm) vent covariant
+
+    REAL, INTENT(IN):: ucov(:, :, :) ! (iim + 1, jjm + 1, llm)
+    ! covariant zonal velocity, in m2 s-1
+
+    REAL, INTENT(IN):: vcov(:, :, :) ! (iim + 1, jjm, llm)
+    ! covariant meridional velocity, in m2 s-1
+
     REAL, INTENT(IN):: teta(:, :, :) ! (iim + 1, jjm + 1, llm)
     REAL, INTENT (IN):: ps(:, :) ! (iim + 1, jjm + 1)
 
@@ -56,12 +61,12 @@ contains
     REAL, INTENT(out):: dteta(:, :, :) ! (iim + 1, jjm + 1, llm)
     real, INTENT(out):: dp(:, :) ! (iim + 1, jjm + 1)
     REAL, INTENT(out):: w(:, :, :) ! (iim + 1, jjm + 1, llm)
-    REAL, intent(out):: pbaru(:, :, :) ! (iim + 1, jjm + 1, llm)
-    REAL, intent(out):: pbarv(:, :, :) ! (iim + 1, jjm, llm)
+    REAL, intent(out):: pbaru(:, :, :) ! (iim + 1, jjm + 1, llm) in kg s-1
+    REAL, intent(out):: pbarv(:, :, :) ! (iim + 1, jjm, llm) in kg s-1
     LOGICAL, INTENT(IN):: conser
 
     ! Local:
-    REAL vcont(iim + 1, jjm, llm), ucont(iim + 1, jjm + 1, llm)
+    REAL vcont(iim + 1, jjm, llm), ucont(iim + 1, jjm + 1, llm) ! in s-1
     REAL ang_3d(iim + 1, jjm + 1, llm)
     real p(iim + 1, jjm + 1, llmp1) ! pressure at layer interface, in Pa
     REAL massebx(ip1jmp1, llm), masseby((iim + 1) * jjm, llm) ! in kg
