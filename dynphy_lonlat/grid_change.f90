@@ -62,7 +62,7 @@ contains
 
   !********************************************
 
-  function gr_dyn_phy(v)
+  pure function gr_dyn_phy(v)
 
     ! Passage d'un champ 3D de la grille dynamique \`a la grille physique
 
