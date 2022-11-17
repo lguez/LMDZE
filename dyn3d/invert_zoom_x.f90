@@ -18,7 +18,6 @@ contains
     USE dimensions, ONLY: iim
 
     DOUBLE PRECISION, intent(in):: beta, Xf(0:), xtild(0:), G(0:) ! (0:nmax)
-
     real, intent(out):: xlon(:), xprim(:) ! (iim)
 
     DOUBLE PRECISION, intent(in):: xuv

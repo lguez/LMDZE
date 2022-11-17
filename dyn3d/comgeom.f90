@@ -120,7 +120,8 @@ contains
     ! dépendant de j uniquement, sera ici indicé aussi en i pour un
     ! adressage plus facile en ij.
 
-    ! cv_2d est aux points v. cu_2d est aux points u. Cf. "inigeom.txt".
+    ! cv_2d est aux points v. cu_2d est aux points
+    ! u. Cf. documentation sur inigeom.
 
     USE comconst, ONLY : ra
     USE comdissnew, ONLY : coefdis, nitergdiv, nitergrot, niterh
@@ -222,7 +223,7 @@ contains
     print *, "gamdi_grot = ", gamdi_grot
     print *, "gamdi_h = ", gamdi_h
 
-    un4rad2 = 0.25 * ra * ra
+    un4rad2 = 0.25 * ra**2
 
     ! Cf. "inigeom.txt". Calcul des quatre aires élémentaires
     ! aireij1_2d, aireij2_2d, aireij3_2d, aireij4_2d qui entourent

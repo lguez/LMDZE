@@ -43,10 +43,10 @@ contains
     use suphec_m, only: rcpd, rkappa, rg
 
     REAL, intent(in):: ucov(:, :, :) ! (iim + 1, jjm + 1, llm) 
-    ! covariant zonal velocity
+    ! covariant zonal velocity, in m2 s-1
 
     REAL, intent(in):: vcov(:, :, :) ! (iim + 1, jjm, llm) 
-    !covariant meridional velocity 
+    ! covariant meridional velocity, in m2 s-1
 
     REAL, intent(in):: teta(:, :, :) ! (iim + 1, jjm + 1, llm)
     ! potential temperature
@@ -87,12 +87,15 @@ contains
 
     ! Local:
     INTEGER i, j, l, ig0, iq
-    REAL paprs(klon, llm + 1) ! aux interfaces des couches 
+    REAL paprs(klon, llm + 1) ! pression aux interfaces des couches
     REAL play(klon, llm) ! aux milieux des couches 
     REAL zphi(klon, llm) ! geopotential at mid-layer, in m2 s-2
     real pphis(klon) ! surface geopotential, in m2 s-2
-    REAL u(klon, llm), v(klon, llm)
+    REAL u(klon, llm), v(klon, llm) ! zonal and meridional wind, in m / s
+
     real zvfi(iim + 1, jjm + 1, llm)
+    ! meridional wind, in m / s, interpolated to scalar grid
+
     REAL t(klon, llm) ! temperature, in K
     real qx(klon, llm, nqmx) ! mass fractions of advected fields
     REAL omega(klon, llm)
@@ -103,11 +106,8 @@ contains
 
     !-----------------------------------------------------------------------
 
-    !!print *, "Call sequence information: calfis"
+    ! Transformation des variables dynamiques en variables physiques :
 
-    ! 40. Transformation des variables dynamiques en variables physiques :
-
-    ! 42. Pression intercouches :
     forall (l = 1: llm + 1) paprs(:, l) = pack(p3d(:, :, l), dyn_phy)
 
     ! 43. Température et pression milieu couche
