@@ -89,10 +89,9 @@ contains
 
     INTEGER i, j, l, ig0, iq
     REAL play(klon, llm) ! aux milieux des couches 
-    REAL u(klon, llm) ! zonal wind, in m / s
 
-    real zvfi(iim + 1, jjm + 1, llm)
-    ! meridional wind, in m / s, interpolated to scalar grid
+    real zufi(iim + 1, jjm + 1, llm), zvfi(iim + 1, jjm + 1, llm)
+    ! zonal and meridional wind, in m / s, interpolated to scalar grid
 
     REAL t(klon, llm) ! temperature, in K
     real qx(klon, llm, nqmx) ! mass fractions of advected fields
@@ -126,17 +125,12 @@ contains
 
     ! 45. champ u:
 
-    DO l = 1, llm
-       DO j = 2, jjm
-          ig0 = 1 + (j - 2) * iim
-          u(ig0 + 1, l) = 0.5 &
-               * (ucov(iim, j, l) / cu_2d(iim, j) + ucov(1, j, l) / cu_2d(1, j))
-          DO i = 2, iim
-             u(ig0 + i, l) = 0.5 * (ucov(i - 1, j, l) / cu_2d(i - 1, j) &
-                  + ucov(i, j, l) / cu_2d(i, j))
-          end DO
-       end DO
-    end DO
+    forall (l = 1:llm) zufi(1, 2:jjm, l) = 0.5 * (ucov(iim, 2:jjm, l) &
+         / cu_2d(iim, 2:jjm) + ucov(1, 2:jjm, l) / cu_2d(1, 2:jjm))
+    forall (i = 2:iim, l = 1:llm) zufi(i, 2:jjm, l) = 0.5 &
+         * (ucov(i - 1, 2:jjm, l) / cu_2d(i - 1, 2:jjm) + ucov(i, 2:jjm, l) &
+         / cu_2d(i, 2:jjm))
+    zufi(iim + 1, 2:jjm, :) = zufi(1, 2:jjm, :)
 
     ! 46.champ v:
 
@@ -155,7 +149,7 @@ contains
           z1(i) = (rlonu(i) - rlonu(i - 1)) * vcov(i, 1, l) / cv_2d(i, 1)
        ENDDO
 
-       u(1, l) = SUM(COS(rlonv(:iim)) * z1) / pi
+       zufi(:, 1, l) = SUM(COS(rlonv(:iim)) * z1) / pi
        zvfi(:, 1, l) = SUM(SIN(rlonv(:iim)) * z1) / pi
     ENDDO
 
@@ -170,13 +164,13 @@ contains
           z1(i) = (rlonu(i) - rlonu(i - 1)) * vcov(i, jjm, l) / cv_2d(i, jjm)
        ENDDO
 
-       u(klon, l) = SUM(COS(rlonv(:iim)) * z1) / pi
+       zufi(:, jjm + 1, l) = SUM(COS(rlonv(:iim)) * z1) / pi
        zvfi(:, jjm + 1, l) = SUM(SIN(rlonv(:iim)) * z1) / pi
     ENDDO
 
     CALL physiq(lafin, dayvrai, time, gr_dyn_phy(p3d), play, gr_dyn_phy(phi), &
-         pack(phis, dyn_phy), u, gr_dyn_phy(zvfi), t, qx, omega, d_u, d_v, &
-         d_t, d_qx)
+         pack(phis, dyn_phy), gr_dyn_phy(zufi), gr_dyn_phy(zvfi), t, qx, &
+         omega, d_u, d_v, d_t, d_qx)
 
     ! transformation des tendances physiques en tendances dynamiques:
 
