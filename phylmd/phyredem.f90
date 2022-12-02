@@ -99,10 +99,10 @@ contains
     call nf95_inq_varid(ncid_restartphy, "fder", varid)
     call nf95_put_var(ncid_restartphy, varid, fder)
 
-    call nf95_inq_varid(ncid_restartphy, "rain_f", varid)
+    call nf95_inq_varid(ncid_restartphy, "rain_fall", varid)
     call nf95_put_var(ncid_restartphy, varid, rain_fall)
 
-    call nf95_inq_varid(ncid_restartphy, "snow_f", varid)
+    call nf95_inq_varid(ncid_restartphy, "snow_fall", varid)
     call nf95_put_var(ncid_restartphy, varid, snow_fall)
 
     call nf95_inq_varid(ncid_restartphy, "RUG", varid)

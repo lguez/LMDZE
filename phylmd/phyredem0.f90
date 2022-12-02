@@ -100,11 +100,11 @@ contains
     call nf95_def_var(ncid_restartphy, 'fder', nf90_float, idim2, varid)
     call nf95_put_att(ncid_restartphy, varid, 'long_name', 'Derive de flux')
 
-    call nf95_def_var(ncid_restartphy, 'rain_f', nf90_float, idim2, varid)
+    call nf95_def_var(ncid_restartphy, 'rain_fall', nf90_float, idim2, varid)
     call nf95_put_att(ncid_restartphy, varid, 'long_name', &
          'precipitation liquide')
 
-    call nf95_def_var(ncid_restartphy, 'snow_f', nf90_float, idim2, varid)
+    call nf95_def_var(ncid_restartphy, 'snow_fall', nf90_float, idim2, varid)
     call nf95_put_att(ncid_restartphy, varid, 'long_name', &
          'precipitation solide')
 

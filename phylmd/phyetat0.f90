@@ -166,12 +166,12 @@ contains
 
     ! Lecture precipitation liquide:
 
-    call NF95_INQ_VARID(ncid_startphy, "rain_f", varid)
+    call NF95_INQ_VARID(ncid_startphy, "rain_fall", varid)
     call NF95_GET_VAR(ncid_startphy, varid, rain_fall)
 
     ! Lecture precipitation solide:
 
-    call NF95_INQ_VARID(ncid_startphy, "snow_f", varid)
+    call NF95_INQ_VARID(ncid_startphy, "snow_fall", varid)
     call NF95_GET_VAR(ncid_startphy, varid, snow_fall)
 
     ! Lecture rayonnement solaire au sol:
