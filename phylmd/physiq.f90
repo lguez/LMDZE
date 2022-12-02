@@ -632,11 +632,7 @@ contains
        z_apres = sum((q_seri + ql_seri) * zmasse, dim=2)
        z_factor = (z_avant - (rain_con + snow_con) * dtphys) / z_apres
        DO k = 1, llm
-          DO i = 1, klon
-             IF (z_factor(i) /= 1.) THEN
-                q_seri(i, k) = q_seri(i, k) * z_factor(i)
-             ENDIF
-          ENDDO
+          where (z_factor /= 1.) q_seri(:, k) = q_seri(:, k) * z_factor
        ENDDO
     ENDIF
 
@@ -757,10 +753,8 @@ contains
     ENDIF
 
     ! Precipitation totale
-    DO i = 1, klon
-       rain_fall(i) = rain_con(i) + rain_lsc(i)
-       snow_fall(i) = snow_con(i) + snow_lsc(i)
-    ENDDO
+    rain_fall = rain_con + rain_lsc
+    snow_fall = snow_con + snow_lsc
 
     ! Humidit\'e relative pour diagnostic :
     DO k = 1, llm
