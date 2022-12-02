@@ -7,7 +7,7 @@ contains
   SUBROUTINE clqh(julien, nisrf, knindex, tsoil, qsol, mu0, rugos, rugoro, &
        u1lay, v1lay, coefh, cdragh, t, q, ts, paprs, pplay, delp, radsol, &
        albedo, snow, qsurf, rain_fall, snow_fall, fluxlat, pctsrf_new_sic, &
-       agesno, d_t, d_q, tsurf_new, z0_new, flux_t, flux_q, dflux_s, dflux_l, &
+       agesno, d_t, d_q, tsurf_new, z0_new, flux_t, flux_q, dflux_t, dflux_q, &
        fqcalving, ffonte, run_off_lic_0, run_off_lic)
 
     ! Authors: Z. X. Li (LMD/CNRS), Laurent Fairhead
@@ -104,7 +104,7 @@ contains
     REAL, intent(out):: flux_q(:) ! (knon)
     ! downward water vapor flux at the surface, in kg m-2 s-1
 
-    real, intent(OUT):: dflux_s(:), dflux_l(:) ! (knon)
+    real, intent(OUT):: dflux_t(:), dflux_q(:) ! (knon)
     ! dérivées des flux de chaleurs sensible et latente par rapport à
     ! T_surf (W m-2 K-1)
 
@@ -155,8 +155,8 @@ contains
        ! Surface "terre", appel \`a l'interface avec les sols continentaux
 
        CALL soil(is_ter, snow, ts, tsoil, soilcap, soilflux)
-       CALL calcul_fluxs(qsurf, tsurf_new, flux_q, fluxlat, flux_t, dflux_s, &
-            dflux_l, ts, pplay(:, 1), cdragh, paprs(:, 1), radsol, t(:, 1), &
+       CALL calcul_fluxs(qsurf, tsurf_new, flux_q, fluxlat, flux_t, dflux_t, &
+            dflux_q, ts, pplay(:, 1), cdragh, paprs(:, 1), radsol, t(:, 1), &
             q(:, 1), u1lay, v1lay, ah, aq, bh, bq, soilflux, &
             cal = 1. / soilcap, beta = min(2. * qsol / max_eau_sol, 1.), &
             dif_grnd = 0.)
@@ -177,8 +177,8 @@ contains
 
        ffonte = 0.
        call limit_read_sst(julien, knindex, tsurf)
-       call calcul_fluxs(qsurf, tsurf_new, flux_q, fluxlat, flux_t, dflux_s, &
-            dflux_l, tsurf, pplay(:, 1), cdragh, paprs(:, 1), radsol, t(:, 1), &
+       call calcul_fluxs(qsurf, tsurf_new, flux_q, fluxlat, flux_t, dflux_t, &
+            dflux_q, tsurf, pplay(:, 1), cdragh, paprs(:, 1), radsol, t(:, 1), &
             q(:, 1), u1lay, v1lay, ah, aq, bh, bq, &
             soilflux = [(0., i = 1, knon)], cal = [(0., i = 1, knon)], &
             beta = [(1., i = 1, knon)], dif_grnd = 0.)
@@ -200,8 +200,8 @@ contains
        enddo
 
        CALL soil(is_sic, snow, tsurf, tsoil, soilcap, soilflux)
-       CALL calcul_fluxs(qsurf, tsurf_new, flux_q, fluxlat, flux_t, dflux_s, &
-            dflux_l, tsurf, pplay(:, 1), cdragh, paprs(:, 1), radsol, t(:, 1), &
+       CALL calcul_fluxs(qsurf, tsurf_new, flux_q, fluxlat, flux_t, dflux_t, &
+            dflux_q, tsurf, pplay(:, 1), cdragh, paprs(:, 1), radsol, t(:, 1), &
             q(:, 1), u1lay, v1lay, ah, aq, bh, bq, soilflux, &
             cal = 1. / soilcap, beta = [(1., i = 1, knon)], &
             dif_grnd = 1. / tau_gl)
@@ -220,8 +220,8 @@ contains
        ! Surface "glaciers continentaux" appel \`a l'interface avec le sol
 
        CALL soil(is_lic, snow, ts, tsoil, soilcap, soilflux)
-       call calcul_fluxs(qsurf, tsurf_new, flux_q, fluxlat, flux_t, dflux_s, &
-            dflux_l, ts, pplay(:, 1), cdragh, paprs(:, 1), radsol, t(:, 1), &
+       call calcul_fluxs(qsurf, tsurf_new, flux_q, fluxlat, flux_t, dflux_t, &
+            dflux_q, ts, pplay(:, 1), cdragh, paprs(:, 1), radsol, t(:, 1), &
             q(:, 1), u1lay, v1lay, ah, aq, bh, bq, soilflux, &
             cal = 1. / soilcap, beta = [(1., i = 1, knon)], dif_grnd = 0.)
        call fonte_neige(is_lic, rain_fall, snow_fall, snow, qsol, &

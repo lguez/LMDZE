@@ -4,8 +4,8 @@ module calcul_fluxs_m
 
 contains
 
-  SUBROUTINE calcul_fluxs(qsurf, tsurf_new, flux_q, fluxlat, flux_t, dflux_s, &
-       dflux_l, tsurf, p1lay, cdragh, ps, radsol, t1lay, q1lay, u1lay, v1lay, &
+  SUBROUTINE calcul_fluxs(qsurf, tsurf_new, flux_q, fluxlat, flux_t, dflux_t, &
+       dflux_q, tsurf, p1lay, cdragh, ps, radsol, t1lay, q1lay, u1lay, v1lay, &
        ah, aq, bh, bq, soilflux, cal, beta, dif_grnd)
 
     ! Cette routine calcule les flux en h et q à l'interface et une
@@ -35,7 +35,7 @@ contains
     real, intent(OUT):: fluxlat(:), flux_t(:) ! (knon)
     ! downward flux of latent and sensible heat (c_p T) at the surface, in W m-2
 
-    real, intent(OUT):: dflux_s(:), dflux_l(:) ! (knon)
+    real, intent(OUT):: dflux_t(:), dflux_q(:) ! (knon)
     ! dérivées des flux de chaleurs sensible et latente par rapport à
     ! T_surf (W m-2 K-1)
 
@@ -85,7 +85,7 @@ contains
          size(cdragh), size(ps), size(qsurf), size(radsol), size(t1lay), &
          size(q1lay), size(u1lay), size(v1lay), size(ah), size(aq), &
          size(bh), size(bq), size(tsurf_new), size(flux_q), &
-         size(fluxlat), size(flux_t), size(dflux_s), size(dflux_l)], &
+         size(fluxlat), size(flux_t), size(dflux_t), size(dflux_q)], &
          "calcul_fluxs knon")
 
     ! Traitement de l'humidité du sol
@@ -112,15 +112,15 @@ contains
     ! H
     oh = 1. - coef * bh * dtphys
     mh = coef * ah / oh
-    dflux_s = - coef * RCPD / oh
+    dflux_t = - coef * RCPD / oh
 
     tsurf_new = (tsurf + cal * dtphys * (radsol + soilflux + mh + sl * mq) &
-         + dif_grnd * t_grnd * dtphys) / (1. - dtphys * cal * (dflux_s + sl &
+         + dif_grnd * t_grnd * dtphys) / (1. - dtphys * cal * (dflux_t + sl &
          * nq) + dtphys * dif_grnd)
     flux_q = mq + nq * tsurf_new
     fluxlat = flux_q * sl
-    flux_t = mh + dflux_s * tsurf_new
-    dflux_l = sl * nq
+    flux_t = mh + dflux_t * tsurf_new
+    dflux_q = sl * nq
     qsurf = (aq + bq * flux_q * dtphys) * (1. - beta) + beta * (qsat + dq_s_dt &
          * (tsurf_new - tsurf))
 
