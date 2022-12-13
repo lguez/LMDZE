@@ -441,7 +441,7 @@ contains
        END IF
     END DO
 
-    ! For energy conservation: when snow is present, the solification
+    ! For energy conservation: when snow is present, the solidification
     ! latent heat is considered.
     DO k = 1, klev
        DO i = 1, klon

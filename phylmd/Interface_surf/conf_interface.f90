@@ -14,7 +14,7 @@ contains
 
     ! From phylmd/conf_phys.F90, version 1.7 2005/07/05 07:21:23
 
-    ! Configuration de l'interace atm/surf
+    ! Configuration de l'interface atmosph\`ere -- surface
 
     use unit_nml_m, only: unit_nml
 

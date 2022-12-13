@@ -18,7 +18,7 @@ contains
 
     ! Tout ce qui a trait aux traceurs est dans "phytrac". Le calcul
     ! de la couche limite pour les traceurs se fait avec "cltrac" et
-    ! ne tient pas compte de la diff\'erentiation des sous-fractions
+    ! ne tient pas compte de la diff\'erenciation des sous-fractions
     ! de sol.
 
     use cdrag_m, only: cdrag

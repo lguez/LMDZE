@@ -205,8 +205,8 @@ contains
             q(:, 1), u1lay, v1lay, ah, aq, bh, bq, soilflux, &
             cal = 1. / soilcap, beta = [(1., i = 1, knon)], &
             dif_grnd = 1. / tau_gl)
-       CALL fonte_neige(is_sic, rain_fall, snow_fall, snow, qsol, &
-            tsurf_new, - flux_q, fqcalving, ffonte, run_off_lic_0, run_off_lic)
+       CALL fonte_neige(is_sic, rain_fall, snow_fall, snow, qsol, tsurf_new, &
+            - flux_q, fqcalving, ffonte, run_off_lic_0, run_off_lic)
 
        ! Compute the albedo:
 
@@ -224,8 +224,8 @@ contains
             dflux_q, ts, pplay(:, 1), cdragh, paprs(:, 1), radsol, t(:, 1), &
             q(:, 1), u1lay, v1lay, ah, aq, bh, bq, soilflux, &
             cal = 1. / soilcap, beta = [(1., i = 1, knon)], dif_grnd = 0.)
-       call fonte_neige(is_lic, rain_fall, snow_fall, snow, qsol, &
-            tsurf_new, - flux_q, fqcalving, ffonte, run_off_lic_0, run_off_lic)
+       call fonte_neige(is_lic, rain_fall, snow_fall, snow, qsol, tsurf_new, &
+            - flux_q, fqcalving, ffonte, run_off_lic_0, run_off_lic)
 
        ! calcul albedo
        CALL albsno(agesno, alb_neig, snow_fall)

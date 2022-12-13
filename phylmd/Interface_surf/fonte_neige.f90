@@ -53,10 +53,10 @@ contains
     ! Local:
 
     integer knon ! nombre de points \`a traiter
-    
+
     real, parameter:: snow_max = 3000.
     ! Masse maximum de neige (kg / m2). Au dessus de ce seuil, la neige
-    ! en exces "s'\'ecoule" (calving).
+    ! en exc\`es "s'\'ecoule" (calving).
 
     integer i
     real fq_fonte
@@ -116,11 +116,8 @@ contains
     IF (nisurf == is_ter) then
        qsol = MIN(qsol + bil_eau_s, max_eau_sol)
     else if (nisurf == is_lic) then
-       do i = 1, knon
-          run_off_lic_0(i) = (coeff_rel * fqcalving(i)) + &
-               (1. - coeff_rel) * run_off_lic_0(i)
-          run_off_lic(i) = run_off_lic_0(i) + bil_eau_s(i) / dtphys
-       enddo
+       run_off_lic_0 = coeff_rel * fqcalving + (1. - coeff_rel) * run_off_lic_0
+       run_off_lic = run_off_lic_0 + bil_eau_s / dtphys
     endif
 
   END SUBROUTINE fonte_neige
