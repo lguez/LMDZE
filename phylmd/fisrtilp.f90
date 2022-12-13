@@ -5,8 +5,7 @@ module fisrtilp_m
 contains
 
   SUBROUTINE fisrtilp(paprs, play, t, q, ptconv, ratqs, d_t, d_q, d_ql, rneb, &
-       cldliq, rain, snow, pfrac_impa, pfrac_nucl, pfrac_1nucl, frac_impa, &
-       frac_nucl, prfl, psfl, rhcl)
+       cldliq, rain, snow, frac_impa, frac_nucl, prfl, psfl, rhcl)
 
     ! From phylmd/fisrtilp.F, version 1.2, 2004/11/09 16:55:40
     ! First author: Z. X. Li (LMD/CNRS), 20 mars 1995
@@ -50,11 +49,6 @@ contains
 
     REAL, INTENT(out):: rain(:) ! (klon) pluies (mm/s)
     REAL, INTENT(out):: snow(:) ! (klon) neige (mm/s)
-
-    ! Coeffients de fraction lessivee :
-    REAL, INTENT(inout):: pfrac_impa(:, :) ! (klon, klev)
-    REAL, INTENT(inout):: pfrac_nucl(:, :) ! (klon, klev)
-    REAL, INTENT(inout):: pfrac_1nucl(:, :) ! (klon, klev)
 
     ! Fraction d'a\'erosols lessiv\'ee par impaction
     REAL, INTENT(out):: frac_impa(:, :) ! (klon, klev)
@@ -138,15 +132,6 @@ contains
        a_tr_sca(2) = -0.5
        a_tr_sca(3) = -0.5
        a_tr_sca(4) = -0.5
-
-       ! Initialisation a 1 des coefs des fractions lessivees
-       DO k = 1, klev
-          DO i = 1, klon
-             pfrac_nucl(i, k) = 1.
-             pfrac_1nucl(i, k) = 1.
-             pfrac_impa(i, k) = 1.
-          END DO
-       END DO
     END IF
 
     ! Initialisation a 0 de zoliq
@@ -418,12 +403,10 @@ contains
                 zalpha_tr = a_tr_sca(4)
              END IF
              zfrac_lessi = 1. - exp(zalpha_tr*zprec_cond(i)/zneb(i))
-             pfrac_nucl(i, k) = pfrac_nucl(i, k)*(1.-zneb(i)*zfrac_lessi)
              frac_nucl(i, k) = 1. - zneb(i)*zfrac_lessi
 
              ! nucleation avec un facteur -1 au lieu de -0.5
              zfrac_lessi = 1. - exp(-zprec_cond(i)/zneb(i))
-             pfrac_1nucl(i, k) = pfrac_1nucl(i, k)*(1.-zneb(i)*zfrac_lessi)
           else
              frac_nucl(i, k) = 1.
           END IF
@@ -440,7 +423,6 @@ contains
                    zalpha_tr = a_tr_sca(2)
                 END IF
                 zfrac_lessi = 1. - exp(zalpha_tr*zprec_cond(i)/zneb(i))
-                pfrac_impa(i, kk) = pfrac_impa(i, kk)*(1.-zneb(i)*zfrac_lessi)
                 frac_impa(i, kk) = 1. - zneb(i)*zfrac_lessi
              END IF
           END DO

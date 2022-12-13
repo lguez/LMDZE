@@ -194,15 +194,6 @@ contains
 
     REAL zxffonte(klon)
 
-    REAL, save, allocatable:: pfrac_impa(:, :) ! (klon, llm)
-    ! Produits des coefs lessivage impaction
-
-    REAL, save, allocatable:: pfrac_nucl(:, :) ! (klon, llm)
-    ! Produits des coefs lessivage nucleation
-
-    REAL, save, allocatable:: pfrac_1nucl(:, :) ! (klon, llm)
-    ! Produits des coefs lessi nucl (alpha = 1)
-
     REAL frac_impa(klon, llm) ! fraction d'a\'erosols lessiv\'es (impaction)
     REAL frac_nucl(klon, llm) ! idem (nucleation)
 
@@ -423,9 +414,6 @@ contains
        allocate(Ma(klon, llm))
        allocate(sig1(klon, llm), w01(klon, llm))
        allocate(ffonte(klon, nbsrf))
-       allocate(pfrac_impa(klon, llm))
-       allocate(pfrac_nucl(klon, llm))
-       allocate(pfrac_1nucl(klon, llm))
        allocate(rain_fall(klon))
        allocate(snow_fall(klon))
        allocate(dlw(klon))
@@ -684,8 +672,8 @@ contains
     endif
 
     CALL fisrtilp(paprs, play, t_seri, q_seri, ptconv, ratqs, d_t_lsc, &
-         d_q_lsc, d_ql_lsc, rneb, cldliq, rain_lsc, snow_lsc, pfrac_impa, &
-         pfrac_nucl, pfrac_1nucl, frac_impa, frac_nucl, prfl, psfl, rhcl)
+         d_q_lsc, d_ql_lsc, rneb, cldliq, rain_lsc, snow_lsc, frac_impa, &
+         frac_nucl, prfl, psfl, rhcl)
 
     WHERE (rain_lsc < 0) rain_lsc = 0.
     WHERE (snow_lsc < 0) snow_lsc = 0.
