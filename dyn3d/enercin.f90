@@ -8,27 +8,17 @@ contains
 
     ! From LMDZ4/libf/dyn3d/enercin.F, version 1.1.1.1 2004/05/19 12:53:06
 
-    USE dimensions, only: iim, llm
-    USE paramet_m, only: ip1jm, ip1jmp1, iip1, iip2, ip1jmi1
+    ! Auteur: P. Le Van
+
+    ! Objet: calcul de l'\'energie cin\'etique aux niveaux s
+
     USE comgeom, only: apoln, apols, alpha2p3, alpha1p4, alpha1p2, alpha3p4, &
          aire
+    USE dimensions, only: iim, llm
+    USE paramet_m, only: ip1jm, ip1jmp1, iip1, iip2, ip1jmi1
 
-    ! =======================================================================
-
-    ! Auteur: P. Le Van
-    ! -------
-
-    ! Objet:
-    ! ------
-
-    ! *********************************************************************
-    ! .. calcul de l'energie cinetique aux niveaux s  ......
-    ! *********************************************************************
     ! vcov, vcont, ucov et ucont sont des arguments d'entree pour le s-pg .
     ! ecin         est  un  argument de sortie pour le s-pg
-
-    ! =======================================================================
-
 
     REAL, INTENT (IN) :: vcov(ip1jm, llm), ucov(ip1jmp1, llm)
     REAL vcont(ip1jm, llm), ucont(ip1jmp1, llm), ecin(ip1jmp1, llm)
