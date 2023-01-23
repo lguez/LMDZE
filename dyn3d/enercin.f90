@@ -8,9 +8,10 @@ contains
 
     ! From LMDZ4/libf/dyn3d/enercin.F, version 1.1.1.1 2004/05/19 12:53:06
 
-    USE dimensions
-    USE paramet_m
-    USE comgeom
+    USE dimensions, only: iim, llm
+    USE paramet_m, only: ip1jm, ip1jmp1, iip1, iip2, ip1jmi1
+    USE comgeom, only: apoln, apols, alpha2p3, alpha1p4, alpha1p2, alpha3p4, &
+         aire
 
     ! =======================================================================
 
