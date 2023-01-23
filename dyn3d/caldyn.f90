@@ -64,8 +64,10 @@ contains
     REAL, INTENT(out):: w(:, :, :) ! (iim + 1, jjm + 1, llm)
     ! vertical mass flux, in kg s-1
 
+    ! Flux de masse :
     REAL, intent(out):: pbaru(:, :, :) ! (iim + 1, jjm + 1, llm) in kg s-1
     REAL, intent(out):: pbarv(:, :, :) ! (iim + 1, jjm, llm) in kg s-1
+
     LOGICAL, INTENT(IN):: conser
 
     ! Local:

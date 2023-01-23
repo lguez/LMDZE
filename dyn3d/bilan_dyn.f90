@@ -30,8 +30,10 @@ contains
 
     real, intent(in):: pk(:, :, :) ! (iip1, jjp1, llm)
 
-    real, intent(in):: pbaru(:, :, :) ! (iip1, jjp1, llm)
-    real, intent(in):: pbarv(:, :, :) ! (iip1, jjm, llm)
+    ! Flux de masse :
+    real, intent(in):: pbaru(:, :, :) ! (iip1, jjp1, llm) in kg s-1
+    real, intent(in):: pbarv(:, :, :) ! (iip1, jjm, llm) in kg s-1
+
     real, intent(in):: teta(:, :, :) ! (iip1, jjp1, llm)
 
     real, intent(in):: phi(:, :, :) ! (iip1, jjp1, llm)

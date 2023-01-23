@@ -34,7 +34,7 @@ module comgeom
   real, pointer:: alpha3_2d(:, :), alpha4_2d(:, :) ! (iim + 1, jjm + 1)
   real, allocatable, target:: alpha3(:), alpha4(:) ! ((iim + 1) * (jjm + 1))
 
-  real, pointer:: alpha1p2_2d(:, :) ! (iim + 1, jjm + 1) 
+  real, pointer:: alpha1p2_2d(:, :) ! (iim + 1, jjm + 1) alpha_1 + alpha_2
   real, allocatable, target:: alpha1p2(:) ! ((iim + 1) * (jjm + 1))
 
   real, pointer:: alpha1p4_2d(:, :), alpha2p3_2d(:, :) ! (iim + 1, jjm + 1)
@@ -328,8 +328,8 @@ contains
 
     DO j = 1, jjp1
        DO i = 1, iim
-          aireu_2d(i, j) = aireij1_2d(i, j) + aireij2_2d(i, j) + &
-               aireij4_2d(i + 1, j) + aireij3_2d(i + 1, j)
+          aireu_2d(i, j) = aireij1_2d(i, j) + aireij2_2d(i, j) &
+               + aireij4_2d(i + 1, j) + aireij3_2d(i + 1, j)
        END DO
     END DO
 

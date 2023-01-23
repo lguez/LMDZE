@@ -64,7 +64,7 @@ contains
 
     ! Variables dynamiques interm\'ediaires pour le transport
     ! Flux de masse :
-    REAL pbaru(iim + 1, jjm + 1, llm), pbarv(iim + 1, jjm, llm)
+    REAL pbaru(iim + 1, jjm + 1, llm), pbarv(iim + 1, jjm, llm) ! in kg s-1
 
     ! Variables dynamiques au pas - 1
     REAL vcovm1(iim + 1, jjm, llm), ucovm1(iim + 1, jjm + 1, llm)

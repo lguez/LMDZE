@@ -8,11 +8,12 @@ contains
 
     ! From phylmd/ozonecm.F, version 1.3 2005/06/06 13:16:33
 
-    ! The ozone climatology is based on an analytic formula which fits the
-    ! Krueger and Mintzner (1976) profile, as well as the variations with
-    ! altitude and latitude of the maximum ozone concentrations and the total
-    ! column ozone concentration of Keating and Young (1986). The analytic
-    ! formula have been established by J.-F. Royer (CRNM, Meteo France), who
+    ! The ozone climatology is based on an analytic formula which fits
+    ! the Krueger and Mintzner (1976) profile, as well as the
+    ! variations with altitude and latitude of the maximum ozone
+    ! concentrations and the total column ozone concentration of
+    ! Keating and Young (1986). The analytic formula have been
+    ! established by Jean-François Royer (CRNM, Meteo France), who
     ! also provided us the code.
 
     ! A. J. Krueger and R. A. Minzner, A Mid-Latitude Ozone Model for the

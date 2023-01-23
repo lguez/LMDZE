@@ -17,6 +17,8 @@ contains
 
     REAL, intent(in):: massebx(ip1jmp1, llm), masseby(ip1jm, llm) ! in kg
     real, intent(in):: vcont(ip1jm, llm), ucont(ip1jmp1, llm) ! in s-1
+
+    ! Flux de masse :
     real, intent(out):: pbaru(ip1jmp1, llm), pbarv(ip1jm, llm) ! in kg s-1
 
     ! Local:
