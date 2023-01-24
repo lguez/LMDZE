@@ -21,7 +21,8 @@ contains
     ! ecin         est  un  argument de sortie pour le s-pg
 
     REAL, INTENT (IN) :: vcov(ip1jm, llm), ucov(ip1jmp1, llm)
-    REAL vcont(ip1jm, llm), ucont(ip1jmp1, llm), ecin(ip1jmp1, llm)
+    REAL, INTENT (IN) :: vcont(ip1jm, llm), ucont(ip1jmp1, llm)
+    real, INTENT (out) :: ecin(ip1jmp1, llm)
 
     REAL ecinni(iip1), ecinsi(iip1)
 
