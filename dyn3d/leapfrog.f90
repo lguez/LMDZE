@@ -11,6 +11,7 @@ contains
 
     ! Int\'egration temporelle du mod\`ele : Matsuno-leapfrog scheme.
 
+    ! Libraries:
     use jumble, only: assert
 
     use addfi_m, only: addfi
@@ -19,13 +20,13 @@ contains
     use caldyn_m, only: caldyn
     USE calfis_m, ONLY: calfis
     USE comgeom, ONLY: aire_2d, apoln, apols
-    use covcont_m, only: covcont
-    USE disvert_m, ONLY: ap, bp
     USE conf_gcm_m, ONLY: dtvr, day_step, iconser, iperiod, iphysiq, nday, &
          iflag_phys
     USE conf_guide_m, ONLY: ok_guide
+    use covcont_m, only: covcont
     USE dimensions, ONLY: iim, jjm, llm, nqmx
     use dissip_m, only: dissip
+    USE disvert_m, ONLY: ap, bp
     USE dynetat0_m, ONLY: day_ini, itau_dyn
     use dynredem1_m, only: dynredem1
     use enercin_m, only: enercin

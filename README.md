@@ -43,8 +43,10 @@ architecture for a large code in modern Fortran.
 ## Installation
 
 Dependencies: [CMake](https://cmake.org/download) (version ≥ 3.16),
-[XIOS](http://forge.ipsl.jussieu.fr/ioserver/wiki),
-[NetCDF-Fortran](https://www.unidata.ucar.edu/downloads/netcdf/index.jsp),
+[XIOS](http://forge.ipsl.jussieu.fr/ioserver/wiki), the [NetCDF-C
+library](https://docs.unidata.ucar.edu/nug/current/getting_and_building_netcdf.html),
+the [NetCDF-Fortran
+library](https://www.unidata.ucar.edu/downloads/netcdf/index.jsp),
 [MPI](https://www.mpi-forum.org).
 
 	git clone --recurse-submodules https://github.com/lguez/LMDZE.git
