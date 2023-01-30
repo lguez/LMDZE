@@ -339,8 +339,6 @@ contains
     real:: facttemps = 1.e-4 ! in s-1
     ! 1 / facttemps est le temps de relaxation des ratqs.
 
-    real facteur
-
     integer:: iflag_cldcon = 1 ! allowed values: - 2, ..., 3
     logical ptconv(klon, llm)
 
@@ -721,17 +719,12 @@ contains
        ! On prend pour les nuages convectifs le maximum du calcul de
        ! la convection et du calcul du pas de temps pr\'ec\'edent diminu\'e
        ! d'un facteur facttemps.
-       facteur = dtphys * facttemps
-       do k = 1, llm
-          do i = 1, klon
-             rnebcon(i, k) = rnebcon(i, k) * facteur
-             if (rnebcon0(i, k) * qcondc(i, k) &
-                  > rnebcon(i, k) * clwcon(i, k)) then
-                rnebcon(i, k) = rnebcon0(i, k)
-                clwcon(i, k) = qcondc(i, k)
-             endif
-          enddo
-       enddo
+       rnebcon = rnebcon * dtphys * facttemps
+
+       where (rnebcon0 * qcondc > rnebcon * clwcon)
+          rnebcon = rnebcon0
+          clwcon = qcondc
+       end where
 
        ! On prend la somme des fractions nuageuses et des contenus en eau
        cldfra = min(max(cldfra, rnebcon), 1.)
