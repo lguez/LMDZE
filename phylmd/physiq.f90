@@ -443,7 +443,6 @@ contains
        q2m = 0.
        ffonte = 0.
        rnebcon0 = 0.
-       qcondc = 0.
        clwcon = 0.
 
        print *, "Enter namelist 'physiq_nml'."
@@ -599,6 +598,7 @@ contains
        u_seri = u_seri + d_u_con
        v_seri = v_seri + d_v_con
     else
+       qcondc = 0.
        conv_q = d_q_dyn + d_q_vdf / dtphys
        conv_t = d_t_dyn + d_t_vdf / dtphys
        z_avant = sum((q_seri + ql_seri) * zmasse, dim=2)
