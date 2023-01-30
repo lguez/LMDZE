@@ -4,9 +4,9 @@ module cv_driver_m
 
 contains
 
-  SUBROUTINE cv_driver(t1, q1, qs1, u1, v1, p1, ph1, iflag1, ft1, fq1, fu1, &
-       fv1, rain, VPrecip1, sig1, w01, icb1, inb1, Ma1, upwd1, dnwd1, &
-       qcondc1, cape1, da1, phi1, mp1)
+  SUBROUTINE cv_driver(t1, q1, qs1, u1, v1, p1, ph1, ft1, fq1, fu1, fv1, rain, &
+       VPrecip1, sig1, w01, icb1, inb1, Ma1, upwd1, dnwd1, qcondc1, cape1, &
+       da1, phi1, mp1)
 
     ! From LMDZ4/libf/phylmd/cv_driver.F, version 1.3, 2005/04/15 12:36:17
     ! Main driver for convection
@@ -45,31 +45,6 @@ contains
     ! value of PH should be greater than (i.e. at a lower level than)
     ! the first value of the array P1.
 
-    integer, intent(out):: iflag1(:) ! (klon)
-    ! Flag for Emanuel conditions.
-
-    ! 0: Moist convection occurs.
-
-    ! 1: Moist convection occurs, but a CFL condition on the
-    ! subsidence warming is violated. This does not cause the scheme
-    ! to terminate.
-
-    ! 2: Moist convection, but no precipitation because ep(inb) < 1e-4
-
-    ! 3: No moist convection because new cbmf is 0 and old cbmf is 0.
-
-    ! 4: No moist convection; atmosphere is not unstable.
-
-    ! 6: No moist convection because ihmin <= minorig.
-
-    ! 7: No moist convection because unreasonable parcel level
-    ! temperature or specific humidity.
-
-    ! 8: No moist convection: lifted condensation level is above the
-    ! 200 mbar level.
-
-    ! 9: No moist convection: cloud base is higher than the level NL-1.
-
     real, intent(out):: ft1(klon, klev) ! temperature tendency (K/s)
     real, intent(out):: fq1(klon, klev) ! specific humidity tendency (s-1)
 
@@ -107,6 +82,31 @@ contains
     ! s-1. M_p in Emanuel (1991 928).
 
     ! Local:
+
+    integer iflag1(klon)
+    ! Flag for Emanuel conditions.
+
+    ! 0: Moist convection occurs.
+
+    ! 1: Moist convection occurs, but a CFL condition on the
+    ! subsidence warming is violated. This does not cause the scheme
+    ! to terminate.
+
+    ! 2: Moist convection, but no precipitation because ep(inb) < 1e-4
+
+    ! 3: No moist convection because new cbmf is 0 and old cbmf is 0.
+
+    ! 4: No moist convection; atmosphere is not unstable.
+
+    ! 6: No moist convection because ihmin <= minorig.
+
+    ! 7: No moist convection because unreasonable parcel level
+    ! temperature or specific humidity.
+
+    ! 8: No moist convection: lifted condensation level is above the
+    ! 200 mbar level.
+
+    ! 9: No moist convection: cloud base is higher than the level NL-1.
 
     real da(klon, klev), phi(klon, klev, klev)
 

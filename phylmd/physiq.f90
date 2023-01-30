@@ -293,8 +293,6 @@ contains
     REAL dnwd(klon, llm) ! saturated downdraft mass flux
     REAL, save, allocatable:: cape(:) ! (klon)
 
-    INTEGER iflagctrl(klon) ! flag fonctionnement de convect
-
     ! Variables du changement
 
     ! con: convection
@@ -580,7 +578,7 @@ contains
     if (conv_emanuel) then
        CALL concvl(paprs, play, t_seri, q_seri, u_seri, v_seri, sig1, w01, &
             d_t_con, d_q_con, d_u_con, d_v_con, rain_con, ibas_con, itop_con, &
-            upwd, dnwd, Ma, cape, iflagctrl, clwcon0, pmflxr, da, phi, mp)
+            upwd, dnwd, Ma, cape, clwcon0, pmflxr, da, phi, mp)
        snow_con = 0.
        mfu = upwd + dnwd
 

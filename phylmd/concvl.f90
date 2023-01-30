@@ -5,8 +5,7 @@ module concvl_m
 contains
 
   SUBROUTINE concvl(paprs, play, t, q, u, v, sig1, w01, d_t, d_q, d_u, d_v, &
-       rain, ibas, itop, upwd, dnwd, ma, cape, iflag, qcondc, pmflxr, da, phi, &
-       mp)
+       rain, ibas, itop, upwd, dnwd, ma, cape, qcondc, pmflxr, da, phi, mp)
 
     ! From phylmd/concvl.F, version 1.3, 2005/04/15 12:36:17
     ! Author: Z. X. Li (LMD/CNRS)
@@ -41,7 +40,6 @@ contains
 
     REAL ma(klon, klev)
     real cape(klon) ! output (J / kg)
-    INTEGER, intent(out):: iflag(klon)
     REAL, intent(out):: qcondc(klon, klev) ! in-cloud water content
     REAL, intent(out):: pmflxr(klon, klev + 1)
     REAL, intent(out):: da(:, :) ! (klon, klev)
@@ -66,9 +64,9 @@ contains
        END DO
     END DO
 
-    CALL cv_driver(t, q, qs, u, v, play / 100., paprs / 100., iflag, d_t, &
-         d_q, d_u, d_v, rain, pmflxr, sig1, w01, ibas, itop, ma, upwd, dnwd, &
-         qcondc, cape, da, phi, mp)
+    CALL cv_driver(t, q, qs, u, v, play / 100., paprs / 100., d_t, d_q, d_u, &
+         d_v, rain, pmflxr, sig1, w01, ibas, itop, ma, upwd, dnwd, qcondc, &
+         cape, da, phi, mp)
     rain = rain / 86400.
     d_t = dtphys * d_t
     d_q = dtphys * d_q
