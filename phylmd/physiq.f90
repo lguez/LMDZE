@@ -451,7 +451,6 @@ contains
        write(unit_nml, nml=physiq_nml)
        call assert(iflag_cldcon >= - 2 .and. iflag_cldcon <= 3, &
             "physiq iflag_cldcon")
-
        call ctherm
        call conf_phys
        frugs = 0.
