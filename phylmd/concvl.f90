@@ -5,8 +5,8 @@ module concvl_m
 contains
 
   SUBROUTINE concvl(paprs, play, t, q, u, v, sig1, w01, d_t, d_q, d_u, d_v, &
-       rain, kbas, itop_con, upwd, dnwd, ma, cape, iflag, qcondc, pmflxr, da, &
-       phi, mp)
+       rain, ibas, itop, upwd, dnwd, ma, cape, iflag, qcondc, pmflxr, da, phi, &
+       mp)
 
     ! From phylmd/concvl.F, version 1.3, 2005/04/15 12:36:17
     ! Author: Z. X. Li (LMD/CNRS)
@@ -30,8 +30,8 @@ contains
     REAL, intent(out):: d_q(klon, klev) ! incr\'ement de la vapeur d'eau
     REAL, intent(out):: d_u(:, :), d_v(:, :) ! (klon, klev)
     REAL, intent(out):: rain(klon) ! pluie (mm / s)
-    INTEGER, intent(out):: kbas(klon)
-    integer, intent(inout):: itop_con(klon)
+    INTEGER, intent(out):: ibas(klon)
+    integer, intent(inout):: itop(klon)
 
     REAL, intent(out):: upwd(klon, klev)
     ! saturated updraft mass flux (kg / m2 / s)
@@ -67,8 +67,8 @@ contains
     END DO
 
     CALL cv_driver(t, q, qs, u, v, play / 100., paprs / 100., iflag, d_t, &
-         d_q, d_u, d_v, rain, pmflxr, sig1, w01, kbas, itop_con, ma, upwd, &
-         dnwd, qcondc, cape, da, phi, mp)
+         d_q, d_u, d_v, rain, pmflxr, sig1, w01, ibas, itop, ma, upwd, dnwd, &
+         qcondc, cape, da, phi, mp)
     rain = rain / 86400.
     d_t = dtphys * d_t
     d_q = dtphys * d_q
