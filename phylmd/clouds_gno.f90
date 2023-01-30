@@ -4,7 +4,7 @@ module CLOUDS_GNO_m
 
 contains
 
-  SUBROUTINE CLOUDS_GNO(Q_SERI, QSAT, CLWCON0, PTCONV, RATQSC, RNEBCON0)
+  SUBROUTINE CLOUDS_GNO(Q_SERI, QSAT, QCONDC, PTCONV, RATQSC, RNEBCON0)
 
     ! From LMDZ4/libf/phylmd/clouds_gno.F, version 1.2, 2004/11/09 16:55:40
 
@@ -20,7 +20,7 @@ contains
     REAL, intent(in):: QSAT(:, :) ! (klon, llm)
     ! mean saturation humidity mixing ratio within the gridbox
 
-    REAL, intent(in):: CLWCON0(:, :) ! (klon, llm)
+    REAL, intent(in):: QCONDC(:, :) ! (klon, llm)
     ! mixing ratio of condensed water within clouds associated
     ! with SUBGRID-SCALE condensation processes (here, it is
     ! predicted by the convection scheme)
@@ -54,7 +54,7 @@ contains
     REAL u(klon), v(klon), erfcu(klon), erfcv(klon)
     REAL xx1(klon), xx2(klon)
     real sqrtpi, zx1, zx2, exdel
-    LOGICAL lconv(klon) ! le calcul a converge (entre autres si clwcon0 < min_q)
+    LOGICAL lconv(klon) ! le calcul a converge (entre autres si qcondc < min_q)
 
     !--------------------------------------------------------------
 
@@ -80,7 +80,7 @@ contains
        !
        ! -> Determine x (the parameter k of the GNO PDF) such that the
        ! contribution of subgrid-scale processes to the in-cloud water
-       ! content is equal to CLWCON0(K) (equations (13), (14), (15) +
+       ! content is equal to QCONDC(K) (equations (13), (14), (15) +
        ! Appendix B of the paper)
        !
        ! Here, an iterative method is used for this purpose (other
@@ -93,7 +93,7 @@ contains
        ! suffisamment d'eau nuageuse.
 
        do i = 1, klon
-          IF ( CLWCON0(i, K) .lt. min_Q ) THEN
+          IF ( QCONDC(i, K) .lt. min_Q ) THEN
              ptconv(i, k) = .false.
              ratqsc(i, k) = 0.
              lconv(i) = .true.
@@ -101,7 +101,7 @@ contains
              lconv(i) = .FALSE.
              vmax(i) = vmax0
 
-             beta(i) = CLWCON0(i, K)/mu(i) + EXP( -MIN(0., delta(i)) )
+             beta(i) = QCONDC(i, K)/mu(i) + EXP( -MIN(0., delta(i)) )
 
              ! roots of equation v > vmax:
 

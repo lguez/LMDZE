@@ -224,7 +224,7 @@ contains
     real, parameter:: dobson_u = 2.1415e-05 ! Dobson unit, in kg m-2
 
     real, save, allocatable:: clwcon(:, :), rnebcon(:, :) ! (klon, llm)
-    real, save, allocatable:: clwcon0(:, :), rnebcon0(:, :) ! (klon, llm)
+    real, save, allocatable:: qcondc(:, :), rnebcon0(:, :) ! (klon, llm)
 
     REAL rhcl(klon, llm) ! humidit\'e relative ciel clair
     REAL dialiq(klon, llm) ! eau liquide nuageuse
@@ -420,7 +420,7 @@ contains
        allocate(albsol(klon))
        ALLOCATE(wo(klon, llm))
        allocate(clwcon(klon, llm), rnebcon(klon, llm))
-       allocate(clwcon0(klon, llm), rnebcon0(klon, llm))
+       allocate(qcondc(klon, llm), rnebcon0(klon, llm))
        allocate(cape(klon))
        allocate(ibas_con(klon), itop_con(klon))
        allocate(ratqs(klon, llm))
@@ -443,7 +443,7 @@ contains
        q2m = 0.
        ffonte = 0.
        rnebcon0 = 0.
-       clwcon0 = 0.
+       qcondc = 0.
        clwcon = 0.
 
        print *, "Enter namelist 'physiq_nml'."
@@ -579,7 +579,7 @@ contains
     if (conv_emanuel) then
        CALL concvl(paprs, play, t_seri, q_seri, u_seri, v_seri, sig1, w01, &
             d_t_con, d_q_con, d_u_con, d_v_con, rain_con, ibas_con, itop_con, &
-            upwd, dnwd, Ma, cape, clwcon0, pmflxr, da, phi, mp)
+            upwd, dnwd, Ma, cape, qcondc, pmflxr, da, phi, mp)
        snow_con = 0.
        mfu = upwd + dnwd
 
@@ -587,8 +587,8 @@ contains
        qsat = qsat / (1. - retv * qsat)
 
        ! Properties of convective clouds
-       clwcon0 = fact_cldcon * clwcon0
-       call clouds_gno(q_seri, qsat, clwcon0, ptconv, ratqsc, rnebcon0)
+       qcondc = fact_cldcon * qcondc
+       call clouds_gno(q_seri, qsat, qcondc, ptconv, ratqsc, rnebcon0)
 
        forall (i = 1:klon) ema_pct(i) = paprs(i, itop_con(i) + 1)
        mfd = 0.
@@ -726,10 +726,10 @@ contains
        do k = 1, llm
           do i = 1, klon
              rnebcon(i, k) = rnebcon(i, k) * facteur
-             if (rnebcon0(i, k) * clwcon0(i, k) &
+             if (rnebcon0(i, k) * qcondc(i, k) &
                   > rnebcon(i, k) * clwcon(i, k)) then
                 rnebcon(i, k) = rnebcon0(i, k)
-                clwcon(i, k) = clwcon0(i, k)
+                clwcon(i, k) = qcondc(i, k)
              endif
           enddo
        enddo
