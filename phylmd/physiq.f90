@@ -443,7 +443,6 @@ contains
        q2m = 0.
        ffonte = 0.
        rnebcon0 = 0.
-       clwcon = 0.
 
        print *, "Enter namelist 'physiq_nml'."
        read(unit=*, nml=physiq_nml)
