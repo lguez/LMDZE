@@ -67,10 +67,8 @@ PROGRAM gcm
   if (n_proc /= 1) call mpi_abort(mpi_comm_world, errorcode = 1)
   call xios_initialize("LMDZE", return_comm = return_comm)
   CALL xios_context_initialize("LMDZE_context", return_comm)
-
   call set_unit_nml
   open(unit_nml, file="used_namelists.txt", status="replace", action="write")
-
   call set_dimensions
   ALLOCATE(ucov(iim + 1, jjm + 1, llm), vcov(iim + 1, jjm, llm))
   ALLOCATE(teta(iim + 1, jjm + 1, llm))

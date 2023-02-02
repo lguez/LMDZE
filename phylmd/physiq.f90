@@ -60,7 +60,6 @@ contains
     use time_phylmdz, only: itap, increment_itap
     use transp_m, only: transp
     use unit_nml_m, only: unit_nml
-    USE ymds2ju_m, ONLY: ymds2ju
     use yoegwd, only: sugwd
     USE yoethf_m, ONLY: r2es, rvtmp2
     use zenang_m, only: zenang
