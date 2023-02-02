@@ -58,10 +58,7 @@ PROGRAM gcm
   REAL, ALLOCATABLE:: masse(:, :, :) ! (iim + 1, jjm + 1, llm)
   ! mass in a grid cell, in kg
 
-  LOGICAL:: true_calendar = .false. ! default value
   integer i, n_proc, return_comm, ncid_start
-
-  namelist /main_nml/true_calendar
 
   !------------------------------------------------------------
 
@@ -84,20 +81,8 @@ PROGRAM gcm
   call init_dimphy
   CALL conf_gcm
   call read_comdissnew
-
-  print *, "Enter namelist 'main_nml'."
-  read (unit=*, nml=main_nml)
-  write(unit_nml, nml=main_nml)
-
   call xios_close_context_definition
-
-  ! Choix du calendrier :
-  if (true_calendar) then
-     call ioconf_calendar('gregorian')
-  else
-     call ioconf_calendar('360_day')
-  endif
-
+  call ioconf_calendar('360_day')
   call infotrac_init
   call nf95_open("start.nc", NF90_NOWRITE, ncid_start) ! fichier \'etat initial
   CALL dynetat0_chosen(ncid_start)
