@@ -89,7 +89,7 @@ contains
     dtphys  = iphysiq * dtvr
     print *, 'dtvr = ', dtvr
     print *, 'dtphys = ', dtphys
-    dtime%second = 3600
+    dtime%second = dtphys
     call xios_set_timestep(dtime)
 
   END SUBROUTINE conf_gcm
