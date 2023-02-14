@@ -47,7 +47,8 @@ contains
 
     integer:: icum  = 0
     integer:: itau = 0
-    real qy, factv(jjm, llm)
+    real qy
+    real factv(jjm, llm) ! in m kg-1
 
     ! Variables dynamiques interm\'ediaires :
     REAL vcont(iip1, jjm, llm), ucont(iip1, jjp1, llm)
@@ -73,7 +74,7 @@ contains
 
     real vq(jjm, llm, ntr, nQ), vqtmp(jjm, llm)
     real avq(jjm, 2: ntr, nQ), psiQ(jjm, llm + 1, nQ)
-    real zmasse(jjm, llm)
+    real zmasse(jjm, llm) ! time average of the mass of a ring along longitude
     real v(jjm, llm), psi(jjm, llm + 1)
     integer i, j, l, iQ
 

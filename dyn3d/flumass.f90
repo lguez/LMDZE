@@ -18,8 +18,8 @@ contains
     REAL, intent(in):: massebx(ip1jmp1, llm), masseby(ip1jm, llm) ! in kg
     real, intent(in):: vcont(ip1jm, llm), ucont(ip1jmp1, llm) ! in s-1
 
-    ! Flux de masse :
-    real, intent(out):: pbaru(ip1jmp1, llm), pbarv(ip1jm, llm) ! in kg s-1
+    real, intent(out):: pbaru(ip1jmp1, llm), pbarv(ip1jm, llm)
+    ! flux de masse, in kg s-1
 
     ! Local:
     REAL apbarun(iip1), apbarus(iip1)
@@ -38,21 +38,19 @@ contains
        end DO
     end DO
 
-    ! Calcul de la composante du flux de masse en x aux pôles 
-    ! par la résolution d'un système de deux équations
-
-    ! la première équation décrivant le calcul de la divergence en un
-    ! point i du pôle, ce calcul étant itéré de i = 1 à i = im.
-    ! c'est-à-dire,
+    ! Calcul de la composante du flux de masse en x aux pôles par la
+    ! résolution d'un système de deux équations, la première équation
+    ! décrivant le calcul de la divergence en un point i du pôle, ce
+    ! calcul étant itéré de i = 1 à i = im. C'est-à-dire :
 
     ! ((0.5 * pbaru(i) - 0.5 * pbaru(i - 1) - pbarv(i)) / aire(i) =
     ! - somme de (pbarv(n)) / aire pôle
 
-    ! l'autre équation spécifiant que la moyenne du flux de masse au
-    ! pôle est nulle c'est-à-dire somme de pbaru(n) * aire locale(n) =
-    ! 0.
+    ! L'autre équation spécifiant que la moyenne du flux de masse au
+    ! pôle est nulle, c'est-à-dire :
+    ! somme de pbaru(n) * aire locale(n) = 0.
 
-    ! on en revient ainsi à déterminer la constante additive commune
+    ! On en revient ainsi à déterminer la constante additive commune
     ! aux pbaru qui représentait pbaru(0, j, l) dans l'équation du
     ! calcul de la divergence au point i=1.
 
@@ -67,30 +65,30 @@ contains
     DO l = 1, llm
        ctn = SUM(pbarv(:iim, l))/ sairen
        cts = SUM(pbarv(ip1jmi1 + 1: ip1jmi1 + iim, l)) / saires
-
        pbaru(1, l)= pbarv(1, l) - ctn * aire(1)
-       pbaru(ip1jm+1, l)= - pbarv(ip1jmi1+1, l) + cts * aire(ip1jm+1)
+       pbaru(ip1jm + 1, l)= - pbarv(ip1jmi1 + 1, l) + cts * aire(ip1jm + 1)
 
        DO i = 2, iim
-          pbaru(i, l) = pbaru(i - 1, l) + &
-               pbarv(i, l) - ctn * aire(i)
-
-          pbaru(i+ ip1jm, l) = pbaru(i+ ip1jm-1, l) - &
-               pbarv(i+ ip1jmi1, l) + cts * aire(i+ ip1jm)
+          pbaru(i, l) = pbaru(i - 1, l) + pbarv(i, l) - ctn * aire(i)
+          pbaru(i + ip1jm, l) = pbaru(i + ip1jm-1, l) - pbarv(i + ip1jmi1, l) &
+               + cts * aire(i + ip1jm)
        end DO
+
        DO i = 1, iim
           apbarun(i) = aireu(i) * pbaru(i, l)
-          apbarus(i) = aireu(i +ip1jm) * pbaru(i +ip1jm, l)
+          apbarus(i) = aireu(i + ip1jm) * pbaru(i + ip1jm, l)
        end DO
+
        ctn0 = - SUM(apbarun(:iim)) / saireun
        cts0 = - SUM(apbarus(:iim)) / saireus
+
        DO i = 1, iim
           pbaru(i, l) = 2. * (pbaru(i, l) + ctn0)
-          pbaru(i+ ip1jm, l) = 2. * (pbaru(i +ip1jm, l) + cts0)
+          pbaru(i + ip1jm, l) = 2. * (pbaru(i + ip1jm, l) + cts0)
        end DO
 
        pbaru(iip1, l) = pbaru(1, l)
-       pbaru(ip1jmp1, l) = pbaru(ip1jm +1, l)
+       pbaru(ip1jmp1, l) = pbaru(ip1jm + 1, l)
     end DO
 
   END SUBROUTINE flumass
