@@ -2,11 +2,11 @@ module dynetat0_chosen_m
 
   IMPLICIT NONE
 
-  integer, protected, save:: day_ref ! jour de l'ann\'ee de l'\'etat initial
+  integer, protected:: day_ref  = 1 ! jour de l'ann\'ee de l'\'etat initial
   ! (= 350 si 20 d\'ecembre par exemple)
 
-  integer, protected, save:: annee_ref
-  ! Annee de l'etat initial (avec 4 chiffres)
+  integer, protected:: annee_ref = 1998
+  ! Ann\'ee de l'\'etat initial (avec 4 chiffres)
 
   REAL, protected, save:: clon ! longitude of the center of the zoom, in rad
   real, protected, save:: clat ! latitude of the center of the zoom, in rad
@@ -66,10 +66,6 @@ contains
     tauy = tab_cntrl(29)
 
     if (raz_date) then
-       ! Default values:
-       day_ref = 1
-       annee_ref = 1998
-       
        print *, "Enter namelist 'dynetat0_nml'."
        read(unit = *, nml = dynetat0_nml)
        write(unit_nml, nml = dynetat0_nml)
@@ -114,10 +110,6 @@ contains
          "read_serre dzoomx dzoomy")
     clon = clon_deg / 180. * pi
     clat = clat_deg / 180. * pi
-
-    ! Default values:
-    day_ref = 1
-    annee_ref = 1998
 
     print *, "Enter namelist 'dynetat0_nml'."
     read(unit = *, nml = dynetat0_nml)
