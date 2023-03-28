@@ -104,7 +104,6 @@ PROGRAM gcm
 
   CALL conf_guide
   CALL leapfrog(ucov, vcov, teta, ps, masse, q)
-
   close(unit_nml)
   call histclo
 
