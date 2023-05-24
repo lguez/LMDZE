@@ -46,7 +46,7 @@ contains
     ! Auteurs : L. Fairhead, P. Le Van
 
     use jumble, only: assert
-    use xios, only: xios_duration, xios_set_timestep
+    use xios, only: xios_duration, xios_set_timestep, xios_define_calendar
 
     use abort_gcm_m, only: abort_gcm
     use comconst, only: daysec
@@ -89,6 +89,7 @@ contains
     dtphys  = iphysiq * dtvr
     print *, 'dtvr = ', dtvr
     print *, 'dtphys = ', dtphys
+    CALL xios_define_calendar(type = "D360")
     dtime%second = dtphys
     call xios_set_timestep(dtime)
 
