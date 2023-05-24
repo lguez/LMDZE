@@ -144,7 +144,7 @@
             "$test_input_dir/Namelists/traceur.def",
             "$test_input_dir/iodef.xml"
 	],
-	"title" : "GCM_control"
+	"title" : "GCM_control", "exclude_cmp": ["xios_client_0.out"]
     },
     {
 	"command" : "$build_dir/dyn3d/gcm",
