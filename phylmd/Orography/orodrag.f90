@@ -55,7 +55,9 @@ contains
 
     !* 1. initialization
 
+    ! Activation thresholds to diminish computation time:
     ktest = zpic - zmea > 100. .AND. zstd > 10.
+    ! (The justification for these thresholds is not a physical one.)
 
     !* 1.1 computational constants
 
