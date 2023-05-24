@@ -7,6 +7,5 @@
   </context>
 
   <context id = "LMDZE_context">
-    <calendar start_date = "2000" />
   </context>
 </simulation>

@@ -15,7 +15,7 @@ PROGRAM gcm
   use netcdf95, only: nf95_close, nf95_open
   use xios, only: xios_initialize, xios_finalize, xios_context_initialize, &
        xios_context_finalize, xios_close_context_definition, &
-       xios_set_time_origin, xios_date
+       xios_set_time_origin, xios_date, xios_set_start_date
 
   use caldyn0_m, only: read_caldyn0
   use comdissnew, only: read_comdissnew
@@ -86,6 +86,7 @@ PROGRAM gcm
   CALL dynetat0_chosen(ncid_start)
   CALL dynetat0(vcov, ucov, teta, q, masse, ps, ncid_start)
   call xios_set_time_origin(xios_date(annee_ref, 1,day_ref, 0, 0, 0))
+  CALL xios_set_start_date(xios_date(annee_ref, 1, day_ini, 0, 0, 0))
   call xios_close_context_definition
   call read_phis(ncid_start)
   call read_caldyn0(ncid_start)
