@@ -86,18 +86,21 @@
 	"title" : "CE0L_control",
 	"symlink" :
 	[
-            "$datasets_dir/Albedo.nc",
+            "$datasets_dir/ATM/INPUT_CE0L/Albedo.nc",
             "$PWD/sea_ice.nc",
             "$PWD/SST.nc",
             ["$Cariolle_dir/coefoz_v2_8.nc", "coefoz.nc"],
             "$ECMWF_dir/ECDYN.nc",
             ["$ECMWF_dir/ECDYN.nc", "ECPHY.nc"],
-            ["$datasets_dir/landiceref_GA_HR.nc", "landiceref.nc"],
             [
-		"$datasets_dir/Relief_GMTED2010_15n015_00625deg_plus_GA.nc",
+		"$datasets_dir/ATM/INPUT_CE0L/landiceref_GA_HR.nc",
+		"landiceref.nc"
+	    ],
+            [
+		"$datasets_dir/ATM/INPUT_CE0L/Relief_GMTED2010_15n015_00625deg_plus_GA.nc",
 		"Relief.nc"
 	    ],
-            "$datasets_dir/Rugos.nc",
+            "$datasets_dir/ATM/INPUT_CE0L/Rugos.nc",
             "$test_input_dir/Namelists/traceur.def"
 	],
 	"command" : "$build_dir/dynphy_lonlat/ce0l",
@@ -109,18 +112,21 @@
 	"title" : "CE0L_zoom",
 	"symlink" :
 	[
-            "$datasets_dir/Albedo.nc",
+            "$datasets_dir/ATM/INPUT_CE0L/Albedo.nc",
             "$PWD/sea_ice.nc",
             "$PWD/SST.nc",
             ["$Cariolle_dir/coefoz_v2_8.nc", "coefoz.nc"],
             "$ECMWF_dir/ECDYN.nc",
             ["$ECMWF_dir/ECDYN.nc", "ECPHY.nc"],
-            ["$datasets_dir/landiceref_GA_HR.nc", "landiceref.nc"],
             [
-		"$datasets_dir/Relief_GMTED2010_15n015_00625deg_plus_GA.nc",
+		"$datasets_dir/ATM/INPUT_CE0L/landiceref_GA_HR.nc",
+		"landiceref.nc"
+	    ],
+            [
+		"$datasets_dir/ATM/INPUT_CE0L/Relief_GMTED2010_15n015_00625deg_plus_GA.nc",
 		"Relief.nc"
 	    ],
-            "$datasets_dir/Rugos.nc",
+            "$datasets_dir/ATM/INPUT_CE0L/Rugos.nc",
             "$test_input_dir/Namelists/traceur.def"
 	]
     },
@@ -616,18 +622,21 @@
     {
 	"title" : "Disvert_CMIP5",
 	"symlink" : [
-            "$datasets_dir/Albedo.nc",
+            "$datasets_dir/ATM/INPUT_CE0L/Albedo.nc",
             "$PWD/sea_ice.nc",
             "$PWD/SST.nc",
             ["$Cariolle_dir/coefoz_v2_8.nc", "coefoz.nc"],
             "$ECMWF_dir/ECDYN.nc",
             ["$ECMWF_dir/ECDYN.nc", "ECPHY.nc"],
-            ["$datasets_dir/landiceref_GA_HR.nc", "landiceref.nc"],
             [
-		"$datasets_dir/Relief_GMTED2010_15n015_00625deg_plus_GA.nc",
+		"$datasets_dir/ATM/INPUT_CE0L/landiceref_GA_HR.nc",
+		"landiceref.nc"
+	    ],
+            [
+		"$datasets_dir/ATM/INPUT_CE0L/Relief_GMTED2010_15n015_00625deg_plus_GA.nc",
 		"Relief.nc"
 	    ],
-            "$datasets_dir/Rugos.nc",
+            "$datasets_dir/ATM/INPUT_CE0L/Rugos.nc",
             "$test_input_dir/Namelists/traceur.def"
 	],
 	"command" : "$build_dir/dynphy_lonlat/ce0l",
@@ -636,18 +645,21 @@
     {
 	"title" : "Disvert_CMIP6",
 	"symlink" : [
-            "$datasets_dir/Albedo.nc",
+            "$datasets_dir/ATM/INPUT_CE0L/Albedo.nc",
             "$PWD/sea_ice.nc",
             "$PWD/SST.nc",
             ["$Cariolle_dir/coefoz_v2_8.nc", "coefoz.nc"],
             "$ECMWF_dir/ECDYN.nc",
             ["$ECMWF_dir/ECDYN.nc", "ECPHY.nc"],
-            ["$datasets_dir/landiceref_GA_HR.nc", "landiceref.nc"],
             [
-		"$datasets_dir/Relief_GMTED2010_15n015_00625deg_plus_GA.nc",
+		"$datasets_dir/ATM/INPUT_CE0L/landiceref_GA_HR.nc",
+		"landiceref.nc"
+	    ],
+            [
+		"$datasets_dir/ATM/INPUT_CE0L/Relief_GMTED2010_15n015_00625deg_plus_GA.nc",
 		"Relief.nc"
 	    ],
-            "$datasets_dir/Rugos.nc",
+            "$datasets_dir/ATM/INPUT_CE0L/Rugos.nc",
             "$test_input_dir/Namelists/traceur.def"
 	],
 	"command" : "$build_dir/dynphy_lonlat/ce0l",
@@ -656,18 +668,21 @@
     {
 	"title" : "Disvert_CMIP3",
 	"symlink" : [
-            "$datasets_dir/Albedo.nc",
+            "$datasets_dir/ATM/INPUT_CE0L/Albedo.nc",
             "$PWD/sea_ice.nc",
             "$PWD/SST.nc",
             ["$Cariolle_dir/coefoz_v2_8.nc", "coefoz.nc"],
             "$ECMWF_dir/ECDYN.nc",
             ["$ECMWF_dir/ECDYN.nc", "ECPHY.nc"],
-            ["$datasets_dir/landiceref_GA_HR.nc", "landiceref.nc"],
             [
-		"$datasets_dir/Relief_GMTED2010_15n015_00625deg_plus_GA.nc",
+		"$datasets_dir/ATM/INPUT_CE0L/landiceref_GA_HR.nc",
+		"landiceref.nc"
+	    ],
+            [
+		"$datasets_dir/ATM/INPUT_CE0L/Relief_GMTED2010_15n015_00625deg_plus_GA.nc",
 		"Relief.nc"
 	    ],
-            "$datasets_dir/Rugos.nc",
+            "$datasets_dir/ATM/INPUT_CE0L/Rugos.nc",
             "$test_input_dir/Namelists/traceur.def"
 	],
 	"command" : "$build_dir/dynphy_lonlat/ce0l",
