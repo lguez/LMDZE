@@ -87,18 +87,18 @@ contains
     PRINT *, 'Call sequence information: suphec'
 
     print *, 'Astronomical constants '
-    print '('' omega = '', E13.7, '' s-1'')', ROMEGA
+    print *, 'omega = ', ROMEGA, 's-1'
 
     print *, 'Radiation constants:'
-    print '('' Stefan-Bol. = '', E13.7, '' W m-2 K-4'')', RSIGMA
+    print *, 'Stefan-Boltzmann constant = ', RSIGMA, ' W m-2 K-4'
 
     print *, 'Thermodynamical constants, gas phase:'
     print *, "rd = ", RD, "J K-1 kg-1"
     print *, "rv = ", RV, "J K-1 kg-1"
-    print '('' Cpd = '', e13.7)', RCPD
-    print '('' Cvd = '', e13.7)', RCVD
-    print '('' Cvv = '', e13.7)', RCVV
-    print '('' Rd / Cpd = '', e13.7)', RKAPPA
+    print *, 'Cpd = ', RCPD
+    print *, 'Cvd = ', RCVD
+    print *, 'Cvv = ', RCVV
+    print *, 'Rd / Cpd = ', RKAPPA
     print *, 'Rv / Rd - 1 = ', RETV
     print *, 'RCPV = ', RCPV
 
