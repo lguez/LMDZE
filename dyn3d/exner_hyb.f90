@@ -47,8 +47,8 @@ contains
 
     pks = rcpd * (ps / preff)**rkappa
     unpl2k = 1. + 2 * rkappa
-
     beta(:, :, llm) = 1. / unpl2k
+
     DO l = llm - 1, 2, -1
        beta(:, :, l) = p(:, :, l) &
             / (p(:, :, l) * unpl2k + p(:, :, l+1) * (beta(:, :, l+1) - unpl2k))
@@ -56,6 +56,7 @@ contains
 
     pk(:, :, 1) = ps * pks &
          / (ps * (1. + rkappa) + 0.5 * (beta(:, :, 2) - unpl2k) * p(:, :, 2))
+
     DO l = 2, llm
        pk(:, :, l) = beta(:, :, l) * pk(:, :, l - 1)
     ENDDO
