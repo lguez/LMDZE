@@ -155,7 +155,8 @@
             ],
             "$test_input_dir/Namelists/traceur.def",
             "$test_input_dir/iodef.xml"
-        ]
+        ],
+	"exclude_cmp": ["xios_client_0.out"]
     },
     "GCM_nudging": {
         "stdin_filename": "$test_input_dir/Namelists/gcm_nml_nudging.txt",
@@ -181,7 +182,8 @@
                 "$test_input_dir/Nudging_regular_grid/v_day_1.nc",
                 "v.nc"
             ]
-        ]
+        ],
+	"exclude_cmp": ["xios_client_0.out"]
     },
     "GCM_ini_anal": {
         "stdin_filename": "$test_input_dir/Namelists/gcm_nml_ini_anal.txt",
@@ -207,7 +209,8 @@
                 "$test_input_dir/Nudging_regular_grid/v_day_1.nc",
                 "v.nc"
             ]
-        ]
+        ],
+	"exclude_cmp": ["xios_client_0.out"]
     },
     "GCM_nudging_Tq": {
         "symlink": [
@@ -241,7 +244,8 @@
             ]
         ],
         "command": "$build_dir/dyn3d/gcm",
-        "stdin_filename": "$test_input_dir/Namelists/gcm_nml_nudging_Tq.txt"
+        "stdin_filename": "$test_input_dir/Namelists/gcm_nml_nudging_Tq.txt",
+	"exclude_cmp": ["xios_client_0.out"]
     },
     "GCM_zoom_control": {
         "command": "$build_dir/dyn3d/gcm",
@@ -259,7 +263,9 @@
             ],
             "$test_input_dir/Namelists/traceur.def",
             "$test_input_dir/iodef.xml"
-        ]
+        ],
+	"exclude_cmp": ["xios_client_0.out"]
+
     },
     "GCM_zoom_Tiedke": {
         "symlink": [
@@ -277,7 +283,9 @@
             "$test_input_dir/iodef.xml"
         ],
         "command": "$build_dir/dyn3d/gcm",
-        "stdin_filename": "$test_input_dir/Namelists/gcm_nml_Tiedke.txt"
+        "stdin_filename": "$test_input_dir/Namelists/gcm_nml_Tiedke.txt",
+	"exclude_cmp": ["xios_client_0.out"]
+
     },
     "GCM_control_day_2": {
         "stdin_filename": "$test_input_dir/Namelists/gcm_nml_control.txt",
@@ -295,7 +303,9 @@
             ],
             "$test_input_dir/Namelists/traceur.def",
             "$test_input_dir/iodef.xml"
-        ]
+        ],
+	"exclude_cmp": ["xios_client_0.out"]
+
     },
     "GCM_control_2_days": {
         "stdin_filename": "$test_input_dir/Namelists/control_2_days.txt",
@@ -313,7 +323,9 @@
             ],
             "$test_input_dir/Namelists/traceur.def",
             "$test_input_dir/iodef.xml"
-        ]
+        ],
+	"exclude_cmp": ["xios_client_0.out"]
+
     },
     "GCM_Tiedke_day_2": {
         "stdin_filename": "$test_input_dir/Namelists/gcm_nml_Tiedke.txt",
@@ -331,7 +343,9 @@
             ],
             "$test_input_dir/Namelists/traceur.def",
             "$test_input_dir/iodef.xml"
-        ]
+        ],
+	"exclude_cmp": ["xios_client_0.out"]
+
     },
     "GCM_nudging_day_2": {
         "stdin_filename": "$test_input_dir/Namelists/gcm_nml_nudging.txt",
@@ -357,7 +371,9 @@
                 "$test_input_dir/Nudging_regular_grid/v_day_2.nc",
                 "v.nc"
             ]
-        ]
+        ],
+	"exclude_cmp": ["xios_client_0.out"]
+
     },
     "GCM_nudging_Tq_day_2": {
         "symlink": [
@@ -391,7 +407,9 @@
             ]
         ],
         "stdin_filename": "$test_input_dir/Namelists/gcm_nml_nudging_Tq.txt",
-        "command": "$build_dir/dyn3d/gcm"
+        "command": "$build_dir/dyn3d/gcm",
+	"exclude_cmp": ["xios_client_0.out"]
+
     },
     "GCM_zoom_control_day_2": {
         "symlink": [
@@ -409,7 +427,9 @@
             "$test_input_dir/iodef.xml"
         ],
         "command": "$build_dir/dyn3d/gcm",
-        "stdin_filename": "$test_input_dir/Namelists/gcm_nml_control.txt"
+        "stdin_filename": "$test_input_dir/Namelists/gcm_nml_control.txt",
+	"exclude_cmp": ["xios_client_0.out"]
+
     },
     "GCM_zoom_Tiedke_day_2": {
         "command": "$build_dir/dyn3d/gcm",
@@ -427,7 +447,9 @@
             ],
             "$test_input_dir/Namelists/traceur.def",
             "$test_input_dir/iodef.xml"
-        ]
+        ],
+	"exclude_cmp": ["xios_client_0.out"]
+
     },
     "GCM_zoom_nudging": {
         "command": "$build_dir/dyn3d/gcm",
@@ -453,7 +475,9 @@
                 "$test_input_dir/Nudging_zoom/v_day_1.nc",
                 "v.nc"
             ]
-        ]
+        ],
+	"exclude_cmp": ["xios_client_0.out"]
+
     },
     "GCM_zoom_ini_anal": {
         "command": "$build_dir/dyn3d/gcm",
@@ -479,7 +503,9 @@
                 "$test_input_dir/Nudging_zoom/v_day_1.nc",
                 "v.nc"
             ]
-        ]
+        ],
+	"exclude_cmp": ["xios_client_0.out"]
+
     },
     "GCM_no_phys": {
         "symlink": [
@@ -491,7 +517,9 @@
             "$test_input_dir/iodef.xml"
         ],
         "command": "$build_dir/dyn3d/gcm",
-        "stdin_filename": "$test_input_dir/Namelists/gcm_nml_no_phys.txt"
+        "stdin_filename": "$test_input_dir/Namelists/gcm_nml_no_phys.txt",
+	"exclude_cmp": ["xios_client_0.out"]
+
     },
     "GCM_pbl_6": {
         "stdin_filename": "$test_input_dir/Namelists/gcm_nml_pbl_6.txt",
@@ -509,7 +537,9 @@
             ],
             "$test_input_dir/Namelists/traceur.def",
             "$test_input_dir/iodef.xml"
-        ]
+        ],
+	"exclude_cmp": ["xios_client_0.out"]
+
     },
     "GCM_pbl_8": {
         "stdin_filename": "$test_input_dir/Namelists/gcm_nml_pbl_8.txt",
@@ -527,7 +557,9 @@
             ],
             "$test_input_dir/Namelists/traceur.def",
             "$test_input_dir/iodef.xml"
-        ]
+        ],
+	"exclude_cmp": ["xios_client_0.out"]
+
     },
     "GCM_pbl_9": {
         "stdin_filename": "$test_input_dir/Namelists/gcm_nml_pbl_9.txt",
@@ -545,7 +577,9 @@
             ],
             "$test_input_dir/Namelists/traceur.def",
             "$test_input_dir/iodef.xml"
-        ]
+        ],
+	"exclude_cmp": ["xios_client_0.out"]
+
     },
     "GCM_pbl_0": {
         "stdin_filename": "$test_input_dir/Namelists/gcm_nml_pbl_0.txt",
@@ -563,7 +597,9 @@
             ],
             "$test_input_dir/Namelists/traceur.def",
             "$test_input_dir/iodef.xml"
-        ]
+        ],
+	"exclude_cmp": ["xios_client_0.out"]
+
     },
     "No_kzmin": {
         "stdin_filename": "$test_input_dir/Namelists/gcm_no_kzmin.txt",
@@ -582,7 +618,9 @@
             "$test_input_dir/Namelists/traceur.def",
             "$test_input_dir/iodef.xml"
         ],
-        "description": "ok_kzmin = f"
+        "description": "ok_kzmin = f",
+	"exclude_cmp": ["xios_client_0.out"]
+
     },
     "Test_inter_barxy": {
         "command": "$build_dir/dyn3d/Inter_barxy/test_inter_barxy",
@@ -696,14 +734,17 @@
             ],
             "$test_input_dir/Namelists/traceur.def",
             "$test_input_dir/iodef.xml"
-        ]
+        ],
+	"exclude_cmp": ["xios_client_0.out"]
+
     },
     "Test_soil": {
         "input": "&logic_nml /\n&conf_gcm_nml /\n&soil_nml /\n",
         "command": "$build_dir/phylmd/Interface_surf/test_soil",
         "symlink": [
             "$test_input_dir/iodef.xml"
-        ]
+        ],
+	"exclude_cmp": ["xios_client_0.out"]
     },
     "GCM_iconser": {
         "stdin_filename": "$test_input_dir/Namelists/gcm_nml_iconser.txt",
@@ -721,6 +762,8 @@
             ],
             "$test_input_dir/Namelists/traceur.def",
             "$test_input_dir/iodef.xml"
-        ]
+        ],
+	"exclude_cmp": ["xios_client_0.out"]
+
     }
 }
