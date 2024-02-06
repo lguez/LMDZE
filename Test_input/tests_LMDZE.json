@@ -71,13 +71,13 @@
                 "$Cariolle_dir/coefoz_v2_8.nc",
                 "coefoz.nc"
             ],
-            "$ECMWF_dir/ECDYN.nc",
+            ["$datasets_dir/ATM/INPUT_CE0L/ECDYN.nc.20020101", "ECDYN.nc"],
             [
-                "$ECMWF_dir/ECDYN.nc",
+                "$datasets_dir/ATM/INPUT_CE0L/ECDYN.nc.20020101",
                 "ECPHY.nc"
             ],
             [
-                "$datasets_dir/ATM/INPUT_CE0L/landiceref_GA_HR.nc",
+                "$datasets_dir/ATM/INPUT_CE0L/landiceref_GA_HR.new.nc",
                 "landiceref.nc"
             ],
             [
@@ -101,13 +101,13 @@
                 "$Cariolle_dir/coefoz_v2_8.nc",
                 "coefoz.nc"
             ],
-            "$ECMWF_dir/ECDYN.nc",
+            ["$datasets_dir/ATM/INPUT_CE0L/ECDYN.nc.20020101", "ECDYN.nc"],
             [
-                "$ECMWF_dir/ECDYN.nc",
+                "$datasets_dir/ATM/INPUT_CE0L/ECDYN.nc.20020101",
                 "ECPHY.nc"
             ],
             [
-                "$datasets_dir/ATM/INPUT_CE0L/landiceref_GA_HR.nc",
+                "$datasets_dir/ATM/INPUT_CE0L/landiceref_GA_HR.new.nc",
                 "landiceref.nc"
             ],
             [
@@ -639,13 +639,13 @@
                 "$Cariolle_dir/coefoz_v2_8.nc",
                 "coefoz.nc"
             ],
-            "$ECMWF_dir/ECDYN.nc",
+            ["$datasets_dir/ATM/INPUT_CE0L/ECDYN.nc.20020101", "ECDYN.nc"],
             [
-                "$ECMWF_dir/ECDYN.nc",
+                "$datasets_dir/ATM/INPUT_CE0L/ECDYN.nc.20020101",
                 "ECPHY.nc"
             ],
             [
-                "$datasets_dir/ATM/INPUT_CE0L/landiceref_GA_HR.nc",
+                "$datasets_dir/ATM/INPUT_CE0L/landiceref_GA_HR.new.nc",
                 "landiceref.nc"
             ],
             [
@@ -667,13 +667,13 @@
                 "$Cariolle_dir/coefoz_v2_8.nc",
                 "coefoz.nc"
             ],
-            "$ECMWF_dir/ECDYN.nc",
+            ["$datasets_dir/ATM/INPUT_CE0L/ECDYN.nc.20020101", "ECDYN.nc"],
             [
-                "$ECMWF_dir/ECDYN.nc",
+                "$datasets_dir/ATM/INPUT_CE0L/ECDYN.nc.20020101",
                 "ECPHY.nc"
             ],
             [
-                "$datasets_dir/ATM/INPUT_CE0L/landiceref_GA_HR.nc",
+                "$datasets_dir/ATM/INPUT_CE0L/landiceref_GA_HR.new.nc",
                 "landiceref.nc"
             ],
             [
@@ -695,13 +695,13 @@
                 "$Cariolle_dir/coefoz_v2_8.nc",
                 "coefoz.nc"
             ],
-            "$ECMWF_dir/ECDYN.nc",
+            ["$datasets_dir/ATM/INPUT_CE0L/ECDYN.nc.20020101", "ECDYN.nc"],
             [
-                "$ECMWF_dir/ECDYN.nc",
+                "$datasets_dir/ATM/INPUT_CE0L/ECDYN.nc.20020101",
                 "ECPHY.nc"
             ],
             [
-                "$datasets_dir/ATM/INPUT_CE0L/landiceref_GA_HR.nc",
+                "$datasets_dir/ATM/INPUT_CE0L/landiceref_GA_HR.new.nc",
                 "landiceref.nc"
             ],
             [
