@@ -55,9 +55,6 @@ contains
     call nf95_close(ncid)
 
     ! Interpolation sur la grille T du mod\`ele :
-    PRINT *, 'Dimensions de "landiceref.nc"'
-    print *, "iml_lic = ", iml_lic
-    print *, "jml_lic = ", jml_lic
 
     ! Si les coordonn\'ees sont en degr\'es, on les transforme :
     IF (MAXVAL(dlon_lic) > pi) THEN
