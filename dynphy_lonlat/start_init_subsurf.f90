@@ -12,9 +12,8 @@ contains
     ! terre pour fixer la fraction de terre et de glace de terre.
 
     use jumble, only: pi, deg_to_rad
-    use netcdf, only: nf90_nowrite
     use netcdf95, only: nf95_close, nf95_gw_var, nf95_inq_varid, nf95_open, &
-         nf95_find_coord
+         nf95_find_coord, nf95_nowrite
 
     use dimensions, only: iim, jjm, llm
     use dynetat0_chosen_m, only: day_ref
@@ -38,7 +37,7 @@ contains
     !---------------------------------
 
     print *, "Call sequence information: start_init_subsurf"
-    call nf95_open("landiceref.nc", nf90_nowrite, ncid)
+    call nf95_open("landiceref.nc", nf95_nowrite, ncid)
     call nf95_find_coord(ncid, std_name = "longitude", varid = varid)
     call nf95_gw_var(ncid, varid, dlon_lic)
 
