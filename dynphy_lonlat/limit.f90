@@ -19,7 +19,7 @@ contains
     use netcdf95, only: NF95_CLOSE, NF95_CREATE, NF95_DEF_DIM, nf95_def_var, &
          nf95_enddef, nf95_get_var, nf95_gw_var, nf95_inq_dimid, &
          nf95_inq_varid, nf95_inquire_dimension, NF95_OPEN, NF95_PUT_ATT, &
-         NF95_PUT_VAR, nf95_find_coord
+         NF95_PUT_VAR, nf95_find_coord, nf95_get_att
     use numer_rec_95, only: spline, splint
     
     use conf_dat2d_m, only: conf_dat2d
@@ -71,6 +71,7 @@ contains
     INTEGER ncid, ncid_limit, varid, dimid
 
     REAL, parameter:: tmidmonth(12) = [(15. + 30. * i, i = 0, 11)]
+    character(len = 4) units
 
     namelist /limit_nml/extrap
 
@@ -320,9 +321,12 @@ contains
     IF (extrap) ALLOCATE(work(imdep, jmdep))
     ALLOCATE(dlon(imdep), dlat(jmdep))
     call NF95_INQ_VARID(ncid, 'tosbcs', varid)
+    call nf95_get_att(ncid, varid, "units", units)
+    call assert(units == "degC" .or. units == "K", "limit tosbcs units")
 
     DO l = 1, lmdep
        call NF95_GET_VAR(ncid, varid, champ, start=[1, 1, l])
+       if (units == "degC") champ = champ + 273.15
        CALL conf_dat2d(dlon_ini, dlat_ini, dlon, dlat, champ)
        IF (extrap) &
             CALL extrapol(champ, imdep, jmdep, 999999., .TRUE., .TRUE., 2, work)
