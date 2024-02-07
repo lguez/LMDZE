@@ -13,8 +13,8 @@ contains
 
     use jumble, only: pi, deg_to_rad
     use netcdf, only: nf90_nowrite
-    use netcdf95, only: nf95_close, nf95_get_var, nf95_gw_var, nf95_inq_varid, &
-         nf95_open, nf95_find_coord
+    use netcdf95, only: nf95_close, nf95_gw_var, nf95_inq_varid, nf95_open, &
+         nf95_find_coord
 
     use dimensions, only: iim, jjm, llm
     use dynetat0_chosen_m, only: day_ref
@@ -29,7 +29,6 @@ contains
     ! position "i".
 
     ! Local:
-    INTEGER iml_lic, jml_lic
     INTEGER ncid, varid
     REAL, ALLOCATABLE:: dlon_lic(:), dlat_lic(:)
     REAL, ALLOCATABLE:: landice(:, :) ! fraction land ice
@@ -42,15 +41,12 @@ contains
     call nf95_open("landiceref.nc", nf90_nowrite, ncid)
     call nf95_find_coord(ncid, std_name = "longitude", varid = varid)
     call nf95_gw_var(ncid, varid, dlon_lic)
-    iml_lic = size(dlon_lic)
 
     call nf95_find_coord(ncid, std_name = "latitude", varid = varid)
     call nf95_gw_var(ncid, varid, dlat_lic)
-    jml_lic = size(dlat_lic)
 
     call nf95_inq_varid(ncid, 'landice', varid)
-    ALLOCATE(landice(iml_lic, jml_lic))
-    call nf95_get_var(ncid, varid, landice)
+    call nf95_gw_var(ncid, varid, landice)
 
     call nf95_close(ncid)
 
