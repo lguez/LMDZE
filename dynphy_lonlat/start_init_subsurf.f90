@@ -15,8 +15,7 @@ contains
     use netcdf95, only: nf95_close, nf95_gw_var, nf95_inq_varid, nf95_open, &
          nf95_find_coord, nf95_nowrite
 
-    use dimensions, only: iim, jjm, llm
-    use dynetat0_chosen_m, only: day_ref
+    use dimensions, only: iim, jjm
     use dynetat0_m, only: rlatu, rlonv
     use grid_change, only: dyn_phy
     use grille_m_m, only: grille_m
