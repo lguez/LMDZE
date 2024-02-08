@@ -19,7 +19,7 @@ contains
     use dynetat0_m, only: rlatu, rlonv
     use grid_change, only: dyn_phy
     use grille_m_m, only: grille_m
-    use indicesol, only: is_oce, is_ter, is_lic, epsfra
+    use indicesol, only: is_oce, is_ter, is_lic, is_sic, epsfra
     use phyetat0_m, only: masque
 
     REAL, intent(out):: pctsrf(:, :) ! (klon, nbsrf)
@@ -54,8 +54,6 @@ contains
          rlatu)
     flic_tmp(iim + 1, :) = flic_tmp(1, :)
 
-    pctsrf = 0.
-
     ! Passage sur la grille physique :
     pctsrf(:, is_lic) = pack(flic_tmp, dyn_phy)
 
@@ -81,6 +79,7 @@ contains
 
     ! Sous-surface oc\'ean et glace de mer (pour d\'emarrer on met la
     ! glace de mer \`a 0) :
+    pctsrf(:, is_sic) = 0.
     pctsrf(:, is_oce) = 1. - masque
     WHERE (pctsrf(:, is_oce) < EPSFRA) pctsrf(:, is_oce) = 0.
 
