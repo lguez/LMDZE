@@ -63,9 +63,9 @@ contains
 
     ! Ad\'equation avec le masque continent :
     WHERE (masque < EPSFRA) pctsrf(:, is_lic) = 0.
-    where (masque <= EPSFRA) pctsrf(:, is_ter) = masque
+    where (masque < EPSFRA) pctsrf(:, is_ter) = masque
 
-    where (masque > EPSFRA)
+    where (masque >= EPSFRA)
        where (pctsrf(:, is_lic) >= masque)
           pctsrf(:, is_lic) = masque
           pctsrf(:, is_ter) = 0.
