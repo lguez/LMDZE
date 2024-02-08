@@ -89,6 +89,7 @@ contains
 
     IF (ji /= 0) then
        PRINT *, 'Bad surface percentages for ', ji, 'points'
+       stop 1
     end IF
 
   end subroutine start_init_subsurf
