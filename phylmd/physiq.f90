@@ -473,7 +473,6 @@ contains
           rugoro = 0.
        ENDIF
 
-       ! Initialisation des sorties
        call ini_histins
        CALL phyredem0(itau_phy + nday * lmt_pas)
        call conf_interface

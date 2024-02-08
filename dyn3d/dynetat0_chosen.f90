@@ -1,5 +1,8 @@
 module dynetat0_chosen_m
 
+  ! Values that were chosen by the user, not computed, in program
+  ! ce0l.
+
   IMPLICIT NONE
 
   integer, protected:: day_ref  = 1 ! jour de l'ann\'ee de l'\'etat initial
@@ -27,7 +30,7 @@ contains
   SUBROUTINE dynetat0_chosen(ncid_start)
 
     ! This procedure reads the initial state of the atmosphere. Values
-    ! that were chosen in ce0l.
+    ! that were chosen by the user, not computed, in program ce0l.
 
     ! Libraries:
     use jumble, only: assert

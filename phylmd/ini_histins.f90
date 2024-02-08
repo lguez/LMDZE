@@ -9,6 +9,7 @@ contains
   subroutine ini_histins
 
     ! From phylmd/ini_histins.h, version 1.2, 2005/05/25 13:10:09
+    ! Initialisation des sorties
 
     ! Libraries:
     use jumble, only: pi
