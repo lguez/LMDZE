@@ -62,10 +62,10 @@ contains
     WHERE (pctsrf(:, is_lic) < EPSFRA) pctsrf(:, is_lic) = 0.
 
     ! Ad\'equation avec le masque continent :
-    WHERE (masque < EPSFRA) pctsrf(:, is_lic) = 0.
-    where (masque < EPSFRA) pctsrf(:, is_ter) = masque
-
-    where (masque >= EPSFRA)
+    WHERE (masque < EPSFRA)
+       pctsrf(:, is_lic) = 0.
+       pctsrf(:, is_ter) = masque
+    elsewhere
        where (pctsrf(:, is_lic) >= masque)
           pctsrf(:, is_lic) = masque
           pctsrf(:, is_ter) = 0.
