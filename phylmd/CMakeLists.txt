@@ -6,7 +6,7 @@ target_sources(LMDZE_objects PRIVATE aaam_bud.f90 ajsec.f90 chem.f90
   initrrnpb.f90 minmaxqfi.f90 newmicro.f90 nflxtr.f90 orbite.f90
   ozonecm.f90 phyetat0.f90 phyredem0.f90 phyredem.f90 physiq.f90
   phytrac.f90 radepsi.f90 radiornpb.f90 suphec.f90 time_phylmdz.f90
-  transp.f90 yoethf.f90 YOMCST.f90 zenang.f90)
+  transp.f90 yoethf.f90 YOMCST.f90 zenang.f90 init_iophy.f90)
 
 foreach(my_dir IN ITEMS Mobidic Thermcell Orography Radlwsw CV30_routines Conflx
     Interface_surf)

@@ -4,9 +4,10 @@ program test_soil
   use mpi_f08, only: mpi_init, mpi_finalize, mpi_comm_size, mpi_comm_world, &
        mpi_abort
   use xios, only: xios_initialize, xios_finalize, xios_context_initialize, &
-       xios_context_finalize, xios_close_context_definition
+       xios_context_finalize, xios_close_context_definition, xios_duration, &
+       xios_set_timestep, xios_define_calendar
 
-  use conf_gcm_m, only: conf_gcm
+  use conf_gcm_m, only: conf_gcm, dtphys
   USE dimsoil, only: nsoilmx
   USE indicesol, only: is_ter
   use soil_m, only: soil
@@ -24,6 +25,7 @@ program test_soil
   ! surface diffusive flux from ground (W m-2)
 
   integer unit, i, n_proc, return_comm
+  TYPE(xios_duration) dtime
 
   !----------------------------------------------------------------
 
@@ -36,6 +38,9 @@ program test_soil
   call set_unit_nml
   open(unit_nml, file="used_namelists.txt", status="replace", action="write")
   CALL conf_gcm
+  CALL xios_define_calendar(type = "D360")
+  dtime%second = dtphys
+  call xios_set_timestep(dtime)
   call xios_close_context_definition
   tsoil = 270.
   call soil(is_ter, [0.], [288.], tsoil, soilcap, soilflux)

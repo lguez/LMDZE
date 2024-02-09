@@ -46,14 +46,11 @@ contains
     ! Auteurs : L. Fairhead, P. Le Van
 
     use jumble, only: assert
-    use xios, only: xios_duration, xios_set_timestep, xios_define_calendar
 
     use abort_gcm_m, only: abort_gcm
     use comconst, only: daysec
     use dimensions, only: iim, jjm
     use unit_nml_m, only: unit_nml
-
-    TYPE(xios_duration) dtime
 
     ! Local:
     namelist /conf_gcm_nml/ raz_date, nday, day_step, iperiod, iapp_tracvl, &
@@ -90,9 +87,6 @@ contains
     dtphys  = iphysiq * dtvr
     print *, 'dtvr = ', dtvr
     print *, 'dtphys = ', dtphys
-    CALL xios_define_calendar(type = "D360")
-    dtime%second = dtphys
-    call xios_set_timestep(dtime)
 
   END SUBROUTINE conf_gcm
 

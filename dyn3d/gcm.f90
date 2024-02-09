@@ -14,8 +14,7 @@ PROGRAM gcm
   use netcdf, only: NF90_NOWRITE
   use netcdf95, only: nf95_close, nf95_open
   use xios, only: xios_initialize, xios_finalize, xios_context_initialize, &
-       xios_context_finalize, xios_close_context_definition, &
-       xios_set_time_origin, xios_date, xios_set_start_date
+       xios_context_finalize
 
   use caldyn0_m, only: read_caldyn0
   use comdissnew, only: read_comdissnew
@@ -26,7 +25,7 @@ PROGRAM gcm
   use dimphy, only: init_dimphy
   USE disvert_m, ONLY : disvert
   use dynetat0_m, only: dynetat0, day_ini
-  use dynetat0_chosen_m, only: dynetat0_chosen, annee_ref, day_ref
+  use dynetat0_chosen_m, only: dynetat0_chosen
   use dynredem0_m, only: dynredem0
   use grid_change, only: init_dyn_phy
   use grid_noro_m, only: read_phis
@@ -36,6 +35,7 @@ PROGRAM gcm
   use inifilr_m, only: inifilr
   use inithist_m, only: inithist
   use init_dynzon_m, only: init_dynzon
+  use init_iophy_m, only: init_iophy
   USE ioconf_calendar_m, only: ioconf_calendar
   use leapfrog_m, only: leapfrog
   use paramet_m, only: paramet
@@ -85,9 +85,7 @@ PROGRAM gcm
   call nf95_open("start.nc", NF90_NOWRITE, ncid_start) ! fichier \'etat initial
   CALL dynetat0_chosen(ncid_start)
   CALL dynetat0(vcov, ucov, teta, q, masse, ps, ncid_start)
-  call xios_set_time_origin(xios_date(annee_ref, 1,day_ref, 0, 0, 0))
-  CALL xios_set_start_date(xios_date(annee_ref, 1, day_ini, 0, 0, 0))
-  call xios_close_context_definition
+  call init_iophy
   call read_phis(ncid_start)
   call read_caldyn0(ncid_start)
   call NF95_CLOSE(ncid_start)
