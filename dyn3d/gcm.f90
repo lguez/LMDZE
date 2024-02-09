@@ -85,11 +85,11 @@ PROGRAM gcm
   call nf95_open("start.nc", NF90_NOWRITE, ncid_start) ! fichier \'etat initial
   CALL dynetat0_chosen(ncid_start)
   CALL dynetat0(vcov, ucov, teta, q, masse, ps, ncid_start)
-  call init_iophy
   call read_phis(ncid_start)
   call read_caldyn0(ncid_start)
   call NF95_CLOSE(ncid_start)
   CALL disvert
+  call init_iophy
   CALL inigeom ! initialisation de la g\'eometrie
   CALL inifilr ! initialisation du filtre
   CALL inidissip
