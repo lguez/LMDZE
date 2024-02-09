@@ -9,9 +9,7 @@ contains
     ! Libraries:
     use jumble, only: rad_to_deg
     use xios, only: xios_set_axis_attr, xios_set_domain_attr, xios_duration, &
-         xios_set_timestep, xios_close_context_definition, &
-         xios_set_time_origin, xios_date, xios_set_start_date, &
-         xios_define_calendar
+         xios_close_context_definition, xios_date, xios_define_calendar
 
     use conf_gcm_m, only: dtphys
     use dimensions, only: iim, jjm, llm
@@ -24,11 +22,10 @@ contains
 
     !----------------------------------------------------------------------
 
-    CALL xios_define_calendar(type = "D360")
     dtime%second = dtphys
-    call xios_set_timestep(dtime)
-    call xios_set_time_origin(xios_date(annee_ref, 1,day_ref, 0, 0, 0))
-    CALL xios_set_start_date(xios_date(annee_ref, 1, day_ini, 0, 0, 0))
+    CALL xios_define_calendar(type = "D360", timestep = dtime, &
+         time_origin = xios_date(annee_ref, 1,day_ref, 0, 0, 0), &
+         start_date = xios_date(annee_ref, 1, day_ini, 0, 0, 0))
     CALL xios_set_domain_attr("dom_glo", type = "rectilinear", &
          ni_glo = iim, nj_glo = jjm + 1, &
          lonvalue_1d = dble(rlonv(:iim) * rad_to_deg), &
