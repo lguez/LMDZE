@@ -66,8 +66,6 @@ PROGRAM gcm
   call mpi_init
   call mpi_comm_size(mpi_comm_world, n_proc)
   if (n_proc /= 1) call mpi_abort(mpi_comm_world, errorcode = 1)
-  call xios_initialize("LMDZE", return_comm = return_comm)
-  CALL xios_context_initialize("LMDZE_context", return_comm)
   call set_unit_nml
   open(unit_nml, file="used_namelists.txt", status="replace", action="write")
   call set_dimensions
@@ -89,6 +87,8 @@ PROGRAM gcm
   call read_caldyn0(ncid_start)
   call NF95_CLOSE(ncid_start)
   CALL disvert
+  call xios_initialize("LMDZE", return_comm = return_comm)
+  CALL xios_context_initialize("LMDZE_context", return_comm)
   call init_iophy
   CALL inigeom ! initialisation de la g\'eometrie
   CALL inifilr ! initialisation du filtre
