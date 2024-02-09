@@ -11,12 +11,16 @@ contains
 
     ! Incrémenter le compteur de la physique
 
+    ! Libraries:
+    use xios, only: xios_update_calendar
+
     use phyetat0_m, only: itau_phy
 
     !--------------------------------------------------
 
     itap = itap + 1
     itau_w = itau_phy + itap
+    CALL xios_update_calendar(itap)
 
   end subroutine increment_itap
 

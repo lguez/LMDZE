@@ -44,6 +44,7 @@ contains
     USE hgardfou_m, ONLY: hgardfou
     USE histsync_m, ONLY: histsync
     USE histwrite_phy_m, ONLY: histwrite_phy
+    USE histwrite_phy_xios_m, ONLY: histwrite_phy_xios
     USE indicesol, ONLY: clnsurf, epsfra, nbsrf
     USE ini_histins_m, ONLY: ini_histins, nid_ins
     use lift_noro_m, only: lift_noro
@@ -862,6 +863,7 @@ contains
     CALL histwrite_phy("tro3", wo * dobson_u * 1e3 / zmasse / rmo3 * md)
     CALL histwrite_phy("rugs", zxrugs)
     CALL histwrite_phy("temp", t_seri)
+    CALL histwrite_phy_xios("temp", t_seri)
     CALL histwrite_phy("vitu", u_seri)
     CALL histwrite_phy("vitv", v_seri)
     CALL histwrite_phy("geop", zphi)

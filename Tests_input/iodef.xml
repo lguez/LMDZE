@@ -21,5 +21,16 @@
         <axis axis_ref = "presnivs"/>
       </grid>
     </grid_definition>
+
+    <field_definition>
+      <field id = "temp" operation = "instant" grid_ref = "grid_glo_presnivs"/>
+    </field_definition>
+
+    <file_definition>
+      <file id = "histins" name = "histins_xios" output_freq = "1ts"
+	    type = "one_file">
+	<field id = "temp"/>
+      </file>
+    </file_definition>
   </context>
 </simulation>
