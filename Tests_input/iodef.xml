@@ -7,5 +7,19 @@
   </context>
 
   <context id = "LMDZE_context">
+    <axis_definition>
+      <axis id = "presnivs" standard_name="Vertical levels" unit = "hPa"/>
+    </axis_definition>
+
+    <domain_definition>
+      <domain id = "dom_glo"  data_dim = "1"/>
+    </domain_definition>
+
+    <grid_definition>
+      <grid id = "grid_glo_presnivs">
+        <domain domain_ref = "dom_glo"/>
+        <axis axis_ref = "presnivs"/>
+      </grid>
+    </grid_definition>
   </context>
 </simulation>
