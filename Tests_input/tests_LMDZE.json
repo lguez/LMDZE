@@ -740,11 +740,7 @@
     },
     "Test_soil": {
         "input": "&logic_nml /\n&conf_gcm_nml /\n&soil_nml /\n",
-        "command": "$build_dir/phylmd/Interface_surf/test_soil",
-        "symlink": [
-            "$tests_input_dir/iodef.xml"
-        ],
-	"exclude_cmp": ["xios_client_0.out"]
+        "command": "$build_dir/phylmd/Interface_surf/test_soil"
     },
     "GCM_iconser": {
         "stdin_filename": "$tests_input_dir/Namelists/gcm_nml_iconser.txt",
