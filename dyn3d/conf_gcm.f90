@@ -55,6 +55,7 @@ contains
 
     TYPE(xios_duration) dtime
 
+    ! Local:
     namelist /conf_gcm_nml/ raz_date, nday, day_step, iperiod, iapp_tracvl, &
          iconser, periodav, iphysiq, ngroup
     namelist /logic_nml/ purmats, iflag_phys

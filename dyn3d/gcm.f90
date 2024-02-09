@@ -114,10 +114,10 @@ PROGRAM gcm
      call nf95_close(Ncid(i))
   end do
 
-  print *, 'Simulation finished'
-  print *, 'Everything is cool'
   CALL xios_context_finalize
   call xios_finalize
+  print *, 'Simulation finished'
+  print *, 'Everything is cool'
   call mpi_finalize
 
 END PROGRAM gcm
