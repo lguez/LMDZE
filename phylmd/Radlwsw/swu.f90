@@ -4,7 +4,7 @@ module swu_m
 
 contains
 
-  SUBROUTINE swu(psct, pcldsw, ppmb, ppsol, prmu0, pfrac, ptave, pwv, paki, &
+  SUBROUTINE swu(psct, pcldsw, ppmb, ppsol, prmu0, fract, ptave, pwv, paki, &
        pcld, pclear, pdsig, pfact, prmu, psec, pud)
 
     USE clesphys, only: rco2
@@ -21,7 +21,7 @@ contains
     DOUBLE PRECISION, intent(in):: ppmb(klon, llm + 1)
     DOUBLE PRECISION, intent(in):: ppsol(klon)
     DOUBLE PRECISION, intent(in):: prmu0(klon)
-    DOUBLE PRECISION, intent(in):: pfrac(klon)
+    DOUBLE PRECISION, intent(in):: fract(klon)
     DOUBLE PRECISION, intent(in):: ptave(klon, llm)
     DOUBLE PRECISION, intent(in):: pwv(klon, llm)
 
@@ -81,7 +81,7 @@ contains
        pud(jl, 3, llm + 1) = 0.
        pud(jl, 4, llm + 1) = 0.
        pud(jl, 5, llm + 1) = 0.
-       pfact(jl) = prmu0(jl) * pfrac(jl) * psct
+       pfact(jl) = prmu0(jl) * fract(jl) * psct
        prmu(jl) = sqrt(1224. * prmu0(jl) * prmu0(jl) + 1.) / 35.
        psec(jl) = 1. / prmu(jl)
        zc1j(jl, llm + 1) = 0.
