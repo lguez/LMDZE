@@ -27,5 +27,4 @@ for half_level_file in glob.glob("half_level_*.csv"):
         plt.text(x, i + 1, str(v), color="red")
 
 ##plt.show()
-plt.savefig("test_disvert.eps")
 plt.savefig("test_disvert.pdf")

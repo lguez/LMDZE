@@ -13,8 +13,8 @@ contains
     ! Author: Z. X. Li (LMD/CNRS)
     ! Date: 1996/07/19
 
-    ! Objet : interface entre le modèle et les rayonnements solaire et
-    ! infrarouge
+    ! Objet : interface entre le mod\`ele et les rayonnements solaire
+    ! et infrarouge
 
     USE clesphys, ONLY: solaire
     USE dimphy, ONLY: klev, klon
