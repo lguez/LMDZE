@@ -1,0 +1,126 @@
+digraph masque
+{
+	subgraph cluster_restartphy
+	{
+		color = red;
+		fontcolor = red;
+		node[color = red, fontcolor = red];
+		masque_restartphy[label = masque]
+		label = "restartphy.nc"
+	}
+
+	subgraph cluster_phyredem
+	{
+		label = "phyredem"
+		masque_phyredem[label = masque]
+	}
+
+	masque_phyredem -> masque_restartphy;
+	
+	subgraph cluster_phyetat0_m
+	{
+		label = "phyetat0_m";
+		masque_phyetat0_m[label = masque, color = green,
+				 fontcolor = green]
+
+		subgraph cluster_set_masque
+		{
+			label = "set_masque";
+			masque_set_masque[label = masque];
+			mask_set_masque[label = mask];
+			mask_set_masque -> masque_set_masque
+		}
+		
+		masque_set_masque -> masque_phyetat0_m
+	}
+	masque_phyetat0_m -> masque_phyredem;
+	
+	subgraph cluster_limit
+	{
+		label = "limit";
+		masque_limit[label = masque];
+		mask_limit[label = mask];
+		pctsrf_limit[label = pctsrf]
+	}
+	
+	masque_phyetat0_m -> masque_limit;
+
+	subgraph cluster_etat0
+	{
+		label = "etat0";
+		masque_etat0[label = masque];
+		pctsrf_etat0[label = pctsrf];
+		masque_etat0 -> pctsrf_etat0;
+		flic_tmp;
+		flic_tmp -> pctsrf_etat0;
+		landice_etat0[label = landice]
+	}
+
+	masque_phyetat0_m -> masque_etat0;
+	
+	subgraph cluster_start_init_orog
+	{
+	    label = "start_init_orog";
+	    relief
+	}
+
+	mask_grid_noro_m -> mask_set_masque;
+	mask_grid_noro_m -> mask_limit;
+	
+	subgraph cluster_grid_noro_m
+	{
+		label = "grid_noro_m";
+		mask_grid_noro_m[label = mask, color = green,
+				 fontcolor = green];
+		
+		subgraph cluster_grid_noro
+		{
+		    label = "grid_noro";
+		    mask_grid_noro[label = mask];
+		    relief_grid_noro[label = relief]
+		}
+		mask_grid_noro -> mask_grid_noro_m
+	}
+
+	relief -> relief_grid_noro;
+
+	subgraph cluster_Relief
+	{
+		color = red;
+		fontcolor = red;
+		node[color = red, fontcolor = red];
+		RELIEF
+		label = "Relief.nc"
+	}
+
+	RELIEF -> relief;
+
+	subgraph cluster_ce0l
+	{
+		label = "ce0l";
+		pctsrf_ce0l[label = pctsrf]
+	}
+
+	pctsrf_etat0 -> pctsrf_ce0l;
+	pctsrf_ce0l -> pctsrf_limit[dir = both];
+	
+	subgraph cluster_grille_m
+	{
+		label = "grille_m";
+		entree
+	}
+
+	entree -> flic_tmp;
+	landice_etat0 -> entree
+	
+	subgraph cluster_landiceref
+	{
+		color = red;
+		fontcolor = red;
+		node[color = red, fontcolor = red];
+		landice
+		label = "landiceref.nc"
+	}
+
+	landice -> landice_etat0
+}

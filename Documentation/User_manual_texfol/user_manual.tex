@@ -1,0 +1,303 @@
+%; whizzy subsubsection   
+\documentclass[a4paper,english,french]{article}
+
+\usepackage[utf8]{inputenc}
+
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{algorithmic}
+\usepackage{babel}
+\usepackage{color}
+\usepackage{graphicx}
+\usepackage{mathabx}
+\usepackage{mathrsfs}
+\usepackage{variations}
+\usepackage[all]{xy}
+\usepackage[np]{numprint}
+
+\usepackage{hyperref}
+
+\hypersetup{pdftitle={Installation et utilisation comme boîte noire},
+  pdfauthor={Lionel Guez}}
+
+\newcommand{\ud}{\mathrm{d}}
+\newcommand{\uD}{\mathrm{D}}
+
+\newcommand{\Eng}[1]{\textit{\foreignlanguage{english}{#1}}}
+\newcommand{\pseudov}[1]{\overset{\curvearrowbotright}{#1}}
+
+\DeclareMathOperator{\diverg}{div}
+\DeclareMathOperator{\tgh}{th}
+\DeclareMathOperator{\Arcsin}{Arcsin}
+
+\renewcommand{\algorithmicdo}{\textbf{faire}}
+\renewcommand{\algorithmicend}{\textbf{fin}}
+\renewcommand{\algorithmicfor}{\textbf{pour}}
+
+\graphicspath{{Graphiques/}}
+
+\author{Lionel GUEZ}
+\title{Manuel pour LMDZE -- Installation et utilisation comme boîte noire}
+
+\begin{document}
+
+\maketitle
+\tableofcontents
+
+\section{Divers}
+
+La résolution spatiale est définie par les variables IIM, JJM et LLM
+(dans \verb+dimensions_nml+).
+
+Cf. figure (\ref{fig:inout_LMDZE}).
+\begin{figure}[htbp]
+  \centering
+  \includegraphics{inout_LMDZE}
+  \caption{Fichiers d'entrée et de sortie.}
+  \label{fig:inout_LMDZE}
+\end{figure}
+Les fichiers \verb+ECDYN.nc+ et \verb+ECPHY.nc+ contiennent des
+données de la réanalyse ERA interim de l'ECMWF, pour un jour
+particulier, avec une résolution de $1^\circ$. Il peut être
+intéressant de refaire ces fichiers pour la date initiale choisie.
+
+Le fichier \verb+amipbc_sic_1x1.nc+ donne la fraction de la surface de
+la mer couverte par de la glace. Les fichiers \verb+amipbc_sic_1x1.nc+
+et \verb+amipbc_sst_1x1.nc+ viennent du projet
+\href{http://www-pcmdi.llnl.gov/projects/amip/AMIP2EXPDSN/BCS/bcsintro.php}{AMIP
+  II}.
+
+\verb+Rugos.nc+ contient la contribution saisonnière de la longueur de
+rugosité (excluant la contribution des variations de relief). Ces
+données viennent de la NASA. Le fichier a probablement été récupéré
+par Laurent Li, mais il ne se souvient rien de plus. \verb+Albedo.nc+
+contient probablement des données de Yann Polcher.
+
+Dans le fichier \verb+landiceref.nc+, la variable NetCDF
+\verb+landice+ prend des valeurs différentes de 0 et 1, entre
+\np{0,125} et \np{0,875}, en un petit nombre de points (163 points),
+sur des côtes. Cf. figure (\ref{fig:landiceref}).
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\textwidth]{landiceref}
+  \caption{Valeurs non nulles de landice dans \texttt{landiceref.nc},
+    près du pôle nord. Projection Lambert azimutale équivalente.}
+  \label{fig:landiceref}
+\end{figure}
+
+Cf. la \href{file://../namelists.ods}{liste des paramètres d'entrée}.
+Avant de lancer l'exécution de \verb+gcm+, il faut en particulier
+choisir \verb+nday+ (par exemple 1 ou 30). Je peux aussi modifier
+\verb+periodav+, qui contrôle la fréquence d'écriture dans le fichier
+\verb+dynzon.nc+.
+
+Phu Le Van conseille de diminuer à 3600 les valeurs de \verb+tetagdiv+
+et \verb+tetagrot+.
+
+\verb+grossismx+ et \verb+grossismy+ doivent être inférieurs à 4 pour
+que le modèle converge.
+
+La résolution horizontale standard est de 96 longitudes $\times$ 72
+latitudes. (Un avantage annexe est que la grille des latitudes tombe
+alors sur des valeurs rondes.) LMDZ ne converge plus lorsque la
+résolution devient trop fine. Cf. aussi la documentation officielle de
+LMDZ4 sur le
+\href{http://www.lmd.jussieu.fr/~lmdz/LMDZ4/choisir_une_resolution.html}{choix
+  d'une résolution horizontale}.
+
+Pour guider, il  faut interpoler à l'avance horizontalement sur la
+grille du modèle. Cf. script \verb+interp_from_era.sh+.
+
+Pour un traceur, il n'est pas obligatoire de choisir une condition à
+la surface, on peut éventuellement se contenter d'une distribution
+initiale et de transporter. Pour ajouter un traceur, ajouter une ligne
+dans traceur.def.
+
+Dans les fichiers d'historiques, la variable NetCDF bils contient la
+somme des variables NetCDF flat, sols, soll, sens. Tous ces flux sont
+positifs vers le bas.
+
+La variable NetCDF ve contient l'intégrale verticale sur toute la
+hauteur de l'atmosphère de la composante méridienne de la densité de
+flux d'advection d'énergie statique sèche. En notant $h_d$ l'énergie
+statique sèche par unité de masse :
+\begin{equation*}
+  h_d = c_{pd} T + \Phi
+\end{equation*}
+$\rho v h_d$ est la composante méridienne de la densité de flux
+d'advection d'énergie statique et on a :
+\begin{equation*}
+  \mathrm{"ve"} = \int v h_d \frac{\ud p}{g} = \int \rho v h_d\ \ud z
+\end{equation*}
+ve est calculé par la procédure transp. ve est un flux d'énergie dans
+la direction méridienne par unité de longueur dans la direction
+zonale. Le nom de la variable correspondante dans CMIP 6 est intvadse.
+\begin{equation*}
+  a \cos \phi \int \mathrm{"ve"} \ud \lambda
+  = \iint \rho h_d \mathbf{U} \cdot \pseudov{\ud^2 S}
+\end{equation*}
+est le flux d'advection d'énergie statique sèche à travers la latitude
+$\phi$ (ou encore à travers le cône de sommet le centre de la Terre,
+d'axe l'axe de rotation de la Terre, et de latitude $\phi$).
+\begin{equation*}
+  \mathrm{"vq"} = \int v q \rho\ \ud z
+\end{equation*}
+
+\section{Paramètres liés au pas de temps}
+
+Les paramètres à choisir au moment de l'exécution et liés au pas de
+temps sont \verb+day_step+, \verb+iphysiq+, \verb+iperiod+ et
+\verb+iconser+. Il faut en particulier penser à ajuster ces paramètres
+lorsque l'on a changé la résolution spatiale. Le principe de base est
+que le pas de temps doit être suffisamment petit pour que le modèle
+soit stable. Il doit être d'autant plus petit que la résolution
+spatiale horizontale est fine. Si les milieux de couches ne montent
+pas trop haut dans la stratosphère alors la résolution verticale n'a
+pas à être prise en compte. La référence est un pas de temps maximal
+de 6 mn environ pour une grille de 64 longitudes par 50 latitudes.
+Lorsqu'on multiplie par un même facteur le nombre de longitudes et de
+latitudes, on divise par ce facteur le pas de temps maximal.
+
+\verb+day_step+ est le nombre de pas de temps par jour. \verb+iphysiq+
+est le nombre de pas de temps entre deux appels de la physique.
+\verb+iperiod+ est le nombre de pas de temps entre deux pas Matsuno.
+\verb+iconser+ est le nombre de pas de temps entre deux écritures des
+variables de contrôle. Ces quatre paramètres doivent recevoir des
+valeurs entières. Apparemment, on laisse toujours \verb+iperiod+ à 5
+(quelle que soit la résolution).
+
+On a en outre la contrainte que \verb+day_step+ soit un multiple de
+\verb+iperiod+, c'est-à-dire normalement un multiple de 5.
+
+Enfin, on a la contrainte suivante sur \verb+iphysiq+. Dans fisrtilp,
+on trouve :
+\begin{verbatim}
+IF (abs(dtime / real(ninter) - 360.) > 0.001) THEN
+   PRINT *, "fisrtilp : ce n'est pas prévu, voir Z. X. Li", dtime
+   PRINT *, 'Je préfère un sous-intervalle de 6 minutes.'
+END IF
+\end{verbatim}
+Donc, comme \verb+ninter+ vaut 5, il faut que \verb+dtime+, le pas de
+temps de la physique, vaille 1800 s à 5.10$^{-3}$ s près. Notons $d$
+le pas de temps de la dynamique, en mn. Il faut donc que
+$\mathtt{iphysiq} \times d = 30$.
+
+En résumé, en notant $d_M$ le pas de temps maximal imposé par la
+résolution, nous avons le système de contraintes suivant :
+\begin{displaymath}
+  \left\{
+    \begin{array}{l}
+      \mathtt{iphysiq} \times d = 30 \\
+      d \le d_M \\
+      \mathtt{day\_step} \times d = 1440 \\
+      \mathtt{day\_step} \equiv 0[5]
+    \end{array}
+  \right.
+\end{displaymath}
+D'où :
+\begin{displaymath}
+  \left\{
+    \begin{array}{l}
+      \mathtt{iphysiq} \ge = 30 / d_M \\
+      48 \times \mathtt{iphysiq} \equiv 0[5]
+    \end{array}
+  \right.
+\end{displaymath}
+C'est-à-dire :
+\begin{displaymath}
+  \left\{
+    \begin{array}{l}
+      \mathtt{iphysiq} \ge = 30 / d_M \\
+      \mathtt{iphysiq} \equiv 0[5]
+    \end{array}
+  \right.
+\end{displaymath}
+On peut donc adopter l'algorithme suivant, pour un maillage sans zoom :
+\begin{verbatim}
+entrer(iim, jjm)
+n := ceiling(max(iim / 64., jjm / 50.))
+iphysiq := 5 * n
+day_step := 240 * n
+\end{verbatim}
+\begin{align*}
+  & \min_{|\phi| \le 60^\circ} (\cos \phi \Delta \lambda)
+  = \frac{\Delta \lambda}{2} = \frac{180^\circ}{\mathtt{iim}} \\
+  & \min \Delta \phi = \Delta \phi = \frac{180^\circ}{\mathtt{jjm}}
+\end{align*}
+Tant que jjm $\le$ iim et que le filtre commence à $60^\circ$, le pas de
+temps est déterminé par iim. Si iim = jjm alors $\delta x = \delta y$
+à $60^\circ$ de latitude.
+
+Pour un maillage avec zoom, la contrainte de stabilité est donnée par
+$\min \Delta \phi$ et :
+\begin{equation*}
+  \min_{|\phi| \le 60^\circ} (\cos \phi \Delta \lambda)
+  = \frac{\min \Delta \lambda}{2}
+\end{equation*}
+Il suffit donc de choisir le pas de temps adéquat pour un maillage sans
+zoom de résolution $\min \Delta \phi$ et $\min \Delta \lambda$. $\min
+\Delta \phi$ et $\min \Delta \lambda$ sont écrits sur la sortie
+standard.
+
+Si on guide alors on lit les champs de guidage quatre fois par jour
+(toutes les 6 h) et on guide tous les iperiod pas de temps. Non
+seulement 6 h doit tomber sur un pas de temps, c'est-à-dire que
+\verb+day_step+ doit être un multiple de 4 mais 6 h doit être un pas
+de temps où l'on guide, c'est-à-dire que \verb+day_step/4+ doit être
+un multiple de iperiod. La condition nécessaire et suffisante est donc
+que \verb+day_step+ soit un multiple de $4 \times$ iperiod.
+
+\section{Ressources nécessaires}
+
+Espace disque par utilisateur :
+\begin{itemize}
+\item fichiers sources LMDZE (sans NetCDF) 12 MiB ;
+\item fichiers objets, exécutables (sans NetCDF) (résolution
+  $16 \times 12 \times 11$) 38 MiB ;
+\item fichiers sortie \verb+ce0l+ 9 MiB ;
+\item fichiers sortie \verb+gcm+ (principalement \verb+histday.nc+) 26
+  MiB.
+\end{itemize}
+Par ailleurs, on peut centraliser :
+\begin{itemize}
+\item fichiers NetCDF entrée \verb+ce0l+ 40 MiB ;
+\item ensemble NetCDF (bibliothèque, utilitaires, manuels, modules,
+  etc.) 3 MiB.
+\end{itemize}
+
+Mémoire principale (résolution $32 \times 24 \times 9$) : 30 MiB.
+
+Durées. Temps de compilation avec \verb+g95 -O3+ : 5 mn. Temps
+d'exécution de \verb+gcm+ avec \verb+g95 -O3+ (résolution $32 \times
+24 \times 9$) : environ 10 mn par mois simulé.
+
+Il est possible d'économiser de la mémoire vive en changeant la valeur
+de kdlon dans \verb+phylmd/raddim.f90+.  Pour cela, consulter le
+tableau (\ref{tab:kdlon}), les
+\href{http://www.lmd.jussieu.fr/~lmdz/LMDZ4/choisir_une_resolution.html}{conseils}
+et le programme
+\href{file:///user/guez/Documents/Informatique_fonctionnement/Tests/LMDZ/choixdim.f}{\texttt{choixdim}}.
+\begin{table}[htbp]
+  \centering
+  \begin{tabular}{lll}
+    \texttt{iim} & \texttt{jjm} & \texttt{kdlon} \\
+    \hline
+    32 & 24 & 41 \\
+    48 & 32 & 149 \\
+    72 & 46 & 1621 \\
+    96 & 72 & 487 \\
+    160 & 98 & 78 \\
+    192 & 43 & 10
+  \end{tabular}
+  \caption{Choix de \texttt{kdlon} dans \texttt{phylmd/raddim.f90}.}
+  \label{tab:kdlon}
+\end{table}
+
+\end{document}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:
