@@ -111,7 +111,7 @@ contains
     DOUBLE PRECISION PTAU(klon, 2, klev)
     DOUBLE PRECISION POMEGA(klon, 2, klev)
     DOUBLE PRECISION PCG(klon, 2, klev)
-    DOUBLE PRECISION zfract(klon), zrmu0(klon)
+    DOUBLE PRECISION zrmu0(klon)
     DOUBLE PRECISION zheat(klon, klev), zcool(klon, klev)
     DOUBLE PRECISION zheat0(klon, klev), zcool0(klon, klev)
     DOUBLE PRECISION ztopsw(klon), ztoplw(klon)
@@ -137,7 +137,6 @@ contains
     PSCT = solaire / dist**2
 
     DO i = 1, klon
-       zfract(i) = fract(i)
        zrmu0(i) = mu0(i)
        PALBD(i, 1) = albedo(i)
        PALBD(i, 2) = albedo(i)
@@ -199,7 +198,7 @@ contains
     CALL LW(PPMB, PDP, PDT0, PEMIS, PTL, PTAVE, PWV, POZON, PAER, PCLDLD, &
          PCLDLU, PVIEW, zcool, zcool0, ztoplw, zsollw, ztoplw0, zsollw0, &
          zsollwdown, ZFLUP, ZFLDN, ZFLUP0, ZFLDN0)
-    CALL SW(PSCT, zrmu0, zfract, PPMB, PDP, PPSOL, PALBD, PALBP, PTAVE, &
+    CALL SW(PSCT, zrmu0, dble(fract), PPMB, PDP, PPSOL, PALBD, PALBP, PTAVE, &
          PWV, PQS, POZON, PCLDSW, PTAU, POMEGA, PCG, zheat, zheat0, ztopsw, &
          zsolsw, ztopsw0, zsolsw0, ZFSUP, ZFSDN, ZFSUP0, ZFSDN0, topswad, &
          solswad)
