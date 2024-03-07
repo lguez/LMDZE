@@ -135,9 +135,8 @@
             "$tests_input_dir/Namelists/traceur.def",
             "$tests_input_dir/iodef.xml"
         ],
-        "exclude_cmp": [
-            "xios_client_0.out"
-        ]
+        "sel_diff_args":
+	{"exclude": ["xios_client_0.out"]}
     },
     "GCM_Tiedke": {
         "command": "$build_dir/dyn3d/gcm",
@@ -156,7 +155,7 @@
             "$tests_input_dir/Namelists/traceur.def",
             "$tests_input_dir/iodef.xml"
         ],
-	"exclude_cmp": ["xios_client_0.out"]
+	"sel_diff_args": {"exclude": ["xios_client_0.out"]}
     },
     "GCM_nudging": {
         "stdin_filename": "$tests_input_dir/Namelists/gcm_nml_nudging.txt",
@@ -183,7 +182,7 @@
                 "v.nc"
             ]
         ],
-	"exclude_cmp": ["xios_client_0.out"]
+	"sel_diff_args": {"exclude": ["xios_client_0.out"]}
     },
     "GCM_ini_anal": {
         "stdin_filename": "$tests_input_dir/Namelists/gcm_nml_ini_anal.txt",
@@ -210,7 +209,7 @@
                 "v.nc"
             ]
         ],
-	"exclude_cmp": ["xios_client_0.out"]
+	"sel_diff_args": {"exclude": ["xios_client_0.out"]}
     },
     "GCM_nudging_Tq": {
         "symlink": [
@@ -245,7 +244,7 @@
         ],
         "command": "$build_dir/dyn3d/gcm",
         "stdin_filename": "$tests_input_dir/Namelists/gcm_nml_nudging_Tq.txt",
-	"exclude_cmp": ["xios_client_0.out"]
+	"sel_diff_args": {"exclude": ["xios_client_0.out"]}
     },
     "GCM_zoom_control": {
         "command": "$build_dir/dyn3d/gcm",
@@ -264,7 +263,7 @@
             "$tests_input_dir/Namelists/traceur.def",
             "$tests_input_dir/iodef.xml"
         ],
-	"exclude_cmp": ["xios_client_0.out"]
+	"sel_diff_args": {"exclude": ["xios_client_0.out"]}
 
     },
     "GCM_zoom_Tiedke": {
@@ -284,7 +283,7 @@
         ],
         "command": "$build_dir/dyn3d/gcm",
         "stdin_filename": "$tests_input_dir/Namelists/gcm_nml_Tiedke.txt",
-	"exclude_cmp": ["xios_client_0.out"]
+	"sel_diff_args": {"exclude": ["xios_client_0.out"]}
 
     },
     "GCM_control_day_2": {
@@ -304,7 +303,7 @@
             "$tests_input_dir/Namelists/traceur.def",
             "$tests_input_dir/iodef.xml"
         ],
-	"exclude_cmp": ["xios_client_0.out"]
+	"sel_diff_args": {"exclude": ["xios_client_0.out"]}
 
     },
     "GCM_control_2_days": {
@@ -324,7 +323,7 @@
             "$tests_input_dir/Namelists/traceur.def",
             "$tests_input_dir/iodef.xml"
         ],
-	"exclude_cmp": ["xios_client_0.out"]
+	"sel_diff_args": {"exclude": ["xios_client_0.out"]}
 
     },
     "GCM_Tiedke_day_2": {
@@ -344,7 +343,7 @@
             "$tests_input_dir/Namelists/traceur.def",
             "$tests_input_dir/iodef.xml"
         ],
-	"exclude_cmp": ["xios_client_0.out"]
+	"sel_diff_args": {"exclude": ["xios_client_0.out"]}
 
     },
     "GCM_nudging_day_2": {
@@ -372,7 +371,7 @@
                 "v.nc"
             ]
         ],
-	"exclude_cmp": ["xios_client_0.out"]
+	"sel_diff_args": {"exclude": ["xios_client_0.out"]}
 
     },
     "GCM_nudging_Tq_day_2": {
@@ -408,7 +407,7 @@
         ],
         "stdin_filename": "$tests_input_dir/Namelists/gcm_nml_nudging_Tq.txt",
         "command": "$build_dir/dyn3d/gcm",
-	"exclude_cmp": ["xios_client_0.out"]
+	"sel_diff_args": {"exclude": ["xios_client_0.out"]}
 
     },
     "GCM_zoom_control_day_2": {
@@ -428,7 +427,7 @@
         ],
         "command": "$build_dir/dyn3d/gcm",
         "stdin_filename": "$tests_input_dir/Namelists/gcm_nml_control.txt",
-	"exclude_cmp": ["xios_client_0.out"]
+	"sel_diff_args": {"exclude": ["xios_client_0.out"]}
 
     },
     "GCM_zoom_Tiedke_day_2": {
@@ -448,7 +447,7 @@
             "$tests_input_dir/Namelists/traceur.def",
             "$tests_input_dir/iodef.xml"
         ],
-	"exclude_cmp": ["xios_client_0.out"]
+	"sel_diff_args": {"exclude": ["xios_client_0.out"]}
 
     },
     "GCM_zoom_nudging": {
@@ -476,7 +475,7 @@
                 "v.nc"
             ]
         ],
-	"exclude_cmp": ["xios_client_0.out"]
+	"sel_diff_args": {"exclude": ["xios_client_0.out"]}
 
     },
     "GCM_zoom_ini_anal": {
@@ -504,7 +503,7 @@
                 "v.nc"
             ]
         ],
-	"exclude_cmp": ["xios_client_0.out"]
+	"sel_diff_args": {"exclude": ["xios_client_0.out"]}
 
     },
     "GCM_no_phys": {
@@ -518,7 +517,7 @@
         ],
         "command": "$build_dir/dyn3d/gcm",
         "stdin_filename": "$tests_input_dir/Namelists/gcm_nml_no_phys.txt",
-	"exclude_cmp": ["xios_client_0.out"]
+	"sel_diff_args": {"exclude": ["xios_client_0.out"]}
 
     },
     "GCM_pbl_6": {
@@ -538,7 +537,7 @@
             "$tests_input_dir/Namelists/traceur.def",
             "$tests_input_dir/iodef.xml"
         ],
-	"exclude_cmp": ["xios_client_0.out"]
+	"sel_diff_args": {"exclude": ["xios_client_0.out"]}
 
     },
     "GCM_pbl_8": {
@@ -558,7 +557,7 @@
             "$tests_input_dir/Namelists/traceur.def",
             "$tests_input_dir/iodef.xml"
         ],
-	"exclude_cmp": ["xios_client_0.out"]
+	"sel_diff_args": {"exclude": ["xios_client_0.out"]}
 
     },
     "GCM_pbl_9": {
@@ -578,7 +577,7 @@
             "$tests_input_dir/Namelists/traceur.def",
             "$tests_input_dir/iodef.xml"
         ],
-	"exclude_cmp": ["xios_client_0.out"]
+	"sel_diff_args": {"exclude": ["xios_client_0.out"]}
 
     },
     "GCM_pbl_0": {
@@ -598,7 +597,7 @@
             "$tests_input_dir/Namelists/traceur.def",
             "$tests_input_dir/iodef.xml"
         ],
-	"exclude_cmp": ["xios_client_0.out"]
+	"sel_diff_args": {"exclude": ["xios_client_0.out"]}
 
     },
     "No_kzmin": {
@@ -619,7 +618,7 @@
             "$tests_input_dir/iodef.xml"
         ],
         "description": "ok_kzmin = f",
-	"exclude_cmp": ["xios_client_0.out"]
+	"sel_diff_args": {"exclude": ["xios_client_0.out"]}
 
     },
     "Test_inter_barxy": {
@@ -735,7 +734,7 @@
             "$tests_input_dir/Namelists/traceur.def",
             "$tests_input_dir/iodef.xml"
         ],
-	"exclude_cmp": ["xios_client_0.out"]
+	"sel_diff_args": {"exclude": ["xios_client_0.out"]}
 
     },
     "Test_soil": {
@@ -759,7 +758,7 @@
             "$tests_input_dir/Namelists/traceur.def",
             "$tests_input_dir/iodef.xml"
         ],
-	"exclude_cmp": ["xios_client_0.out"]
+	"sel_diff_args": {"exclude": ["xios_client_0.out"]}
 
     }
 }
