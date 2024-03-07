@@ -130,9 +130,8 @@ contains
        ENDDO
 
        ! clear-sky:
-       CALL SWU(PSCT, ZCLDSW0, PPMB, PPSOL, &
-            PRMU0, FRACT, PTAVE, PWV, &
-            ZAKI, ZCLD, ZCLEAR, ZDSIG, ZFACT, ZRMU, ZSEC, ZUD)
+       CALL SWU(PSCT, ZCLDSW0, PPMB, PPSOL, PRMU0, FRACT, PTAVE, PWV, ZAKI, &
+            ZCLD, ZCLEAR, ZDSIG, ZFACT, ZRMU, ZSEC, ZUD)
        INU = 1
        CALL SW1S(INU, PALBD, PALBP, PCG, ZCLD, ZCLEAR, ZDSIG, POMEGA, ZOZ, &
             ZRMU, ZSEC, PTAU, ZUD, ZFD, ZFU)

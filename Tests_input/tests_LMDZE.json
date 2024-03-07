@@ -4,11 +4,13 @@
         "command": "$build_dir/dyn3d/test_fxhyp"
     },
     "Test_fxhyp_2": {
-        "input": "&dimensions_nml /\n&SERRE_NML CLON_DEG=  20./\n&dynetat0_nml /\n",
+        "input":
+	"&dimensions_nml /\n&SERRE_NML CLON_DEG=  20./\n&dynetat0_nml /\n",
         "command": "$build_dir/dyn3d/test_fxhyp"
     },
     "Test_fxhyp_3": {
-        "input": "&dimensions_nml /\n&SERRE_NML GROSSISMX=  2./\n&dynetat0_nml /\n",
+        "input":
+	"&dimensions_nml /\n&SERRE_NML GROSSISMX=  2./\n&dynetat0_nml /\n",
         "command": "$build_dir/dyn3d/test_fxhyp",
         "description": "GROSSISMX > 1"
     },
@@ -34,12 +36,14 @@
         "input": "&dimensions_nml /\n&SERRE_NML /\n&dynetat0_nml /\n"
     },
     "Test_inifilr_2": {
-        "input": "&dimensions_nml /\n&SERRE_NML CLON_DEG=  20./\n&dynetat0_nml /\n",
+        "input":
+	"&dimensions_nml /\n&SERRE_NML CLON_DEG=  20./\n&dynetat0_nml /\n",
         "command": "$build_dir/filtrez/test_inifilr"
     },
     "Test_inifilr_3": {
         "command": "$build_dir/filtrez/test_inifilr",
-        "input": "&dimensions_nml /\n&SERRE_NML GROSSISMX=  2./\n&dynetat0_nml /\n"
+        "input":
+	"&dimensions_nml /\n&SERRE_NML GROSSISMX=  2./\n&dynetat0_nml /\n"
     },
     "Test_inifilr_4": {
         "stdin_filename": "$tests_input_dir/Namelists/test_fxhyp_nml_4.txt",
@@ -58,7 +62,8 @@
         "stdin_filename": "$tests_input_dir/Namelists/test_fxhyp_nml_7.txt"
     },
     "Test_inifilr_8": {
-        "input": "&dimensions_nml /\n&SERRE_NML GROSSISMy = 2./\n&dynetat0_nml /\n",
+        "input":
+	"&dimensions_nml /\n&SERRE_NML GROSSISMy = 2./\n&dynetat0_nml /\n",
         "command": "$build_dir/filtrez/test_inifilr",
         "description": "for colat0 < 0.5"
     },
@@ -155,7 +160,8 @@
             "$tests_input_dir/Namelists/traceur.def",
             "$tests_input_dir/iodef.xml"
         ],
-	"sel_diff_args": {"exclude": ["xios_client_0.out"], "ign_att": ["uuid", "timeStamp"]}
+	"sel_diff_args":
+	{"exclude": ["xios_client_0.out"], "ign_att": ["uuid", "timeStamp"]}
     },
     "GCM_nudging": {
         "stdin_filename": "$tests_input_dir/Namelists/gcm_nml_nudging.txt",
@@ -182,7 +188,8 @@
                 "v.nc"
             ]
         ],
-	"sel_diff_args": {"exclude": ["xios_client_0.out"], "ign_att": ["uuid", "timeStamp"]}
+	"sel_diff_args":
+	{"exclude": ["xios_client_0.out"], "ign_att": ["uuid", "timeStamp"]}
     },
     "GCM_ini_anal": {
         "stdin_filename": "$tests_input_dir/Namelists/gcm_nml_ini_anal.txt",
@@ -209,7 +216,8 @@
                 "v.nc"
             ]
         ],
-	"sel_diff_args": {"exclude": ["xios_client_0.out"], "ign_att": ["uuid", "timeStamp"]}
+	"sel_diff_args":
+	{"exclude": ["xios_client_0.out"], "ign_att": ["uuid", "timeStamp"]}
     },
     "GCM_nudging_Tq": {
         "symlink": [
@@ -244,7 +252,8 @@
         ],
         "command": "$build_dir/dyn3d/gcm",
         "stdin_filename": "$tests_input_dir/Namelists/gcm_nml_nudging_Tq.txt",
-	"sel_diff_args": {"exclude": ["xios_client_0.out"], "ign_att": ["uuid", "timeStamp"]}
+	"sel_diff_args":
+	{"exclude": ["xios_client_0.out"], "ign_att": ["uuid", "timeStamp"]}
     },
     "GCM_zoom_control": {
         "command": "$build_dir/dyn3d/gcm",
@@ -263,7 +272,8 @@
             "$tests_input_dir/Namelists/traceur.def",
             "$tests_input_dir/iodef.xml"
         ],
-	"sel_diff_args": {"exclude": ["xios_client_0.out"], "ign_att": ["uuid", "timeStamp"]}
+	"sel_diff_args":
+	{"exclude": ["xios_client_0.out"], "ign_att": ["uuid", "timeStamp"]}
 
     },
     "GCM_zoom_Tiedke": {
@@ -283,7 +293,8 @@
         ],
         "command": "$build_dir/dyn3d/gcm",
         "stdin_filename": "$tests_input_dir/Namelists/gcm_nml_Tiedke.txt",
-	"sel_diff_args": {"exclude": ["xios_client_0.out"], "ign_att": ["uuid", "timeStamp"]}
+	"sel_diff_args":
+	{"exclude": ["xios_client_0.out"], "ign_att": ["uuid", "timeStamp"]}
 
     },
     "GCM_control_day_2": {
@@ -303,7 +314,8 @@
             "$tests_input_dir/Namelists/traceur.def",
             "$tests_input_dir/iodef.xml"
         ],
-	"sel_diff_args": {"exclude": ["xios_client_0.out"], "ign_att": ["uuid", "timeStamp"]}
+	"sel_diff_args":
+	{"exclude": ["xios_client_0.out"], "ign_att": ["uuid", "timeStamp"]}
 
     },
     "GCM_control_2_days": {
@@ -323,7 +335,8 @@
             "$tests_input_dir/Namelists/traceur.def",
             "$tests_input_dir/iodef.xml"
         ],
-	"sel_diff_args": {"exclude": ["xios_client_0.out"], "ign_att": ["uuid", "timeStamp"]}
+	"sel_diff_args":
+	{"exclude": ["xios_client_0.out"], "ign_att": ["uuid", "timeStamp"]}
 
     },
     "GCM_Tiedke_day_2": {
@@ -343,7 +356,8 @@
             "$tests_input_dir/Namelists/traceur.def",
             "$tests_input_dir/iodef.xml"
         ],
-	"sel_diff_args": {"exclude": ["xios_client_0.out"], "ign_att": ["uuid", "timeStamp"]}
+	"sel_diff_args":
+	{"exclude": ["xios_client_0.out"], "ign_att": ["uuid", "timeStamp"]}
 
     },
     "GCM_nudging_day_2": {
@@ -371,7 +385,8 @@
                 "v.nc"
             ]
         ],
-	"sel_diff_args": {"exclude": ["xios_client_0.out"], "ign_att": ["uuid", "timeStamp"]}
+	"sel_diff_args":
+	{"exclude": ["xios_client_0.out"], "ign_att": ["uuid", "timeStamp"]}
 
     },
     "GCM_nudging_Tq_day_2": {
@@ -407,7 +422,8 @@
         ],
         "stdin_filename": "$tests_input_dir/Namelists/gcm_nml_nudging_Tq.txt",
         "command": "$build_dir/dyn3d/gcm",
-	"sel_diff_args": {"exclude": ["xios_client_0.out"], "ign_att": ["uuid", "timeStamp"]}
+	"sel_diff_args":
+	{"exclude": ["xios_client_0.out"], "ign_att": ["uuid", "timeStamp"]}
 
     },
     "GCM_zoom_control_day_2": {
@@ -427,7 +443,8 @@
         ],
         "command": "$build_dir/dyn3d/gcm",
         "stdin_filename": "$tests_input_dir/Namelists/gcm_nml_control.txt",
-	"sel_diff_args": {"exclude": ["xios_client_0.out"], "ign_att": ["uuid", "timeStamp"]}
+	"sel_diff_args":
+	{"exclude": ["xios_client_0.out"], "ign_att": ["uuid", "timeStamp"]}
 
     },
     "GCM_zoom_Tiedke_day_2": {
@@ -447,7 +464,8 @@
             "$tests_input_dir/Namelists/traceur.def",
             "$tests_input_dir/iodef.xml"
         ],
-	"sel_diff_args": {"exclude": ["xios_client_0.out"], "ign_att": ["uuid", "timeStamp"]}
+	"sel_diff_args":
+	{"exclude": ["xios_client_0.out"], "ign_att": ["uuid", "timeStamp"]}
 
     },
     "GCM_zoom_nudging": {
@@ -475,7 +493,8 @@
                 "v.nc"
             ]
         ],
-	"sel_diff_args": {"exclude": ["xios_client_0.out"], "ign_att": ["uuid", "timeStamp"]}
+	"sel_diff_args":
+	{"exclude": ["xios_client_0.out"], "ign_att": ["uuid", "timeStamp"]}
 
     },
     "GCM_zoom_ini_anal": {
@@ -503,7 +522,8 @@
                 "v.nc"
             ]
         ],
-	"sel_diff_args": {"exclude": ["xios_client_0.out"], "ign_att": ["uuid", "timeStamp"]}
+	"sel_diff_args":
+	{"exclude": ["xios_client_0.out"], "ign_att": ["uuid", "timeStamp"]}
 
     },
     "GCM_no_phys": {
@@ -517,7 +537,8 @@
         ],
         "command": "$build_dir/dyn3d/gcm",
         "stdin_filename": "$tests_input_dir/Namelists/gcm_nml_no_phys.txt",
-	"sel_diff_args": {"exclude": ["xios_client_0.out"], "ign_att": ["uuid", "timeStamp"]}
+	"sel_diff_args":
+	{"exclude": ["xios_client_0.out"], "ign_att": ["uuid", "timeStamp"]}
 
     },
     "GCM_pbl_6": {
@@ -537,7 +558,8 @@
             "$tests_input_dir/Namelists/traceur.def",
             "$tests_input_dir/iodef.xml"
         ],
-	"sel_diff_args": {"exclude": ["xios_client_0.out"], "ign_att": ["uuid", "timeStamp"]}
+	"sel_diff_args":
+	{"exclude": ["xios_client_0.out"], "ign_att": ["uuid", "timeStamp"]}
 
     },
     "GCM_pbl_8": {
@@ -557,7 +579,8 @@
             "$tests_input_dir/Namelists/traceur.def",
             "$tests_input_dir/iodef.xml"
         ],
-	"sel_diff_args": {"exclude": ["xios_client_0.out"], "ign_att": ["uuid", "timeStamp"]}
+	"sel_diff_args":
+	{"exclude": ["xios_client_0.out"], "ign_att": ["uuid", "timeStamp"]}
 
     },
     "GCM_pbl_9": {
@@ -577,7 +600,8 @@
             "$tests_input_dir/Namelists/traceur.def",
             "$tests_input_dir/iodef.xml"
         ],
-	"sel_diff_args": {"exclude": ["xios_client_0.out"], "ign_att": ["uuid", "timeStamp"]}
+	"sel_diff_args":
+	{"exclude": ["xios_client_0.out"], "ign_att": ["uuid", "timeStamp"]}
 
     },
     "GCM_pbl_0": {
@@ -597,7 +621,8 @@
             "$tests_input_dir/Namelists/traceur.def",
             "$tests_input_dir/iodef.xml"
         ],
-	"sel_diff_args": {"exclude": ["xios_client_0.out"], "ign_att": ["uuid", "timeStamp"]}
+	"sel_diff_args":
+	{"exclude": ["xios_client_0.out"], "ign_att": ["uuid", "timeStamp"]}
 
     },
     "No_kzmin": {
@@ -618,7 +643,8 @@
             "$tests_input_dir/iodef.xml"
         ],
         "description": "ok_kzmin = f",
-	"sel_diff_args": {"exclude": ["xios_client_0.out"], "ign_att": ["uuid", "timeStamp"]}
+	"sel_diff_args":
+	{"exclude": ["xios_client_0.out"], "ign_att": ["uuid", "timeStamp"]}
 
     },
     "Test_inter_barxy": {
@@ -734,7 +760,8 @@
             "$tests_input_dir/Namelists/traceur.def",
             "$tests_input_dir/iodef.xml"
         ],
-	"sel_diff_args": {"exclude": ["xios_client_0.out"], "ign_att": ["uuid", "timeStamp"]}
+	"sel_diff_args":
+	{"exclude": ["xios_client_0.out"], "ign_att": ["uuid", "timeStamp"]}
 
     },
     "Test_soil": {
@@ -758,7 +785,8 @@
             "$tests_input_dir/Namelists/traceur.def",
             "$tests_input_dir/iodef.xml"
         ],
-	"sel_diff_args": {"exclude": ["xios_client_0.out"], "ign_att": ["uuid", "timeStamp"]}
+	"sel_diff_args":
+	{"exclude": ["xios_client_0.out"], "ign_att": ["uuid", "timeStamp"]}
 
     }
 }
