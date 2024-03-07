@@ -128,7 +128,7 @@ contains
     DOUBLE PRECISION zznormcp
 
     ! The following quantities are needed for the aerosol radiative forcings:
-    DOUBLE PRECISION ztopswad(klon), zsolswad(klon)
+    DOUBLE PRECISION topswad(klon), solswad(klon)
     ! Aerosol direct forcing at TOA and surface
 
     real, parameter:: dobson_u = 2.1415e-05 ! Dobson unit, in kg m-2
@@ -206,8 +206,8 @@ contains
          zsollwdown, ZFLUP, ZFLDN, ZFLUP0, ZFLDN0)
     CALL SW(PSCT, zrmu0, zfract, PPMB, PDP, PPSOL, PALBD, PALBP, PTAVE, &
          PWV, PQS, POZON, PCLDSW, PTAU, POMEGA, PCG, zheat, zheat0, ztopsw, &
-         zsolsw, ztopsw0, zsolsw0, ZFSUP, ZFSDN, ZFSUP0, ZFSDN0, ztopswad, &
-         zsolswad)
+         zsolsw, ztopsw0, zsolsw0, ZFSUP, ZFSDN, ZFSUP0, ZFSDN0, topswad, &
+         solswad)
 
     DO i = 1, klon
        radsol(i) = zsolsw(i) + zsollw(i)
