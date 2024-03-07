@@ -90,16 +90,13 @@ contains
     DOUBLE PRECISION ZFSDN(KLON, KLEV + 1)
     DOUBLE PRECISION ZFSUP0(KLON, KLEV + 1)
     DOUBLE PRECISION ZFSDN0(KLON, KLEV + 1)
-
     DOUBLE PRECISION ZFLUP(KLON, KLEV + 1)
     DOUBLE PRECISION ZFLDN(KLON, KLEV + 1)
     DOUBLE PRECISION ZFLUP0(KLON, KLEV + 1)
     DOUBLE PRECISION ZFLDN0(KLON, KLEV + 1)
-
     DOUBLE PRECISION zx_alpha1, zx_alpha2
     INTEGER k, kk, i
     DOUBLE PRECISION PSCT
-
     DOUBLE PRECISION PALBD(klon, 2), PALBP(klon, 2)
     DOUBLE PRECISION PEMIS(klon), PDT0(klon), PVIEW(klon)
     DOUBLE PRECISION PPSOL(klon), PDP(klon, klev)
@@ -114,9 +111,7 @@ contains
     DOUBLE PRECISION PTAU(klon, 2, klev)
     DOUBLE PRECISION POMEGA(klon, 2, klev)
     DOUBLE PRECISION PCG(klon, 2, klev)
-
     DOUBLE PRECISION zfract(klon), zrmu0(klon)
-
     DOUBLE PRECISION zheat(klon, klev), zcool(klon, klev)
     DOUBLE PRECISION zheat0(klon, klev), zcool0(klon, klev)
     DOUBLE PRECISION ztopsw(klon), ztoplw(klon)
