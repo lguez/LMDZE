@@ -85,10 +85,6 @@ contains
          [idim2, dimid_nbsrf], varid)
     call nf95_put_att(ncid_restartphy, varid, 'long_name', 'Neige de surface')
 
-    call nf95_def_var(ncid_restartphy, 'RADS', nf90_float, idim2, varid)
-    call nf95_put_att(ncid_restartphy, varid, 'long_name', &
-         'Rayonnement net a la surface')
-
     call nf95_def_var(ncid_restartphy, 'solsw', nf90_float, idim2, varid)
     call nf95_put_att(ncid_restartphy, varid, 'long_name', &
          'Rayonnement solaire a la surface')

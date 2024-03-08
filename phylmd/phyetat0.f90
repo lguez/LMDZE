@@ -13,9 +13,9 @@ module phyetat0_m
 contains
 
   SUBROUTINE phyetat0(pctsrf, ftsol, ftsoil, fqsurf, qsol, fsnow, albe, &
-       rain_fall, snow_fall, solsw, sollw, fder, radsol, frugs, agesno, zmea, &
-       zstd, zsig, zgam, zthe, zpic, zval, t_ancien, q_ancien, ancien_ok, &
-       rnebcon, ratqs, clwcon, run_off_lic_0, sig1, w01)
+       rain_fall, snow_fall, solsw, sollw, fder, frugs, agesno, zmea, zstd, &
+       zsig, zgam, zthe, zpic, zval, t_ancien, q_ancien, ancien_ok, rnebcon, &
+       ratqs, clwcon, run_off_lic_0, sig1, w01)
 
     ! From phylmd/phyetat0.F, version 1.4 2005/06/03 10:03:07
     ! Author: Z.X. Li (LMD/CNRS)
@@ -44,7 +44,6 @@ contains
     real, intent(out):: solsw(klon)
     REAL, intent(out):: sollw(klon)
     real, intent(out):: fder(klon)
-    REAL, intent(out):: radsol(klon)
     REAL, intent(out):: frugs(klon, nbsrf)
     REAL, intent(out):: agesno(klon, nbsrf)
     REAL, intent(out):: zmea(klon)
@@ -206,11 +205,6 @@ contains
     ELSE
        call nf95_get_var(ncid_startphy, varid, fder)
     ENDIF
-
-    ! Lecture du rayonnement net au sol:
-
-    call NF95_INQ_VARID(ncid_startphy, "RADS", varid)
-    call NF95_GET_VAR(ncid_startphy, varid, radsol)
 
     ! Lecture de la longueur de rugosite 
 

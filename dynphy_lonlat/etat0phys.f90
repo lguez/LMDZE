@@ -96,9 +96,9 @@ contains
     call nf95_put_var(ncid_restartphy, varid, null_array)
     call phyredem(pctsrf, ftsoil(:, 1, :), ftsoil, fqsurf, &
          pack(qsol_2d, dyn_phy), fsnow, falbe, null_array, null_array, solsw, &
-         sollw, null_array, null_array, frugs, agesno, zmea, zstd, zsig, zgam, &
-         zthe, zpic, zval, t_ancien, q_ancien, rnebcon, ratqs, clwcon, &
-         null_array, sig1, w01)
+         sollw, null_array, frugs, agesno, zmea, zstd, zsig, zgam, zthe, zpic, &
+         zval, t_ancien, q_ancien, rnebcon, ratqs, clwcon, null_array, sig1, &
+         w01)
 
   END SUBROUTINE etat0phys
 

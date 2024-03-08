@@ -5,9 +5,9 @@ module phyredem_m
 contains
 
   SUBROUTINE phyredem(pctsrf, ftsol, ftsoil, fqsurf, qsol, fsnow, falbe, &
-       rain_fall, snow_fall, solsw, sollw, fder, radsol, frugs, agesno, zmea, &
-       zstd, zsig, zgam, zthe, zpic, zval, t_ancien, q_ancien, rnebcon, &
-       ratqs, clwcon, run_off_lic_0, sig1, w01)
+       rain_fall, snow_fall, solsw, sollw, fder, frugs, agesno, zmea, zstd, &
+       zsig, zgam, zthe, zpic, zval, t_ancien, q_ancien, rnebcon, ratqs, &
+       clwcon, run_off_lic_0, sig1, w01)
 
     ! From phylmd/phyredem.F, version 1.3, 2005/05/25 13:10:09
     ! Author: Z. X. Li (LMD/CNRS)
@@ -37,7 +37,6 @@ contains
     REAL, INTENT(IN):: solsw(klon)
     REAL, INTENT(IN):: sollw(klon)
     REAL, INTENT(IN):: fder(klon)
-    REAL, INTENT(IN):: radsol(klon)
     REAL, INTENT(IN):: frugs(klon, nbsrf)
     REAL, INTENT(IN):: agesno(klon, nbsrf)
     REAL, INTENT(IN):: zmea(klon)
@@ -86,9 +85,6 @@ contains
 
     call nf95_inq_varid(ncid_restartphy, "fsnow", varid)
     call nf95_put_var(ncid_restartphy, varid, fsnow)
-
-    call nf95_inq_varid(ncid_restartphy, "RADS", varid)
-    call nf95_put_var(ncid_restartphy, varid, radsol)
 
     call nf95_inq_varid(ncid_restartphy, "solsw", varid)
     call nf95_put_var(ncid_restartphy, varid, solsw)

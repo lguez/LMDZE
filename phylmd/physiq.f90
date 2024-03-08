@@ -453,9 +453,9 @@ contains
             "iflag_cldcon <= - 1 implies Tiedke convection scheme")
        frugs = 0.
        CALL phyetat0(pctsrf, ftsol, ftsoil, fqsurf, qsol, fsnow, falbe, &
-            rain_fall, snow_fall, solsw, sollw, dlw, radsol, frugs, agesno, &
-            zmea, zstd, zsig, zgam, zthe, zpic, zval, t_seri, q_seri, &
-            ancien_ok, rnebcon, ratqs, clwcon, run_off_lic_0, sig1, w01)
+            rain_fall, snow_fall, solsw, sollw, dlw, frugs, agesno, zmea, &
+            zstd, zsig, zgam, zthe, zpic, zval, t_seri, q_seri, ancien_ok, &
+            rnebcon, ratqs, clwcon, run_off_lic_0, sig1, w01)
 
        radpas = lmt_pas / nbapp_rad
        print *, "radpas = ", radpas
@@ -904,8 +904,8 @@ contains
 
     IF (lafin) then
        CALL phyredem(pctsrf, ftsol, ftsoil, fqsurf, qsol, fsnow, falbe, &
-            rain_fall, snow_fall, solsw, sollw, dlw, radsol, frugs, agesno, &
-            zmea, zstd, zsig, zgam, zthe, zpic, zval, t_seri, q_seri, rnebcon, &
+            rain_fall, snow_fall, solsw, sollw, dlw, frugs, agesno, zmea, &
+            zstd, zsig, zgam, zthe, zpic, zval, t_seri, q_seri, rnebcon, &
             ratqs, clwcon, run_off_lic_0, sig1, w01)
     end IF
 
