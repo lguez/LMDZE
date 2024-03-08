@@ -274,7 +274,7 @@ contains
     REAL cldl(klon), cldm(klon), cldh(klon) ! nuages bas, moyen et haut
     REAL cldt(klon), cldq(klon) ! nuage total, eau liquide integree
 
-    REAL zxfluxlat(klon)
+    REAL flat(klon)
     REAL dist ! distance Terre-Soleil, en ua
     real mu0(klon), fract(klon)
     real longi
@@ -549,7 +549,7 @@ contains
     ENDDO
 
     call assert(abs(sum(pctsrf, dim = 2) - 1.) <= EPSFRA, 'physiq: pctsrf')
-    zxfluxlat = sum(fluxlat * pctsrf, dim = 2)
+    flat = sum(fluxlat * pctsrf, dim = 2)
     zt2m = sum(t2m * pctsrf, dim = 2)
     zq2m = sum(q2m * pctsrf, dim = 2)
     u10m = sum(u10m_srf * pctsrf, dim = 2)
@@ -856,7 +856,7 @@ contains
     CALL histwrite_phy("sols", solsw)
     CALL histwrite_phy("rls", sollw)
     CALL histwrite_phy("solldown", sollwdown)
-    CALL histwrite_phy("bils", radsol + sens + zxfluxlat)
+    CALL histwrite_phy("bils", radsol + sens + flat)
     CALL histwrite_phy("sens", sens)
     CALL histwrite_phy("zxfqcalving", sum(fqcalving * pctsrf, dim = 2))
     CALL histwrite_phy("albs", albsol)
@@ -877,7 +877,7 @@ contains
     call histwrite_phy("pmflxr", pmflxr(:, :llm))
     CALL histwrite_phy("msnow", sum(fsnow * pctsrf, dim = 2))
     call histwrite_phy("qsurf", sum(fqsurf * pctsrf, dim = 2))
-    call histwrite_phy("flat", zxfluxlat)
+    call histwrite_phy("flat", flat)
     call histwrite_phy("rld", lwdn)
     call histwrite_phy("rldcs", lwdn0)
     call histwrite_phy("ffonte", zxffonte)
