@@ -361,7 +361,6 @@ contains
                ycdragm(:knon), yt(:knon, :), yv(:knon, :), ypaprs(:knon, :), &
                ypplay(:knon, :), ydelp(:knon, :), y_d_v(:knon, :), &
                y_flux_v(:knon))
-
           CALL clqh(julien, nisrf, ni(:knon), ytsoil(:knon, :), yqsol(:knon), &
                mu0(ni(:knon)), yrugos(:knon), yrugoro(:knon), yu(:knon, 1), &
                yv(:knon, 1), ycoefh(:knon, :), ycdragh(:knon), yt(:knon, :), &

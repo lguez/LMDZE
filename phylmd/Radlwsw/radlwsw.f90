@@ -95,7 +95,7 @@ contains
     DOUBLE PRECISION ZFLUP0(KLON, KLEV + 1)
     DOUBLE PRECISION ZFLDN0(KLON, KLEV + 1)
     DOUBLE PRECISION zx_alpha1, zx_alpha2
-    INTEGER k, kk, i
+    INTEGER k, i
     DOUBLE PRECISION PSCT
     DOUBLE PRECISION PALBD(klon, 2), PALBP(klon, 2)
     DOUBLE PRECISION PEMIS(klon), PDT0(klon), PVIEW(klon)
@@ -187,14 +187,7 @@ contains
        ENDDO
     ENDDO
 
-    DO kk = 1, 5
-       DO k = 1, klev
-          DO i = 1, klon
-             PAER(i, k, kk) = 1E-15
-          ENDDO
-       ENDDO
-    ENDDO
-
+    PAER = 1E-15
     CALL LW(PPMB, PDP, PDT0, PEMIS, PTL, PTAVE, PWV, POZON, PAER, PCLDLD, &
          PCLDLU, PVIEW, zcool, zcool0, ztoplw, zsollw, ztoplw0, zsollw0, &
          zsollwdown, ZFLUP, ZFLDN, ZFLUP0, ZFLDN0)

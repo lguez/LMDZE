@@ -100,7 +100,7 @@ contains
             ZCNTRB(KLON, LLM+1, LLM+1))
        first_call = .false.
     end if
-    
+
     IF (MOD(itaplw0, lw0pas) == 0) THEN
        DO k = 1, LLM
           DO i = 1, KLON
