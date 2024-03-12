@@ -89,9 +89,7 @@ contains
     DOUBLE PRECISION ZSEC(KLON)
     DOUBLE PRECISION ZUD(KLON, 5, LLM+1)
     DOUBLE PRECISION ZCLDSW0(KLON, LLM)
-
     INTEGER inu, jl, jk, i, k, kpl1
-
     INTEGER, PARAMETER:: swpas = 1 ! Every swpas steps, sw is calculated
 
     INTEGER:: itapsw = 0
