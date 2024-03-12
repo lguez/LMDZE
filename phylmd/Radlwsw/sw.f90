@@ -96,22 +96,9 @@ contains
     LOGICAL:: appel1er = .TRUE.
     !jq-Introduced for aerosol forcings
 
-    !jq - Fluxes including aerosol effects
-    DOUBLE PRECISION, save, allocatable:: ZFSUPAD(:, :) ! (KLON, LLM+1)
-    DOUBLE PRECISION, save, allocatable:: ZFSDNAD(:, :) ! (KLON, LLM+1)
-
-    logical:: initialized = .false.
     REAL, PARAMETER :: dobson_u = 2.1415E-05 ! Dobson unit, in kg m-2
 
     !-------------------------------------------------------------------
-
-    if(.not.initialized) then
-       initialized=.TRUE.
-       allocate(ZFSUPAD(KLON, LLM+1), ZFSDNAD(KLON, LLM+1))
-       ZFSUPAD = 0.
-       ZFSDNAD = 0.
-    endif
-    !rv
 
     IF (appel1er) THEN
        PRINT*, 'SW calling frequency: ', swpas
@@ -183,8 +170,8 @@ contains
        PSOLSW0(i) = ZFSDN0(i, 1) - ZFSUP0(i, 1)
        PTOPSW0(i) = ZFSDN0(i, LLM+1) - ZFSUP0(i, LLM+1)
 
-       PSOLSWAD(i) = ZFSDNAD(i, 1) - ZFSUPAD(i, 1)
-       PTOPSWAD(i) = ZFSDNAD(i, LLM+1) - ZFSUPAD(i, LLM+1)
+       PSOLSWAD(i) = 0d0
+       PTOPSWAD(i) = 0d0
     ENDDO
 
   END SUBROUTINE SW
