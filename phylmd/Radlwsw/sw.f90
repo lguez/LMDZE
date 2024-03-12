@@ -93,18 +93,11 @@ contains
     INTEGER, PARAMETER:: swpas = 1 ! Every swpas steps, sw is calculated
 
     INTEGER:: itapsw = 0
-    LOGICAL:: appel1er = .TRUE.
     !jq-Introduced for aerosol forcings
 
     REAL, PARAMETER :: dobson_u = 2.1415E-05 ! Dobson unit, in kg m-2
 
     !-------------------------------------------------------------------
-
-    IF (appel1er) THEN
-       PRINT*, 'SW calling frequency: ', swpas
-       PRINT*, " In general, it should be 1"
-       appel1er = .FALSE.
-    ENDIF
 
     IF (MOD(itapsw, swpas) == 0) THEN
        DO JK = 1, LLM
