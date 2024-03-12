@@ -6,8 +6,7 @@ contains
 
   SUBROUTINE SW(PSCT, PRMU0, FRACT, PPMB, PDP, PPSOL, PALBD, PALBP, PTAVE, &
        PWV, PQS, POZON, PCLDSW, PTAU, POMEGA, PCG, PHEAT, PHEAT0, PTOPSW, &
-       PSOLSW, PTOPSW0, PSOLSW0, ZFSUP, ZFSDN, ZFSUP0, ZFSDN0, PTOPSWAD, &
-       PSOLSWAD)
+       PSOLSW, PTOPSW0, PSOLSW0, ZFSUP, ZFSDN, ZFSUP0, ZFSDN0)
 
     ! Purpose.
     ! This routine computes the shortwave radiation fluxes in two
@@ -66,12 +65,6 @@ contains
     DOUBLE PRECISION ZFSDN(KLON, LLM+1)
     DOUBLE PRECISION ZFSUP0(KLON, LLM+1)
     DOUBLE PRECISION ZFSDN0(KLON, LLM+1)
-
-    DOUBLE PRECISION, intent(out):: PTOPSWAD(KLON)
-    ! (diagnosed aerosol forcing)SHORTWAVE FLUX AT T.O.A.(+AEROSOL DIR)
-
-    DOUBLE PRECISION, intent(out):: PSOLSWAD(KLON)
-    ! (diagnosed aerosol forcing)SHORTWAVE FLUX AT SURFACE(+AEROSOL DIR)
 
     ! Local:
 
@@ -162,8 +155,6 @@ contains
        PTOPSW(i) = ZFSDN(i, LLM+1) - ZFSUP(i, LLM+1)
        PSOLSW0(i) = ZFSDN0(i, 1) - ZFSUP0(i, 1)
        PTOPSW0(i) = ZFSDN0(i, LLM+1) - ZFSUP0(i, LLM+1)
-       PSOLSWAD(i) = 0d0
-       PTOPSWAD(i) = 0d0
     ENDDO
 
   END SUBROUTINE SW
