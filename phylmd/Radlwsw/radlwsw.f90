@@ -147,11 +147,13 @@ contains
        PTL(i, klev + 1) = t_seri(i, klev)
        PDT0(i) = tsol(i) - PTL(i, 1)
     ENDDO
+
     DO k = 2, klev
        DO i = 1, klon
           PTL(i, k) = (t_seri(i, k) + t_seri(i, k-1))*0.5
        ENDDO
     ENDDO
+
     DO k = 1, klev
        DO i = 1, klon
           PDP(i, k) = paprs(i, k)-paprs(i, k + 1)

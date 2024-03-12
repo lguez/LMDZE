@@ -111,6 +111,7 @@ contains
              ZOZ(i, k) = POZON(i, k)*PDP(i, k) * MD/RMO3
           ENDDO
        ENDDO
+
        CALL LWU(PAER, PDP, PPMB, ZOZ, PTAVE, PVIEW, PWV, ZABCU)
        CALL LWBV(ILIM, PDT0, PEMIS, PPMB, PTL, PTAVE, ZABCU, &
             ZFLUC, ZBINT, ZBSUI, ZCTS, ZCNTRB)
