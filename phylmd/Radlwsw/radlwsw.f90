@@ -187,7 +187,7 @@ contains
        ENDDO
     ENDDO
 
-    PAER = 1E-15
+    PAER = 1d-15
     CALL LW(PPMB, PDP, PDT0, PEMIS, PTL, PTAVE, PWV, POZON, PAER, PCLDLD, &
          PCLDLU, PVIEW, zcool, zcool0, ztoplw, zsollw, ztoplw0, zsollw0, &
          zsollwdown, ZFLUP, ZFLDN, ZFLUP0, ZFLDN0)
