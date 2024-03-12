@@ -156,13 +156,12 @@ contains
           PHEAT0(i, k) = PHEAT0(i, k) * DAYSEC*RG/RCPD / PDP(i, k)
        ENDDO
     ENDDO
+
     DO i = 1, KLON
        PSOLSW(i) = ZFSDN(i, 1) - ZFSUP(i, 1)
        PTOPSW(i) = ZFSDN(i, LLM+1) - ZFSUP(i, LLM+1)
-
        PSOLSW0(i) = ZFSDN0(i, 1) - ZFSUP0(i, 1)
        PTOPSW0(i) = ZFSDN0(i, LLM+1) - ZFSUP0(i, LLM+1)
-
        PSOLSWAD(i) = 0d0
        PTOPSWAD(i) = 0d0
     ENDDO

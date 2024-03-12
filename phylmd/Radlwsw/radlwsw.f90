@@ -85,7 +85,6 @@ contains
     REAL, intent(out):: swup0(:, :), swup(:, :) ! (klon, klev + 1)
 
     ! Local:
-
     DOUBLE PRECISION ZFSUP(KLON, KLEV + 1)
     DOUBLE PRECISION ZFSDN(KLON, KLEV + 1)
     DOUBLE PRECISION ZFSUP0(KLON, KLEV + 1)
@@ -117,7 +116,6 @@ contains
     DOUBLE PRECISION ztopsw(klon), ztoplw(klon)
     DOUBLE PRECISION zsolsw(klon), zsollw(klon)
     DOUBLE PRECISION zsollwdown(klon)
-
     DOUBLE PRECISION ztopsw0(klon), ztoplw0(klon)
     DOUBLE PRECISION zsolsw0(klon), zsollw0(klon)
     DOUBLE PRECISION zznormcp
