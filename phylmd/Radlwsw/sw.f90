@@ -82,60 +82,50 @@ contains
     DOUBLE PRECISION ZUD(KLON, 5, LLM+1)
     DOUBLE PRECISION ZCLDSW0(KLON, LLM)
     INTEGER inu, jl, jk, i, k, kpl1
-    INTEGER, PARAMETER:: swpas = 1 ! Every swpas steps, sw is calculated
-
-    INTEGER:: itapsw = 0
-    !jq-Introduced for aerosol forcings
-
     REAL, PARAMETER :: dobson_u = 2.1415E-05 ! Dobson unit, in kg m-2
 
     !-------------------------------------------------------------------
 
-    IF (MOD(itapsw, swpas) == 0) THEN
-       DO JK = 1, LLM
-          DO JL = 1, KLON
-             ZCLDSW0(JL, JK) = 0.0
-             ZOZ(JL, JK) = POZON(JL, JK) / (dobson_u * 1E3 * rg) * PDP(JL, JK)
-          ENDDO
+    DO JK = 1, LLM
+       DO JL = 1, KLON
+          ZCLDSW0(JL, JK) = 0.0
+          ZOZ(JL, JK) = POZON(JL, JK) / (dobson_u * 1E3 * rg) * PDP(JL, JK)
        ENDDO
+    ENDDO
 
-       ! clear-sky:
-       CALL SWU(PSCT, ZCLDSW0, PPMB, PPSOL, PRMU0, FRACT, PTAVE, PWV, ZAKI, &
-            ZCLD, ZCLEAR, ZDSIG, ZFACT, ZRMU, ZSEC, ZUD)
-       INU = 1
-       CALL SW1S(INU, PALBD, PALBP, PCG, ZCLD, ZCLEAR, ZDSIG, POMEGA, ZOZ, &
-            ZRMU, ZSEC, PTAU, ZUD, ZFD, ZFU)
-       INU = 2
-       CALL SW2S(INU, ZAKI, PALBD, PALBP, PCG, ZCLD, ZCLEAR, ZDSIG, POMEGA, &
-            ZOZ, ZRMU, ZSEC, PTAU, ZUD, PWV, PQS, ZFDOWN, ZFUP)
-       DO JK = 1, LLM+1
-          DO JL = 1, KLON
-             ZFSUP0(JL, JK) = (ZFUP(JL, JK) + ZFU(JL, JK)) * ZFACT(JL)
-             ZFSDN0(JL, JK) = (ZFDOWN(JL, JK) + ZFD(JL, JK)) * ZFACT(JL)
-          ENDDO
+    ! clear-sky:
+    CALL SWU(PSCT, ZCLDSW0, PPMB, PPSOL, PRMU0, FRACT, PTAVE, PWV, ZAKI, &
+         ZCLD, ZCLEAR, ZDSIG, ZFACT, ZRMU, ZSEC, ZUD)
+    INU = 1
+    CALL SW1S(INU, PALBD, PALBP, PCG, ZCLD, ZCLEAR, ZDSIG, POMEGA, ZOZ, &
+         ZRMU, ZSEC, PTAU, ZUD, ZFD, ZFU)
+    INU = 2
+    CALL SW2S(INU, ZAKI, PALBD, PALBP, PCG, ZCLD, ZCLEAR, ZDSIG, POMEGA, &
+         ZOZ, ZRMU, ZSEC, PTAU, ZUD, PWV, PQS, ZFDOWN, ZFUP)
+    DO JK = 1, LLM+1
+       DO JL = 1, KLON
+          ZFSUP0(JL, JK) = (ZFUP(JL, JK) + ZFU(JL, JK)) * ZFACT(JL)
+          ZFSDN0(JL, JK) = (ZFDOWN(JL, JK) + ZFD(JL, JK)) * ZFACT(JL)
        ENDDO
+    ENDDO
 
-       CALL SWU(PSCT, PCLDSW, PPMB, PPSOL, PRMU0, FRACT, PTAVE, PWV, ZAKI, &
-            ZCLD, ZCLEAR, ZDSIG, ZFACT, ZRMU, ZSEC, ZUD)
-       INU = 1
-       CALL SW1S(INU, PALBD, PALBP, PCG, ZCLD, ZCLEAR, ZDSIG, POMEGA, ZOZ, &
-            ZRMU, ZSEC, PTAU, ZUD, ZFD, ZFU)
-       INU = 2
-       CALL SW2S(INU, ZAKI, PALBD, PALBP, PCG, ZCLD, ZCLEAR, ZDSIG, POMEGA, &
-            ZOZ, ZRMU, ZSEC, PTAU, ZUD, PWV, PQS, ZFDOWN, ZFUP)
+    CALL SWU(PSCT, PCLDSW, PPMB, PPSOL, PRMU0, FRACT, PTAVE, PWV, ZAKI, &
+         ZCLD, ZCLEAR, ZDSIG, ZFACT, ZRMU, ZSEC, ZUD)
+    INU = 1
+    CALL SW1S(INU, PALBD, PALBP, PCG, ZCLD, ZCLEAR, ZDSIG, POMEGA, ZOZ, &
+         ZRMU, ZSEC, PTAU, ZUD, ZFD, ZFU)
+    INU = 2
+    CALL SW2S(INU, ZAKI, PALBD, PALBP, PCG, ZCLD, ZCLEAR, ZDSIG, POMEGA, &
+         ZOZ, ZRMU, ZSEC, PTAU, ZUD, PWV, PQS, ZFDOWN, ZFUP)
 
-       ! cloudy-sky:
+    ! cloudy-sky:
 
-       DO JK = 1, LLM+1
-          DO JL = 1, KLON
-             ZFSUP(JL, JK) = (ZFUP(JL, JK) + ZFU(JL, JK)) * ZFACT(JL)
-             ZFSDN(JL, JK) = (ZFDOWN(JL, JK) + ZFD(JL, JK)) * ZFACT(JL)
-          ENDDO
+    DO JK = 1, LLM+1
+       DO JL = 1, KLON
+          ZFSUP(JL, JK) = (ZFUP(JL, JK) + ZFU(JL, JK)) * ZFACT(JL)
+          ZFSDN(JL, JK) = (ZFDOWN(JL, JK) + ZFD(JL, JK)) * ZFACT(JL)
        ENDDO
-
-       itapsw = 0
-    ENDIF
-    itapsw = itapsw + 1
+    ENDDO
 
     DO k = 1, LLM
        kpl1 = k+1
