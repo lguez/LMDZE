@@ -103,7 +103,6 @@ contains
     DOUBLE PRECISION PTAVE(klon, klev)
     DOUBLE PRECISION PWV(klon, klev), PQS(klon, klev)
     DOUBLE PRECISION POZON(klon, klev) ! mass fraction of ozone
-    DOUBLE PRECISION PAER(klon, klev, 5) ! AEROSOLS' OPTICAL THICKNESS
     DOUBLE PRECISION PCLDLD(klon, klev)
     DOUBLE PRECISION PCLDLU(klon, klev)
     DOUBLE PRECISION PCLDSW(klon, klev)
@@ -182,8 +181,7 @@ contains
        ENDDO
     ENDDO
 
-    PAER = 1d-15
-    CALL LW(PPMB, PDP, PDT0, PEMIS, PTL, PTAVE, PWV, POZON, PAER, PCLDLD, &
+    CALL LW(PPMB, PDP, PDT0, PEMIS, PTL, PTAVE, PWV, POZON, PCLDLD, &
          PCLDLU, PVIEW, zcool, zcool0, ztoplw, zsollw, ztoplw0, zsollw0, &
          zsollwdown, ZFLUP, ZFLDN, ZFLUP0, ZFLDN0)
     CALL SW(PSCT, zrmu0, dble(fract), PPMB, PDP, PPSOL, PALBD, PALBP, PTAVE, &

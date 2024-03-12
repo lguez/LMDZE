@@ -4,7 +4,7 @@ module LWU_m
 
 contains
 
-  SUBROUTINE LWU(PAER, PDP, PPMB, POZ, PTAVE, PVIEW, PWV, PABCU)
+  SUBROUTINE LWU(PDP, PPMB, POZ, PTAVE, PVIEW, PWV, PABCU)
 
     ! Purpose. Computes absorber amounts including pressure and
     ! temperature effects.
@@ -31,7 +31,6 @@ contains
 
     ! ARGUMENTS:
 
-    DOUBLE PRECISION, intent(in):: PAER(KLON, LLM, 5)
     DOUBLE PRECISION PDP(KLON, LLM)
     DOUBLE PRECISION PPMB(KLON, LLM + 1)
     DOUBLE PRECISION POZ(KLON, LLM)
@@ -43,6 +42,9 @@ contains
     ! effective absorber amounts
 
     ! LOCAL VARIABLES:
+
+    DOUBLE PRECISION PAER(KLON, LLM, 5)
+    ! OPTICAL THICKNESS OF THE AEROSOLS
 
     DOUBLE PRECISION ZABLY(KLON, NUA, 3 * LLM + 1)
     DOUBLE PRECISION ZDUC(KLON, 3 * LLM + 1)
@@ -116,6 +118,8 @@ contains
     DATA (BT(8, IR), IR = 1, 3) / - 0.108482D-03, 0.258096D-05, - .814575D-06 /
 
     !-----------------------------------------------------------------------
+
+    paer = 1d-15
 
     IF (LEVOIGT) THEN
        PVGCO2 = 60.
