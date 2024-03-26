@@ -188,33 +188,27 @@ contains
          PWV, PQS, POZON, PCLDSW, PTAU, POMEGA, PCG, zheat, zheat0, ztopsw, &
          zsolsw, ztopsw0, zsolsw0, ZFSUP, ZFSDN, ZFSUP0, ZFSDN0)
 
-    DO i = 1, klon
-       radsol(i) = zsolsw(i) + zsollw(i)
-       topsw(i) = ztopsw(i)
-       toplw(i) = ztoplw(i)
-       solsw(i) = zsolsw(i)
-       sollw(i) = zsollw(i)
-       sollwdown(i) = zsollwdown(i)
+    radsol = zsolsw + zsollw
+    topsw = ztopsw
+    toplw = ztoplw
+    solsw = zsolsw
+    sollw = zsollw
+    sollwdown = zsollwdown
 
-       DO k = 1, klev + 1
-          lwdn0(i, k) = ZFLDN0(i, k)
-          lwdn(i, k) = ZFLDN(i, k)
-          lwup0(i, k) = ZFLUP0(i, k)
-          lwup(i, k) = ZFLUP(i, k)
-       ENDDO
+    lwdn0 = ZFLDN0
+    lwdn = ZFLDN
+    lwup0 = ZFLUP0
+    lwup = ZFLUP
 
-       topsw0(i) = ztopsw0(i)
-       toplw0(i) = ztoplw0(i)
-       solsw0(i) = zsolsw0(i)
-       sollw0(i) = zsollw0(i)
+    topsw0 = ztopsw0
+    toplw0 = ztoplw0
+    solsw0 = zsolsw0
+    sollw0 = zsollw0
 
-       DO k = 1, klev + 1
-          swdn0(i, k) = ZFSDN0(i, k)
-          swdn(i, k) = ZFSDN(i, k)
-          swup0(i, k) = ZFSUP0(i, k)
-          swup(i, k) = ZFSUP(i, k)
-       ENDDO
-    ENDDO
+    swdn0 = ZFSDN0
+    swdn = ZFSDN
+    swup0 = ZFSUP0
+    swup = ZFSUP
 
     DO k = 1, klev
        DO i = 1, klon
