@@ -24,18 +24,18 @@ contains
     USE yoethf_m, ONLY: rvtmp2
 
     real, intent(in):: dist ! distance Terre-Soleil, en ua
-    real, intent(in):: mu0(:) ! (klon) cosinus de l'angle zenithal
-    real, intent(in):: fract(:) ! (klon)  duree d'ensoleillement normalisee
+    real, intent(in):: mu0(:) ! (klon) cosinus de l'angle z\'enithal
+    real, intent(in):: fract(:) ! (klon) dur\'ee d'ensoleillement normalis\'ee
 
     real, intent(in):: paprs(:, :) ! (klon, klev + 1)
-    ! pression a inter-couche (Pa)
+    ! pression \`a inter-couche (Pa)
 
     real, intent(in):: play(:, :) ! (klon, klev)
     ! pression au milieu de couche (Pa)
 
-    real, intent(in):: tsol(:) ! (klon)  temperature du sol (en K)
-    real, intent(in):: albedo(:) ! (klon)  albedo du sol (entre 0 et 1)
-    real, intent(in):: t_seri(:, :) ! (klon, klev) temperature (K)
+    real, intent(in):: tsol(:) ! (klon)  temp\'erature du sol (en K)
+    real, intent(in):: albedo(:) ! (klon)  alb\'edo du sol (entre 0 et 1)
+    real, intent(in):: t_seri(:, :) ! (klon, klev) temp\'erature (K)
     real, intent(in):: q_seri(:, :) ! (klon, klev) vapeur d'eau (en kg/kg)
 
     real, intent(in):: wo(:, :) ! (klon, klev)
@@ -45,18 +45,18 @@ contains
     ! fraction nuageuse (entre 0 et 1)
 
     real, intent(in):: cldemi(:, :) ! (klon, klev)
-    ! emissivite des nuages dans l'IR (entre 0 et 1)
+    ! \'emissivit\'e des nuages dans l'infrarouge (entre 0 et 1)
 
     real, intent(in):: cldtau(:, :) ! (klon, klev)
     ! \'epaisseur optique des nuages dans le visible (present-day value)
 
     real, intent(out):: heat(:, :) ! (klon, klev)
-    ! échauffement atmosphérique (visible) (K/jour)
+    ! \'echauffement atmosph\'erique (visible) (K/jour)
 
     real, intent(out):: heat0(:, :) ! (klon, klev) chauffage solaire ciel clair
 
     real, intent(out):: cool(:, :) ! (klon, klev)
-    ! refroidissement dans l'IR (K/jour)
+    ! refroidissement dans l'infrarouge (K/jour)
 
     real, intent(out):: cool0(:, :) ! (klon, klev)
     ! refroidissement infrarouge ciel clair
@@ -68,12 +68,12 @@ contains
     ! flux solaire net au sommet de l'atmosph`ere
 
     real, intent(out):: toplw(:) ! (klon)
-    ! rayonnement infrarouge montant au sommet de l'atmosphère
+    ! rayonnement infrarouge montant au sommet de l'atmosph\`ere
 
-    real, intent(out):: solsw(:) ! (klon) flux solaire net à la surface
+    real, intent(out):: solsw(:) ! (klon) flux solaire net \`a la surface
 
     real, intent(out):: sollw(:) ! (klon)
-    ! rayonnement infrarouge net à la surface
+    ! rayonnement infrarouge net \`a la surface
 
     real, intent(out):: sollwdown(:) ! (klon)
     real, intent(out):: topsw0(:) ! (klon)
@@ -194,17 +194,14 @@ contains
     solsw = zsolsw
     sollw = zsollw
     sollwdown = zsollwdown
-
     lwdn0 = ZFLDN0
     lwdn = ZFLDN
     lwup0 = ZFLUP0
     lwup = ZFLUP
-
     topsw0 = ztopsw0
     toplw0 = ztoplw0
     solsw0 = zsolsw0
     sollw0 = zsollw0
-
     swdn0 = ZFSDN0
     swdn = ZFSDN
     swup0 = ZFSUP0

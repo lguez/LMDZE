@@ -4,9 +4,9 @@ module lw_m
 
 contains
 
-  SUBROUTINE LW(PMB, DP, DT0, EMIS, TL, TAVE, WV, OZON, CLDLD, &
-       CLDLU, VIEW, COLR, COLR0, TOPLW, SOLLW, TOPLW0, SOLLW0, &
-       sollwdown, lwup, lwdn, lwup0, lwdn0)
+  SUBROUTINE LW(PMB, DP, DT0, EMIS, TL, TAVE, WV, OZON, CLDLD, CLDLU, VIEW, &
+       COLR, COLR0, TOPLW, SOLLW, TOPLW0, SOLLW0, sollwdown, lwup, lwdn, &
+       lwup0, lwdn0)
 
     use comconst, only: daysec
     use dimphy, only: klon
