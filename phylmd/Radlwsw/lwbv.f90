@@ -7,11 +7,10 @@ contains
   SUBROUTINE lwbv(klim, pdt0, pemis, ppmb, ptl, ptave, pabcu, pfluc, &
        pbint, pbsui, pcts, pcntrb)
 
-    USE dimensions
-    USE dimphy
+    USE dimensions, only: llm
+    USE dimphy, only: klon
     use lwv_m, only: lwv
-    USE suphec_m
-    USE raddimlw
+    USE raddimlw, only: nua, ninter, ntra
 
     ! PURPOSE.
     ! --------
