@@ -9,6 +9,7 @@ contains
        pcntrb, pcts, pfluc)
     USE dimensions
     USE dimphy
+    use lwvb_m, only: lwvb
     use lwvd_m, only: lwvd
     use lwvn_m, only: lwvn
     USE suphec_m
