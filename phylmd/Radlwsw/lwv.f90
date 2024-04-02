@@ -66,7 +66,10 @@ contains
 
     DOUBLE PRECISION pcntrb(klon, llm+1, llm+1) ! CLEAR-SKY ENERGY EXCHANGE MATRIX
     DOUBLE PRECISION pcts(klon, llm) ! COOLING-TO-SPACE TERM
-    DOUBLE PRECISION pfluc(klon, 2, llm+1) ! CLEAR-SKY RADIATIVE FLUXES
+
+    DOUBLE PRECISION, intent(out):: pfluc(klon, 2, llm+1)
+    ! CLEAR-SKY RADIATIVE FLUXES
+
     ! -----------------------------------------------------------------------
     ! LOCAL VARIABLES:
     DOUBLE PRECISION zadjd(klon, llm+1)
