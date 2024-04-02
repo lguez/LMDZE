@@ -105,10 +105,10 @@ contains
     DOUBLE PRECISION OZON(klon, klev) ! mass fraction of ozone
     DOUBLE PRECISION CLDLD(klon, klev)
     DOUBLE PRECISION CLDLU(klon, klev)
-    DOUBLE PRECISION PCLDSW(klon, klev)
-    DOUBLE PRECISION PTAU(klon, 2, klev)
-    DOUBLE PRECISION POMEGA(klon, 2, klev)
-    DOUBLE PRECISION PCG(klon, 2, klev)
+    DOUBLE PRECISION CLDSW(klon, klev)
+    DOUBLE PRECISION TAU(klon, 2, klev)
+    DOUBLE PRECISION OMEGA(klon, 2, klev)
+    DOUBLE PRECISION CG(klon, 2, klev)
     DOUBLE PRECISION rmu0(klon)
     DOUBLE PRECISION zheat(klon, klev), zcool(klon, klev)
     DOUBLE PRECISION zheat0(klon, klev), zcool0(klon, klev)
@@ -157,15 +157,15 @@ contains
                / (paprs(i, k) - paprs(i, k + 1))
           CLDLD(i, k) = cldfra(i, k) * cldemi(i, k)
           CLDLU(i, k) = cldfra(i, k) * cldemi(i, k)
-          PCLDSW(i, k) = cldfra(i, k)
-          PTAU(i, 1, k) = MAX(cldtau(i, k), 1e-05)
+          CLDSW(i, k) = cldfra(i, k)
+          TAU(i, 1, k) = MAX(cldtau(i, k), 1e-05)
           ! (1e-12 serait instable)
-          PTAU(i, 2, k) = MAX(cldtau(i, k), 1e-05)
+          TAU(i, 2, k) = MAX(cldtau(i, k), 1e-05)
           ! (pour 32-bit machines)
-          POMEGA(i, 1, k) = 0.9999 - 5e-04 * EXP(- 0.5 * PTAU(i, 1, k))
-          POMEGA(i, 2, k) = 0.9988 - 2.5e-03 * EXP(- 0.05 * PTAU(i, 2, k))
-          PCG(i, 1, k) = 0.865
-          PCG(i, 2, k) = 0.910
+          OMEGA(i, 1, k) = 0.9999 - 5e-04 * EXP(- 0.5 * TAU(i, 1, k))
+          OMEGA(i, 2, k) = 0.9988 - 2.5e-03 * EXP(- 0.05 * TAU(i, 2, k))
+          CG(i, 1, k) = 0.865
+          CG(i, 2, k) = 0.910
        ENDDO
     ENDDO
 
@@ -174,7 +174,7 @@ contains
          zcool0, ztoplw, zsollw, ztoplw0, zsollw0, zsollwdown, ZFLUP, ZFLDN, &
          ZFLUP0, ZFLDN0)
     CALL SW(SCT, rmu0, dble(fract), PMB, DP, PSOL, ALBD, ALBP, TAVE, &
-         WV, PQS, OZON, PCLDSW, PTAU, POMEGA, PCG, zheat, zheat0, ztopsw, &
+         WV, PQS, OZON, CLDSW, TAU, OMEGA, CG, zheat, zheat0, ztopsw, &
          zsolsw, ztopsw0, zsolsw0, ZFSUP, ZFSDN, ZFSUP0, ZFSDN0)
 
     radsol = zsolsw + zsollw
