@@ -43,9 +43,9 @@ contains
     DOUBLE PRECISION ptave(klon, llm)
     DOUBLE PRECISION, intent(out):: pfluc(klon, 2, llm+1)
     DOUBLE PRECISION pabcu(klon, nua, 3*llm+1)
-    DOUBLE PRECISION pbint(klon, llm+1)
-    DOUBLE PRECISION pbsui(klon)
-    DOUBLE PRECISION pcts(klon, llm)
+    DOUBLE PRECISION, intent(out):: pbint(klon, llm+1)
+    DOUBLE PRECISION, intent(out):: pbsui(klon)
+    DOUBLE PRECISION, intent(out):: pcts(klon, llm)
     DOUBLE PRECISION pcntrb(klon, llm+1, llm+1)
 
     ! LOCAL VARIABLES:

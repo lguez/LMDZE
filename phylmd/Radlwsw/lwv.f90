@@ -65,7 +65,7 @@ contains
     DOUBLE PRECISION pgbtop(klon, 8, 2) ! PADE APPROXIMANTS
 
     DOUBLE PRECISION pcntrb(klon, llm+1, llm+1) ! CLEAR-SKY ENERGY EXCHANGE MATRIX
-    DOUBLE PRECISION pcts(klon, llm) ! COOLING-TO-SPACE TERM
+    DOUBLE PRECISION, intent(out):: pcts(klon, llm) ! COOLING-TO-SPACE TERM
 
     DOUBLE PRECISION, intent(out):: pfluc(klon, 2, llm+1)
     ! CLEAR-SKY RADIATIVE FLUXES
