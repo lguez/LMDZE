@@ -169,12 +169,7 @@ contains
        ENDDO
     ENDDO
 
-    DO k = 1, klev + 1
-       DO i = 1, klon
-          PMB(i, k) = paprs(i, k)/100.
-       ENDDO
-    ENDDO
-
+    PMB = paprs/100.
     CALL LW(PMB, DP, DT0, EMIS, TL, TAVE, WV, OZON, CLDLD, CLDLU, VIEW, zcool, &
          zcool0, ztoplw, zsollw, ztoplw0, zsollw0, zsollwdown, ZFLUP, ZFLDN, &
          ZFLUP0, ZFLDN0)
