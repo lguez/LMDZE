@@ -96,15 +96,13 @@ contains
     DOUBLE PRECISION alpha1
     INTEGER k, i
     DOUBLE PRECISION ALBD(klon, 2)
-    DOUBLE PRECISION EMIS(klon), DT0(klon), VIEW(klon)
-    DOUBLE PRECISION PSOL(klon), DP(klon, klev)
+    DOUBLE PRECISION EMIS(klon), VIEW(klon)
+    DOUBLE PRECISION DP(klon, klev)
     DOUBLE PRECISION TL(klon, klev + 1), PMB(klon, klev + 1)
     DOUBLE PRECISION TAVE(klon, klev)
-    DOUBLE PRECISION WV(klon, klev), PQS(klon, klev)
+    DOUBLE PRECISION WV(klon, klev)
     DOUBLE PRECISION OZON(klon, klev) ! mass fraction of ozone
     DOUBLE PRECISION CLDLD(klon, klev)
-    DOUBLE PRECISION CLDLU(klon, klev)
-    DOUBLE PRECISION CLDSW(klon, klev)
     DOUBLE PRECISION TAU(klon, 2, klev)
     DOUBLE PRECISION OMEGA(klon, 2, klev)
     DOUBLE PRECISION CG(klon, 2, klev)
@@ -125,7 +123,6 @@ contains
     ! EMIS = 0.96
     EMIS = 1.
     VIEW = 1.66
-    PSOL = paprs(:, 1)
 
     DO i = 1, klon
        alpha1 = (paprs(i, 1) - play(i, 2)) / (play(i, 1) - play(i, 2))
@@ -133,7 +130,6 @@ contains
     ENDDO
 
     TL(:, klev + 1) = t_seri(:, klev)
-    DT0 = tsol - TL(:, 1)
     forall (k = 2:klev) TL(:, k) = (t_seri(:, k) + t_seri(:, k - 1)) * 0.5
 
     DO k = 1, klev
@@ -141,12 +137,9 @@ contains
           DP(i, k) = paprs(i, k) - paprs(i, k + 1)
           TAVE(i, k) = t_seri(i, k)
           WV(i, k) = MAX(q_seri(i, k), 1e-12)
-          PQS(i, k) = WV(i, k)
           OZON(i, k) = wo(i, k) * RG * dobson_u * 1e3 &
                / (paprs(i, k) - paprs(i, k + 1))
           CLDLD(i, k) = cldfra(i, k) * cldemi(i, k)
-          CLDLU(i, k) = cldfra(i, k) * cldemi(i, k)
-          CLDSW(i, k) = cldfra(i, k)
           TAU(i, 1, k) = MAX(cldtau(i, k), 1e-05)
           ! (1e-12 serait instable)
           TAU(i, 2, k) = MAX(cldtau(i, k), 1e-05)
@@ -159,12 +152,13 @@ contains
     ENDDO
 
     PMB = paprs / 100.
-    CALL LW(PMB, DP, DT0, EMIS, TL, TAVE, WV, OZON, CLDLD, CLDLU, VIEW, zcool, &
-         zcool0, ztoplw, zsollw, ztoplw0, zsollw0, zsollwdown, ZFLUP, ZFLDN, &
-         ZFLUP0, ZFLDN0)
-    CALL SW(dble(solaire / dist**2), dble(mu0), dble(fract), PMB, DP, PSOL, &
-         ALBD, ALBD, TAVE, WV, PQS, OZON, CLDSW, TAU, OMEGA, CG, zheat, &
-         zheat0, ztopsw, zsolsw, ztopsw0, zsolsw0, ZFSUP, ZFSDN, ZFSUP0, ZFSDN0)
+    CALL LW(PMB, DP, tsol - TL(:, 1), EMIS, TL, TAVE, WV, OZON, CLDLD, CLDLd, &
+         VIEW, zcool, zcool0, ztoplw, zsollw, ztoplw0, zsollw0, zsollwdown, &
+         ZFLUP, ZFLDN, ZFLUP0, ZFLDN0)
+    CALL SW(dble(solaire / dist**2), dble(mu0), dble(fract), PMB, DP, &
+         dble(paprs(:, 1)), ALBD, ALBD, TAVE, WV, wv, OZON, dble(cldfra), TAU, &
+         OMEGA, CG, zheat, zheat0, ztopsw, zsolsw, ztopsw0, zsolsw0, ZFSUP, &
+         ZFSDN, ZFSUP0, ZFSDN0)
     radsol = zsolsw + zsollw
     topsw = ztopsw
     toplw = ztoplw
