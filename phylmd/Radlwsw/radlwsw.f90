@@ -93,13 +93,13 @@ contains
     DOUBLE PRECISION ZFLDN(KLON, KLEV + 1)
     DOUBLE PRECISION ZFLUP0(KLON, KLEV + 1)
     DOUBLE PRECISION ZFLDN0(KLON, KLEV + 1)
-    DOUBLE PRECISION zx_alpha1, zx_alpha2
+    DOUBLE PRECISION alpha1, alpha2
     INTEGER k, i
-    DOUBLE PRECISION PSCT
-    DOUBLE PRECISION PALBD(klon, 2), PALBP(klon, 2)
-    DOUBLE PRECISION PEMIS(klon), PDT0(klon), PVIEW(klon)
-    DOUBLE PRECISION PPSOL(klon), PDP(klon, klev)
-    DOUBLE PRECISION PTL(klon, klev + 1), PPMB(klon, klev + 1)
+    DOUBLE PRECISION SCT
+    DOUBLE PRECISION ALBD(klon, 2), ALBP(klon, 2)
+    DOUBLE PRECISION EMIS(klon), DT0(klon), VIEW(klon)
+    DOUBLE PRECISION PSOL(klon), PDP(klon, klev)
+    DOUBLE PRECISION TL(klon, klev + 1), PPMB(klon, klev + 1)
     DOUBLE PRECISION PTAVE(klon, klev)
     DOUBLE PRECISION PWV(klon, klev), PQS(klon, klev)
     DOUBLE PRECISION POZON(klon, klev) ! mass fraction of ozone
@@ -109,7 +109,7 @@ contains
     DOUBLE PRECISION PTAU(klon, 2, klev)
     DOUBLE PRECISION POMEGA(klon, 2, klev)
     DOUBLE PRECISION PCG(klon, 2, klev)
-    DOUBLE PRECISION zrmu0(klon)
+    DOUBLE PRECISION rmu0(klon)
     DOUBLE PRECISION zheat(klon, klev), zcool(klon, klev)
     DOUBLE PRECISION zheat0(klon, klev), zcool0(klon, klev)
     DOUBLE PRECISION ztopsw(klon), ztoplw(klon)
@@ -126,30 +126,30 @@ contains
     cool = 0.
     heat0 = 0.
     cool0 = 0.
-    PSCT = solaire / dist**2
+    SCT = solaire / dist**2
 
     DO i = 1, klon
-       zrmu0(i) = mu0(i)
-       PALBD(i, 1) = albedo(i)
-       PALBD(i, 2) = albedo(i)
-       PALBP(i, 1) = albedo(i)
-       PALBP(i, 2) = albedo(i)
+       rmu0(i) = mu0(i)
+       ALBD(i, 1) = albedo(i)
+       ALBD(i, 2) = albedo(i)
+       ALBP(i, 1) = albedo(i)
+       ALBP(i, 2) = albedo(i)
        ! cf. JLD pour etre en accord avec ORCHIDEE il faut mettre
-       ! PEMIS(i) = 0.96
-       PEMIS(i) = 1.
-       PVIEW(i) = 1.66
-       PPSOL(i) = paprs(i, 1)
-       zx_alpha1 = (paprs(i, 1)-play(i, 2)) &
+       ! EMIS(i) = 0.96
+       EMIS(i) = 1.
+       VIEW(i) = 1.66
+       PSOL(i) = paprs(i, 1)
+       alpha1 = (paprs(i, 1)-play(i, 2)) &
             / (play(i, 1)-play(i, 2))
-       zx_alpha2 = 1. - zx_alpha1
-       PTL(i, 1) = t_seri(i, 1) * zx_alpha1 + t_seri(i, 2) * zx_alpha2
-       PTL(i, klev + 1) = t_seri(i, klev)
-       PDT0(i) = tsol(i) - PTL(i, 1)
+       alpha2 = 1. - alpha1
+       TL(i, 1) = t_seri(i, 1) * alpha1 + t_seri(i, 2) * alpha2
+       TL(i, klev + 1) = t_seri(i, klev)
+       DT0(i) = tsol(i) - TL(i, 1)
     ENDDO
 
     DO k = 2, klev
        DO i = 1, klon
-          PTL(i, k) = (t_seri(i, k) + t_seri(i, k-1))*0.5
+          TL(i, k) = (t_seri(i, k) + t_seri(i, k-1))*0.5
        ENDDO
     ENDDO
 
@@ -181,10 +181,10 @@ contains
        ENDDO
     ENDDO
 
-    CALL LW(PPMB, PDP, PDT0, PEMIS, PTL, PTAVE, PWV, POZON, PCLDLD, &
-         PCLDLU, PVIEW, zcool, zcool0, ztoplw, zsollw, ztoplw0, zsollw0, &
+    CALL LW(PPMB, PDP, DT0, EMIS, TL, PTAVE, PWV, POZON, PCLDLD, &
+         PCLDLU, VIEW, zcool, zcool0, ztoplw, zsollw, ztoplw0, zsollw0, &
          zsollwdown, ZFLUP, ZFLDN, ZFLUP0, ZFLDN0)
-    CALL SW(PSCT, zrmu0, dble(fract), PPMB, PDP, PPSOL, PALBD, PALBP, PTAVE, &
+    CALL SW(SCT, rmu0, dble(fract), PPMB, PDP, PSOL, ALBD, ALBP, PTAVE, &
          PWV, PQS, POZON, PCLDSW, PTAU, POMEGA, PCG, zheat, zheat0, ztopsw, &
          zsolsw, ztopsw0, zsolsw0, ZFSUP, ZFSDN, ZFSUP0, ZFSDN0)
 
