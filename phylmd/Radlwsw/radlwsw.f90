@@ -120,8 +120,7 @@ contains
 
     !----------------------------------------------------------------------
 
-    ALBD(:, 1) = albedo
-    ALBD(:, 2) = albedo
+    ALBD = spread(albedo, 2, 2)
     ! cf. JLD pour etre en accord avec ORCHIDEE il faut mettre
     ! EMIS = 0.96
     EMIS = 1.
