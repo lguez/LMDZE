@@ -36,7 +36,7 @@ contains
 
     ! ARGUMENTS:
     INTEGER klim
-    DOUBLE PRECISION pdt0(klon)
+    DOUBLE PRECISION, intent(in):: pdt0(klon)
     DOUBLE PRECISION pemis(klon)
     DOUBLE PRECISION ppmb(klon, llm+1)
     DOUBLE PRECISION ptl(klon, llm+1)

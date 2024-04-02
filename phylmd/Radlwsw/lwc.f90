@@ -63,8 +63,8 @@ contains
     DOUBLE PRECISION, intent(in):: pcntrb(klon, llm+1, llm+1) !CLEAR-SKY ENERGY EXCHANGE
     DOUBLE PRECISION pcts(klon, llm) ! CLEAR-SKY LAYER COOLING-TO-SPACE
 
-    DOUBLE PRECISION pcldld(klon, llm)
-    DOUBLE PRECISION pcldlu(klon, llm)
+    DOUBLE PRECISION, intent(in):: pcldld(klon, llm)
+    DOUBLE PRECISION, intent(in):: pcldlu(klon, llm)
     DOUBLE PRECISION pemis(klon)
 
     DOUBLE PRECISION, intent(out):: pflux(:, :, :) ! (klon, 2, llm+1)
