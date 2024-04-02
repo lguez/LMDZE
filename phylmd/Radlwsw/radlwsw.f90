@@ -132,11 +132,11 @@ contains
     TL(:, klev + 1) = t_seri(:, klev)
     forall (k = 2:klev) TL(:, k) = (t_seri(:, k) + t_seri(:, k - 1)) * 0.5
 
-    DO k = 1, klev
+    forall (k = 1:klev)
        DP(:, k) = paprs(:, k) - paprs(:, k + 1)
        OZON(:, k) = wo(:, k) * RG * dobson_u * 1e3 &
             / (paprs(:, k) - paprs(:, k + 1))
-    ENDDO
+    END forall
 
     TAVE = t_seri
     WV = MAX(q_seri, 1e-12)
