@@ -133,24 +133,22 @@ contains
     forall (k = 2:klev) TL(:, k) = (t_seri(:, k) + t_seri(:, k - 1)) * 0.5
 
     DO k = 1, klev
-       DO i = 1, klon
-          DP(i, k) = paprs(i, k) - paprs(i, k + 1)
-          TAVE(i, k) = t_seri(i, k)
-          WV(i, k) = MAX(q_seri(i, k), 1e-12)
-          OZON(i, k) = wo(i, k) * RG * dobson_u * 1e3 &
-               / (paprs(i, k) - paprs(i, k + 1))
-          CLDLD(i, k) = cldfra(i, k) * cldemi(i, k)
-          TAU(i, 1, k) = MAX(cldtau(i, k), 1e-05)
-          ! (1e-12 serait instable)
-          TAU(i, 2, k) = MAX(cldtau(i, k), 1e-05)
-          ! (pour 32-bit machines)
-          OMEGA(i, 1, k) = 0.9999 - 5e-04 * EXP(- 0.5 * TAU(i, 1, k))
-          OMEGA(i, 2, k) = 0.9988 - 2.5e-03 * EXP(- 0.05 * TAU(i, 2, k))
-          CG(i, 1, k) = 0.865
-          CG(i, 2, k) = 0.910
-       ENDDO
+       DP(:, k) = paprs(:, k) - paprs(:, k + 1)
+       OZON(:, k) = wo(:, k) * RG * dobson_u * 1e3 &
+            / (paprs(:, k) - paprs(:, k + 1))
     ENDDO
 
+    TAVE = t_seri
+    WV = MAX(q_seri, 1e-12)
+    CLDLD = cldfra * cldemi
+    TAU(:, 1, :) = MAX(cldtau, 1e-05)
+    ! (1e-12 serait instable)
+    TAU(:, 2, :) = MAX(cldtau, 1e-05)
+    ! (pour 32-bit machines)
+    OMEGA(:, 1, :) = 0.9999 - 5e-04 * EXP(- 0.5 * TAU(:, 1, :))
+    OMEGA(:, 2, :) = 0.9988 - 2.5e-03 * EXP(- 0.05 * TAU(:, 2, :))
+    CG(:, 1, :) = 0.865
+    CG(:, 2, :) = 0.910
     PMB = paprs / 100.
     CALL LW(PMB, DP, tsol - TL(:, 1), EMIS, TL, TAVE, WV, OZON, CLDLD, CLDLd, &
          VIEW, zcool, zcool0, ztoplw, zsollw, ztoplw0, zsollw0, zsollwdown, &
