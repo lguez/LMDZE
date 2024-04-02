@@ -7,9 +7,9 @@ contains
   SUBROUTINE LWB(PDT0, PTAVE, PTL, PB, PBINT, PBSUIN, PBSUR, PBTOP, PDBSL, &
        PGA, PGB, PGASUR, PGBSUR, PGATOP, PGBTOP)
 
-    use dimensions
-    use dimphy
-    use raddimlw
+    use dimensions, only: llm
+    use dimphy, only: klon
+    use raddimlw, only: ninter
 
     ! PURPOSE.
 
