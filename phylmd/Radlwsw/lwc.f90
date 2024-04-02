@@ -62,7 +62,7 @@ SUBROUTINE lwc(klim, pcldld, pcldlu, pemis, pfluc, pbint, pbsuin, pcts, &
   DOUBLE PRECISION pcldlu(klon, llm)
   DOUBLE PRECISION pemis(klon)
 
-  DOUBLE PRECISION pflux(klon, 2, llm+1)
+  DOUBLE PRECISION, intent(out):: pflux(klon, 2, llm+1)
   ! -----------------------------------------------------------------------
   ! * LOCAL VARIABLES:
   INTEGER imx(klon), imxp(klon)

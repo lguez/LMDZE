@@ -62,7 +62,7 @@ SUBROUTINE lwvb(kuaer, ktraer, klim, pabcu, padjd, padju, pb, pbint, pbsui, &
   DOUBLE PRECISION pgatop(klon, 8, 2) ! T.O.A. PADE APPROXIMANTS
   DOUBLE PRECISION pgbtop(klon, 8, 2) ! T.O.A. PADE APPROXIMANTS
 
-  DOUBLE PRECISION pfluc(klon, 2, llm+1) ! CLEAR-SKY RADIATIVE FLUXES
+  DOUBLE PRECISION, intent(out):: pfluc(klon, 2, llm+1) ! CLEAR-SKY RADIATIVE FLUXES
   DOUBLE PRECISION pcts(klon, llm) ! COOLING-TO-SPACE TERM
 
   ! * LOCAL VARIABLES:
