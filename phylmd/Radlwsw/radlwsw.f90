@@ -36,7 +36,7 @@ contains
     real, intent(in):: tsol(:) ! (klon)  temp\'erature du sol (en K)
     real, intent(in):: albedo(:) ! (klon)  alb\'edo du sol (entre 0 et 1)
     real, intent(in):: t_seri(:, :) ! (klon, klev) temp\'erature (K)
-    real, intent(in):: q_seri(:, :) ! (klon, klev) vapeur d'eau (en kg/kg)
+    real, intent(in):: q_seri(:, :) ! (klon, klev) vapeur d'eau (en kg / kg)
 
     real, intent(in):: wo(:, :) ! (klon, klev)
     ! column-density of ozone in a layer, in kilo-Dobsons
@@ -51,12 +51,12 @@ contains
     ! \'epaisseur optique des nuages dans le visible (present-day value)
 
     real, intent(out):: heat(:, :) ! (klon, klev)
-    ! \'echauffement atmosph\'erique (visible) (K/jour)
+    ! \'echauffement atmosph\'erique (visible) (K / jour)
 
     real, intent(out):: heat0(:, :) ! (klon, klev) chauffage solaire ciel clair
 
     real, intent(out):: cool(:, :) ! (klon, klev)
-    ! refroidissement dans l'infrarouge (K/jour)
+    ! refroidissement dans l'infrarouge (K / jour)
 
     real, intent(out):: cool0(:, :) ! (klon, klev)
     ! refroidissement infrarouge ciel clair
@@ -169,7 +169,7 @@ contains
        ENDDO
     ENDDO
 
-    PMB = paprs/100.
+    PMB = paprs / 100.
     CALL LW(PMB, DP, DT0, EMIS, TL, TAVE, WV, OZON, CLDLD, CLDLU, VIEW, zcool, &
          zcool0, ztoplw, zsollw, ztoplw0, zsollw0, zsollwdown, ZFLUP, ZFLDN, &
          ZFLUP0, ZFLDN0)
@@ -202,9 +202,9 @@ contains
           ! between dry air and water vapour specific heat capacity
           zznormcp = 1. + RVTMP2 * WV(i, k)
           heat(i, k) = zheat(i, k) / zznormcp
-          cool(i, k) = zcool(i, k)/zznormcp
-          heat0(i, k) = zheat0(i, k)/zznormcp
-          cool0(i, k) = zcool0(i, k)/zznormcp
+          cool(i, k) = zcool(i, k) / zznormcp
+          heat0(i, k) = zheat0(i, k) / zznormcp
+          cool0(i, k) = zcool0(i, k) / zznormcp
        ENDDO
     ENDDO
 
