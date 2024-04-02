@@ -11,6 +11,7 @@ contains
     use comconst, only: daysec
     use dimphy, only: klon
     use lwbv_m, only: lwbv
+    use lwc_m, only: lwc
     use LWU_m, only: LWU
     use dimensions, only: llm
     USE raddimlw, ONLY: nua

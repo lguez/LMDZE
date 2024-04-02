@@ -1,10 +1,15 @@
+module lwc_m
+
+  IMPLICIT NONE
+
+contains
+
 SUBROUTINE lwc(klim, pcldld, pcldlu, pemis, pfluc, pbint, pbsuin, pcts, &
     pcntrb, pflux)
   USE dimensions
   USE dimphy
   USE radepsi
   USE radopt
-  IMPLICIT NONE
 
   ! PURPOSE.
   ! --------
@@ -382,3 +387,5 @@ SUBROUTINE lwc(klim, pcldld, pcldlu, pemis, pfluc, pbint, pbsuin, pcts, &
 
   RETURN
 END SUBROUTINE lwc
+
+end module lwc_m
