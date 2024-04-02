@@ -23,7 +23,7 @@ SUBROUTINE lwc(klim, pcldld, pcldlu, pemis, pfluc, pbint, pbsuin, pcts, &
   ! PEMIS  : (KLON)             ; SURFACE EMISSIVITY
   ! PFLUC
   ! ==== OUTPUTS ===
-  ! PFLUX(KLON,2,LLM)         ; RADIATIVE FLUXES :
+  ! PFLUX(KLON,2,LLM+1)         ; RADIATIVE FLUXES :
   ! 1  ==>  UPWARD   FLUX TOTAL
   ! 2  ==>  DOWNWARD FLUX TOTAL
 
