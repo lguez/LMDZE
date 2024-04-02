@@ -122,10 +122,6 @@ contains
 
     !----------------------------------------------------------------------
 
-    heat = 0.
-    cool = 0.
-    heat0 = 0.
-    cool0 = 0.
     SCT = solaire / dist**2
     rmu0 = mu0
     ALBD(:, 1) = albedo
