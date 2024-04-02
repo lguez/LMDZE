@@ -95,7 +95,6 @@ contains
     DOUBLE PRECISION ZFLDN0(KLON, KLEV + 1)
     DOUBLE PRECISION alpha1
     INTEGER k, i
-    DOUBLE PRECISION SCT
     DOUBLE PRECISION ALBD(klon, 2), ALBP(klon, 2)
     DOUBLE PRECISION EMIS(klon), DT0(klon), VIEW(klon)
     DOUBLE PRECISION PSOL(klon), DP(klon, klev)
@@ -122,7 +121,6 @@ contains
 
     !----------------------------------------------------------------------
 
-    SCT = solaire / dist**2
     rmu0 = mu0
     ALBD(:, 1) = albedo
     ALBD(:, 2) = albedo
@@ -169,9 +167,9 @@ contains
     CALL LW(PMB, DP, DT0, EMIS, TL, TAVE, WV, OZON, CLDLD, CLDLU, VIEW, zcool, &
          zcool0, ztoplw, zsollw, ztoplw0, zsollw0, zsollwdown, ZFLUP, ZFLDN, &
          ZFLUP0, ZFLDN0)
-    CALL SW(SCT, rmu0, dble(fract), PMB, DP, PSOL, ALBD, ALBP, TAVE, WV, PQS, &
-         OZON, CLDSW, TAU, OMEGA, CG, zheat, zheat0, ztopsw, zsolsw, ztopsw0, &
-         zsolsw0, ZFSUP, ZFSDN, ZFSUP0, ZFSDN0)
+    CALL SW(dble(solaire / dist**2), rmu0, dble(fract), PMB, DP, PSOL, ALBD, &
+         ALBP, TAVE, WV, PQS, OZON, CLDSW, TAU, OMEGA, CG, zheat, zheat0, &
+         ztopsw, zsolsw, ztopsw0, zsolsw0, ZFSUP, ZFSDN, ZFSUP0, ZFSDN0)
     radsol = zsolsw + zsollw
     topsw = ztopsw
     toplw = ztoplw
