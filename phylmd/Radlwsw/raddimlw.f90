@@ -4,13 +4,9 @@ module raddimlw
 
   implicit none
 
-  INTEGER NUA
-  PARAMETER (NUA=24)
-  INTEGER NTRA
-  PARAMETER (NTRA=15)
-  INTEGER Ninter
-  PARAMETER (Ninter=6)
-  INTEGER NG1, NG1P1
-  PARAMETER (NG1=2, NG1P1=NG1+1)
+  INTEGER, PARAMETER:: NUA = 24
+  INTEGER, PARAMETER:: NTRA = 15
+  INTEGER, PARAMETER:: Ninter = 6
+  INTEGER, PARAMETER:: NG1 = 2, NG1P1 = NG1 + 1
 
 end module raddimlw
