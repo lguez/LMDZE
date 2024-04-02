@@ -70,31 +70,22 @@ contains
     DOUBLE PRECISION ZABCU(KLON, NUA, 3*LLM+1)
     DOUBLE PRECISION ZOZ(KLON, LLM)
 
-    DOUBLE PRECISION, save, allocatable:: ZFLUX(:, :, :) ! (KLON, 2, LLM+1)
+    DOUBLE PRECISION ZFLUX(KLON, 2, LLM+1)
     ! RADIATIVE FLUXES (1:up; 2:down)
 
-    DOUBLE PRECISION, save, allocatable:: ZFLUC(:, :, :) ! (KLON, 2, LLM+1)
+    DOUBLE PRECISION ZFLUC(KLON, 2, LLM+1)
     ! CLEAR-SKY RADIATIVE FLUXES
 
     ! Intermediate variables:
-    DOUBLE PRECISION, save, allocatable:: ZBINT(:, :) ! (KLON, LLM+1)
-    DOUBLE PRECISION, save, allocatable:: ZBSUI(:) ! (KLON)
-    DOUBLE PRECISION, save, allocatable:: ZCTS(:, :) ! (KLON, LLM)
+    DOUBLE PRECISION ZBINT(KLON, LLM+1)
+    DOUBLE PRECISION ZBSUI(KLON)
+    DOUBLE PRECISION ZCTS(KLON, LLM)
 
-    DOUBLE PRECISION, save, allocatable:: ZCNTRB(:, :, :)
-    ! (KLON, LLM+1, LLM+1)
+    DOUBLE PRECISION ZCNTRB(KLON, LLM+1, LLM+1)
 
     INTEGER ilim, i, k, kpl1
-    logical:: first_call = .true.
 
     ! ------------------------------------------------------------------
-
-    if (first_call) then
-       allocate(ZFLUX(KLON, 2, LLM+1), ZFLUC(KLON, 2, LLM+1), &
-            ZBINT(KLON, LLM+1), ZBSUI(KLON), ZCTS(KLON, LLM), &
-            ZCNTRB(KLON, LLM+1, LLM+1))
-       first_call = .false.
-    end if
 
     DO k = 1, LLM
        DO i = 1, KLON
