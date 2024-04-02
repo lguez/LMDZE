@@ -35,17 +35,17 @@ contains
     ! * ARGUMENTS:
 
     INTEGER knu
-    DOUBLE PRECISION palbd(klon, 2)
-    DOUBLE PRECISION palbp(klon, 2)
-    DOUBLE PRECISION pcg(klon, 2, llm)
+    DOUBLE PRECISION, intent(in):: palbd(klon, 2)
+    DOUBLE PRECISION, intent(in):: palbp(klon, 2)
+    DOUBLE PRECISION, intent(in):: pcg(klon, 2, llm)
     DOUBLE PRECISION pcld(klon, llm)
     DOUBLE PRECISION pclear(klon)
     DOUBLE PRECISION pdsig(klon, llm)
-    DOUBLE PRECISION pomega(klon, 2, llm)
+    DOUBLE PRECISION, intent(in):: pomega(klon, 2, llm)
     DOUBLE PRECISION poz(klon, llm)
     DOUBLE PRECISION prmu(klon)
     DOUBLE PRECISION psec(klon)
-    DOUBLE PRECISION ptau(klon, 2, llm)
+    DOUBLE PRECISION, intent(in):: ptau(klon, 2, llm)
     DOUBLE PRECISION pud(klon, 5, llm+1)
 
     DOUBLE PRECISION pfd(klon, llm+1)

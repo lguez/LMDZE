@@ -29,7 +29,7 @@ contains
     ! ARGUMENTS:
 
     INTEGER knu
-    DOUBLE PRECISION palbp(klon, 2)
+    DOUBLE PRECISION, intent(in):: palbp(klon, 2)
     DOUBLE PRECISION, intent(in):: pdsig(klon, llm)
     DOUBLE PRECISION, intent(in):: prayl(klon)
     DOUBLE PRECISION psec(klon)

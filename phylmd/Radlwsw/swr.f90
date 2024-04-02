@@ -41,12 +41,12 @@ contains
     ! * ARGUMENTS:
 
     INTEGER knu
-    DOUBLE PRECISION palbd(klon, 2)
-    DOUBLE PRECISION pcg(klon, 2, llm)
+    DOUBLE PRECISION, intent(in):: palbd(klon, 2)
+    DOUBLE PRECISION, intent(in):: pcg(klon, 2, llm)
     DOUBLE PRECISION pcld(klon, llm)
-    DOUBLE PRECISION pomega(klon, 2, llm)
+    DOUBLE PRECISION, intent(in):: pomega(klon, 2, llm)
     DOUBLE PRECISION psec(klon)
-    DOUBLE PRECISION ptau(klon, 2, llm)
+    DOUBLE PRECISION, intent(in):: ptau(klon, 2, llm)
 
     DOUBLE PRECISION pray1(klon, llm+1)
     DOUBLE PRECISION pray2(klon, llm+1)
