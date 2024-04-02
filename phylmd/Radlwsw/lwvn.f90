@@ -44,7 +44,10 @@ contains
 
     DOUBLE PRECISION padjd(klon, llm+1) ! CONTRIBUTION OF ADJACENT LAYERS
     DOUBLE PRECISION padju(klon, llm+1) ! CONTRIBUTION OF ADJACENT LAYERS
-    DOUBLE PRECISION pcntrb(klon, llm+1, llm+1) ! CLEAR-SKY ENERGY EXCHANGE MATRIX
+
+    DOUBLE PRECISION, intent(out):: pcntrb(klon, llm+1, llm+1)
+    ! CLEAR-SKY ENERGY EXCHANGE MATRIX
+
     DOUBLE PRECISION pdbdt(klon, ninter, llm) ! LAYER PLANCK FUNCTION GRADIENT
 
     ! * LOCAL ARRAYS:

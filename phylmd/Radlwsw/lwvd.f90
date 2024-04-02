@@ -41,7 +41,9 @@ contains
     DOUBLE PRECISION pga(klon, 8, 2, llm) ! PADE APPROXIMANTS
     DOUBLE PRECISION pgb(klon, 8, 2, llm) ! PADE APPROXIMANTS
 
-    DOUBLE PRECISION pcntrb(klon, llm+1, llm+1) ! ENERGY EXCHANGE MATRIX
+    DOUBLE PRECISION, intent(inout):: pcntrb(klon, llm+1, llm+1)
+    ! ENERGY EXCHANGE MATRIX
+
     DOUBLE PRECISION pdisd(klon, llm+1) ! CONTRIBUTION BY DISTANT LAYERS
     DOUBLE PRECISION pdisu(klon, llm+1) ! CONTRIBUTION BY DISTANT LAYERS
 

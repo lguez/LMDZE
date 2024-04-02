@@ -60,7 +60,7 @@ contains
     DOUBLE PRECISION pfluc(klon, 2, llm+1) ! CLEAR-SKY RADIATIVE FLUXES
     DOUBLE PRECISION pbint(klon, llm+1) ! HALF LEVEL PLANCK FUNCTION
     DOUBLE PRECISION pbsuin(klon) ! SURFACE PLANCK FUNCTION
-    DOUBLE PRECISION pcntrb(klon, llm+1, llm+1) !CLEAR-SKY ENERGY EXCHANGE
+    DOUBLE PRECISION, intent(in):: pcntrb(klon, llm+1, llm+1) !CLEAR-SKY ENERGY EXCHANGE
     DOUBLE PRECISION pcts(klon, llm) ! CLEAR-SKY LAYER COOLING-TO-SPACE
 
     DOUBLE PRECISION pcldld(klon, llm)

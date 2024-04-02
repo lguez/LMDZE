@@ -46,7 +46,7 @@ contains
     DOUBLE PRECISION, intent(out):: pbint(klon, llm+1)
     DOUBLE PRECISION, intent(out):: pbsui(klon)
     DOUBLE PRECISION, intent(out):: pcts(klon, llm)
-    DOUBLE PRECISION pcntrb(klon, llm+1, llm+1)
+    DOUBLE PRECISION, intent(out):: pcntrb(klon, llm+1, llm+1)
 
     ! LOCAL VARIABLES:
     DOUBLE PRECISION zb(klon, ninter, llm+1)
