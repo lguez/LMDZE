@@ -128,29 +128,29 @@ contains
     cool0 = 0.
     SCT = solaire / dist**2
 
+    rmu0 = mu0
+    ALBD(:, 1) = albedo
+    ALBD(:, 2) = albedo
+    ALBP(:, 1) = albedo
+    ALBP(:, 2) = albedo
+    ! cf. JLD pour etre en accord avec ORCHIDEE il faut mettre
+    ! EMIS = 0.96
+    EMIS = 1.
+    VIEW = 1.66
+    PSOL = paprs(:, 1)
+
     DO i = 1, klon
-       rmu0(i) = mu0(i)
-       ALBD(i, 1) = albedo(i)
-       ALBD(i, 2) = albedo(i)
-       ALBP(i, 1) = albedo(i)
-       ALBP(i, 2) = albedo(i)
-       ! cf. JLD pour etre en accord avec ORCHIDEE il faut mettre
-       ! EMIS(i) = 0.96
-       EMIS(i) = 1.
-       VIEW(i) = 1.66
-       PSOL(i) = paprs(i, 1)
        alpha1 = (paprs(i, 1)-play(i, 2)) &
             / (play(i, 1)-play(i, 2))
        alpha2 = 1. - alpha1
        TL(i, 1) = t_seri(i, 1) * alpha1 + t_seri(i, 2) * alpha2
-       TL(i, klev + 1) = t_seri(i, klev)
-       DT0(i) = tsol(i) - TL(i, 1)
     ENDDO
 
+    TL(:, klev + 1) = t_seri(:, klev)
+    DT0 = tsol - TL(:, 1)
+
     DO k = 2, klev
-       DO i = 1, klon
-          TL(i, k) = (t_seri(i, k) + t_seri(i, k-1))*0.5
-       ENDDO
+       TL(:, k) = (t_seri(:, k) + t_seri(:, k-1))*0.5
     ENDDO
 
     DO k = 1, klev
