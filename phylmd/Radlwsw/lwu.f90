@@ -208,6 +208,7 @@ contains
        JAE1 = 3 * LLM + 1 - JJ
        JAE2 = 3 * LLM + 1 - (JJ + 1)
        JAE3 = 3 * LLM + 1 - JJPN
+
        DO JAE = 1, 5
           DO JL = 1, KLON
              ZUAER(JL, JAE) = sum(RAER(JAE, :)) * PAER &
