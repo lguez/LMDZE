@@ -210,8 +210,7 @@ contains
        JAE3 = 3 * LLM + 1 - JJPN
        DO JAE = 1, 5
           DO JL = 1, KLON
-             ZUAER(JL, JAE) = (RAER(JAE, 1) + RAER(JAE, 2) + RAER(JAE, 3) &
-                  + RAER(JAE, 4) + RAER(JAE, 5)) * PAER &
+             ZUAER(JL, JAE) = sum(RAER(JAE, :)) * PAER &
                   / (ZDUC(JL, JAE1) + ZDUC(JL, JAE2) + ZDUC(JL, JAE3))
           end DO
        end DO
