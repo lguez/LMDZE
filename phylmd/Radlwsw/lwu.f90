@@ -43,9 +43,7 @@ contains
 
     ! LOCAL VARIABLES:
 
-    DOUBLE PRECISION PAER(KLON, LLM, 5)
-    ! OPTICAL THICKNESS OF THE AEROSOLS
-
+    DOUBLE PRECISION PAER ! OPTICAL THICKNESS OF THE AEROSOLS
     DOUBLE PRECISION ZABLY(KLON, NUA, 3 * LLM + 1)
     DOUBLE PRECISION ZDUC(KLON, 3 * LLM + 1)
     DOUBLE PRECISION ZPHIO(KLON)
@@ -212,11 +210,11 @@ contains
        JAE3 = 3 * LLM + 1 - JJPN
        DO JAE = 1, 5
           DO JL = 1, KLON
-             ZUAER(JL, JAE) = (RAER(JAE, 1) * PAER(JL, JKL, 1) &
-                  + RAER(JAE, 2) * PAER(JL, JKL, 2) &
-                  + RAER(JAE, 3) * PAER(JL, JKL, 3) &
-                  + RAER(JAE, 4) * PAER(JL, JKL, 4) &
-                  + RAER(JAE, 5) * PAER(JL, JKL, 5)) &
+             ZUAER(JL, JAE) = (RAER(JAE, 1) * PAER &
+                  + RAER(JAE, 2) * PAER &
+                  + RAER(JAE, 3) * PAER &
+                  + RAER(JAE, 4) * PAER &
+                  + RAER(JAE, 5) * PAER) &
                   / (ZDUC(JL, JAE1) + ZDUC(JL, JAE2) + ZDUC(JL, JAE3))
           end DO
        end DO
