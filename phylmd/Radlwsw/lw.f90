@@ -84,12 +84,6 @@ contains
     ! (KLON, LLM+1, LLM+1)
 
     INTEGER ilim, i, k, kpl1
-
-    INTEGER, PARAMETER:: lw0pas = 1 ! Every lw0pas steps, clear-sky is done
-    INTEGER, PARAMETER:: lwpas = 1 ! Every lwpas steps, cloudy-sky is done
-    ! In general, lw0pas and lwpas should be 1
-
-    INTEGER:: itaplw0 = 0, itaplw = 0
     logical:: first_call = .true.
 
     ! ------------------------------------------------------------------
@@ -101,28 +95,20 @@ contains
        first_call = .false.
     end if
 
-    IF (MOD(itaplw0, lw0pas) == 0) THEN
-       DO k = 1, LLM
-          DO i = 1, KLON
-             ! convertir ozone de kg/kg en pa (modif MPL 100505)
-             ZOZ(i, k) = OZON(i, k)*DP(i, k) * MD/RMO3
-          ENDDO
+    DO k = 1, LLM
+       DO i = 1, KLON
+          ! convertir ozone de kg/kg en pa (modif MPL 100505)
+          ZOZ(i, k) = OZON(i, k)*DP(i, k) * MD/RMO3
        ENDDO
+    ENDDO
 
-       CALL LWU(DP, PMB, ZOZ, TAVE, VIEW, WV, ZABCU)
-       CALL LWBV(ILIM, DT0, EMIS, PMB, TL, TAVE, ZABCU, &
-            ZFLUC, ZBINT, ZBSUI, ZCTS, ZCNTRB)
-       itaplw0 = 0
-    ENDIF
-    itaplw0 = itaplw0 + 1
+    CALL LWU(DP, PMB, ZOZ, TAVE, VIEW, WV, ZABCU)
+    CALL LWBV(ILIM, DT0, EMIS, PMB, TL, TAVE, ZABCU, &
+         ZFLUC, ZBINT, ZBSUI, ZCTS, ZCNTRB)
 
-    IF (MOD(itaplw, lwpas) == 0) THEN
-       CALL LWC(ILIM, CLDLD, CLDLU, EMIS, &
-            ZFLUC, ZBINT, ZBSUI, ZCTS, ZCNTRB, &
-            ZFLUX)
-       itaplw = 0
-    ENDIF
-    itaplw = itaplw + 1
+    CALL LWC(ILIM, CLDLD, CLDLU, EMIS, &
+         ZFLUC, ZBINT, ZBSUI, ZCTS, ZCNTRB, &
+         ZFLUX)
 
     DO k = 1, LLM
        kpl1 = k+1
