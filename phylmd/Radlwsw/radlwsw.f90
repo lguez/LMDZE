@@ -127,7 +127,6 @@ contains
     heat0 = 0.
     cool0 = 0.
     SCT = solaire / dist**2
-
     rmu0 = mu0
     ALBD(:, 1) = albedo
     ALBD(:, 2) = albedo
@@ -140,8 +139,7 @@ contains
     PSOL = paprs(:, 1)
 
     DO i = 1, klon
-       alpha1 = (paprs(i, 1)-play(i, 2)) &
-            / (play(i, 1)-play(i, 2))
+       alpha1 = (paprs(i, 1) - play(i, 2)) / (play(i, 1) - play(i, 2))
        TL(i, 1) = t_seri(i, 1) * alpha1 + t_seri(i, 2) * (1. - alpha1)
     ENDDO
 
@@ -149,26 +147,26 @@ contains
     DT0 = tsol - TL(:, 1)
 
     DO k = 2, klev
-       TL(:, k) = (t_seri(:, k) + t_seri(:, k-1))*0.5
+       TL(:, k) = (t_seri(:, k) + t_seri(:, k - 1)) * 0.5
     ENDDO
 
     DO k = 1, klev
        DO i = 1, klon
-          PDP(i, k) = paprs(i, k)-paprs(i, k + 1)
+          PDP(i, k) = paprs(i, k) - paprs(i, k + 1)
           PTAVE(i, k) = t_seri(i, k)
           PWV(i, k) = MAX(q_seri(i, k), 1e-12)
           PQS(i, k) = PWV(i, k)
           POZON(i, k) = wo(i, k) * RG * dobson_u * 1e3 &
                / (paprs(i, k) - paprs(i, k + 1))
-          PCLDLD(i, k) = cldfra(i, k)*cldemi(i, k)
-          PCLDLU(i, k) = cldfra(i, k)*cldemi(i, k)
+          PCLDLD(i, k) = cldfra(i, k) * cldemi(i, k)
+          PCLDLU(i, k) = cldfra(i, k) * cldemi(i, k)
           PCLDSW(i, k) = cldfra(i, k)
           PTAU(i, 1, k) = MAX(cldtau(i, k), 1e-05)
           ! (1e-12 serait instable)
           PTAU(i, 2, k) = MAX(cldtau(i, k), 1e-05)
           ! (pour 32-bit machines)
-          POMEGA(i, 1, k) = 0.9999 - 5e-04 * EXP(-0.5 * PTAU(i, 1, k))
-          POMEGA(i, 2, k) = 0.9988 - 2.5e-03 * EXP(-0.05 * PTAU(i, 2, k))
+          POMEGA(i, 1, k) = 0.9999 - 5e-04 * EXP(- 0.5 * PTAU(i, 1, k))
+          POMEGA(i, 2, k) = 0.9988 - 2.5e-03 * EXP(- 0.05 * PTAU(i, 2, k))
           PCG(i, 1, k) = 0.865
           PCG(i, 2, k) = 0.910
        ENDDO
