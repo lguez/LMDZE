@@ -93,7 +93,7 @@ contains
     DOUBLE PRECISION ZFLDN(KLON, KLEV + 1)
     DOUBLE PRECISION ZFLUP0(KLON, KLEV + 1)
     DOUBLE PRECISION ZFLDN0(KLON, KLEV + 1)
-    DOUBLE PRECISION alpha1, alpha2
+    DOUBLE PRECISION alpha1
     INTEGER k, i
     DOUBLE PRECISION SCT
     DOUBLE PRECISION ALBD(klon, 2), ALBP(klon, 2)
@@ -142,8 +142,7 @@ contains
     DO i = 1, klon
        alpha1 = (paprs(i, 1)-play(i, 2)) &
             / (play(i, 1)-play(i, 2))
-       alpha2 = 1. - alpha1
-       TL(i, 1) = t_seri(i, 1) * alpha1 + t_seri(i, 2) * alpha2
+       TL(i, 1) = t_seri(i, 1) * alpha1 + t_seri(i, 2) * (1. - alpha1)
     ENDDO
 
     TL(:, klev + 1) = t_seri(:, klev)
