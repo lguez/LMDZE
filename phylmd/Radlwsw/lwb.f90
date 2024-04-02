@@ -4,9 +4,9 @@ module lwb_m
 
 contains
 
-  SUBROUTINE LWB(PDT0, PTAVE, PTL &
-       , PB, PBINT, PBSUIN, PBSUR, PBTOP, PDBSL &
-       , PGA, PGB, PGASUR, PGBSUR, PGATOP, PGBTOP)
+  SUBROUTINE LWB(PDT0, PTAVE, PTL, PB, PBINT, PBSUIN, PBSUR, PBTOP, PDBSL, &
+       PGA, PGB, PGASUR, PGBSUR, PGATOP, PGBTOP)
+
     use dimensions
     use dimphy
     use raddimlw
@@ -1333,7 +1333,6 @@ contains
        end DO
     end DO
 
-    RETURN
   END SUBROUTINE LWB
 
 end module lwb_m
