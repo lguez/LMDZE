@@ -145,10 +145,7 @@ contains
 
     TL(:, klev + 1) = t_seri(:, klev)
     DT0 = tsol - TL(:, 1)
-
-    DO k = 2, klev
-       TL(:, k) = (t_seri(:, k) + t_seri(:, k - 1)) * 0.5
-    ENDDO
+    forall (k = 2:klev) TL(:, k) = (t_seri(:, k) + t_seri(:, k - 1)) * 0.5
 
     DO k = 1, klev
        DO i = 1, klon
