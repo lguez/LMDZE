@@ -5,6 +5,7 @@ module lwvd_m
 contains
 
   SUBROUTINE lwvd(ktraer, pabcu, pdbdt, pga, pgb, pcntrb, pdisd, pdisu)
+
     USE dimensions
     USE dimphy
     USE raddimlw
@@ -91,8 +92,8 @@ contains
        ikn = (jk-1)*ng1p1 + 1
        ikd1 = jk*ng1p1 + 1
 
-       CALL lwttm(pga(1, 1, 1, jk), pgb(1, 1, 1, jk), pabcu(1, 1, ikn), pabcu(1, 1, ikd1), &
-            ztt1)
+       CALL lwttm(pga(1, 1, 1, jk), pgb(1, 1, 1, jk), pabcu(1, 1, ikn), &
+            pabcu(1, 1, ikd1), ztt1)
 
        ! * 2.2.3 HIGHER UP
 
@@ -107,11 +108,11 @@ contains
           ikd2 = jkj*ng1p1 + 1
 
           IF (itt==1) THEN
-             CALL lwttm(pga(1, 1, 1, jkj), pgb(1, 1, 1, jkj), pabcu(1, 1, ikn), &
-                  pabcu(1, 1, ikd2), ztt1)
+             CALL lwttm(pga(1, 1, 1, jkj), pgb(1, 1, 1, jkj), &
+                  pabcu(1, 1, ikn), pabcu(1, 1, ikd2), ztt1)
           ELSE
-             CALL lwttm(pga(1, 1, 1, jkj), pgb(1, 1, 1, jkj), pabcu(1, 1, ikn), &
-                  pabcu(1, 1, ikd2), ztt2)
+             CALL lwttm(pga(1, 1, 1, jkj), pgb(1, 1, 1, jkj), &
+                  pabcu(1, 1, ikn), pabcu(1, 1, ikd2), ztt2)
           END IF
 
           DO ja = 1, ktraer
@@ -162,11 +163,11 @@ contains
           iku2 = (ijkl-1)*ng1p1 + 1
 
           IF (itt==1) THEN
-             CALL lwttm(pga(1, 1, 1, ijkl), pgb(1, 1, 1, ijkl), pabcu(1, 1, iku2), &
-                  pabcu(1, 1, ikn), ztt1)
+             CALL lwttm(pga(1, 1, 1, ijkl), pgb(1, 1, 1, ijkl), &
+                  pabcu(1, 1, iku2), pabcu(1, 1, ikn), ztt1)
           ELSE
-             CALL lwttm(pga(1, 1, 1, ijkl), pgb(1, 1, 1, ijkl), pabcu(1, 1, iku2), &
-                  pabcu(1, 1, ikn), ztt2)
+             CALL lwttm(pga(1, 1, 1, ijkl), pgb(1, 1, 1, ijkl), &
+                  pabcu(1, 1, iku2), pabcu(1, 1, ikn), ztt2)
           END IF
 
           DO ja = 1, ktraer
@@ -187,11 +188,9 @@ contains
              pdisu(jl, jk) = pdisu(jl, jk) + zdzxmg
              pcntrb(jl, jk, ijkl) = zdzxmg
           END DO
-
        END DO
     END DO
 
-    RETURN
   END SUBROUTINE lwvd
 
 end module lwvd_m
