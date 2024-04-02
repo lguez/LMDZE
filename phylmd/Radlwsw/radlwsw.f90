@@ -143,7 +143,7 @@ contains
     CLDLD = cldfra * cldemi
     TAU(:, 1, :) = MAX(cldtau, 1e-05)
     ! (1e-12 serait instable)
-    TAU(:, 2, :) = MAX(cldtau, 1e-05)
+    TAU(:, 2, :) = TAU(:, 1, :)
     ! (pour 32-bit machines)
     OMEGA(:, 1, :) = 0.9999 - 5e-04 * EXP(- 0.5 * TAU(:, 1, :))
     OMEGA(:, 2, :) = 0.9988 - 2.5e-03 * EXP(- 0.05 * TAU(:, 2, :))
