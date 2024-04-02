@@ -75,7 +75,7 @@ contains
     DOUBLE PRECISION ZCNTRB(KLON, LLM+1, LLM+1)
     INTEGER ilim, i, k, kpl1
 
-    ! ------------------------------------------------------------------
+    !------------------------------------------------------------------
 
     DO k = 1, LLM
        DO i = 1, KLON
@@ -93,20 +93,20 @@ contains
        kpl1 = k+1
        DO i = 1, KLON
           COLR(i, k) = ZFLUX(i, 1, kpl1)+ZFLUX(i, 2, kpl1) &
-               - ZFLUX(i, 1, k)- ZFLUX(i, 2, k)
+               - ZFLUX(i, 1, k) - ZFLUX(i, 2, k)
           COLR(i, k) = COLR(i, k) * DAYSEC*RG/RCPD / DP(i, k)
           COLR0(i, k) = ZFLUC(i, 1, kpl1)+ZFLUC(i, 2, kpl1) &
-               - ZFLUC(i, 1, k)- ZFLUC(i, 2, k)
+               - ZFLUC(i, 1, k) - ZFLUC(i, 2, k)
           COLR0(i, k) = COLR0(i, k) * DAYSEC*RG/RCPD / DP(i, k)
        ENDDO
     ENDDO
     DO i = 1, KLON
-       SOLLW(i) = -ZFLUX(i, 1, 1)-ZFLUX(i, 2, 1)
+       SOLLW(i) = - ZFLUX(i, 1, 1) - ZFLUX(i, 2, 1)
        TOPLW(i) = ZFLUX(i, 1, LLM+1) + ZFLUX(i, 2, LLM+1)
 
-       SOLLW0(i) = -ZFLUC(i, 1, 1)-ZFLUC(i, 2, 1)
+       SOLLW0(i) = - ZFLUC(i, 1, 1) - ZFLUC(i, 2, 1)
        TOPLW0(i) = ZFLUC(i, 1, LLM+1) + ZFLUC(i, 2, LLM+1)
-       sollwdown(i) = -ZFLUX(i, 2, 1)
+       sollwdown(i) = - ZFLUX(i, 2, 1)
 
        ! Attention aux signes : LWtop > 0, LWdn < 0
        DO k = 1, LLM+1

@@ -114,13 +114,11 @@ contains
     DOUBLE PRECISION ztopsw0(klon), ztoplw0(klon)
     DOUBLE PRECISION zsolsw0(klon), zsollw0(klon)
     DOUBLE PRECISION zznormcp
-    real, parameter:: dobson_u = 2.1415e-05 ! Dobson unit, in kg m-2
+    real, parameter:: dobson_u = 2.1415e-5 ! Dobson unit, in kg m-2
 
     !----------------------------------------------------------------------
 
     ALBD = spread(albedo, 2, 2)
-    ! cf. JLD pour etre en accord avec ORCHIDEE il faut mettre
-    ! EMIS = 0.96
     EMIS = 1.
     VIEW = 1.66
 
@@ -136,12 +134,13 @@ contains
     TAVE = t_seri
     WV = MAX(q_seri, 1e-12)
     CLDLD = cldfra * cldemi
-    TAU(:, 1, :) = MAX(cldtau, 1e-05)
-    ! (1e-12 serait instable)
+
+    TAU(:, 1, :) = MAX(cldtau, 1e-5)
+    ! (1e-12 serait instable pour 32-bit machines)
+
     TAU(:, 2, :) = TAU(:, 1, :)
-    ! (pour 32-bit machines)
-    OMEGA(:, 1, :) = 0.9999 - 5e-04 * EXP(- 0.5 * TAU(:, 1, :))
-    OMEGA(:, 2, :) = 0.9988 - 2.5e-03 * EXP(- 0.05 * TAU(:, 2, :))
+    OMEGA(:, 1, :) = 0.9999 - 5e-4 * EXP(- 0.5 * TAU(:, 1, :))
+    OMEGA(:, 2, :) = 0.9988 - 2.5e-3 * EXP(- 0.05 * TAU(:, 2, :))
     CG(:, 1, :) = 0.865
     CG(:, 2, :) = 0.910
     PMB = paprs / 100.
