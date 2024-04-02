@@ -1,6 +1,6 @@
 SUBROUTINE lwvb(kuaer, ktraer, klim, pabcu, padjd, padju, pb, pbint, pbsui, &
-    pbsur, pbtop, pdisd, pdisu, pemis, ppmb, pga, pgb, pgasur, pgbsur, &
-    pgatop, pgbtop, pcts, pfluc)
+     pbsur, pbtop, pdisd, pdisu, pemis, ppmb, pga, pgb, pgasur, pgbsur, &
+     pgatop, pgbtop, pcts, pfluc)
   USE dimensions
   USE dimphy
   USE radopt
@@ -93,16 +93,16 @@ SUBROUTINE lwvb(kuaer, ktraer, klim, pabcu, padjd, padju, pb, pbint, pbsui, &
 
 
   DO ja = 1, ntra
-    DO jl = 1, klon
-      ztt(jl, ja) = 1.0
-      ztt1(jl, ja) = 1.0
-    END DO
+     DO jl = 1, klon
+        ztt(jl, ja) = 1.0
+        ztt1(jl, ja) = 1.0
+     END DO
   END DO
 
   DO ja = 1, nua
-    DO jl = 1, klon
-      zuu(jl, ja) = 1.0
-    END DO
+     DO jl = 1, klon
+        zuu(jl, ja) = 1.0
+     END DO
   END DO
 
   ! ------------------------------------------------------------------
@@ -115,27 +115,27 @@ SUBROUTINE lwvb(kuaer, ktraer, klim, pabcu, padjd, padju, pb, pbint, pbsui, &
 
 
   DO jk = 1, llm
-    in = (jk-1)*ng1p1 + 1
+     in = (jk-1)*ng1p1 + 1
 
-    DO ja = 1, kuaer
-      DO jl = 1, klon
-        zuu(jl, ja) = pabcu(jl, ja, in)
-      END DO
-    END DO
+     DO ja = 1, kuaer
+        DO jl = 1, klon
+           zuu(jl, ja) = pabcu(jl, ja, in)
+        END DO
+     END DO
 
 
-    CALL lwtt(pgatop(1,1,1), pgbtop(1,1,1), zuu, ztt)
+     CALL lwtt(pgatop(1,1,1), pgbtop(1,1,1), zuu, ztt)
 
-    DO jl = 1, klon
-      zcntop(jl) = pbtop(jl, 1)*ztt(jl, 1)*ztt(jl, 10) + &
-        pbtop(jl, 2)*ztt(jl, 2)*ztt(jl, 7)*ztt(jl, 11) + &
-        pbtop(jl, 3)*ztt(jl, 4)*ztt(jl, 8)*ztt(jl, 12) + &
-        pbtop(jl, 4)*ztt(jl, 5)*ztt(jl, 9)*ztt(jl, 13) + &
-        pbtop(jl, 5)*ztt(jl, 3)*ztt(jl, 14) + pbtop(jl, 6)*ztt(jl, 6)*ztt(jl, &
-        15)
-      zfd(jl) = zcntop(jl) - pbint(jl, jk) - pdisd(jl, jk) - padjd(jl, jk)
-      pfluc(jl, 2, jk) = zfd(jl)
-    END DO
+     DO jl = 1, klon
+        zcntop(jl) = pbtop(jl, 1)*ztt(jl, 1)*ztt(jl, 10) + &
+             pbtop(jl, 2)*ztt(jl, 2)*ztt(jl, 7)*ztt(jl, 11) + &
+             pbtop(jl, 3)*ztt(jl, 4)*ztt(jl, 8)*ztt(jl, 12) + &
+             pbtop(jl, 4)*ztt(jl, 5)*ztt(jl, 9)*ztt(jl, 13) + &
+             pbtop(jl, 5)*ztt(jl, 3)*ztt(jl, 14) + pbtop(jl, 6)*ztt(jl, 6)*ztt(jl, &
+             15)
+        zfd(jl) = zcntop(jl) - pbint(jl, jk) - pdisd(jl, jk) - padjd(jl, jk)
+        pfluc(jl, 2, jk) = zfd(jl)
+     END DO
 
   END DO
 
@@ -143,10 +143,10 @@ SUBROUTINE lwvb(kuaer, ktraer, klim, pabcu, padjd, padju, pb, pbint, pbsui, &
   in = (jk-1)*ng1p1 + 1
 
   DO jl = 1, klon
-    zcntop(jl) = pbtop(jl, 1) + pbtop(jl, 2) + pbtop(jl, 3) + pbtop(jl, 4) + &
-      pbtop(jl, 5) + pbtop(jl, 6)
-    zfd(jl) = zcntop(jl) - pbint(jl, jk) - pdisd(jl, jk) - padjd(jl, jk)
-    pfluc(jl, 2, jk) = zfd(jl)
+     zcntop(jl) = pbtop(jl, 1) + pbtop(jl, 2) + pbtop(jl, 3) + pbtop(jl, 4) + &
+          pbtop(jl, 5) + pbtop(jl, 6)
+     zfd(jl) = zcntop(jl) - pbint(jl, jk) - pdisd(jl, jk) - padjd(jl, jk)
+     pfluc(jl, 2, jk) = zfd(jl)
   END DO
 
   ! *         2.4     COOLING-TO-SPACE OF LAYERS ABOVE 10 HPA
@@ -161,64 +161,64 @@ SUBROUTINE lwvb(kuaer, ktraer, klim, pabcu, padjd, padju, pb, pbint, pbsui, &
   jlim = llm
 
   IF (.NOT. levoigt) THEN
-    DO jk = llm, 1, -1
-      IF (ppmb(1,jk)<10.0) THEN
-        jlim = jk
-      END IF
-    END DO
+     DO jk = llm, 1, -1
+        IF (ppmb(1,jk)<10.0) THEN
+           jlim = jk
+        END IF
+     END DO
   END IF
   klim = jlim
 
   IF (.NOT. levoigt) THEN
-    DO ja = 1, ktraer
-      DO jl = 1, klon
-        ztt1(jl, ja) = 1.0
-      END DO
-    END DO
-
-    ! *         2.4.2   LOOP OVER LAYERS ABOVE 10 HPA
-    ! -----------------------------
-
-
-    DO jstra = llm, jlim, -1
-      jstru = (jstra-1)*ng1p1 + 1
-
-      DO ja = 1, kuaer
+     DO ja = 1, ktraer
         DO jl = 1, klon
-          zuu(jl, ja) = pabcu(jl, ja, jstru)
+           ztt1(jl, ja) = 1.0
         END DO
-      END DO
+     END DO
+
+     ! *         2.4.2   LOOP OVER LAYERS ABOVE 10 HPA
+     ! -----------------------------
 
 
-      CALL lwtt(pga(1,1,1,jstra), pgb(1,1,1,jstra), zuu, ztt)
+     DO jstra = llm, jlim, -1
+        jstru = (jstra-1)*ng1p1 + 1
 
-      DO jl = 1, klon
-        zctstr = (pb(jl,1,jstra)+pb(jl,1,jstra+1))* &
-          (ztt1(jl,1)*ztt1(jl,10)-ztt(jl,1)*ztt(jl,10)) + &
-          (pb(jl,2,jstra)+pb(jl,2,jstra+1))*(ztt1(jl,2)*ztt1(jl,7)*ztt1(jl,11 &
-          )-ztt(jl,2)*ztt(jl,7)*ztt(jl,11)) + (pb(jl,3,jstra)+pb(jl,3,jstra+1 &
-          ))*(ztt1(jl,4)*ztt1(jl,8)*ztt1(jl,12)-ztt(jl,4)*ztt(jl,8)*ztt(jl,12 &
-          )) + (pb(jl,4,jstra)+pb(jl,4,jstra+1))*(ztt1(jl,5)*ztt1(jl,9)*ztt1( &
-          jl,13)-ztt(jl,5)*ztt(jl,9)*ztt(jl,13)) + (pb(jl,5,jstra)+pb(jl,5, &
-          jstra+1))*(ztt1(jl,3)*ztt1(jl,14)-ztt(jl,3)*ztt(jl,14)) + &
-          (pb(jl,6,jstra)+pb(jl,6,jstra+1))*(ztt1(jl,6)*ztt1(jl,15)-ztt(jl,6) &
-          *ztt(jl,15))
-        pcts(jl, jstra) = zctstr*0.5
-      END DO
-      DO ja = 1, ktraer
+        DO ja = 1, kuaer
+           DO jl = 1, klon
+              zuu(jl, ja) = pabcu(jl, ja, jstru)
+           END DO
+        END DO
+
+
+        CALL lwtt(pga(1,1,1,jstra), pgb(1,1,1,jstra), zuu, ztt)
+
         DO jl = 1, klon
-          ztt1(jl, ja) = ztt(jl, ja)
+           zctstr = (pb(jl,1,jstra)+pb(jl,1,jstra+1))* &
+                (ztt1(jl,1)*ztt1(jl,10)-ztt(jl,1)*ztt(jl,10)) + &
+                (pb(jl,2,jstra)+pb(jl,2,jstra+1))*(ztt1(jl,2)*ztt1(jl,7)*ztt1(jl,11 &
+                )-ztt(jl,2)*ztt(jl,7)*ztt(jl,11)) + (pb(jl,3,jstra)+pb(jl,3,jstra+1 &
+                ))*(ztt1(jl,4)*ztt1(jl,8)*ztt1(jl,12)-ztt(jl,4)*ztt(jl,8)*ztt(jl,12 &
+                )) + (pb(jl,4,jstra)+pb(jl,4,jstra+1))*(ztt1(jl,5)*ztt1(jl,9)*ztt1( &
+                jl,13)-ztt(jl,5)*ztt(jl,9)*ztt(jl,13)) + (pb(jl,5,jstra)+pb(jl,5, &
+                jstra+1))*(ztt1(jl,3)*ztt1(jl,14)-ztt(jl,3)*ztt(jl,14)) + &
+                (pb(jl,6,jstra)+pb(jl,6,jstra+1))*(ztt1(jl,6)*ztt1(jl,15)-ztt(jl,6) &
+                *ztt(jl,15))
+           pcts(jl, jstra) = zctstr*0.5
         END DO
-      END DO
-    END DO
+        DO ja = 1, ktraer
+           DO jl = 1, klon
+              ztt1(jl, ja) = ztt(jl, ja)
+           END DO
+        END DO
+     END DO
   END IF
   ! Mise a zero de securite pour PCTS en cas de LEVOIGT
   IF (levoigt) THEN
-    DO jstra = 1, llm
-      DO jl = 1, klon
-        pcts(jl, jstra) = 0.
-      END DO
-    END DO
+     DO jstra = 1, llm
+        DO jl = 1, klon
+           pcts(jl, jstra) = 0.
+        END DO
+     END DO
   END IF
 
 
@@ -227,45 +227,45 @@ SUBROUTINE lwvb(kuaer, ktraer, klim, pabcu, padjd, padju, pb, pbint, pbsui, &
 
 
   DO jl = 1, klon
-    zbgnd(jl) = pbsui(jl)*pemis(jl) - (1.-pemis(jl))*pfluc(jl, 2, 1) - &
-      pbint(jl, 1)
+     zbgnd(jl) = pbsui(jl)*pemis(jl) - (1.-pemis(jl))*pfluc(jl, 2, 1) - &
+          pbint(jl, 1)
   END DO
 
   jk = 1
   in = (jk-1)*ng1p1 + 1
 
   DO jl = 1, klon
-    zcnsol(jl) = pbsur(jl, 1) + pbsur(jl, 2) + pbsur(jl, 3) + pbsur(jl, 4) + &
-      pbsur(jl, 5) + pbsur(jl, 6)
-    zcnsol(jl) = zcnsol(jl)*zbgnd(jl)/pbsui(jl)
-    zfu(jl) = zcnsol(jl) + pbint(jl, jk) - pdisu(jl, jk) - padju(jl, jk)
-    pfluc(jl, 1, jk) = zfu(jl)
+     zcnsol(jl) = pbsur(jl, 1) + pbsur(jl, 2) + pbsur(jl, 3) + pbsur(jl, 4) + &
+          pbsur(jl, 5) + pbsur(jl, 6)
+     zcnsol(jl) = zcnsol(jl)*zbgnd(jl)/pbsui(jl)
+     zfu(jl) = zcnsol(jl) + pbint(jl, jk) - pdisu(jl, jk) - padju(jl, jk)
+     pfluc(jl, 1, jk) = zfu(jl)
   END DO
 
   DO jk = 2, llm + 1
-    in = (jk-1)*ng1p1 + 1
+     in = (jk-1)*ng1p1 + 1
 
 
-    DO ja = 1, kuaer
-      DO jl = 1, klon
-        zuu(jl, ja) = pabcu(jl, ja, 1) - pabcu(jl, ja, in)
-      END DO
-    END DO
+     DO ja = 1, kuaer
+        DO jl = 1, klon
+           zuu(jl, ja) = pabcu(jl, ja, 1) - pabcu(jl, ja, in)
+        END DO
+     END DO
 
 
-    CALL lwtt(pgasur(1,1,1), pgbsur(1,1,1), zuu, ztt)
+     CALL lwtt(pgasur(1,1,1), pgbsur(1,1,1), zuu, ztt)
 
-    DO jl = 1, klon
-      zcnsol(jl) = pbsur(jl, 1)*ztt(jl, 1)*ztt(jl, 10) + &
-        pbsur(jl, 2)*ztt(jl, 2)*ztt(jl, 7)*ztt(jl, 11) + &
-        pbsur(jl, 3)*ztt(jl, 4)*ztt(jl, 8)*ztt(jl, 12) + &
-        pbsur(jl, 4)*ztt(jl, 5)*ztt(jl, 9)*ztt(jl, 13) + &
-        pbsur(jl, 5)*ztt(jl, 3)*ztt(jl, 14) + pbsur(jl, 6)*ztt(jl, 6)*ztt(jl, &
-        15)
-      zcnsol(jl) = zcnsol(jl)*zbgnd(jl)/pbsui(jl)
-      zfu(jl) = zcnsol(jl) + pbint(jl, jk) - pdisu(jl, jk) - padju(jl, jk)
-      pfluc(jl, 1, jk) = zfu(jl)
-    END DO
+     DO jl = 1, klon
+        zcnsol(jl) = pbsur(jl, 1)*ztt(jl, 1)*ztt(jl, 10) + &
+             pbsur(jl, 2)*ztt(jl, 2)*ztt(jl, 7)*ztt(jl, 11) + &
+             pbsur(jl, 3)*ztt(jl, 4)*ztt(jl, 8)*ztt(jl, 12) + &
+             pbsur(jl, 4)*ztt(jl, 5)*ztt(jl, 9)*ztt(jl, 13) + &
+             pbsur(jl, 5)*ztt(jl, 3)*ztt(jl, 14) + pbsur(jl, 6)*ztt(jl, 6)*ztt(jl, &
+             15)
+        zcnsol(jl) = zcnsol(jl)*zbgnd(jl)/pbsui(jl)
+        zfu(jl) = zcnsol(jl) + pbint(jl, jk) - pdisu(jl, jk) - padju(jl, jk)
+        pfluc(jl, 1, jk) = zfu(jl)
+     END DO
 
 
   END DO
@@ -277,16 +277,16 @@ SUBROUTINE lwvb(kuaer, ktraer, klim, pabcu, padjd, padju, pb, pbint, pbsui, &
 
 
   IF (.NOT. levoigt) THEN
-    DO jl = 1, klon
-      zfn10(jl) = pfluc(jl, 1, jlim) + pfluc(jl, 2, jlim)
-    END DO
-    DO jk = jlim + 1, llm + 1
-      DO jl = 1, klon
-        zfn10(jl) = zfn10(jl) + pcts(jl, jk-1)
-        pfluc(jl, 1, jk) = zfn10(jl)
-        pfluc(jl, 2, jk) = 0.
-      END DO
-    END DO
+     DO jl = 1, klon
+        zfn10(jl) = pfluc(jl, 1, jlim) + pfluc(jl, 2, jlim)
+     END DO
+     DO jk = jlim + 1, llm + 1
+        DO jl = 1, klon
+           zfn10(jl) = zfn10(jl) + pcts(jl, jk-1)
+           pfluc(jl, 1, jk) = zfn10(jl)
+           pfluc(jl, 2, jk) = 0.
+        END DO
+     END DO
   END IF
 
   ! ------------------------------------------------------------------
