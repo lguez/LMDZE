@@ -5,6 +5,7 @@ module lwvn_m
 contains
 
   SUBROUTINE lwvn(kuaer, pabcu, pdbsl, pga, pgb, padjd, padju, pcntrb, pdbdt)
+
     USE dimensions
     USE dimphy
     USE raddimlw
@@ -94,7 +95,6 @@ contains
     ! * 2.1 CONTRIBUTION FROM ADJACENT LAYERS
 
     DO jk = 1, llm
-
        ! * 2.1.1 DOWNWARD LAYERS
 
        im12 = 2*(jk-1)
