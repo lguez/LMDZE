@@ -1259,23 +1259,23 @@
 !*         1.0     PLANCK FUNCTIONS AND GRADIENTS
 !                  ------------------------------
 !
-      DO 102 JK = 1 , LLM+1
-      DO 101 JL = 1, KLON
+      DO JK = 1 , LLM+1
+      DO JL = 1, KLON
       PBINT(JL,JK) = 0.
- 101  CONTINUE
- 102  CONTINUE
-      DO 103 JL = 1, KLON
+   end DO
+end DO
+      DO JL = 1, KLON
       PBSUIN(JL) = 0.
- 103  CONTINUE
+   end DO
 !
-      DO 141 JNU=1,Ninter
+      DO JNU=1,Ninter
 !
 !
 !*         1.1   LEVELS FROM SURFACE TO LLM
 !                ----------------------------
 !
-      DO 112 JK = 1 , LLM
-      DO 111 JL = 1, KLON
+      DO JK = 1 , LLM
+      DO JL = 1, KLON
       ZTI(JL)=(PTL(JL,JK)-TSTAND)/TSTAND
       ZRES(JL) = XP(1,JNU)+ZTI(JL)*(XP(2,JNU)+ZTI(JL)*(XP(3,JNU) &
              +ZTI(JL)*(XP(4,JNU)+ZTI(JL)*(XP(5,JNU)+ZTI(JL)*(XP(6,JNU) &
@@ -1288,14 +1288,14 @@
            +ZTI2(JL)*(XP(4,JNU)+ZTI2(JL)*(XP(5,JNU)+ZTI2(JL)*(XP(6,JNU) &
              )))))
       ZBLAY(JL,JK) = ZRES2(JL)
- 111  CONTINUE
- 112  CONTINUE
+   end DO
+end DO
 !
 !
 !*         1.2   TOP OF THE ATMOSPHERE AND SURFACE
 !                ---------------------------------
 !
-      DO 121 JL = 1, KLON
+      DO JL = 1, KLON
       ZTI(JL)=(PTL(JL,LLM+1)-TSTAND)/TSTAND
       ZTI2(JL) = (PTL(JL,1) + PDT0(JL) - TSTAND) / TSTAND
       ZRES(JL) = XP(1,JNU)+ZTI(JL)*(XP(2,JNU)+ZTI(JL)*(XP(3,JNU) &
@@ -1310,27 +1310,27 @@
       PBTOP(JL,JNU) = ZRES(JL)
       PBSUR(JL,JNU) = ZRES2(JL)
       PBSUIN(JL) = PBSUIN(JL) + ZRES2(JL)
- 121  CONTINUE
+   end DO
 !
 !
 !*         1.3   GRADIENTS IN SUB-LAYERS
 !                -----------------------
 !
-      DO 132 JK = 1 , LLM
+      DO JK = 1 , LLM
       JK2 = 2 * JK
       JK1 = JK2 - 1
-      DO 131 JL = 1, KLON
+      DO JL = 1, KLON
       PDBSL(JL,JNU,JK1) = ZBLAY(JL,JK  ) - ZBLEV(JL,JK)
       PDBSL(JL,JNU,JK2) = ZBLEV(JL,JK+1) - ZBLAY(JL,JK)
- 131  CONTINUE
- 132  CONTINUE
+   end DO
+end DO
 !
- 141  CONTINUE
+end DO
 !
 !*         2.0   CHOOSE THE RELEVANT SETS OF PADE APPROXIMANTS
 !                ---------------------------------------------
 !
-      DO 211 JL=1, KLON
+      DO JL=1, KLON
       ZDSTO1 = (PTL(JL,LLM+1)-TINTP(1)) / TSTP
       IXTOX = MAX( 1, MIN( MXIXT, INT( ZDSTO1 + 1. ) ) )
       ZDSTOX = (PTL(JL,LLM+1)-TINTP(IXTOX))/TSTP
@@ -1349,23 +1349,23 @@
          INDT=IXTX+1
       END IF
       INDS(JL)=INDT
- 211  CONTINUE
+   end DO
 !
-      DO 214 JF=1,2
-      DO 213 JG=1, 8
-      DO 212 JL=1, KLON
+      DO JF=1,2
+      DO JG=1, 8
+      DO JL=1, KLON
       INDSU=INDS(JL)
       PGASUR(JL,JG,JF)=GA(INDSU,2*JG-1,JF)
       PGBSUR(JL,JG,JF)=GB(INDSU,2*JG-1,JF)
       INDTP=INDB(JL)
       PGATOP(JL,JG,JF)=GA(INDTP,2*JG-1,JF)
       PGBTOP(JL,JG,JF)=GB(INDTP,2*JG-1,JF)
- 212  CONTINUE
- 213  CONTINUE
- 214  CONTINUE
+   end DO
+end DO
+end DO
 !
-      DO 225 JK=1,LLM
-      DO 221 JL=1, KLON
+      DO JK=1,LLM
+      DO JL=1, KLON
       ZDST1 = (PTAVE(JL,JK)-TINTP(1)) / TSTP
       IXTX = MAX( 1, MIN( MXIXT, INT( ZDST1 + 1. ) ) )
       ZDSTX = (PTAVE(JL,JK)-TINTP(IXTX))/TSTP
@@ -1375,18 +1375,18 @@
          INDT=IXTX+1
       END IF
       INDB(JL)=INDT
- 221  CONTINUE
+   end DO
 !
-      DO 224 JF=1,2
-      DO 223 JG=1, 8
-      DO 222 JL=1, KLON
+      DO JF=1,2
+      DO JG=1, 8
+      DO JL=1, KLON
       INDT=INDB(JL)
       PGA(JL,JG,JF,JK)=GA(INDT,2*JG,JF)
       PGB(JL,JG,JF,JK)=GB(INDT,2*JG,JF)
- 222  CONTINUE
- 223  CONTINUE
- 224  CONTINUE
- 225  CONTINUE
+   end DO
+end DO
+end DO
+end DO
 !
 !     ------------------------------------------------------------------
 !
