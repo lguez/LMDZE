@@ -9,6 +9,7 @@ contains
 
     USE dimensions, only: llm
     USE dimphy, only: klon
+    use lwb_m, only: lwb
     use lwv_m, only: lwv
     USE raddimlw, only: nua, ninter, ntra
 

@@ -1,10 +1,15 @@
+module lwb_m
+
+  IMPLICIT none
+
+contains
+
       SUBROUTINE LWB(PDT0,PTAVE,PTL &
         , PB,PBINT,PBSUIN,PBSUR,PBTOP,PDBSL &
         , PGA,PGB,PGASUR,PGBSUR,PGATOP,PGBTOP)
       use dimensions
       use dimphy
       use raddimlw
-      IMPLICIT none
 !
 !-----------------------------------------------------------------------
 !     PURPOSE.
@@ -1391,4 +1396,6 @@ end DO
 !     ------------------------------------------------------------------
 !
       RETURN
-      END
+      END SUBROUTINE LWB
+
+end module lwb_m
