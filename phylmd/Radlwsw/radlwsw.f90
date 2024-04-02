@@ -98,13 +98,13 @@ contains
     DOUBLE PRECISION SCT
     DOUBLE PRECISION ALBD(klon, 2), ALBP(klon, 2)
     DOUBLE PRECISION EMIS(klon), DT0(klon), VIEW(klon)
-    DOUBLE PRECISION PSOL(klon), PDP(klon, klev)
-    DOUBLE PRECISION TL(klon, klev + 1), PPMB(klon, klev + 1)
-    DOUBLE PRECISION PTAVE(klon, klev)
-    DOUBLE PRECISION PWV(klon, klev), PQS(klon, klev)
-    DOUBLE PRECISION POZON(klon, klev) ! mass fraction of ozone
-    DOUBLE PRECISION PCLDLD(klon, klev)
-    DOUBLE PRECISION PCLDLU(klon, klev)
+    DOUBLE PRECISION PSOL(klon), DP(klon, klev)
+    DOUBLE PRECISION TL(klon, klev + 1), PMB(klon, klev + 1)
+    DOUBLE PRECISION TAVE(klon, klev)
+    DOUBLE PRECISION WV(klon, klev), PQS(klon, klev)
+    DOUBLE PRECISION OZON(klon, klev) ! mass fraction of ozone
+    DOUBLE PRECISION CLDLD(klon, klev)
+    DOUBLE PRECISION CLDLU(klon, klev)
     DOUBLE PRECISION PCLDSW(klon, klev)
     DOUBLE PRECISION PTAU(klon, 2, klev)
     DOUBLE PRECISION POMEGA(klon, 2, klev)
@@ -149,14 +149,14 @@ contains
 
     DO k = 1, klev
        DO i = 1, klon
-          PDP(i, k) = paprs(i, k) - paprs(i, k + 1)
-          PTAVE(i, k) = t_seri(i, k)
-          PWV(i, k) = MAX(q_seri(i, k), 1e-12)
-          PQS(i, k) = PWV(i, k)
-          POZON(i, k) = wo(i, k) * RG * dobson_u * 1e3 &
+          DP(i, k) = paprs(i, k) - paprs(i, k + 1)
+          TAVE(i, k) = t_seri(i, k)
+          WV(i, k) = MAX(q_seri(i, k), 1e-12)
+          PQS(i, k) = WV(i, k)
+          OZON(i, k) = wo(i, k) * RG * dobson_u * 1e3 &
                / (paprs(i, k) - paprs(i, k + 1))
-          PCLDLD(i, k) = cldfra(i, k) * cldemi(i, k)
-          PCLDLU(i, k) = cldfra(i, k) * cldemi(i, k)
+          CLDLD(i, k) = cldfra(i, k) * cldemi(i, k)
+          CLDLU(i, k) = cldfra(i, k) * cldemi(i, k)
           PCLDSW(i, k) = cldfra(i, k)
           PTAU(i, 1, k) = MAX(cldtau(i, k), 1e-05)
           ! (1e-12 serait instable)
@@ -171,15 +171,15 @@ contains
 
     DO k = 1, klev + 1
        DO i = 1, klon
-          PPMB(i, k) = paprs(i, k)/100.
+          PMB(i, k) = paprs(i, k)/100.
        ENDDO
     ENDDO
 
-    CALL LW(PPMB, PDP, DT0, EMIS, TL, PTAVE, PWV, POZON, PCLDLD, &
-         PCLDLU, VIEW, zcool, zcool0, ztoplw, zsollw, ztoplw0, zsollw0, &
-         zsollwdown, ZFLUP, ZFLDN, ZFLUP0, ZFLDN0)
-    CALL SW(SCT, rmu0, dble(fract), PPMB, PDP, PSOL, ALBD, ALBP, PTAVE, &
-         PWV, PQS, POZON, PCLDSW, PTAU, POMEGA, PCG, zheat, zheat0, ztopsw, &
+    CALL LW(PMB, DP, DT0, EMIS, TL, TAVE, WV, OZON, CLDLD, CLDLU, VIEW, zcool, &
+         zcool0, ztoplw, zsollw, ztoplw0, zsollw0, zsollwdown, ZFLUP, ZFLDN, &
+         ZFLUP0, ZFLDN0)
+    CALL SW(SCT, rmu0, dble(fract), PMB, DP, PSOL, ALBD, ALBP, TAVE, &
+         WV, PQS, OZON, PCLDSW, PTAU, POMEGA, PCG, zheat, zheat0, ztopsw, &
          zsolsw, ztopsw0, zsolsw0, ZFSUP, ZFSDN, ZFSUP0, ZFSDN0)
 
     radsol = zsolsw + zsollw
@@ -205,7 +205,7 @@ contains
        DO i = 1, klon
           ! scale factor to take into account the difference
           ! between dry air and water vapour specific heat capacity
-          zznormcp = 1. + RVTMP2 * PWV(i, k)
+          zznormcp = 1. + RVTMP2 * WV(i, k)
           heat(i, k) = zheat(i, k) / zznormcp
           cool(i, k) = zcool(i, k)/zznormcp
           heat0(i, k) = zheat0(i, k)/zznormcp
