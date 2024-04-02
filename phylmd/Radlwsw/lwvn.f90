@@ -8,32 +8,29 @@ contains
     USE dimensions
     USE dimphy
     USE raddimlw
-    ! -----------------------------------------------------------------------
+
     ! PURPOSE.
-    ! --------
+
     ! CARRIES OUT THE VERTICAL INTEGRATION ON NEARBY LAYERS
     ! TO GIVE LONGWAVE FLUXES OR RADIANCES
 
     ! METHOD.
-    ! -------
 
     ! 1. PERFORMS THE VERTICAL INTEGRATION CORRESPONDING TO THE
     ! CONTRIBUTIONS OF THE ADJACENT LAYERS USING A GAUSSIAN QUADRATURE
 
     ! REFERENCE.
-    ! ----------
 
     ! SEE RADIATION'S PART OF THE MODEL'S DOCUMENTATION AND
     ! ECMWF RESEARCH DEPARTMENT DOCUMENTATION OF THE IFS
 
     ! AUTHOR.
-    ! -------
-    ! JEAN-JACQUES MORCRETTE  *ECMWF*
+
+    ! JEAN-JACQUES MORCRETTE *ECMWF*
 
     ! MODIFICATIONS.
-    ! --------------
+
     ! ORIGINAL : 89-07-14
-    ! -----------------------------------------------------------------------
 
     ! * ARGUMENTS:
 
@@ -47,7 +44,7 @@ contains
     DOUBLE PRECISION padjd(klon, llm+1) ! CONTRIBUTION OF ADJACENT LAYERS
     DOUBLE PRECISION padju(klon, llm+1) ! CONTRIBUTION OF ADJACENT LAYERS
     DOUBLE PRECISION pcntrb(klon, llm+1, llm+1) ! CLEAR-SKY ENERGY EXCHANGE MATRIX
-    DOUBLE PRECISION pdbdt(klon, ninter, llm) !  LAYER PLANCK FUNCTION GRADIENT
+    DOUBLE PRECISION pdbdt(klon, ninter, llm) ! LAYER PLANCK FUNCTION GRADIENT
 
     ! * LOCAL ARRAYS:
 
@@ -67,13 +64,9 @@ contains
     DATA (wg1(jk), jk=1, 2)/1d0, 1d0/
     ! -----------------------------------------------------------------------
 
-    ! *         1.    INITIALIZATION
-    ! --------------
+    ! * 1. INITIALIZATION
 
-
-    ! *         1.1     INITIALIZE LAYER CONTRIBUTIONS
-    ! ------------------------------
-
+    ! * 1.1 INITIALIZE LAYER CONTRIBUTIONS
 
     DO jk = 1, llm + 1
        DO jl = 1, klon
@@ -82,9 +75,7 @@ contains
        END DO
     END DO
 
-    ! *         1.2     INITIALIZE TRANSMISSION FUNCTIONS
-    ! ---------------------------------
-
+    ! * 1.2 INITIALIZE TRANSMISSION FUNCTIONS
 
     DO ja = 1, ntra
        DO jl = 1, klon
@@ -98,22 +89,13 @@ contains
        END DO
     END DO
 
-    ! ------------------------------------------------------------------
+    ! * 2. VERTICAL INTEGRATION
 
-    ! *         2.      VERTICAL INTEGRATION
-    ! --------------------
-
-
-
-    ! *         2.1     CONTRIBUTION FROM ADJACENT LAYERS
-    ! ---------------------------------
-
+    ! * 2.1 CONTRIBUTION FROM ADJACENT LAYERS
 
     DO jk = 1, llm
 
-       ! *         2.1.1   DOWNWARD LAYERS
-       ! ---------------
-
+       ! * 2.1.1 DOWNWARD LAYERS
 
        im12 = 2*(jk-1)
        ind = (jk-1)*ng1p1 + 1
@@ -135,8 +117,7 @@ contains
              END DO
           END DO
 
-
-          CALL lwtt(pga(1,1,1,jk), pgb(1,1,1,jk), zuu, ztt)
+          CALL lwtt(pga(1, 1, 1, jk), pgb(1, 1, 1, jk), zuu, ztt)
 
           DO jl = 1, klon
              zwtr = pdbsl(jl, 1, ibs)*ztt(jl, 1)*ztt(jl, 10) + &
@@ -148,9 +129,7 @@ contains
              zglayd(jl) = zglayd(jl) + zwtr*wg1(jg)
           END DO
 
-          ! *         2.1.2   DOWNWARD LAYERS
-          ! ---------------
-
+          ! * 2.1.2 DOWNWARD LAYERS
 
           imu = ixu + jg
           DO ja = 1, kuaer
@@ -159,8 +138,7 @@ contains
              END DO
           END DO
 
-
-          CALL lwtt(pga(1,1,1,jk), pgb(1,1,1,jk), zuu, ztt)
+          CALL lwtt(pga(1, 1, 1, jk), pgb(1, 1, 1, jk), zuu, ztt)
 
           DO jl = 1, klon
              zwtr = pdbsl(jl, 1, ibs)*ztt(jl, 1)*ztt(jl, 10) + &
