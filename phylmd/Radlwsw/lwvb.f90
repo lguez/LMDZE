@@ -7,14 +7,12 @@ SUBROUTINE lwvb(kuaer, ktraer, klim, pabcu, padjd, padju, pb, pbint, pbsui, &
   USE raddimlw
   IMPLICIT NONE
 
-  ! -----------------------------------------------------------------------
   ! PURPOSE.
-  ! --------
+
   ! INTRODUCES THE EFFECTS OF THE BOUNDARIES IN THE VERTICAL
   ! INTEGRATION
 
   ! METHOD.
-  ! -------
 
   ! 1. COMPUTES THE ENERGY EXCHANGE WITH TOP AND SURFACE OF THE
   ! ATMOSPHERE
@@ -23,23 +21,20 @@ SUBROUTINE lwvb(kuaer, ktraer, klim, pabcu, padjd, padju, pb, pbint, pbsui, &
   ! 3. ADDS UP ALL CONTRIBUTIONS TO GET THE CLEAR-SKY FLUXES
 
   ! REFERENCE.
-  ! ----------
 
   ! SEE RADIATION'S PART OF THE MODEL'S DOCUMENTATION AND
   ! ECMWF RESEARCH DEPARTMENT DOCUMENTATION OF THE IFS
 
   ! AUTHOR.
-  ! -------
-  ! JEAN-JACQUES MORCRETTE  *ECMWF*
+
+  ! JEAN-JACQUES MORCRETTE *ECMWF*
 
   ! MODIFICATIONS.
-  ! --------------
-  ! ORIGINAL : 89-07-14
-  ! Voigt lines (loop 2413 to 2427)  - JJM & PhD - 01/96
-  ! -----------------------------------------------------------------------
 
-  ! *       0.1   ARGUMENTS
-  ! ---------
+  ! ORIGINAL : 89-07-14
+  ! Voigt lines (loop 2413 to 2427) - JJM & PhD - 01/96
+
+  ! * 0.1 ARGUMENTS
 
   INTEGER kuaer, ktraer, klim
 
@@ -81,16 +76,12 @@ SUBROUTINE lwvb(kuaer, ktraer, klim, pabcu, padjd, padju, pb, pbint, pbsui, &
   INTEGER jstra, jstru
   INTEGER in, jlim
   DOUBLE PRECISION zctstr
-  ! -----------------------------------------------------------------------
 
-  ! *         1.    INITIALIZATION
-  ! --------------
+  !-----------------------------------------------------------------------  
 
+  ! * 1. INITIALIZATION
 
-
-  ! *         1.2     INITIALIZE TRANSMISSION FUNCTIONS
-  ! ---------------------------------
-
+  ! * 1.2 INITIALIZE TRANSMISSION FUNCTIONS
 
   DO ja = 1, ntra
      DO jl = 1, klon
@@ -105,14 +96,9 @@ SUBROUTINE lwvb(kuaer, ktraer, klim, pabcu, padjd, padju, pb, pbint, pbsui, &
      END DO
   END DO
 
-  ! ------------------------------------------------------------------
+  ! * 2. VERTICAL INTEGRATION
 
-  ! *         2.      VERTICAL INTEGRATION
-  ! --------------------
-
-  ! *         2.3     EXCHANGE WITH TOP OF THE ATMOSPHERE
-  ! -----------------------------------
-
+  ! * 2.3 EXCHANGE WITH TOP OF THE ATMOSPHERE
 
   DO jk = 1, llm
      in = (jk-1)*ng1p1 + 1
@@ -123,8 +109,7 @@ SUBROUTINE lwvb(kuaer, ktraer, klim, pabcu, padjd, padju, pb, pbint, pbsui, &
         END DO
      END DO
 
-
-     CALL lwtt(pgatop(1,1,1), pgbtop(1,1,1), zuu, ztt)
+     CALL lwtt(pgatop(1, 1, 1), pgbtop(1, 1, 1), zuu, ztt)
 
      DO jl = 1, klon
         zcntop(jl) = pbtop(jl, 1)*ztt(jl, 1)*ztt(jl, 10) + &
@@ -149,20 +134,15 @@ SUBROUTINE lwvb(kuaer, ktraer, klim, pabcu, padjd, padju, pb, pbint, pbsui, &
      pfluc(jl, 2, jk) = zfd(jl)
   END DO
 
-  ! *         2.4     COOLING-TO-SPACE OF LAYERS ABOVE 10 HPA
-  ! ---------------------------------------
+  ! * 2.4 COOLING-TO-SPACE OF LAYERS ABOVE 10 HPA
 
-
-
-  ! *         2.4.1   INITIALIZATION
-  ! --------------
-
+  ! * 2.4.1 INITIALIZATION
 
   jlim = llm
 
   IF (.NOT. levoigt) THEN
      DO jk = llm, 1, -1
-        IF (ppmb(1,jk)<10.0) THEN
+        IF (ppmb(1, jk)<10.0) THEN
            jlim = jk
         END IF
      END DO
@@ -176,9 +156,7 @@ SUBROUTINE lwvb(kuaer, ktraer, klim, pabcu, padjd, padju, pb, pbint, pbsui, &
         END DO
      END DO
 
-     ! *         2.4.2   LOOP OVER LAYERS ABOVE 10 HPA
-     ! -----------------------------
-
+     ! * 2.4.2 LOOP OVER LAYERS ABOVE 10 HPA
 
      DO jstra = llm, jlim, -1
         jstru = (jstra-1)*ng1p1 + 1
@@ -189,20 +167,19 @@ SUBROUTINE lwvb(kuaer, ktraer, klim, pabcu, padjd, padju, pb, pbint, pbsui, &
            END DO
         END DO
 
-
-        CALL lwtt(pga(1,1,1,jstra), pgb(1,1,1,jstra), zuu, ztt)
+        CALL lwtt(pga(1, 1, 1, jstra), pgb(1, 1, 1, jstra), zuu, ztt)
 
         DO jl = 1, klon
-           zctstr = (pb(jl,1,jstra)+pb(jl,1,jstra+1))* &
-                (ztt1(jl,1)*ztt1(jl,10)-ztt(jl,1)*ztt(jl,10)) + &
-                (pb(jl,2,jstra)+pb(jl,2,jstra+1))*(ztt1(jl,2)*ztt1(jl,7)*ztt1(jl,11 &
-                )-ztt(jl,2)*ztt(jl,7)*ztt(jl,11)) + (pb(jl,3,jstra)+pb(jl,3,jstra+1 &
-                ))*(ztt1(jl,4)*ztt1(jl,8)*ztt1(jl,12)-ztt(jl,4)*ztt(jl,8)*ztt(jl,12 &
-                )) + (pb(jl,4,jstra)+pb(jl,4,jstra+1))*(ztt1(jl,5)*ztt1(jl,9)*ztt1( &
-                jl,13)-ztt(jl,5)*ztt(jl,9)*ztt(jl,13)) + (pb(jl,5,jstra)+pb(jl,5, &
-                jstra+1))*(ztt1(jl,3)*ztt1(jl,14)-ztt(jl,3)*ztt(jl,14)) + &
-                (pb(jl,6,jstra)+pb(jl,6,jstra+1))*(ztt1(jl,6)*ztt1(jl,15)-ztt(jl,6) &
-                *ztt(jl,15))
+           zctstr = (pb(jl, 1, jstra)+pb(jl, 1, jstra+1))* &
+                (ztt1(jl, 1)*ztt1(jl, 10)-ztt(jl, 1)*ztt(jl, 10)) + &
+                (pb(jl, 2, jstra)+pb(jl, 2, jstra+1))*(ztt1(jl, 2)*ztt1(jl, 7)*ztt1(jl, 11 &
+                )-ztt(jl, 2)*ztt(jl, 7)*ztt(jl, 11)) + (pb(jl, 3, jstra)+pb(jl, 3, jstra+1 &
+                ))*(ztt1(jl, 4)*ztt1(jl, 8)*ztt1(jl, 12)-ztt(jl, 4)*ztt(jl, 8)*ztt(jl, 12 &
+                )) + (pb(jl, 4, jstra)+pb(jl, 4, jstra+1))*(ztt1(jl, 5)*ztt1(jl, 9)*ztt1(&
+                jl, 13)-ztt(jl, 5)*ztt(jl, 9)*ztt(jl, 13)) + (pb(jl, 5, jstra)+pb(jl, 5, &
+                jstra+1))*(ztt1(jl, 3)*ztt1(jl, 14)-ztt(jl, 3)*ztt(jl, 14)) + &
+                (pb(jl, 6, jstra)+pb(jl, 6, jstra+1))*(ztt1(jl, 6)*ztt1(jl, 15)-ztt(jl, 6) &
+                *ztt(jl, 15))
            pcts(jl, jstra) = zctstr*0.5
         END DO
         DO ja = 1, ktraer
@@ -221,10 +198,7 @@ SUBROUTINE lwvb(kuaer, ktraer, klim, pabcu, padjd, padju, pb, pbint, pbsui, &
      END DO
   END IF
 
-
-  ! *         2.5     EXCHANGE WITH LOWER LIMIT
-  ! -------------------------
-
+  ! * 2.5 EXCHANGE WITH LOWER LIMIT
 
   DO jl = 1, klon
      zbgnd(jl) = pbsui(jl)*pemis(jl) - (1.-pemis(jl))*pfluc(jl, 2, 1) - &
@@ -245,15 +219,13 @@ SUBROUTINE lwvb(kuaer, ktraer, klim, pabcu, padjd, padju, pb, pbint, pbsui, &
   DO jk = 2, llm + 1
      in = (jk-1)*ng1p1 + 1
 
-
      DO ja = 1, kuaer
         DO jl = 1, klon
            zuu(jl, ja) = pabcu(jl, ja, 1) - pabcu(jl, ja, in)
         END DO
      END DO
 
-
-     CALL lwtt(pgasur(1,1,1), pgbsur(1,1,1), zuu, ztt)
+     CALL lwtt(pgasur(1, 1, 1), pgbsur(1, 1, 1), zuu, ztt)
 
      DO jl = 1, klon
         zcnsol(jl) = pbsur(jl, 1)*ztt(jl, 1)*ztt(jl, 10) + &
@@ -267,14 +239,9 @@ SUBROUTINE lwvb(kuaer, ktraer, klim, pabcu, padjd, padju, pb, pbint, pbsui, &
         pfluc(jl, 1, jk) = zfu(jl)
      END DO
 
-
   END DO
 
-
-
-  ! *         2.7     CLEAR-SKY FLUXES
-  ! ----------------
-
+  ! * 2.7 CLEAR-SKY FLUXES
 
   IF (.NOT. levoigt) THEN
      DO jl = 1, klon
@@ -288,8 +255,6 @@ SUBROUTINE lwvb(kuaer, ktraer, klim, pabcu, padjd, padju, pb, pbint, pbsui, &
         END DO
      END DO
   END IF
-
-  ! ------------------------------------------------------------------
 
   RETURN
 END SUBROUTINE lwvb
