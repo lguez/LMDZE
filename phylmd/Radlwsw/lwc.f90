@@ -67,7 +67,7 @@ contains
     DOUBLE PRECISION pcldlu(klon, llm)
     DOUBLE PRECISION pemis(klon)
 
-    DOUBLE PRECISION, intent(out):: pflux(klon, 2, llm+1)
+    DOUBLE PRECISION, intent(out):: pflux(:, :, :) ! (klon, 2, llm+1)
     ! -----------------------------------------------------------------------
     ! * LOCAL VARIABLES:
     INTEGER imx(klon), imxp(klon)
