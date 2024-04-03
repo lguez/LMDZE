@@ -109,8 +109,6 @@ contains
          pbsur, pbtop, zdisd, zdisu, pemis, ppmb, pga, pgb, pgasur, pgbsur, &
          pgatop, pgbtop, pcts, fluc)
 
-
-    RETURN
   END SUBROUTINE lwv
 
 end module lwv_m
