@@ -72,8 +72,8 @@ contains
 
     DOUBLE PRECISION ZABCU(KLON, NUA, 3*LLM+1)
     DOUBLE PRECISION ZOZ(KLON, LLM)
-    DOUBLE PRECISION ZFLUX(KLON, 2, LLM+1) ! RADIATIVE FLUXES (1:up; 2:down)
-    DOUBLE PRECISION ZFLUC(KLON, 2, LLM+1) ! CLEAR-SKY RADIATIVE FLUXES
+    DOUBLE PRECISION FLUX(KLON, 2, LLM+1) ! RADIATIVE FLUXES (1:up; 2:down)
+    DOUBLE PRECISION FLUC(KLON, 2, LLM+1) ! CLEAR-SKY RADIATIVE FLUXES
 
     ! Intermediate variables:
     DOUBLE PRECISION ZBINT(KLON, LLM+1)
@@ -93,36 +93,36 @@ contains
     ENDDO
 
     CALL LWU(DP, PMB, ZOZ, TAVE, VIEW, WV, ZABCU)
-    CALL LWBV(ILIM, DT0, EMIS, PMB, TL, TAVE, ZABCU, ZFLUC, ZBINT, ZBSUI, &
+    CALL LWBV(ILIM, DT0, EMIS, PMB, TL, TAVE, ZABCU, FLUC, ZBINT, ZBSUI, &
          ZCTS, ZCNTRB)
-    CALL LWC(ILIM, CLDLD, CLDLU, EMIS, ZFLUC, ZBINT, ZBSUI, ZCTS, ZCNTRB, ZFLUX)
+    CALL LWC(ILIM, CLDLD, CLDLU, EMIS, FLUC, ZBINT, ZBSUI, ZCTS, ZCNTRB, FLUX)
 
     DO k = 1, LLM
        kpl1 = k+1
 
        DO i = 1, KLON
-          COLR(i, k) = ZFLUX(i, 1, kpl1)+ZFLUX(i, 2, kpl1) &
-               - ZFLUX(i, 1, k) - ZFLUX(i, 2, k)
+          COLR(i, k) = FLUX(i, 1, kpl1)+FLUX(i, 2, kpl1) &
+               - FLUX(i, 1, k) - FLUX(i, 2, k)
           COLR(i, k) = COLR(i, k) * DAYSEC*RG/RCPD / DP(i, k)
-          COLR0(i, k) = ZFLUC(i, 1, kpl1)+ZFLUC(i, 2, kpl1) &
-               - ZFLUC(i, 1, k) - ZFLUC(i, 2, k)
+          COLR0(i, k) = FLUC(i, 1, kpl1)+FLUC(i, 2, kpl1) &
+               - FLUC(i, 1, k) - FLUC(i, 2, k)
           COLR0(i, k) = COLR0(i, k) * DAYSEC*RG/RCPD / DP(i, k)
        ENDDO
     ENDDO
 
     DO i = 1, KLON
-       SOLLW(i) = - ZFLUX(i, 1, 1) - ZFLUX(i, 2, 1)
-       TOPLW(i) = ZFLUX(i, 1, LLM+1) + ZFLUX(i, 2, LLM+1)
-       SOLLW0(i) = - ZFLUC(i, 1, 1) - ZFLUC(i, 2, 1)
-       TOPLW0(i) = ZFLUC(i, 1, LLM+1) + ZFLUC(i, 2, LLM+1)
-       sollwdown(i) = - ZFLUX(i, 2, 1)
+       SOLLW(i) = - FLUX(i, 1, 1) - FLUX(i, 2, 1)
+       TOPLW(i) = FLUX(i, 1, LLM+1) + FLUX(i, 2, LLM+1)
+       SOLLW0(i) = - FLUC(i, 1, 1) - FLUC(i, 2, 1)
+       TOPLW0(i) = FLUC(i, 1, LLM+1) + FLUC(i, 2, LLM+1)
+       sollwdown(i) = - FLUX(i, 2, 1)
 
        ! Attention aux signes : LWtop > 0, LWdn < 0
        DO k = 1, LLM+1
-          lwup(i, k) = ZFLUX(i, 1, k)
-          lwup0(i, k) = ZFLUC(i, 1, k)
-          lwdn(i, k) = ZFLUX(i, 2, k)
-          lwdn0(i, k) = ZFLUC(i, 2, k)
+          lwup(i, k) = FLUX(i, 1, k)
+          lwup0(i, k) = FLUC(i, 1, k)
+          lwdn(i, k) = FLUX(i, 2, k)
+          lwdn0(i, k) = FLUC(i, 2, k)
        ENDDO
     ENDDO
 

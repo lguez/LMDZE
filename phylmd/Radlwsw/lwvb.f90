@@ -6,7 +6,7 @@ contains
 
   SUBROUTINE lwvb(kuaer, ktraer, klim, pabcu, padjd, padju, pb, pbint, pbsui, &
        pbsur, pbtop, pdisd, pdisu, pemis, ppmb, pga, pgb, pgasur, pgbsur, &
-       pgatop, pgbtop, pcts, pfluc)
+       pgatop, pgbtop, pcts, fluc)
 
     USE dimensions
     USE dimphy
@@ -66,7 +66,7 @@ contains
     DOUBLE PRECISION pgatop(klon, 8, 2) ! T.O.A. PADE APPROXIMANTS
     DOUBLE PRECISION pgbtop(klon, 8, 2) ! T.O.A. PADE APPROXIMANTS
 
-    DOUBLE PRECISION, intent(out):: pfluc(klon, 2, llm + 1)
+    DOUBLE PRECISION, intent(out):: fluc(klon, 2, llm + 1)
     ! CLEAR-SKY RADIATIVE FLUXES
 
     DOUBLE PRECISION pcts(klon, llm) ! COOLING-TO-SPACE TERM
@@ -130,7 +130,7 @@ contains
                + pbtop(jl, 5) * ztt(jl, 3) * ztt(jl, 14) &
                + pbtop(jl, 6) * ztt(jl, 6) * ztt(jl, 15)
           zfd(jl) = zcntop(jl) - pbint(jl, jk) - pdisd(jl, jk) - padjd(jl, jk)
-          pfluc(jl, 2, jk) = zfd(jl)
+          fluc(jl, 2, jk) = zfd(jl)
        END DO
 
     END DO
@@ -142,7 +142,7 @@ contains
        zcntop(jl) = pbtop(jl, 1) + pbtop(jl, 2) + pbtop(jl, 3) + pbtop(jl, 4) &
             + pbtop(jl, 5) + pbtop(jl, 6)
        zfd(jl) = zcntop(jl) - pbint(jl, jk) - pdisd(jl, jk) - padjd(jl, jk)
-       pfluc(jl, 2, jk) = zfd(jl)
+       fluc(jl, 2, jk) = zfd(jl)
     END DO
 
     ! * 2.4 COOLING-TO-SPACE OF LAYERS ABOVE 10 HPA
@@ -215,7 +215,7 @@ contains
     ! * 2.5 EXCHANGE WITH LOWER LIMIT
 
     DO jl = 1, klon
-       zbgnd(jl) = pbsui(jl) * pemis(jl) - (1. - pemis(jl)) * pfluc(jl, 2, 1) &
+       zbgnd(jl) = pbsui(jl) * pemis(jl) - (1. - pemis(jl)) * fluc(jl, 2, 1) &
             - pbint(jl, 1)
     END DO
 
@@ -227,7 +227,7 @@ contains
             + pbsur(jl, 5) + pbsur(jl, 6)
        zcnsol(jl) = zcnsol(jl) * zbgnd(jl)/pbsui(jl)
        zfu(jl) = zcnsol(jl) + pbint(jl, jk) - pdisu(jl, jk) - padju(jl, jk)
-       pfluc(jl, 1, jk) = zfu(jl)
+       fluc(jl, 1, jk) = zfu(jl)
     END DO
 
     DO jk = 2, llm + 1
@@ -250,7 +250,7 @@ contains
                * ztt(jl, 6) * ztt(jl, 15)
           zcnsol(jl) = zcnsol(jl) * zbgnd(jl)/pbsui(jl)
           zfu(jl) = zcnsol(jl) + pbint(jl, jk) - pdisu(jl, jk) - padju(jl, jk)
-          pfluc(jl, 1, jk) = zfu(jl)
+          fluc(jl, 1, jk) = zfu(jl)
        END DO
 
     END DO
@@ -259,13 +259,13 @@ contains
 
     IF (.NOT. levoigt) THEN
        DO jl = 1, klon
-          zfn10(jl) = pfluc(jl, 1, jlim) + pfluc(jl, 2, jlim)
+          zfn10(jl) = fluc(jl, 1, jlim) + fluc(jl, 2, jlim)
        END DO
        DO jk = jlim + 1, llm + 1
           DO jl = 1, klon
              zfn10(jl) = zfn10(jl) + pcts(jl, jk - 1)
-             pfluc(jl, 1, jk) = zfn10(jl)
-             pfluc(jl, 2, jk) = 0.
+             fluc(jl, 1, jk) = zfn10(jl)
+             fluc(jl, 2, jk) = 0.
           END DO
        END DO
     END IF

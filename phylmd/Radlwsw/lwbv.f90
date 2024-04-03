@@ -4,7 +4,7 @@ module lwbv_m
 
 contains
 
-  SUBROUTINE lwbv(klim, pdt0, pemis, ppmb, ptl, ptave, pabcu, pfluc, pbint, &
+  SUBROUTINE lwbv(klim, pdt0, pemis, ppmb, ptl, ptave, pabcu, fluc, pbint, &
        pbsui, pcts, pcntrb)
 
     USE dimensions, only: llm
@@ -41,7 +41,7 @@ contains
     DOUBLE PRECISION ppmb(klon, llm+1)
     DOUBLE PRECISION ptl(klon, llm+1)
     DOUBLE PRECISION ptave(klon, llm)
-    DOUBLE PRECISION, intent(out):: pfluc(klon, 2, llm+1)
+    DOUBLE PRECISION, intent(out):: fluc(klon, 2, llm+1)
     DOUBLE PRECISION pabcu(klon, nua, 3*llm+1)
     DOUBLE PRECISION, intent(out):: pbint(klon, llm+1)
     DOUBLE PRECISION, intent(out):: pbsui(klon)
@@ -72,7 +72,7 @@ contains
     ntraer = ntra
     CALL lwv(nuaer, ntraer, klim, pabcu, zb, pbint, pbsui, zbsur, zbtop, &
          zdbsl, pemis, ppmb, zga, zgb, zgasur, zgbsur, zgatop, zgbtop, pcntrb, &
-         pcts, pfluc)
+         pcts, fluc)
 
   END SUBROUTINE lwbv
 

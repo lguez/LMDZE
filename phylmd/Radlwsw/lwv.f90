@@ -6,7 +6,7 @@ contains
 
   SUBROUTINE lwv(kuaer, ktraer, klim, pabcu, pb, pbint, pbsuin, pbsur, pbtop, &
        pdbsl, pemis, ppmb, pga, pgb, pgasur, pgbsur, pgatop, pgbtop, &
-       pcntrb, pcts, pfluc)
+       pcntrb, pcts, fluc)
     USE dimensions
     USE dimphy
     use lwvb_m, only: lwvb
@@ -67,7 +67,7 @@ contains
     DOUBLE PRECISION pcntrb(klon, llm+1, llm+1) ! CLEAR-SKY ENERGY EXCHANGE MATRIX
     DOUBLE PRECISION, intent(out):: pcts(klon, llm) ! COOLING-TO-SPACE TERM
 
-    DOUBLE PRECISION, intent(out):: pfluc(klon, 2, llm+1)
+    DOUBLE PRECISION, intent(out):: fluc(klon, 2, llm+1)
     ! CLEAR-SKY RADIATIVE FLUXES
 
     ! -----------------------------------------------------------------------
@@ -107,7 +107,7 @@ contains
 
     CALL lwvb(kuaer, ktraer, klim, pabcu, zadjd, zadju, pb, pbint, pbsuin, &
          pbsur, pbtop, zdisd, zdisu, pemis, ppmb, pga, pgb, pgasur, pgbsur, &
-         pgatop, pgbtop, pcts, pfluc)
+         pgatop, pgbtop, pcts, fluc)
 
 
     RETURN
