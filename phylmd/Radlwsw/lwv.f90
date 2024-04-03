@@ -8,13 +8,12 @@ contains
        pdbsl, pemis, ppmb, pga, pgb, pgasur, pgbsur, pgatop, pgbtop, &
        pcntrb, pcts, fluc)
 
-    USE dimensions
-    USE dimphy
+    USE dimensions, only: llm
+    USE dimphy, only: klon
     use lwvb_m, only: lwvb
     use lwvd_m, only: lwvd
     use lwvn_m, only: lwvn
-    USE suphec_m
-    USE raddimlw
+    USE raddimlw, only: nua, ninter
 
     ! PURPOSE.
 
