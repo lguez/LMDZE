@@ -15,35 +15,31 @@ contains
     USE suphec_m
     USE raddimlw
 
-    ! -----------------------------------------------------------------------
     ! PURPOSE.
-    ! --------
+
     ! CARRIES OUT THE VERTICAL INTEGRATION TO GIVE LONGWAVE
     ! FLUXES OR RADIANCES
 
     ! METHOD.
-    ! -------
 
     ! 1. PERFORMS THE VERTICAL INTEGRATION DISTINGUISHING BETWEEN
-    ! CONTRIBUTIONS BY -  THE NEARBY LAYERS
-    ! -  THE DISTANT LAYERS
-    ! -  THE BOUNDARY TERMS
+    ! CONTRIBUTIONS BY - THE NEARBY LAYERS
+    ! - THE DISTANT LAYERS
+    ! - THE BOUNDARY TERMS
     ! 2. COMPUTES THE CLEAR-SKY DOWNWARD AND UPWARD EMISSIVITIES.
 
     ! REFERENCE.
-    ! ----------
 
     ! SEE RADIATION'S PART OF THE MODEL'S DOCUMENTATION AND
     ! ECMWF RESEARCH DEPARTMENT DOCUMENTATION OF THE IFS
 
     ! AUTHOR.
-    ! -------
-    ! JEAN-JACQUES MORCRETTE  *ECMWF*
+
+    ! JEAN-JACQUES MORCRETTE *ECMWF*
 
     ! MODIFICATIONS.
-    ! --------------
+
     ! ORIGINAL : 89-07-14
-    ! -----------------------------------------------------------------------
 
     ! * ARGUMENTS:
     INTEGER kuaer, ktraer, klim
@@ -70,7 +66,6 @@ contains
     DOUBLE PRECISION, intent(out):: fluc(klon, 2, llm+1)
     ! CLEAR-SKY RADIATIVE FLUXES
 
-    ! -----------------------------------------------------------------------
     ! LOCAL VARIABLES:
     DOUBLE PRECISION zadjd(klon, llm+1)
     DOUBLE PRECISION zadju(klon, llm+1)
