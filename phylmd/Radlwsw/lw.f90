@@ -9,11 +9,11 @@ contains
        lwup0, lwdn0)
 
     use comconst, only: daysec
+    use dimensions, only: llm
     use dimphy, only: klon
     use lwbv_m, only: lwbv
     use lwc_m, only: lwc
     use LWU_m, only: LWU
-    use dimensions, only: llm
     USE raddimlw, ONLY: nua
     USE suphec_m, ONLY: md, rcpd, rg, rmo3
 
@@ -34,23 +34,28 @@ contains
     ! 5. Introduces the effects of the clouds on the fluxes.
 
     ! Reference: see radiation part of ECMWF documentation of the IFS.
+    ! Author: Jean-Jacques Morcrette ECMWF
+    ! Original: July 14th, 1989
 
-    ! Author:
-    ! Jean-Jacques Morcrette ECMWF
-
-    ! Original : July 14th, 1989
-
-    DOUBLE PRECISION, intent(in):: CLDLD(KLON, LLM) ! DOWNWARD EFFECTIVE CLOUD COVER
-    DOUBLE PRECISION, intent(in):: CLDLU(KLON, LLM) ! UPWARD EFFECTIVE CLOUD COVER
-    DOUBLE PRECISION DP(KLON, LLM) ! LAYER PRESSURE THICKNESS (Pa)
-    DOUBLE PRECISION, intent(in):: DT0(KLON) ! SURFACE TEMPERATURE DISCONTINUITY (K)
-    DOUBLE PRECISION EMIS(KLON) ! SURFACE EMISSIVITY
     DOUBLE PRECISION PMB(KLON, LLM+1) ! HALF LEVEL PRESSURE (mb)
-    DOUBLE PRECISION OZON(KLON, LLM) ! O3 CONCENTRATION (kg/kg)
+    DOUBLE PRECISION DP(KLON, LLM) ! LAYER PRESSURE THICKNESS (Pa)
+
+    DOUBLE PRECISION, intent(in):: DT0(KLON)
+    ! SURFACE TEMPERATURE DISCONTINUITY (K)
+
+    DOUBLE PRECISION EMIS(KLON) ! SURFACE EMISSIVITY
     DOUBLE PRECISION TL(KLON, LLM+1) ! HALF LEVEL TEMPERATURE (K)
     DOUBLE PRECISION TAVE(KLON, LLM) ! LAYER TEMPERATURE (K)
-    DOUBLE PRECISION VIEW(KLON) ! COSECANT OF VIEWING ANGLE
     DOUBLE PRECISION WV(KLON, LLM) ! SPECIFIC HUMIDITY (kg/kg)
+    DOUBLE PRECISION OZON(KLON, LLM) ! O3 CONCENTRATION (kg/kg)
+
+    DOUBLE PRECISION, intent(in):: CLDLD(KLON, LLM)
+    ! DOWNWARD EFFECTIVE CLOUD COVER
+
+    DOUBLE PRECISION, intent(in):: CLDLU(KLON, LLM)
+    ! UPWARD EFFECTIVE CLOUD COVER
+
+    DOUBLE PRECISION VIEW(KLON) ! COSECANT OF VIEWING ANGLE
     DOUBLE PRECISION COLR(KLON, LLM) ! LONG-WAVE TENDENCY (K/day)
     DOUBLE PRECISION COLR0(KLON, LLM) ! LONG-WAVE TENDENCY (K/day) clear-sky
     DOUBLE PRECISION TOPLW(KLON) ! LONGWAVE FLUX AT T.O.A.
@@ -59,9 +64,12 @@ contains
     DOUBLE PRECISION SOLLW0(KLON) ! LONGWAVE FLUX AT SURFACE (CLEAR-SKY)
     double precision sollwdown(klon) ! LONGWAVE downwards flux at surface
     DOUBLE PRECISION lwup(KLON, LLM+1) ! LW up total sky
-    DOUBLE PRECISION lwup0(KLON, LLM+1) ! LW up clear sky
     DOUBLE PRECISION lwdn(KLON, LLM+1) ! LW down total sky
+    DOUBLE PRECISION lwup0(KLON, LLM+1) ! LW up clear sky
     DOUBLE PRECISION lwdn0(KLON, LLM+1) ! LW down clear sky
+
+    ! Local:
+
     DOUBLE PRECISION ZABCU(KLON, NUA, 3*LLM+1)
     DOUBLE PRECISION ZOZ(KLON, LLM)
     DOUBLE PRECISION ZFLUX(KLON, 2, LLM+1) ! RADIATIVE FLUXES (1:up; 2:down)
@@ -79,7 +87,7 @@ contains
 
     DO k = 1, LLM
        DO i = 1, KLON
-          ! convertir ozone de kg/kg en pa (modif MPL 100505)
+          ! convertir ozone de kg/kg en pa
           ZOZ(i, k) = OZON(i, k)*DP(i, k) * MD/RMO3
        ENDDO
     ENDDO
@@ -91,6 +99,7 @@ contains
 
     DO k = 1, LLM
        kpl1 = k+1
+
        DO i = 1, KLON
           COLR(i, k) = ZFLUX(i, 1, kpl1)+ZFLUX(i, 2, kpl1) &
                - ZFLUX(i, 1, k) - ZFLUX(i, 2, k)
@@ -100,10 +109,10 @@ contains
           COLR0(i, k) = COLR0(i, k) * DAYSEC*RG/RCPD / DP(i, k)
        ENDDO
     ENDDO
+
     DO i = 1, KLON
        SOLLW(i) = - ZFLUX(i, 1, 1) - ZFLUX(i, 2, 1)
        TOPLW(i) = ZFLUX(i, 1, LLM+1) + ZFLUX(i, 2, LLM+1)
-
        SOLLW0(i) = - ZFLUC(i, 1, 1) - ZFLUC(i, 2, 1)
        TOPLW0(i) = ZFLUC(i, 1, LLM+1) + ZFLUC(i, 2, LLM+1)
        sollwdown(i) = - ZFLUX(i, 2, 1)
