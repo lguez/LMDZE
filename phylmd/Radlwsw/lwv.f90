@@ -7,6 +7,7 @@ contains
   SUBROUTINE lwv(kuaer, ktraer, klim, pabcu, pb, pbint, pbsuin, pbsur, pbtop, &
        pdbsl, pemis, ppmb, pga, pgb, pgasur, pgbsur, pgatop, pgbtop, &
        pcntrb, pcts, fluc)
+
     USE dimensions
     USE dimphy
     use lwvb_m, only: lwvb
@@ -44,13 +45,20 @@ contains
     ! * ARGUMENTS:
     INTEGER kuaer, ktraer, klim
 
-    DOUBLE PRECISION pabcu(klon, nua, 3*llm+1) ! EFFECTIVE ABSORBER AMOUNTS
-    DOUBLE PRECISION pb(klon, ninter, llm+1) ! SPECTRAL HALF-LEVEL PLANCK FUNCTIONS
+    DOUBLE PRECISION pabcu(klon, nua, 3*llm+1)
+    ! EFFECTIVE ABSORBER AMOUNTS
+
+    DOUBLE PRECISION pb(klon, ninter, llm+1)
+    ! SPECTRAL HALF-LEVEL PLANCK FUNCTIONS
+
     DOUBLE PRECISION pbint(klon, llm+1) ! HALF-LEVEL PLANCK FUNCTIONS
     DOUBLE PRECISION pbsur(klon, ninter) ! SURFACE SPECTRAL PLANCK FUNCTION
     DOUBLE PRECISION pbsuin(klon) ! SURFACE PLANCK FUNCTION
     DOUBLE PRECISION pbtop(klon, ninter) ! T.O.A. SPECTRAL PLANCK FUNCTION
-    DOUBLE PRECISION pdbsl(klon, ninter, llm*2) ! SUB-LAYER PLANCK FUNCTION GRADIENT
+
+    DOUBLE PRECISION pdbsl(klon, ninter, llm*2)
+    ! SUB-LAYER PLANCK FUNCTION GRADIENT
+
     DOUBLE PRECISION pemis(klon) ! SURFACE EMISSIVITY
     DOUBLE PRECISION ppmb(klon, llm+1) ! HALF-LEVEL PRESSURE (MB)
     DOUBLE PRECISION pga(klon, 8, 2, llm) ! PADE APPROXIMANTS
@@ -60,21 +68,23 @@ contains
     DOUBLE PRECISION pgatop(klon, 8, 2) ! PADE APPROXIMANTS
     DOUBLE PRECISION pgbtop(klon, 8, 2) ! PADE APPROXIMANTS
 
-    DOUBLE PRECISION pcntrb(klon, llm+1, llm+1) ! CLEAR-SKY ENERGY EXCHANGE MATRIX
+    DOUBLE PRECISION pcntrb(klon, llm+1, llm+1)
+    ! CLEAR-SKY ENERGY EXCHANGE MATRIX
+
     DOUBLE PRECISION, intent(out):: pcts(klon, llm) ! COOLING-TO-SPACE TERM
 
     DOUBLE PRECISION, intent(out):: fluc(klon, 2, llm+1)
     ! CLEAR-SKY RADIATIVE FLUXES
 
-    ! LOCAL VARIABLES:
+    ! LOCAL:
     DOUBLE PRECISION zadjd(klon, llm+1)
     DOUBLE PRECISION zadju(klon, llm+1)
     DOUBLE PRECISION zdbdt(klon, ninter, llm)
     DOUBLE PRECISION zdisd(klon, llm+1)
     DOUBLE PRECISION zdisu(klon, llm+1)
-
     INTEGER jk, jl
-    ! -----------------------------------------------------------------------
+
+    !-----------------------------------------------------------------------
 
     DO jk = 1, llm + 1
        DO jl = 1, klon
@@ -92,14 +102,12 @@ contains
     END DO
 
     ! * CONTRIBUTION FROM ADJACENT LAYERS
-
     CALL lwvn(kuaer, pabcu, pdbsl, pga, pgb, zadjd, zadju, pcntrb, zdbdt)
-    ! * CONTRIBUTION FROM DISTANT LAYERS
 
+    ! * CONTRIBUTION FROM DISTANT LAYERS
     CALL lwvd(ktraer, pabcu, zdbdt, pga, pgb, pcntrb, zdisd, zdisu)
 
     ! * EXCHANGE WITH THE BOUNDARIES
-
     CALL lwvb(kuaer, ktraer, klim, pabcu, zadjd, zadju, pb, pbint, pbsuin, &
          pbsur, pbtop, zdisd, zdisu, pemis, ppmb, pga, pgb, pgasur, pgbsur, &
          pgatop, pgbtop, pcts, fluc)
