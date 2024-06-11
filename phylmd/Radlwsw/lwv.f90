@@ -5,8 +5,8 @@ module lwv_m
 contains
 
   SUBROUTINE lwv(kuaer, ktraer, klim, pabcu, pb, pbint, pbsuin, pbsur, pbtop, &
-       pdbsl, pemis, ppmb, pga, pgb, pgasur, pgbsur, pgatop, pgbtop, &
-       pcntrb, pcts, fluc)
+       pdbsl, pemis, ppmb, pga, pgb, pgasur, pgbsur, pgatop, pgbtop, pcntrb, &
+       pcts, fluc)
 
     USE dimensions, only: llm
     USE dimphy, only: klon
@@ -15,30 +15,24 @@ contains
     use lwvn_m, only: lwvn
     USE raddimlw, only: nua, ninter
 
-    ! PURPOSE.
-
-    ! CARRIES OUT THE VERTICAL INTEGRATION TO GIVE LONGWAVE
+    ! PURPOSE. CARRIES OUT THE VERTICAL INTEGRATION TO GIVE LONGWAVE
     ! FLUXES OR RADIANCES
 
     ! METHOD.
 
     ! 1. PERFORMS THE VERTICAL INTEGRATION DISTINGUISHING BETWEEN
-    ! CONTRIBUTIONS BY - THE NEARBY LAYERS
+    ! CONTRIBUTIONS BY:
+
+    ! - THE NEARBY LAYERS
     ! - THE DISTANT LAYERS
     ! - THE BOUNDARY TERMS
+
     ! 2. COMPUTES THE CLEAR-SKY DOWNWARD AND UPWARD EMISSIVITIES.
 
-    ! REFERENCE.
-
-    ! SEE RADIATION'S PART OF THE MODEL'S DOCUMENTATION AND
+    ! REFERENCE. SEE RADIATION'S PART OF THE MODEL'S DOCUMENTATION AND
     ! ECMWF RESEARCH DEPARTMENT DOCUMENTATION OF THE IFS
 
-    ! AUTHOR.
-
-    ! JEAN-JACQUES MORCRETTE *ECMWF*
-
-    ! MODIFICATIONS.
-
+    ! AUTHOR. JEAN-JACQUES MORCRETTE *ECMWF*
     ! ORIGINAL : 89-07-14
 
     ! * ARGUMENTS:
