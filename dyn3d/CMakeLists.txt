@@ -4,7 +4,7 @@ target_sources(LMDZE_objects PRIVATE abort_gcm.f90 adaptdt.f90
   conf_dat2d.f90 conf_dat3d.f90 conf_gcm.f90 convflu.f90 convmas.f90
   covcont.f90 covnat.f90 dist_sphe.f90 disvert.f90 divergf.f90
   diverg_gam.f90 dteta1.f90 dudv1.f90 dudv2.f90 dynetat0_chosen.f90
-  dynetat0.f90 dynredem0.f90 enercin.f90 exner_hyb.f90 extrapol.f90
+  dynetat0.f90 dynredem.f90 enercin.f90 exner_hyb.f90 extrapol.f90
   flumass.f90 geopot.f90 grad.f90 grilles_gcm_netcdf_sub.f90
   gr_int_dyn_m.f90 groupe.f90 groupeun.f90 gr_u_scal.f90 gr_v_scal.f90
   heavyside.f90 infotrac_init.f90 init_dynzon.f90 inithist.f90
