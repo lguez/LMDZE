@@ -78,14 +78,13 @@ contains
     allocate(xprimm025(iim + 1), xprimp025(iim + 1))
     allocate(rlatu1(jjm), rlatu2(jjm), yprimu1(jjm), yprimu2(jjm))
 
-    call nf95_inq_varid(ncid_start, "controle", varid)
-    call NF95_Get_VAR(ncid_start, varid, tab_cntrl, start = [30])
-
     if (raz_date) then
        print *, 'Resetting the date.'
        day_ini = day_ref
        itau_dyn = 0
     else
+       call nf95_inq_varid(ncid_start, "controle", varid)
+       call NF95_Get_VAR(ncid_start, varid, tab_cntrl, start = [30])
        itau_dyn = tab_cntrl(2)
        call NF95_INQ_VARID (ncid_start, "temps", varid)
        call NF95_GET_VAR(ncid_start, varid, day_ini)
