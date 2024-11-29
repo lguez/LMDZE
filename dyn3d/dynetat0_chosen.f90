@@ -34,7 +34,8 @@ contains
 
     ! Libraries:
     use jumble, only: assert
-    use netcdf95, only: nf95_inq_varid, NF95_Gw_VAR
+    use netcdf95, only: nf95_inq_varid, NF95_Gw_VAR, nf95_inquire_dimension, &
+         nf95_inq_dimid
 
     use conf_gcm_m, only: raz_date
     use dimensions, only: iim, jjm, llm
@@ -44,19 +45,24 @@ contains
 
     ! Local:
     REAL, allocatable:: tab_cntrl(:) ! tableau des param\`etres du run
-    INTEGER varid
+    INTEGER varid, dimid, nclen
 
     namelist /dynetat0_nml/ day_ref, annee_ref
 
     !-----------------------------------------------------------------------
 
     print *, "Call sequence information: dynetat0_chosen"
+    call nf95_inq_dimid(ncid_start, "rlonu", dimid)
+    call nf95_inquire_dimension(ncid_start, dimid, nclen = nclen)
+    call assert(nclen == iim + 1, "dynetat0_chosen iim")
+    call nf95_inq_dimid(ncid_start, "rlatv", dimid)
+    call nf95_inquire_dimension(ncid_start, dimid, nclen = nclen)
+    call assert(nclen == jjm, "dynetat0_chosen jjm")
+    call nf95_inq_dimid(ncid_start, "sigs", dimid)
+    call nf95_inquire_dimension(ncid_start, dimid, nclen = nclen)
+    call assert(nclen == llm, "dynetat0_chosen llm")
     call nf95_inq_varid(ncid_start, "controle", varid)
     call NF95_Gw_VAR(ncid_start, varid, tab_cntrl)
-
-    call assert(int(tab_cntrl(1)) == iim, "dynetat0_chosen tab_cntrl iim") 
-    call assert(int(tab_cntrl(2)) == jjm, "dynetat0_chosen tab_cntrl jjm") 
-    call assert(int(tab_cntrl(3)) == llm, "dynetat0_chosen tab_cntrl llm") 
 
     clon = tab_cntrl(20)
     clat = tab_cntrl(21)

@@ -66,9 +66,7 @@ CONTAINS
     call assert((/size(vcov, 3), size(ucov, 3), size(teta, 3), size(q, 3), &
          size(masse, 3)/) == llm, "dynredem1 llm")
     call assert(size(q, 4) == nqmx, "dynredem1 nqmx")
-    tab_cntrl(1) = iim
-    tab_cntrl(2) = jjm
-    tab_cntrl(3) = llm
+    tab_cntrl(:3) = 0.
     tab_cntrl(4) = day_ref
     tab_cntrl(5) = annee_ref
     tab_cntrl(6) = ra
