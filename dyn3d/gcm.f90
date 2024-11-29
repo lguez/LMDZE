@@ -19,14 +19,13 @@ PROGRAM gcm
   use caldyn0_m, only: read_caldyn0
   use comdissnew, only: read_comdissnew
   use comgeom, only:  inigeom
-  use conf_gcm_m, only: nday, conf_gcm, iflag_phys
+  use conf_gcm_m, only: conf_gcm, iflag_phys
   use conf_guide_m, only: conf_guide
   use dimensions, only: iim, jjm, llm, nqmx, set_dimensions
   use dimphy, only: init_dimphy
   USE disvert_m, ONLY : disvert
-  use dynetat0_m, only: dynetat0, day_ini
+  use dynetat0_m, only: dynetat0
   use dynetat0_chosen_m, only: dynetat0_chosen
-  use dynredem0_m, only: dynredem0
   use grid_change, only: init_dyn_phy
   use grid_noro_m, only: read_phis
   use histclo_m, only: histclo
@@ -99,7 +98,6 @@ PROGRAM gcm
   IF (iflag_phys) CALL suphec
 
   ! Initialisation des sorties :
-  CALL dynredem0(iday_end = day_ini + nday)
   CALL inithist
   call init_dynzon
 

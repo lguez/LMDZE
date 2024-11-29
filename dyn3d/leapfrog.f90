@@ -28,6 +28,7 @@ contains
     use dissip_m, only: dissip
     USE disvert_m, ONLY: ap, bp
     USE dynetat0_m, ONLY: day_ini, itau_dyn
+    use dynredem0_m, only: dynredem0
     use dynredem1_m, only: dynredem1
     use enercin_m, only: enercin
     USE exner_hyb_m, ONLY: exner_hyb
@@ -211,6 +212,7 @@ contains
             itau_w = itau_dyn + itau + 1)
     end do time_integration
 
+    CALL dynredem0(iday_end = day_ini + nday)
     CALL dynredem1(vcov, ucov, teta, q, masse, ps, itau = itau_dyn + itaufin)
 
     ! Calcul des tendances dynamiques:
