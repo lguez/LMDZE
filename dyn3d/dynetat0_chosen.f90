@@ -24,7 +24,7 @@ module dynetat0_chosen_m
 
   real, protected, save:: taux, tauy
   ! raideur de la transition de l'int\'erieur \`a l'ext\'erieur du zoom
-  
+
 contains
 
   SUBROUTINE dynetat0_chosen(ncid_start)
@@ -42,7 +42,7 @@ contains
 
     integer, intent(in):: ncid_start
 
-    ! Local: 
+    ! Local:
     REAL, allocatable:: tab_cntrl(:) ! tableau des param\`etres du run
     INTEGER varid
 
@@ -51,7 +51,6 @@ contains
     !-----------------------------------------------------------------------
 
     print *, "Call sequence information: dynetat0_chosen"
-
     call nf95_inq_varid(ncid_start, "controle", varid)
     call NF95_Gw_VAR(ncid_start, varid, tab_cntrl)
 
@@ -102,7 +101,7 @@ contains
     dzoomx = 0.2
     dzoomy = 0.2
     taux = 3.
-    tauy = 3. 
+    tauy = 3.
 
     print *, "Enter namelist 'serre_nml'."
     read(unit=*, nml=serre_nml)
