@@ -212,8 +212,8 @@ contains
             itau_w = itau_dyn + itau + 1)
     end do time_integration
 
-    CALL dynredem0(iday_end = day_ini + nday)
-    CALL dynredem1(vcov, ucov, teta, q, masse, ps, itau = itau_dyn + itaufin)
+    CALL dynredem0(vcov, ucov, teta, q, masse, ps, iday_end = day_ini + nday, &
+         itau = itau_dyn + itaufin)
 
     ! Calcul des tendances dynamiques:
     CALL geopot(teta, pk, pks, phi)

@@ -125,8 +125,7 @@ contains
 
     CALL geopot(teta, pk , pks, phi)
     CALL caldyn0(ucov, vcov, teta, ps, pk, phi)
-    CALL dynredem0(day_ref)
-    CALL dynredem1(vcov, ucov, teta, q, masse, ps, itau = 0)
+    CALL dynredem0(vcov, ucov, teta, q, masse, ps, day_ref, itau = 0)
 
   END SUBROUTINE etat0dyn
 
