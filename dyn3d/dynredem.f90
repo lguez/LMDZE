@@ -112,7 +112,7 @@ CONTAINS
     CALL nf95_put_att(ncid, nf95_global, 'title', &
          'start file for the dynamics code')
 
-    ! Definir les dimensions du fichiers:
+    ! Definir les dimensions du fichier:
 
     CALL nf95_def_dim(ncid, 'index', length, idim_index)
     CALL nf95_def_dim(ncid, 'rlonu', iip1, idim_rlonu)
@@ -127,51 +127,37 @@ CONTAINS
 
     CALL nf95_def_var(ncid, 'controle', nf95_float, idim_index, varid_controle)
     CALL nf95_put_att(ncid, varid_controle, 'title', 'Parametres de controle')
-
     CALL nf95_def_var(ncid, 'rlonu', nf95_float, idim_rlonu, varid_rlonu)
     CALL nf95_put_att(ncid, varid_rlonu, 'title', 'Longitudes des points U')
-
     CALL nf95_def_var(ncid, 'rlatu', nf95_float, idim_rlatu, varid_rlatu)
     CALL nf95_put_att(ncid, varid_rlatu, 'title', 'Latitudes des points U')
-
     CALL nf95_def_var(ncid, 'rlonv', nf95_float, idim_rlonv, varid_rlonv)
     CALL nf95_put_att(ncid, varid_rlonv, 'title', 'Longitudes des points V')
-
     CALL nf95_def_var(ncid, 'rlatv', nf95_float, idim_rlatv, varid_rlatv)
     CALL nf95_put_att(ncid, varid_rlatv, 'title', 'Latitudes des points V')
-
     CALL nf95_def_var(ncid, 'xprimu', nf95_float, idim_rlonu, varid_xprimu)
     CALL nf95_put_att(ncid, varid_xprimu, 'title', 'dx / dX aux points u')
-
     CALL nf95_def_var(ncid, 'xprimv', nf95_float, idim_rlonv, varid_xprimv)
     CALL nf95_put_att(ncid, varid_xprimv, 'title', 'dx / dX aux points v')
-
     CALL nf95_def_var(ncid, 'xprimm025', nf95_float, idim_rlonu, &
          varid_xprimm025)
     CALL nf95_def_var(ncid, 'xprimp025', nf95_float, idim_rlonu, &
          varid_xprimp025)
-
     CALL nf95_def_var(ncid, 'rlatu1', nf95_float, idim_rlatv, varid_rlatu1)
     CALL nf95_def_var(ncid, 'rlatu2', nf95_float, idim_rlatv, varid_rlatu2)
     CALL nf95_def_var(ncid, 'yprimu1', nf95_float, idim_rlatv, varid_yprimu1)
     CALL nf95_def_var(ncid, 'yprimu2', nf95_float, idim_rlatv, varid_yprimu2)
-
     CALL nf95_def_var(ncid, 'ap', nf95_float, idim_sig, varid_ap)
     CALL nf95_put_att(ncid, varid_ap, 'title', 'Coefficient A pour hybride')
-
     CALL nf95_def_var(ncid, 'bp', nf95_float, idim_sig, varid_bp)
     CALL nf95_put_att(ncid, varid_bp, 'title', 'Coefficient B pour hybride')
-
     CALL nf95_def_var(ncid, 'presnivs', nf95_float, idim_s, varid_presnivs)
 
-    ! Geopentiel au sol:
-
+    ! G\'eopentiel au sol:
     CALL nf95_def_var(ncid, 'phis', nf95_float, (/idim_rlonv, idim_rlatu/), &
          varid_phis)
     CALL nf95_put_att(ncid, varid_phis, 'standard_name', 'surface_geopotential')
     CALL nf95_put_att(ncid, varid_phis, 'units', 'm2 s-2')
-
-    ! Definir les variables pour pouvoir les enregistrer plus tard:
 
     CALL nf95_def_var(ncid, 'temps', nf95_float, dimid_temps, varid_temps)
     CALL nf95_put_att(ncid, varid_temps, 'title', 'Temps de simulation')
@@ -182,11 +168,9 @@ CONTAINS
     CALL nf95_def_var(ncid, 'ucov', nf95_float, &
          (/idim_rlonu, idim_rlatu, idim_s, dimid_temps/), varid_ucov)
     CALL nf95_put_att(ncid, varid_ucov, 'title', 'Vitesse U')
-
     CALL nf95_def_var(ncid, 'vcov', nf95_float, &
          (/idim_rlonv, idim_rlatv, idim_s, dimid_temps/), varid_vcov)
     CALL nf95_put_att(ncid, varid_vcov, 'title', 'Vitesse V')
-
     CALL nf95_def_var(ncid, 'teta', nf95_float, &
          (/idim_rlonv, idim_rlatu, idim_s, dimid_temps/), varid_teta)
     CALL nf95_put_att(ncid, varid_teta, 'title', 'Temperature')
@@ -204,9 +188,7 @@ CONTAINS
     CALL nf95_def_var(ncid, 'ps', nf95_float, &
          (/idim_rlonv, idim_rlatu, dimid_temps/), varid_ps)
     CALL nf95_put_att(ncid, varid_ps, 'title', 'Pression au sol')
-
     CALL nf95_enddef(ncid)
-
     CALL nf95_put_var(ncid, varid_controle, tab_cntrl)
     CALL nf95_put_var(ncid, varid_rlonu, rlonu)
     CALL nf95_put_var(ncid, varid_rlatu, rlatu)
@@ -225,9 +207,6 @@ CONTAINS
     CALL nf95_put_var(ncid, varid_presnivs, presnivs)
     CALL nf95_put_var(ncid, varid_phis, phis)
     call nf95_put_var(ncid, varid_temps, values = 0.)
-
-    ! \'Ecriture des champs
-
     call nf95_put_var(ncid, varid_ucov, ucov)
     call nf95_put_var(ncid, varid_vcov, vcov)
     call nf95_put_var(ncid, varid_teta, teta)
