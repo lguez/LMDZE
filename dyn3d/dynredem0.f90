@@ -11,9 +11,9 @@ CONTAINS
     ! From dyn3d/dynredem.F, version 1.2, 2004/06/22 11:45:30
     ! \'Ecriture du fichier de red\'emarrage au format NetCDF (initialisation)
 
-    USE netcdf, ONLY: nf90_clobber, nf90_float, nf90_global, nf90_unlimited
-    USE netcdf95, ONLY: nf95_create, nf95_def_dim, nf95_def_var, nf95_enddef, &
-         nf95_put_att, nf95_put_var
+    USE netcdf95, ONLY: nf95_clobber, nf95_float, nf95_global, nf95_unlimited, &
+         nf95_create, nf95_def_dim, nf95_def_var, nf95_enddef, nf95_put_att, &
+         nf95_put_var
 
     use caldyn0_m, only: ang0, etot0, ptot0, stot0, ztot0
     USE comconst, ONLY: daysec, ra
@@ -95,8 +95,8 @@ CONTAINS
     tab_cntrl(30) = iday_end
     tab_cntrl(31:) = 0.
 
-    CALL nf95_create("restart.nc", nf90_clobber, ncid)
-    CALL nf95_put_att(ncid, nf90_global, 'title', &
+    CALL nf95_create("restart.nc", nf95_clobber, ncid)
+    CALL nf95_put_att(ncid, nf95_global, 'title', &
          'start file for the dynamics code')
 
     ! Definir les dimensions du fichiers:
@@ -108,87 +108,87 @@ CONTAINS
     CALL nf95_def_dim(ncid, 'rlatv', jjm, idim_rlatv)
     CALL nf95_def_dim(ncid, 'sigs', llm, idim_s)
     CALL nf95_def_dim(ncid, 'sig', llmp1, idim_sig)
-    CALL nf95_def_dim(ncid, 'temps', nf90_unlimited, dimid_temps)
+    CALL nf95_def_dim(ncid, 'temps', nf95_unlimited, dimid_temps)
 
     ! Definir et enregistrer certains champs invariants:
 
-    CALL nf95_def_var(ncid, 'controle', nf90_float, idim_index, varid_controle)
+    CALL nf95_def_var(ncid, 'controle', nf95_float, idim_index, varid_controle)
     CALL nf95_put_att(ncid, varid_controle, 'title', 'Parametres de controle')
 
-    CALL nf95_def_var(ncid, 'rlonu', nf90_float, idim_rlonu, varid_rlonu)
+    CALL nf95_def_var(ncid, 'rlonu', nf95_float, idim_rlonu, varid_rlonu)
     CALL nf95_put_att(ncid, varid_rlonu, 'title', 'Longitudes des points U')
 
-    CALL nf95_def_var(ncid, 'rlatu', nf90_float, idim_rlatu, varid_rlatu)
+    CALL nf95_def_var(ncid, 'rlatu', nf95_float, idim_rlatu, varid_rlatu)
     CALL nf95_put_att(ncid, varid_rlatu, 'title', 'Latitudes des points U')
 
-    CALL nf95_def_var(ncid, 'rlonv', nf90_float, idim_rlonv, varid_rlonv)
+    CALL nf95_def_var(ncid, 'rlonv', nf95_float, idim_rlonv, varid_rlonv)
     CALL nf95_put_att(ncid, varid_rlonv, 'title', 'Longitudes des points V')
 
-    CALL nf95_def_var(ncid, 'rlatv', nf90_float, idim_rlatv, varid_rlatv)
+    CALL nf95_def_var(ncid, 'rlatv', nf95_float, idim_rlatv, varid_rlatv)
     CALL nf95_put_att(ncid, varid_rlatv, 'title', 'Latitudes des points V')
 
-    CALL nf95_def_var(ncid, 'xprimu', nf90_float, idim_rlonu, varid_xprimu)
+    CALL nf95_def_var(ncid, 'xprimu', nf95_float, idim_rlonu, varid_xprimu)
     CALL nf95_put_att(ncid, varid_xprimu, 'title', 'dx / dX aux points u')
 
-    CALL nf95_def_var(ncid, 'xprimv', nf90_float, idim_rlonv, varid_xprimv)
+    CALL nf95_def_var(ncid, 'xprimv', nf95_float, idim_rlonv, varid_xprimv)
     CALL nf95_put_att(ncid, varid_xprimv, 'title', 'dx / dX aux points v')
 
-    CALL nf95_def_var(ncid, 'xprimm025', nf90_float, idim_rlonu, &
+    CALL nf95_def_var(ncid, 'xprimm025', nf95_float, idim_rlonu, &
          varid_xprimm025)
-    CALL nf95_def_var(ncid, 'xprimp025', nf90_float, idim_rlonu, &
+    CALL nf95_def_var(ncid, 'xprimp025', nf95_float, idim_rlonu, &
          varid_xprimp025)
 
-    CALL nf95_def_var(ncid, 'rlatu1', nf90_float, idim_rlatv, varid_rlatu1)
-    CALL nf95_def_var(ncid, 'rlatu2', nf90_float, idim_rlatv, varid_rlatu2)
-    CALL nf95_def_var(ncid, 'yprimu1', nf90_float, idim_rlatv, varid_yprimu1)
-    CALL nf95_def_var(ncid, 'yprimu2', nf90_float, idim_rlatv, varid_yprimu2)
+    CALL nf95_def_var(ncid, 'rlatu1', nf95_float, idim_rlatv, varid_rlatu1)
+    CALL nf95_def_var(ncid, 'rlatu2', nf95_float, idim_rlatv, varid_rlatu2)
+    CALL nf95_def_var(ncid, 'yprimu1', nf95_float, idim_rlatv, varid_yprimu1)
+    CALL nf95_def_var(ncid, 'yprimu2', nf95_float, idim_rlatv, varid_yprimu2)
 
-    CALL nf95_def_var(ncid, 'ap', nf90_float, idim_sig, varid_ap)
+    CALL nf95_def_var(ncid, 'ap', nf95_float, idim_sig, varid_ap)
     CALL nf95_put_att(ncid, varid_ap, 'title', 'Coefficient A pour hybride')
 
-    CALL nf95_def_var(ncid, 'bp', nf90_float, idim_sig, varid_bp)
+    CALL nf95_def_var(ncid, 'bp', nf95_float, idim_sig, varid_bp)
     CALL nf95_put_att(ncid, varid_bp, 'title', 'Coefficient B pour hybride')
 
-    CALL nf95_def_var(ncid, 'presnivs', nf90_float, idim_s, varid_presnivs)
+    CALL nf95_def_var(ncid, 'presnivs', nf95_float, idim_s, varid_presnivs)
 
     ! Geopentiel au sol:
 
-    CALL nf95_def_var(ncid, 'phis', nf90_float, (/idim_rlonv, idim_rlatu/), &
+    CALL nf95_def_var(ncid, 'phis', nf95_float, (/idim_rlonv, idim_rlatu/), &
          varid_phis)
     CALL nf95_put_att(ncid, varid_phis, 'standard_name', 'surface_geopotential')
     CALL nf95_put_att(ncid, varid_phis, 'units', 'm2 s-2')
 
     ! Definir les variables pour pouvoir les enregistrer plus tard:
 
-    CALL nf95_def_var(ncid, 'temps', nf90_float, dimid_temps, varid)
+    CALL nf95_def_var(ncid, 'temps', nf95_float, dimid_temps, varid)
     CALL nf95_put_att(ncid, varid, 'title', 'Temps de simulation')
     WRITE(unites, fmt = 200) year, month, day
 200 FORMAT ('days since ', I4, '-', I2.2, '-', I2.2, ' 00:00:00')
     CALL nf95_put_att(ncid, varid, 'units', unites)
 
-    CALL nf95_def_var(ncid, 'ucov', nf90_float, &
+    CALL nf95_def_var(ncid, 'ucov', nf95_float, &
          (/idim_rlonu, idim_rlatu, idim_s, dimid_temps/), varid)
     CALL nf95_put_att(ncid, varid, 'title', 'Vitesse U')
 
-    CALL nf95_def_var(ncid, 'vcov', nf90_float, &
+    CALL nf95_def_var(ncid, 'vcov', nf95_float, &
          (/idim_rlonv, idim_rlatv, idim_s, dimid_temps/), varid)
     CALL nf95_put_att(ncid, varid, 'title', 'Vitesse V')
 
-    CALL nf95_def_var(ncid, 'teta', nf90_float, &
+    CALL nf95_def_var(ncid, 'teta', nf95_float, &
          (/idim_rlonv, idim_rlatu, idim_s, dimid_temps/), varid)
     CALL nf95_put_att(ncid, varid, 'title', 'Temperature')
 
     DO iq = 1, nqmx
-       CALL nf95_def_var(ncid, tname(iq), nf90_float, &
+       CALL nf95_def_var(ncid, tname(iq), nf95_float, &
             (/idim_rlonv, idim_rlatu, idim_s, dimid_temps/), varid)
        CALL nf95_put_att(ncid, varid, 'title', ttext(iq))
     END DO
 
-    CALL nf95_def_var(ncid, 'masse', nf90_float, &
+    CALL nf95_def_var(ncid, 'masse', nf95_float, &
          (/idim_rlonv, idim_rlatu, idim_s, dimid_temps/), varid)
     CALL nf95_put_att(ncid, varid, 'title', 'C est quoi ?')
 
-    CALL nf95_def_var(ncid, 'ps', nf90_float, &
+    CALL nf95_def_var(ncid, 'ps', nf95_float, &
          (/idim_rlonv, idim_rlatu, dimid_temps/), varid)
     CALL nf95_put_att(ncid, varid, 'title', 'Pression au sol')
 
