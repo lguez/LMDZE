@@ -55,7 +55,6 @@ contains
 
     ! Local:
     INTEGER iq
-    REAL tab_cntrl(2) ! partie du tableau des param\`etres du run
     INTEGER ierr, varid
 
     !-----------------------------------------------------------------------
@@ -84,8 +83,7 @@ contains
        itau_dyn = 0
     else
        call nf95_inq_varid(ncid_start, "controle", varid)
-       call NF95_Get_VAR(ncid_start, varid, tab_cntrl, start = [30])
-       itau_dyn = tab_cntrl(2)
+       call NF95_Get_VAR(ncid_start, varid, itau_dyn, start = [31])
        call NF95_INQ_VARID (ncid_start, "temps", varid)
        call NF95_GET_VAR(ncid_start, varid, day_ini)
        day_ini = day_ini + 1 ! day_ini is base 1 at the reference date
