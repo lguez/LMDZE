@@ -106,7 +106,8 @@ CONTAINS
     tab_cntrl(29) = tauy
 
     tab_cntrl(30) = iday_end
-    tab_cntrl(31:) = 0.
+    tab_cntrl(31) = itau
+    tab_cntrl(32:) = 0.
 
     CALL nf95_create("restart.nc", nf95_clobber, ncid)
     CALL nf95_put_att(ncid, nf95_global, 'title', &
@@ -228,10 +229,6 @@ CONTAINS
     ! \'Ecriture de la coordonn\'ee temps:
     call nf95_inq_varid(ncid, 'temps', varid)
     call nf95_put_var(ncid, varid, values = 0.)
-
-    ! R\'ecriture du tableau de contr\^ole, "itaufin" n'est pas d\'efini quand
-    ! on passe dans "dynredem0"
-    call nf95_put_var(ncid, varid_controle, real(itau), start=(/31/))
 
     ! \'Ecriture des champs
 
