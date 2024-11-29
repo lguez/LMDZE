@@ -30,7 +30,6 @@ contains
     !---------------------------------------------------------
 
     PRINT *, 'Call sequence information: dynredem1'
-
     call assert((/size(vcov, 1), size(ucov, 1), size(teta, 1), size(q, 1), &
          size(masse, 1), size(ps, 1)/) == iim + 1, "dynredem1 iim")
     call assert((/size(vcov, 2) + 1, size(ucov, 2), size(teta, 2), size(q, 2), &
@@ -39,7 +38,7 @@ contains
          size(masse, 3)/) == llm, "dynredem1 llm")
     call assert(size(q, 4) == nqmx, "dynredem1 nqmx")
 
-    ! \'Ecriture/extension de la coordonn\'ee temps
+    ! \'Ecriture de la coordonn\'ee temps:
     call nf95_inq_varid(ncid, 'temps', varid)
     call nf95_put_var(ncid, varid, values = 0.)
 
@@ -52,10 +51,8 @@ contains
 
     call nf95_inq_varid(ncid, 'ucov', varid)
     call nf95_put_var(ncid, varid, ucov)
-
     call nf95_inq_varid(ncid, 'vcov', varid)
     call nf95_put_var(ncid, varid, vcov)
-
     call nf95_inq_varid(ncid, 'teta', varid)
     call nf95_put_var(ncid, varid, teta)
 
@@ -66,10 +63,8 @@ contains
 
     call nf95_inq_varid(ncid, 'masse', varid)
     call nf95_put_var(ncid, varid, masse)
-
     call nf95_inq_varid(ncid, 'ps', varid)
     call nf95_put_var(ncid, varid, ps)
-
     call nf95_close(ncid)
 
   END SUBROUTINE dynredem1
