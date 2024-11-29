@@ -98,7 +98,7 @@ PROGRAM gcm
   ! Initialisation de la physique :
   IF (iflag_phys) CALL suphec
 
-  ! Initialisation des entr\'ees-sorties :
+  ! Initialisation des sorties :
   CALL dynredem0(iday_end = day_ini + nday)
   CALL inithist
   call init_dynzon
