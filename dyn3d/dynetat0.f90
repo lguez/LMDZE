@@ -87,7 +87,9 @@ contains
        itau_dyn = 0
     else
        itau_dyn = tab_cntrl(2)
-       day_ini = tab_cntrl(1)
+       call NF95_INQ_VARID (ncid_start, "temps", varid)
+       call NF95_GET_VAR(ncid_start, varid, day_ini)
+       day_ini = day_ini + 1 ! day_ini is base 1 at the reference date
     end if
 
     print *, "day_ini = ", day_ini
