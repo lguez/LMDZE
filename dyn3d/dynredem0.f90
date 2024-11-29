@@ -231,8 +231,7 @@ CONTAINS
 
     ! R\'ecriture du tableau de contr\^ole, "itaufin" n'est pas d\'efini quand
     ! on passe dans "dynredem0"
-    call nf95_inq_varid(ncid, 'controle', varid)
-    call nf95_put_var(ncid, varid, real(itau), start=(/31/))
+    call nf95_put_var(ncid, varid_controle, real(itau), start=(/31/))
 
     ! \'Ecriture des champs
 
