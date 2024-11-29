@@ -18,7 +18,7 @@ contains
     use disvert_m, only: ap, bp, preff
     use dynetat0_m, only: rlatu, rlatv, rlonu, rlonv
     use dynetat0_chosen_m, only: day_ref
-    use dynredem0_m, only: dynredem0
+    use dynredem_m, only: dynredem
     use dynredem1_m, only: dynredem1
     use exner_hyb_m, only: exner_hyb
     use geopot_m, only: geopot
@@ -125,7 +125,7 @@ contains
 
     CALL geopot(teta, pk , pks, phi)
     CALL caldyn0(ucov, vcov, teta, ps, pk, phi)
-    CALL dynredem0(vcov, ucov, teta, q, masse, ps, day_ref, itau = 0)
+    CALL dynredem(vcov, ucov, teta, q, masse, ps, day_ref, itau = 0)
 
   END SUBROUTINE etat0dyn
 

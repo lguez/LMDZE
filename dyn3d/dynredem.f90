@@ -1,4 +1,4 @@
-MODULE dynredem0_m
+MODULE dynredem_m
 
   IMPLICIT NONE
 
@@ -6,7 +6,7 @@ MODULE dynredem0_m
 
 CONTAINS
 
-  SUBROUTINE dynredem0(vcov, ucov, teta, q, masse, ps, iday_end, itau)
+  SUBROUTINE dynredem(vcov, ucov, teta, q, masse, ps, iday_end, itau)
 
     ! From dyn3d/dynredem.F, version 1.2, 2004/06/22 11:45:30
     ! \'Ecriture du fichier de red\'emarrage au format NetCDF
@@ -63,7 +63,7 @@ CONTAINS
 
     !-----------------------------------------------------------------------
 
-    PRINT *, 'Call sequence information: dynredem0'
+    PRINT *, 'Call sequence information: dynredem'
     call assert((/size(vcov, 1), size(ucov, 1), size(teta, 1), size(q, 1), &
          size(masse, 1), size(ps, 1)/) == iim + 1, "dynredem1 iim")
     call assert((/size(vcov, 2) + 1, size(ucov, 2), size(teta, 2), size(q, 2), &
@@ -250,6 +250,6 @@ CONTAINS
     call nf95_put_var(ncid, varid, ps)
     call nf95_close(ncid)
 
-  END SUBROUTINE dynredem0
+  END SUBROUTINE dynredem
 
-END MODULE dynredem0_m
+END MODULE dynredem_m
