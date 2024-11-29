@@ -2,8 +2,6 @@ MODULE dynredem_m
 
   IMPLICIT NONE
 
-  INTEGER, protected:: ncid
-
 CONTAINS
 
   SUBROUTINE dynredem(vcov, ucov, teta, q, masse, ps, iday_end, itau)
@@ -51,7 +49,7 @@ CONTAINS
     INTEGER idim_rlonu, idim_rlonv, idim_rlatu, idim_rlatv
     INTEGER idim_s, idim_sig
     INTEGER dimid_temps
-    INTEGER varid
+    INTEGER varid, ncid
     integer varid_controle, varid_rlonu, varid_rlatu, varid_rlonv, varid_rlatv
     integer varid_xprimu, varid_xprimv, varid_xprimm025, varid_xprimp025
     integer varid_rlatu1, varid_rlatu2, varid_yprimu1, varid_yprimu2, varid_ap
