@@ -37,7 +37,7 @@ contains
 
     ! Libraries:
     use netcdf, only: NF90_NOERR
-    use netcdf95, only: NF95_GET_VAR, nf95_inq_varid
+    use netcdf95, only: NF95_GET_VAR, nf95_inq_varid, nf95_global, nf95_get_att
     use jumble, only: assert
 
     use conf_gcm_m, only: raz_date
@@ -82,8 +82,7 @@ contains
        day_ini = day_ref
        itau_dyn = 0
     else
-       call nf95_inq_varid(ncid_start, "controle", varid)
-       call NF95_Get_VAR(ncid_start, varid, itau_dyn, start = [31])
+       call NF95_Get_att(ncid_start, nf95_global, "itau_dyn", itau_dyn)
        call NF95_INQ_VARID (ncid_start, "temps", varid)
        call NF95_GET_VAR(ncid_start, varid, day_ini)
        day_ini = day_ini + 1 ! day_ini is base 1 at the reference date

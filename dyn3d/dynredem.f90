@@ -98,13 +98,12 @@ CONTAINS
     tab_cntrl(28) = taux
     tab_cntrl(29) = tauy
 
-    tab_cntrl(30) = 0.
-    tab_cntrl(31) = itau
-    tab_cntrl(32:) = 0.
+    tab_cntrl(30:) = 0.
 
     CALL nf95_create("restart.nc", nf95_clobber, ncid)
     CALL nf95_put_att(ncid, nf95_global, 'title', &
          'start file for the dynamics code')
+    CALL nf95_put_att(ncid, nf95_global, 'itau_dyn', itau)
 
     ! Definir les dimensions du fichier:
 
