@@ -56,10 +56,8 @@ CONTAINS
     !-----------------------------------------------------------------------
 
     PRINT *, 'Call sequence information: dynredem0'
-
     CALL ymds2ju(annee_ref, 1, iday_end, 0., julian)
     CALL ju2ymds(julian, year, month, day)
-
     tab_cntrl(1) = iim
     tab_cntrl(2) = jjm
     tab_cntrl(3) = llm
