@@ -19,7 +19,7 @@ PROGRAM gcm
   use caldyn0_m, only: read_caldyn0
   use comdissnew, only: read_comdissnew
   use comgeom, only:  inigeom
-  use conf_gcm_m, only: day_step, iperiod, iphysiq, nday, conf_gcm, iflag_phys
+  use conf_gcm_m, only: nday, conf_gcm, iflag_phys
   use conf_guide_m, only: conf_guide
   use dimensions, only: iim, jjm, llm, nqmx, set_dimensions
   use dimphy, only: init_dimphy
