@@ -12,7 +12,7 @@ CONTAINS
     use jumble, only: assert
     USE netcdf95, ONLY: nf95_clobber, nf95_float, nf95_global, nf95_unlimited, &
          nf95_create, nf95_def_dim, nf95_def_var, nf95_enddef, nf95_put_att, &
-         nf95_put_var, nf95_close, nf95_inq_varid
+         nf95_put_var, nf95_close
 
     use caldyn0_m, only: ang0, etot0, ptot0, stot0, ztot0
     USE comconst, ONLY: daysec, ra
@@ -49,11 +49,12 @@ CONTAINS
     INTEGER idim_rlonu, idim_rlonv, idim_rlatu, idim_rlatv
     INTEGER idim_s, idim_sig
     INTEGER dimid_temps
-    INTEGER varid, ncid
+    INTEGER ncid
     integer varid_controle, varid_rlonu, varid_rlatu, varid_rlonv, varid_rlatv
     integer varid_xprimu, varid_xprimv, varid_xprimm025, varid_xprimp025
     integer varid_rlatu1, varid_rlatu2, varid_yprimu1, varid_yprimu2, varid_ap
-    integer varid_bp, varid_presnivs, varid_phis
+    integer varid_bp, varid_presnivs, varid_phis, varid_temps, varid_ucov
+    integer varid_vcov, varid_teta, varid_masse, varid_ps, varid_tracer(nqmx)
 
     double precision julian
     INTEGER year, day, month
@@ -172,37 +173,37 @@ CONTAINS
 
     ! Definir les variables pour pouvoir les enregistrer plus tard:
 
-    CALL nf95_def_var(ncid, 'temps', nf95_float, dimid_temps, varid)
-    CALL nf95_put_att(ncid, varid, 'title', 'Temps de simulation')
+    CALL nf95_def_var(ncid, 'temps', nf95_float, dimid_temps, varid_temps)
+    CALL nf95_put_att(ncid, varid_temps, 'title', 'Temps de simulation')
     WRITE(unites, fmt = 200) year, month, day
 200 FORMAT ('days since ', I4, '-', I2.2, '-', I2.2, ' 00:00:00')
-    CALL nf95_put_att(ncid, varid, 'units', unites)
+    CALL nf95_put_att(ncid, varid_temps, 'units', unites)
 
     CALL nf95_def_var(ncid, 'ucov', nf95_float, &
-         (/idim_rlonu, idim_rlatu, idim_s, dimid_temps/), varid)
-    CALL nf95_put_att(ncid, varid, 'title', 'Vitesse U')
+         (/idim_rlonu, idim_rlatu, idim_s, dimid_temps/), varid_ucov)
+    CALL nf95_put_att(ncid, varid_ucov, 'title', 'Vitesse U')
 
     CALL nf95_def_var(ncid, 'vcov', nf95_float, &
-         (/idim_rlonv, idim_rlatv, idim_s, dimid_temps/), varid)
-    CALL nf95_put_att(ncid, varid, 'title', 'Vitesse V')
+         (/idim_rlonv, idim_rlatv, idim_s, dimid_temps/), varid_vcov)
+    CALL nf95_put_att(ncid, varid_vcov, 'title', 'Vitesse V')
 
     CALL nf95_def_var(ncid, 'teta', nf95_float, &
-         (/idim_rlonv, idim_rlatu, idim_s, dimid_temps/), varid)
-    CALL nf95_put_att(ncid, varid, 'title', 'Temperature')
+         (/idim_rlonv, idim_rlatu, idim_s, dimid_temps/), varid_teta)
+    CALL nf95_put_att(ncid, varid_teta, 'title', 'Temperature')
 
     DO iq = 1, nqmx
        CALL nf95_def_var(ncid, tname(iq), nf95_float, &
-            (/idim_rlonv, idim_rlatu, idim_s, dimid_temps/), varid)
-       CALL nf95_put_att(ncid, varid, 'title', ttext(iq))
+            (/idim_rlonv, idim_rlatu, idim_s, dimid_temps/), varid_tracer(iq))
+       CALL nf95_put_att(ncid, varid_tracer(iq), 'title', ttext(iq))
     END DO
 
     CALL nf95_def_var(ncid, 'masse', nf95_float, &
-         (/idim_rlonv, idim_rlatu, idim_s, dimid_temps/), varid)
-    CALL nf95_put_att(ncid, varid, 'title', 'C est quoi ?')
+         (/idim_rlonv, idim_rlatu, idim_s, dimid_temps/), varid_masse)
+    CALL nf95_put_att(ncid, varid_masse, 'title', 'C est quoi ?')
 
     CALL nf95_def_var(ncid, 'ps', nf95_float, &
-         (/idim_rlonv, idim_rlatu, dimid_temps/), varid)
-    CALL nf95_put_att(ncid, varid, 'title', 'Pression au sol')
+         (/idim_rlonv, idim_rlatu, dimid_temps/), varid_ps)
+    CALL nf95_put_att(ncid, varid_ps, 'title', 'Pression au sol')
 
     CALL nf95_enddef(ncid)
 
@@ -223,29 +224,20 @@ CONTAINS
     CALL nf95_put_var(ncid, varid_bp, bp)
     CALL nf95_put_var(ncid, varid_presnivs, presnivs)
     CALL nf95_put_var(ncid, varid_phis, phis)
-
-    ! \'Ecriture de la coordonn\'ee temps:
-    call nf95_inq_varid(ncid, 'temps', varid)
-    call nf95_put_var(ncid, varid, values = 0.)
+    call nf95_put_var(ncid, varid_temps, values = 0.)
 
     ! \'Ecriture des champs
 
-    call nf95_inq_varid(ncid, 'ucov', varid)
-    call nf95_put_var(ncid, varid, ucov)
-    call nf95_inq_varid(ncid, 'vcov', varid)
-    call nf95_put_var(ncid, varid, vcov)
-    call nf95_inq_varid(ncid, 'teta', varid)
-    call nf95_put_var(ncid, varid, teta)
+    call nf95_put_var(ncid, varid_ucov, ucov)
+    call nf95_put_var(ncid, varid_vcov, vcov)
+    call nf95_put_var(ncid, varid_teta, teta)
 
     DO iq = 1, nqmx
-       call nf95_inq_varid(ncid, tname(iq), varid)
-       call nf95_put_var(ncid, varid, q(:, :, :, iq))
+       call nf95_put_var(ncid, varid_tracer(iq), q(:, :, :, iq))
     END DO
 
-    call nf95_inq_varid(ncid, 'masse', varid)
-    call nf95_put_var(ncid, varid, masse)
-    call nf95_inq_varid(ncid, 'ps', varid)
-    call nf95_put_var(ncid, varid, ps)
+    call nf95_put_var(ncid, varid_masse, masse)
+    call nf95_put_var(ncid, varid_ps, ps)
     call nf95_close(ncid)
 
   END SUBROUTINE dynredem
