@@ -35,7 +35,7 @@ contains
     ! Libraries:
     use jumble, only: assert
     use netcdf95, only: nf95_inq_varid, NF95_Gw_VAR, nf95_inquire_dimension, &
-         nf95_inq_dimid
+         nf95_inq_dimid, nf95_get_att
 
     use conf_gcm_m, only: raz_date
     use dimensions, only: iim, jjm, llm
@@ -46,6 +46,7 @@ contains
     ! Local:
     REAL, allocatable:: tab_cntrl(:) ! tableau des param\`etres du run
     INTEGER varid, dimid, nclen
+    character(len = 30) units
 
     namelist /dynetat0_nml/ day_ref, annee_ref
 
@@ -79,7 +80,9 @@ contains
        write(unit_nml, nml = dynetat0_nml)
     else
        day_ref = tab_cntrl(4)
-       annee_ref = tab_cntrl(5)
+       call nf95_inq_varid(ncid_start, "temps", varid)
+       call nf95_get_att(ncid_start, varid, "units", units)
+       read(unit = units, fmt = "(11x, i4)") annee_ref
     end if
 
   END SUBROUTINE dynetat0_chosen

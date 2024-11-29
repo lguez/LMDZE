@@ -68,7 +68,7 @@ CONTAINS
     call assert(size(q, 4) == nqmx, "dynredem1 nqmx")
     tab_cntrl(:3) = 0.
     tab_cntrl(4) = day_ref
-    tab_cntrl(5) = annee_ref
+    tab_cntrl(5) = 0.
     tab_cntrl(6) = ra
     tab_cntrl(7) = romega
     tab_cntrl(8) = rg
