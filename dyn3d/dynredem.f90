@@ -98,7 +98,7 @@ CONTAINS
     tab_cntrl(28) = taux
     tab_cntrl(29) = tauy
 
-    tab_cntrl(30) = iday_end
+    tab_cntrl(30) = 0.
     tab_cntrl(31) = itau
     tab_cntrl(32:) = 0.
 
