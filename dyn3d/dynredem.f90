@@ -24,10 +24,8 @@ CONTAINS
          dzoomy, grossismx, grossismy, taux, tauy
     use grid_noro_m, only: phis
     USE infotrac_init_m, ONLY: tname, ttext
-    USE ju2ymds_m, ONLY: ju2ymds
     USE paramet_m, ONLY: iip1, jjp1, llmp1
     use suphec_m, only: rg, rcpd, rkappa, romega
-    use ymds2ju_m, only: ymds2ju
 
     REAL, INTENT(IN):: vcov(:, :, :) ! (iim + 1, jjm, llm)
     REAL, INTENT(IN):: ucov(:, :, :) ! (iim + 1, jjm + 1, llm)
@@ -56,8 +54,6 @@ CONTAINS
     integer varid_bp, varid_presnivs, varid_phis, varid_temps, varid_ucov
     integer varid_vcov, varid_teta, varid_masse, varid_ps, varid_tracer(nqmx)
 
-    double precision julian
-    INTEGER year, day, month
     CHARACTER(len=30) unites
 
     !-----------------------------------------------------------------------
@@ -70,8 +66,6 @@ CONTAINS
     call assert((/size(vcov, 3), size(ucov, 3), size(teta, 3), size(q, 3), &
          size(masse, 3)/) == llm, "dynredem1 llm")
     call assert(size(q, 4) == nqmx, "dynredem1 nqmx")
-    CALL ymds2ju(annee_ref, 1, iday_end, 0., julian)
-    CALL ju2ymds(julian, year, month, day)
     tab_cntrl(1) = iim
     tab_cntrl(2) = jjm
     tab_cntrl(3) = llm
@@ -161,8 +155,8 @@ CONTAINS
 
     CALL nf95_def_var(ncid, 'temps', nf95_float, dimid_temps, varid_temps)
     CALL nf95_put_att(ncid, varid_temps, 'title', 'Temps de simulation')
-    WRITE(unites, fmt = 200) year, month, day
-200 FORMAT ('days since ', I4, '-', I2.2, '-', I2.2, ' 00:00:00')
+    WRITE(unites, fmt = 200) annee_ref
+200 FORMAT ('days since ', I4, '-01-01 00:00:00')
     CALL nf95_put_att(ncid, varid_temps, 'units', unites)
 
     CALL nf95_def_var(ncid, 'ucov', nf95_float, &
@@ -206,7 +200,7 @@ CONTAINS
     CALL nf95_put_var(ncid, varid_bp, bp)
     CALL nf95_put_var(ncid, varid_presnivs, presnivs)
     CALL nf95_put_var(ncid, varid_phis, phis)
-    call nf95_put_var(ncid, varid_temps, values = 0.)
+    call nf95_put_var(ncid, varid_temps, iday_end - 1)
     call nf95_put_var(ncid, varid_ucov, ucov)
     call nf95_put_var(ncid, varid_vcov, vcov)
     call nf95_put_var(ncid, varid_teta, teta)
