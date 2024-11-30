@@ -79,7 +79,7 @@ CONTAINS
     tab_cntrl(21) = clat
     tab_cntrl(22) = grossismx
     tab_cntrl(23) = grossismy
-    tab_cntrl(24) = 1.
+    tab_cntrl(24) = 0.
     tab_cntrl(25) = dzoomx
     tab_cntrl(26) = dzoomy
     tab_cntrl(27) = 0.
