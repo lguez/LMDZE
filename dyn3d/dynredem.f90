@@ -31,8 +31,7 @@ CONTAINS
     REAL, INTENT(IN):: q(:, :, :, :) ! (iim + 1, jjm + 1, llm, nqmx)
     REAL, INTENT(IN):: masse(:, :, :) ! (iim + 1, jjm + 1, llm)
     REAL, INTENT(IN):: ps(:, :) ! (iim + 1, jjm + 1)
-    INTEGER, INTENT(IN):: iday_end
-    INTEGER, INTENT(IN):: itau
+    INTEGER, INTENT(IN):: iday_end, itau
 
     ! Local:
 

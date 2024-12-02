@@ -7,6 +7,8 @@ module phyetat0_m
   ! by a simple index, in degrees
 
   integer, save, protected:: itau_phy
+  ! number of time steps of physics since annee_ref, day_ref
+
   REAL, save, protected, allocatable:: masque(:) ! (KLON) fraction of land
   integer, save, protected:: ncid_startphy
 
@@ -318,9 +320,9 @@ contains
     use dimensions, only: iim, jjm
     use dimphy, only: klon
     use dynetat0_m, only: rlatu
-    
+
     !-------------------------------------------------------------------------
-    
+
     allocate(rlat(klon))
     rlat(1) = 90.
     rlat(2:klon-1) = pack(spread(rlatu(2:jjm), 1, iim), .true.) * rad_to_deg
@@ -337,9 +339,9 @@ contains
     use dimensions, only: iim, jjm
     use dimphy, only: klon
     use dynetat0_m, only: rlonv
-    
+
     !-------------------------------------------------------------------------
-    
+
     allocate(rlon(klon))
     rlon(1) = 0.
     rlon(2:klon-1) = pack(spread(rlonv(:iim), 2, jjm - 1), .true.) * rad_to_deg
@@ -356,7 +358,7 @@ contains
     USE grid_noro_m, only: mask
 
     !-------------------------------------------------------------------------
-    
+
     allocate(masque(KLON))
     masque = pack(mask, dyn_phy)
 

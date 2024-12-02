@@ -25,7 +25,9 @@ module dynetat0_m
   REAL, protected, save, allocatable:: rlatu1(:), rlatu2(:), yprimu1(:), &
        yprimu2(:) ! (jjm)
   INTEGER, PARAMETER, private:: nmax = 30000
+
   INTEGER, protected, save:: itau_dyn
+  ! number of time steps of dynamics since annee_ref, day_ref
 
 contains
 
@@ -166,7 +168,7 @@ contains
     ! Author: P. Le Van, from analysis by R. Sadourny 
 
     ! Define rlatu, rlatv, rlatu2, yprimu2, rlatu1, yprimu1.
-    
+
     ! Calcule les latitudes et dérivées dans la grille du GCM pour une
     ! fonction f(y) à dérivée tangente hyperbolique.
 
@@ -487,7 +489,7 @@ contains
 
     ! This procedures defines xprimm025, rlonv, xprimv, rlonu, xprimu
     ! and xprimp025.
-    
+
     ! Calcule les longitudes et dérivées dans la grille du GCM pour
     ! une fonction $x_f(\tilde x)$ à dérivée tangente hyperbolique.
 
