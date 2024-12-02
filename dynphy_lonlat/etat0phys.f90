@@ -13,7 +13,6 @@ contains
     use dimensions, only: iim, jjm, llm
     use dimphy, only: klon
     use dimsoil, only: nsoilmx
-    use dynetat0_chosen_m, only: day_ref
     use grid_change, only: init_dyn_phy, dyn_phy
     use indicesol, only: is_oce, is_sic, is_ter, is_lic, nbsrf
     use phyetat0_m, only: set_lat, set_lon, set_masque
