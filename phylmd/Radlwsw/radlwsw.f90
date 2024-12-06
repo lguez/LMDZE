@@ -65,7 +65,7 @@ contains
     ! bilan radiatif net au sol (W m-2), positif vers le bas
 
     real, intent(out):: topsw(:) ! (klon)
-    ! flux solaire net au sommet de l'atmosph`ere
+    ! net incoming shortwave flux at top of atmosphere
 
     real, intent(out):: toplw(:) ! (klon)
     ! rayonnement infrarouge montant au sommet de l'atmosph\`ere

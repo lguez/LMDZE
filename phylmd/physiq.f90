@@ -257,7 +257,10 @@ contains
     REAL, save, allocatable:: cool0(:, :) ! (klon, llm)
     ! refroidissement infrarouge ciel clair
 
-    REAL, save, allocatable:: topsw(:), toplw(:), solsw(:) ! (klon)
+    REAL, save, allocatable:: topsw(:) ! (klon)
+    ! net incoming shortwave flux at top of atmosphere
+
+    REAL, save, allocatable:: toplw(:), solsw(:) ! (klon)
 
     REAL, save, allocatable:: sollw(:) ! (klon)
     ! surface net downward longwave flux, in W m-2
