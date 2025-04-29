@@ -1,2 +1,2 @@
 10bb2bdd-e584-4d30-b5d0-27b341a95208 autoenable=true sameas-name=personal_web_page sameas-uuid=f16eee74-0881-483b-baf5-edceb0710a6f type=httpalso url=https://web.lmd.jussieu.fr/~lguez/Git_annex_LMDZE timestamp=1745961904s
-f16eee74-0881-483b-baf5-edceb0710a6f encryption=none name=gurtu_rsync rsyncurl=lguez@gurtu.lmd.jussieu.fr:WWW/Git_annex_LMDZE type=rsync timestamp=1745961882s
+f16eee74-0881-483b-baf5-edceb0710a6f encryption=none name=gurtu_rsync rsyncurl=lguez@gurtu.lmd.jussieu.fr:WWW/Git_annex_LMDZE type=rsync timestamp=1745963405s
