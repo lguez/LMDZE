@@ -18,7 +18,7 @@ contains
     ! Différent de la routine "angle" parce que "zenang" fournit des
     ! moyennes de "mu0" et non des valeurs instantanées. Du coup
     ! "fract" prend toutes les valeurs entre 0 et 1. Cf. Capderou (2003
-    ! 784, equation 9.11).
+    ! k0784, equation 9.11).
 
     use jumble, only: assert, pi, twopi
 
@@ -59,7 +59,7 @@ contains
          "zenang")
 
     lat_sun = asin(sin(longi * pi / 180.) * sin(r_incl * pi / 180.))
-    ! Capderou (2003 784, equation 4.49)
+    ! Capderou (2003 k0784, equation 4.49)
 
     gmtime1 = gmtime * 86400.
     gmtime2 = gmtime1 + pdtrad
