@@ -133,6 +133,7 @@ contains
     ! Radiative transfer computations are made every "radpas" call to
     ! "physiq".
 
+    real, save:: pdtrad ! pas de temps du rayonnement (s)
     REAL, save, allocatable:: radsol(:) ! (klon)
     ! Bilan radiatif net au sol (W/m2), positif vers le bas. Must be
     ! saved because radlwsw is not called at every time step.
@@ -462,6 +463,7 @@ contains
 
        radpas = lmt_pas / nbapp_rad
        print *, "radpas = ", radpas
+       pdtrad = dtphys * radpas
 
        ! Initialisation pour le sch\'ema de convection d'Emanuel :
        IF (conv_emanuel) THEN
@@ -529,7 +531,7 @@ contains
     ! la surface.
 
     CALL orbite(REAL(julien), longi, dist)
-    CALL zenang(longi, gmtime, dtphys * radpas, mu0, fract)
+    CALL zenang(longi, gmtime, pdtrad, mu0, fract)
 
     CALL pbl_surface(pctsrf, t_seri, q_seri, u_seri, v_seri, julien, mu0, &
          ftsol, cdmmax, cdhmax, ftsoil, qsol, paprs, play, fsnow, fqsurf, &
