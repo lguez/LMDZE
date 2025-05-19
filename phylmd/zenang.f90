@@ -9,16 +9,16 @@ contains
     ! Author: O. Boucher (LMD/CNRS), d'après les routines "zenith" et
     ! "angle" de Z. X. Li
 
-    ! Date : première version le 13 décembre 1994, revu pour GCM le 30
-    ! septembre 1996
+    ! Date : première version le 13 décembre 1994, revue pour GCM le
+    ! 30 septembre 1996
 
     ! Calcule les valeurs moyennes du cosinus de l'angle zénithal et
     ! l'ensoleillement moyen entre "gmtime" et "gmtime + pdtrad"
     ! connaissant la déclinaison, la latitude et la longitude.
     ! Différent de la routine "angle" parce que "zenang" fournit des
     ! moyennes de "mu0" et non des valeurs instantanées. Du coup
-    ! "fract" prend toutes les valeurs entre 0 et 1. Cf. Capderou (2003
-    ! k0784, equation 9.11).
+    ! "fract" prend toutes les valeurs entre 0 et 1. Cf. Capderou
+    ! (2012 k1031, equation 13.18).
 
     use jumble, only: assert, pi, twopi, deg_to_rad, PIO2
 
