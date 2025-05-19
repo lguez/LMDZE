@@ -56,7 +56,7 @@ contains
     ! (longitude vraie de la Terre dans son orbite solaire, par
     ! rapport au point vernal (21 mars), en degrés)
 
-    real pmu0(klon) ! mean of cosine of solar zenith angle during "pdtphys"
+    real mu0(klon) ! mean of cosine of solar zenith angle during "pdtphys"
 
     !-------------------------------------------------------------
 
@@ -78,9 +78,9 @@ contains
 
     ! Heterogeneous chemistry is only during daytime:
     call orbite(real(julien), earth_long)
-    call zenang(earth_long, gmtime, pdtphys, pmu0)
+    call zenang(earth_long, gmtime, pdtphys, mu0)
     forall (k = 1: llm)
-       where (pmu0 <= cos(87. / 180. * pi)) b(:, k) = 0.
+       where (mu0 <= cos(87. / 180. * pi)) b(:, k) = 0.
     end forall
 
     b = b + a2
