@@ -134,6 +134,8 @@ contains
     ! "physiq".
 
     real, save:: pdtrad ! pas de temps du rayonnement (s)
+    logical call_rad_transfer
+
     REAL, save, allocatable:: radsol(:) ! (klon)
     ! Bilan radiatif net au sol (W/m2), positif vers le bas. Must be
     ! saved because radlwsw is not called at every time step.
@@ -527,11 +529,17 @@ contains
     frugs = MAX(frugs, 0.000015)
     zxrugs = sum(frugs * pctsrf, dim = 2)
 
-    ! Calculs n\'ecessaires au calcul de l'albedo dans l'interface avec
-    ! la surface.
+    call_rad_transfer = MOD(itap - 1, radpas) == 0
 
-    CALL orbite(REAL(julien), longi, dist)
-    CALL zenang(longi, gmtime, pdtrad, mu0, fract)
+    if (call_rad_transfer) then
+       CALL orbite(REAL(julien), longi, dist)
+       CALL zenang(longi, gmtime, pdtrad, mu0, fract)
+    else
+       ! mu0 est quand même n\'ecessaire au calcul de l'albedo dans
+       ! l'interface avec la surface :
+       CALL orbite(REAL(julien), longi)
+       CALL zenang(longi, gmtime, pdtrad, mu0)
+    end if
 
     CALL pbl_surface(pctsrf, t_seri, q_seri, u_seri, v_seri, julien, mu0, &
          ftsol, cdmmax, cdhmax, ftsoil, qsol, paprs, play, fsnow, fqsurf, &
@@ -756,7 +764,7 @@ contains
     CALL newmicro(paprs, play, t_seri, cldliq, cldfra, cldtau, cldemi, cldh, &
          cldl, cldm, cldt, cldq, flwp, fiwp, flwc, fiwc)
 
-    IF (MOD(itap - 1, radpas) == 0) THEN
+    IF (call_rad_transfer) THEN
        wo = ozonecm(REAL(julien), paprs)
        albsol = sum(falbe * pctsrf, dim = 2)
        CALL radlwsw(dist, mu0, fract, paprs, play, tsol, albsol, t_seri, &
