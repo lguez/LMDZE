@@ -45,7 +45,7 @@ contains
     REAL gmtime1, gmtime2
     REAL omega1, omega2 ! temps 1 et 2 exprimés en radians avec 0 à midi
 
-    REAL omega ! heure en rad du coucher de soleil 
+    REAL omega ! heure en rad du coucher de soleil
     ! "- omega" est donc l'heure en rad de lever du soleil.
 
     REAL omegadeb, omegafin
@@ -59,14 +59,14 @@ contains
          "zenang")
 
     lat_sun = asin(sin(longi * pi / 180.) * sin(incl * pi / 180.))
-    ! Capderou (2003 k0784, equation 4.49)
+    ! Capderou (2012 k1031, equation 7.60)
 
     gmtime1 = gmtime * 86400.
     gmtime2 = gmtime1 + pdtrad
 
     DO i = 1, klon
        latr = rlat(i) * pi / 180.
-       
+
        IF (latr >= pi / 2. - lat_sun .OR. latr <= - pi / 2. - lat_sun) then
           omega = pi ! journée polaire
        else IF (latr < pi / 2. + lat_sun .AND. latr > - pi / 2. + lat_sun) THEN
@@ -95,7 +95,7 @@ contains
              mu0(i) = sin(latr) * sin(lat_sun) + cos(latr) * cos(lat_sun) &
                   * (sin(omegafin) - sin(omegadeb)) / (omegafin - omegadeb)
           END IF
-       ELSE 
+       ELSE
           ! omega1 > omega2, à cheval sur deux journées
           ! entre omega1 et pi
           IF (omega1 >= omega) THEN ! nuit
@@ -108,6 +108,7 @@ contains
              z1_mu = sin(latr) * sin(lat_sun) + cos(latr) * cos(lat_sun) &
                   * (sin(omegafin) - sin(omegadeb)) / (omegafin - omegadeb)
           END IF
+
           ! entre - pi et omega2
           IF (omega2 <= - omega) THEN ! nuit
              zfrac2 = 0.
@@ -119,7 +120,8 @@ contains
              z2_mu = sin(latr) * sin(lat_sun) + cos(latr) * cos(lat_sun) &
                   * (sin(omegafin) - sin(omegadeb)) / (omegafin - omegadeb)
           END IF
-          ! moyenne 
+
+          ! moyenne
           IF (present(fract)) fract(i) = (zfrac1 + zfrac2) &
                / (omega2 + twopi - omega1)
           mu0(i) = (zfrac1 * z1_mu + zfrac2 * z2_mu) &
