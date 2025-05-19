@@ -5,7 +5,7 @@ module calfis_m
 contains
 
   SUBROUTINE calfis(ucov, vcov, teta, q, p3d, pk, phi, w, dufi, dvfi, dtetafi, &
-       dqfi, dayvrai, time, lafin)
+       dqfi, dayvrai, gmtime, lafin)
 
     ! From dyn3d/calfis.F, version 1.3, 2005/05/25 13:10:09
     ! Authors: P. Le Van, F. Hourdin
@@ -82,7 +82,7 @@ contains
     integer, intent(in):: dayvrai
     ! current day number, based at value 1 on January 1st of annee_ref
 
-    REAL, intent(in):: time ! time of day, as a fraction of day length
+    REAL, intent(in):: gmtime ! time of day, as a fraction of day length
     LOGICAL, intent(in):: lafin
 
     ! Local:
@@ -172,9 +172,9 @@ contains
        zvfi(:, jjm + 1, l) = SUM(SIN(rlonv(:iim)) * z1) / pi
     ENDDO
 
-    CALL physiq(lafin, dayvrai, time, gr_dyn_phy(p3d), play, gr_dyn_phy(phi), &
-         pack(phis, dyn_phy), gr_dyn_phy(zufi), gr_dyn_phy(zvfi), t, qx, &
-         omega, d_u, d_v, d_t, d_qx)
+    CALL physiq(lafin, dayvrai, gmtime, gr_dyn_phy(p3d), play, &
+         gr_dyn_phy(phi), pack(phis, dyn_phy), gr_dyn_phy(zufi), &
+         gr_dyn_phy(zvfi), t, qx, omega, d_u, d_v, d_t, d_qx)
 
     ! transformation des tendances physiques en tendances dynamiques:
 

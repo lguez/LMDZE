@@ -4,9 +4,10 @@ module phytrac_m
 
 contains
 
-  SUBROUTINE phytrac(julien, time, firstcal, lafin, t, paprs, play, mfu, mfd, &
-       pde_u, pen_d, coefh, cdragh, fm_therm, entr_therm, yu1, yv1, ftsol, &
-       pctsrf, frac_impa, frac_nucl, da, phi, mp, upwd, dnwd, tr_seri, zmasse)
+  SUBROUTINE phytrac(julien, gmtime, firstcal, lafin, t, paprs, play, mfu, &
+       mfd, pde_u, pen_d, coefh, cdragh, fm_therm, entr_therm, yu1, yv1, &
+       ftsol, pctsrf, frac_impa, frac_nucl, da, phi, mp, upwd, dnwd, tr_seri, &
+       zmasse)
 
     ! From phylmd/phytrac.F, version 1.15, 2006/02/21 08:08:30 (SVN
     ! revision 679) and phylmd/write_histrac.h, version 1.9,
@@ -56,7 +57,7 @@ contains
     use time_phylmdz, only: itap
 
     integer, intent(in):: julien !jour julien, 1 <= julien <= 360
-    real, intent(in):: time ! heure de la journ\'ee en fraction de jour
+    real, intent(in):: gmtime ! heure de la journ\'ee en fraction de jour
     logical, intent(in):: firstcal ! first call to "calfis"
     logical, intent(in):: lafin ! fin de la physique
     real, intent(in):: t(:, :) ! (klon, llm) temperature, in K
@@ -333,7 +334,7 @@ contains
           ! Once per day, update the coefficients for ozone chemistry:
           call regr_pr_comb_coefoz(julien, paprs, play)
        end if
-       call o3_chem(julien, time, t, zmasse, dtphys, tr_seri(:, :, 3))
+       call o3_chem(julien, gmtime, t, zmasse, dtphys, tr_seri(:, :, 3))
     end if
 
     ! Calcul de l'effet de la precipitation

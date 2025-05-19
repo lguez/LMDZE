@@ -169,7 +169,7 @@ contains
        IF (MOD(itau + 1, iphysiq) == 0 .AND. iflag_phys) THEN
           CALL calfis(ucov, vcov, teta, q, p3d, pk, phi, w, dufi, dvfi, &
                dtetafi, dqfi, dayvrai = itau / day_step + day_ini, &
-               time = REAL(mod(itau, day_step)) / day_step, &
+               gmtime = REAL(mod(itau, day_step)) / day_step, &
                lafin = itau + 1 == itaufin)
 
           CALL addfi(ucov, vcov, teta, q, dufi, dvfi, dtetafi, dqfi)

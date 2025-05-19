@@ -4,7 +4,7 @@ module physiq_m
 
 contains
 
-  SUBROUTINE physiq(lafin, dayvrai, time, paprs, play, zphi, pphis, u, v, t, &
+  SUBROUTINE physiq(lafin, dayvrai, gmtime, paprs, play, zphi, pphis, u, v, t, &
        qx, omega, d_u, d_v, d_t, d_qx)
 
     ! From phylmd/physiq.F, version 1.22 2006/02/20 09:38:28
@@ -70,7 +70,7 @@ contains
     integer, intent(in):: dayvrai
     ! current day number, based at value 1 on January 1st of annee_ref
 
-    REAL, intent(in):: time ! heure de la journ\'ee en fraction de jour
+    REAL, intent(in):: gmtime ! heure de la journ\'ee en fraction de jour
 
     REAL, intent(in):: paprs(:, :) ! (klon, llm + 1)
     ! pression pour chaque inter-couche, en Pa
@@ -529,7 +529,7 @@ contains
     ! la surface.
 
     CALL orbite(REAL(julien), longi, dist)
-    CALL zenang(longi, time, dtphys * radpas, mu0, fract)
+    CALL zenang(longi, gmtime, dtphys * radpas, mu0, fract)
 
     CALL pbl_surface(pctsrf, t_seri, q_seri, u_seri, v_seri, julien, mu0, &
          ftsol, cdmmax, cdhmax, ftsoil, qsol, paprs, play, fsnow, fqsurf, &
@@ -793,7 +793,7 @@ contains
          sum((v_seri - v) / dtphys * zmasse, dim = 2), paprs, u, v, aam, torsfc)
 
     ! Calcul des tendances traceurs
-    call phytrac(julien, time, firstcal, lafin, t, paprs, play, mfu, mfd, &
+    call phytrac(julien, gmtime, firstcal, lafin, t, paprs, play, mfu, mfd, &
          pde_u, pen_d, coefh, cdragh, fm_therm, entr_therm, u(:, 1), v(:, 1), &
          ftsol, pctsrf, frac_impa, frac_nucl, da, phi, mp, upwd, dnwd, &
          tr_seri, zmasse)
