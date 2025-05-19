@@ -20,7 +20,7 @@ contains
     ! "fract" prend toutes les valeurs entre 0 et 1. Cf. Capderou (2003
     ! k0784, equation 9.11).
 
-    use jumble, only: assert, pi, twopi
+    use jumble, only: assert, pi, twopi, deg_to_rad, PIO2
 
     USE dimphy, ONLY: klon
     USE yomcst, ONLY: incl
@@ -58,27 +58,27 @@ contains
     if (present(fract)) call assert((/size(mu0), size(fract)/) == klon, &
          "zenang")
 
-    lat_sun = asin(sin(longi * pi / 180.) * sin(incl * pi / 180.))
+    lat_sun = asin(sin(longi * deg_to_rad) * sin(incl * deg_to_rad))
     ! Capderou (2012 k1031, equation 7.60)
 
     gmtime1 = gmtime * 86400.
     gmtime2 = gmtime1 + pdtrad
 
     DO i = 1, klon
-       latr = rlat(i) * pi / 180.
+       latr = rlat(i) * deg_to_rad
 
-       IF (latr >= pi / 2. - lat_sun .OR. latr <= - pi / 2. - lat_sun) then
+       IF (latr >= PIO2 - lat_sun .OR. latr <= - PIO2 - lat_sun) then
           omega = pi ! journée polaire
-       else IF (latr < pi / 2. + lat_sun .AND. latr > - pi / 2. + lat_sun) THEN
+       else IF (latr < PIO2 + lat_sun .AND. latr > - PIO2 + lat_sun) THEN
           omega = acos(- tan(latr) * tan(lat_sun))
        else
           omega = 0. ! nuit polaire
        END IF
 
-       omega1 = mod((gmtime1 + rlon(i) * 86400. / 360.) / 86400. * twopi &
-            + twopi, twopi) - pi
-       omega2 = mod((gmtime2 + rlon(i) * 86400. / 360.) / 86400. * twopi &
-            + twopi, twopi) - pi
+       omega1 = mod((gmtime1 + rlon(i) * 240.) / 86400. * twopi + twopi, &
+            twopi) - pi
+       omega2 = mod((gmtime2 + rlon(i) * 240.) / 86400. * twopi + twopi, &
+            twopi) - pi
 
        IF (omega1 <= omega2) THEN
           ! on est dans la meme journee locale
