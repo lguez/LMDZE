@@ -7,9 +7,9 @@ module YOMCST
   ! A1.1.bis Constantes concernant l'orbite de la Terre
   ! Default values from AMIP II
 
-  REAL, protected, save:: R_ecc = 0.016715 ! excentricity
-  real, protected, save:: R_peri = 102.7 ! \'equinoxe, en degr\'es
-  real, protected, save:: R_incl = 23.441 ! inclinaison, en degr\'es
+  REAL, protected, save:: ecc = 0.016715 ! excentricity
+  real, protected, save:: peri = 102.7 ! \'equinoxe, en degr\'es
+  real, protected, save:: incl = 23.441 ! inclinaison, en degr\'es
 
 contains
 
@@ -17,7 +17,7 @@ contains
 
     use unit_nml_m, only: unit_nml
 
-    namelist /YOMCST_nml/ R_ecc, R_peri, R_incl
+    namelist /YOMCST_nml/ ecc, peri, incl
 
     !------------------------------------
 

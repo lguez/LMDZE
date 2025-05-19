@@ -23,7 +23,7 @@ contains
     use jumble, only: assert, pi, twopi
 
     USE dimphy, ONLY: klon
-    USE yomcst, ONLY: r_incl
+    USE yomcst, ONLY: incl
     USE phyetat0_m, ONLY: rlat, rlon
 
     REAL, INTENT(IN):: longi
@@ -58,7 +58,7 @@ contains
     if (present(fract)) call assert((/size(mu0), size(fract)/) == klon, &
          "zenang")
 
-    lat_sun = asin(sin(longi * pi / 180.) * sin(r_incl * pi / 180.))
+    lat_sun = asin(sin(longi * pi / 180.) * sin(incl * pi / 180.))
     ! Capderou (2003 k0784, equation 4.49)
 
     gmtime1 = gmtime * 86400.
