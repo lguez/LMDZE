@@ -225,12 +225,7 @@ contains
             cal = 1. / soilcap, beta = [(1., i = 1, knon)], dif_grnd = 0.)
        call fonte_neige(is_lic, rain_fall, snow_fall, snow, qsol, tsurf_new, &
             - flux_q, fqcalving, ffonte, run_off_lic_0, run_off_lic)
-
-       ! calcul albedo
-       CALL albsno(agesno, alb_neig, snow_fall)
-       WHERE (snow < 1e-4) agesno = 0.
        albedo = 0.77
-
        z0_new = rugoro
     case default
        print *, 'Index of surface = ', nisrf
