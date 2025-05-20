@@ -218,7 +218,6 @@ contains
        z0_new = SQRT(0.002**2 + rugoro**2)
     case (is_lic)
        ! Surface "glaciers continentaux" appel \`a l'interface avec le sol
-
        CALL soil(is_lic, snow, ts, tsoil, soilcap, soilflux)
        call calcul_fluxs(qsurf, tsurf_new, flux_q, fluxlat, flux_t, dflux_t, &
             dflux_q, ts, pplay(:, 1), cdragh, paprs(:, 1), radsol, t(:, 1), &
@@ -232,7 +231,6 @@ contains
        WHERE (snow < 1e-4) agesno = 0.
        albedo = 0.77
 
-       ! Rugosite
        z0_new = rugoro
     case default
        print *, 'Index of surface = ', nisrf
