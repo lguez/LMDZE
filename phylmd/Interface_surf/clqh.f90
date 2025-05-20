@@ -209,7 +209,6 @@ contains
             - flux_q, fqcalving, ffonte, run_off_lic_0, run_off_lic)
 
        ! Compute the albedo:
-
        CALL albsno(agesno, alb_neig, snow_fall)
        WHERE (snow < 1e-4) agesno = 0.
        zfra = snow / (snow + 10.)

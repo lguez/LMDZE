@@ -11,7 +11,7 @@ contains
 
     ! Authors: Z. X. Li (LMD/CNRS), Johannes Quaas
     ! Date: 1993/09/10
-    ! Objet: calcul de l'\'epaisseur optique et de l'\'emissivit\'e des nuages.
+    ! Objet : calcul de l'\'epaisseur optique et de l'\'emissivit\'e des nuages.
 
     USE conf_phys_m, ONLY: rad_chau1, rad_chau2
     USE dimphy, ONLY: klev, klon

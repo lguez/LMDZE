@@ -535,8 +535,8 @@ contains
        CALL orbite(REAL(julien), longi, dist)
        CALL zenang(longi, gmtime, pdtrad, mu0, fract)
     else
-       ! mu0 est quand même n\'ecessaire au calcul de l'albedo dans
-       ! l'interface avec la surface :
+       ! mu0 est quand même n\'ecessaire au calcul de falbe pour
+       ! l'océan par pbl_surface :
        CALL orbite(REAL(julien), longi)
        CALL zenang(longi, gmtime, pdtrad, mu0)
     end if
