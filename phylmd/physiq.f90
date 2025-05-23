@@ -561,7 +561,6 @@ contains
        ENDDO
     ENDDO
 
-    call assert(abs(sum(pctsrf, dim = 2) - 1.) <= EPSFRA, 'physiq: pctsrf')
     flat = sum(fluxlat * pctsrf, dim = 2)
     zt2m = sum(t2m * pctsrf, dim = 2)
     zq2m = sum(q2m * pctsrf, dim = 2)

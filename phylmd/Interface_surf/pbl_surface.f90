@@ -21,6 +21,9 @@ contains
     ! ne tient pas compte de la diff\'erenciation des sous-fractions
     ! de sol.
 
+    ! Libraries:
+    use jumble, only: assert
+
     use cdrag_m, only: cdrag
     use clqh_m, only: clqh
     use clvent_m, only: clvent
@@ -524,6 +527,7 @@ contains
 
     tsol = sum(ftsol * pctsrf, dim = 2)
     dlw = - 4. * RSIGMA * tsol**3
+    call assert(abs(sum(pctsrf, dim = 2) - 1.) <= EPSFRA, 'pbl_surface: pctsrf')
 
   END SUBROUTINE pbl_surface
 
