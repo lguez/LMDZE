@@ -4,8 +4,8 @@ module sw1s_m
 
 contains
 
-  SUBROUTINE sw1s(knu, albd, albp, pcg, pcld, pclear, pdsig, pomega, poz, &
-       prmu, psec, ptau, pud, pfd, pfu)
+  SUBROUTINE sw1s(albd, albp, pcg, pcld, pclear, pdsig, pomega, poz, prmu, &
+       psec, ptau, pud, pfd, pfu, knu)
     
     use dimensions, only: llm
     use dimphy, only: klon
@@ -35,7 +35,6 @@ contains
 
     ! * ARGUMENTS:
 
-    INTEGER, intent(in):: knu
     DOUBLE PRECISION, intent(in):: albd(klon, 2)
     DOUBLE PRECISION, intent(in):: albp(klon, 2)
     DOUBLE PRECISION, intent(in):: pcg(klon, 2, llm)
@@ -51,6 +50,7 @@ contains
 
     DOUBLE PRECISION pfd(klon, llm+1)
     DOUBLE PRECISION pfu(klon, llm+1)
+    INTEGER, intent(in):: knu
 
     ! LOCAL VARIABLES:
 

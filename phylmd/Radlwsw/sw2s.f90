@@ -4,8 +4,8 @@ module sw2s_m
 
 contains
 
-  SUBROUTINE sw2s(knu, paki, albd, albp, pcg, pcld, pclear, pdsig, pomega, &
-       poz, prmu, psec, ptau, pud, pwv, pqs, pfdown, pfup)
+  SUBROUTINE sw2s(paki, albd, albp, pcg, pcld, pclear, pdsig, pomega, poz, &
+       prmu, psec, ptau, pud, pwv, pqs, pfdown, pfup, knu)
     
     USE dimensions
     USE dimphy
@@ -52,7 +52,6 @@ contains
     ! ------------------------------------------------------------------
     ! * ARGUMENTS:
 
-    INTEGER, intent(in):: knu
     DOUBLE PRECISION paki(klon, 2)
     DOUBLE PRECISION, intent(in):: albd(klon, 2)
     DOUBLE PRECISION, intent(in):: albp(klon, 2)
@@ -71,6 +70,7 @@ contains
 
     DOUBLE PRECISION pfdown(klon, llm+1)
     DOUBLE PRECISION pfup(klon, llm+1)
+    INTEGER, intent(in):: knu
 
     ! * LOCAL VARIABLES:
 
