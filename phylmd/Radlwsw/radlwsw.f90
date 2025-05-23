@@ -95,7 +95,7 @@ contains
     DOUBLE PRECISION ZFLDN0(KLON, KLEV + 1)
     DOUBLE PRECISION alpha1
     INTEGER k, i
-    DOUBLE PRECISION ALBD(klon, 2)
+    DOUBLE PRECISION ALBD(klon, 2) ! second dimension is spectral band
     DOUBLE PRECISION EMIS(klon), VIEW(klon)
     DOUBLE PRECISION DP(klon, klev)
     DOUBLE PRECISION TL(klon, klev + 1), PMB(klon, klev + 1)
