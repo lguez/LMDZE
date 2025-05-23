@@ -4,7 +4,7 @@ module sw2s_m
 
 contains
 
-  SUBROUTINE sw2s(knu, paki, palbd, palbp, pcg, pcld, pclear, pdsig, pomega, &
+  SUBROUTINE sw2s(knu, paki, albd, albp, pcg, pcld, pclear, pdsig, pomega, &
        poz, prmu, psec, ptau, pud, pwv, pqs, pfdown, pfup)
     
     USE dimensions
@@ -52,8 +52,8 @@ contains
 
     INTEGER knu
     DOUBLE PRECISION paki(klon, 2)
-    DOUBLE PRECISION, intent(in):: palbd(klon, 2)
-    DOUBLE PRECISION, intent(in):: palbp(klon, 2)
+    DOUBLE PRECISION, intent(in):: albd(klon, 2)
+    DOUBLE PRECISION, intent(in):: albp(klon, 2)
     DOUBLE PRECISION, intent(in):: pcg(klon, 2, llm)
     DOUBLE PRECISION pcld(klon, llm)
     DOUBLE PRECISION pclear(klon)
@@ -161,7 +161,7 @@ contains
     ! --------------------------------
 
 
-    CALL swclr(knu, palbp, pdsig, zrayl, psec, zpizaz, zray1, zray2, zrefz, &
+    CALL swclr(knu, albp, pdsig, zrayl, psec, zpizaz, zray1, zray2, zrefz, &
          zrj0, zrk0, zrmu0, ztauaz, ztra1, ztra2)
 
 
@@ -170,7 +170,7 @@ contains
 
 
     zcgaz = 0d0
-    CALL swr(knu, palbd, pcg, pcld, pomega, psec, ptau, zcgaz, &
+    CALL swr(knu, albd, pcg, pcld, pomega, psec, ptau, zcgaz, &
          zpizaz, zray1, zray2, zrefz, zrj, zrk, zrmue, ztauaz, ztra1, ztra2)
 
 
@@ -190,8 +190,8 @@ contains
 
 
        DO jl = 1, klon
-          zrefz(jl, 2, 1) = palbd(jl, knu)
-          zrefz(jl, 1, 1) = palbd(jl, knu)
+          zrefz(jl, 2, 1) = albd(jl, knu)
+          zrefz(jl, 1, 1) = albd(jl, knu)
        END DO
 
 
@@ -411,7 +411,7 @@ contains
 
 
     DO jl = 1, klon
-       zfu(jl, 1) = zfd(jl, 1)*palbp(jl, knu)
+       zfu(jl, 1) = zfd(jl, 1)*albp(jl, knu)
     END DO
 
     DO jk = 2, llm + 1

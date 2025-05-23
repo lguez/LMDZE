@@ -4,7 +4,7 @@ module swr_m
 
 contains
 
-  SUBROUTINE swr(knu, palbd, pcg, pcld, pomega, psec, ptau, pcgaz, ppizaz, &
+  SUBROUTINE swr(knu, albd, pcg, pcld, pomega, psec, ptau, pcgaz, ppizaz, &
        pray1, pray2, prefz, prj, prk, prmue, ptauaz, ptra1, ptra2)
 
     use dimensions, only: llm
@@ -41,7 +41,7 @@ contains
     ! * ARGUMENTS:
 
     INTEGER knu
-    DOUBLE PRECISION, intent(in):: palbd(klon, 2)
+    DOUBLE PRECISION, intent(in):: albd(klon, 2)
     DOUBLE PRECISION, intent(in):: pcg(klon, 2, llm)
     DOUBLE PRECISION pcld(klon, llm)
     DOUBLE PRECISION, intent(in):: pomega(klon, 2, llm)
@@ -185,8 +185,8 @@ contains
     DO jl = 1, klon
        pray1(jl, llm+1) = 0.
        pray2(jl, llm+1) = 0.
-       prefz(jl, 2, 1) = palbd(jl, knu)
-       prefz(jl, 1, 1) = palbd(jl, knu)
+       prefz(jl, 2, 1) = albd(jl, knu)
+       prefz(jl, 1, 1) = albd(jl, knu)
        ptra1(jl, llm+1) = 1.
        ptra2(jl, llm+1) = 1.
     END DO

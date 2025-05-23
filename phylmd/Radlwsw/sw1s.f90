@@ -4,7 +4,7 @@ module sw1s_m
 
 contains
 
-  SUBROUTINE sw1s(knu, palbd, palbp, pcg, pcld, pclear, pdsig, pomega, poz, &
+  SUBROUTINE sw1s(knu, albd, albp, pcg, pcld, pclear, pdsig, pomega, poz, &
        prmu, psec, ptau, pud, pfd, pfu)
     
     use dimensions, only: llm
@@ -35,8 +35,8 @@ contains
     ! * ARGUMENTS:
 
     INTEGER knu
-    DOUBLE PRECISION, intent(in):: palbd(klon, 2)
-    DOUBLE PRECISION, intent(in):: palbp(klon, 2)
+    DOUBLE PRECISION, intent(in):: albd(klon, 2)
+    DOUBLE PRECISION, intent(in):: albp(klon, 2)
     DOUBLE PRECISION, intent(in):: pcg(klon, 2, llm)
     DOUBLE PRECISION pcld(klon, llm)
     DOUBLE PRECISION pclear(klon)
@@ -116,7 +116,7 @@ contains
     ! --------------------------------
 
 
-    CALL swclr(knu, palbp, pdsig, zrayl, psec, zpizaz, zray1, zray2, zrefz, &
+    CALL swclr(knu, albp, pdsig, zrayl, psec, zpizaz, zray1, zray2, zrefz, &
          zrj0, zrk0, zrmu0, ztauaz, ztra1, ztra2)
 
 
@@ -124,7 +124,7 @@ contains
     ! -----------------------------
 
     zcgaz = 0d0
-    CALL swr(knu, palbd, pcg, pcld, pomega, psec, ptau, zcgaz, &
+    CALL swr(knu, albd, pcg, pcld, pomega, psec, ptau, zcgaz, &
          zpizaz, zray1, zray2, zrefz, zrj, zrk, zrmue, ztauaz, ztra1, ztra2)
 
 
@@ -179,8 +179,8 @@ contains
 
 
     DO jl = 1, klon
-       pfu(jl, 1) = ((1.-pclear(jl))*zdiff(jl)*palbd(jl,knu)+pclear(jl)*zdirf(jl &
-            )*palbp(jl,knu))*rsun(knu)
+       pfu(jl, 1) = ((1.-pclear(jl))*zdiff(jl)*albd(jl,knu)+pclear(jl)*zdirf(jl &
+            )*albp(jl,knu))*rsun(knu)
     END DO
 
     DO jk = 2, llm + 1

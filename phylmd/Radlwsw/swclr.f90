@@ -4,7 +4,7 @@ module swclr_m
 
 contains
 
-  SUBROUTINE swclr(knu, palbp, pdsig, prayl, psec, ppizaz, pray1, pray2, &
+  SUBROUTINE swclr(knu, albp, pdsig, prayl, psec, ppizaz, pray1, pray2, &
        prefz, prj, prk, prmu0, ptauaz, ptra1, ptra2)
 
     ! PURPOSE.
@@ -29,7 +29,7 @@ contains
     ! ARGUMENTS:
 
     INTEGER knu
-    DOUBLE PRECISION, intent(in):: palbp(klon, 2)
+    DOUBLE PRECISION, intent(in):: albp(klon, 2)
     DOUBLE PRECISION, intent(in):: pdsig(klon, llm)
     DOUBLE PRECISION, intent(in):: prayl(klon)
     DOUBLE PRECISION psec(klon)
@@ -146,8 +146,8 @@ contains
     DO jl = 1, klon
        pray1(jl, llm + 1) = 0d0
        pray2(jl, llm + 1) = 0d0
-       prefz(jl, 2, 1) = palbp(jl, knu)
-       prefz(jl, 1, 1) = palbp(jl, knu)
+       prefz(jl, 2, 1) = albp(jl, knu)
+       prefz(jl, 1, 1) = albp(jl, knu)
        ptra1(jl, llm + 1) = 1d0
        ptra2(jl, llm + 1) = 1d0
     END DO
