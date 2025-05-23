@@ -8,47 +8,33 @@ contains
 
     USE dimphy, only: klon
 
-    ! PURPOSE.
+    ! Purpose: this routine computes the transmission functions for
+    ! all the absorbers (H2O, uniformly mixed gases, and O3) in the
+    ! two spectral intervals.
 
-    ! THIS ROUTINE COMPUTES THE TRANSMISSION FUNCTIONS FOR ALL THE
-    ! ABSORBERS (H2O, UNIFORMLY MIXED GASES, AND O3) IN THE TWO SPECTRAL
-    ! INTERVALS.
+    ! Method:. transmission functions are computed using Pade
+    ! approximants and Horner's algorithm.
 
-    ! METHOD.
+    ! Reference: see radiation part of the model documentation and
+    ! ECMWF research department documentation of the IFS.
 
-    ! TRANSMISSION FUNCTION ARE COMPUTED USING PADE APPROXIMANTS
-    ! AND HORNER'S ALGORITHM.
+    ! Author: Jean-Jacques Morcrette, ECMWF
 
-    ! REFERENCE.
+    ! Original: 1995 January 20th
 
-    ! SEE RADIATION'S PART OF THE MODEL'S DOCUMENTATION AND
-    ! ECMWF RESEARCH DEPARTMENT DOCUMENTATION OF THE IFS
+    INTEGER knu ! index of the spectral interval
+    INTEGER kabs ! number of absorbers
+    INTEGER kind(kabs) ! indices of the absorbers
+    DOUBLE PRECISION pu(klon, kabs) ! absorber amount
 
-    ! AUTHOR.
+    DOUBLE PRECISION ptr(klon, kabs) ! transmission function
 
-    ! JEAN-JACQUES MORCRETTE *ECMWF*
-
-    ! MODIFICATIONS.
-
-    ! ORIGINAL : 95-01-20
-
-    ! * ARGUMENTS:
-
-    INTEGER knu ! INDEX OF THE SPECTRAL INTERVAL
-    INTEGER kabs ! NUMBER OF ABSORBERS
-    INTEGER kind(kabs) ! INDICES OF THE ABSORBERS
-    DOUBLE PRECISION pu(klon, kabs) ! ABSORBER AMOUNT
-
-    DOUBLE PRECISION ptr(klon, kabs) ! TRANSMISSION FUNCTION
-
-    ! * LOCAL VARIABLES:
+    ! Local:
 
     DOUBLE PRECISION zr1(klon)
     DOUBLE PRECISION zr2(klon)
     DOUBLE PRECISION zu(klon)
     INTEGER jl, ja, i, j, ia
-
-    ! * Prescribed Data:
 
     DOUBLE PRECISION apad(2, 3, 7), bpad(2, 3, 7), d(2, 3)
     SAVE apad, bpad, d
@@ -81,7 +67,9 @@ contains
     DATA (d(1, i), i=1, 3)/0.00d0, 0.00d0, 0d0/
     DATA (d(2, i), i=1, 3)/0.000000000d0, 0.000000000d0, 0.800000000d0/
 
-    ! * 1. HORNER'S ALGORITHM TO COMPUTE TRANSMISSION FUNCTION
+    !-------------------------------------------------------------------------
+
+    ! 1. Horner's algorithm to compute transmission function
 
     DO ja = 1, kabs
        ia = kind(ja)
@@ -95,7 +83,7 @@ contains
                ia, 3)+zu(jl)*(bpad(knu, ia, 4)+zu(jl)*(bpad(knu, ia, 5)+zu(jl)*(bpad(knu, &
                ia, 6)+zu(jl)*(bpad(knu, ia, 7)))))))
 
-          ! * 2. ADD THE BACKGROUND TRANSMISSION
+          ! 2. Add the background transmission
           ptr(jl, ja) = (zr1(jl)/zr2(jl))*(1.-d(knu, ia)) + d(knu, ia)
        END DO
     END DO
