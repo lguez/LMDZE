@@ -6,8 +6,7 @@ contains
 
   SUBROUTINE swtt1(knu, kabs, kind, pu, ptr)
 
-    USE dimensions
-    USE dimphy
+    USE dimphy, only: klon
 
     ! PURPOSE.
 
