@@ -22,7 +22,7 @@ contains
 
     ! Original: 1995 January 20th
 
-    INTEGER knu ! index of the spectral interval
+    INTEGER, intent(in):: knu ! index of the spectral interval
     INTEGER kabs ! number of absorbers
     INTEGER kind(kabs) ! indices of the absorbers
     DOUBLE PRECISION pu(klon, kabs) ! absorber amount

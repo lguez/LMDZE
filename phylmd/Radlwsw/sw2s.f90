@@ -51,7 +51,7 @@ contains
     ! ------------------------------------------------------------------
     ! * ARGUMENTS:
 
-    INTEGER knu
+    INTEGER, intent(in):: knu
     DOUBLE PRECISION paki(klon, 2)
     DOUBLE PRECISION, intent(in):: albd(klon, 2)
     DOUBLE PRECISION, intent(in):: albp(klon, 2)
