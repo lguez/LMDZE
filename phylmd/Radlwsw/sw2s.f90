@@ -52,7 +52,7 @@ contains
     ! ------------------------------------------------------------------
     ! * ARGUMENTS:
 
-    DOUBLE PRECISION paki(klon, 2)
+    DOUBLE PRECISION, intent(in):: paki(klon, 2)
     DOUBLE PRECISION, intent(in):: albd(klon, 2)
     DOUBLE PRECISION, intent(in):: albp(klon, 2)
     DOUBLE PRECISION, intent(in):: pcg(klon, 2, llm)
