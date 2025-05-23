@@ -4,7 +4,7 @@ module radlwsw_m
 
 contains
 
-  SUBROUTINE radlwsw(dist, mu0, fract, paprs, play, tsol, albedo, t_seri, &
+  SUBROUTINE radlwsw(dist, mu0, fract, paprs, play, tsol, albsol, t_seri, &
        q_seri, wo, cldfra, cldemi, cldtau, heat, heat0, cool, cool0, radsol, &
        topsw, toplw, solsw, sollw, sollwdown, topsw0, toplw0, solsw0, sollw0, &
        lwdn0, lwdn, lwup0, lwup, swdn0, swdn, swup0, swup)
@@ -34,7 +34,7 @@ contains
     ! pression au milieu de couche (Pa)
 
     real, intent(in):: tsol(:) ! (klon)  temp\'erature du sol (en K)
-    real, intent(in):: albedo(:) ! (klon)  alb\'edo du sol (entre 0 et 1)
+    real, intent(in):: albsol(:) ! (klon)  alb\'edo du sol (entre 0 et 1)
     real, intent(in):: t_seri(:, :) ! (klon, klev) temp\'erature (K)
     real, intent(in):: q_seri(:, :) ! (klon, klev) vapeur d'eau (en kg / kg)
 
@@ -118,7 +118,7 @@ contains
 
     !----------------------------------------------------------------------
 
-    ALBD = spread(albedo, 2, 2)
+    ALBD = spread(albsol, 2, 2)
     EMIS = 1.
     VIEW = 1.66
 
