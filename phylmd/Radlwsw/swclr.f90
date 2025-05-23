@@ -28,7 +28,7 @@ contains
 
     ! ARGUMENTS:
 
-    INTEGER knu
+    INTEGER, intent(in):: knu
     DOUBLE PRECISION, intent(in):: albp(klon, 2)
     DOUBLE PRECISION, intent(in):: pdsig(klon, llm)
     DOUBLE PRECISION, intent(in):: prayl(klon)

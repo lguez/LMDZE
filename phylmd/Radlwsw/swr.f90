@@ -40,7 +40,7 @@ contains
     ! ------------------------------------------------------------------
     ! * ARGUMENTS:
 
-    INTEGER knu
+    INTEGER, intent(in):: knu
     DOUBLE PRECISION, intent(in):: albd(klon, 2)
     DOUBLE PRECISION, intent(in):: pcg(klon, 2, llm)
     DOUBLE PRECISION pcld(klon, llm)
