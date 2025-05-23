@@ -13,6 +13,7 @@ contains
     use swclr_m, only: swclr
     use swde_m, only: swde
     use swr_m, only: swr
+    use swtt_m, only: swtt
     use swtt1_m, only: swtt1
 
     ! ------------------------------------------------------------------

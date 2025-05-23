@@ -1,7 +1,9 @@
+module swtt_m
+  IMPLICIT NONE
+contains
 SUBROUTINE swtt(knu, ka, pu, ptr)
   USE dimensions
   USE dimphy
-  IMPLICIT NONE
 
   ! -----------------------------------------------------------------------
   ! PURPOSE.
@@ -101,3 +103,4 @@ SUBROUTINE swtt(knu, ka, pu, ptr)
 
   RETURN
 END SUBROUTINE swtt
+end module swtt_m
