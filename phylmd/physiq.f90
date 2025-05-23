@@ -391,54 +391,25 @@ contains
          'eaux vapeur et liquide sont indispensables')
 
     test_firstcal: IF (firstcal) THEN
-       allocate(t_seri(klon, llm), q_seri(klon, llm))
-       allocate(swdn0(klon, llm + 1), swdn(klon, llm + 1))
-       allocate(swup0(klon, llm + 1), swup(klon, llm + 1))
-       allocate(lwdn0(klon, llm + 1), lwdn(klon, llm + 1))
-       allocate(lwup0(klon, llm + 1), lwup(klon, llm + 1))
-       allocate(radsol(klon))
-       allocate(ftsol(klon, nbsrf))
-       allocate(ftsoil(klon, nsoilmx, nbsrf))
-       allocate(fqsurf(klon, nbsrf))
-       allocate(qsol(klon))
-       allocate(fsnow(klon, nbsrf))
-       allocate(falbe(klon, nbsrf))
-       allocate(zmea(klon))
-       allocate(zstd(klon))
-       allocate(zsig(klon))
-       allocate(zgam(klon))
-       allocate(zthe(klon))
-       allocate(zpic(klon))
-       allocate(zval(klon))
-       allocate(rugoro(klon))
-       allocate(agesno(klon, nbsrf))
-       allocate(run_off_lic_0(klon))
-       allocate(Ma(klon, llm))
-       allocate(sig1(klon, llm), w01(klon, llm))
-       allocate(ffonte(klon, nbsrf))
-       allocate(rain_fall(klon))
-       allocate(snow_fall(klon))
-       allocate(dlw(klon))
-       allocate(frugs(klon, nbsrf))
-       allocate(pctsrf(klon, nbsrf))
-       allocate(albsol(klon))
-       ALLOCATE(wo(klon, llm))
-       allocate(clwcon(klon, llm), rnebcon(klon, llm))
-       allocate(qcondc(klon, llm), rnebcon0(klon, llm))
-       allocate(cape(klon))
-       allocate(ibas_con(klon), itop_con(klon))
-       allocate(ratqs(klon, llm))
-       allocate(t2m(klon, nbsrf), q2m(klon, nbsrf))
-       allocate(u10m_srf(klon, nbsrf), v10m_srf(klon, nbsrf))
-       allocate(airephy(klon))
-       allocate(heat(klon, llm))
-       allocate(heat0(klon, llm))
-       allocate(cool(klon, llm))
-       allocate(cool0(klon, llm))
-       allocate(topsw(klon), toplw(klon), solsw(klon))
-       allocate(sollw(klon))
-       allocate(sollwdown(klon))
-       allocate(topsw0(klon), toplw0(klon), solsw0(klon), sollw0(klon))
+       allocate(t_seri(klon, llm), q_seri(klon, llm), swdn0(klon, llm + 1), &
+            swdn(klon, llm + 1), swup0(klon, llm + 1), swup(klon, llm + 1), &
+            lwdn0(klon, llm + 1), lwdn(klon, llm + 1), lwup0(klon, llm + 1), &
+            lwup(klon, llm + 1), radsol(klon), ftsol(klon, nbsrf), &
+            ftsoil(klon, nsoilmx, nbsrf), fqsurf(klon, nbsrf), qsol(klon), &
+            fsnow(klon, nbsrf), falbe(klon, nbsrf), zmea(klon), zstd(klon), &
+            zsig(klon), zgam(klon), zthe(klon), zpic(klon), zval(klon), &
+            rugoro(klon), agesno(klon, nbsrf), run_off_lic_0(klon), &
+            Ma(klon, llm), sig1(klon, llm), w01(klon, llm), &
+            ffonte(klon, nbsrf), rain_fall(klon), snow_fall(klon), dlw(klon), &
+            frugs(klon, nbsrf), pctsrf(klon, nbsrf), albsol(klon), &
+            wo(klon, llm), clwcon(klon, llm), rnebcon(klon, llm), &
+            qcondc(klon, llm), rnebcon0(klon, llm), cape(klon), &
+            ibas_con(klon), itop_con(klon), ratqs(klon, llm), &
+            t2m(klon, nbsrf), q2m(klon, nbsrf), u10m_srf(klon, nbsrf), &
+            v10m_srf(klon, nbsrf), airephy(klon), heat(klon, llm), &
+            heat0(klon, llm), cool(klon, llm), cool0(klon, llm), topsw(klon), &
+            toplw(klon), solsw(klon), sollw(klon), sollwdown(klon), &
+            topsw0(klon), toplw0(klon), solsw0(klon), sollw0(klon))
 
        ! initialiser
        u10m_srf = 0.
@@ -547,20 +518,12 @@ contains
          d_q_vdf, d_u_vdf, d_v_vdf, flux_t, flux_q, flux_u, flux_v, cdragh, &
          cdragm, coefh, t2m, q2m, u10m_srf, v10m_srf, fqcalving, ffonte, &
          run_off_lic_0, albsol, sollw, solsw, tsol, dlw)
-
-    ! Incr\'ementation des flux :
+    t_seri = t_seri + d_t_vdf
+    q_seri = q_seri + d_q_vdf
+    u_seri = u_seri + d_u_vdf
+    v_seri = v_seri + d_v_vdf
     sens = sum(flux_t * pctsrf, dim = 2)
     evap = - sum(flux_q * pctsrf, dim = 2)
-
-    DO k = 1, llm
-       DO i = 1, klon
-          t_seri(i, k) = t_seri(i, k) + d_t_vdf(i, k)
-          q_seri(i, k) = q_seri(i, k) + d_q_vdf(i, k)
-          u_seri(i, k) = u_seri(i, k) + d_u_vdf(i, k)
-          v_seri(i, k) = v_seri(i, k) + d_v_vdf(i, k)
-       ENDDO
-    ENDDO
-
     flat = sum(fluxlat * pctsrf, dim = 2)
     zt2m = sum(t2m * pctsrf, dim = 2)
     zq2m = sum(q2m * pctsrf, dim = 2)
@@ -581,7 +544,7 @@ contains
        ENDDO
     ENDDO
 
-    ! Appeler la convection
+    ! Appeler la convection:
 
     if (conv_emanuel) then
        CALL concvl(paprs, play, t_seri, q_seri, u_seri, v_seri, sig1, w01, &

@@ -4,9 +4,9 @@ module sw_m
 
 contains
 
-  SUBROUTINE SW(PSCT, PRMU0, FRACT, PPMB, PDP, PPSOL, ALBD, ALBP, PTAVE, &
-       PWV, PQS, POZON, PCLDSW, PTAU, POMEGA, PCG, PHEAT, PHEAT0, TOPSW, &
-       PSOLSW, TOPSW0, PSOLSW0, ZFSUP, ZFSDN, ZFSUP0, ZFSDN0)
+  SUBROUTINE SW(PSCT, PRMU0, FRACT, PPMB, PDP, PPSOL, ALBD, ALBP, PTAVE, PWV, &
+       PQS, POZON, PCLDSW, PTAU, POMEGA, PCG, PHEAT, PHEAT0, TOPSW, PSOLSW, &
+       TOPSW0, PSOLSW0, ZFSUP, ZFSDN, ZFSUP0, ZFSDN0)
 
     ! Purpose. This routine computes the shortwave radiation fluxes
     ! in two spectral intervals following Fouquart and Bonnel (1980).
