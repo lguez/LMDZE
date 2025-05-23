@@ -13,6 +13,7 @@ contains
     use dimensions, only: llm
     USE radepsi, only: zepscq, zepsec
     USE radopt, only: novlp
+    use swtt1_m, only: swtt1
 
     ! ARGUMENTS:
 

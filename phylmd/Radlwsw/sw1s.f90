@@ -11,6 +11,7 @@ contains
     use dimphy, only: klon
     use swclr_m, only: swclr
     use swr_m, only: swr
+    use swtt1_m, only: swtt1
 
     ! PURPOSE.
     ! THIS ROUTINE COMPUTES THE SHORTWAVE RADIATION FLUXES IN TWO
