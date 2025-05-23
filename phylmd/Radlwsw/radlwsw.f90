@@ -85,14 +85,14 @@ contains
     REAL, intent(out):: swup0(:, :), swup(:, :) ! (klon, klev + 1)
 
     ! Local:
-    DOUBLE PRECISION ZFSUP(KLON, KLEV + 1)
-    DOUBLE PRECISION ZFSDN(KLON, KLEV + 1)
-    DOUBLE PRECISION ZFSUP0(KLON, KLEV + 1)
-    DOUBLE PRECISION ZFSDN0(KLON, KLEV + 1)
-    DOUBLE PRECISION ZFLUP(KLON, KLEV + 1)
-    DOUBLE PRECISION ZFLDN(KLON, KLEV + 1)
-    DOUBLE PRECISION ZFLUP0(KLON, KLEV + 1)
-    DOUBLE PRECISION ZFLDN0(KLON, KLEV + 1)
+    DOUBLE PRECISION FSUP(KLON, KLEV + 1)
+    DOUBLE PRECISION FSDN(KLON, KLEV + 1)
+    DOUBLE PRECISION FSUP0(KLON, KLEV + 1)
+    DOUBLE PRECISION FSDN0(KLON, KLEV + 1)
+    DOUBLE PRECISION FLUP(KLON, KLEV + 1)
+    DOUBLE PRECISION FLDN(KLON, KLEV + 1)
+    DOUBLE PRECISION FLUP0(KLON, KLEV + 1)
+    DOUBLE PRECISION FLDN0(KLON, KLEV + 1)
     DOUBLE PRECISION alpha1
     INTEGER k, i
     DOUBLE PRECISION ALBD(klon, 2) ! second dimension is spectral band
@@ -146,29 +146,29 @@ contains
     PMB = paprs / 100.
     CALL LW(PMB, DP, tsol - TL(:, 1), EMIS, TL, TAVE, WV, OZON, CLDLD, CLDLd, &
          VIEW, zcool, zcool0, ztoplw, zsollw, ztoplw0, zsollw0, zsollwdown, &
-         ZFLUP, ZFLDN, ZFLUP0, ZFLDN0)
+         FLUP, FLDN, FLUP0, FLDN0)
     CALL SW(dble(solaire / dist**2), dble(mu0), dble(fract), PMB, DP, &
          dble(paprs(:, 1)), ALBD, ALBD, TAVE, WV, wv, OZON, dble(cldfra), TAU, &
-         OMEGA, CG, zheat, zheat0, ztopsw, zsolsw, ztopsw0, zsolsw0, ZFSUP, &
-         ZFSDN, ZFSUP0, ZFSDN0)
+         OMEGA, CG, zheat, zheat0, ztopsw, zsolsw, ztopsw0, zsolsw0, FSUP, &
+         FSDN, FSUP0, FSDN0)
     radsol = zsolsw + zsollw
     topsw = ztopsw
     toplw = ztoplw
     solsw = zsolsw
     sollw = zsollw
     sollwdown = zsollwdown
-    lwdn0 = ZFLDN0
-    lwdn = ZFLDN
-    lwup0 = ZFLUP0
-    lwup = ZFLUP
+    lwdn0 = FLDN0
+    lwdn = FLDN
+    lwup0 = FLUP0
+    lwup = FLUP
     topsw0 = ztopsw0
     toplw0 = ztoplw0
     solsw0 = zsolsw0
     sollw0 = zsollw0
-    swdn0 = ZFSDN0
-    swdn = ZFSDN
-    swup0 = ZFSUP0
-    swup = ZFSUP
+    swdn0 = FSDN0
+    swdn = FSDN
+    swup0 = FSUP0
+    swup = FSUP
 
     DO k = 1, klev
        DO i = 1, klon
