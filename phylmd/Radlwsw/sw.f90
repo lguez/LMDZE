@@ -104,13 +104,15 @@ contains
        ENDDO
     ENDDO
 
-    ! clear-sky:
+    ! Clear-sky:
+
     CALL SWU(PSCT, ZCLDSW0, PPMB, PPSOL, PRMU0, FRACT, PTAVE, PWV, AKI, &
          ZCLD, ZCLEAR, ZDSIG, ZFACT, ZRMU, ZSEC, ZUD)
     CALL SW1S(ALBD, ALBP, PCG, ZCLD, ZCLEAR, ZDSIG, POMEGA, ZOZ, ZRMU, ZSEC, &
          PTAU, ZUD, ZFD, ZFU, KNU = 1)
     CALL SW2S(AKI, ALBD, ALBP, PCG, ZCLD, ZCLEAR, ZDSIG, POMEGA, ZOZ, ZRMU, &
          ZSEC, PTAU, ZUD, PWV, PQS, ZFDOWN, ZFUP, KNU = 2)
+
     DO JK = 1, LLM+1
        DO JL = 1, KLON
           ZFSUP0(JL, JK) = (ZFUP(JL, JK) + ZFU(JL, JK)) * ZFACT(JL)
@@ -125,7 +127,7 @@ contains
     CALL SW2S(AKI, ALBD, ALBP, PCG, ZCLD, ZCLEAR, ZDSIG, POMEGA, ZOZ, ZRMU, &
          ZSEC, PTAU, ZUD, PWV, PQS, ZFDOWN, ZFUP, KNU = 2)
 
-    ! cloudy-sky:
+    ! Cloudy-sky:
 
     DO JK = 1, LLM+1
        DO JL = 1, KLON
