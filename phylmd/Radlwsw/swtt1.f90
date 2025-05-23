@@ -1,7 +1,11 @@
 module swtt1_m
+
   IMPLICIT NONE
+
 contains
+
   SUBROUTINE swtt1(knu, kabs, kind, pu, ptr)
+
     USE dimensions
     USE dimphy
 
@@ -84,7 +88,6 @@ contains
 
     ! *         1.      HORNER'S ALGORITHM TO COMPUTE TRANSMISSION FUNCTION
 
-
     DO ja = 1, kabs
        ia = kind(ja)
        DO jl = 1, klon
@@ -99,12 +102,10 @@ contains
 
 
           ! *         2.      ADD THE BACKGROUND TRANSMISSION
-
-
           ptr(jl, ja) = (zr1(jl)/zr2(jl))*(1.-d(knu,ia)) + d(knu, ia)
        END DO
     END DO
 
-    RETURN
   END SUBROUTINE swtt1
+
 end module swtt1_m
