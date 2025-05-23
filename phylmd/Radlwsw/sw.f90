@@ -8,21 +8,18 @@ contains
        PWV, PQS, POZON, PCLDSW, PTAU, POMEGA, PCG, PHEAT, PHEAT0, TOPSW, &
        PSOLSW, TOPSW0, PSOLSW0, ZFSUP, ZFSDN, ZFSUP0, ZFSDN0)
 
-    ! Purpose.
-    ! This routine computes the shortwave radiation fluxes in two
-    ! spectral intervals following Fouquart and Bonnel (1980).
+    ! Purpose. This routine computes the shortwave radiation fluxes
+    ! in two spectral intervals following Fouquart and Bonnel (1980).
 
     ! Method.
     ! 1. Computes absorber amounts (swu)
     ! 2. Computes fluxes in 1st spectral interval (SW1S)
     ! 3. Computes fluxes in 2nd spectral interval (SW2S)
 
-    ! Reference.
-    ! See radiation part of the ECMWF research department
-    ! documentation, and Fouquart and Bonnel (1980)
+    ! Reference. See radiation part of the ECMWF research department
+    ! documentation, and Fouquart and Bonnel (1980).
 
-    ! Author.
-    ! Jean-Jacques Morcrette *ecmwf*
+    ! Author. Jean-Jacques Morcrette *ecmwf*
 
     ! Modifications.
     ! Original: 89-07-14
@@ -30,14 +27,12 @@ contains
     ! 03-11-27 J. Quaas Introduce aerosol forcings (based on Boucher)
 
     use comconst, only: daysec
-    use dimphy, only: klon
     use dimensions, only: llm
+    use dimphy, only: klon
     USE suphec_m, ONLY: rcpd, rg
     use sw1s_m, only: sw1s
     use sw2s_m, only: sw2s
     use swu_m, only: swu
-
-    ! ARGUMENTS:
 
     DOUBLE PRECISION, intent(in):: PSCT ! constante solaire
     DOUBLE PRECISION, intent(in):: PRMU0(KLON) ! COSINE OF ZENITHAL ANGLE
@@ -45,15 +40,28 @@ contains
     DOUBLE PRECISION, intent(in):: PPMB(KLON, LLM+1) ! HALF-LEVEL PRESSURE (MB)
     DOUBLE PRECISION, intent(in):: PDP(KLON, LLM) ! LAYER THICKNESS (PA)
     DOUBLE PRECISION, intent(in):: PPSOL(KLON) ! SURFACE PRESSURE (PA)
-    DOUBLE PRECISION, intent(in):: ALBD(KLON, 2) ! albedo du sol (lumiere diffuse)
-    DOUBLE PRECISION, intent(in):: ALBP(KLON, 2) ! albedo du sol (lumiere parallele)
+
+    DOUBLE PRECISION, intent(in):: ALBD(KLON, 2)
+    ! alb\'edo du sol (lumi\`ere diffuse)
+
+    DOUBLE PRECISION, intent(in):: ALBP(KLON, 2)
+    ! alb\'edo du sol (lumi\`ere parall\`ele)
+
     DOUBLE PRECISION, intent(in):: PTAVE(KLON, LLM) ! LAYER TEMPERATURE (K)
     DOUBLE PRECISION, intent(in):: PWV(KLON, LLM) ! SPECIFIC HUMIDITY (KG/KG)
-    DOUBLE PRECISION, intent(in):: PQS(KLON, LLM) ! SATURATED WATER VAPOUR (KG/KG)
-    DOUBLE PRECISION, intent(in):: POZON(KLON, LLM) ! OZONE CONCENTRATION (KG/KG)
+
+    DOUBLE PRECISION, intent(in):: PQS(KLON, LLM)
+    ! SATURATED WATER VAPOUR (KG/KG)
+
+    DOUBLE PRECISION, intent(in):: POZON(KLON, LLM)
+    ! OZONE CONCENTRATION (KG/KG)
+
     DOUBLE PRECISION, intent(in):: PCLDSW(KLON, LLM) ! CLOUD FRACTION
     DOUBLE PRECISION, intent(in):: PTAU(KLON, 2, LLM) ! CLOUD OPTICAL THICKNESS
-    DOUBLE PRECISION, intent(in):: POMEGA(KLON, 2, LLM) ! SINGLE SCATTERING ALBEDO
+
+    DOUBLE PRECISION, intent(in):: POMEGA(KLON, 2, LLM)
+    ! SINGLE SCATTERING ALBEDO
+
     DOUBLE PRECISION, intent(in):: PCG(KLON, 2, LLM) ! ASYMETRY FACTOR
     DOUBLE PRECISION PHEAT(KLON, LLM) ! SHORTWAVE HEATING (K/DAY)
     DOUBLE PRECISION PHEAT0(KLON, LLM)! SHORTWAVE HEATING (K/DAY) clear-sky
