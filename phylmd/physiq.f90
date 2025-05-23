@@ -456,6 +456,7 @@ contains
        CALL phyredem0(itau_phy + nday * lmt_pas)
        call conf_interface
        airephy = pack(aire_2d, dyn_phy)
+       albsol = sum(falbe * pctsrf, dim = 2)
     ENDIF test_firstcal
 
     ! Diagnostic de la tendance dynamique :
@@ -522,6 +523,7 @@ contains
     q_seri = q_seri + d_q_vdf
     u_seri = u_seri + d_u_vdf
     v_seri = v_seri + d_v_vdf
+    albsol = sum(falbe * pctsrf, dim = 2)
     sens = sum(flux_t * pctsrf, dim = 2)
     evap = - sum(flux_q * pctsrf, dim = 2)
     flat = sum(fluxlat * pctsrf, dim = 2)
@@ -728,7 +730,6 @@ contains
 
     IF (call_rad_transfer) THEN
        wo = ozonecm(REAL(julien), paprs)
-       albsol = sum(falbe * pctsrf, dim = 2)
        CALL radlwsw(dist, mu0, fract, paprs, play, tsol, albsol, t_seri, &
             q_seri, wo, cldfra, cldemi, cldtau, heat, heat0, cool, cool0, &
             radsol, topsw, toplw, solsw, sollw, sollwdown, topsw0, toplw0, &

@@ -132,7 +132,7 @@ contains
 
     REAL, intent(inout):: run_off_lic_0(:) ! (klon)
 
-    REAL, intent(out):: albsol(:) ! (klon)
+    REAL, intent(in):: albsol(:) ! (klon)
     ! albedo du sol total, visible, moyen par maille
 
     REAL, intent(in):: sollw(:) ! (klon)
@@ -217,7 +217,6 @@ contains
     !------------------------------------------------------------
 
     tsol = sum(ftsol * pctsrf, dim = 2)
-    albsol = sum(falbe * pctsrf, dim = 2)
 
     ! R\'epartition sous maille des flux longwave et shortwave
     ! R\'epartition du longwave par sous-surface lin\'earis\'ee
