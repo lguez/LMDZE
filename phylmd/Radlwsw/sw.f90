@@ -92,7 +92,7 @@ contains
     DOUBLE PRECISION ZSEC(KLON)
     DOUBLE PRECISION ZUD(KLON, 5, LLM+1)
     DOUBLE PRECISION ZCLDSW0(KLON, LLM)
-    INTEGER inu, jl, jk, i, k, kpl1
+    INTEGER jl, jk, i, k, kpl1
     REAL, PARAMETER :: dobson_u = 2.1415E-05 ! Dobson unit, in kg m-2
 
     !-------------------------------------------------------------------
@@ -107,12 +107,10 @@ contains
     ! clear-sky:
     CALL SWU(PSCT, ZCLDSW0, PPMB, PPSOL, PRMU0, FRACT, PTAVE, PWV, ZAKI, &
          ZCLD, ZCLEAR, ZDSIG, ZFACT, ZRMU, ZSEC, ZUD)
-    INU = 1
     CALL SW1S(ALBD, ALBP, PCG, ZCLD, ZCLEAR, ZDSIG, POMEGA, ZOZ, ZRMU, ZSEC, &
-         PTAU, ZUD, ZFD, ZFU, INU)
-    INU = 2
+         PTAU, ZUD, ZFD, ZFU, KNU = 1)
     CALL SW2S(ZAKI, ALBD, ALBP, PCG, ZCLD, ZCLEAR, ZDSIG, POMEGA, ZOZ, ZRMU, &
-         ZSEC, PTAU, ZUD, PWV, PQS, ZFDOWN, ZFUP, INU)
+         ZSEC, PTAU, ZUD, PWV, PQS, ZFDOWN, ZFUP, KNU = 2)
     DO JK = 1, LLM+1
        DO JL = 1, KLON
           ZFSUP0(JL, JK) = (ZFUP(JL, JK) + ZFU(JL, JK)) * ZFACT(JL)
@@ -122,12 +120,10 @@ contains
 
     CALL SWU(PSCT, PCLDSW, PPMB, PPSOL, PRMU0, FRACT, PTAVE, PWV, ZAKI, &
          ZCLD, ZCLEAR, ZDSIG, ZFACT, ZRMU, ZSEC, ZUD)
-    INU = 1
     CALL SW1S(ALBD, ALBP, PCG, ZCLD, ZCLEAR, ZDSIG, POMEGA, ZOZ, ZRMU, ZSEC, &
-         PTAU, ZUD, ZFD, ZFU, INU)
-    INU = 2
+         PTAU, ZUD, ZFD, ZFU, KNU = 1)
     CALL SW2S(ZAKI, ALBD, ALBP, PCG, ZCLD, ZCLEAR, ZDSIG, POMEGA, ZOZ, ZRMU, &
-         ZSEC, PTAU, ZUD, PWV, PQS, ZFDOWN, ZFUP, INU)
+         ZSEC, PTAU, ZUD, PWV, PQS, ZFDOWN, ZFUP, KNU = 2)
 
     ! cloudy-sky:
 
