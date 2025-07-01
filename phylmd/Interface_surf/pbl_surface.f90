@@ -418,10 +418,12 @@ contains
              fqsurf(i, nisrf) = yqsurf(j)
              frugs(i, nisrf) = yz0_new(j)
              fluxlat(i, nisrf) = yfluxlat(j)
+
              IF (nisrf == is_oce) THEN
                 rugmer(i) = yrugm(j)
                 frugs(i, nisrf) = yrugm(j)
              END IF
+
              agesno(i, nisrf) = yagesno(j)
              fqcalving(i, nisrf) = y_fqcalving(j)
              ffonte(i, nisrf) = y_ffonte(j)
