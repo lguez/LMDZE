@@ -133,7 +133,8 @@ contains
     REAL, intent(inout):: run_off_lic_0(:) ! (klon)
 
     REAL, intent(in):: albsol(:) ! (klon)
-    ! albedo du sol total, visible, moyen par maille
+    ! alb\'edo du sol total, dans le domaine spectral visible, moyen
+    ! par maille
 
     REAL, intent(in):: sollw(:) ! (klon)
     ! surface net downward longwave flux, in W m-2
@@ -354,7 +355,6 @@ contains
                ypplay(:knon, :), yu(:knon, :), yv(:knon, :), yq(:knon, :), &
                yt(:knon, :), yts(:knon), ycdragm(:knon), zgeop(:knon, :), &
                ycoefm(:knon, :), ycoefh(:knon, :), yq2(:knon, :))
-
           CALL clvent(yu(:knon, 1), yv(:knon, 1), ycoefm(:knon, :), &
                ycdragm(:knon), yt(:knon, :), yu(:knon, :), ypaprs(:knon, :), &
                ypplay(:knon, :), ydelp(:knon, :), y_d_u(:knon, :), &
