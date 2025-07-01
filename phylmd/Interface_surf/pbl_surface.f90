@@ -163,7 +163,7 @@ contains
     REAL ytsoil(klon, nsoilmx)
     REAL yts(klon), ypctsrf(klon), yz0_new(klon)
     real yrugos(klon) ! longueur de rugosit\'e, en m
-    REAL yalb(klon)
+    REAL yalbedo(klon)
     REAL snow(klon) ! column-density of mass of snow at the surface, in kg m-2
     real yqsurf(klon), yagesno(klon)
     real yqsol(klon) ! column-density of water in soil, in kg m-2
@@ -369,7 +369,7 @@ contains
                yq(:knon, :), yts(:knon), ypaprs(:knon, :), ypplay(:knon, :), &
                ydelp(:knon, :), &
                fsolsw(ni(:knon), nisrf) + fsollw(ni(:knon), nisrf), &
-               yalb(:knon), snow(:knon), yqsurf(:knon), yrain_fall(:knon), &
+               yalbedo(:knon), snow(:knon), yqsurf(:knon), yrain_fall(:knon), &
                ysnow_fall(:knon), yfluxlat(:knon), pctsrf_new_sic(ni(:knon)), &
                yagesno(:knon), y_d_t(:knon, :), y_d_q(:knon, :), &
                tsurf_new(:knon), yz0_new(:knon), y_flux_t(:knon), &
@@ -413,7 +413,7 @@ contains
              i = ni(j)
              d_ts(i, nisrf) = tsurf_new(j) - yts(j)
              ftsol(i, nisrf) = tsurf_new(j) ! update surface temperature
-             falbe(i, nisrf) = yalb(j)
+             falbe(i, nisrf) = yalbedo(j)
              fsnow(i, nisrf) = snow(j)
              fqsurf(i, nisrf) = yqsurf(j)
              frugs(i, nisrf) = yz0_new(j)
