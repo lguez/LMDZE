@@ -428,7 +428,6 @@ contains
        call conf_phys
        call assert(iflag_cldcon >= 0 .or. .not. conv_emanuel, &
             "iflag_cldcon <= - 1 implies Tiedke convection scheme")
-       frugs = 0.
        CALL phyetat0(pctsrf, ftsol, ftsoil, fqsurf, qsol, fsnow, falbe, &
             rain_fall, snow_fall, solsw, sollw, dlw, frugs, agesno, zmea, &
             zstd, zsig, zgam, zthe, zpic, zval, t_seri, q_seri, ancien_ok, &
