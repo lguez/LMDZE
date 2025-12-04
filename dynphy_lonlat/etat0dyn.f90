@@ -19,7 +19,6 @@ contains
     use dynetat0_m, only: rlatu, rlatv, rlonu, rlonv
     use dynetat0_chosen_m, only: day_ref
     use dynredem_m, only: dynredem
-    use dynredem1_m, only: dynredem1
     use exner_hyb_m, only: exner_hyb
     use geopot_m, only: geopot
     use massdair_m, only: massdair

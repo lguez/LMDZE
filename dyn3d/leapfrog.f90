@@ -29,7 +29,6 @@ contains
     USE disvert_m, ONLY: ap, bp
     USE dynetat0_m, ONLY: day_ini, itau_dyn
     use dynredem_m, only: dynredem
-    use dynredem1_m, only: dynredem1
     use enercin_m, only: enercin
     USE exner_hyb_m, ONLY: exner_hyb
     use filtreg_scal_m, only: filtreg_scal
