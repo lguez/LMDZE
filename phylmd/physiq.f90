@@ -210,8 +210,11 @@ contains
     REAL evap(klon) ! water vapour flux at the surface, positive upwards
     REAL sens(klon) ! flux de chaleur sensible au sol
     REAL, save, allocatable:: dlw(:) ! (klon) derivative of infra-red flux
-    REAL, save, allocatable:: frugs(:, :) ! (klon, nbsrf) longueur de rugosit\'e
-    REAL rugs(klon) ! longueur de rugosit\'e
+
+    REAL, save, allocatable:: frugs(:, :)
+    ! (klon, nbsrf) longueur de rugosit\'e de la fraction de maille
+
+    REAL rugs(klon) ! longueur de rugosit\'e moyenne de la maille
 
     ! Conditions aux limites
 
