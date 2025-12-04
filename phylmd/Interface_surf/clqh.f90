@@ -42,7 +42,7 @@ contains
 
     real, intent(in):: mu0(:) ! (knon) cosinus de l'angle solaire zenithal
     real, intent(in):: rugos(:) ! (knon) rugosite
-    REAL, intent(in):: rugoro(:) ! (knon) rugosite orographique
+    REAL, intent(in):: rugoro(:) ! (knon) longueur de rugosit\'e orographique
 
     REAL, intent(in):: u1lay(:), v1lay(:) ! (knon)
     ! vitesse de la 1ere couche (m / s)

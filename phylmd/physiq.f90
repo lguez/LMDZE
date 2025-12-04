@@ -172,7 +172,7 @@ contains
     REAL, save, allocatable:: zval(:) ! (klon) ! Minimum de l'OESM
 
     REAL, save, allocatable:: rugoro(:) ! (klon)
-    ! longueur de rugosite de l'OESM
+    ! longueur de rugosit\'e orographique
 
     REAL, save, allocatable:: agesno(:, :) ! (klon, nbsrf) ! age de la neige
     REAL, save, allocatable:: run_off_lic_0(:) ! (klon)
@@ -210,8 +210,8 @@ contains
     REAL evap(klon) ! water vapour flux at the surface, positive upwards
     REAL sens(klon) ! flux de chaleur sensible au sol
     REAL, save, allocatable:: dlw(:) ! (klon) derivative of infra-red flux
-    REAL, save, allocatable:: frugs(:, :) ! (klon, nbsrf) ! longueur de rugosite
-    REAL zxrugs(klon) ! longueur de rugosite
+    REAL, save, allocatable:: frugs(:, :) ! (klon, nbsrf) longueur de rugosit\'e
+    REAL rugs(klon) ! longueur de rugosit\'e
 
     ! Conditions aux limites
 
@@ -498,7 +498,7 @@ contains
     ql_seri = 0.
 
     frugs = MAX(frugs, 0.000015)
-    zxrugs = sum(frugs * pctsrf, dim = 2)
+    rugs = sum(frugs * pctsrf, dim = 2)
 
     call_rad_transfer = MOD(itap - 1, radpas) == 0
 
@@ -836,7 +836,7 @@ contains
     CALL histwrite_phy("zxfqcalving", sum(fqcalving * pctsrf, dim = 2))
     CALL histwrite_phy("albs", albsol)
     CALL histwrite_phy("tro3", wo * dobson_u * 1e3 / zmasse / rmo3 * md)
-    CALL histwrite_phy("rugs", zxrugs)
+    CALL histwrite_phy("rugs", rugs)
     CALL histwrite_phy("temp", t_seri)
     CALL histwrite_phy_xios("temp", t_seri)
     CALL histwrite_phy("vitu", u_seri)

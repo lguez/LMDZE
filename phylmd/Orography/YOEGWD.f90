@@ -1,7 +1,8 @@
 module yoegwd
 
   ! From phylmd/YOEGWD.h, version 1.1.1.1 2004/05/19 12:53:08
-  ! Parameters for gravity wave drag calculations
+
+  ! Parameters controlling the gravity wave drag parameterization.
 
   implicit none
 
@@ -16,12 +17,11 @@ contains
 
   SUBROUTINE sugwd(paprs, pplay)
 
-    ! Initialize yoegwd, the common that controls the gravity wave
-    ! drag parametrization.
+    ! Define nktopg and nstra.
 
-    ! REFERENCE: ECMWF Research Department documentation of the IFS
-    ! AUTHOR: MARTIN MILLER *ECMWF*
-    ! ORIGINAL : 90-01-01
+    ! Reference: ECMWF Research Department documentation of the IFS
+    ! Author: Martin MILLER, ECMWF
+    ! Original : 1990-01-01
 
     use jumble, only: assert_eq, ifirstloc
 

@@ -87,7 +87,7 @@ contains
     ! longueur de rugosit\'e (en m)
 
     real, intent(inout):: agesno(:, :) ! (klon, nbsrf)
-    REAL, INTENT(IN):: rugoro(:) ! (klon)
+    REAL, INTENT(IN):: rugoro(:) ! (klon) longueur de rugosit\'e orographique
 
     REAL, intent(out):: d_t(:, :), d_q(:, :) ! (klon, klev)
     ! changement pour t_seri et q_seri

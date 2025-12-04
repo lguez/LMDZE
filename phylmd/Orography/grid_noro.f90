@@ -45,8 +45,8 @@ contains
     USE yoegwd, only: gtsec
 
     ! Coordinates of input field:
-    REAL, intent(in):: xdata(:) ! (iusn)
-    REAL, intent(in):: ydata(:) ! (jusn)
+    REAL, intent(in):: xdata(:) ! (iusn) in rad
+    REAL, intent(in):: ydata(:) ! (jusn) in rad
 
     REAL, intent(in):: relief(:, :) ! (iusn, jusn) input field, in m
     REAL, intent(in):: x(:), y(:) ! coordinates of output field

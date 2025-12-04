@@ -23,7 +23,7 @@ CONTAINS
     REAL, intent(out):: zmea(:) ! (klon) orographie moyenne
 
     REAL, intent(out):: zstd(:) ! (klon)
-    ! (deviation standard de l'orographie sous-maille)
+    ! d\'eviation standard de l'orographie sous-maille
 
     REAL, intent(out):: zsig(:) ! (klon) pente de l'orographie sous-maille
     REAL, intent(out):: zgam(:) ! (klon) anisotropie de l'orographie sous maille

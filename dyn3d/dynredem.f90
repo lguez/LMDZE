@@ -57,12 +57,12 @@ CONTAINS
 
     PRINT *, 'Call sequence information: dynredem'
     call assert((/size(vcov, 1), size(ucov, 1), size(teta, 1), size(q, 1), &
-         size(masse, 1), size(ps, 1)/) == iim + 1, "dynredem1 iim")
+         size(masse, 1), size(ps, 1)/) == iim + 1, "dynredem iim")
     call assert((/size(vcov, 2) + 1, size(ucov, 2), size(teta, 2), size(q, 2), &
-         size(masse, 2), size(ps, 2)/) == jjm + 1, "dynredem1 jjm")
+         size(masse, 2), size(ps, 2)/) == jjm + 1, "dynredem jjm")
     call assert((/size(vcov, 3), size(ucov, 3), size(teta, 3), size(q, 3), &
-         size(masse, 3)/) == llm, "dynredem1 llm")
-    call assert(size(q, 4) == nqmx, "dynredem1 nqmx")
+         size(masse, 3)/) == llm, "dynredem llm")
+    call assert(size(q, 4) == nqmx, "dynredem nqmx")
     tab_cntrl(:3) = 0.
     tab_cntrl(4) = day_ref
     tab_cntrl(5:12) = 0.
