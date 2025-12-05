@@ -214,8 +214,6 @@ contains
     REAL, save, allocatable:: frugs(:, :)
     ! (klon, nbsrf) longueur de rugosit\'e de la fraction de maille
 
-    REAL rugs(klon) ! longueur de rugosit\'e moyenne de la maille
-
     ! Conditions aux limites
 
     INTEGER julien
@@ -520,7 +518,6 @@ contains
          d_q_vdf, d_u_vdf, d_v_vdf, flux_t, flux_q, flux_u, flux_v, cdragh, &
          cdragm, coefh, t2m, q2m, u10m_srf, v10m_srf, fqcalving, ffonte, &
          run_off_lic_0, albsol, sollw, solsw, tsol, dlw)
-    rugs = sum(frugs * pctsrf, dim = 2)
     t_seri = t_seri + d_t_vdf
     q_seri = q_seri + d_q_vdf
     u_seri = u_seri + d_u_vdf
@@ -839,7 +836,7 @@ contains
     CALL histwrite_phy("zxfqcalving", sum(fqcalving * pctsrf, dim = 2))
     CALL histwrite_phy("albs", albsol)
     CALL histwrite_phy("tro3", wo * dobson_u * 1e3 / zmasse / rmo3 * md)
-    CALL histwrite_phy("rugs", rugs)
+    CALL histwrite_phy("rugs", sum(frugs * pctsrf, dim = 2))
     CALL histwrite_phy("temp", t_seri)
     CALL histwrite_phy_xios("temp", t_seri)
     CALL histwrite_phy("vitu", u_seri)
