@@ -168,7 +168,7 @@ contains
     real yqsol(klon) ! column-density of water in soil, in kg m-2
     REAL yrain_fall(klon) ! liquid water mass flux (kg / m2 / s), positive down
     REAL ysnow_fall(klon) ! solid water mass flux (kg / m2 / s), positive down
-    REAL yrugm(klon), yrugoro(klon)
+    REAL yrugoro(klon)
     REAL yfluxlat(klon)
     REAL tsurf_new(klon)
     REAL y_d_t(klon, klev), y_d_q(klon, klev)
@@ -375,15 +375,6 @@ contains
                y_fqcalving(:knon), y_ffonte(:knon), y_run_off_lic_0(:knon), &
                y_run_off_lic(:knon))
 
-          IF (nisrf == is_oce) THEN
-             ! Calculer la longueur de rugosit\'e sur oc\'ean :
-             DO j = 1, knon
-                yrugm(j) = max(1.5E-05, 0.018 * ycdragm(j) * (yu(j, 1)**2 &
-                     + yv(j, 1)**2) / rg + 0.11 * 14E-6 &
-                     / sqrt(ycdragm(j) * (yu(j, 1)**2 + yv(j, 1)**2)))
-             END DO
-          END IF
-
           DO k = 1, klev
              DO j = 1, knon
                 y_d_t(j, k) = y_d_t(j, k) * ypctsrf(j)
@@ -413,7 +404,9 @@ contains
              fluxlat(i, nisrf) = yfluxlat(j)
 
              IF (nisrf == is_oce) THEN
-                frugs(i, is_oce) = yrugm(j)
+                frugs(i, is_oce) = max(1.5E-05, 0.018 * ycdragm(j) &
+                     * (yu(j, 1)**2 + yv(j, 1)**2) / rg + 0.11 * 14E-6 &
+                     / sqrt(ycdragm(j) * (yu(j, 1)**2 + yv(j, 1)**2)))
              else
                 frugs(i, nisrf) = yz0_new(j)
              END IF
