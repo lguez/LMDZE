@@ -501,7 +501,6 @@ contains
     ql_seri = 0.
 
     frugs = MAX(frugs, 0.000015)
-    rugs = sum(frugs * pctsrf, dim = 2)
 
     call_rad_transfer = MOD(itap - 1, radpas) == 0
 
@@ -521,6 +520,7 @@ contains
          d_q_vdf, d_u_vdf, d_v_vdf, flux_t, flux_q, flux_u, flux_v, cdragh, &
          cdragm, coefh, t2m, q2m, u10m_srf, v10m_srf, fqcalving, ffonte, &
          run_off_lic_0, albsol, sollw, solsw, tsol, dlw)
+    rugs = sum(frugs * pctsrf, dim = 2)
     t_seri = t_seri + d_t_vdf
     q_seri = q_seri + d_q_vdf
     u_seri = u_seri + d_u_vdf
