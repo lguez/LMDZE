@@ -237,7 +237,6 @@ contains
     ypaprs = 0.
     ypplay = 0.
     ydelp = 0.
-    yrugoro = 0.
     d_ts = 0.
     flux_t = 0.
     flux_q = 0.
