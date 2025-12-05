@@ -421,7 +421,7 @@ contains
 
              IF (nisrf == is_oce) THEN
                 rugmer(i) = yrugm(j)
-                frugs(i, nisrf) = yrugm(j)
+                frugs(i, is_oce) = yrugm(j)
              END IF
 
              agesno(i, nisrf) = yagesno(j)
