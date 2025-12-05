@@ -159,7 +159,6 @@ contains
     REAL y_fqcalving(klon), y_ffonte(klon)
     real y_run_off_lic_0(klon), y_run_off_lic(klon)
     REAL run_off_lic(klon) ! ruissellement total
-    REAL rugmer(klon)
     REAL ytsoil(klon, nsoilmx)
     REAL yts(klon), ypctsrf(klon), yz0_new(klon)
     real yrugos(klon) ! longueur de rugosit\'e, en m
@@ -231,7 +230,6 @@ contains
     forall (k = 1:klev) delp(:, k) = paprs(:, k) - paprs(:, k + 1)
 
     ! Initialization:
-    rugmer = 0.
     cdragh = 0.
     cdragm = 0.
     dflux_t = 0.
@@ -419,7 +417,6 @@ contains
              fluxlat(i, nisrf) = yfluxlat(j)
 
              IF (nisrf == is_oce) THEN
-                rugmer(i) = yrugm(j)
                 frugs(i, is_oce) = yrugm(j)
              else
                 frugs(i, nisrf) = yz0_new(j)
