@@ -1,6 +1,12 @@
 # Changelog
 
-## 0.16 ()
+## 0.16 (2025-05-23)
+
+### Changed
+
+- Use git annex for large binary files (5df5817b)
+- Require Jumble version > `0.1` (ad311f3e)
+- Do not compute age of snow on land-ice (de2ff27b)
 
 ## 0.15 (2024-12-06)
 
