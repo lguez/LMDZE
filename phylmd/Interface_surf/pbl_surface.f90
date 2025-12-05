@@ -378,10 +378,9 @@ contains
           IF (nisrf == is_oce) THEN
              ! Calculer la longueur de rugosit\'e sur oc\'ean :
              DO j = 1, knon
-                yrugm(j) = 0.018 * ycdragm(j) * (yu(j, 1)**2 + yv(j, 1)**2) &
-                     / rg + 0.11 * 14E-6 &
-                     / sqrt(ycdragm(j) * (yu(j, 1)**2 + yv(j, 1)**2))
-                yrugm(j) = max(1.5E-05, yrugm(j))
+                yrugm(j) = max(1.5E-05, 0.018 * ycdragm(j) * (yu(j, 1)**2 &
+                     + yv(j, 1)**2) / rg + 0.11 * 14E-6 &
+                     / sqrt(ycdragm(j) * (yu(j, 1)**2 + yv(j, 1)**2)))
              END DO
           END IF
 
