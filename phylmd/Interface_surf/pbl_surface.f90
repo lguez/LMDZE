@@ -416,12 +416,13 @@ contains
              falbe(i, nisrf) = yalbedo(j)
              fsnow(i, nisrf) = snow(j)
              fqsurf(i, nisrf) = yqsurf(j)
-             frugs(i, nisrf) = yz0_new(j)
              fluxlat(i, nisrf) = yfluxlat(j)
 
              IF (nisrf == is_oce) THEN
                 rugmer(i) = yrugm(j)
                 frugs(i, is_oce) = yrugm(j)
+             else
+                frugs(i, nisrf) = yz0_new(j)
              END IF
 
              agesno(i, nisrf) = yagesno(j)
