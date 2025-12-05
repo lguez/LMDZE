@@ -509,7 +509,6 @@ contains
     END DO loop_surface
 
     ! On utilise les nouvelles surfaces
-    frugs(:, is_oce) = rugmer
     pctsrf(:, is_oce) = pctsrf_new_oce
     pctsrf(:, is_sic) = pctsrf_new_sic
 
