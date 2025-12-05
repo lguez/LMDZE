@@ -376,9 +376,6 @@ contains
                y_run_off_lic(:knon))
 
           ! calculer la longueur de rugosite sur ocean
-
-          yrugm = 0.
-
           IF (nisrf == is_oce) THEN
              DO j = 1, knon
                 yrugm(j) = 0.018 * ycdragm(j) * (yu(j, 1)**2 + yv(j, 1)**2) &
