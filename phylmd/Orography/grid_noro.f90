@@ -19,8 +19,9 @@ contains
     ! Fairhead
 
     ! Compute the parameters of the sub-grid scale orography scheme as
-    ! described in Lott and Miller (1997) and Lott (1999). Compute
-    ! all the parameters needed for the gravity wave drag code.
+    ! described in Lott and Miller (1997) and Lott (1999, Monthly
+    ! Weather Review, 127, 788). Compute all the parameters needed for
+    ! the gravity wave drag code.
 
     ! Target points are on a rectangular grid:
     ! jjm + 1 latitudes including North and South Poles;
@@ -86,7 +87,7 @@ contains
     ! utilisés pour calculer des dérivées zonales et méridiennes à
     ! partir de paire de points de grille séparés de deux pas de
     ! grille, et non pas adjacents
-    
+
     real zweinor, zweisud, zmeanor, zbordest
     integer ii, i, jj, j
 
@@ -185,21 +186,25 @@ contains
 
     zleny = pi / real(jusn) * ra
     xincr = pi / 2. / real(jusn)
+
     DO ii = 1, iim + 1
        DO jj = 1, jjm + 1
           num_tot(ii, jj) = 0.
           num_lan(ii, jj) = 0.
+
           DO j = 2, jusn + 1 
              zlenx = zleny * cos(yusn(j))
              zdeltax = zdeltay * cos(yusn(j))
              zbordnor = (c(jj) - yusn(j) + xincr) * ra
              zbordsud = (yusn(j) - d(jj) + xincr) * ra
              weighy = MAX(0., min(zbordnor, zbordsud, zleny))
+
              IF (weighy /= 0) THEN
                 DO i = 2, iusn + 2 * iext - 1
                    zbordest = (xusn(i) - a(ii) + xincr) * ra * cos(yusn(j))
                    zbordoue = (b(ii) + xincr - xusn(i)) * ra * cos(yusn(j))
                    weighx = MAX(0., min(zbordest, zbordoue, zlenx))
+
                    IF (weighx /= 0) THEN
                       num_tot(ii, jj) = num_tot(ii, jj) + 1.
                       if (zusn(i, j) >= 1.) &
