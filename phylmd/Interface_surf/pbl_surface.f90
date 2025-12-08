@@ -6,8 +6,8 @@ contains
 
   SUBROUTINE pbl_surface(pctsrf, t_seri, q_seri, u_seri, v_seri, julien, mu0, &
        ftsol, cdmmax, cdhmax, ftsoil, qsol, paprs, play, fsnow, fqsurf, falbe, &
-       fluxlat, rain_fall, snow_fall, frugs, agesno, rugoro, d_t, d_q, d_u, &
-       d_v, flux_t, flux_q, flux_u, flux_v, cdragh, cdragm, coefh, t2m, q2m, &
+       fluxlat, rain_fall, snow_fall, frugs, agesno, d_t, d_q, d_u, d_v, &
+       flux_t, flux_q, flux_u, flux_v, cdragh, cdragm, coefh, t2m, q2m, &
        u10m_srf, v10m_srf, fqcalving, ffonte, run_off_lic_0, albsol, sollw, &
        solsw, tsol, dlw)
 
@@ -87,7 +87,6 @@ contains
     ! longueur de rugosit\'e (en m)
 
     real, intent(inout):: agesno(:, :) ! (klon, nbsrf)
-    REAL, INTENT(IN):: rugoro(:) ! (klon) longueur de rugosit\'e orographique
 
     REAL, intent(out):: d_t(:, :), d_q(:, :) ! (klon, klev)
     ! changement pour t_seri et q_seri
@@ -168,7 +167,6 @@ contains
     real yqsol(klon) ! column-density of water in soil, in kg m-2
     REAL yrain_fall(klon) ! liquid water mass flux (kg / m2 / s), positive down
     REAL ysnow_fall(klon) ! solid water mass flux (kg / m2 / s), positive down
-    REAL yrugoro(klon)
     REAL yfluxlat(klon)
     REAL tsurf_new(klon)
     REAL y_d_t(klon, klev), y_d_q(klon, klev)
@@ -304,7 +302,6 @@ contains
           ysnow_fall(:knon) = snow_fall(ni(:knon))
           yagesno(:knon) = agesno(ni(:knon), nisrf)
           yrugos(:knon) = frugs(ni(:knon), nisrf)
-          yrugoro(:knon) = rugoro(ni(:knon))
           ypaprs(:knon, :) = paprs(ni(:knon), :)
           y_run_off_lic_0(:knon) = run_off_lic_0(ni(:knon))
 
@@ -361,9 +358,9 @@ contains
                ypplay(:knon, :), ydelp(:knon, :), y_d_v(:knon, :), &
                y_flux_v(:knon))
           CALL clqh(julien, nisrf, ni(:knon), ytsoil(:knon, :), yqsol(:knon), &
-               mu0(ni(:knon)), yrugos(:knon), yrugoro(:knon), yu(:knon, 1), &
-               yv(:knon, 1), ycoefh(:knon, :), ycdragh(:knon), yt(:knon, :), &
-               yq(:knon, :), yts(:knon), ypaprs(:knon, :), ypplay(:knon, :), &
+               mu0(ni(:knon)), yrugos(:knon), yu(:knon, 1), yv(:knon, 1), &
+               ycoefh(:knon, :), ycdragh(:knon), yt(:knon, :), yq(:knon, :), &
+               yts(:knon), ypaprs(:knon, :), ypplay(:knon, :), &
                ydelp(:knon, :), &
                fsolsw(ni(:knon), nisrf) + fsollw(ni(:knon), nisrf), &
                yalbedo(:knon), snow(:knon), yqsurf(:knon), yrain_fall(:knon), &

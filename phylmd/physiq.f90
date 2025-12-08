@@ -162,7 +162,6 @@ contains
     ! albedo visible par type de surface
 
     ! Param\`etres de l'orographie \`a l'\'echelle sous-maille (OESM) :
-
     REAL, save, allocatable:: zmea(:) ! (klon) ! orographie moyenne
     REAL, save, allocatable:: zstd(:) ! (klon) ! deviation standard de l'OESM
     REAL, save, allocatable:: zsig(:) ! (klon) ! pente de l'OESM
@@ -170,9 +169,6 @@ contains
     REAL, save, allocatable:: zthe(:) ! (klon) ! orientation de l'OESM
     REAL, save, allocatable:: zpic(:) ! (klon) ! Maximum de l'OESM
     REAL, save, allocatable:: zval(:) ! (klon) ! Minimum de l'OESM
-
-    REAL, save, allocatable:: rugoro(:) ! (klon)
-    ! longueur de rugosit\'e orographique
 
     REAL, save, allocatable:: agesno(:, :) ! (klon, nbsrf) ! age de la neige
     REAL, save, allocatable:: run_off_lic_0(:) ! (klon)
@@ -399,18 +395,18 @@ contains
             ftsoil(klon, nsoilmx, nbsrf), fqsurf(klon, nbsrf), qsol(klon), &
             fsnow(klon, nbsrf), falbe(klon, nbsrf), zmea(klon), zstd(klon), &
             zsig(klon), zgam(klon), zthe(klon), zpic(klon), zval(klon), &
-            rugoro(klon), agesno(klon, nbsrf), run_off_lic_0(klon), &
-            Ma(klon, llm), sig1(klon, llm), w01(klon, llm), &
-            ffonte(klon, nbsrf), rain_fall(klon), snow_fall(klon), dlw(klon), &
-            frugs(klon, nbsrf), pctsrf(klon, nbsrf), albsol(klon), &
-            wo(klon, llm), clwcon(klon, llm), rnebcon(klon, llm), &
-            qcondc(klon, llm), rnebcon0(klon, llm), cape(klon), &
-            ibas_con(klon), itop_con(klon), ratqs(klon, llm), &
-            t2m(klon, nbsrf), q2m(klon, nbsrf), u10m_srf(klon, nbsrf), &
-            v10m_srf(klon, nbsrf), airephy(klon), heat(klon, llm), &
-            heat0(klon, llm), cool(klon, llm), cool0(klon, llm), topsw(klon), &
-            toplw(klon), solsw(klon), sollw(klon), sollwdown(klon), &
-            topsw0(klon), toplw0(klon), solsw0(klon), sollw0(klon))
+            agesno(klon, nbsrf), run_off_lic_0(klon), Ma(klon, llm), &
+            sig1(klon, llm), w01(klon, llm), ffonte(klon, nbsrf), &
+            rain_fall(klon), snow_fall(klon), dlw(klon), frugs(klon, nbsrf), &
+            pctsrf(klon, nbsrf), albsol(klon), wo(klon, llm), &
+            clwcon(klon, llm), rnebcon(klon, llm), qcondc(klon, llm), &
+            rnebcon0(klon, llm), cape(klon), ibas_con(klon), itop_con(klon), &
+            ratqs(klon, llm), t2m(klon, nbsrf), q2m(klon, nbsrf), &
+            u10m_srf(klon, nbsrf), v10m_srf(klon, nbsrf), airephy(klon), &
+            heat(klon, llm), heat0(klon, llm), cool(klon, llm), &
+            cool0(klon, llm), topsw(klon), toplw(klon), solsw(klon), &
+            sollw(klon), sollwdown(klon), topsw0(klon), toplw0(klon), &
+            solsw0(klon), sollw0(klon))
 
        ! initialiser
        u10m_srf = 0.
@@ -445,13 +441,7 @@ contains
           CALL cv30_param
        ENDIF
 
-       IF (ok_orodr) THEN
-          rugoro = MAX(1e-5, zstd * zsig / 2)
-          CALL SUGWD(paprs, play)
-       else
-          rugoro = 0.
-       ENDIF
-
+       IF (ok_orodr) CALL SUGWD(paprs, play)
        call ini_histins
        CALL phyredem0(itau_phy + nday * lmt_pas)
        call conf_interface
@@ -514,7 +504,7 @@ contains
 
     CALL pbl_surface(pctsrf, t_seri, q_seri, u_seri, v_seri, julien, mu0, &
          ftsol, cdmmax, cdhmax, ftsoil, qsol, paprs, play, fsnow, fqsurf, &
-         falbe, fluxlat, rain_fall, snow_fall, frugs, agesno, rugoro, d_t_vdf, &
+         falbe, fluxlat, rain_fall, snow_fall, frugs, agesno, d_t_vdf, &
          d_q_vdf, d_u_vdf, d_v_vdf, flux_t, flux_q, flux_u, flux_v, cdragh, &
          cdragm, coefh, t2m, q2m, u10m_srf, v10m_srf, fqcalving, ffonte, &
          run_off_lic_0, albsol, sollw, solsw, tsol, dlw)

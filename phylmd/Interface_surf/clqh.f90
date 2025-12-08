@@ -4,10 +4,10 @@ module clqh_m
 
 contains
 
-  SUBROUTINE clqh(julien, nisrf, knindex, tsoil, qsol, mu0, rugos, rugoro, &
-       u1lay, v1lay, coefh, cdragh, t, q, ts, paprs, pplay, delp, radsol, &
-       albedo, snow, qsurf, rain_fall, snow_fall, fluxlat, pctsrf_new_sic, &
-       agesno, d_t, d_q, tsurf_new, z0_new, flux_t, flux_q, dflux_t, dflux_q, &
+  SUBROUTINE clqh(julien, nisrf, knindex, tsoil, qsol, mu0, rugos, u1lay, &
+       v1lay, coefh, cdragh, t, q, ts, paprs, pplay, delp, radsol, albedo, &
+       snow, qsurf, rain_fall, snow_fall, fluxlat, pctsrf_new_sic, agesno, &
+       d_t, d_q, tsurf_new, z0_new, flux_t, flux_q, dflux_t, dflux_q, &
        fqcalving, ffonte, run_off_lic_0, run_off_lic)
 
     ! Authors: Z. X. Li (LMD/CNRS), Laurent Fairhead
@@ -42,7 +42,6 @@ contains
 
     real, intent(in):: mu0(:) ! (knon) cosinus de l'angle solaire zenithal
     real, intent(in):: rugos(:) ! (knon) rugosite
-    REAL, intent(in):: rugoro(:) ! (knon) longueur de rugosit\'e orographique
 
     REAL, intent(in):: u1lay(:), v1lay(:) ! (knon)
     ! vitesse de la 1ere couche (m / s)
@@ -170,8 +169,6 @@ contains
        ! add the albedo of snow:
        call interfsur_lim(julien, knindex, albedo, z0_new)
        albedo = alb_neig * zfra + albedo * (1. - zfra)
-
-       z0_new = sqrt(z0_new**2 + rugoro**2)
     case (is_oce)
        ! Surface oc\'ean, appel \`a l'interface avec l'oc\'ean
 
@@ -184,7 +181,7 @@ contains
             beta = [(1., i = 1, knon)], dif_grnd = 0.)
        agesno = 0.
        albedo = alboc_cd(mu0) * fmagic
-       z0_new = sqrt(rugos**2 + rugoro**2)
+       z0_new = rugos
        fqcalving = 0.
     case (is_sic)
        ! Surface glace de mer
@@ -214,7 +211,7 @@ contains
        zfra = snow / (snow + 10.)
        albedo = alb_neig * zfra + 0.6 * (1. - zfra)
 
-       z0_new = SQRT(0.002**2 + rugoro**2)
+       z0_new = 0.002
     case (is_lic)
        ! Surface "glaciers continentaux" appel \`a l'interface avec le sol
        CALL soil(is_lic, snow, ts, tsoil, soilcap, soilflux)
@@ -225,7 +222,7 @@ contains
        call fonte_neige(is_lic, rain_fall, snow_fall, snow, qsol, tsurf_new, &
             - flux_q, fqcalving, ffonte, run_off_lic_0, run_off_lic)
        albedo = 0.77
-       z0_new = rugoro
+       z0_new = 0.
     case default
        print *, 'Index of surface = ', nisrf
        call abort_gcm("clqh", 'Index surface non valable')
