@@ -478,6 +478,7 @@ contains
     forall (k = 1: llm) zmasse(:, k) = (paprs(:, k) - paprs(:, k + 1)) / rg
 
     ! \'Evaporation de l'eau liquide nuageuse :
+
     DO k = 1, llm
        DO i = 1, klon
           zb = MAX(0., ql_seri(i, k))
@@ -486,10 +487,10 @@ contains
           q_seri(i, k) = q_seri(i, k) + zb
        ENDDO
     ENDDO
+
     ql_seri = 0.
 
     frugs = MAX(frugs, 0.000015)
-
     call_rad_transfer = MOD(itap - 1, radpas) == 0
 
     if (call_rad_transfer) then
