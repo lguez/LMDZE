@@ -95,7 +95,9 @@ contains
     REAL, intent(out):: d_t(:, :) ! (knon, klev) variation of air temperature t
     REAL, intent(out):: d_q(:, :) ! (knon, klev) variation of q
     REAL, intent(out):: tsurf_new(:) ! (knon) new surface temperature, in K
-    real, intent(out):: z0_new(:) ! (knon) surface roughness
+
+    real, intent(out):: z0_new(:) ! (knon)
+    ! surface roughness, not defined if nisrf == is_oce
 
     REAL, intent(out):: flux_t(:) ! (knon)
     ! downward flux of sensible heat at the surface (c_p T), in W m-2
@@ -181,7 +183,6 @@ contains
             beta = [(1., i = 1, knon)], dif_grnd = 0.)
        agesno = 0.
        albedo = alboc_cd(mu0) * fmagic
-       z0_new = rugos
        fqcalving = 0.
     case (is_sic)
        ! Surface glace de mer
