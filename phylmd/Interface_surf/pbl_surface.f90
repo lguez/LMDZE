@@ -358,10 +358,9 @@ contains
                ypplay(:knon, :), ydelp(:knon, :), y_d_v(:knon, :), &
                y_flux_v(:knon))
           CALL clqh(julien, nisrf, ni(:knon), ytsoil(:knon, :), yqsol(:knon), &
-               mu0(ni(:knon)), yrugos(:knon), yu(:knon, 1), yv(:knon, 1), &
-               ycoefh(:knon, :), ycdragh(:knon), yt(:knon, :), yq(:knon, :), &
-               yts(:knon), ypaprs(:knon, :), ypplay(:knon, :), &
-               ydelp(:knon, :), &
+               mu0(ni(:knon)), yu(:knon, 1), yv(:knon, 1), ycoefh(:knon, :), &
+               ycdragh(:knon), yt(:knon, :), yq(:knon, :), yts(:knon), &
+               ypaprs(:knon, :), ypplay(:knon, :), ydelp(:knon, :), &
                fsolsw(ni(:knon), nisrf) + fsollw(ni(:knon), nisrf), &
                yalbedo(:knon), snow(:knon), yqsurf(:knon), yrain_fall(:knon), &
                ysnow_fall(:knon), yfluxlat(:knon), pctsrf_new_sic(ni(:knon)), &

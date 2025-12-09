@@ -4,11 +4,11 @@ module clqh_m
 
 contains
 
-  SUBROUTINE clqh(julien, nisrf, knindex, tsoil, qsol, mu0, rugos, u1lay, &
-       v1lay, coefh, cdragh, t, q, ts, paprs, pplay, delp, radsol, albedo, &
-       snow, qsurf, rain_fall, snow_fall, fluxlat, pctsrf_new_sic, agesno, &
-       d_t, d_q, tsurf_new, z0_new, flux_t, flux_q, dflux_t, dflux_q, &
-       fqcalving, ffonte, run_off_lic_0, run_off_lic)
+  SUBROUTINE clqh(julien, nisrf, knindex, tsoil, qsol, mu0, u1lay, v1lay, &
+       coefh, cdragh, t, q, ts, paprs, pplay, delp, radsol, albedo, snow, &
+       qsurf, rain_fall, snow_fall, fluxlat, pctsrf_new_sic, agesno, d_t, &
+       d_q, tsurf_new, z0_new, flux_t, flux_q, dflux_t, dflux_q, fqcalving, &
+       ffonte, run_off_lic_0, run_off_lic)
 
     ! Authors: Z. X. Li (LMD/CNRS), Laurent Fairhead
     ! Dates: 1993 Aug. 18th, February 2000
@@ -41,7 +41,6 @@ contains
     ! column-density of water in soil, in kg m-2
 
     real, intent(in):: mu0(:) ! (knon) cosinus de l'angle solaire zenithal
-    real, intent(in):: rugos(:) ! (knon) rugosite
 
     REAL, intent(in):: u1lay(:), v1lay(:) ! (knon)
     ! vitesse de la 1ere couche (m / s)
