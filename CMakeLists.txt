@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.16)
+cmake_minimum_required(VERSION 3.17)
 list(APPEND CMAKE_MESSAGE_CONTEXT LMDZE)
 project(LMDZE VERSION 0.16 LANGUAGES Fortran CXX)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
